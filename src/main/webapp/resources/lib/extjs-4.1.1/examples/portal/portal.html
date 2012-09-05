@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Portal Layout Sample</title>
+
+    <link rel="stylesheet" type="text/css" href="../../resources/css/ext-all.css" />
+    <link rel="stylesheet" type="text/css" href="portal.css" />
+
+    <!-- GC -->
+
+
+    <script type="text/javascript" src="../../ext.js"></script>
+    <script type="text/javascript" src="all-classes.js"></script>
+
+    <!-- shared example code -->
+    <script type="text/javascript" src="../shared/examples.js"></script>
+
+    <!-- portal classes --><!--
+    <script type="text/javascript" src="classes/Portlet.js"></script>
+    <script type="text/javascript" src="classes/PortalColumn.js"></script>
+    <script type="text/javascript" src="classes/PortalPanel.js"></script>
+    <script type="text/javascript" src="classes/PortalDropZone.js"></script>
+
+     example portlets
+    <script type="text/javascript" src="classes/GridPortlet.js"></script>
+    <script type="text/javascript" src="classes/ChartPortlet.js"></script>
+
+     app
+    -->
+    <script type="text/javascript" src="portal.js"></script>
+    <script type="text/javascript">
+        Ext.Loader.setPath('Ext.app', 'classes');
+
+        Ext.require([
+            //'Ext.diag.layout.ContextItem.*',
+            //'Ext.diag.layout.Context.*',
+
+            'Ext.layout.container.*',
+            'Ext.resizer.Splitter',
+            'Ext.fx.target.Element',
+            'Ext.fx.target.Component',
+            'Ext.window.Window',
+            'Ext.app.Portlet',
+            'Ext.app.PortalColumn',
+            'Ext.app.PortalPanel',
+            'Ext.app.Portlet',
+            'Ext.app.PortalDropZone',
+            'Ext.app.GridPortlet',
+            'Ext.app.ChartPortlet'
+        ]);
+
+        Ext.onReady(function(){
+            Ext.create('Ext.app.Portal');
+        });
+    </script>
+</head>
+<body>
+    <span id="app-msg" style="display:none;"></span>
+</body>
+</html>
