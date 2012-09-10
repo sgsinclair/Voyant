@@ -1,6 +1,6 @@
 Ext.define('Voyant.view.document.Grid', {
 	extend: 'Ext.grid.Panel',
-	alias: 'widget.documentgrid',
+	alias: 'widget.documentGrid',
 	store: 'Documents',
 	
 	title: 'Documents Grid',

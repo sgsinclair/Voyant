@@ -2,7 +2,7 @@
 
 
 String skin = request.getParameter("skin");
-if (skin==null) skin = "simple";
+if (skin==null) skin = "notebook";
 
 %>
 <%= skin %>

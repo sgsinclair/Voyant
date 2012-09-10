@@ -12,15 +12,26 @@ Ext.onReady(function() {
 		appFolder: 'resources/app',
 		
 		models: ['Corpus', 'Document'],
-		stores: ['Corpus', 'Documents'],
+		stores: ['Corpus', 'Documents', 'DocumentTypes'],
 		
-		requires: 'Voyant.view.document.Grid',
+		controllers: ['document.Grid', 'documentTypes.Grid'],
+		
+		requires: [
+			'Voyant.view.document.Grid',
+			'Voyant.view.documentTypes.Grid'
+		],
 		
 		launch: function() {
 			Ext.create('Ext.container.Viewport', {
-				items: {
-					xtype: 'documentgrid'
-				}
+				layout: 'border',
+				items: [{
+					region: 'center',
+					xtype: 'documentGrid'
+				},{
+					region: 'east',
+					xtype: 'documentTypesGrid',
+					split: true
+				}]
 			});
 		}
 	});

@@ -54,7 +54,7 @@ public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
 
 
 String skin = request.getParameter("skin");
-if (skin==null) skin = "simple";
+if (skin==null) skin = "notebook";
 
 
       out.write('\r');

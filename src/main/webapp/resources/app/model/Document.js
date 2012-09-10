@@ -32,5 +32,6 @@ Ext.define('Voyant.model.Document', {
         	return val < 1 ? 0 : (record['@totalWordTypes']/val)*1000;
         }}
 	],
-	belongsTo: 'Corpus'
+	belongsTo: 'Corpus',
+	hasMany: {model: 'DocumentType', name: 'documentTypes'}
 });
