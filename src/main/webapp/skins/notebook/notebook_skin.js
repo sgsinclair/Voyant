@@ -14,13 +14,13 @@ Ext.onReady(function() {
 		models: ['Corpus', 'Document'],
 		stores: ['Corpus', 'Documents', 'DocumentTypes'],
 		controllers: [
-		    'Voyant.tools.DocumentGrid.Controller',
-		    'Voyant.tools.DocumentTypesGrid.Controller'
+		    'Voyant.tools.CorpusGrid.Controller',
+		    'Voyant.tools.DocumentTypeFrequenciesGrid.Controller'
 		],
 		// temp fix since views config is broken in 4.1.1
 		requires: [
-		    'Voyant.tools.DocumentGrid.View',
-		    'Voyant.tools.DocumentTypesGrid.View'
+		    'Voyant.tools.CorpusGrid.View',
+		    'Voyant.tools.DocumentTypeFrequenciesGrid.View'
 		],
 		
 		launch: function() {
@@ -28,10 +28,10 @@ Ext.onReady(function() {
 				layout: 'border',
 				items: [{
 					region: 'center',
-					xtype: 'documentGrid'
+					xtype: 'corpusGrid'
 				},{
 					region: 'east',
-					xtype: 'documentTypesGrid',
+					xtype: 'documentTypeFrequenciesGrid',
 					split: true
 				}]
 			});
