@@ -1,0 +1,17 @@
+#################
+## Eclipse
+#################
+
+.project
+.metadata
+bin/
+tmp/
+work/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.tomcatplugin
+.settings/
