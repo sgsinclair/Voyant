@@ -1,4 +1,4 @@
-Ext.define('Voyant.controller.documentTypes.Grid', {
+Ext.define('Voyant.tools.DocumentTypeFrequenciesGrid.Controller', {
 	extend: 'Ext.app.Controller',
 	init: function(app) {
 		this.application.on({
@@ -7,7 +7,7 @@ Ext.define('Voyant.controller.documentTypes.Grid', {
 		});
 		
 		this.control({
-			'documentTypesGrid': {
+			'documentTypeFrequenciesGrid': {
 				selectionchange: this.onSelectionChange
 			}
 		});

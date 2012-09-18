@@ -1,9 +1,9 @@
-Ext.define('Voyant.view.document.Grid', {
+Ext.define('Voyant.tools.CorpusGrid.View', {
 	extend: 'Ext.grid.Panel',
-	alias: 'widget.documentGrid',
+	alias: 'widget.corpusGrid',
 	store: 'Documents',
 	
-	title: 'Documents Grid',
+	title: 'Corpus',
 	columns: [
 	    {header: 'Title', dataIndex: 'shortTitle'},
 	    {header: 'Total Words', dataIndex: 'totalTokens'}

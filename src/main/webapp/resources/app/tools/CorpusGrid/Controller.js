@@ -1,8 +1,8 @@
-Ext.define('Voyant.controller.document.Grid', {
+Ext.define('Voyant.tools.CorpusGrid.Controller', {
 	extend: 'Ext.app.Controller',
 	init: function(app) {
 		this.control({
-			'documentGrid': {
+			'corpusGrid': {
 				selectionchange: this.onSelectionChange
 			}
 		});

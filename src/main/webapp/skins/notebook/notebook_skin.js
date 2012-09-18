@@ -13,12 +13,14 @@ Ext.onReady(function() {
 		
 		models: ['Corpus', 'Document'],
 		stores: ['Corpus', 'Documents', 'DocumentTypes'],
-		
-		controllers: ['document.Grid', 'documentTypes.Grid'],
-		
+		controllers: [
+		    'Voyant.tools.DocumentGrid.Controller',
+		    'Voyant.tools.DocumentTypesGrid.Controller'
+		],
+		// temp fix since views config is broken in 4.1.1
 		requires: [
-			'Voyant.view.document.Grid',
-			'Voyant.view.documentTypes.Grid'
+		    'Voyant.tools.DocumentGrid.View',
+		    'Voyant.tools.DocumentTypesGrid.View'
 		],
 		
 		launch: function() {

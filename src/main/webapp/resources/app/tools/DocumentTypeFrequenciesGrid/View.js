@@ -1,9 +1,9 @@
-Ext.define('Voyant.view.documentTypes.Grid', {
+Ext.define('Voyant.tools.DocumentTypeFrequenciesGrid.View', {
 	extend: 'Ext.grid.Panel',
-	alias: 'widget.documentTypesGrid',
+	alias: 'widget.documentTypeFrequenciesGrid',
 	store: 'DocumentTypes',
 	
-	title: 'Document Type Frequencies Grid',
+	title: 'Words in Documents',
 	columns: [
 	    {header: 'Type', dataIndex: 'type'},
 	    {header: 'Count', dataIndex: 'rawFreq'}

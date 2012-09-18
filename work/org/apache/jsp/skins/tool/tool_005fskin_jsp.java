@@ -1,10 +1,10 @@
-package org.apache.jsp.skins.notebook;
+package org.apache.jsp.skins.tool;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.jsp.*;
 
-public final class notebook_005fskin_jsp extends org.apache.jasper.runtime.HttpJspBase
+public final class tool_005fskin_jsp extends org.apache.jasper.runtime.HttpJspBase
     implements org.apache.jasper.runtime.JspSourceDependent {
 
   private static final JspFactory _jspxFactory = JspFactory.getDefaultFactory();
@@ -12,10 +12,9 @@ public final class notebook_005fskin_jsp extends org.apache.jasper.runtime.HttpJ
   private static java.util.List _jspx_dependants;
 
   static {
-    _jspx_dependants = new java.util.ArrayList(3);
-    _jspx_dependants.add("/skins/notebook/../shared/pre_skin_head.jsp");
-    _jspx_dependants.add("/skins/notebook/../shared/assets.jsp");
-    _jspx_dependants.add("/skins/notebook/../shared/post_skin_head.jsp");
+    _jspx_dependants = new java.util.ArrayList(2);
+    _jspx_dependants.add("/skins/tool/../shared/assets.jsp");
+    _jspx_dependants.add("/skins/tool/../shared/post_skin_head.jsp");
   }
 
   private javax.el.ExpressionFactory _el_expressionfactory;
@@ -57,13 +56,12 @@ public final class notebook_005fskin_jsp extends org.apache.jasper.runtime.HttpJ
       out = pageContext.getOut();
       _jspx_out = out;
 
+      out.write('\n');
 
+String[] parts = request.getRequestURI().substring(request.getContextPath().length()+1).split("/");
+if (parts.length<2) {throw new Exception("No tool provided.");}
+String tool = parts[1];
 
-String skin = request.getParameter("skin");
-if (skin==null) skin = "simple";
-
-
-      out.write("\n");
       out.write("\n");
       out.write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
       out.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n");
@@ -86,15 +84,17 @@ if (skin==null) skin = "simple";
       out.write("/resources/lib/extjs-4.1.1/ext-all-debug.js'></script>\n");
       out.write("\n");
       out.write("\n");
+      out.write("\t\t<script type='text/javascript'>\n");
+      out.write("\t\t\tExt.onReady(function() {\n");
+      out.write("\t\t\t\tinitTool('");
+      out.print( tool );
+      out.write("');\n");
+      out.write("\t\t\t});\n");
+      out.write("\t\t</script>\n");
+      out.write("\t\t\n");
       out.write("\t\t<!-- SKIN RESOURCES -->\n");
-      out.write("\t\t<script type='text/javascript' src='");
-      out.print( base );
-      out.write("/skins/");
-      out.print( skin );
-      out.write('/');
-      out.print( skin );
-      out.write("_skin.js'></script>\n");
-      out.write('\n');
+      out.write("\t\t<script type='text/javascript' src='../skins/tool/tool_skin.js'></script>\n");
+      out.write("\n");
       out.write("\t</head>\n");
       out.write("\t<body>\n");
  if (!request.getServerName().equals("localhost")) { 
