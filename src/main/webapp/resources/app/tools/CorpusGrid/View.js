@@ -10,6 +10,11 @@ Ext.define('Voyant.tools.CorpusGrid.View', {
 	],
 	
 	initComponent: function() {
+		// check if global store exists, otherwise use local store
+		var store = Ext.getStore(this.store);
+		if (store == undefined) {
+			this.store = Ext.create('Voyant.store.Documents');
+		}
 		this.callParent();
 	}
 });

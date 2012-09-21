@@ -29,9 +29,6 @@ function initTool(tool) {
 			name: 'Voyant',
 			appFolder: '../resources/app',
 			
-			models: ['Corpus', 'Document'],
-			stores: ['Corpus', 'Documents', 'DocumentTypes'],
-			
 			launch: function() {
 				Ext.create('Ext.container.Viewport', {
 					layout: 'fit',
