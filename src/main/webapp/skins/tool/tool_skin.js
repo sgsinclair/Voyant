@@ -4,7 +4,7 @@ Ext.Loader.setConfig({
 		'Voyant': '../resources/app'
 	}
 });
-Ext.require('Voyant.Application');
+Ext.require(['Voyant.Application', 'Voyant.Tool']);
 
 function initTool(tool) {
 	var path = Ext.Loader.getPath('Voyant.tools.'+tool+'.View');
@@ -28,7 +28,7 @@ function initTool(tool) {
 		Voyant.application = Ext.create('Voyant.Application', {
 			name: 'Voyant',
 			appFolder: '../resources/app',
-			
+
 			launch: function() {
 				Ext.create('Ext.container.Viewport', {
 					layout: 'fit',

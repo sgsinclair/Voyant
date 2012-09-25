@@ -1,5 +1,8 @@
 Ext.define('Voyant.tools.CorpusGrid.View', {
 	extend: 'Ext.grid.Panel',
+	mixins: {
+		voyantTool: 'Voyant.Tool'
+	},
 	alias: 'widget.corpusGrid',
 	store: 'Documents',
 	
@@ -8,6 +11,11 @@ Ext.define('Voyant.tools.CorpusGrid.View', {
 	    {header: 'Title', dataIndex: 'shortTitle'},
 	    {header: 'Total Words', dataIndex: 'totalTokens'}
 	],
+	
+	constructor: function(config) {
+		this.mixins.voyantTool.constructor.call(this);
+		this.callParent([config]);
+	},
 	
 	initComponent: function() {
 		// check if global store exists, otherwise use local store
