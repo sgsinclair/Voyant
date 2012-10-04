@@ -1,0 +1,37 @@
+.code_wrapper, .text_wrapper, .text_contents {
+	width: auto;
+	margin: 5px 10px;
+}
+
+.code_wrapper {
+	height: 100px;
+}
+
+.text_contents {
+	padding: 10px;
+	display: none;
+	border: 1px solid #fff;
+	background-color: #fff;
+}
+
+.text_contents:hover {
+	cursor: pointer;
+	border: 1px dashed #999;
+	background-color: #eee;
+}
+
+.code_result {
+	padding: 10px;
+}
+
+#cajaFrame, #codeFrame {
+	display: none;
+} 
+
+.CodeMirror {
+	border: 1px solid #333;
+}
+
+.CodeMirror-scroll {
+	height: 100px !important;
+}
