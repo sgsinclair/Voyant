@@ -28,7 +28,7 @@ Ext.onReady(function() {
 				items: [{
 					region: 'center',
 					xtype: 'panel',
-					defaultType: 'container',
+					defaultType: 'notebookContainer',
 					autoScroll: true,
 					items: [],
 					tbar: [{
@@ -57,12 +57,27 @@ Ext.onReady(function() {
 //				debug: true
 //			});
 //			
-//			Ext.DomHelper.insertHtml('beforeEnd', document.body, '<div id="cajaFrame"></div>');
+			var iframe = Ext.DomHelper.insertHtml('beforeEnd', document.body, '<iframe id="scriptRunner"></iframe>');
+			Ext.defer(function() {
+				var script = iframe.contentDocument.createElement('script');
+				script.setAttribute('type', 'text/javascript');
+				script.setAttribute('src', 'skins/notebook/utils.js');
+				iframe.contentDocument.head.appendChild(script);
+			}, 150);
 		},
 		
 		runCode: function(button) {
 			var concatCode = '';
 			var divs = Ext.DomQuery.select('div[class="code_wrapper"]');
+			
+//			var evalScope = {};
+			
+			var iframeDoc = Ext.get('scriptRunner').dom.contentDocument;
+			var scripts = Ext.query('script', iframeDoc.body);
+			for (var i = 0; i < scripts.length; i++) {
+				Ext.removeNode(scripts[i]);
+			}
+			
 			for (var i = 0; i < divs.length; i++) {
 				var div = divs[i];
 				var editor = this.codeEditors[div.id];
@@ -70,16 +85,24 @@ Ext.onReady(function() {
 				concatCode += code;
 				var result;
 				try {
-					result = eval(concatCode);
+//					result = eval.call(evalScope, code);
+//					result = (new Function("with(this) {" + code + "}")).call(evalScope);
+//					result = (new Function('console.log(this);'+code))();
+					
+					var script = iframeDoc.createElement('script');
+					script.setAttribute('type', 'text/javascript');
+					script.textContent = code;
+					
+					iframeDoc.body.appendChild(script);
 				} catch (e) {
-					result = e;
+					console.log(e);
 				}
 				var codeResult = Ext.get(div).next('div[class="code_result"]');
-				codeResult.setHTML(result);
+//				codeResult.setHTML(result);
 				
 				Ext.get(editor.getWrapperElement()).on('keydown', function() {
-					codeResult.setHTML('');
-				}, this, {single: true});
+					this.setHTML(' ');
+				}, codeResult, {single: true});
 			}
 		},
 		
@@ -129,7 +152,7 @@ Ext.onReady(function() {
 		addCode: function(button) {
 			var panel = button.up('panel');
 			var newpanel = panel.add({
-				html: '<div class="code_wrapper"></div><div class="code_result"></div>'
+				html: '<div class="code_wrapper"></div><div class="code_result"> </div>'
 			});
 			
 			var codeWrapper = newpanel.getEl().down('div[class="code_wrapper"]');
@@ -144,4 +167,62 @@ Ext.onReady(function() {
 			this.codeEditors[id] = editor;
 		}
 	});
+});
+
+Ext.define('Voyant.NotebookContainer', {
+	extend: 'Ext.container.Container',
+	alias: 'widget.notebookContainer',
+	renderTpl: ['<div class="container-wrapper"><div class="container-icons">',
+	            '<span class="x-tool"><img class="x-tool-up" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></span>',
+	            '<span class="x-tool"><img class="x-tool-down" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></span>',
+	            '<span class="x-tool"><img class="x-tool-close" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></span>',
+	            '</div>',
+	            '<div class="container-content">{%this.renderContainer(out,values)%}</div></div>'],
+	moveUp: function() {
+		var sib = this.prev('notebookContainer');
+		if (sib) {
+			var parent = this.up('panel');
+			var parentItems = parent.items;
+			var toMove = parentItems.removeAtKey(this.id);
+			var newIndex = parentItems.indexOfKey(sib.id);
+			parentItems.insert(newIndex, toMove);
+			parent.doLayout();
+		}
+	},
+	moveDown: function() {
+		var sib = this.next('notebookContainer');
+		if (sib) {
+			var parent = this.up('panel');
+			var parentItems = parent.items;
+			var toMove = parentItems.removeAtKey(this.id);
+			var newIndex = parentItems.indexOfKey(sib.id)+1;
+			parentItems.insert(newIndex, toMove);
+			parent.doLayout();
+		}
+	},
+	remove: function() {
+		this.up('panel').remove(this, true);
+	},
+    listeners: {
+    	boxready: function(c) {
+    		var icons = c.el.down('div[class="container-icons"]');
+    		icons.on('click', function(evt, el, opt) {
+    			var e = Ext.get(el);
+    			if (e.is('img')) {
+    				var cls = e.getAttribute('class');
+    				switch (cls) {
+    					case 'x-tool-up':
+    						c.moveUp();
+    						break;
+    					case 'x-tool-down':
+    						c.moveDown();
+    						break;
+    					case 'x-tool-close':
+    						c.remove();
+    				}
+    			}
+    		}, this);
+    	},
+    	scope: this
+    }
 });

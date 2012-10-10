@@ -1,6 +1,22 @@
+.container-wrapper {
+	display: table;
+}
+
+.container-content {
+	display: table-cell;
+	width: 100%;
+}
+
+.container-icons {
+	display: table-cell;
+	width: 25px;
+	vertical-align: top;
+	padding: 5px;
+}
+
 .code_wrapper, .text_wrapper, .text_contents {
 	width: auto;
-	margin: 5px 10px;
+	margin: 5px;
 }
 
 .code_wrapper {
