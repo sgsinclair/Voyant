@@ -57,6 +57,13 @@ Ext.onReady(function() {
 //				debug: true
 //			});
 //			
+			this.loadIframe();
+		},
+		
+		loadIframe: function() {
+			var oldFrame = Ext.get('scriptRunner');
+			if (oldFrame) oldFrame.remove();
+			
 			var iframe = Ext.DomHelper.insertHtml('beforeEnd', document.body, '<iframe id="scriptRunner"></iframe>');
 			Ext.defer(function() {
 				var script = iframe.contentDocument.createElement('script');
@@ -67,6 +74,11 @@ Ext.onReady(function() {
 		},
 		
 		runCode: function(button) {
+			var r = Ext.query('div[class="code_result"]');
+			for (var i = 0; i < r.length; i++) {
+				Ext.get(r).setHTML(' ');
+			}
+			
 			var concatCode = '';
 			var divs = Ext.DomQuery.select('div[class="code_wrapper"]');
 			
@@ -83,19 +95,19 @@ Ext.onReady(function() {
 				var editor = this.codeEditors[div.id];
 				var code = editor.getValue();
 				concatCode += code;
-				var result;
 				try {
 //					result = eval.call(evalScope, code);
 //					result = (new Function("with(this) {" + code + "}")).call(evalScope);
-//					result = (new Function('console.log(this);'+code))();
+//					result = (new Function(code))();
 					
 					var script = iframeDoc.createElement('script');
 					script.setAttribute('type', 'text/javascript');
+					script.setAttribute('onerror', 'handleError');
 					script.textContent = code;
 					
 					iframeDoc.body.appendChild(script);
 				} catch (e) {
-					console.log(e);
+					alert(e);
 				}
 				var codeResult = Ext.get(div).next('div[class="code_result"]');
 //				codeResult.setHTML(result);
@@ -104,6 +116,8 @@ Ext.onReady(function() {
 					this.setHTML(' ');
 				}, codeResult, {single: true});
 			}
+			
+			this.loadIframe();
 		},
 		
 		removeInactiveEditors: function() {
