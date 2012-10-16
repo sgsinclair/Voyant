@@ -1,4 +1,5 @@
 Ext.Loader.setConfig({
+//	disableCaching: false,
 	enabled: true,
 	paths: {
 		'Voyant': 'resources/app'
@@ -35,12 +36,16 @@ Ext.onReady(function() {
 					tbar: [{
 						xtype: 'button',
 						text: 'Add Text',
-						handler: this.addText,
+						handler: function() {
+							this.addText();
+						},
 						scope: this
 					},{
 						xtype: 'button',
 						text: 'Add Code',
-						handler: this.addCode,
+						handler: function() {
+							this.addCode();
+						},
 						scope: this
 					},'->',{
 						xtype: 'button',
@@ -53,12 +58,28 @@ Ext.onReady(function() {
 			
 			CKEDITOR.on('currentInstance', Ext.bind(this.removeInactiveEditors, this));
 			
-//			caja.initialize({
-//				cajaServer: 'https://caja.appspot.com/',
-//				debug: true
-//			});
-//			
 			this.loadIframe();
+			
+			var params = Ext.Object.fromQueryString(window.location.search);
+			if (params.example) {
+				Ext.Ajax.request({
+					url: this.getBaseUrl()+'skins/notebook/examples/'+params.example+'.js',
+					success: Ext.bind(function(response) {
+						var contents = Ext.decode(response.responseText);
+						for (var i = 0; i < contents.length; i++) {
+							var text = contents[i];
+							if (text.type == 'text') {
+								this.addText(text.content, false);
+							} else if (text.type == 'code') {
+								this.addCode(text.content);
+							}
+						}
+					}, this),
+					failure: function(response) {
+						alert('Error loading example.');
+					}
+				});
+			}
 		},
 		
 		loadIframe: function() {
@@ -124,6 +145,7 @@ Ext.onReady(function() {
 		removeInactiveEditors: function() {
 			for (var key in CKEDITOR.instances) {
 				var editor = CKEDITOR.instances[key];
+				console.log(editor.element.$);
 				if (!editor.focusManager.hasFocus) {
 					var html = editor.getData();
 					if (html == '') html = this.emptyText;
@@ -136,19 +158,25 @@ Ext.onReady(function() {
 			}
 		},
 		
-		addText: function(button) {
-			var panel = button.up('panel');
+		addText: function(content, initEditor) {
+			content = content || '';
+			var panel = Ext.ComponentQuery.query('panel[region=center]')[0];
 			var newpanel = panel.add({
-				html: '<div class="text_wrapper"></div><div class="text_contents"></div>'
+				html: '<div class="text_wrapper"></div><div class="text_contents">'+content+'</div>'
 			});
 			
 			var editorWrapper = newpanel.getEl().down('div[class="text_wrapper"]');
 			var contentsWrapper = editorWrapper.next('div[class="text_contents"]');
 			
-			var editor = CKEDITOR.appendTo(editorWrapper.dom, this.ckConfig);
-			editor.on('instanceReady', function() {
-				Ext.defer(this.focus, 50, this);
-			});
+			if (initEditor !== false) {
+				var editor = CKEDITOR.appendTo(editorWrapper.dom, this.ckConfig);
+				editor.on('instanceReady', function() {
+					if (content != null) {
+						editor.setData(content);
+					}
+					Ext.defer(this.focus, 50, this);
+				});
+			}
 
 			contentsWrapper.on('click', function(evt, e, obj) {
 				evt.stopPropagation();
@@ -164,8 +192,9 @@ Ext.onReady(function() {
 			}, this); 
 		},
 		
-		addCode: function(button) {
-			var panel = button.up('panel');
+		addCode: function(content) {
+			content = content || '';
+			var panel = Ext.ComponentQuery.query('panel[region=center]')[0];
 			var newpanel = panel.add({
 				html: '<div class="code_wrapper"></div><div class="code_result"> </div>'
 			});
@@ -173,7 +202,7 @@ Ext.onReady(function() {
 			var codeWrapper = newpanel.getEl().down('div[class="code_wrapper"]');
 			
 			var editor = CodeMirror(codeWrapper.dom, {
-				value: '',
+				value: content,
 				mode: 'javascript',
 				lineNumbers: true,
 				matchBrackets: true 
