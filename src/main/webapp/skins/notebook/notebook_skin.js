@@ -6,7 +6,7 @@ Ext.Loader.setConfig({
 	}
 });
 Ext.require('Voyant.Application');
-Ext.require('Voyant.model.Table');
+Ext.require('Voyant.data.Table');
 
 Ext.onReady(function() {
 	Voyant.application = Ext.create('Voyant.Application', {

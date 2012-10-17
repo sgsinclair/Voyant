@@ -1,4 +1,5 @@
-Ext.define('Voyant.model.Table', {
+Ext.define('Voyant.data.Table', {
+	alias: ['Table'],
 	constructor: function(rows, headers) {
 		this.headers = headers ? headers : [];
 		this.rows = [];
@@ -91,7 +92,7 @@ Ext.define('Voyant.model.Table', {
 		for (var item in counts) {
 			
 			// initialize array with zeros
-			var b[] = [];
+			var b = [];
 			for (var i=0, len=bins; i<len; i++) {b[i]=0;}
 			
 			// calculate bins
@@ -102,26 +103,45 @@ Ext.define('Voyant.model.Table', {
 			// add a row
 			rows.push([item, counts[item][0], counts[item][0] / this.rows.length, b])
 		}
-		return new Voyant.model.Table(rows, ['item','raw','relative','bins'])
+		return new Voyant.data.Table(rows, ['item','raw','relative','bins'])
+	}
+	
+	,toHtmlTable : function() {
+		var html = '<table><thead><tr>';
+		for (var i=0, len=this.headers.length; i<len; i++) {
+			html += '<td>' + this.headers[i] + '</td>';
+		}
+		html += '</tr></thead><tbody>';
+		for (var i=0, ilen=this.rows.length; i<ilen; i++) {
+			html += '<tr>';
+			for (var j=0, jlen=this.rows[i].length; j<jlen; j++) {
+				html += '<td>' + this.rows[i][j] + '</td>';
+			}
+			html += '</tr>';
+		}
+		html += '</tbody></html>';
+		return html;
 	}
 	
 	,statics : {
 		getFrequenciesTable : function(source, config) {
 
 			// treat source as a header
-			if (Voyant.model.Table.prototype.isPrototypeOf(source)) {
+			if (Voyant.data.Table.prototype.isPrototypeOf(source)) {
 				return source.getFrequenciesTable(config);
 			}
 			
 			// treat source as array
 			if (Ext.isArray(source)) {
-				var table = new Voyant.model.Table(source);
+				var table = new Voyant.data.Table(source);
 				return table.getFrequenciesTable(config);
 			}
 
 			Ext.log("Unable to find any data to count: "+source);
-			return new Voyant.model.Table().getFrequenciesTable()
+			return new Voyant.data.Table().getFrequenciesTable()
 		}
 	}
 	
 });
+
+
