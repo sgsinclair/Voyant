@@ -90,7 +90,13 @@ Ext.onReady(function() {
 			Ext.defer(function() {
 				var script = iframe.contentDocument.createElement('script');
 				script.setAttribute('type', 'text/javascript');
-				script.setAttribute('src', 'skins/notebook/utils.js');
+				script.setAttribute('src', 'resources/lib/extjs-4.1.1/ext-all.js');
+				script.onload = function() {
+					var script = iframe.contentDocument.createElement('script');
+					script.setAttribute('type', 'text/javascript');
+					script.setAttribute('src', 'skins/notebook/utils.js');
+					iframe.contentDocument.head.appendChild(script);
+				};
 				iframe.contentDocument.head.appendChild(script);
 			}, 150);
 		},

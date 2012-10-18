@@ -1,3 +1,11 @@
+Ext.Loader.setConfig({
+	enabled: true,
+	paths: {
+		'Voyant': 'resources/app'
+	}
+});
+Ext.require('Voyant.data.Table');
+
 function handleError(msg, url, linenumber) {
 	var scriptCount = this.document.body.getElementsByTagName('script').length;
 	var results = window.parent.document.querySelectorAll('div.code_result');
