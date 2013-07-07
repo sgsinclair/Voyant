@@ -1,5 +1,9 @@
-		<% String base = request.getContextPath(); %>
+<% String base = request.getContextPath(); %>
 
-		<!-- EXTJS -->
-		<link href='<%= base %>/resources/lib/extjs-4.1.1/resources/css/ext-all.css' type='text/css' rel='stylesheet' />
-		<script type='text/javascript' src='<%= base %>/resources/lib/extjs-4.1.1/ext-all-debug.js'></script>
+<!-- EXTJS -->
+<link href='<%= base %>/resources/lib/extjs/current/resources/css/ext-all-neptune.css' type='text/css' rel='stylesheet' />
+<script type='text/javascript' src='<%= base %>/resources/lib/extjs/current/ext-all.js'></script>
+<script type='text/javascript' src='<%= base %>/resources/lib/extjs/current/ext-theme-nepture.js'></script>
+
+<!-- JQUERY -->
+<script type='text/javascript' src='<%= base %>/resources/lib/jquery/current.min.js'></script>

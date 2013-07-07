@@ -3,5 +3,6 @@
 <script type="text/javascript" src="<%= base %>/resources/lib/codemirror/codemirror.js"></script>
 <script type="text/javascript" src="<%= base %>/resources/lib/codemirror/javascript.js"></script>
 <link rel="stylesheet" href="<%= base %>/resources/lib/codemirror/codemirror.css"/>
-<script type="text/javascript" src="<%= base %>/resources/lib/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/lib/ckeditor/current/ckeditor.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/lib/ace/current/ace.js"></script>
 <%@ include file="../shared/post_skin_head.jsp" %>

@@ -1,3 +1,6 @@
+var Voyant = {};
+Voyant.TROMBONE_URL = "http://localhost:8080/voyant/trombone"
+
 Ext.Loader.setConfig({
 //	disableCaching: false,
 	enabled: true,
@@ -6,7 +9,10 @@ Ext.Loader.setConfig({
 	}
 });
 Ext.require('Voyant.Application');
-Ext.require('Voyant.data.Table');
+Ext.require('Voyant.utils.Show');
+Ext.require('Voyant.utils.DeferredManager');
+
+//Ext.require('Voyant.data.Table');
 
 Ext.onReady(function() {
 	Voyant.application = Ext.create('Voyant.Application', {
@@ -16,7 +22,15 @@ Ext.onReady(function() {
 		
 		// notebook specific properties
 		ckConfig: {
-			toolbar: 'Basic',
+			toolbar:  [
+			    	{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', '-', 'RemoveFormat' ] },
+			    	{ name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', 'Blockquote' ] },
+			    	{ name: 'styles', items: [ 'Styles', 'Format' ] },
+			    	{ name: 'links', items: [ 'Link', 'Unlink'] },
+			    	{ name: 'insert', items: [ 'Image', 'Table' ] },
+//			    	{ name: 'tools', items: [ 'Maximize' ] },
+			    	{ name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source' ] },
+			    ], //'Basic',
 			height: 150,
 			resize_enabled: false,
 			toolbarCanCollapse: false
@@ -29,36 +43,27 @@ Ext.onReady(function() {
 				layout: 'border',
 				items: [{
 					region: 'center',
+					header: {
+						title: 'Voyant Notebooks'
+					},
 					xtype: 'panel',
+					id: 'main-notebook-body',
 					defaultType: 'notebookContainer',
 					autoScroll: true,
+					border: false,
+					tools: [{type: 'right'},{type: 'help'}],
 					items: [],
-					tbar: [{
-						xtype: 'button',
-						text: 'Add Text',
-						handler: function() {
-							this.addText();
-						},
-						scope: this
-					},{
-						xtype: 'button',
-						text: 'Add Code',
-						handler: function() {
-							this.addCode();
-						},
-						scope: this
-					},'->',{
-						xtype: 'button',
-						text: 'Run Code',
-						handler: this.runCode,
-						scope: this
-					}]
+				}, {
+					region: 'south',
+					xtype: 'container',
+					id: 'notebook-footer',
+					html: 'Voyant Notebooks, Stéfan Sinclair & Geoffrey Rockwell (©2013)'
 				}]
 			});
 			
 			CKEDITOR.on('currentInstance', Ext.bind(this.removeInactiveEditors, this));
 			
-			this.loadIframe();
+//			this.loadIframe();
 			
 			var params = Ext.Object.fromQueryString(window.location.search);
 			if (params.example) {
@@ -69,9 +74,9 @@ Ext.onReady(function() {
 						for (var i = 0; i < contents.length; i++) {
 							var text = contents[i];
 							if (text.type == 'text') {
-								this.addText(text.content, false);
+								this.addText(i, text.content, false);
 							} else if (text.type == 'code') {
-								this.addCode(text.content);
+								this.addCode(i, text.content);
 							}
 						}
 					}, this),
@@ -80,78 +85,85 @@ Ext.onReady(function() {
 					}
 				});
 			}
-		},
-		
-		loadIframe: function() {
-			var oldFrame = Ext.get('scriptRunner');
-			if (oldFrame) oldFrame.remove();
-			
-			var iframe = Ext.DomHelper.insertHtml('beforeEnd', document.body, '<iframe id="scriptRunner"></iframe>');
-			Ext.defer(function() {
-				var script = iframe.contentDocument.createElement('script');
-				script.setAttribute('type', 'text/javascript');
-				script.setAttribute('src', 'resources/lib/extjs-4.1.1/ext-all.js');
-				script.onload = function() {
-					var script = iframe.contentDocument.createElement('script');
-					script.setAttribute('type', 'text/javascript');
-					script.setAttribute('src', 'skins/notebook/utils.js');
-					iframe.contentDocument.head.appendChild(script);
-				};
-				iframe.contentDocument.head.appendChild(script);
-			}, 150);
-		},
-		
-		runCode: function(button) {
-			var r = Ext.query('div[class="code_result"]');
-			for (var i = 0; i < r.length; i++) {
-				Ext.get(r).setHTML(' ');
-			}
-			
-			var concatCode = '';
-			var divs = Ext.DomQuery.select('div[class="code_wrapper"]');
-			
-//			var evalScope = {};
-			
-			var iframeDoc = Ext.get('scriptRunner').dom.contentDocument;
-			var scripts = Ext.query('script', iframeDoc.body);
-			for (var i = 0; i < scripts.length; i++) {
-				Ext.removeNode(scripts[i]);
-			}
-			
-			for (var i = 0; i < divs.length; i++) {
-				var div = divs[i];
-				var editor = this.codeEditors[div.id];
-				var code = editor.getValue();
-				concatCode += code;
-				try {
-//					result = eval.call(evalScope, code);
-//					result = (new Function("with(this) {" + code + "}")).call(evalScope);
-//					result = (new Function(code))();
-					
-					var script = iframeDoc.createElement('script');
-					script.setAttribute('type', 'text/javascript');
-					script.setAttribute('onerror', 'handleError');
-					script.textContent = code;
-					
-					iframeDoc.body.appendChild(script);
-				} catch (e) {
-					alert(e);
+			else {
+				if (params.inline) {
+					if (params.inline.indexOf("[")==0) {
+						var json = Ext.decode(params.inline);
+						this.createFromJson(json);
+					}
+					else {
+						this.addCode(0, params.inline)
+					}					
 				}
-				var codeResult = Ext.get(div).next('div[class="code_result"]');
-//				codeResult.setHTML(result);
-				
-				Ext.get(editor.getWrapperElement()).on('keydown', function() {
-					this.setHTML(' ');
-				}, codeResult, {single: true});
+				else {
+					this.addText(0, "<h1 style='text-align: center; font-size: larger;'>My Voyant Notebook Title (click to edit)</h1>", false)
+					this.addText(1, "<h2>Introduction</h2><p>(click to edit)</p>", false)
+					this.addCode(2, 'new String("Hello World!").show(); // click to edit and press > to run');
+				}
+			}
+			Ext.defer(this.runAllCode, 200, this);
+		},
+		
+		createFromJson: function(json) {
+			for (var i = 0; i < json.length; i++) {
+				var text = json[i];
+				if (text.type == 'text') {
+					this.addText(i, text.content, false);
+				} else if (text.type == 'code') {
+					this.addCode(i, text.content);
+				}
+			}
+		},
+
+		runCode: function(container) {
+			// clear contents
+			var results = container.el.down("div[class~=code_result]");
+			results.show();
+			results.setHTML(' ');
+			results.mask();
+			
+			var editorContainer = container.el.down("div[class~=code_wrapper]");
+			var editor = this.codeEditors[editorContainer.id];
+			var code = editor.getValue();
+			try {
+				window.Voyant.utils.Show.TARGET = results;
+				eval.call(window, code);
+			}
+			catch (e) {
+				var mode = window.Voyant.utils.Show.MODE;
+				window.Voyant.utils.Show.MODE = 'error';
+				show(e.toString())
+				window.Voyant.utils.Show.MODE = mode;
+			}
+			results.unmask();
+
+		},
+		runAllCode: function() {
+			Ext.query('div[class~=code_result]').forEach(function(container) {
+				Ext.get(container).show().mask('working');
+			})
+			var containers = Ext.query('div[class~=notebook-code-container]');
+			this.tryRunningNextContainer(containers)
+		},
+		
+		tryRunningNextContainer: function(containers) {
+			if (containers.length>0) {
+				console.warn(containers.length,Voyant.utils.deferredManager.getCount())
+				if (Voyant.utils.deferredManager.getCount()>0) {
+					Ext.defer(this.tryRunningNextContainer, 100, this, [containers])
+				}
+				else {
+					var container = containers.shift();
+					this.runCode(Ext.get(container));
+					this.tryRunningNextContainer(containers);
+				}
 			}
 			
-			this.loadIframe();
 		},
 		
 		removeInactiveEditors: function() {
 			for (var key in CKEDITOR.instances) {
 				var editor = CKEDITOR.instances[key];
-				console.log(editor.element.$);
 				if (!editor.focusManager.hasFocus) {
 					var html = editor.getData();
 					if (html == '') html = this.emptyText;
@@ -164,10 +176,12 @@ Ext.onReady(function() {
 			}
 		},
 		
-		addText: function(content, initEditor) {
+		addText: function(position, content, initEditor) {
 			content = content || '';
 			var panel = Ext.ComponentQuery.query('panel[region=center]')[0];
-			var newpanel = panel.add({
+			var newpanel = panel.insert(position, {
+				app: this,
+				cls: 'notebook-text-container',
 				html: '<div class="text_wrapper"></div><div class="text_contents">'+content+'</div>'
 			});
 			
@@ -192,27 +206,56 @@ Ext.onReady(function() {
 				editor.on('instanceReady', function() {
 					Ext.defer(this.focus, 50, this);
 				});
+				editor.on('focus', function(e){
+					contentsWrapper.up('div[class~=container-wrapper]').down('div[class~=container-icons]').addCls('active')
+				})
+				editor.on('blur', function(e){
+					contentsWrapper.up('div[class~=container-wrapper]').down('div[class~=container-icons]').removeCls('active')
+				})
 				var html = contentsWrapper.dom.innerHTML;
 				if (html == this.emptyText) html = '';
 				editor.setData(html);
 			}, this); 
 		},
 		
-		addCode: function(content) {
+		addCode: function(position, content) {
 			content = content || '';
 			var panel = Ext.ComponentQuery.query('panel[region=center]')[0];
-			var newpanel = panel.add({
+			var newpanel = panel.insert(position, {
+				cls: 'notebook-code-container',
+				app: this,
 				html: '<div class="code_wrapper"></div><div class="code_result"> </div>'
 			});
 			
-			var codeWrapper = newpanel.getEl().down('div[class="code_wrapper"]');
+			var codeWrapper = newpanel.getEl().down('div[class~="code_wrapper"]');
 			
-			var editor = CodeMirror(codeWrapper.dom, {
-				value: content,
-				mode: 'javascript',
-				lineNumbers: true,
-				matchBrackets: true 
-			});
+			var editor = ace.edit(codeWrapper.dom);
+			editor.on('blur', function() {
+				Ext.get(editor.container).up('div[class~=container-wrapper]').down('div[class~=container-icons]').removeCls('active')
+//				editor.renderer.setShowGutter(false);
+//				editor.setHighlightActiveLine(false);
+			})
+			editor.on('focus', function() {
+				Ext.get(editor.container).up('div[class~=container-wrapper]').down('div[class~=container-icons]').addCls('active')
+//				editor.renderer.setShowGutter(true);
+//				editor.setHighlightActiveLine(true);
+			})
+		    editor.setTheme("ace/theme/chrome");
+		    editor.getSession().setMode("ace/mode/javascript");
+			editor.setHighlightActiveLine(false);
+		    editor.renderer.setShowPrintMargin(false);
+		    editor.setValue(content);
+		    editor.clearSelection()
+//		    Ext.defer(function() {
+//		    	editor.renderer.setShowGutter(false);
+//		    	
+//		    },500);
+		    //			var editor = CodeMirror(codeWrapper.dom, {
+//				value: content,
+//				mode: 'javascript',
+//				lineNumbers: true,
+//				matchBrackets: true 
+//			});
 			var id = Ext.id(codeWrapper);
 			this.codeEditors[id] = editor;
 		}
@@ -222,10 +265,10 @@ Ext.onReady(function() {
 Ext.define('Voyant.NotebookContainer', {
 	extend: 'Ext.container.Container',
 	alias: 'widget.notebookContainer',
-	renderTpl: ['<div class="container-wrapper"><div class="container-icons">',
-	            '<span class="x-tool"><img class="x-tool-up" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></span>',
-	            '<span class="x-tool"><img class="x-tool-down" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></span>',
-	            '<span class="x-tool"><img class="x-tool-close" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></span>',
+	renderTpl: ['<div class="container-wrapper" style="clear: both"><div class="container-icons inactive">',
+	            '<div><img class="x-tool-img x-tool-right" data-qtip="Press to run this code block" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></div>',
+	            '<div><img class="x-tool-img x-tool-close" data-qtip="Click to remove this notebook section." src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></div>',
+	            '<div><img class="x-tool-img x-tool-plus" data-qtip="Click to add a notebook section.<br />If this is a text block, the added section will be a code block, and vice-versa." src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></div>',
 	            '</div>',
 	            '<div class="container-content">{%this.renderContainer(out,values)%}</div></div>'],
 	moveUp: function() {
@@ -255,20 +298,26 @@ Ext.define('Voyant.NotebookContainer', {
 	},
     listeners: {
     	boxready: function(c) {
-    		var icons = c.el.down('div[class="container-icons"]');
+    		var icons = c.el.down('div[class~="container-icons"]');
     		icons.on('click', function(evt, el, opt) {
     			var e = Ext.get(el);
     			if (e.is('img')) {
     				var cls = e.getAttribute('class');
-    				switch (cls) {
-    					case 'x-tool-up':
-    						c.moveUp();
-    						break;
-    					case 'x-tool-down':
-    						c.moveDown();
-    						break;
-    					case 'x-tool-close':
-    						c.remove();
+    				if (cls.indexOf("close")>-1) {
+    					c.remove();
+    				}
+    				else if (cls.indexOf("plus")>-1) {
+    					var pos = c.up('panel').items.indexOf(c)+1;
+    					// if we are a text container, add code, and vice-versa
+    					if (c.hasCls('notebook-text-container')) {
+    						c.app.addCode(pos);
+    					}
+    					else if (c.hasCls('notebook-code-container')) {
+    						c.app.addText(pos);
+    					}
+    				}
+    				else if (cls.indexOf("right")>-1) {
+    					c.app.runCode(c);
     				}
     			}
     		}, this);

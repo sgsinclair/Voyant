@@ -1,17 +1,56 @@
+#main-notebook-body .x-header-text-container {
+	text-align: left;
+	font-size: 20px;
+	height: 36px;
+	padding-top: 10px;
+	padding-left: 42px;
+}
+#main-notebook-body .x-panel-header {
+	height: 36px;
+	background-image: url('voyant-36x36.png');
+	background-repeat: no-repeat;
+	padding: 0px;
+	padding-right: 10px;
+}
+#notebook-footer {
+	background-color: #f6f6f6;
+	text-align: center;
+	color: #3892d3;
+}
+
+.container-icons img.x-tool-img {
+	margin: 2px;
+}
+.container-icons img.x-tool-img:hover {
+	background-color: red;
+	cursor: pointer;
+}
+
+.notebook-text-container .x-tool-right {
+	display: none;
+}
+
 .container-wrapper {
 	display: table;
+	margin: 1em;
 }
 
 .container-content {
 	display: table-cell;
 	width: 100%;
+	padding-left: 1em;
+	padding-right: 1em;
 }
 
 .container-icons {
+	background-color: white; /* start invisible */
 	display: table-cell;
 	width: 25px;
 	vertical-align: top;
 	padding: 5px;
+}
+.container-icons:hover, .container-icons.active {
+	background-color: #ddd; /* start invisible */
 }
 
 .code_wrapper, .text_wrapper, .text_contents {
@@ -21,10 +60,20 @@
 
 .code_wrapper {
 	height: 100px;
+	background-color: rgb(255,255,252) !important;
+	border: thin solid #eee;
+	border-radius: 5px;
+}
+.code_wrapper .ace_gutter, .code_wrapper .ace_gutter-active-line {
+	background-color: rgb(255,255,252) !important;
+}
+.ace_gutter-cell {
+	color: #bbb;
 }
 
 .text_contents {
 	padding: 10px;
+	padding-left: 0px;
 	border: 1px solid #fff;
 	background-color: #fff;
 }
@@ -36,7 +85,16 @@
 }
 
 .code_result {
+	margin-top: 1em;
 	padding: 10px;
+	background-color: rgb(250,250,250);
+	border: thin solid #eee;
+	border-radius: 5px;
+	margin-left: 3em;
+	display: none;
+}
+.error {
+	color: red;
 }
 
 #cajaFrame, #codeFrame {
