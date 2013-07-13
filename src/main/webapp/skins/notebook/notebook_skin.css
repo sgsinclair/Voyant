@@ -2,13 +2,14 @@
 	text-align: left;
 	font-size: 20px;
 	height: 36px;
-	padding-top: 10px;
-	padding-left: 42px;
+	padding-top: 13px;
+	padding-left: 45px;
 }
 #main-notebook-body .x-panel-header {
-	height: 36px;
+	height: 42px;
 	background-image: url('voyant-36x36.png');
 	background-repeat: no-repeat;
+	background-position: 3px 3px;
 	padding: 0px;
 	padding-right: 10px;
 }
