@@ -1,4 +1,15 @@
 Ext.define("Voyant.utils.Embeddable", {
+	mixins: ['Voyant.utils.Localization'],
+	statics: {
+		i18n: {
+			widgetNotRecognized: {
+				en: new Ext.Template('"{widget}" is not a recognized Voyant widget.')
+			},
+			knownWidgets: {
+				en: 'Known widgets: '
+			}
+		}
+	},
 	transferable: ['getWidget','getRenderTo'],
 	
 	/**
@@ -22,12 +33,12 @@ Ext.define("Voyant.utils.Embeddable", {
 		else {
 			name = widget.toString();
 		}
-		var message = '"'+widget+'" is not a recognized Voyant widget.';
+		var message = this.localize('widgetNotRecognized', {widget: widget});
 		var widgets = [];
 		for (widget in Voyant.widget) {
 			widgets.push(widget);
 		}
-		message+=" Known widgets: "+widgets.join(", ");
+		message+=" "+this.localize('knownWidgets')+widgets.join(", ");
 		showError(message);
 		return false;
 	},

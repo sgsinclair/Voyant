@@ -1,28 +1,31 @@
 Ext.define('Voyant.store.Corpus', {
 	requires: ['Voyant.store.Document','Voyant.widget.CorpusGrid'],
     extend: 'Ext.data.Store',
-    mixins: ['Voyant.utils.Embeddable','Voyant.utils.Transferable'],
+    mixins: ['Voyant.utils.Embeddable','Voyant.utils.Transferable','Voyant.utils.Localization'],
     model: 'Voyant.model.Corpus',
     transferable: ['getDocuments','getSize','getTokensCount','getTypesCount','getId','getTerms','embed'],
+    statics: {
+    	i18n: {
+    		failedCreateCorpus: {en: 'Failed attempt to create a Corpus.'},
+			thisCorpus: {en: 'This corpus'},
+			isEmpty: {en: 'is empty'},
+			hasNdocuments: {
+				en: new Ext.Template("has {count} documents")
+			},
+			has1document: {en: "has 1 document"},
+			widthNwordsAndNTypes: {
+				en: new Ext.Template("with {words} total words and {types} unique word forms")
+			},
+    	}
+    },
     proxy: {
     	actionMethods: {read: 'POST'}, // ensure that we're posting if we have longer input
     	type: 'ajax',
     	url: Voyant.TROMBONE_URL,
     	reader: {
     		type: 'json',
-    		root: 'corpusSummary',
-    		listeners: {
-    			exception: function(reader, response, error, eOpts) {
-    				debugger
-    			}
-    		}
-    	},
-		listeners: {
-			exception: function(reader, response, error, eOpts) {
-				debugger
-				showError("Failed attempt to create a Corpus", response.responseText);
-			}
-		}
+    		root: 'corpusSummary'
+    	}
     },
 	constructor : function(source, config) {
 		this.callParent([config])
@@ -31,30 +34,38 @@ Ext.define('Voyant.store.Corpus', {
 		if (Ext.isString(source) || Ext.isArray(source)) {
 			params.input = source;
 		}
-		this.load({
-			params: Ext.merge(params, config),
-			callback: function(records, operation, success, a, b, c) {
-				if (success) {
-					dfd.resolve(this)
-				}
-				else {
-					// the proxy should show the error
-					dfd.fail("Failed attempt to create a Corpus");
-				}
-				Voyant.utils.deferredManager.release()
-			},
-			scope: this
-		});
-		var promise = dfd.promise();
-		promise.corpus = this;
-		promise.show = window.show;
-		this.transfer(this, promise);
+		
+		// make sure to set the proxy exception handler because we don't get the full responseText otherwise
+		this.proxy.on('exception', function(reader, response, error, eOpts) {
+			showError(this.localize('failedCreateCorpus'), response.responseText);
+		}, this);
+		
+		if (source) {			
+			this.load({
+				params: Ext.merge(params, config),
+				callback: function(records, operation, success, a, b, c) {
+					if (success) {
+						dfd.resolve(this)
+					}
+					else {
+						// the proxy should show the error
+						dfd.fail(this.localize('failedCreateCorpus'));
+					}
+					Voyant.utils.deferredManager.release()
+				},
+				scope: this
+			});
+			var promise = dfd.promise();
+			promise.corpus = this;
+			promise.show = window.show;
+			this.transfer(this, promise);
+			return promise;
+		}
 //		debugger
 //		var methods = ['getDocuments','getSize','getTokensCount','getTypesCount','getId','getTerms','embed','getWidget']
 //		for (var i=0;i<methods.length;i++) {
 //			promise[methods[i]] = this[methods[i]];
 //		}
-		return promise;
 	},
 	
 	getDocuments: function() {
@@ -72,13 +83,17 @@ Ext.define('Voyant.store.Corpus', {
 	
 	show: function() {
 		var size = this.getSize();
-		var message = "This corpus";
-		if (size==0) {message += ' is empty.';}
+		var message = this.localize('thisCorpus');
+		if (size==0) {message += ' '+this.localize('isEmpty')+'.';}
 		else {
-			message+=' has '+size+' document';
-			if (size>1) {message+='s'}
-			message+=' with '+this.getTokensCount()+ ' total words and '+this.getTypesCount()+' unique word forms';
-			message+='.';
+			message+=' ';
+			if (size>1) {
+				message+=this.localize('hasNdocuments', {count: size})
+			}
+			else {
+				message+=this.localize('has1document')			
+			}
+			message+=' '+this.localize('widthNwordsAndNTypes', {words: this.getTokensCount(), types: this.getTypesCount()})+'.'
 		}
 		message.show();
 	},
@@ -119,7 +134,7 @@ Ext.define('Voyant.store.Corpus', {
 			newpromise.show = Number.prototype.show
 			return newpromise;
 		}			
-		return this==null ? 0 : this.first().getDocuments().getCount();
+		return this==null || this.getCount()==0 ? 0 : this.first().getDocuments().getCount();
 	},
 	
 	getTerms: function(config) {
@@ -160,7 +175,7 @@ Ext.define('Voyant.store.Corpus', {
 			widget = widget || Voyant.widget.CorpusGrid;
 			widget = this.getWidget(widget);
 			config = config || {};
-			Ext.applyIf(config, {renderTo: this.getRenderTo(), store: this.getDocuments()})
+			Ext.applyIf(config, {renderTo: this.getRenderTo(), store: this.getSize() > 0 ? this.getDocuments() : Ext.create("Voyant.store.Document")})
 			if (widget) {Ext.create(widget, config)}
 		}
 	},
