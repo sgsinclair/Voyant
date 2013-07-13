@@ -11,6 +11,7 @@ Ext.Loader.setConfig({
 Ext.require('Voyant.Application');
 Ext.require('Voyant.utils.Show');
 Ext.require('Voyant.utils.DeferredManager');
+//Ext.require('Voyant.utils.Localization');
 
 //Ext.require('Voyant.data.Table');
 
@@ -38,10 +39,12 @@ Ext.onReady(function() {
 		},
 		emptyText: 'Click here to edit',
 		codeEditors: {},
-		
-		launch: function() {
-			Ext.create('Ext.container.Viewport', {
+
+		launch: function(profile) {
+//			var me = this;
+			var viewport = Ext.create('Ext.container.Viewport', {
 				layout: 'border',
+				app: this,
 				items: [{
 					region: 'center',
 					header: {
@@ -52,7 +55,49 @@ Ext.onReady(function() {
 					defaultType: 'notebookContainer',
 					autoScroll: true,
 					border: false,
-					tools: [{type: 'right'},{type: 'help'}],
+					tools: [{
+						type: 'save',
+						callback: function(panel) {
+							var app = panel.ownerCt.app;
+							var mypanel = panel; // create a reference
+							var blocks = [];
+							panel.el.query('.container-content').forEach(function(container){
+								var code_wrapper = Ext.get(container).down('.code_wrapper');
+								if (code_wrapper) {
+									var editor = app.codeEditors[code_wrapper.id];
+									blocks.push({type: 'code', content: editor.getValue()});
+								}
+								else {
+									var text_wrapper = Ext.get(container).down('.text_contents');
+									if (text_wrapper) {
+										blocks.push({type: 'code', content: text_wrapper.getHTML()});
+									}
+								}
+							})
+							Ext.Msg.show({
+							     title:'Save Notebook',
+							     msg: '<p>You may be able to use <a href="./?inline='+encodeURIComponent(Ext.encode(blocks))+'">this link</a> – otherwise, copy and paste the content in the box below.</p>'
+							     	+'<p>If you would like to import a new notebook, paste the contents into the box and press "Yes", otherwise, press "No"</p>',
+							     multiline: true,
+							     width: 800,
+							     value : Ext.encode(blocks),
+							     buttons: Ext.Msg.YESNO,
+							     icon: Ext.Msg.QUESTION,
+							     fn: function(button, text) {
+							    	 if (button=='yes') {
+							    		 mypanel.removeAll();
+							    		 app.codeEditors = {};
+							    		 var json = Ext.decode(text);
+							    		 app.createFromJson(json);
+							    	 }
+							     }
+							})
+						},
+						toolTip: 'Save',
+						qtip: 'Save'
+					},{
+						type: 'help'
+					}],
 					items: [],
 				}, {
 					region: 'south',
@@ -61,6 +106,8 @@ Ext.onReady(function() {
 					html: 'Voyant Notebooks, Stéfan Sinclair & Geoffrey Rockwell (©2013)'
 				}]
 			});
+			
+//			viewport.app = this;
 			
 			CKEDITOR.on('currentInstance', Ext.bind(this.removeInactiveEditors, this));
 			
@@ -94,7 +141,6 @@ Ext.onReady(function() {
 							json = Ext.decode(params.inline);
 						}
 						catch(e) {
-							debugger
 							Ext.Msg.show({
 							    title: 'ERROR: Unable to load content from URL.',
 							    msg: "<div class='error'>"+e+"</div>",
@@ -255,16 +301,6 @@ Ext.onReady(function() {
 		    editor.renderer.setShowPrintMargin(false);
 		    editor.setValue(content);
 		    editor.clearSelection()
-//		    Ext.defer(function() {
-//		    	editor.renderer.setShowGutter(false);
-//		    	
-//		    },500);
-		    //			var editor = CodeMirror(codeWrapper.dom, {
-//				value: content,
-//				mode: 'javascript',
-//				lineNumbers: true,
-//				matchBrackets: true 
-//			});
 			var id = Ext.id(codeWrapper);
 			this.codeEditors[id] = editor;
 		}
@@ -275,7 +311,7 @@ Ext.define('Voyant.NotebookContainer', {
 	extend: 'Ext.container.Container',
 	alias: 'widget.notebookContainer',
 	renderTpl: ['<div class="container-wrapper" style="clear: both"><div class="container-icons inactive">',
-	            '<div><img class="x-tool-img x-tool-right" data-qtip="Press to run this code block" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></div>',
+	            '<div><img class="x-tool-img x-tool-next" data-qtip="Press to run this code block" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></div>',
 	            '<div><img class="x-tool-img x-tool-close" data-qtip="Click to remove this notebook section." src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></div>',
 	            '<div><img class="x-tool-img x-tool-plus" data-qtip="Click to add a notebook section.<br />If this is a text block, the added section will be a code block, and vice-versa." src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></div>',
 	            '</div>',
@@ -325,7 +361,7 @@ Ext.define('Voyant.NotebookContainer', {
     						c.app.addText(pos);
     					}
     				}
-    				else if (cls.indexOf("right")>-1) {
+    				else if (cls.indexOf("next")>-1) {
     					c.app.runCode(c);
     				}
     			}
