@@ -2,10 +2,15 @@ package org.voyanttools.voyant;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -24,6 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.voyanttools.trombone.results.ResultsOutputFormat;
 import org.voyanttools.trombone.storage.Storage;
 import org.voyanttools.trombone.storage.file.FileStorage;
@@ -168,7 +174,34 @@ public class Trombone extends HttpServlet {
 
 		resp.setContentType(ResultsOutputFormat.getResultsOutputFormat(parameters.getParameterValue("outputFormat", "json")).getContentType());
 
-		if (parameters.containsKey("template")) {
+		if (parameters.containsKey("fetchJSON")) {
+			URL url;
+			URLConnection c;
+			try {
+				url = new URL(parameters.getParameterValue("fetchJSON").replaceAll(" ", "+"));
+				c = url.openConnection();
+			}
+			catch (MalformedURLException e) {
+				throw new IllegalArgumentException("Attempt to use a malformed URL: "+parameters.getParameterValue("fetchJSON"), e);
+			}
+			c.addRequestProperty("User-Agent", "Mozilla/4.0 (compatible; Trombone)");
+//	        c.setReadTimeout(readTimeoutMilliseconds); 
+//	        c.setConnectTimeout(connectTimeoutMilliseconds);
+			InputStream is = null;
+			try {
+				is = c.getInputStream();
+				//application/json
+				resp.setContentType("application/json;charset=UTF-8");
+				IOUtils.copy(is, resp.getWriter());
+			}
+			finally {
+				if (is!=null) {
+					is.close();
+				}
+			}
+			
+		}
+		else if (parameters.containsKey("template")) {
 			parameters.setParameter("outputFormat", "xml"); // we need xml for transformation
 			final Writer xmlResultsWriter = new StringWriter();
 			runTromboneController(parameters, xmlResultsWriter);
