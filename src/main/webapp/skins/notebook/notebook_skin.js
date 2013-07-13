@@ -20,6 +20,7 @@ Ext.onReady(function() {
 		// ext specific properties
 		name: 'Voyant',
 		appFolder: 'resources/app',
+		session: Ext.data.IdGenerator.get('uuid').generate(),
 		
 		// notebook specific properties
 		ckConfig: {
@@ -87,8 +88,14 @@ Ext.onReady(function() {
 							    	 if (button=='yes') {
 							    		 mypanel.removeAll();
 							    		 app.codeEditors = {};
-							    		 var json = Ext.decode(text);
-							    		 app.createFromJson(json);
+							    		 var json = false;
+							    		 try {
+								    		 json = Ext.decode(text);
+							    		 }
+							    		 catch(e) {
+							    			 showError("Unable to create notebook from the provided text (JSON).")
+							    		 }
+							    		 if (json) {app.createFromJson(json);}
 							    	 }
 							     }
 							})
@@ -141,12 +148,7 @@ Ext.onReady(function() {
 							json = Ext.decode(params.inline);
 						}
 						catch(e) {
-							Ext.Msg.show({
-							    title: 'ERROR: Unable to load content from URL.',
-							    msg: "<div class='error'>"+e+"</div>",
-							    buttons: Ext.Msg.OK,
-							    icon: Ext.window.MessageBox.ERROR								
-							})
+							showError("Unable to laod JSON from URL", e);
 						}
 						if (json) {this.createFromJson(json);}
 					}

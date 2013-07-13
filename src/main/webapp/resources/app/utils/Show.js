@@ -42,7 +42,11 @@ Ext.define("Voyant.utils.Show", {
 					}
 				}
 				else {
-					console[Voyant.utils.Show.MODE](contents);
+					Ext.Msg.show({
+					    msg: contents,
+					    buttons: Ext.Msg.OK,
+					    icon: Voyant.utils.Show.MODE=='error' ? Ext.window.MessageBox.ERROR : Ext.window.MessageBox.INFO
+					})
 				}
 			}
 		},
@@ -50,9 +54,14 @@ Ext.define("Voyant.utils.Show", {
 			var mode = Voyant.utils.Show.MODE;
 			Voyant.utils.Show.MODE='error';
 			if (error.stack && !more) {more=error.stack}
+			if (more && Ext.isString(more)==false) {more=more.toString()}
 			if (more) {
+				if (console) {console.error(error,more);}
 				var id = Ext.data.IdGenerator.get('uuid').generate();
 				error=error.toString()+" <input type='button' onclick='$(\"#"+id+"\").show();$(this).hide()' value='+' /><pre id='"+id+"' style='display: none;'> "+more+'</pre>';
+			}
+			else {
+				if (console) {console.error(error)}
 			}
 			show(error);
 			Voyant.utils.Show.MODE = mode;
@@ -71,3 +80,4 @@ Boolean.prototype.show = show;
 Array.prototype.show = show;
 //Object.prototype.show = show;
 showError = Voyant.utils.Show.showError
+Ext.Error.prototype.show = show;
