@@ -3,12 +3,13 @@ var Corpus = function(source, config) {
 }
 Ext.define('Voyant.Application', {
 	extend: 'Ext.app.Application',
+	requires: ['Voyant.widget.Cirrus'],
 	
 	baseUrl: null,
 	
 	setBaseUrl : function(baseUrl) {
 		this.baseUrl = baseUrl;
-		Ext.BLANK_IMAGE_URL = this.baseUrl + 'resources/lib/extjs-4.1.1/resources/themes/images/default/tree/s.gif';
+		Ext.BLANK_IMAGE_URL = this.baseUrl + '../resources/lib/extjs/current/resources/themes/images/default/tree/s.gif';
 	},
 	
 	/**

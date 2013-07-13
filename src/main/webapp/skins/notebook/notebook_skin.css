@@ -29,10 +29,13 @@
 .notebook-text-container .x-tool-right {
 	display: none;
 }
-
+.x-tool .x-tool-img {
+	opacity: inherit;
+	filter: inherit;
+}
 .container-wrapper {
 	display: table;
-	margin: 1em;
+	margin-left: 1em;
 }
 
 .container-content {
@@ -72,8 +75,8 @@
 }
 
 .text_contents {
-	padding: 10px;
-	padding-left: 0px;
+	/*padding: 10px;
+	padding-left: 0px;*/
 	border: 1px solid #fff;
 	background-color: #fff;
 }
@@ -85,7 +88,7 @@
 }
 
 .code_result {
-	margin-top: 1em;
+	/*margin-top: 1em;*/
 	padding: 10px;
 	background-color: rgb(250,250,250);
 	border: thin solid #eee;

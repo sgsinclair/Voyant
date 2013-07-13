@@ -14,6 +14,15 @@
 	</servlet-mapping>
 	
 	<servlet>
+		<servlet-name>notebook</servlet-name>
+		<jsp-file>/skins/notebook/notebook_skin.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>notebook</servlet-name>
+		<url-pattern>/notebook/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
 		<!-- available from http://localhost:8080/trombone?param=...&param=...&param=... -->
 		<servlet-name>trombone</servlet-name>
 		<servlet-class>org.voyanttools.voyant.Trombone</servlet-class>

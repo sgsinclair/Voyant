@@ -46,6 +46,17 @@ Ext.define("Voyant.utils.Show", {
 				}
 			}
 		},
+		showError: function(error, more) {
+			var mode = Voyant.utils.Show.MODE;
+			Voyant.utils.Show.MODE='error';
+			if (error.stack && !more) {more=error.stack}
+			if (more) {
+				var id = Ext.data.IdGenerator.get('uuid').generate();
+				error=error.toString()+" <input type='button' onclick='$(\"#"+id+"\").show();$(this).hide()' value='+' /><pre id='"+id+"' style='display: none;'> "+more+'</pre>';
+			}
+			show(error);
+			Voyant.utils.Show.MODE = mode;
+		},
 		TARGET : null,
 		MODE: 'info',
 		SINGLE_LINE_MODE : false
@@ -59,3 +70,4 @@ String.prototype.show = show;
 Boolean.prototype.show = show;
 Array.prototype.show = show;
 //Object.prototype.show = show;
+showError = Voyant.utils.Show.showError

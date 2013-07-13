@@ -5,7 +5,7 @@ Ext.Loader.setConfig({
 //	disableCaching: false,
 	enabled: true,
 	paths: {
-		'Voyant': 'resources/app'
+		'Voyant': '../resources/app'
 	}
 });
 Ext.require('Voyant.Application');
@@ -31,6 +31,7 @@ Ext.onReady(function() {
 //			    	{ name: 'tools', items: [ 'Maximize' ] },
 			    	{ name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source' ] },
 			    ], //'Basic',
+			    allowedContent: true,
 			height: 150,
 			resize_enabled: false,
 			toolbarCanCollapse: false
@@ -68,7 +69,7 @@ Ext.onReady(function() {
 			var params = Ext.Object.fromQueryString(window.location.search);
 			if (params.example) {
 				Ext.Ajax.request({
-					url: this.getBaseUrl()+'skins/notebook/examples/'+params.example+'.js',
+					url: this.getBaseUrl()+'../skins/notebook/examples/'+params.example+'.js',
 					success: Ext.bind(function(response) {
 						var contents = Ext.decode(response.responseText);
 						for (var i = 0; i < contents.length; i++) {
@@ -88,8 +89,20 @@ Ext.onReady(function() {
 			else {
 				if (params.inline) {
 					if (params.inline.indexOf("[")==0) {
-						var json = Ext.decode(params.inline);
-						this.createFromJson(json);
+						var json = ""
+						try {
+							json = Ext.decode(params.inline);
+						}
+						catch(e) {
+							debugger
+							Ext.Msg.show({
+							    title: 'ERROR: Unable to load content from URL.',
+							    msg: "<div class='error'>"+e+"</div>",
+							    buttons: Ext.Msg.OK,
+							    icon: Ext.window.MessageBox.ERROR								
+							})
+						}
+						if (json) {this.createFromJson(json);}
 					}
 					else {
 						this.addCode(0, params.inline)
@@ -130,10 +143,7 @@ Ext.onReady(function() {
 				eval.call(window, code);
 			}
 			catch (e) {
-				var mode = window.Voyant.utils.Show.MODE;
-				window.Voyant.utils.Show.MODE = 'error';
-				show(e.toString())
-				window.Voyant.utils.Show.MODE = mode;
+				showError(e)
 			}
 			results.unmask();
 
@@ -148,7 +158,6 @@ Ext.onReady(function() {
 		
 		tryRunningNextContainer: function(containers) {
 			if (containers.length>0) {
-				console.warn(containers.length,Voyant.utils.deferredManager.getCount())
 				if (Voyant.utils.deferredManager.getCount()>0) {
 					Ext.defer(this.tryRunningNextContainer, 100, this, [containers])
 				}

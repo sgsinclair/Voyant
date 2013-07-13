@@ -25,6 +25,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
 import org.voyanttools.trombone.results.ResultsOutputFormat;
+import org.voyanttools.trombone.storage.Storage;
+import org.voyanttools.trombone.storage.file.FileStorage;
 import org.voyanttools.trombone.Controller;
 import org.voyanttools.trombone.util.FlexibleParameters;
 
@@ -39,15 +41,15 @@ public class Trombone extends HttpServlet {
 	private static final String ALCHEMY_API_KEY_FILE_LABEL = "alchemyApiKeyFile";	
 	private String alchemyApiKey = null;
 	private final Set<String> hiddenParameters = new HashSet<String>();
+	private Storage storage;
 
 	private FlexibleParametersFactory flexibleParametersFactory;
 	
 	public Trombone() {
 		
 		this.hiddenParameters.add(ALCHEMY_API_KEY_LABEL);
-		
 		this.flexibleParametersFactory = new FlexibleParametersFactory();
-	
+		this.storage = new FileStorage();
 	}
 	
 	@Override
@@ -116,10 +118,11 @@ public class Trombone extends HttpServlet {
 			resp.setStatus(500);
 			try {
 				final PrintWriter writer = resp.getWriter();
-				writer.write("<p style=\"color:red;\">"+e.getMessage()+"</p>\n");
-				writer.write("<pre id=\"serverErrorDetails\" style=\"overflow: auto; display: none;\">");
+				String message = e.getMessage();
+				if (message!=null && message.isEmpty()==false) {
+					writer.write(e.getMessage()+"\n");
+				}
 				e.printStackTrace(writer);
-				writer.write("</pre>");				
 			}
 			catch (IOException ioe) {
 				this.log("ERROR: Unable to write results", ioe);
@@ -193,7 +196,7 @@ public class Trombone extends HttpServlet {
 		
 	}
 
-	private static void runTromboneController(FlexibleParameters parameters, Writer writer) throws IOException {
+	private void runTromboneController(FlexibleParameters parameters, Writer writer) throws IOException {
 
 		if (parameters == null) {
 			throw new NullPointerException("illegal parameters");
@@ -202,7 +205,7 @@ public class Trombone extends HttpServlet {
 			throw new NullPointerException("illegal writer");
 		}
 		
-		final Controller controller = new Controller(parameters, writer);
+		final Controller controller = new Controller(storage, parameters, writer);
 		controller.run();
 
 	}
