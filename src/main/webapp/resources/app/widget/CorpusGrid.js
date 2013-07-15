@@ -47,6 +47,7 @@ Ext.define('Voyant.widget.CorpusGrid', {
     		}
     		
     	}
+        this.ui = 'light';
     	this.callParent();
     }
 });

@@ -69,6 +69,10 @@ Ext.define('Voyant.store.CorpusTerms', {
 			$.when(this).done(function(terms) {terms.embed(widget,config)})		
 		}
 		else {
+			if (Ext.isObject(widget) && !config) {
+				config = widget;
+				widget = Voyant.widget.Cirrus;
+			}
 			widget = widget || Voyant.widget.Cirrus;
 			widget = this.getWidget(widget);
 			config = config || {};
@@ -77,12 +81,11 @@ Ext.define('Voyant.store.CorpusTerms', {
 		}
 	},
 	show: function(config) {
-		debugger
 		config = config || {};
 		Ext.applyIf(config, {limit: 5})
 		if (!config.limit) {limit.config=Number.MAX_VALUE;}
 		var total = this.getTotalCount();
-		var message = "There are "+total+" term"+(total==1 ? '' : 's');
+		var message = "There are "+Ext.util.Format.number(total,"0,000")+" term"+(total==1 ? '' : 's');
 		var count = this.getCount();
 		if (count==0) {message+='.'}
 		else {
@@ -90,7 +93,7 @@ Ext.define('Voyant.store.CorpusTerms', {
 			message+=":"
 			for (var i=0,len=(count<config.limit ? count : config.limit);i<len;i++) {
 				var record = this.getAt(i);
-				message+=' '+record.get('term')+' ('+record.get('rawFreq')+')';
+				message+=' '+record.get('term')+' ('+Ext.util.Format.number(record.get('rawFreq'),"0,000")+')';
 				if (i<len-1) {message+=','}
 			}
 		}

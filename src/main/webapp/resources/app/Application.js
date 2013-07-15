@@ -3,7 +3,7 @@ var Corpus = function(source, config) {
 }
 Ext.define('Voyant.Application', {
 	extend: 'Ext.app.Application',
-	requires: ['Voyant.widget.Cirrus','Voyant.widget.CorpusTermsGrid'],
+	requires: ['Voyant.widget.Cirrus','Voyant.widget.CorpusTermsGrid','Voyant.widget.ContextsGrid'],
 	mixins: ['Voyant.utils.Localization'],
 	statics: {
 		i18n: {}

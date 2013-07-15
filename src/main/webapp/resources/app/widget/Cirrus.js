@@ -6,6 +6,7 @@ Ext.define('Voyant.widget.Cirrus', {
     	Ext.applyIf(this, {
     		html: '<canvas style="width: 100%; height: 100%"></canvas>'
     	});
+        this.ui = 'light';
     	this.callParent();
     	this.on('afterrender', function(panel) {
     		this.tip = Ext.getBody().appendChild({tag: 'span', style: 'position: absolute; display: none; background-color: white; padding: 3px; border: thin solid #eee;', html: ''})

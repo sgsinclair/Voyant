@@ -9,6 +9,9 @@ Ext.define('Voyant.utils.DeferredManager', {
 	release : function(deferred) {
 		this.stack.pop();
 	},
+	releaseAll : function() {
+		this.stack = [];
+	},
 	getCount : function() {
 		return this.stack.length;
 	}

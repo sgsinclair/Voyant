@@ -17,6 +17,7 @@ Ext.define('Voyant.widget.CorpusTermsGrid', {
     	    	{text: this.localize('relative'), dataIndex: 'relativeFreq'}
     		]
     	});
+        this.ui = 'light';
     	this.callParent();
     }
 });

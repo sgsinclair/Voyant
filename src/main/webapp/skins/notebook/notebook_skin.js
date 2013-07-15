@@ -49,7 +49,8 @@ Ext.onReady(function() {
 				items: [{
 					region: 'center',
 					header: {
-						title: 'Voyant Notebooks'
+						title: 'Voyant Notebooks',
+						id: 'voyant-notebooks-top-header'
 					},
 					xtype: 'panel',
 					id: 'main-notebook-body',
@@ -121,9 +122,10 @@ Ext.onReady(function() {
 //			this.loadIframe();
 			
 			var params = Ext.Object.fromQueryString(window.location.search);
-			if (params.example) {
+			if (params.example || params.fetchJSON) {
+				var url = params.example ? this.getBaseUrl()+'../skins/notebook/examples/'+params.example+'.js' : Voyant.TROMBONE_URL + '?fetchJSON='+params.fetchJSON;
 				Ext.Ajax.request({
-					url: this.getBaseUrl()+'../skins/notebook/examples/'+params.example+'.js',
+					url: url,
 					success: Ext.bind(function(response) {
 						var contents = Ext.decode(response.responseText);
 						for (var i = 0; i < contents.length; i++) {
@@ -181,7 +183,7 @@ Ext.onReady(function() {
 			var results = container.el.down("div[class~=code_result]");
 			results.show();
 			results.setHTML(' ');
-			results.mask();
+			results.mask('working…');
 			
 			var editorContainer = container.el.down("div[class~=code_wrapper]");
 			var editor = this.codeEditors[editorContainer.id];
@@ -189,17 +191,29 @@ Ext.onReady(function() {
 			try {
 				window.Voyant.utils.Show.TARGET = results;
 				eval.call(window, code);
+				Ext.defer(this.tryToUnmask, 100, this, [results]);
+				return true;
 			}
 			catch (e) {
-				showError(e)
+				Voyant.utils.deferredManager.releaseAll();
+				showError(e);
+				results.unmask();
+				return false;
 			}
-			results.unmask();
 
 		},
+		tryToUnmask: function(results) {
+			if (Voyant.utils.deferredManager.getCount()>0) {
+				Ext.defer(this.tryToUnmask, 100, this, [results])
+			}
+			else {
+				results.unmask();
+			}
+		},
 		runAllCode: function() {
-			Ext.query('div[class~=code_result]').forEach(function(container) {
-				Ext.get(container).show().mask('working');
-			})
+//			Ext.query('div[class~=code_result]').forEach(function(container) {
+//				Ext.get(container).update(" ").show().mask('working…');
+//			})
 			var containers = Ext.query('div[class~=notebook-code-container]');
 			this.tryRunningNextContainer(containers)
 		},
@@ -211,8 +225,9 @@ Ext.onReady(function() {
 				}
 				else {
 					var container = containers.shift();
-					this.runCode(Ext.get(container));
-					this.tryRunningNextContainer(containers);
+					if (this.runCode(Ext.get(container))) {
+						this.tryRunningNextContainer(containers);
+					}
 				}
 			}
 			
@@ -356,10 +371,10 @@ Ext.define('Voyant.NotebookContainer', {
     				else if (cls.indexOf("plus")>-1) {
     					var pos = c.up('panel').items.indexOf(c)+1;
     					// if we are a text container, add code, and vice-versa
-    					if (c.hasCls('notebook-text-container')) {
+    					if ((!evt.shiftKey && c.hasCls('notebook-text-container')) || (evt.shiftKey && c.hasCls('notebook-code-container'))) {
     						c.app.addCode(pos);
     					}
-    					else if (c.hasCls('notebook-code-container')) {
+    					else if ((evt.shiftKey && c.hasCls('notebook-code-container')) || (evt.shiftKey && c.hasCls('notebook-text-container'))) {
     						c.app.addText(pos);
     					}
     				}
