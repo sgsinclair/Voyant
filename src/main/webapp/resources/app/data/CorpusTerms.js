@@ -1,6 +1,6 @@
-Ext.define('Voyant.store.CorpusTerms', {
+Ext.define('Voyant.data.CorpusTerms', {
     extend: 'Ext.data.Store',
-    model: 'Voyant.model.CorpusTerms',
+    model: 'Voyant.data.model.CorpusTerms',
     mixins: ['Voyant.utils.Embeddable','Voyant.utils.Transferable'],
     transferable: ['embed'],
     proxy: {

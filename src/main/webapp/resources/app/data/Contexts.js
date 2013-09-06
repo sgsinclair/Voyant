@@ -1,6 +1,6 @@
-Ext.define('Voyant.store.Contexts', {
+Ext.define('Voyant.data.Contexts', {
     extend: 'Ext.data.Store',
-    model: 'Voyant.model.Contexts',
+    model: 'Voyant.data.model.Contexts',
     mixins: ['Voyant.utils.Embeddable','Voyant.utils.Transferable'],
     transferable: ['embed'],
     proxy: {

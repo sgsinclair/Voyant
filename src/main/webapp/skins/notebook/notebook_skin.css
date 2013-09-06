@@ -41,7 +41,7 @@
 
 .container-content {
 	display: table-cell;
-	width: 100%;
+	width: auto;
 	padding-left: 1em;
 	padding-right: 1em;
 }
@@ -56,7 +56,17 @@
 .container-icons:hover, .container-icons.active {
 	background-color: #ddd; /* start invisible */
 }
-
+.notebook-text-container .container-docs {
+	display: none;
+}
+.notebook-code-container .container-docs {
+	width: 300px;
+}
+.container-docs {
+	display: table-cell;
+	vertical-align: top;
+	padding: 5px;
+}
 .code_wrapper, .text_wrapper, .text_contents {
 	width: auto;
 	margin: 5px;
@@ -96,6 +106,40 @@
 	border-radius: 5px;
 	margin-left: 3em;
 	display: none;
+}
+.container-docs {
+	color: #6e6e6e;
+}
+.container-docs .class {
+	color: #66ab16;
+}
+.container-docs .method {
+	color: #0464bb;
+}
+.container-docs .cfg {
+	font-style: italic;
+	color: brown;
+}
+.container-docs .meta {
+	display: none;
+}
+.container-docs .params {
+	font-style: italic;
+	color: brown;
+}
+.container-docs .return {
+	font-style: italic;
+	color: orange;
+}
+.container-docs .keyword {
+	color: teal;
+}
+.container-docs a {
+	text-decoration: none;
+	color: blue;
+}
+.container-docs ul {
+	padding-left: 1em;
 }
 .error {
 	color: red;

@@ -1,4 +1,4 @@
-Ext.define('Voyant.model.Document', {
+Ext.define('Voyant.data.model.Document', {
     extend: 'Ext.data.Model',
     fields: ['id', 'source', 'location', 'author',
              {name: 'tokensCount-lexical', type: 'int'},
@@ -28,5 +28,5 @@ Ext.define('Voyant.model.Document', {
             	return value
              }, type: 'float'}
     ],
-    belongsTo: 'Voyant.model.Corpus'
+    belongsTo: 'Voyant.data.model.Corpus'
 });

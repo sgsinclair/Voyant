@@ -38,7 +38,7 @@ Ext.define('Voyant.widget.ContextsGrid', {
     	this.view.on('expandbody', function(rowNode, record, expandRow, eOpts) {
     		var node = Ext.get(rowNode).down(".x-grid-rowbody");
     		node.mask('working…');
-    		Ext.create("Voyant.store.Contexts", {
+    		Ext.create("Voyant.data.Contexts", {
 				corpus: this.store.corpus,
 				query: record.get('query'),
 				position: record.get('position'),

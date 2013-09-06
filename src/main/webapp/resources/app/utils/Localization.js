@@ -1,9 +1,19 @@
+/**
+ * This is a test
+ * 
+ * @author Stéfan Sinclair
+ * @since 4.0
+ * @class Voyant.utils.Localization
+ */
 Ext.define('Voyant.utils.Localization', {
 	statics: {
 		DEFAULT_LANGUAGE: 'en',
 		LANGUAGE: 'en'
 	},
 	
+	/**
+	 * This is a test
+	 */
 	localize: function(key, config) {
 		return this._localizeObject(this, key, config);
 	},

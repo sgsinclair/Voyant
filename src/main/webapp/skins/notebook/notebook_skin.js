@@ -11,6 +11,7 @@ Ext.Loader.setConfig({
 Ext.require('Voyant.Application');
 Ext.require('Voyant.utils.Show');
 Ext.require('Voyant.utils.DeferredManager');
+Ext.require('Voyant.utils.Documenter');
 //Ext.require('Voyant.utils.Localization');
 
 //Ext.require('Voyant.data.Table');
@@ -161,7 +162,7 @@ Ext.onReady(function() {
 				else {
 					this.addText(0, "<h1 style='text-align: center; font-size: larger;'>My Voyant Notebook Title (click to edit)</h1>", false)
 					this.addText(1, "<h2>Introduction</h2><p>(click to edit)</p>", false)
-					this.addCode(2, 'new String("Hello World!").show(); // click to edit and press > to run');
+					this.addCode(2, 'var corpus = new Corpus("Hello World!");\ncorpus.show(); // click to edit and press > to run');
 				}
 			}
 			Ext.defer(this.runAllCode, 200, this);
@@ -295,6 +296,7 @@ Ext.onReady(function() {
 			var panel = Ext.ComponentQuery.query('panel[region=center]')[0];
 			var newpanel = panel.insert(position, {
 				cls: 'notebook-code-container',
+				documenter: Ext.create('Voyant.utils.Documenter'),
 				app: this,
 				html: '<div class="code_wrapper"></div><div class="code_result"> </div>'
 			});
@@ -302,22 +304,35 @@ Ext.onReady(function() {
 			var codeWrapper = newpanel.getEl().down('div[class~="code_wrapper"]');
 			
 			var editor = ace.edit(codeWrapper.dom);
+			
+			editor.documenter = newpanel;
+						
 			editor.on('blur', function() {
-				Ext.get(editor.container).up('div[class~=container-wrapper]').down('div[class~=container-icons]').removeCls('active')
-//				editor.renderer.setShowGutter(false);
-//				editor.setHighlightActiveLine(false);
+				var wrapper = Ext.get(editor.container).up('div[class~=container-wrapper]');
+				wrapper.down('div[class~=container-icons]').removeCls('active');
+				wrapper.down('div[class~=container-docs]').hide();
 			})
 			editor.on('focus', function() {
-				Ext.get(editor.container).up('div[class~=container-wrapper]').down('div[class~=container-icons]').addCls('active')
-//				editor.renderer.setShowGutter(true);
-//				editor.setHighlightActiveLine(true);
+				var wrapper = Ext.get(editor.container).up('div[class~=container-wrapper]');
+				wrapper.down('div[class~=container-icons]').addCls('active')
+				wrapper.down('div[class~=container-docs]').show();
 			})
+			
+			
+			var docs = newpanel.getEl().down('div[class~=container-docs]');
+			docs.setVisibilityMode(Ext.dom.AbstractElement.DISPLAY);
+//			editor.on('change', newpanel.handleAceEditorData.bind(newpanel, editor, docs));
+			editor.session.on('tokenizerUpdate', newpanel.handleAceEditorTokenizerUpdateData.bind(newpanel, editor, docs));
+//			editor.on('change', function(data) {
+//				Voyant.utils.documenter.handleAceEditorData(editor, data);
+//			})
 		    editor.setTheme("ace/theme/chrome");
 		    editor.getSession().setMode("ace/mode/javascript");
 			editor.setHighlightActiveLine(false);
 		    editor.renderer.setShowPrintMargin(false);
 		    editor.setValue(content);
 		    editor.clearSelection()
+		    //newpanel.handleAceEditorData(editor, docs, null);
 			var id = Ext.id(codeWrapper);
 			this.codeEditors[id] = editor;
 		}
@@ -326,13 +341,14 @@ Ext.onReady(function() {
 
 Ext.define('Voyant.NotebookContainer', {
 	extend: 'Ext.container.Container',
+	mixins: ['Voyant.utils.Documenter'],
 	alias: 'widget.notebookContainer',
 	renderTpl: ['<div class="container-wrapper" style="clear: both"><div class="container-icons inactive">',
 	            '<div><img class="x-tool-img x-tool-next" data-qtip="Press to run this code block" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></div>',
 	            '<div><img class="x-tool-img x-tool-close" data-qtip="Click to remove this notebook section." src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></div>',
 	            '<div><img class="x-tool-img x-tool-plus" data-qtip="Click to add a notebook section.<br />If this is a text block, the added section will be a code block, and vice-versa." src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="/></div>',
 	            '</div>',
-	            '<div class="container-content">{%this.renderContainer(out,values)%}</div></div>'],
+	            '<div class="container-content">{%this.renderContainer(out,values)%}</div><div class="container-docs inactive">test</div></div>'],
 	moveUp: function() {
 		var sib = this.prev('notebookContainer');
 		if (sib) {
@@ -374,7 +390,7 @@ Ext.define('Voyant.NotebookContainer', {
     					if ((!evt.shiftKey && c.hasCls('notebook-text-container')) || (evt.shiftKey && c.hasCls('notebook-code-container'))) {
     						c.app.addCode(pos);
     					}
-    					else if ((evt.shiftKey && c.hasCls('notebook-code-container')) || (evt.shiftKey && c.hasCls('notebook-text-container'))) {
+    					else if ((!evt.shiftKey && c.hasCls('notebook-code-container')) || (evt.shiftKey && c.hasCls('notebook-text-container'))) {
     						c.app.addText(pos);
     					}
     				}

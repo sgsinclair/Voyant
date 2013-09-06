@@ -52,7 +52,7 @@
  * However, it should be noted that most functions of `Corpus` won't be available
  * until the creation is completed. You any or all of `done()`, `fail()` and `always()`:
  * 
- * 		new Corpus("http://stefansinclair.name/").
+ * 		new Corpus("http://stefansinclair.name/")
  * 			.done(function(corpus) {
  * 				// now corpus has all of its functions available
  * 			})
@@ -65,32 +65,120 @@
  * 
  * @author Stéfan Sinclair
  * @since 4.0
- */
-Ext.define('Voyant.store.Corpus', {
-	
-	/**
-	 * @cfg {String} inputFormat
-	 * Specify the format for the input document(s). In most cases, this *should not be set*
-	 * since Voyant has heuristics to guess at the document format. One exception is to 
-	 * specify a particular kind of XML file, such as `RSS2` or `TEI`.
-	 * 
-	 * Valid values include: `ARCHIVE`, `ATOM`, `COMRPRESSED` `HTML`, `MSWORD`, `MSWORDX`, `ODT`, `PAGES`, `PDF`, `RSS`, `RSS2`, `RTF`, `TEI`, `TEICORPUS`, `XML`
-	 */
-	inputFormat : null,
-	
+ * @class Corpus
+ * @alternateClassName Voyant.data.Corpus
+*/
+var Corpus = function(source, config) {
+	return Ext.create("Voyant.data.Corpus", source, config);
+}
 
-	/**
-	 * @cfg {Boolean} splitDocuments
-	 * Determines if parts of an XML document should be combined into one document or separated
-	 * into individual documents.
-	 */
-	splitDocuments: null,
+Ext.define('Voyant.data.Corpus', {
+    mixins: ['Voyant.utils.Embeddable','Voyant.utils.Transferable','Voyant.utils.Localization'],
 	
-	requires: ['Voyant.store.Document','Voyant.widget.CorpusGrid'],
+	requires: ['Voyant.data.Document','Voyant.widget.CorpusGrid'],
 	alternateClassName: ["Corpus"],
     extend: 'Ext.data.Store',
-    mixins: ['Voyant.utils.Embeddable','Voyant.utils.Transferable','Voyant.utils.Localization'],
-    model: 'Voyant.model.Corpus',
+//    mixins: ['Voyant.utils.Embeddable','Voyant.utils.Transferable','Voyant.utils.Localization'],
+    uses: ['Voyant.utils.Localization'],
+    config: {
+    	
+    	/**
+    	 * @cfg {Boolean} splitDocuments
+    	 * Determines if parts of an XML document should be combined into one document or separated
+    	 * into individual documents. This is used in combination with {@link #xmlDocumentsXpath}
+    	 * for XML Files. For some XML-based `inputFormat` values (like `RSS2` and `TEI`), the
+    	 * XPath values are pre-defined, but can be overridden.
+    	 */
+    	splitDocuments: null,
+    	
+    	/**
+    	 * @cfg {String} inputFormat
+    	 * Specify the format for the input document(s). In most cases, this *should not be set*
+    	 * since Voyant has heuristics to guess at the document format. One exception is to 
+    	 * specify a particular kind of XML file, such as `RSS2` or `TEI`.
+    	 * 
+    	 * Valid values include: `ARCHIVE`, `ATOM`, `COMRPRESSED` `HTML`, `MSWORD`, `MSWORDX`,
+    	 * `ODT`, `PAGES`, `PDF`, `RSS`, `RSS2`, `RTF`, `TEI`, `TEICORPUS`, `XML`.
+    	 */
+    	inputFormat : null,
+    	
+    	/**
+    	 * @cfg {String} xmlDocumentsXpath
+    	 * Specifies an XPath expression that defines the location of documents in XML. Care should
+    	 * be given to namespaces and in some caes it might be preferable to abstract namepsaces,
+    	 * 
+    	 * Namespace specific:
+    	 * 
+    	 * 		//item
+    	 * 
+    	 * Namespace abstracted:
+    	 * 
+    	 * 		//*[local-name()='item'
+    	 */
+    	xmlDocumentsXpath: null,
+    	
+    	
+    	/**
+    	 * @cfg {String} xmlContentXpath
+    	 * Specifies an XPath expression that defines the location of the content in XML (with respect to the
+    	 * document, which can be either the root of the document or root relative to the sub-documents specified
+    	 * by {@link #xmlDocumentsXpath}. Care should be given to namespaces and in some caes it might be preferable
+    	 * to abstract namepsaces,
+    	 * 
+    	 * Namespace specific:
+    	 * 
+    	 * 		//description
+    	 * 
+    	 * Namespace abstracted:
+    	 * 
+    	 * 		//*[local-name()='description'
+    	 */
+    	xmlContentXpath: null,
+    	
+    	/**
+    	 * @cfg {String} xmlAuthorXpath
+    	 * Specifies an XPath expression that defines the location of the author metadata in XML. Care should
+    	 * be given to namespaces and in some caes it might be preferable to abstract namepsaces,
+    	 * 
+    	 * Namespace specific:
+    	 * 
+    	 * 		//author
+    	 * 
+    	 * Namespace abstracted:
+    	 * 
+    	 * 		//*[local-name()='author'
+    	 */
+    	xmlAuthorXpath: null,
+    	
+    	/**
+    	 * @cfg {String} xmlTitleXpath
+    	 * Specifies an XPath expression that defines the location of the title metadata in XML. Care should
+    	 * be given to namespaces and in some caes it might be preferable to abstract namepsaces,
+    	 * 
+    	 * Namespace specific:
+    	 * 
+    	 * 		//title
+    	 * 
+    	 * Namespace abstracted:
+    	 * 
+    	 * 		//*[local-name()='title'
+    	 */
+    	xmlTitleXpath: null,
+    	
+    	/**
+    	 * @cfg {String} inputRemoveUntil
+    	 * 
+    	 */
+    	inputRemoveUntil: null,
+    	
+    	inputRemoveUntilAfter: null,
+    	
+    	inputRemoveFrom: null,
+    	
+    	inputRemoveFromAfter: null
+    	
+    },
+    model: 'Voyant.data.model.Corpus',
     transferable: ['getDocuments','getSize','getTokensCount','getTypesCount','getId','getTerms','getContexts','embed'],
     statics: {
     	i18n: {
@@ -115,6 +203,12 @@ Ext.define('Voyant.store.Corpus', {
     		root: 'corpusSummary'
     	}
     },
+    
+    /**
+     * Create a new Corpus.
+     * @param {Mixed} [source] The source document(s) as a text string, a URL, or an Array of text strings and URLs.
+     * @param {Object} [config] Configuration options for creating the {@link Corpus}.
+     */
 	constructor : function(source, config) {
 		this.callParent([config])
 		var dfd = Voyant.utils.deferredManager.getDeferred();
@@ -146,6 +240,7 @@ Ext.define('Voyant.store.Corpus', {
 			var promise = dfd.promise();
 			promise.corpus = this;
 			promise.show = window.show;
+			promise.$className = this.$className;
 			this.transfer(this, promise);
 			return promise;
 		}
@@ -189,6 +284,10 @@ Ext.define('Voyant.store.Corpus', {
 		message.show();
 	},
 	
+	/**
+	 * Get the total number of word tokens in the corpus.
+	 * @return {Number} the total number of word tokens in the corpus
+	 */
 	getTokensCount: function(mode) {
 		if (this.promise) {
 			var newdfd = $.Deferred();
@@ -202,6 +301,10 @@ Ext.define('Voyant.store.Corpus', {
 		return this.getDocuments().sum('tokensCount-'+(mode ? mode : 'lexical'));
 	},
 	
+	/**
+	 * Get the total number of word types (unique word forms) in the corpus.
+	 * @return {Number} the total number of word types (unique word forms) in the corpus
+	 */
 	getTypesCount: function(mode) {
 		if (this.promise) {
 			var newdfd = $.Deferred();
@@ -215,6 +318,10 @@ Ext.define('Voyant.store.Corpus', {
 		return this.getDocuments().sum('typesCount-'+(mode ? mode : 'lexical'));
 	},
 	
+	/**
+	 * Get the total number of word types (unique word forms) in the corpus.
+	 * @return {Number} the total number of word types (unique word forms) in the corpus
+	 */
 	getSize : function() {
 		if (this.promise) {
 			var newdfd = $.Deferred();
@@ -235,10 +342,10 @@ Ext.define('Voyant.store.Corpus', {
 				Ext.merge(config, {corpus: this.getId()});
 				return this.corpus.getTerms(config);
 			}
-			return new Ext.create("Voyant.store.CorpusTerms", config, this);
+			return new Ext.create("Voyant.data.CorpusTerms", config, this);
 		}
 		Ext.merge(config, {corpus: this.getId()});
-		return new Ext.create("Voyant.store.CorpusTerms", config);
+		return new Ext.create("Voyant.data.CorpusTerms", config);
 	},
 	
 	getContexts: function(config) {
@@ -248,10 +355,10 @@ Ext.define('Voyant.store.Corpus', {
 				Ext.merge(config, {corpus: this.getId()});
 				return this.corpus.getContexts(config);
 			}
-			return new Ext.create("Voyant.store.Contexts", config, this);
+			return new Ext.create("Voyant.data.Contexts", config, this);
 		}
 		Ext.merge(config, {corpus: this.getId()});
-		return new Ext.create("Voyant.store.Contexts", config);
+		return new Ext.create("Voyant.data.Contexts", config);
 	},
 	
 	getId: function() {
@@ -271,6 +378,12 @@ Ext.define('Voyant.store.Corpus', {
 		return this.first().get("id");
 	},
 	
+	
+	/**
+	 * Embed this corpus into a Voyant widget.
+	 * @param {Voyant.widget.Widget} [widget] the Voyant widget class (can also be a short string)
+	 * @param {Object} [config] configuration options for the Voyant widget (see the documentation for each widget for more details)
+	 */
 	embed: function(widget, config) {
 		if (this.promise) {
 			$.when(this).done(function(corpus) {corpus.embed(widget,config)})		
@@ -286,7 +399,7 @@ Ext.define('Voyant.store.Corpus', {
 			widget = widget || Voyant.widget.CorpusGrid;
 			widget = this.getWidget(widget);
 			config = config || {};
-			Ext.applyIf(config, {renderTo: this.getRenderTo(), height: 350, store: this.getSize() > 0 ? this.getDocuments() : Ext.create("Voyant.store.Document")})
+			Ext.applyIf(config, {renderTo: this.getRenderTo(), height: 350, store: this.getSize() > 0 ? this.getDocuments() : Ext.create("Voyant.data.Document")})
 			if (widget) {Ext.create(widget, config)}
 		}
 	},
