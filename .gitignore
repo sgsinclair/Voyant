@@ -16,3 +16,4 @@ local.properties
 .tomcatplugin
 .settings/
 /target
+src/main/webapp/WEB-INF/classes
