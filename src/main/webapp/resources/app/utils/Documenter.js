@@ -10,7 +10,7 @@ Ext.define('Voyant.utils.Documenter', {
 					url: '../docs/output/json/'+cls+'.json',
 					params: {cls: cls},
 					failure: function(response, opts) {
-						//showError("Unable to load documentation",response.responseText);
+						showError("Unable to load documentation",response.responseText);
 					},
 					success: function(response, opts) {
 				//		var jsonString = response.responseText.substring(response.responseText.indexOf("(")+1, response.responseText.length-2);
@@ -331,7 +331,7 @@ Voyant.utils.Documenter.loadDocumentationClasses(['Corpus']);
 				Ext.Ajax.request({
 					url: '../docs/output/'+newClass+'.js',
 					failure: function(response, opts) {
-						//showError("Unable to load documentation",response.responseText);
+						showError("Unable to load documentation",response.responseText);
 					},
 					success: function(response, opts) {
 						var jsonString = response.responseText.substring(response.responseText.indexOf("(")+1, response.responseText.length-2);
