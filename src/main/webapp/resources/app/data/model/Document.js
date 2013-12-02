@@ -27,5 +27,11 @@ Ext.define('Voyant.data.model.Document', {
             	}
             	return value
              }, type: 'float'}
-    ]
+    ],
+    show: function() {
+    	var obj = this.getAssociatedData();
+    	for (var name in this.raw) {
+    		show(name+": "+this.raw[name]);
+    	}
+    }
 });

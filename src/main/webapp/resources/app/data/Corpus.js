@@ -179,7 +179,7 @@ Ext.define('Voyant.data.Corpus', {
     	
     },
     model: 'Voyant.data.model.Document',
-    transferable: ['getSize','getTokensCount','getTypesCount','getId','getTerms','getContexts','embed'],
+    transferable: ['getDocument','getSize','getTokensCount','getTypesCount','getId','getTerms','getContexts','embed'],
     statics: {
     	i18n: {
     		failedCreateCorpus: {en: 'Failed attempt to create a Corpus.'},
@@ -202,6 +202,7 @@ Ext.define('Voyant.data.Corpus', {
     		type: 'json',
     		root: 'corpusSummary.documents'
     	}
+    	
     },
     
     /**
@@ -264,6 +265,24 @@ Ext.define('Voyant.data.Corpus', {
 			message+=' '+this.localize('widthNwordsAndNTypes', {words: Ext.util.Format.number(this.getTokensCount(),"0,000"), types: Ext.util.Format.number(this.getTypesCount(),"0,000")})+'.'
 		}
 		message.show();
+	},
+	
+	getDocument: function(selector) {
+		if (this.promise) {
+			var newdfd = $.Deferred();
+			var newpromise = newdfd.promise();
+			$.when(this).done(function(corpus) {
+				newdfd.resolve(corpus.getDocument(selector))
+			})
+			newpromise.show = Number.prototype.show
+			return newpromise;
+		}
+		if (Ext.isNumber(selector)) {
+			return this.getAt(selector);
+		}
+		else if (Ext.isString(selector)) {
+			return this.getById(selector);
+		}
 	},
 	
 	/**
@@ -357,8 +376,8 @@ Ext.define('Voyant.data.Corpus', {
 				return newpromise;
 			}
 		}
-		debugger
-		return this.first().get("id");
+		// yuck, this is a hack, but metachange doesn't seem to fire with a load() method
+		return this.proxy.reader.rawData.corpusSummary.id;
 	},
 	
 	
