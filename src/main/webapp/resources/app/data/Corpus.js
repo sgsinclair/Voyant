@@ -178,8 +178,8 @@ Ext.define('Voyant.data.Corpus', {
     	inputRemoveFromAfter: null
     	
     },
-    model: 'Voyant.data.model.Corpus',
-    transferable: ['getDocuments','getSize','getTokensCount','getTypesCount','getId','getTerms','getContexts','embed'],
+    model: 'Voyant.data.model.Document',
+    transferable: ['getSize','getTokensCount','getTypesCount','getId','getTerms','getContexts','embed'],
     statics: {
     	i18n: {
     		failedCreateCorpus: {en: 'Failed attempt to create a Corpus.'},
@@ -200,7 +200,7 @@ Ext.define('Voyant.data.Corpus', {
     	url: Voyant.TROMBONE_URL,
     	reader: {
     		type: 'json',
-    		root: 'corpusSummary'
+    		root: 'corpusSummary.documents'
     	}
     },
     
@@ -244,26 +244,8 @@ Ext.define('Voyant.data.Corpus', {
 			this.transfer(this, promise);
 			return promise;
 		}
-//		debugger
-//		var methods = ['getDocuments','getSize','getTokensCount','getTypesCount','getId','getTerms','embed','getWidget']
-//		for (var i=0;i<methods.length;i++) {
-//			promise[methods[i]] = this[methods[i]];
-//		}
 	},
-	
-	getDocuments: function() {
-		if (this.promise) {
-			var newdfd = $.Deferred();
-			var newpromise = newdfd.promise();
-			$.when(this).done(function(corpus) {
-				newdfd.resolve(corpus.getDocuments())
-			})
-			newpromise.show = Number.prototype.show
-			return newpromise;
-		}		
-		return this.first().getDocuments();
-	},
-	
+
 	/**
 	 * Show  a very brief overview of this Corpus including the number of documents, total words (tokens) and unique words (types).
 	 */
@@ -298,7 +280,7 @@ Ext.define('Voyant.data.Corpus', {
 			newpromise.show = Number.prototype.show
 			return newpromise;
 		}		
-		return this.getDocuments().sum('tokensCount-'+(mode ? mode : 'lexical'));
+		return this.sum('tokensCount-'+(mode ? mode : 'lexical'));
 	},
 	
 	/**
@@ -315,7 +297,7 @@ Ext.define('Voyant.data.Corpus', {
 			newpromise.show = Number.prototype.show
 			return newpromise;
 		}		
-		return this.getDocuments().sum('typesCount-'+(mode ? mode : 'lexical'));
+		return this.sum('typesCount-'+(mode ? mode : 'lexical'));
 	},
 	
 	/**
@@ -332,7 +314,7 @@ Ext.define('Voyant.data.Corpus', {
 			newpromise.show = Number.prototype.show
 			return newpromise;
 		}			
-		return this==null || this.getCount()==0 ? 0 : this.first().getDocuments().getCount();
+		return this==null ? 0 : this.getCount();
 	},
 	
 	getTerms: function(config) {
@@ -375,6 +357,7 @@ Ext.define('Voyant.data.Corpus', {
 				return newpromise;
 			}
 		}
+		debugger
 		return this.first().get("id");
 	},
 	
@@ -399,7 +382,7 @@ Ext.define('Voyant.data.Corpus', {
 			widget = widget || Voyant.widget.CorpusGrid;
 			widget = this.getWidget(widget);
 			config = config || {};
-			Ext.applyIf(config, {renderTo: this.getRenderTo(), height: 350, store: this.getSize() > 0 ? this.getDocuments() : Ext.create("Voyant.data.Document")})
+			Ext.applyIf(config, {renderTo: this.getRenderTo(), height: 350, store: this.getSize() > 0 ? this : Ext.create("Voyant.data.Document")})
 			if (widget) {Ext.create(widget, config)}
 		}
 	},

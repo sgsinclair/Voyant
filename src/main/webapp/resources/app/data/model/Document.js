@@ -27,6 +27,5 @@ Ext.define('Voyant.data.model.Document', {
             	}
             	return value
              }, type: 'float'}
-    ],
-    belongsTo: 'Voyant.data.model.Corpus'
+    ]
 });

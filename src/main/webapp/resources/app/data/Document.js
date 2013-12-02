@@ -8,6 +8,7 @@
 Ext.define('Voyant.data.Document', {
     extend: 'Ext.data.Store',
     model: 'Voyant.data.model.Document',
+    mixins: ['Voyant.utils.Embeddable','Voyant.utils.Transferable','Voyant.utils.Localization'],
     proxy: {
     	type: 'ajax',
     	url: Voyant.TROMBONE_URL,
