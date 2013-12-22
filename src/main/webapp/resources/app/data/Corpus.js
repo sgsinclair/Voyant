@@ -179,7 +179,7 @@ Ext.define('Voyant.data.Corpus', {
     	
     },
     model: 'Voyant.data.model.Document',
-    transferable: ['getDocument','getSize','getTokensCount','getTypesCount','getId','getTerms','getContexts','embed'],
+    transferable: ['getDocumentTerms', 'getDocument','getSize','getTokensCount','getTypesCount','getId', 'getTerms','getContexts','embed'],
     statics: {
     	i18n: {
     		failedCreateCorpus: {en: 'Failed attempt to create a Corpus.'},
@@ -211,9 +211,13 @@ Ext.define('Voyant.data.Corpus', {
      * @param {Object} [config] Configuration options for creating the {@link Corpus}.
      */
 	constructor : function(source, config) {
+
 		this.callParent([config])
+
 		var dfd = Voyant.utils.deferredManager.getDeferred();
+
 		var params = {tool: ['CorpusCreator','CorpusSummary']};
+
 		if (Ext.isString(source) || Ext.isArray(source)) {
 			params.input = source;
 		}
@@ -278,10 +282,10 @@ Ext.define('Voyant.data.Corpus', {
 			return newpromise;
 		}
 		if (Ext.isNumber(selector)) {
-			return this.getAt(selector);
+			return Ext.create('Voyant.data.Document', this.getAt(selector));
 		}
 		else if (Ext.isString(selector)) {
-			return this.getById(selector);
+			return Ext.create('Voyant.data.Document', this.getById(selector));
 		}
 	},
 	
@@ -347,6 +351,14 @@ Ext.define('Voyant.data.Corpus', {
 		}
 		Ext.merge(config, {corpus: this.getId()});
 		return new Ext.create("Voyant.data.CorpusTerms", config);
+	},
+
+	getDocumentTerms: function(selector) {
+
+        var docInfo = this.getDocument(selector);
+        var doc = Ext.create('Voyant.data.Document', docInfo.title, docInfo);
+        return doc.getTerms(docInfo);
+
 	},
 	
 	getContexts: function(config) {
