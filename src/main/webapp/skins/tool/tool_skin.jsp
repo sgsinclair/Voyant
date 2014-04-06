@@ -13,12 +13,44 @@ String tool = parts[1];
 		<%@ include file="../shared/assets.jsp" %>
 
 		<script type='text/javascript'>
-			Ext.onReady(function() {
-				initTool('<%= tool %>');
-			});
+		var Voyant = {};
+		Voyant.TROMBONE_URL = "http://localhost:8080/voyant/trombone"
+
+		Ext.Loader.setConfig({
+//			disableCaching: false,
+			enabled: true,
+			paths: {
+				'Voyant': '../../resources/app'
+			}
+		});
+		Ext.require('Voyant.Application');
+		Ext.require('Voyant.utils.Show');
+		Ext.require('Voyant.utils.DeferredManager');
+		Ext.require('Voyant.utils.Documenter');
+		//Ext.require('Voyant.utils.Localization');
+
+				Ext.onReady(function() {
+					Voyant.application = Ext.create('Voyant.Application', {
+						// ext specific properties
+						name: 'Voyant',
+						appFolder: 'resources/app',
+						session: Ext.data.IdGenerator.get('uuid').generate(),
+						
+						launch: function(profile) {
+							widget = this.getApplication().getWidget(widget);
+							config = config || {};
+							Ext.applyIf(config, {renderTo: this.getRenderTo(), store: this, width: 400, height: 400})
+							if (widget) {Ext.create(widget, config)}
+
+							debugger
+/* 							Ext.create('Ext.container.Viewport', {
+								layout: 'fit',
+								items: toolConfig
+							});
+ */						}
+					})
+				});
+		
 		</script>
 		
-		<!-- SKIN RESOURCES -->
-		<script type='text/javascript' src='../skins/tool/tool_skin.js'></script>
-
 <%@ include file="../shared/post_skin_head.jsp" %>
