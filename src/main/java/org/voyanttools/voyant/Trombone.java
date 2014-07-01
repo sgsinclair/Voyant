@@ -174,6 +174,7 @@ public class Trombone extends HttpServlet {
 
 		resp.setContentType(ResultsOutputFormat.getResultsOutputFormat(parameters.getParameterValue("outputFormat", "json")).getContentType());
 
+
 		if (parameters.containsKey("fetchJSON")) {
 			URL url;
 			URLConnection c;
@@ -238,6 +239,15 @@ public class Trombone extends HttpServlet {
 			throw new NullPointerException("illegal writer");
 		}
 		
+		// intercept to see if we have a notebook in resources
+		if (parameters.getParameterValue("tool", "").equals("notebook.NotebookManager") && parameters.containsKey("notebook")) {
+			File file = new File(getServletContext().getRealPath("/resources/notebook"), parameters.getParameterValue("notebook"));
+			if (file.exists()) {
+				String string = FileUtils.readFileToString(file);
+				writer.write(string);
+				return;
+			}
+		}
 		final Controller controller = new Controller(storage, parameters, writer);
 		controller.run();
 

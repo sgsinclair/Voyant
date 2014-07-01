@@ -50,6 +50,9 @@ public class HttpParametersDecoder {
 			throw new NullPointerException("illegal values");
 		}
 
+		// let's strip the brackets that indicate an array
+		if (key.endsWith("[]") && key.length()>2) {key = key.substring(0, key.length()-2);}
+
 		if (key.equals("uri")) {
 			decodeURIParameters(key, values);
 		}
@@ -158,7 +161,7 @@ public class HttpParametersDecoder {
 			}
 		}
 		*/
-		
+
 		this.parameters.addParameter(key, values);
 
 	}

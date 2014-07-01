@@ -37,7 +37,8 @@ Ext.onReady(function() {
 			    allowedContent: true,
 			height: 150,
 			resize_enabled: false,
-			toolbarCanCollapse: false
+			toolbarCanCollapse: false,
+			maxLines: 100
 		},
 		emptyText: 'Click here to edit',
 		codeEditors: {},

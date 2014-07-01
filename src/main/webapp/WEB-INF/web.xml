@@ -3,12 +3,21 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 	http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-	metadata-complete="true"
 	version="3.0">
+
+	<context-param>
+		<param-name>version</param-name>
+		<param-value>2.0</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>build</param-name>
+		<param-value>BETA-1</param-value>
+	</context-param>
 	
 	<servlet>
 		<servlet-name>tool</servlet-name>
-		<jsp-file>/skins/tool/tool_skin.jsp</jsp-file>
+		<jsp-file>/tool/index.jsp</jsp-file>
 	</servlet>
 
 	<servlet-mapping>
@@ -18,15 +27,16 @@
 	
 	<servlet>
 		<servlet-name>notebook</servlet-name>
-		<jsp-file>/skins/notebook/notebook_skin.jsp</jsp-file>
+		<jsp-file>/skins/notebook/index.jsp</jsp-file>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>notebook</servlet-name>
 		<url-pattern>/notebook/*</url-pattern>
 	</servlet-mapping>
 	
+	
+	<!-- available from http://localhost:8080/trombone?param=...&param=...&param=... -->
 	<servlet>
-		<!-- available from http://localhost:8080/trombone?param=...&param=...&param=... -->
 		<servlet-name>trombone</servlet-name>
 		<servlet-class>org.voyanttools.voyant.Trombone</servlet-class>
 	</servlet>
@@ -34,6 +44,7 @@
 		<servlet-name>trombone</servlet-name>
 		<url-pattern>/trombone</url-pattern>
 	</servlet-mapping>
+
 	
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>

@@ -1,9 +1,21 @@
-<%
+<%@ include file="pre_app.jsp" %>
+<script>
+	Ext.Loader.setConfig({
+		enabled : true,
+		paths : {
+			'Voyant' : 'app',
+			'resources': 'resources'
+		}
+	});
 
-
-String skin = request.getParameter("skin");
-if (skin==null) skin = "notebook";
-
-%>
-<%= skin %>
-<jsp:forward page='<%= "skins/"+skin+"/"+skin+"_skin.jsp" %>' />
+	Ext.application({
+		extend : 'Voyant.VoyantDefaultApp',
+		name: 'VoyantDefaultApp',
+		config: {
+			baseUrl: './',
+			version: '<%= application.getInitParameter("version") %>',
+			build: '<%= application.getInitParameter("build") %>'			
+		}
+	});
+</script>
+<%@ include file="post_app.jsp" %>

@@ -1,0 +1,246 @@
+Ext.define('Voyant.panel.Trends', {
+	extend: 'Ext.panel.Panel',
+	mixins: ['Voyant.panel.Panel'],
+	requires: ['Ext.chart.CartesianChart','Voyant.data.store.Documents'],
+
+	alias: 'widget.trends',
+	config: {
+		corpus: undefined
+	},
+    statics: {
+    	i18n: {
+    		title: {en: "Trends"},
+    		rawFrequencies: {en: 'raw frequencies'},
+    		relativeFrequencies: {en: 'relative frequencies'},
+    		segments: {en: 'document segments'},
+    		documents: {en: 'documents'}
+    	},
+    	api: {
+    		limit: 5,
+    		stopList: 'auto',
+    		query: undefined,
+    		freqsMode: 'relativeFreqs'
+    	}
+    },
+    
+    layout: 'fit',
+    
+    constructor: function(config) {
+
+    	Ext.apply(this, {
+    		title: this.localize('title')
+    	})
+    	
+    	this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+
+    	if (config.embedded) {
+    		var cls = Ext.getClass(config.embedded).getName();
+    		if (cls=="Voyant.data.store.CorpusTerms") {
+    	    	this.loadFromCorpusTerms(config.embedded);
+    		}
+    		if (cls=="Voyant.data.model.Corpus") {
+    	    	this.loadFromCorpusTerms(config.embedded.getCorpusTerms());
+    		}
+    	}
+    	
+    	this.on("loadedCorpus", function(src, corpus) {
+    		this.loadFromCorpus(corpus);
+    	});
+    	
+    	this.on("documentsClicked", function(src, documents) {
+    		if (this.getCorpus()) {
+    			if (documents.length==1) {
+    				this.setApiParam("query", undefined);
+    				this.loadFromDocument(documents[0]);
+    			}
+    			// TODO: not sure what to do with multiple documents
+    		}
+    	})
+
+    	this.on("termsClicked", function(src, terms) {
+    		if (this.getCorpus()) { // make sure we have a corpus
+        		var queryTerms = [];
+        		terms.forEach(function(term) {
+        			if (term.term) {queryTerms.push(term.term);}
+        		});
+        		if (queryTerms) {
+        			this.setApiParams({
+        				docIndex: undefined,
+        				docId: undefined,
+        				query: queryTerms
+        			});
+        			
+        		}
+        		this.loadFromCorpus(this.getCorpus());
+    		}
+    	})
+
+    	this.on("corpusTermsClicked", function(src, terms) {
+    		if (this.getCorpus()) { // make sure we have a corpus
+    			// TODO: check if we have distribution data?
+    			this.loadFromRecords(terms);
+    		}
+    	})
+    	
+    },
+    
+    loadFromDocument: function(document) {
+    	if (document.then) {
+    		var me = this;
+    		document.then(function(document) {me.loadFromDocument(document)})
+    	}
+    	else {
+    		this.setApiParams({
+    			docIndex: undefined,
+    			docId: document.getId()
+    		})
+        	this.loadFromDocumentTerms(document.getDocumentTerms({autoLoad: false}));
+    	}
+    },
+    
+    loadFromDocumentTerms: function(documentTerms) {
+		documentTerms.load({
+		    callback: function(records, operation, success) {
+		    	if (success) {
+		    		this.setApiParam('mode', 'document');
+		    		this.loadFromRecords(records);
+		    	}
+		    	else {
+					Voyant.application.showResponseError(this.localize('failedGetDocumentTerms'), operation);
+		    	}
+		    },
+		    scope: this,
+		    params: Ext.apply(this.getApiParams(), {
+		    	withDistributions: true
+		    })
+    	});
+    },
+    
+    loadFromCorpus: function(corpus) {
+		this.setCorpus(corpus);
+		if (corpus.getDocumentsCount()==1) {
+			this.loadFromDocument(corpus.getDocument(0));
+		}
+		else {
+    		this.loadFromCorpusTerms(corpus.getCorpusTerms());
+		}
+	},
+
+    loadFromCorpusTerms: function(corpusTerms) {
+		corpusTerms.load({
+		    callback: function(records, operation, success) {
+		    	if (success) {
+			    	this.setApiParam('mode', 'corpus');
+			    	this.loadFromRecords(records);
+		    	}
+		    	else {
+					Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
+		    	}
+		    },
+		    scope: this,
+		    params: Ext.apply(this.getApiParams() || {}, {
+		    	withDistributions: 'relative'
+		    })
+    	});
+    },
+    
+    loadFromRecords: function(records) {
+    	var mode = this.getApiParam('mode');
+    	var terms = [];
+    	var fields = ['index'];
+    	var series = [];
+    	records.forEach(function(record, index) {
+    		var term = record.get('term');
+    		record.get('distributions').forEach(function(r, i) {
+    			if (!terms[i]) {
+    				terms[i] = {"index": i}
+    			}
+    			terms[i]["_"+index] = r;
+    		}, this);
+    		fields.push("_"+index);
+    		series.push({
+    			type: 'line',
+    			title: term,
+    			xField: 'index',
+    			yField: '_'+index,
+                style: {
+                    lineWidth: 2
+                },
+                marker: {
+                    radius: 3
+                },
+                highlight: true,
+                smooth: true,
+                tooltip: {
+                    trackMouse: true,
+                    style: 'background: #fff',
+                    renderer: function(storeItem, item) {
+                    	this.setHtml("<i>"+item.series.getTitle()+"</i>: "+storeItem.get(item.series.getYField()));
+                    }
+                },
+                listeners: {
+                    itemsingletap: function() {
+                    	// TODO: fix trends item tapping
+                    	console.warn("not working currently")
+                    }
+                }
+    		})
+    	}, this);
+    	
+    	
+    	var store = Ext.create('Ext.data.JsonStore', {
+    		fields: fields,
+    		data: terms
+    	});
+    	fields.shift();
+    	
+    	this.buildChart({
+        	store: store,
+        	series: series,
+        	axes: [{
+        		type: 'numeric',
+        		position: 'left',
+        		title: {
+        			text: this.localize(mode=='document' || this.getApiParam('freqsMode') =='rawFreqs' ? 'rawFrequencies' : 'relativeFrequencies'),
+        		}
+        	}, {
+        		type: 'category',
+        		position: 'bottom',
+        		fields: ['index'],
+        		title: {
+            		text: this.localize(mode=='document' ? 'segments' : 'documents'),
+        		},
+        		renderer: function(label, data) {
+        			return mode=='document' ? parseInt(label)+1 : label
+        		}
+        	}]
+    	});
+
+    },
+    
+    buildChart: function(config) {
+    	config.axes.forEach(function(axis) {
+    		Ext.applyIf(axis, {
+        		style: {opacity: .2},
+        		label: {opacity: .5}
+    		})
+    		Ext.applyIf(axis.title, {
+    			fontSize: 12
+    		})
+    	})
+    	Ext.applyIf(config, {
+    		xtype: 'cartesian',
+    		legend: {docked:'top'},
+    		interactions: ['itemhighlight','panzoom'],
+    		innerPadding: {top: 5, right: 5, bottom: 5, left: 5},
+    		border: false,
+    	    bodyBorder: false
+    	});
+    	
+    	// remove existing chart
+    	this.query('chart').forEach(function(chart) {this.remove(chart)}, this);
+
+    	this.add(Ext.create("Ext.chart.CartesianChart", config));
+    }
+})
