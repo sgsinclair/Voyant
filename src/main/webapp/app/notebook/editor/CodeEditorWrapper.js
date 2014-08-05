@@ -84,5 +84,9 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		else {
 			Ext.defer(this.tryToUnmask, 20, this);
 		}
+	},
+	
+	getContent: function() {
+		return this.editor.getValue();
 	}
 })

@@ -26,5 +26,9 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 			}]
 		});
         this.callParent(arguments);
+	},
+	
+	getContent: function() {
+		return this.items.get(0).getContent();
 	}
 })

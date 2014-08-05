@@ -1,5 +1,6 @@
 Ext.define("Voyant.notebook.util.Show", {
-	requires: ['Ext.data.identifier.Uuid','Voyant.util.ResponseError'],
+	extend: 'Ext.Base',
+	requires: ['Ext.data.identifier.Uuid'/*,'Voyant.util.ResponseError'*/],
 	statics: {
 		show: function(contents) {
 			if (this.then) {
@@ -86,7 +87,8 @@ Ext.define("Voyant.notebook.util.Show", {
 		MODE: 'info',
 		SINGLE_LINE_MODE : false
 	}
-})
+});
+
 
 // alias show(contents) as global
 show = Voyant.notebook.util.Show.show;

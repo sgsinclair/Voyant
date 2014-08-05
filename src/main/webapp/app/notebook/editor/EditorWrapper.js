@@ -46,7 +46,7 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 				else if (this.getHeight()<height && height>initialHeight) {
 					this.setSize({height: height})
 				}
-				this.doComponentLayout();
+				this.updateLayout();
 			})
 		}, this);
 		this.callParent(arguments);

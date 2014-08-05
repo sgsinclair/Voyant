@@ -21,7 +21,8 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 			allowedContent: true,
 //			resize_enabled: false,
 			toolbarCanCollapse: true
-		}
+		},
+		editor: undefined
 	},
 	statics: {
 		i18n: {
@@ -52,8 +53,15 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 				if (lastHeight!=me.getHeight()) {
 					me.ownerCt.fireEvent("editorresize",me);
 					lastHeight = me.getHeight();
+					me.setContent(ed.getValue())
 				}
 			})
+			this.setEditor(editor);
 		}
+	},
+	
+	getContent: function() {
+		var editor = this.getEditor();
+		return editor ? this.getEditor().getData() : "";
 	}
 })
