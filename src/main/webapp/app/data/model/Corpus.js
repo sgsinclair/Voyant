@@ -5,11 +5,13 @@ var Corpus = function(source, config) {
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
     mixins: ['Voyant.notebook.util.Embeddable','Voyant.util.Transferable','Voyant.util.Localization'],
-    transferable: ['show',/*'embed','embedSummary',*/'getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount'],
+    transferable: ['show',/*'embed','embedSummary',*/'getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
     embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.panel.Documents'],
     extend: 'Ext.data.Model',
-    
+    config: {
+    	documentsStore: undefined
+    },
     statics: {
     	i18n: {
     		failedCreateCorpus: {en: 'Failed attempt to create a Corpus.'},
@@ -97,7 +99,18 @@ Ext.define('Voyant.data.model.Corpus', {
 //			config.input="http://asdfasfa/"
 			$.getJSON(Voyant.application.getTromboneUrl(), config).done(function(data) {
 				me.set(data.corpus.metadata)
-				dfd.resolve(me);
+				var store = Ext.create("Voyant.data.store.Documents", {corpus: me});
+				me.setDocumentsStore(store);
+				store.load({
+					params: {
+						limit: 1000
+					},
+					callback: function(records, st, success) {
+						me.setDocumentsStore(this);
+						dfd.resolve(me);
+					},
+					scope: store
+				})
 			}).fail(function(response) {
 				Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
 				dfd.reject(); // don't send error since we've already shown it
@@ -118,15 +131,17 @@ Ext.define('Voyant.data.model.Corpus', {
 	},
 	
 	getDocumentTerms: function(config) {
-		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : Ext.create("Voyant.data.store.DocumentTerms", Ext.apply(config || {}, {corpus: this}));
+		return Ext.create("Voyant.data.store.DocumentTerms", Ext.apply(config || {}, {corpus: this}));
 	},
 	
 	getDocuments: function(config) {
-		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : Ext.create("Voyant.data.store.Documents", {corpus: this});
+		debugger
+		return this.documentsStore ? this.documentsStore : Ext.create("Voyant.data.store.Documents", Ext.apply(config || {}, {corpus: this}));
+		//this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.getDocumentsStore();
 	},
 	
 	getDocument: function(config) {
-		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : Ext.create("Voyant.data.store.Documents", {corpus: this}).getDocument(config);
+		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.getDocumentsStore().getDocument(config);
 	},
 	
 	getDocumentsCount: function() {

@@ -1,1 +1,3 @@
-["$.when(new Corpus('hi')).done(function(corpus) {show('<table><tr><td>');corpus.embed();show('</td><td>');corpus.embedCirrus();show('</td></tr></table>')})"]
+var corpus = new Corpus("Hello world");
+var documentTerms = corpus.getDocumentTerms();
+documentTerms.embed();

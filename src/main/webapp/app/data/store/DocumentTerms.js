@@ -2,8 +2,9 @@ Ext.define('Voyant.data.store.DocumentTerms', {
 	extend: 'Ext.data.Store',
 	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.DocumentTerm',
-//    transferable: ['setCorpus'],
-//    embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
+    transferable: ['setCorpus'],
+    requires: ['Voyant.panel.DocumentTerms','Voyant.panel.Cirrus'],
+    embeddable: ['Voyant.panel.DocumentTerms','Voyant.panel.Cirrus'],
 	config: {
 		corpus: undefined
 	},
@@ -12,7 +13,7 @@ Ext.define('Voyant.data.store.DocumentTerms', {
 		config = config || {};
 		
 		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
+		Ext.applyIf(config, {
 		     proxy: {
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),
@@ -28,14 +29,30 @@ Ext.define('Voyant.data.store.DocumentTerms', {
 		     }
 		})
 		
-//    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.callParent([config]);
 
+		if (config && config.corpus) {
+			if (config.corpus.then) {
+				var dfd = Voyant.application.getDeferred(this);
+				var me = this;
+				config.corpus.then(function(corpus) {
+					me.setCorpus(corpus);
+					dfd.resolve(me);
+				});
+				var promise = Voyant.application.getPromiseFromDeferred(dfd);
+				return promise;
+			}
+			else {
+				this.setCorpus(config.corpus);
+			}
+		}
 	},
 	
 	setCorpus: function(corpus) {
 		if (corpus) {
 			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
+			this.load();
 		}
 		this.callParent(arguments);
 	}

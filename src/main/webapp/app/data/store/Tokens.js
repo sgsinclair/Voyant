@@ -1,7 +1,7 @@
-Ext.define('Voyant.data.store.Contexts', {
+Ext.define('Voyant.data.store.Tokens', {
 	extend: 'Ext.data.Store',
 	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.Context',
+    model: 'Voyant.data.model.Token',
 //    transferable: ['setCorpus'],
 //    embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
 	config: {
@@ -17,13 +17,13 @@ Ext.define('Voyant.data.store.Contexts', {
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),
 		         extraParams: {
-		        	 tool: 'corpus.DocumentContexts',
+		        	 tool: 'corpus.DocumentTokens',
 		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
 		        	 stripTags: config.stripTags
 		         },
 		         reader: {
 		             type: 'json',
-		             rootProperty: 'documentContexts.contexts'
+		             rootProperty: 'documentTokens.tokens'
 		         },
 		         simpleSortMode: true
 		     }

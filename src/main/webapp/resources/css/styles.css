@@ -35,3 +35,7 @@ a {
 .x-legend-item-marker {
     top: .35em;
 }
+
+.error {
+	color: red;
+}

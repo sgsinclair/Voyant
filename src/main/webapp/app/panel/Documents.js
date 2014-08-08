@@ -76,8 +76,16 @@ Ext.define('Voyant.panel.Documents', {
     		this.store.loadPage(1);
     	})
     	
-    	if (config.embedded && Ext.getClass(config.embedded).getName() == "Voyant.data.model.Corpus") {
-    		config.corpus = config.embedded
+    	if (config.embedded) {
+    		debugger
+        	if (Ext.getClass(config.embedded).getName() == "Voyant.data.model.Corpus") {
+        		config.corpus = config.embedded
+        	}
+        	else if (Ext.getClass(config.embedded).getName() == "Voyant.data.store.Documents") {
+        		this.store.setRecords(config.embedded.getData())
+        		config.corpus = config.embedded.getCorpus()
+        	}
+    		
     	}
     	
     	// if we have a corpus, load it

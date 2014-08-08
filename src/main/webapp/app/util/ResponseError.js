@@ -1,14 +1,17 @@
 Ext.define("Voyant.util.ResponseError", {
-	extend: "Ext.Error",
+	extend: "Voyant.util.DetailedError",
 	config: {
 		response: undefined,
-		msg: undefined
 	},
 	constructor: function(config) {
 		this.setResponse(config.response);
-		this.setMsg(config.msg);
+		Ext.applyIf(config, {
+			msg: config.response.statusText, // hopefully already set by creator
+			error: config.response.responseText.split(/(\r\n|\r|\n)/).shift(), // show first line of response
+			details: config.response.responseText
+		})
 		this.callParent(arguments);
-		this.show();
+//		this.show();
 	},
 	
 	show: function() {

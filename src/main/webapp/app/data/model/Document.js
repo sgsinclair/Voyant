@@ -19,5 +19,14 @@ Ext.define('Voyant.data.model.Document', {
     		docId: this.get('id')
     	});
     	return this.get('corpus').getDocumentTerms(config);
+    },
+    
+    getFullLabel: function() {
+    	return this.getTitle(); // TODO: complete full label
+    },
+    
+    getTitle: function() {
+    	return this.get('title');
     }
+    
 });

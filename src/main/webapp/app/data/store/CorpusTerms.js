@@ -3,7 +3,7 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.CorpusTerm',
     transferable: ['setCorpus'],
-    requires: ['Voyant.panel.CorpusTerms','Voyant.panel.CorpusTerms'],
+    requires: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
     embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
 	config: {
 		corpus: undefined
@@ -13,6 +13,7 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 		config = config || {};
 		
 		Ext.applyIf(config, {
+			autoLoad: true,
 		     proxy: {
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),
@@ -36,7 +37,16 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 				var me = this;
 				config.corpus.then(function(corpus) {
 					me.setCorpus(corpus);
-					dfd.resolve(me);
+					if (me.getAutoLoad()) {
+						me.load({
+							callback: function() {
+								dfd.resolve(me);
+							}
+						})
+					}
+					else {
+						dfd.resolve(me);
+					}
 				});
 				var promise = Voyant.application.getPromiseFromDeferred(dfd);
 				return promise;

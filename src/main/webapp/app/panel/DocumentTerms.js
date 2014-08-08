@@ -16,7 +16,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     		docIndex: undefined
     	}
     },
-    constructor: function() {
+    constructor: function(config) {
     	
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -25,7 +25,18 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
-    	})
+    	});
+    	
+    	if (config.embedded) {
+    		console.warn(config.embedded.then)
+    		var cls = Ext.getClass(config.embedded).getName();
+    		if (cls=="Voyant.data.store.DocumentTerms" || cls=="Voyant.data.model.Document") {
+    			this.fireEvent('loadedCorpus', this, config.embedded.getCorpus())
+    		}
+    	}
+    	else if (config.corpus) {
+    		this.fireEvent('loadedCorpus', this, config.corpus)
+    	}
     	
     	this.on("corpusTermsClicked", function(src, terms) {
     		if (this.getStore().getCorpus()) { // make sure we have a corpus

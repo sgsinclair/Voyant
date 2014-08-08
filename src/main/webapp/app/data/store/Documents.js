@@ -1,6 +1,8 @@
 Ext.define("Voyant.data.store.Documents", {
 	extend: "Ext.data.Store",
 	model: "Voyant.data.model.Document",
+	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
+    embeddable: ['Voyant.panel.Documents'],
 	config: {
 		corpus: undefined
 	},
@@ -39,7 +41,25 @@ Ext.define("Voyant.data.store.Documents", {
 	        	 }
 	         }
 		})
+    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.callParent([config]);
+		
+		if (config && config.corpus) {
+			if (config.corpus.then) {
+				var dfd = Voyant.application.getDeferred(this);
+				var me = this;
+				config.corpus.then(function(corpus) {
+					me.setCorpus(corpus);
+					dfd.resolve(me);
+				});
+				var promise = Voyant.application.getPromiseFromDeferred(dfd);
+				return promise;
+			}
+			else {
+				this.setCorpus(config.corpus);
+			}
+		}
+
 	},
 	setCorpus: function(corpus) {
 		if (corpus) {
