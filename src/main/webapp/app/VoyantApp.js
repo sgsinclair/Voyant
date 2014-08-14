@@ -14,10 +14,13 @@ Ext.define('Voyant.VoyantApp', {
     },
     
     config: {
+    	baseUrl: undefined,
     	tromboneUrl: undefined
     },
     
     constructor: function(config) {
+    	
+    	this.setBaseUrl(this.config.baseUrl);
     	
     	// set the Trombone URL from the baseURL // TODO: maybe allow this to be overridden
 		this.setTromboneUrl(this.config.baseUrl+'trombone');

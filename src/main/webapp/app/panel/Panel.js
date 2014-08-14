@@ -16,6 +16,10 @@ Ext.define('Voyant.panel.Panel', {
 		return Voyant.application
 	},
 	
+	getBaseUrl: function() {
+		return this.getApplication().getBaseUrl();
+	},
+	
 	getTromboneUrl: function() {
 		return this.getApplication().getTromboneUrl();
 	},
