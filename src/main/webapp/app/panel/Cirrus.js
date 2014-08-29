@@ -60,7 +60,7 @@ Ext.define('Voyant.panel.Cirrus', {
     loadFromCorpusTermsRecords: function(records) {
     	var terms = [];
     	records.forEach(function(record) {
-    		terms.push({word: record.get('term'), size: record.get('rawFreq')});
+    		terms.push({word: record.get('term'), size: record.get('rawFreq'), value: record.get('rawFreq')});
     	});
     	this.buildFromTerms(terms)
     },
