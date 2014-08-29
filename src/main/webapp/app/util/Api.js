@@ -25,7 +25,6 @@ Ext.define('Voyant.util.Api', {
 				if (keepEmpty || !Ext.isEmpty(val)) {api[key]=val;}
 
 			}, this);
-			debugger
 			return api;
 		}
 		else {
