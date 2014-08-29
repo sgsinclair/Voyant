@@ -7,14 +7,25 @@ Ext.define('Voyant.panel.Documents', {
     		title: {en: "Documents"},
     		id: {en: "ID"},
     		documentTitle: {en: "Title"},
+    		documentAuthor: {en: "Author"},
     		tokensCountLexical: {en: "Words"},
     		typesCountLexical: {en: "Types"},
     		typeTokenRatioLexical: {en: "Ratio"},
-    		language: {en: "Language"}
+    		language: {en: "Language"},
+    		matchingDocuments: {en: "Matching documents: {count}"}
     	}
     },
 
     constructor: function(config) {
+    	
+    	var store = Ext.create("Voyant.data.store.Documents", {
+    	    selModel: {pruneRemoved: false}
+    	});
+        store.on("totalcountchange", function() {
+        	this.down('#status').update({count: this.getStore().getTotalCount()});;
+        }, this);
+    	
+    	
     	Ext.apply(this, {
     		title: this.localize('title'),
 	    	columns:[
@@ -23,37 +34,40 @@ Ext.define('Voyant.panel.Documents', {
 	    	        width: 30,
 	    	        sortable: false
 	    	    },{
-	    	        text: this.localize('id'),
-	    	        dataIndex: 'id',
-	    	        hidden: true,
-	    	        sortable: false
-	    	    },{
 	    	        text: this.localize('documentTitle'),
 	    	        dataIndex: 'title',
-	    	        sortable: true
+	    	        sortable: true,
+	    	        flex: 3
+	    	    },{
+	    	        text: this.localize('documentAuthor'),
+	    	        dataIndex: 'author',
+	    	        sortable: true,
+	    	        flex: 2
 	    	    },{
 	    	        text: this.localize('tokensCountLexical'),
 	    	        dataIndex: 'tokensCount-lexical',
 	    	        renderer: Ext.util.Format.numberRenderer('0,000'),
-	    	        sortable: true
+	    	        sortable: true,
+	    	        width: 100
 	    	    },{
 	    	        text: this.localize('typesCountLexical'),
 	    	        dataIndex: 'typesCount-lexical',
-	    	        renderer: Ext.util.Format.numberRenderer('0,000')
+	    	        renderer: Ext.util.Format.numberRenderer('0,000'),
+	    	        width: 100
 	    	    },{
 	    	        text: this.localize('typeTokenRatioLexical'),
 	    	        dataIndex: 'typeTokenRatio-lexical',
-	    	        renderer: function(val) {return Ext.util.Format.percent(val)}
+	    	        renderer: function(val) {return Ext.util.Format.percent(val)},
+	    	        width: 100
 	    	    },{
 	    	        text: this.localize('language'),
 	    	        dataIndex: 'language',
-	    	        renderer: function(val, metaData, record, rowIndex, colIndex, store, view) {return view.ownerCt.getLanguage(val);}
+	    	        renderer: function(val, metaData, record, rowIndex, colIndex, store, view) {return view.ownerCt.getLanguage(val);},
+	    	        width: 100
 	    	    }
 	    	],
 	    	
-	        store: Ext.create("Voyant.data.store.Documents", {
-	    	    selModel: {pruneRemoved: false}
-	    	}),
+	        store: store,
 	    	
 	    	selModel: Ext.create('Ext.selection.RowModel', {
                 listeners: {
@@ -64,7 +78,24 @@ Ext.define('Voyant.panel.Documents', {
                     	scope: this
                     }
                 }
-            })
+            }),
+            
+            dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: [{
+                    width: 170,
+                    fieldLabel: 'Search',
+                    labelWidth: 50,
+                    xtype: 'searchfield',
+                    store: store
+                }, {
+                    xtype: 'component',
+                    itemId: 'status',
+                    tpl: this.localize('matchingDocuments'),
+                    style: 'margin-right:5px'
+                }]
+            }],
     	});
     	
         this.callParent(arguments);

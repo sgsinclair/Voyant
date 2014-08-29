@@ -10,7 +10,7 @@ Ext.define('Voyant.data.model.Document', {
         	 	return data['typesCount-lexical']/data['tokensCount-lexical'];
              }},
              {name: 'title'},
-             {name: 'language', calculate: function(data) {return Ext.isEmpty(data) ? '' : data}}
+             {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data}}
     ],
     
     getDocumentTerms: function(config) {
