@@ -16,8 +16,21 @@ Ext.define('Voyant.util.Api', {
 	getApiParam: function(key, defaultValue) {
 		return this.api[key]!==undefined ? this.api[key] : defaultValue
 	},
-	getApiParams: function() {
-		return this.api
+	getApiParams: function(keys, keepEmpty) {
+		if (keys) {
+			var api = {};
+			if (Ext.isString(keys)) {keys=[keys]}
+			keys.forEach(function(key) {
+				var val = this.getApiParam(key);
+				if (keepEmpty || !Ext.isEmpty(val)) {api[key]=val;}
+
+			}, this);
+			debugger
+			return api;
+		}
+		else {
+			return this.api
+		}
 	},
 	
 	setApiParams: function(config) {

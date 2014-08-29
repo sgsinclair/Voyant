@@ -1,10 +1,12 @@
 Ext.define('Voyant.panel.CorpusTerms', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
+	requires: ['Ext.ux.form.SearchField'],
 	alias: 'widget.corpusterms',
     statics: {
     	i18n: {
     		title: {en: "Corpus Terms"},
+    		matchingTerms: {en: 'Matching terms: {count}'}
     	},
     	api: {
     		stopList: 'auto',
@@ -16,15 +18,18 @@ Ext.define('Voyant.panel.CorpusTerms', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
+    	var api = Ext.apply(this.getApiParams(['stopList','query']), {
+    		withDistributions: 'relative'
+    	});
+    	var proxy = this.getStore().getProxy();
+    	for (var key in api) {proxy.setExtraParam(key, api[key]);}
+    	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
-    		store.load({
-    			params: Ext.apply(this.getApiParams() || {}, {
-    				withDistributions: 'relative'
-    			})
-    		});
+    		store.getProxy().setExtraParam('corpus', corpus.getId())
+    		store.load();
     	})
     	
     	if (config.embedded) {
@@ -45,23 +50,16 @@ Ext.define('Voyant.panel.CorpusTerms', {
     initComponent: function() {
         var me = this;
 
+        var store = Ext.create("Voyant.data.store.CorpusTerms");
+        store.on("totalcountchange", function() {
+        	this.down('#status').update({count: this.getStore().getTotalCount()});;
+        }, me);
+        
         Ext.apply(me, {
     		title: this.localize('title'),
-            store : Ext.create("Voyant.data.store.CorpusTerms", {
-            	proxy: new Ext.data.proxy.Ajax({
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.CorpusTerms'
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'corpusTerms.terms'
-		         },
-		         simpleSortMode: true
-            	})
-            }),
+            store : store,
     		selModel: Ext.create('Ext.selection.CheckboxModel', {
+                pruneRemoved: false,
                 listeners: {
                     selectionchange: {
                     	fn: function(sm, selections) {
@@ -71,7 +69,28 @@ Ext.define('Voyant.panel.CorpusTerms', {
                     }
                 }
             }),
+            dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: [{
+                    width: 170,
+                    fieldLabel: 'Search',
+                    labelWidth: 50,
+                    xtype: 'searchfield',
+                    store: store
+                }, {
+                    xtype: 'component',
+                    itemId: 'status',
+                    tpl: this.localize('matchingTerms'),
+                    style: 'margin-right:5px'
+                }]
+            }],
+
     		columns: [{
+                xtype: 'rownumberer',
+                width: 50,
+                sortable: false
+            },{
     			text: this.localize("term"),
         		dataIndex: 'term',
                 sortable: true

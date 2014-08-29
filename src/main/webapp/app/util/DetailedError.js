@@ -20,12 +20,12 @@ Ext.define("Voyant.util.DetailedError", {
 //		this.show();
 	},
 	
-	show: function() {
-		if (window.showError && ) {showError.call(this);}
+	show: function(config) {
+		if (window.showError) {showError.call(this);}
+		else {this.showMsg(config)}
 	},
 	
 	showMsg: function(config) {
-		debugger
 		config = config || {};
 		Ext.applyIf(config, {
 			message: this.getMsg()+"<p class='error'>\n"+this.getError()+"… "+

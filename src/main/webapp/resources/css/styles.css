@@ -39,3 +39,8 @@ a {
 .error {
 	color: red;
 }
+
+.placeholder {
+	color: grey;
+	font-style: italic;
+}

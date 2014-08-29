@@ -7,7 +7,7 @@ Ext.define('Voyant.data.model.Corpus', {
     mixins: ['Voyant.notebook.util.Embeddable','Voyant.util.Transferable','Voyant.util.Localization'],
     transferable: ['show',/*'embed','embedSummary',*/'getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
     embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
-	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.panel.Documents'],
+	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents','Voyant.panel.Documents'],
     extend: 'Ext.data.Model',
     config: {
     	documentsStore: undefined
@@ -130,13 +130,17 @@ Ext.define('Voyant.data.model.Corpus', {
 		return Ext.create("Voyant.data.store.CorpusTerms", Ext.apply(config || {}, {corpus: this}));
 	},
 	
+	getDocumentQueryMatches: function(config) {
+		// not expected to be called before corpus is defined
+		return Ext.create("Voyant.data.store.DocumentQueryMatches", Ext.apply(config || {}, {corpus: this}));
+	},
+	
 	getDocumentTerms: function(config) {
 		return Ext.create("Voyant.data.store.DocumentTerms", Ext.apply(config || {}, {corpus: this}));
 	},
 	
 	getDocuments: function(config) {
-		debugger
-		return this.documentsStore ? this.documentsStore : Ext.create("Voyant.data.store.Documents", Ext.apply(config || {}, {corpus: this}));
+		return this.getDocumentsStore() ? this.getDocumentsStore() : Ext.create("Voyant.data.store.Documents", Ext.apply(config || {}, {corpus: this}));
 		//this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.getDocumentsStore();
 	},
 	

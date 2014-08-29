@@ -1,5 +1,5 @@
 Ext.define('Voyant.data.store.CorpusTerms', {
-	extend: 'Ext.data.Store',
+	extend: 'Ext.data.BufferedStore',
 	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.CorpusTerm',
     transferable: ['setCorpus'],
@@ -13,7 +13,11 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 		config = config || {};
 		
 		Ext.applyIf(config, {
-			autoLoad: true,
+			pagePurgeCount: 0,
+			pageSize: 100,
+			leadingBufferZone: 300,
+			
+			autoLoad: false, // needs to be false until there's a corpus
 		     proxy: {
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),
@@ -22,7 +26,8 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 		         },
 		         reader: {
 		             type: 'json',
-		             rootProperty: 'corpusTerms.terms'
+		             rootProperty: 'corpusTerms.terms',
+		             totalProperty: 'corpusTerms.total'
 		         },
 		         simpleSortMode: true
 		     }
