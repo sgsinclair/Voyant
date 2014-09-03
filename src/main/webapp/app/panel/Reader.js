@@ -62,6 +62,7 @@ Ext.define('Voyant.panel.Reader', {
     	}, me);
     	me.setTokensStore(tokensStore)
     	me.on("loadedCorpus", function(src, corpus) {
+    		debugger
     		this.getTokensStore().setCorpus(corpus);
     		this.setDocumentsStore(corpus.getDocuments());
     		if (this.rendered) {

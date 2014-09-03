@@ -16,6 +16,7 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 			pagePurgeCount: 0,
 			pageSize: 100,
 			leadingBufferZone: 100,
+			remoteSort: true,
 			
 			autoLoad: false, // needs to be false until there's a corpus
 		     proxy: {
@@ -30,11 +31,7 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 		             totalProperty: 'corpusTerms.total'
 		         },
 		         simpleSortMode: true,
-		     },
-		     sorters: [{
-		            property: 'rawFreq',
-		            direction: 'DESC'
-		        }]
+		     }
 		})
 
     	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);

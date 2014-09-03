@@ -44,15 +44,18 @@ Ext.define('Voyant.panel.Contexts', {
             },{
     			text: this.localize("left"),
         		dataIndex: 'left',
-                sortable: true
+                sortable: true,
+                flex: 1
             },{
     			text: this.localize("term"),
         		dataIndex: 'term',
-                sortable: true
+                sortable: true,
+                width: 'autoSize'
             },{
     			text: this.localize("right"),
         		dataIndex: 'right',
-                sortable: true
+                sortable: true,
+                flex: 1
             }]
         });
         

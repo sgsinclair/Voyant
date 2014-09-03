@@ -230,7 +230,6 @@ Ext.define('Voyant.panel.Trends', {
     		})
     	})
     	Ext.applyIf(config, {
-    		xtype: 'cartesian',
     		legend: {docked:'top'},
     		interactions: ['itemhighlight','panzoom'],
     		innerPadding: {top: 5, right: 5, bottom: 5, left: 5},
@@ -241,6 +240,7 @@ Ext.define('Voyant.panel.Trends', {
     	// remove existing chart
     	this.query('chart').forEach(function(chart) {this.remove(chart)}, this);
 
-    	this.add(Ext.create("Ext.chart.CartesianChart", config));
+		var chart = Ext.create("Ext.chart.CartesianChart", config);
+    	this.add(chart);
     }
 })

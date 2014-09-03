@@ -6,7 +6,8 @@ Ext.define('Voyant.panel.CorpusTerms', {
     statics: {
     	i18n: {
     		title: {en: "Corpus Terms"},
-    		matchingTerms: {en: 'Matching terms: {count}'}
+    		matchingTerms: {en: 'Matching terms: {count}'},
+    		rawFreqTip: {en: "The total count (raw frequency) of this term in the entire corpus."}
     	},
     	api: {
     		stopList: 'auto',
@@ -88,21 +89,22 @@ Ext.define('Voyant.panel.CorpusTerms', {
 
     		columns: [{
                 xtype: 'rownumberer',
-                width: 50,
+                width: 'autoSize',
                 sortable: false
             },{
     			text: this.localize("term"),
         		dataIndex: 'term',
+                width: 125,
                 sortable: true
             },{
             	text: this.localize("rawFreq"),
             	dataIndex: 'rawFreq',
-            	width: 100,
+                width: 'autoSize',
             	sortable: true,
             },{
                 xtype: 'widgetcolumn',
                 text: this.localize("trend"),
-                width: 120,
+                width: 150,
                 dataIndex: 'distributions',
                 widget: {
                     xtype: 'sparklineline'

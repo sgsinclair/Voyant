@@ -14,20 +14,23 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		    }, {
 		        region: 'center',
 		        flex: .4,
-		        layout: 'border',
-		        items: [
+//		        layout: 'border',
+		        xtype: 'reader',
+		        /*items: [
 		               {
 		            	   xtype: 'reader',
 		            	   region: 'center',
 		                   collapsible: true,
+		                   flex: 6
 		               },
 		               {
 		            	   xtype: 'documents',
 		            	   region: 'south',
 		                   collapsible: true,
-		                   split: true
+		                   split: true,
+		                   flex: 4
 		               }
-		        ]
+		        ]*/
 		    },{
 		    	region: 'west',
 		    	flex: .3,
@@ -45,13 +48,17 @@ Ext.define('Voyant.VoyantDefaultApp', {
 			                   collapsible: true
 		            	   }],
 		            	   flex: 6
-		               },
-		               {
-		            	   xtype: 'summary',
+		               },{
+		            	   xtype: 'tabpanel',
 		            	   region: 'south',
-		            	   split: true,
-		            	   flex: 4,
-		                   collapsible: true
+		            	   items: [{
+		            		   xtype: 'summary',
+			                   collapsible: true
+		            	   },{
+		            		   xtype: 'documents',
+			                   collapsible: true
+		            	   }],
+		            	   flex: 4
 		               }
 		        ]
 		    },{

@@ -4,6 +4,7 @@ Ext.define('Voyant.panel.Panel', {
 		i18n: {
 			term: {en: "Term"},
 			rawFreq: {en: "Count"},
+			relativeFreq: {en: 'Relative'},
 			trend: {en: "Trend"}
 		}
 	},

@@ -7,7 +7,12 @@ Ext.define('Voyant.panel.DocumentTerms', {
 	},
     statics: {
     	i18n: {
-    		title: {en: "Document Terms"}
+    		title: {en: "Document Terms"},
+    		matchingTerms: {en: 'Matching terms: {count}'},
+    		termTip: {en: "The term in a single, specific document."},
+    		rawFreqTip: {en: "The count (raw frequency) of this term in this document."},
+    		relativeFreqTip: {en: "The relative frequency (per million) of this term in each document."},
+    		trendTip: {en: 'This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).'}
     	},
     	api: {
     		stopList: 'auto',
@@ -68,9 +73,14 @@ Ext.define('Voyant.panel.DocumentTerms', {
     initComponent: function() {
         var me = this;
 
+        var store = Ext.create("Voyant.data.store.DocumentTerms");
+        store.on("totalcountchange", function() {
+        	this.down('#status').update({count: this.getStore().getTotalCount()});;
+        }, me);
+        
         Ext.apply(me, {
     		title: this.localize('title'),
-            store : Ext.create("Voyant.data.store.DocumentTerms"),
+            store : store,
     		selModel: Ext.create('Ext.selection.CheckboxModel', {
                 listeners: {
                     selectionchange: {
@@ -81,6 +91,22 @@ Ext.define('Voyant.panel.DocumentTerms', {
                     }
                 }
             }),
+            dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: [{
+                    width: 170,
+                    fieldLabel: 'Search',
+                    labelWidth: 50,
+                    xtype: 'searchfield',
+                    store: store
+                }, {
+                    xtype: 'component',
+                    itemId: 'status',
+                    tpl: this.localize('matchingTerms'),
+                    style: 'margin-right:5px'
+                }]
+            }],
     		columns: [{
     			text: '#',
     			width: 30,
@@ -90,15 +116,26 @@ Ext.define('Voyant.panel.DocumentTerms', {
             },{
     			text: this.localize("term"),
         		dataIndex: 'term',
-                sortable: true
+            	tooltip: this.localize("termTip"),
+                sortable: true,
+                width: 125
             },{
             	text: this.localize("rawFreq"),
             	dataIndex: 'rawFreq',
-            	width: 100,
+            	tooltip: this.localize("rawFreqTip"),
+            	width: 'autoSize',
             	sortable: true,
+            },{
+            	text: this.localize("relativeFreq"),
+            	tooltip: this.localize("relativeFreqTip"),
+            	dataIndex: 'relativeFreq',
+            	width: 'autoSize',
+            	sortable: true,
+            	renderer: Ext.util.Format.numberRenderer('0,000')
             },{
                 xtype: 'widgetcolumn',
                 text: this.localize("trend"),
+                tooltip: this.localize('trendTip'),
                 width: 120,
                 dataIndex: 'distributions',
                 widget: {
