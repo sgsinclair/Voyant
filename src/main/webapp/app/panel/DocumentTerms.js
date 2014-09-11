@@ -54,7 +54,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
         			docId: undefined,
         			docIndex: undefined
         		});
-        		this.getStore().loadPage(1, {params: this.getApiParams()});
+        		if (this.isVisible()) {
+            		this.getStore().loadPage(1, {params: this.getApiParams()});
+        		}
     		}
     	});
     	
@@ -66,8 +68,14 @@ Ext.define('Voyant.panel.DocumentTerms', {
     			docid: undefined,
     			query: undefined
     		})
-    		this.getStore().loadPage(1, {params: this.getApiParams()});
-    	})
+    		if (this.isVisible()) {
+        		this.getStore().loadPage(1, {params: this.getApiParams()});
+    		}
+    	});
+    	
+    	this.on("activate", function() { // load after tab activate (if we're in a tab panel)
+    		if (this.getStore().getCorpus()) {this.getStore().loadPage(1, {params: this.getApiParams()})}
+    	}, this)
     },
     
     initComponent: function() {
