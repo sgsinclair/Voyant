@@ -45,16 +45,17 @@ Ext.define('Voyant.panel.Trends', {
     	}
     	
     	this.on("loadedCorpus", function(src, corpus) {
-    		this.loadFromCorpus(corpus);
+    		this.setCorpus(corpus);
+    		if (this.isVisible()) {
+        		this.loadFromCorpus(corpus);
+    		}
     	});
     	
     	this.on("documentsClicked", function(src, documents) {
     		if (this.getCorpus()) {
     			if (documents.length==1) {
-    				this.setApiParam("query", undefined);
     				this.loadFromDocument(documents[0]);
     			}
-    			// TODO: not sure what to do with multiple documents
     		}
     	})
 
@@ -68,20 +69,28 @@ Ext.define('Voyant.panel.Trends', {
         			this.setApiParams({
         				docIndex: undefined,
         				docId: undefined,
-        				query: queryTerms
+        				query: queryTerms,
+        				mode: 'corpus'
         			});
-        			
+            		if (this.isVisible()) {
+                		this.loadFromCorpus(this.getCorpus());
+            		}
         		}
-        		this.loadFromCorpus(this.getCorpus());
     		}
     	})
 
     	this.on("corpusTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
     			// TODO: check if we have distribution data?
-    			this.loadFromRecords(terms);
+    			this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     		}
     	})
+    	
+    	this.on("activate", function() { // tab activation
+    		if (this.getCorpus()) {
+				this.loadFromCorpus(this.getCorpus())
+    		}
+    	}, this)
     	
     },
     
@@ -91,35 +100,48 @@ Ext.define('Voyant.panel.Trends', {
     		document.then(function(document) {me.loadFromDocument(document)})
     	}
     	else {
-    		this.setApiParams({
-    			docIndex: undefined,
-    			docId: document.getId()
-    		})
-        	this.loadFromDocumentTerms(document.getDocumentTerms({autoLoad: false}));
+    		var ids = [];
+    		if (Ext.getClassName(document)=="Voyant.data.model.Document") {
+        		this.setApiParams({
+        			docIndex: undefined,
+        			query: undefined,
+        			docId: document.getId(),
+        			mode: 'document'
+        		})
+        		if (this.isVisible()) {
+                	this.loadFromDocumentTerms();
+        		}
+    		}
     	}
     },
     
     loadFromDocumentTerms: function(documentTerms) {
-		documentTerms.load({
-		    callback: function(records, operation, success) {
-		    	if (success) {
-		    		this.setApiParam('mode', 'document');
-		    		this.loadFromRecords(records);
-		    	}
-		    	else {
-					Voyant.application.showResponseError(this.localize('failedGetDocumentTerms'), operation);
-		    	}
-		    },
-		    scope: this,
-		    params: Ext.apply(this.getApiParams(), {
-		    	withDistributions: true
-		    })
-    	});
+    	if (this.getCorpus()) {
+        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({autoLoad: false});
+    		documentTerms.load({
+    		    callback: function(records, operation, success) {
+    		    	if (success) {
+    		    		this.setApiParam('mode', 'document');
+    		    		this.loadFromRecords(records);
+    		    	}
+    		    	else {
+    					Voyant.application.showResponseError(this.localize('failedGetDocumentTerms'), operation);
+    		    	}
+    		    },
+    		    scope: this,
+    		    params: Ext.apply(this.getApiParams(), {
+    		    	withDistributions: true
+    		    })
+        	});
+    	}
     },
     
     loadFromCorpus: function(corpus) {
 		this.setCorpus(corpus);
-		if (corpus.getDocumentsCount()==1) {
+		if (this.getApiParam("docId")) {
+			this.loadFromDocumentTerms();
+		}
+		else if (corpus.getDocumentsCount()==1) {
 			this.loadFromDocument(corpus.getDocument(0));
 		}
 		else {
