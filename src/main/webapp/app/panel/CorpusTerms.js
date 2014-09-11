@@ -7,7 +7,10 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	i18n: {
     		title: {en: "Corpus Terms"},
     		matchingTerms: {en: 'Matching terms: {count}'},
-    		rawFreqTip: {en: "The total count (raw frequency) of this term in the entire corpus."}
+    		termTip: {en: "The term in the corpus."},
+    		rawFreqTip: {en: "The total count (raw frequency) of this term in the entire corpus."},
+    		relativeFreqTip: {en: "The relative frequency (per million) of this term in the entire corpus, also expressed as a percentage."},
+    		trendTip: {en: "This represents the trend of the relative frequencies for each term in each document in the corpus."}
     	},
     	api: {
     		stopList: 'auto',
@@ -64,7 +67,9 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 listeners: {
                     selectionchange: {
                     	fn: function(sm, selections) {
-                    		this.getApplication().dispatchEvent('corpusTermsClicked', this, selections);
+                    		if (selections && selections.length>0) {
+                        		this.getApplication().dispatchEvent('corpusTermsClicked', this, selections);
+                    		}
                     	},
                     	scope: this
                     }
@@ -94,17 +99,31 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 sortable: false
             },{
     			text: this.localize("term"),
+            	tooltip: this.localize("termTip"),
         		dataIndex: 'term',
                 width: 125,
                 sortable: true
             },{
             	text: this.localize("rawFreq"),
+            	tooltip: this.localize("rawFreqTip"),
             	dataIndex: 'rawFreq',
                 width: 'autoSize',
             	sortable: true,
             },{
+            	text: this.localize("relativeFreq"),
+            	tooltip: this.localize("relativeFreqTip"),
+            	dataIndex: 'relativeFreq',
+            	renderer: function(val) {
+            		var percent = val*100;
+            		return Ext.util.Format.number(val*1000000, "0,000") + " (%"+
+            			(val*100 <  .1 ? "<0.1" : Ext.util.Format.number(val*100, "0.0"))+")"
+            	},
+                width: 125,
+            	sortable: true,
+            },{
                 xtype: 'widgetcolumn',
                 text: this.localize("trend"),
+                tooltip: this.localize("trendTip"),
                 width: 150,
                 dataIndex: 'distributions',
                 widget: {
