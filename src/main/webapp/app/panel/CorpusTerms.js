@@ -68,7 +68,8 @@ Ext.define('Voyant.panel.CorpusTerms', {
                     	},
                     	scope: this
                     }
-                }
+                },
+                mode: 'SIMPLE'
             }),
             dockedItems: [{
                 dock: 'bottom',
