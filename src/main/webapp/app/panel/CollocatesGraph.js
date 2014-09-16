@@ -81,8 +81,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	        .linkDistance(120)
 	        .size([width, height])
 	        .on("tick", function() {
-//				  node.attr("cx", function(d) { debugger; return d.x; })
-//				      .attr("cy", function(d) { return d.y; })
 				  link.attr("x1", function(d) { return d.source.x; })
 				      .attr("y1", function(d) { return d.source.y; })
 				      .attr("x2", function(d) { return d.target.x; })
