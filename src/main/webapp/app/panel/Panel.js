@@ -25,6 +25,11 @@ Ext.define('Voyant.panel.Panel', {
 		return this.getApplication().getTromboneUrl();
 	},
 	
+	dispatchEvent: function() {
+		var application = this.getApplication();
+		application.dispatchEvent.apply(application, arguments);
+	},
+	
 	showError: function(config) {
 		this.getApplication().showError.apply(this, arguments)
 	}

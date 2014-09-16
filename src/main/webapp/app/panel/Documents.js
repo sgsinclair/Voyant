@@ -73,7 +73,7 @@ Ext.define('Voyant.panel.Documents', {
                 listeners: {
                     selectionchange: {
                     	fn: function(sm, selections) {
-                    		this.getApplication().dispatchEvent('documentsClicked', this, selections);
+                    		this.getApplication().dispatchEvent('documentsClicked', this, selections, this.getStore().getCorpus());
                     	},
                     	scope: this
                     }

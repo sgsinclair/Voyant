@@ -19,6 +19,13 @@ Ext.define('Voyant.panel.Cirrus', {
     	}
     },
     
+    config: {
+    	mode: undefined
+    },
+
+    MODE_CORPUS: 'corpus',
+    MODE_DOCUMENT: 'mode_document',
+    
     constructor: function(config) {
 
     	Ext.apply(this, {
@@ -42,22 +49,50 @@ Ext.define('Voyant.panel.Cirrus', {
     
     listeners: {
     	loadedCorpus: function(src, corpus) {
-    		this.loadFromCorpusTerms(corpus.getCorpusTerms());
+    		this.loadFromCorpus(corpus);
+    	},
+    	
+    	documentsClicked: function(src, documents, corpus) {
+    		if (documents) {
+    			var doc = documents[0];
+    			this.setApiParam('docId', doc.getId());
+        		this.loadFromDocumentTerms(documents[0].getDocumentTerms({autoload: false, corpus: corpus}));
+    		}
+    	},
+    	
+    	ensureCorpusView: function(src, corpus) {
+    		if (this.getMode() != this.MODE_CORPUS) {this.loadFromCorpus(corpus);}
     	}
     },
     
-    loadFromCorpusTerms: function(corpusTerms) {
-    	if (corpusTerms) {this.corpusTerms = corpusTerms}
-		this.corpusTerms.load({
+    loadFromCorpus: function(corpus) {    	
+		this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false}));
+    },
+    
+    loadFromDocumentTerms: function(documentTerms) {
+    	documentTerms.load({
 		    callback: function(records, operation, success) {
-		    	this.loadFromCorpusTermsRecords(records)
+		    	this.setMode(this.MODE_DOCUMENT);
+		    	this.loadFromTermsRecords(records)
+		    },
+		    scope: this,
+		    params: this.getApiParams()
+    	});
+    	
+    },
+    
+    loadFromCorpusTerms: function(corpusTerms) {
+		corpusTerms.load({
+		    callback: function(records, operation, success) {
+		    	this.setMode(this.MODE_CORPUS);
+		    	this.loadFromTermsRecords(records)
 		    },
 		    scope: this,
 		    params: this.getApiParams()
     	});
     },
     
-    loadFromCorpusTermsRecords: function(records) {
+    loadFromTermsRecords: function(records) {
     	var terms = [];
     	records.forEach(function(record) {
     		terms.push({word: record.get('term'), size: record.get('rawFreq'), value: record.get('rawFreq')});
@@ -66,8 +101,12 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     buildFromTerms: function(terms) {
-    	if (this.rendered) {
+    	if (this.rendered && terms) {
     		var me = this;
+    		var target = this.getLayout().getRenderTarget();
+    		if (this.cirrus) {
+    			target.update(""); // clear
+    		}
     	    this.cirrus = new Cirrus({
     	        containerId: this.getLayout().getRenderTarget().dom.id,
     	        clickHandler: function(data) {

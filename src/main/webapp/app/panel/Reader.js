@@ -22,7 +22,7 @@ Ext.define('Voyant.panel.Reader', {
     layout: 'border',
     
     items: [{
-    	html: 'up',
+    	bodyPadding: 10,
     	region: 'center',
     	border: false,
     	height: 'auto',
@@ -52,7 +52,7 @@ Ext.define('Voyant.panel.Reader', {
     				contents+="<h3>"+this.getDocumentsStore().getById(record.getDocId()).getFullLabel()+"</h3>";
     			}
     			if (record.isWord()) {
-    				contents += "<span class='token' id='"+ record.getId() + "' data-qtip='"+documentFrequency+" "+record.getDocumentRawFreq()+"'>"+ record.getTerm() + "</span>";
+    				contents += "<span class='word' id='"+ record.getId() + "' data-qtip='"+documentFrequency+" "+record.getDocumentRawFreq()+"'>"+ record.getTerm() + "</span>";
     			}
     			else {
     				contents += record.getTermWithLineSpacing();
@@ -62,7 +62,6 @@ Ext.define('Voyant.panel.Reader', {
     	}, me);
     	me.setTokensStore(tokensStore)
     	me.on("loadedCorpus", function(src, corpus) {
-    		debugger
     		this.getTokensStore().setCorpus(corpus);
     		this.setDocumentsStore(corpus.getDocuments());
     		if (this.rendered) {
@@ -75,13 +74,25 @@ Ext.define('Voyant.panel.Reader', {
     			var body = cmp.body;
     			var dom = body.dom;
     			if (dom.scrollTop+dom.offsetHeight>dom.scrollHeight/2) { // more than half-way down
-    				var last = cmp.getLayout().getRenderTarget().last();
-    				if (last.hasCls("token")) {
-    					var mask = last.insertSibling("<div class='loading'>loading</div>", 'after', false).mask();
-    					var info = Voyant.data.model.Token.getInfoFromElement(last);
-    					this.setApiParams({'skipToDocId': this.getDocumentsStore().getAt(info.docIndex).getId(), start: info.position});
-    					debugger
-    						this.load();
+    				var target = cmp.getLayout().getRenderTarget();
+    				var last = target.last();
+    				if (last.hasCls("loading")==false) {
+    					while(last) {
+    						if (last.hasCls("word")) {
+    	    					var mask = last.insertSibling("<div class='loading'>loading</div>", 'after', false).mask();
+    	    					var info = Voyant.data.model.Token.getInfoFromElement(last);
+    	    					last.destroy();
+								console.warn(info.docIndex)
+    	    					var doc = this.getDocumentsStore().getAt(info.docIndex);
+    	    					var id = doc.getId();
+    	    					console.warn(info.docIndex, doc, id);
+    	    					this.setApiParams({'skipToDocId': id, start: info.position});
+    							this.load();
+    							break;
+    						}
+    						last.destroy(); // remove non word
+    						last = target.last();
+    					}
     				}
     			}
     		}, this);

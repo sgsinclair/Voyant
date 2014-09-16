@@ -93,7 +93,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
                 listeners: {
                     selectionchange: {
                     	fn: function(sm, selections) {
-                    		this.getApplication().dispatchEvent('corpusTermsClicked', this, selections);
+                    		this.getApplication().dispatchEvent('documentTermsClicked', this, selections);
                     	},
                     	scope: this
                     }
@@ -149,7 +149,33 @@ Ext.define('Voyant.panel.DocumentTerms', {
                 widget: {
                     xtype: 'sparklineline'
                 }
-            }]
+            }],
+            
+            listeners: {
+            	termsClicked: {
+            		fn: function(src, terms) {
+                		if (this.getStore().getCorpus()) { // make sure we have a corpus
+                    		var queryTerms = [];
+                    		terms.forEach(function(term) {
+                    			if (term.term) {queryTerms.push(term.term);}
+                    		});
+                    		if (queryTerms) {
+                    			this.setApiParams({
+                    				docIndex: undefined,
+                    				docId: undefined,
+                    				query: queryTerms
+                    			});
+                        		if (this.isVisible()) {
+                            		if (this.isVisible()) {
+                                		this.getStore().loadPage(1, {params: this.getApiParams()});
+                            		}
+                        		}
+                    		}
+                		}
+                	},
+                	scope: this
+            	}
+            }
         });
 
         me.callParent(arguments);

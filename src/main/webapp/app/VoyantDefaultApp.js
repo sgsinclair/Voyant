@@ -40,6 +40,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		               {
 		            	   xtype: 'tabpanel',
 		            	   region: 'center',
+		   		    	split: true,
 		            	   items: [{
 		            		   xtype: 'cirrus',
 			                   collapsible: true
@@ -51,6 +52,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		               },{
 		            	   xtype: 'tabpanel',
 		            	   region: 'south',
+		   		    	   split: true,
 		            	   items: [{
 		            		   xtype: 'summary',
 			                   collapsible: true

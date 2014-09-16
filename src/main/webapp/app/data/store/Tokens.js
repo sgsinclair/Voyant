@@ -23,7 +23,8 @@ Ext.define('Voyant.data.store.Tokens', {
 		         },
 		         reader: {
 		             type: 'json',
-		             rootProperty: 'documentTokens.tokens'
+		             rootProperty: 'documentTokens.tokens',
+		             totalProperty: 'documentTokens.total'
 		         },
 		         simpleSortMode: true
 		     }

@@ -23,6 +23,9 @@ Ext.define('Voyant.panel.Trends', {
     	}
     },
     
+    MODE_CORPUS: 'corpus',
+    MODE_DOCUMENT: 'document',
+    
     layout: 'fit',
     
     constructor: function(config) {
@@ -70,7 +73,7 @@ Ext.define('Voyant.panel.Trends', {
         				docIndex: undefined,
         				docId: undefined,
         				query: queryTerms,
-        				mode: 'corpus'
+        				mode: this.MODE_CORPUS
         			});
             		if (this.isVisible()) {
                 		this.loadFromCorpus(this.getCorpus());
@@ -92,6 +95,14 @@ Ext.define('Voyant.panel.Trends', {
     		}
     	}, this)
     	
+    	this.on("ensureCorpusView", function(src, corpus) {
+    		if (this.getApiParam('mode')!=this.MODE_CORPUS && corpus.getDocumentsCount()>1) {
+    			this.setApiParam('docId', undefined);
+    			this.loadFromCorpus(corpus);
+    		}
+    	}, this);
+
+    	
     },
     
     loadFromDocument: function(document) {
@@ -106,7 +117,7 @@ Ext.define('Voyant.panel.Trends', {
         			docIndex: undefined,
         			query: undefined,
         			docId: document.getId(),
-        			mode: 'document'
+        			mode: this.MODE_DOCUMENT
         		})
         		if (this.isVisible()) {
                 	this.loadFromDocumentTerms();
@@ -129,7 +140,7 @@ Ext.define('Voyant.panel.Trends', {
     		    	}
     		    },
     		    scope: this,
-    		    params: Ext.apply(this.getApiParams(), {
+    		    params: Ext.apply(this.getApiParams(['limit','stopList','query','docId']), {
     		    	withDistributions: true
     		    })
         	});
@@ -153,7 +164,7 @@ Ext.define('Voyant.panel.Trends', {
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
 		    	if (success) {
-			    	this.setApiParam('mode', 'corpus');
+			    	this.setApiParam('mode', this.MODE_CORPUS);
 			    	this.loadFromRecords(records);
 		    	}
 		    	else {
@@ -161,7 +172,7 @@ Ext.define('Voyant.panel.Trends', {
 		    	}
 		    },
 		    scope: this,
-		    params: Ext.apply(this.getApiParams() || {}, {
+		    params: Ext.apply(this.getApiParams(['limit','stopList','query']) || {}, {
 		    	withDistributions: 'relative'
 		    })
     	});
@@ -202,7 +213,8 @@ Ext.define('Voyant.panel.Trends', {
                     }
                 },
                 listeners: {
-                    itemsingletap: function() {
+                	itemmousedown: function() {
+                    	debugger
                     	// TODO: fix trends item tapping
                     	console.warn("not working currently")
                     }
@@ -224,17 +236,17 @@ Ext.define('Voyant.panel.Trends', {
         		type: 'numeric',
         		position: 'left',
         		title: {
-        			text: this.localize(mode=='document' || this.getApiParam('freqsMode') =='rawFreqs' ? 'rawFrequencies' : 'relativeFrequencies'),
+        			text: this.localize(mode==this.MODE_DOCUMENT || this.getApiParam('freqsMode') =='rawFreqs' ? 'rawFrequencies' : 'relativeFrequencies'),
         		}
         	}, {
         		type: 'category',
         		position: 'bottom',
         		fields: ['index'],
         		title: {
-            		text: this.localize(mode=='document' ? 'segments' : 'documents'),
+            		text: this.localize(mode==this.MODE_DOCUMENT ? 'segments' : 'documents'),
         		},
         		renderer: function(label, data) {
-        			return mode=='document' ? parseInt(label)+1 : label
+        			return mode==this.MODE_DOCUMENT ? parseInt(label)+1 : label
         		}
         	}]
     	});
@@ -256,7 +268,22 @@ Ext.define('Voyant.panel.Trends', {
     		interactions: ['itemhighlight','panzoom'],
     		innerPadding: {top: 5, right: 5, bottom: 5, left: 5},
     		border: false,
-    	    bodyBorder: false
+    	    bodyBorder: false,
+    	    listeners: {
+    	    	// FIXME: this is a work-around because item clicking is broken in EXTJS 5.0.1 (so all hover events currently trigger event)
+    	        itemhighlight: {
+    	        	fn: function (item) {
+    	        		if (!this.isLastClickedItem(item)) {
+    	            		if (this.deferredHandleClickedItem) {
+    	            			clearTimeout(this.deferredHandleClickedItem);
+    	            		}
+        	        		this.deferredHandleClickedItem = Ext.defer(this.handleClickedItem, 250, this, arguments);
+    	            		
+    	            	}
+    	        	},
+    	        	scope: this
+    	        }
+    	    }
     	});
     	
     	// remove existing chart
@@ -264,5 +291,25 @@ Ext.define('Voyant.panel.Trends', {
 
 		var chart = Ext.create("Ext.chart.CartesianChart", config);
     	this.add(chart);
+    },
+    
+    handleClickedItem: function(item) {
+    	if (!this.isLastClickedItem(item)) {
+        	var mode = this.getApiParam("mode");
+        	if (mode===this.MODE_DOCUMENT) {
+        		
+        	}
+        	else if (mode==this.MODE_CORPUS) {
+        		this.dispatchEvent("documentIndexTermsClicked", this, [{
+        			term: item.series.getTitle(),
+        			docIndex: item.index
+        		}]);
+        	}
+    		this.lastClickedItem=item;
+    	}
+    },
+    
+    isLastClickedItem: function(item) {
+    	return this.lastClickedItem && this.lastClickedItem.term==item.term && this.lastClickedItem.index==item.index
     }
 })

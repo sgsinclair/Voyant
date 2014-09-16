@@ -21,6 +21,7 @@ function Cirrus(config) {
     }
     
     this.addWords = function(words) {
+    	debugger
         wordController.addWords(words);
     }
     

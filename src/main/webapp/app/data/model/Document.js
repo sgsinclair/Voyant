@@ -27,6 +27,10 @@ Ext.define('Voyant.data.model.Document', {
     
     getTitle: function() {
     	return this.get('title');
+    },
+    
+    getCorpusId: function() {
+    	return this.get('corpus');
     }
     
 });

@@ -12,8 +12,8 @@ Ext.define("Voyant.data.store.Documents", {
     	}
     },
 	sorters: {
-        property: 'title',
-        direction: 'DESC'
+        property: 'index',
+        direction: 'ASC'
 	},
 	remoteSort: true,
 	constructor : function(config) {
