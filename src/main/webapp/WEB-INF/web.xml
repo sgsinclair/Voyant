@@ -14,7 +14,7 @@
 		<param-name>build</param-name>
 		<param-value>BETA-1</param-value>
 	</context-param>
-	
+
 	<servlet>
 		<servlet-name>tool</servlet-name>
 		<jsp-file>/tool/index.jsp</jsp-file>
@@ -24,36 +24,6 @@
 		<servlet-name>tool</servlet-name>
 		<url-pattern>/tool/*</url-pattern>
 	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>documentskin</servlet-name>
-		<jsp-file>/skin/document/index.jsp</jsp-file>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>documentskin</servlet-name>
-		<url-pattern>/skin/document/*</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>corpustoolsetskin</servlet-name>
-		<jsp-file>/skin/corpustoolset/index.jsp</jsp-file>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>corpustoolsetskin</servlet-name>
-		<url-pattern>/skin/corpustoolset/*</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>notebook</servlet-name>
-		<jsp-file>/skins/notebook/index.jsp</jsp-file>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>notebook</servlet-name>
-		<url-pattern>/notebook/*</url-pattern>
-	</servlet-mapping>
-	
 	
 	<!-- available from http://localhost:8080/trombone?param=...&param=...&param=... -->
 	<servlet>

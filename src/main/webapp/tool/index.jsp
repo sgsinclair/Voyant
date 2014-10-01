@@ -4,7 +4,7 @@ String[] parts = request.getRequestURI().substring(request.getContextPath().leng
 if (parts.length<2) {throw new Exception("No tool provided.");}
 String tool = parts[1];
 
-%><%@ include file="../pre_app.jsp" %>
+%><%@ include file="../resources/jsp/pre_app.jsp" %>
 <script>
 	Ext.Loader.setConfig({
 		enabled : true,
@@ -27,4 +27,4 @@ String tool = parts[1];
 	});
 	
 </script>
-<%@ include file="../post_app.jsp" %>
+<%@ include file="../resources/jsp/post_app.jsp" %>

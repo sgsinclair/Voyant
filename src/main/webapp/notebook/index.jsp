@@ -1,4 +1,4 @@
-<%@ include file="../../pre_app.jsp" %>
+<%@ include file="../../resources/jsp/pre_app.jsp" %>
 <script src="../../resources/ckeditor/current/ckeditor.js"></script>
 <script src="../../resources/ace/current/ace.js"></script>
 <style>
@@ -43,4 +43,4 @@
 		}
 	});
 </script>
-<%@ include file="../../post_app.jsp" %>
+<%@ include file="../../resources/jsp/post_app.jsp" %>
