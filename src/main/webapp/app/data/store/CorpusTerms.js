@@ -22,9 +22,9 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 		     proxy: {
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
+		         extraParams: Ext.apply(config.extraParams || {}, {
 		        	 tool: 'corpus.CorpusTerms'
-		         },
+		         }),
 		         reader: {
 		             type: 'json',
 		             rootProperty: 'corpusTerms.terms',

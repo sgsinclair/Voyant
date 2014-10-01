@@ -44,3 +44,20 @@ a {
 	color: grey;
 	font-style: italic;
 }
+
+svg text {
+	text-anchor: middle;
+}
+
+svg text.keyword {
+	text-anchor: middle;
+}
+
+svg text.context {
+	text-anchor: middle;
+}
+
+svg line {
+  stroke: #eee;
+  stroke-width: 1px;
+}

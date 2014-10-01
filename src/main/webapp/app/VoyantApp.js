@@ -33,6 +33,10 @@ Ext.define('Voyant.VoyantApp', {
         
     },
     
+    getTools: function() {
+    	return [{type: 'maximize'},{type: 'help'}]
+    },
+    
     tromboneCall: function(config) {
     	var config = config ? config : {};
     	Ext.applyIf(config, {

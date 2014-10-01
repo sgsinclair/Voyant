@@ -26,6 +26,26 @@
 	</servlet-mapping>
 	
 	<servlet>
+		<servlet-name>documentskin</servlet-name>
+		<jsp-file>/skin/document/index.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>documentskin</servlet-name>
+		<url-pattern>/skin/document/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>corpustoolsetskin</servlet-name>
+		<jsp-file>/skin/corpustoolset/index.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>corpustoolsetskin</servlet-name>
+		<url-pattern>/skin/corpustoolset/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
 		<servlet-name>notebook</servlet-name>
 		<jsp-file>/skins/notebook/index.jsp</jsp-file>
 	</servlet>

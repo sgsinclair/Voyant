@@ -13,6 +13,10 @@ Ext.define('Voyant.panel.Panel', {
 		this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 	},
 	
+	initComponent: function(config) {
+		this.tools = this.getApplication().getTools();
+	},
+	
 	getApplication: function() {
 		return Voyant.application
 	},

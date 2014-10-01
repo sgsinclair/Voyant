@@ -1,6 +1,6 @@
 Ext.define('Voyant.VoyantDefaultApp', {
 	extend : 'Voyant.VoyantCorpusApp',
-	requires: ['Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms'],
+	requires: ['Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CollocatesGraph'],
 	name : 'VoyantDefaultApp',
 	launch: function() {
 		Ext.create('Ext.container.Viewport', {
@@ -82,11 +82,24 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		            	   flex: 5
 		               },
 		               {
-		            	   xtype: 'contexts',
+		            	   xtype: 'tabpanel',
 		            	   region: 'south',
-		            	   split: true,
 		            	   flex: 5,
-		                   collapsible: true
+		            	   items: [
+									{
+										   xtype: 'collocatesgraph',
+										   split: true,
+										   flex: 5,
+									    collapsible: true
+									},{
+					            	   xtype: 'contexts',
+					            	   split: true,
+					            	   flex: 5,
+					                   collapsible: true
+					               }
+					               
+		            	   ],
+		            	   tools: this.getTools()
 		               }
 		        ]
 		    }]

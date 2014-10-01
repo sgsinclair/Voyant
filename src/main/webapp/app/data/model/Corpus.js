@@ -130,6 +130,10 @@ Ext.define('Voyant.data.model.Corpus', {
 		return Ext.create("Voyant.data.store.CorpusTerms", Ext.apply(config || {}, {corpus: this}));
 	},
 	
+	getCorpusCollocates: function(config) {
+		return Ext.create("Voyant.data.store.CorpusCollocates", Ext.apply(config || {}, {corpus: this}));
+	},
+	
 	getDocumentQueryMatches: function(config) {
 		// not expected to be called before corpus is defined
 		return Ext.create("Voyant.data.store.DocumentQueryMatches", Ext.apply(config || {}, {corpus: this}));
