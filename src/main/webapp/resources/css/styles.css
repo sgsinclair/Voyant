@@ -3,6 +3,22 @@ a {
     text-decoration: none;
 }
 
+#logo-container {
+	height: 200px;
+	width: 670px;
+	margin: 0 auto;
+	background-image: url(../images/voyant-see.png);
+	background-repeat: no-repeat;
+}
+
+#voyantheader .x-panel-header-default {
+	background-color: #ffffff;
+}
+
+#voyantheader .x-panel-header-default-collapsed {
+	background-color: #f5f5f5;
+}
+
 .voyant-footer {
     text-align: center;
     font-size: 10px;

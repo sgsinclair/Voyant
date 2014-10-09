@@ -9,8 +9,26 @@ Ext.define('Voyant.panel.VoyantHeader', {
     },
     constructor: function() {
     	Ext.apply(this, {
-    		title: this.localize('title')
-    	})
+    		id: 'voyantheader',
+    		title: '',
+    		layout : 'fit',
+    		html: '<div id="logo-container"></div>',
+    		collapseMode : undefined,
+			collapsible: true,
+			animCollapse: false,
+			titleCollapse: false,
+			floatable: false,
+			header: true,
+			hideCollapseTool: true,
+			tools: [],
+			listeners: {
+				collapse: this.onCollapse
+			}
+    	});
         this.callParent(arguments);
+    },
+    
+    onCollapse: function(panel) {
+    	panel.setTitle(this.localize('title'));
     }
 });
