@@ -36,49 +36,47 @@ Ext.define('Voyant.VoyantDefaultApp', {
 				    	flex: .3,
 				        layout: 'border',
 				        split: true,
-				        items: [
-				               {
-				            	   xtype: 'tabpanel',
-				            	   region: 'center',
-				   		    	split: true,
-				            	   items: [{
-				            		   xtype: 'cirrus',
-					                   collapsible: true
-				            	   },{
-				            		   xtype: 'corpusterms',
-					                   collapsible: true
-				            	   }],
-				            	   flex: 6
-				               },{
-				            	   xtype: 'tabpanel',
-				            	   region: 'south',
-				   		    	   split: true,
-				            	   items: [{
-				            		   xtype: 'summary',
-					                   collapsible: true
-				            	   },{
-				            		   xtype: 'documents',
-					                   collapsible: true
-				            	   }],
-				            	   flex: 4
-				               }
-				        ]
+				        items: [{
+							xtype : 'tabpanel',
+							region : 'center',
+							split : true,
+							items : [ {
+								xtype : 'cirrus',
+								collapsible : true
+							}, {
+								xtype : 'corpusterms',
+								collapsible : true
+							} ],
+							flex : 6
+						}, {
+							xtype : 'tabpanel',
+							region : 'south',
+							split : true,
+							items : [ {
+								xtype : 'summary',
+								collapsible : true
+							}, {
+								xtype : 'documents',
+								collapsible : true
+							} ],
+							flex : 4
+						}]
 				    },{
 				    	region: 'east',
-						    	split : true,
+						split : true,
 						flex : .3,
 						layout : 'border',
 						items : [ {
 							xtype : 'tabpanel',
 							region : 'center',
+							flex : 5,
 							items : [ {
 								xtype : 'trends',
 								collapsible : true
 							}, {
 								xtype : 'documentterms',
 								collapsible : true
-							} ],
-							flex : 5
+							} ]
 						}, {
 							xtype : 'tabpanel',
 							region : 'south',
@@ -95,8 +93,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 								collapsible : true
 							}
 
-							],
-							tools : this.getTools()
+							]
 						} ]
 				    }]
 				}]

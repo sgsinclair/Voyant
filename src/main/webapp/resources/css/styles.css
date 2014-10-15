@@ -16,7 +16,11 @@ a {
 }
 
 #voyantheader .x-panel-header-default-collapsed {
-	background-color: #f5f5f5;
+	background-color: #157fcc;
+}
+
+#voyantheader .x-panel-header-default-collapsed .x-panel-header-title-default {
+	color: #ffffff;
 }
 
 .voyant-footer {
