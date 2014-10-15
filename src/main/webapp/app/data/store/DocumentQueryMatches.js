@@ -10,6 +10,7 @@ Ext.define('Voyant.data.store.DocumentQueryMatches', {
 		
 		// create proxy in constructor so we can set the Trombone URL
 		Ext.applyIf(config, {
+			autoLoad: false,
 		     proxy: {
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),

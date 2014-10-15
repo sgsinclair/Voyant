@@ -1,7 +1,7 @@
 Ext.define('Voyant.panel.CorpusTerms', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
-	requires: ['Ext.ux.form.SearchField'],
+//	requires: ['Ext.ux.form.SearchField'],
 	alias: 'widget.corpusterms',
     statics: {
     	i18n: {

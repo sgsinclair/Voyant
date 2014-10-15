@@ -1,3 +1,25 @@
+Ext.define("Voyant.data.proxy.CorpusTerms", {
+	extend: 'Ext.data.proxy.Ajax',
+	constructor: function(config) {
+		config = config || {};
+		Ext.apply(config, {
+			extraParams: Ext.apply(config.extraParams || {}, {
+				 tool: 'corpus.CorpusTerms'
+			})
+		});
+		Ext.applyIf(config, {
+			url: Voyant.application.getTromboneUrl()
+		})
+		this.callParent([config]);
+	},
+	reader: {
+	    type: 'json',
+	    rootProperty: 'corpusTerms.terms',
+	    totalProperty: 'corpusTerms.total'
+	},
+    simpleSortMode: true,
+})
+
 Ext.define('Voyant.data.store.CorpusTerms', {
 	extend: 'Ext.data.BufferedStore',
 	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
@@ -17,21 +39,8 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 			pageSize: 100,
 			leadingBufferZone: 100,
 			remoteSort: true,
-			
 			autoLoad: false, // needs to be false until there's a corpus
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: Ext.apply(config.extraParams || {}, {
-		        	 tool: 'corpus.CorpusTerms'
-		         }),
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'corpusTerms.terms',
-		             totalProperty: 'corpusTerms.total'
-		         },
-		         simpleSortMode: true,
-		     }
+		    proxy: Ext.create("Voyant.data.proxy.CorpusTerms")
 		})
 
     	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
