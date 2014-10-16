@@ -183,10 +183,10 @@ Ext.define('Voyant.data.model.Corpus', {
 		else {
 			message+=' ';
 			if (size>1) {
-				message+=this.localize('hasNdocuments', {count: Ext.util.Format.number(size,"0,000")})
+				message+=this.localize('hasNdocuments', {count: Ext.util.Format.number(size,"0,000")});
 			}
 			else {
-				message+=this.localize('has1document')			
+				message+=this.localize('has1document');
 			}
 			message+=' '+this.localize('widthNwordsAndNTypes', {words: Ext.util.Format.number(this.getWordTokensCount(),"0,000"), types: Ext.util.Format.number(this.getWordTypesCount(),"0,000")})+'.'
 			message+=" Created "
@@ -213,6 +213,8 @@ Ext.define('Voyant.data.model.Corpus', {
 				message+=this.localize('now');
 			}
 			message+='.';
+			
+			message+='';
 		}
 		return message;
     }

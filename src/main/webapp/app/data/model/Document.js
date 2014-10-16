@@ -10,7 +10,26 @@ Ext.define('Voyant.data.model.Document', {
         	 	return data['typesCount-lexical']/data['tokensCount-lexical'];
              }},
              {name: 'title'},
-             {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data}}
+             {name: 'shortTitle', mapping: function(data) {
+            	var title = data.title.replace(/\.(html?|txt|xml|docx?|pdf|rtf|\/)$/,'');
+         		if (title.length > 25) {
+         				// maybe a file or URL?
+         				var slash = title.lastIndexOf("/");
+         				if (slash>-1) {
+         					title = title.substr(slash+1);
+         				}
+         				
+         				if (title.length>25) {
+         					var space = title.indexOf(" ", 20);
+         					if (space < 0 || space > 30) {
+         						space = 25;
+         					}
+         					title = title.substring(0, space) + "&hellip;;";
+         				}
+         		}
+         		return title; 
+             }},
+             {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data;}}
     ],
     
     getDocumentTerms: function(config) {
@@ -27,6 +46,10 @@ Ext.define('Voyant.data.model.Document', {
     
     getTitle: function() {
     	return this.get('title');
+    },
+    
+    getShortTitle: function() {
+    	return this.get('shortTitle');
     },
     
     getCorpusId: function() {
