@@ -228,7 +228,7 @@
 						<td><div><input class="dream-terms-search" name="publisher" /><span class="badge" id="publisher-badge"></span></div></td>
 					</tr>
 					<tr>
-						<td colspan="2"><input type="checkbox" id="variants"> use spelling variants for keywords</td>
+						<td colspan="2"><input type="checkbox" id="variants" checked=""> use spelling variants for keywords</td>
 				</table>
 			</td>
 		</tr>
