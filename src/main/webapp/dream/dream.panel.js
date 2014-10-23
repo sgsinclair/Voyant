@@ -1,11 +1,18 @@
 Ext.define("Voyant.panel.Dream", {
 	extend: "Ext.panel.Panel",
-	requires: ['Voyant.data.store.DocumentQueryMatches'],
+	requires: ['Voyant.data.store.DocumentQueryMatches','Voyant.util.Variants'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.dream',
     config: {
-    	corpus: undefined
+    	corpus: undefined,
+    	variants: undefined
     },
+    initComponent: function() {
+        var me = this;
+        me.callParent(arguments);
+        this.setVariants(Ext.create("Voyant.util.Variants", [["one","two"],["un","deux"]]))
+    },
+    
 	listeners: {
 		afterrender: function(container) {
 						
@@ -139,23 +146,34 @@ Ext.define("Voyant.panel.Dream", {
 		      })
 		      .autocomplete({
 		        source: function( request, response ) {
-		        	var term = extractLast( request.term ).trim().replace(/,$/,'')+"*"
+		        	var field = this.element[0].name;
+		        	var fieldPrefix = field=="lexical" ? "" : field+":";
+		        	var term = extractLast( request.term ).trim().replace(/,$/,'');
+		        	var queries = [fieldPrefix+term+"*","^"+fieldPrefix+term+"*"];
+		        	var variants = container.getVariants().getVariants(term);
+		        	if (Ext.isArray(variants) && variants.length>1) {
+			        	for (var i=0, len=variants.length; i<len; i++) {
+			        		variants[i] = fieldPrefix+variants[i];
+			        	}
+			        	queries.push(variants.join("|"))
+		        		
+		        	}
+		        	
 		        	$.ajax({
 		                url: container.getTromboneUrl(),
 		                dataType: "json",
 		                data: {
-				            query: this.element[0].name+":"+term,
+				            query: queries,
 				            tool: 'corpus.CorpusTerms',
 				            limit: 5,
 				            corpus: container.getCorpus().getId()
 		                },
 		                success: function( data ) {
 		                	var terms = [];
-		                	if (data.corpusTerms.terms.length>1) {
-		                		terms.push({id: term, label: term, value: term})
-		                	}
+		                	var fieldPrefixRegex = new RegExp("title:","g");
 				        	data.corpusTerms.terms.forEach(function(corpusTerm) {
-				        		  terms.push({id: corpusTerm.term, label: corpusTerm.term + "("+corpusTerm.rawFreq+")", value: corpusTerm.term})
+				        		var term = corpusTerm.term.replace(fieldPrefixRegex,"");
+				        		  terms.push({id: corpusTerm.term, label: term+ "  ("+corpusTerm.rawFreq+")", value: term})
 				        	})
 				        	response(terms);
 		                }
@@ -195,6 +213,7 @@ Ext.define("Voyant.panel.Dream", {
 		var el = Ext.get(this.getEl().dom.querySelector("#"+field+"-badge"));
 		el.setDisplayed("initial").update("?");
 		value = value.trim().replace(/,$/,'');
+		var query = field+":"+value.trim().replace(/,$/,'').split(/\s*[,|]\s*/).join("|"+field+":")
 		if (value) {
 			Ext.create("Voyant.data.store.DocumentQueryMatches", {
 				autoDestroy: true,
@@ -202,7 +221,7 @@ Ext.define("Voyant.panel.Dream", {
 				corpus: this.getCorpus()
 			}).load({
 				scope: this,
-				params: {query: field+":"+value},
+				params: {query: query},
 				callback: function(records, operation, success) {
 					var count = success && records.length>0 ? records[0].getCount() : "0";
 					el.dom.innerHTML=count; // update(0) doesn't work
@@ -247,12 +266,10 @@ Ext.define("Voyant.panel.Dream", {
 		for (var i=0,len=searches.length;i<len;i++) {
 			var val = searches[i].value.trim().replace(/,$/,'');
 			if (val) {
-				fields.push(searches[i].name);
-				var qs = [];
-				val.split(/\s*,\s*/).forEach(function(q) {
-					qs.push(searches[i].name+":"+q)
-				});			
-				queries.push("+("+qs.join(" | ")+")")
+				var field = searches[i].name;
+				var query = field+":"+val.split(/\s*[,|]\s*/).join("|"+field+":")
+				fields.push(field);
+				queries.push("+("+query+")")
 			}
 		}
 
