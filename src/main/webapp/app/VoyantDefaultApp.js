@@ -6,6 +6,22 @@ Ext.define('Voyant.VoyantDefaultApp', {
     	loadedCorpus: function(src, corpus) {
     		this.viewport.down('voyantheader').collapse();
     		this.viewport.down('#toolsContainer').setActiveItem(1);
+    		
+    		if (window.history.pushState) {
+    			// add the corpusId to the url
+    			var corpusId = corpus.getId();
+        		var queryParams = Ext.Object.fromQueryString(document.location.search);
+        		
+    			var url = this.getBaseUrl()+'?corpus='+corpusId;
+    			for (var key in queryParams) {
+    				if (key !== 'corpus') {
+    					url += '&'+key+'='+queryParams[key];
+    				}
+    			}
+    			window.history.pushState({
+    				corpus: corpusId,
+    			}, 'Corpus: '+corpusId, url);
+    		}
     	}
 	},
 	launch: function() {
