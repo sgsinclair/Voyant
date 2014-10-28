@@ -44,21 +44,23 @@ Ext.define('Voyant.panel.Reader', {
     initComponent: function() {
     	var me = this;
     	var tokensStore = Ext.create("Voyant.data.store.Tokens");
-    	tokensStore.on("load", function(s, records) {
-    		var contents = "";
-    		var documentFrequency = this.localize("documentFrequency");
-    		records.forEach(function(record) {
-    			if (record.getPosition()==0) {
-    				contents+="<h3>"+this.getDocumentsStore().getById(record.getDocId()).getFullLabel()+"</h3>";
-    			}
-    			if (record.isWord()) {
-    				contents += "<span class='word' id='"+ record.getId() + "' data-qtip='"+documentFrequency+" "+record.getDocumentRawFreq()+"'>"+ record.getTerm() + "</span>";
-    			}
-    			else {
-    				contents += record.getTermWithLineSpacing();
-    			}
-    		}, this);
-    		this.updateText(contents, true);
+    	tokensStore.on("load", function(s, records, success) {
+    		if (success) {
+	    		var contents = "";
+	    		var documentFrequency = this.localize("documentFrequency");
+	    		records.forEach(function(record) {
+	    			if (record.getPosition()==0) {
+	    				contents+="<h3>"+this.getDocumentsStore().getById(record.getDocId()).getFullLabel()+"</h3>";
+	    			}
+	    			if (record.isWord()) {
+	    				contents += "<span class='word' id='"+ record.getId() + "' data-qtip='"+documentFrequency+" "+record.getDocumentRawFreq()+"'>"+ record.getTerm() + "</span>";
+	    			}
+	    			else {
+	    				contents += record.getTermWithLineSpacing();
+	    			}
+	    		}, this);
+	    		this.updateText(contents, true);
+    		}
     	}, me);
     	me.setTokensStore(tokensStore)
     	me.on("loadedCorpus", function(src, corpus) {
