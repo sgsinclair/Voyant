@@ -4,6 +4,7 @@ Ext.define('Voyant.data.model.Document', {
     fields: [
              {name: 'corpus'},
              {name: 'id'},
+             {name: 'index', type: 'int'},
              {name: 'tokensCount-lexical', type: 'int'},
              {name: 'typesCount-lexical', type: 'int'},
              {name: 'typeTokenRatio-lexical', type: 'float', calculate:  function(data) {
