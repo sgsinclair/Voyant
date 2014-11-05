@@ -520,23 +520,43 @@ function WordController(parentApp) {
             word.alpha = 1;
             if (word.live) word.draw(app.context);
         }
+        var $canvasEl = $(app.canvas);
         if (overWord != null) {
+        	// add pointer cursor
+        	$canvasEl.css('cursor', 'pointer');
+        	
             // draw the tooltip
             app.context.save();
             app.context.textBaseline = 'alphabetic';
             app.context.font = '12px Arial';
+            
             var wordWidth = app.context.measureText(overWord.text).width;
             var valueWidth = app.context.measureText(overWord.value).width;
             var maxWidth = wordWidth > valueWidth ? wordWidth : valueWidth;
+            maxWidth += 20;
+            
+            var x = overX + 15;
+            var y = overY + 25;
+            var appWidth = $canvasEl.width();
+            var appHeight = $canvasEl.height();
+            if (x + maxWidth >= appWidth) {
+            	x -= maxWidth;
+            }
+            if (y + 40 >= appHeight) {
+            	y -= 40;
+            }
+            
             app.context.fillStyle = 'rgba(255,255,255,0.9)';
             app.context.strokeStyle = 'rgba(100,100,100,0.9)';
-            app.context.translate(overX+10, overY+5);
-            app.context.fillRect(0, 0, maxWidth+20, 40);
-            app.context.strokeRect(0, 0, maxWidth+20, 40);
+            app.context.translate(x, y);
+            app.context.fillRect(0, 0, maxWidth, 40);
+            app.context.strokeRect(0, 0, maxWidth, 40);
             app.context.fillStyle = 'rgba(0,0,0,0.9)';
             app.context.fillText(overWord.text+':', 8, 18);
             app.context.fillText(overWord.value, 8, 30);
             app.context.restore();
+        } else {
+        	$canvasEl.css('cursor', 'default');
         }
     }
     
@@ -558,8 +578,8 @@ function WordController(parentApp) {
             overWord = this.findWordByCoords(x, y);
             if (overWord != null) {
                 overWord.isOver = true;
-                overX = event.pageX;
-                overY = event.pageY;
+                overX = x;
+                overY = y;
             }
         }
     }
