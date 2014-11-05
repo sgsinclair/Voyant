@@ -36,7 +36,7 @@ Ext.define('Voyant.panel.Reader', {
     constructor: function() {
     	Ext.apply(this, {
     		title: this.localize('title')
-    	})
+    	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
@@ -62,7 +62,7 @@ Ext.define('Voyant.panel.Reader', {
 	    		this.updateText(contents, true);
     		}
     	}, me);
-    	me.setTokensStore(tokensStore)
+    	me.setTokensStore(tokensStore);
     	me.on("loadedCorpus", function(src, corpus) {
     		this.getTokensStore().setCorpus(corpus);
     		this.setDocumentsStore(corpus.getDocuments());
@@ -71,6 +71,7 @@ Ext.define('Voyant.panel.Reader', {
     		}
     	}, me);
     	me.on("afterrender", function() {
+    		// scroll listener
     		this.items.getAt(0).body.on("scroll", function() {
     			var cmp = this.items.getAt(0);
     			var body = cmp.body;
@@ -81,10 +82,10 @@ Ext.define('Voyant.panel.Reader', {
     				if (last.hasCls("loading")==false) {
     					while(last) {
     						if (last.hasCls("word")) {
-    	    					var mask = last.insertSibling("<div class='loading'>loading</div>", 'after', false).mask();
+    	    					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
     	    					var info = Voyant.data.model.Token.getInfoFromElement(last);
     	    					last.destroy();
-								console.warn(info.docIndex)
+								console.warn(info.docIndex);
     	    					var doc = this.getDocumentsStore().getAt(info.docIndex);
     	    					var id = doc.getId();
     	    					console.warn(info.docIndex, doc, id);
@@ -98,8 +99,22 @@ Ext.define('Voyant.panel.Reader', {
     				}
     			}
     		}, this);
-    		if (this.getCorpus()) {this.load()}
-    	}, me)
+    		
+    		// click listener
+    		this.items.getAt(0).body.on("click", function(event, target) {
+    			target = Ext.get(target);
+    			if (target.hasCls('word')) {
+    				var info = Voyant.data.model.Token.getInfoFromElement(target);
+    				var term = target.getHtml();
+    				var data = [{
+    					term: term
+    				}];
+    				this.getApplication().dispatchEvent('termsClicked', this, data);
+    			}
+    		}, this);
+    		
+    		if (this.getCorpus()) {this.load();}
+    	}, me);
         me.callParent(arguments);
     },
     
@@ -108,13 +123,13 @@ Ext.define('Voyant.panel.Reader', {
     		params: Ext.apply(this.getApiParams(), {
     			stripTags: 'blocksOnly'
     		})
-    	})
+    	});
     },
     
     updateText: function(contents) {
     	var target = this.items.getAt(0).getLayout().getRenderTarget();
     	var last = target.last();
     	if (last && last.isMasked()) {last.destroy();}
-		target.insertHtml('beforeEnd',contents);
+		target.insertHtml('beforeEnd', contents);
     }
-})
+});

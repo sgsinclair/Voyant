@@ -6,7 +6,8 @@ Ext.define('Voyant.panel.Panel', {
 			rawFreq: {en: "Count"},
 			relativeFreq: {en: 'Relative'},
 			trend: {en: "Trend"},
-			colon: {en: ': '}
+			colon: {en: ': '},
+			loading: {en: 'Loading'}
 		}
 	},
 	constructor: function(config) {
