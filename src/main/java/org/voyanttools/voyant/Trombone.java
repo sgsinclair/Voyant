@@ -3,6 +3,7 @@ package org.voyanttools.voyant;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -221,6 +222,21 @@ public class Trombone extends HttpServlet {
 			}
 
 			XslTransformer.transform(xslParameters, xml, xslt, resp.getWriter());
+		}
+		else if (parameters.getParameterValue("outputFormat", "").toUpperCase().equals("ZIP")) {
+			OutputStream outputStream = resp.getOutputStream();
+			final Controller controller = new Controller(storage, parameters);
+			try {
+				controller.run(outputStream);
+			}
+			catch (Exception e) {
+				this.log("ERROR: "+e.getLocalizedMessage(), e);
+				this.log(generateLogMessageForFailedRequest(parameters, this.hiddenParameters));
+				resp.setStatus(500);
+				resp.sendError(500, "Unable to produce ZIP file.\n"+e.getMessage());
+			}
+			outputStream.flush();
+			outputStream.close();
 		}
 		else {
 			Writer writer = resp.getWriter();

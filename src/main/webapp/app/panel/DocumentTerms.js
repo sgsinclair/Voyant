@@ -141,6 +141,13 @@ Ext.define('Voyant.panel.DocumentTerms', {
             	sortable: true,
             	renderer: Ext.util.Format.numberRenderer('0,000')
             },{
+            	text: this.localize("tfidf"),
+            	tooltip: this.localize("tfidfTip"),
+            	dataIndex: 'tfidf',
+            	width: 'autoSize',
+            	sortable: true,
+            	renderer: Ext.util.Format.numberRenderer('0,000.000')
+            },{
                 xtype: 'widgetcolumn',
                 text: this.localize("trend"),
                 tooltip: this.localize('trendTip'),

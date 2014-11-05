@@ -7,6 +7,9 @@ Ext.define('Voyant.data.model.DocumentTerm', {
              {name: 'docId'},
              {name: 'rawFreq', type: 'int'},
              {name: 'relativeFreq', type: 'float'},
+             {name: 'tfidf', type: 'float'},
+             {name: 'zscore', type: 'float'},
+             {name: 'zscoreRatio', type: 'float'},
              {name: 'distributions'}
         ],
     getTerm: function() {return this.get('term');},

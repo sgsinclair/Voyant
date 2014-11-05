@@ -7,6 +7,17 @@ Ext.define("Voyant.panel.Dream", {
     	corpus: undefined,
     	variants: undefined
     },
+    statics: {
+        api: {
+        	documentFormat: undefined,
+        	documentFilename: 'pubDate,author,title'
+        }
+    },
+    constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+
+    },
     initComponent: function() {
         var me = this;
         me.callParent(arguments);
@@ -19,11 +30,36 @@ Ext.define("Voyant.panel.Dream", {
 			if (!container.getCorpus()) {
 				container.body.mask();
 			}
-			
 			$("#export").click(function(ev) {
 				if ($("#total-badge").html()!="0") {
+					var format = container.getApiParam("documentFormat");
+					// make sure the API value is uppercase if it's set
+					if (Ext.isDefined(format) && format!=format.toUpperCase()) {container.setApiParam('documentFormat', format.toUpperCase());}
+					
+					var fieldLabels = {
+							pubDate: 'year',
+							title: 'title',
+							author: 'author',
+							publisher: 'publisher'
+					};
+					var documentFilenames = container.getApiParam('documentFilename').split(',')
+					var filenameHtml = '<table><tr><td>include:</td><td><ul id="filename-use" class="filenamegroup">'
+					var seenFilenames = {};
+					documentFilenames.forEach(function(field) {
+						seenFilenames[field]=true;
+						filenameHtml+="<li data-field='"+field+"'>"+fieldLabels[field]+"</li>";
+					});
+					filenameHtml += '</ul></td></tr><tr><td>exclude:</td><td><ul id="filename-ignore" class="filenamegroup">'
+					for (var field in fieldLabels) {
+						if (!seenFilenames[field]) {
+							filenameHtml+="<li data-field='"+field+"'>"+fieldLabels[field]+"</li>";
+						}
+					}
+					filenameHtml += '</ul></td></tr></table>',
+
 					Ext.create('Ext.window.Window', {
 					    title: 'Export DREaM Corpus',
+//					    modal: true,
 					    width: 500,
 					    items: [{
 					    	xtype: 'container',
@@ -65,12 +101,42 @@ Ext.define("Voyant.panel.Dream", {
 			                    }
 						    },{
 						    	text: 'Download a ZIP Archive',
-						    	glyph: 'xf019@FontAwesome'
+						    	glyph: 'xf019@FontAwesome',
+			                    handler: function(button) {
+			                    	var dlg = button.findParentByType("window");
+			                    	container.getAggregateSearchDocumentQueryMatches({
+			                    		params: {createNewCorpus: true},
+			                    		callback: function(records, operation, success) {
+			                    			if (success) {
+			                    				var corpus = operation.getProxy().getReader().rawData.documentsFinder.corpus;
+			                    				debugger
+			                    				var url = this.getTromboneUrl()+"?corpus="+corpus+"&tool=corpus.CorpusExporter&outputFormat=zip"+
+			                    					"&documentFormat="+(container.getApiParam("documentFormat")=="TXT" ? "TXT" : "ORIGINAL")+
+			                    					"&documentFilename="+container.getApiParam("documentFilename")
+			                    				var win = window.open(url);
+			                    				if (!win) { // popup blocked
+			                    					win = Ext.Msg.show({
+			                    						buttons: Ext.MessageBox.OK,
+			                    						buttonText: {ok: "Close"},
+			                    						icon: Ext.MessageBox.INFO,
+			                    						message: "<a href='"+url+"' target='_blank' class='link'>Click here to download your new corpus.</a>",
+			                    						buttonText: 'Close'
+			                    					});
+			                    					Ext.Msg.getEl().dom.querySelector("a").addEventListener("click", function() {
+			                    						win.close()
+			                    					})
+			                    				}
+			                    				dlg.destroy();
+			                    			}
+			                    		}
+			                    	})
+			                    }
 						    }]
 					    },{
 					    	xtype: 'fieldset',
 					    	title: 'Download Details',
 					    	collapsible: true,
+					    	collapsed: true,
 					    	items: [{
 					    		xtype: 'radiogroup',
 					            fieldLabel: 'file format',
@@ -78,20 +144,35 @@ Ext.define("Voyant.panel.Dream", {
 					            width: 250,
 					            labelWidth: 80,
 					            items: [
-					                {boxLabel: 'XML', name: 'export-format', inputValue: 'XML',checked: true},
-					                {boxLabel: 'plain text', name: 'export-format', inputValue: 'text'},
-					                
-					            ]				    		
+					                {boxLabel: 'XML', name: 'export-format', inputValue: 'XML',checked: format!="TXT"},
+					                {boxLabel: 'plain text', name: 'export-format', inputValue: 'text', checked: format=="TXT"}
+					            ],
+					            listeners: {
+					            	change: function(radio, newValue) {
+					            		container.setApiParam('documentFormat', newValue['export-format']=='TXT' ? 'TXT' : undefined);
+					            	}
+					            }
 					    	},{
 					    		xtype: 'fieldset',
 					    		title: 'File Name',
 					    		cls: 'filename',
-						    	html: '<table><tr><td>include:</td><td><ul id="filename-use" class="filenamegroup"><li>year</li><li>author</li><li>short title</li></ul></td></tr><tr><td>exclude:</td><td><ul id="filename-ignore" class="filenamegroup"><li>long title</li><li>publisher</li><li>current time</li></ul></td></tr></table>',
+						    	html: filenameHtml,
 						    	listeners: {
 						    		afterrender: {
 						    			fn: function() {
 						    				$( "#filename-use, #filename-ignore" ).sortable({
-						    				      connectWith: ".filenamegroup"
+						    				      connectWith: ".filenamegroup",
+						    				      update: function( event, ui ) {
+						    				    	  if (this.id=="filename-use") {
+						    				    		  var items = this.querySelectorAll("li");
+						    				    		  var fields = [];
+						    				    		  for (var i=0, len=items.length; i<len; i++) {
+						    				    			  fields.push(items[i].getAttribute('data-field'))
+						    				    		  }
+						    				    		  container.setApiParam("documentFilename", fields.length>0 ? fields.join(",") : undefined);
+						    				    		  debugger
+						    				    	  }
+						    				      }
 						    				    }).disableSelection();
 						    			}
 						    		}
@@ -150,13 +231,15 @@ Ext.define("Voyant.panel.Dream", {
 		        	var fieldPrefix = field=="lexical" ? "" : field+":";
 		        	var term = extractLast( request.term ).trim().replace(/,$/,'');
 		        	var queries = [fieldPrefix+term+"*","^"+fieldPrefix+term+"*"];
-		        	var variants = container.getVariants().getVariants(term);
-		        	if (Ext.isArray(variants) && variants.length>1) {
-			        	for (var i=0, len=variants.length; i<len; i++) {
-			        		variants[i] = fieldPrefix+variants[i];
+		        	if ($("#variants")[0].checked) {
+			        	var variants = container.getVariants().getVariants(term);
+			        	if (Ext.isArray(variants) && variants.length>1) {
+				        	for (var i=0, len=variants.length; i<len; i++) {
+				        		variants[i] = fieldPrefix+variants[i];
+				        	}
+				        	queries.push(variants.join("|"))
+			        		
 			        	}
-			        	queries.push(variants.join("|"))
-		        		
 		        	}
 		        	
 		        	$.ajax({
