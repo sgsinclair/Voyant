@@ -45,11 +45,11 @@ Ext.define('Voyant.VoyantDefaultApp', {
 					layout: 'border',
 					items: [{
 				        region: 'center',
-				        flex: .4,
+				        flex: 1,
 				        xtype: 'reader',
 				    },{
 				    	region: 'west',
-				    	flex: .3,
+				    	flex: 1,
 				        layout: 'border',
 				        split: true,
 				        items: [{
@@ -80,7 +80,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 				    },{
 				    	region: 'east',
 						split : true,
-						flex : .3,
+						flex : 1,
 						layout : 'border',
 						items : [ {
 							xtype : 'tabpanel',

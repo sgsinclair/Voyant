@@ -42,28 +42,30 @@ Ext.define('Voyant.panel.Documents', {
 	    	        text: this.localize('documentAuthor'),
 	    	        dataIndex: 'author',
 	    	        sortable: true,
+	    	        hidden: true,
 	    	        flex: 2
 	    	    },{
 	    	        text: this.localize('tokensCountLexical'),
 	    	        dataIndex: 'tokensCount-lexical',
 	    	        renderer: Ext.util.Format.numberRenderer('0,000'),
 	    	        sortable: true,
-	    	        width: 100
+	    	        width: 'autoSize'
 	    	    },{
 	    	        text: this.localize('typesCountLexical'),
 	    	        dataIndex: 'typesCount-lexical',
 	    	        renderer: Ext.util.Format.numberRenderer('0,000'),
-	    	        width: 100
+	    	        width: 'autoSize'
 	    	    },{
 	    	        text: this.localize('typeTokenRatioLexical'),
 	    	        dataIndex: 'typeTokenRatio-lexical',
 	    	        renderer: function(val) {return Ext.util.Format.percent(val)},
-	    	        width: 100
+	    	        width: 'autoSize'
 	    	    },{
 	    	        text: this.localize('language'),
 	    	        dataIndex: 'language',
+	    	        hidden: true,
 	    	        renderer: function(val, metaData, record, rowIndex, colIndex, store, view) {return view.ownerCt.getLanguage(val);},
-	    	        width: 100
+	    	        width: 'autoSize'
 	    	    }
 	    	],
 	    	

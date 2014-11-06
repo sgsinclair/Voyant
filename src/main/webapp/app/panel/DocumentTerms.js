@@ -12,7 +12,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
     		termTip: {en: "The term in a single, specific document."},
     		rawFreqTip: {en: "The count (raw frequency) of this term in this document."},
     		relativeFreqTip: {en: "The relative frequency (per million) of this term in each document."},
-    		trendTip: {en: 'This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).'}
+    		trendTip: {en: 'This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).'},
+    		tfidf: {en: 'Significance'},
+    		tfidfTip: {en: 'The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.'}
     	},
     	api: {
     		stopList: 'auto',
@@ -146,6 +148,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
             	dataIndex: 'tfidf',
             	width: 'autoSize',
             	sortable: true,
+            	hidden: true,
             	renderer: Ext.util.Format.numberRenderer('0,000.000')
             },{
                 xtype: 'widgetcolumn',

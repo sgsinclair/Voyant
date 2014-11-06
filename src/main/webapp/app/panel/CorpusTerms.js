@@ -9,7 +9,11 @@ Ext.define('Voyant.panel.CorpusTerms', {
     		matchingTerms: {en: 'Matching terms: {count}'},
     		termTip: {en: "The term in the corpus."},
     		rawFreqTip: {en: "The total count (raw frequency) of this term in the entire corpus."},
-    		relativeFreqTip: {en: "The relative frequency (per million) of this term in the entire corpus, also expressed as a percentage."},
+    		relativeFreqTip: {en: "The relative frequency (per million) of this term in the entire corpus"/*, also expressed as a percentage*/+"."},
+    		relativePeakedness: {en: "Peakedness"},
+    		relativePeakednessTip: {en: "This is a statistical measure of how much the relative frequencies of a term in a corpus are bunched up into peaks (regions with higher values where the rest are lower)."},
+    		relativeSkewness: {en: "Skew"},
+    		relativeSkewnessTip: {en: "This is a statistical measure of the symmetry of the relative frequencies of a term across the corpus."},
     		trendTip: {en: "This represents the trend of the relative frequencies for each term in each document in the corpus."}
     	},
     	api: {
@@ -115,10 +119,27 @@ Ext.define('Voyant.panel.CorpusTerms', {
             	dataIndex: 'relativeFreq',
             	renderer: function(val) {
             		var percent = val*100;
-            		return Ext.util.Format.number(val*1000000, "0,000") + " (%"+
-            			(val*100 <  .1 ? "<0.1" : Ext.util.Format.number(val*100, "0.0"))+")"
+            		return Ext.util.Format.number(val*1000000, "0,000")/* + " (%"+
+            			(val*100 <  .1 ? "<0.1" : Ext.util.Format.number(val*100, "0.0"))+")"*/
             	},
-                width: 125,
+                width: 'autoSize',
+                hidden: true,
+            	sortable: true,
+            },{
+            	text: this.localize("relativePeakedness"),
+            	tooltip: this.localize("relativePeakednessTip"),
+            	dataIndex: 'relativePeakedness',
+            	renderer: Ext.util.Format.numberRenderer("0,000.0"),
+                width: 'autoSize',
+                hidden: true,
+            	sortable: true,
+            },{
+            	text: this.localize("relativeSkewness"),
+            	tooltip: this.localize("relativeSkewnessTip"),
+            	dataIndex: 'relativeSkewness',
+            	renderer: Ext.util.Format.numberRenderer("0,000.0"),
+                width: 'autoSize',
+                hidden: true,
             	sortable: true,
             },{
                 xtype: 'widgetcolumn',
