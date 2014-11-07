@@ -5,15 +5,18 @@ Ext.define('Voyant.panel.Summary', {
     statics: {
     	i18n: {
     		title: {en: "Summary"},
+    		corpusType: {en: '<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword">{type}</a> ({val})<tpl if="xindex &lt; len">, </tpl></tpl>'},
+    		documentType: {en: '<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:val="{docId}:{type}">{type}</a> ({val})<tpl if="xindex &lt; len">, </tpl></tpl>'},
     		mostFrequentWords: {en: 'Most <b>frequent words</b> in the corpus: '},
-    		docsLength: {en: '<ul><tpl for="docs"><li><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({totalWordTokens})<tpl if="xindex &lt; docsLen">, </tpl></li></tpl></ul>'},
+    		docsLength: {en: '<ul><tpl for="docs"><li><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({totalWordTokens})</li></tpl></ul>'},
     		docsLengthLongest: {en: '<b>Longest documents</b> (by words {0})'},
     		docsLengthShortest: {en: 'Shortest documents'},
     		docsLengthAll: {en: 'Documents ordered by number of words ({0})'},
-    		docsDensity: {en: '<ul><tpl for="docs"><li><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({wordDensity})<tpl if="xindex &lt; docsLen">, </tpl></li></tpl></ul>'},
+    		docsDensity: {en: '<ul><tpl for="docs"><li><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({wordDensity})</li></tpl></ul>'},
     		docsDensityHighest: {en: 'Highest <b>vocabulary density</b> ({0})'},
     		docsDensityLowest: {en: 'Lowest density'},
-    		docsDensityAll: {en: 'Documents ordered by vocabulary density ({0})'}
+    		docsDensityAll: {en: 'Documents ordered by vocabulary density ({0})'},
+    		distinctiveWords: {en: '<b>Distinctive words</b> (compared to the rest of the corpus): '}
     	},
     	api: {
     		stopList: 'auto',
@@ -24,9 +27,13 @@ Ext.define('Voyant.panel.Summary', {
     config: {
     	corpus: undefined
     },
-    padding: 10,
+    autoScroll: true,
+    cls: 'corpus-summary',
     
     docsStore: null,
+    documentTermsStore: null,
+    
+    summaryListParent: null,
     
     constructor: function(config ) {
 
@@ -73,13 +80,35 @@ Ext.define('Voyant.panel.Summary', {
 	   	         }
         	});
     		
+    		this.documentTermsStore = Ext.create("Ext.data.Store", {
+    			model: "Voyant.data.model.DocumentTerm",
+        		autoLoad: false,
+        		remoteSort: false,
+        		corpus: this.getCorpus(),
+        		proxy: {
+					type: 'ajax',
+					url: Voyant.application.getTromboneUrl(),
+					extraParams: {
+						tool: 'corpus.DocumentTerms',
+						corpus: this.getCorpus().getId()
+					},
+					reader: {
+						type: 'json',
+			            rootProperty: 'documentTerms.terms',
+			            totalProperty: 'documentTerms.total'
+					},
+					simpleSortMode: true
+	   		     }
+        	});
+    		
     		if (this.rendered) {
-    			var summaryListParent = Ext.dom.Helper.append(this.getLayout().getRenderTarget(), '<ul></ul>');
-    			Ext.dom.Helper.append(summaryListParent, '<li>'+corpus.getShow()+'</li>');
+    			this.summaryListParent = Ext.dom.Helper.append(this.getLayout().getRenderTarget(), '<ul></ul>');
+    			Ext.dom.Helper.append(this.summaryListParent, '<li>'+corpus.getShow()+'</li>');
     			
-    			this.showLongestDocuments(summaryListParent);
-    			this.showMostDenseDocuments(summaryListParent);
-    			this.showMostFrequentWords(summaryListParent);
+    			this.showLongestDocuments();
+    			this.showMostDenseDocuments();
+    			this.showMostFrequentWords();
+    			this.showDistinctiveWords();
     			
     			var params = Ext.apply({}, {
     	    		limit: null
@@ -114,7 +143,7 @@ Ext.define('Voyant.panel.Summary', {
     	}
     },
     
-    showLongestDocuments: function(parentEl) {
+    showLongestDocuments: function() {
     	this.docStore.on('load', function(store, records, success) {
     		var count = store.getTotalCount();
     		if (count > 1) {
@@ -150,14 +179,14 @@ Ext.define('Voyant.panel.Summary', {
     			var tpl = new Ext.XTemplate(this.localize('docsLength'));
     			var out = '';
     			if (count>5) {
-    				out += new Ext.Template(this.localize('docsLengthLongest')) + this.localize('colon') + tpl.apply({docs: data.longest})+'. ';
-    				out += this.localize('docsLengthShortest') + this.localize('colon') + tpl.apply({docs: data.shortest})+'. ';
+    				out += new Ext.Template(this.localize('docsLengthLongest')) + this.localize('colon') + tpl.apply({docs: data.longest});
+    				out += this.localize('docsLengthShortest') + this.localize('colon') + tpl.apply({docs: data.shortest});
     				out += "<a href='#' onclick='return false' class='corpus-documents corpus-documents-length'>"+this.localize('seeAll')+'</a>';
     			}
     			else {
     				out += new Ext.Template(this.localize('docsLengthAll')).apply([this.getSparkLine(lengths)]) + this.localize('colon') + tpl.apply({docs: data.all});
     			}
-    			Ext.dom.Helper.append(parentEl, '<li>'+out+'</li>');
+    			Ext.dom.Helper.append(this.summaryListParent, '<li>'+out+'</li>');
     		} else {
     			
     		}
@@ -165,7 +194,7 @@ Ext.define('Voyant.panel.Summary', {
 		}, this);
     },
     
-    showMostDenseDocuments: function(parentEl) {
+    showMostDenseDocuments: function() {
     	this.docStore.on('load', function(store, records, success) {
     		var count = store.getTotalCount();
     		if (count > 1) {
@@ -201,20 +230,20 @@ Ext.define('Voyant.panel.Summary', {
     			var tpl = new Ext.XTemplate(this.localize('docsDensity'));
     			var out = '';
     			if (count>5) {
-    				out += new Ext.Template(this.localize('docsDensityHighest')).applyTemplate([this.getSparkLine(densities)]) + this.localize('colon') + tpl.apply({docs: data.highest})+'. ';
-    				out += this.localize('docsDensityLowest') + this.localize('colon') + tpl.apply({docs: data.lowest})+'. ';
+    				out += new Ext.Template(this.localize('docsDensityHighest')).applyTemplate([this.getSparkLine(densities)]) + this.localize('colon') + tpl.apply({docs: data.highest});
+    				out += this.localize('docsDensityLowest') + this.localize('colon') + tpl.apply({docs: data.lowest});
     				out += "<a href='#' onclick='return false' class='corpus-documents corpus-documents-density'>"+this.localize('seeAll')+'</a>';
     			}
     			else {
-    				out += new Ext.Template(this.localize('docsDensityAll')).applyTemplate([this.getSparkLine(densities)])  + this.localize('colon') + tpl.apply({docs: data.all}) +'.';
+    				out += new Ext.Template(this.localize('docsDensityAll')).applyTemplate([this.getSparkLine(densities)])  + this.localize('colon') + tpl.apply({docs: data.all});
     			}
     			
-    			Ext.dom.Helper.append(parentEl, '<li>'+out+'</li>');
+    			Ext.dom.Helper.append(this.summaryListParent, '<li>'+out+'</li>');
     		}
     	}, this);
     },
     
-    showMostFrequentWords: function(parentEl) {
+    showMostFrequentWords: function() {
     	var corpus = this.getCorpus();
     	var corpusTerms = corpus.getCorpusTerms();
     	var params = this.getApiParams();
@@ -222,17 +251,57 @@ Ext.define('Voyant.panel.Summary', {
 			scope: this,
 			callback: function(records) {
 				var message = this.localize('mostFrequentWords');
+				var data = [];
+				var len = records.length;
 				records.forEach(function(r, index, array) {
-					message += r.getTerm()+' ('+Ext.util.Format.number(r.get('rawFreq'), "0,000")+')';
-					if (index < array.length - 1) {
-						message += ', ';
-					} else {
-						message += '.';
-					}
+					data.push({
+						type: r.getTerm(),
+						val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
+						len: len
+					});
 				});
-				Ext.dom.Helper.append(parentEl, '<li>'+message+'</li>');
+				message += new Ext.XTemplate(this.localize('corpusType')).applyTemplate({types: data})+'.';
+				Ext.dom.Helper.append(this.summaryListParent, '<li>'+message+'</li>');
 			},
 			params: params
 		});
+    },
+    
+    showDistinctiveWords: function() {
+    	var message = this.localize('distinctiveWords');
+    	var disParentEl = Ext.dom.Helper.append(this.summaryListParent, '<li>'+message+'<ul></ul></li>');
+    	var listParentEl = disParentEl.querySelector('ul');
+    	
+    	this.docStore.on('load', function(store, records, success) {
+    		var count = store.getTotalCount();
+    		if (count > 1) {
+    			store.sort('index', 'ASC');
+    			store.each(function(r) {
+    				var listItemEl = Ext.dom.Helper.append(listParentEl, '<li>'+r.getShortTitle()+'</li>');
+	    			this.documentTermsStore.load({
+	    				params: {
+	    					docId: r.getId(),
+	    					limit: 5,
+	    					sort: 'TFIDF',
+	        				dir: 'DESC',
+	    				},
+	    				scope: this,
+						callback: function(records) {
+							var data = [];
+							var len = records.length;
+							records.forEach(function(r, index, array) {
+								data.push({
+									type: r.getTerm(),
+									val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
+									docId: r.get('docId'),
+									len: len
+								});
+							});
+							Ext.dom.Helper.append(listItemEl, this.localize('colon')+new Ext.XTemplate(this.localize('documentType')).apply({types: data})+'.');
+						}
+	    			});
+    			}, this);
+    		}
+    	}, this);
     }
 });

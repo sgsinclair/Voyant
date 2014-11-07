@@ -81,3 +81,25 @@ svg line {
   stroke: #eee;
   stroke-width: 1px;
 }
+
+/*
+Panel specific styles
+*/
+
+.corpus-summary .x-autocontainer-innerCt {
+	padding: 10px;
+}
+
+.corpus-summary .x-autocontainer-innerCt > ul > li {
+	margin: 0 0 10px 10px;
+}
+
+.corpus-summary ul {
+	margin: 0 0 0 5px;
+    padding: 0;
+}
+
+.corpus-summary ul li {
+	padding: 0;
+    margin: 0 0 0 10px;
+}
