@@ -28,10 +28,17 @@ Ext.define('Voyant.panel.Reader', {
     	height: 'auto',
     	autoScroll: true
     },{
-    	html: 'down',
     	region: 'south',
     	border: false,
-    	height: 30
+    	xtype: 'cartesian',
+    	width: '100%',
+    	height: 30,
+    	insetPadding: 0,
+    	series: [{
+    		type: 'bar',
+    		xField: 'totalTokens',
+    		yField: 'height'
+    	}]
     }],
     constructor: function() {
     	Ext.apply(this, {
@@ -43,6 +50,7 @@ Ext.define('Voyant.panel.Reader', {
     
     initComponent: function() {
     	var me = this;
+    	
     	var tokensStore = Ext.create("Voyant.data.store.Tokens");
     	tokensStore.on("load", function(s, records, success) {
     		if (success) {
@@ -63,9 +71,29 @@ Ext.define('Voyant.panel.Reader', {
     		}
     	}, me);
     	me.setTokensStore(tokensStore);
+    	
+    	var graphStore = Ext.create('Ext.data.JsonStore', {
+    		fields: ['docId', 'docIndex', 'totalTokens', 'height']
+    	});
+    	
     	me.on("loadedCorpus", function(src, corpus) {
     		this.getTokensStore().setCorpus(corpus);
-    		this.setDocumentsStore(corpus.getDocuments());
+    		
+    		var docs = corpus.getDocuments();
+    		this.setDocumentsStore(docs);
+    		
+    		for (var i = 0; i < docs.getTotalCount(); i++) {
+    			var d = docs.getAt(i);
+    			graphStore.loadData({
+    				docId: d.getId(),
+    				docIndex: d.get('index'),
+    				totalTokens: d.get('tokensCount-lexical'),
+    				height: 100
+    			}, true);
+    		}
+    		
+    		this.down('cartesian').setStore(graphStore);
+    		
     		if (this.rendered) {
     			this.load();
     		}
@@ -85,10 +113,10 @@ Ext.define('Voyant.panel.Reader', {
     	    					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
     	    					var info = Voyant.data.model.Token.getInfoFromElement(last);
     	    					last.destroy();
-								console.warn(info.docIndex);
+//								console.warn(info.docIndex);
     	    					var doc = this.getDocumentsStore().getAt(info.docIndex);
     	    					var id = doc.getId();
-    	    					console.warn(info.docIndex, doc, id);
+//    	    					console.warn(info.docIndex, doc, id);
     	    					this.setApiParams({'skipToDocId': id, start: info.position});
     							this.load();
     							break;
@@ -131,5 +159,9 @@ Ext.define('Voyant.panel.Reader', {
     	var last = target.last();
     	if (last && last.isMasked()) {last.destroy();}
 		target.insertHtml('beforeEnd', contents);
+    },
+    
+    updateChart: function() {
+    	
     }
 });
