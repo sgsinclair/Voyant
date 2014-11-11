@@ -103,7 +103,7 @@ Ext.define('Voyant.data.model.Corpus', {
 				me.setDocumentsStore(store);
 				store.load({
 					params: {
-						limit: 1000
+						limit: 100
 					},
 					callback: function(records, st, success) {
 						me.setDocumentsStore(this);
