@@ -136,8 +136,10 @@ function Cirrus(config) {
         
         $(canvasId).click(function(event) {
             var matchingWord = wordController.handleWordClick(event);
-            if (that.config.clickHandler) {
-            	that.config.clickHandler({term: matchingWord.text, value: matchingWord.value});
+            if (matchingWord !== undefined) {
+	            if (that.config.clickHandler) {
+	            	that.config.clickHandler({term: matchingWord.text, value: matchingWord.value});
+	            }
             }
         });
         
