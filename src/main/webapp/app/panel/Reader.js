@@ -30,6 +30,9 @@ Ext.define('Voyant.panel.Reader', {
     	autoScroll: true
     },{
     	region: 'south',
+    	height: 40,
+    	split: true,
+    	splitterResize: true,
     	border: false,
     	layout: {
     		type: 'hbox'
@@ -221,15 +224,38 @@ Ext.define('Voyant.panel.Reader', {
     		return 'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha+')';
     	}
     	
-    	function addChart(flex, index) {
+    	function addChart(fraction, index) {
     		var bColor = getColor(index, 0.5);
     		var sColor = getColor(index, 1.0);
+    		var halfFraction = fraction/2;
     		container.add({
     			xtype: 'cartesian',
-    	    	flex: flex,
-    	    	height: 50,
+    	    	flex: fraction,
+    	    	height: '100%',
     	    	insetPadding: 0,
-    	    	background: bColor,
+    	    	background: {
+    	    		type: 'linear',
+    	    		degrees: 90,
+    	    		stops: [{
+    	    			offset: 0,
+    	    			color: 'white'
+    	    		},{
+    	    			offset: 0.5-halfFraction,
+    	    			color: 'white'
+    	    		},{
+    	    			offset: 0.5-halfFraction,
+    	    			color: bColor
+    	    		},{
+    	    			offset: 0.5+halfFraction,
+    	    			color: bColor
+    	    		},{
+    	    			offset: 0.5+halfFraction,
+    	    			color: 'white'
+    	    		},{
+    	    			offset: 1,
+    	    			color: 'white'
+    	    		}]
+    	    	},
     	    	axes: [{
     	    		type: 'numeric',
     	    		position: 'left',
@@ -269,25 +295,15 @@ Ext.define('Voyant.panel.Reader', {
     	
     	container.removeAll();
     	
-    	// calculate divisions in background "gradient"
     	var docs = corpus.getDocuments();
     	var tokensTotal = corpus.getWordTokensCount();
-    	var currTokensCount = 0;
     	var gradientStops = [];
-    	var lastOffset = 0;
 		for (var i = 0; i < docs.getTotalCount(); i++) {
 			var d = docs.getAt(i);
 			var docIndex = d.get('index');
 			var count = d.get('tokensCount-lexical');
-			currTokensCount += count;
-//			var color = getColor(docIndex, 0.5);
-//			console.log(docIndex, color);
-			
 			var currOffset = count / tokensTotal;
-			
 			addChart(currOffset, docIndex);
-			
-			lastOffset = currOffset;
 		}
     },
     
