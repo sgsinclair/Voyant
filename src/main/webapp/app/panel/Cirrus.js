@@ -26,11 +26,13 @@ Ext.define('Voyant.panel.Cirrus', {
     MODE_CORPUS: 'corpus',
     MODE_DOCUMENT: 'mode_document',
     
+    layout: 'fit',
+    
     constructor: function(config) {
 
     	Ext.apply(this, {
     		title: this.localize('title')
-    	})
+    	});
 
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -48,6 +50,12 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     listeners: {
+    	resize: function(panel, width, height) {
+    		if (this.cirrus) {
+    			this.cirrus.resizeWords();
+    		}
+    	},
+    	
     	loadedCorpus: function(src, corpus) {
     		this.loadFromCorpus(corpus);
     	},
