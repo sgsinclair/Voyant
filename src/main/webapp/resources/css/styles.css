@@ -100,12 +100,12 @@ Panel specific styles
 	margin: 0 0 10px 10px;
 }
 
-.corpus-summary ul {
+.corpus-summary ul, .corpus-summary ol {
 	margin: 0 0 0 5px;
     padding: 0;
 }
 
-.corpus-summary ul li {
+.corpus-summary ul li, .corpus-summary ol li {
 	padding: 0;
     margin: 0 0 0 10px;
 }

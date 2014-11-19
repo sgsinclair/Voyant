@@ -16,12 +16,17 @@ Ext.define('Voyant.panel.Summary', {
     		docsDensityHighest: {en: 'Highest <b>vocabulary density</b> ({0})'},
     		docsDensityLowest: {en: 'Lowest density'},
     		docsDensityAll: {en: 'Documents ordered by vocabulary density ({0})'},
-    		distinctiveWords: {en: '<b>Distinctive words</b> (compared to the rest of the corpus): '}
+    		distinctiveWords: {en: '<b>Distinctive words</b> (compared to the rest of the corpus): '},
+    		moreDistinctiveWords: {en: '<a href="#" onclick="return false">Next {0} of {1} remaining</a>'},
+    		seeAll: {en: 'All&hellip;'},
+    		more: {en: 'More&hellip;'}
     	},
     	api: {
     		stopList: 'auto',
     		start: 0,
-    		limit: 5
+    		limit: 5,
+    		// The maximum number of documents to show distinctive words for.
+    		numberOfDocumentsForDistinctiveWords: 5
     	}
     },
     config: {
@@ -123,7 +128,7 @@ Ext.define('Voyant.panel.Summary', {
 
     	});
     	
-    	this.on("activate", function() {
+    	this.on('activate', function() {
     		if (this.getCorpus()) {
         		this.dispatchEvent('ensureCorpusView', this, this.getCorpus());
     		}
@@ -144,6 +149,7 @@ Ext.define('Voyant.panel.Summary', {
     },
     
     showLongestDocuments: function() {
+    	var parent = Ext.dom.Helper.append(this.summaryListParent, '<li></li>');
     	this.docStore.on('load', function(store, records, success) {
     		var count = store.getTotalCount();
     		if (count > 1) {
@@ -179,14 +185,14 @@ Ext.define('Voyant.panel.Summary', {
     			var tpl = new Ext.XTemplate(this.localize('docsLength'));
     			var out = '';
     			if (count>5) {
-    				out += new Ext.Template(this.localize('docsLengthLongest')) + this.localize('colon') + tpl.apply({docs: data.longest});
+    				out += new Ext.Template(this.localize('docsLengthLongest')).applyTemplate([this.getSparkLine(lengths)]) + this.localize('colon') + tpl.apply({docs: data.longest});
     				out += this.localize('docsLengthShortest') + this.localize('colon') + tpl.apply({docs: data.shortest});
     				out += "<a href='#' onclick='return false' class='corpus-documents corpus-documents-length'>"+this.localize('seeAll')+'</a>';
     			}
     			else {
     				out += new Ext.Template(this.localize('docsLengthAll')).apply([this.getSparkLine(lengths)]) + this.localize('colon') + tpl.apply({docs: data.all});
     			}
-    			Ext.dom.Helper.append(this.summaryListParent, '<li>'+out+'</li>');
+    			Ext.dom.Helper.append(parent, out);
     		} else {
     			
     		}
@@ -195,6 +201,7 @@ Ext.define('Voyant.panel.Summary', {
     },
     
     showMostDenseDocuments: function() {
+    	var parent = Ext.dom.Helper.append(this.summaryListParent, '<li></li>');
     	this.docStore.on('load', function(store, records, success) {
     		var count = store.getTotalCount();
     		if (count > 1) {
@@ -238,19 +245,21 @@ Ext.define('Voyant.panel.Summary', {
     				out += new Ext.Template(this.localize('docsDensityAll')).applyTemplate([this.getSparkLine(densities)])  + this.localize('colon') + tpl.apply({docs: data.all});
     			}
     			
-    			Ext.dom.Helper.append(this.summaryListParent, '<li>'+out+'</li>');
+    			Ext.dom.Helper.append(parent, out);
     		}
     	}, this);
     },
     
     showMostFrequentWords: function() {
+    	var parent = Ext.dom.Helper.append(this.summaryListParent, '<li></li>');
     	var corpus = this.getCorpus();
     	var corpusTerms = corpus.getCorpusTerms();
     	var params = this.getApiParams();
 		corpusTerms.load({
+			params: params,
 			scope: this,
 			callback: function(records) {
-				var message = this.localize('mostFrequentWords');
+				var out = this.localize('mostFrequentWords');
 				var data = [];
 				var len = records.length;
 				records.forEach(function(r, index, array) {
@@ -260,48 +269,78 @@ Ext.define('Voyant.panel.Summary', {
 						len: len
 					});
 				});
-				message += new Ext.XTemplate(this.localize('corpusType')).applyTemplate({types: data})+'.';
-				Ext.dom.Helper.append(this.summaryListParent, '<li>'+message+'</li>');
-			},
-			params: params
+				out += new Ext.XTemplate(this.localize('corpusType')).applyTemplate({types: data})+'.';
+				Ext.dom.Helper.append(parent, out);
+			}
 		});
     },
     
     showDistinctiveWords: function() {
-    	var message = this.localize('distinctiveWords');
-    	var disParentEl = Ext.dom.Helper.append(this.summaryListParent, '<li>'+message+'<ul></ul></li>');
-    	var listParentEl = disParentEl.querySelector('ul');
+    	var disParent = Ext.dom.Helper.append(this.summaryListParent, '<li>'+this.localize('distinctiveWords')+'<ol></ol></li>', true);
+    	var listParent = disParent.first('ol');
     	
     	this.docStore.on('load', function(store, records, success) {
     		var count = store.getTotalCount();
     		if (count > 1) {
     			store.sort('index', 'ASC');
-    			store.each(function(r) {
-    				var listItemEl = Ext.dom.Helper.append(listParentEl, '<li>'+r.getShortTitle()+'</li>');
-	    			this.documentTermsStore.load({
-	    				params: {
-	    					docId: r.getId(),
-	    					limit: 5,
-	    					sort: 'TFIDF',
-	        				dir: 'DESC',
-	    				},
-	    				scope: this,
-						callback: function(records) {
-							var data = [];
-							var len = records.length;
-							records.forEach(function(r, index, array) {
-								data.push({
-									type: r.getTerm(),
-									val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
-									docId: r.get('docId'),
-									len: len
-								});
-							});
-							Ext.dom.Helper.append(listItemEl, this.localize('colon')+new Ext.XTemplate(this.localize('documentType')).apply({types: data})+'.');
-						}
-	    			});
+    			var len = this.getApiParam('numberOfDocumentsForDistinctiveWords');
+    			store.each(function(item, index, length) {
+    				Ext.dom.Helper.append(listParent, {tag: 'li', 'voyant:index': String(index), cls: (index>len-1 ? 'x-hidden' : ''), html: '<a href="#" onclick="return false" class="document-id document-id-distinctive" voyant:val="'+item.get('id')+'">'+item.getShortTitle()+'</a>'});
     			}, this);
+    			
+    			if (count > len) {
+    				var tpl = new Ext.Template(this.localize('moreDistinctiveWords'));
+					var remaining = count-len;
+					var more = Ext.dom.Helper.append(this.summaryListParent, {tag: 'div', html: tpl.apply([len>remaining ? remaining : len,remaining])}, true);
+					more.addListener('click', function() {
+						var hidden = listParent.select('li[class="x-hidden"]');
+						var item;
+						for (i=0;i<hidden.getCount();i++) {
+							if (i==len) {break;}
+							item = hidden.item(i).removeCls('x-hidden');
+						}
+						this.showDistinctiveWordsStep(hidden.item(0));
+						var remaining = hidden.getCount()-len;
+						if (remaining>0) {
+							more.update(tpl.apply([len>remaining ? remaining : len,remaining]));
+						}
+						else {more.remove();}
+					}, this);
+    			}
+    			
+    			this.showDistinctiveWordsStep(listParent.first('li'));
     		}
     	}, this);
+    },
+    
+    showDistinctiveWordsStep: function(el) {
+    	var index = Number(el.getAttribute('index','voyant'));
+		this.documentTermsStore.load({
+			params: {
+				docIndex: index,
+				limit: 5,
+				sort: 'TFIDF',
+				dir: 'DESC',
+			},
+			scope: this,
+			callback: function(records) {
+				var data = [];
+				var len = records.length;
+				records.forEach(function(r, index, array) {
+					data.push({
+						type: r.getTerm(),
+						val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
+						docId: r.get('docId'),
+						len: len
+					});
+				});
+				Ext.dom.Helper.append(el, this.localize('colon')+new Ext.XTemplate(this.localize('documentType')).apply({types: data})+'.');
+				
+				var nextEl = el.next('li');
+				if (nextEl && !nextEl.hasCls('x-hidden')) {
+					this.showDistinctiveWordsStep(nextEl);
+				}
+			}
+		});
     }
 });
