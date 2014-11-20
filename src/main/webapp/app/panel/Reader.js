@@ -47,8 +47,6 @@ Ext.define('Voyant.panel.Reader', {
     },
     
     initComponent: function() {
-    	var me = this;
-    	
     	var tokensStore = Ext.create("Voyant.data.store.Tokens");
     	tokensStore.on("load", function(s, records, success) {
     		if (success) {
@@ -67,10 +65,10 @@ Ext.define('Voyant.panel.Reader', {
 	    		}, this);
 	    		this.updateText(contents, true);
     		}
-    	}, me);
-    	me.setTokensStore(tokensStore);
+    	}, this);
+    	this.setTokensStore(tokensStore);
     	
-    	me.setDocumentTermsStore(Ext.create("Ext.data.Store", {
+    	this.setDocumentTermsStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.DocumentTerm",
     		autoLoad: false,
     		remoteSort: false,
@@ -124,25 +122,11 @@ Ext.define('Voyant.panel.Reader', {
    		    			 }
    		    		 }
    		    	 },
-   		    	 scope: me
+   		    	 scope: this
    		     }
     	}));
     	
-    	me.on("loadedCorpus", function(src, corpus) {
-    		this.getTokensStore().setCorpus(corpus);
-    		this.getDocumentTermsStore().getProxy().setExtraParam('corpus', corpus.getId());
-    		
-    		var docs = corpus.getDocuments();
-    		this.setDocumentsStore(docs);
-    		var container = this.down('panel[region="south"]');
-    		
-    		this.generateChart(corpus, container);
-    		
-    		if (this.rendered) {
-    			this.load();
-    		}
-    	}, me);
-    	me.on("afterrender", function() {
+    	this.on("afterrender", function() {
     		// scroll listener
     		this.items.getAt(0).body.on("scroll", function() {
     			var cmp = this.items.getAt(0);
@@ -186,34 +170,65 @@ Ext.define('Voyant.panel.Reader', {
     		}, this);
     		
     		if (this.getCorpus()) {this.load();}
-    	}, me);
+    	}, this);
     	
-    	Ext.apply(me, {
+    	Ext.apply(this, {
     		listeners: {
-            	termsClicked: {
-            		fn: function(src, terms) {
-                		var queryTerms = [];
-                		terms.forEach(function(term) {
-                			if (term.term) {queryTerms.push(term.term);}
-                		});
-                		if (queryTerms) {
-                			this.getDocumentTermsStore().load({
-            					params: {
-            						query: queryTerms,
-                    				docIndex: undefined,
-                    				docId: undefined,
-                    				page: undefined,
-                    				start: undefined,
-                    				limit: undefined
-                    			}
-                			});
-                		}
-            		}
-            	}
+    			loadedCorpus: function(src, corpus) {
+    	    		this.getTokensStore().setCorpus(corpus);
+    	    		this.getDocumentTermsStore().getProxy().setExtraParam('corpus', corpus.getId());
+    	    		
+    	    		var docs = corpus.getDocuments();
+    	    		this.setDocumentsStore(docs);
+    	    		var container = this.down('panel[region="south"]');
+    	    		
+    	    		this.generateChart(corpus, container);
+    	    		
+    	    		if (this.rendered) {
+    	    			this.load();
+    	    		}
+    			},
+            	termsClicked: function(src, terms) {
+            		var queryTerms = [];
+            		terms.forEach(function(term) {
+            			if (term.term) {queryTerms.push(term.term);}
+            		});
+            		this.loadQueryTerms(queryTerms);
+        		},
+        		corpusTermsClicked: function(src, terms) {
+        			var queryTerms = [];
+            		terms.forEach(function(term) {
+            			if (term.getTerm()) {queryTerms.push(term.getTerm());}
+            		});
+            		this.loadQueryTerms(queryTerms);
+        		},
+        		documentTermsClicked: function(src, terms) {
+        			var queryTerms = [];
+            		terms.forEach(function(term) {
+            			if (term.getTerm()) {queryTerms.push(term.getTerm());}
+            		});
+            		this.loadQueryTerms(queryTerms);
+        		},
+        		scope: this
     		}
     	});
     	
-        me.callParent(arguments);
+        this.callParent(arguments);
+    },
+    
+    loadQueryTerms: function(queryTerms) {
+    	if (queryTerms && queryTerms.length > 0) {
+			this.getDocumentTermsStore().load({
+				params: {
+					query: queryTerms,
+    				docIndex: undefined,
+    				docId: undefined,
+    				page: undefined,
+    				start: undefined,
+    				limit: undefined
+    			}
+			});
+		}
     },
     
     generateChart: function(corpus, container) {
