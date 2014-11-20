@@ -83,8 +83,7 @@ Ext.define('Voyant.panel.Reader', {
 					// TODO offsets and positions not implemented yet
 					withPositions: true,
 					withOffsets: true,
-					// TODO bins not properly set?
-					bins: 50
+					bins: 25
 				},
 				reader: {
 					type: 'json',
@@ -224,10 +223,16 @@ Ext.define('Voyant.panel.Reader', {
     		return 'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha+')';
     	}
     	
-    	function addChart(fraction, index) {
+    	function map(value, istart, istop, ostart, ostop) {
+			return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+		}
+    	
+    	function addChart(docInfo) {
+    		var index = docInfo.index;
+    		var fraction = docInfo.fraction;
+    		var height = docInfo.relativeHeight;
     		var bColor = getColor(index, 0.5);
     		var sColor = getColor(index, 1.0);
-    		var halfFraction = fraction/2;
     		container.add({
     			xtype: 'cartesian',
     	    	flex: fraction,
@@ -238,18 +243,12 @@ Ext.define('Voyant.panel.Reader', {
     	    		degrees: 90,
     	    		stops: [{
     	    			offset: 0,
-    	    			color: 'white'
-    	    		},{
-    	    			offset: 0.5-halfFraction,
-    	    			color: 'white'
-    	    		},{
-    	    			offset: 0.5-halfFraction,
     	    			color: bColor
     	    		},{
-    	    			offset: 0.5+halfFraction,
+    	    			offset: height,
     	    			color: bColor
     	    		},{
-    	    			offset: 0.5+halfFraction,
+    	    			offset: height,
     	    			color: 'white'
     	    		},{
     	    			offset: 1,
@@ -297,13 +296,27 @@ Ext.define('Voyant.panel.Reader', {
     	
     	var docs = corpus.getDocuments();
     	var tokensTotal = corpus.getWordTokensCount();
-    	var gradientStops = [];
+    	var docInfos = [];
+    	var docMinSize = 1000000;
+    	var docMaxSize = -1;
 		for (var i = 0; i < docs.getTotalCount(); i++) {
 			var d = docs.getAt(i);
 			var docIndex = d.get('index');
 			var count = d.get('tokensCount-lexical');
-			var currOffset = count / tokensTotal;
-			addChart(currOffset, docIndex);
+			if (count < docMinSize) docMinSize = count;
+			if (count > docMaxSize) docMaxSize = count;
+			var fraction = count / tokensTotal;
+			docInfos.push({
+				index: docIndex,
+				count: count,
+				fraction: fraction
+			});
+		}
+		
+		for (var i = 0; i < docInfos.length; i++) {
+			var d = docInfos[i];
+			d.relativeHeight = map(d.count, docMinSize, docMaxSize, 0, 1);
+			addChart(d);
 		}
     },
     
