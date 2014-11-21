@@ -1,5 +1,5 @@
 a {
-    color: blue;
+    color: #157fcc;
     text-decoration: none;
 }
 
@@ -26,12 +26,8 @@ a {
 .voyant-footer {
     text-align: center;
     font-size: 10px;
-    color: #ccc;
-    background-color: #157fcc;
-}
-
-.voyant-footer a {
-	color: white;
+    color: #666;
+    background-color: rgb(206, 206, 206);
 }
 
 @font-face {

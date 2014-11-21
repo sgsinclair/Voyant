@@ -25,6 +25,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
     	}
 	},
 	launch: function() {
+		var SPLIT_SIZE = 5;
 		this.viewport = Ext.create('Ext.container.Viewport', {
 		    layout: 'border',
 		    items: [{
@@ -51,11 +52,12 @@ Ext.define('Voyant.VoyantDefaultApp', {
 				    	region: 'west',
 				    	flex: 1,
 				        layout: 'border',
-				        split: true,
+				        split: {
+				        	size: SPLIT_SIZE
+				        },
 				        items: [{
 							xtype : 'tabpanel',
 							region : 'center',
-							split : true,
 							items : [ {
 								xtype : 'cirrus',
 								collapsible : true
@@ -67,7 +69,9 @@ Ext.define('Voyant.VoyantDefaultApp', {
 						}, {
 							xtype : 'tabpanel',
 							region : 'south',
-							split : true,
+							split : {
+					        	size: SPLIT_SIZE
+					        },
 							items : [ {
 								xtype : 'summary',
 								collapsible : true
@@ -79,7 +83,9 @@ Ext.define('Voyant.VoyantDefaultApp', {
 						}]
 				    },{
 				    	region: 'east',
-						split : true,
+						split : {
+				        	size: SPLIT_SIZE
+				        },
 						flex : 1,
 						layout : 'border',
 						items : [ {
@@ -96,6 +102,9 @@ Ext.define('Voyant.VoyantDefaultApp', {
 						}, {
 							xtype : 'tabpanel',
 							region : 'south',
+							split : {
+					        	size: SPLIT_SIZE
+					        },
 							flex : 5,
 							items : [ {
 								xtype : 'collocatesgraph',
