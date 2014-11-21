@@ -31,7 +31,9 @@ Ext.define('Voyant.panel.Reader', {
     },{
     	region: 'south',
     	height: 40,
-    	split: true,
+    	split: {
+    		size: 2
+    	},
     	splitterResize: true,
     	border: false,
     	layout: {
@@ -246,7 +248,7 @@ Ext.define('Voyant.panel.Reader', {
     		var index = docInfo.index;
     		var fraction = docInfo.fraction;
     		var height = docInfo.relativeHeight;
-    		var bColor = getColor(index, 0.5);
+    		var bColor = getColor(index, 0.3);
     		var sColor = getColor(index, 1.0);
     		container.add({
     			xtype: 'cartesian',
