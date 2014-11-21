@@ -76,7 +76,7 @@ Ext.define('Voyant.panel.Summary', {
 	   		     },
 	   	         listeners: {
 	   	        	 load: function(store, records, successful, opts) {
-	   	        		 var corpus = this.getCorpus().getId();
+	   	        		 var corpus = this.getCorpus();
 	   	        		 records.forEach(function(record) {
 	   	        			 record.set('corpus', corpus);
 	   	        		 });
@@ -121,6 +121,8 @@ Ext.define('Voyant.panel.Summary', {
     	    	this.docStore.load({
     				params: params
     			});
+    	    	
+    	    	this.addLinksHandler();
     		}
     		else {
     			Ext.defer(this.fireEvent, 100, this);
@@ -342,5 +344,67 @@ Ext.define('Voyant.panel.Summary', {
 				}
 			}
 		});
+    },
+    
+    addLinksHandler: function() {
+    	this.body.addListener('click', function(e) {
+			var target = e.getTarget(null, null, true);
+			if (target && target.dom.tagName == 'A') {
+				var params = {};
+				if (target.hasCls('corpus-documents')) {
+					if (target.hasCls('corpus-documents-length')) {
+						params.sortBy = 'totalWordTokens';
+					} else if (target.hasCls('corpus-documents-density')) {
+						params.sortBy = 'wordDensity';
+					}
+					params.sortDirection = 'DESC';
+					/**
+					 * @event CorpusGridBootstrap
+					 * @type dispatcher
+					 */
+//					this.dispatchEvent('CorpusGridBootstrap', this, params);
+				} else if (target.hasCls('document-id')) {
+//					if (target.hasCls('document-id-distinctive')) {
+//						Ext.apply(params, {sortBy: 'relativeFreqCorpusDelta', sortDirection: 'DESC'});
+//					}
+//					if (target.hasCls('document-id-density')) {
+//						Ext.apply(params, {sortBy: 'wordDensity', sortDirection: 'DESC'});
+//					}
+					
+					var docId = target.getAttribute('val', 'voyant');
+					var doc = this.docStore.getById(docId);
+					/**
+					 * @event documentsClicked
+					 * @type dispatcher
+					 */
+					this.dispatchEvent('documentsClicked', this, [doc]);
+				} else if (target.hasCls('corpus-type')) {
+					/**
+					 * @event corpusTermsClicked
+					 * @type dispatcher
+					 */
+//					this.dispatchEvent('corpusTermsClicked', this, {type: target.dom.innerHTML});
+				} else if (target.hasCls('corpus-types')) {
+					params.query = '';
+					if (target.hasCls('corpus-types-peaks')) {
+						Ext.apply(params, {sortBy: 'RELATIVEDISTRIBUTIONKURTOSIS', sortDirection: 'DESC', extendedSortZscoreMinimum: 1});
+					}
+					else {
+						Ext.apply(params, {sortBy: 'rawFreq', sortDirection: 'DESC', extendedSortZscoreMinimum: null});
+					}
+					/**
+					 * @event CorpusTypeFrequenciesRequest
+					 * @type dispatcher
+					 */
+//					this.dispatchEvent('CorpusTypeFrequenciesRequest', this, params, {type: 'whitelist', tools: 'voyeurCorpusTypeFrequenciesGrid'});
+				} else if (target.hasCls('document-type')) {
+					/**
+					 * @event documentTermsClicked
+					 * @type dispatcher
+					 */
+//					this.dispatchEvent('documentTermsClicked', this, {docIdType: target.getAttribute('val', 'voyant')});
+				}
+			}
+		}, this);
     }
 });
