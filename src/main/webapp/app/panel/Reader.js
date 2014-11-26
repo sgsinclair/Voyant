@@ -171,7 +171,8 @@ Ext.define('Voyant.panel.Reader', {
     				var info = Voyant.data.model.Token.getInfoFromElement(target);
     				var term = target.getHtml();
     				var data = [{
-    					term: term
+    					term: term,
+    					docIndex: info.docIndex
     				}];
     				this.getApplication().dispatchEvent('termsClicked', this, data);
     			}

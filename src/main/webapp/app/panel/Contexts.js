@@ -29,7 +29,15 @@ Ext.define('Voyant.panel.Contexts', {
 
         Ext.apply(me, {
     		title: this.localize('title'),
-            store : Ext.create("Voyant.data.store.Contexts", {stripTags: "all"}),
+            store : Ext.create("Voyant.data.store.Contexts", {
+            	stripTags: "all",
+            	remoteSort: false,
+            	sortOnLoad: true,
+            	sorters: {
+                    property: 'position',
+                    direction: 'ASC'
+            	}
+            }),
     		selModel: Ext.create('Ext.selection.RowModel', {
                 listeners: {
                     selectionchange: {
@@ -83,12 +91,12 @@ Ext.define('Voyant.panel.Contexts', {
 	           					docIndex.push(item.docIndex);
 	           					docIndexHash[item.docIndex]=true;
 	           				}
-	           			})
+	           			});
 	       	        	this.setApiParams({
 	       	        		docId: undefined,
 	       	        		docIndex: docIndex,
 	       	        		query: queries
-	       	        	})
+	       	        	});
 	       	        	if (this.isVisible()) {
 	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
 	       	        	}
@@ -124,9 +132,24 @@ Ext.define('Voyant.panel.Contexts', {
         		documentIndexTerms.push({
         			term: documentTerm.getTerm(),
         			docIndex: documentTerm.getDocIndex()
-        		})
-        	})
+        		});
+        	});
         	this.fireEvent("documentIndexTermsClicked", this, documentIndexTerms);
+        });
+        
+        me.on("termsClicked", function(src, terms) {
+        	var documentIndexTerms = [];
+        	terms.forEach(function(term) {
+        		if (term.docIndex !== undefined) {
+            		documentIndexTerms.push({
+            			term: term.term,
+            			docIndex: term.docIndex
+            		});
+        		}
+        	});
+        	if (documentIndexTerms.length > 0) {
+        		this.fireEvent("documentIndexTermsClicked", this, documentIndexTerms);
+        	}
         });
 
         me.callParent(arguments);
