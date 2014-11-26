@@ -55,6 +55,13 @@ Ext.define('Voyant.data.model.Document', {
     
     getCorpusId: function() {
     	return this.get('corpus');
+    },
+    
+    isPlainText: function() {
+    	if (this.get("extra.Content-Type") && new RegExp("plain","i").test(this.get("extra.Content-Type"))) {
+    		return true
+    	}
+    	return false;
     }
     
 });

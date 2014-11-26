@@ -40,8 +40,10 @@ Ext.define('Voyant.data.model.Token', {
 	getTerm: function() {
 		return this.get("term")
 	},
-	getTermWithLineSpacing: function() {
-		return this.getTerm().replace(/<\/?\w+\b.*?>/g, "<br /><br />").replace(/>\s+</g,"><").replace(/<br \/><br \/>(<br \/>)+/g,"<br \/><br \/>")
+	getTermWithLineSpacing: function(isPlainText) {
+		var term = this.getTerm().replace(/<\/?\w+\b.*?>/g, "<br /><br />").replace(/>\s+</g,"><").replace(/<br \/><br \/>(<br \/>)+/g,"<br \/><br \/>");
+		if (isPlainText) {term = term.replace(/(\r\n|\r|\n)\s*/g,"<br />")}
+		return term
 	},
 	getPosition: function() {
 		return this.get("position")

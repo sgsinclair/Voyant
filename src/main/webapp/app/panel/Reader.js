@@ -54,15 +54,21 @@ Ext.define('Voyant.panel.Reader', {
     		if (success) {
 	    		var contents = "";
 	    		var documentFrequency = this.localize("documentFrequency");
+	    		var isPlainText = false;
+	    		var docIndex = -1;
 	    		records.forEach(function(record) {
 	    			if (record.getPosition()==0) {
 	    				contents+="<h3>"+this.getDocumentsStore().getById(record.getDocId()).getFullLabel()+"</h3>";
+	    			}
+	    			if (record.getDocIndex()!=docIndex) {
+	    				isPlainText = this.getDocumentsStore().getById(record.getDocId()).isPlainText();
+	    				docIndex = record.getDocIndex();
 	    			}
 	    			if (record.isWord()) {
 	    				contents += "<span class='word' id='"+ record.getId() + "' data-qtip='"+documentFrequency+" "+record.getDocumentRawFreq()+"'>"+ record.getTerm() + "</span>";
 	    			}
 	    			else {
-	    				contents += record.getTermWithLineSpacing();
+	    				contents += record.getTermWithLineSpacing(isPlainText);
 	    			}
 	    		}, this);
 	    		this.updateText(contents, true);
