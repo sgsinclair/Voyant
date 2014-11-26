@@ -110,10 +110,12 @@ Ext.define('Voyant.panel.Summary', {
     			this.summaryListParent = Ext.dom.Helper.append(this.getLayout().getRenderTarget(), '<ul></ul>');
     			Ext.dom.Helper.append(this.summaryListParent, '<li>'+corpus.getShow()+'</li>');
     			
-    			this.showLongestDocuments();
-    			this.showMostDenseDocuments();
+    			var size = corpus.getDocumentsCount();
+    			
+    			if (size>1) {this.showLongestDocuments();}
+    			if (size>1) {this.showMostDenseDocuments();}
     			this.showMostFrequentWords();
-    			this.showDistinctiveWords();
+    			if (size>1) {this.showDistinctiveWords();}
     			
     			var params = Ext.apply({}, {
     	    		limit: null
