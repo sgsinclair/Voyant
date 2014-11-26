@@ -75,6 +75,7 @@ Ext.define("Voyant.panel.Dream", {
 			                    cls: 'send-voyant',
 			                    handler: function(button) {
 			                    	var dlg = button.findParentByType("window");
+			                    	dlg.mask("Creating corpus…");
 			                    	container.getAggregateSearchDocumentQueryMatches({
 			                    		params: {createNewCorpus: true},
 			                    		callback: function(records, operation, success) {
@@ -104,6 +105,7 @@ Ext.define("Voyant.panel.Dream", {
 						    	glyph: 'xf019@FontAwesome',
 			                    handler: function(button) {
 			                    	var dlg = button.findParentByType("window");
+			                    	dlg.mask("Creating corpus…");
 			                    	container.getAggregateSearchDocumentQueryMatches({
 			                    		params: {createNewCorpus: true},
 			                    		callback: function(records, operation, success) {
@@ -248,15 +250,18 @@ Ext.define("Voyant.panel.Dream", {
 		                data: {
 				            query: queries,
 				            tool: 'corpus.CorpusTerms',
+				            sort: 'INDOCUMENTSCOUNT',
+				            dir: 'DESC',
+				            inDocumentsCountOnly: true,
 				            limit: 5,
 				            corpus: container.getCorpus().getId()
 		                },
 		                success: function( data ) {
 		                	var terms = [];
-		                	var fieldPrefixRegex = new RegExp("title:","g");
+		                	var fieldPrefixRegex = new RegExp(field+":","g");
 				        	data.corpusTerms.terms.forEach(function(corpusTerm) {
 				        		var term = corpusTerm.term.replace(fieldPrefixRegex,"");
-				        		  terms.push({id: corpusTerm.term, label: term+ "  ("+corpusTerm.rawFreq+")", value: term})
+				        		  terms.push({id: corpusTerm.term, label: term+ "  ("+corpusTerm.inDocumentsCount+")", value: term})
 				        	})
 				        	response(terms);
 		                }

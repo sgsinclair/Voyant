@@ -14,7 +14,7 @@
 		<param-name>build</param-name>
 		<param-value>BETA-1</param-value>
 	</context-param>
-
+	
 	<servlet>
 		<servlet-name>tool</servlet-name>
 		<jsp-file>/tool/index.jsp</jsp-file>
@@ -24,7 +24,7 @@
 		<servlet-name>tool</servlet-name>
 		<url-pattern>/tool/*</url-pattern>
 	</servlet-mapping>
-	
+
 	<!-- available from http://localhost:8080/trombone?param=...&param=...&param=... -->
 	<servlet>
 		<servlet-name>trombone</servlet-name>
