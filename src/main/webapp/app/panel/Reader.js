@@ -218,6 +218,17 @@ Ext.define('Voyant.panel.Reader', {
             		});
             		this.loadQueryTerms(queryTerms);
         		},
+        		documentsClicked: function(src, documents, corpus) {
+        			if (documents) {
+            			var target = this.items.getAt(0).getLayout().getRenderTarget();
+            			target.setHtml("<div class='loading'>"+this.localize('loading')+"</div>"); // clear everything
+            			var mask = target.first().mask();
+            			
+            			var doc = documents[0];
+            			this.setApiParams({'skipToDocId': doc.getId(), start: 0});
+						this.load();
+            		}
+        		},
         		scope: this
     		}
     	});
