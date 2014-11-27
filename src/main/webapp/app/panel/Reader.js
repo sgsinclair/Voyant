@@ -20,6 +20,8 @@ Ext.define('Voyant.panel.Reader', {
     	documentTermsStore: undefined
     },
     
+    cls: 'voyant-reader',
+    
     layout: 'border',
     
     items: [{
@@ -40,6 +42,7 @@ Ext.define('Voyant.panel.Reader', {
     		type: 'hbox'
     	}
     }],
+    
     constructor: function() {
     	Ext.apply(this, {
     		title: this.localize('title')
@@ -72,6 +75,11 @@ Ext.define('Voyant.panel.Reader', {
 	    			}
 	    		}, this);
 	    		this.updateText(contents, true);
+	    		
+	    		var keyword = this.down('searchfield').getValue();
+	    		if (keyword != '') {
+	    			this.highlightKeywords(keyword);
+	    		}
     		}
     	}, this);
     	this.setTokensStore(tokensStore);
@@ -103,12 +111,13 @@ Ext.define('Voyant.panel.Reader', {
    		    		 store.sort('docIndex', 'ASC');
    		    		 var graphDatas = {};
    		    		 var maxValue = 0;
+   		    		 var term; // store last accessed term
    		    		 store.each(function(r) {
    		    			 var graphData = [];
    		    			 var dist = r.get('distributions');
    		    			 var docId = r.get('docId');
    		    			 var docIndex = r.get('docIndex');
-   		    			 var term = r.get('term');
+   		    			 term = r.get('term');
    		    			 for (var i = 0; i < dist.length; i++) {
    		    				 var bin = i;//docIndex * dist.length + i;
    		    				 var val = dist[i];
@@ -117,6 +126,9 @@ Ext.define('Voyant.panel.Reader', {
    		    			 }
    		    			 graphDatas[docIndex] = graphData;
    		    		 }, this);
+   		    		 
+   		    		 this.highlightKeywords(term);
+   		    		 this.down('searchfield').setValue(term);
    		    		 
    		    		 var graphs = this.query('cartesian');
    		    		 for (var i = 0; i < graphs.length; i++) {
@@ -182,8 +194,21 @@ Ext.define('Voyant.panel.Reader', {
     	}, this);
     	
     	Ext.apply(this, {
+    		// TODO clearing search loads default document terms into chart but probably shouldn't
+    		dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: [{
+                    width: 170,
+                    fieldLabel: 'Search',
+                    labelWidth: 50,
+                    xtype: 'searchfield',
+                    store: this.getDocumentTermsStore()
+                }]
+    		}],
     		listeners: {
     			loadedCorpus: function(src, corpus) {
+    				this.setCorpus(corpus);
     	    		this.getTokensStore().setCorpus(corpus);
     	    		this.getDocumentTermsStore().getProxy().setExtraParam('corpus', corpus.getId());
     	    		
@@ -220,14 +245,20 @@ Ext.define('Voyant.panel.Reader', {
         		},
         		documentsClicked: function(src, documents, corpus) {
         			if (documents) {
-            			var target = this.items.getAt(0).getLayout().getRenderTarget();
-            			target.setHtml("<div class='loading'>"+this.localize('loading')+"</div>"); // clear everything
-            			var mask = target.first().mask();
-            			
             			var doc = documents[0];
             			this.setApiParams({'skipToDocId': doc.getId(), start: 0});
-						this.load();
+						this.load(true);
             		}
+        		},
+        		termLocationClicked: function(src, terms) {
+    				if (terms[0] !== undefined) {
+    					var term = terms[0];
+    					var docIndex = term.get('docIndex');
+    					var position = term.get('position');
+    					var doc = this.getCorpus().getDocument(docIndex);
+    					this.setApiParams({'skipToDocId': doc.getId(), start: position});
+    					this.load(true);
+    				};
         		},
         		scope: this
     		}
@@ -355,7 +386,34 @@ Ext.define('Voyant.panel.Reader', {
 		}
     },
     
-    load: function() {
+    highlightKeywords: function(query, doScroll) {
+		if (!Ext.isArray(query)) query = [query];
+		
+		var target = this.items.getAt(0).getLayout().getRenderTarget();
+		
+		target.select('span[class*=keyword]').removeCls('keyword');
+		
+		var spans = [];
+		var caseInsensitiveQuery = new RegExp('^'+query[0]+'$', 'i');
+		var nodes = target.select('span.word');
+		nodes.each(function(el, compEl, index) {
+			if (el.dom.firstChild && el.dom.firstChild.nodeValue.match(caseInsensitiveQuery)) {
+				el.addCls('keyword');
+				spans.push(el.dom);
+			}
+		});
+		
+//		if (doScroll && spans[0] !== undefined) {
+//			Ext.get(nodes[0]).scrollIntoView(reader).frame("ff0000", 1, { duration: 2 });
+//		}
+	},
+    
+    load: function(doClear) {
+    	if (doClear) {
+    		var target = this.items.getAt(0).getLayout().getRenderTarget();
+			target.setHtml("<div class='loading'>"+this.localize('loading')+"</div>"); // clear everything
+			target.first().mask();
+    	}
     	this.getTokensStore().load({
     		params: Ext.apply(this.getApiParams(), {
     			stripTags: 'blocksOnly'

@@ -84,9 +84,11 @@ svg line {
   stroke-width: 1px;
 }
 
-/*
-Panel specific styles
-*/
+/*************************
+ * Panel specific styles *
+ *************************/
+
+/* Summary */
 
 .corpus-summary .x-autocontainer-innerCt {
 	padding: 10px;
@@ -104,4 +106,10 @@ Panel specific styles
 .corpus-summary ul li, .corpus-summary ol li {
 	padding: 0;
     margin: 0 0 0 10px;
+}
+
+/* Reader */
+
+.voyant-reader .x-panel-body .keyword {
+	background-color: yellow;
 }
