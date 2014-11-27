@@ -1,5 +1,5 @@
 Ext.define('Voyant.data.store.CorpusCollocates', {
-	extend: 'Ext.data.Store',
+	extend: 'Ext.data.BufferedStore',
 	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.CorpusCollocate',
 //    transferable: ['setCorpus'],
@@ -13,6 +13,11 @@ Ext.define('Voyant.data.store.CorpusCollocates', {
 		
 		// create proxy in constructor so we can set the Trombone URL
 		Ext.apply(config, {
+			pagePurgeCount: 0,
+			pageSize: 100,
+			leadingBufferZone: 100,
+			remoteSort: true,
+			autoLoad: false, // needs to be false until there's a corpus
 		     proxy: { // TODO: configure proxy to handle error
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),
@@ -26,7 +31,13 @@ Ext.define('Voyant.data.store.CorpusCollocates', {
 		             totalPropery: 'corpusCollocates.total'
 		         },
 		         simpleSortMode: true
-		     }
+		     },
+	         reader: {
+	             type: 'json',
+	             rootProperty: 'corpusCollocates.collocates',
+	             totalPropery: 'corpusCollocates.total'
+	         },
+
 		})
 		
 //    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);

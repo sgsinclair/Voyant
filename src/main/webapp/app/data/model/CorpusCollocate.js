@@ -1,8 +1,8 @@
 Ext.define('Voyant.data.model.CorpusCollocate', {
     extend: 'Ext.data.Model',
     fields: [
-             {name: 'keyword'},
-             {name: 'keywordRawFreq', type: 'int'},
+             {name: 'term'},
+             {name: 'rawFreq', type: 'int'},
              {name: 'contextTerm'},
              {name: 'contextTermRawFreq', type: 'int'}
     ],
