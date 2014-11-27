@@ -48,6 +48,22 @@ Ext.define('Voyant.panel.Contexts', {
                     }
                 }
             }),
+            dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: [{
+                    width: 170,
+                    fieldLabel: 'Search',
+                    labelWidth: 50,
+                    xtype: 'querysearchfield',
+                    width: 'autoSize'
+                }, {
+                    xtype: 'component',
+                    itemId: 'status',
+                    tpl: this.localize('matchingTerms'),
+                    style: 'margin-right:5px'
+                }]
+            }],
     		columns: [{
     			text: '#',
     			width: 30,
@@ -103,6 +119,7 @@ Ext.define('Voyant.panel.Contexts', {
 	           		 },
 	           		 scope: this
 	           	 }
+	           	 
             }
         });
         
@@ -126,6 +143,11 @@ Ext.define('Voyant.panel.Contexts', {
         	}
         });
         
+        me.on("query", function(src, query) {
+        	this.setApiParam('query', query);
+        	this.getStore().load({params: this.getApiParams()});
+        }, me);
+        
         me.on("documentTermsClicked", function(src, documentTerms) {
         	var documentIndexTerms = [];
         	documentTerms.forEach(function(documentTerm) {
@@ -139,6 +161,7 @@ Ext.define('Voyant.panel.Contexts', {
         
         me.on("termsClicked", function(src, terms) {
         	var documentIndexTerms = [];
+        	if (Ext.isString(terms)) {terms = [terms]}
         	terms.forEach(function(term) {
         		if (term.docIndex !== undefined) {
             		documentIndexTerms.push({
