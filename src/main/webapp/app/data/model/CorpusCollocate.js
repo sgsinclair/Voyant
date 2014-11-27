@@ -7,8 +7,8 @@ Ext.define('Voyant.data.model.CorpusCollocate', {
              {name: 'contextTermRawFreq', type: 'int'}
     ],
     
-    getKeyword: function() {return this.get('keyword');},
-    getKeywordRawFreq: function() {return this.get('keywordRawFreq');},
+    getKeyword: function() {return this.get('term');},
+    getKeywordRawFreq: function() {return this.get('rawFreq');},
     getContextTerm: function() {return this.get('contextTerm');},
     getContextTermRawFreq: function() {return this.get('contextTermRawFreq');}
 });

@@ -1,5 +1,6 @@
 Ext.define('Voyant.panel.CollocatesGraph', {
 	extend: 'Ext.panel.Panel',
+	requires: ['Voyant.util.QuerySearchField'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.collocatesgraph',
     statics: {
@@ -36,7 +37,22 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 
         Ext.apply(me, {
     		title: this.localize('title'),
-    		listeners: {
+            dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: [{
+                    width: 170,
+                    fieldLabel: 'Search',
+                    labelWidth: 50,
+                    xtype: 'querysearchfield'
+                }, {
+                    xtype: 'component',
+                    itemId: 'status',
+                    tpl: this.localize('matchingTerms'),
+                    style: 'margin-right:5px'
+                }]
+            }],
+            listeners: {
     			loadedCorpus: {
     				fn: function(src, corpus) {
 	    				this.setCorpus(corpus);
@@ -59,6 +75,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	                	});
 	    			},
 	    			scope: this
+    			},
+    			query: {
+    				fn: function(src, query) {this.loadFromQuery(query);},
+    				scope: this
     			}
     		}
         })
@@ -66,6 +86,23 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
         me.callParent(arguments);
 
+    },
+    
+    loadFromQuery: function(query) {
+    	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
+    	this.setApiParams({
+    		query: query,
+    		mode: 'corpus'
+    	})
+    	corpusCollocates.load({
+    		params: this.getApiParams(),
+    		callback: function(records, operations, success) {
+    			if (success) {
+    				this.loadFromCorpusCollocateRecords(records);
+    			}
+    		},
+    		scope: this
+    	})
     },
     
     loadFromCorpusTermRecords: function(corpusTerms) {

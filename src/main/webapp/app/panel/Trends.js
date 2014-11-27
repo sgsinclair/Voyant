@@ -1,7 +1,7 @@
 Ext.define('Voyant.panel.Trends', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
-	requires: ['Ext.chart.CartesianChart','Voyant.data.store.Documents'],
+	requires: ['Ext.chart.CartesianChart','Voyant.data.store.Documents','Voyant.util.QuerySearchField'],
 
 	alias: 'widget.trends',
 	config: {
@@ -31,8 +31,24 @@ Ext.define('Voyant.panel.Trends', {
     constructor: function(config) {
 
     	Ext.apply(this, {
-    		title: this.localize('title')
-    	})
+    		title: this.localize('title'),
+            dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: [{
+                    width: 170,
+                    fieldLabel: 'Search',
+                    labelWidth: 50,
+                    xtype: 'querysearchfield',
+                    width: 'autoSize'
+                }, {
+                    xtype: 'component',
+                    itemId: 'status',
+                    tpl: this.localize('matchingTerms'),
+                    style: 'margin-right:5px'
+                }]
+            }]
+        })
     	
     	this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -61,12 +77,17 @@ Ext.define('Voyant.panel.Trends', {
     			}
     		}
     	})
+    	
+    	this.on("query", function(src, query) {
+    		if (Ext.isString(query)) {this.fireEvent("termsClicked", src, [query])}
+    	}, this)
 
     	this.on("termsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
         		var queryTerms = [];
         		terms.forEach(function(term) {
-        			if (term.term) {queryTerms.push(term.term);}
+        			if (Ext.isString(term)) {queryTerms.push(term)}
+        			else if (term.term) {queryTerms.push(term.term);}
         		});
         		if (queryTerms) {
         			this.setApiParams({
