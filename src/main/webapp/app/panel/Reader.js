@@ -19,6 +19,7 @@ Ext.define('Voyant.panel.Reader', {
     	documentsStore: undefined,
     	documentTermsStore: undefined
     },
+    innerContainer: null, // set after render
     
     cls: 'voyant-reader',
     
@@ -29,7 +30,8 @@ Ext.define('Voyant.panel.Reader', {
     	region: 'center',
     	border: false,
     	height: 'auto',
-    	autoScroll: true
+    	autoScroll: true,
+    	html: '<div class="readerContainer"></div>'
     },{
     	region: 'south',
     	height: 40,
@@ -151,24 +153,23 @@ Ext.define('Voyant.panel.Reader', {
     	}));
     	
     	this.on("afterrender", function() {
+    		this.innerContainer = this.down('panel[region="center"]').getLayout().getRenderTarget();
+    		
     		// scroll listener
     		this.items.getAt(0).body.on("scroll", function() {
     			var cmp = this.items.getAt(0);
     			var body = cmp.body;
     			var dom = body.dom;
     			if (dom.scrollTop+dom.offsetHeight>dom.scrollHeight/2) { // more than half-way down
-    				var target = cmp.getLayout().getRenderTarget();
-    				var last = target.last();
+    				var last = this.innerContainer.first().last();
     				if (last.hasCls("loading")==false) {
     					while(last) {
     						if (last.hasCls("word")) {
     	    					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
     	    					var info = Voyant.data.model.Token.getInfoFromElement(last);
     	    					last.destroy();
-//								console.warn(info.docIndex);
     	    					var doc = this.getDocumentsStore().getAt(info.docIndex);
     	    					var id = doc.getId();
-//    	    					console.warn(info.docIndex, doc, id);
     	    					this.setApiParams({'skipToDocId': id, start: info.position});
     							this.load();
     							break;
@@ -389,13 +390,11 @@ Ext.define('Voyant.panel.Reader', {
     highlightKeywords: function(query, doScroll) {
 		if (!Ext.isArray(query)) query = [query];
 		
-		var target = this.items.getAt(0).getLayout().getRenderTarget();
-		
-		target.select('span[class*=keyword]').removeCls('keyword');
+		this.innerContainer.first().select('span[class*=keyword]').removeCls('keyword');
 		
 		var spans = [];
 		var caseInsensitiveQuery = new RegExp('^'+query[0]+'$', 'i');
-		var nodes = target.select('span.word');
+		var nodes = this.innerContainer.first().select('span.word');
 		nodes.each(function(el, compEl, index) {
 			if (el.dom.firstChild && el.dom.firstChild.nodeValue.match(caseInsensitiveQuery)) {
 				el.addCls('keyword');
@@ -410,9 +409,9 @@ Ext.define('Voyant.panel.Reader', {
     
     load: function(doClear) {
     	if (doClear) {
-    		var target = this.items.getAt(0).getLayout().getRenderTarget();
-			target.setHtml("<div class='loading'>"+this.localize('loading')+"</div>"); // clear everything
-			target.first().mask();
+    		this.innerContainer.first().destroy(); // clear everything
+    		this.innerContainer.setHtml('<div class="readerContainer"><div class="loading">'+this.localize('loading')+'</div></div>');
+			this.innerContainer.first().first().mask();
     	}
     	this.getTokensStore().load({
     		params: Ext.apply(this.getApiParams(), {
@@ -422,10 +421,9 @@ Ext.define('Voyant.panel.Reader', {
     },
     
     updateText: function(contents) {
-    	var target = this.items.getAt(0).getLayout().getRenderTarget();
-    	var last = target.last();
+    	var last = this.innerContainer.first().last();
     	if (last && last.isMasked()) {last.destroy();}
-		target.insertHtml('beforeEnd', contents);
+    	this.innerContainer.first().insertHtml('beforeEnd', contents);
     },
     
     updateChart: function() {
