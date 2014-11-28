@@ -52,11 +52,7 @@ Ext.define('Voyant.panel.Contexts', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
-                    width: 170,
-                    fieldLabel: 'Search',
-                    labelWidth: 50,
-                    xtype: 'querysearchfield',
-                    width: 'autoSize'
+                    xtype: 'querysearchfield'
                 }, {
                     xtype: 'component',
                     itemId: 'status',

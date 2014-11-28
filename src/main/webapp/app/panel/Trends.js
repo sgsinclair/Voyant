@@ -1,7 +1,7 @@
 Ext.define('Voyant.panel.Trends', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
-	requires: ['Ext.chart.CartesianChart','Voyant.data.store.Documents','Voyant.util.QuerySearchField'],
+	requires: ['Ext.chart.CartesianChart','Voyant.data.store.Documents'],
 
 	alias: 'widget.trends',
 	config: {
@@ -36,11 +36,7 @@ Ext.define('Voyant.panel.Trends', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
-                    width: 170,
-                    fieldLabel: 'Search',
-                    labelWidth: 50,
-                    xtype: 'querysearchfield',
-                    width: 'autoSize'
+                    xtype: 'querysearchfield'
                 }, {
                     xtype: 'component',
                     itemId: 'status',

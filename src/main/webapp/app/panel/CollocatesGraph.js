@@ -1,6 +1,5 @@
 Ext.define('Voyant.panel.CollocatesGraph', {
 	extend: 'Ext.panel.Panel',
-	requires: ['Voyant.util.QuerySearchField'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.collocatesgraph',
     statics: {
@@ -41,9 +40,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
-                    width: 170,
-                    fieldLabel: 'Search',
-                    labelWidth: 50,
                     xtype: 'querysearchfield'
                 }, {
                     xtype: 'component',

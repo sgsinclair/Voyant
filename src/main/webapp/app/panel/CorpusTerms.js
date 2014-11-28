@@ -1,7 +1,6 @@
 Ext.define('Voyant.panel.CorpusTerms', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
-//	requires: ['Ext.ux.form.SearchField'],
 	alias: 'widget.corpusterms',
     statics: {
     	i18n: {
@@ -38,7 +37,12 @@ Ext.define('Voyant.panel.CorpusTerms', {
     		store.setCorpus(corpus);
     		store.getProxy().setExtraParam('corpus', corpus.getId())
     		store.load();
-    	})
+    	});
+    	
+    	this.on("query", function(src, query) {
+    		this.setApiParam('query', query);
+    		this.store.loadPage(1, {params: this.getApiParams()})
+    	}, this);
     	
     	if (config.embedded) {
     		var cls = Ext.getClass(config.embedded).getName();
@@ -84,11 +88,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
-                    width: 170,
-                    fieldLabel: 'Search',
-                    labelWidth: 50,
-                    xtype: 'searchfield',
-                    store: store
+                    xtype: 'querysearchfield' // FIXME
                 }, {
                     xtype: 'component',
                     itemId: 'status',

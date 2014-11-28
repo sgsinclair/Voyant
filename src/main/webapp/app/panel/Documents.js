@@ -86,11 +86,7 @@ Ext.define('Voyant.panel.Documents', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
-                    width: 170,
-                    fieldLabel: 'Search',
-                    labelWidth: 50,
-                    xtype: 'searchfield',
-                    store: store
+                    xtype: 'querysearchfield' // FIXME
                 }, {
                     xtype: 'component',
                     itemId: 'status',
@@ -106,7 +102,13 @@ Ext.define('Voyant.panel.Documents', {
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		this.store.setCorpus(corpus);
-    		this.store.loadPage(1);
+    		this.store.loadPage(1, {params: this.getApiParams()});
+    	})
+    	
+        // create a listener for corpus loading (defined here, in case we need to load it next)
+    	this.on('query', function(src, query) {
+    		this.setApiParams('query', query);
+    		this.store.loadPage(1, {params: this.getApiParams()});
     	})
     	
     	if (config.embedded) {

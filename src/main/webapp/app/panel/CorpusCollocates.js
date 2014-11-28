@@ -1,6 +1,5 @@
 Ext.define('Voyant.panel.CorpusCollocates', {
 	extend: 'Ext.grid.Panel',
-	requires: ['Voyant.util.QuerySearchField'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.corpuscollocates',
 	config: {
@@ -160,11 +159,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
-                    width: 170,
-                    fieldLabel: 'Search',
-                    labelWidth: 50,
-                    xtype: 'querysearchfield',
-                    store: store
+                    xtype: 'querysearchfield'
                 }, {
                     xtype: 'component',
                     itemId: 'status',
