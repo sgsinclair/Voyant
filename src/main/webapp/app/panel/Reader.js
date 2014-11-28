@@ -381,7 +381,7 @@ Ext.define('Voyant.panel.Reader', {
 		
 		for (var i = 0; i < docInfos.length; i++) {
 			var d = docInfos[i];
-			d.relativeHeight = map(d.count, docMinSize, docMaxSize, 0, 1);
+			d.relativeHeight = d.count==docMaxSize ? 1 : map(d.count, docMinSize, docMaxSize, 0, 1);
 			addChart(d);
 		}
     },

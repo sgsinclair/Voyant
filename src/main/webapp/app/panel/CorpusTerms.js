@@ -88,7 +88,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
-                    xtype: 'querysearchfield' // FIXME
+                    xtype: 'querysearchfield'
                 }, {
                     xtype: 'component',
                     itemId: 'status',

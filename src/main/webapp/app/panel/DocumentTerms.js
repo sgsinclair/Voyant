@@ -45,11 +45,15 @@ Ext.define('Voyant.panel.DocumentTerms', {
     		this.fireEvent('loadedCorpus', this, config.corpus)
     	}
     	
+    	this.on("query", function(src, query) {
+    		this.fireEvent("corpusTermsClicked", src, [query])
+    	}, this);
+    	
     	this.on("corpusTermsClicked", function(src, terms) {
     		if (this.getStore().getCorpus()) { // make sure we have a corpus
         		var query = [];
         		terms.forEach(function(term) {
-        			query.push(term.get("term"));
+        			query.push(Ext.isString(term) ? term : term.get("term"));
         		})
         		this.setApiParams({
         			query: query,
@@ -104,11 +108,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
-                    width: 170,
-                    fieldLabel: 'Search',
-                    labelWidth: 50,
-                    xtype: 'searchfield',
-                    store: store
+                    xtype: 'querysearchfield'
                 }, {
                     xtype: 'component',
                     itemId: 'status',
