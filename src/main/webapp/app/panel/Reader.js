@@ -76,13 +76,17 @@ Ext.define('Voyant.panel.Reader', {
 	    		}, this);
 	    		this.updateText(contents, true);
 	    		
-	    		var keyword = this.down('searchfield').getValue();
+	    		var keyword = this.down('querysearchfield').getValue();
 	    		if (keyword != '') {
 	    			this.highlightKeywords(keyword);
 	    		}
     		}
     	}, this);
     	this.setTokensStore(tokensStore);
+    	
+    	this.on("query", function(src, query) {
+    		this.loadQueryTerms([query]);
+    	}, this);
     	
     	this.setDocumentTermsStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.DocumentTerm",
@@ -128,7 +132,7 @@ Ext.define('Voyant.panel.Reader', {
    		    		 }, this);
    		    		 
    		    		 this.highlightKeywords(term);
-   		    		 this.down('searchfield').setValue(term);
+   		    		 this.down('querysearchfield').setValue(term);
    		    		 
    		    		 var graphs = this.query('cartesian');
    		    		 for (var i = 0; i < graphs.length; i++) {
@@ -199,11 +203,7 @@ Ext.define('Voyant.panel.Reader', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
-                    width: 170,
-                    fieldLabel: 'Search',
-                    labelWidth: 50,
-                    xtype: 'searchfield',
-                    store: this.getDocumentTermsStore()
+                    xtype: 'querysearchfield'
                 }]
     		}],
     		listeners: {
