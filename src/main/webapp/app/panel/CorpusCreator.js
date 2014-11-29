@@ -1,6 +1,6 @@
 Ext.define('Voyant.panel.CorpusCreator', {
-	extend: 'Ext.panel.Panel',
-	//requires: ['Ext.layout.container.Form'],
+	extend: 'Ext.form.Panel',
+	requires: ['Ext.form.field.File'],
 	requires: ['Voyant.data.model.Corpus'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.corpuscreator',
@@ -25,42 +25,123 @@ Ext.define('Voyant.panel.CorpusCreator', {
 
         Ext.apply(me, {
     		title: this.localize('title'),
+    		width: 800,
+    		frame: true,
+    		border: true,
+    		frameHeader: true,
     		layout: {
     			type: 'vbox',
     			align: 'middle'
     		},
-    	    items: [{
+	    	dockedItems: [{
+	    		xtype: 'toolbar',
+                dock: 'bottom',
+    	    	buttonAlign: 'right',
+    	    	defaultButtonUI : 'default',
+	    		items: [{
+	    			text: 'Open'
+	    		},{
+    	        	xtype: 'filefield',
+    	        	name: 'upload',
+        	    	buttonOnly: true,
+        	    	hideLabel: true,
+        	    	buttonText: 'Upload',
+        	    	listeners: {
+        	    		render: function(filefield) {
+        	    			filefield.fileInputEl.dom.setAttribute('multiple', true);
+        	            },
+        	            change: function(filefield, value) {
+        	            	if (value) {
+            	            	var form = filefield.up('form').getForm();
+            	            	if (form.isValid()) {
+            	            		form.submit({
+            	            			url: me.getTromboneUrl(),
+            	            			params: {tool: 'corpus.CorpusCreator'},
+            	            			failure: function(form, action) { // we always fail because of content-type
+            	            				if (action.result) {
+            	            					me.loadCorpus({corpus: action.result.stepEnabledCorpusCreator.storedId})
+            	            				}
+            	            			}
+            	            		})
+            	            	}
+        	            	}
+        	            }
+        	    	}
+	    		},'->',{
+	    	    	xtype: 'button',
+	    	    	scale: 'large',
+	    	    	text: this.localize('reveal'),
+	    	    	handler: this.onReveal
+	    	    }]
+	    	}],
+	    	items: {
     	    	xtype: 'textareafield',
+    	    	width: 800,
+    	    	height: 100,
     	    	itemId: 'input',
-    	    	width: '100%',
-    	    	padding: 10,
     	    	emptyText: this.localize('emptyInput')
+	    	}
+    		/*
+    	    items: [{
+    	    	xtype: 'form',
+    	    	layout: 'fit',
+    	    	buttonAlign: 'right',
+    	    	dockedItems: [{
+    	    		xtype: 'toolbar',
+        	    	buttonAlign: 'right',
+    	    		items: ['->',{
+    	    			text: 'Open',
+    	    		},{
+        	        	xtype: 'filefield',
+            	    	buttonOnly: true,
+            	    	hideLabel: true,
+            	    	buttonText: 'Upload',
+            	    	listeners: {
+            	    		render: function(filefield) {
+            	    			filefield.fileInputEl.dom.setAttribute('multiple', true);
+            	            },
+            	            change: function(filefield) {
+            	            	debugger
+            	            }
+            	    	}
+    	    		}]
+    	    	}],
+    	    	items: [{
+        	    	xtype: 'textareafield',
+        	    	width: 800,
+        	    	height: 100,
+        	    	itemId: 'input',
+        	    	emptyText: this.localize('emptyInput')
+    	    	}]
     	    },{
     	    	xtype: 'button',
     	    	text: this.localize('reveal'),
     	    	handler: this.onReveal
-    	    }]
+    	    }]  
+    	    */ 	    
         });
         
         me.callParent(arguments);
+    },
+    
+    loadCorpus: function(params) {
+		var app = this.getApplication();
+    	var view = app.getViewport();
+		view.mask();
+		new Corpus(params).then(function(corpus) {
+			view.unmask();
+			app.dispatchEvent('loadedCorpus', app, corpus);
+		}).fail(function(message, response) {
+			view.unmask();
+			app.showErrorResponse({message: message}, response);
+		});
     },
     
     onReveal: function() {
     	var panel = this.findParentByType('panel');
     	var input = panel.down('#input').getValue();
     	if (input !== '') {
-    		var app = panel.getApplication();
-	    	var view = app.getViewport();
-			view.mask();
-			new Corpus({
-				input: input
-			}).then(function(corpus) {
-				view.unmask();
-				app.dispatchEvent('loadedCorpus', app, corpus);
-			}).fail(function(message, response) {
-				view.unmask();
-				app.showErrorResponse({message: message}, response);
-			});
+    		this.loadCorpus({input: input});
     	}
     }
 });

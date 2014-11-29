@@ -40,8 +40,14 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		    	itemId: 'toolsContainer',
 				activeItem: 0,
 				items: [{
-					xtype: 'corpuscreator',
-					margin: '25 50 0 50'
+					xtype : 'container',
+					layout: {
+		                type: 'hbox',
+		                pack: 'center'
+		            },
+					items: {
+						xtype: 'corpuscreator'
+					}
 				},{
 					layout: 'border',
 					items: [{

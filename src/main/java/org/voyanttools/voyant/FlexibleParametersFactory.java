@@ -1,6 +1,11 @@
 package org.voyanttools.voyant;
 
+import static java.security.AccessController.doPrivileged;
+
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +16,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.voyanttools.trombone.util.FlexibleParameters;
+
+import sun.security.action.GetPropertyAction;
 
 /**
  * This is a utility class for instantiating {@link FlexibleParameters} from {@link HttpServletRequest}s.
@@ -53,15 +60,20 @@ public class FlexibleParametersFactory {
 		
 		if (ServletFileUpload.isMultipartContent(request)) {
 			final List<FileItem> items = getRequestItems(request);
+			Path tmpPath = Paths.get(Paths.get(doPrivileged(new GetPropertyAction("java.io.tmpdir"))).toString(), "tmp.voyant.uploads");
+			if (!Files.exists(tmpPath)) {
+				Files.createDirectory(tmpPath);
+			}
+			
 			for (FileItem item : items) {
 				if (item.isFormField()) { // normal form field
 					parametersDecoder.decodeParameter(item.getFieldName(), item.getString(), allowLocalFileSystemAccess);
 				}
 				else { // file form field: this is uploaded, therefore the local access check can be bypassed
-					File dir = File.createTempFile("tmp.voyant","uploads");
-					dir.mkdir();
-					File file = new File(dir, item.getName());
+					Path path = Files.createTempDirectory(tmpPath, "tmp.voyant.uploads");
+					File file = new File(path.toFile(), item.getName());
 					item.write(file);
+					parametersDecoder.decodeParameter("upload", file.toString(), true);
 				}
 			}
 		}

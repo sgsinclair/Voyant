@@ -59,7 +59,7 @@ public class HttpParametersDecoder {
 		else if (key.equals("input")) {
 			decodeInlineParameters(key, values);
 		}
-		else if (key.equals("file") || key.equals("directory")) {
+		else if (key.equals("file") || key.equals("directory") || key.equals("upload")) {
 			if (allowLocalFileSystemAccess) {
 				addParameter(key, values);
 			}
