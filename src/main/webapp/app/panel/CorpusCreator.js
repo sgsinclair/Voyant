@@ -80,45 +80,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	    	height: 100,
     	    	itemId: 'input',
     	    	emptyText: this.localize('emptyInput')
-	    	}
-    		/*
-    	    items: [{
-    	    	xtype: 'form',
-    	    	layout: 'fit',
-    	    	buttonAlign: 'right',
-    	    	dockedItems: [{
-    	    		xtype: 'toolbar',
-        	    	buttonAlign: 'right',
-    	    		items: ['->',{
-    	    			text: 'Open',
-    	    		},{
-        	        	xtype: 'filefield',
-            	    	buttonOnly: true,
-            	    	hideLabel: true,
-            	    	buttonText: 'Upload',
-            	    	listeners: {
-            	    		render: function(filefield) {
-            	    			filefield.fileInputEl.dom.setAttribute('multiple', true);
-            	            },
-            	            change: function(filefield) {
-            	            	debugger
-            	            }
-            	    	}
-    	    		}]
-    	    	}],
-    	    	items: [{
-        	    	xtype: 'textareafield',
-        	    	width: 800,
-        	    	height: 100,
-        	    	itemId: 'input',
-        	    	emptyText: this.localize('emptyInput')
-    	    	}]
-    	    },{
-    	    	xtype: 'button',
-    	    	text: this.localize('reveal'),
-    	    	handler: this.onReveal
-    	    }]  
-    	    */ 	    
+	    	}    
         });
         
         me.callParent(arguments);

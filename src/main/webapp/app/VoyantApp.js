@@ -37,6 +37,59 @@ Ext.define('Voyant.VoyantApp', {
     	return [{type: 'maximize'},{type: 'help'}]
     },
     
+    launch: function() {
+    	var me = this;
+		this.callParent(arguments);
+		var viewport = this.getViewport();
+		viewport.mask();
+		Ext.create('Ext.window.Window', {
+		    title: 'Voyant Tools 2.0 Preview Release',
+		    width: 825,
+		    layout: 'fit',
+		    modal: true,
+		    layout: 'vbox',
+		    items: [{
+		    	width: 800,
+		    	margin: '10 5 3 10',
+			    html: "<h2 style='text-align: center;'>Welcome to this Preview Release of Voyant Tools 2.0!</h2>"+
+			    "<p>We've tried to make things usable in order to give a glimpse of what's to come, "+
+			    "but this is an early preview release with lots of missing goodies and a whole bunch of bugs. "+
+			    "Please kick the tires and let us know if you have suggestions on <a href='https://github.com/sgsinclair/Voyant/issues'>Github</a> or <a href='http://twitter.com/voyanttools'>Twitter</a>."+
+			    "<ul>"+
+		    	"<li>some new features and functionality:<ul>"+
+		    		"<li>flexible search (wildcards, phrases, proximity) – hover over search boxes for more details</li>"+
+		    		"<li>better cross-platform and device support (all tools in HTML5, no Flash or Java Applets)</li>"+
+		    		"<li>much better support for larger corpora</li>"+
+		    		"<li>vastly improved performance throughout (corpus creation and tools)</li>"+
+		    	"</ul><li>some things not yet fully implemented:<ul>"+
+			    	"<li>full list of tools and skins from 1.0</li>"+
+			    	"<li>panel/tool-level help, options, and exporting</li>"+
+			    	"<li>adding and reordering documents (new in 2.0)</li>"+
+			    	"<li>N-Gram support (term sequences) (new in 2.0)</li>"+
+			    	"<li>part-of-speech tagggin and lemmatization (new in 2.0)</li>"+
+		    	"</ul></li></ul>"+
+		    	"<p>It's best to assume that this preview release may be incompatible with future releases and that "+
+		    	"any stored corpora will no longer be available after your session. Of course, you can keep using "+
+		    	"<a href='http://voyant-tools.org'>Voyant Tools 1.0</a> "+
+		    	"if you want persistence (normal persistence will be avilable with the full release of Voyant Tools 2.0). Have fun and please give us your <a href='http://twitter.com/voyanttools'>feeback</a>!</p>"
+		    }, {
+		    	xtype: 'button',
+		    	width: '100%',
+		    	scale: 'medium',
+		    	text: 'Continue',
+		    	handler: function(btn) {
+		    		btn.up('window').close();
+		    	}
+		    }],
+		    listeners: {
+		    	close: function(panel) {
+		    		viewport.unmask();
+		    	}
+		    }
+		}).show();
+
+    },
+    
     tromboneCall: function(config) {
     	var config = config ? config : {};
     	Ext.applyIf(config, {
