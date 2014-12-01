@@ -67,9 +67,12 @@ Ext.define('Voyant.util.QuerySearchField', {
     	
         var value = this.getValue();
     	this.findParentByType("panel").fireEvent("query", this, value);
-        if (value.length > 0) {
+    	if (value) {
             this.getTrigger('clear').show();
-            this.updateLayout();
-        }
+    	}
+    	else {
+            this.getTrigger('clear').hide();
+    	}
+        this.updateLayout();
     }
 });
