@@ -38,10 +38,12 @@ Ext.define("Voyant.data.store.Documents", {
 		     },
 	         listeners: {
 	        	 load: function(store, records, successful, opts) {
-	        		 var corpus = store.getCorpus();
-	        		 records.forEach(function(record) {
-	        			 record.set('corpus', corpus);
-	        		 })
+	        		 if (successful) {
+		        		 var corpus = store.getCorpus();
+		        		 records.forEach(function(record) {
+		        			 record.set('corpus', corpus);
+		        		 })
+	        		 }
 	        	 }
 	         }
 		})
