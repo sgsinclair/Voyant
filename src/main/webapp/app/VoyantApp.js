@@ -40,6 +40,8 @@ Ext.define('Voyant.VoyantApp', {
     launch: function() {
     	var me = this;
 		this.callParent(arguments);
+		var params = Ext.Object.fromQueryString(document.location.search);
+		if (params && params.debug && params.debug=='true') { return}
 		var viewport = this.getViewport();
 		viewport.mask();
 		Ext.create('Ext.window.Window', {
