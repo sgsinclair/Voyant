@@ -116,7 +116,12 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	    	xtype: 'button',
 	    	    	scale: 'large',
 	    	    	text: this.localize('reveal'),
-	    	    	handler: this.onReveal
+	    	    	handler: function(btn) {
+	    	        	var input = btn.up('form').down('#input').getValue();
+	    	        	if (input !== '') {
+	    	        		me.loadCorpus({input: input});
+	    	        	}
+	    	    	}
 	    	    }]
 	    	}],
 	    	items: {
