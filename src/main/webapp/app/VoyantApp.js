@@ -68,7 +68,7 @@ Ext.define('Voyant.VoyantApp', {
 			    	"<li>panel/tool-level help, options, and exporting</li>"+
 			    	"<li>adding and reordering documents (new in 2.0)</li>"+
 			    	"<li>N-Gram support (term sequences) (new in 2.0)</li>"+
-			    	"<li>part-of-speech tagggin and lemmatization (new in 2.0)</li>"+
+			    	"<li>part-of-speech tagging and lemmatization (new in 2.0)</li>"+
 		    	"</ul></li></ul>"+
 		    	"<p>It's best to assume that this preview release may be incompatible with future releases and that "+
 		    	"any stored corpora will no longer be available after your session. Of course, you can keep using "+
