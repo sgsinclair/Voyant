@@ -70,7 +70,12 @@ Ext.define('Voyant.panel.CorpusCreator', {
 		    				        			btn.up('window').close();
 	    				        			}
 	    				        			else {
-	    				        				Ext.Msg.alert('Select a Corpus', 'Please be sure to select a corpus.');
+	    				    	        		Ext.Msg.show({
+	    				    	        		    title:'Select a Corpus',
+	    				    	        		    message: 'Please be sure to select a corpus.',
+	    				    	        		    buttons: Ext.Msg.OK,
+	    				    	        		    icon: Ext.Msg.ERROR,
+	    				    	        		});
 	    				        			}
 	    				        		},
 	    				        		flex: 1
@@ -91,9 +96,18 @@ Ext.define('Voyant.panel.CorpusCreator', {
         	    	buttonOnly: true,
         	    	hideLabel: true,
         	    	buttonText: 'Upload',
+        	    	tooltip: 'test',
         	    	listeners: {
         	    		render: function(filefield) {
         	    			filefield.fileInputEl.dom.setAttribute('multiple', true);
+        	    		      Ext.QuickTips.register({
+        	      		        target: filefield.getEl(),
+        	      		        text: 'Upload one or more documents from your computer',
+        	      		        enabled: true,
+        	      		        showDelay: 20,
+        	      		        trackMouse: true,
+        	      		        autoShow: true
+        	      		      });
         	            },
         	            change: function(filefield, value) {
         	            	if (value) {
@@ -120,6 +134,14 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	        	var input = btn.up('form').down('#input').getValue();
 	    	        	if (input !== '') {
 	    	        		me.loadCorpus({input: input});
+	    	        	}
+	    	        	else {
+	    	        		Ext.Msg.show({
+	    	        		    title:'No Text Provided',
+	    	        		    message: 'Please provide text in the text box (or choose open or upload).',
+	    	        		    buttons: Ext.Msg.OK,
+	    	        		    icon: Ext.Msg.ERROR,
+	    	        		});
 	    	        	}
 	    	    	}
 	    	    }]
@@ -149,11 +171,4 @@ Ext.define('Voyant.panel.CorpusCreator', {
 		});
     },
     
-    onReveal: function() {
-    	var panel = this.findParentByType('panel');
-    	var input = panel.down('#input').getValue();
-    	if (input !== '') {
-    		this.loadCorpus({input: input});
-    	}
-    }
 });
