@@ -5,8 +5,8 @@ Ext.define('Voyant.panel.Summary', {
     statics: {
     	i18n: {
     		title: {en: "Summary"},
-    		corpusType: {en: '<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword">{type}</a> ({val})<tpl if="xindex &lt; len">, </tpl></tpl>'},
-    		documentType: {en: '<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:val="{docId}:{type}">{type}</a> ({val})<tpl if="xindex &lt; len">, </tpl></tpl>'},
+    		corpusType: {en: '<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordId="{id}">{type}</a> ({val})<tpl if="xindex &lt; len">, </tpl></tpl>'},
+    		documentType: {en: '<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:recordId="{id}" voyant:val="{docId}:{type}">{type}</a> ({val})<tpl if="xindex &lt; len">, </tpl></tpl>'},
     		mostFrequentWords: {en: 'Most <b>frequent words</b> in the corpus: '},
     		docsLength: {en: '<ul><tpl for="docs"><li><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({totalWordTokens})</li></tpl></ul>'},
     		docsLengthLongest: {en: '<b>Longest documents</b> (by words {0})'},
@@ -35,6 +35,7 @@ Ext.define('Voyant.panel.Summary', {
     autoScroll: true,
     cls: 'corpus-summary',
     
+    corpusTermsStore: null,
     docsStore: null,
     documentTermsStore: null,
     
@@ -53,6 +54,8 @@ Ext.define('Voyant.panel.Summary', {
     	this.on('loadedCorpus', function(src, corpus) {
     		
     		this.setCorpus(corpus);
+    		
+    		this.corpusTermsStore = corpus.getCorpusTerms();
     		
     		// create a local version of the store (avoiding buffered and remoteSort issues)
     		this.docStore = Ext.create("Ext.data.Store", {
@@ -256,10 +259,8 @@ Ext.define('Voyant.panel.Summary', {
     
     showMostFrequentWords: function() {
     	var parent = Ext.dom.Helper.append(this.summaryListParent, '<li></li>');
-    	var corpus = this.getCorpus();
-    	var corpusTerms = corpus.getCorpusTerms();
     	var params = this.getApiParams();
-		corpusTerms.load({
+		this.corpusTermsStore.load({
 			params: params,
 			scope: this,
 			callback: function(records) {
@@ -268,6 +269,7 @@ Ext.define('Voyant.panel.Summary', {
 				var len = records.length;
 				records.forEach(function(r, index, array) {
 					data.push({
+						id: r.getId(),
 						type: r.getTerm(),
 						val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
 						len: len
@@ -320,6 +322,7 @@ Ext.define('Voyant.panel.Summary', {
     showDistinctiveWordsStep: function(el) {
     	var index = Number(el.getAttribute('index','voyant'));
 		this.documentTermsStore.load({
+			addRecords: true,
 			params: {
 				docIndex: index,
 				limit: 5,
@@ -327,11 +330,12 @@ Ext.define('Voyant.panel.Summary', {
 				dir: 'DESC',
 			},
 			scope: this,
-			callback: function(records) {
+			callback: function(records, operation, success) {
 				var data = [];
 				var len = records.length;
 				records.forEach(function(r, index, array) {
 					data.push({
+						id: r.getId(),
 						type: r.getTerm(),
 						val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
 						docId: r.get('docId'),
@@ -385,7 +389,9 @@ Ext.define('Voyant.panel.Summary', {
 					 * @event corpusTermsClicked
 					 * @type dispatcher
 					 */
-//					this.dispatchEvent('corpusTermsClicked', this, {type: target.dom.innerHTML});
+				    var recordId = target.getAttribute('recordId', 'voyant');
+					var record = this.corpusTermsStore.getById(recordId);
+					this.dispatchEvent('corpusTermsClicked', this, [record]);
 				} else if (target.hasCls('corpus-types')) {
 					params.query = '';
 					if (target.hasCls('corpus-types-peaks')) {
@@ -404,7 +410,9 @@ Ext.define('Voyant.panel.Summary', {
 					 * @event documentTermsClicked
 					 * @type dispatcher
 					 */
-//					this.dispatchEvent('documentTermsClicked', this, {docIdType: target.getAttribute('val', 'voyant')});
+					var recordId = target.getAttribute('recordId', 'voyant');
+					var record = this.documentTermsStore.getById(recordId);
+					this.dispatchEvent('documentTermsClicked', this, [record]);
 				}
 			}
 		}, this);

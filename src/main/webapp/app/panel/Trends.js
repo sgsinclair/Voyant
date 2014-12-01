@@ -101,8 +101,9 @@ Ext.define('Voyant.panel.Trends', {
 
     	this.on("corpusTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
-    			// TODO: check if we have distribution data?
-    			this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
+    			if (terms[0] && terms[0].get('distributions') !== undefined) {
+    				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
+    			}
     		}
     	})
     	
