@@ -31,7 +31,7 @@ Ext.define('Voyant.util.QuerySearchField', {
         	listeners: {
     		   render: function(c) {
     		      Ext.QuickTips.register({
-    		        target: c.getEl(),
+    		        target: c.triggers.search.getEl(),
     		        text: c.localize('querySearchTip'),
     		        enabled: true,
     		        showDelay: 20,
