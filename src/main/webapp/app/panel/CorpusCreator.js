@@ -39,7 +39,52 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	    	buttonAlign: 'right',
     	    	defaultButtonUI : 'default',
 	    		items: [{
-	    			text: 'Open'
+	    			text: 'Open',
+	    			tooltip: 'Select an exsting corpus',
+	    			handler: function() {
+	    				Ext.create('Ext.window.Window', {
+	    				    title: 'Open an Existing Corpus',
+	    				    layout: 'fit',
+	    				    modal: true,
+	    				    items: {  // Let's put an empty grid in just to illustrate fit layout
+	    				        xtype: 'form',
+	    				        margin: '5,5,5,5',
+	    				        items: {
+	    				            xtype:'combo',
+	    				            labelWidth: 150,
+	    				            fieldLabel:'Choose a corpus:',
+	    				            name:'corpus',
+	    				            queryMode:'local',
+	    				            store:[['shakespeare',"Shakespeare's Plays"]],
+	    				            
+	    				            forceSelection:true
+	    				        },
+	    				        buttons: [
+	    				        	{
+	    				        		text: 'Open',
+	    				        		handler: function(btn) {
+	    				        			var form = btn.up('form').getForm();
+	    				        			var corpus = btn.up('form').getForm().getValues().corpus
+	    				        			if (corpus!='') {
+	    				        				me.loadCorpus({corpus: corpus})
+		    				        			btn.up('window').close();
+	    				        			}
+	    				        			else {
+	    				        				Ext.Msg.alert('Select a Corpus', 'Please be sure to select a corpus.');
+	    				        			}
+	    				        		},
+	    				        		flex: 1
+	    				            },{
+	    				        		text: 'Cancel',
+	    				        		flex: 1,
+	    				        		handler: function(btn) {
+	    				        			btn.up('window').close();
+	    				        		}
+	    				        	}
+	    				        ]
+	    				    }
+	    				}).show();
+	    			}
 	    		},{
     	        	xtype: 'filefield',
     	        	name: 'upload',
