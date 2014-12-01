@@ -41,6 +41,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 xtype: 'toolbar',
                 items: [{
                     xtype: 'querysearchfield'
+                    	
                 }, {
                     xtype: 'component',
                     itemId: 'status',
@@ -52,29 +53,23 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     			loadedCorpus: {
     				fn: function(src, corpus) {
 	    				this.setCorpus(corpus);
-	    				this.initGraph();
-	    				var corpusTerms = corpus.getCorpusTerms({
-	    					leadingBufferZone: 0,
-	    					autoLoad: false
-	    				});
-	            		corpusTerms.load({
-	            		    callback: function(records, operation, success) {
-	            		    	if (success) {
-	            		    		this.loadFromCorpusTermRecords(records);
-	            		    	}
-	            		    },
-	            		    scope: me,
-	            		    params: {
-	            				limit: 10,
-	            				stopList: this.getApiParam("stopList")
-	            			}
-	                	});
+	    				if (this.isVisible()) {
+	    					this.initLoad();
+	    				}
 	    			},
 	    			scope: this
     			},
     			query: {
     				fn: function(src, query) {this.loadFromQuery(query);},
     				scope: this
+    			},
+    			activate: {
+    				fn: function() { // load after tab activate (if we're in a tab panel)
+    					if (this.getCorpus()) {
+    						Ext.Function.defer(this.initLoad, 100, this);
+    					}
+    		    	},
+    		    	scope: this
     			}
     		}
         })
@@ -82,6 +77,28 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
         me.callParent(arguments);
 
+    },
+    
+    initLoad: function() {
+    	if (this.getCorpus()) {
+    		this.initGraph();
+    		var corpusTerms = this.getCorpus().getCorpusTerms({
+    			leadingBufferZone: 0,
+    			autoLoad: false
+    		});
+    		corpusTerms.load({
+    		    callback: function(records, operation, success) {
+    		    	if (success) {
+    		    		this.loadFromCorpusTermRecords(records);
+    		    	}
+    		    },
+    		    scope: this,
+    		    params: {
+    				limit: 10,
+    				stopList: this.getApiParam("stopList")
+    			}
+        	});
+    	}
     },
     
     loadFromQuery: function(query) {

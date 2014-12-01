@@ -2,6 +2,9 @@ Ext.define('Voyant.VoyantDefaultApp', {
 	extend : 'Voyant.VoyantCorpusApp',
 	requires: ['Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.CorpusCreator', 'Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph'],
 	name : 'VoyantDefaultApp',
+	config: {
+		toolsContainerMainEastSouthTabpanelInitialCollapsed: true
+	},
 	listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.viewport.down('voyantheader').collapse();
@@ -21,6 +24,14 @@ Ext.define('Voyant.VoyantDefaultApp', {
     			window.history.pushState({
     				corpus: corpusId,
     			}, 'Corpus: '+corpusId, url);
+    		}
+    	},
+    	termsClicked: function(src, terms) {
+    		if (terms.length>0 && terms[0].docIndex) { // if we have document-level term
+    			if (this.getToolsContainerMainEastSouthTabpanelInitialCollapsed()) {
+    				this.viewport.getComponent("toolsContainer").getComponent("toolsContainer-main").getComponent("toolsContainer-main-east").getComponent("toolsContainer-main-east-south-tabpanel").expand()
+    				this.setToolsContainerMainEastSouthTabpanelInitialCollapsed(false);
+    			}
     		}
     	}
 	},
@@ -50,6 +61,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 					}
 				},{
 					layout: 'border',
+					itemId: 'toolsContainer-main',
 					items: [{
 				        region: 'center',
 				        flex: 1,
@@ -89,6 +101,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 						}]
 				    },{
 				    	region: 'east',
+				    	itemId: 'toolsContainer-main-east',
 						split : {
 				        	size: SPLIT_SIZE
 				        },
@@ -111,17 +124,19 @@ Ext.define('Voyant.VoyantDefaultApp', {
 						}, {
 							xtype : 'tabpanel',
 							region : 'south',
+							collapsed: true,
+							itemId: 'toolsContainer-main-east-south-tabpanel',
 							split : {
 					        	size: SPLIT_SIZE
 					        },
 							flex : 5,
-							items : [ {
-								xtype : 'collocatesgraph',
+							items : [{
+								xtype : 'contexts',
 								split : true,
 								flex : 5,
 								collapsible : true
-							}, {
-								xtype : 'contexts',
+							},{
+								xtype : 'collocatesgraph',
 								split : true,
 								flex : 5,
 								collapsible : true

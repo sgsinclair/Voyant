@@ -129,6 +129,8 @@ Ext.define('Voyant.VoyantApp', {
 				panels[i].fireEvent.apply(panels[i], arguments);
 			}
 		}
+		
+		if (console) {console.info("Unhandled event: "+eventName, arguments)}
 		if (!isHeard) {
 			if (console) {console.info("Unhandled event: "+eventName, arguments)}
 		}
