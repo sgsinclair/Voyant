@@ -28,7 +28,7 @@ There are many ways of contributing to the development of Voyant Tools:
 The currently available version of [Voyant Tools](http://voyant-tools.org/) is 1.0 but version 2.0 is in active development and is expected to replace 1.0 in the first half of 2015. Voyant Tools 2.0 is a complete rewrite that is focused on better performance and scalability, as well as improved functionality (such as more powerful search).
 
 ## Releases
-* 2.0 M1 (Preview Release): Initial Release
+* Dec 3, 2014 - 2.0 M1 (Preview Release): Initial Release
 
 ##  Known Issues
 * several skins and tools are not yet implemented
