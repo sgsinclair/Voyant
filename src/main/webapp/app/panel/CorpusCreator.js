@@ -40,6 +40,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	    	defaultButtonUI : 'default',
 	    		items: [{
 	    			text: 'Open',
+                    glyph: 'xf115@FontAwesome', // not visible
 	    			tooltip: 'Select an exsting corpus',
 	    			handler: function() {
 	    				Ext.create('Ext.window.Window', {
@@ -62,6 +63,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				        buttons: [
 	    				        	{
 	    				        		text: 'Open',
+	    			                    glyph: 'xf00c@FontAwesome',
 	    				        		handler: function(btn) {
 	    				        			var form = btn.up('form').getForm();
 	    				        			var corpus = btn.up('form').getForm().getValues().corpus
@@ -81,6 +83,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				        		flex: 1
 	    				            },{
 	    				        		text: 'Cancel',
+	    			                    glyph: 'xf00d@FontAwesome',
 	    				        		flex: 1,
 	    				        		handler: function(btn) {
 	    				        			btn.up('window').close();
@@ -92,6 +95,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    			}
 	    		},{
     	        	xtype: 'filefield',
+                    glyph: 'xf093@FontAwesome',
     	        	name: 'upload',
         	    	buttonOnly: true,
         	    	hideLabel: true,
@@ -129,6 +133,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    		},'->',{
 	    	    	xtype: 'button',
 	    	    	scale: 'large',
+                    glyph: 'xf00c@FontAwesome',
 	    	    	text: this.localize('reveal'),
 	    	    	handler: function(btn) {
 	    	        	var input = btn.up('form').down('#input').getValue();

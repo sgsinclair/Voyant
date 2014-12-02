@@ -76,6 +76,7 @@ Ext.define('Voyant.VoyantApp', {
 		    	"if you want persistence (normal persistence will be avilable with the full release of Voyant Tools 2.0). Have fun and please give us your <a href='http://twitter.com/voyanttools'>feeback</a>!</p>"
 		    }, {
 		    	xtype: 'button',
+                glyph: 'xf00c@FontAwesome',
 		    	width: '100%',
 		    	scale: 'medium',
 		    	text: 'Continue',
