@@ -294,13 +294,13 @@ Ext.define('Voyant.panel.Reader', {
 			return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 		}
     	
-    	function addChart(docInfo) {
+    	function addChart(docInfo, reader) {
     		var index = docInfo.index;
     		var fraction = docInfo.fraction;
     		var height = docInfo.relativeHeight;
     		var bColor = getColor(index, 0.3);
     		var sColor = getColor(index, 1.0);
-    		container.add({
+    		var chart = container.add({
     			xtype: 'cartesian',
     	    	flex: fraction,
     	    	height: '100%',
@@ -358,6 +358,20 @@ Ext.define('Voyant.panel.Reader', {
             		data: []
             	})
     		});
+    		
+    		// hack to deal with itemclick bug
+    		chart.body.on('click', function(event, target) {
+    			var el = Ext.get(target);
+    			var x = event.getX();
+    			var box = el.getBox();
+    			var fraction = (x - box.x) / box.width;
+    			var chartContainer = el.parent('.x-panel');
+    			var containerParent = chartContainer.parent();
+    			var children = Ext.toArray(containerParent.dom.children);
+    			var docIndex = children.indexOf(chartContainer.dom);
+    			var doc = this.getDocumentsStore().getAt(docIndex);
+    			this.getApplication().dispatchEvent('documentsClicked', this, [doc]);
+    		}, reader);
     	}
     	
     	container.removeAll();
@@ -384,7 +398,7 @@ Ext.define('Voyant.panel.Reader', {
 		for (var i = 0; i < docInfos.length; i++) {
 			var d = docInfos[i];
 			d.relativeHeight = d.count==docMaxSize ? 1 : map(d.count, docMinSize, docMaxSize, 0, 1);
-			addChart(d);
+			addChart(d, this);
 		}
     },
     
