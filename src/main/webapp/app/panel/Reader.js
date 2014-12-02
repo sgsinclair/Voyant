@@ -342,13 +342,14 @@ Ext.define('Voyant.panel.Reader', {
         				strokeStyle: sColor
         			},
                     tooltip: {
+                    	corpus: corpus,
                         trackMouse: true,
                         style: 'background: #fff',
                         showDelay: 0,
                         dismissDelay: 500,
                         hideDelay: 5,
                         renderer: function(storeItem, item) {
-                            this.setHtml(storeItem.get('term') + ': ' + storeItem.get('distribution'));
+                            this.setHtml(corpus.getDocument(storeItem.get('docIndex')).getTitle()+"<br>"+storeItem.get('term') + ': ' + storeItem.get('distribution'));
                         }
                     }
         		}],
