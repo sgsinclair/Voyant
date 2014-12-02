@@ -148,7 +148,13 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 width: 150,
                 dataIndex: 'distributions',
                 widget: {
-                    xtype: 'sparklineline'
+                    xtype: 'sparklineline',
+                    tipTpl: new Ext.XTemplate('{[this.getDocumentTitle(values.x,values.y)]}', {
+                    	getDocumentTitle: function(docIndex, relativeFreq) {
+                    		return this.panel.store.getCorpus().getDocument(docIndex).getTitle()+"<br>relative frequency: "+Ext.util.Format.number(relativeFreq*1000000, "0,000")
+                    	},
+                    	panel: me 
+                    })
                 }
             }]
         });
