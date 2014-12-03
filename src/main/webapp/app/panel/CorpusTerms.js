@@ -105,7 +105,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     			text: this.localize("term"),
             	tooltip: this.localize("termTip"),
         		dataIndex: 'term',
-                width: 125,
+        		flex: 1,
                 sortable: true
             },{
             	text: this.localize("rawFreq"),
@@ -145,7 +145,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 xtype: 'widgetcolumn',
                 text: this.localize("trend"),
                 tooltip: this.localize("trendTip"),
-                width: 150,
+                flex: 1,
                 dataIndex: 'distributions',
                 widget: {
                     xtype: 'sparklineline',
