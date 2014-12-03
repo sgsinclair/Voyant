@@ -70,9 +70,20 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     					}
     		    	},
     		    	scope: this
+    			}, 
+    			resize: {
+    				fn: function(panel, width, height) {
+    					var el = this.getLayout().getRenderTarget();
+    					var svg = el.down('svg');
+    					svg.set({
+    						width: el.getWidth(),
+    						height: el.getHeight()
+    					});
+    				},
+    				scope: this
     			}
     		}
-        })
+        });
         
     	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
         me.callParent(arguments);
@@ -194,7 +205,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	        .attr("width", width)
 	        .attr("height", height);
     	this.setNode(svg.selectAll(".node"));
-    	this.setLink(svg.selectAll(".link"))
+    	this.setLink(svg.selectAll(".link"));
     	
 //    	this.start();
     },
