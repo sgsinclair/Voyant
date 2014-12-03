@@ -22,7 +22,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
     				}
     			}
     			window.history.pushState({
-    				corpus: corpusId,
+    				corpus: corpusId
     			}, 'Corpus: '+corpusId, url);
     		}
     	},
@@ -66,6 +66,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
 				        region: 'center',
 				        flex: 1,
 				        xtype: 'reader',
+				        collapsible: true
+				       
 				    },{
 				    	region: 'west',
 				    	flex: 1,
@@ -82,11 +84,35 @@ Ext.define('Voyant.VoyantDefaultApp', {
 							}, {
 								xtype : 'corpusterms',
 								collapsible : true
-							} ],
+							}],
+							tabBar: {
+					            items: [{
+					                xtype: 'tbfill'
+					            }, {
+					                xtype: 'button',
+					                text: 'Test Button',
+					                handler: function() {
+					                	debugger
+					                }
+					                	
+					            }]
+					        },
 							flex : 6
 						}, {
+							
+							flex: 4,
+							region: 'south',
+						    items: {
+								tools: [{type: 'help'}],
+						    	title: 'test',
+						    	html: 'test'
+						    }
+						}]
+						
+						/*{
 							xtype : 'tabpanel',
 							region : 'south',
+							collapsible: true,
 							split : {
 					        	size: SPLIT_SIZE
 					        },
@@ -98,7 +124,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 								collapsible : true
 							} ],
 							flex : 4
-						}]
+						}*/
 				    },{
 				    	region: 'east',
 				    	itemId: 'toolsContainer-main-east',

@@ -130,7 +130,7 @@ Ext.define('Voyant.panel.DocumentsFinder', {
 	                    store: new Ext.data.Store({
 	                        fields: ['text','value'],
 	                		data: [[this.localize('textField'),'text'],[this.localize('advancedField'),'advanced']]
-	                    }),
+	                    })
 	    	        },
 	    	        width: 150,
                     renderer: function(v) {return Ext.isEmpty(v) ? '' : me.localize(v+"Field")}
@@ -157,7 +157,7 @@ Ext.define('Voyant.panel.DocumentsFinder', {
 	    	        	return Ext.isEmpty(record.get('query')) ? '' : Ext.util.Format.number(value, '0,000')
 	    	        },
 	    	        minWidth: 100,
-	    	        maxWidth: 100,
+	    	        maxWidth: 100
 	    	    },{
 	    	    	xtype: 'actioncolumn',
 	                width: 25,
@@ -178,7 +178,7 @@ Ext.define('Voyant.panel.DocumentsFinder', {
                 autoDestroy: true,
                 fields: ['id','operator','field','query','count'],
 	    		data: [['','','','',0]]
-            }),
+            })
       	});
     			
         this.callParent(arguments);

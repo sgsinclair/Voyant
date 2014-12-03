@@ -133,7 +133,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
             	dataIndex: 'rawFreq',
             	tooltip: this.localize("rawFreqTip"),
             	width: 'autoSize',
-            	sortable: true,
+            	sortable: true
             },{
             	text: this.localize("relativeFreq"),
             	tooltip: this.localize("relativeFreqTip"),

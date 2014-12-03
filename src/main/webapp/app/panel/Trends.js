@@ -254,14 +254,14 @@ Ext.define('Voyant.panel.Trends', {
         		type: 'numeric',
         		position: 'left',
         		title: {
-        			text: this.localize(mode==this.MODE_DOCUMENT || this.getApiParam('freqsMode') =='rawFreqs' ? 'rawFrequencies' : 'relativeFrequencies'),
+        			text: this.localize(mode==this.MODE_DOCUMENT || this.getApiParam('freqsMode') =='rawFreqs' ? 'rawFrequencies' : 'relativeFrequencies')
         		}
         	}, {
         		type: 'category',
         		position: 'bottom',
         		fields: ['index'],
         		title: {
-            		text: this.localize(mode==this.MODE_DOCUMENT ? 'segments' : 'documents'),
+            		text: this.localize(mode==this.MODE_DOCUMENT ? 'segments' : 'documents')
         		},
         		renderer: function(label, data) {
         			return mode==this.MODE_DOCUMENT ? parseInt(label)+1 : label

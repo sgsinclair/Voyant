@@ -17,7 +17,7 @@ Ext.define("Voyant.data.proxy.CorpusTerms", {
 	    rootProperty: 'corpusTerms.terms',
 	    totalProperty: 'corpusTerms.total'
 	},
-    simpleSortMode: true,
+    simpleSortMode: true
 })
 
 Ext.define('Voyant.data.store.CorpusTerms', {

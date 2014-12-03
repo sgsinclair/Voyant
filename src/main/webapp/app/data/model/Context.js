@@ -7,6 +7,6 @@ Ext.define('Voyant.data.model.Context', {
              {name: 'left'},
              {name: 'keyword'},
              {name: 'term'},
-             {name: 'right'},
+             {name: 'right'}
         ]
 });

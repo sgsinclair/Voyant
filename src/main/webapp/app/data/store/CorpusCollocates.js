@@ -36,7 +36,7 @@ Ext.define('Voyant.data.store.CorpusCollocates', {
 	             type: 'json',
 	             rootProperty: 'corpusCollocates.collocates',
 	             totalPropery: 'corpusCollocates.total'
-	         },
+	         }
 
 		})
 		

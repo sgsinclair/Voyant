@@ -185,7 +185,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
             	dataIndex: 'contextTerm',
             	tooltip: this.localize("contextTermTip"),
             	width: 'autoSize',
-            	sortable: true,
+            	sortable: true
             },{
             	text: this.localize("contextTermRawFreq"),
             	tooltip: this.localize("contextTermRawFreqTip"),

@@ -327,7 +327,7 @@ Ext.define('Voyant.panel.Summary', {
 				docIndex: index,
 				limit: 5,
 				sort: 'TFIDF',
-				dir: 'DESC',
+				dir: 'DESC'
 			},
 			scope: this,
 			callback: function(records, operation, success) {
@@ -364,10 +364,6 @@ Ext.define('Voyant.panel.Summary', {
 						params.sortBy = 'wordDensity';
 					}
 					params.sortDirection = 'DESC';
-					/**
-					 * @event CorpusGridBootstrap
-					 * @type dispatcher
-					 */
 //					this.dispatchEvent('CorpusGridBootstrap', this, params);
 				} else if (target.hasCls('document-id')) {
 //					if (target.hasCls('document-id-distinctive')) {
@@ -379,16 +375,8 @@ Ext.define('Voyant.panel.Summary', {
 					
 					var docId = target.getAttribute('val', 'voyant');
 					var doc = this.docStore.getById(docId);
-					/**
-					 * @event documentsClicked
-					 * @type dispatcher
-					 */
 					this.dispatchEvent('documentsClicked', this, [doc]);
 				} else if (target.hasCls('corpus-type')) {
-					/**
-					 * @event corpusTermsClicked
-					 * @type dispatcher
-					 */
 				    var recordId = target.getAttribute('recordId', 'voyant');
 					var record = this.corpusTermsStore.getById(recordId);
 					this.dispatchEvent('corpusTermsClicked', this, [record]);
@@ -400,16 +388,8 @@ Ext.define('Voyant.panel.Summary', {
 					else {
 						Ext.apply(params, {sortBy: 'rawFreq', sortDirection: 'DESC', extendedSortZscoreMinimum: null});
 					}
-					/**
-					 * @event CorpusTypeFrequenciesRequest
-					 * @type dispatcher
-					 */
 //					this.dispatchEvent('CorpusTypeFrequenciesRequest', this, params, {type: 'whitelist', tools: 'voyeurCorpusTypeFrequenciesGrid'});
 				} else if (target.hasCls('document-type')) {
-					/**
-					 * @event documentTermsClicked
-					 * @type dispatcher
-					 */
 					var recordId = target.getAttribute('recordId', 'voyant');
 					var record = this.documentTermsStore.getById(recordId);
 					this.dispatchEvent('documentTermsClicked', this, [record]);

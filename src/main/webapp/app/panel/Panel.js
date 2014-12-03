@@ -1,5 +1,5 @@
 Ext.define('Voyant.panel.Panel', {
-	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.notebook.util.Embeddable','Voyant.util.DetailedError','Voyant.util.QuerySearchField'],
+	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable',/*'Voyant.notebook.util.Embeddable',*/'Voyant.util.DetailedError','Voyant.util.QuerySearchField'],
 	statics: {
 		i18n: {
 			term: {en: "Term"},
@@ -11,12 +11,18 @@ Ext.define('Voyant.panel.Panel', {
 		}
 	},
 	constructor: function(config) {
+		Ext.apply(this, {
+			tools: [
+				    {type: 'maximize'},
+				    {type: 'plus'},
+				    {type: 'save'},
+				    {type: 'gear'},
+				    {type: 'help'}
+			]
+		})
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-		this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
-	},
-	
-	initComponent: function(config) {
-		this.tools = this.getApplication().getTools();
+//		this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+		this.mixins['Voyant.util.Toolable'].constructor.apply(this, arguments);
 	},
 	
 	getApplication: function() {
@@ -25,6 +31,19 @@ Ext.define('Voyant.panel.Panel', {
 	
 	getBaseUrl: function() {
 		return this.getApplication().getBaseUrl();
+	},
+	
+	openUrl: function(url) {
+		var win = window.open(url);
+		if (!win) { // popup blocked
+			Ext.Msg.show({
+				title: "Popup Blocked",
+				buttonText: {ok: "Close"},
+				icon: Ext.MessageBox.INFO,
+				message: "A popup window was blocked. <a href='"+url+"' target='_blank' class='link'>Click here</a> to open the new window.",
+				buttons: Ext.Msg.OK,
+			});
+		}
 	},
 	
 	getTromboneUrl: function() {

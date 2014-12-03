@@ -93,7 +93,7 @@ Ext.define('Voyant.panel.Documents', {
                     tpl: this.localize('matchingDocuments'),
                     style: 'margin-right:5px'
                 }]
-            }],
+            }]
     	});
     	
         this.callParent(arguments);

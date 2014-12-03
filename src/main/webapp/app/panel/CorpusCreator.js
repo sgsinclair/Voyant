@@ -15,9 +15,10 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	
     },
     
-    constructor: function(config ) {
+    constructor: function(config) {
         this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+        config = config || {};
+    	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {includeTools: {gear: true, help: true}}));
     },
     
     initComponent: function() {
@@ -76,7 +77,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				    	        		    title:'Select a Corpus',
 	    				    	        		    message: 'Please be sure to select a corpus.',
 	    				    	        		    buttons: Ext.Msg.OK,
-	    				    	        		    icon: Ext.Msg.ERROR,
+	    				    	        		    icon: Ext.Msg.ERROR
 	    				    	        		});
 	    				        			}
 	    				        		},
@@ -145,7 +146,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	        		    title:'No Text Provided',
 	    	        		    message: 'Please provide text in the text box (or choose open or upload).',
 	    	        		    buttons: Ext.Msg.OK,
-	    	        		    icon: Ext.Msg.ERROR,
+	    	        		    icon: Ext.Msg.ERROR
 	    	        		});
 	    	        	}
 	    	    	}
@@ -174,6 +175,6 @@ Ext.define('Voyant.panel.CorpusCreator', {
 			view.unmask();
 			app.showErrorResponse({message: message}, response);
 		});
-    },
+    }
     
 });

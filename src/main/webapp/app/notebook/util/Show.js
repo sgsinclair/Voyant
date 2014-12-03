@@ -1,6 +1,6 @@
 Ext.define("Voyant.notebook.util.Show", {
 	extend: 'Ext.Base',
-	requires: ['Ext.data.identifier.Uuid'/*,'Voyant.util.ResponseError'*/],
+	requires: [/*FIXME: 'Ext.data.identifier.Uuid'*//*,'Voyant.util.ResponseError'*/],
 	statics: {
 		show: function(contents) {
 			if (this.then) {
@@ -89,7 +89,8 @@ Ext.define("Voyant.notebook.util.Show", {
 	}
 });
 
-
+// FIXME: commented out to allow for no notebooks version to load
+/*
 // alias show(contents) as global
 show = Voyant.notebook.util.Show.show;
 showError = Voyant.notebook.util.Show.showError;
@@ -98,3 +99,4 @@ String.prototype.show = show;
 Boolean.prototype.show = show;
 Array.prototype.show = show;
 Error.prototype.show = showError;
+*/

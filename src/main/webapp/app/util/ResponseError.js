@@ -1,7 +1,7 @@
 Ext.define("Voyant.util.ResponseError", {
 	extend: "Voyant.util.DetailedError",
 	config: {
-		response: undefined,
+		response: undefined
 	},
 	constructor: function(config) {
 		debugger

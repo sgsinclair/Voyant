@@ -112,7 +112,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
             	tooltip: this.localize("rawFreqTip"),
             	dataIndex: 'rawFreq',
                 width: 'autoSize',
-            	sortable: true,
+            	sortable: true
             },{
             	text: this.localize("relativeFreq"),
             	tooltip: this.localize("relativeFreqTip"),
@@ -124,7 +124,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
             	},
                 width: 'autoSize',
                 hidden: true,
-            	sortable: true,
+            	sortable: true
             },{
             	text: this.localize("relativePeakedness"),
             	tooltip: this.localize("relativePeakednessTip"),
@@ -132,7 +132,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
             	renderer: Ext.util.Format.numberRenderer("0,000.0"),
                 width: 'autoSize',
                 hidden: true,
-            	sortable: true,
+            	sortable: true
             },{
             	text: this.localize("relativeSkewness"),
             	tooltip: this.localize("relativeSkewnessTip"),
@@ -140,7 +140,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
             	renderer: Ext.util.Format.numberRenderer("0,000.0"),
                 width: 'autoSize',
                 hidden: true,
-            	sortable: true,
+            	sortable: true
             },{
                 xtype: 'widgetcolumn',
                 text: this.localize("trend"),
