@@ -159,6 +159,16 @@ Ext.define('Voyant.VoyantApp', {
 		    autoScroll: true
 		})
 		Ext.Msg.show(config);
+	},
+	
+	getToolConfigFromToolXtype: function(xtype) {
+		cls = Ext.ClassManager.getByAlias("widget."+xtype);
+		return {
+			xtype: xtype,
+			title: this._localizeClass(cls, "title"),
+			helpTip: this._localizeClass(cls, "helpTip"),
+			glyph: cls && cls.glyph ? cls.glyph : 'xf12e@FontAwesome'
+		};
 	}
     
 });

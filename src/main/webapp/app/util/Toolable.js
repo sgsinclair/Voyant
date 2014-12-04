@@ -16,34 +16,9 @@ Ext.define('Voyant.util.Toolable', {
 		var parent = this.up('component');
 		if (parent && parent.getInitialConfig('moreTools')) {
 			moreTools = [];
-			 parent.getInitialConfig('moreTools').forEach(function(plusItem) {
-				 if (plusItem!=this.xtype) {
-						if (Ext.isString(plusItem)) {
-							plusItem = {xtype: plusItem}
-						}
-						var xtype = plusItem.xtype;
-						if (xtype) {
-							cls = Ext.ClassManager.getByAlias("widget."+xtype);
-							Ext.apply(plusItem, {
-								xtype: 'button',
-								textAlign: 'left',
-								handler: function() {
-									this.replacePanel(xtype)
-								},
-								scope: this
-									
-							})
-							plusItem.xtype = 'button';
-							if (!plusItem.text) {
-								plusItem.text = this._localizeClass(cls, "title");
-							}
-							if (!plusItem.tooltip) {
-								plusItem.tooltip = this._localizeClass(cls, "help")
-							}
-							if (!plusItem.glyph) {
-								plusItem.glyph = cls.glyph ? cls.glyph : 'xf12e@FontAwesome'
-							}
-							moreTools.push(plusItem);
+			 parent.getInitialConfig('moreTools').forEach(function(xtype) {
+				 if (xtype && xtype!=this.xtype) {
+						moreTools.push(this.getMenuItemFromXtype(xtype));
 							//  fa-puzzle-piece [&#xf12e;]
 							//  fa-text-width [&#xf035;]
 							//  fa-list-alt [&#xf022;]
@@ -53,11 +28,37 @@ Ext.define('Voyant.util.Toolable', {
 							//  fa-info [&#xf129;]
 							//  fa-picture-o [&#xf03e;]
 							//  fa-area-chart [&#xf1fe;]
-						}					 
 				 }
 
 			}, this)
 		}
+		if (moreTools && this.getApplication().getMoreTools) {
+			moreTools.push("-");
+		}
+		if (this.getApplication().getMoreTools) {
+			moreTools = moreTools || [];
+			var app = this.getApplication();
+			var tools = app.getMoreTools();
+			for (var category in tools) {
+				var subcategories = [];
+				for (var subcategory in tools[category]) {
+					var subcats = [];
+					tools[category][subcategory].forEach(function(tool) {
+						subcats.push(this.getMenuItemFromXtype(tool))
+					}, this)
+					subcategories.push({
+						text: app.localize(subcategory),
+						menu: {items: subcats}
+					})
+				}
+				moreTools.push({
+					text: app.localize(category),
+					menu: {items: subcategories}
+				})
+			}
+			
+		}
+		
 		var saveItems = undefined;
 		var toolsMap = {
 				maximize: {
@@ -111,6 +112,16 @@ Ext.define('Voyant.util.Toolable', {
 				});
 			}
 		}, this)
+	},
+	getMenuItemFromXtype: function(xtype) {
+		var config = this.getApplication().getToolConfigFromToolXtype(xtype);
+		return Ext.apply(config, {
+			xtype: 'menuitem',
+			text: config.title,
+			textAlign: 'left',
+			handler: function() {this.replacePanel(config.xtype)},
+			scope: this
+		})
 	},
 	plusToolClick: function(panel) {
 
