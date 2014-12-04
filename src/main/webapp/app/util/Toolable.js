@@ -39,24 +39,25 @@ Ext.define('Voyant.util.Toolable', {
 			moreTools = moreTools || [];
 			var app = this.getApplication();
 			var tools = app.getMoreTools();
-			for (var category in tools) {
-				var subcategories = [];
-				for (var subcategory in tools[category]) {
-					var subcats = [];
-					tools[category][subcategory].forEach(function(tool) {
-						subcats.push(this.getMenuItemFromXtype(tool))
+			tools.forEach(function(category) {
+				var categories = [];
+				category.items.forEach(function(subcategory) {
+					var subcategories = [];
+					subcategory.items.forEach(function(xtype) {
+						subcategories.push(this.getMenuItemFromXtype(xtype))
 					}, this)
-					subcategories.push({
-						text: app.localize(subcategory),
-						menu: {items: subcats}
+					categories.push({
+						text: app.localize(subcategory.i18n),
+						glyph: subcategory.glyph,
+						menu: {items: subcategories}
 					})
-				}
+				}, this);
 				moreTools.push({
-					text: app.localize(category),
-					menu: {items: subcategories}
+					text: app.localize(category.i18n),
+					glyph: category.glyph,
+					menu: {items: categories}
 				})
-			}
-			
+			}, this);
 		}
 		
 		var saveItems = undefined;

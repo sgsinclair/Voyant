@@ -8,23 +8,48 @@ Ext.define('Voyant.VoyantCorpusApp', {
     
     statics: {
     	i18n: {
-    		fetchingCorpus: {en: 'Fetching your corpus…'}
+    		fetchingCorpus: {en: 'Fetching your corpus'},
+    		moreToolsScale: {en: 'Tools by Scale'},
+    		moreToolsScaleCorpus: {en: 'Corpus Tools'},
+    		moreToolsScaleDocument: {en: 'Document Tools'},
+    		moreToolsType: {en: 'Tools by Type'},
+    		moreToolsTypeViz: {en: 'Visualization Tools'},
+    		moreToolsTypeGrid: {en: 'Grid Tools'},
+    		moreToolsTypeOther: {en: 'Other Tools'}
     	}
     },
     
     config: {
     	corpus: undefined,
-    	moreTools: {
-    		scale: {
-        		corpus: ['cirrus','corpusterms','corpuscollocates','documents','summary','trends'],
-        		document: ['cirrus','contexts','documentterms','reader','trends'],
-    		},
-    		type: {
-        		grid: ['corpusterms','corpuscollocates','contexts','documentterms','documents'],
-        		viz: ['cirrus','collocatesgraph','trends'],
-        		other: ['reader']
-    		}
-    	}
+    	moreTools: [{
+    		i18n: 'moreToolsScale',
+    		glyph: 'xf07d@FontAwesome',
+    		items: [{
+    			i18n: 'moreToolsScaleCorpus',
+    			glyph: 'xf111@FontAwesome',
+    			items: ['cirrus','corpusterms','corpuscollocates','documents','summary','trends']
+    		},{
+    			i18n: 'moreToolsScaleDocument',
+    			glyph: 'xf10c@FontAwesome',
+    			items: ['cirrus','contexts','documentterms','reader','trends']
+    		}]
+    	},{
+    		i18n: 'moreToolsType',
+    		glyph: 'xf12e@FontAwesome',
+    		items: [{
+    			i18n: 'moreToolsTypeViz',
+    			glyph: 'xf06e@FontAwesome',
+    			items: ['cirrus','collocatesgraph','trends']
+    		},{
+    			i18n: 'moreToolsTypeGrid',
+    			glyph: 'xf0ce@FontAwesome',
+    			items: ['corpusterms','corpuscollocates','contexts','documentterms','documents']
+    		},{
+    			i18n: 'moreToolsTypeOther',
+    			glyph: 'xf035@FontAwesome',
+    			items: ['reader']
+    		}]
+    	}]
     },
     
     launch: function() {
