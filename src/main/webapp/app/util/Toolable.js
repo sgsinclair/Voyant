@@ -115,8 +115,9 @@ Ext.define('Voyant.util.Toolable', {
 		}, this)
 	},
 	getMenuItemFromXtype: function(xtype) {
+		var xt = xtype;
 		var config = this.getApplication().getToolConfigFromToolXtype(xtype);
-		return Ext.apply(config, {
+		return Ext.apply(Ext.clone(config), {
 			xtype: 'menuitem',
 			text: config.title,
 			textAlign: 'left',
