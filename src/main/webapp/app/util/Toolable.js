@@ -12,11 +12,11 @@ Ext.define('Voyant.util.Toolable', {
 	constructor: function(config) {
 		config = config || {};
 		var me = this;
-		var plusItems = undefined;
+		var moreTools = undefined;
 		var parent = this.up('component');
-		if (parent && parent.getInitialConfig('plusItems')) {
-			plusItems = [];
-			 parent.getInitialConfig('plusItems').forEach(function(plusItem) {
+		if (parent && parent.getInitialConfig('moreTools')) {
+			moreTools = [];
+			 parent.getInitialConfig('moreTools').forEach(function(plusItem) {
 				 if (plusItem!=this.xtype) {
 						if (Ext.isString(plusItem)) {
 							plusItem = {xtype: plusItem}
@@ -43,7 +43,7 @@ Ext.define('Voyant.util.Toolable', {
 							if (!plusItem.glyph) {
 								plusItem.glyph = cls.glyph ? cls.glyph : 'xf12e@FontAwesome'
 							}
-							plusItems.push(plusItem);
+							moreTools.push(plusItem);
 							//  fa-puzzle-piece [&#xf12e;]
 							//  fa-text-width [&#xf035;]
 							//  fa-list-alt [&#xf022;]
@@ -58,15 +58,14 @@ Ext.define('Voyant.util.Toolable', {
 
 			}, this)
 		}
-		console.warn(plusItems)
 		var saveItems = undefined;
 		var toolsMap = {
 				maximize: {
 					fn: this.maximizeToolClick
 				},
 				plus: {
-					fn: plusItems ? undefined : this.plusToolClick,
-					items: plusItems ? plusItems : undefined
+					fn: moreTools ? undefined : this.plusToolClick,
+					items: moreTools ? moreTools : undefined
 				},
 				save: {
 					fn: undefined,

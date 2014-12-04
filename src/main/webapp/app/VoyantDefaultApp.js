@@ -70,7 +70,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 				    	region: 'west',
 				    	flex: 3,
 				    	layout: 'fit',
-				        plusItems: ['cirrus','corpusterms'],
+				        moreTools: ['cirrus','corpusterms'],
 				    	items: {
 					    	xtype: 'cirrus',
 							frame: true,
@@ -80,7 +80,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 				    	region: 'east',
 				    	flex: 3,
 				    	layout: 'fit',
-				        plusItems: ['trends','collocatesgraph','corpuscollocates'],
+				    	moreTools: ['trends','collocatesgraph','corpuscollocates'],
 				        items: {
 					    	xtype: 'trends'
 				        }
@@ -97,7 +97,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 								border: true,
 								layout: 'fit',
 				    			flex: 1,
-						        plusItems: ['summary','documents'],
+				    			moreTools: ['summary','documents'],
 				    			items: {
 					    			xtype: 'summary'
 				    			}
@@ -106,7 +106,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 								border: true,
 								layout: 'fit',
 				    			flex: 1,
-						        plusItems: ['contexts','documentterms'],
+				    			moreTools: ['contexts','documentterms'],
 				    			items: {
 					    			xtype: 'contexts'
 				    			}
