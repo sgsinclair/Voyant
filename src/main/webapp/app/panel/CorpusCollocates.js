@@ -33,7 +33,8 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     		query: undefined,
     		docId: undefined,
     		docIndex: undefined
-    	}
+    	},
+		glyph: 'xf0ce@FontAwesome'
     },
     constructor: function(config) {
     	

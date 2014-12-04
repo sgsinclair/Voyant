@@ -10,7 +10,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		limit: 15,
     		stopList: 'auto',
     		terms: undefined
-    	}
+    	},
+		glyph: 'xf1cb@FontAwesome'
     },
     
     config: {

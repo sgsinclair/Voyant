@@ -47,7 +47,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     		},{
     			i18n: 'moreToolsTypeOther',
     			glyph: 'xf035@FontAwesome',
-    			items: ['reader']
+    			items: ['reader','summary']
     		}]
     	}]
     },

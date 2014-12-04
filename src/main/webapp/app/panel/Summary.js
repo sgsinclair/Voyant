@@ -27,7 +27,8 @@ Ext.define('Voyant.panel.Summary', {
     		limit: 5,
     		// The maximum number of documents to show distinctive words for.
     		numberOfDocumentsForDistinctiveWords: 5
-    	}
+    	},
+		glyph: 'xf1ea@FontAwesome'
     },
     config: {
     	corpus: undefined

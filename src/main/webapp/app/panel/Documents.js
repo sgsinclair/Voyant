@@ -13,7 +13,8 @@ Ext.define('Voyant.panel.Documents', {
     		typeTokenRatioLexical: {en: "Ratio"},
     		language: {en: "Language"},
     		matchingDocuments: {en: "Matching documents: {count}"}
-    	}
+    	},
+		glyph: 'xf0ce@FontAwesome'
     },
 
     constructor: function(config) {

@@ -20,7 +20,8 @@ Ext.define('Voyant.panel.Trends', {
     		stopList: 'auto',
     		query: undefined,
     		freqsMode: 'relativeFreqs'
-    	}
+    	},
+		glyph: 'xf201@FontAwesome'
     },
     
     MODE_CORPUS: 'corpus',

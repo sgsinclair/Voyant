@@ -12,7 +12,7 @@ Ext.define('Voyant.panel.Reader', {
     		start: 0,
     		limit: 1000
     	},
-    	glyph: 'xf035@FontAwesome'
+    	glyph: 'xf0f6@FontAwesome'
 	},
     config: {
     	corpus: undefined,

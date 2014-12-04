@@ -17,7 +17,8 @@ Ext.define('Voyant.panel.Contexts', {
     		docId: undefined,
     		docIndex: undefined,
     		stopList: 'auto'
-    	}
+    	},
+		glyph: 'xf0ce@FontAwesome'
     },
     constructor: function() {
         this.callParent(arguments);

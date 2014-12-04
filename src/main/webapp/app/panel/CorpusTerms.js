@@ -18,7 +18,8 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	api: {
     		stopList: 'auto',
     		query: undefined
-    	}
+    	},
+		glyph: 'xf0ce@FontAwesome'
     },
     constructor: function(config) {
     	
