@@ -25,14 +25,6 @@ Ext.define('Voyant.VoyantDefaultApp', {
     				corpus: corpusId
     			}, 'Corpus: '+corpusId, url);
     		}
-    	},
-    	termsClicked: function(src, terms) {
-    		if (terms.length>0 && terms[0].docIndex) { // if we have document-level term
-    			if (this.getToolsContainerMainEastSouthTabpanelInitialCollapsed()) {
-    				this.viewport.getComponent("toolsContainer").getComponent("toolsContainer-main").getComponent("toolsContainer-main-east").getComponent("toolsContainer-main-east-south-tabpanel").expand()
-    				this.setToolsContainerMainEastSouthTabpanelInitialCollapsed(false);
-    			}
-    		}
     	}
 	},
 	launch: function() {
@@ -62,114 +54,63 @@ Ext.define('Voyant.VoyantDefaultApp', {
 				},{
 					layout: 'border',
 					itemId: 'toolsContainer-main',
+					frame: true,
+					border: true,
 					items: [{
 				        region: 'center',
-				        flex: 1,
-				        xtype: 'reader',
-				        collapsible: true
+				        flex: 3,
+				        layout: 'fit',
+				        items: {
+					        xtype: 'reader',
+							frame: true,
+							border: true
+				        }
 				       
-				    },{
+				    }, {
 				    	region: 'west',
-				    	flex: 1,
-				        layout: 'border',
-				        split: {
-				        	size: SPLIT_SIZE
-				        },
-				        items: [{
-							xtype : 'tabpanel',
-							region : 'center',
-							items : [ {
-								xtype : 'cirrus',
-								collapsible : true
-							}, {
-								xtype : 'corpusterms',
-								collapsible : true
-							}],
-							tabBar: {
-					            items: [{
-					                xtype: 'tbfill'
-					            }, {
-					                xtype: 'button',
-					                text: 'Test Button',
-					                handler: function() {
-					                	debugger
-					                }
-					                	
-					            }]
-					        },
-							flex : 6
-						}, {
-							
-							flex: 4,
-							region: 'south',
-						    items: {
-								tools: [{type: 'help'}],
-						    	title: 'test',
-						    	html: 'test'
-						    }
-						}]
-						
-						/*{
-							xtype : 'tabpanel',
-							region : 'south',
-							collapsible: true,
-							split : {
-					        	size: SPLIT_SIZE
-					        },
-							items : [ {
-								xtype : 'summary',
-								collapsible : true
-							}, {
-								xtype : 'documents',
-								collapsible : true
-							} ],
-							flex : 4
-						}*/
-				    },{
+				    	flex: 3,
+				    	layout: 'fit',
+				        plusItems: ['cirrus','corpusterms'],
+				    	items: {
+					    	xtype: 'cirrus',
+							frame: true,
+							border: true
+				    	}
+				    }, {
 				    	region: 'east',
-				    	itemId: 'toolsContainer-main-east',
-						split : {
-				        	size: SPLIT_SIZE
-				        },
-						flex : 1,
-						layout : 'border',
-						items : [ {
-							xtype : 'tabpanel',
-							region : 'center',
-							flex : 5,
-							items : [ {
-								xtype : 'trends',
-								collapsible : true
-							}, {
-								xtype : 'documentterms',
-								collapsible : true
-							}, {
-								xtype : 'corpuscollocates',
-								collapsible : true
-							} ]
-						}, {
-							xtype : 'tabpanel',
-							region : 'south',
-							collapsed: true,
-							itemId: 'toolsContainer-main-east-south-tabpanel',
-							split : {
-					        	size: SPLIT_SIZE
-					        },
-							flex : 5,
-							items : [{
-								xtype : 'contexts',
-								split : true,
-								flex : 5,
-								collapsible : true
-							},{
-								xtype : 'collocatesgraph',
-								split : true,
-								flex : 5,
-								collapsible : true
-							}
-
-							]
-						} ]
+				    	flex: 3,
+				    	layout: 'fit',
+				        plusItems: ['trends','collocatesgraph','corpuscollocates'],
+				        items: {
+					    	xtype: 'trends'
+				        }
+				    }, {
+				    	region: 'south',
+				    	flex: 2,
+				    	layout: {
+				    		type: 'hbox',
+				    		align: 'stretch'
+				    	},
+				    	
+				    	items: [{
+								frame: true,
+								border: true,
+								layout: 'fit',
+				    			flex: 1,
+						        plusItems: ['summary','documents'],
+				    			items: {
+					    			xtype: 'summary'
+				    			}
+				    		},{
+								frame: true,
+								border: true,
+								layout: 'fit',
+				    			flex: 1,
+						        plusItems: ['contexts','documentterms'],
+				    			items: {
+					    			xtype: 'contexts'
+				    			}
+				    	}]
 				    }]
 				}]
 		    }]

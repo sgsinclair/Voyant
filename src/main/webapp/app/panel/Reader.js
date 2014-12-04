@@ -11,8 +11,9 @@ Ext.define('Voyant.panel.Reader', {
     	api: {
     		start: 0,
     		limit: 1000
-    	}
-    },
+    	},
+    	glyph: 'xf035e@FontAwesome'
+	},
     config: {
     	corpus: undefined,
     	tokensStore: undefined,
@@ -205,6 +206,8 @@ Ext.define('Voyant.panel.Reader', {
                 xtype: 'toolbar',
                 items: [{
                     xtype: 'querysearchfield'
+                },{
+                	text: 'test'
                 }]
     		}],
     		listeners: {

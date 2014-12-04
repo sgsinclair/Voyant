@@ -12,6 +12,10 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	}
     },
     
+    config: {
+    	corpus: undefined
+    },
+    
     launch: function() {
 		this.callParent(arguments);
 
@@ -29,6 +33,12 @@ Ext.define('Voyant.VoyantCorpusApp', {
     			view.unmask();
     			me.showErrorResponse({message: message}, response);
     		});
+    	}
+    },
+    
+    listeners: {
+    	loadedCorpus: function(src, corpus) {
+    		this.setCorpus(corpus);
     	}
     }
 
