@@ -172,7 +172,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
         		dataIndex: 'term',
             	tooltip: this.localize("termTip"),
                 sortable: true,
-                width: 'autoSize'
+                flex: 1
             },{
     			text: this.localize("rawFreq"),
         		dataIndex: 'rawFreq',
@@ -184,7 +184,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
             	text: this.localize("contextTerm"),
             	dataIndex: 'contextTerm',
             	tooltip: this.localize("contextTermTip"),
-            	width: 'autoSize',
+            	flex: 1,
             	sortable: true
             },{
             	text: this.localize("contextTermRawFreq"),

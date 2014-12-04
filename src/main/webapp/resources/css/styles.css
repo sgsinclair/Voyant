@@ -67,22 +67,6 @@ a {
 	font-style: italic;
 }
 
-svg text {
-	text-anchor: middle;
-}
-
-svg text.keyword {
-	text-anchor: middle;
-}
-
-svg text.context {
-	text-anchor: middle;
-}
-
-svg line {
-  stroke: #eee;
-  stroke-width: 1px;
-}
 
 /*************************
  * Panel specific styles *
@@ -112,4 +96,24 @@ svg line {
 
 .voyant-reader .x-panel-body .keyword {
 	background-color: yellow;
+}
+
+/* Collocates Graph */
+svg text {
+    text-anchor: middle;
+}
+
+svg text.keyword {
+    text-anchor: middle;
+    cursor: pointer;
+}
+
+svg text.context {
+    text-anchor: middle;
+    cursor: pointer;
+}
+
+svg line {
+  stroke: #eee;
+  stroke-width: 1px;
 }
