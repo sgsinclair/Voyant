@@ -18,16 +18,7 @@ Ext.define('Voyant.util.Toolable', {
 			moreTools = [];
 			 parent.getInitialConfig('moreTools').forEach(function(xtype) {
 				 if (xtype && xtype!=this.xtype) {
-						moreTools.push(this.getMenuItemFromXtype(xtype));
-							//  fa-puzzle-piece [&#xf12e;]
-							//  fa-text-width [&#xf035;]
-							//  fa-list-alt [&#xf022;]
-							//  fa-line-chart [&#xf201;]
-							//  fa-eye [&#xf06e;]
-							//  fa-bar-chart [&#xf080;]
-							//  fa-info [&#xf129;]
-							//  fa-picture-o [&#xf03e;]
-							//  fa-area-chart [&#xf1fe;]
+					moreTools.push(this.getMenuItemFromXtype(xtype));
 				 }
 
 			}, this)
@@ -73,16 +64,16 @@ Ext.define('Voyant.util.Toolable', {
 					fn: undefined,
 					items: saveItems
 				},
-				gear: {
-					fn: undefined
-				},
+				gear: this.showOptions ? {
+					fn: this.showOptions
+				} : undefined,
 				help: {
 					fn: this.helpToolClick
 				}
 		}
 		var tools = [];
 		for (var tool in toolsMap) {
-			if (config.includeTools && !config.includeTools[tool]) {continue}
+			if (config.includeTools && !config.includeTools[tool] || !toolsMap[tool]) {continue}
 			tools.push({
 				type: tool,
 				tooltip: this.localize(tool+"Tip"),
@@ -140,7 +131,13 @@ Ext.define('Voyant.util.Toolable', {
 		panel.openUrl(url);
 	},
 	helpToolClick: function(panel) {
-		panel.openUrl( "http://docs.voyant-tools.org/");
+		var help = panel.localize('help', {default: false}) || panel.localize('helpTip');
+		if (help==panel._localizeClass(Ext.ClassManager.get("Voyant.util.Toolable"), "helpTip")) {
+			panel.openUrl( "http://docs.voyant-tools.org/");
+		}
+		else {
+			Ext.Msg.alert(panel.localize('title'), help)
+		}
 	},
 	replacePanel: function(xtype) {
 		var corpus = this.getApplication().getCorpus();

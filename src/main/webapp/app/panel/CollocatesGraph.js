@@ -4,7 +4,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	alias: 'widget.collocatesgraph',
     statics: {
     	i18n: {
-    		title: {en: "Collocates Graph"}
+    		title: {en: "Collocates Graph"},
+    		helpTip: {en: "<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:<ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"}
     	},
     	api: {
     		limit: 15,
@@ -49,42 +50,34 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                     tpl: this.localize('matchingTerms'),
                     style: 'margin-right:5px'
                 }]
-            }],
-            listeners: {
-    			loadedCorpus: {
-    				fn: function(src, corpus) {
-	    				this.setCorpus(corpus);
-	    				if (this.isVisible()) {
-	    					this.initLoad();
-	    				}
-	    			},
-	    			scope: this
-    			},
-    			query: {
-    				fn: function(src, query) {this.loadFromQuery(query);},
-    				scope: this
-    			},
-    			activate: {
-    				fn: function() { // load after tab activate (if we're in a tab panel)
+            }]
+        });
+        
+        this.on("loadedCorpus", function(src, corpus) {
+			this.setCorpus(corpus);
+			if (this.isVisible()) {
+				this.initLoad();
+			}
+        }, this);
+        
+        this.on('activate', function() { // load after tab activate (if we're in a tab panel)
     					if (this.getCorpus()) {
     						Ext.Function.defer(this.initLoad, 100, this);
     					}
-    		    	},
-    		    	scope: this
-    			}, 
-    			resize: {
-    				fn: function(panel, width, height) {
+    		    	}, this);
+        
+        this.on("query", function(src, query) {this.loadFromQuery(query);}, this);
+        
+        this.on("resize", function(panel, width, height) {
     					var el = this.getLayout().getRenderTarget();
     					var svg = el.down('svg');
-    					svg.set({
-    						width: el.getWidth(),
-    						height: el.getHeight()
-    					});
-    				},
-    				scope: this
-    			}
-    		}
-        });
+    					if (svg) {
+        					svg.set({
+        						width: el.getWidth(),
+        						height: el.getHeight()
+        					});
+    					}
+    				}, this)
         
     	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
         me.callParent(arguments);

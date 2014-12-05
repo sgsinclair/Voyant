@@ -44,7 +44,7 @@ Ext.define('Voyant.util.Localization', {
 			val =  this._localizeObject(object.superclass, key, config);
 			if (val) {return val;}
 		}
-		return '['+key+']';
+		return config && config.default!=undefined ? config.default : '['+key+']';
 	},
 	
 	_localizeClass: function(clazz, key, config) {
@@ -62,7 +62,7 @@ Ext.define('Voyant.util.Localization', {
 				}
 				return use; // string
 			}
-			return '['+key+']'; // no language key found, so just return the key
+			return config && config.default!=undefined ? config.default : '['+key+']'; // no language key found, so just return the key
 		}
 		return false
 	}
