@@ -7,7 +7,7 @@
 function Cirrus(config) {
     var that = this;
     this.config = config;
-    var canvasId = 'cirrusCanvas';
+    var canvasId = Ext.id(null, 'cirrusCanvas');
     if (this.config.containerId == null) {
         alert('You must provide a valid container ID!');
         return;

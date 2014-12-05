@@ -25,9 +25,9 @@ function WordController(parentApp) {
     var timer; // timer used to incrementally call the arrange method
     this.doingArrange = false;
     this.wordsToArrange = 5; // how many words to arrange for each call to the arrange method
-    overWord = null; // what word is the user mousing over?
-    overX = 0; // position of the mouse when over a word
-    overY = 0;
+    var overWord = null; // what word is the user mousing over?
+    var overX = 0; // position of the mouse when over a word
+    var overY = 0;
     
     var _words = new Array(); // the list of word objects
     this.getWords = function() {
