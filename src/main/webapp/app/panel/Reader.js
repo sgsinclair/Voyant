@@ -25,6 +25,8 @@ Ext.define('Voyant.panel.Reader', {
     
     cls: 'voyant-reader',
     
+    layout: 'fit',
+    
     items: {
     	layout: 'border',
     	items: [{
@@ -155,10 +157,11 @@ Ext.define('Voyant.panel.Reader', {
     	}));
     	
     	this.on("afterrender", function() {
-    		this.innerContainer = this.down('panel[region="center"]').getLayout().getRenderTarget();
+    		var centerPanel = this.down('panel[region="center"]');
+    		this.innerContainer = centerPanel.getLayout().getRenderTarget();
     		
     		// scroll listener
-    		this.items.getAt(0).body.on("scroll", function() {
+    		centerPanel.body.on("scroll", function() {
     			var cmp = this.items.getAt(0);
     			var body = cmp.body;
     			var dom = body.dom;
@@ -184,7 +187,7 @@ Ext.define('Voyant.panel.Reader', {
     		}, this);
     		
     		// click listener
-    		this.items.getAt(0).body.on("click", function(event, target) {
+    		centerPanel.body.on("click", function(event, target) {
     			target = Ext.get(target);
     			if (target.hasCls('word')) {
     				var info = Voyant.data.model.Token.getInfoFromElement(target);
