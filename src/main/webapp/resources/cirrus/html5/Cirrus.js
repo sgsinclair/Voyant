@@ -143,6 +143,13 @@ function Cirrus(config) {
             }
         });
         
+        $(canvasId).mouseover(function(event) {
+        	wordController.startUpdates();
+        });
+        $(canvasId).mouseout(function(event) {
+        	wordController.stopUpdates();
+        });
+        
         $(canvasId).mousemove(function(event) {
             wordController.handleMouseMove(event);
         });
