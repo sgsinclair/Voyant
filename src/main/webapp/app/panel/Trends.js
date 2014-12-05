@@ -10,6 +10,7 @@ Ext.define('Voyant.panel.Trends', {
     statics: {
     	i18n: {
     		title: {en: "Trends"},
+    		helpTip: {en: "<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		rawFrequencies: {en: 'raw frequencies'},
     		relativeFrequencies: {en: 'relative frequencies'},
     		segments: {en: 'document segments'},

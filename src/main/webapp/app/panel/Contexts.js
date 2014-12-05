@@ -6,6 +6,7 @@ Ext.define('Voyant.panel.Contexts', {
     statics: {
     	i18n: {
     		title: {en: "Keywords in Context"},
+    		helpTip: {en: "The Keywords in Context tool shows each occurrence of a keyword with a bit of surounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:</p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		termTip: {en: "The keyword for the context."},
     		left: {en: "Left"},
     		leftTip: {en: "Context to the left of the keyword."},

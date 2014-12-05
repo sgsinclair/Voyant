@@ -8,6 +8,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     statics: {
     	i18n: {
     		title: {en: "Collocates"},
+    		helpTip: {en: "<p>Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus. Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		term: {en: "Term"},
     		termTip: {en: "This is the keyword term around which collocate (context) terms are counted."},
     		termRawFreq: {en: "Count (keyword)"},

@@ -7,6 +7,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     statics: {
     	i18n: {
     		title: {en: "Add Texts"},
+    		helpTip: {en: "This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from you computer (you can select multiple files by using the Ctrl and/or Shift keys)</li></ul>"},
     		emptyInput: {en: "Type in one or more URLs on separate lines or paste in a full text."},
     		reveal: {en: "Reveal"}
     	}

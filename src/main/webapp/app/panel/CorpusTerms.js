@@ -5,6 +5,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     statics: {
     	i18n: {
     		title: {en: "Corpus Terms"},
+    		helpTip: {en: "<p>Corpus Terms is a table view of terms that appear in the entire corpus. Features include:</p><ul><li>reordering by <i>term</i> and <i>count</i> (click on the column headers)</li><li>a sparkline graph of the term frequency trends across the corpus (if the corpus has multiple documents) or across the document (if the corpus has only one document)</li><li>additional columns available (relative frequency, distribution peakedness and skew) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		matchingTerms: {en: 'Matching terms: {count}'},
     		termTip: {en: "The term in the corpus."},
     		rawFreqTip: {en: "The total count (raw frequency) of this term in the entire corpus."},
