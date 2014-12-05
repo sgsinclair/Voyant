@@ -25,27 +25,27 @@ Ext.define('Voyant.panel.Reader', {
     
     cls: 'voyant-reader',
     
-    layout: 'border',
-    
-    items: [{
-    	bodyPadding: 10,
-    	region: 'center',
-    	border: false,
-    	height: 'auto',
-    	autoScroll: true,
-    	html: '<div class="readerContainer"></div>'
-    },{
-    	region: 'south',
-    	height: 40,
-    	split: {
-    		size: 2
-    	},
-    	splitterResize: true,
-    	border: false,
-    	layout: {
-    		type: 'hbox'
-    	}
-    }],
+    items: {
+    	layout: 'border',
+    	items: [{
+	    	bodyPadding: 10,
+	    	region: 'center',
+	    	border: false,
+	    	autoScroll: true,
+	    	html: '<div class="readerContainer"></div>'
+	    },{
+	    	region: 'south',
+	    	height: 40,
+	    	split: {
+	    		size: 2
+	    	},
+	    	splitterResize: true,
+	    	border: false,
+	    	layout: {
+	    		type: 'hbox'
+	    	}
+	    }]
+    },
     
     constructor: function() {
     	Ext.apply(this, {
