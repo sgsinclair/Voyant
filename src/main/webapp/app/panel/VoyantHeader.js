@@ -26,6 +26,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
 			}
     	});
         this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
     
     onCollapse: function(panel) {

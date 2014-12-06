@@ -117,3 +117,20 @@ svg line {
   stroke: #eee;
   stroke-width: 1px;
 }
+
+/* used for panel tool glyphs in the header */
+.x-tool-glyph {
+    font-size: 16px;
+    line-height: 16px;
+    font-weight: normal;
+     color: #157fcc;
+     opacity: .75;
+    width: 20px;
+    margin-right: 5px;
+}
+    .x-tool-glyph:hover {
+        opacity: 1;
+    }
+#voyantheader .x-tool-glyph {
+	color: white;
+}

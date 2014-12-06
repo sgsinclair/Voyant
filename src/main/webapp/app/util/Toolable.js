@@ -53,21 +53,26 @@ Ext.define('Voyant.util.Toolable', {
 		
 		var saveItems = undefined;
 		var toolsMap = {
-				maximize: {
-					fn: this.maximizeToolClick
-				},
-				plus: {
-					fn: moreTools ? undefined : this.plusToolClick,
-					items: moreTools ? moreTools : undefined
-				},
+//				maximize: {
+//					glyph: 'xf08e@FontAwesome',
+//					fn: this.maximizeToolClick
+//				},
 				save: {
+					glyph: 'xf08e@FontAwesome',
 					fn: undefined,
 					items: saveItems
 				},
+				plus: {
+					glyph: 'xf17a@FontAwesome',
+					fn: moreTools ? undefined : this.plusToolClick,
+					items: moreTools ? moreTools : undefined
+				},
 				gear: this.showOptions ? {
+					glyph: 'xf205@FontAwesome',
 					fn: this.showOptions
 				} : undefined,
 				help: {
+					glyph: 'xf128@FontAwesome',
 					fn: this.helpToolClick
 				}
 		}
@@ -79,6 +84,7 @@ Ext.define('Voyant.util.Toolable', {
 				tooltip: this.localize(tool+"Tip"),
 				callback: toolsMap[tool].fn,
 				xtype: 'toolmenu',
+				glyph: toolsMap[tool].glyph,
 				items: toolsMap[tool].items
 			})
 		}
@@ -153,10 +159,17 @@ Ext.define('Voyant.util.Toolable', {
 });
 
 // from http://www.sencha.com/forum/showthread.php?281658-add-dropdown-menu-to-panel-tool&p=1054579&viewfull=1#post1054579
+// and http://www.sencha.com/forum/showthread.php?281953-Glyphs-in-panel-tool&p=1068934&viewfull=1#post1068934
+
 Ext.define('Voyant.util.ToolMenu', {
     extend: 'Ext.panel.Tool',
     alias: 'widget.toolmenu',
-    renderTpl: ['<div class="x-menu-tool-hover">' + '</div><img id="{id}-toolEl" src="{blank}" class="{baseCls}-img {baseCls}-{type}' + '{childElCls}" role="presentation"/>'],
+    renderTpl: ['<div class="x-menu-tool-hover">' + '</div>'+
+            '<tpl if="glyph">' + 
+            '<span id="{id}-toolEl" class="{baseCls}-glyph {childElCls}" role="presentation" style="font-family: {glyphFontFamily}">&#{glyph}</span>' + 
+            '<tpl else>' + 
+            '<img id="{id}-toolEl" src="{blank}" class="{baseCls}-img {baseCls}-{type}' + '{childElCls}" role="presentation"/>' + 
+            '</tpl>'],
     privates: {
         onClick: function() {
             var me = this,
@@ -180,7 +193,32 @@ Ext.define('Voyant.util.ToolMenu', {
             Ext.destroyMembers(this, 'toolMenu'); //destructor
             this.callParent();
         }
-    }       
-
+    },   
+	initComponent: function() {
+	    var me = this;
+	    me.callParent(arguments);
+	
+	    var glyph, glyphParts, glyphFontFamily;
+	    glyph = me.glyph || 'xf12e@FontAwesome';
+	
+	    if (glyph) {
+	        if (typeof glyph === 'string') {
+	            glyphParts = glyph.split('@');
+	            glyph = glyphParts[0];
+	            glyphFontFamily = glyphParts[1];
+	        } else {
+	            glyphFontFamily = 'FontAwesome';
+	        }
+	
+	
+	        Ext.applyIf(me.renderData, {
+	            baseCls: me.baseCls,
+	            blank: Ext.BLANK_IMAGE_URL,
+	            type: me.type,
+	            glyph: glyph,
+	            glyphFontFamily: glyphFontFamily
+	        });
+	    }
+	}
 
 });
