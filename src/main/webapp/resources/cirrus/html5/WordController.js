@@ -18,6 +18,7 @@ function WordController(parentApp) {
         _layout = value;
     }
     
+    this.UPDATE_RATE = 25; // update frequency in milliseconds
     this.COARSENESS = 5; // how many pixels do we skip when creating the mask?
 //    if ($.browser.webkit) this.COARSENESS = 3; 
     this.grid = new Array(); // a multidimensional array ([x][y]), holding co-ords for words
@@ -397,7 +398,7 @@ function WordController(parentApp) {
                         
                         this.toggleLoadingText(false);                               
                         
-                        timer = setInterval(drawWords, 10);
+                        drawWords();
                         
                         break;
                     }
@@ -510,6 +511,19 @@ function WordController(parentApp) {
         app.context.fillText('Loading', app.canvas.width - offset, 10);
         
         app.context.restore();
+    }
+    
+    this.startUpdates = function() {
+    	timer = setInterval(drawWords, that.UPDATE_RATE);
+    }
+    
+    this.stopUpdates = function() {
+    	if (overWord != null) {
+	    	// remove existing tooltip
+	    	overWord = null;
+	    	drawWords();
+    	}
+    	clearTimeout(timer);
     }
     
     function drawWords() {
