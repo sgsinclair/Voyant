@@ -60,9 +60,11 @@ Ext.define('Voyant.VoyantDefaultApp', {
 				        region: 'center',
 				        flex: 3,
 				        layout: 'fit',
-				        xtype: 'reader',
-						frame: true,
-						border: true
+				        items: {
+					        xtype: 'reader',
+							frame: true,
+							border: true
+				        }
 				       
 				    }, {
 				    	region: 'west',
