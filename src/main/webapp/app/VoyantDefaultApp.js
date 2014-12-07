@@ -1,10 +1,8 @@
 Ext.define('Voyant.VoyantDefaultApp', {
 	extend : 'Voyant.VoyantCorpusApp',
-	requires: ['Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.CorpusCreator', 'Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph'],
+	requires: ['Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.CorpusCreator','Voyant.container.Corpus'],
+//	           'Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph'],
 	name : 'VoyantDefaultApp',
-	config: {
-		toolsContainerMainEastSouthTabpanelInitialCollapsed: true
-	},
 	listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.viewport.down('voyantheader').collapse();
@@ -26,6 +24,9 @@ Ext.define('Voyant.VoyantDefaultApp', {
     			}, 'Corpus: '+corpusId, url);
     		}
     	}
+	},
+	getViewComponent: function() {
+		return this.viewport.down('#toolsContainer-main')
 	},
 	launch: function() {
 		var SPLIT_SIZE = 5;
@@ -52,11 +53,13 @@ Ext.define('Voyant.VoyantDefaultApp', {
 						xtype: 'corpuscreator'
 					}
 				},{
-					layout: 'border',
+					layout: 'fit',
 					itemId: 'toolsContainer-main',
-					frame: true,
-					border: true,
-					items: [{
+					items: {
+						xtype: 'container.corpus'
+					}
+					
+					/*items: [{
 				        region: 'center',
 				        flex: 3,
 				        layout: 'fit',
@@ -111,7 +114,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 					    			xtype: 'contexts'
 				    			}
 				    	}]
-				    }]
+				    }]*/
 				}]
 		    }]
 		});

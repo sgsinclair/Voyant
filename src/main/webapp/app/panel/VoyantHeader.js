@@ -7,7 +7,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
     		title: {en: "Voyant Tools"}
     	}
     },
-    constructor: function() {
+    constructor: function(config) {
     	Ext.apply(this, {
     		id: 'voyantheader',
     		title: '',
@@ -26,7 +26,9 @@ Ext.define('Voyant.panel.VoyantHeader', {
 			}
     	});
         this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {
+    		moreTools: ['container.corpus']
+    	}));
     },
     
     onCollapse: function(panel) {

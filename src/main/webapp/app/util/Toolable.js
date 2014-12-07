@@ -13,8 +13,18 @@ Ext.define('Voyant.util.Toolable', {
 		config = config || {};
 		var me = this;
 		var moreTools = undefined;
+		var moreSkins = undefined;
 		var parent = this.up('component');
-		if (parent && parent.getInitialConfig('moreTools')) {
+		if (config.moreTools) {
+			moreTools = [];
+			config.moreTools.forEach(function(xtype) {
+				 if (xtype && xtype!=this.xtype) {
+					moreTools.push(this.getMenuItemFromXtype(xtype));
+				 }
+
+			}, this)
+		}
+		else if (parent && parent.getInitialConfig('moreTools')) {
 			moreTools = [];
 			 parent.getInitialConfig('moreTools').forEach(function(xtype) {
 				 if (xtype && xtype!=this.xtype) {
@@ -49,8 +59,8 @@ Ext.define('Voyant.util.Toolable', {
 					menu: {items: categories}
 				})
 			}, this);
-		}
-		
+		}			
+
 		var saveItems = undefined;
 		var toolsMap = {
 //				maximize: {
@@ -62,11 +72,10 @@ Ext.define('Voyant.util.Toolable', {
 					fn: undefined,
 					items: saveItems
 				},
-				plus: {
+				plus: moreTools || moreSkins ? {
 					glyph: 'xf17a@FontAwesome',
-					fn: moreTools ? undefined : this.plusToolClick,
-					items: moreTools ? moreTools : undefined
-				},
+					items: moreSkins ? moreSkins : moreTools
+				} : undefined,
 				gear: this.showOptions ? {
 					glyph: 'xf205@FontAwesome',
 					fn: this.showOptions
@@ -122,9 +131,6 @@ Ext.define('Voyant.util.Toolable', {
 			scope: this
 		})
 	},
-	plusToolClick: function(panel) {
-
-	},
 	maximizeToolClick: function(panel) {
 		var name = Ext.getClass(panel).getName();
 		var parts = name.split(".");
@@ -148,12 +154,22 @@ Ext.define('Voyant.util.Toolable', {
 	replacePanel: function(xtype) {
 		var corpus = this.getApplication().getCorpus();
 		var config = this.getInitialConfig();
-		var parent = this.up("component");
-		parent.remove(this);
-		this.destroy();
-		var newTool = parent.add({xtype: xtype});
-		if (corpus) {
-			newTool.fireEvent("loadedCorpus", newTool, corpus)
+		var parent;
+		if (this.isXType('voyantheader') && this.getApplication().getViewComponent) {
+			parent = this.getApplication().getViewComponent();
+			parent.removeAll(true);
+			var newTool = parent.add({xtype: xtype});
+			if (corpus) {
+				this.getApplication().dispatchEvent("loadedCorpus", parent, corpus);
+			}
+		}
+		else {
+			parent = this.isXType('voyantheader') && this.getApplication().getViewComponent ? this.getApplication().getViewComponent() : this.up("component");
+			parent.remove(this, true);
+			var newTool = parent.add({xtype: xtype, });
+			if (corpus) {
+				newTool.fireEvent("loadedCorpus", newTool, corpus)
+			}
 		}
 	}
 });
