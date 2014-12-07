@@ -1,8 +1,8 @@
-Ext.define('Voyant.container.Corpus', {
-	extend: 'Ext.container.Container',
+Ext.define('Voyant.panel.CorpusSet', {
+	extend: 'Ext.panel.Panel',
     requires: ['Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph'],
-    mixins: ['Voyant.util.Localization'],
-    alias: 'widget.container.corpus',
+	mixins: ['Voyant.panel.Panel'],
+    alias: 'widget.corpusset',
 	statics: {
 		i18n: {
 			title: {en: "Corpus Skin"},

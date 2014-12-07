@@ -1,7 +1,6 @@
 Ext.define('Voyant.VoyantDefaultApp', {
 	extend : 'Voyant.VoyantCorpusApp',
-	requires: ['Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.CorpusCreator','Voyant.container.Corpus'],
-//	           'Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph'],
+	requires: ['Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.CorpusCreator','Voyant.panel.CorpusSet'],
 	name : 'VoyantDefaultApp',
 	listeners: {
     	loadedCorpus: function(src, corpus) {
@@ -56,7 +55,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 					layout: 'fit',
 					itemId: 'toolsContainer-main',
 					items: {
-						xtype: 'container.corpus'
+						xtype: 'corpusset'
 					}
 					
 					/*items: [{
