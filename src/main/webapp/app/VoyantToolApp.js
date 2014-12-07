@@ -10,7 +10,10 @@ Ext.define('Voyant.VoyantToolApp', {
 		        xtype: 'voyantfooter'
 		    }, {
 		        region: 'center',
-		        xtype: this.getTool()
+		        layout: 'fit',
+		        items: {
+			        xtype: this.getTool()
+		        }
 		    }]
 		});
         this.callParent(arguments);

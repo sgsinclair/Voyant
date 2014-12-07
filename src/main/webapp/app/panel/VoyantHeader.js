@@ -20,10 +20,10 @@ Ext.define('Voyant.panel.VoyantHeader', {
 			floatable: false,
 			header: true,
 			hideCollapseTool: true,
-			tools: [],
 			listeners: {
 				collapse: this.onCollapse
-			}
+			},
+			titleAlign: 'center'
     	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {
