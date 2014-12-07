@@ -13,7 +13,6 @@ Ext.define('Voyant.util.Toolable', {
 		config = config || {};
 		var me = this;
 		var moreTools = undefined;
-		var moreSkins = undefined;
 		var parent = this.up('component');
 		if (config.moreTools) {
 			moreTools = [];
@@ -72,9 +71,9 @@ Ext.define('Voyant.util.Toolable', {
 					fn: undefined,
 					items: saveItems
 				},
-				plus: moreTools || moreSkins ? {
+				plus: moreTools ? {
 					glyph: 'xf17a@FontAwesome',
-					items: moreSkins ? moreSkins : moreTools
+					items: moreTools
 				} : undefined,
 				gear: this.showOptions ? {
 					glyph: 'xf205@FontAwesome',
