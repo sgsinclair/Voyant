@@ -1,6 +1,7 @@
 Ext.define('Voyant.util.Api', {
 	constructor: function(config) {
 		this.api = {};
+		Ext.apply(this.api, Ext.ClassManager.getClass(this).superclass.self.api);
 		Ext.apply(this.api, Ext.ClassManager.getClass(this).api);
     	var queryParams = Ext.Object.fromQueryString(document.location.search);
     	for (var key in this.api) {

@@ -6,7 +6,24 @@ Ext.define('Voyant.util.Toolable', {
 			plusTip: {en: 'Click to choose another tool for this panel location (this will replace the current tool).'},
 			saveTip: {en: 'Export a URL, an embeddable tool, data or a bibliographic reference.'},
 			gearTip: {en: 'Define options for this tool.'},
-			helpTip: {en: 'No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.'}
+			helpTip: {en: 'No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.'},
+			saveTitle: {en: "Export"},
+			saveViewUrl: {en: 'a URL for this view (tools and data)'},
+			saveViewFieldset: {en: 'Export View (Tools and Data)'},
+			saveViewHtmlEmbed: {en: "an HTML snippet for embedding this view in another web page"},
+			saveViewHtmlEmbed: {en: "an HTML snippet for embedding this view in another web page"},
+			saveViewBiblio: {en: "a bibliographic reference for this view"},
+			saveGridFieldset: {en: "Export Data"},
+			saveGridScopeCurrent: {en: "export currently visible data"},
+			saveGridScopeAll: {en: "export all available data"},
+			saveGridFormatHtml: {en: "export as HTML"},
+			saveGridFormatXml: {en: "export as XML"},
+			saveGridFormatTsv: {en: "export as tab separated values (text)"},
+			'export': {en: 'Export'},
+			cancel: {en: 'Cancel'},
+			exportError: {en: "Export Error"},
+			exportNoFunction: {en: "An export function has been defined by is not availble."}
+			
 		}
 	},
 	constructor: function(config) {
@@ -68,16 +85,16 @@ Ext.define('Voyant.util.Toolable', {
 //				},
 				save: {
 					glyph: 'xf08e@FontAwesome',
-					fn: undefined,
+					fn: this.saveToolClick,
 					items: saveItems
 				},
 				plus: moreTools ? {
 					glyph: 'xf17a@FontAwesome',
 					items: moreTools
 				} : undefined,
-				gear: this.showOptions ? {
+				gear: this.showOptionsClick ? {
 					glyph: 'xf205@FontAwesome',
-					fn: this.showOptions
+					fn: this.showOptionsClick
 				} : undefined,
 				help: {
 					glyph: 'xf128@FontAwesome',
@@ -140,6 +157,112 @@ Ext.define('Voyant.util.Toolable', {
 		}
 		if (params) {url += "?"+Ext.Object.toQueryString(params);}
 		panel.openUrl(url);
+	},
+	saveToolClick: function(panel) {
+		var view = panel.isXType('voyantheader') ? '' : Ext.getClassName(panel).split(".").pop();
+		var url = panel.getApplication().getBaseUrl()+'?view='+view+'&corpus='+panel.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(panel.getApiParams());
+		var items = [{
+	       		xtype: 'radio',
+	       		name: 'export',
+	       		inputValue: 'url',
+	       		boxLabel: "<a href='"+url+"' target='_blank'>"+panel.localize('saveViewUrl')+"</a>",
+	       		checked: true
+		},{
+	       xtype: 'fieldset',
+	       collapsible: true,
+	       collapsed: true,
+	       title: panel.localize('saveViewFieldset'),
+	       items: [{
+	       		xtype: 'radio',
+	       		name: 'export',
+	       		inputValue: 'embed',
+	       		boxLabel: panel.localize('saveViewHtmlEmbed')
+	       	},{
+	       		xtype: 'radio',
+	       		name: 'export',
+	       		inputValue: 'biblio',
+	       		boxLabel: panel.localize('saveViewBiblio')
+	       	}]
+		}]
+		if (panel.isXType('grid')) {
+			items.push({
+		       xtype: 'fieldset',
+		       collapsible: true,
+		       collapsed: true,
+		       title: panel.localize('saveGridFieldset'),
+		       items: [{
+		    	   items: [{
+			       		xtype: 'radio',
+			       		name: 'export',
+			       		inputValue: 'gridCurrent',
+			       		boxLabel: panel.localize('saveGridScopeCurrent')
+		    	   },{
+			       		xtype: 'radio',
+			       		name: 'export',
+			       		inputValue: 'gridAll',
+			       		boxLabel: panel.localize('saveGridScopeAll')
+		    	   }]
+		       	},{
+			    	   xtype: 'fieldset',
+			    	   items: [{
+				       		xtype: 'radio',
+				       		name: 'gridFormat',
+				       		inputValue: 'html',
+				       		boxLabel: panel.localize('saveGridFormatHtml'),
+				       		checked: true
+			    	   },{
+				       		xtype: 'radio',
+				       		name: 'gridFormat',
+				       		inputValue: 'json',
+				       		boxLabel: panel.localize('saveGridFormatTsv')
+			    	  	},{
+				       		xtype: 'radio',
+				       		name: 'gridFormat',
+				       		inputValue: 'json',
+				       		boxLabel: panel.localize('saveGridFormatJson')
+			    	   }]
+			       	}]
+			})
+		}
+		Ext.create('Ext.window.Window', {
+			title: panel.localize("saveTitle"),
+			modal: true,
+			items: {
+				xtype: 'form',
+				items: items,
+				buttons: [{
+	            	text: panel.localize("Export"),
+					glyph: 'xf08e@FontAwesome',
+	            	flex: 1,
+	            	panel: panel,
+	        		handler: function(btn) {
+	        			var form = btn.up('form');
+	        			var fn = 'export'+Ext.String.capitalize(form.getValues().export);
+	        			if (Ext.isFunction(panel[fn])) {
+	        				panel[fn].call(panel, panel, form)
+	        			}
+	        			else {
+	        				Ext.Msg.show({
+	        				    title: panel.localize('exportError'),
+	        				    message: panel.localize('exportNoFunction'),
+	        				    buttons: Ext.Msg.OK,
+	        				    icon: Ext.Msg.ERROR
+	        				});
+	        			}
+	        			btn.up('window').close();
+	        		},
+	        		scope: panel
+	            }, {
+	            	text: panel.localize("Cancel"),
+	                glyph: 'xf00d@FontAwesome',
+	        		flex: 1,
+	        		handler: function(btn) {
+	        			btn.up('window').close();
+	        		}
+				}]
+			},
+			bodyPadding: 5
+		}).show()
 	},
 	helpToolClick: function(panel) {
 		var help = panel.localize('help', {default: false}) || panel.localize('helpTip');

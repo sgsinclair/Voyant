@@ -1,7 +1,21 @@
 Ext.define('Voyant.VoyantDefaultApp', {
 	extend : 'Voyant.VoyantCorpusApp',
-	requires: ['Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.CorpusCreator','Voyant.panel.CorpusSet'],
+	mixins: ['Voyant.util.Api'],
 	name : 'VoyantDefaultApp',
+	constructor: function() {
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+        this.callParent(arguments);
+	},
+	statics: {
+		i18n: {
+			'noViewErrorTitle': {en: "View Error"},
+			'noViewErrorTpl': {en: 'No view was found with the name "{view}". You can <a href="{url}">try with the default view</a> instead'},
+		},
+		api: {
+			view: 'corpusset'
+		}
+	},
+	
 	listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.viewport.down('voyantheader').collapse();
@@ -28,6 +42,18 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		return this.viewport.down('#toolsContainer-main')
 	},
 	launch: function() {
+		var view = this.getApiParam('view', 'CorpusSet');
+		var xtype = view.toLowerCase();
+		if (!Ext.ClassManager.getByAlias("widget."+xtype)) {
+			var url = document.location.href.replace(/view=.*?&/,'');
+			Ext.Msg.show({
+			    title: this.localize('noViewErrorTitle'),
+			    message: new Ext.Template(this.localize('noViewErrorTpl')).apply({view: view, url: url}),
+			    buttons: Ext.Msg.OK,
+			    icon: Ext.Msg.ERROR
+			});
+			return;
+		}
 		var SPLIT_SIZE = 5;
 		this.viewport = Ext.create('Ext.container.Viewport', {
 		    layout: 'border',
@@ -55,65 +81,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
 					layout: 'fit',
 					itemId: 'toolsContainer-main',
 					items: {
-						xtype: 'corpusset'
+						xtype: xtype
 					}
-					
-					/*items: [{
-				        region: 'center',
-				        flex: 3,
-				        layout: 'fit',
-				        items: {
-					        xtype: 'reader',
-							frame: true,
-							border: true
-				        }
-				       
-				    }, {
-				    	region: 'west',
-				    	flex: 3,
-				    	layout: 'fit',
-				        moreTools: ['cirrus','corpusterms'],
-				    	items: {
-					    	xtype: 'cirrus',
-							frame: true,
-							border: true
-				    	}
-				    }, {
-				    	region: 'east',
-				    	flex: 3,
-				    	layout: 'fit',
-				    	moreTools: ['trends','collocatesgraph','corpuscollocates'],
-				        items: {
-					    	xtype: 'trends'
-				        }
-				    }, {
-				    	region: 'south',
-				    	flex: 2,
-				    	layout: {
-				    		type: 'hbox',
-				    		align: 'stretch'
-				    	},
-				    	
-				    	items: [{
-								frame: true,
-								border: true,
-								layout: 'fit',
-				    			flex: 1,
-				    			moreTools: ['summary','documents'],
-				    			items: {
-					    			xtype: 'summary'
-				    			}
-				    		},{
-								frame: true,
-								border: true,
-								layout: 'fit',
-				    			flex: 1,
-				    			moreTools: ['contexts','documentterms'],
-				    			items: {
-					    			xtype: 'contexts'
-				    			}
-				    	}]
-				    }]*/
 				}]
 		    }]
 		});
