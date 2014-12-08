@@ -20,8 +20,10 @@ Ext.define('Voyant.util.Toolable', {
 			exportGridScopeCurrent: {en: "export currently visible data"},
 			exportGridScopeAll: {en: "export all available data"},
 			exportGridFormatHtml: {en: "export as HTML"},
-			exportGridFormatXml: {en: "export as XML"},
+			exportGridFormatJson: {en: "export as JSON"},
 			exportGridFormatTsv: {en: "export as tab separated values (text)"},
+			exportGridFormatErrorTitle: {en: "Export Table Format Error"},
+			exportGridFormatErrorMessage: {en: "An unsupported format has been selected: {format}"},
 			'export': {en: 'Export'},
 			cancel: {en: 'Cancel'},
 			exportError: {en: "Export Error"},
@@ -185,7 +187,7 @@ Ext.define('Voyant.util.Toolable', {
 	       		boxLabel: panel.localize('exportViewBiblio')
 	       	}]
 		}]
-		if (false && /* FIXME: disable for now */ panel.isXType('grid')) {
+		if (panel.isXType('grid')) {
 			items.push({
 		       xtype: 'fieldset',
 		       collapsible: true,
@@ -197,12 +199,12 @@ Ext.define('Voyant.util.Toolable', {
 			       		name: 'export',
 			       		inputValue: 'gridCurrent',
 			       		boxLabel: panel.localize('exportGridScopeCurrent')
-		    	   },{
+		    	   }/*,{
 			       		xtype: 'radio',
 			       		name: 'export',
 			       		inputValue: 'gridAll',
 			       		boxLabel: panel.localize('exportGridScopeAll')
-		    	   }]
+		    	   }*/]
 		       	},{
 			    	   xtype: 'fieldset',
 			    	   items: [{
@@ -214,7 +216,7 @@ Ext.define('Voyant.util.Toolable', {
 			    	   },{
 				       		xtype: 'radio',
 				       		name: 'gridFormat',
-				       		inputValue: 'json',
+				       		inputValue: 'tsv',
 				       		boxLabel: panel.localize('exportGridFormatTsv')
 			    	  	},{
 				       		xtype: 'radio',
@@ -299,6 +301,104 @@ Ext.define('Voyant.util.Toolable', {
 	    	'<i>Voyant Tools</i>. Retrieved '+Ext.Date.format(date,'F j, Y')+', from http://voyant-tools.org</fieldset>',
 		    buttons: Ext.Msg.OK,
 		    icon: Ext.Msg.INFO
+		});
+	},
+	exportGridCurrent: function(grid, form) {
+		var format = form.getValues().gridFormat;
+		if (format && Ext.isFunction(this['exportGridCurrent'+Ext.String.capitalize(format)])) {
+			this['exportGridCurrent'+Ext.String.capitalize(format)].apply(this, arguments);
+		}
+		else {
+			Ext.Msg.show({
+			    title: this.localize('exportGridFormatErrorTitle'),
+			    message: new Ext.Template(this.localize('exportGridFormatErrorMessage')).apply({format: format}),
+			    buttons: Ext.Msg.OK,
+			    icon: Ext.Msg.ERROR
+			});
+		}
+	},
+	exportGridCurrentJson: function(grid, form) {
+		var store = grid.getStore();
+		var fields = store.getFields();
+		var value = "<table>\n\t<thead>\n\t\t<tr>\n";
+		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns();
+		values = [];
+		grid.getStore().each(function(row) {
+			var val = {};
+			visibleColumns.forEach(function(column) {
+				val[column.text] = row.get(column.dataIndex);
+			})
+			values.push(val);
+		});
+		Ext.Msg.show({
+		    title: this.localize('exportViewEmbedTitle'),
+		    message: this.localize('exportViewEmbedMessage'),
+		    buttons: Ext.Msg.OK,
+		    icon: Ext.Msg.INFO,
+		    prompt: true,
+	        multiline: true,
+	        value: Ext.encode(values)
+		});
+	},
+	exportGridCurrentTsv: function(grid, form) {
+		var store = grid.getStore();
+		var fields = store.getFields();
+		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns();
+		var fields = [];
+		visibleColumns.forEach(function(column) {
+			fields.push(column.text);
+		})
+		var value = fields.join("\t")+"\n";
+		grid.getStore().each(function(row) {
+			cells = [];
+			visibleColumns.forEach(function(column) {
+				var val = row.get(column.dataIndex);
+				if (Ext.isString(val)) {
+					val = val.replace(/\s+/g,' '); // get rid of multiple whitespace (including newlines and tabs)
+				}
+				cells.push(val)
+			})
+			value += cells.join("\t")+"\n";
+		});
+		Ext.Msg.show({
+		    title: this.localize('exportViewEmbedTitle'),
+		    message: this.localize('exportViewEmbedMessage'),
+		    buttons: Ext.Msg.OK,
+		    icon: Ext.Msg.INFO,
+		    prompt: true,
+	        multiline: true,
+	        value: value
+		});
+	},
+	exportGridCurrentHtml: function(grid, form) {
+		var store = grid.getStore();
+		var fields = store.getFields();
+		var value = "<table>\n\t<thead>\n\t\t<tr>\n";
+		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns();
+		visibleColumns.forEach(function(column) {
+			value+="\t\t\t<td>"+column.text+"</td>\n";
+		})
+		value+="\t\t</tr>\n\t</thead>\n\t<tbody>\n"
+		grid.getStore().each(function(row) {
+			value+="\t\t<tr>\n"
+			visibleColumns.forEach(function(column) {
+				var val = row.get(column.dataIndex);
+				if (Ext.isString(val)) {
+					val = val.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&lg;')
+				}
+				value+="\t\t\t<td>"+val+"</td>\n";
+			})
+			value+="\t\t</tr>\n";
+		});
+		value+="\t</tbody>\n</table>";
+		Ext.Msg.show({
+		    title: this.localize('exportViewEmbedTitle'),
+		    message: this.localize('exportViewEmbedMessage'),
+		    buttons: Ext.Msg.OK,
+		    icon: Ext.Msg.INFO,
+		    prompt: true,
+	        multiline: true,
+	        value: value
 		});
 	},
 	getExportUrl: function() {
