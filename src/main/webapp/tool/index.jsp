@@ -19,7 +19,7 @@ String tool = parts[1];
 		requires: ['Voyant.panel.VoyantHeader','Voyant.panel.<%= tool %>','Voyant.panel.VoyantFooter'],
 		name : 'VoyantToolApp',
 		config: {
-			baseUrl: '../../',
+			baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/',
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>',
 			tool: '<%= tool.toLowerCase() %>'

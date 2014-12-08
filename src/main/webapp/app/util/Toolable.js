@@ -7,18 +7,21 @@ Ext.define('Voyant.util.Toolable', {
 			saveTip: {en: 'Export a URL, an embeddable tool, data or a bibliographic reference.'},
 			gearTip: {en: 'Define options for this tool.'},
 			helpTip: {en: 'No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.'},
-			saveTitle: {en: "Export"},
-			saveViewUrl: {en: 'a URL for this view (tools and data)'},
-			saveViewFieldset: {en: 'Export View (Tools and Data)'},
-			saveViewHtmlEmbed: {en: "an HTML snippet for embedding this view in another web page"},
-			saveViewHtmlEmbed: {en: "an HTML snippet for embedding this view in another web page"},
-			saveViewBiblio: {en: "a bibliographic reference for this view"},
-			saveGridFieldset: {en: "Export Data"},
-			saveGridScopeCurrent: {en: "export currently visible data"},
-			saveGridScopeAll: {en: "export all available data"},
-			saveGridFormatHtml: {en: "export as HTML"},
-			saveGridFormatXml: {en: "export as XML"},
-			saveGridFormatTsv: {en: "export as tab separated values (text)"},
+			exportTitle: {en: "Export"},
+			exportViewUrl: {en: 'a URL for this view (tools and data)'},
+			exportViewFieldset: {en: 'Export View (Tools and Data)'},
+			exportViewHtmlEmbed: {en: "an HTML snippet for embedding this view in another web page"},
+			exportViewHtmlEmbed: {en: "an HTML snippet for embedding this view in another web page"},
+			exportViewEmbedTitle: {en: "Embed HTML Snippet"},
+			exportViewEmbedMessage: {en: "You can copy and paste the HTML snippet from the box below into another web page. Note that some content management systems (like WordPress) may need a special plugin to handle &lt;iframe&gt; tags."},
+			exportBiblioTitle: {en: "Export Bibliographic Reference"},
+			exportViewBiblio: {en: "a bibliographic reference for this view"},
+			exportGridFieldset: {en: "Export Data"},
+			exportGridScopeCurrent: {en: "export currently visible data"},
+			exportGridScopeAll: {en: "export all available data"},
+			exportGridFormatHtml: {en: "export as HTML"},
+			exportGridFormatXml: {en: "export as XML"},
+			exportGridFormatTsv: {en: "export as tab separated values (text)"},
 			'export': {en: 'Export'},
 			cancel: {en: 'Cancel'},
 			exportError: {en: "Export Error"},
@@ -77,7 +80,7 @@ Ext.define('Voyant.util.Toolable', {
 			}, this);
 		}			
 
-		var saveItems = undefined;
+		var exportItems = undefined;
 		var toolsMap = {
 //				maximize: {
 //					glyph: 'xf08e@FontAwesome',
@@ -85,8 +88,8 @@ Ext.define('Voyant.util.Toolable', {
 //				},
 				save: {
 					glyph: 'xf08e@FontAwesome',
-					fn: this.saveToolClick,
-					items: saveItems
+					fn: this.exportToolClick,
+					items: exportItems
 				},
 				plus: moreTools ? {
 					glyph: 'xf17a@FontAwesome',
@@ -158,49 +161,47 @@ Ext.define('Voyant.util.Toolable', {
 		if (params) {url += "?"+Ext.Object.toQueryString(params);}
 		panel.openUrl(url);
 	},
-	saveToolClick: function(panel) {
-		var view = panel.isXType('voyantheader') ? '' : Ext.getClassName(panel).split(".").pop();
-		var url = panel.getApplication().getBaseUrl()+'?view='+view+'&corpus='+panel.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(panel.getApiParams());
+	exportToolClick: function(panel) {
 		var items = [{
 	       		xtype: 'radio',
 	       		name: 'export',
 	       		inputValue: 'url',
-	       		boxLabel: "<a href='"+url+"' target='_blank'>"+panel.localize('saveViewUrl')+"</a>",
+	       		boxLabel: "<a href='"+panel.getExportUrl.call(panel)+"' target='_blank'>"+panel.localize('exportViewUrl')+"</a>",
 	       		checked: true
 		},{
 	       xtype: 'fieldset',
 	       collapsible: true,
 	       collapsed: true,
-	       title: panel.localize('saveViewFieldset'),
+	       title: panel.localize('exportViewFieldset'),
 	       items: [{
 	       		xtype: 'radio',
 	       		name: 'export',
 	       		inputValue: 'embed',
-	       		boxLabel: panel.localize('saveViewHtmlEmbed')
+	       		boxLabel: panel.localize('exportViewHtmlEmbed')
 	       	},{
 	       		xtype: 'radio',
 	       		name: 'export',
 	       		inputValue: 'biblio',
-	       		boxLabel: panel.localize('saveViewBiblio')
+	       		boxLabel: panel.localize('exportViewBiblio')
 	       	}]
 		}]
-		if (panel.isXType('grid')) {
+		if (false && /* FIXME: disable for now */ panel.isXType('grid')) {
 			items.push({
 		       xtype: 'fieldset',
 		       collapsible: true,
 		       collapsed: true,
-		       title: panel.localize('saveGridFieldset'),
+		       title: panel.localize('exportGridFieldset'),
 		       items: [{
 		    	   items: [{
 			       		xtype: 'radio',
 			       		name: 'export',
 			       		inputValue: 'gridCurrent',
-			       		boxLabel: panel.localize('saveGridScopeCurrent')
+			       		boxLabel: panel.localize('exportGridScopeCurrent')
 		    	   },{
 			       		xtype: 'radio',
 			       		name: 'export',
 			       		inputValue: 'gridAll',
-			       		boxLabel: panel.localize('saveGridScopeAll')
+			       		boxLabel: panel.localize('exportGridScopeAll')
 		    	   }]
 		       	},{
 			    	   xtype: 'fieldset',
@@ -208,24 +209,24 @@ Ext.define('Voyant.util.Toolable', {
 				       		xtype: 'radio',
 				       		name: 'gridFormat',
 				       		inputValue: 'html',
-				       		boxLabel: panel.localize('saveGridFormatHtml'),
+				       		boxLabel: panel.localize('exportGridFormatHtml'),
 				       		checked: true
 			    	   },{
 				       		xtype: 'radio',
 				       		name: 'gridFormat',
 				       		inputValue: 'json',
-				       		boxLabel: panel.localize('saveGridFormatTsv')
+				       		boxLabel: panel.localize('exportGridFormatTsv')
 			    	  	},{
 				       		xtype: 'radio',
 				       		name: 'gridFormat',
 				       		inputValue: 'json',
-				       		boxLabel: panel.localize('saveGridFormatJson')
+				       		boxLabel: panel.localize('exportGridFormatJson')
 			    	   }]
 			       	}]
 			})
 		}
 		Ext.create('Ext.window.Window', {
-			title: panel.localize("saveTitle"),
+			title: panel.localize("exportTitle"),
 			modal: true,
 			items: {
 				xtype: 'form',
@@ -263,6 +264,45 @@ Ext.define('Voyant.util.Toolable', {
 			},
 			bodyPadding: 5
 		}).show()
+	},
+	exportUrl: function() {
+		this.openUrl(this.getExportUrl());
+	},
+	exportEmbed: function() {
+		Ext.Msg.show({
+		    title: this.localize('exportViewEmbedTitle'),
+		    message: this.localize('exportViewEmbedMessage'),
+		    buttons: Ext.Msg.OK,
+		    icon: Ext.Msg.INFO,
+		    prompt: true,
+	        multiline: true,
+	        value: "<!--	Exported from Voyant Tools: http://voyant-tools.org/.\n"+
+	        	"Please note that this is an early version and the API may change.\n"+
+	        	"Feel free to change the height and width values below: -->\n"+
+	        	"<iframe style='width: 100%; height: 800px' src='"+this.getExportUrl()+"'></iframe>"
+		});
+	},
+	exportBiblio: function() {
+		var date = new Date();
+		Ext.Msg.show({
+		    title: this.localize('exportBiblioTitle'),
+		    message: '<fieldset><legend>MLA</legend>'+
+	    	'Sinclair, Stéfan and Geoffrey Rockwell. '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'." ')+
+	    	'<i>Voyant Tools</i>. '+Ext.Date.format(date,'Y')+'. Web. '+Ext.Date.format(date,'j M Y')+'. &lt;http://voyant-tools.org&gt;.</fieldset>'+
+	    	'<br >'+
+	    	'<fieldset><legend>Chicago</legend>'+
+	    	'Stéfan Sinclair and Geoffrey Rockwell, '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'", ')+
+	    	'<i>Voyant Tools</i>, accessed '+Ext.Date.format(date,'F j, Y')+', http://voyant-tools.org.</fieldset>'+
+	    	'<br >'+
+	    	'<fieldset><legend>APA</legend>'+
+	    	'Sinclair, S. &amp; G. Rockwell. ('+Ext.Date.format(date,'Y')+"). "+(this.isXType('voyantheader') ? '' : this.localize('title')+'. ')+
+	    	'<i>Voyant Tools</i>. Retrieved '+Ext.Date.format(date,'F j, Y')+', from http://voyant-tools.org</fieldset>',
+		    buttons: Ext.Msg.OK,
+		    icon: Ext.Msg.INFO
+		});
+	},
+	getExportUrl: function() {
+		return this.getApplication().getBaseUrl()+'?view='+(this.isXType('voyantheader') ? '' : Ext.getClassName(this).split(".").pop())+'&corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(this.getApiParams());
 	},
 	helpToolClick: function(panel) {
 		var help = panel.localize('help', {default: false}) || panel.localize('helpTip');

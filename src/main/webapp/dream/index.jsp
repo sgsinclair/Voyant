@@ -15,7 +15,7 @@
 		extend : 'Voyant.VoyantCorpusApp',
 		name: 'VoyantDreamApp',
 		config: {
-			baseUrl: '../',
+			baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/../',
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>'			
 		},
