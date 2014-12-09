@@ -16,19 +16,18 @@ Ext.define('Voyant.util.Toolable', {
 			exportViewEmbedMessage: {en: "You can copy and paste the HTML snippet from the box below into another web page. Note that some content management systems (like WordPress) may need a special plugin to handle &lt;iframe&gt; tags."},
 			exportBiblioTitle: {en: "Export Bibliographic Reference"},
 			exportViewBiblio: {en: "a bibliographic reference for this view"},
-			exportGridFieldset: {en: "Export Data"},
-			exportGridScopeCurrent: {en: "export currently visible data"},
-			exportGridScopeAll: {en: "export all available data"},
-			exportGridFormatHtml: {en: "export as HTML"},
-			exportGridFormatJson: {en: "export as JSON"},
-			exportGridFormatTsv: {en: "export as tab separated values (text)"},
-			exportGridFormatErrorTitle: {en: "Export Table Format Error"},
-			exportGridFormatErrorMessage: {en: "An unsupported format has been selected: {format}"},
+			exportGridCurrent: {en: "Export Current Data"},
+			exportGridCurrentHtml: {en: "export current data as HTML"},
+			exportGridCurrentJson: {en: "export current data as JSON"},
+			exportGridCurrentTsv: {en: "export current data as tab separated values (text)"},
 			'export': {en: 'Export'},
 			cancel: {en: 'Cancel'},
 			exportError: {en: "Export Error"},
-			exportNoFunction: {en: "An export function has been defined by is not availble."}
-			
+			exportNoFunction: {en: "An export function has been defined by is not availble."},
+			exportDataHtmlMessage: {en: "Copy the data below, they can be pasted into an HTML page or used as XML."},
+			exportDataTsvMessage: {en: "Copy data below, they can be pasted into a spreadsheet or text file."},
+			exportDataJsonMessage: {en: "Copy the data below, they can be used in other web-based applications."},
+			exportDataTitle: {en: "Export Data"}
 		}
 	},
 	constructor: function(config) {
@@ -192,39 +191,23 @@ Ext.define('Voyant.util.Toolable', {
 		       xtype: 'fieldset',
 		       collapsible: true,
 		       collapsed: true,
-		       title: panel.localize('exportGridFieldset'),
-		       items: [{
-		    	   items: [{
-			       		xtype: 'radio',
-			       		name: 'export',
-			       		inputValue: 'gridCurrent',
-			       		boxLabel: panel.localize('exportGridScopeCurrent')
-		    	   }/*,{
-			       		xtype: 'radio',
-			       		name: 'export',
-			       		inputValue: 'gridAll',
-			       		boxLabel: panel.localize('exportGridScopeAll')
-		    	   }*/]
-		       	},{
-			    	   xtype: 'fieldset',
-			    	   items: [{
-				       		xtype: 'radio',
-				       		name: 'gridFormat',
-				       		inputValue: 'html',
-				       		boxLabel: panel.localize('exportGridFormatHtml'),
-				       		checked: true
-			    	   },{
-				       		xtype: 'radio',
-				       		name: 'gridFormat',
-				       		inputValue: 'tsv',
-				       		boxLabel: panel.localize('exportGridFormatTsv')
-			    	  	},{
-				       		xtype: 'radio',
-				       		name: 'gridFormat',
-				       		inputValue: 'json',
-				       		boxLabel: panel.localize('exportGridFormatJson')
-			    	   }]
-			       	}]
+		       title: panel.localize('exportGridCurrent'),
+	    	   items: [{
+		       		xtype: 'radio',
+		       		name: 'export',
+		       		inputValue: 'gridCurrentHtml',
+		       		boxLabel: panel.localize('exportGridCurrentHtml')
+	    	   },{
+		       		xtype: 'radio',
+		       		name: 'export',
+		       		inputValue: 'gridCurrentTsv',
+		       		boxLabel: panel.localize('exportGridCurrentTsv')
+	    	  	},{
+		       		xtype: 'radio',
+		       		name: 'export',
+		       		inputValue: 'gridCurrentJson',
+		       		boxLabel: panel.localize('exportGridCurrentJson')
+	    	   }]
 			})
 		}
 		Ext.create('Ext.window.Window', {
@@ -303,20 +286,6 @@ Ext.define('Voyant.util.Toolable', {
 		    icon: Ext.Msg.INFO
 		});
 	},
-	exportGridCurrent: function(grid, form) {
-		var format = form.getValues().gridFormat;
-		if (format && Ext.isFunction(this['exportGridCurrent'+Ext.String.capitalize(format)])) {
-			this['exportGridCurrent'+Ext.String.capitalize(format)].apply(this, arguments);
-		}
-		else {
-			Ext.Msg.show({
-			    title: this.localize('exportGridFormatErrorTitle'),
-			    message: new Ext.Template(this.localize('exportGridFormatErrorMessage')).apply({format: format}),
-			    buttons: Ext.Msg.OK,
-			    icon: Ext.Msg.ERROR
-			});
-		}
-	},
 	exportGridCurrentJson: function(grid, form) {
 		var store = grid.getStore();
 		var fields = store.getFields();
@@ -331,8 +300,8 @@ Ext.define('Voyant.util.Toolable', {
 			values.push(val);
 		});
 		Ext.Msg.show({
-		    title: this.localize('exportViewEmbedTitle'),
-		    message: this.localize('exportViewEmbedMessage'),
+		    title: this.localize('exportDataTitle'),
+		    message: this.localize('exportDataJsonMessage'),
 		    buttons: Ext.Msg.OK,
 		    icon: Ext.Msg.INFO,
 		    prompt: true,
@@ -361,8 +330,8 @@ Ext.define('Voyant.util.Toolable', {
 			value += cells.join("\t")+"\n";
 		});
 		Ext.Msg.show({
-		    title: this.localize('exportViewEmbedTitle'),
-		    message: this.localize('exportViewEmbedMessage'),
+		    title: this.localize('exportDataTitle'),
+		    message: this.localize('exportDataTsvMessage'),
 		    buttons: Ext.Msg.OK,
 		    icon: Ext.Msg.INFO,
 		    prompt: true,
@@ -392,8 +361,8 @@ Ext.define('Voyant.util.Toolable', {
 		});
 		value+="\t</tbody>\n</table>";
 		Ext.Msg.show({
-		    title: this.localize('exportViewEmbedTitle'),
-		    message: this.localize('exportViewEmbedMessage'),
+		    title: this.localize('exportDataTitle'),
+		    message: this.localize('exportDataHtmlMessage'),
 		    buttons: Ext.Msg.OK,
 		    icon: Ext.Msg.INFO,
 		    prompt: true,
