@@ -12,7 +12,8 @@ Ext.define('Voyant.data.model.Document', {
              }},
              {name: 'title'},
              {name: 'shortTitle', mapping: function(data) {
-            	var title = data.title.replace(/\.(html?|txt|xml|docx?|pdf|rtf|\/)$/,'');
+            	var title = data.title || '';
+            	title = title.replace(/\.(html?|txt|xml|docx?|pdf|rtf|\/)$/,'');
          		if (title.length > 25) {
          				// maybe a file or URL?
          				var slash = title.lastIndexOf("/");
