@@ -18,7 +18,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		stopList: 'auto',
     		terms: undefined
     	},
-		glyph: 'xf06e@FontAwesome',
+		glyph: 'xf06e@FontAwesome'
     },
     
     config: {
