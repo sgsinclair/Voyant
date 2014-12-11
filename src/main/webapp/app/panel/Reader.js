@@ -19,7 +19,8 @@ Ext.define('Voyant.panel.Reader', {
     	corpus: undefined,
     	tokensStore: undefined,
     	documentsStore: undefined,
-    	documentTermsStore: undefined
+    	documentTermsStore: undefined,
+    	exportVisualization: false
     },
     innerContainer: null, // set after render
     

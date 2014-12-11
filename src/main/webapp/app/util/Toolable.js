@@ -27,7 +27,14 @@ Ext.define('Voyant.util.Toolable', {
 			exportDataHtmlMessage: {en: "Copy the data below, they can be pasted into an HTML page or used as XML."},
 			exportDataTsvMessage: {en: "Copy data below, they can be pasted into a spreadsheet or text file."},
 			exportDataJsonMessage: {en: "Copy the data below, they can be used in other web-based applications."},
-			exportDataTitle: {en: "Export Data"}
+    		exportPng: {en: "export a PNG image of this visualization"},
+			exportDataTitle: {en: "Export Data"},
+			exportVizTitle: {en: "Export Visualization"},
+			exportPngTitle: {en: "Export PNG"},
+    		exportSvg: {en: "export the SVG of this visualization"},
+			exportPngMessage: {en: "<p>This is a thumbnail of the PNG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the HTML code below.</p>"},
+			exportSvgTitle: {en: "Export SVG"},
+			exportSvgMessage: {en: "<p>This is a thumbnail of the SVG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the SVG code below.</p>"}
 		}
 	},
 	constructor: function(config) {
@@ -210,6 +217,29 @@ Ext.define('Voyant.util.Toolable', {
 	    	   }]
 			})
 		}
+		if ((!panel.getExportVisualization || panel.getExportVisualization()) && (panel.down("chart") || panel.getTargetEl().dom.querySelector("canvas") || panel.getTargetEl().dom.querySelector("svg"))) {
+			var formats = [{
+				xtype: 'radio',
+				name: 'export',
+				inputValue: 'png',
+				boxLabel: panel.localize('exportPng')
+	    	}];
+			if (panel.getTargetEl().dom.querySelector("svg")) {
+				formats.push({
+					xtype: 'radio',
+					name: 'export',
+					inputValue: 'svg',
+					boxLabel: panel.localize('exportSvg')
+				})
+			}
+			items.push({
+			       xtype: 'fieldset',
+			       collapsible: true,
+			       collapsed: true,
+			       title: panel.localize('exportVizTitle'),
+		    	   items: formats
+	    	});
+		}
 		Ext.create('Ext.window.Window', {
 			title: panel.localize("exportTitle"),
 			modal: true,
@@ -249,6 +279,69 @@ Ext.define('Voyant.util.Toolable', {
 			},
 			bodyPadding: 5
 		}).show()
+	},
+	exportSvg: function(img) {
+		var svg = this.getTargetEl().dom.querySelector("svg");
+		if (svg) {
+			var html = d3.select(svg)
+				.attr("version", 1.1)
+				.attr("xmlns", "http://www.w3.org/2000/svg")
+				.node().parentNode.innerHTML
+			Ext.Msg.show({
+			    title: this.localize('exportSvgTitle'),
+			    message: '<img src="'+'data:image/svg+xml;base64,'+ btoa(html)+'" style="float: right; max-width: 200px; max-height: 200px; border: thin dotted #ccc;"/>'+this.localize('exportSvgMessage'),
+			    buttons: Ext.Msg.OK,
+			    icon: Ext.Msg.INFO,
+			    prompt: true,
+		        multiline: true,
+		        value: html
+			});		
+		}
+	},
+	exportPngData: function(img) {
+		Ext.Msg.show({
+		    title: this.localize('exportPngTitle'),
+		    message: '<img src="'+img+'" style="float: right; max-width: 200px; max-height: 200px; border: thin dotted #ccc;"/>'+this.localize('exportPngMessage'),
+		    buttons: Ext.Msg.OK,
+		    icon: Ext.Msg.INFO,
+		    prompt: true,
+	        multiline: true,
+	        value: '<img src="'+img+'" />'
+		});		
+	},
+	exportPng: function() {
+		var img;
+		var chart = this.down('chart'); // first try finding a chart
+		if (chart) {
+			return this.exportPngData(this.down('chart').getImage().data);
+		}
+
+		var canvas = this.getTargetEl().dom.querySelector("canvas"); // next try finding a canvas
+		if (canvas) {
+			return this.exportPngData(canvas.toDataURL("image/png"));
+		}
+		
+		
+		var svg = this.getTargetEl().dom.querySelector("svg"); // finally try finding an SVG
+		if (svg) {
+			var html = d3.select(svg)
+				.attr("version", 1.1)
+				.attr("xmlns", "http://www.w3.org/2000/svg")
+				.node().parentNode.innerHTML;
+			  img = 'data:image/svg+xml;base64,'+ btoa(html);
+			  
+			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: svg.offsetWidth,height:svg.offsetHeight}),
+			  context = canvas.getContext("2d"), me=this;
+			  
+			  var image = new Image;
+			  image.src = img;
+			  image.panel = this;
+			  image.onload = function() {
+				  context.drawImage(image, 0, 0);
+				  img = canvas.toDataURL("image/png");
+				  return this.panel.exportPngData.call(this.panel, img);
+			  };
+		}
 	},
 	exportUrl: function() {
 		this.openUrl(this.getExportUrl());
