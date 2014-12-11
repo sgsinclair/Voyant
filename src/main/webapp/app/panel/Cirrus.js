@@ -22,7 +22,10 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     config: {
-    	mode: undefined
+    	mode: undefined,
+    	options: {
+    		xtype: 'stoplistoption'
+    	}
     },
 
     MODE_CORPUS: 'corpus',

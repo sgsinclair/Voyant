@@ -1,5 +1,5 @@
 Ext.define('Voyant.panel.Panel', {
-	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable',/*'Voyant.notebook.util.Embeddable',*/'Voyant.util.DetailedError','Voyant.util.QuerySearchField'],
+	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable',/*'Voyant.notebook.util.Embeddable',*/'Voyant.util.DetailedError','Voyant.util.QuerySearchField','Voyant.widget.StopListOption'],
 	statics: {
 		i18n: {
 			term: {en: "Term"},
@@ -11,15 +11,6 @@ Ext.define('Voyant.panel.Panel', {
 		}
 	},
 	constructor: function(config) {
-		Ext.apply(this, {
-			tools: [
-				    {type: 'maximize'},
-				    {type: 'plus'},
-				    {type: 'save'},
-				    {type: 'gear'},
-				    {type: 'help'}
-			]
-		})
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 //		this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.mixins['Voyant.util.Toolable'].constructor.apply(this, arguments);

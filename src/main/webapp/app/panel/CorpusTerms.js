@@ -22,6 +22,11 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
+    config: {
+    	options: {
+    		xtype: 'stoplistoption'
+    	}
+    },
     constructor: function(config) {
     	
         this.callParent(arguments);

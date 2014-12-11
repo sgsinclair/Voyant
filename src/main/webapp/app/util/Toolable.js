@@ -21,7 +21,9 @@ Ext.define('Voyant.util.Toolable', {
 			exportGridCurrentJson: {en: "export current data as JSON"},
 			exportGridCurrentTsv: {en: "export current data as tab separated values (text)"},
 			'export': {en: 'Export'},
-			cancel: {en: 'Cancel'},
+			exportTitle: {en: 'Export'},
+			confirmTitle: {en: 'Confirm'},
+			cancelTitle: {en: 'Cancel'},
 			exportError: {en: "Export Error"},
 			exportNoFunction: {en: "An export function has been defined by is not availble."},
 			exportDataHtmlMessage: {en: "Copy the data below, they can be pasted into an HTML page or used as XML."},
@@ -103,9 +105,40 @@ Ext.define('Voyant.util.Toolable', {
 					glyph: 'xf17a@FontAwesome',
 					items: moreTools
 				} : undefined,
-				gear: this.showOptionsClick ? {
+				gear: this.showOptionsClick || this.getOptions ? {
 					glyph: 'xf205@FontAwesome',
-					fn: this.showOptionsClick
+					fn: this.showOptionsClick ? this.showOptionsClick : function(panel) {
+						// we're here because the panel hasn't overridden the click function
+						Ext.create('Ext.window.Window', {
+							title: panel.localize("exportTitle"),
+							modal: true,
+			            	panel: panel,
+							items: {
+								xtype: 'form',
+								items: panel.getOptions(),
+								buttons: [{
+					            	text: panel.localize("confirmTitle"),
+									glyph: 'xf00c@FontAwesome',
+					            	flex: 1,
+					            	panel: panel,
+					        		handler: function(btn) {
+					        			var values = btn.up('form').getValues();
+					        			this.setApiParams(values);
+					        			btn.up('window').close();
+					        		},
+					        		scope: panel
+					            }, {
+					            	text: panel.localize("cancelTitle"),
+					                glyph: 'xf00d@FontAwesome',
+					        		flex: 1,
+					        		handler: function(btn) {
+					        			btn.up('window').close();
+					        		}
+								}]
+							},
+							bodyPadding: 5
+						}).show()
+					}
 				} : undefined,
 				help: {
 					glyph: 'xf128@FontAwesome',
@@ -247,7 +280,7 @@ Ext.define('Voyant.util.Toolable', {
 				xtype: 'form',
 				items: items,
 				buttons: [{
-	            	text: panel.localize("Export"),
+	            	text: panel.localize("exportTitle"),
 					glyph: 'xf08e@FontAwesome',
 	            	flex: 1,
 	            	panel: panel,
@@ -269,7 +302,7 @@ Ext.define('Voyant.util.Toolable', {
 	        		},
 	        		scope: panel
 	            }, {
-	            	text: panel.localize("Cancel"),
+	            	text: panel.localize("cancelTitle"),
 	                glyph: 'xf00d@FontAwesome',
 	        		flex: 1,
 	        		handler: function(btn) {
