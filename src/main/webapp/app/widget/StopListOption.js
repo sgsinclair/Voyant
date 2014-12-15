@@ -21,7 +21,9 @@ Ext.define('Voyant.widget.StopListOption', {
     		se: {en: "Swedish"},
     		mu: {en: "Multilingual"},
     		ok: {en: "Save"},
-    		cancel: {en: "Cancel"}
+    		cancel: {en: "Cancel"},
+    		editStopListTitle: {en: "Edit Stoplist"},
+    		editStopListMessage: {en: "This is the stoplist, one term per line."},
     	}
     },
     initComponent: function(config) {
@@ -90,7 +92,7 @@ Ext.define('Voyant.widget.StopListOption', {
     	    },
     	    success: function(response){
     	    	var json = Ext.util.JSON.decode(response.responseText);
-    	    	var keywords = json.keywords.keywords.join("\n");
+    	    	var keywords = json.keywords.keywords.sort().join("\n");
     			Ext.Msg.show({
 	    		    title: this.localize('editStopListTitle'),
 	    		    message: this.localize('editStopListMessage'),

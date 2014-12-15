@@ -13,9 +13,8 @@ Ext.define('Voyant.panel.Cirrus', {
     		title: {en: "Cirrus"},
     		helpTip: {en: "<p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document – this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>"}
     	},
-    	api: {
+    	api: { // stopList inherited from app
     		limit: 50,
-    		stopList: 'auto',
     		terms: undefined
     	},
 		glyph: 'xf06e@FontAwesome'
