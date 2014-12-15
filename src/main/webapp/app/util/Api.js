@@ -1,32 +1,56 @@
 Ext.define('Voyant.util.Api', {
 	constructor: function(config) {
+		var apis = [];
+		if (!this.isApplication) {
+			var app = this.getApplication();
+			this.addParentApi(apis, Ext.ClassManager.getClass(app)); // gather class params
+			if (app.getApiParams) {
+				apis.splice(0, 0, this.getApplication().getApiParams()); // now add instance params
+			}
+		}
+		this.addParentApi(apis, Ext.ClassManager.getClass(this)); // add params from this class and parents
+		
 		this.api = {};
-		Ext.apply(this.api, Ext.ClassManager.getClass(this).superclass.self.api);
-		Ext.apply(this.api, Ext.ClassManager.getClass(this).api);
+		apis.forEach(function(a) {
+			for (key in a) {
+				this.api[key] = {initial: a[key], value: a[key]} // overwrite previous entries
+			}
+		}, this)
+		
     	var queryParams = Ext.Object.fromQueryString(document.location.search);
-    	for (var key in this.api) {
-    		if (key in queryParams) {
+    	for (var key in queryParams) {
+    		if (this.api[key]) {
     			this.setApiParam(key, queryParams[key]);
     		}
     	}
 	},
+	addParentApi: function(apis, clz) {
+		if (clz.api) {apis.splice(0,0, clz.api)} // add to front
+		if (clz.superclass) {this.addParentApi(apis, clz.superclass.self)}
+	},
 	getApiParam: function(key, defaultValue) {
-		return this.api[key]!==undefined ? this.api[key] : defaultValue
+		return this.api[key]!==undefined ? this.api[key].value : defaultValue
 	},
 	getApiParams: function(keys, keepEmpty) {
-		if (keys) {
-			var api = {};
-			if (Ext.isString(keys)) {keys=[keys]}
-			keys.forEach(function(key) {
-				var val = this.getApiParam(key);
-				if (keepEmpty || !Ext.isEmpty(val)) {api[key]=val;}
+		keys = keys || Object.keys(this.api);
+		var api = {};
+		if (Ext.isString(keys)) {keys=[keys]}
+		keys.forEach(function(key) {
+			var val = this.getApiParam(key);
+			if (keepEmpty || !Ext.isEmpty(val)) {api[key]=val;}
 
-			}, this);
-			return api;
+		}, this);
+		return api;
+	},
+	
+	getModifiedApiParams: function() {
+		var api = {};
+		for (var key in this.api) {
+			if (this.api[key].initial!=this.api[key].value) {
+				api[key]=this.api[key].value
+			}
 		}
-		else {
-			return this.api
-		}
+		return api
 	},
 	
 	setApiParams: function(config) {
@@ -34,6 +58,6 @@ Ext.define('Voyant.util.Api', {
 	},
 	
 	setApiParam: function(key, value) {
-		this.api[key]=value;
+		if (this.api[key]) {this.api[key].value=value;}
 	}
 });

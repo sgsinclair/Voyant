@@ -32,24 +32,26 @@ Ext.define('Voyant.panel.CorpusTerms', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
-    	var api = Ext.apply(this.getApiParams(['stopList','query']), {
-    		withDistributions: 'relative'
-    	});
-    	var proxy = this.getStore().getProxy();
-    	for (var key in api) {proxy.setExtraParam(key, api[key]);}
-    	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
     		store.getProxy().setExtraParam('corpus', corpus.getId())
-    		store.load();
+    		this.fireEvent("apiChange", this);
     	});
     	
     	this.on("query", function(src, query) {
     		this.setApiParam('query', query);
-    		this.store.loadPage(1, {params: this.getApiParams()})
+    		this.fireEvent("apiChange", this);
+    		this.store.loadPage(1)
     	}, this);
+    	
+    	this.on("apiChange", function() {
+    		var api = this.getApiParams(['stopList','query']);
+        	var proxy = this.getStore().getProxy();
+        	for (var key in api) {proxy.setExtraParam(key, api[key]);}
+        	this.getStore().loadPage(1);
+    	}, this)
     	
     	if (config.embedded) {
     		var cls = Ext.getClass(config.embedded).getName();

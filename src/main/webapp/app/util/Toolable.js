@@ -124,6 +124,14 @@ Ext.define('Voyant.util.Toolable', {
 					        		handler: function(btn) {
 					        			var values = btn.up('form').getValues();
 					        			this.setApiParams(values);
+					        			var app = this.getApplication();
+					        			var corpus = app.getCorpus();
+					        			if (corpus) {
+					        				app.dispatchEvent("loadedCorpus", this, corpus);
+					        			}
+					        			else {
+					        				this.fireEvent("apiChange", this);
+					        			}
 					        			btn.up('window').close();
 					        		},
 					        		scope: panel
@@ -195,7 +203,7 @@ Ext.define('Voyant.util.Toolable', {
 		var name = Ext.getClass(panel).getName();
 		var parts = name.split(".");
 		url = panel.getBaseUrl()+"tool/"+parts[parts.length-1]+"/";
-		params = panel.getApiParams();
+		params = panel.getModifiedApiParams();
 		if (!params.corpus && panel.getCorpus && panel.getCorpus()) {
 			params.corpus = panel.getCorpus().getId();
 		}
@@ -497,7 +505,9 @@ Ext.define('Voyant.util.Toolable', {
 		});
 	},
 	getExportUrl: function() {
-		return this.getApplication().getBaseUrl()+'?view='+(this.isXType('voyantheader') ? '' : Ext.getClassName(this).split(".").pop())+'&corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(this.getApiParams());
+		var api = this.getModifiedApiParams();
+		if (this.isXType('voyantheader')) {api.view=Ext.getClassName(this).split(".").pop()}
+		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(this.getModifiedApiParams());
 	},
 	helpToolClick: function(panel) {
 		var help = panel.localize('help', {default: false}) || panel.localize('helpTip');
