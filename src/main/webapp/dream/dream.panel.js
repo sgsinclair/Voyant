@@ -85,7 +85,7 @@ Ext.define("Voyant.panel.Dream", {
 			                    				var win = window.open(url);
 			                    				if (!win) { // popup blocked
 			                    					win = Ext.Msg.show({
-			                    						Ext.MessageBox.OK,
+			                    						buttons: Ext.MessageBox.OK,
 			                    						buttonText: {ok: "Close"},
 			                    						icon: Ext.MessageBox.INFO,
 			                    						message: "<a href='"+url+"' target='_blank' class='link'>Click here</a> to access your new corpus.",
