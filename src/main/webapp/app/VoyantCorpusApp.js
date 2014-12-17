@@ -67,7 +67,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     			me.dispatchEvent('loadedCorpus', this, corpus);
     		}).fail(function(message, response) {
     			view.unmask();
-    			me.showErrorResponse({message: message}, response);
+    			//me.showErrorResponse({message: message}, response);
     		});
     	}
     },

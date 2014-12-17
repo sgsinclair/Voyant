@@ -4,7 +4,6 @@ Ext.define("Voyant.util.ResponseError", {
 		response: undefined
 	},
 	constructor: function(config) {
-		debugger
 		this.setResponse(config.response);
 		Ext.applyIf(config, {
 			msg: config.response.statusText, // hopefully already set by creator
