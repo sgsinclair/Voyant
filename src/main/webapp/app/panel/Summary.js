@@ -334,21 +334,23 @@ Ext.define('Voyant.panel.Summary', {
 			scope: this,
 			callback: function(records, operation, success) {
 				var data = [];
-				var len = records.length;
-				records.forEach(function(r, index, array) {
-					data.push({
-						id: r.getId(),
-						type: r.getTerm(),
-						val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
-						docId: r.get('docId'),
-						len: len
+				if (records) { // TODO: why wouldn't we have records here?
+					var len = records.length;
+					records.forEach(function(r, index, array) {
+						data.push({
+							id: r.getId(),
+							type: r.getTerm(),
+							val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
+							docId: r.get('docId'),
+							len: len
+						});
 					});
-				});
-				Ext.dom.Helper.append(el, this.localize('colon')+new Ext.XTemplate(this.localize('documentType')).apply({types: data})+'.');
-				
-				var nextEl = el.next('li');
-				if (nextEl && !nextEl.hasCls('x-hidden')) {
-					this.showDistinctiveWordsStep(nextEl);
+					Ext.dom.Helper.append(el, this.localize('colon')+new Ext.XTemplate(this.localize('documentType')).apply({types: data})+'.');
+					
+					var nextEl = el.next('li');
+					if (nextEl && !nextEl.hasCls('x-hidden')) {
+						this.showDistinctiveWordsStep(nextEl);
+					}
 				}
 			}
 		});
