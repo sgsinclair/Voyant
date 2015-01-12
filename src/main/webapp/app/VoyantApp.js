@@ -169,6 +169,73 @@ Ext.define('Voyant.VoyantApp', {
 			tooltip: this._localizeClass(cls, "helpTip"),
 			glyph: cls && cls.glyph ? cls.glyph : 'xf12e@FontAwesome'
 		};
+	},
+	
+	/**
+	 * A universal palette of colors for use with terms and documents.
+	 */
+	colors: [[0, 0, 255], [51, 197, 51], [255, 0, 255], [121, 51, 255], [28, 255, 255], [255, 174, 0], [30, 177, 255], [182, 242, 58], [255, 0, 164], [51, 102, 153], [34, 111, 52], [155, 20, 104], [109, 43, 157], [128, 130, 33], [111, 76, 10], [119, 115, 165], [61, 177, 169], [202, 135, 115], [194, 169, 204], [181, 212, 228], [182, 197, 174], [255, 197, 197], [228, 200, 124], [197, 179, 159]],
+	
+	rgbToHex: function(a) {
+		return "#" + ((1 << 24) + (a[0] << 16) + (a[1] << 8) + a[2]).toString(16).slice(1);
+	},
+	
+	/**
+	 * Gets the whole color palette.
+	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of each color (optional, defaults to rgb values).
+	 * @return {Array} The color palette.
+	 */
+	getColorPalette: function(returnHex) {
+		if (returnHex) {
+			var colors = [];
+			for (var i = 0; i < this.colors.length; i++) {
+				colors.push(this.rgbToHex(this.colors[i]));
+			}
+			return colors;
+		} else {
+			return this.colors;
+		}
+	},
+	
+	/**
+	 * Gets a particular color from the palette.
+	 * @param {Integer} index The index of the color to get.
+	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of the color (optional, defaults to rgb values).
+	 * @return {Mixed} The requested color, either a hex string or array of rgb values.
+	 */
+	getColor: function(index, returnHex) {
+		if (returnHex) {
+			return this.rgbToHex(this.colors[index]);
+		} else {
+			return this.colors[index];
+		}
+	},
+	
+	/**
+	 * For tracking associations between a term and a color, to ensure consistent coloring across tools.
+	 */
+	colorTermAssociations: new Ext.util.MixedCollection(),
+	
+	/**
+	 * Gets the color associated with the term.  Creates a new association if none exists.
+	 * @param {String} term The term to get the color for.
+	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of the color (optional, defaults to rgb values).
+	 * @return {Mixed} The requested color, either a hex string or array of rgb values.
+	 */
+	getColorForTerm: function(term, returnHex) {
+		if (term.indexOf(':') != -1) {
+			term = term.split(':')[1];
+		}
+		var color = this.colorTermAssociations.get(term);
+		if (color == null) {
+			var index = this.colorTermAssociations.getCount() % this.colors.length;
+			color = this.colors[index];
+			this.colorTermAssociations.add(term, color);
+		}
+		if (returnHex) {
+			color = this.rgbToHex(color);
+		}
+		return color;
 	}
     
 });

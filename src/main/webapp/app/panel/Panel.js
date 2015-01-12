@@ -17,7 +17,7 @@ Ext.define('Voyant.panel.Panel', {
 	},
 	
 	getApplication: function() {
-		return Voyant.application
+		return Voyant.application;
 	},
 	
 	getBaseUrl: function() {
