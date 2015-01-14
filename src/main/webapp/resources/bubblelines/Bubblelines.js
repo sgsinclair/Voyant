@@ -71,8 +71,8 @@ Bubblelines.prototype = {
 //			Ext.Msg.alert('Bubblelines', this.localize('corpusTooSmall'));
 		} else {
 			var container = this.container;
-			var height = container.ownerCt.getHeight();//Math.max(this.selectedDocs.getCount() * this.graphSeparation + 15, container.ownerCt.getHeight());
-			var width = container.ownerCt.getWidth();
+			var height = container.getHeight();//Math.max(this.selectedDocs.getCount() * this.graphSeparation + 15, container.ownerCt.getHeight());
+			var width = container.getWidth();
 			this.DRAW_SHORT_TITLES = width < 500;
 			var id = Ext.id('bubblelines');
 			container.add({
@@ -275,11 +275,14 @@ Bubblelines.prototype = {
 	calculateGraphHeights: function() {
 		var graphSeparation = this.maxRadius * 0.5;
 		if (this.SEPARATE_LINES_FOR_TERMS) {
-			var types = this.getApiParamValue('typeFilter');
+			var terms = [];
+			for (var term in this.currentTerms) {
+				terms.push(term);
+			}
 			this.cache.each(function(doc, index, length) {
-				var height = this.maxRadius * types.length;
-				for (var i = 0; i < types.length; i++) {
-					if (!doc.types[types[i]]) {
+				var height = this.maxRadius * terms.length;
+				for (var i = 0; i < terms.length; i++) {
+					if (!doc.terms[terms[i]]) {
 						height -= this.maxRadius;
 					}
 				}
@@ -426,6 +429,9 @@ Bubblelines.prototype = {
 			
 //			var filter = this.getApiParamValue('typeFilter');
 			var filter = [];
+			for (var term in this.currentTerms) {
+				filter.push(term);
+			}
 			
 			if (!this.SEPARATE_LINES_FOR_TERMS) {
 				drawLine();
@@ -511,7 +517,7 @@ Bubblelines.prototype = {
 			
 			xIndex += lineLength;
 			
-			if (!this.SEPARATE_LINES_FOR_TERMS || filter == null || filter.length == 0) {
+			if (!this.SEPARATE_LINES_FOR_TERMS) {
 				this.ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
 				this.ctx.font = '10px Verdana';
 				this.ctx.fillText(freqTotal, xIndex + 5, this.yIndex-4);
@@ -566,7 +572,7 @@ Bubblelines.prototype = {
 				for (var t in doc.freqCounts) {
 					count++;
 				}
-				height = count * 16 + 10;
+				height = count * 16;// + 10;
 				if (y + height > this.canvas.height) {
 					y -= height;
 				}
@@ -576,14 +582,14 @@ Bubblelines.prototype = {
 				y += 10;
 				this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
 				this.ctx.font = '10px Verdana';
-				var total = 0;
+//				var total = 0;
 				for (var t in doc.freqCounts) {
 					var freq = doc.freqCounts[t];
-					total += freq;
+//					total += freq;
 					this.ctx.fillText(t+': '+freq, x, y, 90);
 					y += 16;
 				}
-				this.ctx.fillText(this.localize('total')+': '+total, x, y, 90);
+//				this.ctx.fillText(this.localize('total')+': '+total, x, y, 90);
 				
 			} else {
 				height = this.overBubbles.length * 16 + 10;
@@ -615,6 +621,7 @@ Bubblelines.prototype = {
 		this.clearToolTipId = null;
 	},
 
+	// TODO remove this
 	reloadTypeData: function() {
 		this.cache.clear();
 		this.store.removeAll();
@@ -875,11 +882,11 @@ Bubblelines.prototype = {
 		return color;
 	},
 	
-	removeAllTypes: function() {
-		this.typeStore.each(function(record) {
-			var type = record.get('type');
-			this.removeTerm(type);
+	removeAllTerms: function() {
+		this.cache.each(function(doc) {
+			doc.terms = {};
 		}, this);
+		this.currentTerms = {};
 	},
 	
 	removeTerm: function(term) {

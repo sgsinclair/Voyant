@@ -118,6 +118,14 @@ svg line {
   stroke-width: 1px;
 }
 
+/* Bubblelines */
+
+.term.over {
+	cursor: pointer;
+}
+
+
+
 /* used for panel tool glyphs in the header */
 .x-tool-glyph {
     font-size: 16px;

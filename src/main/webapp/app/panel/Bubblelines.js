@@ -93,6 +93,8 @@ Ext.define('Voyant.panel.Bubblelines', {
     		this.getDocStore().load();
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
     	}, this);
+    	
+    	this.down('#granularity').setValue(parseInt(this.getApiParam('bins')));
     },
     
     initComponent: function() {
@@ -181,14 +183,12 @@ Ext.define('Voyant.panel.Bubblelines', {
                 },{
 	            	xtype: 'button',
 	            	text: this.localize('clearTerms'),
-	            	disabled: true,
 	            	handler: function() {
-	//            		this.removeAllTerms();
-	//            		Ext.getCmp('termsView').clearSelections(true);
-	//            		this.termStore.removeAll();
-	//            		this.store.removeAll();
-	//            		this.setApiParams({typeFilter: []});
-	//            		this.bubblelines.drawGraph();
+	            		this.down('#termsView').getSelectionModel().deselectAll(true);
+	            		this.termStore.removeAll();
+	            		this.setApiParams({query: null});
+	            		this.bubblelines.removeAllTerms();
+	            		this.bubblelines.drawGraph();
 	            	},
 	            	scope: this
 	            },
@@ -209,13 +209,14 @@ Ext.define('Voyant.panel.Bubblelines', {
 	//            			this.selectedDocs.each(this.bubblelines.findLongestDocumentTitle, this);
 	//        				this.bubblelines.setMaxLineWidth(width - this.MAX_LABEL_WIDTH - 75);    
 	//            			
-	//            			this.reloadTypeData();
+	//            			this.reloadTermsData();
 	//            		},
 	//            		scope: this
 	//            	}
 	//            }
 	            ,'-',{
 	            	xtype: 'slider',
+	            	itemId: 'granularity',
 	            	fieldLabel: this.localize('granularity'),
 	            	labelAlign: 'right',
 	            	labelWidth: 70,
@@ -223,29 +224,23 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	increment: 10,
 	            	minValue: 10,
 	            	maxValue: 300,
-	            	disabled: true,
-//	            	value: parseInt(this.getApiParam('bins')),
 	            	listeners: {
-	//            		change: function(slider, newvalue, thumb) {
-	//            			slider.ownerCt.getComponent('sliderValue').setText(newvalue);
-	//            		},
-	//            		changecomplete: function(slider, newvalue) {
-	//            			this.setApiParams({bins: newvalue});
-	//            			this.reloadTypeData();
-	//            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({bins: newvalue});
+	            			this.reloadTermsData();
+	            		},
 	            		scope: this
 	            	}
 	            },'-',{
 	            	xtype: 'checkbox',
 	            	boxLabel: this.localize('separateLines'),
 	            	boxLabelAlign: 'before',
-	            	checked: false,//this.SEPARATE_LINES_FOR_TERMS,
-	            	disabled: true,
+	            	checked: false,
 	            	handler: function(checkbox, checked) {
-	//            		this.SEPARATE_LINES_FOR_TERMS = checked;
-	//            		this.lastClickedBubbles = {};
-	//            		this.bubblelines.setCanvasHeight();
-	//    				this.bubblelines.drawGraph();
+	            		this.bubblelines.SEPARATE_LINES_FOR_TERMS = checked;
+	            		this.bubblelines.lastClickedBubbles = {};
+	            		this.bubblelines.setCanvasHeight();
+	    				this.bubblelines.drawGraph();
 	            	},
 	            	scope: this
 	            	
@@ -268,13 +263,12 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	itemSelector: 'div.term',
 	            	overItemCls: 'over',
 	            	selectedItemCls: 'selected',
-	            	multiSelect: true,
-	            	simpleSelect: true,
+	            	focusCls: '',
 	            	listeners: {
-	            		beforeclick: function(dv, index, node, event) {
+	            		beforeitemclick: function(dv, record, item, index, event, opts) {
 	            			event.preventDefault();
 	            			event.stopPropagation();
-	            			dv.fireEvent('contextmenu', dv, index, node, event);
+	            			dv.fireEvent('itemcontextmenu', dv, record, item, index, event, opts);
 	            			return false;
 	            		},
 	            		selectionchange: function(selModel, selections) {
@@ -312,22 +306,26 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            			var isSelected = dv.isSelected(el);
 	            			var menu = new Ext.menu.Menu({
 	            				floating: true,
-	            				items: [{
-	            					text: isSelected ? this.localize('hideTerm') : this.localize('showTerm'),
-	            					handler: function() {
-	            						if (isSelected) {
-	            							dv.deselect(record);
-	            						} else {
-	            							dv.select(record, true);
-	            						}
-	            					},
-	            					scope: this
-	            				},{
+	            				items: [
+//	            				{
+//	            					text: isSelected ? this.localize('hideTerm') : this.localize('showTerm'),
+//	            					handler: function() {
+//	            						if (isSelected) {
+//	            							dv.deselect(record);
+//	            						} else {
+//	            							dv.select(record, true);
+//	            						}
+//	            					},
+//	            					scope: this
+//	            				},
+	            				{
 	            					text: this.localize('removeTerm'),
 	            					handler: function() {
 	            						dv.deselect(index);
 	            						var term = this.termStore.getAt(index).get('term');
 	            						this.termStore.removeAt(index);
+	            						dv.refresh();
+	            						
 	            						this.bubblelines.removeTerm(term);
 	            						this.bubblelines.setCanvasHeight();
 	            						this.bubblelines.drawGraph();
@@ -405,6 +403,14 @@ Ext.define('Voyant.panel.Bubblelines', {
     	}
 	},
     
+	reloadTermsData: function() {
+		var terms = [];
+		for (var term in this.bubblelines.currentTerms) {
+			terms.push(term);
+		}
+		this.getDocTermsFromQuery(terms);
+	},
+	
     filterDocuments: function() {
 		var docIds = this.getApiParam('docId');
 		if (docIds == '') {
