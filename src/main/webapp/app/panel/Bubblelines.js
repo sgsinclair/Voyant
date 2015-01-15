@@ -94,6 +94,30 @@ Ext.define('Voyant.panel.Bubblelines', {
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
     	}, this);
     	
+    	this.on('query', function(src, query) {
+    		if (query !== undefined && query != '') {
+    			this.getDocTermsFromQuery(query);
+    		}
+    	}, this);
+    	
+    	this.on('termsClicked', function(src, terms) {
+    		if (src !== this) {
+	    		var queryTerms = [];
+	    		terms.forEach(function(term) {
+	    			if (term.term) {queryTerms.push(term.term);}
+	    		});
+	    		this.getDocTermsFromQuery(queryTerms);
+    		}
+		}, this);
+    	
+    	this.on('documentTermsClicked', function(src, terms) {
+    		var queryTerms = [];
+    		terms.forEach(function(term) {
+    			if (term.getTerm()) {queryTerms.push(term.getTerm());}
+    		});
+    		this.getDocTermsFromQuery(queryTerms);
+    	}, this);
+    	
     	this.down('#granularity').setValue(parseInt(this.getApiParam('bins')));
     },
     
@@ -358,16 +382,13 @@ Ext.define('Voyant.panel.Bubblelines', {
             				this.bubblelines.initializeCanvas();
             			}
             		},
+	        		resize: function(cnt, width, height) {
+	        			this.bubblelines.doLayout();
+	        		},
             		scope: this
             	}
             }
 		});
-		
-    	this.on('query', function(src, query) {
-    		if (query !== undefined && query != '') {
-    			this.getDocTermsFromQuery(query);
-    		}
-    	}, this);
     	
     	this.callParent(arguments);
     },

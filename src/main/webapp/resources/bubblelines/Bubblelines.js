@@ -109,30 +109,32 @@ Bubblelines.prototype = {
 	},
 	
 	doLayout: function() {
-		var width = this.container.getWidth();
-		
-		// width related calculations
-		this.DRAW_SHORT_TITLES = width < 500;
-		this.setTitleWidthsAndMaxTitleWidth();
-		
-		var children = Ext.DomQuery.jsSelect('div:not(div[class*=term])', this.container.el.dom);
-		for (var i = 0; i < children.length; i++) {
-			var child = Ext.fly(children[i]);
-			child.setWidth(width);
+		if (this.initialized) {
+			var width = this.container.getWidth();
+			
+			// width related calculations
+			this.DRAW_SHORT_TITLES = width < 500;
+			this.setTitleWidthsAndMaxTitleWidth();
+			
+			var children = Ext.DomQuery.jsSelect('div:not(div[class*=term])', this.container.el.dom);
+			for (var i = 0; i < children.length; i++) {
+				var child = Ext.fly(children[i]);
+				child.setWidth(width);
+			}
+			this.canvas.width = width;
+			
+			var padding = 75;
+			if (this.DRAW_SHORT_TITLES) padding = 50;
+			this.setMaxLineWidth(width - this.MAX_LABEL_WIDTH - padding);
+			this.setLineLengths();
+			
+			this.recache();
+			
+			// height related calculations
+			this.setCanvasHeight();
+			
+			this.drawGraph();
 		}
-		this.canvas.width = width;
-		
-		var padding = 75;
-		if (this.DRAW_SHORT_TITLES) padding = 50;
-		this.setMaxLineWidth(width - this.MAX_LABEL_WIDTH - padding);
-		this.setLineLengths();
-		
-		this.recache();
-		
-		// height related calculations
-		this.setCanvasHeight();
-		
-		this.drawGraph();
 	},
 	
 	addDocToCache: function(doc) {
