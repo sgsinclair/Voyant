@@ -356,42 +356,44 @@ function WordController(parentApp) {
 
                 do {
                     word = _words[timer_i];
-                    var a = Math.random() * Math.PI; // angle?
-                    var d = Math.random() * (word.size * 0.25); // diameter?
-                    var da = (Math.random() - 0.5) * 0.5;
-                    var halfWordWidth = word.width * 0.5;
-                    var halfWordHeight = word.height * 0.5;
-
-                    while (true) {
-                        x = Math.floor((halfWidth + (Math.cos(a) * d * this.ratio) - halfWordWidth) / this.COARSENESS) * this.COARSENESS;
-                        y = Math.floor((halfHeight + (Math.sin(a) * d) - halfWordHeight) / this.COARSENESS) * this.COARSENESS;
-
-                        fail = false;
-                        if (x + halfWordWidth >= appCanvasWidth || y + halfWordHeight >= appCanvasHeight) {
-                            fail = true;
-                        } else {
-                        	fail = hitTest(x, y, word.height, word.width, word.mask);
-                        }
-                        if (!fail) {
-                            break;
-                        }
-                        a += da;
-                        d += dd;
-                    }
-
-                    finalizeWord(x, y, word);
-                    if (app.useFadeEffect) {
-                    	word.alpha = 0;
-	                    for (var w = 0; w < timer_i; w++) {
-	                        var wrd = _words[w];
-	                        if (wrd.alpha < 1) fadeWord(wrd);
+                    if (word !== undefined) {
+	                    var a = Math.random() * Math.PI; // angle?
+	                    var d = Math.random() * (word.size * 0.25); // diameter?
+	                    var da = (Math.random() - 0.5) * 0.5;
+	                    var halfWordWidth = word.width * 0.5;
+	                    var halfWordHeight = word.height * 0.5;
+	
+	                    while (true) {
+	                        x = Math.floor((halfWidth + (Math.cos(a) * d * this.ratio) - halfWordWidth) / this.COARSENESS) * this.COARSENESS;
+	                        y = Math.floor((halfHeight + (Math.sin(a) * d) - halfWordHeight) / this.COARSENESS) * this.COARSENESS;
+	
+	                        fail = false;
+	                        if (x + halfWordWidth >= appCanvasWidth || y + halfWordHeight >= appCanvasHeight) {
+	                            fail = true;
+	                        } else {
+	                        	fail = hitTest(x, y, word.height, word.width, word.mask);
+	                        }
+	                        if (!fail) {
+	                            break;
+	                        }
+	                        a += da;
+	                        d += dd;
 	                    }
-                    } else {
-                    	word.alpha = 1;
-                    	word.draw(app.context);
+	
+	                    finalizeWord(x, y, word);
+	                    if (app.useFadeEffect) {
+	                    	word.alpha = 0;
+		                    for (var w = 0; w < timer_i; w++) {
+		                        var wrd = _words[w];
+		                        if (wrd.alpha < 1) fadeWord(wrd);
+		                    }
+	                    } else {
+	                    	word.alpha = 1;
+	                    	word.draw(app.context);
+	                    }
                     }
                     timer_i++;
-                    if (timer_i == _words.length) {
+                    if (timer_i >= _words.length) {
                         clearTimeout(timer);
 //                        console.profileEnd();
                         this.doingArrange = false;
