@@ -79,7 +79,11 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         						height: el.getHeight()
         					});
     					}
-    				}, this)
+    					var force = this.getForce();
+    					if (force) {
+    						force.size([width, height]);
+    					}
+    				}, this);
         
     	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
         me.callParent(arguments);
@@ -113,7 +117,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	this.setApiParams({
     		query: query,
     		mode: 'corpus'
-    	})
+    	});
     	corpusCollocates.load({
     		params: this.getApiParams(),
     		callback: function(records, operations, success) {
@@ -122,16 +126,16 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     			}
     		},
     		scope: this
-    	})
+    	});
     },
     
     loadFromCorpusTermRecords: function(corpusTerms) {
     	if (Ext.isArray(corpusTerms) && corpusTerms.length>0) {
     		var terms = [];
     		corpusTerms.forEach(function(corpusTerm) {
-    			terms.push(corpusTerm.getTerm())
+    			terms.push(corpusTerm.getTerm());
     		});
-    		this.loadFromCorpusTermStringsArray(terms)
+    		this.loadFromCorpusTermStringsArray(terms);
     	}
     },
     
@@ -140,7 +144,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	this.setApiParams({
     		query: corpusTermStringsArray,
     		mode: 'corpus'
-    	})
+    	});
     	corpusCollocates.load({
     		params: this.getApiParams(),
     		callback: function(records, operations, success) {
@@ -149,28 +153,28 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     			}
     		},
     		scope: this
-    	})
+    	});
     },
     
     loadFromCorpusCollocateRecords: function(records) {
     	if (Ext.isArray(records)) {
     		var thisNodes = this.getNodes() || {};
     		var thisLinks = this.getLinks() || {};
-    		var start = this.getApiParam('limit')
+    		var start = this.getApiParam('limit');
     		records.forEach(function(corpusCollocate) {
     			
     			var keywordNode = {term: corpusCollocate.getKeyword(), type: 'keyword', value: corpusCollocate.getKeywordRawFreq(), start: start};
     			var keywordNodeKey = [keywordNode.term,keywordNode.type].join(";")
-    			if (thisNodes[keywordNodeKey]) {thisNodes[keywordNodeKey].value+=keywordNode.value}
-    			else {thisNodes[keywordNodeKey]=keywordNode}
+    			if (thisNodes[keywordNodeKey]) {thisNodes[keywordNodeKey].value+=keywordNode.value;}
+    			else {thisNodes[keywordNodeKey]=keywordNode;}
     			
     			var contextNode = {term: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
     			var contextNodeKey = [contextNode.term,contextNode.type].join(";")
-    			if (thisNodes[contextNodeKey]) {thisNodes[contextNodeKey].value+=contextNode.value}
-    			else {thisNodes[contextNodeKey]=contextNode}
+    			if (thisNodes[contextNodeKey]) {thisNodes[contextNodeKey].value+=contextNode.value;}
+    			else {thisNodes[contextNodeKey]=contextNode;}
     			
     			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
-    			if (!thisLinks[linkKey]) {thisLinks[linkKey]={source:thisNodes[keywordNodeKey],target:thisNodes[contextNodeKey]}}
+    			if (!thisLinks[linkKey]) {thisLinks[linkKey]={source:thisNodes[keywordNodeKey],target:thisNodes[contextNodeKey]};}
     			
     		});
     		
@@ -218,8 +222,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	  node = this.getNode().data(force.nodes(), function(d) { return d.term+d.type;});
 //    	  node.enter().append("g").attr("class", function(d) { return "node " + d.id; }).attr("dx", 12).attr("dy", ".35em").call(this.getForce().drag)
     	  
-    	  var keywordValues = force.nodes().filter(function(d) {return d.type=='keyword';}).map(function(d) {return d.value});
-    	  var contextTermValues = force.nodes().filter(function(d) {return d.type=='context';}).map(function(d) {return d.value});
+    	  var keywordValues = force.nodes().filter(function(d) {return d.type=='keyword';}).map(function(d) {return d.value;});
+    	  var contextTermValues = force.nodes().filter(function(d) {return d.type=='context';}).map(function(d) {return d.value;});
     	  var range = [8,20];
     	  var keywordFontSize = d3.scale.linear().domain([d3.min(keywordValues),d3.max(keywordValues)]).range(range);
     	  var contextFontSize = d3.scale.linear().domain([d3.min(contextTermValues),d3.max(contextTermValues)]).range(range);
@@ -230,22 +234,22 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	  	.append("text")
     	  		.attr("class", function(d) { return "node " + d.type; })
     	  		.attr("text-anchor", "middle")
-    	  		.style("fill", function(d) {return corpusColours(d.type=='keyword' ? 1 : 2)})
+    	  		.style("fill", function(d) {return corpusColours(d.type=='keyword' ? 1 : 2);})
     	  		.attr("dx", 12).attr("dy", ".35em")
-    	  		.text(function(d) { return d.term })
+    	  		.text(function(d) { return d.term; })
     	  		.style("font-size", function(d) { return (d.type=='context' ? contextFontSize(d.value) : keywordFontSize(d.value))+"pt"; })
     	  		.on("dblclick", function() {
     	  			me.dragstart.apply(this, arguments); // freeze the word
-    	  			me.itemdblclick.apply(me, arguments)} // load more words
+    	  			me.itemdblclick.apply(me, arguments);} // load more words
     	  		)
     	  		.on("click", this.itemclick)
     	  		.on("mouseover", function(d) {
-    	  			this.textContent=d.term+" ("+d.value+")"
+    	  			this.textContent=d.term+" ("+d.value+")";
     	  			d.wasfixed = d.fixed;
     	  			me.itemclick.apply(this, arguments);
     	  		})
     	  		.on("mouseout", function(d) {
-    	  			this.textContent=d.term
+    	  			this.textContent=d.term;
     	  			d3.select(this).classed("fixed", d.fixed = d.wasfixed);
     			})
     	  		.call(drag);
@@ -270,19 +274,19 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     			if (success) {
     	    		var thisNodes = this.getNodes() || {};
     	    		var thisLinks = this.getLinks() || {};
-    	    		var start = this.getApiParam('limit')
+    	    		var start = this.getApiParam('limit');
 	    			var keywordNode = d;
     	    		d.start+=limit;
-	    			var keywordNodeKey = [keywordNode.term,keywordNode.type].join(";")
+	    			var keywordNodeKey = [keywordNode.term,keywordNode.type].join(";");
     	    		records.forEach(function(corpusCollocate) {
     	    			
     	    			var contextNode = {term: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
-    	    			var contextNodeKey = [contextNode.term,contextNode.type].join(";")
-    	    			if (thisNodes[contextNodeKey]) {thisNodes[contextNodeKey].value+=contextNode.value}
-    	    			else {thisNodes[contextNodeKey]=contextNode}
+    	    			var contextNodeKey = [contextNode.term,contextNode.type].join(";");
+    	    			if (thisNodes[contextNodeKey]) {thisNodes[contextNodeKey].value+=contextNode.value;}
+    	    			else {thisNodes[contextNodeKey]=contextNode;}
     	    			
     	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
-    	    			if (!thisLinks[linkKey]) {thisLinks[linkKey]={source:thisNodes[keywordNodeKey],target:thisNodes[contextNodeKey]}}
+    	    			if (!thisLinks[linkKey]) {thisLinks[linkKey]={source:thisNodes[keywordNodeKey],target:thisNodes[contextNodeKey]};}
     	    			
     	    		});
     	    		
@@ -291,7 +295,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     			}
     		},
     		scope: this
-    	})
+    	});
     },
     
     updateNodesAndLinks: function(nodes, links) {
@@ -302,4 +306,4 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		this.start();
     }
     
-})
+});
