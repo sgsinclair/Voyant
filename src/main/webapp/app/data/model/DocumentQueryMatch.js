@@ -3,7 +3,9 @@ Ext.define('Voyant.data.model.DocumentQueryMatch', {
     fields: [
              {name: 'id'},
              {name: 'count', 'type': 'int'},
-             {name: 'query'}
+             {name: 'query'},
+             {name: 'distributions'}
         ],
-    getCount: function() {return this.get('count')}
+    getCount: function() {return this.get('count')},
+    getDistributions: function() {return this.get("distributions")}
 });

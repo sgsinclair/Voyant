@@ -146,7 +146,7 @@ Ext.define("Voyant.panel.Dream", {
 					            labelWidth: 80,
 					            items: [
 					                {boxLabel: 'XML', name: 'export-format', inputValue: 'XML',checked: format!="TXT"},
-					                {boxLabel: 'plain text', name: 'export-format', inputValue: 'text', checked: format=="TXT"}
+					                {boxLabel: 'plain text', name: 'export-format', inputValue: 'TXT', checked: format=="TXT"}
 					            ],
 					            listeners: {
 					            	change: function(radio, newValue) {
@@ -171,7 +171,6 @@ Ext.define("Voyant.panel.Dream", {
 						    				    			  fields.push(items[i].getAttribute('data-field'))
 						    				    		  }
 						    				    		  container.setApiParam("documentFilename", fields.length>0 ? fields.join(",") : undefined);
-						    				    		  debugger
 						    				    	  }
 						    				      }
 						    				    }).disableSelection();
@@ -326,21 +325,45 @@ Ext.define("Voyant.panel.Dream", {
 
 		var el = Ext.get(this.getEl().dom.querySelector("#total-badge"));
 		el.setDisplayed("initial").update("?");
-		if (aggregateQueries.queries.length>1) {
+		if (aggregateQueries.queries.length>0) {
+			// one field, so just copy value until search is complete
+			if (aggregateQueries.queries.length==1) {
+				el.dom.innerHTML = this.getEl().dom.querySelector("#"+aggregateQueries.fields[0]+"-badge").innerHTML; // only one field, so just copy value
+			}
 			this.getAggregateSearchDocumentQueryMatches({
+				params: {
+					withDistributions: true,
+					bins: 10
+				},
 				callback: function(records, operation, success) {
 					var count = 0;
 					if (success) {
-						records.forEach(function(record) {
+						records.forEach(function(record, i) {
 							count+=record.getCount();
-						})
+							if (i==0) {
+								var values = record.getDistributions();
+								if (this.aggregateSparkline) {
+									this.aggregateSparkline.setValues(values)
+								}
+								else {
+									var ex = Ext.get(this.getEl().dom.querySelector("#export"));
+									this.aggregateSparkline = Ext.create({
+										xtype: 'sparklineline',
+										values: values,
+										height: 25,
+										width: 100,
+										renderTo: ex,
+										cls: 'dream-spark'
+									});
+									ex.appendChild(this.aggregateSparkline.el);
+								}
+							}
+							console.warn(record.getDistributions())
+						}, this)
 					}
 					el.dom.innerHTML=count; // update(0) doesn't work
 				}
 			})
-		}
-		else if (aggregateQueries.queries.length==1) {
-			el.dom.innerHTML = this.getEl().dom.querySelector("#"+aggregateQueries.fields[0]+"-badge").innerHTML; // only one field, so just copy value
 		}
 		else {
 			el.dom.innerHTML=0;
@@ -372,8 +395,13 @@ Ext.define("Voyant.panel.Dream", {
 	getAggregateSearchDocumentQueryMatches: function(config) {
 		var docMatches = this.getCorpus().getDocumentQueryMatches();
 		config = config || {};
+		
 		config.params = config.params || {};
-		if (!config.params.query) {config.params.query = this.getAggregateQueries().queries.join(" ")}
+		Ext.applyIf(config.params, {
+			withDistributions: true,
+			bins: 100,
+			query:  this.getAggregateQueries().queries.join(" ")
+		});
 		docMatches.load(Ext.applyIf(config, {
 			scope: this
 		}))
