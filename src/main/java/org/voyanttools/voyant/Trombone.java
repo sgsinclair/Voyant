@@ -219,6 +219,7 @@ public class Trombone extends HttpServlet {
 			XslTransformer.transform(xslParameters, xml, xslt, resp.getWriter());
 		}
 		else if (parameters.getParameterValue("outputFormat", "").toUpperCase().equals("ZIP")) {
+			resp.setHeader("Content-Disposition", "filename=" + parameters.getParameterValue("zipFilename", "VoyantCorpusDownload.zip"));
 			OutputStream outputStream = resp.getOutputStream();
 			final Controller controller = new Controller(storage, parameters);
 			try {

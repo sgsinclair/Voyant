@@ -110,9 +110,9 @@ Ext.define("Voyant.panel.Dream", {
 			                    		params: {createNewCorpus: true},
 			                    		callback: function(records, operation, success) {
 			                    			if (success) {
-			                    				var corpus = operation.getProxy().getReader().rawData.documentsFinder.corpus;
-			                    				debugger
-			                    				var url = this.getTromboneUrl()+"?corpus="+corpus+"&tool=corpus.CorpusExporter&outputFormat=zip"+
+			                    				var data = operation.getProxy().getReader().rawData.documentsFinder;
+			                    				var url = this.getTromboneUrl()+"?corpus="+data.corpus+"&tool=corpus.CorpusExporter&outputFormat=zip"+
+			                    					"&zipFilename=DreamCorpus-"+data.documentsCount+"Documents.zip"+
 			                    					"&documentFormat="+(container.getApiParam("documentFormat")=="TXT" ? "TXT" : "ORIGINAL")+
 			                    					"&documentFilename="+container.getApiParam("documentFilename")
 			                    				var win = window.open(url);
@@ -121,8 +121,7 @@ Ext.define("Voyant.panel.Dream", {
 			                    						buttons: Ext.MessageBox.OK,
 			                    						buttonText: {ok: "Close"},
 			                    						icon: Ext.MessageBox.INFO,
-			                    						message: "<a href='"+url+"' target='_blank' class='link'>Click here to download your new corpus.</a>",
-			                    						buttonText: 'Close'
+			                    						message: "<a href='"+url+"' target='_blank' class='link'>Click here to download your new corpus.</a>"
 			                    					});
 			                    					Ext.Msg.getEl().dom.querySelector("a").addEventListener("click", function() {
 			                    						win.close()
