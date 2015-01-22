@@ -506,8 +506,8 @@ Ext.define('Voyant.util.Toolable', {
 	},
 	getExportUrl: function() {
 		var api = this.getModifiedApiParams();
-		if (this.isXType('voyantheader')) {api.view=Ext.getClassName(this).split(".").pop()}
-		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(this.getModifiedApiParams());
+		if (!this.isXType('voyantheader')) {api.view=Ext.getClassName(this).split(".").pop()}
+		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(api);
 	},
 	helpToolClick: function(panel) {
 		var help = panel.localize('help', {default: false}) || panel.localize('helpTip');
