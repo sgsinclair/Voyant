@@ -146,7 +146,7 @@ Ext.define("Voyant.panel.Dream", {
 					            labelWidth: 80,
 					            items: [
 					                {boxLabel: 'XML', name: 'export-format', inputValue: 'XML',checked: format!="TXT"},
-					                {boxLabel: 'plain text', name: 'export-format', inputValue: 'text', checked: format=="TXT"}
+					                {boxLabel: 'plain text', name: 'export-format', inputValue: 'TXT', checked: format=="TXT"}
 					            ],
 					            listeners: {
 					            	change: function(radio, newValue) {
