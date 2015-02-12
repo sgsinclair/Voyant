@@ -34,20 +34,26 @@ Ext.define('Voyant.panel.ScatterPlot', {
         Ext.apply(this, {
         	store: store
         });
-        var rec = store.getAt(0);
-        var tokens = rec.getTokens();
-        var dimensions = rec.getDimensions();
+        
+        store.load();
+        store.on('load', function() {
+        	console.log(arguments);
+        });
+        
+//        var rec = store.getAt(0);
+//        var tokens = rec.getTokens();
+//        var dimensions = rec.getDimensions();
         
         var maxFreq = 0;
         var minFreq = 100000000;
         
         var data = [];
-        tokens.forEach(function(token) {
-        	var freq = token.get('rawFreq');
-        	if (freq > maxFreq) maxFreq = freq;
-        	if (freq < minFreq) minFreq = freq;
-        	data.push({term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1]});
-        });
+//        tokens.forEach(function(token) {
+//        	var freq = token.get('rawFreq');
+//        	if (freq > maxFreq) maxFreq = freq;
+//        	if (freq < minFreq) minFreq = freq;
+//        	data.push({term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1]});
+//        });
         
     	var store = Ext.create('Ext.data.JsonStore', {
     		fields: ['term', 'x', 'y', 'rawFreq', 'cluster'],
