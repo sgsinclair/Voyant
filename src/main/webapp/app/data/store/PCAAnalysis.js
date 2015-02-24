@@ -1,4 +1,4 @@
-Ext.define('Voyant.data.store.StatisticalAnalysis', {
+Ext.define('Voyant.data.store.PCAAnalysis', {
 	extend: 'Ext.data.Store',
 	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.StatisticalAnalysis',
@@ -16,14 +16,14 @@ Ext.define('Voyant.data.store.StatisticalAnalysis', {
 				type: 'ajax',
 				url: Voyant.application.getTromboneUrl(),
 				extraParams: {
-					tool: 'corpus.CA',
+					tool: 'corpus.PCA',
 					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
 					withDistributions: true
 		         },
 		         reader: {
 		             type: 'json',
-		             rootProperty: 'correspondenceAnalysis',
-		             totalProperty: 'correspondenceAnalysis.totalTypes'
+		             rootProperty: 'pcaAnalysis',
+		             totalProperty: 'pcaAnalysis.totalTypes'
 		         },
 		         simpleSortMode: true
 			 }

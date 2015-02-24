@@ -34,6 +34,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     freqTipTemplate: null,
     
+    caStore: null,
+    pcaStore: null,
+    
     layout: 'center',
     
     constructor: function(config) {
@@ -42,7 +45,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     },
     
     initComponent: function() {
-        var store = Ext.create("Voyant.data.store.StatisticalAnalysis");
+        var caStore = Ext.create("Voyant.data.store.CAAnalysis");
+        var pcaStore = Ext.create("Voyant.data.store.PCAAnalysis");
         
         var analysis = 'ca';//this.getApiParam('analysis');
         var numTerms = 20;//this.getApiParam('limit');
@@ -51,10 +55,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         
         Ext.apply(this, {
         	title: this.localize('title'),
-        	store: store,
+        	caStore: caStore,
+        	pcaStore: pcaStore,
         	tbar: [{
         		text: this.localize('analysis'),
-        		disabled: true,
     			menu: {
 					items: [
 					    {text: this.localize('pca'), checked:analysis==='pca', group:'analysis', xtype: 'menucheckitem'},
@@ -67,7 +71,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 									this.setApiParam('analysis', 'pca');
 								} else {
 									this.setApiParam('analysis', 'ca');
-									if (this.getCorpus().getSize() == 3) {
+									if (this.getCorpus().getDocumentsCount() == 3) {
 	//									this.setApiParam('dimensions', 2);
 	//									this.dimsButton.menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
 									}
@@ -150,11 +154,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
         
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.store.setCorpus(corpus);
+    		this.setCorpus(corpus);
+    		this.caStore.setCorpus(corpus);
+    		this.pcaStore.setCorpus(corpus);
     		this.loadFromApis();
     	}, this);
         
-        this.store.on('load', function(store, records) {
+        this.caStore.on('load', function(store, records) {
+        	this.buildChart(store);
+        }, this);
+        this.pcaStore.on('load', function(store, records) {
         	this.buildChart(store);
         }, this);
         
@@ -167,18 +176,20 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	        	var size = Math.min(panel.body.getHeight(), panel.body.getWidth());
 	        	chart.setSize(size, size).redraw();
 	        	
-//	        	chart.body.on('click', function(event, target) {
-//	            	var xy = event.getXY();
-//	            	var parentXY = Ext.fly(target).getXY();
-//	            	var x = xy[0] - parentXY[0];
-//	            	var y = xy[1] - parentXY[1];
-//	            	var item = this.down('#chart').getItemForPoint(x,y);
-//	            	if (item != null) {
-//	            		var data = item.record.data;
-//	            		var record = Ext.create('Voyant.data.model.CorpusTerm', data);
-//	            		this.getApplication().dispatchEvent('corpusTermsClicked', this, [record]);
-//	            	}
-//	            }, this);
+	        	chart.on('render', function(chart) {
+	        		chart.body.on('click', function(event, target) {
+		            	var xy = event.getXY();
+		            	var parentXY = Ext.fly(target).getXY();
+		            	var x = xy[0] - parentXY[0];
+		            	var y = xy[1] - parentXY[1];
+		            	var item = this.down('#chart').getItemForPoint(x,y);
+		            	if (item != null) {
+		            		var data = item.record.data;
+		            		var record = Ext.create('Voyant.data.model.CorpusTerm', data);
+		            		this.getApplication().dispatchEvent('corpusTermsClicked', this, [record]);
+		            	}
+		            }, this);
+	        	}, this);
         	}
         }, this);
         
@@ -195,14 +206,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	
     	var rec = store.getAt(0);
         var tokens = rec.getTokens();
-        var dimensions = rec.getDimensions();
+//        var dimensions = rec.getDimensions();
         
         var maxFreq = 0;
-        var minFreq = 100000000;
+        var minFreq = Number.MAX_VALUE;
         
         var data = [];
         tokens.forEach(function(token) {
-        	var freq = token.get('rawFreq');
+        	var freq = token.get('@rawFreq');
         	if (freq > maxFreq) maxFreq = freq;
         	if (freq < minFreq) minFreq = freq;
         	data.push({term: token.get('@term'), rawFreq: freq, relativeFreq: token.get('@relativeFreq'), cluster: token.get('@cluster'), x: token.get('vector')[0], y: token.get('vector')[1]});
@@ -271,9 +282,15 @@ Ext.define('Voyant.panel.ScatterPlot', {
     loadFromApis: function() {
     	var params = {};
     	Ext.apply(params, this.getApiParams());
-    	this.store.load({
-    		params: params
-    	});
+    	if (params.analysis === 'pca') {
+    		this.pcaStore.load({
+	    		params: params
+	    	});
+    	} else {
+	    	this.caStore.load({
+	    		params: params
+	    	});
+    	}
     },
     
     interpolate: function(lambda, minSrc, maxSrc, minDst, maxDst) {
