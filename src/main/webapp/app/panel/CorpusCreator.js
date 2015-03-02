@@ -139,7 +139,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
             	            				unknownFiles.push(filename.split("/").pop())
             	            			}
             	            		}
-            	            		if (badFiles || unknownFiles) {
+            	            		if (badFiles.length>0 || unknownFiles.length>0) {
             	            			var file = filefield;
             	            			Ext.Msg.show({
             	            				title: me.localize("fileTypesWarning"),
