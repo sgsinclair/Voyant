@@ -20,7 +20,7 @@ Ext.define("Voyant.data.store.Documents", {
 		// create proxy in constructor so we can set the Trombone URL
 		Ext.apply(config, {
 			pagePurgeCount: 0,
-			pageSize: 100,
+			pageSize: 1000,
 			leadingBufferZone: 100,
 		     proxy: {
 		         type: 'ajax',

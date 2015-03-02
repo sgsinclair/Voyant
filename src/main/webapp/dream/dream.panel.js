@@ -107,7 +107,7 @@ Ext.define("Voyant.panel.Dream", {
 			                    	var dlg = button.findParentByType("window");
 			                    	dlg.mask("Creating corpus…");
 			                    	container.getAggregateSearchDocumentQueryMatches({
-			                    		params: {createNewCorpus: true},
+			                    		params: {createNewCorpus: true, temporaryCorpus: true},
 			                    		callback: function(records, operation, success) {
 			                    			if (success) {
 			                    				var data = operation.getProxy().getReader().rawData.documentsFinder;

@@ -383,29 +383,35 @@ Ext.define('Voyant.panel.Reader', {
     	container.removeAll();
     	
     	var docs = corpus.getDocuments();
-    	var tokensTotal = corpus.getWordTokensCount();
-    	var docInfos = [];
-    	var docMinSize = 1000000;
-    	var docMaxSize = -1;
-		for (var i = 0; i < docs.getTotalCount(); i++) {
-			var d = docs.getAt(i);
-			var docIndex = d.get('index');
-			var count = d.get('tokensCount-lexical');
-			if (count < docMinSize) docMinSize = count;
-			if (count > docMaxSize) docMaxSize = count;
-			var fraction = count / tokensTotal;
-			docInfos.push({
-				index: docIndex,
-				count: count,
-				fraction: fraction
-			});
-		}
-		
-		for (var i = 0; i < docInfos.length; i++) {
-			var d = docInfos[i];
-			d.relativeHeight = d.count==docMaxSize ? 1 : map(d.count, docMinSize, docMaxSize, 0, 1);
-			addChart(d, this);
-		}
+    	var docsCount = docs.getTotalCount();
+    	if (docsCount<50) {
+    		
+    	
+	    	var tokensTotal = corpus.getWordTokensCount();
+	    	var docInfos = [];
+	    	var docMinSize = 1000000;
+	    	var docMaxSize = -1;
+	//		for (var i = 0; i < docs.getTotalCount(); i++) {
+			for (var i = 0; i < docs.getCount(); i++) {
+				var d = docs.getAt(i);
+				var docIndex = d.get('index');
+				var count = d.get('tokensCount-lexical');
+				if (count < docMinSize) docMinSize = count;
+				if (count > docMaxSize) docMaxSize = count;
+				var fraction = count / tokensTotal;
+				docInfos.push({
+					index: docIndex,
+					count: count,
+					fraction: fraction
+				});
+			}
+			
+			for (var i = 0; i < docInfos.length; i++) {
+				var d = docInfos[i];
+				d.relativeHeight = d.count==docMaxSize ? 1 : map(d.count, docMinSize, docMaxSize, 0, 1);
+				addChart(d, this);
+			}
+    	}
     },
     
     highlightKeywords: function(query, doScroll) {
