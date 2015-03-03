@@ -105,9 +105,8 @@ Ext.define('Voyant.panel.Reader', {
 				extraParams: {
 					tool: 'corpus.DocumentTerms',
 					withDistributions: true,
-					// TODO offsets and positions not implemented yet
+					// TODO handle positions
 					withPositions: true,
-					withOffsets: true,
 					bins: 25
 				},
 				reader: {
