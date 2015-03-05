@@ -5,7 +5,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     statics: {
     	i18n: {
     		title: {en: "Collocates Graph"},
-    		helpTip: {en: "<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:<ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"}
+    		helpTip: {en: "<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:<ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
+    		clearTerms: {en: "clear terms"},
+    		releaseToRemove: {en: "Release to remove this term"},
+    		cleaning: {en: "Cleaning"}
     	},
     	api: {
     		query: undefined,
@@ -24,6 +27,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	nodes: undefined,
     	links: undefined,
     	force: undefined,
+    	graphHeight: undefined,
+    	graphWidth: undefined,
     	corpusColours: d3.scale.category10()
     },
 
@@ -51,6 +56,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                     itemId: 'status',
                     tpl: this.localize('matchingTerms'),
                     style: 'margin-right:5px'
+                }, {
+                	text: me.localize('clearTerms'),
+                	handler: function() {
+                		this.updateNodesAndLinks([],[])
+                	},
+                	scope: me
                 }]
             }]
         });
@@ -204,6 +215,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	var svg = d3.select(el.dom).append("svg")
 	        .attr("width", width)
 	        .attr("height", height);
+    	this.setGraphWidth(width);
+    	this.setGraphHeight(height);
     	this.setNode(svg.selectAll(".node"));
     	this.setLink(svg.selectAll(".link"));
     	
@@ -211,8 +224,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     start: function() {
-    	var force = this.getForce();
-    	var drag = force.drag().on("dragstart", this.dragstart);
+  	  var me = this;
+  	  var force = this.getForce();
+    	var drag = force.drag();
+    	drag.on("dragstart", this.dragstart)
+    	drag.on("drag", function(d) {me.drag.call(me, d)})
+    	drag.on("dragend", function(d) {if (me.isOffCanvas(d)) {d.fixed = false; d3.select(this).classed("fixed", false);} me.dragend.call(me, d)})
     	
     	  link = this.getLink().data(force.links(), function(d) { return d.source.term+d.source.type + "-" + d.target.term+d.source.type; });
     	  link.enter().insert("line", ".node").attr("class", "link");
@@ -228,7 +245,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	  var keywordFontSize = d3.scale.linear().domain([d3.min(keywordValues),d3.max(keywordValues)]).range(range);
     	  var contextFontSize = d3.scale.linear().domain([d3.min(contextTermValues),d3.max(contextTermValues)]).range(range);
 
-    	  var me = this;
     	  var corpusColours = this.getCorpusColours();
     	  node.enter()
     	  	.append("text")
@@ -248,7 +264,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	  			d.wasfixed = d.fixed;
     	  			me.itemclick.apply(this, arguments);
     	  		})
-    	  		.on("mouseout", function(d) {
+    	  		.on("mouseout", function(d,a,b,c) {
     	  			this.textContent=d.term;
     	  			d3.select(this).classed("fixed", d.fixed = d.wasfixed);
     			})
@@ -258,10 +274,64 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	  force.start();
     },
     
+    isOffCanvas: function(d) {
+    	return d.x < 0 || d.y < 0 || d.x > this.getGraphWidth() || d.y > this.getGraphHeight();
+    },
+    
+    drag: function(d,a,b,c) {
+    	if (this.isMasked()) {
+    		if (!this.isOffCanvas(d)) {
+    			this.unmask();
+    		}
+    	}
+    	else if (this.isOffCanvas(d)) {
+    		this.mask(this.localize("releaseToRemove"))
+    	}
+    },
     dragstart: function(d) {
     	d.wasfixed=true;
     	d3.select(this).classed("fixed", d.fixed = true );
     },
+    dragend: function(d) {
+    	if (this.isOffCanvas(d)) {
+    		this.unmask();
+    		this.mask("cleaning");
+    		delete this.getNodes()[d.term+";"+d.type]
+    		this.prune();
+    		this.updateNodesAndLinks();
+    		this.unmask();
+    	}
+    },
+    
+    prune: function() {
+		var thisNodes = this.getNodes() || {};
+		var thisLinks = this.getLinks() || {};
+		var keys = Object.keys(this.getLinks());
+		var possibleOrphans = [];
+		var validNodes = {}
+		var pruned = 0;
+		for (var i=0, len=keys.length; i<len; i++) {
+			parts = keys[i].split("--");
+			if (!thisNodes[parts[0]] || !thisNodes[parts[1]]) {
+				delete thisLinks[keys[i]]
+				pruned++;
+				possibleOrphans.push(parts[0], parts[1])
+			}
+			else {
+				validNodes[parts[0]]=true
+				validNodes[parts[1]]=true
+			}
+		}
+		if (pruned>0) {
+			for (var i=0, len=possibleOrphans.length; i<len; i++) {
+				if (!validNodes[possibleOrphans[i]]) {
+					delete thisNodes[possibleOrphans[i]]
+				}
+			}
+			this.prune();
+		}
+    },
+    
     itemclick: function(d) {
 //    	d3.select(this).classed("fixed", d.fixed = false);
     },
@@ -299,6 +369,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     updateNodesAndLinks: function(nodes, links) {
+    	nodes = nodes || this.getNodes() || {};
+    	links = links || this.getLinks() || {};
 		this.setNodes(nodes);
 		this.setLinks(links);
 		this.getForce().nodes($.map(nodes, function(v) { return v; }));
