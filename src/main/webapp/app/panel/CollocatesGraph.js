@@ -82,19 +82,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         this.on("query", function(src, query) {this.loadFromQuery(query);}, this);
         
         this.on("resize", function(panel, width, height) {
-    					var el = this.getLayout().getRenderTarget();
-    					var svg = el.down('svg');
-    					if (svg) {
-        					svg.set({
-        						width: el.getWidth(),
-        						height: el.getHeight()
-        					});
-    					}
-    					var force = this.getForce();
-    					if (force) {
-    						force.size([width, height]);
-    					}
-    				}, this);
+        	// a bit heavy handed, but nodes seem to keep their position, so it's actually fairly smooth
+        	this.initGraph();
+        	this.updateNodesAndLinks();
+		}, this);
         
     	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
         me.callParent(arguments);
