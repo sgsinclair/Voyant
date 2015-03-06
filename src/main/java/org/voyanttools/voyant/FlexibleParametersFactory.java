@@ -3,6 +3,7 @@ package org.voyanttools.voyant;
 import static java.security.AccessController.doPrivileged;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,6 +16,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.NameValuePair;
 import org.voyanttools.trombone.util.FlexibleParameters;
 
 import sun.security.action.GetPropertyAction;
@@ -78,8 +81,18 @@ public class FlexibleParametersFactory {
 			}
 		}
 		else {
-			for (Map.Entry<String, String[]> param : ((Map<String, String[]>) request.getParameterMap()).entrySet()) {
-				parametersDecoder.decodeParameters(param.getKey(), param.getValue(), allowLocalFileSystemAccess);
+			if (request.getMethod().equals("GET")) {
+				// I couldn't for the life of me convince a GET request to use the specified character encoding (tried req.setCharacterEncoding() etc.)
+				// so we'll not use the simpler request.getParameterMap() and instead parse the query string ourselves
+				List<NameValuePair> pairs = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
+				for (NameValuePair pair : pairs) {
+					parametersDecoder.decodeParameters(pair.getName(), new String[]{pair.getValue()}, allowLocalFileSystemAccess);
+				}
+			}
+			else {
+				for (Map.Entry<String, String[]> param : ((Map<String, String[]>) request.getParameterMap()).entrySet()) {
+					parametersDecoder.decodeParameters(param.getKey(), param.getValue(), allowLocalFileSystemAccess);
+				}		
 			}
 		}
 	
