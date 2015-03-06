@@ -97,24 +97,31 @@ Ext.define('Voyant.data.model.Corpus', {
 			var dfd = Voyant.application.getDeferred(this);
 			var me = this;	
 //			config.input="http://asdfasfa/"
-			$.getJSON(Voyant.application.getTromboneUrl(), config).done(function(data) {
-				me.set(data.corpus.metadata)
-				var store = Ext.create("Voyant.data.store.Documents", {corpus: me});
-				me.setDocumentsStore(store);
-				store.load({
-					params: {
-						limit: 1000
-					},
-					callback: function(records, st, success) {
-						me.setDocumentsStore(this);
-						dfd.resolve(me);
-					},
-					scope: store
+			
+			$.ajax({
+				  type: "POST",
+				  url: Voyant.application.getTromboneUrl(),
+				  data: config,
+				  dataType: "json"
+				}).done(function(data) {
+					me.set(data.corpus.metadata)
+					var store = Ext.create("Voyant.data.store.Documents", {corpus: me});
+					me.setDocumentsStore(store);
+					store.load({
+						params: {
+							limit: 1000
+						},
+						callback: function(records, st, success) {
+							me.setDocumentsStore(this);
+							dfd.resolve(me);
+						},
+						scope: store
 				})
-			}).fail(function(response) {
-				Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
-				dfd.reject(); // don't send error since we've already shown it
-			});
+				}).fail(function(response) {
+					debugger
+					Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
+					dfd.reject(); // don't send error since we've already shown it
+				});
 			
 			return Voyant.application.getPromiseFromDeferred(dfd);
 

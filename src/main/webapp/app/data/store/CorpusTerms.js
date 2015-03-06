@@ -3,7 +3,7 @@ Ext.define("Voyant.data.proxy.CorpusTerms", {
 	constructor: function(config) {
 		config = config || {};
 		Ext.apply(config, {
-			extraParams: Ext.apply(config.extraParams || {}, {
+            extraParams: Ext.apply(config.extraParams || {}, {
 				 tool: 'corpus.CorpusTerms'
 			})
 		});
