@@ -11,7 +11,8 @@ Ext.define('Voyant.panel.Reader', {
     	},
     	api: {
     		start: 0,
-    		limit: 1000
+    		limit: 1000,
+    		skipToDocId: undefined
     	},
     	glyph: 'xf0f6@FontAwesome'
 	},
