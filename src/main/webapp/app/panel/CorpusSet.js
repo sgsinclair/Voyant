@@ -14,31 +14,28 @@ Ext.define('Voyant.panel.CorpusSet', {
         this.callParent(arguments);
 	},
 	layout: 'border',
-	header: false,
 	items: [{
         region: 'center',
         flex: 3,
         layout: 'fit',
+        
         items: {
-	        xtype: 'reader',
-			frame: true,
-			border: true
+	        xtype: 'reader'
         }
-       
     }, {
     	region: 'west',
     	flex: 3,
     	layout: 'fit',
         moreTools: ['cirrus','corpusterms'],
+    	split: {width: 5},
     	items: {
-	    	xtype: 'cirrus',
-			frame: true,
-			border: true
+	    	xtype: 'cirrus'
     	}
     }, {
     	region: 'east',
     	flex: 3,
     	layout: 'fit',
+    	split: {width: 5},
     	moreTools: ['trends','collocatesgraph','corpuscollocates'],
         items: {
 	    	xtype: 'trends'
@@ -46,25 +43,26 @@ Ext.define('Voyant.panel.CorpusSet', {
     }, {
     	region: 'south',
     	flex: 2,
-    	layout: {
-    		type: 'hbox',
-    		align: 'stretch'
-    	},
-    	
+    	split: {width: 5},
+    	layout: 'border',
+//    	layout: {
+//    		type: 'hbox',
+//    		align: 'stretch'
+//    	},
     	items: [{
-				frame: true,
-				border: true,
 				layout: 'fit',
+				region: 'center',
     			flex: 1,
+    	    	split: {width: 5},
     			moreTools: ['summary','documents'],
     			items: {
 	    			xtype: 'summary'
     			}
     		},{
-				frame: true,
-				border: true,
 				layout: 'fit',
+				region: 'west',
     			flex: 1,
+    	    	split: {width: 5},
     			moreTools: ['contexts','documentterms'],
     			items: {
 	    			xtype: 'contexts'

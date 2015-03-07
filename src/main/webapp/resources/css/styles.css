@@ -142,3 +142,8 @@ svg line {
 #voyantheader .x-tool-glyph {
 	color: white;
 }
+
+
+.x-splitter {
+	background-color: rgb(245, 245, 245);
+}
