@@ -72,6 +72,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
         var me = this;
 
         var store = Ext.create("Voyant.data.store.CorpusTerms");
+        store.getProxy().setExtraParam("withDistributions", "relative");
         store.on("totalcountchange", function() {
         	this.down('#status').update({count: this.getStore().getTotalCount()});;
         }, me);
