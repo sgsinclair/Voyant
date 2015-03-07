@@ -60,7 +60,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     			}
     		},{
 				layout: 'fit',
-				region: 'west',
+				region: 'east',
     			flex: 1,
     	    	split: {width: 5},
     			moreTools: ['contexts','documentterms'],
