@@ -118,7 +118,7 @@ Ext.define('Voyant.VoyantApp', {
     	var viewport = this.getViewport();
 		var panels = viewport.query("panel,chart");
 		var isHeard = false;
-		
+
 		// tell the app
 		if (this.hasListener && this.hasListener(eventName)) {
 			this.fireEvent.apply(this, arguments);
@@ -133,7 +133,6 @@ Ext.define('Voyant.VoyantApp', {
 			}
 		}
 		
-		if (console) {console.info("Unhandled event: "+eventName, arguments)}
 		if (!isHeard) {
 			if (console) {console.info("Unhandled event: "+eventName, arguments)}
 		}

@@ -20,7 +20,9 @@ Ext.define('Voyant.panel.Trends', {
     		limit: 5,
     		stopList: 'auto',
     		query: undefined,
-    		freqsMode: 'relativeFreqs'
+    		freqsMode: 'relativeFreqs',
+    		docIndex: undefined,
+    		docId: undefined
     	},
 		glyph: 'xf201@FontAwesome'
     },
@@ -106,6 +108,9 @@ Ext.define('Voyant.panel.Trends', {
     			if (terms[0] && terms[0].get('distributions') !== undefined) {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
+    			else {
+    				
+    			}
     		}
     	})
     	
@@ -126,6 +131,7 @@ Ext.define('Voyant.panel.Trends', {
     },
     
     loadFromDocument: function(document) {
+    	debugger
     	if (document.then) {
     		var me = this;
     		document.then(function(document) {me.loadFromDocument(document)})
