@@ -131,7 +131,7 @@ Ext.define('Voyant.panel.Trends', {
     },
     
     loadFromDocument: function(document) {
-    	debugger
+
     	if (document.then) {
     		var me = this;
     		document.then(function(document) {me.loadFromDocument(document)})
@@ -240,7 +240,7 @@ Ext.define('Voyant.panel.Trends', {
                 },
                 listeners: {
                 	itemmousedown: function() {
-                    	debugger
+//                    	debugger
                     	// TODO: fix trends item tapping
                     	console.warn("not working currently")
                     }
