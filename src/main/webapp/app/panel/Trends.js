@@ -22,7 +22,8 @@ Ext.define('Voyant.panel.Trends', {
     		query: undefined,
     		freqsMode: 'relativeFreqs',
     		docIndex: undefined,
-    		docId: undefined
+    		docId: undefined,
+    		mode: undefined
     	},
 		glyph: 'xf201@FontAwesome'
     },
