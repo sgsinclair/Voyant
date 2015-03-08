@@ -11,11 +11,14 @@ Ext.define('Voyant.panel.Cirrus', {
     statics: {
     	i18n: {
     		title: {en: "Cirrus"},
-    		helpTip: {en: "<p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document – this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>"}
+    		helpTip: {en: "<p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document – this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>"},
+    		reset: {en: 'reset'}
     	},
     	api: { // stopList inherited from app
     		limit: 50,
-    		terms: undefined
+    		terms: undefined,
+    		docId: undefined,
+    		docIndex: undefined
     	},
 		glyph: 'xf06e@FontAwesome'
     },
@@ -24,7 +27,8 @@ Ext.define('Voyant.panel.Cirrus', {
     	mode: undefined,
     	options: {
     		xtype: 'stoplistoption'
-    	}
+    	},
+    	corpus: undefined
     },
 
     MODE_CORPUS: 'corpus',
@@ -35,7 +39,22 @@ Ext.define('Voyant.panel.Cirrus', {
     constructor: function(config) {
 
     	Ext.apply(this, {
-    		title: this.localize('title')
+    		title: this.localize('title'),
+    		dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: ['->',{
+                    text: this.localize('reset'),
+                    hidden: true,
+                    itemId: 'reset',
+                    handler: function(btn) {
+                    	btn.hide();
+                    	var corpus = this.getCorpus();
+                    	if (corpus) {this.loadFromCorpus(corpus);}
+                    },
+                    scope: this
+                }]
+    		}]
     	});
 
         this.callParent(arguments);
@@ -77,6 +96,8 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     loadFromCorpus: function(corpus) {    	
+		this.setCorpus(corpus);
+		this.setApiParams({docId: undefined, docIndex: undefined})
 		this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false}));
     },
     
@@ -89,7 +110,7 @@ Ext.define('Voyant.panel.Cirrus', {
 		    scope: this,
 		    params: this.getApiParams()
     	});
-    	
+    	this.down("#reset").show();
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
