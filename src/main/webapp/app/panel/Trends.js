@@ -92,10 +92,10 @@ Ext.define('Voyant.panel.Trends', {
         		});
         		if (queryTerms) {
         			this.setApiParams({
-        				docIndex: undefined,
-        				docId: undefined,
-        				query: queryTerms,
-        				mode: this.MODE_CORPUS
+//        				docIndex: undefined,
+//        				docId: undefined,
+//        				mode: this.MODE_CORPUS,
+        				query: queryTerms
         			});
             		if (this.isVisible()) {
                 		this.loadFromCorpus(this.getCorpus());
