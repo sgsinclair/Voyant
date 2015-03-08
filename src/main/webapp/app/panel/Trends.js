@@ -262,6 +262,7 @@ Ext.define('Voyant.panel.Trends', {
         	axes: [{
         		type: 'numeric',
         		position: 'left',
+                minimum: 0,
         		title: {
         			text: this.localize(mode==this.MODE_DOCUMENT || this.getApiParam('freqsMode') =='rawFreqs' ? 'rawFrequencies' : 'relativeFrequencies')
         		}
@@ -318,6 +319,11 @@ Ext.define('Voyant.panel.Trends', {
 
 		var chart = Ext.create("Ext.chart.CartesianChart", config);
     	this.add(chart);
+    },
+    
+    clearChart: function() {
+    	// we need a way of updating data instead of this brute-force approach
+    	this.query('chart').forEach(function(chart) {this.remove(chart)}, this);
     },
     
     handleClickedItem: function(item) {
