@@ -11,13 +11,15 @@ Ext.define('Voyant.panel.Contexts', {
     		left: {en: "Left"},
     		leftTip: {en: "Context to the left of the keyword."},
     		right: {en: "Right"},
-    		rightTip: {en: "Context to the right of the keyword."}
+    		rightTip: {en: "Context to the right of the keyword."},
+    		context: {en: "context"}
     	},
     	api: {
     		query: undefined,
     		docId: undefined,
     		docIndex: undefined,
-    		stopList: 'auto'
+    		stopList: 'auto',
+    		context: 5
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
@@ -60,6 +62,22 @@ Ext.define('Voyant.panel.Contexts', {
                     itemId: 'status',
                     tpl: this.localize('matchingTerms'),
                     style: 'margin-right:5px'
+                }, this.localize('context'), {
+                	xtype: 'slider',
+                	minValue: 5,
+                	value: 5,
+                	maxValue: 50,
+                	increment: 5,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(me.getApiParam('context'))
+                		},
+                		dragend: function(slider, newValue) {
+                			me.setApiParam("context", slider.getValue());
+           		        	me.getStore().loadPage(1, {params: me.getApiParams()});
+                		}
+                	}
                 }]
             }],
     		columns: [{
