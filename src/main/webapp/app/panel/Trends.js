@@ -219,7 +219,7 @@ Ext.define('Voyant.panel.Trends', {
     			terms[i]["_"+index] = r;
     		}, this);
     		fields.push("_"+index);
-    		series.push({
+        	series.push({
     			type: 'line',
     			title: term,
     			xField: 'index',
@@ -236,8 +236,16 @@ Ext.define('Voyant.panel.Trends', {
                     trackMouse: true,
                     style: 'background: #fff',
                     renderer: function(storeItem, item) {
-                    	this.setHtml("<i>"+item.series.getTitle()+"</i>: "+storeItem.get(item.series.getYField()));
-                    }
+                    	var html = "<i>"+item.series.getTitle()+"</i>: "+storeItem.get(item.series.getYField());
+                    	if (mode==this.panel.MODE_CORPUS) {
+                    		var corpus = this.panel.getCorpus();
+                    		if (corpus && corpus.getDocumentsCount() == storeItem.store.getCount()) {
+                    			html += '<br/><i>'+this.panel.getCorpus().getDocument(item.index).getShortTitle()+"</i>";
+                    		}
+                    	}
+                    	this.setHtml(html);
+                    },
+                    panel: this
                 },
                 listeners: {
                 	itemmousedown: function() {
