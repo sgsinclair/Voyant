@@ -8,6 +8,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	i18n: {
     		title: {en: "Add Texts"},
     		helpTip: {en: "This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from you computer (you can select multiple files by using the Ctrl and/or Shift keys)</li></ul>"},
+    		gearTip: {en: "Options"},
+    		gearWinTitle: {en: "Options"},
+    		inputFormat: {en: "Input Format"},
+    		xpathDocuments: {en: "XPath to Documents"},
+    		xpathContent: {en: "XPath to Content"},
+    		xpathTitle: {en: "XPath to Title"},
+    		xpathAuthor: {en: "XPath to Author"},
     		emptyInput: {en: "Type in one or more URLs on separate lines or paste in a full text."},
     		uploadingCorpus: {en: "Uploading corpus…"},
     		fileTypesWarning: {en: "File Types Warning"},
@@ -15,7 +22,16 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		badFiles: {en: "incompatible (likely error): "},
     		unknownFiles: {en: "unrecognized (possible error): "},
     		sureContinue: {en: "Are you sure you wish to continue?"},
-    		reveal: {en: "Reveal"}
+    		reveal: {en: "Reveal"},
+    		ok: {en: "OK"},
+    		cancel: {en: "Cancel"}
+    	},
+    	api: {
+    		inputFormat: undefined,
+    		xmlDocumentsXpath: undefined,
+    		xmlContentXpath: undefined,
+    		xmlTitleXpath: undefined,
+    		xmlAuthorXpath: undefined
     	}
     },
     config: {
@@ -74,9 +90,9 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    			                    glyph: 'xf00c@FontAwesome',
 	    				        		handler: function(btn) {
 	    				        			var form = btn.up('form').getForm();
-	    				        			var corpus = btn.up('form').getForm().getValues().corpus
+	    				        			var corpus = btn.up('form').getForm().getValues().corpus;
 	    				        			if (corpus!='') {
-	    				        				me.loadCorpus({corpus: corpus})
+	    				        				me.loadCorpus({corpus: corpus});
 		    				        			btn.up('window').close();
 	    				        			}
 	    				        			else {
@@ -126,17 +142,17 @@ Ext.define('Voyant.panel.CorpusCreator', {
             	            	var form = filefield.up('form').getForm();
             	            	if (form.isValid()) {
             	            		var files = filefield.fileInputEl.dom.files;
-            	            		var badFilesRe = /\.(png|gif|jpe?g|xls|mp[234a]|mpeg|exe|wmv|avi|ppt|mpg|tif|wav|mov|psd|wma|ai|bmp|pps|aif|pub|dwg|indd|swf|asf|mbd|dmg|flv)$/i
-            	            		var goodFilesRe = /\.(txt|pdf|html?|xml|docx?|rtf|pages|odt|zip|jar|tar|gz|ar|cpio|bzip2|bz2|gzip)$/i
+            	            		var badFilesRe = /\.(png|gif|jpe?g|xls|mp[234a]|mpeg|exe|wmv|avi|ppt|mpg|tif|wav|mov|psd|wma|ai|bmp|pps|aif|pub|dwg|indd|swf|asf|mbd|dmg|flv)$/i;
+            	            		var goodFilesRe = /\.(txt|pdf|html?|xml|docx?|rtf|pages|odt|zip|jar|tar|gz|ar|cpio|bzip2|bz2|gzip)$/i;
             	            		var badFiles = [];
             	            		var unknownFiles = [];
             	            		for (var i = 0, len = files.length; i<len; i++) {
             	            			var filename = files[i].name;
             	            			if (badFilesRe.test(filename)) {
-            	            				badFiles.push(filename.split("/").pop())
+            	            				badFiles.push(filename.split("/").pop());
             	            			}
             	            			else if (!goodFilesRe.test(filename)) {
-            	            				unknownFiles.push(filename.split("/").pop())
+            	            				unknownFiles.push(filename.split("/").pop());
             	            			}
             	            		}
             	            		if (badFiles.length>0 || unknownFiles.length>0) {
@@ -202,19 +218,25 @@ Ext.define('Voyant.panel.CorpusCreator', {
     },
     
     loadForm: function(form) {
+    	var params = {tool: 'corpus.CorpusCreator'};
+    	var apiParams = this.getApiParams();
+    	delete apiParams.view;
+    	delete apiParams.stopList;
+    	Ext.apply(params, apiParams);
+    	
     	var view = this.getApplication().getViewport();
-		view.mask(this.localize('uploadingCorpus'))
+		view.mask(this.localize('uploadingCorpus'));
 		form.submit({
 			url: this.getTromboneUrl(),
-			params: {tool: 'corpus.CorpusCreator'},
+			params: params,
 			failure: function(form, action) { // we always fail because of content-type
-            	view.unmask()
+            	view.unmask();
 				if (action.result) {
-					this.loadCorpus({corpus: action.result.stepEnabledCorpusCreator.storedId})
+					this.loadCorpus({corpus: action.result.stepEnabledCorpusCreator.storedId});
 				}
 			},
 			scope: this
-		})
+		});
     },
    
     loadCorpus: function(params) {
@@ -228,6 +250,57 @@ Ext.define('Voyant.panel.CorpusCreator', {
 			view.unmask();
 			app.showErrorResponse({message: message}, response);
 		});
+    },
+    
+    showOptionsClick: function(panel) {
+    	var me = panel;
+    	if (me.optionsWin === undefined) {
+    		me.optionsWin = Ext.create('Ext.window.Window', {
+    			title: me.localize('gearWinTitle'),
+    			closeAction: 'hide',
+    			height: 225,
+    			width: 500,
+    			layout: 'fit',
+    			bodyPadding: 10,
+    			items: [{
+    				xtype: 'form',
+    				defaultType: 'textfield',
+    				fieldDefaults: {
+    					labelAlign: 'right',
+    					labelWidth: 160
+    				},
+    				items: [{
+    					fieldLabel: me.localize('xpathDocuments'),
+    					name: 'xmlDocumentsXpath'
+    				},{
+    					fieldLabel: me.localize('xpathContent'),
+    					name: 'xmlContentXpath'
+    				},{
+    					fieldLabel: me.localize('xpathAuthor'),
+    					name: 'xmlAuthorXpath'
+    				},{
+    					fieldLabel: me.localize('xpathTitle'),
+    					name: 'xmlTitleXpath'
+    				}]
+    			}],
+    			buttons: [{
+    				text: me.localize('ok'),
+    				handler: function(button, event) {
+    					var win = button.findParentByType('window');
+    					var form = win.down('form');
+    					var params = form.getValues();
+    					me.setApiParams(params);
+    					win.hide();
+    				}
+    			},{
+    				text: me.localize('cancel'),
+    				handler: function(button, event) {
+    					button.findParentByType('window').hide();
+    				}
+    			}]
+    		});
+    	}
+    	me.optionsWin.show();
     }
     
 });
