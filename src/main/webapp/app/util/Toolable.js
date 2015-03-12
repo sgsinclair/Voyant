@@ -155,7 +155,7 @@ Ext.define('Voyant.util.Toolable', {
 		}
 		var tools = [];
 		for (var tool in toolsMap) {
-			if (config.includeTools && !config.includeTools[tool] || !toolsMap[tool]) {continue}
+			if (config.includeTools && !config.includeTools[tool] || !toolsMap[tool]) {continue;}
 			tools.push({
 				type: tool,
 				tooltip: this.localize(tool+"Tip"),
@@ -510,7 +510,7 @@ Ext.define('Voyant.util.Toolable', {
 		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(api);
 	},
 	helpToolClick: function(panel) {
-		var help = panel.localize('help', {default: false}) || panel.localize('helpTip');
+		var help = panel.localize('help', {"default": false}) || panel.localize('helpTip');
 		if (help==panel._localizeClass(Ext.ClassManager.get("Voyant.util.Toolable"), "helpTip")) {
 			panel.openUrl( "http://docs.voyant-tools.org/");
 		}
