@@ -162,12 +162,13 @@ Ext.define('Voyant.panel.Reader', {
     		this.innerContainer = centerPanel.getLayout().getRenderTarget();
     		
     		// scroll listener
-    		centerPanel.body.on("scroll", function() {
+    		centerPanel.body.on("scroll", function(event, target) {
     			var cmp = this.items.getAt(0);
     			var body = cmp.body;
     			var dom = body.dom;
     			if (dom.scrollTop+dom.offsetHeight>dom.scrollHeight/2) { // more than half-way down
-    				var last = this.innerContainer.first().last();
+    				var readerContainer = this.innerContainer.first();
+    				var last = readerContainer.last();
     				if (last.hasCls("loading")==false) {
     					while(last) {
     						if (last.hasCls("word")) {
@@ -181,7 +182,7 @@ Ext.define('Voyant.panel.Reader', {
     							break;
     						}
     						last.destroy(); // remove non word
-    						last = target.last();
+    						last = readerContainer.last();
     					}
     				}
     			}
