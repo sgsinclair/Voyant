@@ -426,13 +426,21 @@ Ext.define('Voyant.util.Toolable', {
 		var value = "<table>\n\t<thead>\n\t\t<tr>\n";
 		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns();
 		values = [];
-		grid.getStore().each(function(row) {
-			var val = {};
-			visibleColumns.forEach(function(column) {
-				val[column.text] = row.get(column.dataIndex);
-			})
-			values.push(val);
-		});
+
+        function jsonCollector(row) {
+            var val = {};
+            visibleColumns.forEach(function (column) {
+                val[column.text] = row.get(column.dataIndex);
+            });
+            values.push(val);
+        }
+
+        if (store.buffered) {
+            store.data.forEach(jsonCollector);
+        } else {
+            store.each(jsonCollector);
+        }
+
 		Ext.Msg.show({
 		    title: this.localize('exportDataTitle'),
 		    message: this.localize('exportDataJsonMessage'),
@@ -452,17 +460,25 @@ Ext.define('Voyant.util.Toolable', {
 			fields.push(column.text);
 		})
 		var value = fields.join("\t")+"\n";
-		grid.getStore().each(function(row) {
-			cells = [];
-			visibleColumns.forEach(function(column) {
-				var val = row.get(column.dataIndex);
-				if (Ext.isString(val)) {
-					val = val.replace(/\s+/g,' '); // get rid of multiple whitespace (including newlines and tabs)
-				}
-				cells.push(val)
-			})
-			value += cells.join("\t")+"\n";
-		});
+
+        function tsvCollector(row) {
+            cells = [];
+            visibleColumns.forEach(function (column) {
+                var val = row.get(column.dataIndex);
+                if (Ext.isString(val)) {
+                    val = val.replace(/\s+/g, ' '); // get rid of multiple whitespace (including newlines and tabs)
+                }
+                cells.push(val)
+            });
+            value += cells.join("\t") + "\n";
+        }
+
+        if (store.buffered) {
+            store.data.forEach(tsvCollector);
+        } else {
+            store.each(tsvCollector);
+        }
+
 		Ext.Msg.show({
 		    title: this.localize('exportDataTitle'),
 		    message: this.localize('exportDataTsvMessage'),
@@ -480,19 +496,28 @@ Ext.define('Voyant.util.Toolable', {
 		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns();
 		visibleColumns.forEach(function(column) {
 			value+="\t\t\t<td>"+column.text+"</td>\n";
-		})
-		value+="\t\t</tr>\n\t</thead>\n\t<tbody>\n"
-		grid.getStore().each(function(row) {
-			value+="\t\t<tr>\n"
-			visibleColumns.forEach(function(column) {
-				var val = row.get(column.dataIndex);
-				if (Ext.isString(val)) {
-					val = val.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&lg;')
-				}
-				value+="\t\t\t<td>"+val+"</td>\n";
-			})
-			value+="\t\t</tr>\n";
 		});
+
+		value+="\t\t</tr>\n\t</thead>\n\t<tbody>\n";
+
+        function htmlCollector(row) {
+            value += "\t\t<tr>\n";
+            visibleColumns.forEach(function (column) {
+                var val = row.get(column.dataIndex);
+                if (Ext.isString(val)) {
+                    val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&lg;');
+                }
+                value += "\t\t\t<td>" + val + "</td>\n";
+            });
+            value += "\t\t</tr>\n";
+        }
+
+        if (store.buffered) {
+            store.data.forEach(htmlCollector);
+        } else {
+            store.each(htmlCollector);
+        }
+
 		value+="\t</tbody>\n</table>";
 		Ext.Msg.show({
 		    title: this.localize('exportDataTitle'),
