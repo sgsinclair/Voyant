@@ -216,7 +216,14 @@ Ext.define('Voyant.util.Toolable', {
 	       		name: 'export',
 	       		inputValue: 'url',
 	       		boxLabel: "<a href='"+panel.getExportUrl.call(panel)+"' target='_blank'>"+panel.localize('exportViewUrl')+"</a>",
-	       		checked: true
+	       		checked: true,
+	       		listeners: {
+	       			afterrender: function() {
+	       				this.boxLabelEl.on("click", function() {
+	       					this.up('window').close()
+	       				}, this)
+	       			}
+	       		}
 		},{
 	       xtype: 'fieldset',
 	       collapsible: true,
