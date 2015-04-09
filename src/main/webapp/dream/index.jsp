@@ -13,6 +13,7 @@
 
 	Ext.application({
 		extend : 'Voyant.VoyantCorpusApp',
+		requires: ['Voyant.util.QuerySearchField'],
 		name: 'VoyantDreamApp',
 		config: {
 			baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/',
@@ -33,10 +34,19 @@
 			    layout: 'fit',
 			    items: [{
 			    	html: html,
-			    	xtype: 'dream'
+			    	xtype: 'dream',
+			    	listeners: {
+			    		afterrender: function() {
+			    		      Ext.create('Ext.tip.ToolTip', {
+							        target: this.getEl().dom.querySelector(".search-tips"),
+        							html: Voyant.util.QuerySearchField.i18n.querySearchTip.en
+      							});
+			    		}
+			    	}
 			    }]
 			});
 			this.callParent(arguments);
+			
 		}
 	});
 </script>
@@ -159,6 +169,7 @@
 		background-color: white;
 		z-index: 3;
 	}
+	.search-tips {caption-side: top; text-align: right; font-size: smaller; color: #157fcc}
 	
 </style>
 </head>
@@ -188,6 +199,7 @@
 
 <div align="center">
 	<table>
+		<caption class='search-tips'>search tips</caption>
 		<tr>
 			<td valign="top">
 				<table>
