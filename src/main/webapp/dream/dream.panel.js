@@ -230,7 +230,12 @@ Ext.define("Voyant.panel.Dream", {
 		        	var field = this.element[0].name;
 		        	var fieldPrefix = field=="lexical" ? "" : field+":";
 		        	var term = extractLast( request.term ).trim().replace(/,$/,'');
+		        	if (term.charAt(0)=='-') {
+		        		fieldPrefix = '-'+fieldPrefix;
+		        		term = term.substring(1)
+		        	}
 		        	var queries = [fieldPrefix+term+"*","^"+fieldPrefix+term+"*"];
+		        	
 		        	if ($("#variants")[0].checked) {
 			        	var variants = container.getVariants().getVariants(term);
 			        	if (Ext.isArray(variants) && variants.length>1) {
@@ -295,12 +300,22 @@ Ext.define("Voyant.panel.Dream", {
 			this.setCorpus(corpus);
 		}
 	},
+	
+	getFieldValueSearchQuery: function(value, field) {
+		var queries = [];
+		var values = value.trim().replace(/,$/,'').split(/\s*[,|]\s*/).forEach(function(val) {
+			val = val.trim();
+			if (val.charAt(0)=='-') {queries.push("-"+field+":"+val.substring(1))}
+			else {queries.push(field+":"+val)}
+		})
+		return queries.join("|")
+	},
+	
 	search: function(value, field) {
 		var el = Ext.get(this.getEl().dom.querySelector("#"+field+"-badge"));
 		el.setDisplayed("initial").update("?");
-		value = value.trim().replace(/,$/,'');
-		var query = field+":"+value.trim().replace(/,$/,'').split(/\s*[,|]\s*/).join("|"+field+":")
-		if (value) {
+		var query = this.getFieldValueSearchQuery(value, field)
+		if (query.length>0) {
 			Ext.create("Voyant.data.store.DocumentQueryMatches", {
 				autoDestroy: true,
 				autoLoad: false,
@@ -358,7 +373,6 @@ Ext.define("Voyant.panel.Dream", {
 									ex.appendChild(this.aggregateSparkline.el);
 								}
 							}
-							console.warn(record.getDistributions())
 						}, this)
 					}
 					el.dom.innerHTML=count; // update(0) doesn't work
@@ -374,12 +388,15 @@ Ext.define("Voyant.panel.Dream", {
 		var fields = [];
 		var searches = this.getEl().dom.querySelectorAll(".dream-terms-search");
 		for (var i=0,len=searches.length;i<len;i++) {
-			var val = searches[i].value.trim().replace(/,$/,'');
-			if (val) {
-				var field = searches[i].name;
-				var query = field+":"+val.split(/\s*[,|]\s*/).join("|"+field+":")
-				fields.push(field);
+			var query = this.getFieldValueSearchQuery(searches[i].value, searches[i].name)
+			if (query.indexOf('|')>-1) {
 				queries.push("+("+query+")")
+			}
+			else if (query.charAt(0)=='-') {
+				queries.push(query)
+			}
+			else {
+				queries.push("+"+query)
 			}
 		}
 
