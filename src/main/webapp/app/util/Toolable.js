@@ -191,6 +191,9 @@ Ext.define('Voyant.util.Toolable', {
 	getMenuItemFromXtype: function(xtype) {
 		var xt = xtype;
 		var config = this.getApplication().getToolConfigFromToolXtype(xtype);
+		if (config && config.tooltip) {
+			delete config.tooltip // don't use this for now since it causes problems in the menu
+		}
 		return Ext.apply(Ext.clone(config), {
 			xtype: 'menuitem',
 			text: config.title,

@@ -161,11 +161,13 @@ Ext.define('Voyant.VoyantApp', {
 	},
 	
 	getToolConfigFromToolXtype: function(xtype) {
-		cls = Ext.ClassManager.getByAlias("widget."+xtype);
+		cls = Ext.ClassManager.getByAlias("widget."+xtype);		
 		return {
 			xtype: xtype,
 			title: this._localizeClass(cls, "title"),
-			tooltip: this._localizeClass(cls, "helpTip"),
+			tooltip: { // this needs to be an object for compatibility (other configs can be changed)
+				text: this._localizeClass(cls, "helpTip"),
+			},
 			glyph: cls && cls.glyph ? cls.glyph : 'xf12e@FontAwesome'
 		};
 	},
