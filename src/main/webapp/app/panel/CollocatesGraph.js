@@ -59,7 +59,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 }, {
                 	text: me.localize('clearTerms'),
                 	handler: function() {
-                		this.updateNodesAndLinks([],[])
+                		this.updateNodesAndLinks({},{})
                 	},
                 	scope: me
                 }]
