@@ -104,7 +104,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
                     	},
                     	scope: this
                     }
-                }
+                },
+                pruneRemoved: false,
+    			mode: 'SIMPLE'
             }),
             dockedItems: [{
                 dock: 'bottom',
