@@ -35,6 +35,7 @@
 			    items: [{
 			    	html: html,
 			    	xtype: 'dream',
+			    	header: false,
 			    	autoScroll: true,
 			    	listeners: {
 			    		afterrender: function() {
