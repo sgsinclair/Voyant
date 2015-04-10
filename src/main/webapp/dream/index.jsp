@@ -35,6 +35,7 @@
 			    items: [{
 			    	html: html,
 			    	xtype: 'dream',
+			    	autoScroll: true,
 			    	listeners: {
 			    		afterrender: function() {
 			    		      Ext.create('Ext.tip.ToolTip', {
