@@ -263,9 +263,19 @@ Ext.define('Voyant.panel.Reader', {
     					var term = terms[0];
     					var docIndex = term.get('docIndex');
     					var position = term.get('position');
+    					var bufferPosition = position - (this.getApiParam('limit')/2);
     					var doc = this.getCorpus().getDocument(docIndex);
-    					this.setApiParams({'skipToDocId': doc.getId(), start: position});
-    					this.load(true);
+    					this.setApiParams({'skipToDocId': doc.getId(), start: bufferPosition < 0 ? 0 : bufferPosition});
+    					this.load(true, {
+    						callback: function() {
+    							var el = this.body.dom.querySelector("#_" + docIndex + "_" + position);
+    							if (el) {
+    								el.scrollIntoView()
+    							}
+    							this.highlightKeywords(term.get('term'), false)
+    						},
+    						scope: this
+    					});
     				};
         		},
         		scope: this
@@ -435,17 +445,17 @@ Ext.define('Voyant.panel.Reader', {
 //		}
 	},
     
-    load: function(doClear) {
+    load: function(doClear, config) {
     	if (doClear) {
     		this.innerContainer.first().destroy(); // clear everything
     		this.innerContainer.setHtml('<div class="readerContainer"><div class="loading">'+this.localize('loading')+'</div></div>');
 			this.innerContainer.first().first().mask();
     	}
-    	this.getTokensStore().load({
+    	this.getTokensStore().load(Ext.apply(config || {}, {
     		params: Ext.apply(this.getApiParams(), {
     			stripTags: 'blocksOnly'
     		})
-    	});
+    	}))
     },
     
     updateText: function(contents) {
