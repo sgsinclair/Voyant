@@ -222,7 +222,9 @@ Ext.define("Voyant.panel.Dream", {
 		        }
 		        if (event.keyCode === $.ui.keyCode.TAB || event.keyCode === $.ui.keyCode.ENTER) {
 		        	container.search(this.value, this.name);
-			          event.preventDefault();
+			        if (event.keyCode === $.ui.keyCode.ENTER) {
+			        	event.preventDefault();
+			        }
 		        }
 		      })
 		      .autocomplete({
