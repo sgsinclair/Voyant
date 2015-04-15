@@ -13,7 +13,7 @@
     <xsl:template match="/">
         <div class="tokens">
         	<xsl:for-each-group select="results/documentTokens/tokens/token" group-by="docIndex">
-        		<document>
+        		<div class="document">
         			<xsl:attribute name="docIndex">
         				<xsl:value-of select="docIndex"/>
         			</xsl:attribute>
@@ -21,7 +21,7 @@
         				<xsl:value-of select="docId"/>
         			</xsl:attribute>
         			<xsl:apply-templates select="current-group()"/>
-        		</document>
+        		</div>
         	</xsl:for-each-group>
         </div>
     </xsl:template>
@@ -33,6 +33,7 @@
             			<xsl:text>word</xsl:text>
             		</xsl:attribute>
             		<xsl:attribute name="tokenid">
+            		    <text>word_</text>
             			<xsl:value-of select="docIndex"/>
             			<text>.</text>
             			<xsl:value-of select="position"/>
@@ -76,7 +77,7 @@
             	<xsl:value-of select="$tags[1]/start" disable-output-escaping="yes"/><xsl:value-of select="$tagName" disable-output-escaping="yes"/>
             	<xsl:value-of select="$tags[1]/attributes"/>
             	<xsl:if test="contains(tokenType, 'open')">
-            		<xsl:text> tokenid="tag</xsl:text>
+            		<xsl:text> tokenid="tag_</xsl:text>
             		<xsl:value-of select="docIndex"/>
             		<xsl:text>.</xsl:text>
             		<xsl:value-of select="startOffset"/>
