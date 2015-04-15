@@ -42,11 +42,11 @@ Ext.define("Voyant.data.store.Documents", {
 		        		 var corpus = store.getCorpus();
 		        		 records.forEach(function(record) {
 		        			 record.set('corpus', corpus);
-		        		 })
+		        		 });
 	        		 }
 	        	 }
 	         }
-		})
+		});
     	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.callParent([config]);
 		
@@ -87,8 +87,8 @@ Ext.define("Voyant.data.store.Documents", {
 						dfd.reject(); // don't send error since we've already shown it
 			    	}
 			    }
-			})
-			return dfd.promise()
+			});
+			return dfd.promise();
 		}
 		return Ext.isNumber(config) ? this.getAt(config) : this.getById(config);
 	}
