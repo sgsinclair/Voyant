@@ -186,6 +186,10 @@ body {
 	padding-left: 0px;
 }
 
+.dtc-tree .disabled .x-tree-node-text {
+	color: #aaa;
+}
+
 .dtc-tree .x-tree-node a span {
 	padding: 0;
 }
@@ -397,6 +401,18 @@ body {
     -o-transform: rotate(-90deg); 
 }
 
+#dtcTools .x-tab-default {
+	border-color: #fff;
+}
+
+#dtcTools .x-tab-bar-default, #dtcTools .x-tab-default-top {
+    background-color: #fff;
+}
+
+#dtcTools .x-tab-bar-default-top > .x-tab-bar-body-default {
+	padding: 0px !important;
+}
+
 #dtcTools .x-tab-strip-top .x-tab-right {
 	background-image: none;
     border-image: none;
@@ -429,18 +445,28 @@ body {
 	border-color: #818284;
 }
 
-#dtcTools .x-tab-strip-top .x-tab-strip-over .x-tab-strip-text {
+#dtcTools .x-tab.x-tab-default.x-tab-over {
+	border: 1px solid #fff;
+    background-color: #fff;
+}
+
+#dtcTools .x-tab.x-tab-default.x-tab-over .x-tab-inner {
 	color: #231f20;
 }
 
-#dtcTools .x-tab-strip-text {
+#dtcTools .x-tab-inner {
 	color: #818284;
 	font-size: 13px;
 	font-family: "Glypha Bold","Bookman Old Style","Serifa BT","URW Bookman L","itc bookman",times,serif;
 	font-weight: normal;
 }
 
-#dtcTools ul.x-tab-strip .x-tab-strip-active .x-tab-strip-text {
+#dtcTools .x-tab.x-tab-active.x-tab-default {
+	border: 1px solid #fff;
+	background-color: #fff;
+}
+
+#dtcTools .x-tab.x-tab-active.x-tab-default .x-tab-inner {
 	color: #231f20;
 }
 

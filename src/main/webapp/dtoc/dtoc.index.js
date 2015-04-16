@@ -23,7 +23,6 @@ Ext.define('Voyant.panel.DToC.Index', {
     	this.isCurator = config.isCurator == null ? false : config.isCurator;
     	
     	var treeStore = Ext.create('Ext.data.TreeStore', {
-//			fields: [],
 			batchUpdateMode: 'complete',
 			autoLoad: false,
 			root: {
@@ -42,37 +41,51 @@ Ext.define('Voyant.panel.DToC.Index', {
 			rootVisible: false,
 			overflowX: 'hidden',
 			overflowY: 'auto',
+			hideHeaders: true,
 			viewConfig: {
 				overflowX: 'hidden',
-				overflowY: 'auto',
-				listeners: {
-					itemclick: function(view, record, el, index, event) {
-					},
-					scope: this
-				}
+				overflowY: 'auto'
+			},
+			columns: {
+				items: [{
+					xtype: 'treecolumn',
+					width: '100%',
+					renderer: function(value, metadata) {
+						var r = metadata.record;
+						if (r.getData().targetMatches !== true) {
+							metadata.tdCls += ' disabled';
+						}
+						value = r.data.text;
+						return value;
+					}
+				}]
 			},
 			selModel: new Ext.selection.TreeModel({
 				mode: 'MULTI',
 				listeners: {
+					beforeselect: function(sel, record) {
+						// cancel if there are no target matches
+						return record.getData().targetMatches === true;
+					},
 					selectionchange: function(sm, nodes) {
 						var indexes = [];
 						for (var i = 0; i < nodes.length; i++) {
 							var node = nodes[i];
-							if (node.isLeaf()) {
-								var t = node.getData().targets;
-								for (var j = 0; j < t.length; j++) {
-									var id = t[j];
-									var data = {};
-									var indexObj = this.indexIds[id];
-									if (Ext.isObject(indexObj)) {
-										Ext.apply(data, indexObj);
-										data.label = (node.parentNode.getData().textNoCount ? node.parentNode.getData().textNoCount : '') + ' ' + node.getData().textNoCount;
-										indexes.push(data);
-									}
-								}
-							} else {
+							if (!node.isLeaf()) {
 								node.expand();
-//								this.getSelectionModel().deselect(node);
+							}
+							var t = node.getData().targets;
+							for (var j = 0; j < t.length; j++) {
+								var id = t[j];
+								var data = {};
+								var indexObj = this.indexIds[id];
+								if (Ext.isObject(indexObj)) {
+									Ext.apply(data, indexObj);
+									data.label = (node.parentNode.getData().textNoCount ? node.parentNode.getData().textNoCount : '') + ' ' + node.getData().textNoCount;
+									indexes.push(data);
+								} else {
+									console.log('no targets:',node.data.textNoCount);
+								}
 							}
 						}
 						this.getApplication().dispatchEvent('indexesSelected', this, indexes);
@@ -204,14 +217,22 @@ Ext.define('Voyant.panel.DToC.Index', {
 					return idsToKeep.indexOf(n) != -1;
 				});
 				if (match) {
-					r.data.keep = true;
+					r.data.targetMatches = true;
+					r.eachChild(function(n) {
+						n.data.targetMatches = true;
+					});
+					if (r.getDepth() > 1) {
+						r.getRefOwner().data.targetMatches = true;
+					}
 				}
 			}, this);
 		} else {
+			this.getView().refresh(); // re-run renderer
+			
 			// do the actual filtering
-			this.getStore().filterBy(function(r) {
-				return r.getData().keep === true;
-			}, this);
+//			this.getStore().filterBy(function(r) {
+//				return r.getData().targetMatches === true;
+//			}, this);
 		}
 	},
 	

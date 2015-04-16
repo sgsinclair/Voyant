@@ -84,9 +84,6 @@ Ext.define('Voyant.panel.DToC', {
         			id: 'dtcTools',
         			width: 300,
         			minWidth: 24, // needed for hboxfitsplit layout
-        			headerCfg: {
-        				style: 'padding: 0px;'
-        			},
         			xtype: 'tabpanel',
 //        			plugins: new Ext.ux.plugins.PanelCollapseHorizontal({
 //        				headerText: 'Index & Tags',
