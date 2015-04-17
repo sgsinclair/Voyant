@@ -75,6 +75,13 @@ Ext.define('Voyant.panel.DToC.ToC', {
 								};
 								this.getApplication().dispatchEvent('tagSelected', this, edata);
 								break;
+							case 'kwic':
+								var data = {
+									tokenId: data.tokenId,
+									docId: data.docId,
+									docIdType: data.docId+':'+data.kwicData
+								};
+								this.getApplication().dispatchEvent('tokenSelected', this, data);
 							}
 			    		}
 					},
@@ -95,7 +102,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			    	listeners: {
 			    		keydown: function(field, event) {
 			    			if (event.getCharCode() == 13) {
-			    				var query = this.getTopToolbar().getComponent('search').getValue();
+			    				var query = this.getDockedItems('toolbar #search')[0].getValue();
 			    				this.submitQuery(query);
 			    			}
 			    		},
@@ -393,34 +400,27 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	
 	submitQuery: function(query) {
 		if (query != '') {
-			var docIdTypes = [];
-			
-			var docs = this.getCorpus().getDocuments();
-			for (var i = 0, len = docs.getCount(); i < len; i++) {
-	    		var doc = docs.getAt(i);
-	    		docIdTypes.push(doc.getId()+':'+query);
-			}
-			
-			this.getKwicsForDocIdTypes(docIdTypes);
+			this.getKwics({query: query});
 		}
 	},
 
-	getKwicsForDocIdTypes: function(docIdTypes) {
+	getKwics: function(config) {
+		var params = {
+			tool: 'corpus.DocumentContexts',
+			context: 6,
+//			limit: 50,
+			sortBy: 'offset',
+			sortDirection: 'DESC',
+			corpus: this.getCorpus().getId()
+		};
+		Ext.apply(params, config);
 		Ext.Ajax.request({
 			url: this.getTromboneUrl(),
-			params: {
-				tool: 'TypeKwics',
-				context: 6,
-//				limit: 50,
-				sortBy: 'offset',
-				sortDirection: 'DESC',
-				corpus: this.getCorpus().getId(),
-				docIdType: docIdTypes
-			},
+			params: params,
 			success: function(response, options) {
 				this.removeNodes('kwic');
 				var result = Ext.decode(response.responseText);
-				this.addKwicsToTree(result.typeKwics.kwics);
+				this.addKwicsToTree(result.documentContexts.contexts);
 				
 //				this.getApplication().dispatchEvent('documentTypesSelected', this, {docIdType:docIdTypes});
 			},
@@ -429,47 +429,49 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	},
 	
 	addKwicsToTree: function(kwics) {
-		var root = this.getRootNode();
-		var kwic, type, doc, docId, text, tokenId;
-		var kwicsForEvent = [];
-		for (var i = 0; i < kwics.length; i++) {
-			kwic = kwics[i];
-			docId = kwic['@docId'];
-			type = kwic['@middle'];
-			text = kwic['@left'] + ' <span class="dtc-kwic-highlight">' + type + '</span> ' + kwic['@right'];
-			tokenId = kwic['@tokenId'];
+		if (kwics.length > 0) {
+			var docsToExpand = [];
 			
-			kwicsForEvent.push({docId: docId, tokenId: tokenId, type: 'kwic'});
-			
-			doc = root.findChild('docId', docId);
-			doc.appendChild({
-				text: text,
-				leaf: true,
-				cls: 'kwic child',
-				editable: false,
-				draggable: false,
-				tokenId: tokenId,
-				kwicData: type,
-				docId: docId,
-				dtcType: 'kwic',
-				listeners: {
-					click: function(node, event) {
-						var data = {
-							tokenId: node.getData().tokenId,
-							docId: node.getData().docId,
-							docIdType: node.getData().docId+':'+node.getData().kwicData
-						};
-						this.getApplication().dispatchEvent('tokenSelected', this, data);
-					},
-					scope: this
+			var root = this.getRootNode();
+			var kwic, type, doc, docIndex, docId, text, tokenId;
+			var kwicsForEvent = [];
+			for (var i = 0; i < kwics.length; i++) {
+				kwic = kwics[i];
+				docIndex = kwic.docIndex;
+				docId = this.getCorpus().getDocument(docIndex).getId();
+				type = kwic.middle;
+				text = kwic.left + ' <span class="dtc-kwic-highlight">' + type + '</span> ' + kwic.right;
+				
+				tokenId = 'word_'+docIndex+'.'+kwic.position;
+				
+				kwicsForEvent.push({docId: docId, tokenId: tokenId, type: 'kwic'});
+				
+				doc = root.findChild('docId', docId);
+				doc.collapse();
+				if (docsToExpand.indexOf(doc) === -1) {
+					docsToExpand.push(doc);
 				}
-			});
-//			doc.ui.addClass('hasChildren');
-			doc.expand();
+				
+				doc.appendChild({
+					text: text,
+					leaf: true,
+					cls: 'kwic child',
+					editable: false,
+					draggable: false,
+					tokenId: tokenId,
+					kwicData: type,
+					docId: docId,
+					dtcType: 'kwic'
+				});
+			}
+			
+			for (var i = 0; i < docsToExpand.length; i++) {
+				docsToExpand[i].expand();
+			}
+			
+			this.getApplication().dispatchEvent('tocUpdated', this, kwicsForEvent);
+			Ext.defer(this.updateDocModelOutline, 500, this);
 		}
-		
-		this.getApplication().dispatchEvent('tocUpdated', this, kwicsForEvent);
-		Ext.defer(this.updateDocModelOutline, 500, this);
 	},
 	
 	addTagsToTree: function(tags, subtype) {
