@@ -30,13 +30,11 @@ Ext.define('Voyant.panel.DToC', {
 			title: 'Tags',
 			id: 'dtcMarkup',
 			xtype: 'dtocMarkup'
-		}
-//		,{
-//			title: 'Stats',
-//			id: 'dtcStats',
-//			xtype: 'corpusterms'
-//		}
-		];
+		},{
+			title: 'Stats',
+			id: 'dtcStats',
+			xtype: 'dtocStats'
+		}];
         
         Ext.apply(me, {
         	layout: 'border',

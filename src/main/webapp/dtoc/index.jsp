@@ -38,6 +38,7 @@
 <script src="dtoc.panel.js"></script>
 <script src="dtoc.markup.js"></script>
 <script src="dtoc.index.js"></script>
+<script src="dtoc.stats.js"></script>
 <script src="dtoc.docmodel.js"></script>
 <script src="dtoc.toc.js"></script>
 <script src="dtoc.reader.js"></script>

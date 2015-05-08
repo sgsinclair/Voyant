@@ -103,6 +103,12 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			}
 		}, this);
 		
+		this.addListener('corpusTermsClicked', function(src, terms) {
+			if (terms.length === 0) {
+				this.clearHits('kwic');
+			}
+		}, this);
+		
 		this.addListener('tocUpdated', function(src, data) {
 			this.clearHits('kwic');
 			
@@ -141,7 +147,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 						Ext.getCmp('dtcMarkup').clearSelections();
 						Ext.getCmp('dtcIndex').clearSelections();
 						Ext.getCmp('dtcReader').clearHighlights();
-//						Ext.getCmp('dtcStats').getSelectionModel().clearSelections();
+						Ext.getCmp('dtcStats').getSelectionModel().deselectAll(true);
 						var tree = Ext.getCmp('dtcToc');
 						tree.clearTree();
 			    		tree.updateDocModelOutline();

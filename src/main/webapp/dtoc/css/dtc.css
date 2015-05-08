@@ -594,9 +594,43 @@ body {
 	content: counter(item) ".";
 }
 
+#dtcReaderContainer q::before, #dtcReaderContainer quote::before {
+    content: "\201C";
+}
+
+#dtcReaderContainer q::after, #dtcReaderContainer quote::after {
+    content: "\201D";
+}
+
 #dtcReaderContainer q[type="block"], #dtcReaderContainer quote[type="block"] {
 	display: block;
 	margin: 10px 40px;
+}
+
+#dtcReaderContainer xmltitle[level="a"]::before {
+    content: "\201C";
+}
+
+#dtcReaderContainer xmltitle[level="a"]::after {
+    content: "\201D";
+}
+
+#dtcReaderContainer xmltitle[level="m"] {
+    font-style: italic;
+}
+
+#dtcReaderContainer xmltitle[level="j"] {
+    font-style: italic;
+}
+
+#dtcReaderContainer xmlhead {
+    display: block;
+    font-weight: bold;
+}
+
+#dtcReaderContainer bibl {
+    display: block;
+    margin: 8px 0;
 }
 
 #dtcReaderContainer [rend="bold"] {

@@ -253,6 +253,13 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		indexesSelected: function(src, indexes) {
 			this.removeNodes('index');
 			this.addIndexesToTree(indexes);
+		},
+		corpusTermsClicked: function(src, terms) {
+			var query = [];
+			terms.forEach(function(term) {
+				query.push(term.get("term"));
+			});
+			this.submitQuery(query);
 		}
 	},
     
@@ -401,6 +408,8 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	submitQuery: function(query) {
 		if (query != '') {
 			this.getKwics({query: query});
+		} else {
+			this.removeNodes('kwic');
 		}
 	},
 
@@ -409,8 +418,9 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			tool: 'corpus.DocumentContexts',
 			context: 6,
 //			limit: 50,
-			sortBy: 'offset',
-			sortDirection: 'DESC',
+			simpleSortMode: true,
+			sortBy: 'position',
+			sortDirection: 'ASC', // TODO sort direction not implemented on server
 			corpus: this.getCorpus().getId()
 		};
 		Ext.apply(params, config);
@@ -420,7 +430,16 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			success: function(response, options) {
 				this.removeNodes('kwic');
 				var result = Ext.decode(response.responseText);
-				this.addKwicsToTree(result.documentContexts.contexts);
+				var contexts = result.documentContexts.contexts;
+				contexts.sort(function(a,b) {
+					if (a.position > b.position) {
+						return 1;
+					} else if (a.position < b.position) {
+						return -1;
+					}
+					return 0;
+				});
+				this.addKwicsToTree(contexts);
 				
 //				this.getApplication().dispatchEvent('documentTypesSelected', this, {docIdType:docIdTypes});
 			},

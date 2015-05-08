@@ -131,7 +131,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	showHitsForTags: Ext.emptyFn, // need to override this
 	
 	clearSelections: function() {
-		this.getSelectionModel().clearSelections();
+		this.getSelectionModel().deselectAll(true);
 	},
 	
 	_getDocumentXml: function(docId, callback) {

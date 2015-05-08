@@ -84,7 +84,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 									data.label = (node.parentNode.getData().textNoCount ? node.parentNode.getData().textNoCount : '') + ' ' + node.getData().textNoCount;
 									indexes.push(data);
 								} else {
-									console.log('no targets:',node.data.textNoCount);
+									if (console) {
+										console.log('no targets:',node.data.textNoCount+', id:'+id);
+									}
 								}
 							}
 						}
@@ -205,7 +207,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 	},
 
 	clearSelections: function() {
-		this.getSelectionModel().clearSelections();
+		this.getSelectionModel().deselectAll(true);
 	},
 	
 	filterIndex: function(idsToKeep) {
