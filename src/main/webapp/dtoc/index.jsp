@@ -42,6 +42,13 @@
 <script src="dtoc.docmodel.js"></script>
 <script src="dtoc.toc.js"></script>
 <script src="dtoc.reader.js"></script>
+
+<link href="annotator/annotator.min.css" rel="stylesheet" type="text/css" />
+<link href="annotator/dtoc.annotator.css" rel="stylesheet" type="text/css" />
+<script src="annotator/annotator-full.min.js"></script>
+<script src="annotator/dtoc.annotator.auth.js"></script>
+<script src="annotator/dtoc.annotator.js"></script>
+
 <link href="css/dtc.css" rel="stylesheet" type="text/css" />
 <title>Dynamic Table of Contexts</title>
 </head>

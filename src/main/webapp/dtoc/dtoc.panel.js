@@ -4,7 +4,8 @@ Ext.define('Voyant.panel.DToC', {
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.dtoc',
     config: {
-    	corpus: undefined
+    	corpus: undefined,
+    	annotator: undefined
     },
     statics: {
         api: {
@@ -13,9 +14,6 @@ Ext.define('Voyant.panel.DToC', {
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-
-    	
-    	
     },
     initComponent: function() {
         var me = this;
@@ -34,6 +32,10 @@ Ext.define('Voyant.panel.DToC', {
 			title: 'Stats',
 			id: 'dtcStats',
 			xtype: 'dtocStats'
+		},{
+			title: 'Annotations',
+			id: 'dtcAnnotator',
+			xtype: 'dtocAnnotator'
 		}];
         
         Ext.apply(me, {
@@ -91,7 +93,7 @@ Ext.define('Voyant.panel.DToC', {
         			deferredRender: false,
         			activeTab: 0,
         			items: dtcToolsConfig
-        		},{xtype: 'splitter'},{
+        		},{xtype: 'splitter', width: 10},{
         			title: 'Table of Contents',
         			id: 'dtcToc',
         			xtype: 'dtocToc',
@@ -100,7 +102,7 @@ Ext.define('Voyant.panel.DToC', {
 //                    }),
         			width: 250,
         			minWidth: 24 // needed for hboxfitsplit layout
-        		},{xtype: 'splitter'},{
+        		},{xtype: 'splitter', width: 10},{
         			flex: 1,
         			minWidth: 350,
         			layout: 'hbox',
@@ -159,7 +161,7 @@ Ext.define('Voyant.panel.DToC', {
         					scope: this
         				}]
         			}]
-        		},{xtype: 'splitter'},{
+        		},{xtype: 'splitter', width: 10},{
         			xtype: 'container',
         			html: '<div></div>',
         			width: 1,

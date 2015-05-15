@@ -70,10 +70,11 @@ body {
 	background-color: #ffffff;
 }
 
-.x-splitbar-h {
+.x-splitter-vertical {
 	background-image: url("../images/drag_dot.png");
 	background-repeat: no-repeat;
 	background-position: center;
+	background-color: #ffffff;
 }
 
 .dtc-panel {
