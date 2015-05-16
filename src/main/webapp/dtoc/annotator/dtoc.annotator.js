@@ -10,6 +10,7 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
     },
     
     annotator: null,
+    loginButtonClicked: false,
     
 	store: null,
 	tpl: null,
@@ -62,7 +63,6 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
 		
 		Ext.apply(config, {
 			layout: 'fit',
-			tools: null,
 			tbar: new Ext.Toolbar({
 		    	cls: 'dtc-toolbar',
 		    	hideBorders: true,
@@ -125,17 +125,35 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
 					scope: this
 				}
 			},{
-				itemId: 'annotatorLoginButton',
-				xtype: 'button',
-				text: 'Annotator Login',
-				tooltip: 'This will take you to the login page. You must reload DToC after logging in.',
-				tooltipType: 'title',
-				style: 'margin: 10px auto;',
-				handler: function() {
-					window.open('http://annotateit.org/user/login');
+				xtype: 'panel',
+				border: false,
+				width: '100%',
+				height: '100%',
+				items: {
+					itemId: 'annotatorLoginButton',
+					xtype: 'button',
+					text: 'Annotator Login',
+					tooltip: 'This will take you to the login page. You must reload DToC after logging in.',
+					tooltipType: 'title',
+					style: 'display: block; margin: 10px auto;',
+					width: 105,
+					handler: function() {
+						this.loginButtonClicked = true;
+						window.open('http://annotateit.org/user/login');
+					},
+					scope: this
 				}
 			}]
 		});
+		
+		function focusHandler() {
+			if (this.loginButtonClicked) {
+				var docId = Ext.getCmp('dtcReader').getCurrentDocId();
+				this.loadAnnotationsForDocId(docId);
+				this.loginButtonClicked = false;
+			}
+		}
+		window.addEventListener('focus', focusHandler.bind(this));
 		
 		this.callParent(arguments);
 		this.mixins['Voyant.panel.Panel'].constructor.apply(this, [Ext.apply(config, {includeTools: {}})]);
@@ -169,20 +187,28 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
 			}
 		},
 		dtcDocumentLoaded: function(src, data) {
-			var app = this.getApplication();
-			var base = app.getBaseUrl();
-			var uri = 'http://voyant-tools.org/'+'?skin=dtc&corpus='+app.getCorpus().getId()+'&docId='+data.docId;
-			
-			this.annotator.loadAnnotationsForDocId(uri);
+			this.loadAnnotationsForDocId(data.docId);
 		},
 		activate: function () {
 			this.toggleView();
 		}
 	},
 	
+	loadAnnotationsForDocId: function(docId) {
+		var app = this.getApplication();
+		var base = app.getBaseUrl();
+		var uri = 'http://voyant-tools.org/'+'?skin=dtc&corpus='+app.getCorpus().getId()+'&docId='+docId;
+		
+		this.annotator.loadAnnotationsForDocId(uri);
+	},
+	
 	export: function() {
 		this._doingExport = true;
-		this._docsToExport = this.getApplication().getCorpus().getDocuments().keys.slice(0);
+		this._docsToExport = [];
+		var corpus = this.getApplication().getCorpus();
+		for (var i = 0, len = corpus.getDocumentsCount(); i < len; i++) {
+			this._docsToExport.push(corpus.getDocument(i).getId());
+		}
 		this._annotationsForExport = [];
 		
 		if (this._progressWin === null) {
@@ -208,10 +234,10 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
 	_doExport: function() {
 		var docId = this._docsToExport.shift();
 		if (docId !== undefined) {
-			var totalDocs = this.getApplication().getCorpus().getDocuments().length;
+			var totalDocs = this.getApplication().getCorpus().getDocumentsCount();
 			var percentage = Math.abs(this._docsToExport.length - totalDocs) / totalDocs;
 			this._progressBar.updateProgress(percentage);
-			this.annotator.loadAnnotationsForDocId(docId);
+			this.loadAnnotationsForDocId(docId);
 		} else {
 			this._progressBar.updateProgress(1);
 			this._progressWin.hide();
@@ -260,13 +286,13 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
 	},
 	toggleView: function() {
 		if (this.annotator.isAuthenticated()) {
-			this.getComponent('annotatorLoginButton').hide();
-			this.getComponent('viewer').show();
-			this.getDockedItems('toolbar #export')[0].show();
+			this.queryById('annotatorLoginButton').hide();
+			this.queryById('viewer').show();
+			this.queryById('export').show();
 		} else {
-			this.getComponent('viewer').hide();
-			this.getDockedItems('toolbar #export')[0].hide();
-			this.getComponent('annotatorLoginButton').show();
+			this.queryById('viewer').hide();
+			this.queryById('export').hide();
+			this.queryById('annotatorLoginButton').show();
 		}
 	}
 });
@@ -298,9 +324,7 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
             width: 300,
             autoHeight: true,
             items: {
-                xtype: 'form',
-                labelAlign: 'right',
-                labelWidth: 200,
+                xtype: 'panel',
                 border: false,
                 bodyStyle: 'padding:5px;',
                 items: [{
@@ -310,6 +334,7 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
                     xtype: 'button',
                     text: 'Annotator Login',
                     handler: function() {
+                    	Ext.getCmp('dtcAnnotator').loginButtonClicked = true;
                         window.open('http://annotateit.org/user/login');
                     },
                     scope: this
@@ -321,6 +346,8 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
                     html: '<hr style="border: none; border-top: 1px solid #ccc; width: 90%;" />'
                 },{
                     xtype: 'checkbox',
+                    labelAlign: 'right',
+                    labelWidth: 200,
                     itemId: 'showMsg',
                     fieldLabel: 'Stop showing this message',
                     checked: !this.showLoginWindow
@@ -329,8 +356,7 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
             buttons: [{
                 text: 'Ok',
                 handler: function() {
-                    var form = this.loginWin.findByType('form')[0];
-                    this.showLoginWindow = !form.getComponent('showMsg').getValue();
+                    this.showLoginWindow = !this.loginWin.queryById('showMsg').getValue();
                     this.loginWin.hide();
                 },
                 scope: this
@@ -358,16 +384,16 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 		
 		function onAnnotationCreated(anno) {
 			// TODO trigger reload in annotations panel
-			Ext.toast('The annotation was successfully created.', 'Annotation Created');
+			Ext.toast('The annotation was successfully created.', 'Annotation Created', 'b');
 		}
 		
 		function onAnnotationUpdated(anno) {
-			Ext.toast('The annotation was successfully updated.', 'Annotation Updated');
+			Ext.toast('The annotation was successfully updated.', 'Annotation Updated', 'b');
 		}
 		
 		function onAnnotationDeleted(anno) {
 			if (anno.id !== undefined) {
-				Ext.toast('The annotation was successfully deleted.', 'Annotation Deleted');
+				Ext.toast('The annotation was successfully deleted.', 'Annotation Deleted', 'b');
 			}
 		}
 		
@@ -426,8 +452,8 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 			
 			if (this.firstInit) {
 				// TODO events are persisting
-				this.annotator.on('annotationEditorShown', onEditorShown.createDelegate(this))
-				this.annotator.on('annotationViewerShown', onViewerShown.createDelegate(this))
+				this.annotator.on('annotationEditorShown', onEditorShown.createDelegate(this));
+				this.annotator.on('annotationViewerShown', onViewerShown.createDelegate(this));
 				this.annotator.on('annotationsLoaded', onAnnotationsLoaded.createDelegate(this));
 				this.annotator.on('annotationCreated', onAnnotationCreated.createDelegate(this));
 				this.annotator.on('annotationUpdated', onAnnotationUpdated.createDelegate(this));
