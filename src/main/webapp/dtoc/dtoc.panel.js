@@ -59,7 +59,7 @@ Ext.define('Voyant.panel.DToC', {
         		},{
         			columnWidth: 1,
         			padding: '0 0 0 5px',
-        			html: '<div id="headerBookName" class="headerRow"><span>Book Name</span></div><div id="headerAuthor" class="headerRow"><span>Author Name</span></div>'
+        			html: '<div id="headerBookName" class="headerRow">Regenerations: Canadian Women&rsquo;s Writing/&Eacute;criture des femmes au Canada.</div><div id="headerAuthor" class="headerRow">Ed. Marie Carri&egrave;re and Patricia Demers.</div>'
         		},{
         			width: 285,
         			style: {

@@ -43,10 +43,10 @@ body {
 
 #headerBookName {
 	font-size: 16px;
+	font-style: italic;
 }
 
 #headerAuthor {
-	font-style: italic;
 }
 
 #modeToggle, #exportButton {
@@ -596,14 +596,20 @@ body {
 }
 
 #dtcReaderContainer q::before, #dtcReaderContainer quote::before {
-    content: "\201C";
+    content: "";
+}
+#dtcReaderContainer q::after, #dtcReaderContainer quote::after {
+    content: "";
 }
 
-#dtcReaderContainer q::after, #dtcReaderContainer quote::after {
+#dtcReaderContainer q:not([type="block"]):not([rend="bloc"])::before, #dtcReaderContainer quote:not([type="block"]):not([rend="bloc"])::before {
+    content: "\201C";
+}
+#dtcReaderContainer q:not([type="block"]):not([rend="bloc"])::after, #dtcReaderContainer quote:not([type="block"]):not([rend="bloc"])::after {
     content: "\201D";
 }
 
-#dtcReaderContainer q[type="block"], #dtcReaderContainer quote[type="block"] {
+#dtcReaderContainer q[type="block"], #dtcReaderContainer q[rend="bloc"], #dtcReaderContainer quote[type="block"], #dtcReaderContainer quote[rend="bloc"] {
 	display: block;
 	margin: 10px 40px;
 }
@@ -632,6 +638,8 @@ body {
 #dtcReaderContainer bibl {
     display: block;
     margin: 8px 0;
+    padding-left: 24px;
+    text-indent: -24px;
 }
 
 #dtcReaderContainer [rend="bold"] {

@@ -326,26 +326,23 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	},
 	
 	_processHeader: function() {
-	    var firstP;
 		var header = Ext.get(Ext.DomQuery.select('xmlHead', this.readerContainer.dom)[0]);
 		if (header != null) {
 			header.setVisibilityMode(Ext.Element.DISPLAY);
 			header.hide();
-			firstP = header.next();
 		}
 		var byline = Ext.get(Ext.DomQuery.select('byline', this.readerContainer.dom)[0]);
         if (byline != null) {
             byline.setVisibilityMode(Ext.Element.DISPLAY);
             byline.hide();
-            firstP = byline.next();
         }
 		var docauthors = Ext.DomQuery.select('docAuthor', this.readerContainer.dom);
 		for (var i = 0; i < docauthors.length; i++) {
 		    var docauthor = Ext.get(docauthors[i]);
 		    docauthor.setVisibilityMode(Ext.Element.DISPLAY);
             docauthor.hide();
-            firstP = docauthor.next();
 		}
+		var firstP = Ext.get(Ext.DomQuery.select('div[type="chapter"] > p', this.readerContainer.dom)[0]);
 		if (firstP != null) {
 			firstP.addCls('firstParagraph');
 			var firstSpan = firstP.child('span');
