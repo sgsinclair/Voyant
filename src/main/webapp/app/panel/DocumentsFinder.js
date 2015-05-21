@@ -1,7 +1,7 @@
 Ext.define('Voyant.panel.DocumentsFinder', {
 	extend: 'Ext.grid.Panel',
 	require: ['Voyant.data.store.DocumentQueryMatches','Ext.grid.plugin.CellEditing'],
-	mixins: ['Voyant.panel.Panel','Voyant.util.Localization'],
+	mixins: ['Voyant.panel.Panel'/*,'Voyant.util.Localization'*/],
 	alias: 'widget.documentsfinder',
     statics: {
     	i18n: {

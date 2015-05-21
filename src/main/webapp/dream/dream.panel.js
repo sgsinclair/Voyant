@@ -305,7 +305,7 @@ Ext.define("Voyant.panel.Dream", {
 	
 	getFieldValueSearchQuery: function(value, field) {
 		var queries = [];
-		var values = value.trim().replace(/,$/,'').split(/\s*[,|]\s*/).forEach(function(val) {
+		var values = value.toLowerCase().trim().replace(/,$/,'').split(/\s*[,|]\s*/).forEach(function(val) {
 			val = val.trim();
 			if (val.charAt(0)=='-') {queries.push("-"+field+":"+val.substring(1))}
 			else {queries.push(field+":"+val)}

@@ -1,6 +1,6 @@
 Ext.define('Voyant.data.store.Tokens', {
 	extend: 'Ext.data.Store',
-	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
+	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.Token',
 //    transferable: ['setCorpus'],
 //    embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],

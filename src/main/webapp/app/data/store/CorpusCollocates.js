@@ -1,6 +1,6 @@
 Ext.define('Voyant.data.store.CorpusCollocates', {
 	extend: 'Ext.data.BufferedStore',
-	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
+	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.CorpusCollocate',
 //    transferable: ['setCorpus'],
 //    embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],

@@ -23,7 +23,7 @@ Ext.define('Voyant.widget.StopListOption', {
     		ok: {en: "Save"},
     		cancel: {en: "Cancel"},
     		editStopListTitle: {en: "Edit Stoplist"},
-    		editStopListMessage: {en: "This is the stoplist, one term per line."},
+    		editStopListMessage: {en: "This is the stoplist, one term per line."}
     	}
     },
     initComponent: function(config) {
@@ -79,7 +79,7 @@ Ext.define('Voyant.widget.StopListOption', {
 			    title: this.localize('noEditAutoTitle'),
 			    message: this.localize('noEditAutoMessage'),
 			    buttons: Ext.Msg.OK,
-			    icon: Ext.Msg.ERROR,
+			    icon: Ext.Msg.ERROR
 			});
     		return
     	}

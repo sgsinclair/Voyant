@@ -7,7 +7,12 @@
 			'resources': 'resources'
 		}
 	});
+</script>
 
+<script type="text/javascript" src="resources/voyant/current/voyant.jsp<%= (request.getParameter("debug")!=null ? "?debug=true" : "") %>"></script>
+
+<script>
+Ext.onReady(function(){
 	Ext.application({
 		extend : 'Voyant.VoyantDefaultApp',
 		name: 'VoyantDefaultApp',
@@ -17,6 +22,7 @@
 			build: '<%= application.getInitParameter("build") %>'			
 		}
 	});
+});
 </script>
 <title>Voyant Tools</title>
 <%@ include file="resources/jsp/post_app.jsp" %>

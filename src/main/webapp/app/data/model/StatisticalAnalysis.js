@@ -2,7 +2,7 @@ Ext.define('Voyant.data.model.StatisticalAnalysis', {
     extend: 'Ext.data.Model',
     requires: ['Voyant.data.model.PrincipalComponent', 'Voyant.data.model.Dimension', 'Voyant.data.model.AnalysisToken'],
     fields: [
-         {name: 'id'},
+         {name: 'id'}
 //         ,{name: 'dimensions', reference: 'Voyant.data.model.Dimension'}
 //         ,{name: 'tokens', reference: 'Voyant.data.model.AnalysisToken'}
     ]

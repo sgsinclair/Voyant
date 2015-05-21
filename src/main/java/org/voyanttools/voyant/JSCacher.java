@@ -1,19 +1,17 @@
 package org.voyanttools.voyant;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.FileUtils;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
@@ -22,216 +20,159 @@ import com.google.javascript.jscomp.SourceFile;
 
 
 /**
- * @author Andrew MacDonald
+ * @author Andrew MacDonald and Stéfan Sinclair
  */
 public class JSCacher {
 
 	final static String ENCODING = "UTF-8";
 	final static String CACHED_FILENAME = "voyant.js";
+	final static String CACHED_FILENAME_MINIFIED = "voyant.min.js";
+	
+	private static String[] jsFiles = new String[]{
+		
+		"resources/bubblelines/Bubblelines.js",
+		
+		"resources/cirrus/html5/Cirrus.js",
+		"resources/cirrus/html5/Word.js",
+		"resources/cirrus/html5/WordController.js",
+
+		"app/util/Api.js",
+		"app/util/Localization.js",
+		"app/util/Deferrable.js",
+		"app/util/DetailedError.js",
+		"app/util/QuerySearchField.js",
+		"app/util/ResponseError.js",
+		"app/util/SparkLine.js",
+		"app/util/Toolable.js",
+		"app/util/Transferable.js",
+		"app/util/Variants.js",
+
+		"app/data/model/AnalysisToken.js",
+		"app/data/model/Context.js",
+		"app/data/model/CorpusCollocate.js",
+		"app/data/model/CorpusTerm.js",
+		"app/data/model/Dimension.js",
+		"app/data/model/Document.js",
+		"app/data/model/DocumentQueryMatch.js",
+		"app/data/model/DocumentTerm.js",
+		"app/data/model/PrincipalComponent.js",
+		"app/data/model/StatisticalAnalysis.js",
+		"app/data/model/Token.js",
+
+		"app/data/store/CAAnalysis.js",
+		"app/data/store/Contexts.js",
+		"app/data/store/CorpusCollocates.js",
+		"app/data/store/CorpusTerms.js",
+		"app/data/store/DocumentQueryMatches.js",
+		"app/data/store/DocumentTerms.js",
+		"app/data/store/Documents.js",
+		"app/data/store/PCAAnalysis.js",
+		"app/data/store/Tokens.js",
+
+		"app/data/model/Corpus.js",
+
+		"app/widget/StopListOption.js",
+
+		"app/panel/Panel.js",
+		"app/panel/Bubblelines.js",
+		"app/panel/Cirrus.js",
+		"app/panel/CollocatesGraph.js",
+		"app/panel/Contexts.js",
+		"app/panel/CorpusCollocates.js",
+		"app/panel/CorpusCreator.js",
+		"app/panel/CorpusTerms.js",
+		"app/panel/DocumentTerms.js",
+		"app/panel/Documents.js",
+		"app/panel/DocumentsFinder.js",
+		"app/panel/Dummy.js",
+		"app/panel/Reader.js",
+		"app/panel/ScatterPlot.js",
+		"app/panel/Summary.js",
+		"app/panel/TopicContexts.js",
+		"app/panel/Trends.js",
+		"app/panel/VoyantFooter.js",
+		"app/panel/VoyantHeader.js",
+		"app/panel/CorpusSet.js",
+
+		"app/VoyantApp.js",
+		"app/VoyantCorpusApp.js",
+		"app/VoyantDefaultApp.js"};
 	
 	// Closure options
 	final static int SUMMARY_DETAIL_LEVEL = 1;
 	
-	static long lastCache;
-	static File cachedFile;
-
-	public static String getCache(HttpServletRequest request, HttpServletResponse response, boolean forceRecache, boolean preserveWhitespace) throws MalformedURLException {
+	public static void sendCache(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		response.setCharacterEncoding(ENCODING);
 		
-		// check parameters
-		if (!forceRecache) {
-			String fr = request.getParameter("forceRecache");
-			if (fr!=null && fr.equals("true")) {forceRecache=true;}
-		}
+		File basePath = new File(request.getSession().getServletContext().getRealPath("/"));
 		
-		if (!preserveWhitespace) {
-			String pw = request.getParameter("preserveWhitespace");
-			if (pw!=null && pw.equals("true")) {preserveWhitespace=true;}
-		}
+		String debug = request.getParameter("debug");
 		
-		String skipJsCacheCheck = request.getSession().getServletContext().getInitParameter("skipJsCacheCheck");
-		if (!forceRecache && skipJsCacheCheck != null && skipJsCacheCheck.equals("true")) {
-			return redirectToCache(response);
-		}
-		
-		String appPath = request.getSession().getServletContext().getRealPath("/app");
+		File cachedFile = new File(basePath, "/resources/voyant/current/"+CACHED_FILENAME);
+        File cachedFileMinified = new File(basePath, "/resources/voyant/current/"+CACHED_FILENAME_MINIFIED);
+		if (debug!=null && debug.equals("true")) {
+			long lastModifiedCachedFile = cachedFile.lastModified();
+			List<File> files = getCacheableFiles(basePath);
 
-		cachedFile = new File(request.getSession().getServletContext().getRealPath("/resources/voyant/current")+File.separator+"voyant.js");
-		lastCache = cachedFile.lastModified();
-		
-		if (forceRecache) {
-			// allow recache even if skipJsCacheChecking is true
-			return doCache(appPath, preserveWhitespace);
-		}
-		else if (!isCacheCurrent(appPath)) {
-			// check again in a synchronized way – there's overhead to rechecking,
-			// but we help to avoid the cache being written several times needlessly
-			synchronized(JSCacher.class) {
-				if (!isCacheCurrent(appPath)) {
-					return doCache(appPath, preserveWhitespace);
-				}
-				else {
-					return redirectToCache(response);
+			// look for any file that's been updated since last cache
+			boolean needsUpdate = false;
+			for (File file : files) {
+				if (file.lastModified() > lastModifiedCachedFile) {
+					needsUpdate = true;
+					break;
 				}
 			}
-		} else {
-			return redirectToCache(response);
-		}
-	}
-
-	private static String redirectToCache(HttpServletResponse response) {
-		try {
-			response.sendRedirect(CACHED_FILENAME);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return "alert('Unable to load cached Voyeur scripts');";
-		}
-		return "";
-	}
-
-	private static boolean isCacheCurrent(String resourcesPath) {
-		File scriptsDir = new File(resourcesPath+File.separator+"scripts");
-		File toolsDir = new File(resourcesPath+File.separator+"tools");
-
-		DateCheckerAction dc = new DateCheckerAction();
-
-		visitAllJSFiles(scriptsDir, dc);
-		visitAllJSFiles(toolsDir, dc);
-
-		return dc.current;
-	}
-	
-	private synchronized static String doCache(String resourcesPath, boolean preserveWhitespace) {
-		
-		CachingAction ca;
-		if (preserveWhitespace) {
-			ca = new ConcatenatingAction();
-		} else {
-			ca = new CompressingAction();
-		}
-		
-		visitAllJSFiles(new File(resourcesPath), ca);
-
-		String cache = ca.getStringBuffer().toString();
-		Writer out = null;
-		try {
-			out = new OutputStreamWriter(new FileOutputStream(cachedFile), ENCODING);
-			out.write(cache);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return cache;
-	}
-
-	public interface FileAction {
-		public abstract void execute(File file);
-	}
-	
-	public interface CachingAction extends FileAction {
-		public abstract StringBuffer getStringBuffer();
-	}
-
-	private static class DateCheckerAction implements FileAction {
-
-		public boolean current;
-
-		DateCheckerAction() {
-			current = true;
-		}
-
-		public void execute(File file) {
-			if (file.lastModified() > lastCache) {
-				current = false;
-			}
-		}
-	}
-
-	private static class CompressingAction implements CachingAction {
-
-		private StringBuffer cache;
-		
-		private List<SourceFile> jsFiles = new ArrayList<SourceFile>();
-		private List<SourceFile> externalFiles = new ArrayList<SourceFile>();
-
-		CompressingAction() {
-			cache = new StringBuffer("/* This file created by JSCacher. Last modified: "+new Date().toString()+" */\n");
-		}
-
-		public void execute(File file) {
-			System.out.println("compressing: "+file.getName());
 			
-			SourceFile jsFile = SourceFile.fromFile(file);
-			jsFiles.add(jsFile);
-		}
-
-		public StringBuffer getStringBuffer() {
-			try {
+			if (needsUpdate) {
+				
+				List<SourceFile> sourceFiles = new ArrayList<SourceFile>();
+				
+				String header = "/* This file created by JSCacher. Last modified: "+new Date().toString()+" */\n";
+				StringBuffer cache = new StringBuffer(header);
+				for (File file : files) {
+					String s = FileUtils.readFileToString(file);
+					cache.append(s).append("\n"); // assuming UTF-8
+					sourceFiles.add(SourceFile.fromFile(file));
+				}
+				
+				// write out concatenated file
+				FileUtils.writeStringToFile(cachedFile, cache.toString());
+				
+				// compile and write minified version
 				Compiler compiler = new Compiler();
 				CompilerOptions options = new CompilerOptions();
 				options.setSummaryDetailLevel(SUMMARY_DETAIL_LEVEL);
 				
 				CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);                
-                compiler.compile(externalFiles, jsFiles, options);
+                compiler.compile(new ArrayList<SourceFile>(), sourceFiles, options);
+                
+                cache.setLength(0);
+                cache.append(header);
                 cache.append(compiler.toSource());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return cache;
-		}
-	}
-	
-	private static class ConcatenatingAction implements CachingAction {
-		
-		private StringBuffer cache;
 
-		ConcatenatingAction() {
-			cache = new StringBuffer("/* This file created by JSCacher. Last modified: "+new Date().toString()+" */\n");
+				// write out minified file
+                FileUtils.writeStringToFile(cachedFileMinified, cache.toString());		
+
+			}			
+			response.sendRedirect(CACHED_FILENAME);
+		}
+		else {
+			response.sendRedirect(CACHED_FILENAME_MINIFIED);
 		}
 
-		public void execute(File file) {
-			System.out.println("concatenating: "+file.getName());
-			try {
-				cache.append("\n").append(readFileAsString(file));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		public StringBuffer getStringBuffer() {
-			return cache;
-		}
 	}
 
-	private static void visitAllJSFiles(File dir, FileAction action) {
-		if (dir.isDirectory()) {
-			String[] children = dir.list();
-			for (int i=0; i<children.length; i++) {
-				visitAllJSFiles(new File(dir, children[i]), action);
-			}
-		} else {
-			if (dir.getName().endsWith(".js")) {
-				action.execute(dir);
+	private static List<File> getCacheableFiles(File basePath) throws IOException {
+		List<File> files = new ArrayList<File>();
+		for (String jsFile : jsFiles) {
+			File f = new File(basePath, jsFile);
+			if (f.exists()) {files.add(f);}
+			else {
+				throw new IOException("File does not exist:"+f);
 			}
 		}
+		return files;
 	}
 
-	private static String readFileAsString(File file) throws java.io.IOException{
-		byte[] buffer = new byte[(int) file.length()];
-		BufferedInputStream f = null;
-		try {
-			f = new BufferedInputStream(new FileInputStream(file));
-			f.read(buffer);
-		} finally {
-			if (f != null) try { f.close(); } catch (IOException ignored) { }
-		}
-		return new String(buffer);
-	}
 }

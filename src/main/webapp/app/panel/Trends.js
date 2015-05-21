@@ -1,4 +1,4 @@
-Ext.define('Voyant.panel.Trends', {
+ Ext.define('Voyant.panel.Trends', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
 	requires: ['Ext.chart.CartesianChart','Voyant.data.store.Documents'],
@@ -104,6 +104,12 @@ Ext.define('Voyant.panel.Trends', {
     		}
     	})
 
+    	this.on("documentTermsClicked", function(src, terms) {
+    		if (this.getCorpus()) { // make sure we have a corpus
+	    		this.setApiParam('mode', 'document');
+	    		this.loadFromRecords(terms);
+    		}
+    	})
     	this.on("corpusTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
     			if (terms[0] && terms[0].get('distributions') !== undefined) {

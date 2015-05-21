@@ -22,11 +22,11 @@ Ext.define("Voyant.data.proxy.CorpusTerms", {
 
 Ext.define('Voyant.data.store.CorpusTerms', {
 	extend: 'Ext.data.BufferedStore',
-	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
+	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.CorpusTerm',
     transferable: ['setCorpus'],
-    requires: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
-    embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
+    // requires: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
+    // embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
 	config: {
 		corpus: undefined
 	},
@@ -43,7 +43,7 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 		    proxy: Ext.create("Voyant.data.proxy.CorpusTerms")
 		})
 
-    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.callParent([config]);
 		
 		if (config && config.corpus) {

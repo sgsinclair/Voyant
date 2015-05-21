@@ -4,10 +4,10 @@ var Corpus = function(source, config) {
 
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
-    mixins: ['Voyant.notebook.util.Embeddable','Voyant.util.Transferable','Voyant.util.Localization'],
+    mixins: [/*'Voyant.notebook.util.Embeddable','Voyant.util.Transferable',*/'Voyant.util.Localization'],
     transferable: ['show',/*'embed','embedSummary',*/'getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
-    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
-	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents','Voyant.panel.Documents'],
+    //embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
+	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
     	documentsStore: undefined
@@ -82,7 +82,7 @@ Ext.define('Voyant.data.model.Corpus', {
 	constructor : function(source, config) {
 				
 		this.callParent([config]); // only send config, not source
-    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this);
+    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this);
 
 		if (source) {
 			
@@ -118,7 +118,6 @@ Ext.define('Voyant.data.model.Corpus', {
 						scope: store
 				})
 				}).fail(function(response) {
-					debugger
 					Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
 					dfd.reject(); // don't send error since we've already shown it
 				});

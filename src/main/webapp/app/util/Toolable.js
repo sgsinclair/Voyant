@@ -304,7 +304,7 @@ Ext.define('Voyant.util.Toolable', {
 	            	panel: panel,
 	        		handler: function(btn) {
 	        			var form = btn.up('form');
-	        			var fn = 'export'+Ext.String.capitalize(form.getValues().export);
+	        			var fn = 'export'+Ext.String.capitalize(form.getValues()['export']);
 	        			if (Ext.isFunction(panel[fn])) {
 	        				panel[fn].call(panel, panel, form)
 	        			}
@@ -568,7 +568,7 @@ Ext.define('Voyant.util.Toolable', {
 		else {
 			parent = this.isXType('voyantheader') && this.getApplication().getViewComponent ? this.getApplication().getViewComponent() : this.up("component");
 			parent.remove(this, true);
-			var newTool = parent.add({xtype: xtype, });
+			var newTool = parent.add({xtype: xtype});
 			if (corpus) {
 				newTool.fireEvent("loadedCorpus", newTool, corpus)
 			}

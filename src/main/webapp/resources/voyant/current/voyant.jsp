@@ -1,3 +1,1 @@
-<%@ page contentType="text/javascript" %>
-<% String cache = org.voyanttools.voyant.JSCacher.getCache(request, response, false, false); %>
-<%= cache %>
+<% org.voyanttools.voyant.JSCacher.sendCache(request, response); // should always redirect %>

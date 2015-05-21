@@ -1,10 +1,10 @@
 Ext.define('Voyant.data.store.DocumentTerms', {
 	extend: 'Ext.data.BufferedStore',
-	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
+	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.DocumentTerm',
     transferable: ['setCorpus'],
-    requires: ['Voyant.panel.DocumentTerms','Voyant.panel.Cirrus'],
-    embeddable: ['Voyant.panel.DocumentTerms','Voyant.panel.Cirrus'],
+    //requires: ['Voyant.panel.DocumentTerms','Voyant.panel.Cirrus'],
+    //embeddable: ['Voyant.panel.DocumentTerms','Voyant.panel.Cirrus'],
 	config: {
 		corpus: undefined
 	},
@@ -34,7 +34,7 @@ Ext.define('Voyant.data.store.DocumentTerms', {
 		     }
 		})
 		
-    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.callParent([config]);
 
 		if (config && config.corpus) {

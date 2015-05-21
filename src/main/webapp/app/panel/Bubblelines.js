@@ -1,5 +1,4 @@
-Ext.Loader.loadScript(Ext.Loader.getPath("resources")+"/bubblelines/Bubblelines.js");
-
+// assuming Bubblelines library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Bubblelines', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],

@@ -9,7 +9,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 	statics: {
 		i18n: {
 			'noViewErrorTitle': {en: "View Error"},
-			'noViewErrorTpl': {en: 'No view was found with the name "{view}". You can <a href="{url}">try with the default view</a> instead'},
+			'noViewErrorTpl': {en: 'No view was found with the name "{view}". You can <a href="{url}">try with the default view</a> instead'}
 		},
 		api: {
 			view: 'corpusset',

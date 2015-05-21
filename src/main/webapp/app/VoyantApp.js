@@ -166,7 +166,7 @@ Ext.define('Voyant.VoyantApp', {
 			xtype: xtype,
 			title: this._localizeClass(cls, "title"),
 			tooltip: { // this needs to be an object for compatibility (other configs can be changed)
-				text: this._localizeClass(cls, "helpTip"),
+				text: this._localizeClass(cls, "helpTip")
 			},
 			glyph: cls && cls.glyph ? cls.glyph : 'xf12e@FontAwesome'
 		};

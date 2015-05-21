@@ -1,6 +1,6 @@
 Ext.define('Voyant.data.store.CAAnalysis', {
 	extend: 'Ext.data.Store',
-	mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
+	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.StatisticalAnalysis',
 	config: {
 		corpus: undefined

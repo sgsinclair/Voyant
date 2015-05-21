@@ -1,9 +1,5 @@
-// for mysterious reasons, Ext.require loads the scripts but produces a blank page, so use loadScript instead
-var cirrushtml5path = Ext.Loader.getPath("resources")+"/cirrus/html5"
-Ext.Loader.loadScript(cirrushtml5path+"/Cirrus.js")
-Ext.Loader.loadScript(cirrushtml5path+"/Word.js")
-Ext.Loader.loadScript(cirrushtml5path+"/WordController.js")
 
+// assuming Cirrus library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Cirrus', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],

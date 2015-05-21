@@ -1,6 +1,7 @@
 Ext.define('Voyant.panel.DocumentTerms', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
+	requires: ['Voyant.data.store.DocumentTerms'],
 	alias: 'widget.documentterms',
 	config: {
 		corpus: undefined

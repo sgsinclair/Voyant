@@ -1,6 +1,6 @@
 Ext.define('Voyant.data.model.Document', {
     extend: 'Ext.data.Model',
-    requires: ['Voyant.data.store.DocumentTerms'],
+    //requires: ['Voyant.data.store.DocumentTerms'],
     fields: [
              {name: 'corpus'},
              {name: 'id'},
