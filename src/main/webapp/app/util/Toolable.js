@@ -154,6 +154,17 @@ Ext.define('Voyant.util.Toolable', {
 				}
 		}
 		var tools = [];
+		
+		// check to see if there are tool objects configured
+		if (config.includeTools) {
+			for (var tool in config.includeTools) {
+				if (typeof config.includeTools[tool] == "object") {
+					tools.push(config.includeTools[tool])
+				}
+			}
+		}
+		
+		
 		for (var tool in toolsMap) {
 			if (config.includeTools && !config.includeTools[tool] || !toolsMap[tool]) {continue;}
 			tools.push({
@@ -165,6 +176,7 @@ Ext.define('Voyant.util.Toolable', {
 				items: toolsMap[tool].items
 			})
 		}
+		
 		Ext.apply(this, {
 			tools: tools
 		})

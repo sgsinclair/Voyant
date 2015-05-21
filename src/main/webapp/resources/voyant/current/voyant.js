@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu May 21 13:53:44 EDT 2015 */
+/* This file created by JSCacher. Last modified: Thu May 21 16:10:44 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2413,6 +2413,17 @@ Ext.define('Voyant.util.Toolable', {
 				}
 		}
 		var tools = [];
+		
+		// check to see if there are tool objects configured
+		if (config.includeTools) {
+			for (var tool in config.includeTools) {
+				if (typeof config.includeTools[tool] == "object") {
+					tools.push(config.includeTools[tool])
+				}
+			}
+		}
+		
+		
 		for (var tool in toolsMap) {
 			if (config.includeTools && !config.includeTools[tool] || !toolsMap[tool]) {continue;}
 			tools.push({
@@ -2424,6 +2435,7 @@ Ext.define('Voyant.util.Toolable', {
 				items: toolsMap[tool].items
 			})
 		}
+		
 		Ext.apply(this, {
 			tools: tools
 		})
@@ -3981,7 +3993,8 @@ Ext.define('Voyant.widget.StopListOption', {
     		ok: {en: "Save"},
     		cancel: {en: "Cancel"},
     		editStopListTitle: {en: "Edit Stoplist"},
-    		editStopListMessage: {en: "This is the stoplist, one term per line."}
+    		editStopListMessage: {en: "This is the stoplist, one term per line."},
+    		applyGlobally: {en: "apply globally"}
     	}
     },
     initComponent: function(config) {
@@ -4017,11 +4030,15 @@ Ext.define('Voyant.widget.StopListOption', {
 	    	            fields: ['name', 'value'],
 	    	            data: data
 	    	        }
-	    		},{
+	    		}, {width: 10}, {xtype: 'tbspacer'}, {
 	    			xtype: 'button',
 	    			text: this.localize('editList'),
 	    			handler: this.editList,
 	    			scope: this
+	    		}, {width: 10}, {
+	    			xtype: 'checkbox',
+	    			name: 'stopListGlobal',
+	    			boxLabel: this.localize('applyGlobally')
 	    		}]
     	})
         me.callParent(arguments);
@@ -5692,7 +5709,16 @@ Ext.define('Voyant.panel.CorpusCreator', {
     constructor: function(config) {
         this.callParent(arguments);
         config = config || {};
-    	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {includeTools: {gear: true, help: true}}));
+        
+    	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {includeTools: {gear: true, help: true, 
+    		code: {
+    			type: 'code',
+    			tooltip: this.localize("codeTip"),
+    			callback: function() {alert("code clicked")},
+    			xtype: 'toolmenu',
+    			glyph: 'xf121@FontAwesome'
+    	}}}));
+    	
     },
     
     initComponent: function() {

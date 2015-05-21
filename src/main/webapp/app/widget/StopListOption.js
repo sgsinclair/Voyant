@@ -23,7 +23,8 @@ Ext.define('Voyant.widget.StopListOption', {
     		ok: {en: "Save"},
     		cancel: {en: "Cancel"},
     		editStopListTitle: {en: "Edit Stoplist"},
-    		editStopListMessage: {en: "This is the stoplist, one term per line."}
+    		editStopListMessage: {en: "This is the stoplist, one term per line."},
+    		applyGlobally: {en: "apply globally"}
     	}
     },
     initComponent: function(config) {
@@ -59,11 +60,15 @@ Ext.define('Voyant.widget.StopListOption', {
 	    	            fields: ['name', 'value'],
 	    	            data: data
 	    	        }
-	    		},{
+	    		}, {width: 10}, {xtype: 'tbspacer'}, {
 	    			xtype: 'button',
 	    			text: this.localize('editList'),
 	    			handler: this.editList,
 	    			scope: this
+	    		}, {width: 10}, {
+	    			xtype: 'checkbox',
+	    			name: 'stopListGlobal',
+	    			boxLabel: this.localize('applyGlobally')
 	    		}]
     	})
         me.callParent(arguments);
