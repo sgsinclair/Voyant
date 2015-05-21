@@ -42,14 +42,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
         this.callParent(arguments);
         config = config || {};
         
-    	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {includeTools: {gear: true, help: true, 
-    		code: {
-    			type: 'code',
-    			tooltip: this.localize("codeTip"),
-    			callback: function() {alert("code clicked")},
-    			xtype: 'toolmenu',
-    			glyph: 'xf121@FontAwesome'
-    	}}}));
+    	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {includeTools: {gear: true, help: true}}));
     	
     },
     
