@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu May 21 16:10:44 EDT 2015 */
+/* This file created by JSCacher. Last modified: Fri May 22 13:51:10 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -1407,6 +1407,8 @@ function WordController(parentApp) {
         //~ wordObj.height = trueHeight;
         
         var angle = 0;
+        
+        /*
         if (false) {
 //        if (!$.browser.opera) {
             // opera can't render rotated text
@@ -1427,6 +1429,9 @@ function WordController(parentApp) {
                 }
 //            }
         }
+        */
+        
+
         wordObj.size = Math.max(wordObj.height, wordObj.width);
         wordObj.rotation = degreesToRadians(angle);
         
@@ -1825,9 +1830,10 @@ Ext.define('Voyant.util.Api', {
 			var app = this.getApplication();
 			this.addParentApi(apis, Ext.ClassManager.getClass(app)); // gather class params
 			if (app.getApiParams) {
-				apis.splice(0, 0, this.getApplication().getApiParams()); // now add instance params
+				apis.push(this.getApplication().getApiParams()); // now add instance params, last
 			}
 		}
+
 		this.addParentApi(apis, Ext.ClassManager.getClass(this)); // add params from this class and parents
 		
 		this.api = {};
@@ -1878,7 +1884,7 @@ Ext.define('Voyant.util.Api', {
 	},
 	
 	setApiParam: function(key, value) {
-		if (this.api[key]) {this.api[key].value=value;}
+		if (this.api && this.api[key]) {this.api[key].value=value;}
 	}
 });
 /**
@@ -2382,14 +2388,36 @@ Ext.define('Voyant.util.Toolable', {
 					            	panel: panel,
 					        		handler: function(btn) {
 					        			var values = btn.up('form').getValues();
+					        			
+					        			// set api values (all of them, not just global ones)
 					        			this.setApiParams(values);
+
 					        			var app = this.getApplication();
 					        			var corpus = app.getCorpus();
-					        			if (corpus) {
-					        				app.dispatchEvent("loadedCorpus", this, corpus);
+					        			
+					        			// treat stopwords differently since they can be set globally
+					        			if (values['stopList'] != undefined && values['stopListGlobal'] != undefined && values.stopListGlobal) {
+					        				
+					        				// set the api value for the app
+					        				if (app.setApiParams) {
+					        					app.setApiParams({stopList: values.stopList})
+					        				}
+					        				
+					        				// tell the panels, including this one
+					        				var panels = app.getViewport().query("panel,chart");
+					        				for (var i=0; i<panels.length; i++) {
+					        					if (panels[i].setApiParams) {
+					        						panels[i].setApiParams({stopList: values.stopList});
+					        					}
+					        				}
+					        				
+					        				// trigger a reloading of the app
+					        				if (corpus) {app.dispatchEvent("loadedCorpus", this, corpus);}
 					        			}
+					        			
+					        			// otherwise dispatch changes to this tool and reload corpus
 					        			else {
-					        				this.fireEvent("apiChange", this);
+					        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
 					        			}
 					        			btn.up('window').close();
 					        		},
@@ -4008,7 +4036,7 @@ Ext.define('Voyant.widget.StopListOption', {
                {name : this.localize('it'),   value: 'stop.it.italian.txt'},
                {name : this.localize('no'),   value: 'stop.no.norwegian.txt'},
                {name : this.localize('se'),   value: 'stop.se.swedish-long.txt'},
-               {name : this.localize('mu'),   value: 'stop.mu-multi.txt'}]
+               {name : this.localize('mu'),   value: 'stop.mu.multi.txt'}]
     	data.sort(function(a,b) { // sort by label
     		return a.name < b.name ? -1 : 1;
     	})
@@ -4038,6 +4066,7 @@ Ext.define('Voyant.widget.StopListOption', {
 	    		}, {width: 10}, {
 	    			xtype: 'checkbox',
 	    			name: 'stopListGlobal',
+	    			checked: true,
 	    			boxLabel: this.localize('applyGlobally')
 	    		}]
     	})
@@ -5710,14 +5739,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
         this.callParent(arguments);
         config = config || {};
         
-    	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {includeTools: {gear: true, help: true, 
-    		code: {
-    			type: 'code',
-    			tooltip: this.localize("codeTip"),
-    			callback: function() {alert("code clicked")},
-    			xtype: 'toolmenu',
-    			glyph: 'xf121@FontAwesome'
-    	}}}));
+    	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {includeTools: {gear: true, help: true}}));
     	
     },
     
@@ -7932,7 +7954,9 @@ Ext.define('Voyant.panel.Summary', {
         	});
     		
     		if (this.rendered) {
-    			this.summaryListParent = Ext.dom.Helper.append(this.getLayout().getRenderTarget(), '<ul></ul>');
+    			var el = this.getLayout().getRenderTarget();
+    			el.update('');
+    			this.summaryListParent = Ext.dom.Helper.append(el, '<ul></ul>');
     			Ext.dom.Helper.append(this.summaryListParent, '<li>'+corpus.getShow()+'</li>');
     			
     			var size = corpus.getDocumentsCount();

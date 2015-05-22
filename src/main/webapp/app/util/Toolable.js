@@ -123,14 +123,36 @@ Ext.define('Voyant.util.Toolable', {
 					            	panel: panel,
 					        		handler: function(btn) {
 					        			var values = btn.up('form').getValues();
+					        			
+					        			// set api values (all of them, not just global ones)
 					        			this.setApiParams(values);
+
 					        			var app = this.getApplication();
 					        			var corpus = app.getCorpus();
-					        			if (corpus) {
-					        				app.dispatchEvent("loadedCorpus", this, corpus);
+					        			
+					        			// treat stopwords differently since they can be set globally
+					        			if (values['stopList'] != undefined && values['stopListGlobal'] != undefined && values.stopListGlobal) {
+					        				
+					        				// set the api value for the app
+					        				if (app.setApiParams) {
+					        					app.setApiParams({stopList: values.stopList})
+					        				}
+					        				
+					        				// tell the panels, including this one
+					        				var panels = app.getViewport().query("panel,chart");
+					        				for (var i=0; i<panels.length; i++) {
+					        					if (panels[i].setApiParams) {
+					        						panels[i].setApiParams({stopList: values.stopList});
+					        					}
+					        				}
+					        				
+					        				// trigger a reloading of the app
+					        				if (corpus) {app.dispatchEvent("loadedCorpus", this, corpus);}
 					        			}
+					        			
+					        			// otherwise dispatch changes to this tool and reload corpus
 					        			else {
-					        				this.fireEvent("apiChange", this);
+					        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
 					        			}
 					        			btn.up('window').close();
 					        		},

@@ -112,7 +112,9 @@ Ext.define('Voyant.panel.Summary', {
         	});
     		
     		if (this.rendered) {
-    			this.summaryListParent = Ext.dom.Helper.append(this.getLayout().getRenderTarget(), '<ul></ul>');
+    			var el = this.getLayout().getRenderTarget();
+    			el.update('');
+    			this.summaryListParent = Ext.dom.Helper.append(el, '<ul></ul>');
     			Ext.dom.Helper.append(this.summaryListParent, '<li>'+corpus.getShow()+'</li>');
     			
     			var size = corpus.getDocumentsCount();

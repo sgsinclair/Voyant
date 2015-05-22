@@ -5,9 +5,10 @@ Ext.define('Voyant.util.Api', {
 			var app = this.getApplication();
 			this.addParentApi(apis, Ext.ClassManager.getClass(app)); // gather class params
 			if (app.getApiParams) {
-				apis.splice(0, 0, this.getApplication().getApiParams()); // now add instance params
+				apis.push(this.getApplication().getApiParams()); // now add instance params, last
 			}
 		}
+
 		this.addParentApi(apis, Ext.ClassManager.getClass(this)); // add params from this class and parents
 		
 		this.api = {};
@@ -58,6 +59,6 @@ Ext.define('Voyant.util.Api', {
 	},
 	
 	setApiParam: function(key, value) {
-		if (this.api[key]) {this.api[key].value=value;}
+		if (this.api && this.api[key]) {this.api[key].value=value;}
 	}
 });

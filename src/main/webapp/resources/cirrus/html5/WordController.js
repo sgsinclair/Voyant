@@ -268,6 +268,8 @@ function WordController(parentApp) {
         //~ wordObj.height = trueHeight;
         
         var angle = 0;
+        
+        /*
         if (false) {
 //        if (!$.browser.opera) {
             // opera can't render rotated text
@@ -288,6 +290,9 @@ function WordController(parentApp) {
                 }
 //            }
         }
+        */
+        
+
         wordObj.size = Math.max(wordObj.height, wordObj.width);
         wordObj.rotation = degreesToRadians(angle);
         

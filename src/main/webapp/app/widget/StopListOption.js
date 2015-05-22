@@ -38,7 +38,7 @@ Ext.define('Voyant.widget.StopListOption', {
                {name : this.localize('it'),   value: 'stop.it.italian.txt'},
                {name : this.localize('no'),   value: 'stop.no.norwegian.txt'},
                {name : this.localize('se'),   value: 'stop.se.swedish-long.txt'},
-               {name : this.localize('mu'),   value: 'stop.mu-multi.txt'}]
+               {name : this.localize('mu'),   value: 'stop.mu.multi.txt'}]
     	data.sort(function(a,b) { // sort by label
     		return a.name < b.name ? -1 : 1;
     	})
@@ -68,6 +68,7 @@ Ext.define('Voyant.widget.StopListOption', {
 	    		}, {width: 10}, {
 	    			xtype: 'checkbox',
 	    			name: 'stopListGlobal',
+	    			checked: true,
 	    			boxLabel: this.localize('applyGlobally')
 	    		}]
     	})
