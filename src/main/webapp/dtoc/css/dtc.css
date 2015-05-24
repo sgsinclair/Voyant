@@ -587,6 +587,20 @@ body {
 	background: none;
 }
 
+#dtcReaderContainer titlepage {
+    display: block;
+}
+
+#dtcReaderContainer doctitle {
+    display: block;
+    font-size: 120%;
+    font-weight: bold;
+}
+
+#dtcReaderContainer s {
+    text-decoration: none !important;
+}
+
 #dtcReaderContainer list {
 	counter-reset: item;
 }
