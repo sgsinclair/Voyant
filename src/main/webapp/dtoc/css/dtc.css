@@ -94,8 +94,9 @@ body {
 	padding: 7px 5px 6px 10px;
 }
 
+/*
 .dtc-panel-header .x-tool {
-	background-image: url("../images/tool-sprites-dtc.gif");
+	background-image: url("../images/tool-sprites-dark.png");
 }
 
 .dtc-panel-header .x-tool-xml {
@@ -105,6 +106,11 @@ body {
 
 .dtc-panel-header .x-tool-xml-over {
     background-position: 0 -345px;
+}
+*/
+
+.x-tool-glyph {
+	color: #818284 !important;
 }
 
 .dtc-tree .x-tree-icon-leaf, .dtc-tree .x-tree-icon-parent {
@@ -250,7 +256,7 @@ body {
 	background: none;
 }
 
-.x-combo-list-item.disabled {
+.x-boundlist-item.disabled {
 	color: #999 !important;
 }
 
@@ -538,11 +544,12 @@ body {
 	box-shadow: 4px 4px 4px 1px #818284;
 }
 
-.dtcReaderNote .x-tip-header {
+.dtcReaderNote .x-tip-header-title {
 	cursor: move;
+	margin: 1px 0 0 3px !important;
 }
 
-.dtcReaderNote .x-window-header, .dtcReaderNote .x-tip-header-text {
+.dtcReaderNote .x-window-header, .dtcReaderNote .x-title-text {
 	color: #231f20;
 	font-size: 14px;
 	font-weight: 400;

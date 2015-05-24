@@ -12,6 +12,17 @@ Ext.define('Voyant.panel.DToC.Reader', {
         }
     },
     
+    toolTipConfig: {
+		cls: 'dtcReaderNote',
+		showDelay: 50,
+		draggable: true,
+		constrainPosition: true,
+		border: false,
+		shadow: false,
+		padding: 5,
+		maxWidth: 400
+	},
+    
     MINIMUM_LIMIT: 1000,
 	currentDocId: null,
 	loading: false,
@@ -22,10 +33,6 @@ Ext.define('Voyant.panel.DToC.Reader', {
     constructor: function(config) {
     	
     	Ext.applyIf(config, {
-			includeTools: {
-				gear: true
-//				,help: true
-			},
 			baseCls: 'x-plain dtc-panel',
 			height: '100%',
 			html: '<div id="dtcReaderContainer"><div id="dtcReaderDivWrapper"></div><div id="dtcReaderButtons"></div></div>'
@@ -359,7 +366,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		for (var i = 0; i < notes.length; i++) {
 			var note = notes[i];
 			var noteNumber = Ext.DomHelper.insertBefore(note, '<span class="noteNumber">'+(i+1)+'</span>', true);
-			var tip = new Ext.ToolTip(Ext.apply({
+			var tip = new Ext.ux.DToCToolTip(Ext.apply({
 				target: noteNumber,
 				title: 'Note '+(i+1),
 				html: Ext.isIE ? note.text : note.textContent
@@ -388,9 +395,9 @@ Ext.define('Voyant.panel.DToC.Reader', {
 					var tokenId = ref.getAttribute('tokenid');
 					this.tokenToolTipsMap[tokenId] = tip;
 					
-//					biblNumber.on('click', function(e, el, o, b) {
+//					biblNumber.on('click', function(b, e, el, o) {
 //						b.scrollIntoView(this.readerContainer.dom);
-//					}.createDelegate(this, [bibl], true));
+//					}.bind(this, [bibl]));
 				}
 			}
 		}

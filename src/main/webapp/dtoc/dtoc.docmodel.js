@@ -254,16 +254,16 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 							}
 						}
 					}
-				}.createDelegate(this),
+				}.bind(this),
 				start: function(event, ui) {
 					this.isArrowDragging = true;
 					this.dragStartTime = null;
 					this.chapterButtonContainer.hide();
-				}.createDelegate(this),
+				}.bind(this),
 				stop: function(event, ui) {
 					this.isArrowDragging = false;
 					this.dragStartTime = null;
-				}.createDelegate(this)
+				}.bind(this)
 			});
 			
 			panel.body.addListener('click', function(e) {

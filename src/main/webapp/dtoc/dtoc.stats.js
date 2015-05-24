@@ -17,7 +17,7 @@ Ext.define('Voyant.panel.DToC.Stats', {
     		trendTip: {en: "This represents the trend of the relative frequencies for each term in each document in the corpus."}
     	},
     	api: {
-    		stopList: 'auto',
+    		stopList: 'stop.en.taporware.txt',
     		query: undefined
     	}
     },
@@ -26,6 +26,10 @@ Ext.define('Voyant.panel.DToC.Stats', {
     		xtype: 'stoplistoption'
     	}
     },
+    
+    corpusStore: null,
+    docStore: null,
+    
     constructor: function(config) {
     	
         this.callParent(arguments);
@@ -34,9 +38,12 @@ Ext.define('Voyant.panel.DToC.Stats', {
     
     listeners: {
     	loadedCorpus: function(src, corpus) {
-    		var store = this.getStore();
-    		store.setCorpus(corpus);
-    		store.getProxy().setExtraParam('corpus', corpus.getId());
+    		this.docStore.setCorpus(corpus);
+    		this.corpusStore.setCorpus(corpus);
+    		this.docStore.getProxy().setExtraParam('corpus', corpus.getId());
+    		this.corpusStore.getProxy().setExtraParam('corpus', corpus.getId());
+    		this.docStore.getProxy().setExtraParam('stopList', 'stop.en.taporware.txt');
+    		this.corpusStore.getProxy().setExtraParam('stopList', 'stop.en.taporware.txt');
     		this.fireEvent("apiChange", this);
     	},
     	apiChange: function() {
@@ -51,22 +58,30 @@ Ext.define('Voyant.panel.DToC.Stats', {
     		this.setApiParam('query', query);
     		this.fireEvent("apiChange", this);
     		this.getStore().loadPage(1);
+    	},
+    	dtcDocumentLoaded: function(src, docId) {
+    		if (this.getStore() === this.docStore) {
+	    		this.getStore().getProxy().setExtraParam('docId', docId);
+	    		this.getStore().loadPage(1);
+    		}
     	}
     },
     
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusTerms");
-        store.getProxy().setExtraParam("withDistributions", "relative");
+        this.corpusStore = Ext.create("Voyant.data.store.CorpusTerms");
+        this.corpusStore.getProxy().setExtraParam("withDistributions", "relative");
 //        store.on("totalcountchange", function() {
 //        	this.down('#status').update({count: this.getStore().getTotalCount()});;
 //        }, me);
         
+        this.docStore = Ext.create('Voyant.data.store.DocumentTerms');
+        
         Ext.apply(me, {
     		title: this.localize('title'),
-            store : store,
-    		selModel: Ext.create('Ext.selection.CheckboxModel', {
+            store : this.docStore,
+    		selModel: Ext.create('Ext.selection.RowModel', {
                 pruneRemoved: false,
                 listeners: {
                     selectionchange: {
@@ -76,8 +91,39 @@ Ext.define('Voyant.panel.DToC.Stats', {
                     	scope: this
                     }
                 },
-                mode: 'SIMPLE'
+                mode: 'MULTI'
             }),
+            
+            tbar: new Ext.Toolbar({
+		    	cls: 'dtc-toolbar',
+		    	hideBorders: true,
+		    	items: [{
+		    		text: 'Chapter Stats',
+			        itemId: 'statsPicker',
+			        menu: {
+			        	items: [{text: 'Chapter Stats', type: 'Document'},{text: 'Collection Stats', type: 'Corpus'}],
+	                    plain: true,
+	                    showSeparator: false,
+	                    listeners: {
+	                    	click: function(menu, item) {
+	                    		var type = item.initialConfig.type;
+								if (type === 'Document') {
+									this.reconfigure(this.docStore);
+									this.queryById('statsPicker').setText('Chapter Stats');
+									var docId = Ext.getCmp('dtcReader').getCurrentDocId();
+									this.docStore.getProxy().setExtraParam('docId', docId);
+								} else {
+									this.reconfigure(this.corpusStore);
+									this.queryById('statsPicker').setText('Collection Stats');
+								}
+								this.getStore().loadPage(1);
+	                    	},
+	                    	scope: this
+	                    }
+	                }
+		    	}]
+            }),
+            
 //            dockedItems: [{
 //                dock: 'bottom',
 //                xtype: 'toolbar',
@@ -103,8 +149,7 @@ Ext.define('Voyant.panel.DToC.Stats', {
             	dataIndex: 'rawFreq',
                 flex: 1,
             	sortable: true
-            }
-            ,{
+            },{
             	text: this.localize("relativeFreq"),
             	tooltip: this.localize("relativeFreqTip"),
             	dataIndex: 'relativeFreq',
@@ -154,14 +199,5 @@ Ext.define('Voyant.panel.DToC.Stats', {
 
         me.callParent(arguments);
         
-    },
-    
-    load: function() {
-    	if (this.rendered) {
-    		this.store.loadPage(1)
-    	}
-    	else {
-			Ext.defer(this.load, 100, this);
-    	}
     }
-})
+});

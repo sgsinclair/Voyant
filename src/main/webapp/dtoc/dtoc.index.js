@@ -263,8 +263,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 		} else {
 			this.currentChapterFilter = item.getId();
 	        var docId = item.initialConfig.docId;
-	        this.getStore().filterBy(function(node) {
-	            var t = node.getData().targets || [];
+	        this.getStore().clearFilter();
+	        this.getStore().filterBy(function(record, id) {
+	            var t = record.getData().targets || [];
 	            for (var i = 0; i < t.length; i++) {
 	                var id = t[i];
 	                var indexObj = this.indexIds[id];

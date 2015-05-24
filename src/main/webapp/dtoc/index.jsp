@@ -35,13 +35,17 @@
 		}
 	});
 </script>
+<script src="dtoc.tooltip.js"></script>
 <script src="dtoc.panel.js"></script>
 <script src="dtoc.markup.js"></script>
+<script src="dtoc.markup.curator.js"></script>
 <script src="dtoc.index.js"></script>
 <script src="dtoc.stats.js"></script>
 <script src="dtoc.docmodel.js"></script>
 <script src="dtoc.toc.js"></script>
 <script src="dtoc.reader.js"></script>
+
+<link href='http://fonts.googleapis.com/css?family=Nunito:300,400' rel='stylesheet' type='text/css' />
 
 <link href="annotator/annotator.min.css" rel="stylesheet" type="text/css" />
 <link href="annotator/dtoc.annotator.css" rel="stylesheet" type="text/css" />
