@@ -32,6 +32,6 @@ Ext.define('Voyant.panel.VoyantHeader', {
     },
     
     onCollapse: function(panel) {
-    	panel.setTitle(this.localize('title'));
+    	//panel.setTitle(this.localize('title'));
     }
 });

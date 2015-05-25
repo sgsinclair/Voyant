@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri May 22 13:51:10 EDT 2015 */
+/* This file created by JSCacher. Last modified: Mon May 25 09:51:16 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5362,6 +5362,24 @@ Ext.define('Voyant.panel.Contexts', {
                 flex: 1
             }],
             listeners: {
+            	documentSegmentTermClicked: {
+	           		 fn: function(src, documentSegmentTerm) {
+	           			 if (!documentSegmentTerm.term) {return}
+	           			 params = {query: documentSegmentTerm.term};
+	           			 if (documentSegmentTerm.docId) {
+	           				 params.docId = documentSegmentTerm.docId
+	           			 }
+	           			 else {
+	           				 // default to first document
+	           				 params.docIndex = documentSegmentTerm.docIndex ?  documentSegmentTerm.docIndex : 0
+	           			 }
+	           			 this.setApiParams(params);
+	       	        	if (this.isVisible()) {
+	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
+	       	        	}
+	           		 },
+	           		 scope: this
+            	},
 	           	 documentIndexTermsClicked: {
 	           		 fn: function(src, documentIndexTerms) {
 	           			// this isn't quite right, since we want every term associated with a docIndex, but for now it will do
@@ -8607,11 +8625,10 @@ Ext.define('Voyant.panel.TopicContexts', {
                     panel: this
                 },
                 listeners: {
-                	itemmousedown: function() {
-//                    	debugger
-                    	// TODO: fix trends item tapping
-                    	console.warn("not working currently")
-                    }
+                	itemclick: {
+        	        	fn: this.handleClickedItem,
+        	        	scope: this
+                	}
                 }
     		})
     	}, this);
@@ -8659,11 +8676,15 @@ Ext.define('Voyant.panel.TopicContexts', {
     		})
     	})
     	Ext.applyIf(config, {
+    	    plugins: {
+    	        ptype: 'chartitemevents',
+    	        moveEvents: true
+    	    },
     		legend: {docked:'top'},
     		interactions: ['itemhighlight','panzoom'],
     		innerPadding: {top: 5, right: 5, bottom: 5, left: 5},
     		border: false,
-    	    bodyBorder: false,
+    	    bodyBorder: false/*,
     	    listeners: {
     	    	// FIXME: this is a work-around because item clicking is broken in EXTJS 5.0.1 (so all hover events currently trigger event)
     	        itemhighlight: {
@@ -8678,7 +8699,7 @@ Ext.define('Voyant.panel.TopicContexts', {
     	        	},
     	        	scope: this
     	        }
-    	    }
+    	    }*/
     	});
     	
     	// remove existing chart
@@ -8693,11 +8714,17 @@ Ext.define('Voyant.panel.TopicContexts', {
     	this.query('chart').forEach(function(chart) {this.remove(chart)}, this);
     },
     
-    handleClickedItem: function(item) {
-    	if (!this.isLastClickedItem(item)) {
+    handleClickedItem: function(chart, item) {
+    	console.warn(item.series.getTitle(), item.index)
         	var mode = this.getApiParam("mode");
         	if (mode===this.MODE_DOCUMENT) {
-        		
+        		var docId = this.getApiParam("docId");
+        		if (docId) {
+            		this.dispatchEvent("documentIndexTermsClicked", this, [{
+            			term: item.series.getTitle(),
+            			docId: docId
+            		}]);
+        		}
         	}
         	else if (mode==this.MODE_CORPUS) {
         		this.dispatchEvent("documentIndexTermsClicked", this, [{
@@ -8705,8 +8732,6 @@ Ext.define('Voyant.panel.TopicContexts', {
         			docIndex: item.index
         		}]);
         	}
-    		this.lastClickedItem=item;
-    	}
     },
     
     isLastClickedItem: function(item) {
@@ -8784,7 +8809,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
     },
     
     onCollapse: function(panel) {
-    	panel.setTitle(this.localize('title'));
+    	//panel.setTitle(this.localize('title'));
     }
 });
 
