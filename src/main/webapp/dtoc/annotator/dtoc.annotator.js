@@ -67,12 +67,9 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
 		    	cls: 'dtc-toolbar',
 		    	hideBorders: true,
 		    	items: [{
-		    		xtype: 'tbtext',
-		    		text: 'Filter',
-		    		style: 'color: #231F20;'
-		    	},' ',{
 			    	xtype: 'textfield',
 			    	itemId: 'filter',
+			    	emptyText: 'Filter',
 			    	width: 120,
 			    	enableKeyEvents: true,
 			    	listeners: {
