@@ -452,13 +452,13 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 			
 			if (this.firstInit) {
 				// TODO events are persisting
-				this.annotator.on('annotationEditorShown', onEditorShown.createDelegate(this));
-				this.annotator.on('annotationViewerShown', onViewerShown.createDelegate(this));
-				this.annotator.on('annotationsLoaded', onAnnotationsLoaded.createDelegate(this));
-				this.annotator.on('annotationCreated', onAnnotationCreated.createDelegate(this));
-				this.annotator.on('annotationUpdated', onAnnotationUpdated.createDelegate(this));
-				this.annotator.on('annotationDeleted', onAnnotationDeleted.createDelegate(this));
-				this.annotator.on('authenticationFailed', onAuthenticationFailed.createDelegate(this));
+				this.annotator.on('annotationEditorShown', onEditorShown.bind(this));
+				this.annotator.on('annotationViewerShown', onViewerShown.bind(this));
+				this.annotator.on('annotationsLoaded', onAnnotationsLoaded.bind(this));
+				this.annotator.on('annotationCreated', onAnnotationCreated.bind(this));
+				this.annotator.on('annotationUpdated', onAnnotationUpdated.bind(this));
+				this.annotator.on('annotationDeleted', onAnnotationDeleted.bind(this));
+				this.annotator.on('authenticationFailed', onAuthenticationFailed.bind(this));
 				
 				this.firstInit = false;
 			}
@@ -477,7 +477,7 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 
 		this.loadAnnotationsForDocId = function(uri) {
 			// need to destroy and recreate annotator each time in order to load annos from new uri
-			initAnnotator.createDelegate(this, [uri])();
+			initAnnotator.bind(this, [uri])();
 			
 //			this.annotator.plugins.Store.options.annotationData.uri = uri;
 //			this.annotator.plugins.Store.loadAnnotationsFromSearch();

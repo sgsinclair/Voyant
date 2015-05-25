@@ -5,16 +5,6 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	curatedTags: null, // curated tags list
 	tagTotals: {}, // tracks tag freq counts for entire corpus
 	
-	tagStore: Ext.create('Ext.data.JsonStore', {
-		fields: [
-			{name: 'tagName', allowBlank: false},
-			{name: 'label', allowBlank: false},
-			{name: 'freq', type: 'int'},
-			{name: 'type'}
-		],
-		sortInfo: {field: 'label', direction: 'ASC'}
-    }),
-	
 	loadAllTags: function() {
 //		console.log('loadAllTags');
 		
@@ -44,7 +34,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			var tagData = this._parseTags(xml, docId, this.curatedTags);
 			this.saveTags(tagData, docId);
 			if (callback) callback();
-		}.createDelegate(this));
+		}.bind(this));
 	},
 	
 	updateTagTotals: function(updateSelections) {
@@ -52,9 +42,9 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		var selectedTagRecords = [];
 		var data = [];
 		for (var tag in this.tagTotals) {
-//			var index = this.tagStore.findExact('tagName', tag);
+//			var index = this.store.findExact('tagName', tag);
 			var match = null;
-			this.tagStore.each(function(r) {
+			this.store.each(function(r) {
 				if (r.get('tagName') === tag) {
 					match = r;
 					return false;
@@ -85,8 +75,8 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 //				}
 			}
 		}
-		this.tagStore.loadData(data, true);
-		this.tagStore.sort('label', 'ASC');
+		this.store.loadData(data, true);
+		this.store.sort('label', 'ASC');
 //		if (updateSelections && sm.grid) sm.selectRecords(selectedTagRecords);
 	},
 	
@@ -95,7 +85,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	 */
 	exportTagData: function() {
 		var jsonData = [];
-		this.tagStore.each(function(rec) {
+		this.store.each(function(rec) {
 			var data = rec.data;
 			if (data.tagName !== '') {
     			if (data.label === '') {
@@ -412,6 +402,8 @@ Ext.define('Voyant.panel.DToC.Markup', {
         }
     },
     
+    currentChapterFilter: null,
+    
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -431,9 +423,22 @@ Ext.define('Voyant.panel.DToC.Markup', {
         	}
         }));
         
+        var tagStore = Ext.create('Ext.data.JsonStore', {
+    		fields: [
+				{name: 'tagName', allowBlank: false},
+				{name: 'label', allowBlank: false},
+				{name: 'freq', type: 'int'},
+				{name: 'type'}
+			],
+			sortInfo: {field: 'label', direction: 'ASC'}
+	    });
+        
         Ext.apply(me, {
     		title: me.localize('title'),
-            store : me.tagStore,
+            store : tagStore,
+            viewConfig: {
+            	markDirty: false
+            },
     		selModel: Ext.create('Ext.selection.RowModel', {
     			mode: 'MULTI',
                 listeners: {
@@ -448,7 +453,29 @@ Ext.define('Voyant.panel.DToC.Markup', {
             dockedItems: [{
                 dock: 'top',
                 xtype: 'toolbar',
-                items: []
+                items: [{
+			    	xtype: 'textfield',
+			    	itemId: 'filter',
+			    	emptyText: 'Filter',
+			    	width: 120,
+			    	enableKeyEvents: true,
+			    	listeners: {
+			    		keyup: this.textFilterHandler,
+			    		scope: this
+			    	}
+			    }, '->', {
+                    text: 'Filter by Chapter',
+                    itemId: 'chapterFilter',
+                    menu: {
+                        items: [],
+                        plain: true,
+                        showSeparator: false,
+                        listeners: {
+                            click:  this.chapterFilterHandler,
+                            scope: this
+                        }
+                    }
+                }]
             }],
             hideHeaders: true,
     		columns: [
@@ -462,13 +489,13 @@ Ext.define('Voyant.panel.DToC.Markup', {
     
     handleSelections: function(selections) {
 	    var docIdFilter;
-//	    this.getTopToolbar().getComponent('chapterFilter').menu.items.each(function(item) {
-//	        if (item.checked) {
-//	            docIdFilter = item.initialConfig.docId;
-//	            return false;
-//	        }
-//	        return true;
-//	    });
+	    this.getDockedItems('toolbar #chapterFilter')[0].menu.items.each(function(item) {
+	        if (item.checked) {
+	            docIdFilter = item.initialConfig.docId;
+	            return false;
+	        }
+	        return true;
+	    });
 		var tags = [];
 		for (var i = 0; i < selections.length; i++) {
 			var sel = selections[i].data;
@@ -489,6 +516,69 @@ Ext.define('Voyant.panel.DToC.Markup', {
 		this.getApplication().dispatchEvent('tagsSelected', this, tags);
 	},
     
+	updateChapterFilter: function() {
+	    var menu = this.getDockedItems('toolbar #chapterFilter')[0].menu;
+	    menu.removeAll();
+	    
+	    var docs = this.getCorpus().getDocuments();
+		for (var i = 0, len = docs.getCount(); i < len; i++) {
+    		var doc = docs.getAt(i);
+    		menu.add({
+	            xtype: 'menucheckitem',
+	            docId: doc.getId(),
+	            group: 'chapters',
+	            text: doc.getShortTitle()
+	        });
+		}
+	},
+	
+	textFilterHandler: function() {
+		var value = this.getDockedItems('toolbar #filter')[0].getValue();
+		if (value == '') {
+			this.getStore().clearFilter();
+		} else {
+			var regex = new RegExp('.*'+value+'.*', 'i');
+			this.getStore().filterBy(function(r) {
+				return r.get('label').match(regex) !== null;
+			});
+		}
+	},
+	
+	chapterFilterHandler: function(menu, item) {
+		var textFilter = this.getDockedItems('toolbar #filter')[0].getValue();
+		var regex = new RegExp('.*'+textFilter+'.*', 'i');
+		
+		if (this.currentChapterFilter !== null && item.getId() === this.currentChapterFilter) {
+			this.currentChapterFilter = null;
+			item.setChecked(false);
+			this.getStore().clearFilter();
+			this.getStore().each(function(record) {
+				var freqTotal = this.tagTotals[record.get('tagName')].freq;
+				record.set('freq', freqTotal);
+			}, this);
+			if (textFilter != '') {
+				this.textFilterHandler();
+			}
+		} else {
+			this.currentChapterFilter = item.getId();
+	        var docId = item.initialConfig.docId;
+	        var docTags = this.savedTags[docId];
+	        this.getStore().clearFilter();
+	        this.getStore().filterBy(function(record, id) {
+				var tagName = record.get('tagName');
+				var tagObj = docTags[tagName];
+				if (tagObj != undefined && tagObj != null) {
+				    record.set('freq', tagObj.length);
+				    if (textFilter != '') {
+				    	return record.get('label').match(regex) !== null;
+				    }
+				    return true;
+				}
+				return false;
+	        }, this);
+		}
+	},
+	
 	listeners: {
 		afterrender: function(container) {
 				
@@ -497,6 +587,8 @@ Ext.define('Voyant.panel.DToC.Markup', {
 			this.setCorpus(corpus);
 //			this.getTokensStore().setCorpus(corpus);
 //			this.getTokensStore().load();
+			
+			this.updateChapterFilter();
 			
 			this.loadAllTags();
 		}

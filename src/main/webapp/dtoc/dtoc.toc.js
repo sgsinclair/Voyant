@@ -40,6 +40,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			useArrows: true,
 			lines: false,
 			rootVisible: false,
+			hideHeaders: true,
 			overflowX: 'hidden',
 			overflowY: 'auto',
 			viewConfig: {
@@ -109,11 +110,13 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			    		scope: this
 			    	}
 			    }]
-		    })
+		    }),
+		    listeners: {}
 		};
 		if (config.doInit) {
 			treeConfig.listeners.afterrender = {
 	    		fn: function() {
+	    			this.setCorpus(this.getApplication().getCorpus());
 	    			this.initToc(config.initData);
 	    		},
 	    		scope: this,
@@ -122,31 +125,54 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		}
 		
 		if (this.isCurator) {
-			treeConfig.plugins = {ptype: 'treeviewdragdrop'};
-			treeConfig.listeners.beforedrop = function(targetNode, dropPosition, dragData, event) {
-				if ((dragData.getData().isDoc && dropPosition === 'append') || !targetNode.getData().isDoc) return false;
+			treeConfig.plugins = ['cellediting'];
+			treeConfig.viewConfig.plugins = {
+				ptype: 'treeviewdragdrop',
+				containerScroll: true
 			};
-			treeConfig.listeners.nodedrop = {
+			treeConfig.columns = {
+				items: {
+					dataIndex: 'text',
+					flex: 1,
+					editor: {
+						xtype: 'textfield',
+						allowBlank: false,
+						selectOnFocus: true
+					}
+				}
+			};
+			treeConfig.listeners.edit = {
+				fn: function(ed, context) {
+					var docId = context.record.getData().docId;
+					var record = this.getCorpus().getDocument(docId);
+					record.set('title', context.value);
+					var shortTitle = record.fieldsMap.shortTitle.mapping({title: context.value});
+					record.set('shortTitle', shortTitle);
+				},
+				scope: this
+			};
+			treeConfig.viewConfig.listeners.beforedrop = function(targetNode, dragData, overModel, dropPosition, dropHandlers, event) {
+				if ((dragData.records[0].getData().isDoc && dropPosition === 'append') || !overModel.getData().isDoc) return false;
+			};
+			treeConfig.viewConfig.listeners.drop = {
 				fn: function(node, data, overModel, dropPosition) {
-					var children = e.tree.getRootNode().childNodes;
+					var children = this.getRootNode().childNodes;
 					var corpus = this.getCorpus();
 					for (var i = 0; i < children.length; i++) {
 						var child = children[i];
 						child.getData().docIndex = i;
 						var doc = corpus.getDocument(child.getData().docId);
 						// store the original index
-						if (!doc.record.fields.containsKey('origIndex')) {
-							doc.record.fields.add(new Ext.data.Field({
+						if (doc.get('origIndex') === undefined) {
+							// hack to add a new field
+							Voyant.data.model.Document.prototype.fields.push(new Ext.data.Field({
 								name: 'origIndex', type: 'int'
 							}));
-							doc.record.set('origIndex', doc.record.get('index'));
+							doc.set('origIndex', doc.get('index'));
 						}
-						doc.record.set('index', i);
+						doc.set('index', i);
 					}
-					corpus.getDocuments().sort('ASC', function(a, b) {
-						if (a.getIndex() < b.getIndex()) return -1;
-						else return 1;
-					});
+					corpus.getDocuments().sort('index', 'ASC');
 					Ext.getCmp('dtcDocModel').buildProspect();
 				},
 				scope: this
@@ -161,29 +187,6 @@ Ext.define('Voyant.panel.DToC.ToC', {
 				fn: this.editNodeLabel,
 				scope: this
 			};
-			treeConfig.listeners.render = {
-				fn: function() {
-					this.treeEditor = new Ext.tree.TreeEditor(this.getComponent('dtcTree'), {
-						allowBlank: false,
-						selectOnFocus: true
-					}, {
-						cancelOnEsc: true,
-						completeOnEnter: true,
-						listeners: {
-							complete: function(ed, newval, oldval) {
-								var docId = ed.editNode.getData().docId;
-								var record = this.getCorpus().getDocument(docId).record;
-								record.set('title', newval);
-								var shortTitle = record.store.fields.get('shortTitle').convert(newval);
-								record.set('shortTitle', shortTitle);
-							},
-							scope: this
-						}
-					});
-				},
-				scope: this,
-				single: true
-			};
 		}
 		
 		Ext.apply(config, treeConfig);
@@ -191,8 +194,6 @@ Ext.define('Voyant.panel.DToC.ToC', {
         this.callParent(arguments);
         this.mixins['Voyant.panel.Panel'].constructor.apply(this, [Ext.apply(config, {includeTools: {}})]);
 
-    	
-    	
     },
     initComponent: function() {
         var me = this;
@@ -306,7 +307,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			if (modifyCurrent) {
 				docNode = root.findChild('docId', doc.getId());
 				if (docNode) {
-					docNode.setText(title);
+					docNode.set('text', title);
 				}
 			} else {
 				docNode = root.appendChild(this.createChapterTreeNode(title, doc));
@@ -351,42 +352,42 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			var doc = this.getCorpus().getDocument(treeNode.getData().docId);
 			var docNode = root.findChild('docId', doc.getId());
 			if (docNode) {
-				var nodeEl = docNode.getUI().getEl().firstChild;
+				// FIXME
+//				var nodeEl = docNode.getUI().getEl().firstChild;
 				// TODO destroy tooltip when treenode is removed
-				var tip = new Ext.ToolTip(Ext.apply({
-					target: nodeEl,
-					title: '',
-					listeners: {
-						show: function(tt) {
-							var authors = doc.get('author');
-							var names = '';
-							for (var i = 0; i < authors.length; i++) {
-								var author = authors[i];
-								if (i > 0) {
-									if (authors.length > 2) names += ', ';
-									if (i == authors.length - 1) {
-										names += ' and ';
-									}
-								}
-								names += author.forename + ' ' + author.surname;
-							}
-							tt.body.update('<span class="title">'+doc.get('title').normalize()+'</span>'+
-									'<br/><span class="author">'+names+'</span>');
-						},
-						scope: this
-					}
-				}, this.toolTipConfig));
-				docNode.getData().toolTip = tip;
-				
-				if (this.titlesMode == this.MIN_TITLES) {
-					docNode.getData().toolTip.enable();
-				} else {
-					docNode.getData().toolTip.disable();
-				}
+//				var tip = new Ext.ToolTip(Ext.apply({
+//					target: nodeEl,
+//					title: '',
+//					listeners: {
+//						show: function(tt) {
+//							var authors = doc.get('author');
+//							var names = '';
+//							for (var i = 0; i < authors.length; i++) {
+//								var author = authors[i];
+//								if (i > 0) {
+//									if (authors.length > 2) names += ', ';
+//									if (i == authors.length - 1) {
+//										names += ' and ';
+//									}
+//								}
+//								names += author.forename + ' ' + author.surname;
+//							}
+//							tt.body.update('<span class="title">'+doc.get('title').normalize()+'</span>'+
+//									'<br/><span class="author">'+names+'</span>');
+//						},
+//						scope: this
+//					}
+//				}, this.toolTipConfig));
+//				docNode.getData().toolTip = tip;
+//				
+//				if (this.titlesMode == this.MIN_TITLES) {
+//					docNode.getData().toolTip.enable();
+//				} else {
+//					docNode.getData().toolTip.disable();
+//				}
 			}
 		}
 	},
-	
 
 	getTitlesMode: function() {
 		return this.titlesMode;
@@ -770,5 +771,95 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	
 	updateDocModelOutline: function() {
 //		Ext.getCmp('dtcDocModel').setOutlineDimensions(this.getTokenRange());
+	},
+	
+	/*
+	isXPathValid: function(xpath) {
+		try {
+			var result = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null);
+		} catch (e) {
+			return false;
+		}
+		return true;
+	},
+	
+	showXPathDialog: function(toolEl) {
+		if (this.xpathWin == null) {
+			this.xpathWin = Ext.create('Ext.window.Window', {
+				modal: true,
+				title: 'Add XPath',
+				width: 300,
+				layout: 'form',
+				labelAlign: 'right',
+				labelWidth: 75,
+				items: [{
+			    	xtype: 'textfield',
+			    	itemId: 'xpath',
+			    	fieldLabel: 'XPath'
+				},{
+					xtype: 'radiogroup',
+					itemId: 'apply',
+					fieldLabel: 'Add To',
+					items: [{
+						boxLabel: 'Current Doc',
+						name: 'xpathApply',
+						checked: true
+					},{
+						boxLabel: 'All Docs',
+						name: 'xpathApply',
+						checked: false,
+						disabled: true
+					}]
+				}],
+				buttons: [{
+					text: 'Ok',
+					handler: function() {
+						var xpath = this.xpathWin.getComponent('xpath').getValue();
+	    				var isValid = this.isXPathValid(xpath);
+	    				if (!isValid) {
+	    					Ext.MessageBox.show({
+	    						buttons: Ext.Msg.OK,
+	    						icon: Ext.Msg.ERROR,
+	    						width: 300,
+	    						height: 150,
+	    						title: 'Error',
+	    						msg: 'The supplied XPath is not valid.'
+	    					});
+	    				}
+	    				var apply = this.xpathWin.getComponent('apply').getValue();
+	    				if (apply.boxLabel == 'Current Doc') {
+	    					var docId = Ext.getCmp('dtcReader').getCurrentDocId();
+	    					this.addXPathToTree(docId, xpath);
+	    				} else {
+	    					
+	    				}
+						this.xpathWin.hide();
+					},
+					scope: this
+				},{
+					text: 'Cancel',
+					handler: function() {
+						this.xpathWin.hide();
+					},
+					scope: this
+				}]
+			});
+		}
+		this.xpathWin.show(toolEl);
+	},*/
+	
+	exportDocNodes: function() {
+		var datas = [];
+		var children = this.getRootNode().childNodes;
+		for (var i = 0; i < children.length; i++) {
+			var child = children[i];
+			var data = child.getData();
+			datas.push({
+				text: data.text,
+				docId: data.docId
+			});
+		}
+		
+		return datas;
 	}
 });
