@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 25 09:51:16 EDT 2015 */
+/* This file created by JSCacher. Last modified: Mon May 25 10:15:17 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5768,7 +5768,11 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		title: this.localize('title'),
     		width: 800,
     		frame: true,
-    		border: true,
+    		padding: 10,
+    		style: {
+    		    borderColor: '#aaa',
+    		    borderStyle: 'solid'
+    		},
     		frameHeader: true,
     		layout: {
     			type: 'vbox',
@@ -8715,7 +8719,6 @@ Ext.define('Voyant.panel.TopicContexts', {
     },
     
     handleClickedItem: function(chart, item) {
-    	console.warn(item.series.getTitle(), item.index)
         	var mode = this.getApiParam("mode");
         	if (mode===this.MODE_DOCUMENT) {
         		var docId = this.getApiParam("docId");
@@ -8809,7 +8812,9 @@ Ext.define('Voyant.panel.VoyantHeader', {
     },
     
     onCollapse: function(panel) {
-    	//panel.setTitle(this.localize('title'));
+    	debugger 
+    	// the title may be in flux when collapsing, so call defer setting of title
+    	Ext.defer(function() {this.setTitle(this.localize('title'))}, 10, panel)
     }
 });
 

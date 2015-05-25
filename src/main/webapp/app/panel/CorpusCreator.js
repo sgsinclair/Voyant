@@ -53,7 +53,11 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		title: this.localize('title'),
     		width: 800,
     		frame: true,
-    		border: true,
+    		padding: 10,
+    		style: {
+    		    borderColor: '#aaa',
+    		    borderStyle: 'solid'
+    		},
     		frameHeader: true,
     		layout: {
     			type: 'vbox',

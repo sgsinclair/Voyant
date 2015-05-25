@@ -32,6 +32,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
     },
     
     onCollapse: function(panel) {
-    	//panel.setTitle(this.localize('title'));
+    	// the title may be in flux when collapsing, so call defer setting of title
+    	Ext.defer(function() {this.setTitle(this.localize('title'))}, 10, panel)
     }
 });
