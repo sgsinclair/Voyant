@@ -254,11 +254,10 @@
                     panel: this
                 },
                 listeners: {
-                	itemmousedown: function() {
-//                    	debugger
-                    	// TODO: fix trends item tapping
-                    	console.warn("not working currently")
-                    }
+                	itemclick: {
+        	        	fn: this.handleClickedItem,
+        	        	scope: this
+                	}
                 }
     		})
     	}, this);
@@ -306,11 +305,15 @@
     		})
     	})
     	Ext.applyIf(config, {
+    	    plugins: {
+    	        ptype: 'chartitemevents',
+    	        moveEvents: true
+    	    },
     		legend: {docked:'top'},
     		interactions: ['itemhighlight','panzoom'],
     		innerPadding: {top: 5, right: 5, bottom: 5, left: 5},
     		border: false,
-    	    bodyBorder: false,
+    	    bodyBorder: false/*,
     	    listeners: {
     	    	// FIXME: this is a work-around because item clicking is broken in EXTJS 5.0.1 (so all hover events currently trigger event)
     	        itemhighlight: {
@@ -325,7 +328,7 @@
     	        	},
     	        	scope: this
     	        }
-    	    }
+    	    }*/
     	});
     	
     	// remove existing chart
@@ -340,11 +343,16 @@
     	this.query('chart').forEach(function(chart) {this.remove(chart)}, this);
     },
     
-    handleClickedItem: function(item) {
-    	if (!this.isLastClickedItem(item)) {
+    handleClickedItem: function(chart, item) {
         	var mode = this.getApiParam("mode");
         	if (mode===this.MODE_DOCUMENT) {
-        		
+        		var docId = this.getApiParam("docId");
+        		if (docId) {
+            		this.dispatchEvent("documentIndexTermsClicked", this, [{
+            			term: item.series.getTitle(),
+            			docId: docId
+            		}]);
+        		}
         	}
         	else if (mode==this.MODE_CORPUS) {
         		this.dispatchEvent("documentIndexTermsClicked", this, [{
@@ -352,8 +360,6 @@
         			docIndex: item.index
         		}]);
         	}
-    		this.lastClickedItem=item;
-    	}
     },
     
     isLastClickedItem: function(item) {

@@ -107,6 +107,24 @@ Ext.define('Voyant.panel.Contexts', {
                 flex: 1
             }],
             listeners: {
+            	documentSegmentTermClicked: {
+	           		 fn: function(src, documentSegmentTerm) {
+	           			 if (!documentSegmentTerm.term) {return}
+	           			 params = {query: documentSegmentTerm.term};
+	           			 if (documentSegmentTerm.docId) {
+	           				 params.docId = documentSegmentTerm.docId
+	           			 }
+	           			 else {
+	           				 // default to first document
+	           				 params.docIndex = documentSegmentTerm.docIndex ?  documentSegmentTerm.docIndex : 0
+	           			 }
+	           			 this.setApiParams(params);
+	       	        	if (this.isVisible()) {
+	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
+	       	        	}
+	           		 },
+	           		 scope: this
+            	},
 	           	 documentIndexTermsClicked: {
 	           		 fn: function(src, documentIndexTerms) {
 	           			// this isn't quite right, since we want every term associated with a docIndex, but for now it will do
