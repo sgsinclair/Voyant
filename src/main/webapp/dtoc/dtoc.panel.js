@@ -8,9 +8,16 @@ Ext.define('Voyant.panel.DToC', {
     	annotator: undefined
     },
     statics: {
+    	i18n: {
+    		'clickUrl' : {
+    			en: 'Open this <a href="{0}" target="_blank">URL</a> in a new window.'
+    		}
+    	},
         api: {
         }
     },
+    
+    queryParameters: null,
     
 	isCurator: false,
     
@@ -28,6 +35,8 @@ Ext.define('Voyant.panel.DToC', {
 		} else {
 			Ext.QuickTips.disable();
 		}
+    	
+    	this.queryParameters = Ext.urlDecode(window.location.search.substring(1));
     },
     
     initComponent: function() {
@@ -142,18 +151,30 @@ Ext.define('Voyant.panel.DToC', {
         				title: 'Chapter Title',
         				flex: 1,
         				includeTools: {
-        					gear: true,
-        					help: true,
         					code: {
-        		    			type: 'code',
-        		    			tooltip: 'Get XML for current chapter',
+        		    			type: 'help', // hack to show all tools by default
+        		    			tooltip: 'Get XML for Current Chapter',
         		    			callback: this.showXML.bind(this),
         		    			xtype: 'toolmenu',
+        		    			margin: '0 10 0 0',
         		    			glyph: 'xf121@FontAwesome'
-        		    		}
-        				},
-        				helpToolClick: this.showHelp.bind(this),
-        				showOptionsClick: this.showSettings.bind(this)
+        		    		},
+        					settings: {
+        						type: 'help',
+        						tooltip: 'Settings',
+        						xtype: 'toolmenu',
+        						callback: this.showSettings.bind(this),
+        						margin: '0 10 0 0',
+        						glyph: 'xf205@FontAwesome'
+        					},
+        					dtcHelp: {
+        						type: 'help',
+        						tooltip: 'Help',
+        						xtype: 'toolmenu',
+        						callback: this.showHelp.bind(this),
+        						glyph: 'xf128@FontAwesome'
+        					}
+        				}
         			}]
         		},{xtype: 'splitter', width: 10},{
         			xtype: 'container',
@@ -165,6 +186,99 @@ Ext.define('Voyant.panel.DToC', {
         });
         
         me.callParent(arguments);
+    },
+    
+    getDataFromString: function(dataString) {    	
+    	var data = null;
+    	if (dataString == null && this.loadInkeTags == true) {
+    		data = {markup:[{"tagName":"xmlTitle","label":"title","type":"t"},
+    			        {"tagName":"placeName","label":"place","type":"t"},
+    			        {"tagName":"country","label":"country","type":"t"},
+    			        {"tagName":"region[@type='province']","label":"province","type":"x"},
+    			        {"tagName":"region[@type='state']","label":"state","type":"x"},
+    			        {"tagName":"settlement[@type='town']","label":"town","type":"x"},
+    			        {"tagName":"settlement[@type='city']","label":"city","type":"x"},
+    			        {"tagName":"persName","label":"person","type":"t"},
+    			        {"tagName":"persName[@type='character']","label":"character","type":"x"},
+    			        {"tagName":"orgName","label":"organization","type":"t"},
+    			        {"tagName":"date","label":"date","type":"t"},
+    			        {"tagName":"quote","label":"citation","type":"t"},
+    			        {"tagName":"note","label":"note","type":"t"},
+    			        {"tagName":"bibl","label":"bibliographic reference","type":"t"},
+    			        {"tagName":"author","label":"author","type":"t"},
+    			        {"tagName":"publisher","label":"publisher","type":"t"},
+    			        {"tagName":"pubPlace","label":"publication place","type":"t"},
+    			        {"tagName":"ref[@target*='religion']","label":"religion","type":"x"},
+    			        {"tagName":"ref[@target*='textual_strategies']","label":"textual strategies","type":"x"},
+    			        {"tagName":"ref[@target*='authority']","label":"authority","type":"x"},
+    			        {"tagName":"ref[@target*='narrative_technique']","label":"narrative technique","type":"x"},
+    			        {"tagName":"ref[@target*='writing_climate']","label":"writing climate","type":"x"},
+    			        {"tagName":"ref[@target*='theme_or_topic']","label":"theme or topic","type":"x"},
+    			        {"tagName":"ref[@target*='intertextuality']","label":"intertextuality","type":"x"},
+    			        {"tagName":"ref[@target*='formal_response']","label":"formal response","type":"x"},
+    			        {"tagName":"ref[@target*='race_and_ethnicity']","label":"race and ethnicity","type":"x"},
+    			        {"tagName":"ref[@target*='methodology']","label":"methodology","type":"x"},
+    			        {"tagName":"ref[@target*='social_movement']","label":"social movement","type":"x"},
+    			        {"tagName":"ref[@target*='class_issue']","label":"class issue","type":"x"},
+    			        {"tagName":"ref[@target*='sexuality']","label":"sexuality","type":"x"},
+    			        {"tagName":"ref[@target*='education']","label":"education","type":"x"},
+    			        {"tagName":"ref[@target*='politics']","label":"politics","type":"x"}],
+    			        toc:[]};
+    	} else if (dataString != null) {
+	    	try {
+				data = Ext.decode(dataString);
+			} catch (e) {
+				if (window.console) console.log(e);
+			}
+    	}
+		
+		if (data != null) {
+			var dtcMarkup = Ext.getCmp('dtcMarkup');
+			dtcMarkup.curatedTags = {};
+			dtcMarkup.tagTotals = {};
+			dtcMarkup.savedTags = {};
+			for (var i = 0; i < data.markup.length; i++) {
+				var tag = data.markup[i];
+				dtcMarkup.curatedTags[tag.tagName] = tag;
+			}
+//			dtcMarkup.store.loadData(data.markup, false);
+//			dtcMarkup.loadAllTags();
+			
+			if (data.toc && data.toc.length > 0) {
+				var treeNodes = [];
+				for (var i = 0; i < data.toc.length; i++) {
+					var node = data.toc[i];
+					var doc = this.getCorpus().getDocument(node.d);
+					var docId = doc.getId();
+					
+					// check if docIndex matches doc order
+					// if it doesn't, set the appropriate fields
+					if (node.d != i) {
+						
+						if (doc.get('origIndex') === undefined) {
+							// hack to add a new field
+							Voyant.data.model.Document.prototype.fields.push(new Ext.data.Field({
+								name: 'origIndex', type: 'int'
+							}));
+							doc.set('origIndex', node.d);
+						}
+						doc.set('title', node.t);
+						doc.set('index', i);
+					}
+					
+					treeNodes.push({
+						text: node.t,
+						docId: docId
+					});
+				}
+				
+				// TODO sorting messes things up
+//				this.getCorpus().getDocuments().sort('index', 'ASC');
+				
+	//			console.debug(treeNodes);
+				Ext.getCmp('dtcToc').initToc(treeNodes, true);
+			}
+		}
     },
     
     setDTCMode: function(isCurator) {
@@ -454,7 +568,7 @@ Ext.define('Voyant.panel.DToC', {
 			var doc = this.getCorpus().getDocument(node.docId);
 			
 			var docIndex = doc.getIndex();
-			var origDocIndex = doc.record.get('origIndex');
+			var origDocIndex = doc.get('origIndex');
 			if (origDocIndex != null) {
 				docIndex = origDocIndex; 
 			}
@@ -474,11 +588,9 @@ Ext.define('Voyant.panel.DToC', {
 		Ext.Ajax.request({
            url: this.getTromboneUrl(),
            params: {
-        	   corpus: this.getCorpus().getId(),
-        	   tool: 'ParamsData',
-        	   store: true,
-        	   data: curatorId,
-        	   curatorData: exportString
+        	   tool: 'resource.StoredResource',
+        	   resourceId: curatorId,
+        	   storeResource: exportString
            },
            success: function(response, options) {
 				// TODO add original query params if necessary
@@ -486,37 +598,25 @@ Ext.define('Voyant.panel.DToC', {
 					corpus: this.getCorpus().getId(),
 					curatorId: curatorId
 				};
-				if (this.query.annotator != null) {
-					params.annotator = this.query.annotator;
-				}
-				var url = this.getBaseUrl()+'?skin=dtc&'+Ext.urlEncode(params);
+
+				var url = this.getBaseUrl()+'dtoc/?'+Ext.urlEncode(params);
 				
-				var textarea = Ext.DomQuery.selectNode('textarea', Ext.Msg.getDialog().body.dom);
-				textarea.originalFontFamily = textarea.style.fontFamily;
-				textarea.originalWrap = textarea.originalWrap;
-				textarea.style.fontFamily = 'monospace';
-				textarea.setAttribute('wrap','off');
-				
-				var msg = '<p>'+ new Ext.Template(this.localize('tool.clickUrl')).apply([url])+'</p>';
+				var msg = '<p>'+ new Ext.Template(this.localize('clickUrl')).apply([url])+'</p>';
 				
 				var msgBox = Ext.Msg.show({
-					title: this.localize('tool.export'),
-					msg: msg,
-					value: url,
-					width: Ext.getBody().getWidth()-50,
+					title: 'Export',
+					message: msg,
 					buttons: Ext.MessageBox.OK,
+					value: url,
 					multiline: true,
-					icon: Ext.MessageBox.INFO,
-					fn: function() {
-						textarea.style.fontFamily = textarea.originalFontFamily;
-						textarea.setAttribute('wrap',textarea.originalWrap ? textarea.originalWrap : '');
-					}
+					width: Ext.getBody().getWidth()-50,
+					icon: Ext.MessageBox.INFO
 				});
 			},
 			failure: function() {
 				Ext.Msg.show({
 					title: 'Error',
-					msg: 'There was an error generating the export link.',
+					message: 'There was an error generating the export link.',
 					buttons: Ext.MessageBox.OK,
 					icon: Ext.MessageBox.ERROR
 				});
@@ -531,6 +631,27 @@ Ext.define('Voyant.panel.DToC', {
 		},
 		loadedCorpus: function(src, corpus) {
 			this.setCorpus(corpus);
+			
+			if (this.queryParameters.curatorId) {
+				var curatorId = this.queryParameters.curatorId;
+				Ext.Ajax.request({
+		           url: this.getTromboneUrl(),
+		           params: {
+		        	   tool: 'resource.StoredResource',
+		        	   retrieveResourceId: curatorId
+		           },
+		           success: function(response, options) {
+		        	   var json = Ext.decode(response.responseText);
+		        	   var curatorString = json.storedResource.resource;
+		        	   this.getDataFromString(curatorString);
+		           },
+		           failure: function() {
+		           },
+		           scope: this
+				});
+			} else {
+				this.getDataFromString();
+			}
 		}
 	}
 });

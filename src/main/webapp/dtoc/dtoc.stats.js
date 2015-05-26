@@ -30,6 +30,11 @@ Ext.define('Voyant.panel.DToC.Stats', {
     corpusStore: null,
     docStore: null,
     
+    languageStopListMappings: {
+    	'en': 'stop.en.taporware.txt',
+    	'fr': 'stop.fr.veronis.txt'
+    },
+    
     constructor: function(config) {
     	
         this.callParent(arguments);
@@ -42,8 +47,8 @@ Ext.define('Voyant.panel.DToC.Stats', {
     		this.corpusStore.setCorpus(corpus);
     		this.docStore.getProxy().setExtraParam('corpus', corpus.getId());
     		this.corpusStore.getProxy().setExtraParam('corpus', corpus.getId());
-    		this.docStore.getProxy().setExtraParam('stopList', 'stop.en.taporware.txt');
-    		this.corpusStore.getProxy().setExtraParam('stopList', 'stop.en.taporware.txt');
+    		this.docStore.getProxy().setExtraParam('stopList', 'auto');
+    		this.corpusStore.getProxy().setExtraParam('stopList', 'auto');
     		this.fireEvent("apiChange", this);
     	},
     	apiChange: function() {
@@ -61,6 +66,9 @@ Ext.define('Voyant.panel.DToC.Stats', {
     	},
     	dtcDocumentLoaded: function(src, docId) {
     		if (this.getStore() === this.docStore) {
+    			var lang = Ext.getCmp('dtcReader').getCurrentDocLanguage();
+    			var stoplist = this.languageStopListMappings[lang] || 'auto';
+    			this.getStore().getProxy().setExtraParam('stopList', stoplist);
 	    		this.getStore().getProxy().setExtraParam('docId', docId);
 	    		this.getStore().loadPage(1);
     		}
@@ -71,12 +79,13 @@ Ext.define('Voyant.panel.DToC.Stats', {
         var me = this;
 
         this.corpusStore = Ext.create("Voyant.data.store.CorpusTerms");
-        this.corpusStore.getProxy().setExtraParam("withDistributions", "relative");
+        this.corpusStore.getProxy().setExtraParam("withDistributions", true);
 //        store.on("totalcountchange", function() {
 //        	this.down('#status').update({count: this.getStore().getTotalCount()});;
 //        }, me);
         
         this.docStore = Ext.create('Voyant.data.store.DocumentTerms');
+        this.docStore.getProxy().setExtraParam("withDistributions", true);
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -177,24 +186,16 @@ Ext.define('Voyant.panel.DToC.Stats', {
                 flex: 1,
                 hidden: true,
             	sortable: true
-            }
-//            ,{
-//                xtype: 'widgetcolumn',
-//                text: this.localize("trend"),
-//                tooltip: this.localize("trendTip"),
-//                flex: 1,
-//                dataIndex: 'distributions',
-//                widget: {
-//                    xtype: 'sparklineline',
-//                    tipTpl: new Ext.XTemplate('{[this.getDocumentTitle(values.x,values.y)]}', {
-//                    	getDocumentTitle: function(docIndex, relativeFreq) {
-//                    		return this.panel.store.getCorpus().getDocument(docIndex).getTitle()+"<br>relative frequency: "+Ext.util.Format.number(relativeFreq*1000000, "0,000")
-//                    	},
-//                    	panel: me 
-//                    })
-//                }
-//            }
-            ]
+            },{
+                xtype: 'widgetcolumn',
+                text: this.localize("trend"),
+                tooltip: this.localize("trendTip"),
+                flex: 1,
+                dataIndex: 'distributions',
+                widget: {
+                    xtype: 'sparklineline'
+                }
+            }]
         });
 
         me.callParent(arguments);

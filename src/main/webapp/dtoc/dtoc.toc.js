@@ -268,7 +268,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		if (!this.initialized || forceInit === true) {
 			if (data) {
 				var root = this.getRootNode();
-				root.removeAll(true);
+				root.removeAll();
 				for (var i = 0; i < data.length; i++) {
 					var d = data[i];
 					var doc = this.getCorpus().getDocument(d.docId);

@@ -25,6 +25,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
     
     MINIMUM_LIMIT: 1000,
 	currentDocId: null,
+	currentDocLanguage: null,
 	loading: false,
 	readerContainer: null,
 	prevButton: null,
@@ -292,14 +293,14 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			callback: function(el, success, response, options) {
 				this.loading = false;
 				
-				this.getApplication().dispatchEvent('dtcDocumentLoaded', this, {docId:this.currentDocId});
-				
 				if (this.getIndexForDocId(params.docId) > 0) {
 					this.prevButton.show();
 				}
 				if (this.getIndexForDocId(params.docId) < this.getCorpus().getDocumentsCount()) {
 					this.nextButton.show();
 				}
+				
+				this._processLanguage();
 				
 				this._processHeader();
 				
@@ -309,6 +310,8 @@ Ext.define('Voyant.panel.DToC.Reader', {
 				this._processImages();
 				
 				this._getSelections();
+				
+				this.getApplication().dispatchEvent('dtcDocumentLoaded', this, {docId:this.currentDocId});
 				
 				if (callback) callback.call(this);
 			},
@@ -330,6 +333,15 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			var docId = this.getCorpus().getDocument(index+1).getId();
 			this.getApplication().dispatchEvent('corpusDocumentSelected', this, {docId:docId});
 		}
+	},
+	
+	_processLanguage: function() {
+	    var langEl = Ext.get(Ext.DomQuery.select('div[xml\\:lang]', this.readerContainer.dom)[0]);
+	    if (langEl != null) {
+	        this.currentDocLanguage = langEl.getAttribute('xml:lang').split('-')[0];
+	    } else {
+	        this.currentDocLanguage = null;
+	    }
 	},
 	
 	_processHeader: function() {
@@ -540,6 +552,10 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			};
 		}
 		return {};
+	},
+	
+	getCurrentDocLanguage: function() {
+	    return this.currentDocLanguage;
 	},
 	
 	getCurrentDocId: function() {

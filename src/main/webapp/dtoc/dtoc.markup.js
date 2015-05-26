@@ -92,6 +92,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
     			    data.label = data.tagName;
     			}
     			delete data.freq;
+    			delete data.id;
     			jsonData.push(data);
 			}
 		}, this);
