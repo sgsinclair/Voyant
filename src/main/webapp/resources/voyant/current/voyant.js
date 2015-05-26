@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 26 15:21:43 EDT 2015 */
+/* This file created by JSCacher. Last modified: Tue May 26 15:51:03 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4321,11 +4321,21 @@ Ext.define('Voyant.panel.Bubblelines', {
     	this.on('loadedCorpus', function(src, corpus) {
     		this.setCorpus(corpus);
     		this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
-    		this.getDocStore().load();
+    		if (this.isVisible()) {
+        		this.getDocStore().load();
+    		}
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
     	}, this);
     	
-    	this.on('query', function(src, query) {
+        this.on('activate', function() { // load after tab activate (if we're in a tab panel)
+			if (this.getCorpus()) {
+				
+				Ext.Function.defer(function() {this.getDocStore().load()}, 100, this);
+			}
+    	}, this);
+        
+        
+        this.on('query', function(src, query) {
     		if (query !== undefined && query != '') {
     			this.getDocTermsFromQuery(query);
     		}
@@ -8939,7 +8949,6 @@ Ext.define('Voyant.panel.TabPanel', {
 		}
 	},
 	constructor: function(config) {
-		console.warn(arguments)
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 	},

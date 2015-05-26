@@ -89,11 +89,21 @@ Ext.define('Voyant.panel.Bubblelines', {
     	this.on('loadedCorpus', function(src, corpus) {
     		this.setCorpus(corpus);
     		this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
-    		this.getDocStore().load();
+    		if (this.isVisible()) {
+        		this.getDocStore().load();
+    		}
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
     	}, this);
     	
-    	this.on('query', function(src, query) {
+        this.on('activate', function() { // load after tab activate (if we're in a tab panel)
+			if (this.getCorpus()) {
+				
+				Ext.Function.defer(function() {this.getDocStore().load()}, 100, this);
+			}
+    	}, this);
+        
+        
+        this.on('query', function(src, query) {
     		if (query !== undefined && query != '') {
     			this.getDocTermsFromQuery(query);
     		}

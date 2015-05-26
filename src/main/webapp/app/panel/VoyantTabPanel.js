@@ -8,7 +8,6 @@ Ext.define('Voyant.panel.TabPanel', {
 		}
 	},
 	constructor: function(config) {
-		console.warn(arguments)
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 	},
