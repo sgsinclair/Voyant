@@ -108,6 +108,7 @@ Ext.define('Voyant.util.Toolable', {
 				gear: this.showOptionsClick || this.getOptions ? {
 					glyph: 'xf205@FontAwesome',
 					fn: this.showOptionsClick ? this.showOptionsClick : function(panel) {
+						if (panel.isXType("voyanttabpanel")) {panel = panel.getActiveTab()}
 						// we're here because the panel hasn't overridden the click function
 						Ext.create('Ext.window.Window', {
 							title: panel.localize("exportTitle"),
@@ -248,6 +249,7 @@ Ext.define('Voyant.util.Toolable', {
 		panel.openUrl(url);
 	},
 	exportToolClick: function(panel) {
+		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
 		var items = [{
 	       		xtype: 'radio',
 	       		name: 'export',
@@ -579,6 +581,7 @@ Ext.define('Voyant.util.Toolable', {
 		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(api);
 	},
 	helpToolClick: function(panel) {
+		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
 		var help = panel.localize('help', {"default": false}) || panel.localize('helpTip');
 		if (help==panel._localizeClass(Ext.ClassManager.get("Voyant.util.Toolable"), "helpTip")) {
 			panel.openUrl( "http://docs.voyant-tools.org/");
@@ -603,6 +606,9 @@ Ext.define('Voyant.util.Toolable', {
 			parent = this.isXType('voyantheader') && this.getApplication().getViewComponent ? this.getApplication().getViewComponent() : this.up("component");
 			parent.remove(this, true);
 			var newTool = parent.add({xtype: xtype});
+			if (parent.isXType("voyanttabpanel")) {
+				parent.setActiveTab(newTool)
+			}
 			if (corpus) {
 				newTool.fireEvent("loadedCorpus", newTool, corpus)
 			}

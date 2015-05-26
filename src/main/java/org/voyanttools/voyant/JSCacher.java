@@ -93,6 +93,7 @@ public class JSCacher {
 		"app/panel/VoyantFooter.js",
 		"app/panel/VoyantHeader.js",
 		"app/panel/CorpusSet.js",
+		"app/panel/VoyantTabPanel.js",
 
 		"app/VoyantApp.js",
 		"app/VoyantCorpusApp.js",

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 26 10:51:23 EDT 2015 */
+/* This file created by JSCacher. Last modified: Tue May 26 15:21:43 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2373,6 +2373,7 @@ Ext.define('Voyant.util.Toolable', {
 				gear: this.showOptionsClick || this.getOptions ? {
 					glyph: 'xf205@FontAwesome',
 					fn: this.showOptionsClick ? this.showOptionsClick : function(panel) {
+						if (panel.isXType("voyanttabpanel")) {panel = panel.getActiveTab()}
 						// we're here because the panel hasn't overridden the click function
 						Ext.create('Ext.window.Window', {
 							title: panel.localize("exportTitle"),
@@ -2513,6 +2514,7 @@ Ext.define('Voyant.util.Toolable', {
 		panel.openUrl(url);
 	},
 	exportToolClick: function(panel) {
+		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
 		var items = [{
 	       		xtype: 'radio',
 	       		name: 'export',
@@ -2844,6 +2846,7 @@ Ext.define('Voyant.util.Toolable', {
 		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(api);
 	},
 	helpToolClick: function(panel) {
+		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
 		var help = panel.localize('help', {"default": false}) || panel.localize('helpTip');
 		if (help==panel._localizeClass(Ext.ClassManager.get("Voyant.util.Toolable"), "helpTip")) {
 			panel.openUrl( "http://docs.voyant-tools.org/");
@@ -2868,6 +2871,9 @@ Ext.define('Voyant.util.Toolable', {
 			parent = this.isXType('voyantheader') && this.getApplication().getViewComponent ? this.getApplication().getViewComponent() : this.up("component");
 			parent.remove(this, true);
 			var newTool = parent.add({xtype: xtype});
+			if (parent.isXType("voyanttabpanel")) {
+				parent.setActiveTab(newTool)
+			}
 			if (corpus) {
 				newTool.fireEvent("loadedCorpus", newTool, corpus)
 			}
@@ -4185,6 +4191,9 @@ Ext.define('Voyant.panel.Panel', {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 //		this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.mixins['Voyant.util.Toolable'].constructor.apply(this, arguments);
+		if (!this.glyph) {
+			this.glyph = Ext.ClassManager.getClass(this).glyph
+		}
 	},
 	
 	getApplication: function() {
@@ -4887,7 +4896,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	alias: 'widget.collocatesgraph',
     statics: {
     	i18n: {
-    		title: {en: "Collocates Graph"},
+    		title: {en: "Links"},
     		helpTip: {en: "<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:<ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		clearTerms: {en: "clear terms"},
     		releaseToRemove: {en: "Release to remove this term"},
@@ -5260,7 +5269,7 @@ Ext.define('Voyant.panel.Contexts', {
 	alias: 'widget.contexts',
     statics: {
     	i18n: {
-    		title: {en: "Keywords in Context"},
+    		title: {en: "Contexts"},
     		helpTip: {en: "The Keywords in Context tool shows each occurrence of a keyword with a bit of surounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:</p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		termTip: {en: "The keyword for the context."},
     		left: {en: "Left"},
@@ -8459,11 +8468,9 @@ Ext.define('Voyant.panel.TopicContexts', {
     	}, this)
 
     	this.on("termsClicked", function(src, terms) {
-    		debugger
     		if (this.getCorpus()) { // make sure we have a corpus
         		var queryTerms = [];
         		terms.forEach(function(term) {
-        			debugger
         			if (Ext.isString(term)) {queryTerms.push(term)}
         			else if (term.term) {queryTerms.push(term.term);}
         			else if (term.getTerm) {queryTerms.push(term.getTerm());}
@@ -8841,6 +8848,8 @@ Ext.define('Voyant.panel.CorpusSet', {
         flex: 3,
         layout: 'fit',
         
+        xtype: 'voyanttabpanel',
+    	tabBarHeaderPosition: 0,
         items: {
 	        xtype: 'reader'
         }
@@ -8849,19 +8858,39 @@ Ext.define('Voyant.panel.CorpusSet', {
     	flex: 3,
     	layout: 'fit',
         moreTools: ['cirrus','corpusterms'],
+        xtype: 'voyanttabpanel',
+    	split: {width: 5},
+    	tabBarHeaderPosition: 0,
+    	items: [{
+	    	xtype: 'cirrus'
+    		
+    	},{
+	    	xtype: 'corpusterms'
+    	}]
+    }, /* {
+    	region: 'west',
+    	flex: 3,
+    	layout: 'fit',
+        moreTools: ['cirrus','corpusterms'],
     	split: {width: 5},
     	items: {
 	    	xtype: 'cirrus'
     	}
-    }, {
+    }, */{
     	region: 'east',
     	flex: 3,
     	layout: 'fit',
+        xtype: 'voyanttabpanel',
     	split: {width: 5},
+    	tabBarHeaderPosition: 0,
     	moreTools: ['trends','collocatesgraph','corpuscollocates'],
-        items: {
+        items: [{
 	    	xtype: 'trends'
-        }
+        },{
+	    	xtype: 'collocatesgraph'
+        },{
+	    	xtype: 'corpuscollocates'
+        }]
     }, {
     	region: 'south',
     	flex: 2,
@@ -8875,23 +8904,69 @@ Ext.define('Voyant.panel.CorpusSet', {
 				layout: 'fit',
 				region: 'center',
     			flex: 1,
+    	        xtype: 'voyanttabpanel',
     	    	split: {width: 5},
+    	    	tabBarHeaderPosition: 0,
     			moreTools: ['summary','documents'],
-    			items: {
+    			items: [{
 	    			xtype: 'summary'
-    			}
+    			},{
+	    			xtype: 'documents'
+    			}]
     		},{
 				layout: 'fit',
 				region: 'east',
     			flex: 1,
+    	        xtype: 'voyanttabpanel',
     	    	split: {width: 5},
+    	    	tabBarHeaderPosition: 0,
     			moreTools: ['contexts','documentterms'],
-    			items: {
+    			items: [{
 	    			xtype: 'contexts'
-    			}
+    			},{
+	    			xtype: 'bubblelines'
+    			}]
     	}]
     }]
 })
+
+Ext.define('Voyant.panel.TabPanel', {
+	extend: 'Ext.tab.Panel',
+	alias: 'widget.voyanttabpanel',
+	mixins: ['Voyant.panel.Panel'],
+	statics: {
+		i18n: {
+		}
+	},
+	constructor: function(config) {
+		console.warn(arguments)
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+	},
+	initComponent: function() {
+    	this.callParent(arguments);
+	},
+	listeners: {
+		tabchange: function(panel, newTab) {
+			this.tools = [];
+			this.getHeader().tools = [];
+			this.query("toolmenu").forEach(function(toolMenu) {
+				toolMenu.destroy();
+			})
+			this.addTool(newTab.tools)
+		},
+		afterrender: function(panel) {
+			this.fireEvent("tabchange", this, this.getActiveTab())
+		}
+	},
+	showOptionsClick: function(panel) {
+		debugger
+		var tab = panel.getActiveTab();
+		if (tab.showOptionsClick) {
+			tab.showOptionsClick.apply(tab, arguments)
+		}
+	}
+});
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',

@@ -19,6 +19,8 @@ Ext.define('Voyant.panel.CorpusSet', {
         flex: 3,
         layout: 'fit',
         
+        xtype: 'voyanttabpanel',
+    	tabBarHeaderPosition: 0,
         items: {
 	        xtype: 'reader'
         }
@@ -27,19 +29,39 @@ Ext.define('Voyant.panel.CorpusSet', {
     	flex: 3,
     	layout: 'fit',
         moreTools: ['cirrus','corpusterms'],
+        xtype: 'voyanttabpanel',
+    	split: {width: 5},
+    	tabBarHeaderPosition: 0,
+    	items: [{
+	    	xtype: 'cirrus'
+    		
+    	},{
+	    	xtype: 'corpusterms'
+    	}]
+    }, /* {
+    	region: 'west',
+    	flex: 3,
+    	layout: 'fit',
+        moreTools: ['cirrus','corpusterms'],
     	split: {width: 5},
     	items: {
 	    	xtype: 'cirrus'
     	}
-    }, {
+    }, */{
     	region: 'east',
     	flex: 3,
     	layout: 'fit',
+        xtype: 'voyanttabpanel',
     	split: {width: 5},
+    	tabBarHeaderPosition: 0,
     	moreTools: ['trends','collocatesgraph','corpuscollocates'],
-        items: {
+        items: [{
 	    	xtype: 'trends'
-        }
+        },{
+	    	xtype: 'collocatesgraph'
+        },{
+	    	xtype: 'corpuscollocates'
+        }]
     }, {
     	region: 'south',
     	flex: 2,
@@ -53,20 +75,28 @@ Ext.define('Voyant.panel.CorpusSet', {
 				layout: 'fit',
 				region: 'center',
     			flex: 1,
+    	        xtype: 'voyanttabpanel',
     	    	split: {width: 5},
+    	    	tabBarHeaderPosition: 0,
     			moreTools: ['summary','documents'],
-    			items: {
+    			items: [{
 	    			xtype: 'summary'
-    			}
+    			},{
+	    			xtype: 'documents'
+    			}]
     		},{
 				layout: 'fit',
 				region: 'east',
     			flex: 1,
+    	        xtype: 'voyanttabpanel',
     	    	split: {width: 5},
+    	    	tabBarHeaderPosition: 0,
     			moreTools: ['contexts','documentterms'],
-    			items: {
+    			items: [{
 	    			xtype: 'contexts'
-    			}
+    			},{
+	    			xtype: 'bubblelines'
+    			}]
     	}]
     }]
 })
