@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 25 13:50:44 EDT 2015 */
+/* This file created by JSCacher. Last modified: Tue May 26 10:51:23 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8459,11 +8459,14 @@ Ext.define('Voyant.panel.TopicContexts', {
     	}, this)
 
     	this.on("termsClicked", function(src, terms) {
+    		debugger
     		if (this.getCorpus()) { // make sure we have a corpus
         		var queryTerms = [];
         		terms.forEach(function(term) {
+        			debugger
         			if (Ext.isString(term)) {queryTerms.push(term)}
         			else if (term.term) {queryTerms.push(term.term);}
+        			else if (term.getTerm) {queryTerms.push(term.getTerm());}
         		});
         		if (queryTerms) {
         			this.setApiParams({
@@ -8491,7 +8494,7 @@ Ext.define('Voyant.panel.TopicContexts', {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
-    				
+    				this.fireEvent("termsClicked", src, terms)
     			}
     		}
     	})

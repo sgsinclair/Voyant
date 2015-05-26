@@ -89,6 +89,7 @@
         		terms.forEach(function(term) {
         			if (Ext.isString(term)) {queryTerms.push(term)}
         			else if (term.term) {queryTerms.push(term.term);}
+        			else if (term.getTerm) {queryTerms.push(term.getTerm());}
         		});
         		if (queryTerms) {
         			this.setApiParams({
@@ -116,7 +117,7 @@
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
-    				
+    				this.fireEvent("termsClicked", src, terms)
     			}
     		}
     	})
