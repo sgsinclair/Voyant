@@ -67,6 +67,7 @@ Ext.define('Voyant.panel.Reader', {
 	    		var documentFrequency = this.localize("documentFrequency");
 	    		var isPlainText = false;
 	    		var docIndex = -1;
+	    		var isLastNewLine = false
 	    		records.forEach(function(record) {
 	    			if (record.getPosition()==0) {
 	    				contents+="<h3>"+this.getDocumentsStore().getById(record.getDocId()).getFullLabel()+"</h3>";
@@ -76,10 +77,17 @@ Ext.define('Voyant.panel.Reader', {
 	    				docIndex = record.getDocIndex();
 	    			}
 	    			if (record.isWord()) {
+	    				isLastNewLine = false;
 	    				contents += "<span class='word' id='"+ record.getId() + "' data-qtip='"+documentFrequency+" "+record.getDocumentRawFreq()+"'>"+ record.getTerm() + "</span>";
 	    			}
 	    			else {
-	    				contents += record.getTermWithLineSpacing(isPlainText);
+	    				var newContents = record.getTermWithLineSpacing(isPlainText);
+	    				var isNewLine = newContents.indexOf("<br />")==0
+	    				if (isLastNewLine && (isNewLine || newContents.trim().length==0)) {}
+	    				else {
+	    					contents += newContents;
+	    					isLastNewLine = isNewLine;
+	    				}
 	    			}
 	    		}, this);
 	    		this.updateText(contents, true);

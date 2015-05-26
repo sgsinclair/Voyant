@@ -180,9 +180,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	this.tokenFreqTipTemplate = new Ext.Template(this.localize('tokenFreqTip'));
     	this.docFreqTipTemplate = new Ext.Template(this.localize('docFreqTip'));
         
-        this.on('add', function(panel) {
+        this.on('afterrender', function(panel) {
+        	debugger
         	var chart = this.down('#chart');
         	if (chart !== null) {
+        		debugger
 	        	var size = Math.min(panel.body.getHeight(), panel.body.getWidth());
 	        	// TODO set chart size after parent resize, without trigger infinite layout loop
 	        	chart.setSize(size, size).redraw();

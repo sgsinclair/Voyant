@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 26 15:51:03 EDT 2015 */
+/* This file created by JSCacher. Last modified: Tue May 26 16:39:17 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7136,6 +7136,7 @@ Ext.define('Voyant.panel.Reader', {
 	    		var documentFrequency = this.localize("documentFrequency");
 	    		var isPlainText = false;
 	    		var docIndex = -1;
+	    		var isLastNewLine = false
 	    		records.forEach(function(record) {
 	    			if (record.getPosition()==0) {
 	    				contents+="<h3>"+this.getDocumentsStore().getById(record.getDocId()).getFullLabel()+"</h3>";
@@ -7145,10 +7146,17 @@ Ext.define('Voyant.panel.Reader', {
 	    				docIndex = record.getDocIndex();
 	    			}
 	    			if (record.isWord()) {
+	    				isLastNewLine = false;
 	    				contents += "<span class='word' id='"+ record.getId() + "' data-qtip='"+documentFrequency+" "+record.getDocumentRawFreq()+"'>"+ record.getTerm() + "</span>";
 	    			}
 	    			else {
-	    				contents += record.getTermWithLineSpacing(isPlainText);
+	    				var newContents = record.getTermWithLineSpacing(isPlainText);
+	    				var isNewLine = newContents.indexOf("<br />")==0
+	    				if (isLastNewLine && (isNewLine || newContents.trim().length==0)) {}
+	    				else {
+	    					contents += newContents;
+	    					isLastNewLine = isNewLine;
+	    				}
 	    			}
 	    		}, this);
 	    		this.updateText(contents, true);
@@ -7720,9 +7728,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	this.tokenFreqTipTemplate = new Ext.Template(this.localize('tokenFreqTip'));
     	this.docFreqTipTemplate = new Ext.Template(this.localize('docFreqTip'));
         
-        this.on('add', function(panel) {
+        this.on('afterrender', function(panel) {
+        	debugger
         	var chart = this.down('#chart');
         	if (chart !== null) {
+        		debugger
 	        	var size = Math.min(panel.body.getHeight(), panel.body.getWidth());
 	        	// TODO set chart size after parent resize, without trigger infinite layout loop
 	        	chart.setSize(size, size).redraw();
@@ -8857,12 +8867,13 @@ Ext.define('Voyant.panel.CorpusSet', {
         region: 'center',
         flex: 3,
         layout: 'fit',
-        
         xtype: 'voyanttabpanel',
     	tabBarHeaderPosition: 0,
-        items: {
+        items: [{
 	        xtype: 'reader'
-        }
+        }/*,{
+        	xtype: 'scatterplot'
+        }*/]
     }, {
     	region: 'west',
     	flex: 3,

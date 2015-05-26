@@ -18,12 +18,13 @@ Ext.define('Voyant.panel.CorpusSet', {
         region: 'center',
         flex: 3,
         layout: 'fit',
-        
         xtype: 'voyanttabpanel',
     	tabBarHeaderPosition: 0,
-        items: {
+        items: [{
 	        xtype: 'reader'
-        }
+        }/*,{
+        	xtype: 'scatterplot'
+        }*/]
     }, {
     	region: 'west',
     	flex: 3,
