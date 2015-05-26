@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 25 10:15:17 EDT 2015 */
+/* This file created by JSCacher. Last modified: Mon May 25 13:50:44 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8812,7 +8812,6 @@ Ext.define('Voyant.panel.VoyantHeader', {
     },
     
     onCollapse: function(panel) {
-    	debugger 
     	// the title may be in flux when collapsing, so call defer setting of title
     	Ext.defer(function() {this.setTitle(this.localize('title'))}, 10, panel)
     }

@@ -1,0 +1,61 @@
+html {
+  margin: 0px;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  margin: 0px;
+  width: 100%;
+  min-height: 100%;
+}
+
+.twic_panel {
+  border-radius: 15px;
+  /*position: absolute;*/
+}
+
+.div_twic_graph {
+  margin-left: auto;
+  margin-right: auto;
+  overflow: auto;
+}
+
+.rect_twic_graph {
+  fill: white;
+}
+
+.group_twic_graph_overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.div_twic_info {
+  margin-left: auto;
+  margin-right: auto;
+  overflow: auto;
+}
+
+.div_twic_info_topicbar {
+  background-color: #002240;
+  border-radius: 15px;
+}
+
+.svg_twic_info {
+  overflow: scroll;
+}
+
+.topic_wordlist {
+  font-family: Archer;
+  font-size: 20;
+}
+
+.div_twic_info_docbar {
+  background-color: #002240;
+  border-radius: 15px;
+}
+
+.svg_twic_info_docbar {
+
+  overflow: scroll;
+}
