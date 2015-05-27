@@ -320,7 +320,7 @@ public class Trombone extends HttpServlet {
 		if (parameters.containsKey("tool") == true) {
 			final String[] tools = parameters.getParameterValues("tool");
 			for (int i=0, len=tools.length ; i < len ; i++) {
-				sb.append("tool");
+				sb.append(tools[i]);
 				if (i+1 < len) {
 					sb.append(",");
 				}

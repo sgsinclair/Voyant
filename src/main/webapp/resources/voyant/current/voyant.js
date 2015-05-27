@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 26 16:39:17 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed May 27 08:10:13 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4328,8 +4328,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     	}, this);
     	
         this.on('activate', function() { // load after tab activate (if we're in a tab panel)
-			if (this.getCorpus()) {
-				
+			if (this.getCorpus()) {				
 				Ext.Function.defer(function() {this.getDocStore().load()}, 100, this);
 			}
     	}, this);
@@ -4607,7 +4606,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	xtype: 'container',
 	            	autoEl: 'div',
 	            	itemId: 'canvasParent',
-	            	autoScroll: true,
+	            	scrollable: true,
 	            	style: 'overflow-x: hidden !important;'
 	            }],
 	            listeners: {
@@ -4657,11 +4656,15 @@ Ext.define('Voyant.panel.Bubblelines', {
      * @param query {String|Array}
      */
     getDocTermsFromQuery: function(query) {
-    	var docs = this.getCorpus().getDocuments();
-    	for (var i = 0, len = docs.getCount(); i < len; i++) {
-    		var doc = docs.getAt(i);
-	    	this.setApiParams({query: query, docIndex: undefined, docId: doc.getId()});
-			this.getDocTermStore().load({params: this.getApiParams()});
+    	if (query) {this.setApiParam("query", query);} // make sure it's set for subsequent calls
+    	var corpus = this.getCorpus();
+    	if (corpus && this.isVisible()) {
+        	var docs = this.getCorpus().getDocuments();
+        	for (var i = 0, len = docs.getCount(); i < len; i++) {
+        		var doc = docs.getAt(i);
+    	    	this.setApiParams({query: query, docIndex: undefined, docId: doc.getId()});
+    			this.getDocTermStore().load({params: this.getApiParams()});
+        	}
     	}
 	},
     
@@ -5433,7 +5436,7 @@ Ext.define('Voyant.panel.Contexts', {
         
         me.on("loadedCorpus", function(src, corpus) {
         	this.getStore().setCorpus(corpus);
-        	if (this.getApiParam("query")) {
+//        	if (this.getApiParam("query")) {
         		var corpusTerms = Ext.create("Voyant.data.store.CorpusTerms", {corpus: corpus});
         		corpusTerms.load({
         		    callback: function(records, operation, success) {
@@ -5448,10 +5451,8 @@ Ext.define('Voyant.panel.Contexts', {
         				stopList: this.getApiParam("stopList")
         			}
             	});
-        	}
-        	else {
-            	this.getStore().load({params: this.getApiParams()});
-        	}
+ //       	}
+//            	this.getStore().load({params: this.getApiParams()});
         });
         
         me.on("query", function(src, query) {

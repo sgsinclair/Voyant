@@ -159,7 +159,7 @@ Ext.define('Voyant.panel.Contexts', {
         
         me.on("loadedCorpus", function(src, corpus) {
         	this.getStore().setCorpus(corpus);
-        	if (this.getApiParam("query")) {
+//        	if (this.getApiParam("query")) {
         		var corpusTerms = Ext.create("Voyant.data.store.CorpusTerms", {corpus: corpus});
         		corpusTerms.load({
         		    callback: function(records, operation, success) {
@@ -174,10 +174,8 @@ Ext.define('Voyant.panel.Contexts', {
         				stopList: this.getApiParam("stopList")
         			}
             	});
-        	}
-        	else {
-            	this.getStore().load({params: this.getApiParams()});
-        	}
+ //       	}
+//            	this.getStore().load({params: this.getApiParams()});
         });
         
         me.on("query", function(src, query) {
