@@ -23,7 +23,7 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 		         reader: {
 		             type: 'json',
 		             rootProperty: 'correspondenceAnalysis',
-		             totalProperty: 'correspondenceAnalysis.totalTypes'
+		             totalProperty: 'correspondenceAnalysis.totalTerms'
 		         },
 		         simpleSortMode: true
 			 }
