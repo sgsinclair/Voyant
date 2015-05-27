@@ -108,7 +108,12 @@
     	this.on("documentTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
 	    		this.setApiParam('mode', 'document');
-	    		this.loadFromRecords(terms);
+    			if (terms[0] && terms[0].get('distributions') !== undefined) {
+    				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
+    			}
+    			else {
+    				this.fireEvent("termsClicked", src, terms)
+    			}
     		}
     	})
     	this.on("corpusTermsClicked", function(src, terms) {
