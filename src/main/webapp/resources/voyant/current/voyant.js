@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 27 13:58:18 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed May 27 14:12:39 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4275,7 +4275,12 @@ Ext.define('Voyant.panel.Bubblelines', {
     		 * @property docIndex The document index to restrict results to.
     		 * @type Integer
     		 */
-    		docIndex: undefined
+    		docIndex: undefined,
+    		/**
+    		 * @property maxDocs The maximum number of documents to show.
+    		 * @type Integer
+    		 */
+    		maxDocs: 50
     	},
     	glyph: 'xf06e@FontAwesome'
 	},
@@ -4659,7 +4664,11 @@ Ext.define('Voyant.panel.Bubblelines', {
     	var corpus = this.getCorpus();
     	if (corpus && this.isVisible()) {
         	var docs = this.getCorpus().getDocuments();
-        	for (var i = 0, len = docs.getCount(); i < len; i++) {
+        	var len = docs.getCount();
+//        	var maxDocs = parseInt(this.getApiParam('maxDocs'))
+//        	if (len > maxDocs) {len = maxDocs}
+//        	debugger
+        	for (var i = 0; i < len; i++) {
         		var doc = docs.getAt(i);
     	    	this.setApiParams({query: query, docIndex: undefined, docId: doc.getId()});
     			this.getDocTermStore().load({params: this.getApiParams()});
@@ -9019,7 +9028,17 @@ Ext.define('Voyant.panel.CorpusSet', {
 	    			xtype: 'bubblelines'
     			}]
     	}]
-    }]
+    }],
+    listeners: {
+    	loadedCorpus: function(src, corpus) {
+    		if (corpus.getDocumentsCount()>30) {
+    			var bubblelines = this.down('bubblelines');
+    			if (bubblelines) {
+    				bubblelines.up('voyanttabpanel').remove(bubblelines)
+    			}
+    		}
+    	}
+    }
 })
 
 Ext.define('Voyant.panel.TabPanel', {

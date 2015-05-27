@@ -99,5 +99,15 @@ Ext.define('Voyant.panel.CorpusSet', {
 	    			xtype: 'bubblelines'
     			}]
     	}]
-    }]
+    }],
+    listeners: {
+    	loadedCorpus: function(src, corpus) {
+    		if (corpus.getDocumentsCount()>30) {
+    			var bubblelines = this.down('bubblelines');
+    			if (bubblelines) {
+    				bubblelines.up('voyanttabpanel').remove(bubblelines)
+    			}
+    		}
+    	}
+    }
 })
