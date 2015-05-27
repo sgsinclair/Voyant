@@ -252,7 +252,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	fieldLabel: this.localize('granularity'),
 	            	labelAlign: 'right',
 	            	labelWidth: 70,
-	            	width: 200,
+	            	width: 120,
 	            	increment: 10,
 	            	minValue: 10,
 	            	maxValue: 300,

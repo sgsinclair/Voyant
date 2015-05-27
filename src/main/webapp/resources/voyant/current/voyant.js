@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 27 13:56:39 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed May 27 13:58:18 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4482,7 +4482,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	fieldLabel: this.localize('granularity'),
 	            	labelAlign: 'right',
 	            	labelWidth: 70,
-	            	width: 200,
+	            	width: 120,
 	            	increment: 10,
 	            	minValue: 10,
 	            	maxValue: 300,
