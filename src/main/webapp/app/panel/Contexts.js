@@ -12,14 +12,16 @@ Ext.define('Voyant.panel.Contexts', {
     		leftTip: {en: "Context to the left of the keyword."},
     		right: {en: "Right"},
     		rightTip: {en: "Context to the right of the keyword."},
-    		context: {en: "context"}
+    		context: {en: "context"},
+    		expand: {en: "expand"}
     	},
     	api: {
     		query: undefined,
     		docId: undefined,
     		docIndex: undefined,
     		stopList: 'auto',
-    		context: 5
+    		context: 5,
+    		expand: 50
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
@@ -31,7 +33,7 @@ Ext.define('Voyant.panel.Contexts', {
     initComponent: function() {
         var me = this;
 
-        Ext.apply(me, {
+        Ext.apply(me, { 
     		title: this.localize('title'),
             store : Ext.create("Voyant.data.store.Contexts", {
             	stripTags: "all",
@@ -52,6 +54,10 @@ Ext.define('Voyant.panel.Contexts', {
                     }
                 }
             }),
+            plugins: [{ // the expander slider assumes there's only one plugin, needs to be updated if changed
+                ptype: 'rowexpander',
+                rowBodyTpl : new Ext.XTemplate('')
+            }],
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
@@ -73,9 +79,35 @@ Ext.define('Voyant.panel.Contexts', {
                 		render: function(slider) {
                 			slider.setValue(me.getApiParam('context'))
                 		},
-                		dragend: function(slider, newValue) {
+                		changecomplete: function(slider, newValue) {
                 			me.setApiParam("context", slider.getValue());
            		        	me.getStore().loadPage(1, {params: me.getApiParams()});
+                		}
+                	}
+                }, this.localize('expand'), {
+                	xtype: 'slider',
+                	minValue: 5,
+                	value: 5,
+                	maxValue: 500,
+                	increment: 10,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(me.getApiParam('expand'))
+                		},
+                		changecomplete: function(slider, newValue) {
+                			me.setApiParam('expand', newValue);
+                			var view = me.getView();
+                			var recordsExpanded = me.plugins[0].recordsExpanded;
+                			var store = view.getStore();
+                			for (id in recordsExpanded) {
+                				if (recordsExpanded[id]) {
+                					var record = store.getByInternalId(id);
+                					var row = view.getRow(record);
+                					var expandRow = row.parentNode.childNodes[1]
+                					view.fireEvent("expandbody", row, record, expandRow, {force: true})
+                				}
+                			}
                 		}
                 	}
                 }]
@@ -152,8 +184,36 @@ Ext.define('Voyant.panel.Contexts', {
 	       	        	}
 	           		 },
 	           		 scope: this
-	           	 }
-	           	 
+	           	 },
+                 afterrender: function(me) {
+                	 me.getView().on('expandbody', function( rowNode, record, expandRow, eOpts ) {
+                		 if (expandRow.innerText=="" || (eOpts && eOpts.force)) {
+                	            var store = Ext.create("Voyant.data.store.Contexts", {
+                	            	stripTags: "all",
+                	            	corpus: me.getStore().getCorpus()
+                	            })
+                	            var data = record.getData()
+                	            store.load({
+                	            	params: {
+                    	            	query: data.query,
+                    	            	docIndex: data.docIndex,
+                    	            	position: data.position,
+                    	            	limit: 1,
+                    	            	context: me.getApiParam('expand')
+                	            	},
+                	                callback: function(records, operation, success) {
+                	                	if (success && records.length==1) {
+                	                		data = records[0].getData()
+                	                		operation.expandRow.firstElementChild.firstElementChild.innerHTML = data.left + " <span class='word keyword'>" + data.middle + "</span> " + data.right
+                	                	}
+                	                },
+                	                expandRow : expandRow
+                	            })
+                	            
+                		 }
+                	 }) 
+                 }
+
             }
         });
         

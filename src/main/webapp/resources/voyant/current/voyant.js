@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 27 10:37:38 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed May 27 13:56:39 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -77,6 +77,7 @@ Bubblelines.prototype = {
 			this.DRAW_SHORT_TITLES = width < 500;
 			var id = Ext.id('bubblelines');
 			container.add({
+				xtype: 'container',
 				width: width,
 				height: height,
 				html: '<canvas id="'+id+'" width="'+width+'" height="'+height+'"></canvas>',
@@ -186,7 +187,7 @@ Bubblelines.prototype = {
 					maxDistribution = d;
 				}
 				
-				cachedPositions.push({id: Ext.id(null, 'bub'), x: xIndex, freq: d, radius: 0, bin: i, tokenIds: termInfo.positions.slice(tokenPos, tokenPos+=d)});
+				cachedPositions.push({id: Ext.id(null, 'bub'), x: xIndex, freq: d, radius: 0, bin: i, tokenPositions: termInfo.positions.slice(tokenPos, tokenPos+=d)});
 				xIndex += spacing;
 			}
 			
@@ -730,7 +731,7 @@ Bubblelines.prototype = {
 												yIndex: yIndex,
 												freq: type.pos[xIndex].freq,
 												id: type.pos[xIndex].id,
-												tokenIds: type.pos[xIndex].tokenIds,
+												tokenPositions: type.pos[xIndex].tokenPositions,
 												x: event.layerX+10,
 												y: event.layerY+10
 											});
@@ -826,27 +827,24 @@ Bubblelines.prototype = {
 		this.lastClickedBubbles = {};
 		if (this.overBubbles.length > 0 && this.overBubbles[0].label) {
 			var hits = [];
-			var tokenIds = [];
-			var limit = 0;
+			var tokenPositions = [];
 			var termData = [];
 			for (var i = 0; i < this.overBubbles.length; i++) {
 				var b = this.overBubbles[i];
 				
-				termData.push({term: b.label, docIndex: b.docIndex});
+				termData.push({term: b.label, docIndex: b.docIndex, docId: b.docId, tokenPositions: b.tokenPositions});
 				
 				if (this.lastClickedBubbles[b.docIndex] == null) {
 					this.lastClickedBubbles[b.docIndex] = {};
 				}
 				this.lastClickedBubbles[b.docIndex][b.label] = b.id;
-				limit += b.freq;
 				hits.push(b.docId+':'+b.label);
-				tokenIds.push(b.tokenIds);
+				tokenPositions.push(b.tokenPositions);
 			}
-			tokenIds = Ext.flatten(tokenIds);
-			tokenIds.sort();
+			tokenPositions = Ext.flatten(tokenPositions);
+			tokenPositions.sort();
 			
 			if (this.externalClickHandler !== undefined) {
-//				this.externalClickHandler({docIdType: hits, tokenIdStart: tokenIds[0], tokenIds: tokenIds, limit: limit});
 				this.externalClickHandler(termData);
 			}
 		}
@@ -4606,8 +4604,9 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	xtype: 'container',
 	            	autoEl: 'div',
 	            	itemId: 'canvasParent',
-	            	scrollable: true,
-	            	style: 'overflow-x: hidden !important;'
+	            	layout: 'fit',
+	            	overflowY: 'auto',
+	            	overflowX: 'hidden'
 	            }],
 	            listeners: {
 	            	render: function(component) {
@@ -5289,14 +5288,16 @@ Ext.define('Voyant.panel.Contexts', {
     		leftTip: {en: "Context to the left of the keyword."},
     		right: {en: "Right"},
     		rightTip: {en: "Context to the right of the keyword."},
-    		context: {en: "context"}
+    		context: {en: "context"},
+    		expand: {en: "expand"}
     	},
     	api: {
     		query: undefined,
     		docId: undefined,
     		docIndex: undefined,
     		stopList: 'auto',
-    		context: 5
+    		context: 5,
+    		expand: 50
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
@@ -5308,7 +5309,7 @@ Ext.define('Voyant.panel.Contexts', {
     initComponent: function() {
         var me = this;
 
-        Ext.apply(me, {
+        Ext.apply(me, { 
     		title: this.localize('title'),
             store : Ext.create("Voyant.data.store.Contexts", {
             	stripTags: "all",
@@ -5329,6 +5330,10 @@ Ext.define('Voyant.panel.Contexts', {
                     }
                 }
             }),
+            plugins: [{ // the expander slider assumes there's only one plugin, needs to be updated if changed
+                ptype: 'rowexpander',
+                rowBodyTpl : new Ext.XTemplate('')
+            }],
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
@@ -5350,9 +5355,35 @@ Ext.define('Voyant.panel.Contexts', {
                 		render: function(slider) {
                 			slider.setValue(me.getApiParam('context'))
                 		},
-                		dragend: function(slider, newValue) {
+                		changecomplete: function(slider, newValue) {
                 			me.setApiParam("context", slider.getValue());
            		        	me.getStore().loadPage(1, {params: me.getApiParams()});
+                		}
+                	}
+                }, this.localize('expand'), {
+                	xtype: 'slider',
+                	minValue: 5,
+                	value: 5,
+                	maxValue: 500,
+                	increment: 10,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(me.getApiParam('expand'))
+                		},
+                		changecomplete: function(slider, newValue) {
+                			me.setApiParam('expand', newValue);
+                			var view = me.getView();
+                			var recordsExpanded = me.plugins[0].recordsExpanded;
+                			var store = view.getStore();
+                			for (id in recordsExpanded) {
+                				if (recordsExpanded[id]) {
+                					var record = store.getByInternalId(id);
+                					var row = view.getRow(record);
+                					var expandRow = row.parentNode.childNodes[1]
+                					view.fireEvent("expandbody", row, record, expandRow, {force: true})
+                				}
+                			}
                 		}
                 	}
                 }]
@@ -5429,8 +5460,36 @@ Ext.define('Voyant.panel.Contexts', {
 	       	        	}
 	           		 },
 	           		 scope: this
-	           	 }
-	           	 
+	           	 },
+                 afterrender: function(me) {
+                	 me.getView().on('expandbody', function( rowNode, record, expandRow, eOpts ) {
+                		 if (expandRow.innerText=="" || (eOpts && eOpts.force)) {
+                	            var store = Ext.create("Voyant.data.store.Contexts", {
+                	            	stripTags: "all",
+                	            	corpus: me.getStore().getCorpus()
+                	            })
+                	            var data = record.getData()
+                	            store.load({
+                	            	params: {
+                    	            	query: data.query,
+                    	            	docIndex: data.docIndex,
+                    	            	position: data.position,
+                    	            	limit: 1,
+                    	            	context: me.getApiParam('expand')
+                	            	},
+                	                callback: function(records, operation, success) {
+                	                	if (success && records.length==1) {
+                	                		data = records[0].getData()
+                	                		operation.expandRow.firstElementChild.firstElementChild.innerHTML = data.left + " <span class='word keyword'>" + data.middle + "</span> " + data.right
+                	                	}
+                	                },
+                	                expandRow : expandRow
+                	            })
+                	            
+                		 }
+                	 }) 
+                 }
+
             }
         });
         
