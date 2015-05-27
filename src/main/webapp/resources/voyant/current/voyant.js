@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 27 09:23:44 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed May 27 10:37:38 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5525,6 +5525,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     	},
     	api: {
     		stopList: 'auto',
+    		context: 5,
     		query: undefined,
     		docId: undefined,
     		docIndex: undefined
@@ -5645,7 +5646,12 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 listeners: {
                     selectionchange: {
                     	fn: function(sm, selections) {
-                    		this.getApplication().dispatchEvent('documentTermsClicked', this, selections);
+                    		var terms = [];
+                    		var context = this.getApiParam("context")
+                    		selections.forEach(function(selection) {
+                    			terms.push('"'+selection.getKeyword()+" "+selection.getContextTerm()+'"~'+context)
+                    		})
+                    		this.getApplication().dispatchEvent('termsClicked', this, terms);
                     	},
                     	scope: this
                     }
@@ -9109,7 +9115,7 @@ Ext.define('Voyant.VoyantApp', {
     	return Ext.ComponentQuery.query('viewport')[0];
     },
 
-    dispatchEvent: function(eventName) {
+    dispatchEvent: function(eventName, src) {
     	var viewport = this.getViewport();
 		var panels = viewport.query("panel,chart");
 		var isHeard = false;
@@ -9120,9 +9126,12 @@ Ext.define('Voyant.VoyantApp', {
 			isHeard = true
 		}
 		
-		// tell the panels
+		// tell the panels, except the current one
 		for (var i=0; i<panels.length; i++) {
 			if (panels[i].hasListener && panels[i].hasListener(eventName)) {
+				if (src && src.getId && panels[i].getId && src.getId()==panels[i].getId()) {
+					continue; // don't send to self
+				}
 				isHeard = true;
 				panels[i].fireEvent.apply(panels[i], arguments);
 			}

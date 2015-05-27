@@ -31,6 +31,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     	},
     	api: {
     		stopList: 'auto',
+    		context: 5,
     		query: undefined,
     		docId: undefined,
     		docIndex: undefined
@@ -151,7 +152,12 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 listeners: {
                     selectionchange: {
                     	fn: function(sm, selections) {
-                    		this.getApplication().dispatchEvent('documentTermsClicked', this, selections);
+                    		var terms = [];
+                    		var context = this.getApiParam("context")
+                    		selections.forEach(function(selection) {
+                    			terms.push('"'+selection.getKeyword()+" "+selection.getContextTerm()+'"~'+context)
+                    		})
+                    		this.getApplication().dispatchEvent('termsClicked', this, terms);
                     	},
                     	scope: this
                     }

@@ -114,7 +114,7 @@ Ext.define('Voyant.VoyantApp', {
     	return Ext.ComponentQuery.query('viewport')[0];
     },
 
-    dispatchEvent: function(eventName) {
+    dispatchEvent: function(eventName, src) {
     	var viewport = this.getViewport();
 		var panels = viewport.query("panel,chart");
 		var isHeard = false;
@@ -125,9 +125,12 @@ Ext.define('Voyant.VoyantApp', {
 			isHeard = true
 		}
 		
-		// tell the panels
+		// tell the panels, except the current one
 		for (var i=0; i<panels.length; i++) {
 			if (panels[i].hasListener && panels[i].hasListener(eventName)) {
+				if (src && src.getId && panels[i].getId && src.getId()==panels[i].getId()) {
+					continue; // don't send to self
+				}
 				isHeard = true;
 				panels[i].fireEvent.apply(panels[i], arguments);
 			}
