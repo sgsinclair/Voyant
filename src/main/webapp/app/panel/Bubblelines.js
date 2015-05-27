@@ -374,8 +374,9 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	xtype: 'container',
 	            	autoEl: 'div',
 	            	itemId: 'canvasParent',
-	            	scrollable: true,
-	            	style: 'overflow-x: hidden !important;'
+	            	layout: 'fit',
+	            	overflowY: 'auto',
+	            	overflowX: 'hidden'
 	            }],
 	            listeners: {
 	            	render: function(component) {

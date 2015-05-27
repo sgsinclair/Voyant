@@ -76,6 +76,7 @@ Bubblelines.prototype = {
 			this.DRAW_SHORT_TITLES = width < 500;
 			var id = Ext.id('bubblelines');
 			container.add({
+				xtype: 'container',
 				width: width,
 				height: height,
 				html: '<canvas id="'+id+'" width="'+width+'" height="'+height+'"></canvas>',
@@ -185,7 +186,7 @@ Bubblelines.prototype = {
 					maxDistribution = d;
 				}
 				
-				cachedPositions.push({id: Ext.id(null, 'bub'), x: xIndex, freq: d, radius: 0, bin: i, tokenIds: termInfo.positions.slice(tokenPos, tokenPos+=d)});
+				cachedPositions.push({id: Ext.id(null, 'bub'), x: xIndex, freq: d, radius: 0, bin: i, tokenPositions: termInfo.positions.slice(tokenPos, tokenPos+=d)});
 				xIndex += spacing;
 			}
 			
@@ -729,7 +730,7 @@ Bubblelines.prototype = {
 												yIndex: yIndex,
 												freq: type.pos[xIndex].freq,
 												id: type.pos[xIndex].id,
-												tokenIds: type.pos[xIndex].tokenIds,
+												tokenPositions: type.pos[xIndex].tokenPositions,
 												x: event.layerX+10,
 												y: event.layerY+10
 											});
@@ -825,27 +826,24 @@ Bubblelines.prototype = {
 		this.lastClickedBubbles = {};
 		if (this.overBubbles.length > 0 && this.overBubbles[0].label) {
 			var hits = [];
-			var tokenIds = [];
-			var limit = 0;
+			var tokenPositions = [];
 			var termData = [];
 			for (var i = 0; i < this.overBubbles.length; i++) {
 				var b = this.overBubbles[i];
 				
-				termData.push({term: b.label, docIndex: b.docIndex});
+				termData.push({term: b.label, docIndex: b.docIndex, docId: b.docId, tokenPositions: b.tokenPositions});
 				
 				if (this.lastClickedBubbles[b.docIndex] == null) {
 					this.lastClickedBubbles[b.docIndex] = {};
 				}
 				this.lastClickedBubbles[b.docIndex][b.label] = b.id;
-				limit += b.freq;
 				hits.push(b.docId+':'+b.label);
-				tokenIds.push(b.tokenIds);
+				tokenPositions.push(b.tokenPositions);
 			}
-			tokenIds = Ext.flatten(tokenIds);
-			tokenIds.sort();
+			tokenPositions = Ext.flatten(tokenPositions);
+			tokenPositions.sort();
 			
 			if (this.externalClickHandler !== undefined) {
-//				this.externalClickHandler({docIdType: hits, tokenIdStart: tokenIds[0], tokenIds: tokenIds, limit: limit});
 				this.externalClickHandler(termData);
 			}
 		}
