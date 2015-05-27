@@ -208,7 +208,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     	
     	Ext.apply(this, {
     		dockedItems: [{
-                dock: 'top',
+                dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
                 	xtype: 'querysearchfield'

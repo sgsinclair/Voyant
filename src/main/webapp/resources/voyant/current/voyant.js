@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 27 08:25:21 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed May 27 08:43:42 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4440,7 +4440,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     	
     	Ext.apply(this, {
     		dockedItems: [{
-                dock: 'top',
+                dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
                 	xtype: 'querysearchfield'
