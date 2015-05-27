@@ -45,7 +45,12 @@ Ext.define('Voyant.panel.Bubblelines', {
     		 * @property docIndex The document index to restrict results to.
     		 * @type Integer
     		 */
-    		docIndex: undefined
+    		docIndex: undefined,
+    		/**
+    		 * @property maxDocs The maximum number of documents to show.
+    		 * @type Integer
+    		 */
+    		maxDocs: 50
     	},
     	glyph: 'xf06e@FontAwesome'
 	},
@@ -252,7 +257,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	fieldLabel: this.localize('granularity'),
 	            	labelAlign: 'right',
 	            	labelWidth: 70,
-	            	width: 200,
+	            	width: 120,
 	            	increment: 10,
 	            	minValue: 10,
 	            	maxValue: 300,
@@ -429,7 +434,11 @@ Ext.define('Voyant.panel.Bubblelines', {
     	var corpus = this.getCorpus();
     	if (corpus && this.isVisible()) {
         	var docs = this.getCorpus().getDocuments();
-        	for (var i = 0, len = docs.getCount(); i < len; i++) {
+        	var len = docs.getCount();
+//        	var maxDocs = parseInt(this.getApiParam('maxDocs'))
+//        	if (len > maxDocs) {len = maxDocs}
+//        	debugger
+        	for (var i = 0; i < len; i++) {
         		var doc = docs.getAt(i);
     	    	this.setApiParams({query: query, docIndex: undefined, docId: doc.getId()});
     			this.getDocTermStore().load({params: this.getApiParams()});
