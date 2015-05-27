@@ -167,12 +167,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     			
     			var keywordNode = {term: corpusCollocate.getKeyword(), type: 'keyword', value: corpusCollocate.getKeywordRawFreq(), start: start};
     			var keywordNodeKey = [keywordNode.term,keywordNode.type].join(";")
-    			if (thisNodes[keywordNodeKey]) {thisNodes[keywordNodeKey].value+=keywordNode.value;}
+    			if (thisNodes[keywordNodeKey]) {/*thisNodes[keywordNodeKey].value+=keywordNode.value;*/}
     			else {thisNodes[keywordNodeKey]=keywordNode;}
     			
     			var contextNode = {term: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
     			var contextNodeKey = [contextNode.term,contextNode.type].join(";")
-    			if (thisNodes[contextNodeKey]) {thisNodes[contextNodeKey].value+=contextNode.value;}
+    			if (thisNodes[contextNodeKey]) {/*thisNodes[contextNodeKey].value+=contextNode.value;*/}
     			else {thisNodes[contextNodeKey]=contextNode;}
     			
     			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
@@ -343,7 +343,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	    			
     	    			var contextNode = {term: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
     	    			var contextNodeKey = [contextNode.term,contextNode.type].join(";");
-    	    			if (thisNodes[contextNodeKey]) {thisNodes[contextNodeKey].value+=contextNode.value;}
+    	    			if (thisNodes[contextNodeKey]) {/*thisNodes[contextNodeKey].value+=contextNode.value;*/}
     	    			else {thisNodes[contextNodeKey]=contextNode;}
     	    			
     	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
