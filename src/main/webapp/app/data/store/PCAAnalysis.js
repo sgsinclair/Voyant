@@ -23,7 +23,7 @@ Ext.define('Voyant.data.store.PCAAnalysis', {
 		         reader: {
 		             type: 'json',
 		             rootProperty: 'pcaAnalysis',
-		             totalProperty: 'pcaAnalysis.totalTypes'
+		             totalProperty: 'pcaAnalysis.totalTerms'
 		         },
 		         simpleSortMode: true
 			 }
