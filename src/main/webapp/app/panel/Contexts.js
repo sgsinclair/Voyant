@@ -6,6 +6,8 @@ Ext.define('Voyant.panel.Contexts', {
     statics: {
     	i18n: {
     		title: {en: "Contexts"},
+    		document: {en: "Document"},
+    		documentTip: {en: "The document of the occurrence."},
     		helpTip: {en: "The Keywords in Context tool shows each occurrence of a keyword with a bit of surounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:</p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		termTip: {en: "The keyword for the context."},
     		left: {en: "Left"},
@@ -113,11 +115,14 @@ Ext.define('Voyant.panel.Contexts', {
                 }]
             }],
     		columns: [{
-    			text: '#',
-    			width: 30,
+    			text: this.localize("document"),
+    			toolTip: this.localize("documentTip"),
+                width: 'autoSize',
         		dataIndex: 'docIndex',
-                sortable: true,
-                renderer: function(v) {return v+1;} // 0-based to 1-based
+                sortable: false,
+                renderer: function (value, metaData, record, rowIndex, colIndex, store) {
+                	return store.getCorpus().getDocument(value).getTinyLabel();
+                }
             },{
     			text: this.localize("left"),
     			tooltip: this.localize("leftTip"),
