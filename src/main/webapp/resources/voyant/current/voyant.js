@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu May 28 09:12:07 EDT 2015 */
+/* This file created by JSCacher. Last modified: Thu May 28 21:00:24 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5915,7 +5915,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				            fieldLabel:'Choose a corpus:',
 	    				            name:'corpus',
 	    				            queryMode:'local',
-	    				            store:[['shakespeare',"Shakespeare's Plays"]],
+	    				            store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],
 	    				            
 	    				            forceSelection:true
 	    				        },

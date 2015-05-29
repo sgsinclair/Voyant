@@ -86,7 +86,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				            fieldLabel:'Choose a corpus:',
 	    				            name:'corpus',
 	    				            queryMode:'local',
-	    				            store:[['shakespeare',"Shakespeare's Plays"]],
+	    				            store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],
 	    				            
 	    				            forceSelection:true
 	    				        },
