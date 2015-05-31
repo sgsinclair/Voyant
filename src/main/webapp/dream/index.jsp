@@ -13,7 +13,7 @@
 
 	Ext.application({
 		extend : 'Voyant.VoyantCorpusApp',
-		requires: ['Voyant.util.QuerySearchField'],
+		requires: ['Voyant.widget.QuerySearchField'],
 		name: 'VoyantDreamApp',
 		config: {
 			baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/',
@@ -41,7 +41,7 @@
 			    		afterrender: function() {
 			    		      Ext.create('Ext.tip.ToolTip', {
 							        target: this.getEl().dom.querySelector(".search-tips"),
-        							html: Voyant.util.QuerySearchField.i18n.querySearchTip.en
+        							html: Voyant.widget.QuerySearchField.i18n.querySearchTip.en
       							});
 			    		}
 			    	}

@@ -1,4 +1,4 @@
-Ext.define('Voyant.util.QuerySearchField', {
+Ext.define('Voyant.widget.QuerySearchField', {
     extend: 'Ext.form.field.Text',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.querysearchfield',

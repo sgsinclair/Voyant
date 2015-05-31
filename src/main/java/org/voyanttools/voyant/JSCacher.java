@@ -40,7 +40,6 @@ public class JSCacher {
 		"app/util/Localization.js",
 		"app/util/Deferrable.js",
 		"app/util/DetailedError.js",
-		"app/util/QuerySearchField.js",
 		"app/util/ResponseError.js",
 		"app/util/SparkLine.js",
 		"app/util/Toolable.js",
@@ -72,6 +71,7 @@ public class JSCacher {
 		"app/data/model/Corpus.js",
 
 		"app/widget/StopListOption.js",
+		"app/widget/QuerySearchField.js",
 
 		"app/panel/Panel.js",
 		"app/panel/Bubblelines.js",
