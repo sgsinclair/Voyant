@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu May 28 21:00:24 EDT 2015 */
+/* This file created by JSCacher. Last modified: Sun May 31 11:04:20 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2092,7 +2092,7 @@ Ext.define('Voyant.util.QuerySearchField', {
     		},
             labelWidth: 50,
             fieldLabel: me.localize('querySearch'),
-            width: 'autoSize'
+            width: 175
 
         })
 

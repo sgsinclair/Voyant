@@ -43,7 +43,7 @@ Ext.define('Voyant.util.QuerySearchField', {
     		},
             labelWidth: 50,
             fieldLabel: me.localize('querySearch'),
-            width: 'autoSize'
+            width: 175
 
         })
 
