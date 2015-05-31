@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun May 31 11:10:00 EDT 2015 */
+/* This file created by JSCacher. Last modified: Sun May 31 11:21:49 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4117,7 +4117,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	statics: {
 		i18n: {
 			querySearch: {en: 'Search'},
-			querySearchTip: {en: '<ul><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,&quot;coat mittens&quot;~5</b>: combine syntaxes</li></ul>'}
+			querySearchTip: {en: '<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,&quot;coat mittens&quot;~5</b>: combine syntaxes</li></ul>'}
 		}
 	},
     triggers: {
@@ -4176,6 +4176,12 @@ Ext.define('Voyant.widget.QuerySearchField', {
     },
 
     onSearchClick : function(){
+    	Ext.Msg.show({
+    	    title: this.localize('querySearch'),
+    	    message: this.localize('querySearchTip'),
+    	    buttons: Ext.Msg.OK,
+    	    icon: Ext.Msg.INFO
+    	});
     	
         var value = this.getValue();
     	this.findParentByType("panel").fireEvent("query", this, value);
