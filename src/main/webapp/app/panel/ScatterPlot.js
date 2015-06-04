@@ -66,6 +66,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		itemId: 'terms',
         		xtype: 'grid',
         		flex: 1,
+        		border: true,
         		columns: [{
         			text: this.localize('terms'),
     				dataIndex: 'term',
@@ -74,26 +75,34 @@ Ext.define('Voyant.panel.ScatterPlot', {
     			},{
     				text: this.localize('rawFreq'),
     				dataIndex: 'rawFreq',
-    				flex: 1,
+    				width: 'autoSize',
                     sortable: true
+    			},{
+    				text: this.localize('relFreq'),
+    				dataIndex: 'relativeFreq',
+    				width: 'autoSize',
+                    sortable: true,
+                    hidden: true
     			}],
     			selModel: Ext.create('Ext.selection.RowModel', {
                     listeners: {
                         selectionchange: {
                         	fn: function(sm, selections) {
-                        		this.getApplication().dispatchEvent('corpusTermsClicked', this, selections);
+//                        		this.getApplication().dispatchEvent('corpusTermsClicked', this, selections);
+                        		var term = selections[0].get('term');
+                        		this.selectTerm(term);
                         	},
                         	scope: this
                         }
                     },
-                    mode: 'MULTI'
+                    mode: 'SINGLE'
                 }),
         		store: Ext.create('Ext.data.JsonStore', {
             		fields: [
              		    {name: 'term'},
              		    {name: 'rawFreq', type: 'int'},
-             		    {name: 'relativeFreq', type: 'number'}
-//                 		    ,{name: 'coordinates', mapping : 'vector'}
+             		    {name: 'relativeFreq', type: 'number'},
+             		    {name: 'coordinates', mapping : 'vector'}
              		],
              		sorters: [{property: 'rawFreq', direction: 'DESC'}]
                  })
@@ -244,20 +253,24 @@ Ext.define('Voyant.panel.ScatterPlot', {
         var maxFreq = 0;
         var minFreq = Number.MAX_VALUE;
         
+        var termStore = this.queryById('terms').getStore();
+        
         var data = [];
         tokens.forEach(function(token) {
-        	var freq = parseInt(token.get('rawFreq'), 10);
+        	var freq = token.get('rawFreq');
         	var isDoc = token.get('category') === 'part';
         	if (!isDoc) {
 	        	if (freq > maxFreq) maxFreq = freq;
 	        	if (freq < minFreq) minFreq = freq;
+	        	
+	        	if (termStore.findExact('term', token.get('term') === -1)) {
+	        		termStore.addSorted(token);
+	        	}
         	}
         	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1]};
         	tokenData.isDoc = isDoc;
         	data.push(tokenData);
         }, this);
-        
-        this.queryById('terms').getStore().loadRawData(data, false);
         
     	var newStore = Ext.create('Ext.data.JsonStore', {
     		fields: ['term', 'x', 'y', 'rawFreq', 'cluster', 'isDoc'],
@@ -301,10 +314,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
         				}
         			}
         		},
+        		marker: {
+        		    type: 'circle'
+        		},
+        		highlight: {
+        			fillStyle: 'yellow',
+                    strokeStyle: 'black'
+        		},
         		renderer: function (sprite, config, rendererData, index) {
     				var store = rendererData.store;
     				var item = store.getAt(index);
-    				var clusterIndex = parseInt(item.get('cluster'), 10);
+    				var clusterIndex = item.get('cluster');
     				var scatterplot = this.getParent().up('scatterplot');
     				
     				if (clusterIndex === -1) {
@@ -317,7 +337,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
     				config.strokeStyle = 'rgba('+color.join(',')+',1)';
     				
     				var freq = item.get('rawFreq');
-    				var radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
+    				var radius;
+    				if (item.get('isDoc')) {
+    					radius = 5;
+    				} else {
+    					radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
+    				}
     				config.radius = radius;
     			}
         	}],
@@ -360,6 +385,26 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	
     	var chart = Ext.create('Ext.chart.CartesianChart', config);
     	this.insert(0, chart);
+    },
+    
+    selectTerm: function(term) {
+    	var series = this.down('chart').getSeries()[0];
+    	var index = series.getStore().findExact('term', term);
+    	if (index !== -1) {
+    		var record = series.getStore().getAt(index);
+    		var sprite = series.getSprites()[0];
+    		// constructing series item, like in the chart series source
+    		var item = {
+				series: series,
+                category: series.getItemInstancing() ? 'items' : 'markers',
+                index: index,
+                record: record,
+                field: series.getYField(),
+                sprite: sprite
+    		};
+    		
+    		series.setHighlightItem(item);
+    	}
     },
     
     getCurrentTerms: function() {
