@@ -4,7 +4,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	requires: ['Ext.chart.CartesianChart'],
 	alias: 'widget.scatterplot',
 	config: {
-		corpus: undefined
+		corpus: undefined,
+		options: {
+    		xtype: 'stoplistoption'
+    	}
 	},
     statics: {
     	i18n: {
@@ -16,6 +19,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		rawFreq: {en: "Raw Frequency"},
     		relFreq: {en: "Relative Frequency"},
     		terms: {en: "Terms"},
+    		term: {en: "Term"},
+    		addTerm: {en: "Add Term"},
     		clusters: {en: "Clusters"},
     		remove: {en: "Remove"},
     		nearby: {en: "Nearby"},
@@ -30,6 +35,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		bins: 10,
     		clusters: 3,
     		freqType: 'raw',
+    		stopList: undefined,
     		target: undefined,
     		query: undefined
     	},
@@ -40,6 +46,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
     docFreqTipTemplate: null,
     caStore: null,
     pcaStore: null,
+    termStore: Ext.create('Ext.data.JsonStore', {
+		fields: [
+			{name: 'term'},
+			{name: 'rawFreq', type: 'int'},
+			{name: 'relativeFreq', type: 'number'},
+			{name: 'coordinates', mapping : 'vector'}
+		],
+		sorters: [{property: 'rawFreq', direction: 'DESC'}]
+	}),
+	newTerm: null,
     chartMenu: null,
     
     constructor: function(config) {
@@ -52,23 +68,201 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	title: this.localize('title'),
         	caStore: Ext.create('Voyant.data.store.CAAnalysis'),
         	pcaStore: Ext.create('Voyant.data.store.PCAAnalysis'),
+        	termStore: this.termStore,
         	chartMenu: Ext.create('Ext.menu.Menu', {
         		items: [
         			//{text: this.localize('remove')},
         			{text: this.localize('nearby')}
         		]
         	}),
-        	layout: {
-        		type: 'hbox',
-        		align: 'stretch'
-        	},
+        	layout: 'border',
+        	autoDestroy: true,
         	items: [{
+        		itemId: 'chartParent',
+        		region: 'center',
+        		layout: 'fit',
+        		tbar: [{
+            		text: this.localize('analysis'),
+            		itemId: 'analysis',
+        			menu: {
+    					items: [
+    					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
+    					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'}
+    					],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								if (item.text === this.localize('pca')) {
+    									this.setApiParam('analysis', 'pca');
+    								} else {
+    									this.setApiParam('analysis', 'ca');
+    									if (this.getCorpus().getDocumentsCount() == 3) {
+    	//									this.setApiParam('dimensions', 2);
+    	//									this.dimsButton.menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
+    									}
+    								}
+    								this.loadFromApis();
+    							}
+    						},
+    						scope: this
+    					}
+        			}
+            	},{
+            		text: this.localize('freqType'),
+            		itemId: 'freqType',
+            		disabled: true,
+            		menu: {
+            			items: [
+            			    {text: this.localize('rawFreq'), itemId: 'freqType_raw', group:'freqType', xtype: 'menucheckitem'},
+            			    {text: this.localize('relFreq'), itemId: 'freqType_relative', group:'freqType', xtype: 'menucheckitem'}
+            			],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								if (item.text === this.localize('rawFreq')) {
+    									this.setApiParam('freqType', 'raw');
+    								} else {
+    									this.setApiParam('freqType', 'relative');
+    								}
+    								this.loadFromApis();
+    							}
+    						},
+    						scope: this
+    					}
+            		}
+            	},{
+            		text: this.localize('terms'),
+            		itemId: 'limit',
+            		menu: {
+            			items: [
+            			    {text: '10', itemId: 'limit_10', group: 'terms', xtype: 'menucheckitem'},
+            			    {text: '20', itemId: 'limit_20', group: 'terms', xtype: 'menucheckitem'},
+    	        			{text: '30', itemId: 'limit_30', group: 'terms', xtype: 'menucheckitem'},
+    	        			{text: '40', itemId: 'limit_40', group: 'terms', xtype: 'menucheckitem'},
+    	        			{text: '50', itemId: 'limit_50', group: 'terms', xtype: 'menucheckitem'},
+    	        			{text: '60', itemId: 'limit_60', group: 'terms', xtype: 'menucheckitem'},
+    	        			{text: '70', itemId: 'limit_70', group: 'terms', xtype: 'menucheckitem'},
+    	        			{text: '80', itemId: 'limit_80', group: 'terms', xtype: 'menucheckitem'},
+    	        			{text: '90', itemId: 'limit_90', group: 'terms', xtype: 'menucheckitem'},
+    	        			{text: '100', itemId: 'limit_100', group: 'terms', xtype: 'menucheckitem'}
+            			],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								this.setApiParam('limit', parseInt(item.text));
+    								this.loadFromApis();
+    							}
+    						},
+    						scope: this
+    					}
+            		}
+            	},{
+            		text: this.localize('clusters'),
+            		itemId: 'clusters',
+            		menu: {
+            			items: [
+            			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '2', itemId: 'clusters_2', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '3', itemId: 'clusters_3', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '4', itemId: 'clusters_4', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '5', itemId: 'clusters_5', group: 'clusters', xtype: 'menucheckitem'}
+            			],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								this.setApiParam('clusters', parseInt(item.text));
+    								this.loadFromApis();
+    							}
+    						},
+    						scope: this
+    					}
+            		}
+            	}]
+        	},{
         		itemId: 'terms',
         		xtype: 'grid',
-        		flex: 1,
+        		title: 'Terms',
+        		region: 'east',
+        		width: '40%',
+        		split: true,
+        		collapsible: true,
         		border: true,
+        		dockedItems: [{
+                    dock: 'top',
+                    xtype: 'toolbar',
+                    items: [{
+                        xtype: 'button',
+                        text: this.localize('nearby'),
+                        glyph: 'xf0b2@FontAwesome',
+                        handler: function() {
+                        	var sel = this.down('#terms').getSelection()[0];
+                        	if (sel !== undefined) {
+	                        	var term = sel.get('term');
+	                        	var limit = Math.max(2000, Math.round(this.getCorpus().getWordTokensCount() / 100));
+								this.setApiParams({limit: limit, target: term});
+								this.loadFromApis();
+								this.setApiParam('target', undefined);
+                        	}
+                        },
+                        scope: this
+                    },{
+                        xtype: 'button',
+                        text: this.localize('remove'),
+                        glyph: 'xf068@FontAwesome',
+                        handler: function() {
+                        	var sel = this.down('#terms').getSelection()[0];
+                        	if (sel !== undefined) {
+	                        	var term = sel.get('term');
+	                        	
+	                        	var series = this.down('#chart').getSeries()[0];
+	                        	var index = series.getStore().findExact('term', term);
+	                        	series.getStore().removeAt(index);
+	                        	
+	                        	this.termStore.remove(sel);
+                        	}
+                        },
+                        scope: this
+                    },{
+                    	xtype: 'textfield',
+                    	emptyText: this.localize('addTerm'),
+                    	triggers: {
+                            clear: {
+                                weight: 0,
+                                cls: Ext.baseCSSPrefix + 'form-clear-trigger',
+                                hidden: true,
+                                handler: function(){
+                                    this.setValue('');
+                                	this.findParentByType('panel').fireEvent('query', this, undefined);
+                                    this.getTrigger('clear').hide();
+                                    this.updateLayout();
+                                }
+                            },
+                            search: {
+                                weight: 1,
+                                cls: Ext.baseCSSPrefix + 'form-search-trigger',
+                                handler: function(){
+                                    var value = this.getValue();
+                                	this.findParentByType('panel').fireEvent('query', this, value);
+                                	if (value) {
+                                        this.getTrigger('clear').show();
+                                	} else {
+                                        this.getTrigger('clear').hide();
+                                	}
+                                    this.updateLayout();
+                                }
+                            }
+                        },
+                        listeners: {
+                        	specialkey: function(field, event) {
+                        		if (event.getKey() === event.ENTER) {
+                                    this.triggers.search.onClick();
+                                }
+                        	}
+                        }
+                    }]
+                }],
         		columns: [{
-        			text: this.localize('terms'),
+        			text: this.localize('term'),
     				dataIndex: 'term',
     				flex: 1,
                     sortable: true
@@ -89,119 +283,28 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         selectionchange: {
                         	fn: function(sm, selections) {
 //                        		this.getApplication().dispatchEvent('corpusTermsClicked', this, selections);
-                        		var term = selections[0].get('term');
-                        		this.selectTerm(term);
+                        		var sel = selections[0];
+                        		if (sel !== undefined) {
+	                        		var term = sel.get('term');
+	                        		this.selectTerm(term);
+                        		}
                         	},
                         	scope: this
                         }
                     },
                     mode: 'SINGLE'
                 }),
-        		store: Ext.create('Ext.data.JsonStore', {
-            		fields: [
-             		    {name: 'term'},
-             		    {name: 'rawFreq', type: 'int'},
-             		    {name: 'relativeFreq', type: 'number'},
-             		    {name: 'coordinates', mapping : 'vector'}
-             		],
-             		sorters: [{property: 'rawFreq', direction: 'DESC'}]
-                 })
-        	}],
-        	tbar: [{
-        		text: this.localize('analysis'),
-        		itemId: 'analysis',
-    			menu: {
-					items: [
-					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
-					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'}
-					],
-					listeners: {
-						click: function(menu, item) {
-							if (item !== undefined) {
-								if (item.text === this.localize('pca')) {
-									this.setApiParam('analysis', 'pca');
-								} else {
-									this.setApiParam('analysis', 'ca');
-									if (this.getCorpus().getDocumentsCount() == 3) {
-	//									this.setApiParam('dimensions', 2);
-	//									this.dimsButton.menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
-									}
-								}
-								this.loadFromApis();
-							}
-						},
-						scope: this
-					}
-    			}
-        	},{
-        		text: this.localize('freqType'),
-        		itemId: 'freqType',
-        		disabled: true,
-        		menu: {
-        			items: [
-        			    {text: this.localize('rawFreq'), itemId: 'freqType_raw', group:'freqType', xtype: 'menucheckitem'},
-        			    {text: this.localize('relFreq'), itemId: 'freqType_relative', group:'freqType', xtype: 'menucheckitem'}
-        			],
-					listeners: {
-						click: function(menu, item) {
-							if (item !== undefined) {
-								if (item.text === this.localize('rawFreq')) {
-									this.setApiParam('freqType', 'raw');
-								} else {
-									this.setApiParam('freqType', 'relative');
-								}
-								this.loadFromApis();
-							}
-						},
-						scope: this
-					}
-        		}
-        	},{
-        		text: this.localize('terms'),
-        		itemId: 'limit',
-        		menu: {
-        			items: [
-        			    {text: '10', itemId: 'limit_10', group: 'terms', xtype: 'menucheckitem'},
-        			    {text: '20', itemId: 'limit_20', group: 'terms', xtype: 'menucheckitem'},
-	        			{text: '30', itemId: 'limit_30', group: 'terms', xtype: 'menucheckitem'},
-	        			{text: '40', itemId: 'limit_40', group: 'terms', xtype: 'menucheckitem'},
-	        			{text: '50', itemId: 'limit_50', group: 'terms', xtype: 'menucheckitem'},
-	        			{text: '60', itemId: 'limit_60', group: 'terms', xtype: 'menucheckitem'},
-	        			{text: '70', itemId: 'limit_70', group: 'terms', xtype: 'menucheckitem'},
-	        			{text: '80', itemId: 'limit_80', group: 'terms', xtype: 'menucheckitem'},
-	        			{text: '90', itemId: 'limit_90', group: 'terms', xtype: 'menucheckitem'},
-	        			{text: '100', itemId: 'limit_100', group: 'terms', xtype: 'menucheckitem'}
-        			],
-					listeners: {
-						click: function(menu, item) {
-							if (item !== undefined) {
-								this.setApiParam('limit', parseInt(item.text));
-								this.loadFromApis();
-							}
-						},
-						scope: this
-					}
-        		}
-        	},{
-        		text: this.localize('clusters'),
-        		itemId: 'clusters',
-        		menu: {
-        			items: [
-        			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
-        			    {text: '2', itemId: 'clusters_2', group: 'clusters', xtype: 'menucheckitem'},
-        			    {text: '3', itemId: 'clusters_3', group: 'clusters', xtype: 'menucheckitem'},
-        			    {text: '4', itemId: 'clusters_4', group: 'clusters', xtype: 'menucheckitem'},
-        			    {text: '5', itemId: 'clusters_5', group: 'clusters', xtype: 'menucheckitem'}
-        			],
-					listeners: {
-						click: function(menu, item) {
-							if (item !== undefined) {
-								this.setApiParam('clusters', parseInt(item.text));
-								this.loadFromApis();
-							}
-						},
-						scope: this
-					}
+        		store: this.termStore,
+        		listeners: {
+        			query: function(component, value) {
+    					if (value !== undefined && this.termStore.findExact('term', value) === -1) {
+	                		this.newTerm = value;
+	                		this.loadFromApis();
+    					} else {
+    						this.newTerm = null;
+    					}
+        			},
+        			scope: this
         		}
         	}]
         });
@@ -210,7 +313,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	this.on('loadedCorpus', function(src, corpus) {
     		function setCheckItemFromApi(apiParamName) {
     			var value = this.getApiParam(apiParamName);
-    			var menu = this.getDockedItems('toolbar')[0].down('#'+apiParamName);
+    			var menu = this.queryById('chartParent').getDockedItems('toolbar')[0].down('#'+apiParamName);
     			menu.down('#'+apiParamName+'_'+value).setChecked(true);
     		}
     		var setCheckBound = setCheckItemFromApi.bind(this);
@@ -243,7 +346,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	
     	var oldChart = this.queryById('chart');
     	if (oldChart !== null) {
-    		oldChart.remove();
+    		this.queryById('chartParent').remove(oldChart);
     	}
     	
     	var rec = store.getAt(0);
@@ -253,7 +356,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         var maxFreq = 0;
         var minFreq = Number.MAX_VALUE;
         
-        var termStore = this.queryById('terms').getStore();
+        if (this.newTerm !== null) {
+        	// TODO highlight new term
+        	this.newTerm = null;
+        }
         
         var data = [];
         tokens.forEach(function(token) {
@@ -263,8 +369,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	        	if (freq > maxFreq) maxFreq = freq;
 	        	if (freq < minFreq) minFreq = freq;
 	        	
-	        	if (termStore.findExact('term', token.get('term') === -1)) {
-	        		termStore.addSorted(token);
+	        	if (this.termStore.findExact('term', token.get('term') === -1)) {
+	        		this.termStore.addSorted(token);
 	        	}
         	}
         	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1]};
@@ -280,9 +386,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	var config = {
         	itemId: 'chart',
         	xtype: 'cartesian',
-        	width: '50%',
         	store: newStore,
-        	interactions: ['panzoom','itemhighlight'],
+        	interactions: ['crosszoom','panzoom','itemhighlight'],
         	plugins: {
                 ptype: 'chartitemevents'
             },
@@ -324,26 +429,28 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		renderer: function (sprite, config, rendererData, index) {
     				var store = rendererData.store;
     				var item = store.getAt(index);
-    				var clusterIndex = item.get('cluster');
-    				var scatterplot = this.getParent().up('scatterplot');
-    				
-    				if (clusterIndex === -1) {
-    					// no clusters were specified in initial call
-    					clusterIndex = 0;
+    				if (item !== null) {
+	    				var clusterIndex = item.get('cluster');
+	    				var scatterplot = this.getParent().up('scatterplot');
+	    				
+	    				if (clusterIndex === -1) {
+	    					// no clusters were specified in initial call
+	    					clusterIndex = 0;
+	    				}
+	    				
+	    				var color = scatterplot.getApplication().getColor(clusterIndex);
+	    				config.fillStyle = 'rgba('+color.join(',')+',0.5)';
+	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
+	    				
+	    				var freq = item.get('rawFreq');
+	    				var radius;
+	    				if (item.get('isDoc')) {
+	    					radius = 5;
+	    				} else {
+	    					radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
+	    				}
+	    				config.radius = radius;
     				}
-    				
-    				var color = scatterplot.getApplication().getColor(clusterIndex);
-    				config.fillStyle = 'rgba('+color.join(',')+',0.5)';
-    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
-    				
-    				var freq = item.get('rawFreq');
-    				var radius;
-    				if (item.get('isDoc')) {
-    					radius = 5;
-    				} else {
-    					radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
-    				}
-    				config.radius = radius;
     			}
         	}],
         	listeners: {
@@ -369,7 +476,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			            			} else {
 			            				var limit = Math.max(2000, Math.round(this.getCorpus().getWordTokensCount() / 100));
 			            				var terms = this.getCurrentTerms();
-										this.setApiParams({limit: limit, target: chartItem.record.get('term'), query: terms});
+										this.setApiParams({limit: limit, target: chartItem.record.get('term'), query: terms.join(',')});
 										this.loadFromApis();
 										this.setApiParam('target', undefined);
 			            			}
@@ -384,11 +491,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         };
     	
     	var chart = Ext.create('Ext.chart.CartesianChart', config);
-    	this.insert(0, chart);
+    	this.queryById('chartParent').insert(0, chart);
     },
     
     selectTerm: function(term) {
-    	var series = this.down('chart').getSeries()[0];
+    	var series = this.down('#chart').getSeries()[0];
     	var index = series.getStore().findExact('term', term);
     	if (index !== -1) {
     		var record = series.getStore().getAt(index);
@@ -409,10 +516,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     getCurrentTerms: function() {
     	var terms = [];
-    	var store = this.queryById('chart').getStore();
-    	store.each(function(item) {
-    		if (!item.get('isDoc')) {
-    			terms.push(item.get('term'));
+    	this.termStore.each(function(r) {
+    		if (!r.get('isDoc')) {
+    			terms.push(r.get('term'));
     		}
     	});
     	return terms;
@@ -420,8 +526,19 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     loadFromApis: function() {
     	var params = {};
+    	var terms = this.getCurrentTerms();
+    	if (this.newTerm !== null) {
+    		terms.push(this.newTerm);
+    		this.setApiParam('limit', terms.length);
+    	}
+    	if (terms.length > 0) {
+    		if (this.newTerm !== null) {
+    			params.query = terms.join(',');
+    		}
+    		params.term = terms;
+    	}
     	Ext.apply(params, this.getApiParams());
-    	delete params.stopList;
+//    	delete params.stopList;
     	if (params.analysis === 'pca') {
     		this.pcaStore.load({
 	    		params: params
