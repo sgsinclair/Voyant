@@ -22,8 +22,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		term: {en: "Term"},
     		addTerm: {en: "Add Term"},
     		clusters: {en: "Clusters"},
+    		dimensions: {en: "Dimensions"},
     		remove: {en: "Remove"},
+    		removeTerm: {en: 'Remove <b>{0}</b>'},
     		nearby: {en: "Nearby"},
+    		nearbyTerm: {en: 'Nearby <b>{0}</b>'},
     		helpTip: {en: "<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>"},
     		tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
     		docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'}
@@ -34,7 +37,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		dimensions: 3,
     		bins: 10,
     		clusters: 3,
-    		freqType: 'raw',
     		stopList: undefined,
     		target: undefined,
     		query: undefined
@@ -71,9 +73,15 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	termStore: this.termStore,
         	chartMenu: Ext.create('Ext.menu.Menu', {
         		items: [
-        			//{text: this.localize('remove')},
-        			{text: this.localize('nearby')}
-        		]
+        			{text: this.localize('remove'), itemId: 'remove'},
+        			{text: this.localize('nearby'), itemId: 'nearby'}
+        		],
+        		listeners: {
+        			hide: function() {
+        				this.down('#chart').getSeries()[0].enableToolTips();
+        			},
+        			scope: this
+        		}
         	}),
         	layout: 'border',
         	autoDestroy: true,
@@ -84,6 +92,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		tbar: [{
             		text: this.localize('analysis'),
             		itemId: 'analysis',
+            		glyph: 'xf1ec@FontAwesome',
         			menu: {
     					items: [
     					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
@@ -107,32 +116,35 @@ Ext.define('Voyant.panel.ScatterPlot', {
     						scope: this
     					}
         			}
-            	},{
-            		text: this.localize('freqType'),
-            		itemId: 'freqType',
-            		disabled: true,
-            		menu: {
-            			items: [
-            			    {text: this.localize('rawFreq'), itemId: 'freqType_raw', group:'freqType', xtype: 'menucheckitem'},
-            			    {text: this.localize('relFreq'), itemId: 'freqType_relative', group:'freqType', xtype: 'menucheckitem'}
-            			],
-    					listeners: {
-    						click: function(menu, item) {
-    							if (item !== undefined) {
-    								if (item.text === this.localize('rawFreq')) {
-    									this.setApiParam('freqType', 'raw');
-    								} else {
-    									this.setApiParam('freqType', 'relative');
-    								}
-    								this.loadFromApis();
-    							}
-    						},
-    						scope: this
-    					}
-            		}
-            	},{
+            	},
+//            	{
+//            		text: this.localize('freqType'),
+//            		itemId: 'freqType',
+//            		disabled: true,
+//            		menu: {
+//            			items: [
+//            			    {text: this.localize('rawFreq'), itemId: 'freqType_raw', group:'freqType', xtype: 'menucheckitem'},
+//            			    {text: this.localize('relFreq'), itemId: 'freqType_relative', group:'freqType', xtype: 'menucheckitem'}
+//            			],
+//    					listeners: {
+//    						click: function(menu, item) {
+//    							if (item !== undefined) {
+//    								if (item.text === this.localize('rawFreq')) {
+//    									this.setApiParam('freqType', 'raw');
+//    								} else {
+//    									this.setApiParam('freqType', 'relative');
+//    								}
+//    								this.loadFromApis();
+//    							}
+//    						},
+//    						scope: this
+//    					}
+//            		}
+//            	},
+            	{
             		text: this.localize('terms'),
             		itemId: 'limit',
+            		glyph: 'xf0f6@FontAwesome',
             		menu: {
             			items: [
             			    {text: '10', itemId: 'limit_10', group: 'terms', xtype: 'menucheckitem'},
@@ -159,6 +171,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
             	},{
             		text: this.localize('clusters'),
             		itemId: 'clusters',
+            		glyph: 'xf192@FontAwesome',
             		menu: {
             			items: [
             			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
@@ -171,6 +184,25 @@ Ext.define('Voyant.panel.ScatterPlot', {
     						click: function(menu, item) {
     							if (item !== undefined) {
     								this.setApiParam('clusters', parseInt(item.text));
+    								this.loadFromApis();
+    							}
+    						},
+    						scope: this
+    					}
+            		}
+            	},{
+            		text: this.localize('dimensions'),
+            		itemId: 'dimensions',
+            		glyph: 'xf1b2@FontAwesome',
+            		menu: {
+            			items: [
+            			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
+            			    {text: '3', itemId: 'dimensions_3', group: 'dimensions', xtype: 'menucheckitem'}
+            			],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								this.setApiParam('dimensions', parseInt(item.text));
     								this.loadFromApis();
     							}
     						},
@@ -198,10 +230,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         	var sel = this.down('#terms').getSelection()[0];
                         	if (sel !== undefined) {
 	                        	var term = sel.get('term');
-	                        	var limit = Math.max(2000, Math.round(this.getCorpus().getWordTokensCount() / 100));
-								this.setApiParams({limit: limit, target: term});
-								this.loadFromApis();
-								this.setApiParam('target', undefined);
+	                        	this.getNearbyForTerm(term);
                         	}
                         },
                         scope: this
@@ -213,12 +242,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         	var sel = this.down('#terms').getSelection()[0];
                         	if (sel !== undefined) {
 	                        	var term = sel.get('term');
-	                        	
-	                        	var series = this.down('#chart').getSeries()[0];
-	                        	var index = series.getStore().findExact('term', term);
-	                        	series.getStore().removeAt(index);
-	                        	
-	                        	this.termStore.remove(sel);
+	                        	this.removeTerm(term);
                         	}
                         },
                         scope: this
@@ -318,9 +342,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		}
     		var setCheckBound = setCheckItemFromApi.bind(this);
     		setCheckBound('analysis');
-    		setCheckBound('freqType');
     		setCheckBound('limit');
     		setCheckBound('clusters');
+    		setCheckBound('dimensions');
     		
     		this.setCorpus(corpus);
     		this.caStore.setCorpus(corpus);
@@ -355,6 +379,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
         
         var maxFreq = 0;
         var minFreq = Number.MAX_VALUE;
+        var maxFill = 0;
+        var minFill = Number.MAX_VALUE;
+        var dims = this.getApiParam('dimensions');
         
         if (this.newTerm !== null) {
         	// TODO highlight new term
@@ -373,13 +400,18 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	        		this.termStore.addSorted(token);
 	        	}
         	}
-        	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1]};
+        	if (dims === 3) {
+				var z = token.get('vector')[2];
+				if (z < minFill) minFill = z;
+				if (z > maxFill) maxFill = z;
+			}
+        	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], z: token.get('vector')[2], y: token.get('vector')[1]};
         	tokenData.isDoc = isDoc;
         	data.push(tokenData);
         }, this);
         
     	var newStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'rawFreq', 'cluster', 'isDoc'],
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'cluster', 'isDoc'],
     		data: data
     	});
     	
@@ -401,7 +433,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		fields: ['y']
         	}],
         	series: [{
-        		type: 'scatter',
+        		type: 'customScatter',
         		xField: 'x',
         		yField: 'y',
         		label: {
@@ -438,8 +470,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    					clusterIndex = 0;
 	    				}
 	    				
+	    				var a = 0.65;
+	    				if (dims === 3) {
+	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
+	    				}
 	    				var color = scatterplot.getApplication().getColor(clusterIndex);
-	    				config.fillStyle = 'rgba('+color.join(',')+',0.5)';
+	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
 	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
 	    				
 	    				var freq = item.get('rawFreq');
@@ -469,16 +505,22 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		            	var y = xy[1] - parentXY[1];
 		            	var chartItem = this.down('#chart').getItemForPoint(x,y);
 		            	if (chartItem != null) {
+		            		this.down('#chart').getSeries()[0].disableToolTips();
+		            		
+		            		var term = chartItem.record.get('term');
+		            		
+		            		var text = (new Ext.Template(this.localize('removeTerm'))).apply([term]);
+		            		this.chartMenu.queryById('remove').setText(text);
+		            		text = (new Ext.Template(this.localize('nearbyTerm'))).apply([term]);
+		            		this.chartMenu.queryById('nearby').setText(text);
+		            		
 		            		this.chartMenu.on('click', function(menu, item) {
 		            			if (item !== undefined) {
+		            				var term = chartItem.record.get('term');
 			            			if (item.text === this.localize('remove')) {
-			            				
+			            				this.removeTerm(term);
 			            			} else {
-			            				var limit = Math.max(2000, Math.round(this.getCorpus().getWordTokensCount() / 100));
-			            				var terms = this.getCurrentTerms();
-										this.setApiParams({limit: limit, target: chartItem.record.get('term'), query: terms.join(',')});
-										this.loadFromApis();
-										this.setApiParam('target', undefined);
+			            				this.getNearbyForTerm(term);
 			            			}
 		            			}
 		            		}, this, {single: true});
@@ -524,6 +566,22 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	return terms;
     },
     
+    getNearbyForTerm: function(term) {
+    	var limit = Math.max(2000, Math.round(this.getCorpus().getWordTokensCount() / 100));
+		this.setApiParams({limit: limit, target: term});
+		this.loadFromApis();
+		this.setApiParam('target', undefined);
+    },
+    
+    removeTerm: function(term) {
+    	var series = this.down('#chart').getSeries()[0];
+    	var index = series.getStore().findExact('term', term);
+    	series.getStore().removeAt(index);
+    	
+    	index = this.termStore.findExact('term', term);
+    	this.termStore.removeAt(index);
+    },
+    
     loadFromApis: function() {
     	var params = {};
     	var terms = this.getCurrentTerms();
@@ -553,4 +611,33 @@ Ext.define('Voyant.panel.ScatterPlot', {
     interpolate: function(lambda, minSrc, maxSrc, minDst, maxDst) {
         return minDst + (maxDst - minDst) * Math.max(0, Math.min(1, (lambda - minSrc) / (maxSrc - minSrc)));
     }
+});
+
+/**
+ * Adds tool tip disabling.
+ */
+Ext.define('Ext.chart.series.CustomScatter', {
+	extend: 'Ext.chart.series.Scatter',
+	
+	alias: 'series.customScatter',
+    type: 'customScatter',
+    seriesType: 'scatterSeries',
+	
+	tipsDisabled: false,
+	
+	enableToolTips: function() {
+		this.tipsDisabled = false;
+	},
+	
+	disableToolTips: function() {
+		this.tipsDisabled = true;
+	},
+	
+    showTip: function (item, xy) {
+    	if (this.tipsDisabled) {
+    		return;
+    	}
+    	
+    	this.callParent(arguments);
+    }	
 });
