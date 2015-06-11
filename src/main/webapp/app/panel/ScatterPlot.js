@@ -11,26 +11,33 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	},
     statics: {
     	i18n: {
-    		title: {en: "ScatterPlot"},
-    		analysis: {en: "Analysis"},
-    		ca: {en: "Correspondence Analysis"},
-    		pca: {en: "Principal Components Analysis"},
-    		rawFreq: {en: "Raw Frequency"},
-    		relFreq: {en: "Relative Frequency"},
-    		terms: {en: "Terms"},
-    		term: {en: "Term"},
-    		numTerms: {en: "Terms Count"},
-    		addTerm: {en: "Add Term"},
-    		clusters: {en: "Clusters"},
-    		dimensions: {en: "Dimensions"},
-    		remove: {en: "Remove"},
-    		removeTerm: {en: 'Remove <b>{0}</b>'},
-    		nearby: {en: "Nearby"},
-    		nearbyTerm: {en: 'Nearby <b>{0}</b>'},
-    		loading: {en: "Loading"},
-    		helpTip: {en: "<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>"},
-    		tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
-    		docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'}
+			title: {en: "ScatterPlot"},
+			analysis: {en: "Analysis"},
+			ca: {en: "Correspondence Analysis"},
+			pca: {en: "Principal Components Analysis"},
+			rawFreq: {en: "Raw Frequency"},
+			relFreq: {en: "Relative Frequency"},
+			terms: {en: "Terms"},
+			term: {en: "Term"},
+			numTerms: {en: "Terms Count"},
+			addTerm: {en: "Add Term"},
+			clusters: {en: "Clusters"},
+			dimensions: {en: "Dimensions"},
+			remove: {en: "Remove"},
+			removeTerm: {en: 'Remove <b>{0}</b>'},
+			nearby: {en: "Nearby"},
+			nearbyTerm: {en: 'Nearby <b>{0}</b>'},
+			pcTitle: {en: 'Percentage of Total Variation Explained by Each Component'},
+			pc: {en: 'PC'},
+			caTitle: {en :'Percentage of Total Assocation Explained by Each Dimension'},
+			dimension: {en :'Dimension'},
+			xAxis: {en :'X Axis'},
+			yAxis: {en :'Y Axis'},
+			fill: {en :'Fill'},
+			loading: {en: "Loading"},
+			helpTip: {en: "<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>"},
+			tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
+			docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'}
     	},
     	api: {
     		analysis: 'ca',
@@ -38,7 +45,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		dimensions: 3,
     		bins: 10,
     		clusters: 3,
-    		stopList: undefined,
+    		stopList: 'auto',
     		target: undefined,
     		query: undefined
     	},
@@ -80,7 +87,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		],
         		listeners: {
         			hide: function() {
-        				this.down('#chart').getSeries()[0].enableToolTips();
+        				var series = this.down('#chart').getSeries();
+        				series[0].enableToolTips();
+        				series[1].enableToolTips();
         			},
         			scope: this
         		}
@@ -359,18 +368,50 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	}
     	
     	var rec = store.getAt(0);
-        var tokens = rec.getTokens();
-//        var dimensions = rec.getDimensions();
+        var numDims = this.getApiParam('dimensions');
+        
+    	var summary = '';    	
+    	if (this.getApiParam('analysis') == 'pca') {
+    		// calculate the percentage of original data represented by the dominant principal components
+			var pcs = rec.getPrincipalComponents();
+			var eigenTotal = 0;
+			for (var i = 0; i < pcs.length; i++) {
+				var pc = pcs[i];
+				eigenTotal += parseFloat(pc.get('eigenValue'));
+			}
+			summary = this.localize('pcTitle')+'\n';
+			var pcMapping = ['xAxis', 'yAxis', 'fill'];
+			for (var i = 0; i < pcs.length; i++) {
+				if (i >= numDims) break;
+				
+				var pc = pcs[i];
+				var eigenValue = parseFloat(pc.get('eigenValue'));
+				var percentage = eigenValue / eigenTotal * 100;
+				summary += this.localize('pc')+' '+(i+1)+' ('+this.localize(pcMapping[i])+'): '+Math.round(percentage*100)/100+'%\n';
+			}
+    	} else {
+    		summary = this.localize('caTitle')+'\n';
+    		var pcMapping = ['xAxis', 'yAxis', 'fill'];
+    		
+    		var dimensions = rec.getDimensions();
+    		for (var i = 0; i < dimensions.length; i++) {
+    			if (i >= numDims) break;
+    			
+    			var percentage = parseFloat(dimensions[i]['data']);
+    			summary += this.localize('dimension')+' '+(i+1)+' ('+this.localize(pcMapping[i])+'): '+Math.round(percentage*100)/100+'%\n';
+    		}
+    	}
         
         var maxFreq = 0;
         var minFreq = Number.MAX_VALUE;
         var maxFill = 0;
         var minFill = Number.MAX_VALUE;
-        var dims = this.getApiParam('dimensions');
                 
         this.termStore.removeAll();
         
-        var data = [];
+        var tokens = rec.getTokens();
+        var termData = [];
+        var docData = [];
         tokens.forEach(function(token) {
         	var freq = token.get('rawFreq');
         	var isDoc = token.get('category') === 'part';
@@ -382,14 +423,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	        		this.termStore.addSorted(token);
 	        	}
         	}
-        	if (dims === 3) {
+        	if (numDims === 3) {
 				var z = token.get('vector')[2];
 				if (z < minFill) minFill = z;
 				if (z > maxFill) maxFill = z;
 			}
-        	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], z: token.get('vector')[2], y: token.get('vector')[1]};
-        	tokenData.isDoc = isDoc;
-        	data.push(tokenData);
+        	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2], isDoc: isDoc};
+        	if (isDoc) {
+        		docData.push(tokenData);
+        	} else {
+        		termData.push(tokenData);
+        	}
         }, this);
         
         var newCount = this.termStore.getCount();
@@ -397,15 +441,18 @@ Ext.define('Voyant.panel.ScatterPlot', {
         this.setApiParam('limit', newCount);
         
         
-    	var newStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'cluster', 'isDoc'],
-    		data: data
+    	var termSeriesStore = Ext.create('Ext.data.JsonStore', {
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc'],
+    		data: termData
+    	});
+    	var docSeriesStore = Ext.create('Ext.data.JsonStore', {
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc'],
+    		data: docData
     	});
     	
     	var config = {
         	itemId: 'chart',
         	xtype: 'cartesian',
-        	store: newStore,
         	interactions: ['crosszoom','panzoom','itemhighlight'],
         	plugins: {
                 ptype: 'chartitemevents'
@@ -419,10 +466,18 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		position: 'left',
         		fields: ['y']
         	}],
+        	sprites: [{
+        		type: 'text',
+        		text: summary,
+        		x: 70,
+        		y: 70
+        	}],
+        	innerPadding: {top: 25, right: 25, bottom: 25, left: 25},
         	series: [{
         		type: 'customScatter',
         		xField: 'x',
         		yField: 'y',
+        		store: termSeriesStore,
         		label: {
         			field: 'term',
         			display: 'over'
@@ -431,11 +486,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         			trackMouse: true,
         			style: 'background: #fff',
         			renderer: function (storeItem, item) {
-        				if (storeItem.get('isDoc')) {
-        					this.setHtml(that.docFreqTipTemplate.apply([storeItem.get('term'),storeItem.get('rawFreq')]));
-        				} else {
-        					this.setHtml(that.tokenFreqTipTemplate.apply([storeItem.get('term'),storeItem.get('rawFreq'),storeItem.get('relativeFreq')]));
-        				}
+        				this.setHtml(that.tokenFreqTipTemplate.apply([storeItem.get('term'),storeItem.get('rawFreq'),storeItem.get('relativeFreq')]));
         			}
         		},
         		marker: {
@@ -458,7 +509,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				}
 	    				
 	    				var a = 0.65;
-	    				if (dims === 3) {
+	    				if (numDims === 3) {
 	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
 	    				}
 	    				var color = scatterplot.getApplication().getColor(clusterIndex);
@@ -466,13 +517,54 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
 	    				
 	    				var freq = item.get('rawFreq');
-	    				var radius;
-	    				if (item.get('isDoc')) {
-	    					radius = 5;
-	    				} else {
-	    					radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
-	    				}
+	    				var radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
 	    				config.radius = radius;
+    				}
+    			}
+        	},{
+        		type: 'customScatter',
+        		xField: 'x',
+        		yField: 'y',
+        		store: docSeriesStore,
+        		label: {
+        			field: 'term',
+        			display: 'over'
+        		},
+        		tooltip: {
+        			trackMouse: true,
+        			style: 'background: #fff',
+        			renderer: function (storeItem, item) {
+        				this.setHtml(that.docFreqTipTemplate.apply([storeItem.get('term'),storeItem.get('rawFreq')]));
+        			}
+        		},
+        		marker: {
+        		    type: 'diamond'
+        		},
+        		highlight: {
+        			fillStyle: 'yellow',
+                    strokeStyle: 'black'
+        		},
+        		renderer: function (sprite, config, rendererData, index) {
+    				var store = rendererData.store;
+    				var item = store.getAt(index);
+    				if (item !== null) {
+	    				var clusterIndex = item.get('cluster');
+	    				var scatterplot = this.getParent().up('scatterplot');
+	    				
+	    				if (clusterIndex === -1) {
+	    					// no clusters were specified in initial call
+	    					clusterIndex = 0;
+	    				}
+	    				
+	    				var a = 0.65;
+	    				if (numDims === 3) {
+	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
+	    				}
+	    				var color = scatterplot.getApplication().getColor(6);
+	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
+	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
+
+	    				config.radius = 5;
     				}
     			}
         	}],
@@ -491,8 +583,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		            	var x = xy[0] - parentXY[0];
 		            	var y = xy[1] - parentXY[1];
 		            	var chartItem = this.down('#chart').getItemForPoint(x,y);
-		            	if (chartItem != null) {
-		            		this.down('#chart').getSeries()[0].disableToolTips();
+		            	if (chartItem != null && chartItem.record.get('isDoc') != true) {
+		            		var series = this.down('#chart').getSeries();
+		            		series[0].disableToolTips();
+		            		series[1].disableToolTips();
 		            		
 		            		var term = chartItem.record.get('term');
 		            		
@@ -638,5 +732,5 @@ Ext.define('Ext.chart.series.CustomScatter', {
     	}
     	
     	this.callParent(arguments);
-    }	
+    }
 });
