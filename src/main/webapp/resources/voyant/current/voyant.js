@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun May 31 11:21:49 EDT 2015 */
+/* This file created by JSCacher. Last modified: Mon Jun 15 11:48:29 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8620,6 +8620,9 @@ Ext.define('Voyant.panel.TopicContexts', {
     	
     	this.on("loadedCorpus", function(src, corpus) {
     		this.setCorpus(corpus);
+    		if (corpus.getDocumentsCount()==1 && this.getApiParam("mode")!=this.MODE_DOCUMENT) {
+    			this.setApiParam("mode", this.MODE_DOCUMENT)
+    		}
     		if (this.isVisible()) {
         		this.loadFromCorpus(corpus);
     		}
@@ -8672,7 +8675,7 @@ Ext.define('Voyant.panel.TopicContexts', {
     	})
     	this.on("corpusTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
-    			if (terms[0] && terms[0].get('distributions') !== undefined) {
+    			if (terms[0] && terms[0].get('distributions') !== undefined && this.getCorpus().getDocumentsCount()>1) {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
