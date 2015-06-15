@@ -27,4 +27,5 @@ String tool = parts[1];
 	});
 	
 </script>
+<title>Voyant Tools - <%= tool %></title>
 <%@ include file="../resources/jsp/post_app.jsp" %>
