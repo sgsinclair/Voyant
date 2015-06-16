@@ -79,11 +79,13 @@ Ext.define('Voyant.panel.CorpusSet', {
     	        xtype: 'voyanttabpanel',
     	    	split: {width: 5},
     	    	tabBarHeaderPosition: 0,
-    			moreTools: ['summary','documents'],
+    			moreTools: ['summary','documents','corpusngrams'],
     			items: [{
 	    			xtype: 'summary'
     			},{
 	    			xtype: 'documents'
+    			},{
+	    			xtype: 'corpusngrams'
     			}]
     		},{
 				layout: 'fit',

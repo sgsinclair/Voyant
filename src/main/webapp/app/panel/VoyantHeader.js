@@ -27,7 +27,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
     	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {
-    		moreTools: ['corpusset']
+    		moreTools: ['corpusset','scatterplot']
     	}));
     },
     

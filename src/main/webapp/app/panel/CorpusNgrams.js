@@ -13,17 +13,26 @@ Ext.define('Voyant.panel.CorpusNgrams', {
     		termTip: {en: "This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence)."},
     		termRawFreq: {en: "Count"},
     		termRawFreqTip: {en: "The number of times the phrase occurs in the corpus."},
-    		matchingTerms: {en: 'Matching: {count}'},
+    		matchingTerms: {en: '{count}'},
     		length: {en: "Length"},
-    		lengthTip: {en: "The upper and lower bounds of phrase lengths (how many words in each phrase)."}
+    		lengthTip: {en: "The upper and lower bounds of phrase lengths (how many words in each phrase)."},
+    		overlap: {en: "Overlap"},
+    		overlapTip: {en: "overlap tip"},
+    		overlapMenu: {en: "Choose an overlap filter:"},
+    		overlapNone: {en: "none (keep all)"},
+    		overlapLength: {en: "prioritize longest phrases"},
+    		overlapFreq: {en: "prioritize most frequent phrases"},
     	},
     	api: {
     		stopList: 'auto',
     		query: undefined,
     		docId: undefined,
     		docIndex: undefined,
+    		sort: 'length',
+    		dir: 'desc',
     		minLength: 2,
-    		maxLength: 50
+    		maxLength: 50,
+    		overlapFilter: 'length'
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
@@ -64,7 +73,7 @@ Ext.define('Voyant.panel.CorpusNgrams', {
         			docIndex: undefined
         		});
         		if (this.isVisible()) {
-            		this.getStore().loadPage(1, {params: this.getApiParams()});
+            		this.getStore().load({params: this.getApiParams()});
         		}
     		}
     	});
@@ -82,44 +91,29 @@ Ext.define('Voyant.panel.CorpusNgrams', {
     
     loadFromApis: function() {
     	if (this.getStore().getCorpus()) {
-//    		if (this.getApiParam('query')) {
-    			this.getStore().loadPage(1, {params: this.getApiParams()});
-//    		}
-//    		else {
-//				var corpusTerms = this.getStore().getCorpus().getCorpusTerms({
-//					leadingBufferZone: 0,
-//					autoLoad: false
-//				});
-//        		corpusTerms.load({
-//        		    callback: function(records, operation, success) {
-//        		    	if (success) {
-//        		    		var terms = [];
-//        		    		records.forEach(function(term) {
-//        		    			terms.push(term.getTerm());
-//        		    		})
-//        		    		this.getStore().getProxy().setExtraParam("query", terms);
-//        		    		this.setApiParam('query', terms);
-//        		    		this.loadFromApis();
-//        		    	}
-//        		    },
-//        		    scope: this,
-//        		    params: {
-//        				limit: 1,
-//        				stopList: this.getApiParam("stopList")
-//        			}
-//            	});
-//
-//    		}
+    			this.getStore().load({params: this.getApiParams()});
     	}
     },
     
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusNgrams");
+        var store = Ext.create("Voyant.data.store.CorpusNgrams", {
+        	autoLoad: false
+        });
         store.on("totalcountchange", function() {
         	this.down('#status').update({count: this.getStore().getTotalCount()});;
         }, me);
+        store.on("beforesort", function(store, sorters, eOpts) {
+        	debugger
+        }, me)
+        me.on("sortchange", function( ct, column, direction, eOpts ) {
+        	this.setApiParam('sort', column.dataIndex);
+        	this.setApiParam('dir', direction);
+        	var api = this.getApiParams(["stopList", "query", "docId", "docIndex", "sort", "dir", "minLength", "maxLength", "overlapFilter"]);
+        	var proxy = this.getStore().getProxy();
+        	for (var key in api) {proxy.setExtraParam(key, api[key]);}
+        }, me)
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -180,6 +174,43 @@ Ext.define('Voyant.panel.CorpusNgrams', {
                     		scope: me
                 		}
                 	}
+                }, '-', {
+                    xtype: 'button',
+                    text: this.localize('overlap'),
+                    tooltip: this.localize('overlapTip'),
+                    menu: {
+                    	items: [
+                           '<b class="menu-title">'+this.localize('overlapMenu')+'</b>',
+                           {
+                               text: this.localize("overlapNone"),
+                               checked: true,
+                               group: 'overlap',
+                               checkHandler: function() {
+                            	   this.setApiParam('overlapFilter', 'none')
+                            	   this.getStore().load({params: this.getApiParams()})
+                               },
+                               scope: this
+                           }, {
+                               text: this.localize("overlapLength"),
+                               checked: false,
+                               group: 'overlap',
+                               checkHandler: function() {
+                            	   this.setApiParam('overlapFilter', 'length')
+                            	   this.getStore().load({params: this.getApiParams()})
+                               },
+                               scope: this
+                           }, {
+                               text: this.localize("overlapFreq"),
+                               checked: false,
+                               group: 'overlap',
+                               checkHandler: function() {
+                            	   this.setApiParam('overlapFilter', 'rawfreq')
+                            	   this.getStore().load({params: this.getApiParams()})
+                               },
+                               scope: this
+                           }
+	                   ]
+                    }
                 }]
             }],
     		columns: [{
