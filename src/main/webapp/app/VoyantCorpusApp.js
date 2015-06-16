@@ -4,7 +4,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     
     name: 'VoyantCorpusApp',
 
-    requires: ['Voyant.panel.CorpusSet','Voyant.data.model.Corpus','Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.CorpusCreator', 'Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph','Voyant.panel.ScatterPlot','Voyant.panel.TopicContexts'],
+    requires: ['Voyant.panel.CorpusSet','Voyant.data.model.Corpus','Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.CorpusCreator', 'Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph','Voyant.panel.CorpusNgrams','Voyant.panel.ScatterPlot','Voyant.panel.TopicContexts'],
     
     statics: {
     	i18n: {
@@ -27,7 +27,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     		items: [{
     			i18n: 'moreToolsScaleCorpus',
     			glyph: 'xf111@FontAwesome',
-    			items: ['cirrus','corpusterms','corpuscollocates','documents','summary','trends','scatterplot']
+    			items: ['cirrus','corpusterms','corpuscollocates','corpusngrams','documents','summary','trends','scatterplot']
     		},{
     			i18n: 'moreToolsScaleDocument',
     			glyph: 'xf10c@FontAwesome',
@@ -43,7 +43,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     		},{
     			i18n: 'moreToolsTypeGrid',
     			glyph: 'xf0ce@FontAwesome',
-    			items: ['corpusterms','corpuscollocates','contexts','documentterms','documents']
+    			items: ['corpusterms','corpuscollocates','corpusngrams','contexts','documentterms','documents']
     		},{
     			i18n: 'moreToolsTypeOther',
     			glyph: 'xf035@FontAwesome',

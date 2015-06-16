@@ -147,3 +147,30 @@ svg line {
 .x-splitter {
 	background-color: rgb(245, 245, 245);
 }
+
+
+    .fa-trigger {
+    	background-image: none !important;
+    	font-family: FontAwesome;
+        font-weight: normal;
+        font-style: normal;
+        font-size: 16px !important;
+        text-align: center;
+    	padding-top: 12px;
+    	color: #aaa;
+    }
+    .form-fa-search-trigger:after {
+    	content: "\f002";
+    }
+    .form-fa-clear-trigger:after {
+    	content: "\f00d";
+    }
+    .form-fa-help-trigger:after {
+    	content: "\f128";
+    }
+    .x-form-trigger.fa {
+    	display:table-cell;
+    	background-image:none !important;
+    	padding-top:5px;
+    }
+    .green {color:green;}

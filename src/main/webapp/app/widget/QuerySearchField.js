@@ -9,17 +9,24 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		}
 	},
     triggers: {
+    	/*
         clear: {
             weight: 0,
-            cls: Ext.baseCSSPrefix + 'form-clear-trigger',
+            cls: 'fa-trigger form-fa-clear-trigger',
             hidden: true,
             handler: 'onClearClick',
             scope: 'this'
         },
         search: {
             weight: 1,
-            cls: Ext.baseCSSPrefix + 'form-search-trigger',
+            cls: 'fa-trigger form-fa-search-trigger',
             handler: 'onSearchClick',
+            scope: 'this'
+        },*/
+        help: {
+            weight: 2,
+            cls: 'fa-trigger form-fa-help-trigger',
+            handler: 'onHelpClick',
             scope: 'this'
         }
     },
@@ -31,7 +38,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
         	listeners: {
     		   render: function(c) {
     		      Ext.QuickTips.register({
-    		        target: c.triggers.search.getEl(),
+    		        target: c.triggers.help.getEl(),
     		        text: c.localize('querySearchTip'),
     		        enabled: true,
     		        showDelay: 20,
@@ -41,16 +48,17 @@ Ext.define('Voyant.widget.QuerySearchField', {
     		    },
     		    scope: me
     		},
-            labelWidth: 50,
-            fieldLabel: me.localize('querySearch'),
-            width: 175
+//            labelWidth: 50,
+//            fieldLabel: me.localize('querySearch'),
+            width: 120,
+            emptyText: me.localize('querySearch')
 
         })
 
         me.callParent(arguments);
         me.on('specialkey', function(f, e){
             if (e.getKey() == e.ENTER) {
-                me.onSearchClick();
+                me.doSearch();
             }
         });
 
@@ -59,26 +67,30 @@ Ext.define('Voyant.widget.QuerySearchField', {
     onClearClick : function(){
         this.setValue('');
     	this.findParentByType("panel").fireEvent("query", this, undefined);
-        this.getTrigger('clear').hide();
+        //this.getTrigger('clear').hide();
         this.updateLayout();
     },
 
-    onSearchClick : function(){
+    onHelpClick : function(){
     	Ext.Msg.show({
     	    title: this.localize('querySearch'),
     	    message: this.localize('querySearchTip'),
     	    buttons: Ext.Msg.OK,
     	    icon: Ext.Msg.INFO
     	});
-    	
+    },
+    
+    doSearch: function() {
         var value = this.getValue();
-    	this.findParentByType("panel").fireEvent("query", this, value);
+    	this.findParentByType("panel").fireEvent("query", this, value.length==0 ? undefined : value);
+    	/*
     	if (value) {
             this.getTrigger('clear').show();
     	}
     	else {
             this.getTrigger('clear').hide();
     	}
+    	*/
         this.updateLayout();
     }
 });
