@@ -59,13 +59,13 @@ Ext.define('Voyant.VoyantApp', {
 			    "Please kick the tires and let us know if you have suggestions on <a href='https://github.com/sgsinclair/Voyant/issues'>Github</a> or <a href='http://twitter.com/voyanttools'>Twitter</a>."+
 			    "<ul>"+
 		    	"<li>some new features and functionality:<ul>"+
-		    		"<li>flexible search (wildcards, phrases, proximity) – hover over search boxes for more details</li>"+
+		    		"<li>flexible search (wildcards, phrases, proximity) – hover over help icon in search boxes for more details</li>"+
+			    	"<li>new <i>Phrases</i> tool for analyzing repeating n-grams</li>"+
 		    		"<li>better cross-platform and device support (all tools in HTML5, no Flash or Java Applets)</li>"+
 		    		"<li>much better support for larger corpora</li>"+
 		    		"<li>vastly improved performance throughout (corpus reader and collocates are notable examples)</li>"+
 		    	"</ul><li>some things not yet fully implemented:<ul>"+
 			    	"<li>full list of tools and skins from 1.0</li>"+
-			    	"<li>panel/tool-level help, options, and exporting</li>"+
 			    	"<li>adding and reordering documents (new in 2.0)</li>"+
 			    	"<li>N-Gram support (term sequences) (new in 2.0)</li>"+
 			    	"<!--<li>part-of-speech tagging and lemmatization (new in 2.0)</li>-->"+

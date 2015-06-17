@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jun 17 12:40:19 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed Jun 17 13:05:09 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -9961,12 +9961,12 @@ Ext.define('Voyant.VoyantApp', {
 			    "<ul>"+
 		    	"<li>some new features and functionality:<ul>"+
 		    		"<li>flexible search (wildcards, phrases, proximity) – hover over search boxes for more details</li>"+
+			    	"<li>new <i>Phrases</i> tool for analyzing repeating n-grams</li>"+
 		    		"<li>better cross-platform and device support (all tools in HTML5, no Flash or Java Applets)</li>"+
 		    		"<li>much better support for larger corpora</li>"+
 		    		"<li>vastly improved performance throughout (corpus reader and collocates are notable examples)</li>"+
 		    	"</ul><li>some things not yet fully implemented:<ul>"+
 			    	"<li>full list of tools and skins from 1.0</li>"+
-			    	"<li>panel/tool-level help, options, and exporting</li>"+
 			    	"<li>adding and reordering documents (new in 2.0)</li>"+
 			    	"<li>N-Gram support (term sequences) (new in 2.0)</li>"+
 			    	"<!--<li>part-of-speech tagging and lemmatization (new in 2.0)</li>-->"+
