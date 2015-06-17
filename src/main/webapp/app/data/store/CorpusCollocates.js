@@ -28,16 +28,10 @@ Ext.define('Voyant.data.store.CorpusCollocates', {
 		         reader: {
 		             type: 'json',
 		             rootProperty: 'corpusCollocates.collocates',
-		             totalPropery: 'corpusCollocates.total'
+		             totalProperty: 'corpusCollocates.total'
 		         },
 		         simpleSortMode: true
-		     },
-	         reader: {
-	             type: 'json',
-	             rootProperty: 'corpusCollocates.collocates',
-	             totalPropery: 'corpusCollocates.total'
-	         }
-
+		     }
 		})
 		
 //    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);

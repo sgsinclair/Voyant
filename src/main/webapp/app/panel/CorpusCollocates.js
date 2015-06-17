@@ -17,7 +17,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     		contextTermTip: {en: "This is the collocate (context) term that occurs near the keyword term."},
     		contextTermRawFreq: {en: "Count (context)"},
     		contextTermRawFreqTip: {en: "The number of times this collocate occurs near the keyword term in the corpus."},
-    		matchingTerms: {en: 'Matching terms: {count}'}
+    		matchingTerms: {en: '{count}'}
     		
     		/*,
     		matchingTerms: {en: 'Matching terms: {count}'},
@@ -141,8 +141,8 @@ Ext.define('Voyant.panel.CorpusCollocates', {
         var me = this;
 
         var store = Ext.create("Voyant.data.store.CorpusCollocates");
-        store.on("totalcountchange", function() {
-        	this.down('#status').update({count: this.getStore().getTotalCount()});;
+        store.on("totalcountchange", function(total) {
+        	this.down('#status').update({count: Ext.util.Format.number(total, "0,000")});
         }, me);
         
         Ext.apply(me, {

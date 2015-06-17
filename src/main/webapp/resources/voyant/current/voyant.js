@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jun 17 08:47:16 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed Jun 17 09:11:15 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3313,16 +3313,10 @@ Ext.define('Voyant.data.store.CorpusCollocates', {
 		         reader: {
 		             type: 'json',
 		             rootProperty: 'corpusCollocates.collocates',
-		             totalPropery: 'corpusCollocates.total'
+		             totalProperty: 'corpusCollocates.total'
 		         },
 		         simpleSortMode: true
-		     },
-	         reader: {
-	             type: 'json',
-	             rootProperty: 'corpusCollocates.collocates',
-	             totalPropery: 'corpusCollocates.total'
-	         }
-
+		     }
 		})
 		
 //    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
@@ -5725,7 +5719,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     		contextTermTip: {en: "This is the collocate (context) term that occurs near the keyword term."},
     		contextTermRawFreq: {en: "Count (context)"},
     		contextTermRawFreqTip: {en: "The number of times this collocate occurs near the keyword term in the corpus."},
-    		matchingTerms: {en: 'Matching terms: {count}'}
+    		matchingTerms: {en: '{count}'}
     		
     		/*,
     		matchingTerms: {en: 'Matching terms: {count}'},
@@ -5849,8 +5843,8 @@ Ext.define('Voyant.panel.CorpusCollocates', {
         var me = this;
 
         var store = Ext.create("Voyant.data.store.CorpusCollocates");
-        store.on("totalcountchange", function() {
-        	this.down('#status').update({count: this.getStore().getTotalCount()});;
+        store.on("totalcountchange", function(total) {
+        	this.down('#status').update({count: Ext.util.Format.number(total, "0,000")});
         }, me);
         
         Ext.apply(me, {
