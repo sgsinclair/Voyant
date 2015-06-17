@@ -1,6 +1,6 @@
 Ext.define('Voyant.panel.CorpusSet', {
 	extend: 'Ext.panel.Panel',
-    requires: ['Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph'],
+    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph'],
 	mixins: ['Voyant.panel.Panel'],
     alias: 'widget.corpusset',
 	statics: {
@@ -79,13 +79,13 @@ Ext.define('Voyant.panel.CorpusSet', {
     	        xtype: 'voyanttabpanel',
     	    	split: {width: 5},
     	    	tabBarHeaderPosition: 0,
-    			moreTools: ['summary','documents','corpusngrams'],
+    			moreTools: ['summary','documents','phrases'],
     			items: [{
 	    			xtype: 'summary'
     			},{
 	    			xtype: 'documents'
     			},{
-	    			xtype: 'corpusngrams'
+	    			xtype: 'phrases'
     			}]
     		},{
 				layout: 'fit',

@@ -95,10 +95,15 @@
         			else if (term.getTerm) {queryTerms.push(term.getTerm());}
         		});
         		if (queryTerms) {
+        			
+            		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
+            			this.setApiParams({
+            				'mode': this.MODE_CORPUS,
+            				'docIndex': undefined,
+            				'docId': undefined
+            			});
+            		}
         			this.setApiParams({
-//        				docIndex: undefined,
-//        				docId: undefined,
-//        				mode: this.MODE_CORPUS,
         				query: queryTerms
         			});
             		if (this.isVisible()) {

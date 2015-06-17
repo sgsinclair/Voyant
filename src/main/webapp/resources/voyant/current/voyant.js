@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Jun 16 19:28:54 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed Jun 17 08:47:16 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2972,7 +2972,7 @@ Ext.define('Voyant.data.model.CorpusNgram', {
              {name: 'rawFreq', type: 'int'},
              {name: 'distributions'}
         ],
-    getTerm: function() {return this.get('term');},
+    getTerm: function() {return this.get('term');}
 });
 Ext.define('Voyant.data.model.Dimension', {
     extend: 'Ext.data.Model',
@@ -3339,67 +3339,6 @@ Ext.define('Voyant.data.store.CorpusCollocates', {
 
 });
 
-Ext.define('Voyant.data.store.CorpusNgrams', {
-	extend: 'Ext.data.BufferedStore',
-    model: 'Voyant.data.model.CorpusNgram',
-    config: {
-    	corpus: undefined
-    },
-	constructor : function(config) {
-		
-		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.applyIf(config, {
-			pagePurgeCount: 0,
-			pageSize: 100,
-			leadingBufferZone: 100,
-			remoteSort: true,
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.CorpusNgrams',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'corpusNgrams.ngrams',
-		             totalProperty: 'corpusNgrams.total'
-		         },
-		         simpleSortMode: true
-		     }
-		})
-		
-    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
-		this.callParent([config]);
-
-		if (config && config.corpus) {
-			if (config.corpus.then) {
-				var dfd = Voyant.application.getDeferred(this);
-				var me = this;
-				config.corpus.then(function(corpus) {
-					me.setCorpus(corpus);
-					dfd.resolve(me);
-				});
-				var promise = Voyant.application.getPromiseFromDeferred(dfd);
-				return promise;
-			}
-			else {
-				this.setCorpus(config.corpus);
-			}
-		}
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
-	}
-
-});
-
 Ext.define("Voyant.data.proxy.CorpusTerms", {
 	extend: 'Ext.data.proxy.Ajax',
 	constructor: function(config) {
@@ -3730,6 +3669,67 @@ Ext.define('Voyant.data.store.PCAAnalysis', {
 		}
 		this.callParent(arguments);
 	}
+});
+
+Ext.define('Voyant.data.store.CorpusNgrams', {
+	extend: 'Ext.data.BufferedStore',
+    model: 'Voyant.data.model.CorpusNgram',
+    config: {
+    	corpus: undefined
+    },
+	constructor : function(config) {
+		
+		config = config || {};
+		
+		// create proxy in constructor so we can set the Trombone URL
+		Ext.applyIf(config, {
+			pagePurgeCount: 0,
+			pageSize: 100,
+			leadingBufferZone: 100,
+			remoteSort: true,
+		     proxy: {
+		         type: 'ajax',
+		         url: Voyant.application.getTromboneUrl(),
+		         extraParams: {
+		        	 tool: 'corpus.CorpusNgrams',
+		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
+		         },
+		         reader: {
+		             type: 'json',
+		             rootProperty: 'corpusNgrams.ngrams',
+		             totalProperty: 'corpusNgrams.total'
+		         },
+		         simpleSortMode: true
+		     }
+		})
+		
+    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+		this.callParent([config]);
+
+		if (config && config.corpus) {
+			if (config.corpus.then) {
+				var dfd = Voyant.application.getDeferred(this);
+				var me = this;
+				config.corpus.then(function(corpus) {
+					me.setCorpus(corpus);
+					dfd.resolve(me);
+				});
+				var promise = Voyant.application.getPromiseFromDeferred(dfd);
+				return promise;
+			}
+			else {
+				this.setCorpus(config.corpus);
+			}
+		}
+	},
+	
+	setCorpus: function(corpus) {
+		if (corpus) {
+			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
+		}
+		this.callParent(arguments);
+	}
+
 });
 
 Ext.define('Voyant.data.store.Tokens', {
@@ -4330,6 +4330,43 @@ Ext.define('Voyant.panel.Panel', {
 	
 	showError: function(config) {
 		this.getApplication().showError.apply(this, arguments)
+	}
+});
+
+Ext.define('Voyant.panel.VoyantTabPanel', {
+	extend: 'Ext.tab.Panel',
+	alias: 'widget.voyanttabpanel',
+	mixins: ['Voyant.panel.Panel'],
+	statics: {
+		i18n: {
+		}
+	},
+	constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+	},
+	initComponent: function() {
+    	this.callParent(arguments);
+	},
+	listeners: {
+		tabchange: function(panel, newTab) {
+			this.tools = [];
+			this.getHeader().tools = [];
+			this.query("toolmenu").forEach(function(toolMenu) {
+				toolMenu.destroy();
+			})
+			this.addTool(newTab.tools)
+		},
+		afterrender: function(panel) {
+			this.fireEvent("tabchange", this, this.getActiveTab())
+		}
+	},
+	showOptionsClick: function(panel) {
+		debugger
+		var tab = panel.getActiveTab();
+		if (tab.showOptionsClick) {
+			tab.showOptionsClick.apply(tab, arguments)
+		}
 	}
 });
 // assuming Bubblelines library is loaded by containing page (via voyant.jsp)
@@ -6228,16 +6265,16 @@ Ext.define('Voyant.panel.CorpusCreator', {
     }
     
 });
-Ext.define('Voyant.panel.CorpusNgrams', {
+Ext.define('Voyant.panel.Phrases', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
-	alias: 'widget.corpusngrams',
+	alias: 'widget.phrases',
 	config: {
 		corpus: undefined
 	},
     statics: {
     	i18n: {
-    		title: {en: "Corpus Phrases"},
+    		title: {en: "Phrases"},
     		helpTip: {en: "<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->"},
     		term: {en: "Term"},
     		termTip: {en: "This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence)."},
@@ -6251,7 +6288,7 @@ Ext.define('Voyant.panel.CorpusNgrams', {
     		overlapMenu: {en: "Choose an overlap filter:"},
     		overlapNone: {en: "none (keep all)"},
     		overlapLength: {en: "prioritize longest phrases"},
-    		overlapFreq: {en: "prioritize most frequent phrases"},
+    		overlapFreq: {en: "prioritize most frequent phrases"}
     	},
     	api: {
     		stopList: 'auto',
@@ -6355,7 +6392,7 @@ Ext.define('Voyant.panel.CorpusNgrams', {
                     		var terms = [];
                     		var context = this.getApiParam("context")
                     		selections.forEach(function(selection) {
-                    			terms.push(selection.getTerm())
+                    			terms.push('"'+selection.getTerm()+'"')
                     		})
                     		this.getApplication().dispatchEvent('termsClicked', this, terms);
                     	},
@@ -9352,10 +9389,15 @@ Ext.define('Voyant.panel.TopicContexts', {
         			else if (term.getTerm) {queryTerms.push(term.getTerm());}
         		});
         		if (queryTerms) {
+        			
+            		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
+            			this.setApiParams({
+            				'mode': this.MODE_CORPUS,
+            				'docIndex': undefined,
+            				'docId': undefined
+            			});
+            		}
         			this.setApiParams({
-//        				docIndex: undefined,
-//        				docId: undefined,
-//        				mode: this.MODE_CORPUS,
         				query: queryTerms
         			});
             		if (this.isVisible()) {
@@ -9710,7 +9752,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
 
 Ext.define('Voyant.panel.CorpusSet', {
 	extend: 'Ext.panel.Panel',
-    requires: ['Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph'],
+    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph'],
 	mixins: ['Voyant.panel.Panel'],
     alias: 'widget.corpusset',
 	statics: {
@@ -9789,13 +9831,13 @@ Ext.define('Voyant.panel.CorpusSet', {
     	        xtype: 'voyanttabpanel',
     	    	split: {width: 5},
     	    	tabBarHeaderPosition: 0,
-    			moreTools: ['summary','documents','corpusngrams'],
+    			moreTools: ['summary','documents','phrases'],
     			items: [{
 	    			xtype: 'summary'
     			},{
 	    			xtype: 'documents'
     			},{
-	    			xtype: 'corpusngrams'
+	    			xtype: 'phrases'
     			}]
     		},{
 				layout: 'fit',
@@ -9823,43 +9865,6 @@ Ext.define('Voyant.panel.CorpusSet', {
     	}
     }
 })
-
-Ext.define('Voyant.panel.TabPanel', {
-	extend: 'Ext.tab.Panel',
-	alias: 'widget.voyanttabpanel',
-	mixins: ['Voyant.panel.Panel'],
-	statics: {
-		i18n: {
-		}
-	},
-	constructor: function(config) {
-        this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-	},
-	initComponent: function() {
-    	this.callParent(arguments);
-	},
-	listeners: {
-		tabchange: function(panel, newTab) {
-			this.tools = [];
-			this.getHeader().tools = [];
-			this.query("toolmenu").forEach(function(toolMenu) {
-				toolMenu.destroy();
-			})
-			this.addTool(newTab.tools)
-		},
-		afterrender: function(panel) {
-			this.fireEvent("tabchange", this, this.getActiveTab())
-		}
-	},
-	showOptionsClick: function(panel) {
-		debugger
-		var tab = panel.getActiveTab();
-		if (tab.showOptionsClick) {
-			tab.showOptionsClick.apply(tab, arguments)
-		}
-	}
-});
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
@@ -10111,7 +10116,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     
     name: 'VoyantCorpusApp',
 
-    requires: ['Voyant.panel.CorpusSet','Voyant.data.model.Corpus','Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.CorpusCreator', 'Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph','Voyant.panel.CorpusNgrams','Voyant.panel.ScatterPlot','Voyant.panel.TopicContexts'],
+    requires: ['Voyant.panel.CorpusSet','Voyant.data.model.Corpus','Voyant.panel.VoyantHeader', 'Voyant.panel.VoyantFooter', 'Voyant.panel.CorpusCreator', 'Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph','Voyant.panel.Phrases','Voyant.panel.ScatterPlot','Voyant.panel.TopicContexts'],
     
     statics: {
     	i18n: {
@@ -10134,7 +10139,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     		items: [{
     			i18n: 'moreToolsScaleCorpus',
     			glyph: 'xf111@FontAwesome',
-    			items: ['cirrus','corpusterms','corpuscollocates','corpusngrams','documents','summary','trends','scatterplot']
+    			items: ['cirrus','corpusterms','corpuscollocates','phrases','documents','summary','trends','scatterplot']
     		},{
     			i18n: 'moreToolsScaleDocument',
     			glyph: 'xf10c@FontAwesome',
@@ -10150,7 +10155,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     		},{
     			i18n: 'moreToolsTypeGrid',
     			glyph: 'xf0ce@FontAwesome',
-    			items: ['corpusterms','corpuscollocates','corpusngrams','contexts','documentterms','documents']
+    			items: ['corpusterms','corpuscollocates','phrases','contexts','documentterms','documents']
     		},{
     			i18n: 'moreToolsTypeOther',
     			glyph: 'xf035@FontAwesome',

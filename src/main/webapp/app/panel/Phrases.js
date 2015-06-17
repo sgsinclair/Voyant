@@ -1,13 +1,13 @@
-Ext.define('Voyant.panel.CorpusNgrams', {
+Ext.define('Voyant.panel.Phrases', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
-	alias: 'widget.corpusngrams',
+	alias: 'widget.phrases',
 	config: {
 		corpus: undefined
 	},
     statics: {
     	i18n: {
-    		title: {en: "Corpus Phrases"},
+    		title: {en: "Phrases"},
     		helpTip: {en: "<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->"},
     		term: {en: "Term"},
     		termTip: {en: "This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence)."},
@@ -21,7 +21,7 @@ Ext.define('Voyant.panel.CorpusNgrams', {
     		overlapMenu: {en: "Choose an overlap filter:"},
     		overlapNone: {en: "none (keep all)"},
     		overlapLength: {en: "prioritize longest phrases"},
-    		overlapFreq: {en: "prioritize most frequent phrases"},
+    		overlapFreq: {en: "prioritize most frequent phrases"}
     	},
     	api: {
     		stopList: 'auto',
@@ -125,7 +125,7 @@ Ext.define('Voyant.panel.CorpusNgrams', {
                     		var terms = [];
                     		var context = this.getApiParam("context")
                     		selections.forEach(function(selection) {
-                    			terms.push(selection.getTerm())
+                    			terms.push('"'+selection.getTerm()+'"')
                     		})
                     		this.getApplication().dispatchEvent('termsClicked', this, terms);
                     	},

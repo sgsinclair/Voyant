@@ -1,5 +1,5 @@
 
-Ext.define('Voyant.panel.TabPanel', {
+Ext.define('Voyant.panel.VoyantTabPanel', {
 	extend: 'Ext.tab.Panel',
 	alias: 'widget.voyanttabpanel',
 	mixins: ['Voyant.panel.Panel'],

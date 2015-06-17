@@ -6,5 +6,5 @@ Ext.define('Voyant.data.model.CorpusNgram', {
              {name: 'rawFreq', type: 'int'},
              {name: 'distributions'}
         ],
-    getTerm: function() {return this.get('term');},
+    getTerm: function() {return this.get('term');}
 });
