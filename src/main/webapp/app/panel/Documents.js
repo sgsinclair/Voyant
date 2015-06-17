@@ -5,6 +5,7 @@ Ext.define('Voyant.panel.Documents', {
     statics: {
     	i18n: {
     		title: {en: "Documents"},
+    		emptyText: {en: "No matching results."},
     		helpTip: {en: "<p>Documents is a table view of the documents in the corpus. Features include:</p><ul><li>reordering by <i>Title</i>, <i>Words</i> count (tokens), word forms count (<i>Types</i>), and <i>Ratio</i> (Types/Tokens Ratio) (click on the column headers)</li><li>a search box for queries (by default in the full-text, title and author fields &mdash; hover over the magnifying icon for help with the syntax)</li></ul>"},
     		id: {en: "ID"},
     		documentTitle: {en: "Title"},
@@ -27,6 +28,7 @@ Ext.define('Voyant.panel.Documents', {
     	
     	Ext.apply(this, {
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
 	    	columns:[
 	    	   {
 	    	        xtype: 'rownumberer',

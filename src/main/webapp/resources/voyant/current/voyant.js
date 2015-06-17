@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jun 17 13:05:09 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed Jun 17 13:17:30 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5454,6 +5454,7 @@ Ext.define('Voyant.panel.Contexts', {
     statics: {
     	i18n: {
     		title: {en: "Contexts"},
+    		emptyText: {en: "No matching results."},
     		document: {en: "Document"},
     		documentTip: {en: "The document of the occurrence."},
     		helpTip: {en: "The Keywords in Context tool shows each occurrence of a keyword with a bit of surounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:</p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
@@ -5485,6 +5486,7 @@ Ext.define('Voyant.panel.Contexts', {
 
         Ext.apply(me, { 
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
             store : Ext.create("Voyant.data.store.Contexts", {
             	stripTags: "all",
             	remoteSort: false,
@@ -5735,6 +5737,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     statics: {
     	i18n: {
     		title: {en: "Collocates"},
+    		emptyText: {en: "No matching results."},
     		helpTip: {en: "<p>Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus. Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		term: {en: "Term"},
     		termTip: {en: "This is the keyword term around which collocate (context) terms are counted."},
@@ -5871,6 +5874,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
         
         Ext.apply(me, {
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
             store : store,
     		selModel: Ext.create('Ext.selection.CheckboxModel', {
                 listeners: {
@@ -6288,6 +6292,7 @@ Ext.define('Voyant.panel.Phrases', {
     statics: {
     	i18n: {
     		title: {en: "Phrases"},
+    		emptyText: {en: "No matching results."},
     		helpTip: {en: "<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->"},
     		term: {en: "Term"},
     		termTip: {en: "This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence)."},
@@ -6391,6 +6396,7 @@ Ext.define('Voyant.panel.Phrases', {
         
         Ext.apply(me, {
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
             store : store,
     		selModel: Ext.create('Ext.selection.CheckboxModel', {
                 listeners: {
@@ -6554,6 +6560,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     statics: {
     	i18n: {
     		title: {en: "Corpus Terms"},
+    		emptyText: {en: "No matching results."},
     		helpTip: {en: "<p>Corpus Terms is a table view of terms that appear in the entire corpus. Features include:</p><ul><li>reordering by <i>term</i> and <i>count</i> (click on the column headers)</li><li>a sparkline graph of the term frequency trends across the corpus (if the corpus has multiple documents) or across the document (if the corpus has only one document)</li><li>additional columns available (relative frequency, distribution peakedness and skew) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		matchingTerms: {en: 'Matching terms: {count}'},
     		termTip: {en: "The term in the corpus."},
@@ -6625,6 +6632,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
         
         Ext.apply(me, {
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
             store : store,
     		selModel: Ext.create('Ext.selection.CheckboxModel', {
                 pruneRemoved: false,
@@ -6737,6 +6745,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     statics: {
     	i18n: {
     		title: {en: "Document Terms"},
+    		emptyText: {en: "No matching results."},
     		helpTip: {en: "<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		matchingTerms: {en: 'Matching terms: {count}'},
     		termTip: {en: "The term in a single, specific document."},
@@ -6821,6 +6830,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
         
         Ext.apply(me, {
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
             store : store,
     		selModel: Ext.create('Ext.selection.CheckboxModel', {
                 listeners: {
@@ -6929,6 +6939,7 @@ Ext.define('Voyant.panel.Documents', {
     statics: {
     	i18n: {
     		title: {en: "Documents"},
+    		emptyText: {en: "No matching results."},
     		helpTip: {en: "<p>Documents is a table view of the documents in the corpus. Features include:</p><ul><li>reordering by <i>Title</i>, <i>Words</i> count (tokens), word forms count (<i>Types</i>), and <i>Ratio</i> (Types/Tokens Ratio) (click on the column headers)</li><li>a search box for queries (by default in the full-text, title and author fields &mdash; hover over the magnifying icon for help with the syntax)</li></ul>"},
     		id: {en: "ID"},
     		documentTitle: {en: "Title"},
@@ -6951,6 +6962,7 @@ Ext.define('Voyant.panel.Documents', {
     	
     	Ext.apply(this, {
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
 	    	columns:[
 	    	   {
 	    	        xtype: 'rownumberer',
@@ -7057,6 +7069,7 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     statics: {
     	i18n: {
     		title: {en: "Documents Finder"},
+    		emptyText: {en: "No matching results."},
     		operator: {en: "Operator"},
     		field: {en: "Field"},
     		query: {en: "Query"},
@@ -7096,6 +7109,7 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     	
     	Ext.apply(this, {
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
     		plugins: [this.cellEditing],
     		bbar: [
     		       {
@@ -9960,7 +9974,7 @@ Ext.define('Voyant.VoyantApp', {
 			    "Please kick the tires and let us know if you have suggestions on <a href='https://github.com/sgsinclair/Voyant/issues'>Github</a> or <a href='http://twitter.com/voyanttools'>Twitter</a>."+
 			    "<ul>"+
 		    	"<li>some new features and functionality:<ul>"+
-		    		"<li>flexible search (wildcards, phrases, proximity) – hover over search boxes for more details</li>"+
+		    		"<li>flexible search (wildcards, phrases, proximity) – hover over help icon in search boxes for more details</li>"+
 			    	"<li>new <i>Phrases</i> tool for analyzing repeating n-grams</li>"+
 		    		"<li>better cross-platform and device support (all tools in HTML5, no Flash or Java Applets)</li>"+
 		    		"<li>much better support for larger corpora</li>"+

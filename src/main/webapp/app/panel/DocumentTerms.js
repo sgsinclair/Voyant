@@ -9,6 +9,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     statics: {
     	i18n: {
     		title: {en: "Document Terms"},
+    		emptyText: {en: "No matching results."},
     		helpTip: {en: "<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		matchingTerms: {en: 'Matching terms: {count}'},
     		termTip: {en: "The term in a single, specific document."},
@@ -93,6 +94,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
         
         Ext.apply(me, {
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
             store : store,
     		selModel: Ext.create('Ext.selection.CheckboxModel', {
                 listeners: {

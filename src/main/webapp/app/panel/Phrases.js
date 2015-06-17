@@ -8,6 +8,7 @@ Ext.define('Voyant.panel.Phrases', {
     statics: {
     	i18n: {
     		title: {en: "Phrases"},
+    		emptyText: {en: "No matching results."},
     		helpTip: {en: "<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->"},
     		term: {en: "Term"},
     		termTip: {en: "This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence)."},
@@ -111,6 +112,7 @@ Ext.define('Voyant.panel.Phrases', {
         
         Ext.apply(me, {
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
             store : store,
     		selModel: Ext.create('Ext.selection.CheckboxModel', {
                 listeners: {

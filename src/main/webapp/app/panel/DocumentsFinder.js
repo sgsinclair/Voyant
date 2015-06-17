@@ -6,6 +6,7 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     statics: {
     	i18n: {
     		title: {en: "Documents Finder"},
+    		emptyText: {en: "No matching results."},
     		operator: {en: "Operator"},
     		field: {en: "Field"},
     		query: {en: "Query"},
@@ -45,6 +46,7 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     	
     	Ext.apply(this, {
     		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
     		plugins: [this.cellEditing],
     		bbar: [
     		       {
