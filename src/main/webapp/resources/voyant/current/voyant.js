@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jun 17 10:19:36 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed Jun 17 11:25:41 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4277,7 +4277,7 @@ Ext.define('Voyant.widget.TotalPropertyStatus', {
     alias: 'widget.totalpropertystatus',
 	statics: {
 		i18n: {
-    		totalPropertyStatus: {en: '{count:number("0,000")}'},
+    		totalPropertyStatus: {en: '{count:number("0,000")}'}
 		}
 	},
     initComponent: function() {
@@ -9291,8 +9291,11 @@ Ext.define('Voyant.panel.TopicContexts', {
     	i18n: {
     		title: {en: "Trends"},
     		helpTip: {en: "<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
+    		freqsModeTip: {en: "Determines if frequencies are expressed as raw counts or as relative counts (per document or segment)."},
     		rawFrequencies: {en: 'raw frequencies'},
     		relativeFrequencies: {en: 'relative frequencies'},
+    		raw: {en: 'raw'},
+    		relative: {en: 'relative'},
     		segments: {en: 'document segments'},
     		documents: {en: 'documents'}
     	},
@@ -9300,7 +9303,7 @@ Ext.define('Voyant.panel.TopicContexts', {
     		limit: 5,
     		stopList: 'auto',
     		query: undefined,
-    		freqsMode: 'relativeFreqs',
+    		withDistributions: 'relative',
     		docIndex: undefined,
     		docId: undefined,
     		mode: undefined
@@ -9315,17 +9318,6 @@ Ext.define('Voyant.panel.TopicContexts', {
     
     constructor: function(config) {
 
-    	Ext.apply(this, {
-    		title: this.localize('title'),
-            dockedItems: [{
-                dock: 'bottom',
-                xtype: 'toolbar',
-                items: [{
-                    xtype: 'querysearchfield'
-                }]
-            }]
-        })
-    	
     	this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 
@@ -9426,6 +9418,51 @@ Ext.define('Voyant.panel.TopicContexts', {
     	
     },
     
+    initComponent: function() {
+        var me = this;
+    	Ext.apply(this, {
+    		title: this.localize('title'),
+            dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: [{
+                    	xtype: 'querysearchfield'
+                	},{
+		                xtype: 'button',
+		                text: this.localize('relative'),
+		                tooltip: this.localize('freqsModeTip'),
+		                menu: {
+		                	items: [
+		                       {
+		                           text: this.localize("relativeFrequencies"),
+		                           checked: true,
+		                           group: 'freqsMode',
+		                           checkHandler: function(item) {
+		                        	   item.up('button').setText(this.localize('raw'));
+		                        	   this.setApiParam('withDistributions', 'relative');
+		                        	   this.reloadFromChart();
+		                           },
+		                           scope: this
+		                       }, {
+		                           text: this.localize("rawFrequencies"),
+		                           checked: false,
+		                           group: 'freqsMode',
+		                           checkHandler: function(item) {
+		                        	   item.up('button').setText(this.localize('raw'));
+		                        	   this.setApiParam('withDistributions', 'raw');
+		                        	   this.reloadFromChart();
+		                           },
+		                           scope: this
+		                       }
+		                   ]
+		                }
+                }]
+            }]
+        }) 
+        me.callParent(arguments);
+    	 
+    },
+    
     loadFromDocument: function(document) {
 
     	if (document.then) {
@@ -9462,9 +9499,7 @@ Ext.define('Voyant.panel.TopicContexts', {
     		    	}
     		    },
     		    scope: this,
-    		    params: Ext.apply(this.getApiParams(['limit','stopList','query','docId']), {
-    		    	withDistributions: true
-    		    })
+    		    params: this.getApiParams(['limit','stopList','query','docId','withDistributions'])
         	});
     	}
     },
@@ -9494,9 +9529,7 @@ Ext.define('Voyant.panel.TopicContexts', {
 		    	}
 		    },
 		    scope: this,
-		    params: Ext.apply(this.getApiParams(['limit','stopList','query']) || {}, {
-		    	withDistributions: 'relative'
-		    })
+		    params: this.getApiParams(['limit','stopList','query','withDistributions'])
     	});
     },
     
@@ -9505,6 +9538,7 @@ Ext.define('Voyant.panel.TopicContexts', {
     	var terms = [];
     	var fields = ['index'];
     	var series = [];
+    	var max = 0;
     	records.forEach(function(record, index) {
     		var term = record.get('term');
     		record.get('distributions').forEach(function(r, i) {
@@ -9512,6 +9546,7 @@ Ext.define('Voyant.panel.TopicContexts', {
     				terms[i] = {"index": i}
     			}
     			terms[i]["_"+index] = r;
+    			if (r>max) {max=r}
     		}, this);
     		fields.push("_"+index);
         	series.push({
@@ -9551,7 +9586,6 @@ Ext.define('Voyant.panel.TopicContexts', {
     		})
     	}, this);
     	
-    	
     	var store = Ext.create('Ext.data.JsonStore', {
     		fields: fields,
     		data: terms
@@ -9564,9 +9598,11 @@ Ext.define('Voyant.panel.TopicContexts', {
         	axes: [{
         		type: 'numeric',
         		position: 'left',
-                minimum: 0,
+        		majorTickSteps: this.getApiParam('withDistributions') =='raw' && max < 20 ? max : undefined,
+//                minimum: 0,
+                increment: 1,
         		title: {
-        			text: this.localize(mode==this.MODE_DOCUMENT || this.getApiParam('freqsMode') =='rawFreqs' ? 'rawFrequencies' : 'relativeFrequencies')
+        			text: this.localize(mode==this.MODE_DOCUMENT || this.getApiParam('withDistributions') =='raw' ? 'rawFrequencies' : 'relativeFrequencies')
         		}
         	}, {
         		type: 'category',
@@ -9581,6 +9617,17 @@ Ext.define('Voyant.panel.TopicContexts', {
         	}]
     	});
 
+    },
+    
+    reloadFromChart: function() {
+    	var chart = this.down('chart');
+    	if (chart) {
+    		var terms = [];
+    		chart.series.forEach(function(serie) {
+    			terms.push(serie.getTitle())
+    		})
+    		this.fireEvent("termsClicked", this, terms);
+    	}
     },
     
     buildChart: function(config) {
