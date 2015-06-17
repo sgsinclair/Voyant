@@ -47,7 +47,7 @@ Ext.define('Voyant.data.model.Document', {
 					if (space < 0 || space > max) {
 						space = max;
 					}
-					string = string.substring(0, space) + "&hellip;;";
+					string = string.substring(0, space) + "…";
 				}
 		}
   		return string

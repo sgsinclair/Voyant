@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jun 17 11:25:41 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed Jun 17 12:40:19 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3029,7 +3029,7 @@ Ext.define('Voyant.data.model.Document', {
 					if (space < 0 || space > max) {
 						space = max;
 					}
-					string = string.substring(0, space) + "&hellip;;";
+					string = string.substring(0, space) + "…";
 				}
 		}
   		return string
@@ -9592,6 +9592,7 @@ Ext.define('Voyant.panel.TopicContexts', {
     	});
     	fields.shift();
     	
+    	var me = this;
     	this.buildChart({
         	store: store,
         	series: series,
@@ -9611,8 +9612,13 @@ Ext.define('Voyant.panel.TopicContexts', {
         		title: {
             		text: this.localize(mode==this.MODE_DOCUMENT ? 'segments' : 'documents')
         		},
+                label   : {
+                    rotate:{degrees:-30},
+                    textAlign: 'end'
+
+               },
         		renderer: function(label, data) {
-        			return mode==this.MODE_DOCUMENT ? parseInt(label)+1 : label
+        			return mode==me.MODE_DOCUMENT ? parseInt(label)+1 : me.getCorpus().getDocument(label).getTinyTitle()
         		}
         	}]
     	});

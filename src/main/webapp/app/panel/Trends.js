@@ -312,6 +312,7 @@
     	});
     	fields.shift();
     	
+    	var me = this;
     	this.buildChart({
         	store: store,
         	series: series,
@@ -331,8 +332,13 @@
         		title: {
             		text: this.localize(mode==this.MODE_DOCUMENT ? 'segments' : 'documents')
         		},
+                label   : {
+                    rotate:{degrees:-30},
+                    textAlign: 'end'
+
+               },
         		renderer: function(label, data) {
-        			return mode==this.MODE_DOCUMENT ? parseInt(label)+1 : label
+        			return mode==me.MODE_DOCUMENT ? parseInt(label)+1 : me.getCorpus().getDocument(label).getTinyTitle()
         		}
         	}]
     	});
