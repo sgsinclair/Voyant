@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jun 17 09:11:15 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed Jun 17 10:19:36 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4271,8 +4271,41 @@ Ext.define('Voyant.widget.QuerySearchField', {
         this.updateLayout();
     }
 });
+Ext.define('Voyant.widget.TotalPropertyStatus', {
+    extend: 'Ext.Component',
+    mixins: ['Voyant.util.Localization'],
+    alias: 'widget.totalpropertystatus',
+	statics: {
+		i18n: {
+    		totalPropertyStatus: {en: '{count:number("0,000")}'},
+		}
+	},
+    initComponent: function() {
+        var me = this;
+        Ext.applyIf(me, {
+            tpl: this.localize('totalPropertyStatus'),
+            itemId: 'totalpropertystatus',
+            style: 'margin-right:5px',
+            listeners: {
+            	afterrender: function(cmp) {
+            		var grid = cmp.up('grid')
+            		if (grid) {
+            			var store = grid.getStore();
+            			cmp.updateStatus(store.getTotalCount()); // make sure we set this in case of lazy render
+            			grid.getStore().on("totalcountchange", cmp.updateStatus, cmp) // bind changes to update
+            		}
+            	}
+            }
+        })
+        me.callParent(arguments);
+    },
+    updateStatus: function(count) {
+    	this.update({count: count})
+    }
+});
+
 Ext.define('Voyant.panel.Panel', {
-	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable',/*'Voyant.notebook.util.Embeddable',*/'Voyant.util.DetailedError','Voyant.widget.QuerySearchField','Voyant.widget.StopListOption'],
+	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable',/*'Voyant.notebook.util.Embeddable',*/'Voyant.util.DetailedError','Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.TotalPropertyStatus'],
 	statics: {
 		i18n: {
 			term: {en: "Term"},
@@ -5100,11 +5133,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                     xtype: 'querysearchfield'
                     	
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
-                }, {
                 	text: me.localize('clearTerms'),
                 	handler: function() {
                 		this.updateNodesAndLinks({},{})
@@ -5486,10 +5514,7 @@ Ext.define('Voyant.panel.Contexts', {
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
+                    xtype: 'totalpropertystatus'
                 }, this.localize('context'), {
                 	xtype: 'slider',
                 	minValue: 5,
@@ -5843,9 +5868,6 @@ Ext.define('Voyant.panel.CorpusCollocates', {
         var me = this;
 
         var store = Ext.create("Voyant.data.store.CorpusCollocates");
-        store.on("totalcountchange", function(total) {
-        	this.down('#status').update({count: Ext.util.Format.number(total, "0,000")});
-        }, me);
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -5871,10 +5893,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
+                    xtype: 'totalpropertystatus'
                 }]
             }],
     		columns: [{
@@ -6362,12 +6381,6 @@ Ext.define('Voyant.panel.Phrases', {
         var store = Ext.create("Voyant.data.store.CorpusNgrams", {
         	autoLoad: false
         });
-        store.on("totalcountchange", function() {
-        	this.down('#status').update({count: this.getStore().getTotalCount()});;
-        }, me);
-        store.on("beforesort", function(store, sorters, eOpts) {
-        	debugger
-        }, me)
         me.on("sortchange", function( ct, column, direction, eOpts ) {
         	this.setApiParam('sort', column.dataIndex);
         	this.setApiParam('dir', direction);
@@ -6400,10 +6413,7 @@ Ext.define('Voyant.panel.Phrases', {
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
+                    xtype: 'totalpropertystatus'
                 }, '-', {
                 	text: me.localize('length'),
                 	tooltip: 'test',
@@ -6612,9 +6622,6 @@ Ext.define('Voyant.panel.CorpusTerms', {
 
         var store = Ext.create("Voyant.data.store.CorpusTerms");
         store.getProxy().setExtraParam("withDistributions", "relative");
-        store.on("totalcountchange", function() {
-        	this.down('#status').update({count: this.getStore().getTotalCount()});;
-        }, me);
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -6639,10 +6646,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
+                    xtype: 'totalpropertystatus'
                 }]
             }],
 
@@ -6814,9 +6818,6 @@ Ext.define('Voyant.panel.DocumentTerms', {
         var me = this;
 
         var store = Ext.create("Voyant.data.store.DocumentTerms");
-        store.on("totalcountchange", function() {
-        	this.down('#status').update({count: this.getStore().getTotalCount()});;
-        }, me);
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -6839,10 +6840,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
+                    xtype: 'totalpropertystatus'
                 }]
             }],
     		columns: [{
@@ -6949,9 +6947,6 @@ Ext.define('Voyant.panel.Documents', {
     	var store = Ext.create("Voyant.data.store.Documents", {
     	    selModel: {pruneRemoved: false}
     	});
-        store.on("totalcountchange", function() {
-        	this.down('#status').update({count: this.getStore().getTotalCount()});;
-        }, this);
     	
     	
     	Ext.apply(this, {
@@ -7016,10 +7011,7 @@ Ext.define('Voyant.panel.Documents', {
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingDocuments'),
-                    style: 'margin-right:5px'
+                    xtype: 'totalpropertystatus'
                 }]
             }]
     	});
@@ -9330,11 +9322,6 @@ Ext.define('Voyant.panel.TopicContexts', {
                 xtype: 'toolbar',
                 items: [{
                     xtype: 'querysearchfield'
-                }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
                 }]
             }]
         })

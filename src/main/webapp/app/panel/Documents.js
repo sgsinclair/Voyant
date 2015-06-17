@@ -23,9 +23,6 @@ Ext.define('Voyant.panel.Documents', {
     	var store = Ext.create("Voyant.data.store.Documents", {
     	    selModel: {pruneRemoved: false}
     	});
-        store.on("totalcountchange", function() {
-        	this.down('#status').update({count: this.getStore().getTotalCount()});;
-        }, this);
     	
     	
     	Ext.apply(this, {
@@ -90,10 +87,7 @@ Ext.define('Voyant.panel.Documents', {
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingDocuments'),
-                    style: 'margin-right:5px'
+                    xtype: 'totalpropertystatus'
                 }]
             }]
     	});

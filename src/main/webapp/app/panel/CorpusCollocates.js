@@ -141,9 +141,6 @@ Ext.define('Voyant.panel.CorpusCollocates', {
         var me = this;
 
         var store = Ext.create("Voyant.data.store.CorpusCollocates");
-        store.on("totalcountchange", function(total) {
-        	this.down('#status').update({count: Ext.util.Format.number(total, "0,000")});
-        }, me);
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -169,10 +166,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
+                    xtype: 'totalpropertystatus'
                 }]
             }],
     		columns: [{

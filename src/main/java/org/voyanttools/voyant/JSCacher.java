@@ -74,6 +74,7 @@ public class JSCacher {
 
 		"app/widget/StopListOption.js",
 		"app/widget/QuerySearchField.js",
+		"app/widget/TotalPropertyStatus.js",
 
 		"app/panel/Panel.js",
 		"app/panel/VoyantTabPanel.js",

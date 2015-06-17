@@ -101,12 +101,6 @@ Ext.define('Voyant.panel.Phrases', {
         var store = Ext.create("Voyant.data.store.CorpusNgrams", {
         	autoLoad: false
         });
-        store.on("totalcountchange", function() {
-        	this.down('#status').update({count: this.getStore().getTotalCount()});;
-        }, me);
-        store.on("beforesort", function(store, sorters, eOpts) {
-        	debugger
-        }, me)
         me.on("sortchange", function( ct, column, direction, eOpts ) {
         	this.setApiParam('sort', column.dataIndex);
         	this.setApiParam('dir', direction);
@@ -139,10 +133,7 @@ Ext.define('Voyant.panel.Phrases', {
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
+                    xtype: 'totalpropertystatus'
                 }, '-', {
                 	text: me.localize('length'),
                 	tooltip: 'test',

@@ -1,5 +1,5 @@
 Ext.define('Voyant.panel.Panel', {
-	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable',/*'Voyant.notebook.util.Embeddable',*/'Voyant.util.DetailedError','Voyant.widget.QuerySearchField','Voyant.widget.StopListOption'],
+	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable',/*'Voyant.notebook.util.Embeddable',*/'Voyant.util.DetailedError','Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.TotalPropertyStatus'],
 	statics: {
 		i18n: {
 			term: {en: "Term"},

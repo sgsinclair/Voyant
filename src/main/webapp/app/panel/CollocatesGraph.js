@@ -52,11 +52,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                     xtype: 'querysearchfield'
                     	
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
-                }, {
                 	text: me.localize('clearTerms'),
                 	handler: function() {
                 		this.updateNodesAndLinks({},{})

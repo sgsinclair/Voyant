@@ -42,11 +42,6 @@
                 xtype: 'toolbar',
                 items: [{
                     xtype: 'querysearchfield'
-                }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
                 }]
             }]
         })

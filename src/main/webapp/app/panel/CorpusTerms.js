@@ -73,9 +73,6 @@ Ext.define('Voyant.panel.CorpusTerms', {
 
         var store = Ext.create("Voyant.data.store.CorpusTerms");
         store.getProxy().setExtraParam("withDistributions", "relative");
-        store.on("totalcountchange", function() {
-        	this.down('#status').update({count: this.getStore().getTotalCount()});;
-        }, me);
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -100,10 +97,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
-                    xtype: 'component',
-                    itemId: 'status',
-                    tpl: this.localize('matchingTerms'),
-                    style: 'margin-right:5px'
+                    xtype: 'totalpropertystatus'
                 }]
             }],
 
