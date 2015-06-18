@@ -11,6 +11,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		gearTip: {en: "Options"},
     		gearWinTitle: {en: "Options"},
     		inputFormat: {en: "Input Format"},
+    		inputFormatAuto: {en: "Auto-Detect (recommended)"},
     		xpathDocuments: {en: "XPath to Documents"},
     		xpathContent: {en: "XPath to Content"},
     		xpathTitle: {en: "XPath to Title"},
@@ -22,6 +23,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		badFiles: {en: "incompatible (likely error): "},
     		unknownFiles: {en: "unrecognized (possible error): "},
     		sureContinue: {en: "Are you sure you wish to continue?"},
+    		error: {en: "Error"},
+    		errorNotXmlContinue: {en: "You've selected an XML input format but the input doesn't appear to be XML. Are you sure you wish to continue?"},
     		reveal: {en: "Reveal"},
     		ok: {en: "OK"},
     		cancel: {en: "Cancel"}
@@ -86,8 +89,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				            fieldLabel:'Choose a corpus:',
 	    				            name:'corpus',
 	    				            queryMode:'local',
-	    				            store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],
-	    				            
+	    				            store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],				            
 	    				            forceSelection:true
 	    				        },
 	    				        buttons: [
@@ -198,7 +200,19 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	    	handler: function(btn) {
 	    	        	var input = btn.up('form').down('#input').getValue();
 	    	        	if (input !== '') {
-	    	        		me.loadCorpus({input: input});
+	    	        		var api = me.getApiParams();
+	    	            	delete api.view;
+	    	            	delete api.stopList;
+	    	        		if (api.inputFormat && input.trim().indexOf("<")!==0) {
+	    	        			Ext.Msg.confirm(me.localize('error'), me.localize('errorNotXmlContinue'), function(buttonId) {
+	    	        				if (buttonId=='yes') {
+				    	        		me.loadCorpus(Ext.apply(api, {input: input}));
+	    	        				}
+	    	        			}, me);
+	    	        		}
+	    	        		else {
+		    	        		me.loadCorpus(Ext.apply(api, {input: input}));
+	    	        		}
 	    	        	}
 	    	        	else {
 	    	        		Ext.Msg.show({
@@ -229,7 +243,6 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	delete apiParams.view;
     	delete apiParams.stopList;
     	Ext.apply(params, apiParams);
-    	
     	var view = this.getApplication().getViewport();
 		view.mask(this.localize('uploadingCorpus'));
 		form.submit({
@@ -275,7 +288,19 @@ Ext.define('Voyant.panel.CorpusCreator', {
     					labelAlign: 'right',
     					labelWidth: 160
     				},
+    				defaults: {
+    					width: 400
+    				},
     				items: [{
+			            xtype:'combo',
+			            width: 400,
+			            fieldLabel: me.localize('inputFormat'),
+			            name: 'inputFormat',
+			            queryMode:'local',
+			            store:[['',me.localize('inputFormatAuto')],['TEI',"TEI"],['RSS',"RSS"]],
+			            forceSelection:true,
+			            value: ''
+    				},{
     					fieldLabel: me.localize('xpathDocuments'),
     					name: 'xmlDocumentsXpath'
     				},{
