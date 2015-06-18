@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jun 17 21:35:50 EDT 2015 */
+/* This file created by JSCacher. Last modified: Wed Jun 17 21:42:29 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3239,7 +3239,7 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 });
 
 Ext.define('Voyant.data.store.Contexts', {
-	extend: 'Ext.data.Store',
+	extend: 'Ext.data.BufferedStore',
 	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.Context',
 //    transferable: ['setCorpus'],
@@ -3253,6 +3253,10 @@ Ext.define('Voyant.data.store.Contexts', {
 		
 		// create proxy in constructor so we can set the Trombone URL
 		Ext.apply(config, {
+			pagePurgeCount: 0,
+			pageSize: 100,
+			leadingBufferZone: 100,
+			remoteSort: true,
 		     proxy: {
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),
@@ -3263,7 +3267,8 @@ Ext.define('Voyant.data.store.Contexts', {
 		         },
 		         reader: {
 		             type: 'json',
-		             rootProperty: 'documentContexts.contexts'
+		             rootProperty: 'documentContexts.contexts',
+		             totalProperty: 'documentContexts.total'
 		         },
 		         simpleSortMode: true
 		     }

@@ -1,5 +1,5 @@
 Ext.define('Voyant.data.store.Contexts', {
-	extend: 'Ext.data.Store',
+	extend: 'Ext.data.BufferedStore',
 	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.Context',
 //    transferable: ['setCorpus'],
@@ -13,6 +13,10 @@ Ext.define('Voyant.data.store.Contexts', {
 		
 		// create proxy in constructor so we can set the Trombone URL
 		Ext.apply(config, {
+			pagePurgeCount: 0,
+			pageSize: 100,
+			leadingBufferZone: 100,
+			remoteSort: true,
 		     proxy: {
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),
@@ -23,7 +27,8 @@ Ext.define('Voyant.data.store.Contexts', {
 		         },
 		         reader: {
 		             type: 'json',
-		             rootProperty: 'documentContexts.contexts'
+		             rootProperty: 'documentContexts.contexts',
+		             totalProperty: 'documentContexts.total'
 		         },
 		         simpleSortMode: true
 		     }
