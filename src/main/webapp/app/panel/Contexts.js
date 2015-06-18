@@ -16,7 +16,9 @@ Ext.define('Voyant.panel.Contexts', {
     		right: {en: "Right"},
     		rightTip: {en: "Context to the right of the keyword."},
     		context: {en: "context"},
-    		expand: {en: "expand"}
+    		expand: {en: "expand"},
+    		corpus: {en: "corpus"},
+    		corpusTip: {en: "Reset to corpus mode (contexts from all documents)."}
     	},
     	api: {
     		query: undefined,
@@ -111,6 +113,17 @@ Ext.define('Voyant.panel.Contexts', {
                 			}
                 		}
                 	}
+                },{
+                	text: this.localize('corpus'),
+                	tooltip: this.localize("corpusTip"),
+                	itemId: 'corpus',
+                	handler: function(btn) {
+                		btn.hide()
+                		this.setApiParams({docIndex: undefined, docId: undefined});
+                		this.getStore().load({params: this.getApiParams()})
+                	},
+                	hidden: true,
+                	scope: this
                 }]
             }], 
     		columns: [{
@@ -183,6 +196,7 @@ Ext.define('Voyant.panel.Contexts', {
 	       	        		docIndex: docIndex,
 	       	        		query: queries
 	       	        	});
+	       	        	this.down("#corpus").show()
 	       	        	if (this.isVisible()) {
 	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
 	       	        	}
