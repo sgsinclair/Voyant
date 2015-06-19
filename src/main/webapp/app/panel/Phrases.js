@@ -18,7 +18,7 @@ Ext.define('Voyant.panel.Phrases', {
     		length: {en: "Length"},
     		lengthTip: {en: "The upper and lower bounds of phrase lengths (how many words in each phrase)."},
     		overlap: {en: "Overlap"},
-    		overlapTip: {en: "overlap tip"},
+    		overlapTip: {en: "This determines how overlapping phrases are filtered."},
     		overlapMenu: {en: "Choose an overlap filter:"},
     		overlapNone: {en: "none (keep all)"},
     		overlapLength: {en: "prioritize longest phrases"},
@@ -109,7 +109,7 @@ Ext.define('Voyant.panel.Phrases', {
         	var proxy = this.getStore().getProxy();
         	for (var key in api) {proxy.setExtraParam(key, api[key]);}
         }, me)
-        
+
         Ext.apply(me, {
     		title: this.localize('title'),
     		emptyText: this.localize("emptyText"),
@@ -175,34 +175,51 @@ Ext.define('Voyant.panel.Phrases', {
                     	items: [
                            '<b class="menu-title">'+this.localize('overlapMenu')+'</b>',
                            {
+                        	   xtype: 'menucheckitem',
                                text: this.localize("overlapNone"),
-                               checked: true,
                                group: 'overlap',
+                               inputValue: 'none',
                                checkHandler: function() {
                             	   this.setApiParam('overlapFilter', 'none')
                             	   this.getStore().load({params: this.getApiParams()})
                                },
                                scope: this
                            }, {
+                        	   xtype: 'menucheckitem',
                                text: this.localize("overlapLength"),
-                               checked: false,
                                group: 'overlap',
+                               inputValue: 'length',
                                checkHandler: function() {
                             	   this.setApiParam('overlapFilter', 'length')
                             	   this.getStore().load({params: this.getApiParams()})
                                },
                                scope: this
                            }, {
+                        	   xtype: 'menucheckitem',
                                text: this.localize("overlapFreq"),
-                               checked: false,
                                group: 'overlap',
+                               inputValue: 'rawFreq',
                                checkHandler: function() {
                             	   this.setApiParam('overlapFilter', 'rawfreq')
                             	   this.getStore().load({params: this.getApiParams()})
                                },
                                scope: this
                            }
-	                   ]
+	                   ],
+	                   listeners: {
+	                	   afterrender: {
+	                		   fn: function(menu) {
+	                			   var overlapFilter = this.getApiParam('overlapFilter');
+	                			   menu.items.each(function(item) {
+	                				   if (item.group) {
+	                					   item.setChecked(item.inputValue==overlapFilter);
+	                				   }
+	                			   }, this)
+	                		   },
+	                		   scope: this
+	                	   }
+                
+	                   }
                     }
                 }]
             }],

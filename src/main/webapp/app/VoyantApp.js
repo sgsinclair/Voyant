@@ -67,7 +67,6 @@ Ext.define('Voyant.VoyantApp', {
 		    	"</ul><li>some things not yet fully implemented:<ul>"+
 			    	"<li>full list of tools and skins from 1.0</li>"+
 			    	"<li>adding and reordering documents (new in 2.0)</li>"+
-			    	"<li>N-Gram support (term sequences) (new in 2.0)</li>"+
 			    	"<!--<li>part-of-speech tagging and lemmatization (new in 2.0)</li>-->"+
 		    	"</ul></li></ul>"+
 		    	"<p>It's best to assume that this preview release may be incompatible with future releases and that "+
