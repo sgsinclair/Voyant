@@ -23,6 +23,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			addTerm: {en: "Add Term"},
 			clusters: {en: "Clusters"},
 			dimensions: {en: "Dimensions"},
+			labels: {en: "Labels"},
 			remove: {en: "Remove"},
 			removeTerm: {en: 'Remove <b>{0}</b>'},
 			nearby: {en: "Nearby"},
@@ -68,6 +69,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	newTerm: null,
 	termsTimeout: null,
     chartMenu: null,
+    labelsMode: 0, // 0 all labels, 1 word labels, 2 no labels
     
     constructor: function(config) {
         this.callParent(arguments);
@@ -82,8 +84,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	termStore: this.termStore,
         	chartMenu: Ext.create('Ext.menu.Menu', {
         		items: [
-        			{text: this.localize('remove'), itemId: 'remove'},
-        			{text: this.localize('nearby'), itemId: 'nearby'}
+        			{text: this.localize('remove'), itemId: 'remove', glyph: 'xf068@FontAwesome'},
+        			{text: this.localize('nearby'), itemId: 'nearby', glyph: 'xf0b2@FontAwesome'}
         		],
         		listeners: {
         			hide: function() {
@@ -168,6 +170,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
     						scope: this
     					}
             		}
+            	},{
+            		text: this.localize('labels'),
+            		itemId: 'labels',
+            		glyph: 'xf02b@FontAwesome',
+            		handler: function() {
+            			this.labelsMode++;
+    					if (this.labelsMode > 2) this.labelsMode = 0;
+    					this.doLabels();
+					},
+					scope: this
             	}]
         	},{
         		itemId: 'terms',
@@ -469,6 +481,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	sprites: [{
         		type: 'text',
         		text: summary,
+        		hidden: this.labelsMode > 0,
         		x: 70,
         		y: 70
         	}],
@@ -478,10 +491,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xField: 'x',
         		yField: 'y',
         		store: termSeriesStore,
-        		label: {
-        			field: 'term',
-        			display: 'over'
-        		},
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
@@ -526,10 +535,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xField: 'x',
         		yField: 'y',
         		store: docSeriesStore,
-        		label: {
-        			field: 'term',
-        			display: 'over'
-        		},
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
@@ -613,6 +618,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	}
         };
     	
+    	if (this.labelsMode < 2) {
+    		config.series[0].label = {
+    			field: 'term',
+    			display: 'over'
+    		};
+    		config.series[1].label = {
+    			field: 'term',
+    			display: 'over'
+    		};
+    	}
+    	
     	var chart = Ext.create('Ext.chart.CartesianChart', config);
     	this.queryById('chartParent').insert(0, chart);
     	
@@ -620,6 +636,29 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	this.selectTerm(this.newTerm);
         	this.newTerm = null;
         }
+    },
+    
+    doLabels: function() {
+    	var chart = this.queryById('chart');
+    	var series = chart.getSeries();
+    	var summary = chart.getSurface('chart').getItems()[0];
+    	switch (this.labelsMode) {
+    		case 0:
+    			series[0].getLabel().show();
+        		series[1].getLabel().show();
+        		summary.show();
+        		break;
+    		case 1:
+    			series[0].getLabel().show();
+        		series[1].getLabel().show();
+    			summary.hide();
+    			break;
+    		case 2:
+    			series[0].getLabel().hide();
+        		series[1].getLabel().hide();
+        		summary.hide();
+    	}
+    	chart.redraw();
     },
     
     selectTerm: function(term) {
