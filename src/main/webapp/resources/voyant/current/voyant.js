@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Jun 23 09:05:52 EDT 2015 */
+/* This file created by JSCacher. Last modified: Tue Jun 23 18:50:17 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -956,22 +956,21 @@ function Cirrus(config) {
     
     this.clear = function() {
         this.canvas.width = this.canvas.width;
-    }
+    };
     
     this.addWords = function(words) {
-    	debugger
         wordController.addWords(words);
-    }
+    };
     
     this.arrangeWords = function() {
         wordController.arrangeWords();
-    }
+    };
 
     this.clearAll = function() {
         wordController.setWords([]);
         wordController.grid = [];
         this.clear();
-    }
+    };
 
     this.resizeWords = function() {
         that.setCanvasDimensions();
@@ -980,7 +979,7 @@ function Cirrus(config) {
         wordController.resizeWords();
         wordController.arrangeWords();
         resizeTimer = null;
-    }
+    };
 
     this.setCanvasDimensions = function() {
         var container = $(containerId)[0];
@@ -988,7 +987,7 @@ function Cirrus(config) {
         var height = Math.max(container.offsetHeight, container.clientHeight);
         this.canvas.width = width;
         this.canvas.height = height;
-    }
+    };
 
     function hex2RGB(hex) {
         hex = hex.charAt(0) == '#' ? hex.substring(1,7) : hex;
@@ -1133,7 +1132,7 @@ function Word(_text, _origSize, _color, _rolloverText, _value) {
         ctx.rotate(this.rotation);
         ctx.fillText(this.text, 0, 0);
         ctx.restore();
-    }
+    };
 }
 
 function WordController(parentApp) {
@@ -1150,10 +1149,21 @@ function WordController(parentApp) {
     var _layout = this.CIRCLE; // what layout to use
     this.getLayout = function() {
         return _layout;
-    }
+    };
     this.setLayout = function(value) {
         _layout = value;
-    }
+    };
+    
+    this.HORIZONTAL = 0;
+    this.MIXED = 1; // horizontal and vertical
+    
+    var _wordOrientation = this.MIXED;
+    this.getWordOrientation = function() {
+        return _wordOrientation;
+    };
+    this.setWordOrientation = function(value) {
+    	_wordOrientation = value;
+    };
     
     this.UPDATE_RATE = 25; // update frequency in milliseconds
     this.COARSENESS = 5; // how many pixels do we skip when creating the mask?
@@ -1406,28 +1416,25 @@ function WordController(parentApp) {
         
         var angle = 0;
         
-        /*
-        if (false) {
-//        if (!$.browser.opera) {
-            // opera can't render rotated text
-//            if (wordObj.text.match(/\s/) == null) {
-                if (Math.random() > 0.66) {
-                    var tempHeight = wordObj.height;
-                    var tempWidth = wordObj.width;
-                    wordObj.height = tempWidth;
-                    wordObj.width = tempHeight;
-                    if (Math.round(Math.random()) == 0) {
-                        angle = 90;
-                        wordObj.ty = 0;
-                    } else {
-                        angle = -90;
-                        wordObj.ty = wordObj.height;
-                        wordObj.tx = wordObj.width;
-                    }
-                }
-//            }
+        if (that.getWordOrientation() === that.MIXED) {
+	        if (wordObj.text.match(/\s/) == null) {
+				if (Math.random() > 0.66) {
+					var tempHeight = wordObj.height;
+					var tempWidth = wordObj.width;
+					wordObj.height = tempWidth;
+					wordObj.width = tempHeight;
+					if (Math.round(Math.random()) == 0) {
+						angle = 90;
+						wordObj.ty = 0;
+					} else {
+						angle = -90;
+						wordObj.ty = wordObj.height;
+						wordObj.tx = wordObj.width;
+					}
+				}
+			}
         }
-        */
+        
         
 
         wordObj.size = Math.max(wordObj.height, wordObj.width);
@@ -4959,6 +4966,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	options: {
     		xtype: 'stoplistoption'
     	},
+    	filesLoaded: false,
     	corpus: undefined
     },
 
@@ -4969,6 +4977,8 @@ Ext.define('Voyant.panel.Cirrus', {
     
     constructor: function(config) {
 
+    	this.loadFiles();
+    	
     	Ext.apply(this, {
     		title: this.localize('title'),
     		dockedItems: [{
@@ -5036,7 +5046,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	documentTerms.load({
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_DOCUMENT);
-		    	this.loadFromTermsRecords(records)
+		    	this.loadFromTermsRecords(records);
 		    },
 		    scope: this,
 		    params: this.getApiParams()
@@ -5048,7 +5058,7 @@ Ext.define('Voyant.panel.Cirrus', {
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_CORPUS);
-		    	this.loadFromTermsRecords(records)
+		    	this.loadFromTermsRecords(records);
 		    },
 		    scope: this,
 		    params: this.getApiParams()
@@ -5060,7 +5070,35 @@ Ext.define('Voyant.panel.Cirrus', {
     	records.forEach(function(record) {
     		terms.push({word: record.get('term'), size: record.get('rawFreq'), value: record.get('rawFreq')});
     	});
-    	this.buildFromTerms(terms)
+    	this.buildFromTerms(terms);
+    },
+    
+    loadFiles: function() {
+    	debugger
+    	if (!Cirrus || !WordController || !Word) {
+        	Ext.Loader.loadScript({
+        		url: this.getBaseUrl()+'resources/cirrus/html5/Cirrus.js',
+        		scope: this,
+        		onLoad: function() {
+        			Ext.Loader.loadScript({
+        	    		url: this.getBaseUrl()+'resources/cirrus/html5/WordController.js',
+        	    		scope: this,
+        	    		onLoad: function() {
+        	    			Ext.Loader.loadScript({
+        	    	    		url: this.getBaseUrl()+'resources/cirrus/html5/Word.js',
+        	    	    		scope: this,
+        	    	    		onLoad: function() {
+        	    	    			this.setFilesLoaded(true);
+        	    	    		}
+        	    	    	});
+        	    		}
+        	    	});
+        		}
+        	});
+    	}
+    	else {
+			this.setFilesLoaded(true);
+    	}
     },
     
     buildFromTerms: function(terms) {
@@ -5083,7 +5121,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	}
     }
     
-})
+});
 Ext.define('Voyant.panel.CollocatesGraph', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -8184,6 +8222,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			addTerm: {en: "Add Term"},
 			clusters: {en: "Clusters"},
 			dimensions: {en: "Dimensions"},
+			labels: {en: "Labels"},
 			remove: {en: "Remove"},
 			removeTerm: {en: 'Remove <b>{0}</b>'},
 			nearby: {en: "Nearby"},
@@ -8229,6 +8268,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	newTerm: null,
 	termsTimeout: null,
     chartMenu: null,
+    labelsMode: 0, // 0 all labels, 1 word labels, 2 no labels
     
     constructor: function(config) {
         this.callParent(arguments);
@@ -8243,8 +8283,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	termStore: this.termStore,
         	chartMenu: Ext.create('Ext.menu.Menu', {
         		items: [
-        			{text: this.localize('remove'), itemId: 'remove'},
-        			{text: this.localize('nearby'), itemId: 'nearby'}
+        			{text: this.localize('remove'), itemId: 'remove', glyph: 'xf068@FontAwesome'},
+        			{text: this.localize('nearby'), itemId: 'nearby', glyph: 'xf0b2@FontAwesome'}
         		],
         		listeners: {
         			hide: function() {
@@ -8329,6 +8369,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
     						scope: this
     					}
             		}
+            	},{
+            		text: this.localize('labels'),
+            		itemId: 'labels',
+            		glyph: 'xf02b@FontAwesome',
+            		handler: function() {
+            			this.labelsMode++;
+    					if (this.labelsMode > 2) this.labelsMode = 0;
+    					this.doLabels();
+					},
+					scope: this
             	}]
         	},{
         		itemId: 'terms',
@@ -8630,6 +8680,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	sprites: [{
         		type: 'text',
         		text: summary,
+        		hidden: this.labelsMode > 0,
         		x: 70,
         		y: 70
         	}],
@@ -8639,10 +8690,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xField: 'x',
         		yField: 'y',
         		store: termSeriesStore,
-        		label: {
-        			field: 'term',
-        			display: 'over'
-        		},
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
@@ -8687,10 +8734,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xField: 'x',
         		yField: 'y',
         		store: docSeriesStore,
-        		label: {
-        			field: 'term',
-        			display: 'over'
-        		},
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
@@ -8774,6 +8817,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	}
         };
     	
+    	if (this.labelsMode < 2) {
+    		config.series[0].label = {
+    			field: 'term',
+    			display: 'over'
+    		};
+    		config.series[1].label = {
+    			field: 'term',
+    			display: 'over'
+    		};
+    	}
+    	
     	var chart = Ext.create('Ext.chart.CartesianChart', config);
     	this.queryById('chartParent').insert(0, chart);
     	
@@ -8781,6 +8835,29 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	this.selectTerm(this.newTerm);
         	this.newTerm = null;
         }
+    },
+    
+    doLabels: function() {
+    	var chart = this.queryById('chart');
+    	var series = chart.getSeries();
+    	var summary = chart.getSurface('chart').getItems()[0];
+    	switch (this.labelsMode) {
+    		case 0:
+    			series[0].getLabel().show();
+        		series[1].getLabel().show();
+        		summary.show();
+        		break;
+    		case 1:
+    			series[0].getLabel().show();
+        		series[1].getLabel().show();
+    			summary.hide();
+    			break;
+    		case 2:
+    			series[0].getLabel().hide();
+        		series[1].getLabel().hide();
+        		summary.hide();
+    	}
+    	chart.redraw();
     },
     
     selectTerm: function(term) {

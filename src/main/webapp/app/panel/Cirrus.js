@@ -132,25 +132,30 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     loadFiles: function() {
-    	Ext.Loader.loadScript({
-    		url: this.getBaseUrl()+'resources/cirrus/html5/Cirrus.js',
-    		scope: this,
-    		onLoad: function() {
-    			Ext.Loader.loadScript({
-    	    		url: this.getBaseUrl()+'resources/cirrus/html5/WordController.js',
-    	    		scope: this,
-    	    		onLoad: function() {
-    	    			Ext.Loader.loadScript({
-    	    	    		url: this.getBaseUrl()+'resources/cirrus/html5/Word.js',
-    	    	    		scope: this,
-    	    	    		onLoad: function() {
-    	    	    			this.setFilesLoaded(true);
-    	    	    		}
-    	    	    	});
-    	    		}
-    	    	});
-    		}
-    	});
+    	if (!Cirrus || !WordController || !Word) {
+        	Ext.Loader.loadScript({
+        		url: this.getBaseUrl()+'resources/cirrus/html5/Cirrus.js',
+        		scope: this,
+        		onLoad: function() {
+        			Ext.Loader.loadScript({
+        	    		url: this.getBaseUrl()+'resources/cirrus/html5/WordController.js',
+        	    		scope: this,
+        	    		onLoad: function() {
+        	    			Ext.Loader.loadScript({
+        	    	    		url: this.getBaseUrl()+'resources/cirrus/html5/Word.js',
+        	    	    		scope: this,
+        	    	    		onLoad: function() {
+        	    	    			this.setFilesLoaded(true);
+        	    	    		}
+        	    	    	});
+        	    		}
+        	    	});
+        		}
+        	});
+    	}
+    	else {
+			this.setFilesLoaded(true);
+    	}
     },
     
     buildFromTerms: function(terms) {
