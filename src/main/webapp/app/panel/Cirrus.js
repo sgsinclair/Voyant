@@ -24,6 +24,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	options: {
     		xtype: 'stoplistoption'
     	},
+    	filesLoaded: false,
     	corpus: undefined
     },
 
@@ -34,6 +35,8 @@ Ext.define('Voyant.panel.Cirrus', {
     
     constructor: function(config) {
 
+    	this.loadFiles();
+    	
     	Ext.apply(this, {
     		title: this.localize('title'),
     		dockedItems: [{
@@ -101,7 +104,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	documentTerms.load({
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_DOCUMENT);
-		    	this.loadFromTermsRecords(records)
+		    	this.loadFromTermsRecords(records);
 		    },
 		    scope: this,
 		    params: this.getApiParams()
@@ -113,7 +116,7 @@ Ext.define('Voyant.panel.Cirrus', {
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_CORPUS);
-		    	this.loadFromTermsRecords(records)
+		    	this.loadFromTermsRecords(records);
 		    },
 		    scope: this,
 		    params: this.getApiParams()
@@ -125,7 +128,29 @@ Ext.define('Voyant.panel.Cirrus', {
     	records.forEach(function(record) {
     		terms.push({word: record.get('term'), size: record.get('rawFreq'), value: record.get('rawFreq')});
     	});
-    	this.buildFromTerms(terms)
+    	this.buildFromTerms(terms);
+    },
+    
+    loadFiles: function() {
+    	Ext.Loader.loadScript({
+    		url: this.getBaseUrl()+'resources/cirrus/html5/Cirrus.js',
+    		scope: this,
+    		onLoad: function() {
+    			Ext.Loader.loadScript({
+    	    		url: this.getBaseUrl()+'resources/cirrus/html5/WordController.js',
+    	    		scope: this,
+    	    		onLoad: function() {
+    	    			Ext.Loader.loadScript({
+    	    	    		url: this.getBaseUrl()+'resources/cirrus/html5/Word.js',
+    	    	    		scope: this,
+    	    	    		onLoad: function() {
+    	    	    			this.setFilesLoaded(true);
+    	    	    		}
+    	    	    	});
+    	    		}
+    	    	});
+    		}
+    	});
     },
     
     buildFromTerms: function(terms) {
@@ -148,4 +173,4 @@ Ext.define('Voyant.panel.Cirrus', {
     	}
     }
     
-})
+});

@@ -18,22 +18,21 @@ function Cirrus(config) {
     
     this.clear = function() {
         this.canvas.width = this.canvas.width;
-    }
+    };
     
     this.addWords = function(words) {
-    	debugger
         wordController.addWords(words);
-    }
+    };
     
     this.arrangeWords = function() {
         wordController.arrangeWords();
-    }
+    };
 
     this.clearAll = function() {
         wordController.setWords([]);
         wordController.grid = [];
         this.clear();
-    }
+    };
 
     this.resizeWords = function() {
         that.setCanvasDimensions();
@@ -42,7 +41,7 @@ function Cirrus(config) {
         wordController.resizeWords();
         wordController.arrangeWords();
         resizeTimer = null;
-    }
+    };
 
     this.setCanvasDimensions = function() {
         var container = $(containerId)[0];
@@ -50,7 +49,7 @@ function Cirrus(config) {
         var height = Math.max(container.offsetHeight, container.clientHeight);
         this.canvas.width = width;
         this.canvas.height = height;
-    }
+    };
 
     function hex2RGB(hex) {
         hex = hex.charAt(0) == '#' ? hex.substring(1,7) : hex;

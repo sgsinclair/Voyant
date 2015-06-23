@@ -36,5 +36,5 @@ function Word(_text, _origSize, _color, _rolloverText, _value) {
         ctx.rotate(this.rotation);
         ctx.fillText(this.text, 0, 0);
         ctx.restore();
-    }
+    };
 }

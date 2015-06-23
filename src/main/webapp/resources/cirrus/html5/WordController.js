@@ -13,10 +13,21 @@ function WordController(parentApp) {
     var _layout = this.CIRCLE; // what layout to use
     this.getLayout = function() {
         return _layout;
-    }
+    };
     this.setLayout = function(value) {
         _layout = value;
-    }
+    };
+    
+    this.HORIZONTAL = 0;
+    this.MIXED = 1; // horizontal and vertical
+    
+    var _wordOrientation = this.MIXED;
+    this.getWordOrientation = function() {
+        return _wordOrientation;
+    };
+    this.setWordOrientation = function(value) {
+    	_wordOrientation = value;
+    };
     
     this.UPDATE_RATE = 25; // update frequency in milliseconds
     this.COARSENESS = 5; // how many pixels do we skip when creating the mask?
@@ -269,28 +280,25 @@ function WordController(parentApp) {
         
         var angle = 0;
         
-        /*
-        if (false) {
-//        if (!$.browser.opera) {
-            // opera can't render rotated text
-//            if (wordObj.text.match(/\s/) == null) {
-                if (Math.random() > 0.66) {
-                    var tempHeight = wordObj.height;
-                    var tempWidth = wordObj.width;
-                    wordObj.height = tempWidth;
-                    wordObj.width = tempHeight;
-                    if (Math.round(Math.random()) == 0) {
-                        angle = 90;
-                        wordObj.ty = 0;
-                    } else {
-                        angle = -90;
-                        wordObj.ty = wordObj.height;
-                        wordObj.tx = wordObj.width;
-                    }
-                }
-//            }
+        if (that.getWordOrientation() === that.MIXED) {
+	        if (wordObj.text.match(/\s/) == null) {
+				if (Math.random() > 0.66) {
+					var tempHeight = wordObj.height;
+					var tempWidth = wordObj.width;
+					wordObj.height = tempWidth;
+					wordObj.width = tempHeight;
+					if (Math.round(Math.random()) == 0) {
+						angle = 90;
+						wordObj.ty = 0;
+					} else {
+						angle = -90;
+						wordObj.ty = wordObj.height;
+						wordObj.tx = wordObj.width;
+					}
+				}
+			}
         }
-        */
+        
         
 
         wordObj.size = Math.max(wordObj.height, wordObj.width);
