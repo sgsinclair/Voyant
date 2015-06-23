@@ -8,14 +8,16 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		helpTip: {en: "<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:<ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		clearTerms: {en: "clear terms"},
     		releaseToRemove: {en: "Release to remove this term"},
-    		cleaning: {en: "Cleaning"}
+    		cleaning: {en: "Cleaning"},
+    		context: {en: "Context"}
     	},
     	api: {
     		query: undefined,
     		mode: undefined,
     		limit: 15,
     		stopList: 'auto',
-    		terms: undefined
+    		terms: undefined,
+    		context: 5
     	},
 		glyph: 'xf1cb@FontAwesome'
     },
@@ -57,6 +59,36 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 		this.updateNodesAndLinks({},{})
                 	},
                 	scope: me
+                }, this.localize('context'), {
+                	xtype: 'slider',
+                	minValue: 3,
+                	value: 5,
+                	maxValue: 30,
+                	increment: 2,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(me.getApiParam('context'))
+                		},
+                		changecomplete: {
+                			fn: function(slider, newValue) {
+                    			me.setApiParam("context", slider.getValue());
+                    			if (this.nodes) {
+                        			var terms = [];
+                    				for (var key in this.nodes) {
+                    					if (this.nodes[key]['type']=='keyword') {
+                    						terms.push(this.nodes[key].term)
+                    					}
+                    				}
+                    				if (terms) {
+                    					this.updateNodesAndLinks({},{})
+                    					this.loadFromQuery(terms)
+                    				}
+                    			}
+                    		},
+                    		scope: me
+                		}
+                	}
                 }]
             }]
         });
@@ -228,8 +260,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	  var keywordValues = force.nodes().filter(function(d) {return d.type=='keyword';}).map(function(d) {return d.value;});
     	  var contextTermValues = force.nodes().filter(function(d) {return d.type=='context';}).map(function(d) {return d.value;});
     	  var range = [8,20];
-    	  var keywordFontSize = d3.scale.linear().domain([d3.min(keywordValues),d3.max(keywordValues)]).range(range);
-    	  var contextFontSize = d3.scale.linear().domain([d3.min(contextTermValues),d3.max(contextTermValues)]).range(range);
+    	  var kmin = d3.min(keywordValues);
+    	  var kmax = d3.max(keywordValues);
+    	  var cmin = d3.min(contextTermValues);
+    	  var cmax = d3.max(contextTermValues);
+    	  
+    	  var fontSize = d3.scale.linear().domain([(kmin < cmin ? kmin : cmin), (kmax > cmax ? kmax : cmax)]).range(range);
 
     	  var corpusColours = this.getCorpusColours();
     	  node.enter()
@@ -239,7 +275,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	  		.style("fill", function(d) {return corpusColours(d.type=='keyword' ? 1 : 2);})
     	  		.attr("dx", 12).attr("dy", ".35em")
     	  		.text(function(d) { return d.term; })
-    	  		.style("font-size", function(d) { return (d.type=='context' ? contextFontSize(d.value) : keywordFontSize(d.value))+"pt"; })
+    	  		.style("font-size", function(d) { return (fontSize(d.value))+"pt"; })
     	  		.on("dblclick", function() {
     	  			me.dragstart.apply(this, arguments); // freeze the word
     	  			me.itemdblclick.apply(me, arguments);} // load more words

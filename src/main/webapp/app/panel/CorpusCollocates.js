@@ -18,7 +18,8 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     		contextTermTip: {en: "This is the collocate (context) term that occurs near the keyword term."},
     		contextTermRawFreq: {en: "Count (context)"},
     		contextTermRawFreqTip: {en: "The number of times this collocate occurs near the keyword term in the corpus."},
-    		matchingTerms: {en: '{count}'}
+    		matchingTerms: {en: '{count}'},
+    		context: {en: 'context'}
     		
     		/*,
     		matchingTerms: {en: 'Matching terms: {count}'},
@@ -169,6 +170,22 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                     xtype: 'querysearchfield'
                 }, {
                     xtype: 'totalpropertystatus'
+                }, this.localize('context'), {
+                	xtype: 'slider',
+                	minValue: 1,
+                	value: 5,
+                	maxValue: 30,
+                	increment: 2,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(me.getApiParam('context'))
+                		},
+                		changecomplete: function(slider, newValue) {
+                			me.setApiParam("context", slider.getValue());
+           		        	me.getStore().loadPage(1, {params: me.getApiParams()});
+                		}
+                	}
                 }]
             }],
     		columns: [{
