@@ -442,6 +442,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			}
         	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2], isDoc: isDoc};
         	if (isDoc) {
+        		tokenData.docIndex = token.get('docIndex');
+        		var doc = this.getCorpus().getDocument(tokenData.docIndex);
+        		tokenData.term = doc.getTinyTitle();
+        		tokenData.title = doc.getTitle();
         		docData.push(tokenData);
         	} else {
         		termData.push(tokenData);
@@ -454,11 +458,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         
         
     	var termSeriesStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc'],
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc', 'docIndex'],
     		data: termData
     	});
     	var docSeriesStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc'],
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc', 'docIndex'],
     		data: docData
     	});
     	
@@ -539,7 +543,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         			trackMouse: true,
         			style: 'background: #fff',
         			renderer: function (storeItem, item) {
-        				this.setHtml(that.docFreqTipTemplate.apply([storeItem.get('term'),storeItem.get('rawFreq')]));
+        				this.setHtml(that.docFreqTipTemplate.apply([storeItem.get('title'),storeItem.get('rawFreq')]));
         			}
         		},
         		marker: {
@@ -576,8 +580,13 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	listeners: {
         		itemclick: function(chart, item, event) {
         			var data = item.record.data;
-        			var record = Ext.create('Voyant.data.model.CorpusTerm', data);
-            		this.getApplication().dispatchEvent('corpusTermsClicked', this, [record]);
+        			if (data.isDoc) {
+        				var record = this.getCorpus().getDocument(data.docIndex);
+	            		this.getApplication().dispatchEvent('documentsClicked', this, [record]);
+        			} else {
+	        			var record = Ext.create('Voyant.data.model.CorpusTerm', data);
+	            		this.getApplication().dispatchEvent('corpusTermsClicked', this, [record]);
+        			}
         		},
         		render: function(chart) {
         			chart.body.on('contextmenu', function(event, target) {
