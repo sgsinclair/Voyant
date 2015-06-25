@@ -99,21 +99,21 @@ a {
 }
 
 /* Collocates Graph */
-svg text {
+svg#collocatesGraph text {
     text-anchor: middle;
 }
 
-svg text.keyword {
-    text-anchor: middle;
-    cursor: pointer;
-}
-
-svg text.context {
+svg#collocatesGraph text.keyword {
     text-anchor: middle;
     cursor: pointer;
 }
 
-svg line {
+svg#collocatesGraph text.context {
+    text-anchor: middle;
+    cursor: pointer;
+}
+
+svg#collocatesGraph line {
   stroke: #eee;
   stroke-width: 1px;
 }

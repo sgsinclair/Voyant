@@ -231,6 +231,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	        }));
     	
     	var svg = d3.select(el.dom).append("svg")
+    		.attr("id", "collocatesGraph")
 	        .attr("width", width)
 	        .attr("height", height);
     	this.setGraphWidth(width);
