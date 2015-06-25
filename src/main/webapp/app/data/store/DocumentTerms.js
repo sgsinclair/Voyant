@@ -57,7 +57,6 @@ Ext.define('Voyant.data.store.DocumentTerms', {
 	setCorpus: function(corpus) {
 		if (corpus) {
 			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-			this.load();
 		}
 		this.callParent(arguments);
 	}
