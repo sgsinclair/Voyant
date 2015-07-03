@@ -164,7 +164,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 		this.corpusStore = Ext.create("Voyant.data.store.CorpusTerms", {
 			listeners : {
-				'load' : {
+				load: {
 					fn : function(store, records, success) {
 //						console.log('corpus store: load')
 						this.initData(records,'corpus');
@@ -186,7 +186,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 						this.redrawSliderOverlay();
 						
 						if(this.reselectTop == true) {
-							var len = this.overlayQueue.length;
+							len = this.overlayQueue.length;
 							while(len-->0){
 								this.manageOverlaySticky(this.overlayQueue[len].params);
 							}
@@ -201,7 +201,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 		this.documentStore = Ext.create("Voyant.data.store.DocumentTerms", {
 			listeners : {
-				'load' : {
+				load: {
 					fn : function(store, records, success) {
 //						console.log('document store: load')
 						this.initData(records,'document');
@@ -224,7 +224,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 						this.redrawSliderOverlay();
 						
 						if(this.reselectTop == true) {
-							var len = this.overlayQueue.length;
+							len = this.overlayQueue.length;
 							while(len-->0){
 								this.manageOverlaySticky(this.overlayQueue[len].params);
 							}
@@ -339,8 +339,10 @@ Ext.define('Voyant.panel.TermsRadio', {
 			text: this.localize('toggleLeft')
 			,tooltip : this.localize('toggleLeftTip')
 			,listeners : {
-				'click' : {
+				click : {
 					fn : function() {
+						var toolObject = this;
+						
 						//if the the graphics are already in the midst of transitioning ignore any other clicks
 				    	if(!this.isTransitioning){
 				    		this.toggleLeftCheck();
@@ -364,9 +366,9 @@ Ext.define('Voyant.panel.TermsRadio', {
 			text: this.localize('toggleRight')
 			,tooltip : this.localize('toggleRightTip')
 			,listeners : {
-				'click' : {
+				click : {
 					fn : function() {
-						toolObject = this;
+						var toolObject = this;
 						
 						//if the the graphics are already in the midst of transitioning ignore any other clicks
 				    	if(!this.isTransitioning) {
@@ -392,7 +394,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 			text: this.localize('stop')
 			,tooltip : this.localize('stopTip')
 			,listeners : {
-				'click' : {fn : function() {
+				click : {fn : function() {
 						this.continueTransition = false;
 					}					
 					,scope : this
@@ -405,7 +407,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 			text: this.localize('reset')
 			,tooltip : this.localize('resetTip')
 			,listeners : {
-				'click' : {fn : function() {
+				click : {fn : function() {
+					var toolObject = this;
 						//reset to beginning
 						setTimeout(function(){
 							toolObject.shiftCount = 0;
@@ -444,6 +447,8 @@ Ext.define('Voyant.panel.TermsRadio', {
     	// TODO
 		var manageCorpusTypeSelect = function(data) {
 			//console.log('fn: manageCorpusTypeSelect')
+			var toolObject = this;
+			
 			var datatype = [];
 			if(typeof data.type == 'string'){
 				datatype = [data.type];
@@ -484,6 +489,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 		var selectWord = function(wordToSelect) {
 			//console.log('fn: selectWord')
+			var toolObject = this;
+			
 			var foundWord = false,
 				len = toolObject.records.length;
 			while(len-- > 0){
@@ -608,55 +615,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 //    		}
     	});
 		
-		/**
-		 * @event CorpusTypeFrequenciesResultLoaded
-		 * @type listener
-		 */
-		this.addListener('CorpusTypeFrequenciesResultLoaded', function(src, data) {
-			if (src==this) {
-				this.initData(this.corpusTypeReader.readRecords(data).records, 'corpus');
-				this.prepareData();
-				
-				this.initChart();
-				this.drawXAxis();
-				this.drawYAxis();
-				this.drawChart();
-				this.drawSlider();
-				this.drawVerticalSlider();
-				this.initLegend();
-				this.transitionCall = 'draw';
-				
-				this.setVisibleSegments();
-				this.grabTopWords();
-				this.startScroll();
-			}
-		}, this);
-			
-		/**
-		 * @event DocumentTypeFrequenciesResultLoaded
-		 * @type listener
-		 */
-		this.addListener('DocumentTypeFrequenciesResultLoaded', function(src, data) {
-			if (src==this) {	
-				this.initData(this.documentTypeReader.readRecords(data).records, 'document');
-				this.prepareData();
-				
-				this.initChart();
-				
-				this.drawXAxis();
-				this.drawYAxis();
-				this.drawChart();
-				this.drawSlider();
-				this.drawVerticalSlider();
-				this.initLegend();
-				this.transitionCall = 'draw';
-			    
-				this.setVisibleSegments();
-				this.grabTopWords();
-				this.startScroll();
-			}
-		}, this);
-		
 		this.on("loadedCorpus", function(src, corpus) {
     		this.setCorpus(corpus);
     		this.documentStore.setCorpus(corpus);
@@ -728,18 +686,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 			}
 		} else {
 			this.numDataPoints = this.records[0].get('distributions').length;
-		}
-		
-		//prepare parameters for either corpus mode or document mode
-		var idStringStart = 'this.records[',
-			idStringEnd;
-		
-		if(this.getApiParam('mode') === 'document') { 
-			idStringEnd = '].data.docId';
-		}
-		
-		if(this.getApiParam('mode') === 'corpus') {
-			idStringEnd = '].id';
 		}
 		
     	this.counterSeries = [];
@@ -832,10 +778,10 @@ Ext.define('Voyant.panel.TermsRadio', {
 		}
 		
 	    for( var k = 0; k < this.numDataPoints; k++ ) {
-			check1 = 0; //add a single first data point
+			var check1 = 0; //add a single first data point
 	    	for(var p = 0; p < this.counterSeries[k].length; p++ ) {
 	    			
-    			check2 = 0; //check will make sure a data point is not added to a series more than once
+    			var check2 = 0; //check will make sure a data point is not added to a series more than once
     			
 	    		//add very first point, this is done like this so the for loop can use the .length operator
 	    		if(check1 === 0){
@@ -978,7 +924,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     //verifies that data CAN be moved to the right
     ,toggleRightCheck: function () {
     	//console.log("fn: toggleRightCheck")
-    	toolObject = this;
+    	var toolObject = this;
     	if(this.numVisPoints + this.shiftCount < this.numDataPoints) {
     		//manage transition movements and controls
     		this.isTransitioning = true;
@@ -1043,7 +989,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     }
     
     ,grabTopWords: function () {
-    	toolObject = this;
+    	var toolObject = this;
     	
     	var corpusTerms = this.getCorpus().getCorpusTerms();
     	corpusTerms.load({
@@ -1096,6 +1042,8 @@ Ext.define('Voyant.panel.TermsRadio', {
     
     ,startScroll: function() {
     	//console.log("fn: startScroll")
+    	var toolObject = this;
+    	
     	if(toolObject.numDataPoints > toolObject.numVisPoints && toolObject.shiftCount === 0){
 			//manage transition movements and controls
 			toolObject.isTransitioning = true;
@@ -1110,7 +1058,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     
     //find words from the records that originally did not make it past the limit
 	,grabAbsentWords: function (absentWord) {
-    	toolObject = this;
+    	var toolObject = this;
     	var corpusTerms = this.getCorpus().getCorpusTerms();
     	corpusTerms.load({
     		scope: this,
@@ -1299,7 +1247,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		var numberFormat = d3.format(".2r");
 		function logFormat(d) {
 			var x = Math.log(d) / Math.log(10) + 1e-6;
-			return Math.abs(x - Math.floor(x)) < .7 ? numberFormat(d) : "";
+			return Math.abs(x - Math.floor(x)) < 0.7 ? numberFormat(d) : "";
 		} 
 		
 		this.yAxisScale.scale(toolObject.yScale)
@@ -1531,7 +1479,10 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    	.call(this.sliderDrag);
     }
     
-    ,sliderDrag: d3.behavior.drag()
+    ,sliderDrag: function() {
+    	var toolObject = this;
+    	
+    	d3.behavior.drag()
         .origin(Object)
         .on('drag', function(d) {
         	if(!toolObject.isTransitioning) {
@@ -1609,7 +1560,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 					toolObject.redraw();
 	        	}
         	}
-        })
+        });
+    }
     
     ,redrawSlider: function() {
     	this.chart.selectAll('rect[class=slider]')
@@ -1733,6 +1685,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 	//build the params bundle to pass to manageOverlaySticky
 	,buildParamsBundle: function (info) { 
 		//console.log('fn: builParamsBundle')
+		var toolObject = this;
+		
 		var type = info.wordString,
 			params = {},
 			paramsBundle = {},
@@ -1951,10 +1905,14 @@ Ext.define('Voyant.panel.TermsRadio', {
 //		console.log(this.overlayQueue)
 	}
 	
-	,buildSliderPath: d3.svg.line()
+	,buildSliderPath: function (pathArray) {
+		var toolObject = this;
+		var line = d3.svg.line()
 		    .x(function(d) { return toolObject.xSliderScale(d.x); })
 		    .y(function(d) { return toolObject.ySliderScale(d.y); })
-		    .interpolate("monotone")
+		    .interpolate("monotone");
+		return line(pathArray);
+	}
 	
 	,sliderOverlayOn: function (objectToSelect) {
 		//console.log('fn: sliderOverlayOn')		
@@ -2077,7 +2035,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 	,chartOverlayOn: function(objectToSelect) {
 //		console.log('fn: chartOverlayOn')
 		
-		toolObject = this;
+		var toolObject = this;
 					
 		//change selected word colour
 		this.chart.selectAll('g[class=section]')
@@ -2102,7 +2060,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		    .y(function(d) { return d.y; })
 		    .interpolate('monotone');
 		
-		path = this.chart.select('.overlay')
+		var path = this.chart.select('.overlay')
 			.append('g')
 			.attr('class', 'frequency-line-' + objectToSelect.selector)
 			.append('path')
@@ -2123,6 +2081,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 	}
 	
 	,chartOverlayOff: function(selector){
+		var toolObject = this;
+		
 		this.chart.selectAll('text.' + selector)
 	    	.style('fill', 'black')
 	    	.style('fill-opacity', function(d) { return toolObject.opacityScale(d.freq); });
@@ -2145,7 +2105,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 	,initLegend: function () {
 		//console.log('fn: initLegend')
-		toolObject = this;
+		var toolObject = this;
 		
 		this.legendX = this.body.getWidth() - (100 + this.rPadding);
 		this.legendY = this.navigationHeight + (this.tPadding * 2) + 10;
@@ -2227,7 +2187,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 	
 	,updateLegendAdd: function(objectToSelect, index) {
 		//console.log('fn: updateLegendAdd')
-		toolObject = this;
+		var toolObject = this;
 		
 		//Dynamically find the position of the legend
 		//this.chart.select("rect[id=legendBox]") returns a twice nested array
@@ -2287,6 +2247,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 	//resize the ledeng according to the number of words and their length
 	,resizeLegend: function () {
 		//console.log('fn: resizeLegend')
+		var toolObject = this;
+		
 		var scale = d3.scale.linear()
 			.domain([1,12])
 			.range([8.3,100]);
@@ -2423,17 +2385,17 @@ Ext.define('Voyant.panel.TermsRadio', {
 				if(item.text > documents) {
 					item.setDisabled(true);
 				} 
-			})
+			});
 		}
 		if(this.getApiParam('mode') === 'document'){
-			toolObject = this;
+			var toolObject = this;
 			this.visibleSegments.menu.items.each(function(item, index, len) {
 				if(parseInt(item.text) > toolObject.numDataPoints) {
 					item.setDisabled(true);
 				} else {
 					item.setDisabled(false);
 				}
-			})
+			});
 		}
 	}
 	
@@ -2552,6 +2514,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 					listeners : {
 						click : {
 							fn : function(btn) {
+								var toolObject = this;
+								
 								var formPanel = btn.findParentByType('form');
 								var form = formPanel.getForm();
 								var stopList = form.findField('stopList');
