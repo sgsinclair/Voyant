@@ -53,8 +53,6 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @default 5
     		 */
     		,visibleBins: 5
-    	
-    		,dispatchers: ['documentTypeSelected']
     		
     		/**
     		 * @property docIdType The document type(s) to restrict results to.
@@ -63,8 +61,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 */
     		,docIdType: null
     		
-    		,limit: 10
-    		,listeners: ['CorpusSummaryResultLoaded', 'CorpusTypeFrequenciesResultLoaded', 'DocumentTypeFrequenciesResultLoaded', 'corpusTypeSelected', 'corpusTypesSelected', 'documentTypeSelected', 'documentTypesSelected']
+    		,limit: 50
     	
     		/**
         	 * @property mode What mode to operate at, either document or corpus.
@@ -95,14 +92,12 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 */
     		,stopList: 'auto'
     		
-    		,toolType: ['Visualization']
-    		
     		/**
-    		 * @property type The corpus type(s) to restrict results to.
-    		 * @type String|Array
+    		 * @property query The corpus type(s) to restrict results to.
+    		 * @type String
     		 * @default null
     		 */
-    		,type: null
+    		,query: null
     		
     		/**
     		 * @property yAxisScale The scale for the y axis.
@@ -162,38 +157,64 @@ Ext.define('Voyant.panel.TermsRadio', {
 	
 	,constructor: function(config) {
 		
+		var onLoadHandler = function(mode, store, records, success) {
+			var query = this.getApiParam('query');
+			if (query != null) {
+				this.setApiParams({query: null});
+				var match = false;
+				for (var i = 0; i < this.records.length; i++) {
+					var r = this.records[i];
+					if (r.getTerm() == query) {
+						match = true;
+						break;
+					}
+				}
+				if (!match) {
+					records = records.concat(this.records);
+				} else {
+					// TODO if records are the same no need to do recalculations
+					records = this.records;
+				}
+			}
+			
+			this.initData(records, mode);
+			this.prepareData();
+			//for shiftcount > 0 exclusively
+			var len = this.shiftCount;
+			while(len-- > 0){
+			//for(var j = 0; j < this.shiftCount; j++){
+				this.displayData.shift();
+			}
+			
+			if (this.chart != null) {
+				this.redraw();
+			} else {
+				this.initializeChart();
+			}
+			
+			this.setVisibleSegments();
+			this.redrawSliderOverlay();
+			
+			if (query != null) {
+				var info = {wordString : query, docId : null};
+    			var paramsBundle = this.buildParamsBundle(info);
+    			this.manageOverlaySticky(paramsBundle);
+			}
+			
+			if(this.reselectTop == true) {
+				len = this.overlayQueue.length;
+				while(len-->0){
+					this.manageOverlaySticky(this.overlayQueue[len].params);
+				}
+				this.setApiParams({ selectedWords: [] });
+				this.grabTopWords();
+			}
+		};
+		
 		this.corpusStore = Ext.create("Voyant.data.store.CorpusTerms", {
 			listeners : {
 				load: {
-					fn : function(store, records, success) {
-//						console.log('corpus store: load')
-						this.initData(records,'corpus');
-						this.prepareData();
-						//for shiftcount > 0 exclusively
-						var len = this.shiftCount;
-						while(len-- > 0){
-						//for(var j = 0; j < this.shiftCount; j++){
-							this.displayData.shift();
-						}
-						
-						if (this.chart != null) {
-							this.redraw();
-						} else {
-							this.initializeChart();
-						}
-						
-						this.setVisibleSegments();
-						this.redrawSliderOverlay();
-						
-						if(this.reselectTop == true) {
-							len = this.overlayQueue.length;
-							while(len-->0){
-								this.manageOverlaySticky(this.overlayQueue[len].params);
-							}
-							this.setApiParams({ selectedWords: [] });
-							this.grabTopWords();
-						}
-					},
+					fn : onLoadHandler.bind(this, 'corpus'),
 					scope : this
 				}
 			}
@@ -202,37 +223,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 		this.documentStore = Ext.create("Voyant.data.store.DocumentTerms", {
 			listeners : {
 				load: {
-					fn : function(store, records, success) {
-//						console.log('document store: load')
-						this.initData(records,'document');
-						this.prepareData();
-						
-						//for shiftcount > 0 exclusively
-						var len = this.shiftCount;
-						while(len-- > 0){
-						//for(var j = 0; j < this.shiftCount; j++){
-							this.displayData.shift();
-						}
-						
-						if (this.chart != null) {
-							this.redraw();
-						} else {
-							this.initializeChart();
-						}
-						
-						this.setVisibleSegments();
-						this.redrawSliderOverlay();
-						
-						if(this.reselectTop == true) {
-							len = this.overlayQueue.length;
-							while(len-->0){
-								this.manageOverlaySticky(this.overlayQueue[len].params);
-							}
-							this.setApiParams({ selectedWords: [] });
-							this.grabTopWords();
-						}
-					}
-					,scope : this
+					fn : onLoadHandler.bind(this, 'document'),
+					scope : this
 				}
 			}
 		});
@@ -301,34 +293,46 @@ Ext.define('Voyant.panel.TermsRadio', {
 		});
 		
 		//fraction of words that are visible
-		var fraction = 100;
-		this.fraction = new Ext.Button({
-			text: this.localize('fraction')
-			,tooltip: this.localize('fractionTip')
-			,menu: new Ext.menu.Menu({
-				items: [
-				         new Ext.menu.CheckItem({text:'200',checked:fraction==100,group:'fraction'})
-				         ,new Ext.menu.CheckItem({text:'180',checked:fraction==70,group:'fraction'})
-				         ,new Ext.menu.CheckItem({text:'160',checked:fraction==60,group:'fraction'})
-				         ,new Ext.menu.CheckItem({text:'140',checked:fraction==50,group:'fraction'})
-				         ,new Ext.menu.CheckItem({text:'120',checked:fraction==40,group:'fraction'})
-						 ,new Ext.menu.CheckItem({text:'100',checked:fraction==30,group:'fraction'})
-						 ,new Ext.menu.CheckItem({text:'80',checked:fraction==20,group:'fraction'})
-						 ,new Ext.menu.CheckItem({text:'60',checked:fraction==15,group:'fraction'})
-						 ,new Ext.menu.CheckItem({text:'40',checked:fraction==10,group:'fraction'})
-						 ,new Ext.menu.CheckItem({text:'20',checked:fraction==5,group:'fraction'})
-					]
-				,listeners: {
-					click: {
-						fn: function(menu, item) {
-							// TODO fires twice?
-							this.setApiParams({limit: parseInt(item.text)});
-    						this.loadStore();
-						}
-						,scope : this
+		var fraction = 50;
+		this.fraction = new Ext.form.ComboBox({
+//			text: this.localize('fraction'),
+//			tooltip: this.localize('fractionTip')
+			
+			
+			fieldLabel: this.localize('fraction'),
+    		labelAlign: 'right',
+    		labelWidth: 100,
+    		itemId: 'limit',
+    		width: 180,
+    		store: Ext.create('Ext.data.ArrayStore', {
+    			fields: ['count'],
+    			data: [[10],[20],[30],[40],[50],[60],[70],[80],[90],[100]]
+    		}),
+    		value: fraction,
+    		displayField: 'count',
+    		valueField: 'count',
+    		queryMode: 'local',
+    		editable: true,
+    		allowBlank: false,
+    		validator: function(val) {
+    			return val.match(/\D/) === null;
+    		},
+    		listeners: {
+				change: function(combo, newVal, oldVal) {
+					function doLoad() {
+						var val = Math.min(parseInt(newVal), 10000);
+						this.setApiParam('limit', val);
+						this.loadStore();
 					}
-				}
-			})
+					if (combo.isValid() && oldVal !== null) {
+						if (this.termsTimeout !== null) {
+							clearTimeout(this.termsTimeout);
+						}
+						this.termsTimeout = setTimeout(doLoad.bind(this), 500);
+					}
+				},
+				scope: this
+			}
 		});
 		
 		this.typeSearch = Ext.create('Voyant.widget.QuerySearchField', {
@@ -570,49 +574,16 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    });
 		
 		this.on("termsClicked", function(src, terms) {
-			// orig code
-//	    	var found = false;
-//	    	if(this.records.length == this.recordslength) //console.log("this.records.length == this.recordslength");
-//	    	var len = this.records.length;
-//			while(len-- > 0){
-//	    		if(this.records[len].data.type === type) {
-//	    			var info = {wordString : this.records[len].data.type
-//	    				,docId : this.records[len].data.docId
-//	    			};
-//	    			var paramsBundle = this.buildParamsBundle(info);
-//	    			this.manageOverlaySticky(paramsBundle);
-//	    		found = true;
-//	    		}
-//	    	}
-//	    	if(!found){
-//	    		window.alert(type + " was not found in the " + this.getApiParam('mode'));
-//	    	}
-			
-			// trends code
-//    		if (this.getCorpus()) { // make sure we have a corpus
-//        		var queryTerms = [];
-//        		terms.forEach(function(term) {
-//        			if (Ext.isString(term)) {queryTerms.push(term)}
-//        			else if (term.term) {queryTerms.push(term.term);}
-//        			else if (term.getTerm) {queryTerms.push(term.getTerm());}
-//        		});
-//        		if (queryTerms) {
-//        			
-//            		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
-//            			this.setApiParams({
-//            				'mode': this.MODE_CORPUS,
-//            				'docIndex': undefined,
-//            				'docId': undefined
-//            			});
-//            		}
-//        			this.setApiParams({
-//        				query: queryTerms
-//        			});
-//            		if (this.isVisible()) {
-//                		this.loadFromCorpus(this.getCorpus());
-//            		}
-//        		}
-//    		}
+			// TODO load term distribution data
+    		terms.forEach(function(term) {
+    			var queryTerm;
+    			if (Ext.isString(term)) {queryTerm = term;}
+    			else if (term.term) {queryTerm = term.term;}
+    			else if (term.getTerm) {queryTerm = term.getTerm();}
+    			
+    			this.setApiParams({query: queryTerm});
+    			this.loadStore();
+    		}, this);
     	});
 		
 		this.on("loadedCorpus", function(src, corpus) {
@@ -624,11 +595,23 @@ Ext.define('Voyant.panel.TermsRadio', {
 			if (params.type) {
 				delete params.limit;
 			}
+			var store;
 			if (params.mode=='document' || this.getCorpus().getDocumentsCount() == 1) {
-				this.documentStore.load({params: params});
+				store = this.documentStore;
 			} else {
-				this.corpusStore.load({params: params});
+				delete params.bins;
+				store = this.corpusStore;
 			}
+			
+			// select top 3 words
+			store.on('load', function(store, records) {
+				for (var i = 0; i < 3; i++) {
+					var info = {wordString : records[i].get('term'), docId : null /*records[i].get('docId')*/};
+	    			var paramsBundle = this.buildParamsBundle(info);
+	    			this.manageOverlaySticky(paramsBundle);
+				}
+			}, this, {single: true});
+			store.load({params: params});
     	}, this);
 		
 		/**
@@ -1022,7 +1005,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 						data = [];
 						store.each(function(item) {
 							data.push({type: item.get('type')});
-						})
+						});
 						for(var j = 0; j < 3; j++){
 							for(var i = 0; i < toolObject.records.length; i++) {
 		        	    		if(toolObject.records[i].data.type === data[j].type) {
@@ -2468,6 +2451,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 			this.documentStore.load({params: params});
 		}
 		if(this.getApiParam('mode') === 'corpus') {
+			delete params.bins;
 			this.corpusStore.load({params: params});
 		}
 	}
