@@ -10,7 +10,10 @@ Ext.define('Voyant.panel.TermsRadio', {
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.termsradio',
 	config: {
-		corpus: undefined
+		corpus: undefined,
+		options: [{
+			xtype: 'stoplistoption'
+		}]
 	},
     statics: {
     	i18n: {
@@ -21,8 +24,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		,segmentsTip: {en: 'This option allows you to define how many segments a document should be divided into (note that this option only applies to distribution within a document, not distribution across a corpus).'}
     		,displayPanel: {en: 'Display Panel'}
     		,displayPanelTip: {en: 'Panel to control settings for word display.'}
-    		,duration: {en: 'Scroll speed.'}
-    		,durationTip: {en: 'Controls the speed of the scrolling text.'}
+    		,duration: {en: 'Scroll Duration'}
     		,fraction: {en: 'Word Display'}	
     		,fractionTip: {en: 'This option allows you to define the number of words displayed. Ex. 20 will only keep the words that occur with the lowest 20% of frequency.'}
     		,reset: {en: 'Reset'}
@@ -37,6 +39,9 @@ Ext.define('Voyant.panel.TermsRadio', {
     		,visibleSegmentsTip: {en: 'This option allows you to define how many segments are visible at once.'}
     		,adaptedFrom: {en: 'TermsRadio is adapted from Type frequencies chart.'}
     		,scrollSpeed: {en: 'Scroll speed'}
+    		,yScale: {en: 'Y-axis Scale'}
+    		,linear: {en: 'Linear'}
+    		,log: {en: 'Logarithmic'}
     	},
     	api: {
     		withDistributions: true,
@@ -131,7 +136,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 	,records: 0
 	,recordsLength: 0
 	,reselectTop: false
-	,scaleCall: 'log'
 	,shiftCount: 0
 	,sliderDragSum: 0
 	,titlesArray: []
@@ -158,50 +162,56 @@ Ext.define('Voyant.panel.TermsRadio', {
 	,constructor: function(config) {
 		
 		var onLoadHandler = function(mode, store, records, success) {
+			this.setApiParams({mode: mode});
+			
 			var query = this.getApiParam('query');
+			var queryMatch = false;
 			if (query != null) {
 				this.setApiParams({query: null});
 				var match = false;
 				for (var i = 0; i < this.records.length; i++) {
 					var r = this.records[i];
 					if (r.getTerm() == query) {
-						match = true;
+						queryMatch = true;
 						break;
 					}
 				}
-				if (!match) {
+				if (!queryMatch) {
 					records = records.concat(this.records);
-				} else {
-					// TODO if records are the same no need to do recalculations
-					records = this.records;
 				}
 			}
 			
-			this.initData(records, mode);
-			this.prepareData();
-			//for shiftcount > 0 exclusively
-			var len = this.shiftCount;
-			while(len-- > 0){
-			//for(var j = 0; j < this.shiftCount; j++){
-				this.displayData.shift();
+			if (!queryMatch) {
+				this.initData(records);
+				this.prepareData();
+				//for shiftcount > 0 exclusively
+				var len = this.shiftCount;
+				while(len-- > 0){
+				//for(var j = 0; j < this.shiftCount; j++){
+					this.displayData.shift();
+				}
+				
+				if (this.chart != null) {
+					this.redraw();
+				} else {
+					this.initializeChart();
+				}
+				
+				this.setVisibleSegments();
+				this.redrawSliderOverlay();
 			}
-			
-			if (this.chart != null) {
-				this.redraw();
-			} else {
-				this.initializeChart();
-			}
-			
-			this.setVisibleSegments();
-			this.redrawSliderOverlay();
 			
 			if (query != null) {
-				var info = {wordString : query, docId : null};
+				var docId = null;
+				if (mode === 'document') {
+					docId = this.getCorpus().getDocument(0).getId();
+				}
+				var info = {wordString : query, docId : docId};
     			var paramsBundle = this.buildParamsBundle(info);
     			this.manageOverlaySticky(paramsBundle);
 			}
 			
-			if(this.reselectTop == true) {
+			if (this.reselectTop == true) {
 				len = this.overlayQueue.length;
 				while(len-->0){
 					this.manageOverlaySticky(this.overlayQueue[len].params);
@@ -295,15 +305,11 @@ Ext.define('Voyant.panel.TermsRadio', {
 		//fraction of words that are visible
 		var fraction = 50;
 		this.fraction = new Ext.form.ComboBox({
-//			text: this.localize('fraction'),
-//			tooltip: this.localize('fractionTip')
-			
-			
 			fieldLabel: this.localize('fraction'),
     		labelAlign: 'right',
     		labelWidth: 100,
     		itemId: 'limit',
-    		width: 180,
+    		width: 170,
     		store: Ext.create('Ext.data.ArrayStore', {
     			fields: ['count'],
     			data: [[10],[20],[30],[40],[50],[60],[70],[80],[90],[100]]
@@ -426,11 +432,12 @@ Ext.define('Voyant.panel.TermsRadio', {
 		});
 		
 		this.duration = new Ext.Slider({
-			text : this.localize('duration')
-			,tooltip : this.localize('durationTip')
-			,width : 80
-			,minValue : 5000
-			,maxValue : 2000
+			fieldLabel : this.localize('duration')
+			,labelAlign : 'right'
+			,width : 160
+			,increment : 100
+			,minValue : 2000
+			,maxValue : 5000
 		});
 		
 		/*Ext.applyIf(config, {
@@ -441,12 +448,40 @@ Ext.define('Voyant.panel.TermsRadio', {
 			title: this.localize('title'),
 			bbar: new Ext.Toolbar({
 	            enableOverflow: true,
-	            items: [this.toggleLeft,this.stop,this.toggleRight,'-',this.resetButton,'-',this.localize('scrollSpeed')+':',this.duration,'-',this.fraction,'-',this.segments,this.visibleSegments,'-',this.typeSearch]
+	            items: [this.toggleLeft,this.stop,this.toggleRight,'-',this.resetButton,'-',this.duration,'-',this.fraction,'-',this.segments,this.visibleSegments,'-',this.typeSearch]
 			})
 		});
 		
+		// need to add option here so we have access to localize
+		this.config.options.push({
+			xtype: 'combo',
+			queryMode : 'local',
+			triggerAction : 'all',
+			forceSelection : true,
+			editable : false,
+			fieldLabel : this.localize('yScale'),
+			labelAlign : 'right',
+			name : 'yAxisScale',
+			valueField : 'value',
+			displayField : 'name',
+			store: new Ext.data.JsonStore({
+				fields : ['name', 'value'],
+				data   : [{
+					name : this.localize('linear'),   value: 'linear'
+				},{
+					name : this.localize('log'),  value: 'log'
+				}]
+			}),
+			listeners: {
+				render: function(combo) {
+					combo.setValue(this.getApiParam('yAxisScale'));
+				},
+				scope: this
+			}
+		});
+		
 		this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+		this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 		
     	// TODO
 		var manageCorpusTypeSelect = function(data) {
@@ -606,7 +641,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 			// select top 3 words
 			store.on('load', function(store, records) {
 				for (var i = 0; i < 3; i++) {
-					var info = {wordString : records[i].get('term'), docId : null /*records[i].get('docId')*/};
+					var r = records[i];
+					var info = {wordString : r.get('term'), docId : r.get('docId')};
 	    			var paramsBundle = this.buildParamsBundle(info);
 	    			this.manageOverlaySticky(paramsBundle);
 				}
@@ -646,22 +682,32 @@ Ext.define('Voyant.panel.TermsRadio', {
 		}, this);
 	}
 	
+    ,loadStore: function () {
+		var params = this.getApiParams();
+		if(this.getApiParam('mode') === 'document') { 
+			this.documentStore.load({params: params});
+		}
+		if(this.getApiParam('mode') === 'corpus') {
+			delete params.bins;
+			this.corpusStore.load({params: params});
+		}
+	}
+    
 	//
 	//DATA FUNCTIONS
 	//	
 
-	,initData: function (records, mode) { 	
+	,initData: function (records) { 	
 		//console.log("fn: initData")
 		//console.profile('profilethis')
 		this.records = records;
-		this.setApiParams({mode: mode});
 		
 		this.recordsLength = this.records.length;
 	
 		this.numVisPoints = parseInt(this.getApiParam('visibleBins'));
 		this.shiftCount = parseInt(this.getApiParam('position'));
 		
-		if(mode === 'document') {
+		if(this.getApiParam('mode') === 'document') {
 			this.numDataPoints = this.records[0].get('distributions').length;
 			if(this.numDataPoints !== this.getApiParam('bins')){
 				this.numDataPoints = parseInt(this.getApiParam('bins'));
@@ -1133,8 +1179,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    if(this.getApiParam('mode') === 'corpus') {
 			this.segments.setDisabled(true);
 		}
-		
-	    this.scaleCall = this.getApiParam('yAxisScale');
 	    
 		//depending on the size of display set the length that labels can be
 		this.setTitleLength();
@@ -1320,12 +1364,12 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    	.style('fill-opacity', function(d) { return toolObject.opacityScale(d.freq); })
 	        .text(function(d) { return d.wordString; })
 	        .on('mouseover', function(d) { 
-	 	        d3.select(this).style('font-size', function(d) { return (toolObject.fontScale(d.freq) * toolObject.maxFont / toolObject.fontScale(d.freq)) + 'px'; });
+	 	        d3.select(this).style('cursor', 'pointer').style('font-size', function(d) { return (toolObject.fontScale(d.freq) * toolObject.maxFont / toolObject.fontScale(d.freq)) + 'px'; });
 	 	        var paramsBundle = toolObject.buildParamsBundle(d);
 	 	        toolObject.manageOverlaySlippery(paramsBundle);
 	        })
 	        .on('mouseout', function(d) { 
-	        	d3.select(this).style('font-size', function(d) { return toolObject.fontScale(d.freq) + 'px'; });
+	        	d3.select(this).style('cursor', 'auto').style('font-size', function(d) { return toolObject.fontScale(d.freq) + 'px'; });
 	        	var paramsBundle = toolObject.buildParamsBundle(d);
 	        	toolObject.manageOverlaySlippery(paramsBundle);
 	        })
@@ -1446,8 +1490,7 @@ Ext.define('Voyant.panel.TermsRadio', {
   	    	.attr('width', lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1))
   	    	.style('fill', 'silver')
   	    	.style('fill-opacity', 0.25)
-	    	.style('cursor', 'move')
-	    	.call(this.sliderDrag);
+	    	.style('cursor', 'move');
 	    		    
 	    var greyBoxAfter = this.chart.append('rect')
 	    	.attr('class', 'slider')
@@ -1458,14 +1501,10 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    	.attr('width', lengthHor * (this.numDataPoints - this.numVisPoints - this.shiftCount + this.callOffset()) / (this.numDataPoints - 1))
 	    	.style('fill', 'silver')
 	    	.style('fill-opacity', 0.25)
-	    	.style('cursor', 'move')
-	    	.call(this.sliderDrag);
-    }
-    
-    ,sliderDrag: function() {
-    	var toolObject = this;
-    	
-    	d3.behavior.drag()
+	    	.style('cursor', 'move');
+	    
+	    var toolObject = this;
+    	var drag = d3.behavior.drag()
         .origin(Object)
         .on('drag', function(d) {
         	if(!toolObject.isTransitioning) {
@@ -1537,13 +1576,16 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    		if(toolObject.shiftCount !== oldShiftCount) {
 	    			toolObject.sliderDragSum = 0;
 	    			
-	        		toolObject.setApiParams({position: this.shiftCount});
+	        		toolObject.setApiParams({position: toolObject.shiftCount});
 					toolObject.prepareData();
 					
 					toolObject.redraw();
 	        	}
         	}
         });
+	    
+	    greyBoxBefore.call(drag);
+	    greyBoxAfter.call(drag);
     }
     
     ,redrawSlider: function() {
@@ -2189,10 +2231,10 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    	.attr('fill', objectToSelect.colour)
 	    	.attr('font-size', '16px')
 	    	.on('mouseover', function() {
-				d3.select(this).style('font-size', '18px');
+				d3.select(this).style('cursor', 'pointer').style('font-size', '18px');
 			})
 			.on('mouseout', function() {
-	            d3.select(this).style('font-size', '16px');
+	            d3.select(this).style('cursor', 'auto').style('font-size', '16px');
 			})	
 			.on('click', function() {
 	        	toolObject.manageOverlaySticky(objectToSelect.params);
@@ -2290,8 +2332,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 	,yScale: null
 	
 	,manageYScale: function () {
-		if(this.scaleCall == 'linear') this.yScale = d3.scale.linear();
-		if(this.scaleCall == 'log') this.yScale = d3.scale.log();
+		if(this.getApiParam('yAxisScale') == 'linear') this.yScale = d3.scale.linear();
+		if(this.getApiParam('yAxisScale') == 'log') this.yScale = d3.scale.log();
 		
 		this.yScale.domain([this.minFreq, this.absMaxFreq * this.valFraction * 1.25])
 				.rangeRound([this.body.getHeight() - this.bPadding, (this.tPadding * 2) + this.navigationHeight]);
@@ -2303,8 +2345,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 		var top = this.tPadding
 			,bottom = this.tPadding + this.navigationHeight;
 		
-		if(this.scaleCall == 'linear') this.ySliderScale = d3.scale.linear();
-		if(this.scaleCall == 'log') this.ySliderScale = d3.scale.log();
+		if(this.getApiParam('yAxisScale') == 'linear') this.ySliderScale = d3.scale.linear();
+		if(this.getApiParam('yAxisScale') == 'log') this.ySliderScale = d3.scale.log();
 		
 		this.ySliderScale.domain([this.minFreq, this.absMaxFreq])
 				.rangeRound([bottom, top]);
@@ -2442,117 +2484,5 @@ Ext.define('Voyant.panel.TermsRadio', {
 		} else {
 			return '';
 		}
-	}
-	
-	,loadStore: function () {
-//		console.log('fn: loadStore')
-		var params = this.getApiParams();
-		if(this.getApiParam('mode') === 'document') { 
-			this.documentStore.load({params: params});
-		}
-		if(this.getApiParam('mode') === 'corpus') {
-			delete params.bins;
-			this.corpusStore.load({params: params});
-		}
-	}
-	
-//	,corpusTypeReader: new Ext.data.JsonReader({
-//		root : 'corpusTypes.types'
-//		,totalProperty : 'corpusTypes["@totalTypes"]'
-//	}, Ext.data.Record.create(Voyeur.data.CorpusTypes.fields)) 
-//	
-//	,documentTypeReader: new Ext.data.JsonReader({
-//		root: 'documentTypes.types'
-//		,totalProperty: 'documentTypes["@totalTypes"]'
-//	}, Ext.data.Record.create(Voyeur.data.DocumentTypes.fields))
-
-	,showOptions: function() {
-		this.showOptionsWindow({
-			items : [{
-				xtype : 'form',
-				labelWidth : 150,
-				labelAlign : 'right',
-				border : false,
-				items : [{xtype: 'combo'
-                    ,mode : 'local'
-                    ,value : this.scaleCall
-                    ,triggerAction : 'all'
-                    ,forceSelection : true
-    				,editable : false
-    				,fieldLabel : 'Y-axis Scale'
-    				,name : 'scale'
-    				,hiddenName : 'scale'
-                    ,valueField : 'value'
-                    ,displayField : 'name'
-					,store: new Ext.data.JsonStore({
-                        fields : ['name', 'value']
-                        ,data   : [
-                            {name : 'Linear',   value: 'linear'}
-                            ,{name : 'Logarithmic',  value: 'log'}
-                        ]
-                    })
-				}],
-				buttons : [{
-					text : this.localize('ok', 'tool'),
-					iconCls : 'icon-accept',
-					listeners : {
-						click : {
-							fn : function(btn) {
-								var toolObject = this;
-								
-								var formPanel = btn.findParentByType('form');
-								var form = formPanel.getForm();
-								var stopList = form.findField('stopList');
-								var scale = form.findField('scale').value;
-								var global = form.findField('globalStopWords').getValue();
-								
-								//redraw y axis with new scale
-								this.setApiParams({yAxisScale: scale});
-								this.scaleCall = scale;
-								
-								// make sure we don't have any queries
-								if(stopList.getValue() && !stopList.getRawValue()) stopList.setValue('');
-								
-								//if a new stop list is in fact set queue a reselection of the top three words
-								if(stopList.getValue() != this.getApiParam('stopList')){
-									toolObject.reselectTop = true;
-								}
-								this.setApiParams({stopList: stopList.getValue()});
-
-								//formPanel.findParentByType('window').destroy();
-								btn.findParentByType('window').destroy();
-								
-								if(global) {
-									this.getApplication().applyParamsGlobally({
-										stopList: this.getApiParam('stopList')
-									}, false);
-								}
-								
-								//reload tool
-								this.loadStore();						    	
-							},
-							scope : this
-						}
-					}
-				}, {
-					text : this.localize('cancel', 'tool'),
-					handler : function(btn) {
-						btn.findParentByType('window').destroy();
-					}
-				}, {
-					text : this.localize('restore', 'tool'),
-					listeners : {
-						click : {
-							fn : function(btn) {
-								var form = btn.findParentByType('form').getForm();
-								form.findField('stopList').setValue(this.getApiParamDefaultValue('stopList'));
-							},
-							scope : this
-						}
-					}
-	
-				}]
-			}]
-		}, true);
 	}
 });
