@@ -42,6 +42,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		,yScale: {en: 'Y-axis Scale'}
     		,linear: {en: 'Linear'}
     		,log: {en: 'Logarithmic'}
+    		,removeTerm: {en: 'Remove <b>{0}</b>'}
     	},
     	api: {
     		withDistributions: true,
@@ -150,11 +151,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 	,tPadding: 20
 	,navigationHeight: 100
 	
-	//legend dimensions
-	,legendWidth: 60	
-	,legendY: 0
-	,legendX: 0
-	
 	//tracks largest dimensions, used in resizing
 	,largestW: 0
 	,largestH: 0
@@ -209,15 +205,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 				var info = {wordString : query, docId : docId};
     			var paramsBundle = this.buildParamsBundle(info);
     			this.manageOverlaySticky(paramsBundle);
-			}
-			
-			if (this.reselectTop == true) {
-				len = this.overlayQueue.length;
-				while(len-->0){
-					this.manageOverlaySticky(this.overlayQueue[len].params);
-				}
-				this.setApiParams({ selectedWords: [] });
-				this.grabTopWords();
 			}
 		};
 		
@@ -440,12 +427,47 @@ Ext.define('Voyant.panel.TermsRadio', {
 			,maxValue : 5000
 		});
 		
-		/*Ext.applyIf(config, {
-			iconCls : 'chart-line'
-			,bbar: [this.toggleLeft,'-',this.toggleRight,'-',this.duration,'-',this.displayPanel,'-',this.typeSearch]
-		});*/
 		Ext.apply(config, {
 			title: this.localize('title'),
+			legendMenu: Ext.create('Ext.menu.Menu', {
+				items: [
+        			{text: '', itemId: 'remove', glyph: 'xf068@FontAwesome'}
+        		]
+        	}),
+			tbar: new Ext.Toolbar({
+				items: {
+					xtype: 'legend',
+					store: new Ext.data.JsonStore({
+						fields : ['name', 'mark']
+					}),
+					listeners: {
+						itemclick: function(view, record, el, index) {
+							var term = record.get('name');
+							if (this.isTermSelected(term)) {
+								this.doTermDeselect(term);
+							} else {
+								this.doTermSelect(term);
+							}
+						},
+						itemcontextmenu: function(view, record, el, index, event) {
+							event.preventDefault();
+			            	var xy = event.getXY();
+			            	
+			            	var term = record.get('name');
+			            	var text = (new Ext.Template(this.localize('removeTerm'))).apply([term]);
+		            		this.legendMenu.queryById('remove').setText(text);
+		            		
+		            		this.legendMenu.on('click', function(menu, item) {
+		            			if (item !== undefined) {
+		            				this.doTermDeselect(term, true);
+		            			}
+		            		}, this, {single: true});
+		            		this.legendMenu.showAt(xy);
+						},
+						scope: this
+					}
+				}
+			}),
 			bbar: new Ext.Toolbar({
 	            enableOverflow: true,
 	            items: [this.toggleLeft,this.stop,this.toggleRight,'-',this.resetButton,'-',this.duration,'-',this.fraction,'-',this.segments,this.visibleSegments,'-',this.typeSearch]
@@ -483,71 +505,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 		this.callParent(arguments);
 		this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 		
-    	// TODO
-		var manageCorpusTypeSelect = function(data) {
-			//console.log('fn: manageCorpusTypeSelect')
-			var toolObject = this;
-			
-			var datatype = [];
-			if(typeof data.type == 'string'){
-				datatype = [data.type];
-			}
-			else{
-				datatype = data.type;
-			}
-			
-			//check against overlayQueue
-			//if a word is in first not in second de-select
-			//if a word is in both do nothing
-			//if a word is not in first but in second select
-			var toggleWords = [];
-				
-			for(var i = 0; i < toolObject.overlayQueue.length; i++){
-				var isntInArray = true;
-				//toggleWords.push(toolObject.overlayQueue[i]);
-				for(var j = 0; j < datatype.length; j++){
-					if(toolObject.overlayQueue[i].word == datatype[j]){
-						isntInArray = false;
-					}
-				}
-				if(isntInArray) toggleWords.push(toolObject.overlayQueue[i].word);
-			}
-			
-			for(var i = 0; i < datatype.length; i++){
-				var isntInArray = true;
-				for(var j = 0; j < toolObject.overlayQueue.length; j++){
-					if(toolObject.overlayQueue[j].word == datatype[i]){
-						isntInArray = false;
-					}
-				}
-				if(isntInArray) toggleWords.push(datatype[i]);
-			}
-			
-			return toggleWords;
-		};
-		
-		var selectWord = function(wordToSelect) {
-			//console.log('fn: selectWord')
-			var toolObject = this;
-			
-			var foundWord = false,
-				len = toolObject.records.length;
-			while(len-- > 0){
-	    		if(toolObject.records[len].data.type === wordToSelect){
-	    			foundWord = true;
-	    			var info = {wordString : toolObject.records[len].data.type
-	    				,docId : toolObject.records[len].data.docId};
-	    			var paramsBundle = toolObject.buildParamsBundle(info);
-	    			toolObject.manageOverlaySticky(paramsBundle);
-	    		}
-	    	}
-	    	if(!foundWord){
-    			//remove limit 
-    			toolObject.setApiParams({limit: 500});
-    			toolObject.grabAbsentWords(wordToSelect);
-    		}
-		};
-		
 		/**
 		 * @event corpusTypesSelected
 		 * @type listener
@@ -556,52 +513,20 @@ Ext.define('Voyant.panel.TermsRadio', {
 			if (this.getCorpus().getDocumentsCount() > 1) {
         		terms.forEach(function(term) {
         			var t = term.getTerm();
+        			this.setApiParams({query: t});
+        			this.loadStore();
         		});
-        		
-        		// TODO old code
-//				var toggleWords = manageCorpusTypeSelect(data);
-//				//if word isn't already added
-//				var notAdded = true,
-//					lenA = toggleWords.length,
-//					lenB = toolObject.overlayQueue.length;
-//				while(lenA-- > 0){
-//					while(lenB-- > 0){
-//						if(data.type[lenA] == toolObject.overlayQueue[lenB]) notAdded = false;
-//					}
-//					if(notAdded){
-//						//select word
-//						selectWord(toggleWords[lenA]);	
-//					}
-//				}
-			} else {
-				this.loadStore();
 			}
 		});
 		
 		this.addListener('documentTermsClicked', function(src, terms){
-			//if(this.hasLogger) console.log('fn: documentTypeSelected');
 			if(src && src.xtype==this.xtype) {return false;}
 			
 			terms.forEach(function(term) {
     			var t = term.getTerm();
+    			this.setApiParams({query: t});
+    			this.loadStore();
     		});
-			
-			// TODO old code
-//			if(data.type) {
-//				//select word
-//				var len = this.records.length;
-//				while(len-- > 0){
-//    	    		if(this.records[len].data.type === data.type) {
-//    	    			var info = {wordString : this.records[len].data.type
-//    	    				,docId : this.records[len].data.docId
-//    	    			};
-//    	    			var paramsBundle = this.buildParamsBundle(info);
-//    	    			this.manageOverlaySticky(paramsBundle);
-//    	    		}
-//    	    	}
-//			} else {
-//				this.loadStore();
-//			}
 		});
 		
 		this.on('query', function(src, query){
@@ -1017,58 +942,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 		}
     }
     
-    ,grabTopWords: function () {
-    	var toolObject = this;
-    	
-    	var corpusTerms = this.getCorpus().getCorpusTerms();
-    	corpusTerms.load({
-    		scope: this,
-    		params: this.getApiParams(),
-    		callback: function(records, operation, success) {
-    			if(success) {
-					var json = Ext.decode(response.responseText);
-					var store = new Ext.data.JsonStore({
-						fields: Voyeur.data.CorpusTypes.fields
-						,data: json.corpusTypes.types
-					});
-					//check if there is a list of words stored in the API param values if note display top three most frequent words
-					var data = this.getApiParam('selectedWords');
-					if(data.length > 0) {
-						//continue with current array
-						for(var j = 0; j < data.length; j++){
-							for(var i = 0; i < toolObject.records.length; i++) {
-		        	    		if(toolObject.records[i].data.type === data[j]) {
-		        	    			var info = {wordString : toolObject.records[i].data.type
-		        	    				,docId : toolObject.records[i].data.docId
-		        	    			};
-		        	    			var paramsBundle = toolObject.buildParamsBundle(info);
-		        	    			toolObject.manageOverlaySticky(paramsBundle);
-		        	    		}
-		        	    	}
-						}
-					} else {
-						//clear and populate with top three
-						data = [];
-						store.each(function(item) {
-							data.push({type: item.get('type')});
-						});
-						for(var j = 0; j < 3; j++){
-							for(var i = 0; i < toolObject.records.length; i++) {
-		        	    		if(toolObject.records[i].data.type === data[j].type) {
-		        	    			var info = {wordString : toolObject.records[i].data.type
-		        	    				,docId : toolObject.records[i].data.docId
-		        	    			};
-		        	    			var paramsBundle = toolObject.buildParamsBundle(info);
-		        	    			toolObject.manageOverlaySticky(paramsBundle);
-		        	    		}
-		        	    	}
-						}
-					}
-				}
-    		}
-    	});
-    }
-    
     ,startScroll: function() {
     	//console.log("fn: startScroll")
     	var toolObject = this;
@@ -1085,37 +958,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 		}
     }
     
-    //find words from the records that originally did not make it past the limit
-	,grabAbsentWords: function (absentWord) {
-    	var toolObject = this;
-    	var corpusTerms = this.getCorpus().getCorpusTerms();
-    	corpusTerms.load({
-    		scope: this,
-    		params: this.getApiParams(),
-    		callback: function(records, operation, success) {
-				toolObject.selectedRecords = [];
-				var json = Ext.decode(response.responseText);
-				var store = new Ext.data.JsonStore({
-					fields: Voyeur.data.CorpusTypes.fields
-					,data: json.corpusTypes.types
-				});
-				//check if there is a list of words stored in the API param values if not display top three most frequent words
-				var data = this.getApiParam('selectedWords'),
-					lenB = store.data.items.length;
-				for(var i = 0; i < lenB; i++) {
-    	    		if(store.data.items[i].data.type === absentWord) {
-						toolObject.records.push(store.data.items[i]);
-						
-						var info = {wordString : store.data.items[i].data.type
-		    				,docId : store.data.items[i].data.docId};
-		    			var paramsBundle = toolObject.buildParamsBundle(info);
-		    			toolObject.manageOverlaySticky(paramsBundle);
-    	    		}
-    	    	}
-			}
-		});
-    }
-    
     //
     //DISPLAY FUNCTIONS
     //
@@ -1130,7 +972,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 		this.drawChart();
 		this.drawSlider();
 		this.drawVerticalSlider();
-		this.initLegend();
 		this.transitionCall = 'draw';
 	}
 	
@@ -1144,7 +985,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 		this.redrawSlider();
 		this.redrawVerticalSlider();
 		this.redrawChartOverlay();
-		this.redrawLegend();
     }
     
 	,initChart: function () {
@@ -1217,17 +1057,17 @@ Ext.define('Voyant.panel.TermsRadio', {
     		.attr('transform', 'translate(0,' + (h - this.bPadding) + ')')
     		.call(this.xAxisScale);
     	
-    	this.xAxis.selectAll('text')
-			.on('mouseover', function () {
-				d3.select(this)
-					.attr('fill', 'red')
-					.style("font-size", '18px');
-			})
-			.on('mouseout', function () {
-				d3.select(this)
-					.attr('fill', 'black')
-					.style("font-size", '11px');
-			});
+//    	this.xAxis.selectAll('text')
+//			.on('mouseover', function () {
+//				d3.select(this)
+//					.attr('fill', 'red')
+//					.style("font-size", '18px');
+//			})
+//			.on('mouseout', function () {
+//				d3.select(this)
+//					.attr('fill', 'black')
+//					.style("font-size", '11px');
+//			});
 		this.styleXAxis();
     }
     
@@ -1697,9 +1537,6 @@ Ext.define('Voyant.panel.TermsRadio', {
         
         //animates the chart overlay
 		this.redrawChartOverlay();
-		
-		//redraws the legend
-		this.redrawLegend();
 	}
 	
 	,callTransition: function () {
@@ -1808,86 +1645,109 @@ Ext.define('Voyant.panel.TermsRadio', {
 //		console.log('fn: manageOverlaySticky')
 		var toolObject = this;
 		
-		var string = paramsBundle.type
-			,selector = this.removeFilteredCharacters(paramsBundle.type)
-			,checkOn = 'on'
-			,lineObject
-			,index
-			,apiArray = [];
+		var term = paramsBundle.type;
 		
 		this.transitionCall = 'draw';
-		 
-		//check if the word that was selected was already sticky
-		//if so checkOn = off and nothing happens
+		
+		if (!this.isTermSelected(term)) {
+			this.doTermSelect(term, true);
+		} else {
+			this.doTermDeselect(term, true);
+		}
+	},
+	
+	getTermIndex: function(term) {
+		var index = -1;
+		var selector = selector = this.removeFilteredCharacters(term);
 		var len = this.overlayQueue.length;
 		while(--len >= 0){
-			//begin updating API array of finished words
-			apiArray.push(this.overlayQueue[len].string);
-			//check if the click event was on a selected word or not
 			if(selector === this.overlayQueue[len].selector){ 
-		    	checkOn = 'off';
-		    	lineObject = this.overlayQueue[len];
-		    	index = len;
+				index = len;
+			}
+		}
+		return index;
+	},
+	
+	isTermSelected: function(term) {
+		return this.getTermIndex(term) !== -1;
+	},
+	
+	doTermSelect: function(term, legendAdd) {
+		var selector = selector = this.removeFilteredCharacters(term);
+		//finish updating API array of selected words
+		var apiArray = this.getApiParam('selectedWords');
+		apiArray.push(term);
+		this.setApiParams({selectedWords: apiArray});
+		
+		//draw the sticky path
+		var stickyColour = this.colourIndex[0];
+		this.colourIndex.shift();
+		
+		if (legendAdd === true) {
+			var legend = this.query('[xtype=legend]')[0];
+			legend.getStore().add({name: term, mark: stickyColour});
+		} else {
+			var legend = this.query('[xtype=legend]')[0];
+			var record = legend.getStore().findRecord('name', term);
+			if (record !== null) {
+				record.set('mark', stickyColour);
+				legend.refresh();
 			}
 		}
 		
-		//select a sticky word
-		if(checkOn === 'on') {
-			//finish updating API array of selected words
-			apiArray.push(string);
-			this.setApiParams({selectedWords: apiArray});
-			
-			//draw the sticky path
-			var stickyColour = this.colourIndex[0];
-			this.colourIndex.shift();
-			
-			//repopulate colour index if it is empty
-			if(this.colourIndex.length === 0) { 
-				for(var i = 0; i < this.colourMasterList.length; i++){
-					this.colourIndex.push(this.colourMasterList[i]);
-				}
+		//repopulate colour index if it is empty
+		if(this.colourIndex.length === 0) { 
+			for(var i = 0; i < this.colourMasterList.length; i++){
+				this.colourIndex.push(this.colourMasterList[i]);
 			}
-			var pathHolder = this.prepareFullPath(string);
-			lineObject = {
-				word: string, 
-				selector: selector, 
-				params: paramsBundle,
-				fullPath: pathHolder.path,
-				pathMin: pathHolder.min,
-				pathMax: pathHolder.max,
-				colour: stickyColour
-			};
-			
-			//if this was selected a slippery before click event remove line from navigation bar
-			if(selector === this.lastSlippery){
-				this.sliderOverlayOff(selector);
-				this.lastSlippery = null;
-			}
-			
-			//make sure there is no path already present
-			this.chart.select('g[class=frequency-line-' + selector + ']')
-				.remove();
+		}
+		var pathHolder = this.prepareFullPath(term);
+		var lineObject = {
+			word: term, 
+			selector: selector,
+			params: {params: {}, type: term},
+			fullPath: pathHolder.path,
+			pathMin: pathHolder.min,
+			pathMax: pathHolder.max,
+			colour: stickyColour
+		};
+		
+		//if this was selected a slippery before click event remove line from navigation bar
+		if(selector === this.lastSlippery){
+			this.sliderOverlayOff(selector);
+			this.lastSlippery = null;
+		}
+		
+		//make sure there is no path already present
+		this.chart.select('g[class=frequency-line-' + selector + ']').remove();
 
-			this.overlayQueue.push(lineObject);
-			this.chartOverlayOn(lineObject);
-			this.sliderOverlayOn(lineObject);
+		this.overlayQueue.push(lineObject);
+		this.chartOverlayOn(lineObject);
+		this.sliderOverlayOn(lineObject);
+	},
+	
+	doTermDeselect: function(term, legendRemove) {
+		var selector = this.removeFilteredCharacters(term);
+		var index = this.getTermIndex(term);
+		
+		if (legendRemove === true) {
+			var legend = this.query('[xtype=legend]')[0];
+			var index = legend.getStore().findExact('name', term);
+			legend.getStore().removeAt(index);
 		}
-		//deselect a sticky word
-		else{
-			var updateApi = this.getApiParam('selectedWords');
-			for(var i = 0, len = updateApi.length; i < len; i++) {
-				if(updateApi[i] === selector) {
-					updateApi.splice(i, 1);
-					this.setApiParams({selectedWords: updateApi});
-				}
+		
+		var updateApi = this.getApiParam('selectedWords');
+		for(var i = 0, len = updateApi.length; i < len; i++) {
+			if(updateApi[i] === selector) {
+				updateApi.splice(i, 1);
+				this.setApiParams({selectedWords: updateApi});
 			}
-			this.chartOverlayOff(selector);
-			this.colourIndex.push(this.overlayQueue[index].colour);
-	    	this.overlayQueue.splice(index, 1);
-	    	this.sliderOverlayOff(selector);
-			this.updateLegendRemove(selector);
-			this.lastSticky = selector;
 		}
+		this.chartOverlayOff(selector);
+		this.colourIndex.push(this.overlayQueue[index].colour);
+    	this.overlayQueue.splice(index, 1);
+    	this.sliderOverlayOff(selector);
+		this.lastSticky = selector;
 	}
 	
 	,prepareFullPath: function (string) {
@@ -2102,7 +1962,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 				.ease("linear")
 			    .attr("transform", "translate(" + posDif + ")");
 		}
-		this.redrawLegend();
 	}
 	
 	,chartOverlayOff: function(selector){
@@ -2124,175 +1983,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 			this.chartOverlayOff(this.overlayQueue[i].selector);
 			this.chartOverlayOn(this.overlayQueue[i]);
 		}
-	}
-	
-	//LEGEND FUNCTIONS
-		
-	,initLegend: function () {
-		//console.log('fn: initLegend')
-		var toolObject = this;
-		
-		this.legendX = this.body.getWidth() - (100 + this.rPadding);
-		this.legendY = this.navigationHeight + (this.tPadding * 2) + 10;
-		
-		//allow the legend to be draggable
-        var drag = d3.behavior.drag()
-	        .origin(Object)
-	        .on('drag', function (d) {
-	        	//update current position
-	        	toolObject.legendX = this.x.baseVal.value + d3.event.dx;
-	        	toolObject.legendY = this.y.baseVal.value + d3.event.dy;
-	        	
-	        	d3.select(this)
-	            	.attr('x', this.x.baseVal.value + d3.event.dx)
-	            	.attr('y', this.y.baseVal.value + d3.event.dy);
-	        	
-	        	toolObject.chart.select('rect[id=legendBox]')
-	        		.attr('x', function () { return parseInt(this.getAttribute('x')) + parseInt(d3.event.dx); })
-	        		.attr('y', function () { return parseInt(this.getAttribute('y')) + parseInt(d3.event.dy); });
-	        		
-	        	toolObject.chart.selectAll('text[class=legend]')
-	        		.attr('x', function () { return parseInt(this.getAttribute('x')) + parseInt(d3.event.dx); })
-	        		.attr('y', function () { return parseInt(this.getAttribute('y')) + parseInt(d3.event.dy); });
-	        });
-        
-		var legend = this.chart.append('rect')
-			.attr('class', 'legend')
-			.attr('id', 'legendBox')
-	    	.attr('x', toolObject.legendX)
-	    	.attr('y', toolObject.legendY)
-	    	.attr('rx', 4)
-	    	.attr('width', 100)
-	    	.attr('height', 100)
-	    	.style('fill', 'white')
-	    	.style('stroke', 'black');
-	    	
-		var legendToolBar = this.chart.append('rect')
-			.attr('class', 'legend')
-			.attr('id', 'legendToolBar')
-	    	.attr('x', toolObject.legendX)
-	    	.attr('y', toolObject.legendY)
-	    	.attr('rx', 4)
-	    	.attr('width', 100)
-	    	.attr('height', 10)
-	    	.style('fill', 'silver')
-	    	.style('fill-opacity', 0.25)
-	    	.style('stroke', 'black')
-	    	.style('cursor', 'move')
-	    	.call(drag)
-	      .append('title')
-	    	.text('Drag to move legend.');
-	    	
-		//hide the legend untill the first words are added to it
-		$('.legend').hide();
-	}
-	
-	,redrawLegend: function() {
-		//console.log('fn: redrawLegend')
-		//reset the legend so it stay over-top of the overlay
-		if(this.chart.selectAll('rect[class=legend]')) {
-			this.chart.selectAll('rect[class=legend]')
-				.remove();
-			
-			this.chart.selectAll('text[class=legend]')
-				.remove();
-		
-			this.initLegend();
-		
-			//reveal legend if there are any words to display
-			//add words to legend
-			if(this.overlayQueue.length !== 0){ 
-				$('.legend').show(); 
-				for(var i = 0; i <= this.overlayQueue.length - 1; i++){
-					this.updateLegendAdd(this.overlayQueue[i], i + 1);
-				}
-			}
-		}
-	}
-	
-	,updateLegendAdd: function(objectToSelect, index) {
-		//console.log('fn: updateLegendAdd')
-		var toolObject = this;
-		
-		//Dynamically find the position of the legend
-		//this.chart.select("rect[id=legendBox]") returns a twice nested array
-		var yOffset = (index * 15) + 10,
-			xOffset = 5,
-			yPos = this.chart.select("rect[id=legendBox]")[0][0].y.baseVal.value + yOffset,
-			xPos = this.chart.select("rect[id=legendBox]")[0][0].x.baseVal.value + xOffset;
-		
-		//add text to the legend
-	    this.chart.append('text')
-	    	.attr('class','legend')
-	    	.attr('id', objectToSelect.selector)
-	    	.text(objectToSelect.word)
-	    	.attr('y', yPos)
-	    	.attr('x', xPos)
-	    	.attr('fill', objectToSelect.colour)
-	    	.attr('font-size', '16px')
-	    	.on('mouseover', function() {
-				d3.select(this).style('cursor', 'pointer').style('font-size', '18px');
-			})
-			.on('mouseout', function() {
-	            d3.select(this).style('cursor', 'auto').style('font-size', '16px');
-			})	
-			.on('click', function() {
-	        	toolObject.manageOverlaySticky(objectToSelect.params);
-			})
-	    	.on('dblclick', function(d) {
-	    		debugger;
-				toolObject.getApplication().dispatchEvent('documentTermsClicked', toolObject, objectToSelect.params);
-	    	});
-		
-		this.resizeLegend();
-	}
-	
-	,updateLegendRemove: function(selector) {
-		//console.log('fn: updateLegendRemove')
-		//remove a word from the legend
-	    this.chart.selectAll('text[id=' + selector + ']')
-    		.remove();
-	    
-	    //move the words to fill in the hole from removed word
-	    var legendYVal = this.chart.select("rect[id=legendBox]")[0][0].y.baseVal.value;
-	    
-	    this.chart.selectAll('text[class=legend]')
-    		.attr('y', function(d,i) {
-    			var yOffset = (i + 1) * 15 + 10;
-    			return legendYVal + yOffset;
-    		});
-		
-		//hide the legend if the last sticky word is removed
-		if(this.overlayQueue.length === 0){
-			$('.legend').hide();
-		}
-		this.resizeLegend();
-	}
-	
-	//resize the ledeng according to the number of words and their length
-	,resizeLegend: function () {
-		//console.log('fn: resizeLegend')
-		var toolObject = this;
-		
-		var scale = d3.scale.linear()
-			.domain([1,12])
-			.range([8.3,100]);
-		
-		this.legendWidth = 60;
-		
-		for(var i = 0; i < this.overlayQueue.length; i++){
-			var scaledLen = scale(this.overlayQueue[i].word.length);
-			if(scaledLen >= this.legendWidth) this.legendWidth = scaledLen;
-		}
-	
-		var h = this.overlayQueue.length * 15 + 15;
-		
-		this.chart.select('rect[id=legendBox]')
-			.attr('height', h)
-			.attr('width', toolObject.legendWidth);
-		
-		this.chart.select('rect[id=legendToolBar]')
-			.attr('width', toolObject.legendWidth);
 	}
 	
 	//
