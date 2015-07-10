@@ -119,8 +119,9 @@ Ext.define('Voyant.panel.TermsRadio', {
 	,absMinFreq: 0
 	,allData: []
 	,chart: null
-	,colourIndex: ['blue', 'green', 'orange', 'brown', 'magenta']
-	,colourMasterList: ['blue', 'green', 'orange', 'brown', 'magenta']
+	,theme: Ext.create('Ext.chart.theme.Base')
+	,colorIndex: []
+	,colorMasterList: []
 	,continueTransition: true
 	,counterSeries: [] 
 	,displayData: []
@@ -156,6 +157,11 @@ Ext.define('Voyant.panel.TermsRadio', {
 	,largestH: 0
 	
 	,constructor: function(config) {
+		
+		this.colorMasterList = this.theme.getColors();
+		for (var i = 0; i < this.colorMasterList.length; i++) {
+			this.colorIndex.push(this.colorMasterList[i]);
+		}
 		
 		var onLoadHandler = function(mode, store, records, success) {
 			this.setApiParams({mode: mode});
@@ -1229,39 +1235,39 @@ Ext.define('Voyant.panel.TermsRadio', {
     }
     
     ,drawVerticalSlider: function() {
-    	var h = this.body.getHeight(),
-			w = this.body.getWidth();
-    	
-    	var totalTopOffset = (this.tPadding * 2) + this.navigationHeight
-        	,lengthVer = h - (totalTopOffset + this.bPadding);
-        
-	    //create vertical minimap rectangle and slider
-	    var sliderPosScale = d3.scale.linear()
-			.domain([this.absMaxFreq, this.minFreq])
-			.range([totalTopOffset, lengthVer]);
-	    
-	    var rectVer = this.chart.append('rect')
-	  	    .attr('class', 'minimap')
-	  	    .attr('x', w - (this.rPadding * 0.66))
-	  	    .attr('y', totalTopOffset)
-	  	    .attr('rx', 3.33)
-	  	    .attr('width', 6.66)
-	  	    .attr('height', lengthVer)
-	  	    .style('fill','aliceblue')
-	  	    .style('stroke','black')
-	  	    .style('stroke-width','1')
-	  	    .style('fill-opacity','0.75');
-	    	
-	    var sliderVer = this.chart.append('rect')
-			.attr('class', 'minimap')
-	  	    .attr('x', w - (this.rPadding * 0.66))
-	  	    .attr('y', totalTopOffset)
-	  	    .attr('rx', 3.33)
-	  	    .attr('width', 6.66)
-	  	    .attr('height', lengthVer * ((this.absMaxFreq * this.valFraction) - this.minFreq) / this.absMaxFreq)
-	  	    .style('fill','CornflowerBlue')
-	  	    .style('stroke','black')
-	  	    .style('stroke-width','1');
+//    	var h = this.body.getHeight(),
+//			w = this.body.getWidth();
+//    	
+//    	var totalTopOffset = (this.tPadding * 2) + this.navigationHeight
+//        	,lengthVer = h - (totalTopOffset + this.bPadding);
+//        
+//	    //create vertical minimap rectangle and slider
+//	    var sliderPosScale = d3.scale.linear()
+//			.domain([this.absMaxFreq, this.minFreq])
+//			.range([totalTopOffset, lengthVer]);
+//	    
+//	    var rectVer = this.chart.append('rect')
+//	  	    .attr('class', 'minimap')
+//	  	    .attr('x', w - (this.rPadding * 0.66))
+//	  	    .attr('y', totalTopOffset)
+//	  	    .attr('rx', 3.33)
+//	  	    .attr('width', 6.66)
+//	  	    .attr('height', lengthVer)
+//	  	    .style('fill','aliceblue')
+//	  	    .style('stroke','black')
+//	  	    .style('stroke-width','1')
+//	  	    .style('fill-opacity','0.75');
+//	    	
+//	    var sliderVer = this.chart.append('rect')
+//			.attr('class', 'minimap')
+//	  	    .attr('x', w - (this.rPadding * 0.66))
+//	  	    .attr('y', totalTopOffset)
+//	  	    .attr('rx', 3.33)
+//	  	    .attr('width', 6.66)
+//	  	    .attr('height', lengthVer * ((this.absMaxFreq * this.valFraction) - this.minFreq) / this.absMaxFreq)
+//	  	    .style('fill','CornflowerBlue')
+//	  	    .style('stroke','black')
+//	  	    .style('stroke-width','1');
     }
     
     ,redrawVerticalSlider: function() {
@@ -1680,8 +1686,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 		this.setApiParams({selectedWords: apiArray});
 		
 		//draw the sticky path
-		var stickyColour = this.colourIndex[0];
-		this.colourIndex.shift();
+		var stickyColour = this.colorIndex[0];
+		this.colorIndex.shift();
 		
 		if (legendAdd === true) {
 			var legend = this.query('[xtype=legend]')[0];
@@ -1696,9 +1702,9 @@ Ext.define('Voyant.panel.TermsRadio', {
 		}
 		
 		//repopulate colour index if it is empty
-		if(this.colourIndex.length === 0) { 
-			for(var i = 0; i < this.colourMasterList.length; i++){
-				this.colourIndex.push(this.colourMasterList[i]);
+		if(this.colorIndex.length === 0) { 
+			for(var i = 0; i < this.colorMasterList.length; i++){
+				this.colorIndex.push(this.colorMasterList[i]);
 			}
 		}
 		var pathHolder = this.prepareFullPath(term);
@@ -1744,7 +1750,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 			}
 		}
 		this.chartOverlayOff(selector);
-		this.colourIndex.push(this.overlayQueue[index].colour);
+		this.colorIndex.push(this.overlayQueue[index].colour);
     	this.overlayQueue.splice(index, 1);
     	this.sliderOverlayOff(selector);
 		this.lastSticky = selector;
