@@ -22,6 +22,10 @@
 					<exclude>**/*.java</exclude>
 				</excludes>
 			</resource>
+			<!--  make sure we grab the Voyant JS file liste -->
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+			</resource>
 		</resources>
 		
 		<plugins>

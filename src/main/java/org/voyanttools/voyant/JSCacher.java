@@ -2,6 +2,7 @@ package org.voyanttools.voyant;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
@@ -27,82 +29,6 @@ public class JSCacher {
 	final static String ENCODING = "UTF-8";
 	final static String CACHED_FILENAME = "voyant.js";
 	final static String CACHED_FILENAME_MINIFIED = "voyant.min.js";
-	
-	private static String[] jsFiles = new String[]{
-		
-		"resources/bubblelines/Bubblelines.js",
-		
-		"resources/cirrus/html5/Cirrus.js",
-		"resources/cirrus/html5/Word.js",
-		"resources/cirrus/html5/WordController.js",
-
-		"app/util/Api.js",
-		"app/util/Localization.js",
-		"app/util/Deferrable.js",
-		"app/util/DetailedError.js",
-		"app/util/ResponseError.js",
-		"app/util/SparkLine.js",
-		"app/util/Toolable.js",
-		"app/util/Transferable.js",
-		"app/util/Variants.js",
-
-		"app/data/model/AnalysisToken.js",
-		"app/data/model/Context.js",
-		"app/data/model/CorpusCollocate.js",
-		"app/data/model/CorpusTerm.js",
-		"app/data/model/CorpusNgram.js",
-		"app/data/model/Dimension.js",
-		"app/data/model/Document.js",
-		"app/data/model/DocumentQueryMatch.js",
-		"app/data/model/DocumentTerm.js",
-		"app/data/model/PrincipalComponent.js",
-		"app/data/model/StatisticalAnalysis.js",
-		"app/data/model/Token.js",
-
-		"app/data/store/CAAnalysis.js",
-		"app/data/store/Contexts.js",
-		"app/data/store/CorpusCollocates.js",
-		"app/data/store/CorpusTerms.js",
-		"app/data/store/DocumentQueryMatches.js",
-		"app/data/store/DocumentTerms.js",
-		"app/data/store/Documents.js",
-		"app/data/store/PCAAnalysis.js",
-		"app/data/store/CorpusNgrams.js",
-		"app/data/store/Tokens.js",
-
-		"app/data/model/Corpus.js",
-
-		"app/widget/StopListOption.js",
-		"app/widget/QuerySearchField.js",
-		"app/widget/TotalPropertyStatus.js",
-
-		"app/panel/Panel.js",
-		"app/panel/VoyantTabPanel.js",
-		"app/panel/Bubblelines.js",
-		"app/panel/Cirrus.js",
-		"app/panel/CollocatesGraph.js",
-		"app/panel/Contexts.js",
-		"app/panel/CorpusCollocates.js",
-		"app/panel/CorpusCreator.js",
-		"app/panel/Phrases.js",
-		"app/panel/CorpusTerms.js",
-		"app/panel/DocumentTerms.js",
-		"app/panel/Documents.js",
-		"app/panel/DocumentsFinder.js",
-		"app/panel/Dummy.js",
-		"app/panel/Reader.js",
-		"app/panel/ScatterPlot.js",
-		"app/panel/Summary.js",
-		"app/panel/TopicContexts.js",
-		"app/panel/TermsRadio.js",
-		"app/panel/Trends.js",
-		"app/panel/VoyantFooter.js",
-		"app/panel/VoyantHeader.js",
-		"app/panel/CorpusSet.js",
-
-		"app/VoyantApp.js",
-		"app/VoyantCorpusApp.js",
-		"app/VoyantDefaultApp.js"};
 	
 	// Closure options
 	final static int SUMMARY_DETAIL_LEVEL = 1;
@@ -170,8 +96,12 @@ public class JSCacher {
 	}
 
 	private static List<File> getCacheableFiles(File basePath) throws IOException {
+		InputStream is = org.voyanttools.voyant.JSCacher.class.getResourceAsStream("voyant-js.txt");
+		List<String> lines = IOUtils.readLines(is);
+		is.close();
 		List<File> files = new ArrayList<File>();
-		for (String jsFile : jsFiles) {
+		for (String jsFile : lines) {
+			if (jsFile.trim().startsWith("#") || jsFile.trim().isEmpty()) {continue;}
 			File f = new File(basePath, jsFile);
 			if (f.exists()) {files.add(f);}
 			else {
