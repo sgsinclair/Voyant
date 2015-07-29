@@ -63,7 +63,7 @@ Ext.define('Voyant.util.Toolable', {
 			}, this)
 		}
 		if (moreTools && this.getApplication().getMoreTools) {
-			moreTools.push("-");
+			moreTools.push({xtype: 'menuseparator'});
 		}
 		if (this.getApplication().getMoreTools) {
 			moreTools = moreTools || [];

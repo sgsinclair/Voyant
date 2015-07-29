@@ -94,6 +94,7 @@ public class JSCacher {
 		"app/panel/ScatterPlot.js",
 		"app/panel/Summary.js",
 		"app/panel/TopicContexts.js",
+		"app/panel/TermsRadio.js",
 		"app/panel/Trends.js",
 		"app/panel/VoyantFooter.js",
 		"app/panel/VoyantHeader.js",

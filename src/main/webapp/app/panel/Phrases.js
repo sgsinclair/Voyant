@@ -173,7 +173,6 @@ Ext.define('Voyant.panel.Phrases', {
                     tooltip: this.localize('overlapTip'),
                     menu: {
                     	items: [
-                           '<b class="menu-title">'+this.localize('overlapMenu')+'</b>',
                            {
                         	   xtype: 'menucheckitem',
                                text: this.localize("overlapNone"),
