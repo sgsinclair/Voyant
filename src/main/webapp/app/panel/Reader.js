@@ -21,8 +21,13 @@ Ext.define('Voyant.panel.Reader', {
     	tokensStore: undefined,
     	documentsStore: undefined,
     	documentTermsStore: undefined,
-    	exportVisualization: false
+    	exportVisualization: false,
+    	lastScrollTop: 0,
+    	scrollDownwards: true
     },
+    
+    INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling up
+    
     innerContainer: null, // set after render
     
     cls: 'voyant-reader',
@@ -67,7 +72,7 @@ Ext.define('Voyant.panel.Reader', {
 	    		var documentFrequency = this.localize("documentFrequency");
 	    		var isPlainText = false;
 	    		var docIndex = -1;
-	    		var isLastNewLine = false
+	    		var isLastNewLine = false;
 	    		records.forEach(function(record) {
 	    			if (record.getPosition()==0) {
 	    				contents+="<h3>"+this.getDocumentsStore().getById(record.getDocId()).getFullLabel()+"</h3>";
@@ -82,7 +87,7 @@ Ext.define('Voyant.panel.Reader', {
 	    			}
 	    			else {
 	    				var newContents = record.getTermWithLineSpacing(isPlainText);
-	    				var isNewLine = newContents.indexOf("<br />")==0
+	    				var isNewLine = newContents.indexOf("<br />")==0;
 	    				if (isLastNewLine && (isNewLine || newContents.trim().length==0)) {}
 	    				else {
 	    					contents += newContents;
@@ -171,21 +176,68 @@ Ext.define('Voyant.panel.Reader', {
     		
     		// scroll listener
     		centerPanel.body.on("scroll", function(event, target) {
-    			var cmp = this.items.getAt(0);
-    			var body = cmp.body;
-    			var dom = body.dom;
-    			if (dom.scrollTop+dom.offsetHeight>dom.scrollHeight/2) { // more than half-way down
-    				var readerContainer = this.innerContainer.first();
+    			var readerContainer = this.innerContainer.first();
+    			var downwardsScroll = this.getLastScrollTop() < target.scrollTop;
+    			// scroll up
+    			if (!downwardsScroll && target.scrollTop < 1) {
+    				var first = readerContainer.first('.word');
+    				if (first !== null) {
+    					var info = Voyant.data.model.Token.getInfoFromElement(first);
+    					var docIndex = parseInt(info.docIndex);
+    					var start = parseInt(info.position);
+    					if (docIndex > 0) {
+    						var doc = this.getDocumentsStore().getAt(docIndex);    						
+    						var limit = this.getApiParam('limit');
+    						if (start === 0) {
+    							docIndex--;
+    							doc = this.getDocumentsStore().getAt(docIndex);
+    							var totalTokens = doc.get('tokensCount-lexical');
+    							start = totalTokens-limit;
+    							if (start < 0) {
+    								start = 0;
+    								this.setApiParam('limit', totalTokens);
+    							}
+    						} else {
+    							start -= limit;
+    						}
+    						if (start < 0) start = 0;
+    						
+	    					var id = doc.getId();
+	    					this.setApiParams({'skipToDocId': id, start: start});
+	    					this.setScrollDownwards(downwardsScroll);
+							this.load();
+							this.setApiParam('limit', this.INITIAL_LIMIT);
+    					}
+    				}
+    			// scroll down
+    			} else if (downwardsScroll && target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
     				var last = readerContainer.last();
-    				if (last.hasCls("loading")==false) {
+    				// store any text that occurs after last word
+    				var lastText = $(readerContainer.dom).contents().filter(function() {
+    					return this.nodeType === 3;
+    				}).last();
+    				if (last.hasCls("loading")===false) {
     					while(last) {
     						if (last.hasCls("word")) {
-    	    					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
     	    					var info = Voyant.data.model.Token.getInfoFromElement(last);
-    	    					last.destroy();
+    	    					var docIndex = parseInt(info.docIndex);
+    	    					var start = parseInt(info.position);
     	    					var doc = this.getDocumentsStore().getAt(info.docIndex);
     	    					var id = doc.getId();
+    	    					
+    	    					if (start + this.getApiParam('limit') >= doc.get('tokensCount-lexical') && docIndex == this.getCorpus().getDocumentsCount()-1) {
+    	    						break;
+    	    					}
+    	    					
+    	    					// remove any text after the last word
+    	    					if (last.el.dom.nextSibling === lastText[0]) {
+    	    						lastText.remove();
+    	    					}
+    	    					
+    	    					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
+    	    					last.destroy();
     	    					this.setApiParams({'skipToDocId': id, start: info.position});
+    	    					this.setScrollDownwards(downwardsScroll);
     							this.load();
     							break;
     						}
@@ -194,6 +246,7 @@ Ext.define('Voyant.panel.Reader', {
     					}
     				}
     			}
+    			this.setLastScrollTop(target.scrollTop);
     		}, this);
     		
     		// click listener
@@ -278,9 +331,9 @@ Ext.define('Voyant.panel.Reader', {
     						callback: function() {
     							var el = this.body.dom.querySelector("#_" + docIndex + "_" + position);
     							if (el) {
-    								el.scrollIntoView()
+    								el.scrollIntoView();
     							}
-    							this.highlightKeywords(term.get('term'), false)
+    							this.highlightKeywords(term.get('term'), false);
     						},
     						scope: this
     					});
@@ -463,13 +516,14 @@ Ext.define('Voyant.panel.Reader', {
     		params: Ext.apply(this.getApiParams(), {
     			stripTags: 'blocksOnly'
     		})
-    	}))
+    	}));
     },
     
     updateText: function(contents) {
     	var last = this.innerContainer.first().last();
     	if (last && last.isMasked()) {last.destroy();}
-    	this.innerContainer.first().insertHtml('beforeEnd', contents);
+    	var where = this.getScrollDownwards() ? 'beforeEnd' : 'afterBegin';
+    	this.innerContainer.first().insertHtml(where, contents);
     },
     
     updateChart: function() {
