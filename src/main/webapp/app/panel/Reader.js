@@ -26,7 +26,7 @@ Ext.define('Voyant.panel.Reader', {
     	scrollDownwards: true
     },
     
-    INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling up
+    INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling
     
     innerContainer: null, // set after render
     
@@ -185,29 +185,27 @@ Ext.define('Voyant.panel.Reader', {
     					var info = Voyant.data.model.Token.getInfoFromElement(first);
     					var docIndex = parseInt(info.docIndex);
     					var start = parseInt(info.position);
-    					if (docIndex > 0) {
-    						var doc = this.getDocumentsStore().getAt(docIndex);    						
-    						var limit = this.getApiParam('limit');
-    						if (start === 0) {
-    							docIndex--;
-    							doc = this.getDocumentsStore().getAt(docIndex);
-    							var totalTokens = doc.get('tokensCount-lexical');
-    							start = totalTokens-limit;
-    							if (start < 0) {
-    								start = 0;
-    								this.setApiParam('limit', totalTokens);
-    							}
-    						} else {
-    							start -= limit;
-    						}
-    						if (start < 0) start = 0;
-    						
-	    					var id = doc.getId();
-	    					this.setApiParams({'skipToDocId': id, start: start});
-	    					this.setScrollDownwards(downwardsScroll);
-							this.load();
-							this.setApiParam('limit', this.INITIAL_LIMIT);
-    					}
+						var doc = this.getDocumentsStore().getAt(docIndex);    						
+						var limit = this.getApiParam('limit');
+						if (docIndex > 0 && start === 0) {
+							docIndex--;
+							doc = this.getDocumentsStore().getAt(docIndex);
+							var totalTokens = doc.get('tokensCount-lexical');
+							start = totalTokens-limit;
+							if (start < 0) {
+								start = 0;
+								this.setApiParam('limit', totalTokens);
+							}
+						} else {
+							start -= limit;
+						}
+						if (start < 0) start = 0;
+						
+    					var id = doc.getId();
+    					this.setApiParams({'skipToDocId': id, start: start});
+    					this.setScrollDownwards(downwardsScroll);
+						this.load();
+						this.setApiParam('limit', this.INITIAL_LIMIT);
     				}
     			// scroll down
     			} else if (downwardsScroll && target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
@@ -225,8 +223,14 @@ Ext.define('Voyant.panel.Reader', {
     	    					var doc = this.getDocumentsStore().getAt(info.docIndex);
     	    					var id = doc.getId();
     	    					
-    	    					if (start + this.getApiParam('limit') >= doc.get('tokensCount-lexical') && docIndex == this.getCorpus().getDocumentsCount()-1) {
-    	    						break;
+    	    					var totalTokens = doc.get('tokensCount-lexical');
+    	    					if (start + this.getApiParam('limit') >= totalTokens && docIndex == this.getCorpus().getDocumentsCount()-1) {
+    	    						var limit = totalTokens - start;
+    	    						if (limit <= 1) {
+    	    							break;
+    	    						} else {
+    	    							this.setApiParam('limit', limit);
+    	    						}
     	    					}
     	    					
     	    					// remove any text after the last word
@@ -239,6 +243,7 @@ Ext.define('Voyant.panel.Reader', {
     	    					this.setApiParams({'skipToDocId': id, start: info.position});
     	    					this.setScrollDownwards(downwardsScroll);
     							this.load();
+    							this.setApiParam('limit', this.INITIAL_LIMIT);
     							break;
     						}
     						last.destroy(); // remove non word
