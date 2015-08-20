@@ -15,6 +15,8 @@ Ext.define('Voyant.panel.Contexts', {
     		leftTip: {en: "Context to the left of the keyword."},
     		right: {en: "Right"},
     		rightTip: {en: "Context to the right of the keyword."},
+    		position: {en: "Position"},
+    		positionTip: {en: "The position of the keyword within the document."},
     		context: {en: "context"},
     		expand: {en: "expand"},
     		corpus: {en: "corpus"},
@@ -153,6 +155,13 @@ Ext.define('Voyant.panel.Contexts', {
     			tooltip: this.localize("rightTip"),
         		dataIndex: 'right',
                 sortable: true,
+                flex: 1
+            },{
+    			text: this.localize("position"),
+    			tooltip: this.localize("positionTip"),
+        		dataIndex: 'position',
+                sortable: true,
+                hidden: true,
                 flex: 1
             }],
             listeners: {

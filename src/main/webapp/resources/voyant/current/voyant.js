@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Aug 20 17:02:04 EDT 2015 */
+/* This file created by JSCacher. Last modified: Thu Aug 20 17:16:35 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5541,6 +5541,8 @@ Ext.define('Voyant.panel.Contexts', {
     		leftTip: {en: "Context to the left of the keyword."},
     		right: {en: "Right"},
     		rightTip: {en: "Context to the right of the keyword."},
+    		position: {en: "Position"},
+    		positionTip: {en: "The position of the keyword within the document."},
     		context: {en: "context"},
     		expand: {en: "expand"},
     		corpus: {en: "corpus"},
@@ -5679,6 +5681,13 @@ Ext.define('Voyant.panel.Contexts', {
     			tooltip: this.localize("rightTip"),
         		dataIndex: 'right',
                 sortable: true,
+                flex: 1
+            },{
+    			text: this.localize("position"),
+    			tooltip: this.localize("positionTip"),
+        		dataIndex: 'position',
+                sortable: true,
+                hidden: true,
                 flex: 1
             }],
             listeners: {
@@ -6937,11 +6946,11 @@ Ext.define('Voyant.panel.DocumentTerms', {
     		}
     	}
     	else if (config.corpus) {
-    		this.fireEvent('loadedCorpus', this, config.corpus)
+    		this.fireEvent('loadedCorpus', this, config.corpus);
     	}
     	
     	this.on("query", function(src, query) {
-    		this.fireEvent("corpusTermsClicked", src, [query])
+    		this.fireEvent("corpusTermsClicked", src, [query]);
     	}, this);
     	
     	this.on("corpusTermsClicked", function(src, terms) {
@@ -6974,7 +6983,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	});
     	
     	this.on("activate", function() { // load after tab activate (if we're in a tab panel)
-    		if (this.getStore().getCorpus()) {this.getStore().loadPage(1, {params: this.getApiParams()})}
+    		if (this.getStore().getCorpus()) {
+    			this.getStore().loadPage(1, {params: this.getApiParams()});
+    		}
     	}, this);
     },
     
@@ -7085,7 +7096,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
         
     }
     
-})
+});
 
 Ext.define('Voyant.panel.Documents', {
 	extend: 'Ext.grid.Panel',
