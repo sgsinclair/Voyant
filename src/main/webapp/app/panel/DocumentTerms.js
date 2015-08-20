@@ -4,7 +4,10 @@ Ext.define('Voyant.panel.DocumentTerms', {
 	requires: ['Voyant.data.store.DocumentTerms'],
 	alias: 'widget.documentterms',
 	config: {
-		corpus: undefined
+		corpus: undefined,
+		options: {
+    		xtype: 'stoplistoption'
+    	}
 	},
     statics: {
     	i18n: {
@@ -39,18 +42,20 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	});
     	
     	if (config.embedded) {
-    		console.warn(config.embedded.then)
+    		if (window.console) {
+    			console.warn(config.embedded.then);
+    		}
     		var cls = Ext.getClass(config.embedded).getName();
     		if (cls=="Voyant.data.store.DocumentTerms" || cls=="Voyant.data.model.Document") {
-    			this.fireEvent('loadedCorpus', this, config.embedded.getCorpus())
+    			this.fireEvent('loadedCorpus', this, config.embedded.getCorpus());
     		}
     	}
     	else if (config.corpus) {
-    		this.fireEvent('loadedCorpus', this, config.corpus)
+    		this.fireEvent('loadedCorpus', this, config.corpus);
     	}
     	
     	this.on("query", function(src, query) {
-    		this.fireEvent("corpusTermsClicked", src, [query])
+    		this.fireEvent("corpusTermsClicked", src, [query]);
     	}, this);
     	
     	this.on("corpusTermsClicked", function(src, terms) {
@@ -58,7 +63,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
         		var query = [];
         		terms.forEach(function(term) {
         			query.push(Ext.isString(term) ? term : term.get("term"));
-        		})
+        		});
         		this.setApiParams({
         			query: query,
         			docId: undefined,
@@ -83,7 +88,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	});
     	
     	this.on("activate", function() { // load after tab activate (if we're in a tab panel)
-    		if (this.getStore().getCorpus()) {this.getStore().loadPage(1, {params: this.getApiParams()})}
+    		if (this.getStore().getCorpus()) {
+    			this.getStore().loadPage(1, {params: this.getApiParams()});
+    		}
     	}, this);
     },
     
@@ -194,4 +201,4 @@ Ext.define('Voyant.panel.DocumentTerms', {
         
     }
     
-})
+});

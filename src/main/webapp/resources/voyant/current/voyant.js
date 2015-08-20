@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Aug 19 15:25:07 EDT 2015 */
+/* This file created by JSCacher. Last modified: Thu Aug 20 17:02:04 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6890,7 +6890,10 @@ Ext.define('Voyant.panel.DocumentTerms', {
 	requires: ['Voyant.data.store.DocumentTerms'],
 	alias: 'widget.documentterms',
 	config: {
-		corpus: undefined
+		corpus: undefined,
+		options: {
+    		xtype: 'stoplistoption'
+    	}
 	},
     statics: {
     	i18n: {
@@ -6925,10 +6928,12 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	});
     	
     	if (config.embedded) {
-    		console.warn(config.embedded.then)
+    		if (window.console) {
+    			console.warn(config.embedded.then);
+    		}
     		var cls = Ext.getClass(config.embedded).getName();
     		if (cls=="Voyant.data.store.DocumentTerms" || cls=="Voyant.data.model.Document") {
-    			this.fireEvent('loadedCorpus', this, config.embedded.getCorpus())
+    			this.fireEvent('loadedCorpus', this, config.embedded.getCorpus());
     		}
     	}
     	else if (config.corpus) {
@@ -6944,7 +6949,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
         		var query = [];
         		terms.forEach(function(term) {
         			query.push(Ext.isString(term) ? term : term.get("term"));
-        		})
+        		});
         		this.setApiParams({
         			query: query,
         			docId: undefined,
