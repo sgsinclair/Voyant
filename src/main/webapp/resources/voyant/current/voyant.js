@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Aug 20 17:16:35 EDT 2015 */
+/* This file created by JSCacher. Last modified: Fri Aug 21 16:42:48 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3246,7 +3246,7 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 });
 
 Ext.define('Voyant.data.store.Contexts', {
-	extend: 'Ext.data.BufferedStore',
+	extend: 'Voyant.data.store.VoyantStore',
 	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.Context',
 //    transferable: ['setCorpus'],
@@ -3368,7 +3368,7 @@ Ext.define("Voyant.data.proxy.CorpusTerms", {
 })
 
 Ext.define('Voyant.data.store.CorpusTerms', {
-	extend: 'Ext.data.BufferedStore',
+	extend: 'Voyant.data.store.VoyantStore',
 	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.CorpusTerm',
     transferable: ['setCorpus'],
@@ -3474,7 +3474,7 @@ Ext.define('Voyant.data.store.DocumentQueryMatches', {
 });
 
 Ext.define('Voyant.data.store.DocumentTerms', {
-	extend: 'Ext.data.BufferedStore',
+	extend: 'Voyant.data.store.VoyantStore',
 	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.DocumentTerm',
     transferable: ['setCorpus'],
@@ -5570,6 +5570,7 @@ Ext.define('Voyant.panel.Contexts', {
     		title: this.localize('title'),
     		emptyText: this.localize("emptyText"),
             store : Ext.create("Voyant.data.store.Contexts", {
+            	parentPanel: this,
             	stripTags: "all",
             	remoteSort: false,
             	sortOnLoad: true,
@@ -5624,7 +5625,7 @@ Ext.define('Voyant.panel.Contexts', {
                 	width: 50,
                 	listeners: {
                 		render: function(slider) {
-                			slider.setValue(me.getApiParam('expand'))
+                			slider.setValue(me.getApiParam('expand'));
                 		},
                 		changecomplete: function(slider, newValue) {
                 			me.setApiParam('expand', newValue);
@@ -5635,8 +5636,8 @@ Ext.define('Voyant.panel.Contexts', {
                 				if (recordsExpanded[id]) {
                 					var record = store.getByInternalId(id);
                 					var row = view.getRow(record);
-                					var expandRow = row.parentNode.childNodes[1]
-                					view.fireEvent("expandbody", row, record, expandRow, {force: true})
+                					var expandRow = row.parentNode.childNodes[1];
+                					view.fireEvent("expandbody", row, record, expandRow, {force: true});
                 				}
                 			}
                 		}
@@ -5646,14 +5647,14 @@ Ext.define('Voyant.panel.Contexts', {
                 	tooltip: this.localize("corpusTip"),
                 	itemId: 'corpus',
                 	handler: function(btn) {
-                		btn.hide()
+                		btn.hide();
                 		this.setApiParams({docIndex: undefined, docId: undefined});
-                		this.getStore().load({params: this.getApiParams()})
+                		this.getStore().load({params: this.getApiParams()});
                 	},
                 	hidden: true,
                 	scope: this
                 }]
-            }], 
+            }],
     		columns: [{
     			text: this.localize("document"),
     			toolTip: this.localize("documentTip"),
@@ -6751,22 +6752,14 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
-    		store.getProxy().setExtraParam('corpus', corpus.getId())
-    		this.fireEvent("apiChange", this);
+    		store.getProxy().setExtraParam('corpus', corpus.getId());
+    		store.loadPage(1);
     	});
     	
     	this.on("query", function(src, query) {
     		this.setApiParam('query', query);
-    		this.fireEvent("apiChange", this);
-    		this.store.loadPage(1)
+    		this.getStore().loadPage(1);
     	}, this);
-    	
-    	this.on("apiChange", function() {
-    		var api = this.getApiParams(['stopList','query']);
-        	var proxy = this.getStore().getProxy();
-        	for (var key in api) {proxy.setExtraParam(key, api[key]);}
-        	this.getStore().loadPage(1);
-    	}, this)
     	
     	if (config.embedded) {
     		var cls = Ext.getClass(config.embedded).getName();
@@ -6786,7 +6779,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusTerms");
+        var store = Ext.create("Voyant.data.store.CorpusTerms", {parentPanel: this});
         store.getProxy().setExtraParam("withDistributions", "relative");
         
         Ext.apply(me, {
@@ -6992,7 +6985,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.DocumentTerms");
+        var store = Ext.create("Voyant.data.store.DocumentTerms", {parentPanel: this});
         
         Ext.apply(me, {
     		title: this.localize('title'),

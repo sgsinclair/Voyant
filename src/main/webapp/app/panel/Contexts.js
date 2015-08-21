@@ -44,6 +44,7 @@ Ext.define('Voyant.panel.Contexts', {
     		title: this.localize('title'),
     		emptyText: this.localize("emptyText"),
             store : Ext.create("Voyant.data.store.Contexts", {
+            	parentPanel: this,
             	stripTags: "all",
             	remoteSort: false,
             	sortOnLoad: true,
@@ -98,7 +99,7 @@ Ext.define('Voyant.panel.Contexts', {
                 	width: 50,
                 	listeners: {
                 		render: function(slider) {
-                			slider.setValue(me.getApiParam('expand'))
+                			slider.setValue(me.getApiParam('expand'));
                 		},
                 		changecomplete: function(slider, newValue) {
                 			me.setApiParam('expand', newValue);
@@ -109,8 +110,8 @@ Ext.define('Voyant.panel.Contexts', {
                 				if (recordsExpanded[id]) {
                 					var record = store.getByInternalId(id);
                 					var row = view.getRow(record);
-                					var expandRow = row.parentNode.childNodes[1]
-                					view.fireEvent("expandbody", row, record, expandRow, {force: true})
+                					var expandRow = row.parentNode.childNodes[1];
+                					view.fireEvent("expandbody", row, record, expandRow, {force: true});
                 				}
                 			}
                 		}
@@ -120,14 +121,14 @@ Ext.define('Voyant.panel.Contexts', {
                 	tooltip: this.localize("corpusTip"),
                 	itemId: 'corpus',
                 	handler: function(btn) {
-                		btn.hide()
+                		btn.hide();
                 		this.setApiParams({docIndex: undefined, docId: undefined});
-                		this.getStore().load({params: this.getApiParams()})
+                		this.getStore().load({params: this.getApiParams()});
                 	},
                 	hidden: true,
                 	scope: this
                 }]
-            }], 
+            }],
     		columns: [{
     			text: this.localize("document"),
     			toolTip: this.localize("documentTip"),

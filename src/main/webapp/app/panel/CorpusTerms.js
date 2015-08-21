@@ -37,22 +37,14 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
-    		store.getProxy().setExtraParam('corpus', corpus.getId())
-    		this.fireEvent("apiChange", this);
+    		store.getProxy().setExtraParam('corpus', corpus.getId());
+    		store.loadPage(1);
     	});
     	
     	this.on("query", function(src, query) {
     		this.setApiParam('query', query);
-    		this.fireEvent("apiChange", this);
-    		this.store.loadPage(1)
+    		this.getStore().loadPage(1);
     	}, this);
-    	
-    	this.on("apiChange", function() {
-    		var api = this.getApiParams(['stopList','query']);
-        	var proxy = this.getStore().getProxy();
-        	for (var key in api) {proxy.setExtraParam(key, api[key]);}
-        	this.getStore().loadPage(1);
-    	}, this)
     	
     	if (config.embedded) {
     		var cls = Ext.getClass(config.embedded).getName();
@@ -72,7 +64,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusTerms");
+        var store = Ext.create("Voyant.data.store.CorpusTerms", {parentPanel: this});
         store.getProxy().setExtraParam("withDistributions", "relative");
         
         Ext.apply(me, {
