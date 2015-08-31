@@ -76,23 +76,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		}, this);
 		
 		this.addListener('corpusDocumentSelected', function(src, data) {
-			if (this.currentDocId != data.docId) {
-				this.setApiParams({docId: data.docId, start: 0});
-				
-				this.fetchText(function() {
-					if (data.tokenId) {
-						this.highlightToken(data.tokenId);
-					} else {
-						this.getApplication().dispatchEvent('dtcReaderScroll', this, {el: this.readerContainer.dom, docId: data.docId});
-					}
-				});
-			} else {
-				if (data.tokenId) {
-					this.highlightToken(data.tokenId);
-				} else {
-					this.readerContainer.scrollTo('top', 0, false);
-				}
-			}
+			this.fetchDocument(data);
 		}, this);
 		
 		this._doScrollTo = function(src, data, animate) {
@@ -236,7 +220,9 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			
 			var docId = this.getApiParams().docId;
 			if (docId == null) docId = this.getCorpus().getDocument(0).getId();
-			this.getApplication().dispatchEvent('corpusDocumentSelected', this, {docId: docId});
+			var data = {docId: docId};
+			this.getApplication().dispatchEvent('corpusDocumentSelected', this, data);
+			this.fetchDocument(data);
 		}
 	},
 	
@@ -293,21 +279,25 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			callback: function(el, success, response, options) {
 				this.loading = false;
 				
-				if (this.getIndexForDocId(params.docId) > 0) {
+				var index = this.getIndexForDocId(params.docId);
+				
+				if (index > 0) {
 					this.prevButton.show();
 				}
-				if (this.getIndexForDocId(params.docId) < this.getCorpus().getDocumentsCount()) {
+				if (index < this.getCorpus().getDocumentsCount()) {
 					this.nextButton.show();
 				}
 				
 				this._processLanguage();
-				
-				this._processHeader();
-				
-				this.tokenToolTipsMap = {};
-				this._processNotes();
-				this._processBibls();
 				this._processImages();
+				if (index > 0) {
+    				this._processHeader();
+    				this._processNotes();
+    				this._processBibls();
+				} else {
+				    this._processCoverPage();
+				}
+				
 				
 				this._getSelections();
 				
@@ -319,19 +309,41 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		});
 	},
 	
+	fetchDocument: function(data) {
+		if (this.currentDocId != data.docId) {
+			this.setApiParams({docId: data.docId, start: 0});
+			
+			this.fetchText(function() {
+				if (data.tokenId) {
+					this.highlightToken(data.tokenId);
+				} else {
+					this.getApplication().dispatchEvent('dtcReaderScroll', this, {el: this.readerContainer.dom, docId: data.docId});
+				}
+			});
+		} else {
+			if (data.tokenId) {
+				this.highlightToken(data.tokenId);
+			} else {
+				this.readerContainer.scrollTo('top', 0, false);
+			}
+		}
+	},
+	
 	fetchPreviousDocument: function() {
 		var index = this.getIndexForDocId(this.currentDocId);
 		if (index > 0) {
-			var docId = this.getCorpus().getDocument(index-1).getId();
-			this.getApplication().dispatchEvent('corpusDocumentSelected', this, {docId:docId});
+			var data = {docId: this.getCorpus().getDocument(index-1).getId()};
+			this.getApplication().dispatchEvent('corpusDocumentSelected', this, data);
+			this.fetchDocument(data);
 		}
 	},
 	
 	fetchNextDocument: function() {
 		var index = this.getIndexForDocId(this.currentDocId);
 		if (index < this.getCorpus().getDocumentsCount()) {
-			var docId = this.getCorpus().getDocument(index+1).getId();
-			this.getApplication().dispatchEvent('corpusDocumentSelected', this, {docId:docId});
+			var data = {docId: this.getCorpus().getDocument(index+1).getId()};
+			this.getApplication().dispatchEvent('corpusDocumentSelected', this, data);
+			this.fetchDocument(data);
 		}
 	},
 	
@@ -344,29 +356,65 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	    }
 	},
 	
+	_processCoverPage: function() {
+	    var parent = Ext.get(Ext.DomQuery.select('#dtcReaderDivWrapper')[0]).first();
+	    parent.addCls('coverPage');
+	    
+	    var firstNote = Ext.get(Ext.DomQuery.select('#dtcReaderDivWrapper note')[0]);
+	    if (firstNote != null) {
+	    	firstNote.setStyle('marginLeft', '5em');
+	    }
+	    
+	    function resizeImage(event, img) {
+	        var coverImage = Ext.get(img);
+	        var cBox = coverImage.getBox();
+	        var rBox = this.readerContainer.parent().getBox();
+	        
+	        if (cBox.width > rBox.width + 50) {
+	            coverImage.setWidth(rBox.width - 100);
+	        } else if (cBox.height > rBox.height + 50) {
+	            coverImage.setHeight(rBox.height - 50);
+	        }
+	        
+	        coverImage.show();
+	    }
+	    
+	    var coverImage = Ext.get(Ext.DomQuery.select('#dtcReaderDivWrapper img')[0]);
+	    if (coverImage != null) {
+		    var cBox = coverImage.getBox();
+		    if (cBox.width === 0) {
+		        coverImage.hide();
+		        coverImage.on('load', resizeImage, this);
+		    } else {
+		        resizeImage.bind(this, null, coverImage)();
+		    }
+	    }
+	},
+	
 	_processHeader: function() {
 		var header = Ext.get(Ext.DomQuery.select('xmlHead', this.readerContainer.dom)[0]);
 		if (header != null) {
 			header.setVisibilityMode(Ext.Element.DISPLAY);
 			header.hide();
 		}
-		var byline = Ext.get(Ext.DomQuery.select('byline', this.readerContainer.dom)[0]);
-        if (byline != null) {
+        var bylines = Ext.DomQuery.select('byline', this.readerContainer.dom);
+		for (var i = 0; i < bylines.length; i++) {
+		    var byline = Ext.get(bylines[i]);
             byline.setVisibilityMode(Ext.Element.DISPLAY);
             byline.hide();
-        }
+		}
 		var docauthors = Ext.DomQuery.select('docAuthor', this.readerContainer.dom);
 		for (var i = 0; i < docauthors.length; i++) {
 		    var docauthor = Ext.get(docauthors[i]);
 		    docauthor.setVisibilityMode(Ext.Element.DISPLAY);
             docauthor.hide();
 		}
-		var firstP = Ext.get(Ext.DomQuery.select('div[type="chapter"] > p', this.readerContainer.dom)[0]);
+		var firstP = Ext.get(Ext.DomQuery.select('#dtcReaderDivWrapper div[type] > p', this.readerContainer.dom)[0]);
 		if (firstP != null) {
 			firstP.addCls('firstParagraph');
 			var firstSpan = firstP.child('span');
 			if (firstSpan) {
-				var text = Ext.isIE ? firstSpan.dom.text : firstSpan.dom.textContent;
+				var text = firstSpan.dom.textContent;
 				var dropText = '<span class="dropCap">'+text.substring(0, 1)+'</span>'+text.substring(1);
 				firstSpan.update(dropText);
 			}
@@ -374,6 +422,9 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	},
 	
 	_processNotes: function() {
+		this.hideAllNotes(true);
+	    this.tokenToolTipsMap = {};
+	    
 		var notes = Ext.DomQuery.select('note', this.readerContainer.dom);
 		for (var i = 0; i < notes.length; i++) {
 			var note = notes[i];
@@ -381,7 +432,11 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			var tip = new Ext.ux.DToCToolTip(Ext.apply({
 				target: noteNumber,
 				title: 'Note '+(i+1),
-				html: Ext.isIE ? note.text : note.textContent
+				html: note.textContent,
+				listeners: {
+				    beforeshow: this.hideAllNotes,
+				    scope: this
+				}
 			}, this.toolTipConfig));
 			var tokenId = note.getAttribute('tokenid');
 			this.tokenToolTipsMap[tokenId] = tip;
@@ -488,6 +543,15 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		tagEl.addCls(type);
 	},
 	
+	hideAllNotes: function(destroy) {
+	    for (var id in this.tokenToolTipsMap) {
+	        this.tokenToolTipsMap[id].hide();
+	        if (destroy === true) {
+	            this.tokenToolTipsMap[id].destroy();
+	        }
+	    }
+	},
+	
 	scrollToToken: function(tokenId) {
 		var readerEl = this.readerContainer.dom;
 		var tag = Ext.get(Ext.DomQuery.select('*[tokenid="'+tokenId+'"]', readerEl)[0]);
@@ -569,32 +633,42 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	setReaderTitle: function(docId) {
 		docId = docId || this.currentDocId;
 		var doc = this.getCorpus().getDocument(docId);
-		var title = doc.get('title').normalize();
-		var surnames = '';
-		var authors = doc.get('author');
-		if (typeof authors === 'string') {
-			authors = [{surname: authors}];
-		}
-		for (var i = 0; i < authors.length; i++) {
-			if (i > 0) {
-				if (authors.length > 2) surnames += ', ';
-				if (i == authors.length - 1) {
-					surnames += ' and ';
+		var titleHtml = '';
+		if (doc.getIndex() > 0) {
+			var title = doc.get('title').normalize();
+			var surnames = '';
+			var colon = ':';
+			var authors = doc.get('author');
+			if (authors !== undefined) {
+				if (typeof authors === 'string') {
+					authors = [{surname: authors}];
+				}
+				for (var i = 0; i < authors.length; i++) {
+					if (i > 0) {
+						if (authors.length > 2) surnames += ', ';
+						if (i == authors.length - 1) {
+							surnames += ' and ';
+						}
+					}
+					surnames += authors[i].surname;
+				}
+				if (surnames === '') {
+				    // no authors so get rid of colon
+				    colon = '';
 				}
 			}
-			surnames += authors[i].surname;
+			titleHtml = '<span class="author">'+surnames+'</span>'+colon+' <span class="title">'+title+'</span>';
+		} else {
+			titleHtml = '<span class="title">Front Matter</span>';
 		}
-		this.setTitle('<span class="author">'+surnames+'</span>: <span class="title">'+title+'</span>');
+		this.setTitle(titleHtml);
 		
 		this.resizeReaderComponents();
 	},
 	
 	resizeReaderComponents: function() {
-//		var headerHeight = this.header.getHeight();
-//		this.readerContainer.setTop(headerHeight+'px');
-//		var panelHeight = this.ownerCt.getHeight();
-//		var borderHeight = this.el.getBorderWidth('tb');
-//		this.body.setHeight(panelHeight - borderHeight - headerHeight);
+		var parentWidth = this.readerContainer.parent().getWidth();
+		this.readerContainer.setWidth(parentWidth);
 	},
 	
 	setReaderScroll: function(location) {

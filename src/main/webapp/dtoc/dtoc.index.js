@@ -12,15 +12,14 @@ Ext.define('Voyant.panel.DToC.Index', {
         }
     },
     
-    initialized: false,
-	isCurator: false,
 	treeEditor: null,
 	currentChapterFilter: null,
 	
 	indexIds: {},
+	
+	_maskEl: null,
     
     constructor: function(config) {
-    	this.isCurator = config.isCurator == null ? false : config.isCurator;
     	
     	var treeStore = Ext.create('Ext.data.TreeStore', {
 			batchUpdateMode: 'complete',
@@ -135,38 +134,6 @@ Ext.define('Voyant.panel.DToC.Index', {
 			    }]
 		    })
 		};
-		if (config.doInit) {
-			treeConfig.listeners.afterrender = {
-	    		fn: function() {
-	    			this.initTree(config.initData);
-	    		},
-	    		scope: this,
-	    		single: true
-	    	};
-		}
-		if (this.isCurator) {
-//			treeConfig.enableDD = true;
-//			treeConfig.listeners.beforenodedrop = function(e) {
-//				if ((e.dropNode.getData().isDoc && e.point == 'append') || !e.target.getData().isDoc) e.cancel = true;
-//			};
-//			treeConfig.listeners.dblclick = {
-//				fn: this.editNodeLabel,
-//				scope: this
-//			};
-//			treeConfig.listeners.render = {
-//				fn: function() {
-//					this.treeEditor = new Ext.tree.TreeEditor(this, {
-//						allowBlank: false,
-//						selectOnFocus: true
-//					}, {
-//						cancelOnEsc: true,
-//						completeOnEnter: true
-//					});
-//				},
-//				scope: this,
-//				single: true
-//			};
-		}
 		
 		Ext.apply(config, treeConfig);
     	
@@ -186,12 +153,13 @@ Ext.define('Voyant.panel.DToC.Index', {
 		},
 		loadedCorpus: function(src, corpus) {
 			this.setCorpus(corpus);
-			
-			this.initTree();
+			this.loadIndex();
 			this.updateChapterFilter();
 		},
 		allTagsLoaded: function(src) {
 			this.filterIndex();
+			
+			this.body.unmask();
 			
 			// re-select previously selected nodes (why?)
 //			var sm = this.getSelectionModel();
@@ -202,7 +170,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 	},
 	
 	loadIndex: function() {
-		var index = this.getCorpus().getDocuments().getCount();
+	    this._maskEl = this.body.mask('Processing Index: 0%', 'loadMask');
+	    
+		var index = this.getCorpus().getDocumentsCount();
 		this._getDocumentXml(index);
 	},
 
@@ -236,6 +206,11 @@ Ext.define('Voyant.panel.DToC.Index', {
 //				return r.getData().targetMatches === true;
 //			}, this);
 		}
+	},
+	
+	updateIndexProgress: function(progress) {
+	    var msgEl = this._maskEl.down('.x-mask-msg-text');
+	    msgEl.dom.firstChild.data = 'Processing Index: '+Math.floor(progress*100)+'%';
 	},
 	
 	updateChapterFilter: function() {
@@ -303,6 +278,8 @@ Ext.define('Voyant.panel.DToC.Index', {
 					this._processIndex(items, rootConfig);
 //					console.log(JSON.stringify(rootConfig, null, '\t'));
 					this.getRootNode().appendChild(rootConfig.children);
+					
+					this.getApplication().dispatchEvent('indexProcessed', this);
 				}
 			},
 			failure: function(respose) {
@@ -315,11 +292,14 @@ Ext.define('Voyant.panel.DToC.Index', {
 	_processIndex: function(items, parentConfig) {
 	    function getTitle(el) {
 	        var title = undefined;
-	        for (var i = 0; i < el.children.length; i++) {
-	            var childEl = el.children[i];
-	            var name = childEl.nodeName.toLowerCase();
-	            if (name !== 'item' && name !== 'list') {
-	                title = childEl.textContent;
+	        var children = el.childNodes;
+	        for (var i = 0; i < children.length; i++) {
+	            var child = children[i];
+	            if (child.nodeType === Node.ELEMENT_NODE) {
+    	            var name = child.nodeName.toLowerCase();
+    	            if (name !== 'item' && name !== 'list') {
+    	                title = child.textContent;
+    	            }
 	            }
 	        }
 	        if (title === undefined) {
@@ -425,13 +405,6 @@ Ext.define('Voyant.panel.DToC.Index', {
 	editNodeLabel: function(node) {
 		if (node.getData().editable != false) {
 			this.treeEditor.startEdit(node.ui.textNode);
-		}
-	},
-	
-	initTree: function(data) {
-		if (!this.initialized) {
-			this.loadIndex();
-			this.initialized = true;
 		}
 	}
 });

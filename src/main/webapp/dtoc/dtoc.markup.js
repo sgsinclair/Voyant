@@ -159,7 +159,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		var nextRe = new RegExp('(([^\\s]+\\s\\s*){'+Math.floor(this.TAG_SNIPPET_WORD_LENGTH/2)+'})(.*)');
 		
 		function getText(tag) {
-			var text = Ext.isIE ? tag.text : tag.textContent;
+			var text = tag.textContent;
 			text = text.replace(/\s+/g, ' '); // consolidate whitespace
 			var shortText = text.replace(shortRe, "$1");
 			return {content: shortText, shortened: shortText.length < text.length};
@@ -184,7 +184,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			function doGet(currTag, dir, currText) {
 				var node = getPrevOrNextTag(currTag, false, dir == 'prev');
 				if (node != null) {
-					var text = Ext.isIE ? node.text : node.textContent;
+					var text = node.textContent;
 					if (dir == 'prev') {
 						currText = text + currText;
 					} else {
@@ -259,130 +259,155 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			return data;
 		}
 		
-		var returnData = {};
-		if (customTagSet == null) {
-			// no curation so parse all tags
-			var tags = Ext.DomQuery.jsSelect('*', docBody);
-			returnData = produceTagData(tags);
-		} else {
-			// find hits for curated tags only
-			for (var tag in customTagSet) {
-				var cTag = customTagSet[tag];
-				if (cTag.type == 'x') {
-					var data = {};
-					var xpath = cTag.tagName;
-					var results = getXPathResults(xpath);
-					if (results.length > 0) {
-						data[xpath] = [];
-						var el, dataObj, text, surrText;
-						for (var i = 0; i < results.length; i++) {
-							var el = results[i];
-							dataObj = {
-								docId: docId,
-								tagName: xpath,
-								label: cTag.label,
-								tokenId: el.getAttribute('tokenid'),
-								subtype: el.getAttribute('subtype'),
-								type: 'x'
-							};
-							
-							text = getText(el);
-							dataObj.text = text.content;
-							
-							if (text.shortened == false) {
-								surrText = getSurroundingText(el);
-								dataObj.prevText = surrText[0];
-								dataObj.nextText = surrText[1];
-							} else {
-								dataObj.text += '&hellip;';
-							}
-							data[xpath].push(dataObj);
-						}
-					}
-					Ext.apply(returnData, data);
-				} else {
-					var results = Ext.DomQuery.jsSelect(cTag.tagName, docBody);
-					Ext.apply(returnData, produceTagData(results, cTag.label));
-				}
-			}
-		}
+		if (docBody != null) {
 		
-		// process header
-		var head = docBody.querySelectorAll('xmlHead').item(0);
-		if (head) {
-		    // special handling for TEI docs
-			var authors = head.querySelectorAll('author');
-			if (authors.length > 0) {
-    			var authorsArray = [];
-    			for (var i = 0; i < authors.length; i++) {
-    				var author = authors.item(i);
-    				var authorObj = {};
-    				var updateAuthor = false;
-    				
-    				var forename = author.getElementsByTagName('forename').item(0);
-    				var surname = author.getElementsByTagName('surname').item(0);
-    				if (forename !== null) {
-    				    authorObj.forename = Ext.isIE ? forename.text : forename.textContent;
-    				    updateAuthor = true;
-    				}
-    				if (surname !== null) {
-    				    authorObj.surname = Ext.isIE ? surname.text : surname.textContent;
-    				    updateAuthor = true;
-    				}
-    				
-    				if (updateAuthor) {
-    				    authorsArray.push(authorObj);
-    				}
-    			}
-    			if (authorsArray.length > 0) {
-    			    this.getCorpus().getDocument(docId).record.set('author', authorsArray);
-    			}
+			var returnData = {};
+			if (customTagSet == null) {
+				// no curation so parse all tags
+				var tags = Ext.DomQuery.jsSelect('*', docBody);
+				returnData = produceTagData(tags);
+			} else {
+				// find hits for curated tags only
+				for (var tag in customTagSet) {
+					var cTag = customTagSet[tag];
+					if (cTag.type == 'x') {
+						var data = {};
+						var xpath = cTag.tagName;
+						var results = getXPathResults(xpath);
+						if (results.length > 0) {
+							data[xpath] = [];
+							var el, dataObj, text, surrText;
+							for (var i = 0; i < results.length; i++) {
+								var el = results[i];
+								dataObj = {
+									docId: docId,
+									tagName: xpath,
+									label: cTag.label,
+									tokenId: el.getAttribute('tokenid'),
+									subtype: el.getAttribute('subtype'),
+									type: 'x'
+								};
+								
+								text = getText(el);
+								dataObj.text = text.content;
+								
+								if (text.shortened == false) {
+									surrText = getSurroundingText(el);
+									dataObj.prevText = surrText[0];
+									dataObj.nextText = surrText[1];
+								} else {
+									dataObj.text += '&hellip;';
+								}
+								data[xpath].push(dataObj);
+							}
+						}
+						Ext.apply(returnData, data);
+					} else {
+						var results = Ext.DomQuery.jsSelect(cTag.tagName, docBody);
+						Ext.apply(returnData, produceTagData(results, cTag.label));
+					}
+				}
 			}
 			
-			var reader = Ext.getCmp('dtcReader');
-			if (reader.currentDocId == docId) {
-				reader.setReaderTitle();
-			}
-		}
-		
-		if (this.getApplication().useIndex) {
-			// find index items
-			var dtcIndex = Ext.getCmp('dtcIndex');
-			var indexIds = dtcIndex.indexIds;
-			var idsToKeep = [];
-			for (var id in indexIds) {
-			    var hit;
-			    try {
-			        hit = docBody.querySelectorAll('*[*|id='+id+']').item(0);
-			    } catch (e) {
-			        if (window.console) {
-			            console.log('bad ID', id);
-			        }
-			    }
-				if (hit) {
-					idsToKeep.push(id);
-					indexIds[id] = {
-						tokenId: hit.getAttribute('tokenid'),
-						tag: hit.nodeName,
-						docId: docId
-					};
-					
-					var text = getText(hit);
-					indexIds[id].text = text.content;
-					
-					if (text.shortened == false) {
-						surrText = getSurroundingText(hit);
-						indexIds[id].prevText = surrText[0];
-						indexIds[id].nextText = surrText[1];
-					} else {
-						indexIds[id].text += '&hellip;';
-					}
+			// process header
+			var head = docBody.querySelectorAll('xmlHead').item(0);
+			if (head) {
+			    // special handling for TEI docs
+				var authors = head.querySelectorAll('author');
+				if (authors.length > 0) {
+	    			var authorsArray = [];
+	    			for (var i = 0; i < authors.length; i++) {
+	    				var author = authors.item(i);
+	    				var authorObj = {};
+	    				var updateAuthor = false;
+	    				
+	    				var forename = author.getElementsByTagName('forename').item(0);
+	    				var surname = author.getElementsByTagName('surname').item(0);
+	    				if (forename !== null) {
+	    				    authorObj.forename = forename.textContent;
+	    				    updateAuthor = true;
+	    				}
+	    				if (surname !== null) {
+	    				    authorObj.surname = surname.textContent;
+	    				    updateAuthor = true;
+	    				}
+	    				
+	    				if (updateAuthor) {
+	    				    authorsArray.push(authorObj);
+	    				}
+	    			}
+	    			if (authorsArray.length > 0) {
+	    			    this.getCorpus().getDocument(docId).record.set('author', authorsArray);
+	    			}
+				}
+				
+				var reader = Ext.getCmp('dtcReader');
+				if (reader.currentDocId == docId) {
+					reader.setReaderTitle();
 				}
 			}
-			dtcIndex.filterIndex(idsToKeep);
+			
+			if (this.getApplication().useIndex) {
+				var dtcIndex = Ext.getCmp('dtcIndex');
+			    
+			    var totalDocs = this.getCorpus().getDocumentsCount();
+			    var docIndex = this.getCorpus().getDocument(docId).getIndex();
+			    var progress = docIndex / totalDocs;
+			    dtcIndex.updateIndexProgress(progress);
+				
+				// find index items
+				var dtcIndex = Ext.getCmp('dtcIndex');
+				var indexIds = dtcIndex.indexIds;
+				var idsToKeep = [];
+				for (var id in indexIds) {
+				    var hit;
+				    try {
+				    	if (Ext.isIE) {
+				            var result = document.evaluate('//*["'+id+'"=@*[local-name()="id"]]', docBody,
+			                    function(prefix){
+			                        return {
+			                            xml: "http://www.w3.org/XML/1998/namespace"
+			                        }[prefix] || null;
+			                    },
+			                    XPathResult.FIRST_ORDERED_NODE_TYPE
+			                );
+				            hit = result.singleNodeValue;
+				        } else {
+				            hit = docBody.querySelectorAll('*[*|id="'+id+'"]').item(0);
+				        }
+				    } catch (e) {
+				        if (window.console) {
+				            console.log('bad ID', id);
+				        }
+				    }
+					if (hit) {
+						idsToKeep.push(id);
+						indexIds[id] = {
+							tokenId: hit.getAttribute('tokenid'),
+							tag: hit.nodeName,
+							docId: docId
+						};
+						
+						var text = getText(hit);
+						indexIds[id].text = text.content;
+						
+						if (text.shortened == false) {
+							surrText = getSurroundingText(hit);
+							indexIds[id].prevText = surrText[0];
+							indexIds[id].nextText = surrText[1];
+						} else {
+							indexIds[id].text += '&hellip;';
+						}
+					}
+				}
+				dtcIndex.filterIndex(idsToKeep);
+			}
+			
+			return returnData;
+		} else {
+			console.log('parse error');
+			return {};
 		}
-		
-		return returnData;
 	}
 });
 
@@ -590,7 +615,8 @@ Ext.define('Voyant.panel.DToC.Markup', {
 //			this.getTokensStore().load();
 			
 			this.updateChapterFilter();
-			
+		},
+		indexProcessed: function() {
 			this.loadAllTags();
 		}
 	}

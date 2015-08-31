@@ -304,7 +304,11 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 	adjustForToolbar: true, // should we adjust height values for the Annotator toolbar? (should only do once)
 	
 	isAuthenticated : function() {
-		return this.annotator.plugins.Auth.haveValidToken();
+	    if (this.annotator != null) {
+	        return this.annotator.plugins.Auth.haveValidToken();
+	    } else {
+	        return false;
+	    }
 	},
 	
 	getApplication : function() {
@@ -398,14 +402,12 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 		    if (this.showLoginWindow) {
 		        this.loginWin.show();
 		    }
+		    this.destroyAnnotator(); // don't show pop-up if we're not authenticated
 		}
 		
 		function initAnnotator(uri) {
 			if (this.annotator !== null) {
-				// TODO none of this is working
-				this.annotator.removeEvents();
-				this.annotator.destroy();
-				this.annotator = null;
+				this.destroyAnnotator();
 			}
 			
 			this.annotator = new Annotator($('#'+this.containerId));
@@ -471,7 +473,15 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 			}
 			$('html').removeAttr('style'); // inserted by Annotator for toolbar
 		}
-
+		
+		this.destroyAnnotator = function() {
+		    if (this.annotator != null) {
+    		    this.annotator.removeEvents();
+                this.annotator.destroy();
+                this.annotator = null;
+		    }
+		};
+		
 		this.loadAnnotationsForDocId = function(uri) {
 			// need to destroy and recreate annotator each time in order to load annos from new uri
 			initAnnotator.bind(this, [uri])();

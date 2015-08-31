@@ -2,6 +2,8 @@
 <!--
 <script type="text/javascript" src="<%= base %>/resources/ext/current/ext-all-debug.js"></script>
 -->
+<script src="wgxpath/wgxpath.install.js"></script>
+
 <script>
 	Ext.Loader.setConfig({
 		enabled : true,

@@ -154,6 +154,10 @@ body {
 	padding-left: 3px;
 }
 
+#dtcToc .x-grid-cell-inner .author {
+    font-variant: small-caps;
+}
+
 #dtcIndex .x-tree-node-text, #dtcToc .x-grid-tree-node-leaf .x-tree-node-text {
 	display: inline-block;
 	width: 80% !important;
@@ -370,6 +374,10 @@ body {
 }
 
 /* ext theme overrides */
+.x-tool-img {
+    background-image: url("../images/tool-sprites-dark.png") !important;
+}
+
 .x-border-layout-ct {
 	background-color: #ffffff !important;
 }
@@ -378,6 +386,7 @@ body {
 	width: 8px !important;
 }
 
+/*
 .x-layout-collapsed {
 	border: 2px solid #818284;
 	background-color: #ffffff;
@@ -388,24 +397,14 @@ body {
 .x-layout-collapsed-over {
 	background-color: #e7e7e7;
 }
+*/
 
-.x-layout-collapsed .collapsed-header {
+.x-panel-header-collapsed .x-title-text {
 	color: #818284;
 	font-size: 13px;
 	font-family: "Glypha Bold","Bookman Old Style","Serifa BT","URW Bookman L","itc bookman",times,serif;
 	font-weight: normal;
-	position: absolute;
-	top: 120px;
-	left: 1px;
 	white-space: nowrap;
-	-webkit-transform-origin: 0 0;
-    -moz-transform-origin: 0 0;
-    -ms-transform-origin: 0 0;
-    -o-transform-origin: 0 0;
-	-webkit-transform: rotate(-90deg); 
-    -moz-transform: rotate(-90deg); 
-    -ms-transform: rotate(-90deg); 
-    -o-transform: rotate(-90deg); 
 }
 
 #dtcTools .x-tab-default {
@@ -497,6 +496,34 @@ body {
 	font-family: Georgia, serif;
 	font-size: 16px;
     line-height: 22px;
+}
+
+#dtcReaderContainer .coverPage note {
+    display: block !important;
+}
+
+#dtcReaderContainer .coverPage addrLine {
+    display: block;
+}
+
+#dtcReaderContainer .coverPage biblFull {
+    display: block;
+}
+
+#dtcReaderContainer .coverPage resp {
+    display: block;
+}
+
+#dtcReaderContainer .coverPage ab {
+    display: block;
+}
+
+#dtcReaderContainer .coverPage ab persname {
+    font-variant: small-caps;
+}
+
+#dtcReaderContainer .coverPage list > item > list > item {
+    margin-left: 30px;
 }
 
 #dtcReaderContainer p {
@@ -601,6 +628,10 @@ body {
     text-decoration: none !important;
 }
 
+#dtcReaderContainer figure {
+    margin: 10px 0px !important;
+}
+
 #dtcReaderContainer list {
 	counter-reset: item;
 }
@@ -661,6 +692,32 @@ body {
     margin: 8px 0;
     padding-left: 24px;
     text-indent: -24px;
+}
+
+#dtcReaderContainer table {
+    display: table;
+    table-layout: fixed;
+    width: 80%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+#dtcReaderContainer tr {
+    display: table-row;
+}
+
+#dtcReaderContainer td {
+    display: table-cell;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+#dtcReaderContainer td p {
+	margin: 0;
 }
 
 #dtcReaderContainer [rend="bold"] {
