@@ -295,7 +295,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		var root = this.getRootNode();
 		
 		var docs = this.getCorpus().getDocuments();
-		for (var i = 0, len = docs.getCount(); i < len; i++) {
+		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
     		var doc = docs.getAt(i);
     		var docNode, title, author;
     		if (i === 0) {

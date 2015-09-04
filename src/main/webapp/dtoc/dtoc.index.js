@@ -54,6 +54,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 						if (r.getData().targetMatches !== true) {
 							metadata.tdCls += ' disabled';
 						}
+						if (r.getData().isCrossRef === true) {
+							metadata.tdCls += ' crossRef';
+						}
 						value = r.data.text;
 						return value;
 					}
@@ -68,28 +71,38 @@ Ext.define('Voyant.panel.DToC.Index', {
 					},
 					selectionchange: function(sm, nodes) {
 						var indexes = [];
+						var crossRef = null;
 						for (var i = 0; i < nodes.length; i++) {
 							var node = nodes[i];
 							if (!node.isLeaf()) {
 								node.expand();
 							}
-							var t = node.getData().targets;
-							for (var j = 0; j < t.length; j++) {
-								var id = t[j];
-								var data = {};
-								var indexObj = this.indexIds[id];
-								if (Ext.isObject(indexObj)) {
-									Ext.apply(data, indexObj);
-									data.label = (node.parentNode.getData().textNoCount ? node.parentNode.getData().textNoCount : '') + ' ' + node.getData().textNoCount;
-									indexes.push(data);
-								} else {
-									if (console) {
-										console.log('no targets:',node.data.textNoCount+', id:'+id);
+							if (node.getData().isCrossRef) {
+								crossRef = node.getOwnerTree().getRootNode().findChild('indexId', node.getData().targets[0]);
+								break;
+							} else {
+								var t = node.getData().targets;
+								for (var j = 0; j < t.length; j++) {
+									var id = t[j];
+									var data = {};
+									var indexObj = this.indexIds[id];
+									if (Ext.isObject(indexObj)) {
+										Ext.apply(data, indexObj);
+										data.label = (node.parentNode.getData().textNoCount ? node.parentNode.getData().textNoCount : '') + ' ' + node.getData().textNoCount;
+										indexes.push(data);
+									} else {
+										if (console) {
+											console.log('no targets:',node.data.textNoCount+', id:'+id);
+										}
 									}
 								}
 							}
 						}
-						this.getApplication().dispatchEvent('indexesSelected', this, indexes);
+						if (crossRef != null) {
+							node.getOwnerTree().selectPath(crossRef.getPath());
+						} else {
+							this.getApplication().dispatchEvent('indexesSelected', this, indexes);
+						}
 					},
 					scope: this
 				}
@@ -188,6 +201,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 				var match = targets.some(function(n){
 					return idsToKeep.indexOf(n) != -1;
 				});
+				r.data.targetMatches = true;
 				if (match) {
 					r.data.targetMatches = true;
 					r.eachChild(function(n) {
@@ -218,7 +232,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 	    menu.removeAll();
 	    
 	    var docs = this.getCorpus().getDocuments();
-		for (var i = 0, len = docs.getCount(); i < len; i++) {
+		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
     		var doc = docs.getAt(i);
     		menu.add({
 	            xtype: 'menucheckitem',
@@ -276,6 +290,8 @@ Ext.define('Voyant.panel.DToC.Index', {
 					    children: []
 					};
 					this._processIndex(items, rootConfig);
+//					this._resolveCrossRefs(rootConfig, rootConfig);
+					
 //					console.log(JSON.stringify(rootConfig, null, '\t'));
 					this.getRootNode().appendChild(rootConfig.children);
 					
@@ -283,7 +299,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 				}
 			},
 			failure: function(respose) {
-				console.log('failed to get index');
+				this.alertInfo({title: 'DToC Indexer', msg:'Failed to get index.'});
 			},
 			scope: this
 		});
@@ -336,12 +352,14 @@ Ext.define('Voyant.panel.DToC.Index', {
 	    
 		for (var i = 0; i < items.length; i++) {
 			var item = Ext.get(items[i]);
+			var itemId = item.getAttribute('xml:id');
 			var text = undefined;
 			var title = undefined;
 			var count = 0;
 			var targets = [];
 			var subItems = [];
 			var childConfig = undefined;
+			var isCrossRef = false;
 			
 			if (item.down('ref')) {
                 var ref = item.down('ref');
@@ -353,6 +371,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 	                    var id = ids[j].replace(/^#/, '');
 	                    if (id != '') {
 	                        if (id.match(/^[a-z]/i) != null) { // must start with a letter
+	                        	if (id.indexOf('ie') === 0) {
+	                        		isCrossRef = true;
+	                        	}
 	                            targets.push(id);
 	                            count++;
 	                            this.indexIds[id] = true; // set to true for now, dtcMarkup will add further info
@@ -364,7 +385,6 @@ Ext.define('Voyant.panel.DToC.Index', {
                 parentConfig.count += count;
 //              parentNode.setText(parentNode.getData().textNoCount + ' ('+parentNode.getData().count+')');
             }
-			
 			
 			if (item.down('list')) {
 			    if (text === undefined) {
@@ -390,7 +410,9 @@ Ext.define('Voyant.panel.DToC.Index', {
     				count: count,
     				textNoCount: text,
     				targets: targets,
-    				leaf: isLeaf
+    				leaf: isLeaf,
+    				indexId: itemId,
+    				isCrossRef: isCrossRef
     			};
     			
     			parentConfig.children.push(childConfig);
@@ -398,6 +420,42 @@ Ext.define('Voyant.panel.DToC.Index', {
     			    childConfig.children = [];
     			    this._processIndex(subItems, childConfig);//child);
     			}
+			}
+		}
+	},
+	
+	_resolveCrossRefs: function(rootConfig, parentConfig) {
+		if (!parentConfig.leaf) {
+			for (var i = 0; i < parentConfig.children.length; i++) {
+				var child = parentConfig.children[i];
+				if (child.isCrossRef && child.crossed != true) {
+					var id = child.targets[0];
+					var crossRef = {};
+					this._findCrossRefTarget(id, crossRef, rootConfig);
+					Ext.apply(child, crossRef);
+					child.text = 'CR '+child.text;
+					child.crossed = true;
+//					child.children = [];  // stop max stack msg
+//					child.leaf = true;
+				} else {
+					this._resolveCrossRefs(rootConfig, child);
+				}
+			}
+		}
+	},
+	
+	_findCrossRefTarget: function(id, crossRef, parent) {
+		if (parent.indexId === id) {
+			Ext.apply(crossRef, parent);
+			return;
+		}
+		if (!parent.leaf) {
+			for (var i = 0; i < parent.children.length; i++) {
+				if (crossRef.indexId === undefined) {
+					this._findCrossRefTarget(id, crossRef, parent.children[i]);
+				} else {
+					return;
+				}
 			}
 		}
 	},

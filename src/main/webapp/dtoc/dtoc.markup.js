@@ -361,6 +361,9 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 				var idsToKeep = [];
 				for (var id in indexIds) {
 				    var hit;
+				    if (id.indexOf('ie') == 0) {
+				    	// cross reference
+				    }
 				    try {
 				    	if (Ext.isIE) {
 				            var result = document.evaluate('//*["'+id+'"=@*[local-name()="id"]]', docBody,
@@ -547,7 +550,7 @@ Ext.define('Voyant.panel.DToC.Markup', {
 	    menu.removeAll();
 	    
 	    var docs = this.getCorpus().getDocuments();
-		for (var i = 0, len = docs.getCount(); i < len; i++) {
+		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
     		var doc = docs.getAt(i);
     		menu.add({
 	            xtype: 'menucheckitem',

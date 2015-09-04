@@ -12,19 +12,50 @@
 			'resources': '../resources'
 		}
 	});
-
+	
 	Ext.application({
 		extend : 'Voyant.VoyantCorpusApp',
 		name: 'VoyantDTOCApp',
 		config: {
 			baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/',
 			version: '<%= application.getInitParameter("version") %>',
-			build: '<%= application.getInitParameter("build") %>'			
+			build: '<%= application.getInitParameter("build") %>'
 		},
 		
 		useIndex: true, // whether to check for and display the index
 		
 		launch: function() {
+			if (this.useIndex) {
+				// remove the index from the count
+				Voyant.data.model.Corpus.override({
+					getDocumentsCount: function() {
+						var count = this.callParent(arguments)-1;
+			        	return count;
+			        }
+			    });
+				
+				Voyant.data.store.Documents.override({
+					getDocument: function(config) {
+						if (this.getCorpus().getDocumentsCount()!=this.getTotalCount()-1) {
+				            var dfd = Voyant.application.getDeferred();
+				            var me = this;
+				            this.load({
+				                scope: this,
+				                callback: function(records, operation, success) {
+				                    if (success) {dfd.resolve(this.getDocument(config));}
+				                    else {
+				                        Voyant.application.showResponseError(this.localize('failedGetDocuments'), response);
+				                        dfd.reject(); // don't send error since we've already shown it
+				                    }
+				                }
+				            });
+				            return dfd.promise();
+				        }
+				        return Ext.isNumber(config) ? this.getAt(config) : this.getById(config);
+					}
+				});
+			}
+			
 			Ext.create('Ext.container.Viewport', {
 			    layout: 'border',
 			    cls: 'dtoc-body',
