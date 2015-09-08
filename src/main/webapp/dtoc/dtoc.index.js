@@ -51,7 +51,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 					width: '100%',
 					renderer: function(value, metadata) {
 						var r = metadata.record;
-						if (r.getData().targetMatches !== true) {
+						if (r.getData().targetMatches !== true && r.getData().isCrossRef !== true) {
 							metadata.tdCls += ' disabled';
 						}
 						if (r.getData().isCrossRef === true) {
@@ -67,7 +67,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 				listeners: {
 					beforeselect: function(sel, record) {
 						// cancel if there are no target matches
-						return record.getData().targetMatches === true;
+						return record.getData().targetMatches === true || record.getData().isCrossRef === true;
 					},
 					selectionchange: function(sm, nodes) {
 						var indexes = [];

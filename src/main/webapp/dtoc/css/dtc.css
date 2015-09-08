@@ -176,6 +176,15 @@ body {
 	max-width: 14px;
 }
 
+#dtcIndex .crossRef .x-tree-icon-leaf {
+    background-image: url("../images/crossref.png") !important;
+    width: 16px;
+}
+
+#dtcIndex .crossRef .x-tree-node-text {
+	width: 70% !important;
+}
+
 .dtc-tree .x-grid-item {
 	border-bottom: 1px solid #E7E7E7;
 }
