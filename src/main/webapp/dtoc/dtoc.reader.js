@@ -432,7 +432,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			var tip = new Ext.ux.DToCToolTip(Ext.apply({
 				target: noteNumber,
 				title: 'Note '+(i+1),
-				html: note.textContent,
+				html: note.innerHTML,
 				listeners: {
 				    beforeshow: this.hideAllNotes,
 				    scope: this
@@ -579,7 +579,16 @@ Ext.define('Voyant.panel.DToC.Reader', {
     			setTimeout(function() {
     				tip.show();
     				tip.showCloseButton();
-    			}, 500);
+    				var tokenid = tag.getAttribute('tokenid');
+    				var type = 'index';
+    				if (tag.hasCls('tag')) {
+    					type = 'tag';
+    				} else if (tag.hasCls('kwic')) {
+    					type = 'kwic';
+    				}
+    				var noteTag = tip.el.down('*[tokenid="'+tokenid+'"]');
+    				this._doHighlight(noteTag, type);
+    			}.bind(this), 500);
     		} else {
     			var color = '#F47922';
     			if (tag.hasCls('tag')) {
