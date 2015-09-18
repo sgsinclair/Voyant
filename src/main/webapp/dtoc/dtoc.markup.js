@@ -166,26 +166,18 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		}
 		
 		function getSurroundingText(tag) {
-			function getPrevOrNextTag(currTag, isParent, isPrev) {
-				if (currTag.nodeType <= 3) {
-					var node = isPrev ? currTag.previousSibling : currTag.nextSibling;
-					if (node == null) {
-						return getPrevOrNextTag(currTag.parentNode, true, isPrev);
-					} else if (isParent) {
-						return node.nodeType == 3 ? node : (isPrev ? node.lastChild : node.firstChild);
-					} else {
-						return node;
-					}
-				} else {
-					return null;
-				}
-			}
-			
 			function doGet(currTag, dir, currText) {
-				var node = getPrevOrNextTag(currTag, false, dir == 'prev');
+				var walker = currTag.ownerDocument.createTreeWalker(currTag.ownerDocument, NodeFilter.SHOW_TEXT, null, false);
+				walker.currentNode = currTag;
+				if (dir === 'prev') {
+					walker.previousNode();
+				} else {
+					walker.nextNode();
+				}
+				var node = walker.currentNode;
 				if (node != null) {
 					var text = node.textContent;
-					if (dir == 'prev') {
+					if (dir === 'prev') {
 						currText = text + currText;
 					} else {
 						currText += text;
@@ -198,9 +190,23 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			}
 			
 			var prevText = doGet(tag, 'prev', '');
-			prevText = prevText.replace(prevRe, "$2");
-			var nextText = doGet(tag, 'next', '');
-			nextText = nextText.replace(nextRe, "$1"); 
+			var match = prevText.match(prevRe);
+			if (match != null) {
+				prevText = match[2];
+			}
+			var walker = tag.ownerDocument.createTreeWalker(tag.ownerDocument, NodeFilter.SHOW_ALL, null, false);
+			walker.currentNode = tag;
+			walker.nextSibling();
+			tag = walker.currentNode;
+			var currText = '';
+			if (tag.nodeType === Node.TEXT_NODE) {
+				currText = tag.textContent;
+			}
+			var nextText = doGet(tag, 'next', currText);
+			match = nextText.match(nextRe);
+			if (match != null) {
+				nextText = match[1];
+			}
 			
 			return [prevText, nextText];
 		}
@@ -217,42 +223,47 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		
 		function produceTagData(tags, label) {
 			var data = {};
-			var tag, nodeName, dataObj, text, surrText;
+			var tag, nodeName, tokenId, dataObj, text, surrText;
 			for (var i = 0; i < tags.length; i++) {
 				tag = tags[i];
 				nodeName = tag.nodeName;
-				dataObj = {
-					docId: docId,
-					tagName: nodeName,
-					label: label || nodeName,
-					tokenId: tag.getAttribute('tokenid'),
-					subtype: tag.getAttribute('subtype'),
-					type: 't'
-				};
-				
-				text = getText(tag);
-				dataObj.text = text.content;
-				
-				if (text.shortened == false) {
-					surrText = getSurroundingText(tag);
-					dataObj.prevText = surrText[0];
-					dataObj.nextText = surrText[1];
+				tokenId = tag.getAttribute('tokenid');
+				if (tokenId == null) {
+					// empty tags lack tokenid attribute
 				} else {
-					dataObj.text += '&hellip;';
-				}
-				
-				// FIXME temp fix, title not allowed outside of head in html
-				// see similar fix in docTokensPlusStructure2html.xsl
-				if (nodeName == 'title') {
-					dataObj.tagName = 'xmlTitle';
-				} else if (nodeName == 'head') {
-                    dataObj.tagName = 'xmlHead';
-                }
-				
-				if (data[nodeName] == null) {
-					data[nodeName] = [dataObj];
-				} else {
-					data[nodeName].push(dataObj);
+					dataObj = {
+						docId: docId,
+						tagName: nodeName,
+						label: label || nodeName,
+						tokenId: tokenId,
+						subtype: tag.getAttribute('subtype'),
+						type: 't'
+					};
+					
+					text = getText(tag);
+					dataObj.text = text.content;
+					
+					if (text.shortened == false) {
+						surrText = getSurroundingText(tag);
+						dataObj.prevText = surrText[0];
+						dataObj.nextText = surrText[1];
+					} else {
+						dataObj.text += '&hellip;';
+					}
+					
+					// FIXME temp fix, title not allowed outside of head in html
+					// see similar fix in docTokensPlusStructure2html.xsl
+					if (nodeName == 'title') {
+						dataObj.tagName = 'xmlTitle';
+					} else if (nodeName == 'head') {
+	                    dataObj.tagName = 'xmlHead';
+	                }
+					
+					if (data[nodeName] == null) {
+						data[nodeName] = [dataObj];
+					} else {
+						data[nodeName].push(dataObj);
+					}
 				}
 			}
 
