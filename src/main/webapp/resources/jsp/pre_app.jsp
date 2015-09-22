@@ -26,3 +26,19 @@
 
 
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/css/styles.css" />
+
+
+<%
+	// check to see if there's CSS in the URL
+	if (request.getParameter("cssInline")!=null) { 
+		for (String cssInline : request.getParameterValues("cssInline")) { %>
+			<style type="text/css"><%= cssInline %></style>
+	<% } 
+	}
+	
+	// check to see for CSS URL
+	if (request.getParameter("cssUri")!=null) { 
+		for (String cssUri : request.getParameterValues("cssUri")) { %>
+		<link rel="stylesheet" href="<%= cssUri %>" type="text/css" charset="utf-8">
+	<% } 
+} %>
