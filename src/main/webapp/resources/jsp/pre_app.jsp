@@ -1,4 +1,8 @@
-<%@ page contentType="text/html;charset=UTF-8" %><% String base = request.getContextPath(); %><!DOCTYPE html>
+<%  // not sure it matters, but just in case, don't have any whitespace before doctype declaration (and possible redirects)
+	if (org.voyanttools.voyant.Voyant.preProcess(this.getServletConfig().getServletContext(), request, response)) {return;}
+%><%@ page contentType="text/html;charset=UTF-8" %><% 
+	String base = request.getContextPath();
+%><!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">

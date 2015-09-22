@@ -6,24 +6,20 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Calendar;
 
-import org.voyanttools.trombone.Controller;
-import org.voyanttools.trombone.results.Results;
-import org.voyanttools.trombone.util.FlexibleParameters;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.voyanttools.trombone.Controller;
+import org.voyanttools.trombone.util.FlexibleParameters;
 
 /**
  * @author Stéfan Sinclair
  */
-public class Voyeur {
+public class Voyant {
 	
 	/**
 	 * Pre-process the request. At the moment this will look if there's a referer,
@@ -97,8 +93,7 @@ public class Voyeur {
 			if (params.getParameterBooleanValue("forceUpdate") == true) {
 				referer = referer + String.valueOf(Calendar.getInstance().getTimeInMillis());
 			}
-			params.addParameter("archive", referer);
-			params.addParameter("corpus", referer.replaceAll("\\W+", "_"));
+			params.addParameter("input", referer);
 			final StringBuilder uri = new StringBuilder("./?"); // hoping this works
 			uri.append(params.getAsQueryString());
 			response.sendRedirect(uri.toString());
