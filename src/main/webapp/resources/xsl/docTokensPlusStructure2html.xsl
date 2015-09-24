@@ -69,6 +69,13 @@
             			<xsl:when test="$tags[1]/tagName='title'">
             				<xsl:text>xmlTitle</xsl:text>
             			</xsl:when>
+            			<!-- convert table elements -->
+            			<xsl:when test="$tags[1]/tagName='row'">
+                            <xsl:text>tr</xsl:text>
+                        </xsl:when>
+                        <xsl:when test="$tags[1]/tagName='cell'">
+                            <xsl:text>td</xsl:text>
+                        </xsl:when>
             			<xsl:otherwise>
             				<xsl:value-of select="$tags[1]/tagName"/>
             			</xsl:otherwise>
