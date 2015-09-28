@@ -21,7 +21,7 @@ Ext.define("Voyant.data.proxy.CorpusTerms", {
 })
 
 Ext.define('Voyant.data.store.CorpusTerms', {
-	extend: 'Ext.data.BufferedStore',
+	extend: 'Voyant.data.store.VoyantStore',
 	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.CorpusTerm',
     transferable: ['setCorpus'],

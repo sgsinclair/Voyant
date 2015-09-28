@@ -159,33 +159,25 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		var nextRe = new RegExp('(([^\\s]+\\s\\s*){'+Math.floor(this.TAG_SNIPPET_WORD_LENGTH/2)+'})(.*)');
 		
 		function getText(tag) {
-			var text = Ext.isIE ? tag.text : tag.textContent;
+			var text = tag.textContent;
 			text = text.replace(/\s+/g, ' '); // consolidate whitespace
 			var shortText = text.replace(shortRe, "$1");
 			return {content: shortText, shortened: shortText.length < text.length};
 		}
 		
 		function getSurroundingText(tag) {
-			function getPrevOrNextTag(currTag, isParent, isPrev) {
-				if (currTag.nodeType <= 3) {
-					var node = isPrev ? currTag.previousSibling : currTag.nextSibling;
-					if (node == null) {
-						return getPrevOrNextTag(currTag.parentNode, true, isPrev);
-					} else if (isParent) {
-						return node.nodeType == 3 ? node : (isPrev ? node.lastChild : node.firstChild);
-					} else {
-						return node;
-					}
-				} else {
-					return null;
-				}
-			}
-			
 			function doGet(currTag, dir, currText) {
-				var node = getPrevOrNextTag(currTag, false, dir == 'prev');
+				var walker = currTag.ownerDocument.createTreeWalker(currTag.ownerDocument, NodeFilter.SHOW_TEXT, null, false);
+				walker.currentNode = currTag;
+				if (dir === 'prev') {
+					walker.previousNode();
+				} else {
+					walker.nextNode();
+				}
+				var node = walker.currentNode;
 				if (node != null) {
-					var text = Ext.isIE ? node.text : node.textContent;
-					if (dir == 'prev') {
+					var text = node.textContent;
+					if (dir === 'prev') {
 						currText = text + currText;
 					} else {
 						currText += text;
@@ -198,9 +190,23 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			}
 			
 			var prevText = doGet(tag, 'prev', '');
-			prevText = prevText.replace(prevRe, "$2");
-			var nextText = doGet(tag, 'next', '');
-			nextText = nextText.replace(nextRe, "$1"); 
+			var match = prevText.match(prevRe);
+			if (match != null) {
+				prevText = match[2];
+			}
+			var walker = tag.ownerDocument.createTreeWalker(tag.ownerDocument, NodeFilter.SHOW_ALL, null, false);
+			walker.currentNode = tag;
+			walker.nextSibling();
+			tag = walker.currentNode;
+			var currText = '';
+			if (tag.nodeType === Node.TEXT_NODE) {
+				currText = tag.textContent;
+			}
+			var nextText = doGet(tag, 'next', currText);
+			match = nextText.match(nextRe);
+			if (match != null) {
+				nextText = match[1];
+			}
 			
 			return [prevText, nextText];
 		}
@@ -217,172 +223,205 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		
 		function produceTagData(tags, label) {
 			var data = {};
-			var tag, nodeName, dataObj, text, surrText;
+			var tag, nodeName, tokenId, dataObj, text, surrText;
 			for (var i = 0; i < tags.length; i++) {
 				tag = tags[i];
 				nodeName = tag.nodeName;
-				dataObj = {
-					docId: docId,
-					tagName: nodeName,
-					label: label || nodeName,
-					tokenId: tag.getAttribute('tokenid'),
-					subtype: tag.getAttribute('subtype'),
-					type: 't'
-				};
-				
-				text = getText(tag);
-				dataObj.text = text.content;
-				
-				if (text.shortened == false) {
-					surrText = getSurroundingText(tag);
-					dataObj.prevText = surrText[0];
-					dataObj.nextText = surrText[1];
+				tokenId = tag.getAttribute('tokenid');
+				if (tokenId == null) {
+					// empty tags lack tokenid attribute
 				} else {
-					dataObj.text += '&hellip;';
-				}
-				
-				// FIXME temp fix, title not allowed outside of head in html
-				// see similar fix in docTokensPlusStructure2html.xsl
-				if (nodeName == 'title') {
-					dataObj.tagName = 'xmlTitle';
-				} else if (nodeName == 'head') {
-                    dataObj.tagName = 'xmlHead';
-                }
-				
-				if (data[nodeName] == null) {
-					data[nodeName] = [dataObj];
-				} else {
-					data[nodeName].push(dataObj);
+					dataObj = {
+						docId: docId,
+						tagName: nodeName,
+						label: label || nodeName,
+						tokenId: tokenId,
+						subtype: tag.getAttribute('subtype'),
+						type: 't'
+					};
+					
+					text = getText(tag);
+					dataObj.text = text.content;
+					
+					if (text.shortened == false) {
+						surrText = getSurroundingText(tag);
+						dataObj.prevText = surrText[0];
+						dataObj.nextText = surrText[1];
+					} else {
+						dataObj.text += '&hellip;';
+					}
+					
+					// FIXME temp fix, title not allowed outside of head in html
+					// see similar fix in docTokensPlusStructure2html.xsl
+					if (nodeName == 'title') {
+						dataObj.tagName = 'xmlTitle';
+					} else if (nodeName == 'head') {
+	                    dataObj.tagName = 'xmlHead';
+	                }
+					
+					if (data[nodeName] == null) {
+						data[nodeName] = [dataObj];
+					} else {
+						data[nodeName].push(dataObj);
+					}
 				}
 			}
 
 			return data;
 		}
 		
-		var returnData = {};
-		if (customTagSet == null) {
-			// no curation so parse all tags
-			var tags = Ext.DomQuery.jsSelect('*', docBody);
-			returnData = produceTagData(tags);
-		} else {
-			// find hits for curated tags only
-			for (var tag in customTagSet) {
-				var cTag = customTagSet[tag];
-				if (cTag.type == 'x') {
-					var data = {};
-					var xpath = cTag.tagName;
-					var results = getXPathResults(xpath);
-					if (results.length > 0) {
-						data[xpath] = [];
-						var el, dataObj, text, surrText;
-						for (var i = 0; i < results.length; i++) {
-							var el = results[i];
-							dataObj = {
-								docId: docId,
-								tagName: xpath,
-								label: cTag.label,
-								tokenId: el.getAttribute('tokenid'),
-								subtype: el.getAttribute('subtype'),
-								type: 'x'
-							};
-							
-							text = getText(el);
-							dataObj.text = text.content;
-							
-							if (text.shortened == false) {
-								surrText = getSurroundingText(el);
-								dataObj.prevText = surrText[0];
-								dataObj.nextText = surrText[1];
-							} else {
-								dataObj.text += '&hellip;';
-							}
-							data[xpath].push(dataObj);
-						}
-					}
-					Ext.apply(returnData, data);
-				} else {
-					var results = Ext.DomQuery.jsSelect(cTag.tagName, docBody);
-					Ext.apply(returnData, produceTagData(results, cTag.label));
-				}
-			}
-		}
+		if (docBody != null) {
 		
-		// process header
-		var head = docBody.querySelectorAll('xmlHead').item(0);
-		if (head) {
-		    // special handling for TEI docs
-			var authors = head.querySelectorAll('author');
-			if (authors.length > 0) {
-    			var authorsArray = [];
-    			for (var i = 0; i < authors.length; i++) {
-    				var author = authors.item(i);
-    				var authorObj = {};
-    				var updateAuthor = false;
-    				
-    				var forename = author.getElementsByTagName('forename').item(0);
-    				var surname = author.getElementsByTagName('surname').item(0);
-    				if (forename !== null) {
-    				    authorObj.forename = Ext.isIE ? forename.text : forename.textContent;
-    				    updateAuthor = true;
-    				}
-    				if (surname !== null) {
-    				    authorObj.surname = Ext.isIE ? surname.text : surname.textContent;
-    				    updateAuthor = true;
-    				}
-    				
-    				if (updateAuthor) {
-    				    authorsArray.push(authorObj);
-    				}
-    			}
-    			if (authorsArray.length > 0) {
-    			    this.getCorpus().getDocument(docId).record.set('author', authorsArray);
-    			}
+			var returnData = {};
+			if (customTagSet == null) {
+				// no curation so parse all tags
+				var tags = Ext.DomQuery.jsSelect('*', docBody);
+				returnData = produceTagData(tags);
+			} else {
+				// find hits for curated tags only
+				for (var tag in customTagSet) {
+					var cTag = customTagSet[tag];
+					if (cTag.type == 'x') {
+						var data = {};
+						var xpath = cTag.tagName;
+						var results = getXPathResults(xpath);
+						if (results.length > 0) {
+							data[xpath] = [];
+							var el, dataObj, text, surrText;
+							for (var i = 0; i < results.length; i++) {
+								var el = results[i];
+								dataObj = {
+									docId: docId,
+									tagName: xpath,
+									label: cTag.label,
+									tokenId: el.getAttribute('tokenid'),
+									subtype: el.getAttribute('subtype'),
+									type: 'x'
+								};
+								
+								text = getText(el);
+								dataObj.text = text.content;
+								
+								if (text.shortened == false) {
+									surrText = getSurroundingText(el);
+									dataObj.prevText = surrText[0];
+									dataObj.nextText = surrText[1];
+								} else {
+									dataObj.text += '&hellip;';
+								}
+								data[xpath].push(dataObj);
+							}
+						}
+						Ext.apply(returnData, data);
+					} else {
+						var results = Ext.DomQuery.jsSelect(cTag.tagName, docBody);
+						Ext.apply(returnData, produceTagData(results, cTag.label));
+					}
+				}
 			}
 			
-			var reader = Ext.getCmp('dtcReader');
-			if (reader.currentDocId == docId) {
-				reader.setReaderTitle();
-			}
-		}
-		
-		if (this.getApplication().useIndex) {
-			// find index items
-			var dtcIndex = Ext.getCmp('dtcIndex');
-			var indexIds = dtcIndex.indexIds;
-			var idsToKeep = [];
-			for (var id in indexIds) {
-			    var hit;
-			    try {
-			        hit = docBody.querySelectorAll('*[*|id='+id+']').item(0);
-			    } catch (e) {
-			        if (window.console) {
-			            console.log('bad ID', id);
-			        }
-			    }
-				if (hit) {
-					idsToKeep.push(id);
-					indexIds[id] = {
-						tokenId: hit.getAttribute('tokenid'),
-						tag: hit.nodeName,
-						docId: docId
-					};
-					
-					var text = getText(hit);
-					indexIds[id].text = text.content;
-					
-					if (text.shortened == false) {
-						surrText = getSurroundingText(hit);
-						indexIds[id].prevText = surrText[0];
-						indexIds[id].nextText = surrText[1];
-					} else {
-						indexIds[id].text += '&hellip;';
-					}
+			// process header
+			var head = docBody.querySelectorAll('xmlHead').item(0);
+			if (head) {
+			    // special handling for TEI docs
+				var authors = head.querySelectorAll('author');
+				if (authors.length > 0) {
+	    			var authorsArray = [];
+	    			for (var i = 0; i < authors.length; i++) {
+	    				var author = authors.item(i);
+	    				var authorObj = {};
+	    				var updateAuthor = false;
+	    				
+	    				var forename = author.getElementsByTagName('forename').item(0);
+	    				var surname = author.getElementsByTagName('surname').item(0);
+	    				if (forename !== null) {
+	    				    authorObj.forename = forename.textContent;
+	    				    updateAuthor = true;
+	    				}
+	    				if (surname !== null) {
+	    				    authorObj.surname = surname.textContent;
+	    				    updateAuthor = true;
+	    				}
+	    				
+	    				if (updateAuthor) {
+	    				    authorsArray.push(authorObj);
+	    				}
+	    			}
+	    			if (authorsArray.length > 0) {
+	    			    this.getCorpus().getDocument(docId).record.set('author', authorsArray);
+	    			}
+				}
+				
+				var reader = Ext.getCmp('dtcReader');
+				if (reader.currentDocId == docId) {
+					reader.setReaderTitle();
 				}
 			}
-			dtcIndex.filterIndex(idsToKeep);
+			
+			if (this.getApplication().useIndex) {
+				var dtcIndex = Ext.getCmp('dtcIndex');
+			    
+			    var totalDocs = this.getCorpus().getDocumentsCount();
+			    var docIndex = this.getCorpus().getDocument(docId).getIndex();
+			    var progress = docIndex / totalDocs;
+			    dtcIndex.updateIndexProgress(progress);
+				
+				// find index items
+				var dtcIndex = Ext.getCmp('dtcIndex');
+				var indexIds = dtcIndex.indexIds;
+				var idsToKeep = [];
+				for (var id in indexIds) {
+				    var hit;
+				    if (id.indexOf('ie') == 0) {
+				    	// cross reference
+				    }
+				    try {
+				    	if (Ext.isIE) {
+				            var result = document.evaluate('//*["'+id+'"=@*[local-name()="id"]]', docBody,
+			                    function(prefix){
+			                        return {
+			                            xml: "http://www.w3.org/XML/1998/namespace"
+			                        }[prefix] || null;
+			                    },
+			                    XPathResult.FIRST_ORDERED_NODE_TYPE
+			                );
+				            hit = result.singleNodeValue;
+				        } else {
+				            hit = docBody.querySelectorAll('*[*|id="'+id+'"]').item(0);
+				        }
+				    } catch (e) {
+				        if (window.console) {
+				            console.log('bad ID', id);
+				        }
+				    }
+					if (hit) {
+						idsToKeep.push(id);
+						indexIds[id] = {
+							tokenId: hit.getAttribute('tokenid'),
+							tag: hit.nodeName,
+							docId: docId
+						};
+						
+						var text = getText(hit);
+						indexIds[id].text = text.content;
+						
+						if (text.shortened == false) {
+							surrText = getSurroundingText(hit);
+							indexIds[id].prevText = surrText[0];
+							indexIds[id].nextText = surrText[1];
+						} else {
+							indexIds[id].text += '&hellip;';
+						}
+					}
+				}
+				dtcIndex.filterIndex(idsToKeep);
+			}
+			
+			return returnData;
+		} else {
+			console.log('parse error');
+			return {};
 		}
-		
-		return returnData;
 	}
 });
 
@@ -522,7 +561,7 @@ Ext.define('Voyant.panel.DToC.Markup', {
 	    menu.removeAll();
 	    
 	    var docs = this.getCorpus().getDocuments();
-		for (var i = 0, len = docs.getCount(); i < len; i++) {
+		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
     		var doc = docs.getAt(i);
     		menu.add({
 	            xtype: 'menucheckitem',
@@ -590,7 +629,8 @@ Ext.define('Voyant.panel.DToC.Markup', {
 //			this.getTokensStore().load();
 			
 			this.updateChapterFilter();
-			
+		},
+		indexProcessed: function() {
 			this.loadAllTags();
 		}
 	}

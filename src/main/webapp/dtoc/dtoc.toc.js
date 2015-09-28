@@ -98,7 +98,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			    	xtype: 'textfield',
 			    	width: 135,
 			    	itemId: 'search',
-			    	emptyText: 'Search',
+			    	emptyText: 'Word Search',
 			    	enableKeyEvents: true,
 			    	listeners: {
 			    		keydown: function(field, event) {
@@ -295,15 +295,26 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		var root = this.getRootNode();
 		
 		var docs = this.getCorpus().getDocuments();
-		for (var i = 0, len = docs.getCount(); i < len; i++) {
+		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
     		var doc = docs.getAt(i);
-    		var docNode, title;
-			if (this.titlesMode == this.MIN_TITLES) {
-				title = doc.getShortTitle().normalize();
-				title = title.slice(0, title.length-1);
-			} else {
-				title = doc.getTitle().normalize();
-			}
+    		var docNode, title, author;
+    		if (i === 0) {
+    			title = 'Front Matter';
+    		} else {
+				if (this.titlesMode == this.MIN_TITLES) {
+					title = doc.getShortTitle().normalize();
+					title = title.slice(0, title.length-1);
+				} else {
+					title = doc.getTitle().normalize();
+				}
+				if (!this.isCurator) {
+					author = doc.get('author');
+					if (author === undefined) {
+						author = '';
+					}
+				    title += '<br/><span class="author">'+author+'</span>';
+				}
+    		}
 			if (modifyCurrent) {
 				docNode = root.findChild('docId', doc.getId());
 				if (docNode) {
@@ -725,6 +736,8 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			node.removeAll();
 			node.collapse();
 		});
+		
+		this.getDockedItems('toolbar #search')[0].setValue('');
 	},
 	
 	removeNodes: function(type, idsToKeep) {

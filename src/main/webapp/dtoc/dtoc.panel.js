@@ -30,6 +30,10 @@ Ext.define('Voyant.panel.DToC', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
+    	if (Ext.isIE) {
+	        wgxpath.install(); // document.evaluate / xpath support
+	    }
+    	
     	if (this.showFreqInReader) {
 			Ext.QuickTips.enable();
 		} else {
@@ -105,6 +109,10 @@ Ext.define('Voyant.panel.DToC', {
         			align: 'stretch'
         		},
         		items: [{
+        			title: 'Index & Tags',
+        			header: {
+        				hidden: true
+        			},
         			id: 'dtcTools',
         			width: 300,
         			minWidth: 24, // needed for hboxfitsplit layout
@@ -116,8 +124,19 @@ Ext.define('Voyant.panel.DToC', {
         			baseCls: 'x-plain dtc-panel',
         			deferredRender: false,
         			activeTab: 0,
-        			items: dtcToolsConfig
-        		},{xtype: 'splitter', width: 10},{
+        			items: dtcToolsConfig,
+        			animCollapse: false,
+        			collapseDirection: 'left'
+        		},{
+        			xtype: 'splitter',
+        			width: 10,
+        			listeners: {
+        				afterrender: function(splitter) {
+        					splitter.getEl().on('click', this.onSplitterClick.bind(this, splitter));
+        				},
+        				scope: this
+        			}
+        		},{
         			title: 'Table of Contents',
         			id: 'dtcToc',
         			xtype: 'dtocToc',
@@ -125,8 +144,19 @@ Ext.define('Voyant.panel.DToC', {
 //                        showCollapseTool: false
 //                    }),
         			width: 250,
-        			minWidth: 24 // needed for hboxfitsplit layout
-        		},{xtype: 'splitter', width: 10},{
+        			minWidth: 24, // needed for hboxfitsplit layout
+        			animCollapse: false,
+        			collapseDirection: 'left'
+        		},{
+        			xtype: 'splitter',
+        			width: 10,
+        			listeners: {
+        				afterrender: function(splitter) {
+        					splitter.getEl().on('click', this.onSplitterClick.bind(this, splitter));
+        				},
+        				scope: this
+        			}
+        		},{
         			flex: 1,
         			minWidth: 350,
         			layout: 'hbox',
@@ -625,6 +655,11 @@ Ext.define('Voyant.panel.DToC', {
 	  });
 	},
     
+	onSplitterClick: function(splitter, event, el) {
+		var panel = splitter.prev();
+		panel.toggleCollapse();
+	},
+	
 	listeners: {
 		afterrender: function(container) {
 				

@@ -175,7 +175,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 				
 				var corpus = this.getCorpus();
 				var docs = corpus.getDocuments();
-				for (var i = 0, len = docs.getCount(); i < len; i++) {
+				for (var i = 0, len = corpus.getDocumentsCount(); i < len; i++) {
 		    		var doc = docs.getAt(i);
 					this.model.add(doc.getId(), {
 						index: {},
@@ -312,13 +312,13 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 		var docs = this.getCorpus().getDocuments();
 		
 		var totalTokens = 0;
-		for (var i = 0, len = docs.getCount(); i < len; i++) {
+		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
     		var doc = docs.getAt(i);
 			totalTokens += doc.get('tokensCount-lexical');
 		};
 		
 		var containerHeight = this.segmentContainer.getHeight();
-		var separationHeight = (docs.getCount() - 1) * this.LINE_HEIGHT;
+		var separationHeight = (this.getCorpus().getDocumentsCount() - 1) * this.LINE_HEIGHT;
 		containerHeight -= separationHeight;
 		var availableLines = parseInt(containerHeight / this.LINE_HEIGHT);
 		if (this.LINE_HEIGHT * availableLines > containerHeight) {
@@ -335,7 +335,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 		var label;
 		this.documents = new Ext.util.MixedCollection();
 		
-		for (var i = 0, len = docs.getCount(); i < len; i++) {
+		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
     		var doc = docs.getAt(i);
 			label = doc.getShortTitle();
 			docIndex = doc.getIndex();

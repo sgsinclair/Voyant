@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Aug 14 16:31:37 EDT 2015 */
+/* This file created by JSCacher. Last modified: Fri Aug 21 16:42:48 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3246,7 +3246,7 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 });
 
 Ext.define('Voyant.data.store.Contexts', {
-	extend: 'Ext.data.BufferedStore',
+	extend: 'Voyant.data.store.VoyantStore',
 	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.Context',
 //    transferable: ['setCorpus'],
@@ -3368,7 +3368,7 @@ Ext.define("Voyant.data.proxy.CorpusTerms", {
 })
 
 Ext.define('Voyant.data.store.CorpusTerms', {
-	extend: 'Ext.data.BufferedStore',
+	extend: 'Voyant.data.store.VoyantStore',
 	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.CorpusTerm',
     transferable: ['setCorpus'],
@@ -3474,7 +3474,7 @@ Ext.define('Voyant.data.store.DocumentQueryMatches', {
 });
 
 Ext.define('Voyant.data.store.DocumentTerms', {
-	extend: 'Ext.data.BufferedStore',
+	extend: 'Voyant.data.store.VoyantStore',
 	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.DocumentTerm',
     transferable: ['setCorpus'],
@@ -5541,6 +5541,8 @@ Ext.define('Voyant.panel.Contexts', {
     		leftTip: {en: "Context to the left of the keyword."},
     		right: {en: "Right"},
     		rightTip: {en: "Context to the right of the keyword."},
+    		position: {en: "Position"},
+    		positionTip: {en: "The position of the keyword within the document."},
     		context: {en: "context"},
     		expand: {en: "expand"},
     		corpus: {en: "corpus"},
@@ -5568,6 +5570,7 @@ Ext.define('Voyant.panel.Contexts', {
     		title: this.localize('title'),
     		emptyText: this.localize("emptyText"),
             store : Ext.create("Voyant.data.store.Contexts", {
+            	parentPanel: this,
             	stripTags: "all",
             	remoteSort: false,
             	sortOnLoad: true,
@@ -5622,7 +5625,7 @@ Ext.define('Voyant.panel.Contexts', {
                 	width: 50,
                 	listeners: {
                 		render: function(slider) {
-                			slider.setValue(me.getApiParam('expand'))
+                			slider.setValue(me.getApiParam('expand'));
                 		},
                 		changecomplete: function(slider, newValue) {
                 			me.setApiParam('expand', newValue);
@@ -5633,8 +5636,8 @@ Ext.define('Voyant.panel.Contexts', {
                 				if (recordsExpanded[id]) {
                 					var record = store.getByInternalId(id);
                 					var row = view.getRow(record);
-                					var expandRow = row.parentNode.childNodes[1]
-                					view.fireEvent("expandbody", row, record, expandRow, {force: true})
+                					var expandRow = row.parentNode.childNodes[1];
+                					view.fireEvent("expandbody", row, record, expandRow, {force: true});
                 				}
                 			}
                 		}
@@ -5644,14 +5647,14 @@ Ext.define('Voyant.panel.Contexts', {
                 	tooltip: this.localize("corpusTip"),
                 	itemId: 'corpus',
                 	handler: function(btn) {
-                		btn.hide()
+                		btn.hide();
                 		this.setApiParams({docIndex: undefined, docId: undefined});
-                		this.getStore().load({params: this.getApiParams()})
+                		this.getStore().load({params: this.getApiParams()});
                 	},
                 	hidden: true,
                 	scope: this
                 }]
-            }], 
+            }],
     		columns: [{
     			text: this.localize("document"),
     			toolTip: this.localize("documentTip"),
@@ -5679,6 +5682,13 @@ Ext.define('Voyant.panel.Contexts', {
     			tooltip: this.localize("rightTip"),
         		dataIndex: 'right',
                 sortable: true,
+                flex: 1
+            },{
+    			text: this.localize("position"),
+    			tooltip: this.localize("positionTip"),
+        		dataIndex: 'position',
+                sortable: true,
+                hidden: true,
                 flex: 1
             }],
             listeners: {
@@ -6742,22 +6752,14 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
-    		store.getProxy().setExtraParam('corpus', corpus.getId())
-    		this.fireEvent("apiChange", this);
+    		store.getProxy().setExtraParam('corpus', corpus.getId());
+    		store.loadPage(1);
     	});
     	
     	this.on("query", function(src, query) {
     		this.setApiParam('query', query);
-    		this.fireEvent("apiChange", this);
-    		this.store.loadPage(1)
+    		this.getStore().loadPage(1);
     	}, this);
-    	
-    	this.on("apiChange", function() {
-    		var api = this.getApiParams(['stopList','query']);
-        	var proxy = this.getStore().getProxy();
-        	for (var key in api) {proxy.setExtraParam(key, api[key]);}
-        	this.getStore().loadPage(1);
-    	}, this)
     	
     	if (config.embedded) {
     		var cls = Ext.getClass(config.embedded).getName();
@@ -6777,7 +6779,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusTerms");
+        var store = Ext.create("Voyant.data.store.CorpusTerms", {parentPanel: this});
         store.getProxy().setExtraParam("withDistributions", "relative");
         
         Ext.apply(me, {
@@ -6890,7 +6892,10 @@ Ext.define('Voyant.panel.DocumentTerms', {
 	requires: ['Voyant.data.store.DocumentTerms'],
 	alias: 'widget.documentterms',
 	config: {
-		corpus: undefined
+		corpus: undefined,
+		options: {
+    		xtype: 'stoplistoption'
+    	}
 	},
     statics: {
     	i18n: {
@@ -6925,18 +6930,20 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	});
     	
     	if (config.embedded) {
-    		console.warn(config.embedded.then)
+    		if (window.console) {
+    			console.warn(config.embedded.then);
+    		}
     		var cls = Ext.getClass(config.embedded).getName();
     		if (cls=="Voyant.data.store.DocumentTerms" || cls=="Voyant.data.model.Document") {
-    			this.fireEvent('loadedCorpus', this, config.embedded.getCorpus())
+    			this.fireEvent('loadedCorpus', this, config.embedded.getCorpus());
     		}
     	}
     	else if (config.corpus) {
-    		this.fireEvent('loadedCorpus', this, config.corpus)
+    		this.fireEvent('loadedCorpus', this, config.corpus);
     	}
     	
     	this.on("query", function(src, query) {
-    		this.fireEvent("corpusTermsClicked", src, [query])
+    		this.fireEvent("corpusTermsClicked", src, [query]);
     	}, this);
     	
     	this.on("corpusTermsClicked", function(src, terms) {
@@ -6944,7 +6951,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
         		var query = [];
         		terms.forEach(function(term) {
         			query.push(Ext.isString(term) ? term : term.get("term"));
-        		})
+        		});
         		this.setApiParams({
         			query: query,
         			docId: undefined,
@@ -6969,14 +6976,16 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	});
     	
     	this.on("activate", function() { // load after tab activate (if we're in a tab panel)
-    		if (this.getStore().getCorpus()) {this.getStore().loadPage(1, {params: this.getApiParams()})}
+    		if (this.getStore().getCorpus()) {
+    			this.getStore().loadPage(1, {params: this.getApiParams()});
+    		}
     	}, this);
     },
     
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.DocumentTerms");
+        var store = Ext.create("Voyant.data.store.DocumentTerms", {parentPanel: this});
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -7080,7 +7089,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
         
     }
     
-})
+});
 
 Ext.define('Voyant.panel.Documents', {
 	extend: 'Ext.grid.Panel',
@@ -7898,76 +7907,10 @@ Ext.define('Voyant.panel.Reader', {
     			var downwardsScroll = this.getLastScrollTop() < target.scrollTop;
     			// scroll up
     			if (!downwardsScroll && target.scrollTop < 1) {
-    				var first = readerContainer.first('.word');
-    				if (first !== null) {
-    					var info = Voyant.data.model.Token.getInfoFromElement(first);
-    					var docIndex = parseInt(info.docIndex);
-    					var start = parseInt(info.position);
-						var doc = this.getDocumentsStore().getAt(docIndex);    						
-						var limit = this.getApiParam('limit');
-						if (docIndex > 0 && start === 0) {
-							docIndex--;
-							doc = this.getDocumentsStore().getAt(docIndex);
-							var totalTokens = doc.get('tokensCount-lexical');
-							start = totalTokens-limit;
-							if (start < 0) {
-								start = 0;
-								this.setApiParam('limit', totalTokens);
-							}
-						} else {
-							start -= limit;
-						}
-						if (start < 0) start = 0;
-						
-    					var id = doc.getId();
-    					this.setApiParams({'skipToDocId': id, start: start});
-    					this.setScrollDownwards(downwardsScroll);
-						this.load();
-						this.setApiParam('limit', this.INITIAL_LIMIT);
-    				}
+    				this.fetchPrevious();
     			// scroll down
     			} else if (downwardsScroll && target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
-    				var last = readerContainer.last();
-    				// store any text that occurs after last word
-    				var lastText = $(readerContainer.dom).contents().filter(function() {
-    					return this.nodeType === 3;
-    				}).last();
-    				if (last.hasCls("loading")===false) {
-    					while(last) {
-    						if (last.hasCls("word")) {
-    	    					var info = Voyant.data.model.Token.getInfoFromElement(last);
-    	    					var docIndex = parseInt(info.docIndex);
-    	    					var start = parseInt(info.position);
-    	    					var doc = this.getDocumentsStore().getAt(info.docIndex);
-    	    					var id = doc.getId();
-    	    					
-    	    					var totalTokens = doc.get('tokensCount-lexical');
-    	    					if (start + this.getApiParam('limit') >= totalTokens && docIndex == this.getCorpus().getDocumentsCount()-1) {
-    	    						var limit = totalTokens - start;
-    	    						if (limit <= 1) {
-    	    							break;
-    	    						} else {
-    	    							this.setApiParam('limit', limit);
-    	    						}
-    	    					}
-    	    					
-    	    					// remove any text after the last word
-    	    					if (last.el.dom.nextSibling === lastText[0]) {
-    	    						lastText.remove();
-    	    					}
-    	    					
-    	    					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
-    	    					last.destroy();
-    	    					this.setApiParams({'skipToDocId': id, start: info.position});
-    	    					this.setScrollDownwards(downwardsScroll);
-    							this.load();
-    							this.setApiParam('limit', this.INITIAL_LIMIT);
-    							break;
-    						}
-    						last.destroy(); // remove non word
-    						last = readerContainer.last();
-    					}
-    				}
+    				this.fetchNext();
     			}
     			this.setLastScrollTop(target.scrollTop);
     		}, this);
@@ -7995,6 +7938,18 @@ Ext.define('Voyant.panel.Reader', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
+                	glyph: 'xf060@FontAwesome',
+            		handler: function() {
+            			this.fetchPrevious();
+            		},
+            		scope: this
+            	},{
+            		glyph: 'xf061@FontAwesome',
+            		handler: function() {
+            			this.fetchNext();
+            		},
+            		scope: this
+            	},{xtype: 'tbseparator'},{
                     xtype: 'querysearchfield'
                 }]
     		}],
@@ -8229,6 +8184,100 @@ Ext.define('Voyant.panel.Reader', {
 //		}
 	},
     
+	fetchPrevious: function() {
+		var readerContainer = this.innerContainer.first();
+		var first = readerContainer.first('.word');
+		if (first != null && first.hasCls("loading")===false) {
+			while(first) {
+				if (first.hasCls("word")) {
+					var info = Voyant.data.model.Token.getInfoFromElement(first);
+					var docIndex = parseInt(info.docIndex);
+					var start = parseInt(info.position);
+					var doc = this.getDocumentsStore().getAt(docIndex);    						
+					var limit = this.getApiParam('limit');
+					var getPrevDoc = false;
+					if (docIndex === 0 && start === 0) {
+						break;
+					}
+					if (docIndex > 0 && start === 0) {
+						getPrevDoc = true;
+						docIndex--;
+						doc = this.getDocumentsStore().getAt(docIndex);
+						var totalTokens = doc.get('tokensCount-lexical');
+						start = totalTokens-limit;
+						if (start < 0) {
+							start = 0;
+							this.setApiParam('limit', totalTokens);
+						}
+					} else {
+						limit--; // subtract one to limit for the word we're removing. need to do this to account for non-lexical tokens before/after first word.
+						start -= limit;
+					}
+					if (start < 0) start = 0;
+					
+					var mask = first.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'before', false).mask();
+					if (!getPrevDoc) {
+						first.destroy();
+					}
+					
+					var id = doc.getId();
+					this.setApiParams({'skipToDocId': id, start: start});
+					this.setScrollDownwards(false);
+					this.load();
+					this.setApiParam('limit', this.INITIAL_LIMIT);
+					break;
+				}
+				first.destroy(); // remove non word
+				first = readerContainer.first();
+			}
+		}
+	},
+	
+	fetchNext: function() {
+		var readerContainer = this.innerContainer.first();
+		var last = readerContainer.last();
+		if (last.hasCls("loading")===false) {
+			// store any text that occurs after last word
+			var lastText = $(readerContainer.dom).contents().filter(function() {
+				return this.nodeType === 3;
+			}).last();
+			while(last) {
+				if (last.hasCls("word")) {
+					var info = Voyant.data.model.Token.getInfoFromElement(last);
+					var docIndex = parseInt(info.docIndex);
+					var start = parseInt(info.position);
+					var doc = this.getDocumentsStore().getAt(info.docIndex);
+					var id = doc.getId();
+					
+					var totalTokens = doc.get('tokensCount-lexical');
+					if (start + this.getApiParam('limit') >= totalTokens && docIndex == this.getCorpus().getDocumentsCount()-1) {
+						var limit = totalTokens - start;
+						if (limit <= 1) {
+							break;
+						} else {
+							this.setApiParam('limit', limit);
+						}
+					}
+					
+					// remove any text after the last word
+					if (last.el.dom.nextSibling === lastText[0]) {
+						lastText.remove();
+					}
+					
+					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
+					last.destroy();
+					this.setApiParams({'skipToDocId': id, start: info.position});
+					this.setScrollDownwards(true);
+					this.load();
+					this.setApiParam('limit', this.INITIAL_LIMIT);
+					break;
+				}
+				last.destroy(); // remove non word
+				last = readerContainer.last();
+			}
+		}
+	},
+	
     load: function(doClear, config) {
     	if (doClear) {
     		this.innerContainer.first().destroy(); // clear everything
@@ -8243,8 +8292,8 @@ Ext.define('Voyant.panel.Reader', {
     },
     
     updateText: function(contents) {
-    	var last = this.innerContainer.first().last();
-    	if (last && last.isMasked()) {last.destroy();}
+    	var loadingMask = this.innerContainer.down('.loading');
+    	if (loadingMask) loadingMask.destroy();
     	var where = this.getScrollDownwards() ? 'beforeEnd' : 'afterBegin';
     	this.innerContainer.first().insertHtml(where, contents);
     },

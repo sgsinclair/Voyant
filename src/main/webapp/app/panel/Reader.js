@@ -180,76 +180,10 @@ Ext.define('Voyant.panel.Reader', {
     			var downwardsScroll = this.getLastScrollTop() < target.scrollTop;
     			// scroll up
     			if (!downwardsScroll && target.scrollTop < 1) {
-    				var first = readerContainer.first('.word');
-    				if (first !== null) {
-    					var info = Voyant.data.model.Token.getInfoFromElement(first);
-    					var docIndex = parseInt(info.docIndex);
-    					var start = parseInt(info.position);
-						var doc = this.getDocumentsStore().getAt(docIndex);    						
-						var limit = this.getApiParam('limit');
-						if (docIndex > 0 && start === 0) {
-							docIndex--;
-							doc = this.getDocumentsStore().getAt(docIndex);
-							var totalTokens = doc.get('tokensCount-lexical');
-							start = totalTokens-limit;
-							if (start < 0) {
-								start = 0;
-								this.setApiParam('limit', totalTokens);
-							}
-						} else {
-							start -= limit;
-						}
-						if (start < 0) start = 0;
-						
-    					var id = doc.getId();
-    					this.setApiParams({'skipToDocId': id, start: start});
-    					this.setScrollDownwards(downwardsScroll);
-						this.load();
-						this.setApiParam('limit', this.INITIAL_LIMIT);
-    				}
+    				this.fetchPrevious();
     			// scroll down
     			} else if (downwardsScroll && target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
-    				var last = readerContainer.last();
-    				// store any text that occurs after last word
-    				var lastText = $(readerContainer.dom).contents().filter(function() {
-    					return this.nodeType === 3;
-    				}).last();
-    				if (last.hasCls("loading")===false) {
-    					while(last) {
-    						if (last.hasCls("word")) {
-    	    					var info = Voyant.data.model.Token.getInfoFromElement(last);
-    	    					var docIndex = parseInt(info.docIndex);
-    	    					var start = parseInt(info.position);
-    	    					var doc = this.getDocumentsStore().getAt(info.docIndex);
-    	    					var id = doc.getId();
-    	    					
-    	    					var totalTokens = doc.get('tokensCount-lexical');
-    	    					if (start + this.getApiParam('limit') >= totalTokens && docIndex == this.getCorpus().getDocumentsCount()-1) {
-    	    						var limit = totalTokens - start;
-    	    						if (limit <= 1) {
-    	    							break;
-    	    						} else {
-    	    							this.setApiParam('limit', limit);
-    	    						}
-    	    					}
-    	    					
-    	    					// remove any text after the last word
-    	    					if (last.el.dom.nextSibling === lastText[0]) {
-    	    						lastText.remove();
-    	    					}
-    	    					
-    	    					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
-    	    					last.destroy();
-    	    					this.setApiParams({'skipToDocId': id, start: info.position});
-    	    					this.setScrollDownwards(downwardsScroll);
-    							this.load();
-    							this.setApiParam('limit', this.INITIAL_LIMIT);
-    							break;
-    						}
-    						last.destroy(); // remove non word
-    						last = readerContainer.last();
-    					}
-    				}
+    				this.fetchNext();
     			}
     			this.setLastScrollTop(target.scrollTop);
     		}, this);
@@ -277,6 +211,18 @@ Ext.define('Voyant.panel.Reader', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 items: [{
+                	glyph: 'xf060@FontAwesome',
+            		handler: function() {
+            			this.fetchPrevious();
+            		},
+            		scope: this
+            	},{
+            		glyph: 'xf061@FontAwesome',
+            		handler: function() {
+            			this.fetchNext();
+            		},
+            		scope: this
+            	},{xtype: 'tbseparator'},{
                     xtype: 'querysearchfield'
                 }]
     		}],
@@ -511,6 +457,100 @@ Ext.define('Voyant.panel.Reader', {
 //		}
 	},
     
+	fetchPrevious: function() {
+		var readerContainer = this.innerContainer.first();
+		var first = readerContainer.first('.word');
+		if (first != null && first.hasCls("loading")===false) {
+			while(first) {
+				if (first.hasCls("word")) {
+					var info = Voyant.data.model.Token.getInfoFromElement(first);
+					var docIndex = parseInt(info.docIndex);
+					var start = parseInt(info.position);
+					var doc = this.getDocumentsStore().getAt(docIndex);    						
+					var limit = this.getApiParam('limit');
+					var getPrevDoc = false;
+					if (docIndex === 0 && start === 0) {
+						break;
+					}
+					if (docIndex > 0 && start === 0) {
+						getPrevDoc = true;
+						docIndex--;
+						doc = this.getDocumentsStore().getAt(docIndex);
+						var totalTokens = doc.get('tokensCount-lexical');
+						start = totalTokens-limit;
+						if (start < 0) {
+							start = 0;
+							this.setApiParam('limit', totalTokens);
+						}
+					} else {
+						limit--; // subtract one to limit for the word we're removing. need to do this to account for non-lexical tokens before/after first word.
+						start -= limit;
+					}
+					if (start < 0) start = 0;
+					
+					var mask = first.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'before', false).mask();
+					if (!getPrevDoc) {
+						first.destroy();
+					}
+					
+					var id = doc.getId();
+					this.setApiParams({'skipToDocId': id, start: start});
+					this.setScrollDownwards(false);
+					this.load();
+					this.setApiParam('limit', this.INITIAL_LIMIT);
+					break;
+				}
+				first.destroy(); // remove non word
+				first = readerContainer.first();
+			}
+		}
+	},
+	
+	fetchNext: function() {
+		var readerContainer = this.innerContainer.first();
+		var last = readerContainer.last();
+		if (last.hasCls("loading")===false) {
+			// store any text that occurs after last word
+			var lastText = $(readerContainer.dom).contents().filter(function() {
+				return this.nodeType === 3;
+			}).last();
+			while(last) {
+				if (last.hasCls("word")) {
+					var info = Voyant.data.model.Token.getInfoFromElement(last);
+					var docIndex = parseInt(info.docIndex);
+					var start = parseInt(info.position);
+					var doc = this.getDocumentsStore().getAt(info.docIndex);
+					var id = doc.getId();
+					
+					var totalTokens = doc.get('tokensCount-lexical');
+					if (start + this.getApiParam('limit') >= totalTokens && docIndex == this.getCorpus().getDocumentsCount()-1) {
+						var limit = totalTokens - start;
+						if (limit <= 1) {
+							break;
+						} else {
+							this.setApiParam('limit', limit);
+						}
+					}
+					
+					// remove any text after the last word
+					if (last.el.dom.nextSibling === lastText[0]) {
+						lastText.remove();
+					}
+					
+					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
+					last.destroy();
+					this.setApiParams({'skipToDocId': id, start: info.position});
+					this.setScrollDownwards(true);
+					this.load();
+					this.setApiParam('limit', this.INITIAL_LIMIT);
+					break;
+				}
+				last.destroy(); // remove non word
+				last = readerContainer.last();
+			}
+		}
+	},
+	
     load: function(doClear, config) {
     	if (doClear) {
     		this.innerContainer.first().destroy(); // clear everything
@@ -525,8 +565,8 @@ Ext.define('Voyant.panel.Reader', {
     },
     
     updateText: function(contents) {
-    	var last = this.innerContainer.first().last();
-    	if (last && last.isMasked()) {last.destroy();}
+    	var loadingMask = this.innerContainer.down('.loading');
+    	if (loadingMask) loadingMask.destroy();
     	var where = this.getScrollDownwards() ? 'beforeEnd' : 'afterBegin';
     	this.innerContainer.first().insertHtml(where, contents);
     },
