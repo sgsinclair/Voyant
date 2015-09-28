@@ -4,6 +4,31 @@ String[] parts = request.getRequestURI().substring(request.getContextPath().leng
 if (parts.length<2) {throw new Exception("No tool provided.");}
 String tool = parts[1];
 
+String query = request.getQueryString();
+
+// tools that need to be redirected
+String redirectTool = null;
+if (tool.equals("Links")) {redirectTool="CollocatesGraph";}
+else if (tool.equals("CorpusGrid")) {redirectTool="Documents";}
+else if (tool.equals("CorpusSummary")) {redirectTool="Summary";}
+else if (tool.equals("CorpusTypeFrequenciesGrid")) {redirectTool="CorpusTerms";}
+else if (tool.equals("DocumentInputAdd")) {redirectTool="CorpusTerms";}
+else if (tool.equals("DocumentTypeCollocateFrequenciesGrid")) {redirectTool="CorpusTerms";}
+else if (tool.equals("DocumentTypeFrequenciesGrid")) {redirectTool="DocumentTerms";}
+else if (tool.equals("DocumentTypeKwicsGrid")) {redirectTool="Contexts";}
+else if (tool.equals("TypeFrequenciesChart")) {redirectTool="Trends";}
+else if (tool.equals("VisualCollocator")) {redirectTool="CollocatesGraph";}
+if (redirectTool!=null) {
+	response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+	response.setHeader("Location", "../"+redirectTool+"/"+(query!=null ? "?"+query : ""));
+}
+
+// check to make sure that the indicated tool exists, otherwise redirect
+if (new java.io.File(request.getServletContext().getRealPath("app/Panel/"+tool+".js")).exists()==false) {
+	response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+	response.setHeader("Location", "../NoTool/?tool="+tool+(query!=null ? "&"+query : ""));
+}
+
 %><%@ include file="../resources/jsp/pre_app.jsp" %>
 <script>
 	Ext.Loader.setConfig({
