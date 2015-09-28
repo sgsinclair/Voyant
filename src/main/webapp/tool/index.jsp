@@ -23,8 +23,17 @@ if (redirectTool!=null) {
 	response.setHeader("Location", "../"+redirectTool+"/"+(query!=null ? "?"+query : ""));
 }
 
+boolean isNotRealTool = false;
+String[] notRealTools = new String[]{"Panel","VoyantFooter","VoyantHeader","VoyantTabPanel"};
+for (String notRealTool : notRealTools) {
+	if (notRealTool.equals(tool)) {
+		isNotRealTool = true;
+		break;
+	}
+}
+
 // check to make sure that the indicated tool exists, otherwise redirect
-if (new java.io.File(request.getServletContext().getRealPath("app/Panel/"+tool+".js")).exists()==false) {
+if (isNotRealTool || new java.io.File(request.getServletContext().getRealPath("app/Panel/"+tool+".js")).exists()==false) {
 	response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 	response.setHeader("Location", "../NoTool/?tool="+tool+(query!=null ? "&"+query : ""));
 }
