@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Calendar;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Source;
@@ -30,8 +29,7 @@ public class Voyant {
 	 * @return true if preProcessing has resulted in a redirect
 	 * @throws Exception 
 	 */
-	public static boolean preProcess(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+	public static boolean preProcess(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String method = request.getMethod();
 		if (method==null) {return false;}
 
@@ -40,7 +38,7 @@ public class Voyant {
 
 		// if we have a POST request, we need to create the corpus before redirecting
 		if (method.equals("POST") && request.getParameter("noRedirect") == null) {
-			return handlePostAndRedirect(servletContext, request, response, params);
+			return handlePostAndRedirect(request, response, params);
 		}
 
 		// if we have a GET request, we need to check for a useReferer parameter
@@ -54,7 +52,7 @@ public class Voyant {
 	
 		
 
-	private static boolean handlePostAndRedirect(ServletContext servletContext, HttpServletRequest request,
+	private static boolean handlePostAndRedirect(HttpServletRequest request,
 			HttpServletResponse response, FlexibleParameters params) throws IOException, TransformerException {
 		
 		// run the controller and then redirect to the current URL with a corpusID
@@ -66,7 +64,7 @@ public class Voyant {
 		
 		XslTransformer xslTransformer = new XslTransformer();
 		Source xml = new StreamSource(new StringReader(writer.toString()));
-		Source xsl = XslTransformer.getTemplateSource(params.getParameterValue("template"), servletContext);
+		Source xsl = XslTransformer.getTemplateSource(params.getParameterValue("template"), request.getSession().getServletContext());
 		xslTransformer.transform(xml, xsl, xslWriter);
 		String corpusId = xslWriter.toString();
 		final StringBuilder uri = new StringBuilder("./?corpus=").append(corpusId);

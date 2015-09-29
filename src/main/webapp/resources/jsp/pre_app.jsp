@@ -1,5 +1,5 @@
 <%  // not sure it matters, but just in case, don't have any whitespace before doctype declaration (and possible redirects)
-//	if (org.voyanttools.voyant.Voyant.preProcess(this.getServletConfig().getServletContext(), request, response)) {return;}
+	if (org.voyanttools.voyant.Voyant.preProcess(request, response)) {return;}
 %><%@ page contentType="text/html;charset=UTF-8" %><% 
 	String base = request.getContextPath();
 %><!DOCTYPE html>

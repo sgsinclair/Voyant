@@ -84,9 +84,12 @@ public class FlexibleParametersFactory {
 			if (request.getMethod().equals("GET")) {
 				// I couldn't for the life of me convince a GET request to use the specified character encoding (tried req.setCharacterEncoding() etc.)
 				// so we'll not use the simpler request.getParameterMap() and instead parse the query string ourselves
-				List<NameValuePair> pairs = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
-				for (NameValuePair pair : pairs) {
-					parametersDecoder.decodeParameters(pair.getName(), new String[]{pair.getValue()}, allowLocalFileSystemAccess);
+				String queryString = request.getQueryString();
+				if (queryString!=null) {
+					List<NameValuePair> pairs = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
+					for (NameValuePair pair : pairs) {
+						parametersDecoder.decodeParameters(pair.getName(), new String[]{pair.getValue()}, allowLocalFileSystemAccess);
+					}
 				}
 			}
 			else {
