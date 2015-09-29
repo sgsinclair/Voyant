@@ -16,6 +16,6 @@ Ext.define('Voyant.VoyantToolApp', {
 		        }
 		    }]
 		});
-        this.callParent(arguments);
+		this.callParent(arguments);
 	}
 });

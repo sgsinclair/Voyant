@@ -57,6 +57,18 @@ if (isNotRealTool || new java.io.File(request.getServletContext().getRealPath("a
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>',
 			tool: '<%= tool.toLowerCase() %>'
+		},
+		launch: function() {
+			if (this.hasQueryToLoad()) {
+				this.callParent(arguments);
+			}
+			else {
+				var url = "../../?view=<%= tool %>";
+				if (document.location.search) {
+					url+="&"+document.location.search.substring(1)
+				}
+				window.location.replace(url)
+			}
 		}
 	});
 	

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Sep 29 11:34:51 EDT 2015 */
+/* This file created by JSCacher. Last modified: Tue Sep 29 14:39:43 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -12830,7 +12830,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		// check parameters to see if we can load a corpus 
     	var queryParams = Ext.Object.fromQueryString(document.location.search);
 
-    	if (queryParams.corpus || queryParams.input) {
+    	if (this.hasQueryToLoad()) {
     		var me = this;
     		var view = me.getViewport()
     		view.mask(this.localize("fetchingCorpus"));
@@ -12842,6 +12842,13 @@ Ext.define('Voyant.VoyantCorpusApp', {
     			//me.showErrorResponse({message: message}, response);
     		});
     	}
+    },
+    
+    hasQueryToLoad: function(params) {
+    	if (!params) {
+    		params = Ext.Object.fromQueryString(document.location.search);
+    	}
+    	return params.corpus || params.input; // TODO: should this include "archive" from V1?
     },
     
     listeners: {
