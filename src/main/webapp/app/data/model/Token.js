@@ -16,39 +16,39 @@ Ext.define('Voyant.data.model.Token', {
     		if (arg && arg.getId) {
     			var parts = arg.getId().split("_");
     			return {
-    				docIndex: parts[1],
-    				position: parts[2]
-    			}
+    				docIndex: parseInt(parts[1]),
+    				position: parseInt(parts[2])
+    			};
     		}
     	}
     },
 	isWord: function() {
-		return this.getTokenType()=='lexical' // maybe something else later?
+		return this.getTokenType()=='lexical'; // maybe something else later?
 	},
 	getTokenType: function() {
-		return this.get("tokenType")
+		return this.get("tokenType");
 	},
 	getId: function() {
 		return ["",this.getDocIndex(),this.getPosition()].join("_");
 	},
 	getDocIndex: function() {
-		return this.get("docIndex")
+		return this.get("docIndex");
 	},
 	getDocId: function() {
-		return this.get("docId")
+		return this.get("docId");
 	},
 	getTerm: function() {
-		return this.get("term")
+		return this.get("term");
 	},
 	getTermWithLineSpacing: function(isPlainText) {
 		var term = this.getTerm().replace(/<\/?\w+\b.*?>/g, "<br /><br />").replace(/>\s+</g,"><").replace(/<br \/><br \/>(<br \/>)+/g,"<br \/><br \/>");
-		if (isPlainText) {term = term.replace(/(\r\n|\r|\n)\s*/g,"<br />")}
-		return term
+		if (isPlainText) {term = term.replace(/(\r\n|\r|\n)\s*/g,"<br />");};
+		return term;
 	},
 	getPosition: function() {
-		return this.get("position")
+		return this.get("position");
 	},
 	getDocumentRawFreq: function() {
-		return this.get("rawFreq")
+		return this.get("rawFreq");
 	}
 });
