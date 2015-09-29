@@ -23,7 +23,9 @@ Ext.define('Voyant.panel.Reader', {
     	documentTermsStore: undefined,
     	exportVisualization: false,
     	lastScrollTop: 0,
-    	scrollDownwards: true
+    	scrollDownwards: true,
+    	locationMarker: undefined,
+    	lastLocationUpdate: new Date()
     },
     
     INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling
@@ -178,12 +180,18 @@ Ext.define('Voyant.panel.Reader', {
     		centerPanel.body.on("scroll", function(event, target) {
     			var readerContainer = this.innerContainer.first();
     			var downwardsScroll = this.getLastScrollTop() < target.scrollTop;
+    			
     			// scroll up
     			if (!downwardsScroll && target.scrollTop < 1) {
     				this.fetchPrevious();
     			// scroll down
-    			} else if (downwardsScroll && target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
+    			} else if (downwardsScroll && target.scrollHeight - target.scrollTop < target.offsetHeight*1.5) {//target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
     				this.fetchNext();
+    			} else {
+    				var now = new Date();
+        			if (now - this.getLastLocationUpdate() > 250) {
+        				this.updateLocationMarker(target);
+        			}
     			}
     			this.setLastScrollTop(target.scrollTop);
     		}, this);
@@ -198,6 +206,7 @@ Ext.define('Voyant.panel.Reader', {
     					term: term,
     					docIndex: info.docIndex
     				}];
+    				this.loadQueryTerms([term]);
     				this.getApplication().dispatchEvent('termsClicked', this, data);
     			}
     		}, this);
@@ -235,6 +244,8 @@ Ext.define('Voyant.panel.Reader', {
     	    		var docs = corpus.getDocuments();
     	    		this.setDocumentsStore(docs);
     	    		var container = this.down('panel[region="south"]');
+    	    		
+    	    		this.setLocationMarker(Ext.DomHelper.append(container.el, {tag: 'div', style: 'background-color: #157fcc; height: 100%; width: 2px; position: absolute; top: 0; left: 0;'}));
     	    		
     	    		this.generateChart(corpus, container);
     	    		
@@ -312,6 +323,82 @@ Ext.define('Voyant.panel.Reader', {
 		}
     },
     
+    updateLocationMarker: function(target) {
+    	var amount;
+		if (target.scrollTop == 0) {
+			amount = 0;
+		} else if (target.scrollHeight - target.scrollTop == target.clientHeight) {
+			amount = 1;
+		} else {
+			amount = (target.scrollTop + target.clientHeight * 0.5) / target.scrollHeight;
+		}
+		
+		var readerWords = $(target).find('.readerContainer').find('.word'); //.filter(function(index, el) { return $(el).position().top > 0; }); // filter by position too slow
+		var firstWord = readerWords.first()[0];
+		var lastWord = readerWords.last()[0];
+		if (firstWord !== undefined && lastWord !== undefined) {
+			var corpus = this.getCorpus();
+			var partialFirstDoc = false;
+			
+			var info1 = Voyant.data.model.Token.getInfoFromElement(Ext.get(firstWord));
+			var info2 = Voyant.data.model.Token.getInfoFromElement(Ext.get(lastWord));
+			if (info1.position !== 0) {
+				partialFirstDoc = true;
+			}
+
+			var docTokens = {};
+			var totalTokens = 0;
+			if (info1.docIndex === info2.docIndex) {
+				totalTokens = info2.position - info1.position;
+				var tokens = corpus.getDocument(info1.docIndex).get('tokensCount-lexical');
+				docTokens[info1.docIndex] = tokens;
+			} else {
+				var currIndex = info1.docIndex;
+				while (currIndex <= info2.docIndex) {
+					var tokens = corpus.getDocument(currIndex).get('tokensCount-lexical');
+					if (partialFirstDoc && currIndex === info1.docIndex) {
+						tokens -= info1.position; // subtract missing tokens
+						totalTokens += tokens;
+					} else if (currIndex === info2.docIndex) {
+						totalTokens += info2.position; // only count tokens up until last displayed word
+					} else {
+						totalTokens += tokens;
+					}
+					docTokens[currIndex] = tokens;
+					currIndex++;
+				}
+			}
+			
+			var tokenPos = Math.round(totalTokens * amount);
+			var docIndex = 0;
+			var tokenPosInDoc;
+			if (info1.docIndex === info2.docIndex) {
+				docIndex = info1.docIndex;
+				tokenPosInDoc = tokenPos;
+			} else if (partialFirstDoc && tokenPos === 0) {
+				// we're at the top of a partially loaded doc
+				docIndex = info1.docIndex;
+				tokenPosInDoc = info1.position;
+			} else {
+				var currToken = 0;
+				for (var i = info1.docIndex; i <= info2.docIndex; i++) {
+					docIndex = i;
+					currToken += docTokens[i];
+					if (currToken >= tokenPos) {
+						break;
+					}
+				}
+				tokenPosInDoc = docTokens[docIndex] - (currToken - tokenPos);
+			}
+			var fraction = tokenPosInDoc / docTokens[docIndex];
+			var graph = this.query('cartesian')[docIndex];
+			var locX = graph.getX() + graph.getWidth()*fraction;
+			Ext.get(this.getLocationMarker()).setX(locX);
+			
+		}
+		this.setLastLocationUpdate(new Date());
+    },
+    
     generateChart: function(corpus, container) {
     	function getColor(index, alpha) {
     		var colors = [[116,116,181], [139,163,83], [189,157,60], [171,75,75], [174,61,155]];
@@ -331,6 +418,9 @@ Ext.define('Voyant.panel.Reader', {
     		var sColor = getColor(index, 1.0);
     		var chart = container.add({
     			xtype: 'cartesian',
+    			plugins: {
+                    ptype: 'chartitemevents'
+                },
     	    	flex: fraction,
     	    	height: '100%',
     	    	insetPadding: 0,
@@ -385,10 +475,17 @@ Ext.define('Voyant.panel.Reader', {
     	    	store: Ext.create('Ext.data.ArrayStore', {
             		fields: ['docId', 'docIndex', 'bin', 'distribution', 'term'],
             		data: []
-            	})
+            	}),
+            	listeners: {
+            		itemclick: function(chart, item, event) {
+            			var data = item.record.data;
+            			var doc = this.getDocumentsStore().getAt(data.docIndex);
+            			this.getApplication().dispatchEvent('documentsClicked', this, [doc]);
+            		},
+            		scope: reader
+            	}
     		});
     		
-    		// hack to deal with itemclick bug
     		chart.body.on('click', function(event, target) {
     			var el = Ext.get(target);
     			var x = event.getX();
@@ -399,7 +496,6 @@ Ext.define('Voyant.panel.Reader', {
     			var children = Ext.toArray(containerParent.dom.children);
     			var docIndex = children.indexOf(chartContainer.dom);
     			var doc = this.getDocumentsStore().getAt(docIndex);
-    			this.getApplication().dispatchEvent('documentsClicked', this, [doc]);
     		}, reader);
     	}
     	
@@ -464,8 +560,8 @@ Ext.define('Voyant.panel.Reader', {
 			while(first) {
 				if (first.hasCls("word")) {
 					var info = Voyant.data.model.Token.getInfoFromElement(first);
-					var docIndex = parseInt(info.docIndex);
-					var start = parseInt(info.position);
+					var docIndex = info.docIndex;
+					var start = info.position;
 					var doc = this.getDocumentsStore().getAt(docIndex);    						
 					var limit = this.getApiParam('limit');
 					var getPrevDoc = false;
@@ -517,8 +613,8 @@ Ext.define('Voyant.panel.Reader', {
 			while(last) {
 				if (last.hasCls("word")) {
 					var info = Voyant.data.model.Token.getInfoFromElement(last);
-					var docIndex = parseInt(info.docIndex);
-					var start = parseInt(info.position);
+					var docIndex = info.docIndex;
+					var start = info.position;
 					var doc = this.getDocumentsStore().getAt(info.docIndex);
 					var id = doc.getId();
 					
@@ -569,6 +665,9 @@ Ext.define('Voyant.panel.Reader', {
     	if (loadingMask) loadingMask.destroy();
     	var where = this.getScrollDownwards() ? 'beforeEnd' : 'afterBegin';
     	this.innerContainer.first().insertHtml(where, contents);
+    	
+    	var target = this.down('panel[region="center"]').body.dom;
+    	this.updateLocationMarker(target);
     },
     
     updateChart: function() {
