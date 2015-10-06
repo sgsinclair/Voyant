@@ -24,6 +24,9 @@
 <!-- D3 -->
 <script type="text/javascript" src="<%= base %>/resources/d3/current/d3.min.js"></script>
 
+<!-- vis.js -->
+<script type="text/javascript" src="<%= base %>/resources/visjs/vis.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/visjs/vis.css" />
 
 <!-- FontAwesome -->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/fontawesome/current/css/font-awesome.min.css" />
