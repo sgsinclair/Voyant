@@ -25,7 +25,8 @@ Ext.define('Voyant.panel.RezoViz', {
     	network: undefined, // the vis network graph
     	nodesStore: undefined, // used by combo
     	nodesDataSet: undefined, // used by vis
-    	edgesDataSet: undefined // used by vis
+    	edgesDataSet: undefined, // used by vis
+    	highlightedEntity: undefined
     },
 
     nodeOptions: {
@@ -48,6 +49,16 @@ Ext.define('Voyant.panel.RezoViz', {
 			color: '#157fcc',
 			highlight: '#EA8034',
 			hover: '#EA8034'
+		}
+	},
+	highlightOptions: {
+		color: {
+			border: '#CB157F',
+			background: '#EB42A5',
+			hover: {
+				border: '#CB157F',
+				background: '#EB42A5'
+			}
 		}
 	},
     
@@ -156,7 +167,7 @@ Ext.define('Voyant.panel.RezoViz', {
     	for (var i = 0; i < nodes.length; i++) {
     		var n = nodes[i];
     		n.id = i;
-    		visNodes.push({id: i, label: n.term, type: n.type, rawFreq: n.rawFreq});
+    		visNodes.push({id: i, label: n.term, type: n.type, rawFreq: n.rawFreq, title: n.term + (n.rawFreq ? ' ('+n.rawFreq+')':'')});
     	}
     	
     	this.getNodesStore().loadData(nodes);
@@ -203,27 +214,18 @@ Ext.define('Voyant.panel.RezoViz', {
 //    	});
     	network.on('selectNode', function(params) {
     		var node = params.nodes[0];
-    		var nodes = network.getConnectedNodes(node);
-    		nodes.push(node);
-    		var edges = network.getConnectedEdges(node);
-    		
-    		// custom selection to avoid selecting edges between the secondary/connected nodes
-    		network.unselectAll();
-    		for (var i = 0; i < nodes.length; i++) {
-    			var n = nodes[i];
-    			var nodeObj = network.body.nodes[n];
-    			network.selectionHandler.selectObject(nodeObj, false);
-    		}
-    		for (var i = 0; i < edges.length; i++) {
-    			var e = edges[i];
-    			var edgeObj = network.body.edges[e];
-    			network.selectionHandler.selectObject(edgeObj, false);
-    		}
-    		
+    		this.doNodeSelect(node);
     	}.bind(this));
     	network.on('deselectNode', function(params) {
+    		this.removeHighlight();
     		network.unselectAll(); // need this due to our custom selecting code
-    	});
+    		
+    		// the following doesn't work
+    		var node = params.nodes[0];
+    		if (node !== undefined) {
+    			this.doNodeSelect(node);
+    		}
+    	}.bind(this));
     	network.on('selectEdge', function(params) {
     		// prevent edge selection
     		network.unselectAll();
@@ -232,18 +234,47 @@ Ext.define('Voyant.panel.RezoViz', {
     	this.setNetwork(network);
     },
     
+    doNodeSelect: function(node) {
+    	var network = this.getNetwork();
+		var nodes = network.getConnectedNodes(node);
+		nodes.push(node);
+		var edges = network.getConnectedEdges(node);
+		
+		// custom selection to avoid selecting edges between the secondary/connected nodes
+		this.removeHighlight();
+		network.unselectAll();
+		for (var i = 0; i < nodes.length; i++) {
+			var n = nodes[i];
+			var nodeObj = network.body.nodes[n];
+			network.selectionHandler.selectObject(nodeObj, false);
+		}
+		for (var i = 0; i < edges.length; i++) {
+			var e = edges[i];
+			var edgeObj = network.body.edges[e];
+			network.selectionHandler.selectObject(edgeObj, false);
+		}
+    },
+    
     highlightEntity: function(nodeId) {
     	var network = this.getNetwork();
     	for (var id in network.body.nodes) {
     		if (id == nodeId) {
-    			network.body.nodes[id].setOptions({
-    	    		color: '#E92B9A'
-    	    	});
+    			network.body.nodes[id].setOptions(this.highlightOptions);
+    			this.setHighlightedEntity(nodeId);
     		} else {
     			network.body.nodes[id].setOptions(this.nodeOptions);
     		}
     	}
     	network.redraw();
+    },
+    
+    removeHighlight: function() {
+    	var id = this.getHighlightedEntity();
+    	if (id !== undefined) {
+    		this.getNetwork().body.nodes[id].setOptions(this.nodeOptions);
+    		this.getNetwork().redraw();
+    		this.setHighlightedEntity(undefined);
+    	}
     },
     
     categoriesHandler: function(item) {
