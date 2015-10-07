@@ -220,10 +220,10 @@ Ext.define('Voyant.panel.RezoViz', {
     		this.removeHighlight();
     		network.unselectAll(); // need this due to our custom selecting code
     		
-    		// the following doesn't work
     		var node = params.nodes[0];
     		if (node !== undefined) {
-    			this.doNodeSelect(node);
+    			// select clicked node after deselection is finished
+    			setTimeout(this.doNodeSelect.bind(this), 5, node);
     		}
     	}.bind(this));
     	network.on('selectEdge', function(params) {
@@ -253,6 +253,8 @@ Ext.define('Voyant.panel.RezoViz', {
 			var edgeObj = network.body.edges[e];
 			network.selectionHandler.selectObject(edgeObj, false);
 		}
+		
+		network.redraw(); // need to force redraw if coming from deselect
     },
     
     highlightEntity: function(nodeId) {
