@@ -9,7 +9,10 @@ Ext.define('Voyant.panel.RezoViz', {
     		people: {en: 'People'},
     		locations: {en: 'Locations'},
     		organizations: {en: 'Organizations'},
-    		reload: {en: 'Reload'}
+    		reload: {en: 'Reload'},
+    		repulsion: {en: 'Repulsion'},
+    		stiffness: {en: 'Stiffness'},
+    		friction: {en: 'Friction'}
     	},
     	api: {
     		query: undefined,
@@ -71,7 +74,9 @@ Ext.define('Voyant.panel.RezoViz', {
         var me = this;
         
         this.setNodesStore(Ext.create('Ext.data.Store', {
-        	fields: ['id', 'term', 'type', 'rawFreq']
+        	fields: ['id', 'term', 'type', 'rawFreq'],
+        	sortOnLoad: true,
+        	sorters: 'term'
         }));
         
         Ext.apply(me, {
@@ -118,6 +123,60 @@ Ext.define('Voyant.panel.RezoViz', {
 	                		scope: this
 	                	}]
 	                }
+                },{ xtype: 'tbseparator' },{
+                	xtype: 'slider',
+                	fieldLabel: this.localize('repulsion'),
+                	labelAlign: 'right',
+                	labelWidth: 70,
+                	width: 150,
+                	value: 2,
+                	increment: 1,
+                	minValue: 0,
+                	maxValue: 10,
+                	listeners: {
+                		changecomplete: function(slider, val) {
+                			val = this.map(val, 0, 10, 0, -20000);
+                			this.getNetwork().physics.options.barnesHut.gravitationalConstant = val;
+                			this.getNetwork().startSimulation();
+                		},
+                		scope: this
+                	}
+                },{
+                	xtype: 'slider',
+                	fieldLabel: this.localize('stiffness'),
+                	labelAlign: 'right',
+                	labelWidth: 70,
+                	width: 150,
+                	value: 4,
+                	increment: 1,
+                	minValue: 0,
+                	maxValue: 10,
+                	listeners: {
+                		changecomplete: function(slider, val) {
+                			val /= 100;
+                			this.getNetwork().physics.options.barnesHut.springConstant = val;
+                			this.getNetwork().startSimulation();
+                		},
+                		scope: this
+                	}
+                },{
+                	xtype: 'slider',
+                	fieldLabel: this.localize('friction'),
+                	labelAlign: 'right',
+                	labelWidth: 55,
+                	width: 150,
+                	value: 9,
+                	increment: 10,
+                	minValue: 0,
+                	maxValue: 100,
+                	listeners: {
+                		changecomplete: function(slider, val) {
+                			val /= 100;
+                			this.getNetwork().physics.options.barnesHut.damping = val;
+                			this.getNetwork().startSimulation();
+                		},
+                		scope: this
+                	}
                 }]
             }]
         });
@@ -125,10 +184,6 @@ Ext.define('Voyant.panel.RezoViz', {
         this.on('loadedCorpus', function(src, corpus) {
         	this.setCorpus(corpus);
         	this.getEntities();
-        }, this);
-        
-        this.on('query', function(src, query) {
-//        	this.loadFromQuery(query);
         }, this);
         
         this.on('resize', function(panel, width, height) {
@@ -195,6 +250,16 @@ Ext.define('Voyant.panel.RezoViz', {
     			hover: true,
     			hoverConnectedEdges: true,
     			multiselect: false
+    		},
+    		physics: {
+				barnesHut: {
+					gravitationalConstant: -2000,
+					centralGravity: 0.3,
+					springLength: 95,
+					springConstant: 0.04,
+					damping: 0.09,
+					avoidOverlap: 0
+				}
     		},
     		nodes: this.nodeOptions,
     		edges: this.edgeOptions
@@ -289,5 +354,9 @@ Ext.define('Voyant.panel.RezoViz', {
     	
     	this.setApiParam('types', categories);
     	this.getEntities();
-    }
+    },
+    
+    map: function(value, istart, istop, ostart, ostop) {
+		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+	}
 });
