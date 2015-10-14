@@ -210,7 +210,8 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
 		
 		if (this._progressWin === null) {
 			this._progressBar = new Ext.ProgressBar({
-				width: 300
+				width: 300,
+				textTpl: '{percent}%'
 			});
 			this._progressWin = new Ext.Window({
 	            title: 'Exporting Annotations',
@@ -484,7 +485,7 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 		
 		this.loadAnnotationsForDocId = function(uri) {
 			// need to destroy and recreate annotator each time in order to load annos from new uri
-			initAnnotator.bind(this, [uri])();
+			initAnnotator.bind(this, uri)();
 			
 //			this.annotator.plugins.Store.options.annotationData.uri = uri;
 //			this.annotator.plugins.Store.loadAnnotationsFromSearch();
