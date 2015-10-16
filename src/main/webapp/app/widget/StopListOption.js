@@ -43,7 +43,7 @@ Ext.define('Voyant.widget.StopListOption', {
     	data.sort(function(a,b) { // sort by label
     		return a.name < b.name ? -1 : 1;
     	})
-    	data.splice(0, 0, {name : this.localize('auto'),   value: 'auto'}, {name : this.localize('none'),   value: ''}, {name : this.localize('new'),   value: 'new'})
+    	data.splice(0, 0, {name : this.localize('auto'),   value: 'auto'}, {name : this.localize('none'),   value: ''},  {name : this.localize('new'),   value: 'new'})
     	
     	Ext.apply(me, {
 	    		items: [{

@@ -39,11 +39,11 @@ Ext.define('Voyant.panel.RezoViz', {
 			background: '#82C3F2',
 			highlight: {
 				border: '#EA8034',
-				background: '#EFA26B',
+				background: '#EFA26B'
 			},
 			hover: {
 				border: '#157fcc',
-				background: '#82C3F2',
+				background: '#82C3F2'
 			}
 		}
 	},

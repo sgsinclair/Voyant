@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Oct 16 13:27:28 EDT 2015 */
+/* This file created by JSCacher. Last modified: Fri Oct 16 14:00:04 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4081,7 +4081,7 @@ Ext.define('Voyant.widget.StopListOption', {
     	data.sort(function(a,b) { // sort by label
     		return a.name < b.name ? -1 : 1;
     	})
-    	data.splice(0, 0, {name : this.localize('auto'),   value: 'auto'}, {name : this.localize('none'),   value: ''}, {name : this.localize('new'),   value: 'new'})
+    	data.splice(0, 0, {name : this.localize('auto'),   value: 'auto'}, {name : this.localize('none'),   value: ''},  {name : this.localize('new'),   value: 'new'})
     	
     	Ext.apply(me, {
 	    		items: [{
@@ -7778,11 +7778,11 @@ Ext.define('Voyant.panel.RezoViz', {
 			background: '#82C3F2',
 			highlight: {
 				border: '#EA8034',
-				background: '#EFA26B',
+				background: '#EFA26B'
 			},
 			hover: {
 				border: '#157fcc',
-				background: '#82C3F2',
+				background: '#82C3F2'
 			}
 		}
 	},
