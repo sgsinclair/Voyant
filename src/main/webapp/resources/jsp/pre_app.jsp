@@ -23,6 +23,7 @@
 
 <!-- D3 -->
 <script type="text/javascript" src="<%= base %>/resources/d3/current/d3.min.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/cirrus/html5/d3.layout.cloud.js"></script>
 
 <!-- vis.js -->
 <script type="text/javascript" src="<%= base %>/resources/visjs/vis.js"></script>

@@ -43,8 +43,6 @@ Ext.define('Voyant.panel.Cirrus', {
     
     constructor: function(config) {
 
-    	this.loadFiles();
-    	
     	Ext.apply(this, {
     		title: this.localize('title'),
     		dockedItems: [{
@@ -80,7 +78,7 @@ Ext.define('Voyant.panel.Cirrus', {
     
     listeners: {
     	resize: function(panel, width, height) {
-    		if (this.getVisLayout()) {
+    		if (this.getVisLayout() && this.getCorpus()) {
     			this.setAdjustedSizes();
     			
     			var el = this.getLayout().getRenderTarget();
@@ -106,7 +104,13 @@ Ext.define('Voyant.panel.Cirrus', {
     	
     	ensureCorpusView: function(src, corpus) {
     		if (this.getMode() != this.MODE_CORPUS) {this.loadFromCorpus(corpus);}
+    	},
+    	
+    	boxready: function() {
+			this.setFilesLoaded(true);
+			this.initVisLayout();
     	}
+    	
     },
     
     loadFromCorpus: function(corpus) {    	
@@ -147,23 +151,6 @@ Ext.define('Voyant.panel.Cirrus', {
     	});
     	this.setTerms(terms);
     	this.buildFromTerms();
-    },
-    
-    loadFiles: function() {
-    	if (typeof d3.layout.cloud == 'undefined') {
-        	Ext.Loader.loadScript({
-        		url: this.getBaseUrl()+'resources/cirrus/html5/d3.layout.cloud.js',
-        		scope: this,
-        		onLoad: function() {
-        			this.setFilesLoaded(true);
-        			this.initVisLayout();
-        		}
-        	});
-    	}
-    	else {
-			this.setFilesLoaded(true);
-			this.initVisLayout();
-    	}
     },
     
     initVisLayout: function() {

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Oct 16 14:00:04 EDT 2015 */
+/* This file created by JSCacher. Last modified: Fri Oct 16 16:50:12 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4975,8 +4975,9 @@ Ext.define('Voyant.panel.Cirrus', {
     		helpTip: {en: "<p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document – this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>"},
     		reset: {en: 'reset'}
     	},
-    	api: { // stopList inherited from app
-    		limit: 50,
+    	api: {
+    		stopList: 'auto',
+    		limit: 100,
     		terms: undefined,
     		docId: undefined,
     		docIndex: undefined
@@ -4990,7 +4991,14 @@ Ext.define('Voyant.panel.Cirrus', {
     		xtype: 'stoplistoption'
     	},
     	filesLoaded: false,
-    	corpus: undefined
+    	corpus: undefined,
+    	terms: undefined,
+    	visLayout: undefined, // cloud layout algorithm
+    	vis: undefined, // actual vis
+    	sizeAdjustment: 100, // amount to multiply a word's relative size by
+    	minFontSize: 12,
+    	largestWordSize: 0,
+    	smallestWordSize: 1000000
     },
 
     MODE_CORPUS: 'corpus',
@@ -5000,8 +5008,6 @@ Ext.define('Voyant.panel.Cirrus', {
     
     constructor: function(config) {
 
-    	this.loadFiles();
-    	
     	Ext.apply(this, {
     		title: this.localize('title'),
     		dockedItems: [{
@@ -5037,8 +5043,15 @@ Ext.define('Voyant.panel.Cirrus', {
     
     listeners: {
     	resize: function(panel, width, height) {
-    		if (this.cirrus) {
-    			this.cirrus.resizeWords();
+    		if (this.getVisLayout() && this.getCorpus()) {
+    			this.setAdjustedSizes();
+    			
+    			var el = this.getLayout().getRenderTarget();
+    	    	width = el.getWidth();
+    			height = el.getHeight();
+    			
+    			el.down('svg').set({width: width, height: height});
+    			this.getVisLayout().size([width, height]).stop().words(this.getTerms()).start();
     		}
     	},
     	
@@ -5056,12 +5069,18 @@ Ext.define('Voyant.panel.Cirrus', {
     	
     	ensureCorpusView: function(src, corpus) {
     		if (this.getMode() != this.MODE_CORPUS) {this.loadFromCorpus(corpus);}
+    	},
+    	
+    	boxready: function() {
+			this.setFilesLoaded(true);
+			this.initVisLayout();
     	}
+    	
     },
     
     loadFromCorpus: function(corpus) {    	
 		this.setCorpus(corpus);
-		this.setApiParams({docId: undefined, docIndex: undefined})
+		this.setApiParams({docId: undefined, docIndex: undefined});
 		this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false}));
     },
     
@@ -5081,6 +5100,8 @@ Ext.define('Voyant.panel.Cirrus', {
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_CORPUS);
+//		    	var resp = JSON.parse(operation._response.responseText);
+//		    	this.buildFromTerms(resp.corpusTerms.terms);
 		    	this.loadFromTermsRecords(records);
 		    },
 		    scope: this,
@@ -5091,46 +5112,163 @@ Ext.define('Voyant.panel.Cirrus', {
     loadFromTermsRecords: function(records) {
     	var terms = [];
     	records.forEach(function(record) {
-    		terms.push({word: record.get('term'), size: record.get('rawFreq'), value: record.get('rawFreq')});
+    		terms.push({text: record.get('term'), size: record.get('rawFreq')});
     	});
-    	this.buildFromTerms(terms);
+    	this.setTerms(terms);
+    	this.buildFromTerms();
     },
     
-    loadFiles: function() {
-    	if (typeof Cirrus == 'undefined' || typeof WordController == 'undefined' || typeof Word == 'undefined') {
-        	Ext.Loader.loadScript({
-        		url: [this.getBaseUrl()+'resources/cirrus/html5/Cirrus.js',this.getBaseUrl()+'resources/cirrus/html5/WordController.js',this.getBaseUrl()+'resources/cirrus/html5/Word.js'],
-        		scope: this,
-        		onLoad: function() {
-        			this.setFilesLoaded(true);
-        		}
-        	});
-    	}
-    	else {
-			this.setFilesLoaded(true);
+    initVisLayout: function() {
+    	if (this.getVisLayout() == undefined) {
+	    	var el = this.getLayout().getRenderTarget();
+	    	var width = el.getWidth();
+			var height = el.getHeight();
+			this.setVisLayout(
+				d3.layout.cloud()
+					.size([width, height])
+					.padding(1)
+					.rotate(function() { return ~~(Math.random() * 2) * 90; })
+					.spiral('rectangular')
+					.font('Impact')
+					.fontSize(function(d) {
+						return d.fontSize;
+					}.bind(this))
+					.text(function(d) {
+						return d.text;
+					})
+					.on('end', this.draw.bind(this))
+			);
+			
+			var svg = d3.select(el.dom).append('svg').attr('width', width).attr('height', height);
+			this.setVis(svg.append('g').attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')'));
     	}
     },
     
-    buildFromTerms: function(terms) {
+    buildFromTerms: function() {
+    	var terms = this.getTerms();
     	if (this.rendered && terms) {
-    		var me = this;
-    		var target = this.getLayout().getRenderTarget();
-    		if (this.cirrus) {
-    			target.update(""); // clear
+    		var minSize = 1000;
+    		var maxSize = -1;
+    		for (var i = 0; i < terms.length; i++) {
+    			var size = terms[i].size;
+    			if (size < minSize) minSize = size;
+    			if (size > maxSize) maxSize = size;
     		}
-    	    this.cirrus = new Cirrus({
-    	        containerId: this.getLayout().getRenderTarget().dom.id,
-    	        clickHandler: function(data) {
-    	        	me.getApplication().dispatchEvent('termsClicked', me, [data]);
-    	        },
-    	        words: terms
-    	    });   
-    	}
-    	else {
+    		this.setSmallestWordSize(minSize);
+    		this.setLargestWordSize(maxSize);
+    		
+    		// set the relative sizes for each word (0.0 to 1.0), then adjust based on available area
+    		this.setRelativeSizes();
+    		this.setAdjustedSizes();
+    		
+//    		var fontSizer = d3.scale.pow().range([10, 100]).domain([minSize, maxSize]);
+    		
+    		this.getVisLayout().words(terms);
+    		this.getVisLayout().start();
+    	} else {
     		Ext.defer(this.buidlFromTerms, 50, this);
     	}
-    }
+    },
     
+    draw: function(words, bounds) {
+    	var fill = d3.scale.category20b();
+    	var el = this.getLayout().getRenderTarget();
+    	var width = this.getVisLayout().size()[0];
+    	var height = this.getVisLayout().size()[1];
+    	
+    	var scale = bounds ? Math.min(
+			width / Math.abs(bounds[1].x - width / 2),
+			width / Math.abs(bounds[0].x - width / 2),
+			height / Math.abs(bounds[1].y - height / 2),
+			height / Math.abs(bounds[0].y - height / 2)
+    	) / 2 : 1;
+    	
+		var wordNodes = this.getVis().selectAll('text').data(words, function(d) {return d.text;});
+		
+		wordNodes.transition().duration(1000)
+			.attr('transform', function(d) {
+				return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')';
+			})
+			.style('font-size', function(d) { return d.size + 'px'; });
+		
+		wordNodes.enter().append('text')
+			.attr('text-anchor', 'middle')
+			.attr('transform', function(d) {
+				return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')';
+			})
+			.style('font-size', '1px').transition().duration(1000).style('font-size', function(d) { return d.size + 'px'; });
+		
+		wordNodes
+			.style('font-family', function(d) { return d.font; })
+			.style('fill', function(d) { return fill(d.text); })
+			.text(function(d) { return d.text; });
+		
+		wordNodes.exit().remove();
+		
+		this.getVis().transition().duration(1000).attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')scale(' + scale + ')');
+    },
+    
+    map: function(value, istart, istop, ostart, ostop) {
+		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+	},
+	
+	calculateSizeAdjustment: function() {
+		var el = this.getLayout().getRenderTarget();
+		
+        var stageArea = el.getWidth() * el.getHeight();
+        if (stageArea < 100000) this.setMinFontSize(8);
+        else this.setMinFontSize(12);
+        
+        var terms = this.getTerms();
+        var pixelsPerWord = stageArea / terms.length;
+        var totalWordsSize = 0;
+        for (var i = 0; i < terms.length; i++) {
+            var word = terms[i];
+            var wordArea = this.calculateWordArea(word);
+            totalWordsSize += wordArea;
+        }
+        this.setSizeAdjustment(stageArea / totalWordsSize);
+    },
+    
+    calculateWordArea: function(word) {
+        var baseSize = Math.log(word.relativeSize * 10) * Math.LOG10E; // take the relativeSize (0.1 to 1.0), multiply by 10, then get the base-10 log of it
+        var height = (baseSize + word.relativeSize) / 2; // find the average between relativeSize and the log
+        var width = 0; //(baseSize / 1.5) * word.text.length;
+        for (var i = 0; i < word.text.length; i++ ) {
+            var letter = word.text.charAt(i);
+            if (letter == 'f' || letter == 'i' || letter == 'j' || letter == 'l' || letter == 'r' || letter == 't') width += baseSize / 3;
+            else if (letter == 'm' || letter == 'w') width += baseSize / (4 / 3);
+            else width += baseSize / 1.9;
+        }
+        var wordArea = height * width;
+        return wordArea;
+    },
+    
+    setAdjustedSizes: function() {
+    	this.calculateSizeAdjustment();
+    	var terms = this.getTerms();
+		for (var i = 0; i < terms.length; i++) {
+			var term = terms[i];
+			var adjustedSize = this.findNewRelativeSize(term);
+			term.fontSize = adjustedSize > this.getMinFontSize() ? adjustedSize : this.getMinFontSize();
+		}
+    },
+    
+    setRelativeSizes: function() {
+    	var terms = this.getTerms();
+    	for (var i = 0; i < terms.length; i++) {
+            var word = terms[i];
+            word.relativeSize = this.map(word.size, this.getSmallestWordSize(), this.getLargestWordSize(), 0.1, 1);
+        }
+    },
+    
+    findNewRelativeSize: function(word) {
+    	var areaMultiplier = this.getSizeAdjustment();
+        var area = this.calculateWordArea(word) * areaMultiplier;
+        // given the area = (x+6)*(2*x/3*y), solve for x
+        var newRelativeSize = (Math.sqrt(6) * Math.sqrt(6 * Math.pow(word.text.length, 2) + area * word.text.length) - 6 * word.text.length) / (2 * word.text.length);
+        return newRelativeSize;
+    }
 });
 Ext.define('Voyant.panel.CollocatesGraph', {
 	extend: 'Ext.panel.Panel',
