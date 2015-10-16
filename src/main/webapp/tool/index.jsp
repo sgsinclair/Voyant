@@ -1,10 +1,13 @@
 <%
 
-String[] parts = request.getRequestURI().substring(request.getContextPath().length()+1).split("/");
-if (parts.length<2) {throw new Exception("No tool provided.");}
-String tool = parts[1];
-
 String query = request.getQueryString();
+String[] parts = request.getRequestURI().substring(request.getContextPath().length()+1).split("/");
+if (parts.length<2) {
+	response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+	response.setHeader("Location", request.getContextPath()+"/"+(query!=null ? "?"+query : ""));
+	return;
+}
+String tool = parts[1];
 
 // tools that need to be redirected
 String redirectTool = null;
@@ -21,6 +24,7 @@ else if (tool.equals("VisualCollocator")) {redirectTool="CollocatesGraph";}
 if (redirectTool!=null) {
 	response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 	response.setHeader("Location", "../"+redirectTool+"/"+(query!=null ? "?"+query : ""));
+	return;
 }
 
 boolean isNotRealTool = false;
@@ -36,6 +40,7 @@ for (String notRealTool : notRealTools) {
 if (isNotRealTool || new java.io.File(request.getServletContext().getRealPath("app/Panel/"+tool+".js")).exists()==false) {
 	response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 	response.setHeader("Location", "../NoTool/?tool="+tool+(query!=null ? "&"+query : ""));
+	return;
 }
 
 %><%@ include file="../resources/jsp/pre_app.jsp" %>

@@ -10,6 +10,7 @@ Ext.define('Voyant.widget.StopListOption', {
     		noEditAutoTitle: {en: "Edit Stoplist Error"},
     		noEditAutoMessage: {en: 'The auto-detected stoplist cannot be edited, please select a specifc stoplist such as the "New User-Defined List".'},
     		auto: {en: "Auto-detect"},
+    		none: {en: "None"},
     		'new': {en: "New User-Defined List"},
     		en: {en: "English"},
     		de: {en: "German"},
@@ -42,7 +43,7 @@ Ext.define('Voyant.widget.StopListOption', {
     	data.sort(function(a,b) { // sort by label
     		return a.name < b.name ? -1 : 1;
     	})
-    	data.splice(0, 0, {name : this.localize('auto'),   value: 'auto'}, {name : this.localize('new'),   value: 'new'})
+    	data.splice(0, 0, {name : this.localize('auto'),   value: 'auto'}, {name : this.localize('none'),   value: ''}, {name : this.localize('new'),   value: 'new'})
     	
     	Ext.apply(me, {
 	    		items: [{
