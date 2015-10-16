@@ -185,8 +185,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 	loadIndex: function() {
 	    this._maskEl = this.body.mask('Processing Index: 0%', 'loadMask');
 	    
-		var index = this.getCorpus().getDocumentsCount();
-		this._getDocumentXml(index);
+		this._getIndexXml();
 	},
 
 	clearSelections: function() {
@@ -267,7 +266,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 		}
 	},
 	
-	_getDocumentXml: function(index) {
+	_getIndexXml: function() {
 		Ext.Ajax.request({
 			url: Voyant.application.getTromboneUrl(),
 			params: {

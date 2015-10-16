@@ -643,33 +643,29 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		docId = docId || this.currentDocId;
 		var doc = this.getCorpus().getDocument(docId);
 		var titleHtml = '';
-		if (doc.getIndex() > 0) {
-			var title = doc.get('title').normalize();
-			var surnames = '';
-			var colon = ':';
-			var authors = doc.get('author');
-			if (authors !== undefined) {
-				if (typeof authors === 'string') {
-					authors = [{surname: authors}];
-				}
-				for (var i = 0; i < authors.length; i++) {
-					if (i > 0) {
-						if (authors.length > 2) surnames += ', ';
-						if (i == authors.length - 1) {
-							surnames += ' and ';
-						}
-					}
-					surnames += authors[i].surname;
-				}
-				if (surnames === '') {
-				    // no authors so get rid of colon
-				    colon = '';
-				}
+		var title = doc.get('title').normalize();
+		var surnames = '';
+		var colon = ': ';
+		var authors = doc.get('author');
+		if (authors !== undefined) {
+			if (typeof authors === 'string') {
+				authors = [{surname: authors}];
 			}
-			titleHtml = '<span class="author">'+surnames+'</span>'+colon+' <span class="title">'+title+'</span>';
-		} else {
-			titleHtml = '<span class="title">Front Matter</span>';
+			for (var i = 0; i < authors.length; i++) {
+				if (i > 0) {
+					if (authors.length > 2) surnames += ', ';
+					if (i == authors.length - 1) {
+						surnames += ' and ';
+					}
+				}
+				surnames += authors[i].surname;
+			}
+			if (surnames === '') {
+			    // no authors so get rid of colon
+			    colon = '';
+			}
 		}
+		titleHtml = '<span class="author">'+surnames+'</span>'+colon+'<span class="title">'+title+'</span>';
 		this.setTitle(titleHtml);
 		
 		this.resizeReaderComponents();

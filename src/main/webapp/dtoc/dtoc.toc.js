@@ -298,23 +298,19 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
     		var doc = docs.getAt(i);
     		var docNode, title, author;
-    		if (i === 0) {
-    			title = 'Front Matter';
-    		} else {
-				if (this.titlesMode == this.MIN_TITLES) {
-					title = doc.getShortTitle().normalize();
-					title = title.slice(0, title.length-1);
-				} else {
-					title = doc.getTitle().normalize();
+			if (this.titlesMode == this.MIN_TITLES) {
+				title = doc.getShortTitle().normalize();
+				title = title.slice(0, title.length-1);
+			} else {
+				title = doc.getTitle().normalize();
+			}
+			if (!this.isCurator) {
+				author = doc.get('author');
+				if (author === undefined) {
+					author = '';
 				}
-				if (!this.isCurator) {
-					author = doc.get('author');
-					if (author === undefined) {
-						author = '';
-					}
-				    title += '<br/><span class="author">'+author+'</span>';
-				}
-    		}
+			    title += '<br/><span class="author">'+author+'</span>';
+			}
 			if (modifyCurrent) {
 				docNode = root.findChild('docId', doc.getId());
 				if (docNode) {
