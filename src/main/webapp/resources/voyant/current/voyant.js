@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Oct 17 15:33:00 EDT 2015 */
+/* This file created by JSCacher. Last modified: Sat Oct 17 15:59:09 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2768,7 +2768,6 @@ Ext.define('Voyant.util.Toolable', {
 		});
 	},
 	getExportUrl: function() {
-		debugger
 		var api = this.isXType('voyantheader') ? this.getApplication().getModifiedApiParams() : this.getModifiedApiParams();
 		if (!this.isXType('voyantheader')) {api.view=Ext.getClassName(this).split(".").pop()}
 		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(api);
@@ -4426,7 +4425,6 @@ Ext.define('Voyant.panel.VoyantTabPanel', {
 		}
 	},
 	showOptionsClick: function(panel) {
-		debugger
 		var tab = panel.getActiveTab();
 		if (tab.showOptionsClick) {
 			tab.showOptionsClick.apply(tab, arguments)
@@ -5173,6 +5171,7 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     draw: function(words, bounds) {
+    	var panel = this;
     	var fill = d3.scale.category20b();
     	var el = this.getLayout().getRenderTarget();
     	var width = this.getVisLayout().size()[0];
@@ -5198,12 +5197,13 @@ Ext.define('Voyant.panel.Cirrus', {
 			.attr('transform', function(d) {
 				return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')';
 			})
-			.style('font-size', '1px').transition().duration(1000).style('font-size', function(d) { return d.size + 'px'; });
+			.style('font-size', '1px').transition().duration(1000).style('font-size', function(d) { return d.size + 'px'; })
 		
 		wordNodes
 			.style('font-family', function(d) { return d.font; })
 			.style('fill', function(d) { return fill(d.text); })
-			.text(function(d) { return d.text; });
+			.text(function(d) { return d.text; })
+			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text])})
 		
 		wordNodes.exit().remove();
 		
