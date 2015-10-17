@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Oct 16 16:50:12 EDT 2015 */
+/* This file created by JSCacher. Last modified: Sat Oct 17 15:33:00 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2768,7 +2768,8 @@ Ext.define('Voyant.util.Toolable', {
 		});
 	},
 	getExportUrl: function() {
-		var api = this.getModifiedApiParams();
+		debugger
+		var api = this.isXType('voyantheader') ? this.getApplication().getModifiedApiParams() : this.getModifiedApiParams();
 		if (!this.isXType('voyantheader')) {api.view=Ext.getClassName(this).split(".").pop()}
 		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(api);
 	},
@@ -2805,6 +2806,7 @@ Ext.define('Voyant.util.Toolable', {
 				newTool.fireEvent("loadedCorpus", newTool, corpus)
 			}
 		}
+		this.getApplication().dispatchEvent('panelChange', this)
 	}
 });
 
@@ -5128,7 +5130,7 @@ Ext.define('Voyant.panel.Cirrus', {
 					.size([width, height])
 					.padding(1)
 					.rotate(function() { return ~~(Math.random() * 2) * 90; })
-					.spiral('rectangular')
+					.spiral('archimedean')
 					.font('Impact')
 					.fontSize(function(d) {
 						return d.fontSize;
@@ -12910,24 +12912,17 @@ Ext.define('Voyant.panel.CorpusSet', {
 			title: {en: "Corpus View"},
 			helpTip: {en: "This is the default, general-purpose corpus view."}
 		},
+		api: {
+			panels: undefined
+		},
 		glyph: 'xf17a@FontAwesome'
 	},
 	constructor: function(config) {
         this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 	},
 	layout: 'border',
 	items: [{
-        region: 'center',
-        flex: 3,
-        layout: 'fit',
-        xtype: 'voyanttabpanel',
-    	tabBarHeaderPosition: 0,
-        items: [{
-	        xtype: 'reader'
-        }/*,{
-        	xtype: 'scatterplot'
-        }*/]
-    }, {
     	region: 'west',
     	flex: 3,
     	layout: 'fit',
@@ -12941,16 +12936,16 @@ Ext.define('Voyant.panel.CorpusSet', {
     	},{
 	    	xtype: 'corpusterms'
     	}]
-    }, /* {
-    	region: 'west',
-    	flex: 3,
-    	layout: 'fit',
-        moreTools: ['cirrus','corpusterms'],
-    	split: {width: 5},
-    	items: {
-	    	xtype: 'cirrus'
-    	}
-    }, */{
+    },{
+        region: 'center',
+        flex: 3,
+        layout: 'fit',
+        xtype: 'voyanttabpanel',
+    	tabBarHeaderPosition: 0,
+        items: [{
+	        xtype: 'reader'
+        }]
+    }, {
     	region: 'east',
     	flex: 3,
     	layout: 'fit',
@@ -13005,6 +13000,28 @@ Ext.define('Voyant.panel.CorpusSet', {
     	}]
     }],
     listeners: {
+    	boxready: function() {
+    		var panelsString = this.getApiParam("panels");
+    		if (panelsString) {
+    			var panels = panelsString.toLowerCase().split(",");
+    			var tabpanels = this.query("voyanttabpanel");
+    			for (var i=0, len=panels.length; i<len; i++) {
+    				var panel = panels[i];
+    				if (panel && Ext.ClassManager.getByAlias('widget.'+panel) && tabpanels[i]) {
+    					var tabpanel = tabpanels[i];
+    					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already selected
+    					tabpanel.items.each(function(item, index) {
+    						if (item.isXType(panel)) {
+    							this.setActiveTab(index)
+    							return false
+    						}
+    					}, tabpanel)
+    					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already switched
+    					tabpanel.getActiveTab().replacePanel(panel); // switch to specified panel
+    				}
+    			}
+    		}
+    	},
     	loadedCorpus: function(src, corpus) {
     		if (corpus.getDocumentsCount()>30) {
     			var bubblelines = this.down('bubblelines');
@@ -13012,6 +13029,13 @@ Ext.define('Voyant.panel.CorpusSet', {
     				bubblelines.up('voyanttabpanel').remove(bubblelines)
     			}
     		}
+    	},
+    	panelChange: function(src) {
+    		var panels = [];
+    		this.query("voyanttabpanel").forEach(function(item) {
+    			panels.push(item.getActiveTab().xtype)
+    		})
+    		this.getApplication().setApiParam('panels', panels.join(','))
     	}
     }
 })
@@ -13363,7 +13387,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		},
 		api: {
 			view: 'corpusset',
-			stopList: 'auto'
+			stopList: 'auto',
+			panels: undefined
 		}
 	},
 	

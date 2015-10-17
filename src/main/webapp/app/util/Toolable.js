@@ -576,7 +576,7 @@ Ext.define('Voyant.util.Toolable', {
 		});
 	},
 	getExportUrl: function() {
-		var api = this.getModifiedApiParams();
+		var api = this.isXType('voyantheader') ? this.getApplication().getModifiedApiParams() : this.getModifiedApiParams();
 		if (!this.isXType('voyantheader')) {api.view=Ext.getClassName(this).split(".").pop()}
 		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(api);
 	},
@@ -613,6 +613,7 @@ Ext.define('Voyant.util.Toolable', {
 				newTool.fireEvent("loadedCorpus", newTool, corpus)
 			}
 		}
+		this.getApplication().dispatchEvent('panelChange', this)
 	}
 });
 

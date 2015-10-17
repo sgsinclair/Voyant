@@ -8,24 +8,17 @@ Ext.define('Voyant.panel.CorpusSet', {
 			title: {en: "Corpus View"},
 			helpTip: {en: "This is the default, general-purpose corpus view."}
 		},
+		api: {
+			panels: undefined
+		},
 		glyph: 'xf17a@FontAwesome'
 	},
 	constructor: function(config) {
         this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 	},
 	layout: 'border',
 	items: [{
-        region: 'center',
-        flex: 3,
-        layout: 'fit',
-        xtype: 'voyanttabpanel',
-    	tabBarHeaderPosition: 0,
-        items: [{
-	        xtype: 'reader'
-        }/*,{
-        	xtype: 'scatterplot'
-        }*/]
-    }, {
     	region: 'west',
     	flex: 3,
     	layout: 'fit',
@@ -39,16 +32,16 @@ Ext.define('Voyant.panel.CorpusSet', {
     	},{
 	    	xtype: 'corpusterms'
     	}]
-    }, /* {
-    	region: 'west',
-    	flex: 3,
-    	layout: 'fit',
-        moreTools: ['cirrus','corpusterms'],
-    	split: {width: 5},
-    	items: {
-	    	xtype: 'cirrus'
-    	}
-    }, */{
+    },{
+        region: 'center',
+        flex: 3,
+        layout: 'fit',
+        xtype: 'voyanttabpanel',
+    	tabBarHeaderPosition: 0,
+        items: [{
+	        xtype: 'reader'
+        }]
+    }, {
     	region: 'east',
     	flex: 3,
     	layout: 'fit',
@@ -103,6 +96,28 @@ Ext.define('Voyant.panel.CorpusSet', {
     	}]
     }],
     listeners: {
+    	boxready: function() {
+    		var panelsString = this.getApiParam("panels");
+    		if (panelsString) {
+    			var panels = panelsString.toLowerCase().split(",");
+    			var tabpanels = this.query("voyanttabpanel");
+    			for (var i=0, len=panels.length; i<len; i++) {
+    				var panel = panels[i];
+    				if (panel && Ext.ClassManager.getByAlias('widget.'+panel) && tabpanels[i]) {
+    					var tabpanel = tabpanels[i];
+    					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already selected
+    					tabpanel.items.each(function(item, index) {
+    						if (item.isXType(panel)) {
+    							this.setActiveTab(index)
+    							return false
+    						}
+    					}, tabpanel)
+    					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already switched
+    					tabpanel.getActiveTab().replacePanel(panel); // switch to specified panel
+    				}
+    			}
+    		}
+    	},
     	loadedCorpus: function(src, corpus) {
     		if (corpus.getDocumentsCount()>30) {
     			var bubblelines = this.down('bubblelines');
@@ -110,6 +125,13 @@ Ext.define('Voyant.panel.CorpusSet', {
     				bubblelines.up('voyanttabpanel').remove(bubblelines)
     			}
     		}
+    	},
+    	panelChange: function(src) {
+    		var panels = [];
+    		this.query("voyanttabpanel").forEach(function(item) {
+    			panels.push(item.getActiveTab().xtype)
+    		})
+    		this.getApplication().setApiParam('panels', panels.join(','))
     	}
     }
 })

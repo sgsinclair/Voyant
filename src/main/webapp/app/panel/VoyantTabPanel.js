@@ -28,7 +28,6 @@ Ext.define('Voyant.panel.VoyantTabPanel', {
 		}
 	},
 	showOptionsClick: function(panel) {
-		debugger
 		var tab = panel.getActiveTab();
 		if (tab.showOptionsClick) {
 			tab.showOptionsClick.apply(tab, arguments)
