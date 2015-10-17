@@ -163,7 +163,7 @@ Ext.define('Voyant.panel.Cirrus', {
 					.size([width, height])
 					.padding(1)
 					.rotate(function() { return ~~(Math.random() * 2) * 90; })
-					.spiral('rectangular')
+					.spiral('archimedean')
 					.font('Impact')
 					.fontSize(function(d) {
 						return d.fontSize;
