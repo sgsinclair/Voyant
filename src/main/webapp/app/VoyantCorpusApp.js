@@ -19,6 +19,11 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	}
     },
     
+	constructor: function() {
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+        this.callParent(arguments);
+	},
+	
     config: {
     	corpus: undefined,
     	moreTools: [{

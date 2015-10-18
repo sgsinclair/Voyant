@@ -28,6 +28,8 @@ Ext.define('Voyant.VoyantApp', {
     	// set the application for the Corpus so that we can use a simple constructor
 		Voyant.application = this;
 		
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+
 		// call the parent constructor
         this.callParent(arguments);
         

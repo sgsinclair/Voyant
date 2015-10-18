@@ -12,13 +12,16 @@ Ext.define('Voyant.panel.RezoViz', {
     		reload: {en: 'Reload'},
     		repulsion: {en: 'Repulsion'},
     		stiffness: {en: 'Stiffness'},
-    		friction: {en: 'Friction'}
+    		friction: {en: 'Friction'},
+    		noEntities: {en: 'No entities to graph.'},
+    		loadingEntities: {en: 'Loading entities…'}
     	},
     	api: {
     		query: undefined,
     		limit: 15,
     		stopList: 'auto',
-    		types:['organization','location','person']
+    		type: ['organization','location','person'],
+    		minEdgeCount: 2
     	},
 		glyph: 'xf1cb@FontAwesome'
     },
@@ -201,6 +204,9 @@ Ext.define('Voyant.panel.RezoViz', {
         
         this.on('loadedCorpus', function(src, corpus) {
         	this.setCorpus(corpus);
+        	if (corpus.getDocumentsCount()==1) {
+        		this.setApiParam("minEdgeCount", 1)
+        	}
         	this.getEntities();
         }, this);
         
@@ -214,20 +220,28 @@ Ext.define('Voyant.panel.RezoViz', {
     
     getEntities: function() {
     	var corpusId = this.getCorpus().getId();
-    	var types = this.getApiParam('types');
+    	var el = this.getLayout().getRenderTarget();
+    	el.mask(this.localize('loadingEntities'))
     	Ext.Ajax.request({
     		url: this.getApplication().getTromboneUrl(),
     		method: 'POST',
     		params: {
     			tool: 'corpus.EntityCollocationsGraph',
-    			type: types,
+    			type: this.getApiParam('type'),
     			limit: this.getApiParam('limit'),
+    			minEdgeCount: this.getApiParam("minEdgeCount"),
     			corpus: corpusId
     		},
     		success: function(response) {
+    			el.unmask();
     			var obj = Ext.decode(response.responseText);
-    			this.processEntities(obj.entityCollocationsGraph);
-    			this.initGraph();
+    			if (obj.entityCollocationsGraph.edges.length==0) {
+    				this.showError({msg: this.localize('noEntities')})
+    			}
+    			else {
+        			this.processEntities(obj.entityCollocationsGraph);
+        			this.initGraph();
+    			}
     		},
     		scope: this
     	});

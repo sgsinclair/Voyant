@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Oct 18 14:26:59 EDT 2015 */
+/* This file created by JSCacher. Last modified: Sun Oct 18 15:54:31 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7892,13 +7892,16 @@ Ext.define('Voyant.panel.RezoViz', {
     		reload: {en: 'Reload'},
     		repulsion: {en: 'Repulsion'},
     		stiffness: {en: 'Stiffness'},
-    		friction: {en: 'Friction'}
+    		friction: {en: 'Friction'},
+    		noEntities: {en: 'No entities to graph.'},
+    		loadingEntities: {en: 'Loading entities…'}
     	},
     	api: {
     		query: undefined,
     		limit: 15,
     		stopList: 'auto',
-    		types:['organization','location','person']
+    		type: ['organization','location','person'],
+    		minEdgeCount: 2
     	},
 		glyph: 'xf1cb@FontAwesome'
     },
@@ -8081,6 +8084,9 @@ Ext.define('Voyant.panel.RezoViz', {
         
         this.on('loadedCorpus', function(src, corpus) {
         	this.setCorpus(corpus);
+        	if (corpus.getDocumentsCount()==1) {
+        		this.setApiParam("minEdgeCount", 1)
+        	}
         	this.getEntities();
         }, this);
         
@@ -8094,20 +8100,28 @@ Ext.define('Voyant.panel.RezoViz', {
     
     getEntities: function() {
     	var corpusId = this.getCorpus().getId();
-    	var types = this.getApiParam('types');
+    	var el = this.getLayout().getRenderTarget();
+    	el.mask(this.localize('loadingEntities'))
     	Ext.Ajax.request({
     		url: this.getApplication().getTromboneUrl(),
-    		method: 'GET',
+    		method: 'POST',
     		params: {
     			tool: 'corpus.EntityCollocationsGraph',
-    			type: types,
+    			type: this.getApiParam('type'),
     			limit: this.getApiParam('limit'),
+    			minEdgeCount: this.getApiParam("minEdgeCount"),
     			corpus: corpusId
     		},
     		success: function(response) {
+    			el.unmask();
     			var obj = Ext.decode(response.responseText);
-    			this.processEntities(obj.entityCollocationsGraph);
-    			this.initGraph();
+    			if (obj.entityCollocationsGraph.edges.length==0) {
+    				this.showError({msg: this.localize('noEntities')})
+    			}
+    			else {
+        			this.processEntities(obj.entityCollocationsGraph);
+        			this.initGraph();
+    			}
     		},
     		scope: this
     	});
@@ -8177,13 +8191,7 @@ Ext.define('Voyant.panel.RezoViz', {
     		nodes: this.getNodesDataSet(),
     		edges: this.getEdgesDataSet()
     	}, options);
-    	
-//    	network.on('click', function(params) {
-//    		
-//    	});
-//    	network.on('doubleClick', function(params) {
-//    		
-//    	});
+
     	network.on('selectNode', function(params) {
     		var node = params.nodes[0];
     		this.doNodeSelect(node);
@@ -13097,6 +13105,8 @@ Ext.define('Voyant.VoyantApp', {
     	// set the application for the Corpus so that we can use a simple constructor
 		Voyant.application = this;
 		
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+
 		// call the parent constructor
         this.callParent(arguments);
         
@@ -13332,6 +13342,11 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	}
     },
     
+	constructor: function() {
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+        this.callParent(arguments);
+	},
+	
     config: {
     	corpus: undefined,
     	moreTools: [{
