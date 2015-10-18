@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Oct 17 15:59:09 EDT 2015 */
+/* This file created by JSCacher. Last modified: Sun Oct 18 14:26:59 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4419,6 +4419,7 @@ Ext.define('Voyant.panel.VoyantTabPanel', {
 				toolMenu.destroy();
 			})
 			this.addTool(newTab.tools)
+			this.getApplication().dispatchEvent("panelChange", this)
 		},
 		afterrender: function(panel) {
 			this.fireEvent("tabchange", this, this.getActiveTab())
@@ -7911,36 +7912,54 @@ Ext.define('Voyant.panel.RezoViz', {
     	highlightedEntity: undefined
     },
 
+    categorizedNodeOptions: {
+    	location: {
+    		font: {
+    			color: 'green'
+    		}
+    	},
+    	person: {
+    		font: {
+    			color: 'maroon'
+    		}
+    	},
+    	organization: {
+    		font: {
+    			color: 'purple'
+    		}
+    	}
+    },
     nodeOptions: {
 		shape: 'box',
 		color: {
-			border: '#157fcc',
-			background: '#82C3F2',
-			highlight: {
-				border: '#EA8034',
-				background: '#EFA26B'
-			},
-			hover: {
-				border: '#157fcc',
-				background: '#82C3F2'
-			}
-		}
+			border: 'rgba(0,0,0,0.1)',
+			background: 'rgba(255,255,255,1)'
+		},
+		scaling:{
+            label: {
+              min: 8,
+              max: 20
+            }
+          }
 	},
 	edgeOptions: {
 		color: {
-			color: '#157fcc',
-			highlight: '#EA8034',
-			hover: '#EA8034'
-		}
+			color: 'rgba(0,0,0,0.1)',
+			highlight: 'black',
+			hover: 'red'
+		},
+		labelHighlightBold: false
 	},
 	highlightOptions: {
+		font: {
+			color: 'white'
+		},
 		color: {
-			border: '#CB157F',
-			background: '#EB42A5',
+			background: 'black'/*,
 			hover: {
 				border: '#CB157F',
 				background: '#EB42A5'
-			}
+			}*/
 		}
 	},
     
@@ -8082,6 +8101,7 @@ Ext.define('Voyant.panel.RezoViz', {
     		params: {
     			tool: 'corpus.EntityCollocationsGraph',
     			type: types,
+    			limit: this.getApiParam('limit'),
     			corpus: corpusId
     		},
     		success: function(response) {
@@ -8097,11 +8117,19 @@ Ext.define('Voyant.panel.RezoViz', {
     	var nodes = entityParent.nodes;
     	var edges = entityParent.edges;
     	
-    	var visNodes = [];
+    	// we need to calculate the font size because the scaling option doesn't seem to work as advertised
+    	var extent = d3.extent(nodes, function(node) {return node.rawFreq});
+    	var min = extent[0];
+    	var max = extent[1];    	
+    	var scaleFont = d3.scale.linear()
+                    .domain([min, max])
+                    .range([10, 24]);
+    	
+    	var visNodes = []
     	for (var i = 0; i < nodes.length; i++) {
     		var n = nodes[i];
     		n.id = i;
-    		visNodes.push({id: i, label: n.term, type: n.type, rawFreq: n.rawFreq, title: n.term + (n.rawFreq ? ' ('+n.rawFreq+')':'')});
+    		visNodes.push({id: i, label: n.term, value: nodes[i].rawFreq, font: {size: scaleFont(n.rawFreq), color: this.categorizedNodeOptions[n.type].font.color}, type: n.type, rawFreq: n.rawFreq, title: n.term + (n.rawFreq ? ' ('+n.rawFreq+')':'')});
     	}
     	
     	this.getNodesStore().loadData(nodes);
@@ -8109,7 +8137,7 @@ Ext.define('Voyant.panel.RezoViz', {
     	var visEdges = [];
     	for (var i = 0; i < edges.length; i++) {
     		var link = edges[i].nodes;
-    		visEdges.push({from: link[0], to: link[1]});
+    		visEdges.push({from: link[0], to: link[1], title: edges[i].count, value: 200*edges[i].count});
     	}
     	
     	this.setNodesDataSet(new vis.DataSet(visNodes));

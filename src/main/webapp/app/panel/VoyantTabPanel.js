@@ -22,6 +22,7 @@ Ext.define('Voyant.panel.VoyantTabPanel', {
 				toolMenu.destroy();
 			})
 			this.addTool(newTab.tools)
+			this.getApplication().dispatchEvent("panelChange", this)
 		},
 		afterrender: function(panel) {
 			this.fireEvent("tabchange", this, this.getActiveTab())
