@@ -171,11 +171,11 @@ Ext.define('Voyant.panel.Contexts', {
 	           			 if (!documentSegmentTerm.term) {return}
 	           			 params = {query: documentSegmentTerm.term};
 	           			 if (documentSegmentTerm.docId) {
-	           				 params.docId = documentSegmentTerm.docId
+	           				 params.docId = documentSegmentTerm.docId;
 	           			 }
 	           			 else {
 	           				 // default to first document
-	           				 params.docIndex = documentSegmentTerm.docIndex ?  documentSegmentTerm.docIndex : 0
+	           				 params.docIndex = documentSegmentTerm.docIndex ? documentSegmentTerm.docIndex : 0;
 	           			 }
 	           			 this.setApiParams(params);
 	       	        	if (this.isVisible()) {

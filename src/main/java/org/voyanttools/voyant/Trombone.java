@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -106,6 +107,13 @@ public class Trombone extends HttpServlet {
 			throw new NullPointerException("illegal servlet response");
 		}
 
+		try {
+			req.setCharacterEncoding("UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+		}
+		resp.setCharacterEncoding("UTF-8");
+		
 		final FlexibleParameters parameters = getFlexibleParameters(req);
 		if (parameters == null) {
 			return;

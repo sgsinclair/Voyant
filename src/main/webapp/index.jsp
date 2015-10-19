@@ -2,6 +2,7 @@
 <script>
 	Ext.Loader.setConfig({
 		enabled : true,
+		disableCaching: false,
 		paths : {
 			'Voyant' : 'app',
 			'resources': 'resources'
