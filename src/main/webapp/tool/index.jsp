@@ -47,7 +47,6 @@ if (isNotRealTool || new java.io.File(request.getServletContext().getRealPath("a
 <script>
 	Ext.Loader.setConfig({
 		enabled : true,
-		disableCaching: false,
 		paths : {
 			'Voyant' : '../../app',
 			'resources': '../../resources',
