@@ -25,7 +25,6 @@ Ext.define('Voyant.panel.Cirrus', {
     	options: {
     		xtype: 'stoplistoption'
     	},
-    	filesLoaded: false,
     	corpus: undefined,
     	terms: undefined,
     	visLayout: undefined, // cloud layout algorithm
@@ -107,7 +106,6 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	boxready: function() {
-			this.setFilesLoaded(true);
 			this.initVisLayout();
     	}
     	
@@ -147,7 +145,7 @@ Ext.define('Voyant.panel.Cirrus', {
     loadFromTermsRecords: function(records) {
     	var terms = [];
     	records.forEach(function(record) {
-    		terms.push({text: record.get('term'), size: record.get('rawFreq')});
+    		terms.push({text: record.get('term'), rawFreq: record.get('rawFreq')});
     	});
     	this.setTerms(terms);
     	this.buildFromTerms();
@@ -174,8 +172,21 @@ Ext.define('Voyant.panel.Cirrus', {
 					.on('end', this.draw.bind(this))
 			);
 			
-			var svg = d3.select(el.dom).append('svg').attr('width', width).attr('height', height);
+			var svg = d3.select(el.dom).append('svg').attr('id','cirrusGraph').attr('width', width).attr('height', height);
 			this.setVis(svg.append('g').attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')'));
+			
+			var tip = Ext.create('Ext.tip.ToolTip', {
+				target: svg.node(),
+				delegate: 'text',
+				trackMouse: true,
+				listeners: {
+					beforeshow: function(tip) {
+						var el = tip.triggerElement;
+						var freq = el.getAttribute('data-freq');
+						tip.update(freq);
+					}
+				}
+			});
     	}
     },
     
@@ -185,7 +196,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		var minSize = 1000;
     		var maxSize = -1;
     		for (var i = 0; i < terms.length; i++) {
-    			var size = terms[i].size;
+    			var size = terms[i].rawFreq;
     			if (size < minSize) minSize = size;
     			if (size > maxSize) maxSize = size;
     		}
@@ -198,8 +209,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		
 //    		var fontSizer = d3.scale.pow().range([10, 100]).domain([minSize, maxSize]);
     		
-    		this.getVisLayout().words(terms);
-    		this.getVisLayout().start();
+    		this.getVisLayout().words(terms).start();
     	} else {
     		Ext.defer(this.buidlFromTerms, 50, this);
     	}
@@ -225,20 +235,23 @@ Ext.define('Voyant.panel.Cirrus', {
 			.attr('transform', function(d) {
 				return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')';
 			})
-			.style('font-size', function(d) { return d.size + 'px'; });
+			.style('font-size', function(d) { return d.fontSize + 'px'; });
 		
 		wordNodes.enter().append('text')
 			.attr('text-anchor', 'middle')
+			.attr('data-freq', function(d) {
+				return d.rawFreq;
+			})
 			.attr('transform', function(d) {
 				return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')';
 			})
-			.style('font-size', '1px').transition().duration(1000).style('font-size', function(d) { return d.size + 'px'; })
+			.style('font-size', '1px').transition().duration(1000).style('font-size', function(d) { return d.fontSize + 'px'; });
 		
 		wordNodes
 			.style('font-family', function(d) { return d.font; })
 			.style('fill', function(d) { return fill(d.text); })
 			.text(function(d) { return d.text; })
-			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text])})
+			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);});
 		
 		wordNodes.exit().remove();
 		
@@ -250,21 +263,23 @@ Ext.define('Voyant.panel.Cirrus', {
 	},
 	
 	calculateSizeAdjustment: function() {
-		var el = this.getLayout().getRenderTarget();
-		
-        var stageArea = el.getWidth() * el.getHeight();
-        if (stageArea < 100000) this.setMinFontSize(8);
-        else this.setMinFontSize(12);
+		var terms = this.getTerms();
+        if (terms !== undefined) {
+			var el = this.getLayout().getRenderTarget();
+			
+	        var stageArea = el.getWidth() * el.getHeight();
+	        if (stageArea < 100000) this.setMinFontSize(8);
+	        else this.setMinFontSize(12);
         
-        var terms = this.getTerms();
-        var pixelsPerWord = stageArea / terms.length;
-        var totalWordsSize = 0;
-        for (var i = 0; i < terms.length; i++) {
-            var word = terms[i];
-            var wordArea = this.calculateWordArea(word);
-            totalWordsSize += wordArea;
+	        var pixelsPerWord = stageArea / terms.length;
+	        var totalWordsSize = 0;
+	        for (var i = 0; i < terms.length; i++) {
+	            var word = terms[i];
+	            var wordArea = this.calculateWordArea(word);
+	            totalWordsSize += wordArea;
+	        }
+	        this.setSizeAdjustment(stageArea / totalWordsSize);
         }
-        this.setSizeAdjustment(stageArea / totalWordsSize);
     },
     
     calculateWordArea: function(word) {
@@ -284,19 +299,23 @@ Ext.define('Voyant.panel.Cirrus', {
     setAdjustedSizes: function() {
     	this.calculateSizeAdjustment();
     	var terms = this.getTerms();
-		for (var i = 0; i < terms.length; i++) {
-			var term = terms[i];
-			var adjustedSize = this.findNewRelativeSize(term);
-			term.fontSize = adjustedSize > this.getMinFontSize() ? adjustedSize : this.getMinFontSize();
-		}
+    	if (terms !== undefined) {
+			for (var i = 0; i < terms.length; i++) {
+				var term = terms[i];
+				var adjustedSize = this.findNewRelativeSize(term);
+				term.fontSize = adjustedSize > this.getMinFontSize() ? adjustedSize : this.getMinFontSize();
+			}
+    	}
     },
     
     setRelativeSizes: function() {
     	var terms = this.getTerms();
-    	for (var i = 0; i < terms.length; i++) {
-            var word = terms[i];
-            word.relativeSize = this.map(word.size, this.getSmallestWordSize(), this.getLargestWordSize(), 0.1, 1);
-        }
+    	if (terms !== undefined) {
+	    	for (var i = 0; i < terms.length; i++) {
+	            var word = terms[i];
+	            word.relativeSize = this.map(word.rawFreq, this.getSmallestWordSize(), this.getLargestWordSize(), 0.1, 1);
+	        }
+    	}
     },
     
     findNewRelativeSize: function(word) {

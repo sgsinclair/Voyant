@@ -98,6 +98,12 @@ a {
 	background-color: yellow;
 }
 
+/* Cirrus */
+
+svg#cirrusGraph text {
+    cursor: pointer;
+}
+
 /* Collocates Graph */
 svg#collocatesGraph text {
     text-anchor: middle;
