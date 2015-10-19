@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Oct 18 15:54:31 EDT 2015 */
+/* This file created by JSCacher. Last modified: Sun Oct 18 17:29:31 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7898,7 +7898,7 @@ Ext.define('Voyant.panel.RezoViz', {
     	},
     	api: {
     		query: undefined,
-    		limit: 15,
+    		limit: 25,
     		stopList: 'auto',
     		type: ['organization','location','person'],
     		minEdgeCount: 2
@@ -7993,7 +7993,8 @@ Ext.define('Voyant.panel.RezoViz', {
                     store: this.getNodesStore(),
                     listeners: {
 						select: function(combo, record) {
-							this.highlightEntity(record.get('id'));
+							this.getNetwork().selectNodes([record.get('id')])
+//							this.highlightEntity(record.get('id'));
 						},
 						scope: this
                     }
@@ -8165,7 +8166,7 @@ Ext.define('Voyant.panel.RezoViz', {
     	// explicitly set dimensions
     	el.setWidth(el.getWidth());
     	el.setHeight(el.getHeight());
-    	
+
     	var options = {
 			interaction: {
     			hover: true,
@@ -8173,14 +8174,15 @@ Ext.define('Voyant.panel.RezoViz', {
     			multiselect: false
     		},
     		physics: {
+    			solver: 'barnesHut'/*,
 				barnesHut: {
-					gravitationalConstant: -2000,
-					centralGravity: 0.3,
+					gravitationalConstant: -65000,
+					centralGravity: 0,
 					springLength: 95,
 					springConstant: 0.04,
 					damping: 0.09,
 					avoidOverlap: 0
-				}
+				}*/
     		},
     		nodes: this.nodeOptions,
     		edges: this.edgeOptions
@@ -8267,7 +8269,7 @@ Ext.define('Voyant.panel.RezoViz', {
     		}
     	});
     	
-    	this.setApiParam('types', categories);
+    	this.setApiParam('type', categories);
     	this.getEntities();
     },
     

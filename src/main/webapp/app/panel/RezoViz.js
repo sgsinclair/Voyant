@@ -18,7 +18,7 @@ Ext.define('Voyant.panel.RezoViz', {
     	},
     	api: {
     		query: undefined,
-    		limit: 15,
+    		limit: 25,
     		stopList: 'auto',
     		type: ['organization','location','person'],
     		minEdgeCount: 2
@@ -113,7 +113,8 @@ Ext.define('Voyant.panel.RezoViz', {
                     store: this.getNodesStore(),
                     listeners: {
 						select: function(combo, record) {
-							this.highlightEntity(record.get('id'));
+							this.getNetwork().selectNodes([record.get('id')])
+//							this.highlightEntity(record.get('id'));
 						},
 						scope: this
                     }
@@ -285,7 +286,7 @@ Ext.define('Voyant.panel.RezoViz', {
     	// explicitly set dimensions
     	el.setWidth(el.getWidth());
     	el.setHeight(el.getHeight());
-    	
+
     	var options = {
 			interaction: {
     			hover: true,
@@ -293,14 +294,15 @@ Ext.define('Voyant.panel.RezoViz', {
     			multiselect: false
     		},
     		physics: {
+    			solver: 'barnesHut'/*,
 				barnesHut: {
-					gravitationalConstant: -2000,
-					centralGravity: 0.3,
+					gravitationalConstant: -65000,
+					centralGravity: 0,
 					springLength: 95,
 					springConstant: 0.04,
 					damping: 0.09,
 					avoidOverlap: 0
-				}
+				}*/
     		},
     		nodes: this.nodeOptions,
     		edges: this.edgeOptions
@@ -357,6 +359,7 @@ Ext.define('Voyant.panel.RezoViz', {
 		network.redraw(); // need to force redraw if coming from deselect
     },
     
+    /* this can probably be deleted since it was only used by the search box
     highlightEntity: function(nodeId) {
     	var network = this.getNetwork();
     	for (var id in network.body.nodes) {
@@ -369,6 +372,7 @@ Ext.define('Voyant.panel.RezoViz', {
     	}
     	network.redraw();
     },
+    */
     
     removeHighlight: function() {
     	var id = this.getHighlightedEntity();
@@ -387,7 +391,7 @@ Ext.define('Voyant.panel.RezoViz', {
     		}
     	});
     	
-    	this.setApiParam('types', categories);
+    	this.setApiParam('type', categories);
     	this.getEntities();
     },
     
