@@ -217,7 +217,8 @@ Ext.define('Voyant.panel.Cirrus', {
     
     draw: function(words, bounds) {
     	var panel = this;
-    	var fill = d3.scale.category20b();
+    	// no longer used
+    	// var fill = d3.scale.category20b();
     	var el = this.getLayout().getRenderTarget();
     	var width = this.getVisLayout().size()[0];
     	var height = this.getVisLayout().size()[1];
@@ -249,7 +250,7 @@ Ext.define('Voyant.panel.Cirrus', {
 		
 		wordNodes
 			.style('font-family', function(d) { return d.font; })
-			.style('fill', function(d) { return fill(d.text); })
+			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
 			.text(function(d) { return d.text; })
 			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);});
 		
