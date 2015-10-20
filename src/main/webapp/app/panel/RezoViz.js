@@ -10,10 +10,12 @@ Ext.define('Voyant.panel.RezoViz', {
     		locations: {en: 'Locations'},
     		organizations: {en: 'Organizations'},
     		reload: {en: 'Reload'},
+    		minEdgeCount: {en: 'Min. Edge Count'},
     		repulsion: {en: 'Repulsion'},
     		stiffness: {en: 'Stiffness'},
     		friction: {en: 'Friction'},
     		noEntities: {en: 'No entities to graph.'},
+    		noEntitiesForEdgeCount: {en: 'No entities were found. Would you like to reduce the minimum edge count to improve results?'},
     		loadingEntities: {en: 'Loading entities…'}
     	},
     	api: {
@@ -32,7 +34,7 @@ Ext.define('Voyant.panel.RezoViz', {
     	nodesStore: undefined, // used by combo
     	nodesDataSet: undefined, // used by vis
     	edgesDataSet: undefined, // used by vis
-    	highlightedEntity: undefined
+    	isNetworkBounded: true
     },
 
     categorizedNodeOptions: {
@@ -113,8 +115,7 @@ Ext.define('Voyant.panel.RezoViz', {
                     store: this.getNodesStore(),
                     listeners: {
 						select: function(combo, record) {
-							this.getNetwork().selectNodes([record.get('id')])
-//							this.highlightEntity(record.get('id'));
+							this.getNetwork().selectNodes([record.get('id')]);
 						},
 						scope: this
                     }
@@ -145,6 +146,30 @@ Ext.define('Voyant.panel.RezoViz', {
 	                		scope: this
 	                	}]
 	                }
+                },{
+					xtype: 'numberfield',
+					itemId: 'minEdgeCount',
+					fieldLabel: this.localize('minEdgeCount'),
+					labelAlign: 'right',
+					labelWidth: 120,
+					width: 170,
+					maxValue: 10,
+					minValue: 1,
+					allowDecimals: false,
+					allowExponential: false,
+					allowOnlyWhitespace: false,
+					listeners: {
+						render: function(field) {
+							field.setRawValue(this.getApiParam('minEdgeCount'));
+						},
+						change: function(field, newVal) {
+							if (field.isValid()) {
+								this.setApiParam('minEdgeCount', newVal);
+								this.getEntities();
+							}
+						},
+						scope: this
+					}
                 },{ xtype: 'tbseparator' },{
                 	xtype: 'slider',
                 	fieldLabel: this.localize('repulsion'),
@@ -206,7 +231,7 @@ Ext.define('Voyant.panel.RezoViz', {
         this.on('loadedCorpus', function(src, corpus) {
         	this.setCorpus(corpus);
         	if (corpus.getDocumentsCount()==1) {
-        		this.setApiParam("minEdgeCount", 1)
+        		this.setApiParam("minEdgeCount", 1);
         	}
         	this.getEntities();
         }, this);
@@ -222,7 +247,7 @@ Ext.define('Voyant.panel.RezoViz', {
     getEntities: function() {
     	var corpusId = this.getCorpus().getId();
     	var el = this.getLayout().getRenderTarget();
-    	el.mask(this.localize('loadingEntities'))
+    	el.mask(this.localize('loadingEntities'));
     	Ext.Ajax.request({
     		url: this.getApplication().getTromboneUrl(),
     		method: 'POST',
@@ -237,7 +262,15 @@ Ext.define('Voyant.panel.RezoViz', {
     			el.unmask();
     			var obj = Ext.decode(response.responseText);
     			if (obj.entityCollocationsGraph.edges.length==0) {
-    				this.showError({msg: this.localize('noEntities')})
+    				this.showError({msg: this.localize('noEntities')});
+    				Ext.Msg.confirm(this.localize('error'), this.localize('noEntitiesForEdgeCount'), function(button) {
+    					if (button === 'yes') {
+    						var newEdgeCount = Math.max(1, this.getApiParam('minEdgeCount')-1);
+    						this.queryById('minEdgeCount').setRawValue(newEdgeCount);
+    						this.setApiParam('minEdgeCount', newEdgeCount);
+    						this.getEntities();
+    					}
+    				}, this);
     			}
     			else {
         			this.processEntities(obj.entityCollocationsGraph);
@@ -253,14 +286,14 @@ Ext.define('Voyant.panel.RezoViz', {
     	var edges = entityParent.edges;
     	
     	// we need to calculate the font size because the scaling option doesn't seem to work as advertised
-    	var extent = d3.extent(nodes, function(node) {return node.rawFreq});
+    	var extent = d3.extent(nodes, function(node) {return node.rawFreq;});
     	var min = extent[0];
     	var max = extent[1];    	
     	var scaleFont = d3.scale.linear()
                     .domain([min, max])
                     .range([10, 24]);
     	
-    	var visNodes = []
+    	var visNodes = [];
     	for (var i = 0; i < nodes.length; i++) {
     		var n = nodes[i];
     		n.id = i;
@@ -314,12 +347,30 @@ Ext.define('Voyant.panel.RezoViz', {
     		edges: this.getEdgesDataSet()
     	}, options);
 
+    	if (this.getIsNetworkBounded()) {
+	    	network.on('beforeDrawing', function (ctx) {
+	    		var el = this.getLayout().getRenderTarget();
+	    		var width = el.getWidth();
+	    		var height = el.getHeight();
+	    		
+	    	    var nodePositions = network.getPositions();
+	    	    for (var id in nodePositions) {
+	    	    	var node = nodePositions[id];
+	    	    	var xy = network.canvasToDOM(node);
+	    	    	var boundedX = Math.max(0, Math.min(width, xy.x));
+	    	    	var boundedY = Math.max(0, Math.min(height, xy.y));
+	    	    	var bXY = network.DOMtoCanvas({x: boundedX, y: boundedY});
+	    	    	network.body.nodes[id].x = bXY.x;
+	    	    	network.body.nodes[id].y = bXY.y;
+	    	    }
+	    	}.bind(this));
+    	}
+    	
     	network.on('selectNode', function(params) {
     		var node = params.nodes[0];
     		this.doNodeSelect(node);
     	}.bind(this));
     	network.on('deselectNode', function(params) {
-    		this.removeHighlight();
     		network.unselectAll(); // need this due to our custom selecting code
     		
     		var node = params.nodes[0];
@@ -338,14 +389,13 @@ Ext.define('Voyant.panel.RezoViz', {
     
     doNodeSelect: function(node) {
 		var term = this.getNodesDataSet().get(node).label;
-		this.dispatchEvent("termsClicked", this, [term])
+		this.dispatchEvent("termsClicked", this, [term]);
     	var network = this.getNetwork();
 		var nodes = network.getConnectedNodes(node);
 		nodes.push(node);
 		var edges = network.getConnectedEdges(node);
 		
 		// custom selection to avoid selecting edges between the secondary/connected nodes
-		this.removeHighlight();
 		network.unselectAll();
 		for (var i = 0; i < nodes.length; i++) {
 			var n = nodes[i];
@@ -359,30 +409,6 @@ Ext.define('Voyant.panel.RezoViz', {
 		}
 		
 		network.redraw(); // need to force redraw if coming from deselect
-    },
-    
-    /* this can probably be deleted since it was only used by the search box
-    highlightEntity: function(nodeId) {
-    	var network = this.getNetwork();
-    	for (var id in network.body.nodes) {
-    		if (id == nodeId) {
-    			network.body.nodes[id].setOptions(this.highlightOptions);
-    			this.setHighlightedEntity(nodeId);
-    		} else {
-    			network.body.nodes[id].setOptions(this.nodeOptions);
-    		}
-    	}
-    	network.redraw();
-    },
-    */
-    
-    removeHighlight: function() {
-    	var id = this.getHighlightedEntity();
-    	if (id !== undefined) {
-    		this.getNetwork().body.nodes[id].setOptions(this.nodeOptions);
-    		this.getNetwork().redraw();
-    		this.setHighlightedEntity(undefined);
-    	}
     },
     
     categoriesHandler: function(item) {
