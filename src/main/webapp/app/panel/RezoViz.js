@@ -337,6 +337,8 @@ Ext.define('Voyant.panel.RezoViz', {
     },
     
     doNodeSelect: function(node) {
+		var term = this.getNodesDataSet().get(node).label;
+		this.dispatchEvent("termsClicked", this, [term])
     	var network = this.getNetwork();
 		var nodes = network.getConnectedNodes(node);
 		nodes.push(node);

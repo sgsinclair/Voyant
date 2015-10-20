@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Oct 19 21:10:29 EDT 2015 */
+/* This file created by JSCacher. Last modified: Mon Oct 19 21:44:15 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5183,7 +5183,8 @@ Ext.define('Voyant.panel.Cirrus', {
     
     draw: function(words, bounds) {
     	var panel = this;
-    	var fill = d3.scale.category20b();
+    	// no longer used
+    	// var fill = d3.scale.category20b();
     	var el = this.getLayout().getRenderTarget();
     	var width = this.getVisLayout().size()[0];
     	var height = this.getVisLayout().size()[1];
@@ -5215,7 +5216,7 @@ Ext.define('Voyant.panel.Cirrus', {
 		
 		wordNodes
 			.style('font-family', function(d) { return d.font; })
-			.style('fill', function(d) { console.warn(panel.getApplication().getColorForTerm(d.text, true)); return panel.getApplication().getColorForTerm(d.text, true); })
+			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
 			.text(function(d) { return d.text; })
 			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);});
 		
@@ -8236,6 +8237,8 @@ Ext.define('Voyant.panel.RezoViz', {
     },
     
     doNodeSelect: function(node) {
+		var term = this.getNodesDataSet().get(node).label;
+		this.dispatchEvent("termsClicked", this, [term])
     	var network = this.getNetwork();
 		var nodes = network.getConnectedNodes(node);
 		nodes.push(node);
