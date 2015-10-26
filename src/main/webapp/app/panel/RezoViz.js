@@ -176,14 +176,13 @@ Ext.define('Voyant.panel.RezoViz', {
                 	labelAlign: 'right',
                 	labelWidth: 70,
                 	width: 150,
-                	value: 2,
-                	increment: 1,
+                	value: 100,
+                	increment: 10,
                 	minValue: 0,
-                	maxValue: 10,
+                	maxValue: 500,
                 	listeners: {
                 		changecomplete: function(slider, val) {
-                			val = this.map(val, 0, 10, 0, -20000);
-                			this.getNetwork().physics.options.barnesHut.gravitationalConstant = val;
+                			this.getNetwork().physics.options.repulsion.nodeDistance = val;
                 			this.getNetwork().startSimulation();
                 		},
                 		scope: this
@@ -201,7 +200,7 @@ Ext.define('Voyant.panel.RezoViz', {
                 	listeners: {
                 		changecomplete: function(slider, val) {
                 			val /= 100;
-                			this.getNetwork().physics.options.barnesHut.springConstant = val;
+                			this.getNetwork().physics.options.repulsion.springConstant = val;
                 			this.getNetwork().startSimulation();
                 		},
                 		scope: this
@@ -219,7 +218,7 @@ Ext.define('Voyant.panel.RezoViz', {
                 	listeners: {
                 		changecomplete: function(slider, val) {
                 			val /= 100;
-                			this.getNetwork().physics.options.barnesHut.damping = val;
+                			this.getNetwork().physics.options.repulsion.damping = val;
                 			this.getNetwork().startSimulation();
                 		},
                 		scope: this
@@ -327,15 +326,10 @@ Ext.define('Voyant.panel.RezoViz', {
     			multiselect: false
     		},
     		physics: {
-    			solver: 'barnesHut'/*,
-				barnesHut: {
-					gravitationalConstant: -65000,
-					centralGravity: 0,
-					springLength: 95,
-					springConstant: 0.04,
-					damping: 0.09,
-					avoidOverlap: 0
-				}*/
+    			solver: 'repulsion',
+    			repulsion: {
+    				centralGravity: 0.1
+    			}
     		},
     		nodes: this.nodeOptions,
     		edges: this.edgeOptions
