@@ -1,4 +1,9 @@
-<%@ include file="resources/jsp/pre_app.jsp" %>
+<% if (request.getServerName().equals("dream.voyant-tools.org")) { 
+        String query = request.getQueryString();
+        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+		response.setHeader("Location", "dream/"+(query!=null ? "?"+query : "?corpus=dream"));
+        return;
+   } %><%@ include file="resources/jsp/pre_app.jsp" %>
 <script>
 	Ext.Loader.setConfig({
 		enabled : true,

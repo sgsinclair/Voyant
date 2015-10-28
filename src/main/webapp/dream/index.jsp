@@ -1,7 +1,7 @@
 <%@ include file="../resources/jsp/pre_app.jsp" %>
-<!--
-<script type="text/javascript" src="<%= base %>/resources/ext/current/ext-all-debug.js"></script>
--->
+
+<script type="text/javascript" src="../resources/voyant/current/voyant.jsp<%= (request.getParameter("debug")!=null ? "?debug=true" : "") %>"></script>
+
 <script>
 	Ext.Loader.setConfig({
 		enabled : true,
