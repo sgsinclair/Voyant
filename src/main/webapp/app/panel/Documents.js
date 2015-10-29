@@ -38,12 +38,14 @@ Ext.define('Voyant.panel.Documents', {
 	    	        text: this.localize('documentTitle'),
 	    	        dataIndex: 'title',
 	    	        sortable: true,
+	    	        renderer: function(val, metadata, record) {return record.getTitle();},
 	    	        flex: 3
 	    	    },{
 	    	        text: this.localize('documentAuthor'),
 	    	        dataIndex: 'author',
 	    	        sortable: true,
 	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getAuthor();},
 	    	        flex: 2
 	    	    },{
 	    	        text: this.localize('tokensCountLexical'),

@@ -31,7 +31,8 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getTitle: function() {
-    	return this.get('title');
+    	var title = this.get('title');
+    	return Ext.isArray(title) ? title.join("; ") : title;
     },
     
     getTruncated: function(string, max) {
@@ -71,6 +72,11 @@ Ext.define('Voyant.data.model.Document', {
     
     getTinyLabel: function() {
     	return (parseInt(this.getIndex())+1) + ') ' + this.getTinyTitle();
+    },
+    
+    getAuthor: function() {
+    	var author = this.get('author');
+    	return Ext.isArray(author) ? title.join("; ") : author;
     },
     
     getCorpusId: function() {

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Oct 26 20:54:31 EDT 2015 */
+/* This file created by JSCacher. Last modified: Thu Oct 29 12:49:03 EDT 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3021,7 +3021,8 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getTitle: function() {
-    	return this.get('title');
+    	var title = this.get('title');
+    	return Ext.isArray(title) ? title.join("; ") : title;
     },
     
     getTruncated: function(string, max) {
@@ -3061,6 +3062,11 @@ Ext.define('Voyant.data.model.Document', {
     
     getTinyLabel: function() {
     	return (parseInt(this.getIndex())+1) + ') ' + this.getTinyTitle();
+    },
+    
+    getAuthor: function() {
+    	var author = this.get('author');
+    	return Ext.isArray(author) ? title.join("; ") : author;
     },
     
     getCorpusId: function() {
@@ -7304,12 +7310,14 @@ Ext.define('Voyant.panel.Documents', {
 	    	        text: this.localize('documentTitle'),
 	    	        dataIndex: 'title',
 	    	        sortable: true,
+	    	        renderer: function(val, metadata, record) {return record.getTitle();},
 	    	        flex: 3
 	    	    },{
 	    	        text: this.localize('documentAuthor'),
 	    	        dataIndex: 'author',
 	    	        sortable: true,
 	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getAuthor();},
 	    	        flex: 2
 	    	    },{
 	    	        text: this.localize('tokensCountLexical'),
