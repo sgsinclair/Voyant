@@ -6,7 +6,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	i18n: {
     		title: {en: "Links"},
     		helpTip: {en: "<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:<ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		clearTerms: {en: "clear terms"},
+    		clearTerms: {en: "Clear Terms"},
     		releaseToRemove: {en: "Release to remove this term"},
     		cleaning: {en: "Cleaning"},
     		context: {en: "Context"}
@@ -26,14 +26,52 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	corpus: undefined,
     	node: undefined,
     	link: undefined,
-    	nodes: undefined,
-    	links: undefined,
+    	
+    	nodeDataSet: new vis.DataSet(),
+    	edgeDataSet: new vis.DataSet(),
+    	network: undefined,
+    	contextMenu: undefined,
+    	
     	force: undefined,
     	graphHeight: undefined,
     	graphWidth: undefined,
     	corpusColours: d3.scale.category10()
     },
 
+    nodeOptions: {
+		shape: 'box',
+		color: {
+			border: 'rgba(0,0,0,0.1)',
+			background: 'rgba(255,255,255,1)'
+		},
+		scaling:{
+            label: {
+              min: 8,
+              max: 20
+            }
+          }
+	},
+	edgeOptions: {
+		color: {
+			color: 'rgba(0,0,0,0.1)',
+			highlight: 'black',
+			hover: 'red'
+		},
+		labelHighlightBold: false
+	},
+	highlightOptions: {
+		font: {
+			color: 'white'
+		},
+		color: {
+			background: 'black'/*,
+			hover: {
+				border: '#CB157F',
+				background: '#EB42A5'
+			}*/
+		}
+	},
+    
     constructor: function(config) {
 
         this.callParent(arguments);
@@ -52,14 +90,13 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 xtype: 'toolbar',
                 items: [{
                     xtype: 'querysearchfield'
-                    	
-                }, {
+                },{
                 	text: me.localize('clearTerms'),
                 	handler: function() {
-                		this.updateNodesAndLinks({},{})
+                		this.getNodeDataSet().clear();
                 	},
                 	scope: me
-                }, this.localize('context'), {
+                },this.localize('context'),{
                 	xtype: 'slider',
                 	minValue: 3,
                 	value: 5,
@@ -68,23 +105,16 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 	width: 50,
                 	listeners: {
                 		render: function(slider) {
-                			slider.setValue(me.getApiParam('context'))
+                			slider.setValue(me.getApiParam('context'));
                 		},
                 		changecomplete: {
                 			fn: function(slider, newValue) {
-                    			me.setApiParam("context", slider.getValue());
-                    			if (this.nodes) {
-                        			var terms = [];
-                    				for (var key in this.nodes) {
-                    					if (this.nodes[key]['type']=='keyword') {
-                    						terms.push(this.nodes[key].term)
-                    					}
-                    				}
-                    				if (terms) {
-                    					this.updateNodesAndLinks({},{})
-                    					this.loadFromQuery(terms)
-                    				}
-                    			}
+                    			this.setApiParam("context", slider.getValue());
+                    			var terms = this.getNodeDataSet().map(function(node) { return node.label; });
+                				if (terms.length > 0) {
+                					this.getNodeDataSet().clear();
+                					this.loadFromQuery(terms);
+                				}
                     		},
                     		scope: me
                 		}
@@ -92,6 +122,42 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 }]
             }]
         });
+        
+        this.setContextMenu(Ext.create('Ext.menu.Menu', {
+			renderTo: Ext.getBody(),
+			items: [{
+				text: '',
+				itemId: 'label',
+				disabled: true
+			},{
+		        xtype: 'menuseparator'
+			},{
+				xtype: 'menucheckitem',
+				text: 'Fixed',
+				itemId: 'fixed',
+				listeners: {
+					checkchange: function(c, checked, e) {
+						var n = this.getNetwork().getSelectedNodes();
+						if (n[0] != null) {
+							this.getNodeDataSet().update({id: n[0], fixed: checked});
+						}
+					},
+					scope: this
+				}
+			},{
+				xtype: 'button',
+				text: 'Remove',
+				style: 'margin: 5px;',
+				handler: function(b, e) {
+					var n = this.getNetwork().getSelectedNodes();
+					if (n[0] != null) {
+						this.getNodeDataSet().remove(n[0]);
+						b.up('menu').hide();
+					}
+				},
+				scope: this
+			}]
+		}));
         
         this.on("loadedCorpus", function(src, corpus) {
 			this.setCorpus(corpus);
@@ -109,9 +175,24 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         this.on("query", function(src, query) {this.loadFromQuery(query);}, this);
         
         this.on("resize", function(panel, width, height) {
-        	// a bit heavy handed, but nodes seem to keep their position, so it's actually fairly smooth
-        	this.initGraph();
-        	this.updateNodesAndLinks();
+        	var el = this.getLayout().getRenderTarget();
+        	
+        	var docked = this.getDockedItems();
+        	var dHeight = 0;
+        	for (var i = 0; i < docked.length; i++) {
+        		dHeight += docked[i].getHeight();
+        	}
+        	
+        	var elHeight = height - dHeight;
+        	
+        	el.setHeight(elHeight);
+        	el.setWidth(el.getWidth());
+        	this.setGraphHeight(el.getHeight());
+        	this.setGraphWidth(el.getWidth());
+        	
+        	if (this.getNetwork() !== undefined) {
+        		this.getNetwork().fit();
+        	}
 		}, this);
         
     	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
@@ -187,59 +268,184 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     
     loadFromCorpusCollocateRecords: function(records) {
     	if (Ext.isArray(records)) {
-    		var thisNodes = this.getNodes() || {};
-    		var thisLinks = this.getLinks() || {};
+    		var nodeDS = this.getNodeDataSet();
+    		var edgeDS = this.getEdgeDataSet();
     		var start = this.getApiParam('limit');
     		records.forEach(function(corpusCollocate) {
-    			
-    			var keywordNode = {term: corpusCollocate.getKeyword(), type: 'keyword', value: corpusCollocate.getKeywordRawFreq(), start: start};
-    			var keywordNodeKey = [keywordNode.term,keywordNode.type].join(";")
-    			if (thisNodes[keywordNodeKey]) {/*thisNodes[keywordNodeKey].value+=keywordNode.value;*/}
-    			else {thisNodes[keywordNodeKey]=keywordNode;}
-    			
-    			var contextNode = {term: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
-    			var contextNodeKey = [contextNode.term,contextNode.type].join(";")
-    			if (thisNodes[contextNodeKey]) {/*thisNodes[contextNodeKey].value+=contextNode.value;*/}
-    			else {thisNodes[contextNodeKey]=contextNode;}
-    			
-    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
-    			if (!thisLinks[linkKey]) {thisLinks[linkKey]={source:thisNodes[keywordNodeKey],target:thisNodes[contextNodeKey]};}
-    			
+    			if (corpusCollocate.getContextTerm() != corpusCollocate.getTerm()) {
+	    			var keywordNode = {label: corpusCollocate.getKeyword(), title: corpusCollocate.getKeyword()+' ('+corpusCollocate.getKeywordRawFreq()+')', type: 'keyword', value: corpusCollocate.getKeywordRawFreq(), start: start};
+	    			var keywordNodeKey = [keywordNode.label,keywordNode.type].join(";");
+	    			keywordNode.id = keywordNodeKey;
+	    			
+	    			var existingNode = nodeDS.get(keywordNodeKey);
+	    			if (existingNode != null) {
+	    			} else {
+	    				nodeDS.add(keywordNode);
+	    			}
+	    			
+	    			var contextNode = {label: corpusCollocate.getContextTerm(), title: corpusCollocate.getContextTerm()+' ('+corpusCollocate.getContextTermRawFreq()+')', type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
+	    			var contextNodeKey = [contextNode.label,contextNode.type].join(";");
+	    			contextNode.id = contextNodeKey;
+	    			
+	    			existingNode = nodeDS.get(contextNodeKey);
+	    			if (existingNode != null) {
+	    			} else {
+	    				nodeDS.add(contextNode);
+	    			}
+	    			
+	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
+	    			
+	    			existingNode = edgeDS.get(linkKey);
+	    			if (existingNode != null) {
+	    			} else {
+	    				edgeDS.add({id: linkKey, from: keywordNodeKey, to: contextNodeKey});
+	    			}
+    			}
     		});
     		
-    		this.updateNodesAndLinks(thisNodes, thisLinks);
+    		var min = Number.MAX_VALUE;
+    		var max = -1;
+    		nodeDS.forEach(function(item) {
+    			if (item.value > max) max = item.value;
+    			if (item.value < min) min = item.value;
+    		});
+    		console.log(min, max);
+    		nodeDS.setOptions({
+    			scaling: {
+    				min: min,
+    				max: max,
+    				label: true
+    			}
+//    			,customScalingFunction: function(min, max, total, value) {
+//					if (max === min) {
+//						return 0.5;
+//					} else {
+//						var scale = 1 / (max - min);
+//						return Math.max(0, (value - min) * scale);
+//					}
+//				}
+    		});
+    		
+    		
+//    		this.getNetwork().redraw();
+    		this.getNetwork().fit();
     	}
     },
     
     initGraph: function() {
     	var el = this.getLayout().getRenderTarget();
-    	el.update(""); // clear
-    	var height = el.getHeight();
-    	var width = el.getWidth();
-    	this.setForce(d3.layout.force()
-	        .nodes([])
-	        .links([])
-	        .charge(-50)
-	        .linkDistance(120)
-	        .size([width, height])
-	        .on("tick", function() {
-				  link.attr("x1", function(d) { return d.source.x; })
-				      .attr("y1", function(d) { return d.source.y; })
-				      .attr("x2", function(d) { return d.target.x; })
-				      .attr("y2", function(d) { return d.target.y; });
-          		node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-	        }));
+    	el.setWidth(el.getWidth());
+    	el.setHeight(el.getHeight());
+    	this.setGraphHeight(el.getHeight());
+    	this.setGraphWidth(el.getWidth());
     	
-    	var svg = d3.select(el.dom).append("svg")
-    		.attr("id", "collocatesGraph")
-	        .attr("width", width)
-	        .attr("height", height);
-    	this.setGraphWidth(width);
-    	this.setGraphHeight(height);
-    	this.setNode(svg.selectAll(".node"));
-    	this.setLink(svg.selectAll(".link"));
-    	
-//    	this.start();
+    	if (this.getNetwork() === undefined) {
+	    	var options = {
+	    		autoResize: true,
+				interaction: {
+	    			hover: true,
+	    			hoverConnectedEdges: true,
+	    			multiselect: false
+	    		},
+	    		physics: {
+					barnesHut: {
+					}
+	    		},
+	    		nodes: this.nodeOptions,
+	    		edges: this.edgeOptions
+	    	};
+	    	
+	    	
+	    	var network = new vis.Network(el.dom, {
+	    		nodes: this.getNodeDataSet(),
+	    		edges: this.getEdgeDataSet()
+	    	}, options);
+	
+	    	
+	    	this.setNetwork(network);
+	    	
+	    	this.getNodeDataSet().on('remove', function(e, props, sender) {
+	    		var key = props.items[0];
+	    		var deadEdges = this.getEdgeDataSet().get({
+	    			filter: function(item) {
+	    				return item.from == key || item.to == key;
+	    			}
+	    		});
+	    		this.getEdgeDataSet().remove(deadEdges);
+	    		var orphans = [];
+	    		this.getNodeDataSet().forEach(function(node) {
+	    			var match = this.getEdgeDataSet().get({
+		    			filter: function(item) {
+		    				return item.from == node.id || item.to == node.id;
+		    			}
+		    		});
+	    			if (match.length == 0) {
+	    				orphans.push(node.id);
+	    			}
+	    		}.bind(this));
+	    		this.getNodeDataSet().remove(orphans);
+	    	}.bind(this));
+	    	
+	    	network.on('dragStart', function(params) {
+	    		var n = params.nodes[0];
+	    		if (n != null) {
+	    			this.getNodeDataSet().update({id: n, fixed: false});
+	    		}
+	    	}.bind(this));
+	    	
+	    	network.on('dragging', function(params) {
+	    		var n = params.nodes[0];
+	    		if (n != null) {
+		    		if (this.isMasked()) {
+			    		if (!this.isOffCanvas(params.pointer.DOM)) {
+			    			this.unmask();
+			    		}
+			    	}
+			    	else if (this.isOffCanvas(params.pointer.DOM)) {
+			    		this.mask(this.localize("releaseToRemove"));
+			    	}
+	    		}
+	    	}.bind(this));
+	    	
+	    	network.on('dragEnd', function(params) {
+	    		var n = params.nodes[0];
+	    		if (n != null) {
+	    			if (this.isOffCanvas(params.pointer.DOM)) {
+	    	    		this.unmask();
+	    	    		this.mask("cleaning");
+	    	    		this.getNodeDataSet().remove(n);
+	    	    		this.unmask();
+	    	    	} else {
+	    	    		this.getNodeDataSet().update({id: n, fixed: true});
+	    	    	}
+	    		}
+	    	}.bind(this));
+	    	
+	    	network.on('click', function(params) {
+	    		this.getContextMenu().hide();
+	    	}.bind(this));
+	    	
+	    	network.on('doubleClick', function(params) {
+	    		var n = params.nodes[0];
+	    		if (n != null) {
+	    			var data = this.getNodeDataSet().get(n);
+	    			this.itemdblclick(data);
+	    		}
+	    	}.bind(this));
+	    	
+	    	network.on('oncontext', function(params) {
+	    		params.event.preventDefault();
+	    		var n = this.getNetwork().getNodeAt(params.pointer.DOM);
+	    		if (n != null) {
+	    			this.getNetwork().selectNodes([n]);
+	    			var data = this.getNodeDataSet().get(n);
+	    			var menu = this.getContextMenu();
+	    			menu.queryById('label').setText(data.label);
+	    			menu.queryById('fixed').setChecked(data.fixed);
+	    			menu.showAt(params.event.pageX, params.event.pageY);
+	    		}
+	    	}.bind(this));
+    	}
     },
     
     start: function() {
@@ -300,105 +506,47 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     isOffCanvas: function(d) {
     	return d.x < 0 || d.y < 0 || d.x > this.getGraphWidth() || d.y > this.getGraphHeight();
     },
-    
-    drag: function(d,a,b,c) {
-    	if (this.isMasked()) {
-    		if (!this.isOffCanvas(d)) {
-    			this.unmask();
-    		}
-    	}
-    	else if (this.isOffCanvas(d)) {
-    		this.mask(this.localize("releaseToRemove"))
-    	}
-    },
-    dragstart: function(d) {
-    	d.wasfixed=true;
-    	d3.select(this).classed("fixed", d.fixed = true );
-    },
-    dragend: function(d) {
-    	if (this.isOffCanvas(d)) {
-    		this.unmask();
-    		this.mask("cleaning");
-    		delete this.getNodes()[d.term+";"+d.type]
-    		this.prune();
-    		this.updateNodesAndLinks();
-    		this.unmask();
-    	}
-    },
-    
-    prune: function() {
-		var thisNodes = this.getNodes() || {};
-		var thisLinks = this.getLinks() || {};
-		var keys = Object.keys(this.getLinks());
-		var possibleOrphans = [];
-		var validNodes = {}
-		var pruned = 0;
-		for (var i=0, len=keys.length; i<len; i++) {
-			parts = keys[i].split("--");
-			if (!thisNodes[parts[0]] || !thisNodes[parts[1]]) {
-				delete thisLinks[keys[i]]
-				pruned++;
-				possibleOrphans.push(parts[0], parts[1])
-			}
-			else {
-				validNodes[parts[0]]=true
-				validNodes[parts[1]]=true
-			}
-		}
-		if (pruned>0) {
-			for (var i=0, len=possibleOrphans.length; i<len; i++) {
-				if (!validNodes[possibleOrphans[i]]) {
-					delete thisNodes[possibleOrphans[i]]
-				}
-			}
-			this.prune();
-		}
-    },
-    
-    itemclick: function(d) {
-//    	d3.select(this).classed("fixed", d.fixed = false);
-    },
+
     itemdblclick: function(d) {
     	var limit = 10;
     	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	corpusCollocates.load({
-    		params: Ext.apply(this.getApiParams(), {query: d.term, start: d.start, limit: limit}),
+    		params: Ext.apply(this.getApiParams(), {query: d.label, start: d.start, limit: limit}),
     		callback: function(records, operation, success) {
     			if (success) {
-    	    		var thisNodes = this.getNodes() || {};
-    	    		var thisLinks = this.getLinks() || {};
+    	    		var nodeDS = this.getNodeDataSet();
+    	    		var edgeDS = this.getEdgeDataSet();
+    	    		
     	    		var start = this.getApiParam('limit');
 	    			var keywordNode = d;
     	    		d.start+=limit;
-	    			var keywordNodeKey = [keywordNode.term,keywordNode.type].join(";");
+	    			var keywordNodeKey = [keywordNode.label,keywordNode.type].join(";");
+	    			
     	    		records.forEach(function(corpusCollocate) {
-    	    			
-    	    			var contextNode = {term: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
-    	    			var contextNodeKey = [contextNode.term,contextNode.type].join(";");
-    	    			if (thisNodes[contextNodeKey]) {/*thisNodes[contextNodeKey].value+=contextNode.value;*/}
-    	    			else {thisNodes[contextNodeKey]=contextNode;}
-    	    			
-    	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
-    	    			if (!thisLinks[linkKey]) {thisLinks[linkKey]={source:thisNodes[keywordNodeKey],target:thisNodes[contextNodeKey]};}
-    	    			
+    	    			if (corpusCollocate.getContextTerm() != corpusCollocate.getTerm()) {
+	    	    			var contextNode = {label: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
+	    	    			var contextNodeKey = [contextNode.label,contextNode.type].join(";");
+	    	    			contextNode.id = contextNodeKey;
+	    	    			
+	    	    			var existingNode = nodeDS.get(contextNodeKey);
+	    	    			if (existingNode != null) {
+	    	    			} else {
+	    	    				nodeDS.add(contextNode);
+	    	    			}
+	    	    			
+	    	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
+	    	    			
+	    	    			existingNode = edgeDS.get(linkKey);
+	    	    			if (existingNode != null) {
+	    	    			} else {
+	    	    				edgeDS.add({id: linkKey, from: keywordNodeKey, to: contextNodeKey});
+	    	    			}  	    			
+    	    			}
     	    		});
-    	    		
-    	    		this.updateNodesAndLinks(thisNodes, thisLinks);
-    	    		
     			}
     		},
     		scope: this
     	});
-    },
-    
-    updateNodesAndLinks: function(nodes, links) {
-    	nodes = nodes || this.getNodes() || {};
-    	links = links || this.getLinks() || {};
-		this.setNodes(nodes);
-		this.setLinks(links);
-		this.getForce().nodes($.map(nodes, function(v) { return v; }));
-		this.getForce().links($.map(links, function(v) { return v; }));
-		this.start();
     }
     
 });
