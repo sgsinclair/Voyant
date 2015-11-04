@@ -22,6 +22,10 @@
 		},
 		launch: function() {
 
+	    	if (!this.hasQueryToLoad()) {
+		    	location.replace("?corpus=dream")
+	    	}
+
 			// get current markup and then dispose of it
 			var html = $('body').html();
 			$('body').html("");
@@ -47,7 +51,43 @@
 			    	}
 			    }]
 			});
+
 			this.callParent(arguments);
+
+			var viewport = this.getViewport();
+			viewport.mask();
+			Ext.create('Ext.window.Window', {
+			    title: 'DREaM Preview Release',
+			    width: 825,
+			    layout: 'fit',
+			    modal: true,
+			    layout: 'vbox',
+			    items: [{
+			    	width: 800,
+			    	margin: '10 5 3 10',
+				    html: "<h2 style='text-align: center;'>Welcome to this Preview Release of DREaM!</h2>"+
+				    "<p>The <i>Distant Reading Early Modernity</i> (DREaM) is an experimental interface produced by members of the <a href='http://earlymodernconversions.com/'>Early Modern Conversions</a> "+
+				    "In particular, DREaM is an attempt to bridge the gap between the <a href='http://www.textcreationpartnership.org/tcp-eebo/'>TCP-EEBO</a> text repository and the reading and analysis funcitonality of <a href='http://voyant-tools.org'>Voyant Tools</a>. "+
+				    "Because of licensing restrictions, this instance of DREaM is limited to most of the 25,000 texts from Phase I of TCP-EEBO.</p>"+
+				    "<p>For a bit more information about DREaM please see <a href='http://earlymodernconversions.com/introducing-dream/'>this article</a> or <a href='https://youtu.be/A4ftsPlsGtU'>this video</a>.</p> "+
+				    "<p>Please be aware that this is an early preview release and things may not work as expected (or not work at all). We're still working on some refinements, including faster exporting of large document sets and a more advanced catalogue interface. "+
+				    "Have fun and please give us your feedback via <a href='http://twitter.com/voyanttools'>twitter</a> or <a href='https://github.com/sgsinclair/Voyant/issues?q=is%3Aopen+is%3Aissue+label%3Adream'>GitHub</a>!</p>"
+			    }, {
+			    	xtype: 'button',
+	                glyph: 'xf00c@FontAwesome',
+			    	width: '100%',
+			    	scale: 'medium',
+			    	text: 'Continue',
+			    	handler: function(btn) {
+			    		btn.up('window').close();
+			    	}
+			    }],
+			    listeners: {
+			    	close: function(panel) {
+			    		viewport.unmask();
+			    	}
+			    }
+			}).show();
 			
 		}
 	});
@@ -241,8 +281,9 @@
 						<td>Select by keywords in publisher</td>
 						<td><div><input class="dream-terms-search" name="publisher" /><span class="badge" id="publisher-badge"></span></div></td>
 					</tr>
-					<tr>
+					<!-- <tr>
 						<td colspan="2"><input type="checkbox" id="variants" checked=""> use spelling variants for keywords</td>
+					</tr> -->
 				</table>
 			</td>
 		</tr>

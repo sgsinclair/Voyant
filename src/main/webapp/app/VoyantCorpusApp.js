@@ -60,10 +60,8 @@ Ext.define('Voyant.VoyantCorpusApp', {
     launch: function() {
 		this.callParent(arguments);
 
-		// check parameters to see if we can load a corpus 
-    	var queryParams = Ext.Object.fromQueryString(document.location.search);
-
     	if (this.hasQueryToLoad()) {
+        	var queryParams = Ext.Object.fromQueryString(document.location.search);
     		var me = this;
     		var view = me.getViewport()
     		view.mask(this.localize("fetchingCorpus"));

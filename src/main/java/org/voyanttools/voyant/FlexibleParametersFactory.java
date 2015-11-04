@@ -103,7 +103,6 @@ public class FlexibleParametersFactory {
 	
 	}
 	
-	@SuppressWarnings("unchecked")
 	private static List<FileItem> getRequestItems(HttpServletRequest request) throws FileUploadException {
 		
 		if (request == null) {

@@ -1,15 +1,9 @@
 package org.voyanttools.voyant;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.Writer;
-import java.net.URL;
-import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;

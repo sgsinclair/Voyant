@@ -238,7 +238,7 @@ Ext.define("Voyant.panel.Dream", {
 		        	}
 		        	var queries = [fieldPrefix+term+"*","^"+fieldPrefix+term+"*"];
 		        	
-		        	if ($("#variants")[0].checked) {
+		        	if ($("#variants")[0] && $("#variants")[0].checked) {
 			        	var variants = container.getVariants().getVariants(term);
 			        	if (Ext.isArray(variants) && variants.length>1) {
 				        	for (var i=0, len=variants.length; i<len; i++) {
