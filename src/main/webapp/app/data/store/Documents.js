@@ -1,5 +1,5 @@
 Ext.define("Voyant.data.store.Documents", {
-	extend: "Ext.data.BufferedStore",
+	extend: "Ext.data.Store",
 	model: "Voyant.data.model.Document",
 	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     // embeddable: ['Voyant.panel.Documents'],
@@ -19,9 +19,9 @@ Ext.define("Voyant.data.store.Documents", {
 	constructor : function(config) {
 		// create proxy in constructor so we can set the Trombone URL
 		Ext.apply(config, {
-			pagePurgeCount: 0,
-			pageSize: 1000,
-			leadingBufferZone: 100,
+//			pagePurgeCount: 0,
+//			pageSize: 1000,
+//			leadingBufferZone: 100,
 		     proxy: {
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),

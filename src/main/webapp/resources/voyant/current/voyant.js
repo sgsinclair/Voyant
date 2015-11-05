@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Oct 30 13:43:49 EDT 2015 */
+/* This file created by JSCacher. Last modified: Thu Nov 05 14:16:25 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3569,7 +3569,7 @@ Ext.define('Voyant.data.store.DocumentTerms', {
 });
 
 Ext.define("Voyant.data.store.Documents", {
-	extend: "Ext.data.BufferedStore",
+	extend: "Ext.data.Store",
 	model: "Voyant.data.model.Document",
 	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     // embeddable: ['Voyant.panel.Documents'],
@@ -3589,9 +3589,9 @@ Ext.define("Voyant.data.store.Documents", {
 	constructor : function(config) {
 		// create proxy in constructor so we can set the Trombone URL
 		Ext.apply(config, {
-			pagePurgeCount: 0,
-			pageSize: 1000,
-			leadingBufferZone: 100,
+//			pagePurgeCount: 0,
+//			pageSize: 1000,
+//			leadingBufferZone: 100,
 		     proxy: {
 		         type: 'ajax',
 		         url: Voyant.application.getTromboneUrl(),
@@ -5307,7 +5307,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	i18n: {
     		title: {en: "Links"},
     		helpTip: {en: "<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:<ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		clearTerms: {en: "clear terms"},
+    		clearTerms: {en: "Clear Terms"},
     		releaseToRemove: {en: "Release to remove this term"},
     		cleaning: {en: "Cleaning"},
     		context: {en: "Context"}
@@ -5327,14 +5327,52 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	corpus: undefined,
     	node: undefined,
     	link: undefined,
-    	nodes: undefined,
-    	links: undefined,
+    	
+    	nodeDataSet: new vis.DataSet(),
+    	edgeDataSet: new vis.DataSet(),
+    	network: undefined,
+    	contextMenu: undefined,
+    	
     	force: undefined,
     	graphHeight: undefined,
     	graphWidth: undefined,
     	corpusColours: d3.scale.category10()
     },
 
+    nodeOptions: {
+		shape: 'box',
+		color: {
+			border: 'rgba(0,0,0,0.1)',
+			background: 'rgba(255,255,255,1)'
+		},
+		scaling:{
+            label: {
+              min: 8,
+              max: 20
+            }
+          }
+	},
+	edgeOptions: {
+		color: {
+			color: 'rgba(0,0,0,0.1)',
+			highlight: 'black',
+			hover: 'red'
+		},
+		labelHighlightBold: false
+	},
+	highlightOptions: {
+		font: {
+			color: 'white'
+		},
+		color: {
+			background: 'black'/*,
+			hover: {
+				border: '#CB157F',
+				background: '#EB42A5'
+			}*/
+		}
+	},
+    
     constructor: function(config) {
 
         this.callParent(arguments);
@@ -5353,14 +5391,13 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 xtype: 'toolbar',
                 items: [{
                     xtype: 'querysearchfield'
-                    	
-                }, {
+                },{
                 	text: me.localize('clearTerms'),
                 	handler: function() {
-                		this.updateNodesAndLinks({},{})
+                		this.getNodeDataSet().clear();
                 	},
                 	scope: me
-                }, this.localize('context'), {
+                },this.localize('context'),{
                 	xtype: 'slider',
                 	minValue: 3,
                 	value: 5,
@@ -5369,23 +5406,16 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 	width: 50,
                 	listeners: {
                 		render: function(slider) {
-                			slider.setValue(me.getApiParam('context'))
+                			slider.setValue(me.getApiParam('context'));
                 		},
                 		changecomplete: {
                 			fn: function(slider, newValue) {
-                    			me.setApiParam("context", slider.getValue());
-                    			if (this.nodes) {
-                        			var terms = [];
-                    				for (var key in this.nodes) {
-                    					if (this.nodes[key]['type']=='keyword') {
-                    						terms.push(this.nodes[key].term)
-                    					}
-                    				}
-                    				if (terms) {
-                    					this.updateNodesAndLinks({},{})
-                    					this.loadFromQuery(terms)
-                    				}
-                    			}
+                    			this.setApiParam("context", slider.getValue());
+                    			var terms = this.getNodeDataSet().map(function(node) { return node.label; });
+                				if (terms.length > 0) {
+                					this.getNodeDataSet().clear();
+                					this.loadFromQuery(terms);
+                				}
                     		},
                     		scope: me
                 		}
@@ -5393,6 +5423,42 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 }]
             }]
         });
+        
+        this.setContextMenu(Ext.create('Ext.menu.Menu', {
+			renderTo: Ext.getBody(),
+			items: [{
+				text: '',
+				itemId: 'label',
+				disabled: true
+			},{
+		        xtype: 'menuseparator'
+			},{
+				xtype: 'menucheckitem',
+				text: 'Fixed',
+				itemId: 'fixed',
+				listeners: {
+					checkchange: function(c, checked, e) {
+						var n = this.getNetwork().getSelectedNodes();
+						if (n[0] != null) {
+							this.getNodeDataSet().update({id: n[0], fixed: checked});
+						}
+					},
+					scope: this
+				}
+			},{
+				xtype: 'button',
+				text: 'Remove',
+				style: 'margin: 5px;',
+				handler: function(b, e) {
+					var n = this.getNetwork().getSelectedNodes();
+					if (n[0] != null) {
+						this.getNodeDataSet().remove(n[0]);
+						b.up('menu').hide();
+					}
+				},
+				scope: this
+			}]
+		}));
         
         this.on("loadedCorpus", function(src, corpus) {
 			this.setCorpus(corpus);
@@ -5410,9 +5476,24 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         this.on("query", function(src, query) {this.loadFromQuery(query);}, this);
         
         this.on("resize", function(panel, width, height) {
-        	// a bit heavy handed, but nodes seem to keep their position, so it's actually fairly smooth
-        	this.initGraph();
-        	this.updateNodesAndLinks();
+        	var el = this.getLayout().getRenderTarget();
+        	
+        	var docked = this.getDockedItems();
+        	var dHeight = 0;
+        	for (var i = 0; i < docked.length; i++) {
+        		dHeight += docked[i].getHeight();
+        	}
+        	
+        	var elHeight = height - dHeight;
+        	
+        	el.setHeight(elHeight);
+        	el.setWidth(el.getWidth());
+        	this.setGraphHeight(el.getHeight());
+        	this.setGraphWidth(el.getWidth());
+        	
+        	if (this.getNetwork() !== undefined) {
+        		this.getNetwork().fit();
+        	}
 		}, this);
         
     	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
@@ -5488,59 +5569,184 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     
     loadFromCorpusCollocateRecords: function(records) {
     	if (Ext.isArray(records)) {
-    		var thisNodes = this.getNodes() || {};
-    		var thisLinks = this.getLinks() || {};
+    		var nodeDS = this.getNodeDataSet();
+    		var edgeDS = this.getEdgeDataSet();
     		var start = this.getApiParam('limit');
     		records.forEach(function(corpusCollocate) {
-    			
-    			var keywordNode = {term: corpusCollocate.getKeyword(), type: 'keyword', value: corpusCollocate.getKeywordRawFreq(), start: start};
-    			var keywordNodeKey = [keywordNode.term,keywordNode.type].join(";")
-    			if (thisNodes[keywordNodeKey]) {/*thisNodes[keywordNodeKey].value+=keywordNode.value;*/}
-    			else {thisNodes[keywordNodeKey]=keywordNode;}
-    			
-    			var contextNode = {term: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
-    			var contextNodeKey = [contextNode.term,contextNode.type].join(";")
-    			if (thisNodes[contextNodeKey]) {/*thisNodes[contextNodeKey].value+=contextNode.value;*/}
-    			else {thisNodes[contextNodeKey]=contextNode;}
-    			
-    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
-    			if (!thisLinks[linkKey]) {thisLinks[linkKey]={source:thisNodes[keywordNodeKey],target:thisNodes[contextNodeKey]};}
-    			
+    			if (corpusCollocate.getContextTerm() != corpusCollocate.getTerm()) {
+	    			var keywordNode = {label: corpusCollocate.getKeyword(), title: corpusCollocate.getKeyword()+' ('+corpusCollocate.getKeywordRawFreq()+')', type: 'keyword', value: corpusCollocate.getKeywordRawFreq(), start: start};
+	    			var keywordNodeKey = [keywordNode.label,keywordNode.type].join(";");
+	    			keywordNode.id = keywordNodeKey;
+	    			
+	    			var existingNode = nodeDS.get(keywordNodeKey);
+	    			if (existingNode != null) {
+	    			} else {
+	    				nodeDS.add(keywordNode);
+	    			}
+	    			
+	    			var contextNode = {label: corpusCollocate.getContextTerm(), title: corpusCollocate.getContextTerm()+' ('+corpusCollocate.getContextTermRawFreq()+')', type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
+	    			var contextNodeKey = [contextNode.label,contextNode.type].join(";");
+	    			contextNode.id = contextNodeKey;
+	    			
+	    			existingNode = nodeDS.get(contextNodeKey);
+	    			if (existingNode != null) {
+	    			} else {
+	    				nodeDS.add(contextNode);
+	    			}
+	    			
+	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
+	    			
+	    			existingNode = edgeDS.get(linkKey);
+	    			if (existingNode != null) {
+	    			} else {
+	    				edgeDS.add({id: linkKey, from: keywordNodeKey, to: contextNodeKey});
+	    			}
+    			}
     		});
     		
-    		this.updateNodesAndLinks(thisNodes, thisLinks);
+    		var min = Number.MAX_VALUE;
+    		var max = -1;
+    		nodeDS.forEach(function(item) {
+    			if (item.value > max) max = item.value;
+    			if (item.value < min) min = item.value;
+    		});
+    		console.log(min, max);
+    		nodeDS.setOptions({
+    			scaling: {
+    				min: min,
+    				max: max,
+    				label: true
+    			}
+//    			,customScalingFunction: function(min, max, total, value) {
+//					if (max === min) {
+//						return 0.5;
+//					} else {
+//						var scale = 1 / (max - min);
+//						return Math.max(0, (value - min) * scale);
+//					}
+//				}
+    		});
+    		
+    		
+//    		this.getNetwork().redraw();
+    		this.getNetwork().fit();
     	}
     },
     
     initGraph: function() {
     	var el = this.getLayout().getRenderTarget();
-    	el.update(""); // clear
-    	var height = el.getHeight();
-    	var width = el.getWidth();
-    	this.setForce(d3.layout.force()
-	        .nodes([])
-	        .links([])
-	        .charge(-50)
-	        .linkDistance(120)
-	        .size([width, height])
-	        .on("tick", function() {
-				  link.attr("x1", function(d) { return d.source.x; })
-				      .attr("y1", function(d) { return d.source.y; })
-				      .attr("x2", function(d) { return d.target.x; })
-				      .attr("y2", function(d) { return d.target.y; });
-          		node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-	        }));
+    	el.setWidth(el.getWidth());
+    	el.setHeight(el.getHeight());
+    	this.setGraphHeight(el.getHeight());
+    	this.setGraphWidth(el.getWidth());
     	
-    	var svg = d3.select(el.dom).append("svg")
-    		.attr("id", "collocatesGraph")
-	        .attr("width", width)
-	        .attr("height", height);
-    	this.setGraphWidth(width);
-    	this.setGraphHeight(height);
-    	this.setNode(svg.selectAll(".node"));
-    	this.setLink(svg.selectAll(".link"));
-    	
-//    	this.start();
+    	if (this.getNetwork() === undefined) {
+	    	var options = {
+	    		autoResize: true,
+				interaction: {
+	    			hover: true,
+	    			hoverConnectedEdges: true,
+	    			multiselect: false
+	    		},
+	    		physics: {
+					barnesHut: {
+					}
+	    		},
+	    		nodes: this.nodeOptions,
+	    		edges: this.edgeOptions
+	    	};
+	    	
+	    	
+	    	var network = new vis.Network(el.dom, {
+	    		nodes: this.getNodeDataSet(),
+	    		edges: this.getEdgeDataSet()
+	    	}, options);
+	
+	    	
+	    	this.setNetwork(network);
+	    	
+	    	this.getNodeDataSet().on('remove', function(e, props, sender) {
+	    		var key = props.items[0];
+	    		var deadEdges = this.getEdgeDataSet().get({
+	    			filter: function(item) {
+	    				return item.from == key || item.to == key;
+	    			}
+	    		});
+	    		this.getEdgeDataSet().remove(deadEdges);
+	    		var orphans = [];
+	    		this.getNodeDataSet().forEach(function(node) {
+	    			var match = this.getEdgeDataSet().get({
+		    			filter: function(item) {
+		    				return item.from == node.id || item.to == node.id;
+		    			}
+		    		});
+	    			if (match.length == 0) {
+	    				orphans.push(node.id);
+	    			}
+	    		}.bind(this));
+	    		this.getNodeDataSet().remove(orphans);
+	    	}.bind(this));
+	    	
+	    	network.on('dragStart', function(params) {
+	    		var n = params.nodes[0];
+	    		if (n != null) {
+	    			this.getNodeDataSet().update({id: n, fixed: false});
+	    		}
+	    	}.bind(this));
+	    	
+	    	network.on('dragging', function(params) {
+	    		var n = params.nodes[0];
+	    		if (n != null) {
+		    		if (this.isMasked()) {
+			    		if (!this.isOffCanvas(params.pointer.DOM)) {
+			    			this.unmask();
+			    		}
+			    	}
+			    	else if (this.isOffCanvas(params.pointer.DOM)) {
+			    		this.mask(this.localize("releaseToRemove"));
+			    	}
+	    		}
+	    	}.bind(this));
+	    	
+	    	network.on('dragEnd', function(params) {
+	    		var n = params.nodes[0];
+	    		if (n != null) {
+	    			if (this.isOffCanvas(params.pointer.DOM)) {
+	    	    		this.unmask();
+	    	    		this.mask("cleaning");
+	    	    		this.getNodeDataSet().remove(n);
+	    	    		this.unmask();
+	    	    	} else {
+	    	    		this.getNodeDataSet().update({id: n, fixed: true});
+	    	    	}
+	    		}
+	    	}.bind(this));
+	    	
+	    	network.on('click', function(params) {
+	    		this.getContextMenu().hide();
+	    	}.bind(this));
+	    	
+	    	network.on('doubleClick', function(params) {
+	    		var n = params.nodes[0];
+	    		if (n != null) {
+	    			var data = this.getNodeDataSet().get(n);
+	    			this.itemdblclick(data);
+	    		}
+	    	}.bind(this));
+	    	
+	    	network.on('oncontext', function(params) {
+	    		params.event.preventDefault();
+	    		var n = this.getNetwork().getNodeAt(params.pointer.DOM);
+	    		if (n != null) {
+	    			this.getNetwork().selectNodes([n]);
+	    			var data = this.getNodeDataSet().get(n);
+	    			var menu = this.getContextMenu();
+	    			menu.queryById('label').setText(data.label);
+	    			menu.queryById('fixed').setChecked(data.fixed);
+	    			menu.showAt(params.event.pageX, params.event.pageY);
+	    		}
+	    	}.bind(this));
+    	}
     },
     
     start: function() {
@@ -5601,105 +5807,47 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     isOffCanvas: function(d) {
     	return d.x < 0 || d.y < 0 || d.x > this.getGraphWidth() || d.y > this.getGraphHeight();
     },
-    
-    drag: function(d,a,b,c) {
-    	if (this.isMasked()) {
-    		if (!this.isOffCanvas(d)) {
-    			this.unmask();
-    		}
-    	}
-    	else if (this.isOffCanvas(d)) {
-    		this.mask(this.localize("releaseToRemove"))
-    	}
-    },
-    dragstart: function(d) {
-    	d.wasfixed=true;
-    	d3.select(this).classed("fixed", d.fixed = true );
-    },
-    dragend: function(d) {
-    	if (this.isOffCanvas(d)) {
-    		this.unmask();
-    		this.mask("cleaning");
-    		delete this.getNodes()[d.term+";"+d.type]
-    		this.prune();
-    		this.updateNodesAndLinks();
-    		this.unmask();
-    	}
-    },
-    
-    prune: function() {
-		var thisNodes = this.getNodes() || {};
-		var thisLinks = this.getLinks() || {};
-		var keys = Object.keys(this.getLinks());
-		var possibleOrphans = [];
-		var validNodes = {}
-		var pruned = 0;
-		for (var i=0, len=keys.length; i<len; i++) {
-			parts = keys[i].split("--");
-			if (!thisNodes[parts[0]] || !thisNodes[parts[1]]) {
-				delete thisLinks[keys[i]]
-				pruned++;
-				possibleOrphans.push(parts[0], parts[1])
-			}
-			else {
-				validNodes[parts[0]]=true
-				validNodes[parts[1]]=true
-			}
-		}
-		if (pruned>0) {
-			for (var i=0, len=possibleOrphans.length; i<len; i++) {
-				if (!validNodes[possibleOrphans[i]]) {
-					delete thisNodes[possibleOrphans[i]]
-				}
-			}
-			this.prune();
-		}
-    },
-    
-    itemclick: function(d) {
-//    	d3.select(this).classed("fixed", d.fixed = false);
-    },
+
     itemdblclick: function(d) {
     	var limit = 10;
     	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	corpusCollocates.load({
-    		params: Ext.apply(this.getApiParams(), {query: d.term, start: d.start, limit: limit}),
+    		params: Ext.apply(this.getApiParams(), {query: d.label, start: d.start, limit: limit}),
     		callback: function(records, operation, success) {
     			if (success) {
-    	    		var thisNodes = this.getNodes() || {};
-    	    		var thisLinks = this.getLinks() || {};
+    	    		var nodeDS = this.getNodeDataSet();
+    	    		var edgeDS = this.getEdgeDataSet();
+    	    		
     	    		var start = this.getApiParam('limit');
 	    			var keywordNode = d;
     	    		d.start+=limit;
-	    			var keywordNodeKey = [keywordNode.term,keywordNode.type].join(";");
+	    			var keywordNodeKey = [keywordNode.label,keywordNode.type].join(";");
+	    			
     	    		records.forEach(function(corpusCollocate) {
-    	    			
-    	    			var contextNode = {term: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
-    	    			var contextNodeKey = [contextNode.term,contextNode.type].join(";");
-    	    			if (thisNodes[contextNodeKey]) {/*thisNodes[contextNodeKey].value+=contextNode.value;*/}
-    	    			else {thisNodes[contextNodeKey]=contextNode;}
-    	    			
-    	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
-    	    			if (!thisLinks[linkKey]) {thisLinks[linkKey]={source:thisNodes[keywordNodeKey],target:thisNodes[contextNodeKey]};}
-    	    			
+    	    			if (corpusCollocate.getContextTerm() != corpusCollocate.getTerm()) {
+	    	    			var contextNode = {label: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
+	    	    			var contextNodeKey = [contextNode.label,contextNode.type].join(";");
+	    	    			contextNode.id = contextNodeKey;
+	    	    			
+	    	    			var existingNode = nodeDS.get(contextNodeKey);
+	    	    			if (existingNode != null) {
+	    	    			} else {
+	    	    				nodeDS.add(contextNode);
+	    	    			}
+	    	    			
+	    	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
+	    	    			
+	    	    			existingNode = edgeDS.get(linkKey);
+	    	    			if (existingNode != null) {
+	    	    			} else {
+	    	    				edgeDS.add({id: linkKey, from: keywordNodeKey, to: contextNodeKey});
+	    	    			}  	    			
+    	    			}
     	    		});
-    	    		
-    	    		this.updateNodesAndLinks(thisNodes, thisLinks);
-    	    		
     			}
     		},
     		scope: this
     	});
-    },
-    
-    updateNodesAndLinks: function(nodes, links) {
-    	nodes = nodes || this.getNodes() || {};
-    	links = links || this.getLinks() || {};
-		this.setNodes(nodes);
-		this.setLinks(links);
-		this.getForce().nodes($.map(nodes, function(v) { return v; }));
-		this.getForce().links($.map(links, function(v) { return v; }));
-		this.start();
     }
     
 });
@@ -7286,9 +7434,37 @@ Ext.define('Voyant.panel.Documents', {
     		typesCountLexical: {en: "Types"},
     		typeTokenRatioLexical: {en: "Ratio"},
     		language: {en: "Language"},
-    		matchingDocuments: {en: "Matching documents: {count}"}
+    		matchingDocuments: {en: "Matching documents: {count}"},
+    		error: {en: "Error"},
+    		remove: {en: "Remove"},
+    		reorder: {en: "Reorder"},
+    		keep: {en: "Keep"},
+    		modify: {en: "Modify"},
+    		newCorpus: {en: "New Corpus"},
+    		modifyTip: {en: "Click this button to create a new corpus by selecting a subset of documents or by re-ordering documents."},
+    		allSelectedError: {en: "You have selected all documents, you must select a subset of documents to remove or keep."},
+    		removeSelectedDocuments: {en: "Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('selected document')}?"},
+    		removeFilteredDocuments: {en: "Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('filtered document')}?"},
+    		keepSelectedDocuments: {en: "Create a <i>new</i> corpus that only keeps the {0:plural('selected document')}?"},
+    		keepFilteredDocuments: {en: "Create a <i>new</i> corpus that only keeps the {0:plural('filtered document')}?"},
+    		selectOrFilterError: {en: "You need to first select documents by clicking on one or more rows or by performing a search query."},
+    		onlyOneError: {en: "Your corpus has only one document, you can't remove or keep documents to create a new corpus."},
+    		reorderFilteredError: {en: "You cannot reorder a filtered (after search query) corpus. Please create a new corpus first (with the <i>Remove</i> or <i>Keep</i> button) and then reorder the new corpus."},
+    		reorderOriginalError: {en: "Please reorder the corpus first (drag and drop the rows in the table)."},
+    		reorderSelectedDocuments: {en: "Create a <i>new</i> corpus based on the order shown?"}
+    	},
+    	api: {
+    		query: undefined,
+    		docIndex: undefined,
+    		docId: undefined
     	},
 		glyph: 'xf0ce@FontAwesome'
+    },
+    
+    MODE_EDITING: 'editing',
+    MODE_NORMAL: 'normal',
+    config: {
+    	mode: this.MODE_NORMAL
     },
 
     constructor: function(config) {
@@ -7297,14 +7473,93 @@ Ext.define('Voyant.panel.Documents', {
     	    selModel: {pruneRemoved: false}
     	});
     	
+    	var dockedItemsItems = [{
+            xtype: 'querysearchfield'
+        }, {
+            xtype: 'totalpropertystatus'
+        }]
+    	
+    	if (!config || config.mode!=this.MODE_EDITING) {
+    		dockedItemsItems.push({
+            	text: this.localize("modify"),
+            	tooltip: this.localize("modifyTip"),
+    			glyph: 'xf044@FontAwesome',
+    			scope: this,
+            	handler: function(btn) {
+            		var win = Ext.create('Ext.window.Window', {
+            		    title: this.localize("title"),
+            		    modal: true,
+            		    width: "80%",
+            		    minWidth: 300,
+            		    minHeight: 200,
+            		    height: "80%",
+            		    layout: 'fit',
+            		    items: {
+            		    	xtype: 'documents',
+            		    	mode: this.MODE_EDITING,
+            		    	corpus: this.getStore().getCorpus(),
+            		    	header: false,
+            		    	viewConfig: {
+            		            plugins:{
+            		                ptype:'gridviewdragdrop'
+            		            },
+            		            listeners: {
+            		            	beforedrop: function(node, data, overModel, dropPosition, dropHandlers) {
+            		            		if (this.getStore().getCount()<this.getStore().getCorpus().getDocumentsCount()) {
+            		            			var panel = this.up("panel");
+            		        				Ext.Msg.show({
+            		        				    title: panel.localize('error'),
+            		        				    message: panel.localize('reorderFilteredError'),
+            		        				    buttons: Ext.Msg.OK,
+            		        				    icon: Ext.Msg.ERROR
+            		        				});
+            		            			return false;
+            		            		}
+            		            		return true;
+            		            	}
+            		            }
+            		    	}
+            		    },
+            		    buttons: [{
+                			text: this.localize('remove'),
+                			glyph: 'xf00d@FontAwesome',
+                			hidden: this.getStore().getCorpus().getDocumentsCount()==1,
+                			handler: this.keepRemoveReorderHandler,
+                			itemId: 'remove',
+                			scope: this
+                		}, {
+                			text: this.localize('keep'),
+                			glyph: 'xf00c@FontAwesome',
+                			hidden: this.getStore().getCorpus().getDocumentsCount()==1,
+                			handler: this.keepRemoveReorderHandler,
+                			itemId: 'keep',
+                			scope: this
+                		}, {
+                			text: this.localize('reorder'),
+                			glyph: 'xf00c@FontAwesome',
+                			hidden: this.getStore().getCorpus().getDocumentsCount()==1,
+                			handler: this.keepRemoveReorderHandler,
+                			itemId: 'reorder',
+                			scope: this
+                		},{
+            		        text: 'Cancel',
+            		        handler: function(btn) {
+            		        	btn.up("window").close();
+            		        }
+            		    }]
+            		}).show();
+
+            	}
+    		})
+    	}
     	
     	Ext.apply(this, {
     		title: this.localize('title'),
     		emptyText: this.localize("emptyText"),
 	    	columns:[
 	    	   {
-	    	        xtype: 'rownumberer',
-	    	        width: 30,
+	    		   xtype: 'rownumberer',
+	    	        renderer: function(value, metaData, record) {return record.getIndex()+1},
 	    	        sortable: false
 	    	    },{
 	    	        text: this.localize('documentTitle'),
@@ -7347,6 +7602,7 @@ Ext.define('Voyant.panel.Documents', {
 	        store: store,
 	    	
 	    	selModel: Ext.create('Ext.selection.RowModel', {
+	    		mode: 'MULTI',
                 listeners: {
                     selectionchange: {
                     	fn: function(sm, selections) {
@@ -7360,11 +7616,7 @@ Ext.define('Voyant.panel.Documents', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-                items: [{
-                    xtype: 'querysearchfield'
-                }, {
-                    xtype: 'totalpropertystatus'
-                }]
+                items: dockedItemsItems
             }]
     	});
     	
@@ -7374,17 +7626,16 @@ Ext.define('Voyant.panel.Documents', {
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		this.store.setCorpus(corpus);
-    		this.store.loadPage(1, {params: this.getApiParams()});
+    		this.store.load({params: this.getApiParams()});
     	})
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('query', function(src, query) {
     		this.setApiParam('query', query);
-    		this.store.loadPage(1, {params: this.getApiParams()});
+    		this.store.load({params: this.getApiParams()});
     	})
     	
     	if (config.embedded) {
-    		debugger
         	if (Ext.getClass(config.embedded).getName() == "Voyant.data.model.Corpus") {
         		config.corpus = config.embedded
         	}
@@ -7399,6 +7650,143 @@ Ext.define('Voyant.panel.Documents', {
     	if (config.corpus) {
     		this.fireEvent('loadedCorpus', this, config.corpus)
     	}
+    },
+    
+    keepRemoveReorderHandler: function(btn) {
+    	// we're not sure which scope we're in, so ensure we're talking about this buttons panel
+		var panel = btn.up("window").down("documents");
+		var selection = panel.getSelection();
+		var docs = panel.getStore().getCorpus().getDocumentsCount();
+		var btnMode = btn.getItemId();
+		// if reordering, check to make sure that we're not looking at a subset
+		if (btnMode=='reorder') {
+			if (panel.getStore().getCount()<docs) {
+				return Ext.Msg.show({
+				    title: this.localize('error'),
+				    message: this.localize('reorderFilteredError'),
+				    buttons: Ext.Msg.OK,
+				    icon: Ext.Msg.ERROR
+				});
+			}
+			else {
+				docIndex = [];
+				panel.getStore().each(function(doc) {
+					docIndex.push(doc.getIndex())
+			    }, this);
+				for (var i=1; i<docIndex.length; i++) {
+					if (docIndex[i-1]>docIndex[i]) {
+						return Ext.Msg.confirm(panel.localize('newCorpus'), new Ext.Template(panel.localize(btnMode+'Documents')).applyTemplate([selection.length]), function(confirmBtn){
+							if (confirmBtn==='yes') {
+								docIndex = [];
+								this.getStore().each(function(doc) {
+									docIndex.push(doc.getIndex())
+							    }, this);
+								var params = {docIndex: docIndex};
+								params[btnMode+"Documents"] = true;
+								this.editCorpus(params)
+							}
+						}, panel);
+					}
+				}
+				// if we get here it's because nothing's been reordered
+				return Ext.Msg.show({
+				    title: this.localize('error'),
+				    message: this.localize('reorderOriginalError'),
+				    buttons: Ext.Msg.OK,
+				    icon: Ext.Msg.ERROR
+				});
+			}
+			
+		}
+		
+		if (selection.length>0) {
+			if (selection.length==docs) {
+				if (docs==1) {
+					return Ext.Msg.show({
+					    title: this.localize('error'),
+					    message: this.localize('onlyOneError'),
+					    buttons: Ext.Msg.OK,
+					    icon: Ext.Msg.ERROR
+					});
+				}
+				else {
+					return Ext.Msg.show({
+					    title: this.localize('error'),
+					    message: this.localize('allSelectedError'),
+					    buttons: Ext.Msg.OK,
+					    icon: Ext.Msg.ERROR
+					});
+				}
+			}
+			else {
+				return Ext.Msg.confirm(this.localize('newCorpus'), new Ext.Template(this.localize(btnMode+'SelectedDocuments')).applyTemplate([selection.length]), function(confirmBtn){
+					if (confirmBtn==='yes') {
+						docIndex = [];
+						selection.forEach(function(doc){
+							docIndex.push(doc.getIndex())
+						})
+						var params = {docIndex: docIndex};
+						params[btnMode+"Documents"] = true;
+						this.editCorpus(params)
+					}
+				}, panel);
+			}
+		}
+		else if (panel.getApiParam("query") && panel.getStore().getCount()<docs) {
+			return Ext.Msg.confirm(this.localize('newCorpus'), new Ext.Template(this.localize(btnMode+'FilteredDocuments')).applyTemplate([selection.length]), function(confirmBtn){
+				if (confirmBtn==='yes') {
+					docIndex = [];
+					this.getStore().each(function(doc) {
+						docIndex.push(doc.getIndex())
+				    }, this);
+					var params = {docIndex: docIndex};
+					params[btnMode+"Documents"] = true;
+					this.editCorpus(params)
+				}
+			}, panel);
+		}
+		else {
+			return Ext.Msg.show({
+			    title: this.localize('error'),
+			    message: this.localize('selectOrFilterError'),
+			    buttons: Ext.Msg.OK,
+			    icon: Ext.Msg.ERROR
+			});
+		}    	
+    },
+    
+    editCorpus: function(params) {
+    	
+    	Ext.apply(params, {
+    		tool: 'corpus.CorpusManager',
+    		corpus: this.getStore().getCorpus().getId()
+    	})
+
+    	// mask main viewport while we create a new corpus
+    	var app = this.getApplication();
+    	var view = app.getViewport();
+		view.mask(this.localize("Creating new corpus…"));
+    	Ext.Ajax.request({
+    		url: this.getApplication().getTromboneUrl(),
+    		method: 'POST',
+    		params: params,
+    		success: function(response) {
+    			view.unmask();
+    			var obj = Ext.decode(response.responseText);
+    			view.mask("Loading new corpus…")
+    			new Corpus({corpus: obj.corpus.id}).then(function(corpus) {
+    				view.unmask();
+    				app.dispatchEvent('loadedCorpus', app, corpus);
+    			}).fail(function(message, response) {
+    				view.unmask();
+    				app.showErrorResponse({message: message}, response);
+    			});
+    		}
+    	});
+    	
+    	// close editing window if we're in modal mode, should happen asynchronously while new corpus is created
+    	var win = this.up("window");
+    	if (win && win.isFloating()) {win.close()}
     }
 })
 Ext.define('Voyant.panel.DocumentsFinder', {
