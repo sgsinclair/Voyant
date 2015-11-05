@@ -38,7 +38,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	}
     },
     config: {
-    	
+    	corpus: undefined
     },
     
     constructor: function(config) {
@@ -75,6 +75,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    			text: 'Open',
                     glyph: 'xf115@FontAwesome', // not visible
 	    			tooltip: 'Select an exsting corpus',
+	    			hidden: this.getCorpus()!=undefined,
 	    			handler: function() {
 	    				Ext.create('Ext.window.Window', {
 	    				    title: 'Open an Existing Corpus',
@@ -192,7 +193,19 @@ Ext.define('Voyant.panel.CorpusCreator', {
         	            	}
         	            }
         	    	}
-	    		},'->',{
+	    		},'->', {
+	    	    	xtype: 'button',
+	    	    	scale: 'large',
+        			glyph: 'xf00d@FontAwesome',
+	    	    	text: this.localize('cancel'),
+	    	    	hidden: this.getCorpus()==undefined,
+	    	    	handler: function(btn) {
+	    	        	var win = this.up("window");
+	    	        	if (win && win.isFloating()) {
+	    	        		win.close();
+	    	        	}
+	    	    	}
+	    	    }, {
 	    	    	xtype: 'button',
 	    	    	scale: 'large',
                     glyph: 'xf00c@FontAwesome',
@@ -238,7 +251,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
     },
     
     loadForm: function(form) {
-    	var params = {tool: 'corpus.CorpusCreator'};
+    	var params = {tool: this.getCorpus() ? 'corpus.CorpusMetadata' : 'corpus.CorpusCreator'};
+    	if (this.getCorpus()) {
+    		Ext.apply(params, {
+    			corpus: this.getCorpus().getId(),
+    			addDocuments: true
+    		})
+    	};
     	var apiParams = this.getApiParams();
     	delete apiParams.view;
     	delete apiParams.stopList;
@@ -251,7 +270,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
 			failure: function(form, action) { // we always fail because of content-type
             	view.unmask();
 				if (action.result) {
-					this.loadCorpus({corpus: action.result.stepEnabledCorpusCreator.storedId});
+					this.setCorpus(undefined)
+					this.loadCorpus({corpus: action.result.corpus ? action.result.corpus.metadata.id : action.result.stepEnabledCorpusCreator.storedId});
 				}
 			},
 			scope: this
@@ -259,6 +279,18 @@ Ext.define('Voyant.panel.CorpusCreator', {
     },
    
     loadCorpus: function(params) {
+    	if (this.getCorpus()) {
+    		Ext.apply(params, {
+    			corpus: this.getCorpus().getId(),
+    			addDocuments: true
+    		})
+    	};
+    	
+    	var win = this.up("window");
+    	if (win && win.isFloating()) {
+    		win.close();
+    	}
+    	
 		var app = this.getApplication();
     	var view = app.getViewport();
 		view.mask();
@@ -269,6 +301,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 			view.unmask();
 			app.showErrorResponse({message: message}, response);
 		});
+		
     },
     
     showOptionsClick: function(panel) {

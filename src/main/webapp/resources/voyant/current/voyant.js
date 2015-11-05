@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Nov 05 14:16:25 EST 2015 */
+/* This file created by JSCacher. Last modified: Thu Nov 05 15:44:04 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6456,7 +6456,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	}
     },
     config: {
-    	
+    	corpus: undefined
     },
     
     constructor: function(config) {
@@ -6493,6 +6493,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    			text: 'Open',
                     glyph: 'xf115@FontAwesome', // not visible
 	    			tooltip: 'Select an exsting corpus',
+	    			hidden: this.getCorpus()!=undefined,
 	    			handler: function() {
 	    				Ext.create('Ext.window.Window', {
 	    				    title: 'Open an Existing Corpus',
@@ -6610,7 +6611,19 @@ Ext.define('Voyant.panel.CorpusCreator', {
         	            	}
         	            }
         	    	}
-	    		},'->',{
+	    		},'->', {
+	    	    	xtype: 'button',
+	    	    	scale: 'large',
+        			glyph: 'xf00d@FontAwesome',
+	    	    	text: this.localize('cancel'),
+	    	    	hidden: this.getCorpus()==undefined,
+	    	    	handler: function(btn) {
+	    	        	var win = this.up("window");
+	    	        	if (win && win.isFloating()) {
+	    	        		win.close();
+	    	        	}
+	    	    	}
+	    	    }, {
 	    	    	xtype: 'button',
 	    	    	scale: 'large',
                     glyph: 'xf00c@FontAwesome',
@@ -6656,7 +6669,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
     },
     
     loadForm: function(form) {
-    	var params = {tool: 'corpus.CorpusCreator'};
+    	var params = {tool: this.getCorpus() ? 'corpus.CorpusMetadata' : 'corpus.CorpusCreator'};
+    	if (this.getCorpus()) {
+    		Ext.apply(params, {
+    			corpus: this.getCorpus().getId(),
+    			addDocuments: true
+    		})
+    	};
     	var apiParams = this.getApiParams();
     	delete apiParams.view;
     	delete apiParams.stopList;
@@ -6669,7 +6688,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
 			failure: function(form, action) { // we always fail because of content-type
             	view.unmask();
 				if (action.result) {
-					this.loadCorpus({corpus: action.result.stepEnabledCorpusCreator.storedId});
+					this.setCorpus(undefined)
+					this.loadCorpus({corpus: action.result.corpus ? action.result.corpus.metadata.id : action.result.stepEnabledCorpusCreator.storedId});
 				}
 			},
 			scope: this
@@ -6677,6 +6697,18 @@ Ext.define('Voyant.panel.CorpusCreator', {
     },
    
     loadCorpus: function(params) {
+    	if (this.getCorpus()) {
+    		Ext.apply(params, {
+    			corpus: this.getCorpus().getId(),
+    			addDocuments: true
+    		})
+    	};
+    	
+    	var win = this.up("window");
+    	if (win && win.isFloating()) {
+    		win.close();
+    	}
+    	
 		var app = this.getApplication();
     	var view = app.getViewport();
 		view.mask();
@@ -6687,6 +6719,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 			view.unmask();
 			app.showErrorResponse({message: message}, response);
 		});
+		
     },
     
     showOptionsClick: function(panel) {
@@ -7436,12 +7469,17 @@ Ext.define('Voyant.panel.Documents', {
     		language: {en: "Language"},
     		matchingDocuments: {en: "Matching documents: {count}"},
     		error: {en: "Error"},
+    		add: {en: "Add"},
+    		addTip: {en: "Click here to add new documents to this corpus."},
     		remove: {en: "Remove"},
+    		removeTip: {en: "Click here to create a new corpus that excludes selected or filtered (search query) documents."},
     		reorder: {en: "Reorder"},
+    		reorderTip: {en: "Click here to create a new corpus based on a reordering of documents (drag and drop rows to reorder)."},
     		keep: {en: "Keep"},
+    		keepTip: {en: "Click here to create a new corpus that only includes selected or filtered (search query) documents."},
     		modify: {en: "Modify"},
     		newCorpus: {en: "New Corpus"},
-    		modifyTip: {en: "Click this button to create a new corpus by selecting a subset of documents or by re-ordering documents."},
+    		modifyTip: {en: "Click this button to create a new corpus by adding new documents, by selecting a subset of documents or by re-ordering documents."},
     		allSelectedError: {en: "You have selected all documents, you must select a subset of documents to remove or keep."},
     		removeSelectedDocuments: {en: "Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('selected document')}?"},
     		removeFilteredDocuments: {en: "Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('filtered document')}?"},
@@ -7451,7 +7489,7 @@ Ext.define('Voyant.panel.Documents', {
     		onlyOneError: {en: "Your corpus has only one document, you can't remove or keep documents to create a new corpus."},
     		reorderFilteredError: {en: "You cannot reorder a filtered (after search query) corpus. Please create a new corpus first (with the <i>Remove</i> or <i>Keep</i> button) and then reorder the new corpus."},
     		reorderOriginalError: {en: "Please reorder the corpus first (drag and drop the rows in the table)."},
-    		reorderSelectedDocuments: {en: "Create a <i>new</i> corpus based on the order shown?"}
+    		reorderDocuments: {en: "Create a <i>new</i> corpus based on the order shown?"}
     	},
     	api: {
     		query: undefined,
@@ -7494,6 +7532,8 @@ Ext.define('Voyant.panel.Documents', {
             		    minHeight: 200,
             		    height: "80%",
             		    layout: 'fit',
+            		    frame: true,
+            		    border: true,
             		    items: {
             		    	xtype: 'documents',
             		    	mode: this.MODE_EDITING,
@@ -7521,14 +7561,33 @@ Ext.define('Voyant.panel.Documents', {
             		    	}
             		    },
             		    buttons: [{
+                			text: this.localize('add'),
+                			tooltip: this.localize("addTip"),
+                			glyph: 'xf067@FontAwesome',
+                			handler: function(btn) {
+                				btn.up("window").close();
+                				Ext.create('Ext.window.Window', {
+                					header: false,
+                        		    modal: true,
+                        		    layout: 'fit',
+                        		    items: {
+                        		    	xtype: 'corpuscreator',
+                        		    	corpus: this.getStore().getCorpus()
+                        		    }
+                        		}).show();
+                			},
+                			scope: this
+                		}, {
                 			text: this.localize('remove'),
-                			glyph: 'xf00d@FontAwesome',
+                			tooltip: this.localize("removeTip"),
+                			glyph: 'xf05e@FontAwesome',
                 			hidden: this.getStore().getCorpus().getDocumentsCount()==1,
                 			handler: this.keepRemoveReorderHandler,
                 			itemId: 'remove',
                 			scope: this
                 		}, {
                 			text: this.localize('keep'),
+                			tooltip: this.localize("keepTip"),
                 			glyph: 'xf00c@FontAwesome',
                 			hidden: this.getStore().getCorpus().getDocumentsCount()==1,
                 			handler: this.keepRemoveReorderHandler,
@@ -7536,13 +7595,15 @@ Ext.define('Voyant.panel.Documents', {
                 			scope: this
                 		}, {
                 			text: this.localize('reorder'),
-                			glyph: 'xf00c@FontAwesome',
+                			tooltip: this.localize("reorderTip"),
+                			glyph: 'xf0dc@FontAwesome',
                 			hidden: this.getStore().getCorpus().getDocumentsCount()==1,
                 			handler: this.keepRemoveReorderHandler,
                 			itemId: 'reorder',
                 			scope: this
                 		},{
             		        text: 'Cancel',
+                			glyph: 'xf00d@FontAwesome',
             		        handler: function(btn) {
             		        	btn.up("window").close();
             		        }
