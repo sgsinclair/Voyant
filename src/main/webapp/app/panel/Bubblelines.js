@@ -195,7 +195,7 @@ Ext.define('Voyant.panel.Bubblelines', {
    		    			termObj[term] = termData;
    		    			this.bubblelines.addTermsToDoc(termObj, docId);
    		    		}, this);
-   		    		this.bubblelines.doLayout();
+   		    		this.bubblelines.doBubblelinesLayout();
 
 //   					this.processDocuments();
 //   					if (this.maxFreqChanged) {
@@ -397,7 +397,7 @@ Ext.define('Voyant.panel.Bubblelines', {
             			}
             		},
 	        		resize: function(cnt, width, height) {
-	        			this.bubblelines.doLayout();
+	        			this.bubblelines.doBubblelinesLayout();
 	        		},
             		scope: this
             	}

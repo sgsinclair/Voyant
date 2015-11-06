@@ -239,7 +239,7 @@
 
     loadFromCorpusTerms: function(corpusTerms) {
 		corpusTerms.load({
-		    callback: function(records, operation, success) {
+		    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
 		    	if (success) {
 			    	this.setApiParam('mode', this.MODE_CORPUS);
 			    	this.loadFromRecords(records);

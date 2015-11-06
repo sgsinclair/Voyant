@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Nov 05 15:44:04 EST 2015 */
+/* This file created by JSCacher. Last modified: Thu Nov 05 20:52:38 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -105,12 +105,12 @@ Bubblelines.prototype = {
 	        		}
 	        	}
 			});
-			container.doLayout();
+			container.updateLayout();
 			this.initialized = true;
 		}
 	},
 	
-	doLayout: function() {
+	doBubblelinesLayout: function() {
 		if (this.initialized) {
 			var width = this.container.getWidth();
 			
@@ -4635,7 +4635,7 @@ Ext.define('Voyant.panel.Bubblelines', {
    		    			termObj[term] = termData;
    		    			this.bubblelines.addTermsToDoc(termObj, docId);
    		    		}, this);
-   		    		this.bubblelines.doLayout();
+   		    		this.bubblelines.doBubblelinesLayout();
 
 //   					this.processDocuments();
 //   					if (this.maxFreqChanged) {
@@ -4837,7 +4837,7 @@ Ext.define('Voyant.panel.Bubblelines', {
             			}
             		},
 	        		resize: function(cnt, width, height) {
-	        			this.bubblelines.doLayout();
+	        			this.bubblelines.doBubblelinesLayout();
 	        		},
             		scope: this
             	}
@@ -13176,7 +13176,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 
     loadFromCorpusTerms: function(corpusTerms) {
 		corpusTerms.load({
-		    callback: function(records, operation, success) {
+		    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
 		    	if (success) {
 			    	this.setApiParam('mode', this.MODE_CORPUS);
 			    	this.loadFromRecords(records);

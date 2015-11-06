@@ -104,12 +104,12 @@ Bubblelines.prototype = {
 	        		}
 	        	}
 			});
-			container.doLayout();
+			container.updateLayout();
 			this.initialized = true;
 		}
 	},
 	
-	doLayout: function() {
+	doBubblelinesLayout: function() {
 		if (this.initialized) {
 			var width = this.container.getWidth();
 			

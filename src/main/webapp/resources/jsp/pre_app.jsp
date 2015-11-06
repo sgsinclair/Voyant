@@ -14,6 +14,14 @@
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/current/ext-theme-crisp-all_01.css" />
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/current/ext-theme-crisp-all_02.css" />
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/current/sencha-charts-all.css" />
+<!--
+<script type="text/javascript" src="<%= base %>/resources/ext/6.0.0/ext-all.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/ext/6.0.0/charts.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/ext/6.0.0/theme-crisp.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.0/theme-crisp-all_1.css" />
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.0/theme-crisp-all_2.css" />
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.0/charts-all.css" />
+ -->
 
 <!-- jQuery -->
 <script type="text/javascript" src="<%= base %>/resources/jquery/current/jquery.min.js"></script>
