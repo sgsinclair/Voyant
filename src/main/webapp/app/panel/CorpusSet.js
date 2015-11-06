@@ -18,6 +18,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 	},
 	layout: 'border',
+	header: false,
 	items: [{
     	region: 'west',
     	flex: 3,

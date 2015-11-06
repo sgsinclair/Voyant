@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Nov 05 20:52:38 EST 2015 */
+/* This file created by JSCacher. Last modified: Thu Nov 05 21:07:05 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -13461,6 +13461,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 	},
 	layout: 'border',
+	header: false,
 	items: [{
     	region: 'west',
     	flex: 3,
