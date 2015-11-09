@@ -14,12 +14,6 @@ Ext.define('Voyant.panel.Catalogue', {
     },
     config: {
     	corpus: undefined
-    	config: {
-    		author: {
-    			label: "Authors",
-    			
-    		}
-    	}
     },
     
     constructor: function(config ) {

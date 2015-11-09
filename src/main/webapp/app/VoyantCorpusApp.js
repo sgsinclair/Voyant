@@ -27,33 +27,25 @@ Ext.define('Voyant.VoyantCorpusApp', {
     config: {
     	corpus: undefined,
     	moreTools: [{
-    		i18n: 'moreToolsScale',
-    		glyph: 'xf07d@FontAwesome',
-    		items: [{
-    			i18n: 'moreToolsScaleCorpus',
-    			glyph: 'xf111@FontAwesome',
-    			items: ['cirrus','corpusterms','corpuscollocates','phrases','documents','summary','trends','scatterplot','termsradio']
-    		},{
-    			i18n: 'moreToolsScaleDocument',
-    			glyph: 'xf10c@FontAwesome',
-    			items: ['cirrus','contexts','documentterms','reader','trends']
-    		}]
+			i18n: 'moreToolsScaleCorpus',
+			glyph: 'xf065@FontAwesome',
+			items: ['cirrus','corpusterms','corpuscollocates','phrases','documents','summary','trends','scatterplot','termsradio']
     	},{
-    		i18n: 'moreToolsType',
-    		glyph: 'xf12e@FontAwesome',
-    		items: [{
-    			i18n: 'moreToolsTypeViz',
-    			glyph: 'xf06e@FontAwesome',
-    			items: ['cirrus','collocatesgraph','trends','scatterplot','termsradio']
-    		},{
-    			i18n: 'moreToolsTypeGrid',
-    			glyph: 'xf0ce@FontAwesome',
-    			items: ['corpusterms','corpuscollocates','phrases','contexts','documentterms','documents']
-    		},{
-    			i18n: 'moreToolsTypeOther',
-    			glyph: 'xf035@FontAwesome',
-    			items: ['reader','summary']
-    		}]
+			i18n: 'moreToolsScaleDocument',
+			glyph: 'xf066@FontAwesome',
+			items: ['cirrus','contexts','documentterms','reader','trends']
+    	},{
+			i18n: 'moreToolsTypeViz',
+			glyph: 'xf06e@FontAwesome',
+			items: ['cirrus','collocatesgraph','trends','scatterplot','termsradio']
+		},{
+			i18n: 'moreToolsTypeGrid',
+			glyph: 'xf0ce@FontAwesome',
+			items: ['corpusterms','corpuscollocates','phrases','contexts','documentterms','documents']
+		},{
+			i18n: 'moreToolsTypeOther',
+			glyph: 'xf035@FontAwesome',
+			items: ['reader','summary']
     	}]
     },
     

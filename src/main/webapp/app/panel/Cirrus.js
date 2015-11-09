@@ -8,11 +8,13 @@ Ext.define('Voyant.panel.Cirrus', {
     	i18n: {
     		title: {en: "Cirrus"},
     		helpTip: {en: "<p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document – this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>"},
+    		visible: {en: "Show"},
     		reset: {en: 'reset'}
     	},
     	api: {
     		stopList: 'auto',
     		limit: 100,
+    		visible: 50,
     		terms: undefined,
     		docId: undefined,
     		docIndex: undefined
@@ -26,6 +28,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		xtype: 'stoplistoption'
     	},
     	corpus: undefined,
+    	records: undefined,
     	terms: undefined,
     	visLayout: undefined, // cloud layout algorithm
     	vis: undefined, // actual vis
@@ -41,13 +44,39 @@ Ext.define('Voyant.panel.Cirrus', {
     layout: 'fit',
     
     constructor: function(config) {
-
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    },
+    
+    initComponent: function (config) {
     	Ext.apply(this, {
     		title: this.localize('title'),
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-                items: ['->',{
+                items: [{
+	            	xtype: 'slider',
+	            	itemId: 'visible',
+	            	fieldLabel: this.localize('visible'),
+	            	labelAlign: 'right',
+	            	labelWidth: 40,
+	            	width: 120,
+	            	increment: 10,
+	            	minValue: 10,
+	            	maxValue: 100,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.maxValue = this.getApiParam("limit")
+	            			slider.increment = parseInt(slider.maxValue/50)
+	            			slider.setValue(this.getApiParam("visible"))
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({visible: newvalue});
+	            			this.loadFromTermsRecords();
+	            		},
+	            		scope: this
+	            	}
+                }, {xtype: 'tbfill'}, {
                     text: this.localize('reset'),
                     hidden: true,
                     itemId: 'reset',
@@ -61,10 +90,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		}]
     	});
 
-        this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-
-    	if (config.embedded) {
+    	if (config && config.embedded) {
     		var cls = Ext.getClass(config.embedded).getName();
     		if (cls=="Voyant.data.store.CorpusTerms") {
     	    	this.loadFromCorpusTerms(config.embedded);
@@ -73,6 +99,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	    	this.loadFromCorpusTerms(config.embedded.getCorpusTerms());
     		}
     	}
+    	this.callParent(arguments);
     },
     
     listeners: {
@@ -97,7 +124,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		if (documents) {
     			var doc = documents[0];
     			this.setApiParam('docId', doc.getId());
-        		this.loadFromDocumentTerms(documents[0].getDocumentTerms({autoload: false, corpus: corpus}));
+        		this.loadFromDocumentTerms(documents[0].getDocumentTerms({autoload: false, corpus: corpus, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
     		}
     	},
     	
@@ -114,14 +141,15 @@ Ext.define('Voyant.panel.Cirrus', {
     loadFromCorpus: function(corpus) {    	
 		this.setCorpus(corpus);
 		this.setApiParams({docId: undefined, docIndex: undefined});
-		this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false}));
+		this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
     },
     
     loadFromDocumentTerms: function(documentTerms) {
     	documentTerms.load({
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_DOCUMENT);
-		    	this.loadFromTermsRecords(records);
+		    	this.setRecords(operation.getRecords()); // not sure why operation.records is different from records
+		    	this.loadFromTermsRecords();
 		    },
 		    scope: this,
 		    params: this.getApiParams()
@@ -133,20 +161,23 @@ Ext.define('Voyant.panel.Cirrus', {
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_CORPUS);
-//		    	var resp = JSON.parse(operation._response.responseText);
-//		    	this.buildFromTerms(resp.corpusTerms.terms);
-		    	this.loadFromTermsRecords(records);
+		    	this.setRecords(operation.getRecords()); // not sure why operation.records is different from records
+		    	this.loadFromTermsRecords();
 		    },
 		    scope: this,
 		    params: this.getApiParams()
     	});
     },
     
-    loadFromTermsRecords: function(records) {
+    loadFromTermsRecords: function() {
+    	var records = this.getRecords();
+    	var visible = this.getApiParam("visible");
+    	if (visible>records.length) {visible=records.length;}
     	var terms = [];
-    	records.forEach(function(record) {
-    		terms.push({text: record.get('term'), rawFreq: record.get('rawFreq')});
-    	});
+    	for (var i=0; i<visible; i++) {
+    		terms.push({text: records[i].get('term'), rawFreq: records[i].get('rawFreq')});
+    	}
+    	console.warn(terms)
     	this.setTerms(terms);
     	this.buildFromTerms();
     },

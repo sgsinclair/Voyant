@@ -71,17 +71,9 @@ Ext.define('Voyant.util.Toolable', {
 			var tools = app.getMoreTools();
 			tools.forEach(function(category) {
 				var categories = [];
-				category.items.forEach(function(subcategory) {
-					var subcategories = [];
-					subcategory.items.forEach(function(xtype) {
-						subcategories.push(this.getMenuItemFromXtype(xtype))
-					}, this)
-					categories.push({
-						text: app.localize(subcategory.i18n),
-						glyph: subcategory.glyph,
-						menu: {items: subcategories}
-					})
-				}, this);
+				category.items.forEach(function(xtype) {
+					categories.push(this.getMenuItemFromXtype(xtype))
+				}, this)
 				moreTools.push({
 					text: app.localize(category.i18n),
 					glyph: category.glyph,
