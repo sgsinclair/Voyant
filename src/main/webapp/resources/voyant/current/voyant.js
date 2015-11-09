@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Nov 09 11:10:19 EST 2015 */
+/* This file created by JSCacher. Last modified: Mon Nov 09 11:49:38 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4973,11 +4973,12 @@ Ext.define('Voyant.panel.Cirrus', {
     		title: {en: "Cirrus"},
     		helpTip: {en: "<p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document – this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>"},
     		visible: {en: "Show"},
-    		reset: {en: 'reset'}
+    		reset: {en: 'reset'},
+    		maxTerms: {en: "Max terms"}
     	},
     	api: {
     		stopList: 'auto',
-    		limit: 100,
+    		limit: 500,
     		visible: 50,
     		terms: undefined,
     		docId: undefined,
@@ -4988,9 +4989,24 @@ Ext.define('Voyant.panel.Cirrus', {
     
     config: {
     	mode: undefined,
-    	options: {
-    		xtype: 'stoplistoption'
-    	},
+    	options: [
+    		{xtype: 'stoplistoption'},
+    		{
+    	        xtype: 'numberfield',
+    	        name: 'label',
+    	        fieldLabel: 'Max words',
+    	        labelAlign: 'right',
+    	        value: 500,
+    	        minValue: 50,
+    	        step: 50,
+    	        listeners: {
+        	        afterrender: function(field) {
+        	        	var win = field.up("window");
+        	        	if (win && win.panel) {field.setFieldLabel(win.panel.localize("maxTerms"))}
+        	        }
+    	        }
+    	    }
+    	],
     	corpus: undefined,
     	records: undefined,
     	terms: undefined,
@@ -5025,9 +5041,9 @@ Ext.define('Voyant.panel.Cirrus', {
 	            	labelAlign: 'right',
 	            	labelWidth: 40,
 	            	width: 120,
-	            	increment: 10,
-	            	minValue: 10,
-	            	maxValue: 100,
+	            	increment: 25,
+	            	minValue: 25,
+	            	maxValue: 500,
 	            	listeners: {
 	            		afterrender: function(slider) {
 	            			slider.maxValue = this.getApiParam("limit")
