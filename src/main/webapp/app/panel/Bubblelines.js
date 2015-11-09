@@ -301,6 +301,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	itemSelector: 'div.term',
 	            	overItemCls: 'over',
 	            	selectedItemCls: 'selected',
+	            	cls: 'selected', // default selected
 	            	focusCls: '',
 	            	listeners: {
 	            		beforeitemclick: function(dv, record, item, index, event, opts) {
@@ -310,6 +311,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            			return false;
 	            		},
 	            		selectionchange: function(selModel, selections) {
+	            			debugger
 	            			var dv = this.down('#termsView');
 	            			var terms = [];
 	            			
@@ -341,21 +343,38 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            		itemcontextmenu: function(dv, record, el, index, event) {
 	            			event.preventDefault();
 	            			event.stopPropagation();
-	            			var isSelected = dv.isSelected(el);
+	            			var isSelected = dv.getEl().hasCls("selected");
 	            			var menu = new Ext.menu.Menu({
 	            				floating: true,
 	            				items: [
-//	            				{
-//	            					text: isSelected ? this.localize('hideTerm') : this.localize('showTerm'),
-//	            					handler: function() {
-//	            						if (isSelected) {
+	            				/*
+	            				{
+	            					text: isSelected ? this.localize('hideTerm') : this.localize('showTerm'),
+	            					handler: function() {
+	            						debugger // processTerms
+//	            						var term = this.termStore.getAt(index).get('term');
+	            						if (isSelected) {
+	            							console.warn(record.data, el)
+	            							dv.getEl().removeCls("selected").addCls("unselected")
+	            							el.style.oldcolor=el.style.color;
+	            							el.style.color="rgb(200,200,200)"
+//	            							dv.
+//	            							dv.addCls("unselected")
 //	            							dv.deselect(record);
-//	            						} else {
+//		            						this.bubblelines.removeTerm(term);
+	            						} else {
+	            							dv.getEl().removeCls("unselected").addCls("selected")
+	            							el.style.color=oldcolor
+//		            						this.bubblelines.removeTerm(term);
 //	            							dv.select(record, true);
-//	            						}
-//	            					},
-//	            					scope: this
-//	            				},
+	            						}
+	            						dv.refresh();
+//	            						this.bubblelines.removeTerm(term);
+//	            						this.bubblelines.setCanvasHeight();
+//	            						this.bubblelines.drawGraph();
+	            					},
+	            					scope: this
+	            				},*/
 	            				{
 	            					text: this.localize('removeTerm'),
 	            					handler: function() {

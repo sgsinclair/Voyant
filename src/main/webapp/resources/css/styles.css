@@ -130,6 +130,9 @@ svg#collocatesGraph line {
 	cursor: pointer;
 }
 
+.term.unselected {
+	color: grey !important;
+}
 
 
 /* used for panel tool glyphs in the header */
@@ -180,3 +183,5 @@ svg#collocatesGraph line {
     	padding-top:5px;
     }
     .green {color:green;}
+    
+ 
