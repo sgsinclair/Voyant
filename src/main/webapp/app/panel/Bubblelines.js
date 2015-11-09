@@ -57,7 +57,8 @@ Ext.define('Voyant.panel.Bubblelines', {
 	config: {
 		corpus: undefined,
 		docTermStore: undefined,
-		docStore: undefined
+		docStore: undefined,
+    	options: {xtype: 'stoplistoption'}
 	},
 	
 	selectedDocs: undefined,
@@ -408,9 +409,13 @@ Ext.define('Voyant.panel.Bubblelines', {
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
+    	if (this.bubblelines) { // get rid of existing terms
+    		this.bubblelines.removeAllTerms();
+    		this.termStore.removeAll(true);
+    	}
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
-		    	var query = this.getApiParam('query') || [];
+		    	var query = []; //this.getApiParam('query') || [];
 				if (typeof query == 'string') query = [query];
 		    	records.forEach(function(record, index) {
 					query.push(record.get('term'));
@@ -420,7 +425,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		    scope: this,
 		    params: {
 		    	limit: 5,
-		    	stopList: 'auto'
+		    	stopList: this.getApiParams('stopList')
 		    }
     	});
     },
@@ -437,7 +442,6 @@ Ext.define('Voyant.panel.Bubblelines', {
         	var len = docs.getCount();
 //        	var maxDocs = parseInt(this.getApiParam('maxDocs'))
 //        	if (len > maxDocs) {len = maxDocs}
-//        	debugger
         	for (var i = 0; i < len; i++) {
         		var doc = docs.getAt(i);
     	    	this.setApiParams({query: query, docIndex: undefined, docId: doc.getId()});

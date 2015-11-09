@@ -540,19 +540,21 @@ Bubblelines.prototype = {
 //		this.ctx.fillRect(0, this.yIndex-this.maxRadius*0.75, 350, 2);
 	},
 	
-	drawLegend: function() {
+	drawLegend: function() { // obsolete code?
 		var x = this.MAX_LABEL_WIDTH + this.maxRadius;
 		var y = 5;
 		this.ctx.textBaseline = 'top';
 		this.ctx.font = '16px serif';
-		this.typeStore.each(function(record) {
-			var color = record.get('color').join(',');
-			this.ctx.fillStyle = 'rgb('+color+')';
-			var type = record.get('type');
-			this.ctx.fillText(type, x, y);
-			var width = this.ctx.measureText(type).width;
-			x += width + 8;
-		}, this);
+		if (this.typeStore) {
+			this.typeStore.each(function(record) {
+				var color = record.get('color').join(',');
+				this.ctx.fillStyle = 'rgb('+color+')';
+				var type = record.get('type');
+				this.ctx.fillText(type, x, y);
+				var width = this.ctx.measureText(type).width;
+				x += width + 8;
+			}, this);
+		}
 	},
 	
 	drawToolTip: function() {
