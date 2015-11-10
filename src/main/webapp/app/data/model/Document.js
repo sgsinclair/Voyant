@@ -76,7 +76,7 @@ Ext.define('Voyant.data.model.Document', {
     
     getAuthor: function() {
     	var author = this.get('author');
-    	return Ext.isArray(author) ? title.join("; ") : author;
+    	return Ext.isArray(author) ? author.join("; ") : author;
     },
     
     getCorpusId: function() {
