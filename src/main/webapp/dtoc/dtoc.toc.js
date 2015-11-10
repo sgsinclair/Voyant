@@ -466,30 +466,32 @@ Ext.define('Voyant.panel.DToC.ToC', {
 				kwic = kwics[i];
 				docIndex = kwic.docIndex;
 				docId = this.getCorpus().getDocument(docIndex).getId();
-				type = kwic.middle;
-				text = kwic.left + ' <span class="dtc-kwic-highlight">' + type + '</span> ' + kwic.right;
-				
-				tokenId = 'word_'+docIndex+'.'+kwic.position;
-				
-				kwicsForEvent.push({docId: docId, tokenId: tokenId, type: 'kwic'});
-				
 				doc = root.findChild('docId', docId);
-				doc.collapse();
-				if (docsToExpand.indexOf(doc) === -1) {
-					docsToExpand.push(doc);
+				if (doc != null) {
+					type = kwic.middle;
+					text = kwic.left + ' <span class="dtc-kwic-highlight">' + type + '</span> ' + kwic.right;
+					
+					tokenId = 'word_'+docIndex+'.'+kwic.position;
+					
+					kwicsForEvent.push({docId: docId, tokenId: tokenId, type: 'kwic'});
+					
+					doc.collapse();
+					if (docsToExpand.indexOf(doc) === -1) {
+						docsToExpand.push(doc);
+					}
+					
+					doc.appendChild({
+						text: text,
+						leaf: true,
+						cls: 'kwic child',
+						editable: false,
+						draggable: false,
+						tokenId: tokenId,
+						kwicData: type,
+						docId: docId,
+						dtcType: 'kwic'
+					});
 				}
-				
-				doc.appendChild({
-					text: text,
-					leaf: true,
-					cls: 'kwic child',
-					editable: false,
-					draggable: false,
-					tokenId: tokenId,
-					kwicData: type,
-					docId: docId,
-					dtcType: 'kwic'
-				});
 			}
 			
 			for (var i = 0; i < docsToExpand.length; i++) {
@@ -540,39 +542,41 @@ Ext.define('Voyant.panel.DToC.ToC', {
 				
 				var docId = tag.docId;
 				var doc = root.findChild('docId', docId);
-				doc.collapse();
-				if (docsToExpand.indexOf(doc) === -1) {
-					docsToExpand.push(doc);
-				}
-				
-				var text = tag.text || '';
-				var nodeText = '';
-				if (tag.subtype == null) {
-					nodeText = '<span class="dtc-tag-highlight">'+tag.label+'</span><br/>';
-				}
-				if (tag.prevText) {
-					nodeText += tag.prevText+'<span class="dtc-tag-highlight">'+text+'</span>'+tag.nextText;
-				} else {
-					nodeText += text;
-				}
-				
-				var nodeConfig = {
-					text: nodeText,
-					cls: 'tag'+(tag.subtype == null ? ' child' : ' subtype child'),
-					leaf: true,
-					editable: false,
-					draggable: false,
-					identifier: tag.identifier,
-					docId: tag.docId,
-					tokenId: tag.tokenId,
-					dtcType: 'tag',
-					tagData: tag
-				};
-				
-				if (subtypeNode) {
-					subtypeNode.appendChild(nodeConfig);
-				} else {
-					doc.appendChild(nodeConfig);
+				if (doc != null) {
+					doc.collapse();
+					if (docsToExpand.indexOf(doc) === -1) {
+						docsToExpand.push(doc);
+					}
+					
+					var text = tag.text || '';
+					var nodeText = '';
+					if (tag.subtype == null) {
+						nodeText = '<span class="dtc-tag-highlight">'+tag.label+'</span><br/>';
+					}
+					if (tag.prevText) {
+						nodeText += tag.prevText+'<span class="dtc-tag-highlight">'+text+'</span>'+tag.nextText;
+					} else {
+						nodeText += text;
+					}
+					
+					var nodeConfig = {
+						text: nodeText,
+						cls: 'tag'+(tag.subtype == null ? ' child' : ' subtype child'),
+						leaf: true,
+						editable: false,
+						draggable: false,
+						identifier: tag.identifier,
+						docId: tag.docId,
+						tokenId: tag.tokenId,
+						dtcType: 'tag',
+						tagData: tag
+					};
+					
+					if (subtypeNode) {
+						subtypeNode.appendChild(nodeConfig);
+					} else {
+						doc.appendChild(nodeConfig);
+					}
 				}
 			}
 			
@@ -604,19 +608,21 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			}
 			
 			doc = root.findChild('docId', index.docId);
-			doc.appendChild({
-				text: text,
-				cls: 'index child',
-				leaf: true,
-				editable: false,
-				draggable: false,
-				tokenId: index.tokenId,
-				docId: index.docId,
-				dtcType: 'index',
-				indexData: index
-			});
-//			doc.ui.addClass('hasChildren');
-			doc.expand();
+			if (doc != null) {
+				doc.appendChild({
+					text: text,
+					cls: 'index child',
+					leaf: true,
+					editable: false,
+					draggable: false,
+					tokenId: index.tokenId,
+					docId: index.docId,
+					dtcType: 'index',
+					indexData: index
+				});
+	//			doc.ui.addClass('hasChildren');
+				doc.expand();
+			}
 		}
 		
 		Ext.defer(this.updateDocModelOutline, 500, this);
@@ -631,38 +637,40 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			docId = type['@docId'];
 			word = type['@type'];
 			doc = root.findChild('docId', docId);
-			if (clearedDocs[docId] == null) {
-				doc.removeAll(true);
-//				doc.ui.removeClass('hasChildren');
-				clearedDocs[docId] = true;
+			if (doc != null) {
+				if (clearedDocs[docId] == null) {
+					doc.removeAll(true);
+	//				doc.ui.removeClass('hasChildren');
+					clearedDocs[docId] = true;
+				}
+				var tokenId;
+				for (var j = 0; j < type.tokenIds['int-array'].length; j++) {
+					tokenId = type.tokenIds['int-array'][j];
+					doc.appendChild({
+						text: word,
+						leaf: true,
+						editable: false,
+						draggable: false,
+						tokenId: tokenId,
+						typeData: word,
+						dtcType: 'type',
+						docId: docId,
+						listeners: {
+							click: function(node, event) {
+								var data = {
+									tokenId: node.getData().tokenId,
+									docId: node.getData().docId,
+									docIdType: node.getData().docId+':'+node.getData().typeData
+								};
+								this.getApplication().dispatchEvent('tokenSelected', this, data);
+							},
+							scope: this
+						}
+					});
+				}
+	//			doc.ui.addClass('hasChildren');
+				doc.expand();
 			}
-			var tokenId;
-			for (var j = 0; j < type.tokenIds['int-array'].length; j++) {
-				tokenId = type.tokenIds['int-array'][j];
-				doc.appendChild({
-					text: word,
-					leaf: true,
-					editable: false,
-					draggable: false,
-					tokenId: tokenId,
-					typeData: word,
-					dtcType: 'type',
-					docId: docId,
-					listeners: {
-						click: function(node, event) {
-							var data = {
-								tokenId: node.getData().tokenId,
-								docId: node.getData().docId,
-								docIdType: node.getData().docId+':'+node.getData().typeData
-							};
-							this.getApplication().dispatchEvent('tokenSelected', this, data);
-						},
-						scope: this
-					}
-				});
-			}
-//			doc.ui.addClass('hasChildren');
-			doc.expand();
 		}
 		Ext.getCmp('dtcMarkup').showHitsForTags();
 	},
@@ -673,51 +681,53 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			if (result.resultType == XPathResult.UNORDERED_NODE_ITERATOR_TYPE) {
 				var root = this.getRootNode();
 				var doc = root.findChild('docId', docId);
-//				doc.ui.removeClass('hasChildren');
-				doc.removeAll(true);
-				var tag = result.iterateNext();
-				if (tag == null) {
-					Ext.MessageBox.show({
-						buttons: Ext.Msg.OK,
-						icon: Ext.Msg.INFO,
-						width: 300,
-						height: 150,
-						title: 'Info',
-						msg: 'There were no matches for the supplied XPath.'
-					});
-					return;
-				}
-				while (tag) {
-					var tokens = Ext.DomQuery.jsSelect('span[tokenid]', tag);
-					var length = Math.min(tokens.length, 14);
-					var text = '<span class="dtc-highlight">'+tag.nodeName+'</span>';
-					for (var i = 0; i < length; i++) {
-						text += ' '+tokens[i].textContent;
+				if (doc != null) {
+	//				doc.ui.removeClass('hasChildren');
+					doc.removeAll(true);
+					var tag = result.iterateNext();
+					if (tag == null) {
+						Ext.MessageBox.show({
+							buttons: Ext.Msg.OK,
+							icon: Ext.Msg.INFO,
+							width: 300,
+							height: 150,
+							title: 'Info',
+							msg: 'There were no matches for the supplied XPath.'
+						});
+						return;
 					}
-					doc.appendChild({
-						text: text,
-						leaf: true,
-						expandable: false,
-						editable: false,
-						draggable: false,
-						tokenId: tag.getAttribute('tokenid'),
-						docId: docId,
-						dtcType: 'xpath',
-						listeners: {
-							click: function(node, event) {
-								var data = {
-									xpath: "//span[@tokenid='"+node.getData().tokenId+"']",
-									docId: node.getData().docId
-								};
-								this.getApplication().dispatchEvent('tagSelected', this, data);
-							},
-							scope: this
+					while (tag) {
+						var tokens = Ext.DomQuery.jsSelect('span[tokenid]', tag);
+						var length = Math.min(tokens.length, 14);
+						var text = '<span class="dtc-highlight">'+tag.nodeName+'</span>';
+						for (var i = 0; i < length; i++) {
+							text += ' '+tokens[i].textContent;
 						}
-					});
-					tag = result.iterateNext();
+						doc.appendChild({
+							text: text,
+							leaf: true,
+							expandable: false,
+							editable: false,
+							draggable: false,
+							tokenId: tag.getAttribute('tokenid'),
+							docId: docId,
+							dtcType: 'xpath',
+							listeners: {
+								click: function(node, event) {
+									var data = {
+										xpath: "//span[@tokenid='"+node.getData().tokenId+"']",
+										docId: node.getData().docId
+									};
+									this.getApplication().dispatchEvent('tagSelected', this, data);
+								},
+								scope: this
+							}
+						});
+						tag = result.iterateNext();
+					}
+	//				doc.ui.addClass('hasChildren');
+					doc.expand();
 				}
-//				doc.ui.addClass('hasChildren');
-				doc.expand();
 			} else {
 				
 			}
