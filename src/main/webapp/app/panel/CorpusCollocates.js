@@ -36,9 +36,13 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     		context: 5,
     		query: undefined,
     		docId: undefined,
-    		docIndex: undefined
+    		docIndex: undefined,
+    		sort: 'contextTermRawFreq'
     	},
 		glyph: 'xf0ce@FontAwesome'
+    },
+    config: {
+    	options: {xtype: 'stoplistoption'}
     },
     constructor: function(config) {
     	
@@ -142,7 +146,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusCollocates");
+        var store = Ext.create("Voyant.data.store.CorpusCollocates", {parentPanel: this});
         
         Ext.apply(me, {
     		title: this.localize('title'),

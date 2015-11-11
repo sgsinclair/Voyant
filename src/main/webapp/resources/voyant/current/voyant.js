@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Nov 09 11:49:38 EST 2015 */
+/* This file created by JSCacher. Last modified: Wed Nov 11 11:20:42 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -541,19 +541,21 @@ Bubblelines.prototype = {
 //		this.ctx.fillRect(0, this.yIndex-this.maxRadius*0.75, 350, 2);
 	},
 	
-	drawLegend: function() {
+	drawLegend: function() { // obsolete code?
 		var x = this.MAX_LABEL_WIDTH + this.maxRadius;
 		var y = 5;
 		this.ctx.textBaseline = 'top';
 		this.ctx.font = '16px serif';
-		this.typeStore.each(function(record) {
-			var color = record.get('color').join(',');
-			this.ctx.fillStyle = 'rgb('+color+')';
-			var type = record.get('type');
-			this.ctx.fillText(type, x, y);
-			var width = this.ctx.measureText(type).width;
-			x += width + 8;
-		}, this);
+		if (this.typeStore) {
+			this.typeStore.each(function(record) {
+				var color = record.get('color').join(',');
+				this.ctx.fillStyle = 'rgb('+color+')';
+				var type = record.get('type');
+				this.ctx.fillText(type, x, y);
+				var width = this.ctx.measureText(type).width;
+				x += width + 8;
+			}, this);
+		}
 	},
 	
 	drawToolTip: function() {
@@ -3058,7 +3060,7 @@ Ext.define('Voyant.data.model.Document', {
     
     getAuthor: function() {
     	var author = this.get('author');
-    	return Ext.isArray(author) ? title.join("; ") : author;
+    	return Ext.isArray(author) ? author.join("; ") : author;
     },
     
     getCorpusId: function() {
@@ -3318,7 +3320,7 @@ Ext.define('Voyant.data.store.Contexts', {
 });
 
 Ext.define('Voyant.data.store.CorpusCollocates', {
-	extend: 'Ext.data.BufferedStore',
+	extend: 'Voyant.data.store.VoyantStore',
 	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     model: 'Voyant.data.model.CorpusCollocate',
 //    transferable: ['setCorpus'],
@@ -4489,7 +4491,8 @@ Ext.define('Voyant.panel.Bubblelines', {
 	config: {
 		corpus: undefined,
 		docTermStore: undefined,
-		docStore: undefined
+		docStore: undefined,
+    	options: {xtype: 'stoplistoption'}
 	},
 	
 	selectedDocs: undefined,
@@ -4732,6 +4735,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	itemSelector: 'div.term',
 	            	overItemCls: 'over',
 	            	selectedItemCls: 'selected',
+	            	cls: 'selected', // default selected
 	            	focusCls: '',
 	            	listeners: {
 	            		beforeitemclick: function(dv, record, item, index, event, opts) {
@@ -4741,6 +4745,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            			return false;
 	            		},
 	            		selectionchange: function(selModel, selections) {
+	            			debugger
 	            			var dv = this.down('#termsView');
 	            			var terms = [];
 	            			
@@ -4772,21 +4777,38 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            		itemcontextmenu: function(dv, record, el, index, event) {
 	            			event.preventDefault();
 	            			event.stopPropagation();
-	            			var isSelected = dv.isSelected(el);
+	            			var isSelected = dv.getEl().hasCls("selected");
 	            			var menu = new Ext.menu.Menu({
 	            				floating: true,
 	            				items: [
-//	            				{
-//	            					text: isSelected ? this.localize('hideTerm') : this.localize('showTerm'),
-//	            					handler: function() {
-//	            						if (isSelected) {
+	            				/*
+	            				{
+	            					text: isSelected ? this.localize('hideTerm') : this.localize('showTerm'),
+	            					handler: function() {
+	            						debugger // processTerms
+//	            						var term = this.termStore.getAt(index).get('term');
+	            						if (isSelected) {
+	            							console.warn(record.data, el)
+	            							dv.getEl().removeCls("selected").addCls("unselected")
+	            							el.style.oldcolor=el.style.color;
+	            							el.style.color="rgb(200,200,200)"
+//	            							dv.
+//	            							dv.addCls("unselected")
 //	            							dv.deselect(record);
-//	            						} else {
+//		            						this.bubblelines.removeTerm(term);
+	            						} else {
+	            							dv.getEl().removeCls("unselected").addCls("selected")
+	            							el.style.color=oldcolor
+//		            						this.bubblelines.removeTerm(term);
 //	            							dv.select(record, true);
-//	            						}
-//	            					},
-//	            					scope: this
-//	            				},
+	            						}
+	            						dv.refresh();
+//	            						this.bubblelines.removeTerm(term);
+//	            						this.bubblelines.setCanvasHeight();
+//	            						this.bubblelines.drawGraph();
+	            					},
+	            					scope: this
+	            				},*/
 	            				{
 	            					text: this.localize('removeTerm'),
 	            					handler: function() {
@@ -4840,9 +4862,13 @@ Ext.define('Voyant.panel.Bubblelines', {
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
+    	if (this.bubblelines) { // get rid of existing terms
+    		this.bubblelines.removeAllTerms();
+    		this.termStore.removeAll(true);
+    	}
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
-		    	var query = this.getApiParam('query') || [];
+		    	var query = []; //this.getApiParam('query') || [];
 				if (typeof query == 'string') query = [query];
 		    	records.forEach(function(record, index) {
 					query.push(record.get('term'));
@@ -4852,7 +4878,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		    scope: this,
 		    params: {
 		    	limit: 5,
-		    	stopList: 'auto'
+		    	stopList: this.getApiParams('stopList')
 		    }
     	});
     },
@@ -4869,7 +4895,6 @@ Ext.define('Voyant.panel.Bubblelines', {
         	var len = docs.getCount();
 //        	var maxDocs = parseInt(this.getApiParam('maxDocs'))
 //        	if (len > maxDocs) {len = maxDocs}
-//        	debugger
         	for (var i = 0; i < len; i++) {
         		var doc = docs.getAt(i);
     	    	this.setApiParams({query: query, docIndex: undefined, docId: doc.getId()});
@@ -5157,7 +5182,6 @@ Ext.define('Voyant.panel.Cirrus', {
     	for (var i=0; i<visible; i++) {
     		terms.push({text: records[i].get('term'), rawFreq: records[i].get('rawFreq')});
     	}
-    	console.warn(terms)
     	this.setTerms(terms);
     	this.buildFromTerms();
     },
@@ -6233,9 +6257,13 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     		context: 5,
     		query: undefined,
     		docId: undefined,
-    		docIndex: undefined
+    		docIndex: undefined,
+    		sort: 'contextTermRawFreq'
     	},
 		glyph: 'xf0ce@FontAwesome'
+    },
+    config: {
+    	options: {xtype: 'stoplistoption'}
     },
     constructor: function(config) {
     	
@@ -6339,7 +6367,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusCollocates");
+        var store = Ext.create("Voyant.data.store.CorpusCollocates", {parentPanel: this});
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -13844,7 +13872,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','corpuscollocates','phrases','documents','summary','trends','scatterplot','termsradio']
+			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','phrases','documents','summary','trends','scatterplot','termsradio']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
@@ -13852,7 +13880,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
-			items: ['cirrus','collocatesgraph','trends','scatterplot','termsradio']
+			items: ['cirrus','bubblelines','collocatesgraph','trends','scatterplot','termsradio']
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',

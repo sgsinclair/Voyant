@@ -193,7 +193,6 @@ Ext.define('Voyant.panel.Cirrus', {
     	for (var i=0; i<visible; i++) {
     		terms.push({text: records[i].get('term'), rawFreq: records[i].get('rawFreq')});
     	}
-    	console.warn(terms)
     	this.setTerms(terms);
     	this.buildFromTerms();
     },
