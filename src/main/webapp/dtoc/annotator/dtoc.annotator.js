@@ -300,6 +300,8 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 	id: 'dtcAnnotatorBridge',
 	containerId: 'dtcReaderContainer',
 	annotator: null,
+	annotatorAdderObserver: null, // MutationObserver to properly position the adder when it's shown
+	doAdderAdjust: true, // whether to try to fix the adder position
 	firstInit: true,
 	showLoginWindow: true,
 	adjustForToolbar: true, // should we adjust height values for the Annotator toolbar? (should only do once)
@@ -365,8 +367,15 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
             }]
         });
 		
-		function onEditorShown(event, editor) {
-			
+		function onEditorShown(editor, anno) {
+			var $editor = $('.annotator-editor form', '#dtcReaderContainer');
+			var $parent = $('#dtcReaderContainer');
+			if ($editor.offset().top < $parent.offset().top) {
+				$editor.parents('.annotator-editor').addClass('annotator-invert-y');
+			}
+			if ($editor.offset().left + $editor.outerWidth() > $parent.offset().left + $parent.outerWidth()) {
+				$editor.parents('.annotator-editor').addClass('annotator-invert-x');
+			}
 		}
 		
 		function onViewerShown(viewer, anno) {
@@ -463,6 +472,27 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 				this.firstInit = false;
 			}
 			
+			if (this.annotatorAdderObserver === null) {
+				if (window.MutationObserver) {
+					this.annotatorAdderObserver = new MutationObserver(function(mutations) {
+						var $editor = $('.annotator-adder', '#dtcReaderContainer');
+						if ($editor.is(':visible') && this.doAdderAdjust) {
+							var $parent = $('#dtcReaderContainer');
+							if ($editor.offset().top < $parent.offset().top) {
+								$editor.offset({top: $parent.offset().top});
+							}
+							if ($editor.offset().left + $editor.outerWidth() > $parent.offset().left + $parent.outerWidth()) {
+								$editor.offset({left: $parent.offset().left});
+							}
+							this.doAdderAdjust = false;
+						} else {
+							this.doAdderAdjust = true;
+						}
+					}.bind(this));				
+					this.annotatorAdderObserver.observe($('.annotator-adder', '#dtcReaderContainer')[0], {attributes: true, attributeFilter: ['style'], attributeOldValue: true});
+				}
+			}
+			
 			if (this.adjustForToolbar) {
 				var paddingTop = parseInt($('html').css('paddingTop'));
 				var header = Ext.getCmp('header');
@@ -481,6 +511,10 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
                 this.annotator.destroy();
                 this.annotator = null;
 		    }
+		    if (this.annotatorAdderObserver != null) {
+                this.annotatorAdderObserver.disconnect();
+                this.annotatorAdderObserver = null;
+            }
 		};
 		
 		this.loadAnnotationsForDocId = function(uri) {
