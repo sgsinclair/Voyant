@@ -79,9 +79,9 @@
                         "title": "Cirrus"
                     },
                     {
-                        "name": "collocates",
-                        "url": "guides/tools/collocates",
-                        "title": "Collocates"
+                        "name": "corpuscollocates",
+                        "url": "guides/tools/corpuscollocates",
+                        "title": "Corpus Collocates"
                     },
                     {
                         "name": "collocatesgraph",
