@@ -44,12 +44,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			border: 'rgba(0,0,0,0.1)',
 			background: 'rgba(255,255,255,1)'
 		},
-		scaling:{
-            label: {
-              min: 8,
-              max: 20
-            }
-          }
+		scaling: {
+			label: {
+				min: 10, 
+				max: 30
+			}
+		}
 	},
 	edgeOptions: {
 		color: {
@@ -153,6 +153,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 					if (n[0] != null) {
 						this.getNodeDataSet().remove(n[0]);
 						b.up('menu').hide();
+						this.forceUpdate();
 					}
 				},
 				scope: this
@@ -266,68 +267,70 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	});
     },
     
-    loadFromCorpusCollocateRecords: function(records) {
+    loadFromCorpusCollocateRecords: function(records, keywordId) {
     	if (Ext.isArray(records)) {
-    		var nodeDS = this.getNodeDataSet();
+    		var existingKeys = {};
+    		this.getNodeDataSet().forEach(function(item) {
+    			existingKeys[item.id] = true;
+    		});
+    		var newNodes = [];
+    		var newEdges = [];
     		var edgeDS = this.getEdgeDataSet();
+    		
     		var start = this.getApiParam('limit');
     		records.forEach(function(corpusCollocate) {
     			if (corpusCollocate.getContextTerm() != corpusCollocate.getTerm()) {
-	    			var keywordNode = {label: corpusCollocate.getKeyword(), title: corpusCollocate.getKeyword()+' ('+corpusCollocate.getKeywordRawFreq()+')', type: 'keyword', value: corpusCollocate.getKeywordRawFreq(), start: start};
-	    			var keywordNodeKey = [keywordNode.label,keywordNode.type].join(";");
-	    			keywordNode.id = keywordNodeKey;
+    				if (keywordId === undefined) {
+		    			var keywordNode = {
+		    				id: corpusCollocate.getKeyword(),
+	    					label: corpusCollocate.getKeyword(),
+	    					title: corpusCollocate.getKeyword()+' ('+corpusCollocate.getKeywordRawFreq()+')',
+	    					type: 'keyword',
+	    					value: corpusCollocate.getKeywordRawFreq(),
+	    					start: start
+						};
+		    			keywordId = keywordNode.id;
+		    			if (existingKeys[keywordId] !== undefined) {
+		    			} else {
+		    				existingKeys[keywordId] = true;
+		    				newNodes.push(keywordNode);
+		    			}
+    				}
 	    			
-	    			var existingNode = nodeDS.get(keywordNodeKey);
-	    			if (existingNode != null) {
+	    			var contextNode = {
+	    				id: corpusCollocate.getContextTerm(),
+    					label: corpusCollocate.getContextTerm(),
+    					title: corpusCollocate.getContextTerm()+' ('+corpusCollocate.getContextTermRawFreq()+')',
+    					type: 'context',
+    					value: corpusCollocate.getContextTermRawFreq(),
+    					start: 0
+					};
+	    			var contextNodeKey = contextNode.id;
+	    			if (existingKeys[contextNodeKey] !== undefined) {
 	    			} else {
-	    				nodeDS.add(keywordNode);
+	    				existingKeys[contextNodeKey] = true;
+	    				newNodes.push(contextNode);
 	    			}
 	    			
-	    			var contextNode = {label: corpusCollocate.getContextTerm(), title: corpusCollocate.getContextTerm()+' ('+corpusCollocate.getContextTermRawFreq()+')', type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
-	    			var contextNodeKey = [contextNode.label,contextNode.type].join(";");
-	    			contextNode.id = contextNodeKey;
+	    			var linkExists = false;
+	    			edgeDS.forEach(function(item) {
+	    				if ((item.from == keywordId && item.to == contextNodeKey) || (item.from == contextNodeKey && item.to == keywordId)) {
+	    					linkExists = true;
+	    				}
+	    			});
 	    			
-	    			existingNode = nodeDS.get(contextNodeKey);
-	    			if (existingNode != null) {
-	    			} else {
-	    				nodeDS.add(contextNode);
-	    			}
 	    			
-	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
-	    			
-	    			existingNode = edgeDS.get(linkKey);
-	    			if (existingNode != null) {
-	    			} else {
-	    				edgeDS.add({id: linkKey, from: keywordNodeKey, to: contextNodeKey});
+	    			if (!linkExists) {
+	    				newEdges.push({from: keywordId, to: contextNodeKey});
 	    			}
     			}
     		});
     		
-    		var min = Number.MAX_VALUE;
-    		var max = -1;
-    		nodeDS.forEach(function(item) {
-    			if (item.value > max) max = item.value;
-    			if (item.value < min) min = item.value;
-    		});
-    		console.log(min, max);
-    		nodeDS.setOptions({
-    			scaling: {
-    				min: min,
-    				max: max,
-    				label: true
-    			}
-//    			,customScalingFunction: function(min, max, total, value) {
-//					if (max === min) {
-//						return 0.5;
-//					} else {
-//						var scale = 1 / (max - min);
-//						return Math.max(0, (value - min) * scale);
-//					}
-//				}
-    		});
+    		this.getNodeDataSet().add(newNodes);
+    		edgeDS.add(newEdges);
     		
+    		this.forceUpdate();
     		
-//    		this.getNetwork().redraw();
     		this.getNetwork().fit();
     	}
     },
@@ -414,6 +417,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    	    		this.unmask();
 	    	    		this.mask("cleaning");
 	    	    		this.getNodeDataSet().remove(n);
+	    	    		this.forceUpdate();
 	    	    		this.unmask();
 	    	    	} else {
 	    	    		this.getNodeDataSet().update({id: n, fixed: true});
@@ -448,59 +452,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	}
     },
     
-    start: function() {
-  	  var me = this;
-  	  var force = this.getForce();
-    	var drag = force.drag();
-    	drag.on("dragstart", this.dragstart)
-    	drag.on("drag", function(d) {me.drag.call(me, d)})
-    	drag.on("dragend", function(d) {if (me.isOffCanvas(d)) {d.fixed = false; d3.select(this).classed("fixed", false);} me.dragend.call(me, d)})
-    	
-    	  link = this.getLink().data(force.links(), function(d) { return d.source.term+d.source.type + "-" + d.target.term+d.source.type; });
-    	  link.enter().insert("line", ".node").attr("class", "link");
-    	  link.exit().remove();
-    	  this.setLink(link);
-    	  
-    	  node = this.getNode().data(force.nodes(), function(d) { return d.term+d.type;});
-//    	  node.enter().append("g").attr("class", function(d) { return "node " + d.id; }).attr("dx", 12).attr("dy", ".35em").call(this.getForce().drag)
-    	  
-    	  var keywordValues = force.nodes().filter(function(d) {return d.type=='keyword';}).map(function(d) {return d.value;});
-    	  var contextTermValues = force.nodes().filter(function(d) {return d.type=='context';}).map(function(d) {return d.value;});
-    	  var range = [8,20];
-    	  var kmin = d3.min(keywordValues);
-    	  var kmax = d3.max(keywordValues);
-    	  var cmin = d3.min(contextTermValues);
-    	  var cmax = d3.max(contextTermValues);
-    	  
-    	  var fontSize = d3.scale.linear().domain([(kmin < cmin ? kmin : cmin), (kmax > cmax ? kmax : cmax)]).range(range);
-
-    	  var corpusColours = this.getCorpusColours();
-    	  node.enter()
-    	  	.append("text")
-    	  		.attr("class", function(d) { return "node " + d.type; })
-    	  		.attr("text-anchor", "middle")
-    	  		.style("fill", function(d) {return corpusColours(d.type=='keyword' ? 1 : 2);})
-    	  		.attr("dx", 12).attr("dy", ".35em")
-    	  		.text(function(d) { return d.term; })
-    	  		.style("font-size", function(d) { return (fontSize(d.value))+"pt"; })
-    	  		.on("dblclick", function() {
-    	  			me.dragstart.apply(this, arguments); // freeze the word
-    	  			me.itemdblclick.apply(me, arguments);} // load more words
-    	  		)
-    	  		.on("click", this.itemclick)
-    	  		.on("mouseover", function(d) {
-    	  			this.textContent=d.term+" ("+d.value+")";
-    	  			d.wasfixed = d.fixed;
-    	  			me.itemclick.apply(this, arguments);
-    	  		})
-    	  		.on("mouseout", function(d,a,b,c) {
-    	  			this.textContent=d.term;
-    	  			d3.select(this).classed("fixed", d.fixed = d.wasfixed);
-    			})
-    	  		.call(drag);
-    	  node.exit().remove();
-    	  this.setNode(node);
-    	  force.start();
+    forceUpdate: function() {
+    	// force visjs to apply scaling
+    	var ids = this.getNodeDataSet().map(function(item) {
+			return {id: item.id};
+		});
+		this.getNodeDataSet().update(ids);
     },
     
     isOffCanvas: function(d) {
@@ -508,41 +465,17 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
 
     itemdblclick: function(d) {
-    	var limit = 10;
+    	var limit = this.getApiParam('limit');
     	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	corpusCollocates.load({
     		params: Ext.apply(this.getApiParams(), {query: d.label, start: d.start, limit: limit}),
     		callback: function(records, operation, success) {
     			if (success) {
-    	    		var nodeDS = this.getNodeDataSet();
-    	    		var edgeDS = this.getEdgeDataSet();
+    	    		this.getNodeDataSet().update({id: d.id, start: d.start+limit});
     	    		
-    	    		var start = this.getApiParam('limit');
-	    			var keywordNode = d;
-    	    		d.start+=limit;
-	    			var keywordNodeKey = [keywordNode.label,keywordNode.type].join(";");
+	    			var keywordNodeKey = d.label;
 	    			
-    	    		records.forEach(function(corpusCollocate) {
-    	    			if (corpusCollocate.getContextTerm() != corpusCollocate.getTerm()) {
-	    	    			var contextNode = {label: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
-	    	    			var contextNodeKey = [contextNode.label,contextNode.type].join(";");
-	    	    			contextNode.id = contextNodeKey;
-	    	    			
-	    	    			var existingNode = nodeDS.get(contextNodeKey);
-	    	    			if (existingNode != null) {
-	    	    			} else {
-	    	    				nodeDS.add(contextNode);
-	    	    			}
-	    	    			
-	    	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
-	    	    			
-	    	    			existingNode = edgeDS.get(linkKey);
-	    	    			if (existingNode != null) {
-	    	    			} else {
-	    	    				edgeDS.add({id: linkKey, from: keywordNodeKey, to: contextNodeKey});
-	    	    			}  	    			
-    	    			}
-    	    		});
+    	    		this.loadFromCorpusCollocateRecords(records, keywordNodeKey);
     			}
     		},
     		scope: this
