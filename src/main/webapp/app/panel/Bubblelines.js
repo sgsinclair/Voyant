@@ -301,7 +301,10 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	itemSelector: 'div.term',
 	            	overItemCls: 'over',
 	            	selectedItemCls: 'selected',
-	            	cls: 'selected', // default selected
+	            	selectionModel: {
+	            		mode: 'SIMPLE'
+	            	},
+//	            	cls: 'selected', // default selected
 	            	focusCls: '',
 	            	listeners: {
 	            		beforeitemclick: function(dv, record, item, index, event, opts) {
@@ -310,22 +313,24 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            			dv.fireEvent('itemcontextmenu', dv, record, item, index, event, opts);
 	            			return false;
 	            		},
+	            		beforecontainerclick: function() {
+	            			// cancel deselect all
+	            			event.preventDefault();
+	            			event.stopPropagation();
+	            			return false;
+	            		},
 	            		selectionchange: function(selModel, selections) {
-	            			debugger
 	            			var dv = this.down('#termsView');
 	            			var terms = [];
 	            			
-	            			var allTerms = dv.el.query('div[class*=term]');
-	            			for (i = 0; i < allTerms.length; i++) {
-	            				Ext.fly(allTerms[i]).addCls('unselected');
-	            			}
-	            			
-	            			var i, rec;
-	            			for (i = 0; i < selections.length; i++) {
-	            				rec = selections[i];
-	            				terms.push(rec.get('term'));
-	            				Ext.fly(dv.getNode(rec)).removeCls('unselected');
-	            			}
+	            			dv.getStore().each(function(r) {
+	            				if (selections.indexOf(r) !== -1) {
+	            					terms.push(r.get('term'));
+	            					Ext.fly(dv.getNodeByRecord(r)).removeCls('unselected').addCls('selected');
+	            				} else {
+	            					Ext.fly(dv.getNodeByRecord(r)).removeCls('selected').addCls('unselected');
+	            				}
+	            			});
 	            			
 	            			for (i in this.lastClickedBubbles) {
 	            				var lcTerms = this.lastClickedBubbles[i];
@@ -336,46 +341,27 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            				}
 	            				
 	            			}
-	            			this.setApiParams({typeFilter: terms});
+	            			this.bubblelines.termsFilter = terms;
 	            			this.bubblelines.setCanvasHeight();
 	            			this.bubblelines.drawGraph();
 	            		},
 	            		itemcontextmenu: function(dv, record, el, index, event) {
 	            			event.preventDefault();
 	            			event.stopPropagation();
-	            			var isSelected = dv.getEl().hasCls("selected");
+	            			var isSelected = dv.isSelected(el);
 	            			var menu = new Ext.menu.Menu({
 	            				floating: true,
-	            				items: [
-	            				/*
-	            				{
+	            				items: [{
 	            					text: isSelected ? this.localize('hideTerm') : this.localize('showTerm'),
 	            					handler: function() {
-	            						debugger // processTerms
-//	            						var term = this.termStore.getAt(index).get('term');
 	            						if (isSelected) {
-	            							console.warn(record.data, el)
-	            							dv.getEl().removeCls("selected").addCls("unselected")
-	            							el.style.oldcolor=el.style.color;
-	            							el.style.color="rgb(200,200,200)"
-//	            							dv.
-//	            							dv.addCls("unselected")
-//	            							dv.deselect(record);
-//		            						this.bubblelines.removeTerm(term);
+	            							dv.deselect(index);
 	            						} else {
-	            							dv.getEl().removeCls("unselected").addCls("selected")
-	            							el.style.color=oldcolor
-//		            						this.bubblelines.removeTerm(term);
-//	            							dv.select(record, true);
+	            							dv.select(index, true);
 	            						}
-	            						dv.refresh();
-//	            						this.bubblelines.removeTerm(term);
-//	            						this.bubblelines.setCanvasHeight();
-//	            						this.bubblelines.drawGraph();
 	            					},
 	            					scope: this
-	            				},*/
-	            				{
+	            				},{
 	            					text: this.localize('removeTerm'),
 	            					handler: function() {
 	            						dv.deselect(index);
@@ -539,6 +525,8 @@ Ext.define('Voyant.panel.Bubblelines', {
 			var color = this.getApplication().getColorForTerm(term);
 			if (this.termStore.find('term', term) === -1) {
 				this.termStore.loadData([[term, color]], true);
+				var index = this.termStore.find('term', term);
+				this.down('#termsView').select(index, true); // manually select since the store's load listener isn't triggered
 			}
 			var distributions = termRecord.get('distributions');
 			termObj = {positions: positions, distributions: distributions, rawFreq: rawFreq, color: color};

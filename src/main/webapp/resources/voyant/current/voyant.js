@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Nov 11 11:20:42 EST 2015 */
+/* This file created by JSCacher. Last modified: Fri Nov 13 17:16:11 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -48,6 +48,7 @@ function Bubblelines(config) {
 	this.cache = new Ext.util.MixedCollection();
 	
 	this.currentTerms = {}; // tracks what terms we're currently showing
+	this.termsFilter = []; //
 
 	this.initialized = false;
 }
@@ -279,10 +280,7 @@ Bubblelines.prototype = {
 	calculateGraphHeights: function() {
 		var graphSeparation = this.maxRadius * 0.5;
 		if (this.SEPARATE_LINES_FOR_TERMS) {
-			var terms = [];
-			for (var term in this.currentTerms) {
-				terms.push(term);
-			}
+			var terms = this.termsFilter;
 			this.cache.each(function(doc, index, length) {
 				var height = this.maxRadius * terms.length;
 				for (var i = 0; i < terms.length; i++) {
@@ -432,14 +430,14 @@ Bubblelines.prototype = {
 			}
 			
 //			var filter = this.getApiParamValue('typeFilter');
-			var filter = [];
-			for (var term in this.currentTerms) {
-				filter.push(term);
-			}
+//			var filter = [];
+//			for (var term in this.currentTerms) {
+//				filter.push(term);
+//			}
 			
 			if (!this.SEPARATE_LINES_FOR_TERMS) {
 				drawLine();
-			} else if (filter == null || filter.length == 0) {
+			} else if (this.termsFilter == null || this.termsFilter.length === 0) {
 				drawLine();
 			}
 			
@@ -452,7 +450,7 @@ Bubblelines.prototype = {
 			var checkClickedBubbles = this.lastClickedBubbles[index] != null;
 			var termsDrawn = 0;
 			for (var t in terms) {
-//				if (filter.indexOf(t) != -1) {
+				if (this.termsFilter.indexOf(t) !== -1) {
 					var info = terms[t];
 					if (info) {
 						termsDrawn++;
@@ -506,7 +504,7 @@ Bubblelines.prototype = {
 							this.yIndex += this.maxRadius;
 						}
 					}
-//				}
+				}
 			}
 			
 			if (this.SEPARATE_LINES_FOR_TERMS && termsDrawn == 0) {
@@ -718,7 +716,7 @@ Bubblelines.prototype = {
 						
 						var count = 0;
 						for (var t in doc.terms) {
-							if (this.currentTerms[t] !== undefined) {
+							if (this.termsFilter.indexOf(t) !== -1) {
 								var type = doc.terms[t];
 								if (type) {
 									if (this.SEPARATE_LINES_FOR_TERMS && count == yIndex || !this.SEPARATE_LINES_FOR_TERMS) {
@@ -890,6 +888,7 @@ Bubblelines.prototype = {
 			doc.terms = {};
 		}, this);
 		this.currentTerms = {};
+		this.termsFilter = [];
 	},
 	
 	removeTerm: function(term) {
@@ -4512,6 +4511,7 @@ Ext.define('Voyant.panel.Bubblelines', {
         		var termsView = this.down('#termsView');
         		for (var i = 0; i < records.length; i++) {
         			var r = records[i];
+        			console.log('select', r.get('term'));
         			termsView.select(r, true);
         		}
         	},
@@ -4735,7 +4735,10 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	itemSelector: 'div.term',
 	            	overItemCls: 'over',
 	            	selectedItemCls: 'selected',
-	            	cls: 'selected', // default selected
+	            	selectionModel: {
+	            		mode: 'SIMPLE'
+	            	},
+//	            	cls: 'selected', // default selected
 	            	focusCls: '',
 	            	listeners: {
 	            		beforeitemclick: function(dv, record, item, index, event, opts) {
@@ -4744,22 +4747,24 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            			dv.fireEvent('itemcontextmenu', dv, record, item, index, event, opts);
 	            			return false;
 	            		},
+	            		beforecontainerclick: function() {
+	            			// cancel deselect all
+	            			event.preventDefault();
+	            			event.stopPropagation();
+	            			return false;
+	            		},
 	            		selectionchange: function(selModel, selections) {
-	            			debugger
 	            			var dv = this.down('#termsView');
 	            			var terms = [];
 	            			
-	            			var allTerms = dv.el.query('div[class*=term]');
-	            			for (i = 0; i < allTerms.length; i++) {
-	            				Ext.fly(allTerms[i]).addCls('unselected');
-	            			}
-	            			
-	            			var i, rec;
-	            			for (i = 0; i < selections.length; i++) {
-	            				rec = selections[i];
-	            				terms.push(rec.get('term'));
-	            				Ext.fly(dv.getNode(rec)).removeCls('unselected');
-	            			}
+	            			dv.getStore().each(function(r) {
+	            				if (selections.indexOf(r) !== -1) {
+	            					terms.push(r.get('term'));
+	            					Ext.fly(dv.getNodeByRecord(r)).removeCls('unselected').addCls('selected');
+	            				} else {
+	            					Ext.fly(dv.getNodeByRecord(r)).removeCls('selected').addCls('unselected');
+	            				}
+	            			});
 	            			
 	            			for (i in this.lastClickedBubbles) {
 	            				var lcTerms = this.lastClickedBubbles[i];
@@ -4770,46 +4775,27 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            				}
 	            				
 	            			}
-	            			this.setApiParams({typeFilter: terms});
+	            			this.bubblelines.termsFilter = terms;
 	            			this.bubblelines.setCanvasHeight();
 	            			this.bubblelines.drawGraph();
 	            		},
 	            		itemcontextmenu: function(dv, record, el, index, event) {
 	            			event.preventDefault();
 	            			event.stopPropagation();
-	            			var isSelected = dv.getEl().hasCls("selected");
+	            			var isSelected = dv.isSelected(el);
 	            			var menu = new Ext.menu.Menu({
 	            				floating: true,
-	            				items: [
-	            				/*
-	            				{
+	            				items: [{
 	            					text: isSelected ? this.localize('hideTerm') : this.localize('showTerm'),
 	            					handler: function() {
-	            						debugger // processTerms
-//	            						var term = this.termStore.getAt(index).get('term');
 	            						if (isSelected) {
-	            							console.warn(record.data, el)
-	            							dv.getEl().removeCls("selected").addCls("unselected")
-	            							el.style.oldcolor=el.style.color;
-	            							el.style.color="rgb(200,200,200)"
-//	            							dv.
-//	            							dv.addCls("unselected")
-//	            							dv.deselect(record);
-//		            						this.bubblelines.removeTerm(term);
+	            							dv.deselect(index);
 	            						} else {
-	            							dv.getEl().removeCls("unselected").addCls("selected")
-	            							el.style.color=oldcolor
-//		            						this.bubblelines.removeTerm(term);
-//	            							dv.select(record, true);
+	            							dv.select(index, true);
 	            						}
-	            						dv.refresh();
-//	            						this.bubblelines.removeTerm(term);
-//	            						this.bubblelines.setCanvasHeight();
-//	            						this.bubblelines.drawGraph();
 	            					},
 	            					scope: this
-	            				},*/
-	            				{
+	            				},{
 	            					text: this.localize('removeTerm'),
 	            					handler: function() {
 	            						dv.deselect(index);
@@ -4973,6 +4959,8 @@ Ext.define('Voyant.panel.Bubblelines', {
 			var color = this.getApplication().getColorForTerm(term);
 			if (this.termStore.find('term', term) === -1) {
 				this.termStore.loadData([[term, color]], true);
+				var index = this.termStore.find('term', term);
+				this.down('#termsView').select(index, true); // manually select since the store's load listener isn't triggered
 			}
 			var distributions = termRecord.get('distributions');
 			termObj = {positions: positions, distributions: distributions, rawFreq: rawFreq, color: color};
@@ -5408,12 +5396,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			border: 'rgba(0,0,0,0.1)',
 			background: 'rgba(255,255,255,1)'
 		},
-		scaling:{
-            label: {
-              min: 8,
-              max: 20
-            }
-          }
+		scaling: {
+			label: {
+				min: 10, 
+				max: 30
+			}
+		}
 	},
 	edgeOptions: {
 		color: {
@@ -5517,6 +5505,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 					if (n[0] != null) {
 						this.getNodeDataSet().remove(n[0]);
 						b.up('menu').hide();
+						this.forceUpdate();
 					}
 				},
 				scope: this
@@ -5630,68 +5619,70 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	});
     },
     
-    loadFromCorpusCollocateRecords: function(records) {
+    loadFromCorpusCollocateRecords: function(records, keywordId) {
     	if (Ext.isArray(records)) {
-    		var nodeDS = this.getNodeDataSet();
+    		var existingKeys = {};
+    		this.getNodeDataSet().forEach(function(item) {
+    			existingKeys[item.id] = true;
+    		});
+    		var newNodes = [];
+    		var newEdges = [];
     		var edgeDS = this.getEdgeDataSet();
+    		
     		var start = this.getApiParam('limit');
     		records.forEach(function(corpusCollocate) {
     			if (corpusCollocate.getContextTerm() != corpusCollocate.getTerm()) {
-	    			var keywordNode = {label: corpusCollocate.getKeyword(), title: corpusCollocate.getKeyword()+' ('+corpusCollocate.getKeywordRawFreq()+')', type: 'keyword', value: corpusCollocate.getKeywordRawFreq(), start: start};
-	    			var keywordNodeKey = [keywordNode.label,keywordNode.type].join(";");
-	    			keywordNode.id = keywordNodeKey;
+    				if (keywordId === undefined) {
+		    			var keywordNode = {
+		    				id: corpusCollocate.getKeyword(),
+	    					label: corpusCollocate.getKeyword(),
+	    					title: corpusCollocate.getKeyword()+' ('+corpusCollocate.getKeywordRawFreq()+')',
+	    					type: 'keyword',
+	    					value: corpusCollocate.getKeywordRawFreq(),
+	    					start: start
+						};
+		    			keywordId = keywordNode.id;
+		    			if (existingKeys[keywordId] !== undefined) {
+		    			} else {
+		    				existingKeys[keywordId] = true;
+		    				newNodes.push(keywordNode);
+		    			}
+    				}
 	    			
-	    			var existingNode = nodeDS.get(keywordNodeKey);
-	    			if (existingNode != null) {
+	    			var contextNode = {
+	    				id: corpusCollocate.getContextTerm(),
+    					label: corpusCollocate.getContextTerm(),
+    					title: corpusCollocate.getContextTerm()+' ('+corpusCollocate.getContextTermRawFreq()+')',
+    					type: 'context',
+    					value: corpusCollocate.getContextTermRawFreq(),
+    					start: 0
+					};
+	    			var contextNodeKey = contextNode.id;
+	    			if (existingKeys[contextNodeKey] !== undefined) {
 	    			} else {
-	    				nodeDS.add(keywordNode);
+	    				existingKeys[contextNodeKey] = true;
+	    				newNodes.push(contextNode);
 	    			}
 	    			
-	    			var contextNode = {label: corpusCollocate.getContextTerm(), title: corpusCollocate.getContextTerm()+' ('+corpusCollocate.getContextTermRawFreq()+')', type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
-	    			var contextNodeKey = [contextNode.label,contextNode.type].join(";");
-	    			contextNode.id = contextNodeKey;
+	    			var linkExists = false;
+	    			edgeDS.forEach(function(item) {
+	    				if ((item.from == keywordId && item.to == contextNodeKey) || (item.from == contextNodeKey && item.to == keywordId)) {
+	    					linkExists = true;
+	    				}
+	    			});
 	    			
-	    			existingNode = nodeDS.get(contextNodeKey);
-	    			if (existingNode != null) {
-	    			} else {
-	    				nodeDS.add(contextNode);
-	    			}
 	    			
-	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
-	    			
-	    			existingNode = edgeDS.get(linkKey);
-	    			if (existingNode != null) {
-	    			} else {
-	    				edgeDS.add({id: linkKey, from: keywordNodeKey, to: contextNodeKey});
+	    			if (!linkExists) {
+	    				newEdges.push({from: keywordId, to: contextNodeKey});
 	    			}
     			}
     		});
     		
-    		var min = Number.MAX_VALUE;
-    		var max = -1;
-    		nodeDS.forEach(function(item) {
-    			if (item.value > max) max = item.value;
-    			if (item.value < min) min = item.value;
-    		});
-    		console.log(min, max);
-    		nodeDS.setOptions({
-    			scaling: {
-    				min: min,
-    				max: max,
-    				label: true
-    			}
-//    			,customScalingFunction: function(min, max, total, value) {
-//					if (max === min) {
-//						return 0.5;
-//					} else {
-//						var scale = 1 / (max - min);
-//						return Math.max(0, (value - min) * scale);
-//					}
-//				}
-    		});
+    		this.getNodeDataSet().add(newNodes);
+    		edgeDS.add(newEdges);
     		
+    		this.forceUpdate();
     		
-//    		this.getNetwork().redraw();
     		this.getNetwork().fit();
     	}
     },
@@ -5778,6 +5769,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    	    		this.unmask();
 	    	    		this.mask("cleaning");
 	    	    		this.getNodeDataSet().remove(n);
+	    	    		this.forceUpdate();
 	    	    		this.unmask();
 	    	    	} else {
 	    	    		this.getNodeDataSet().update({id: n, fixed: true});
@@ -5812,59 +5804,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	}
     },
     
-    start: function() {
-  	  var me = this;
-  	  var force = this.getForce();
-    	var drag = force.drag();
-    	drag.on("dragstart", this.dragstart)
-    	drag.on("drag", function(d) {me.drag.call(me, d)})
-    	drag.on("dragend", function(d) {if (me.isOffCanvas(d)) {d.fixed = false; d3.select(this).classed("fixed", false);} me.dragend.call(me, d)})
-    	
-    	  link = this.getLink().data(force.links(), function(d) { return d.source.term+d.source.type + "-" + d.target.term+d.source.type; });
-    	  link.enter().insert("line", ".node").attr("class", "link");
-    	  link.exit().remove();
-    	  this.setLink(link);
-    	  
-    	  node = this.getNode().data(force.nodes(), function(d) { return d.term+d.type;});
-//    	  node.enter().append("g").attr("class", function(d) { return "node " + d.id; }).attr("dx", 12).attr("dy", ".35em").call(this.getForce().drag)
-    	  
-    	  var keywordValues = force.nodes().filter(function(d) {return d.type=='keyword';}).map(function(d) {return d.value;});
-    	  var contextTermValues = force.nodes().filter(function(d) {return d.type=='context';}).map(function(d) {return d.value;});
-    	  var range = [8,20];
-    	  var kmin = d3.min(keywordValues);
-    	  var kmax = d3.max(keywordValues);
-    	  var cmin = d3.min(contextTermValues);
-    	  var cmax = d3.max(contextTermValues);
-    	  
-    	  var fontSize = d3.scale.linear().domain([(kmin < cmin ? kmin : cmin), (kmax > cmax ? kmax : cmax)]).range(range);
-
-    	  var corpusColours = this.getCorpusColours();
-    	  node.enter()
-    	  	.append("text")
-    	  		.attr("class", function(d) { return "node " + d.type; })
-    	  		.attr("text-anchor", "middle")
-    	  		.style("fill", function(d) {return corpusColours(d.type=='keyword' ? 1 : 2);})
-    	  		.attr("dx", 12).attr("dy", ".35em")
-    	  		.text(function(d) { return d.term; })
-    	  		.style("font-size", function(d) { return (fontSize(d.value))+"pt"; })
-    	  		.on("dblclick", function() {
-    	  			me.dragstart.apply(this, arguments); // freeze the word
-    	  			me.itemdblclick.apply(me, arguments);} // load more words
-    	  		)
-    	  		.on("click", this.itemclick)
-    	  		.on("mouseover", function(d) {
-    	  			this.textContent=d.term+" ("+d.value+")";
-    	  			d.wasfixed = d.fixed;
-    	  			me.itemclick.apply(this, arguments);
-    	  		})
-    	  		.on("mouseout", function(d,a,b,c) {
-    	  			this.textContent=d.term;
-    	  			d3.select(this).classed("fixed", d.fixed = d.wasfixed);
-    			})
-    	  		.call(drag);
-    	  node.exit().remove();
-    	  this.setNode(node);
-    	  force.start();
+    forceUpdate: function() {
+    	// force visjs to apply scaling
+    	var ids = this.getNodeDataSet().map(function(item) {
+			return {id: item.id};
+		});
+		this.getNodeDataSet().update(ids);
     },
     
     isOffCanvas: function(d) {
@@ -5872,41 +5817,17 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
 
     itemdblclick: function(d) {
-    	var limit = 10;
+    	var limit = this.getApiParam('limit');
     	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	corpusCollocates.load({
     		params: Ext.apply(this.getApiParams(), {query: d.label, start: d.start, limit: limit}),
     		callback: function(records, operation, success) {
     			if (success) {
-    	    		var nodeDS = this.getNodeDataSet();
-    	    		var edgeDS = this.getEdgeDataSet();
+    	    		this.getNodeDataSet().update({id: d.id, start: d.start+limit});
     	    		
-    	    		var start = this.getApiParam('limit');
-	    			var keywordNode = d;
-    	    		d.start+=limit;
-	    			var keywordNodeKey = [keywordNode.label,keywordNode.type].join(";");
+	    			var keywordNodeKey = d.label;
 	    			
-    	    		records.forEach(function(corpusCollocate) {
-    	    			if (corpusCollocate.getContextTerm() != corpusCollocate.getTerm()) {
-	    	    			var contextNode = {label: corpusCollocate.getContextTerm(), type: 'context', value: corpusCollocate.getContextTermRawFreq(), start: 0};
-	    	    			var contextNodeKey = [contextNode.label,contextNode.type].join(";");
-	    	    			contextNode.id = contextNodeKey;
-	    	    			
-	    	    			var existingNode = nodeDS.get(contextNodeKey);
-	    	    			if (existingNode != null) {
-	    	    			} else {
-	    	    				nodeDS.add(contextNode);
-	    	    			}
-	    	    			
-	    	    			var linkKey = [keywordNodeKey,contextNodeKey].join("--");
-	    	    			
-	    	    			existingNode = edgeDS.get(linkKey);
-	    	    			if (existingNode != null) {
-	    	    			} else {
-	    	    				edgeDS.add({id: linkKey, from: keywordNodeKey, to: contextNodeKey});
-	    	    			}  	    			
-    	    			}
-    	    		});
+    	    		this.loadFromCorpusCollocateRecords(records, keywordNodeKey);
     			}
     		},
     		scope: this

@@ -47,6 +47,7 @@ function Bubblelines(config) {
 	this.cache = new Ext.util.MixedCollection();
 	
 	this.currentTerms = {}; // tracks what terms we're currently showing
+	this.termsFilter = []; //
 
 	this.initialized = false;
 }
@@ -278,10 +279,7 @@ Bubblelines.prototype = {
 	calculateGraphHeights: function() {
 		var graphSeparation = this.maxRadius * 0.5;
 		if (this.SEPARATE_LINES_FOR_TERMS) {
-			var terms = [];
-			for (var term in this.currentTerms) {
-				terms.push(term);
-			}
+			var terms = this.termsFilter;
 			this.cache.each(function(doc, index, length) {
 				var height = this.maxRadius * terms.length;
 				for (var i = 0; i < terms.length; i++) {
@@ -431,14 +429,14 @@ Bubblelines.prototype = {
 			}
 			
 //			var filter = this.getApiParamValue('typeFilter');
-			var filter = [];
-			for (var term in this.currentTerms) {
-				filter.push(term);
-			}
+//			var filter = [];
+//			for (var term in this.currentTerms) {
+//				filter.push(term);
+//			}
 			
 			if (!this.SEPARATE_LINES_FOR_TERMS) {
 				drawLine();
-			} else if (filter == null || filter.length == 0) {
+			} else if (this.termsFilter == null || this.termsFilter.length === 0) {
 				drawLine();
 			}
 			
@@ -451,7 +449,7 @@ Bubblelines.prototype = {
 			var checkClickedBubbles = this.lastClickedBubbles[index] != null;
 			var termsDrawn = 0;
 			for (var t in terms) {
-//				if (filter.indexOf(t) != -1) {
+				if (this.termsFilter.indexOf(t) !== -1) {
 					var info = terms[t];
 					if (info) {
 						termsDrawn++;
@@ -505,7 +503,7 @@ Bubblelines.prototype = {
 							this.yIndex += this.maxRadius;
 						}
 					}
-//				}
+				}
 			}
 			
 			if (this.SEPARATE_LINES_FOR_TERMS && termsDrawn == 0) {
@@ -717,7 +715,7 @@ Bubblelines.prototype = {
 						
 						var count = 0;
 						for (var t in doc.terms) {
-							if (this.currentTerms[t] !== undefined) {
+							if (this.termsFilter.indexOf(t) !== -1) {
 								var type = doc.terms[t];
 								if (type) {
 									if (this.SEPARATE_LINES_FOR_TERMS && count == yIndex || !this.SEPARATE_LINES_FOR_TERMS) {
@@ -889,6 +887,7 @@ Bubblelines.prototype = {
 			doc.terms = {};
 		}, this);
 		this.currentTerms = {};
+		this.termsFilter = [];
 	},
 	
 	removeTerm: function(term) {
