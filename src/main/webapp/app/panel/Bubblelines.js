@@ -265,6 +265,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	listeners: {
 	            		changecomplete: function(slider, newvalue) {
 	            			this.setApiParams({bins: newvalue});
+	            			this.bubblelines.bubbleSpacing = newvalue;
 	            			this.reloadTermsData();
 	            		},
 	            		scope: this
@@ -396,6 +397,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	                		container: canvasParent,
 	                		clickHandler: this.bubbleClickHandler.bind(this)
 	                	});
+	                	this.bubblelines.bubbleSpacing = parseInt(this.getApiParam('bins'));
 	            	},
             		afterlayout: function(container) {
             			if (this.bubblelines.initialized === false) {

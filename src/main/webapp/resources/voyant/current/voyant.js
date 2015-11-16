@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Nov 13 17:16:11 EST 2015 */
+/* This file created by JSCacher. Last modified: Mon Nov 16 17:16:01 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -48,7 +48,8 @@ function Bubblelines(config) {
 	this.cache = new Ext.util.MixedCollection();
 	
 	this.currentTerms = {}; // tracks what terms we're currently showing
-	this.termsFilter = []; //
+	this.termsFilter = []; // tracks the subset of terms
+	this.bubbleSpacing = 50;
 
 	this.initialized = false;
 }
@@ -624,21 +625,6 @@ Bubblelines.prototype = {
 		clearTimeout(this.clearToolTipId);
 		this.clearToolTipId = null;
 	},
-
-	// TODO remove this
-	reloadTypeData: function() {
-		this.cache.clear();
-		this.store.removeAll();
-		var types = this.getApiParamValue('type');
-		if (types.length == 0) {
-			this.cacheDocuments();
-			this.drawGraph();
-		}
-		for (var i = 0; i < types.length; i++) {
-    		var type = types[i];
-    		this.store.load({params: {type: type}, add: true});
-    	}
-	},
 	
 	mouseEnterHandler: function(event) {
 		this.mouseOver = true;
@@ -705,8 +691,7 @@ Bubblelines.prototype = {
 							y: event.layerY+10
 						}];
 					} else {
-						// TODO bins
-						var spacing = doc.lineLength / 50;// this.getApiParamValue('bins');
+						var spacing = doc.lineLength / this.bubbleSpacing;
 						var xIndex = Math.round(x / spacing);
 						var prevDocHeight = this.maxRadius;
 						if (docIndex > 0) {
@@ -4511,7 +4496,6 @@ Ext.define('Voyant.panel.Bubblelines', {
         		var termsView = this.down('#termsView');
         		for (var i = 0; i < records.length; i++) {
         			var r = records[i];
-        			console.log('select', r.get('term'));
         			termsView.select(r, true);
         		}
         	},
@@ -4699,6 +4683,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	listeners: {
 	            		changecomplete: function(slider, newvalue) {
 	            			this.setApiParams({bins: newvalue});
+	            			this.bubblelines.bubbleSpacing = newvalue;
 	            			this.reloadTermsData();
 	            		},
 	            		scope: this
@@ -4830,6 +4815,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	                		container: canvasParent,
 	                		clickHandler: this.bubbleClickHandler.bind(this)
 	                	});
+	                	this.bubblelines.bubbleSpacing = parseInt(this.getApiParam('bins'));
 	            	},
             		afterlayout: function(container) {
             			if (this.bubblelines.initialized === false) {

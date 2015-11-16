@@ -47,7 +47,8 @@ function Bubblelines(config) {
 	this.cache = new Ext.util.MixedCollection();
 	
 	this.currentTerms = {}; // tracks what terms we're currently showing
-	this.termsFilter = []; //
+	this.termsFilter = []; // tracks the subset of terms
+	this.bubbleSpacing = 50;
 
 	this.initialized = false;
 }
@@ -623,21 +624,6 @@ Bubblelines.prototype = {
 		clearTimeout(this.clearToolTipId);
 		this.clearToolTipId = null;
 	},
-
-	// TODO remove this
-	reloadTypeData: function() {
-		this.cache.clear();
-		this.store.removeAll();
-		var types = this.getApiParamValue('type');
-		if (types.length == 0) {
-			this.cacheDocuments();
-			this.drawGraph();
-		}
-		for (var i = 0; i < types.length; i++) {
-    		var type = types[i];
-    		this.store.load({params: {type: type}, add: true});
-    	}
-	},
 	
 	mouseEnterHandler: function(event) {
 		this.mouseOver = true;
@@ -704,8 +690,7 @@ Bubblelines.prototype = {
 							y: event.layerY+10
 						}];
 					} else {
-						// TODO bins
-						var spacing = doc.lineLength / 50;// this.getApiParamValue('bins');
+						var spacing = doc.lineLength / this.bubbleSpacing;
 						var xIndex = Math.round(x / spacing);
 						var prevDocHeight = this.maxRadius;
 						if (docIndex > 0) {
