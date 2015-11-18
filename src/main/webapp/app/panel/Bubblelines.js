@@ -107,12 +107,19 @@ Ext.define('Voyant.panel.Bubblelines', {
 			}
     	}, this);
         
-        
         this.on('query', function(src, query) {
     		if (query !== undefined && query != '') {
     			this.getDocTermsFromQuery(query);
     		}
     	}, this);
+        
+        this.on('documentsSelected', function(src, docIds) {
+        	this.setApiParam('docId', docIds);
+        	this.bubblelines.cache.each(function(d) {
+        		d.hidden = docIds.indexOf(d.id) === -1;
+        	});
+        	this.bubblelines.drawGraph();
+        }, this);
     	
     	this.on('termsClicked', function(src, terms) {
     		if (src !== this) {
@@ -156,6 +163,7 @@ Ext.define('Voyant.panel.Bubblelines', {
    		     listeners: {
    		    	load: function(store, records, successful, options) {
    					this.processDocuments(records);
+   					this.down('#docSelector').populate(records);
    					this.processedDocs.each(function(doc) {
    						this.bubblelines.addDocToCache(doc);
    					}, this);
@@ -230,35 +238,17 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	},
 	            	scope: this
 	            },
-	//            '-',{
-	//            	xtype: 'documentSelector',
-	//            	listeners: {
-	//            		documentsSelected: function(docIds) {
-	//            			this.setApiParams({docId: docIds});
-	//            			
-	//            			this.filterDocuments();
-	//            			
-	//            			var container = Ext.getCmp('canvasParent');
-	//            			var height = Math.max(this.selectedDocs.getCount() * this.graphSeparation + 15, container.ownerCt.getHeight());
-	//        				var width = container.ownerCt.getWidth();
-	//        				this.canvas.height = height;
-	//            			
-	//            			this.selectedDocs.each(this.bubblelines.findLongestDocument, this);
-	//            			this.selectedDocs.each(this.bubblelines.findLongestDocumentTitle, this);
-	//        				this.bubblelines.setMaxLineWidth(width - this.MAX_LABEL_WIDTH - 75);    
-	//            			
-	//            			this.reloadTermsData();
-	//            		},
-	//            		scope: this
-	//            	}
-	//            }
+	            '-',{
+	            	xtype: 'documentselector',
+	            	itemId: 'docSelector'
+	            }
 	            ,'-',{
 	            	xtype: 'slider',
 	            	itemId: 'granularity',
 	            	fieldLabel: this.localize('granularity'),
 	            	labelAlign: 'right',
 	            	labelWidth: 70,
-	            	width: 120,
+	            	width: 150,
 	            	increment: 10,
 	            	minValue: 10,
 	            	maxValue: 300,
@@ -500,6 +490,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		docs.forEach(this.processDocument, this);
 	},
 	
+	// produce format that bubblelines can use
 	processDocument: function(doc) {
 		var docId = doc.getId();
 		if (!this.processedDocs.containsKey(docId)) {

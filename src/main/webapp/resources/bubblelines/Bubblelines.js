@@ -30,7 +30,6 @@ function Bubblelines(config) {
 	this.maxDocLength = 2;
 	this.maxFreq = {term: null, value: 0};
 	this.maxRadius = 0;
-	this.selectedDocs = new Ext.util.MixedCollection();
 	
 	/**
 	 * The cache of docs. Each has the following properties:
@@ -57,58 +56,42 @@ Bubblelines.prototype = {
 	constructor: Bubblelines,
 	
 	initializeCanvas: function() {
-//		if (this.getCorpus().getSize() == 1) {
-//			this.DRAW_TITLES = false;
-//		}
-//		
-//		this.filterDocuments();
-		
-		this.selectedDocs.each(this.findLongestDocument, this);
-		
-//		var docIds = this.getApiParamValue('docId');
-//		if (typeof docIds == 'string') docIds = [docIds];
-//		this.getTopToolbar().findByType('documentSelector')[0].populate(docIds);
-		
-		if (this.maxDocLength <= 1) {
-//			Ext.Msg.alert('Bubblelines', this.localize('corpusTooSmall'));
-		} else {
-			var container = this.container;
-			var height = container.getHeight();//Math.max(this.selectedDocs.getCount() * this.graphSeparation + 15, container.ownerCt.getHeight());
-			var width = container.getWidth();
-			this.DRAW_SHORT_TITLES = width < 500;
-			var id = Ext.id('bubblelines');
-			container.add({
-				xtype: 'container',
-				width: width,
-				height: height,
-				html: '<canvas id="'+id+'" width="'+width+'" height="'+height+'"></canvas>',
-				border: false,
-	        	listeners: {
-	        		afterrender: {
-	        			fn: function(cnt) {
-	    					this.canvas = document.getElementById(id);
-	        				this.ctx = this.canvas.getContext('2d');
-	        				this.canvas.addEventListener('click', this.clickHandler.bind(this), false);
-	        				this.canvas.addEventListener('mousedown', this.mouseDownHandler.bind(this), false);
-	        				this.canvas.addEventListener('mouseup', this.mouseUpHandler.bind(this), false);
-	        				this.canvas.addEventListener('mousemove', this.moveHandler.bind(this), false);
-	        				this.canvas.addEventListener('mouseenter', this.mouseEnterHandler.bind(this), false);
-	        				this.canvas.addEventListener('mouseleave', this.mouseLeaveHandler.bind(this), false);
-	        				            				
-//	        				this.findLongestDocumentTitle();
-//	        				
-//	        				var padding = 75;
-//            				if (this.DRAW_SHORT_TITLES) padding = 50;
-//            				this.setMaxLineWidth(width - this.MAX_LABEL_WIDTH - padding);
-	        			},
-	        			single: true,
-	        			scope: this
-	        		}
-	        	}
-			});
-			container.updateLayout();
-			this.initialized = true;
-		}
+		var container = this.container;
+		var height = container.getHeight();
+		var width = container.getWidth();
+		this.DRAW_SHORT_TITLES = width < 500;
+		var id = Ext.id('bubblelines');
+		container.add({
+			xtype: 'container',
+			width: width,
+			height: height,
+			html: '<canvas id="'+id+'" width="'+width+'" height="'+height+'"></canvas>',
+			border: false,
+        	listeners: {
+        		afterrender: {
+        			fn: function(cnt) {
+    					this.canvas = document.getElementById(id);
+        				this.ctx = this.canvas.getContext('2d');
+        				this.canvas.addEventListener('click', this.clickHandler.bind(this), false);
+        				this.canvas.addEventListener('mousedown', this.mouseDownHandler.bind(this), false);
+        				this.canvas.addEventListener('mouseup', this.mouseUpHandler.bind(this), false);
+        				this.canvas.addEventListener('mousemove', this.moveHandler.bind(this), false);
+        				this.canvas.addEventListener('mouseenter', this.mouseEnterHandler.bind(this), false);
+        				this.canvas.addEventListener('mouseleave', this.mouseLeaveHandler.bind(this), false);
+        				            				
+//        				this.findLongestDocumentTitle();
+//        				
+//        				var padding = 75;
+//        				if (this.DRAW_SHORT_TITLES) padding = 50;
+//        				this.setMaxLineWidth(width - this.MAX_LABEL_WIDTH - padding);
+        			},
+        			single: true,
+        			scope: this
+        		}
+        	}
+		});
+		container.updateLayout();
+		this.initialized = true;
 	},
 	
 	doBubblelinesLayout: function() {
@@ -366,177 +349,179 @@ Bubblelines.prototype = {
 	},
 	
 	drawDocument: function(doc, index, totalDocs) {
-		var lineLength = doc.lineLength;
-		var titleIndent = this.MAX_LABEL_WIDTH - doc.titleWidth;
-		
-		var xIndex = 5;
-		
-		this.ctx.textBaseline = 'top';
-		this.ctx.font = 'bold 12px Verdana';
-		
-		if (this.dragInfo != null && this.dragInfo.oldIndex == index) {
-			this.ctx.fillStyle = 'rgba(128, 128, 128, 0.5)';
-			xIndex += titleIndent;
-			this.ctx.fillText(doc.title, xIndex, this.yIndex);
-			if (this.SEPARATE_LINES_FOR_TERMS) {
-				this.yIndex += doc.height;
-			}
-		} else {			
-			// draw label
-			if (this.DRAW_TITLES) {
+		if (!doc.hidden) {
+			var lineLength = doc.lineLength;
+			var titleIndent = this.MAX_LABEL_WIDTH - doc.titleWidth;
+			
+			var xIndex = 5;
+			
+			this.ctx.textBaseline = 'top';
+			this.ctx.font = 'bold 12px Verdana';
+			
+			if (this.dragInfo != null && this.dragInfo.oldIndex == index) {
+				this.ctx.fillStyle = 'rgba(128, 128, 128, 0.5)';
 				xIndex += titleIndent;
-//				var c = this.getColor(this.getApplication().getCorpus().getDocument(doc.id).getIndex());
-//				this.ctx.strokeStyle = 'rgba('+c[0]+', '+c[1]+', '+c[2]+', 1.0)';
-//				this.ctx.lineWidth = 2;
-//				this.ctx.beginPath();
-//				this.ctx.moveTo(xIndex, this.yIndex+12);
-//				this.ctx.lineTo(this.MAX_LABEL_WIDTH, this.yIndex+12);
-//				this.ctx.stroke();
+				this.ctx.fillText(doc.title, xIndex, this.yIndex);
+				if (this.SEPARATE_LINES_FOR_TERMS) {
+					this.yIndex += doc.height;
+				}
+			} else {			
+				// draw label
+				if (this.DRAW_TITLES) {
+					xIndex += titleIndent;
+	//				var c = this.getColor(this.getApplication().getCorpus().getDocument(doc.id).getIndex());
+	//				this.ctx.strokeStyle = 'rgba('+c[0]+', '+c[1]+', '+c[2]+', 1.0)';
+	//				this.ctx.lineWidth = 2;
+	//				this.ctx.beginPath();
+	//				this.ctx.moveTo(xIndex, this.yIndex+12);
+	//				this.ctx.lineTo(this.MAX_LABEL_WIDTH, this.yIndex+12);
+	//				this.ctx.stroke();
+					
+					this.ctx.fillStyle = 'rgba(128, 128, 128, 1.0)';
+					var title = doc.title;
+					if (this.DRAW_SHORT_TITLES) title = (index+1)+')';
+					this.ctx.fillText(title, xIndex, this.yIndex);
+				}
 				
-				this.ctx.fillStyle = 'rgba(128, 128, 128, 1.0)';
-				var title = doc.title;
-				if (this.DRAW_SHORT_TITLES) title = (index+1)+')';
-				this.ctx.fillText(title, xIndex, this.yIndex);
-			}
-			
-//			this.ctx.fillStyle = 'rgba(0, 0, 128, 1.0)';
-//			this.ctx.fillRect(0, this.yIndex-this.maxRadius*0.75, 250, 2);
-			
-			// shift down slightly to vertically align line and bubbles with label
-			this.yIndex += 4;
-			
-			// draw line
-			var that = this;
-			function drawLine() {
-				xIndex = that.MAX_LABEL_WIDTH + that.maxRadius;
-				that.ctx.strokeStyle = 'rgba(128, 128, 128, 1.0)';
-				that.ctx.fillStyle = 'rgba(128, 128, 128, 1.0)';
-				that.ctx.lineWidth = 0.25;
+	//			this.ctx.fillStyle = 'rgba(0, 0, 128, 1.0)';
+	//			this.ctx.fillRect(0, this.yIndex-this.maxRadius*0.75, 250, 2);
 				
-				that.ctx.beginPath();
-				that.ctx.moveTo(xIndex, that.yIndex-6);
-				that.ctx.lineTo(xIndex, that.yIndex+6);
-				that.ctx.stroke();
+				// shift down slightly to vertically align line and bubbles with label
+				this.yIndex += 4;
 				
-				that.ctx.beginPath();
-				that.ctx.moveTo(xIndex, that.yIndex);
-				that.ctx.lineTo(xIndex + lineLength, that.yIndex);
-				that.ctx.stroke();
+				// draw line
+				var that = this;
+				function drawLine() {
+					xIndex = that.MAX_LABEL_WIDTH + that.maxRadius;
+					that.ctx.strokeStyle = 'rgba(128, 128, 128, 1.0)';
+					that.ctx.fillStyle = 'rgba(128, 128, 128, 1.0)';
+					that.ctx.lineWidth = 0.25;
+					
+					that.ctx.beginPath();
+					that.ctx.moveTo(xIndex, that.yIndex-6);
+					that.ctx.lineTo(xIndex, that.yIndex+6);
+					that.ctx.stroke();
+					
+					that.ctx.beginPath();
+					that.ctx.moveTo(xIndex, that.yIndex);
+					that.ctx.lineTo(xIndex + lineLength, that.yIndex);
+					that.ctx.stroke();
+					
+					that.ctx.beginPath();
+					that.ctx.moveTo(xIndex + lineLength, that.yIndex-6);
+					that.ctx.lineTo(xIndex + lineLength, that.yIndex+6);
+					that.ctx.stroke();
+				}
 				
-				that.ctx.beginPath();
-				that.ctx.moveTo(xIndex + lineLength, that.yIndex-6);
-				that.ctx.lineTo(xIndex + lineLength, that.yIndex+6);
-				that.ctx.stroke();
-			}
-			
-//			var filter = this.getApiParamValue('typeFilter');
-//			var filter = [];
-//			for (var term in this.currentTerms) {
-//				filter.push(term);
-//			}
-			
-			if (!this.SEPARATE_LINES_FOR_TERMS) {
-				drawLine();
-			} else if (this.termsFilter == null || this.termsFilter.length === 0) {
-				drawLine();
-			}
-			
-			// draw bubbles
-			var pi2 = Math.PI * 2;
-			
-			var freqTotal = 0;
-			doc.freqCounts = {};
-			var terms = doc.terms;
-			var checkClickedBubbles = this.lastClickedBubbles[index] != null;
-			var termsDrawn = 0;
-			for (var t in terms) {
-				if (this.termsFilter.indexOf(t) !== -1) {
-					var info = terms[t];
-					if (info) {
-						termsDrawn++;
-						if (this.SEPARATE_LINES_FOR_TERMS) {
-							drawLine();
-						}
-						
-						var freqForType = 0;
-						
-						var c = info.color.join(',');
-						this.ctx.strokeStyle = 'rgba('+c+', 1)';
-						this.ctx.fillStyle = 'rgba('+c+', 0.35)';
-						this.ctx.lineWidth = 0.25;
-						
-						freqTotal += info.rawFreq;
-						freqForType += info.rawFreq;
-						
-						var checkCurrentType = checkClickedBubbles && this.lastClickedBubbles[index][t];
-						
-						for (var i = 0; i < info.pos.length; i++) {
-							var b = info.pos[i];
-							if (b.radius > 0) {
-								var doClickedBubble = false;
-								if (checkCurrentType && this.lastClickedBubbles[index][t] == b.id) {
-									this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
-									this.ctx.fillStyle = 'rgba('+c+', 0.5)';
-									this.ctx.lineWidth = 1;
-									doClickedBubble = true;
-								}
-								
-								this.ctx.beginPath();
-								this.ctx.arc(b.x+xIndex, this.yIndex, b.radius, 0, pi2, true);
-								this.ctx.closePath();
-								this.ctx.fill();
-								this.ctx.stroke();
-								
-								if (doClickedBubble) {
-									this.ctx.strokeStyle = 'rgba('+c+', 1)';
-									this.ctx.fillStyle = 'rgba('+c+', 0.35)';
-									this.ctx.lineWidth = 0.25;
+	//			var filter = this.getApiParamValue('typeFilter');
+	//			var filter = [];
+	//			for (var term in this.currentTerms) {
+	//				filter.push(term);
+	//			}
+				
+				if (!this.SEPARATE_LINES_FOR_TERMS) {
+					drawLine();
+				} else if (this.termsFilter == null || this.termsFilter.length === 0) {
+					drawLine();
+				}
+				
+				// draw bubbles
+				var pi2 = Math.PI * 2;
+				
+				var freqTotal = 0;
+				doc.freqCounts = {};
+				var terms = doc.terms;
+				var checkClickedBubbles = this.lastClickedBubbles[index] != null;
+				var termsDrawn = 0;
+				for (var t in terms) {
+					if (this.termsFilter.indexOf(t) !== -1) {
+						var info = terms[t];
+						if (info) {
+							termsDrawn++;
+							if (this.SEPARATE_LINES_FOR_TERMS) {
+								drawLine();
+							}
+							
+							var freqForType = 0;
+							
+							var c = info.color.join(',');
+							this.ctx.strokeStyle = 'rgba('+c+', 1)';
+							this.ctx.fillStyle = 'rgba('+c+', 0.35)';
+							this.ctx.lineWidth = 0.25;
+							
+							freqTotal += info.rawFreq;
+							freqForType += info.rawFreq;
+							
+							var checkCurrentType = checkClickedBubbles && this.lastClickedBubbles[index][t];
+							
+							for (var i = 0; i < info.pos.length; i++) {
+								var b = info.pos[i];
+								if (b.radius > 0) {
+									var doClickedBubble = false;
+									if (checkCurrentType && this.lastClickedBubbles[index][t] == b.id) {
+										this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
+										this.ctx.fillStyle = 'rgba('+c+', 0.5)';
+										this.ctx.lineWidth = 1;
+										doClickedBubble = true;
+									}
+									
+									this.ctx.beginPath();
+									this.ctx.arc(b.x+xIndex, this.yIndex, b.radius, 0, pi2, true);
+									this.ctx.closePath();
+									this.ctx.fill();
+									this.ctx.stroke();
+									
+									if (doClickedBubble) {
+										this.ctx.strokeStyle = 'rgba('+c+', 1)';
+										this.ctx.fillStyle = 'rgba('+c+', 0.35)';
+										this.ctx.lineWidth = 0.25;
+									}
 								}
 							}
-						}
-						doc.freqCounts[t] = freqForType;
-						
-						if (this.SEPARATE_LINES_FOR_TERMS) {
-							this.ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
-							this.ctx.font = '10px Verdana';
-							this.ctx.fillText(freqForType, xIndex + lineLength + 5, this.yIndex-4);
+							doc.freqCounts[t] = freqForType;
 							
-							this.yIndex += this.maxRadius;
+							if (this.SEPARATE_LINES_FOR_TERMS) {
+								this.ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
+								this.ctx.font = '10px Verdana';
+								this.ctx.fillText(freqForType, xIndex + lineLength + 5, this.yIndex-4);
+								
+								this.yIndex += this.maxRadius;
+							}
 						}
 					}
 				}
-			}
-			
-			if (this.SEPARATE_LINES_FOR_TERMS && termsDrawn == 0) {
-				drawLine();
 				
-				this.ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
-				this.ctx.font = '10px Verdana';
-				this.ctx.fillText(0, xIndex + lineLength + 5, this.yIndex-4);
+				if (this.SEPARATE_LINES_FOR_TERMS && termsDrawn == 0) {
+					drawLine();
+					
+					this.ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
+					this.ctx.font = '10px Verdana';
+					this.ctx.fillText(0, xIndex + lineLength + 5, this.yIndex-4);
+					
+					this.yIndex += this.maxRadius;
+				}
 				
-				this.yIndex += this.maxRadius;
+				xIndex += lineLength;
+				
+				if (!this.SEPARATE_LINES_FOR_TERMS) {
+					this.ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
+					this.ctx.font = '10px Verdana';
+					this.ctx.fillText(freqTotal, xIndex + 5, this.yIndex-4);
+				}
 			}
-			
-			xIndex += lineLength;
 			
 			if (!this.SEPARATE_LINES_FOR_TERMS) {
-				this.ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
-				this.ctx.font = '10px Verdana';
-				this.ctx.fillText(freqTotal, xIndex + 5, this.yIndex-4);
+				this.yIndex += doc.height;
+			} else {
+				this.yIndex += this.maxRadius * 0.5;
 			}
+			
+			// undo previous shift
+			this.yIndex -= 4;
+			
+	//		this.ctx.fillStyle = 'rgba(128, 0, 0, 1.0)';
+	//		this.ctx.fillRect(0, this.yIndex-this.maxRadius*0.75, 350, 2);
 		}
-		
-		if (!this.SEPARATE_LINES_FOR_TERMS) {
-			this.yIndex += doc.height;
-		} else {
-			this.yIndex += this.maxRadius * 0.5;
-		}
-		
-		// undo previous shift
-		this.yIndex -= 4;
-		
-//		this.ctx.fillStyle = 'rgba(128, 0, 0, 1.0)';
-//		this.ctx.fillRect(0, this.yIndex-this.maxRadius*0.75, 350, 2);
 	},
 	
 	drawLegend: function() { // obsolete code?
