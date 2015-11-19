@@ -593,6 +593,20 @@ Ext.define('Voyant.util.Toolable', {
 			if (corpus) {
 				this.getApplication().dispatchEvent("loadedCorpus", parent, corpus);
 			}
+			
+			var queryParams = Ext.Object.fromQueryString(document.location.search);
+			var url = this.getApplication().getBaseUrl();
+			url += '?corpus='+corpus.getId();
+			url += '&view='+xtype;
+			for (var key in queryParams) {
+				if (key !== 'corpus' && key !== 'view') {
+					url += '&'+key+'='+queryParams[key];
+				}
+			}
+			window.history.pushState({
+				corpus: corpus.getId(),
+				view: xtype
+			}, '', url);
 		}
 		else {
 			parent = this.isXType('voyantheader') && this.getApplication().getViewComponent ? this.getApplication().getViewComponent() : this.up("component");
