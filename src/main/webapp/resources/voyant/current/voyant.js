@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Nov 24 16:28:11 EST 2015 */
+/* This file created by JSCacher. Last modified: Tue Nov 24 16:55:00 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -13521,7 +13521,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
     
     onCollapse: function(panel) {
     	// the title may be in flux when collapsing, so call defer setting of title
-    	Ext.defer(function() {this.setTitle(this.localize('title'))}, 10, panel)
+    	Ext.defer(function() {this.setTitle("<img src='"+this.getBaseUrl()+"/resources/images/voyant-logo-tiny.png' style='vertical-align: middle' alt='Voyant Tools' /> "+this.localize('title'))}, 10, panel)
     }
 });
 
