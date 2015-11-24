@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Nov 19 16:24:04 EST 2015 */
+/* This file created by JSCacher. Last modified: Tue Nov 24 15:41:32 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2303,13 +2303,19 @@ Ext.define('Voyant.util.Toolable', {
 					        				}
 					        				
 					        				// trigger a reloading of the app
-					        				if (corpus) {app.dispatchEvent("loadedCorpus", this, corpus);}
+					        				if (corpus) {
+					        					app.dispatchEvent("loadedCorpus", this, corpus);
+					        					
+						        				// events aren't sent to owning panels, so fire locally too
+					        					this.fireEvent("loadedCorpus", this, corpus);
+					        				}
+					        				
+					        				
 					        			}
 					        			
-					        			// otherwise dispatch changes to this tool and reload corpus
-					        			else {
-					        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
-					        			}
+					        			// fire this even if we have global stopwords since the app dispatch won't reach this tool
+				        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+
 					        			btn.up('window').close();
 					        		},
 					        		scope: panel
@@ -2767,7 +2773,8 @@ Ext.define('Voyant.util.Toolable', {
 				}
 			}
 			window.history.pushState({
-				corpus: corpus.getId()
+				corpus: corpus.getId(),
+				view: xtype
 			}, '', url);
 		}
 		else {

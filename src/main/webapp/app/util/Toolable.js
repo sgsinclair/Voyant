@@ -140,13 +140,19 @@ Ext.define('Voyant.util.Toolable', {
 					        				}
 					        				
 					        				// trigger a reloading of the app
-					        				if (corpus) {app.dispatchEvent("loadedCorpus", this, corpus);}
+					        				if (corpus) {
+					        					app.dispatchEvent("loadedCorpus", this, corpus);
+					        					
+						        				// events aren't sent to owning panels, so fire locally too
+					        					this.fireEvent("loadedCorpus", this, corpus);
+					        				}
+					        				
+					        				
 					        			}
 					        			
-					        			// otherwise dispatch changes to this tool and reload corpus
-					        			else {
-					        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
-					        			}
+					        			// fire this even if we have global stopwords since the app dispatch won't reach this tool
+				        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+
 					        			btn.up('window').close();
 					        		},
 					        		scope: panel
