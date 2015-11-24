@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Nov 24 15:41:32 EST 2015 */
+/* This file created by JSCacher. Last modified: Tue Nov 24 16:28:11 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -13470,7 +13470,10 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	alias: 'widget.voyantheader',
     statics: {
     	i18n: {
-    		title: {en: "Voyant Tools"}
+    		title: {en: "Voyant Tools"},
+    		home: {en: "Start Over"},
+    		homeTip: {en: "Click to start over from the corpus creation screen."},
+    		homeConfirm: {en: "Are you sure you want to start over (and leave the current corpus)?"}
     	}
     },
     constructor: function(config) {
@@ -13493,7 +13496,26 @@ Ext.define('Voyant.panel.VoyantHeader', {
     	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {
-    		moreTools: ['corpusset','scatterplot','termsradio']
+    		moreTools: ['corpusset','scatterplot','termsradio'],
+			includeTools: {
+				save: true,
+				plus: true,
+				help: true,
+				home: {
+					type: 'home',
+					tooltip: this.localize("homeTip"),
+					xtype: 'toolmenu',
+	                glyph: 'xf015@FontAwesome',
+	        		handler: function(btn) {
+	        			var panel = this.up("panel")
+	        			Ext.Msg.confirm(panel.localize('home'), panel.localize('homeConfirm'), function(buttonId) {
+	        				if (buttonId=='yes') {
+	        					document.location.href = panel.getBaseUrl()
+	        				}
+	        			}, this);
+	        		}
+				}
+			}
     	}));
     },
     
