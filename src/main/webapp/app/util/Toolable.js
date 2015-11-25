@@ -7,6 +7,7 @@ Ext.define('Voyant.util.Toolable', {
 			saveTip: {en: 'Export a URL, an embeddable tool, data or a bibliographic reference.'},
 			gearTip: {en: 'Define options for this tool.'},
 			helpTip: {en: 'No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.'},
+			moreHelp: {en: 'More help…'},
 			exportTitle: {en: "Export"},
 			exportViewUrl: {en: 'a URL for this view (tools and data)'},
 			exportViewFieldset: {en: 'Export View (Tools and Data)'},
@@ -582,10 +583,10 @@ Ext.define('Voyant.util.Toolable', {
 		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
 		var help = panel.localize('help', {"default": false}) || panel.localize('helpTip');
 		if (help==panel._localizeClass(Ext.ClassManager.get("Voyant.util.Toolable"), "helpTip")) {
-			panel.openUrl( "http://docs.voyant-tools.org/");
+			panel.openUrl( panel.getBaseUrl()+"docs/#!/guide/" + panel.getXType());
 		}
 		else {
-			Ext.Msg.alert(panel.localize('title'), help)
+			Ext.Msg.alert(panel.localize('title'), help +"<p><a href='"+panel.getBaseUrl()+"docs/#!/guide/"+ panel.getXType()+"' target='voyantdocs'>"+panel.localize("moreHelp")+"</a></p>")
 		}
 	},
 	replacePanel: function(xtype) {

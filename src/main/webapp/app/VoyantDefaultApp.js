@@ -10,7 +10,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		i18n: {
 			'noViewErrorTitle': {en: "View Error"},
 			'noViewErrorTpl': {en: 'No view was found with the name "{view}". You can <a href="{url}">try with the default view</a> instead'},
-			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts. <a href='http://docs.voyant-tools.org/'>Find out more</a>.</p>"}
+			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts. <a href='/docs/'>Find out more</a>.</p>"},
+			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts.</p>"}
 		},
 		api: {
 			view: 'corpusset',

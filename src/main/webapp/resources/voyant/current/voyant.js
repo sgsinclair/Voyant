@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Nov 24 16:55:00 EST 2015 */
+/* This file created by JSCacher. Last modified: Wed Nov 25 08:52:06 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2170,6 +2170,7 @@ Ext.define('Voyant.util.Toolable', {
 			saveTip: {en: 'Export a URL, an embeddable tool, data or a bibliographic reference.'},
 			gearTip: {en: 'Define options for this tool.'},
 			helpTip: {en: 'No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.'},
+			moreHelp: {en: 'More help…'},
 			exportTitle: {en: "Export"},
 			exportViewUrl: {en: 'a URL for this view (tools and data)'},
 			exportViewFieldset: {en: 'Export View (Tools and Data)'},
@@ -2745,10 +2746,10 @@ Ext.define('Voyant.util.Toolable', {
 		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
 		var help = panel.localize('help', {"default": false}) || panel.localize('helpTip');
 		if (help==panel._localizeClass(Ext.ClassManager.get("Voyant.util.Toolable"), "helpTip")) {
-			panel.openUrl( "http://docs.voyant-tools.org/");
+			panel.openUrl( panel.getBaseUrl()+"docs/#!guide/" + panel.getXType());
 		}
 		else {
-			Ext.Msg.alert(panel.localize('title'), help)
+			Ext.Msg.alert(panel.localize('title'), help +"<p><a href='"+panel.getBaseUrl()+"docs/#!guide/"+ panel.getXType()+"' target='voyantdocs'>"+panel.localize("moreHelp")+"</a></p>")
 		}
 	},
 	replacePanel: function(xtype) {
@@ -13471,6 +13472,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
     statics: {
     	i18n: {
     		title: {en: "Voyant Tools"},
+			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts."},
     		home: {en: "Start Over"},
     		homeTip: {en: "Click to start over from the corpus creation screen."},
     		homeConfirm: {en: "Are you sure you want to start over (and leave the current corpus)?"}
@@ -13953,7 +13955,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		i18n: {
 			'noViewErrorTitle': {en: "View Error"},
 			'noViewErrorTpl': {en: 'No view was found with the name "{view}". You can <a href="{url}">try with the default view</a> instead'},
-			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts. <a href='http://docs.voyant-tools.org/'>Find out more</a>.</p>"}
+			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts. <a href='/docs/'>Find out more</a>.</p>"},
+			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts.</p>"}
 		},
 		api: {
 			view: 'corpusset',
