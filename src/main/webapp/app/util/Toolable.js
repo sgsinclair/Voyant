@@ -586,7 +586,8 @@ Ext.define('Voyant.util.Toolable', {
 			panel.openUrl( panel.getBaseUrl()+"docs/#!/guide/" + panel.getXType());
 		}
 		else {
-			Ext.Msg.alert(panel.localize('title'), help +"<p><a href='"+panel.getBaseUrl()+"docs/#!/guide/"+ panel.getXType()+"' target='voyantdocs'>"+panel.localize("moreHelp")+"</a></p>")
+			Ext.Msg.alert(panel.localize('title'), help +"<p><a href='"+panel.getBaseUrl()+
+					"docs/"+ (panel.isXType('voyantheader') ? '' : "#!/guide/"+panel.getXType()) +"' target='voyantdocs'>"+panel.localize("moreHelp")+"</a></p>")
 		}
 	},
 	replacePanel: function(xtype) {
