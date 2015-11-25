@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Nov 25 13:50:04 EST 2015 */
+/* This file created by JSCacher. Last modified: Wed Nov 25 14:23:13 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2170,6 +2170,7 @@ Ext.define('Voyant.util.Toolable', {
 			saveTip: {en: 'Export a URL, an embeddable tool, data or a bibliographic reference.'},
 			gearTip: {en: 'Define options for this tool.'},
 			helpTip: {en: 'No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.'},
+			moreHelp: {en: 'More help…'},
 			exportTitle: {en: "Export"},
 			exportViewUrl: {en: 'a URL for this view (tools and data)'},
 			exportViewFieldset: {en: 'Export View (Tools and Data)'},
@@ -2303,13 +2304,19 @@ Ext.define('Voyant.util.Toolable', {
 					        				}
 					        				
 					        				// trigger a reloading of the app
-					        				if (corpus) {app.dispatchEvent("loadedCorpus", this, corpus);}
+					        				if (corpus) {
+					        					app.dispatchEvent("loadedCorpus", this, corpus);
+					        					
+						        				// events aren't sent to owning panels, so fire locally too
+					        					this.fireEvent("loadedCorpus", this, corpus);
+					        				}
+					        				
+					        				
 					        			}
 					        			
-					        			// otherwise dispatch changes to this tool and reload corpus
-					        			else {
-					        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
-					        			}
+					        			// fire this even if we have global stopwords since the app dispatch won't reach this tool
+				        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+
 					        			btn.up('window').close();
 					        		},
 					        		scope: panel
@@ -2739,10 +2746,10 @@ Ext.define('Voyant.util.Toolable', {
 		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
 		var help = panel.localize('help', {"default": false}) || panel.localize('helpTip');
 		if (help==panel._localizeClass(Ext.ClassManager.get("Voyant.util.Toolable"), "helpTip")) {
-			panel.openUrl( "http://docs.voyant-tools.org/");
+			panel.openUrl( panel.getBaseUrl()+"docs/#!/guide/" + panel.getXType());
 		}
 		else {
-			Ext.Msg.alert(panel.localize('title'), help)
+			Ext.Msg.alert(panel.localize('title'), help +"<p><a href='"+panel.getBaseUrl()+"docs/#!/guide/"+ panel.getXType()+"' target='voyantdocs'>"+panel.localize("moreHelp")+"</a></p>")
 		}
 	},
 	replacePanel: function(xtype) {
@@ -9104,7 +9111,9 @@ Ext.define('Voyant.panel.Reader', {
             			else if (term.term) {queryTerms.push(term.term);}
             			else if (term.getTerm) {queryTerms.push(term.getTerm());}
             		});
-            		this.loadQueryTerms(queryTerms);
+            		if (queryTerms.length > 0) {
+            			this.loadQueryTerms(queryTerms);
+            		}
         		},
         		corpusTermsClicked: function(src, terms) {
         			var queryTerms = [];
@@ -11360,11 +11369,12 @@ Ext.define('Voyant.panel.TermsRadio', {
 		this.on("termsClicked", function(src, terms) {
 			// TODO load term distribution data
 			terms.forEach(function(term) {
-				var queryTerm = '';
+				var queryTerm;
     			if (Ext.isString(term)) {queryTerm = term;}
     			else if (term.term) {queryTerm = term.term;}
     			else if (term.getTerm) {queryTerm = term.getTerm();}
     			
+    			// TODO handling for multiple terms
     			this.setApiParams({query: queryTerm});
     			this.loadStore();
     		}, this);
@@ -13080,7 +13090,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		if (this.getCorpus()) { // make sure we have a corpus
         		var queryTerms = [];
         		terms.forEach(function(term) {
-        			if (Ext.isString(term)) {queryTerms.push(term)}
+        			if (Ext.isString(term)) {queryTerms.push(term);}
         			else if (term.term) {queryTerms.push(term.term);}
         			else if (term.getTerm) {queryTerms.push(term.getTerm());}
         		});
@@ -13474,7 +13484,11 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	alias: 'widget.voyantheader',
     statics: {
     	i18n: {
-    		title: {en: "Voyant Tools"}
+    		title: {en: "Voyant Tools"},
+			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts."},
+    		home: {en: "Start Over"},
+    		homeTip: {en: "Click to start over from the corpus creation screen."},
+    		homeConfirm: {en: "Are you sure you want to start over (and leave the current corpus)?"}
     	}
     },
     constructor: function(config) {
@@ -13497,13 +13511,32 @@ Ext.define('Voyant.panel.VoyantHeader', {
     	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {
-    		moreTools: ['corpusset','scatterplot','termsradio']
+    		moreTools: ['corpusset','scatterplot','termsradio'],
+			includeTools: {
+				save: true,
+				plus: true,
+				help: true,
+				home: {
+					type: 'home',
+					tooltip: this.localize("homeTip"),
+					xtype: 'toolmenu',
+	                glyph: 'xf015@FontAwesome',
+	        		handler: function(btn) {
+	        			var panel = this.up("panel")
+	        			Ext.Msg.confirm(panel.localize('home'), panel.localize('homeConfirm'), function(buttonId) {
+	        				if (buttonId=='yes') {
+	        					document.location.href = panel.getBaseUrl()
+	        				}
+	        			}, this);
+	        		}
+				}
+			}
     	}));
     },
     
     onCollapse: function(panel) {
     	// the title may be in flux when collapsing, so call defer setting of title
-    	Ext.defer(function() {this.setTitle(this.localize('title'))}, 10, panel)
+    	Ext.defer(function() {this.setTitle("<img src='"+this.getBaseUrl()+"/resources/images/voyant-logo-tiny.png' style='vertical-align: middle' alt='Voyant Tools' /> "+this.localize('title'))}, 10, panel)
     }
 });
 
@@ -13935,7 +13968,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		i18n: {
 			'noViewErrorTitle': {en: "View Error"},
 			'noViewErrorTpl': {en: 'No view was found with the name "{view}". You can <a href="{url}">try with the default view</a> instead'},
-			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts. <a href='http://docs.voyant-tools.org/'>Find out more</a>.</p>"}
+			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts. <a href='/docs/'>Find out more</a>.</p>"},
+			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts.</p>"}
 		},
 		api: {
 			view: 'corpusset',
