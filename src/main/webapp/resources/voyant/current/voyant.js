@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Nov 19 16:24:04 EST 2015 */
+/* This file created by JSCacher. Last modified: Wed Nov 25 13:50:04 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2767,7 +2767,8 @@ Ext.define('Voyant.util.Toolable', {
 				}
 			}
 			window.history.pushState({
-				corpus: corpus.getId()
+				corpus: corpus.getId(),
+				view: xtype
 			}, '', url);
 		}
 		else {
@@ -4633,8 +4634,10 @@ Ext.define('Voyant.panel.Bubblelines', {
     		if (src !== this) {
 	    		var queryTerms = [];
 	    		terms.forEach(function(term) {
-	    			if (term.term) {queryTerms.push(term.term);}
-	    		});
+        			if (Ext.isString(term)) {queryTerms.push(term);}
+        			else if (term.term) {queryTerms.push(term.term);}
+        			else if (term.getTerm) {queryTerms.push(term.getTerm());}
+        		});
 	    		this.getDocTermsFromQuery(queryTerms);
     		}
 		}, this);
@@ -6443,9 +6446,11 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 		if (this.getStore().getCorpus()) { // make sure we have a corpus
                     		var queryTerms = [];
                     		terms.forEach(function(term) {
-                    			if (term.term) {queryTerms.push(term.term);}
+                    			if (Ext.isString(term)) {queryTerms.push(term);}
+                    			else if (term.term) {queryTerms.push(term.term);}
+                    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
                     		});
-                    		if (queryTerms) {
+                    		if (queryTerms.length > 0) {
                     			this.setApiParams({
                     				docIndex: undefined,
                     				docId: undefined,
@@ -7100,9 +7105,11 @@ Ext.define('Voyant.panel.Phrases', {
                 		if (this.getStore().getCorpus()) { // make sure we have a corpus
                     		var queryTerms = [];
                     		terms.forEach(function(term) {
-                    			if (term.term) {queryTerms.push(term.term);}
+                    			if (Ext.isString(term)) {queryTerms.push(term);}
+                    			else if (term.term) {queryTerms.push(term.term);}
+                    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
                     		});
-                    		if (queryTerms) {
+                    		if (queryTerms.length > 0) {
                     			this.setApiParams({
                     				docIndex: undefined,
                     				docId: undefined,
@@ -7477,9 +7484,11 @@ Ext.define('Voyant.panel.DocumentTerms', {
                 		if (this.getStore().getCorpus()) { // make sure we have a corpus
                     		var queryTerms = [];
                     		terms.forEach(function(term) {
-                    			if (term.term) {queryTerms.push(term.term);}
+                    			if (Ext.isString(term)) {queryTerms.push(term);}
+                    			else if (term.term) {queryTerms.push(term.term);}
+                    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
                     		});
-                    		if (queryTerms) {
+                    		if (queryTerms.length > 0) {
                     			this.setApiParams({
                     				docIndex: undefined,
                     				docId: undefined,
@@ -9091,7 +9100,9 @@ Ext.define('Voyant.panel.Reader', {
             	termsClicked: function(src, terms) {
             		var queryTerms = [];
             		terms.forEach(function(term) {
-            			if (term.term) {queryTerms.push(term.term);}
+            			if (Ext.isString(term)) {queryTerms.push(term);}
+            			else if (term.term) {queryTerms.push(term.term);}
+            			else if (term.getTerm) {queryTerms.push(term.getTerm());}
             		});
             		this.loadQueryTerms(queryTerms);
         		},
@@ -11348,8 +11359,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 		this.on("termsClicked", function(src, terms) {
 			// TODO load term distribution data
-    		terms.forEach(function(term) {
-    			var queryTerm;
+			terms.forEach(function(term) {
+				var queryTerm = '';
     			if (Ext.isString(term)) {queryTerm = term;}
     			else if (term.term) {queryTerm = term.term;}
     			else if (term.getTerm) {queryTerm = term.getTerm();}

@@ -541,12 +541,13 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 		this.on("termsClicked", function(src, terms) {
 			// TODO load term distribution data
-    		terms.forEach(function(term) {
-    			var queryTerm;
+			terms.forEach(function(term) {
+				var queryTerm;
     			if (Ext.isString(term)) {queryTerm = term;}
     			else if (term.term) {queryTerm = term.term;}
     			else if (term.getTerm) {queryTerm = term.getTerm();}
     			
+    			// TODO handling for multiple terms
     			this.setApiParams({query: queryTerm});
     			this.loadStore();
     		}, this);

@@ -256,9 +256,13 @@ Ext.define('Voyant.panel.Reader', {
             	termsClicked: function(src, terms) {
             		var queryTerms = [];
             		terms.forEach(function(term) {
-            			if (term.term) {queryTerms.push(term.term);}
+            			if (Ext.isString(term)) {queryTerms.push(term);}
+            			else if (term.term) {queryTerms.push(term.term);}
+            			else if (term.getTerm) {queryTerms.push(term.getTerm());}
             		});
-            		this.loadQueryTerms(queryTerms);
+            		if (queryTerms.length > 0) {
+            			this.loadQueryTerms(queryTerms);
+            		}
         		},
         		corpusTermsClicked: function(src, terms) {
         			var queryTerms = [];

@@ -77,7 +77,7 @@
     		if (this.getCorpus()) { // make sure we have a corpus
         		var queryTerms = [];
         		terms.forEach(function(term) {
-        			if (Ext.isString(term)) {queryTerms.push(term)}
+        			if (Ext.isString(term)) {queryTerms.push(term);}
         			else if (term.term) {queryTerms.push(term.term);}
         			else if (term.getTerm) {queryTerms.push(term.getTerm());}
         		});

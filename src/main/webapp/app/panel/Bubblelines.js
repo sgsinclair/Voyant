@@ -125,8 +125,10 @@ Ext.define('Voyant.panel.Bubblelines', {
     		if (src !== this) {
 	    		var queryTerms = [];
 	    		terms.forEach(function(term) {
-	    			if (term.term) {queryTerms.push(term.term);}
-	    		});
+        			if (Ext.isString(term)) {queryTerms.push(term);}
+        			else if (term.term) {queryTerms.push(term.term);}
+        			else if (term.getTerm) {queryTerms.push(term.getTerm());}
+        		});
 	    		this.getDocTermsFromQuery(queryTerms);
     		}
 		}, this);
