@@ -12,7 +12,9 @@ Ext.define('Voyant.widget.DocumentSelector', {
 	},
 
 	config: {
-		docs: undefined
+		docs: undefined,
+		corpus: undefined,
+		docStore: undefined
 	},
 	
     initComponent: function() {
@@ -27,6 +29,36 @@ Ext.define('Voyant.widget.DocumentSelector', {
 		});
 
 		me.callParent(arguments);
+		
+		this.setDocStore(Ext.create("Ext.data.Store", {
+			model: "Voyant.data.model.Document",
+    		autoLoad: false,
+    		remoteSort: false,
+    		proxy: {
+				type: 'ajax',
+				url: Voyant.application.getTromboneUrl(),
+				extraParams: {
+					tool: 'corpus.DocumentsMetadata'
+				},
+				reader: {
+					type: 'json',
+					rootProperty: 'documentsMetadata.documents',
+					totalProperty: 'documentsMetadata.total'
+				},
+				simpleSortMode: true
+   		     },
+   		     listeners: {
+   		    	load: function(store, records, successful, options) {
+   					this.populate(records);
+   				},
+   				scope: this
+   		     }
+    	}));
+    },
+    
+    updateCorpus: function(corpus) {
+    	this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
+    	this.getDocStore().load();
     },
     
     populate: function(docs, replace) {

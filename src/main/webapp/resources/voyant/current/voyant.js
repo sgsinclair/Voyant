@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Nov 25 08:52:06 EST 2015 */
+/* This file created by JSCacher. Last modified: Wed Nov 25 14:23:13 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2746,10 +2746,10 @@ Ext.define('Voyant.util.Toolable', {
 		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
 		var help = panel.localize('help', {"default": false}) || panel.localize('helpTip');
 		if (help==panel._localizeClass(Ext.ClassManager.get("Voyant.util.Toolable"), "helpTip")) {
-			panel.openUrl( panel.getBaseUrl()+"docs/#!guide/" + panel.getXType());
+			panel.openUrl( panel.getBaseUrl()+"docs/#!/guide/" + panel.getXType());
 		}
 		else {
-			Ext.Msg.alert(panel.localize('title'), help +"<p><a href='"+panel.getBaseUrl()+"docs/#!guide/"+ panel.getXType()+"' target='voyantdocs'>"+panel.localize("moreHelp")+"</a></p>")
+			Ext.Msg.alert(panel.localize('title'), help +"<p><a href='"+panel.getBaseUrl()+"docs/#!/guide/"+ panel.getXType()+"' target='voyantdocs'>"+panel.localize("moreHelp")+"</a></p>")
 		}
 	},
 	replacePanel: function(xtype) {
@@ -4641,8 +4641,10 @@ Ext.define('Voyant.panel.Bubblelines', {
     		if (src !== this) {
 	    		var queryTerms = [];
 	    		terms.forEach(function(term) {
-	    			if (term.term) {queryTerms.push(term.term);}
-	    		});
+        			if (Ext.isString(term)) {queryTerms.push(term);}
+        			else if (term.term) {queryTerms.push(term.term);}
+        			else if (term.getTerm) {queryTerms.push(term.getTerm());}
+        		});
 	    		this.getDocTermsFromQuery(queryTerms);
     		}
 		}, this);
@@ -6451,9 +6453,11 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 		if (this.getStore().getCorpus()) { // make sure we have a corpus
                     		var queryTerms = [];
                     		terms.forEach(function(term) {
-                    			if (term.term) {queryTerms.push(term.term);}
+                    			if (Ext.isString(term)) {queryTerms.push(term);}
+                    			else if (term.term) {queryTerms.push(term.term);}
+                    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
                     		});
-                    		if (queryTerms) {
+                    		if (queryTerms.length > 0) {
                     			this.setApiParams({
                     				docIndex: undefined,
                     				docId: undefined,
@@ -7108,9 +7112,11 @@ Ext.define('Voyant.panel.Phrases', {
                 		if (this.getStore().getCorpus()) { // make sure we have a corpus
                     		var queryTerms = [];
                     		terms.forEach(function(term) {
-                    			if (term.term) {queryTerms.push(term.term);}
+                    			if (Ext.isString(term)) {queryTerms.push(term);}
+                    			else if (term.term) {queryTerms.push(term.term);}
+                    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
                     		});
-                    		if (queryTerms) {
+                    		if (queryTerms.length > 0) {
                     			this.setApiParams({
                     				docIndex: undefined,
                     				docId: undefined,
@@ -7485,9 +7491,11 @@ Ext.define('Voyant.panel.DocumentTerms', {
                 		if (this.getStore().getCorpus()) { // make sure we have a corpus
                     		var queryTerms = [];
                     		terms.forEach(function(term) {
-                    			if (term.term) {queryTerms.push(term.term);}
+                    			if (Ext.isString(term)) {queryTerms.push(term);}
+                    			else if (term.term) {queryTerms.push(term.term);}
+                    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
                     		});
-                    		if (queryTerms) {
+                    		if (queryTerms.length > 0) {
                     			this.setApiParams({
                     				docIndex: undefined,
                     				docId: undefined,
@@ -9099,9 +9107,13 @@ Ext.define('Voyant.panel.Reader', {
             	termsClicked: function(src, terms) {
             		var queryTerms = [];
             		terms.forEach(function(term) {
-            			if (term.term) {queryTerms.push(term.term);}
+            			if (Ext.isString(term)) {queryTerms.push(term);}
+            			else if (term.term) {queryTerms.push(term.term);}
+            			else if (term.getTerm) {queryTerms.push(term.getTerm());}
             		});
-            		this.loadQueryTerms(queryTerms);
+            		if (queryTerms.length > 0) {
+            			this.loadQueryTerms(queryTerms);
+            		}
         		},
         		corpusTermsClicked: function(src, terms) {
         			var queryTerms = [];
@@ -11356,12 +11368,13 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 		this.on("termsClicked", function(src, terms) {
 			// TODO load term distribution data
-    		terms.forEach(function(term) {
-    			var queryTerm;
+			terms.forEach(function(term) {
+				var queryTerm;
     			if (Ext.isString(term)) {queryTerm = term;}
     			else if (term.term) {queryTerm = term.term;}
     			else if (term.getTerm) {queryTerm = term.getTerm();}
     			
+    			// TODO handling for multiple terms
     			this.setApiParams({query: queryTerm});
     			this.loadStore();
     		}, this);
@@ -13077,7 +13090,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		if (this.getCorpus()) { // make sure we have a corpus
         		var queryTerms = [];
         		terms.forEach(function(term) {
-        			if (Ext.isString(term)) {queryTerms.push(term)}
+        			if (Ext.isString(term)) {queryTerms.push(term);}
         			else if (term.term) {queryTerms.push(term.term);}
         			else if (term.getTerm) {queryTerms.push(term.getTerm());}
         		});

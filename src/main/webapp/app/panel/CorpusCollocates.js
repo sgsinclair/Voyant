@@ -234,9 +234,11 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 		if (this.getStore().getCorpus()) { // make sure we have a corpus
                     		var queryTerms = [];
                     		terms.forEach(function(term) {
-                    			if (term.term) {queryTerms.push(term.term);}
+                    			if (Ext.isString(term)) {queryTerms.push(term);}
+                    			else if (term.term) {queryTerms.push(term.term);}
+                    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
                     		});
-                    		if (queryTerms) {
+                    		if (queryTerms.length > 0) {
                     			this.setApiParams({
                     				docIndex: undefined,
                     				docId: undefined,

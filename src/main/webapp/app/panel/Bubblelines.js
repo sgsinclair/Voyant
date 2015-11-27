@@ -99,6 +99,7 @@ Ext.define('Voyant.panel.Bubblelines', {
         		this.getDocStore().load();
     		}
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
+    		this.down('#docSelector').setCorpus(corpus);
     	}, this);
     	
         this.on('activate', function() { // load after tab activate (if we're in a tab panel)
@@ -125,8 +126,10 @@ Ext.define('Voyant.panel.Bubblelines', {
     		if (src !== this) {
 	    		var queryTerms = [];
 	    		terms.forEach(function(term) {
-	    			if (term.term) {queryTerms.push(term.term);}
-	    		});
+        			if (Ext.isString(term)) {queryTerms.push(term);}
+        			else if (term.term) {queryTerms.push(term.term);}
+        			else if (term.getTerm) {queryTerms.push(term.getTerm());}
+        		});
 	    		this.getDocTermsFromQuery(queryTerms);
     		}
 		}, this);
@@ -163,7 +166,6 @@ Ext.define('Voyant.panel.Bubblelines', {
    		     listeners: {
    		    	load: function(store, records, successful, options) {
    					this.processDocuments(records);
-   					this.down('#docSelector').populate(records);
    					this.processedDocs.each(function(doc) {
    						this.bubblelines.addDocToCache(doc);
    					}, this);
