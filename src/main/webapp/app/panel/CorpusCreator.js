@@ -12,10 +12,21 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		gearWinTitle: {en: "Options"},
     		inputFormat: {en: "Input Format"},
     		inputFormatAuto: {en: "Auto-Detect (recommended)"},
+    		advancedOptionsText: {en: "The advanced options below only apply to certain input formats. See the documentation on <a href='{0}' target='voyantdocs'>creating a corpus</a>."},
+    		xmlOptions: {en: "XML"},
     		xpathDocuments: {en: "XPath to Documents"},
     		xpathContent: {en: "XPath to Content"},
     		xpathTitle: {en: "XPath to Title"},
     		xpathAuthor: {en: "XPath to Author"},
+    		tableOptions: {en: "Tabular Data"},
+    		tableDocuments: {en: "Documents Columns"},
+    		tableContent: {en: "Content Columns"},
+    		tableTitle: {en: "Title Columns"},
+    		tableAuthor: {en: "Author Columns"},
+    		tokenizationOptions: {en: "Tokenization"},
+    		tokenization: {en: "tokenization"},
+    		tokenizationAuto: {en: "Automatic (highly recommended)"},
+    		tokenizationWordBoundaries: {en: "Simple Word Boundaries"},
     		emptyInput: {en: "Type in one or more URLs on separate lines or paste in a full text."},
     		uploadingCorpus: {en: "Uploading corpus…"},
     		fileTypesWarning: {en: "File Types Warning"},
@@ -34,7 +45,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		xmlDocumentsXpath: undefined,
     		xmlContentXpath: undefined,
     		xmlTitleXpath: undefined,
-    		xmlAuthorXpath: undefined
+    		xmlAuthorXpath: undefined,
+    		tokenization: undefined
     	}
     },
     config: {
@@ -310,8 +322,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		me.optionsWin = Ext.create('Ext.window.Window', {
     			title: me.localize('gearWinTitle'),
     			closeAction: 'hide',
-    			height: 225,
-    			width: 500,
+//    			width: 500,
     			layout: 'fit',
     			bodyPadding: 10,
     			items: [{
@@ -319,33 +330,84 @@ Ext.define('Voyant.panel.CorpusCreator', {
     				defaultType: 'textfield',
     				fieldDefaults: {
     					labelAlign: 'right',
-    					labelWidth: 160
-    				},
-    				defaults: {
+    					labelWidth: 130,
     					width: 400
     				},
-    				items: [{
-			            xtype:'combo',
-			            width: 400,
-			            fieldLabel: me.localize('inputFormat'),
-			            name: 'inputFormat',
-			            queryMode:'local',
-			            store:[['',me.localize('inputFormatAuto')],['TEI',"TEI"],['RSS',"RSS"]],
-			            forceSelection:true,
-			            value: ''
-    				},{
-    					fieldLabel: me.localize('xpathDocuments'),
-    					name: 'xmlDocumentsXpath'
-    				},{
-    					fieldLabel: me.localize('xpathContent'),
-    					name: 'xmlContentXpath'
-    				},{
-    					fieldLabel: me.localize('xpathAuthor'),
-    					name: 'xmlAuthorXpath'
-    				},{
-    					fieldLabel: me.localize('xpathTitle'),
-    					name: 'xmlTitleXpath'
-    				}]
+    				items: [
+						{
+						    xtype:'combo',
+						    fieldLabel: me.localize('inputFormat'),
+						    labelWidth: 140, // try to align with fieldset
+						    name: 'inputFormat',
+						    queryMode:'local',
+						    store:[['',me.localize('inputFormatAuto')],['TEI',"TEI"],['RSS',"RSS"]],
+						    forceSelection:true,
+						    value: ''
+						},{
+							xtype: 'container',
+							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/creatingcorpus'])+'</i></p>',
+							width: 375
+						},{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/creatingcorpus-section-xml' target='voyantdocs'>"+me.localize('xmlOptions')+"</a>",
+	                        collapsible: true,
+	                        collapsed: true,
+	                        defaultType: 'textfield',
+	                        items: [
+								{
+									fieldLabel: me.localize('xpathDocuments'),
+									name: 'xmlDocumentsXpath'
+								},{
+									fieldLabel: me.localize('xpathContent'),
+									name: 'xmlContentXpath'
+								},{
+									fieldLabel: me.localize('xpathAuthor'),
+									name: 'xmlAuthorXpath'
+								},{
+									fieldLabel: me.localize('xpathTitle'),
+									name: 'xmlTitleXpath'
+								}
+							]
+						},{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/creatingcorpus-section-table' target='voyantdocs'>"+me.localize('tableOptions')+"</a>",
+	                        collapsible: true,
+	                        collapsed: true,
+	                        defaultType: 'textfield',
+	                        items: [
+								{
+									fieldLabel: me.localize('tableDocuments'),
+									name: 'tableDocuments'
+								},{
+									fieldLabel: me.localize('tableContent'),
+									name: 'tableContent'
+								},{
+									fieldLabel: me.localize('tableAuthor'),
+									name: 'tableAuthor'
+								},{
+									fieldLabel: me.localize('tableTitle'),
+									name: 'tableTitle'
+								}
+							]
+						},{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/creatingcorpus-section-tokenization' target='voyantdocs'>"+me.localize('tokenizationOptions')+"</a>",
+	                        collapsible: true,
+//	                        collapsed: true,
+	                        items: [
+								{
+								    xtype:'combo',
+								    fieldLabel: me.localize('tokenization'),
+								    name: 'tokenization',
+								    queryMode:'local',
+								    store:[['',me.localize('tokenizationAuto')],['wordBoundaries',me.localize("tokenizationWordBoundaries")]],
+								    forceSelection:true,
+								    value: ''
+								}
+							]
+						}
+						
+					]
     			}],
     			buttons: [{
     				text: me.localize('ok'),
