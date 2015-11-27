@@ -325,11 +325,11 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            				}
 	            			});
 	            			
-	            			for (i in this.lastClickedBubbles) {
-	            				var lcTerms = this.lastClickedBubbles[i];
-	            				for (term in lcTerms) {
-	            					if (terms.indexOf(type) == -1) {
-	            						delete this.lastClickedBubbles[i][term];
+	            			for (var index in this.bubblelines.lastClickedBubbles) {
+	            				var lcTerms = this.bubblelines.lastClickedBubbles[index];
+	            				for (var term in lcTerms) {
+	            					if (terms.indexOf(term) == -1) {
+	            						delete this.bubblelines.lastClickedBubbles[index][term];
 	            					}
 	            				}
 	            				
