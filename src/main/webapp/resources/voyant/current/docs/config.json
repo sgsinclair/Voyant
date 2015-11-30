@@ -6,5 +6,6 @@
     "--warnings": ["-link", "-no_doc"],
     "--seo": true,
     "--guides": "guides.json",
-    "--output": "docs"
+    "--output": "docs",
+    "--template": "template-min"
 }

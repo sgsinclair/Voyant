@@ -51,3 +51,7 @@ One of the most interesting features of Voyant Tools is the ability to bookmark 
 {@img save-bookmark.png Export Bookmark}
 
 ## Next Steps
+
+* explore the [user interface guides](#!/guide/ui)
+* explore the [tools available](#!/guide/tools)
+* read more [about Voyant Tools](#!/guide/about)
