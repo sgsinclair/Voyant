@@ -1,18 +1,24 @@
 package org.voyanttools.voyant;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Source;
+import javax.servlet.http.HttpServletResponseWrapper;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
 
-import org.voyanttools.trombone.Controller;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.voyanttools.trombone.util.FlexibleParameters;
 
 /**
@@ -52,21 +58,27 @@ public class Voyant {
 	
 		
 
+	/**
+	 * The only time we should be here is when we have a post method to Voyant that includes input and that
+	 * needs to be processed to create a new corpus, and then redirect to the URL with the corpus.
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 * @throws IOException
+	 * @throws TransformerException
+	 * @throws ServletException 
+	 */
 	private static boolean handlePostAndRedirect(HttpServletRequest request,
-			HttpServletResponse response, FlexibleParameters params) throws IOException, TransformerException {
+			HttpServletResponse response, FlexibleParameters params) throws IOException, TransformerException, ServletException {
 		
-		// run the controller and then redirect to the current URL with a corpusID
-		Writer writer = new StringWriter();
-		Controller controller = new Controller(params, writer);
-		controller.run();
+		PostedInputResponseWrapper postedInputResponseWrapper = new PostedInputResponseWrapper(response);
+		request.getRequestDispatcher("trombone").include(new PostedInputRequestWrapper(request), postedInputResponseWrapper);
 
-		Writer xslWriter = new StringWriter();
-		
-		XslTransformer xslTransformer = new XslTransformer();
-		Source xml = new StreamSource(new StringReader(writer.toString()));
-		Source xsl = XslTransformer.getTemplateSource(params.getParameterValue("template"), request.getSession().getServletContext());
-		xslTransformer.transform(xml, xsl, xslWriter);
-		String corpusId = xslWriter.toString();
+		String responseString = postedInputResponseWrapper.toString();
+		JSONObject obj= (JSONObject) JSONValue.parse(responseString);
+		JSONObject builder = (JSONObject) obj.get("stepEnabledCorpusCreator");
+		String corpusId = (String) builder.get("storedId");
 		final StringBuilder uri = new StringBuilder("./?corpus=").append(corpusId);
 		response.sendRedirect(uri.toString());
 		return true;
@@ -98,5 +110,56 @@ public class Voyant {
 			return true;
 		}
 		return false;
+	}
+	
+	private static class PostedInputRequestWrapper extends HttpServletRequestWrapper {
+		private final String TOOL = "corpus.CorpusCreator";
+		private PostedInputRequestWrapper(HttpServletRequest request) {
+			super(request);
+		}
+		@Override
+		public Map<String,String[]> getParameterMap() {
+			Map<String, String[]> map = super.getParameterMap();
+			map.put("tool", getParameterValues("tool"));
+			return map;
+		}
+		@Override
+		public Enumeration<String> getParameterNames() {
+			Set<String> names = new HashSet<String>();
+			Enumeration<String> e = super.getParameterNames();
+			while (e.hasMoreElements()) {
+				names.add(e.nextElement());
+			}
+			names.add("tool");
+			return Collections.enumeration(names);
+		}
+		@Override
+		public String getParameter(String name) {
+			return name.equals("tool") ? TOOL : super.getParameter(name);
+		}
+		@Override
+		public String[] getParameterValues(String name) {
+			return name.equals("tool") ? new String[]{getParameter("tool")} : super.getParameterValues(name);
+		}
+	}
+	
+	private static class PostedInputResponseWrapper extends HttpServletResponseWrapper {
+		private StringWriter stringWriter;
+		private PrintWriter writer;
+		private PostedInputResponseWrapper(HttpServletResponse response) {
+			super(response);
+			stringWriter = new StringWriter();
+			writer = new PrintWriter(stringWriter);
+		}
+		@Override
+		public PrintWriter getWriter() {
+			return writer;
+		}
+		@Override
+		public String toString() {
+//			writer.flush();
+			writer.flush();
+			return stringWriter.toString();
+		}
 	}
 }
