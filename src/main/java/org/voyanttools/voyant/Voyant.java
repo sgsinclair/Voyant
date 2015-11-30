@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -119,8 +120,13 @@ public class Voyant {
 		}
 		@Override
 		public Map<String,String[]> getParameterMap() {
-			Map<String, String[]> map = super.getParameterMap();
-			map.put("tool", getParameterValues("tool"));
+			// we need to create a new map because some servlets provide an unmodifiable map
+			Map<String, String[]> map = new HashMap<String, String[]>();
+			Enumeration<String> e = getParameterNames();
+			while (e.hasMoreElements()) {
+				String name = e.nextElement();
+				map.put(name, getParameterValues(name));
+			}
 			return map;
 		}
 		@Override
