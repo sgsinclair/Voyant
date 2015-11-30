@@ -2,6 +2,8 @@
 
 Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus.
 
+## Overview
+
 The table view shows the following three columns by default:
 
 - *Term*: this is the keyword (or keywords) being searched

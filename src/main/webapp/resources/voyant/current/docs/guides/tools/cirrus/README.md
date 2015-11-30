@@ -2,6 +2,8 @@
 
 Cirrus is a word cloud that visualizes the top frequency words of a corpus or document.
 
+## Overview
+
 The word cloud positions the words such that the terms that occur the most frequently are positioned centrally and are sized the largest. As the algorithm goes through the list and continues to attempt to draw words as close as possible to the center of the visualization it will also include small words within spaces left by larger words that do not fit together snugly. It's important to understand that the colour of words and their absolute position are not significant (if you resize the window or reload the page, words may appear in a different location).
 
 Clicking on words in Cirrus will usually cause one or more other tools to react (if you're in a multi-tool [skin](#!/guide/skins). Hovering over a word will cause a box to appear that displays the frequency count for that term.

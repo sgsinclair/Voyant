@@ -12,15 +12,39 @@ Ext.define('Voyant.widget.StopListOption', {
     		auto: {en: "Auto-detect"},
     		none: {en: "None"},
     		'new': {en: "New User-Defined List"},
-    		en: {en: "English"},
-    		de: {en: "German"},
-    		es: {en: "Spanish"},
-    		fr: {en: "French"},
-    		hu: {en: "Hungarian"},
-    		it: {en: "Italian"},
-    		no: {en: "Norwegian"},
-    		se: {en: "Swedish"},
-    		mu: {en: "Multilingual"},
+    		
+    		ar: {en: "Arabic", value: 'stop.ar.arabic-lucene.txt'},
+    		bg: {en: "Bulgarian", value: 'stop.bu.bulgarian-lucene.txt'},
+    		br: {en: "Breton", value: 'stop.br.breton-lucene.txt'},
+    		ca: {en: "Catalan", value: 'stop.ca.catalan-lucene.txt'},
+    		ckb: {en: "Kurdish", value: 'stop.ckb-turkish-lucene.txt'},
+    		cn: {en: "Chinese", value: 'stop.cn.chinese-lawrence.txt'},
+    		cz: {en: "Czech", value: 'stop.cz.czech-lucene.txt'},
+    		de: {en: "German", value: 'stop.de.german.txt'},
+    		el: {en: "Greek", value: 'stop.el.greek-lucene.txt'},
+    		en: {en: "English", value: 'stop.en.taporware.txt'},
+    		es: {en: "Spanish", value: 'stop.es.spanish.txt'},
+    		eu: {en: "Basque", value: 'stop.eu.basque-lucene.txt'},
+    		fa: {en: "Farsi", value: 'stop.fa.farsi-lucene.txt'},
+    		fr: {en: "French", value: 'stop.fr.veronis.txt'},
+    		ga: {en: "Irish", value: 'stop.ga-irish-lucene.txt'},
+    		gl: {en: "Galician", value: 'stop.ga.galician-lucene.txt'},
+    		hi: {en: "Hindi", value: 'stop.hi.hindi-lucene.txt'},
+    		hu: {en: "Hungarian", value: 'stop.hu.hungarian.txt'},
+    		hy: {en: "Armenian", value: 'stop.hy.armenian-lucene.txt'},
+    		id: {en: "Indonesian", value: 'stop.id.indonesian-lucene.txt'},
+    		it: {en: "Italian", value: 'stop.it.italian.txt'},
+    		ja: {en: "Japanese", value: 'stop.ja.japanese-lucene.txt'},
+    		lt: {en: "Latvian", value: 'stop.lv.latvian-lucene.txt'},
+    		lv: {en: "Lithuanian", value: 'stop.lt.lithuanian-lucene.txt'},
+    		mu: {en: "Multilingual", value: 'stop.mu.multi.txt'},
+    		nl: {en: "Dutch", value: 'stop.nl.dutch.txt'},
+    		no: {en: "Norwegian", value: 'stop.no.norwegian.txt'},
+    		ro: {en: "Romanian", value: 'stop.ro.romanian-lucene.txt'},
+    		se: {en: "Swedish", value: 'stop.se.swedish-long.txt'},
+    		th: {en: "Thai", value: 'stop.th.thai-lucene.txt'},
+    		tr: {en: "Turkish", value: 'stop.tr.turkish-lucene.txt'},
+    		
     		ok: {en: "Save"},
     		cancel: {en: "Cancel"},
     		editStopListTitle: {en: "Edit Stoplist"},
@@ -31,20 +55,28 @@ Ext.define('Voyant.widget.StopListOption', {
     initComponent: function(config) {
     	var me = this;
     	var value = this.up('window').panel.getApiParam('stopList');
-        var data = [{name : this.localize('en'),   value: 'stop.en.taporware.txt'},
-               {name : this.localize('de'),   value: 'stop.de.german.txt'},
-               {name : this.localize('es'),   value: 'stop.es.spanish.txt'},
-               {name : this.localize('fr'),   value: 'stop.fr.veronis.txt'},
-               {name : this.localize('hu'),   value: 'stop.hu.hungarian.txt'},
-               {name : this.localize('it'),   value: 'stop.it.italian.txt'},
-               {name : this.localize('no'),   value: 'stop.no.norwegian.txt'},
-               {name : this.localize('se'),   value: 'stop.se.swedish-long.txt'},
-               {name : this.localize('mu'),   value: 'stop.mu.multi.txt'}]
+    	
+    	var data = [];
+    	"ar,bg,br,ca,ckb,cn,cz,de,el,en,es,eu,fa,fr,ga,gl,hi,hu,hy,id,it,ja,lv,lt,mu,nl,no,ro,se,th,tr".split(",").forEach(function(lang) {
+    		data.push({name: this.localize(lang), value: this.localize(lang, {lang: 'value'})})
+    	}, this);
+//    	debugger
+//        var data = [{name : this.localize('en'),   value: 'stop.en.taporware.txt'},
+//               {name : this.localize('de'),   value: 'stop.de.german.txt'},
+//               {name : this.localize('es'),   value: 'stop.es.spanish.txt'},
+//               {name : this.localize('fr'),   value: 'stop.fr.veronis.txt'},
+//               {name : this.localize('hu'),   value: 'stop.hu.hungarian.txt'},
+//               {name : this.localize('it'),   value: 'stop.it.italian.txt'},
+//               {name : this.localize('no'),   value: 'stop.no.norwegian.txt'},
+//               {name : this.localize('se'),   value: 'stop.se.swedish-long.txt'},
+//               {name : this.localize('mu'),   value: 'stop.mu.multi.txt'}]
     	data.sort(function(a,b) { // sort by label
     		return a.name < b.name ? -1 : 1;
     	})
     	data.splice(0, 0, {name : this.localize('auto'),   value: 'auto'}, {name : this.localize('none'),   value: ''},  {name : this.localize('new'),   value: 'new'})
-    	
+    	data.forEach(function(item) {
+    		console.warn(item.name+": "+item.value)
+    	})
     	Ext.apply(me, {
 	    		items: [{
 	    	        xtype: 'combo',

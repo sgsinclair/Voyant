@@ -15,7 +15,7 @@
                         "name": "guides",
                         "url": "guides/ui",
                         "title": "List of Guides",
-                        "description": "This provides a list of the user interface guides available."
+                        "description": "An overview of the user interface guides available."
                     },
                     {
                         "name": "commonui",
@@ -28,8 +28,8 @@
                         "title": "What's New"
                     },
                     {
-                        "name": "creatingcorpus",
-                        "url": "guides/ui/creatingcorpus",
+                        "name": "corpuscreator",
+                        "url": "guides/ui/corpuscreator",
                         "title": "Creating a Corpus"
                     },
                     {
@@ -46,16 +46,6 @@
                         "name": "embedding",
                         "url": "guides/ui/embedding",
                         "title": "Embedding Voyant"
-                    },
-                    {
-                        "name": "stopwords",
-                        "url": "guides/ui/stopwords",
-                        "title": "Stopwords"
-                    },
-                    {
-                        "name": "stopwords",
-                        "url": "guides/ui/stopwords",
-                        "title": "Stopwords"
                     }
                 ]
             },
@@ -66,7 +56,7 @@
                         "name": "tools",
                         "url": "guides/tools",
                         "title": "List of Tools",
-                        "description": "Tools List"
+                        "description": "An overview of the tools available."
                     },
                     {
                         "name": "bubblelines",
@@ -142,7 +132,7 @@
                         "name": "about",
                         "url": "guides/about",
                         "title": "About",
-                        "description": "Tools List"
+                        "description": "General information about Voyant Tools."
                     }
                  ]
             }

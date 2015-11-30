@@ -50,7 +50,10 @@ Ext.define('Voyant.util.Localization', {
 	_localizeClass: function(clazz, key, config) {
 		if (clazz && clazz.i18n && clazz.i18n[key]) {
 			var use = false;
-			if (clazz.i18n[key][Voyant.util.Localization.LANGUAGE]) {
+			if (config && config.lang && clazz.i18n[key][config.lang]) {
+				use = clazz.i18n[key][config.lang];
+			}
+			else if (clazz.i18n[key][Voyant.util.Localization.LANGUAGE]) {
 				use = clazz.i18n[key][Voyant.util.Localization.LANGUAGE];
 			}
 			else if (clazz.i18n[key][Voyant.util.Localization.DEFAULT_LANGUAGE]) {

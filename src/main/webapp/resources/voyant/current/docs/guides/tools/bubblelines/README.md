@@ -1,6 +1,11 @@
 # Bubblelines
 
-Bubblelines visualizes the frequency and distribution of terms in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal length (50 segments by default). Each selected word is represented as a bubble with the size of the bubble indicating the word’s frequency in the corresponding segment of text. The larger the bubble the more frequently the word occurs.
+Bubblelines visualizes the frequency and distribution of terms in a corpus. 
+
+
+## Overview
+
+Each document in the corpus is represented as a horizontal line and divided into segments of equal length (50 segments by default). Each selected word is represented as a bubble with the size of the bubble indicating the word’s frequency in the corresponding segment of text. The larger the bubble the more frequently the word occurs.
 
 {@img bubblelines.png Bubblelines}
 
@@ -25,6 +30,8 @@ Clicking on the [Options](#!/guide/options) icon allows you to define a set of s
 ## Additional Information
 
 Bubblelines currently doesn't work well with corpora that have many hundreds of documents or more.
+
+Bubblelines was initially designed by Carlos Fiorentino as a student of Stan Ruecker.
 
 ## See Also
 
