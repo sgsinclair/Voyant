@@ -276,12 +276,15 @@ Ext.define('Voyant.panel.DToC.Index', {
 			success: function(response) {
 				var json = JSON.parse(response.responseText);
 				var indexText = json['org.voyanttools.trombone.tool.corpus.DtocIndex'].index;
+				// FIXME remove hack once resolved server side
+				indexText = indexText.replace(/&/g, '&amp;');
+				
 				var parser = new DOMParser();
 				var indexDoc = parser.parseFromString(indexText, 'application/xml');
 				
 				var items = Ext.DomQuery.select('div/list/item', indexDoc);
 				if (items.length == 0) {
-					this.alertInfo({title: 'DToC Indexer', msg:'No index items were found!'});
+					this.showError({title: 'DToC Indexer', message:'No index items were found!'});
 				} else {
 //					var root = this.getRootNode();
 					var rootConfig = {
@@ -298,7 +301,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 				}
 			},
 			failure: function(respose) {
-				this.alertInfo({title: 'DToC Indexer', msg:'Failed to get index.'});
+				this.showError({title: 'DToC Indexer', message:'Failed to get index.'});
 			},
 			scope: this
 		});
