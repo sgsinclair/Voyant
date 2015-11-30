@@ -7,6 +7,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
+<link rel="shortcut icon" type="image/ico" href="<%= base %>/resources/voyant/favicon.ico" />
+
 <!-- EXTJS -->
 <script type="text/javascript" src="<%= base %>/resources/ext/current/ext-all.js"></script>
 <script type="text/javascript" src="<%= base %>/resources/ext/current/sencha-charts.js"></script>
