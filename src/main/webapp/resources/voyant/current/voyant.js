@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Nov 27 15:42:43 EST 2015 */
+/* This file created by JSCacher. Last modified: Sun Nov 29 22:05:29 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4909,11 +4909,11 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            				}
 	            			});
 	            			
-	            			for (i in this.lastClickedBubbles) {
-	            				var lcTerms = this.lastClickedBubbles[i];
-	            				for (term in lcTerms) {
-	            					if (terms.indexOf(type) == -1) {
-	            						delete this.lastClickedBubbles[i][term];
+	            			for (var index in this.bubblelines.lastClickedBubbles) {
+	            				var lcTerms = this.bubblelines.lastClickedBubbles[index];
+	            				for (var term in lcTerms) {
+	            					if (terms.indexOf(term) == -1) {
+	            						delete this.bubblelines.lastClickedBubbles[index][term];
 	            					}
 	            				}
 	            				
@@ -6567,17 +6567,19 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		inputFormatAuto: {en: "Auto-Detect (recommended)"},
     		advancedOptionsText: {en: "The advanced options below only apply to certain input formats. See the documentation on <a href='{0}' target='voyantdocs'>creating a corpus</a>."},
     		xmlOptions: {en: "XML"},
-    		xpathDocuments: {en: "XPath to Documents"},
-    		xpathContent: {en: "XPath to Content"},
-    		xpathTitle: {en: "XPath to Title"},
-    		xpathAuthor: {en: "XPath to Author"},
+    		xmlOptionsText: {en: "Define XPath Expressions for any of the following:"},
+    		xpathDocuments: {en: "Documents"},
+    		xpathGroupBy: {en: "Group by"},
+    		xpathContent: {en: "Content"},
+    		xpathTitle: {en: "Title"},
+    		xpathAuthor: {en: "Author"},
     		tableOptions: {en: "Tabular Data"},
-    		tableDocuments: {en: "Documents Columns"},
-    		tableContent: {en: "Content Columns"},
-    		tableTitle: {en: "Title Columns"},
-    		tableAuthor: {en: "Author Columns"},
+    		tableDocuments: {en: "Documents"},
+    		tableContent: {en: "Content"},
+    		tableTitle: {en: "Title"},
+    		tableAuthor: {en: "Author"},
     		tokenizationOptions: {en: "Tokenization"},
-    		tokenization: {en: "tokenization"},
+    		tokenization: {en: "Tokenization"},
     		tokenizationAuto: {en: "Automatic (highly recommended)"},
     		tokenizationWordBoundaries: {en: "Simple Word Boundaries"},
     		emptyInput: {en: "Type in one or more URLs on separate lines or paste in a full text."},
@@ -6883,14 +6885,14 @@ Ext.define('Voyant.panel.CorpusCreator', {
     				defaultType: 'textfield',
     				fieldDefaults: {
     					labelAlign: 'right',
-    					labelWidth: 130,
-    					width: 400
+    					labelWidth: 80,
+    					width: 320
     				},
     				items: [
 						{
 						    xtype:'combo',
 						    fieldLabel: me.localize('inputFormat'),
-						    labelWidth: 140, // try to align with fieldset
+						    labelWidth: 90, // try to align with fieldset
 						    name: 'inputFormat',
 						    queryMode:'local',
 						    store:[['',me.localize('inputFormatAuto')],['TEI',"TEI"],['RSS',"RSS"]],
@@ -6898,32 +6900,39 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    value: ''
 						},{
 							xtype: 'container',
-							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/creatingcorpus'])+'</i></p>',
+							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator'])+'</i></p>',
 							width: 375
 						},{
 	        				xtype: 'fieldset',
-	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/creatingcorpus-section-xml' target='voyantdocs'>"+me.localize('xmlOptions')+"</a>",
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-xml' target='voyantdocs'>"+me.localize('xmlOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        defaultType: 'textfield',
 	                        items: [
-								{
-									fieldLabel: me.localize('xpathDocuments'),
-									name: 'xmlDocumentsXpath'
-								},{
+	                            {
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("xmlOptionsText")+'</i></p>',
+	    							width: 375
+	                            },{
 									fieldLabel: me.localize('xpathContent'),
 									name: 'xmlContentXpath'
+								},{
+									fieldLabel: me.localize('xpathTitle'),
+									name: 'xmlTitleXpath'
 								},{
 									fieldLabel: me.localize('xpathAuthor'),
 									name: 'xmlAuthorXpath'
 								},{
-									fieldLabel: me.localize('xpathTitle'),
-									name: 'xmlTitleXpath'
+									fieldLabel: me.localize('xpathDocuments'),
+									name: 'xmlDocumentsXpath'
+								},{
+									fieldLabel: me.localize('xpathGroupBy'),
+									name: 'xmlGroupByXpath'
 								}
 							]
-						},{
+						},/*{
 	        				xtype: 'fieldset',
-	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/creatingcorpus-section-table' target='voyantdocs'>"+me.localize('tableOptions')+"</a>",
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-table' target='voyantdocs'>"+me.localize('tableOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        defaultType: 'textfield',
@@ -6942,11 +6951,11 @@ Ext.define('Voyant.panel.CorpusCreator', {
 									name: 'tableTitle'
 								}
 							]
-						},{
+						},*/{
 	        				xtype: 'fieldset',
-	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/creatingcorpus-section-tokenization' target='voyantdocs'>"+me.localize('tokenizationOptions')+"</a>",
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-tokenization' target='voyantdocs'>"+me.localize('tokenizationOptions')+"</a>",
 	                        collapsible: true,
-//	                        collapsed: true,
+	                        collapsed: true,
 	                        items: [
 								{
 								    xtype:'combo',
