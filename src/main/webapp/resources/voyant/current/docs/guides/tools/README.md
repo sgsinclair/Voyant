@@ -49,7 +49,7 @@
 		</div>
 		<div>
 			<h4>Contexts</h4>
-			<p></p>
+			<p>The Contexts (or Keywords in Context) tool shows each occurrence of a keyword with a bit of surrounding text (the context).</p>
 		</div>
 	</dd></a>
 </div>
@@ -61,7 +61,7 @@
 		</div>
 		<div>
 			<h4>Corpus Terms</h4>
-			<p></p>
+			<p>Corpus Terms is a table view of term frequencies in the entire corpus.</p>
 		</div>
 	</dd></a>
 </div>
@@ -73,7 +73,7 @@
 		</div>
 		<div>
 			<h4>Documents</h4>
-			<p>Documents.</p>
+			<p>The Documents tool shows a table of the documents in the corpus and includes functionality for modifying the corpus.</p>
 		</div>
 	</dd></a>
 </div>
@@ -97,7 +97,7 @@
 		</div>
 		<div>
 			<h4>Reader</h4>
-			<p></p>
+			<p>The Reader tool provides a way of reading documents in the corpus, text is fetched on-demand as needed.</p>
 		</div>
 	</dd></a>
 </div>
