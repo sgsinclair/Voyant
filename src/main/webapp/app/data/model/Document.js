@@ -32,6 +32,7 @@ Ext.define('Voyant.data.model.Document', {
     
     getTitle: function() {
     	var title = this.get('title');
+    	if (title === undefined) title = '';
     	return Ext.isArray(title) ? title.join("; ") : title;
     },
     
