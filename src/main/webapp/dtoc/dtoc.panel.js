@@ -558,32 +558,33 @@ Ext.define('Voyant.panel.DToC', {
 	},
 	
 	showHelp: function(el) {
-    	if (this.helpWin == null) {
-	    	this.helpWin = Ext.create('Ext.window.Window', {
-				title: 'Documentation',
-				modal: true,
-				closeAction: 'hide',
-				width: 500,
-				height: 400,
-				layout: 'fit',
-				items: {
-					xtype: 'panel',
-					border: false,
-					html: '<div id="dtcDocumentationContainer"><div></div></div>'
-				},
-				listeners: {
-					show: {
-						fn: function() {
-							Ext.get('dtcDocumentationContainer').first().load({
-					    		url: Voyant.application.getBaseUrl()+'dtoc/dtc_documentation.htm'
-					    	});
-						},
-						single: true
-					}
-				}
-	    	});
-    	}
-	    this.helpWin.show(el);
+//    	if (this.helpWin == null) {
+	    this.helpWin = this.openUrl("http://cwrc.ca/DToC_Documentation/")
+//	    	Ext.create('Ext.window.Window', {
+//				title: 'Documentation',
+//				modal: true,
+//				closeAction: 'hide',
+//				width: 500,
+//				height: 400,
+//				layout: 'fit',
+//				items: {
+//					xtype: 'panel',
+//					border: false,
+//					html: '<div id="dtcDocumentationContainer"><div></div></div>'
+//				},
+//				listeners: {
+//					show: {
+//						fn: function() {
+//							Ext.get('dtcDocumentationContainer').first().load({
+//					    		url: Voyant.application.getBaseUrl()+'dtoc/dtc_documentation.htm'
+//					    	});
+//						},
+//						single: true
+//					}
+//				}
+//	    	});
+//    	}
+//	    this.helpWin.show(el);
     },
 	
 	doExport: function() {

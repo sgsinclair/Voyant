@@ -342,7 +342,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    labelWidth: 90, // try to align with fieldset
 						    name: 'inputFormat',
 						    queryMode:'local',
-						    store:[['',me.localize('inputFormatAuto')],['TEI',"TEI"],['RSS',"RSS"]],
+						    store:[['',me.localize('inputFormatAuto')],['TEI',"TEI"],['RSS',"RSS"],['DToC',"DToC"]],
 						    forceSelection:true,
 						    value: ''
 						},{
