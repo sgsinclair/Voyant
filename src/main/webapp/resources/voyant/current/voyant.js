@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Nov 29 22:05:29 EST 2015 */
+/* This file created by JSCacher. Last modified: Tue Dec 01 13:59:45 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3010,6 +3010,7 @@ Ext.define('Voyant.data.model.Document', {
     
     getTitle: function() {
     	var title = this.get('title');
+    	if (title === undefined) title = '';
     	return Ext.isArray(title) ? title.join("; ") : title;
     },
     
@@ -6895,7 +6896,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    labelWidth: 90, // try to align with fieldset
 						    name: 'inputFormat',
 						    queryMode:'local',
-						    store:[['',me.localize('inputFormatAuto')],['TEI',"TEI"],['RSS',"RSS"]],
+						    store:[['',me.localize('inputFormatAuto')],['TEI',"TEI"],['RSS',"RSS"],['DToC',"DToC"]],
 						    forceSelection:true,
 						    value: ''
 						},{
