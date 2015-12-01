@@ -177,7 +177,8 @@ Ext.define('Voyant.panel.Knots', {
 	            },
 	            '-',{
 	            	xtype: 'documentselector',
-	            	itemId: 'docSelector'
+	            	itemId: 'docSelector',
+	            	singleSelect: true
 	            }
 	            ,'-',{
 	            	xtype: 'slider',

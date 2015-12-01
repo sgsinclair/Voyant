@@ -14,12 +14,15 @@ Ext.define('Voyant.widget.DocumentSelector', {
 	config: {
 		docs: undefined,
 		corpus: undefined,
-		docStore: undefined
+		docStore: undefined,
+		singleSelect: false
 	},
 	
     initComponent: function() {
 		var me = this;
-
+		
+		this.setSingleSelect(this.config.singleSelect == undefined ? this.getSingleSelect() : this.config.singleSelect);
+		
 		Ext.apply(me, {
 			text: this.localize('documents'),
 			menu: [],
@@ -69,11 +72,14 @@ Ext.define('Voyant.widget.DocumentSelector', {
     		menu.removeAll();
     	}
     	
+    	var isSingleSelect = this.getSingleSelect();
+    	
     	menu.add([{
     		xtype: 'button',
     		style: 'margin: 5px;',
     		itemId: 'selectAll',
     		text: this.localize('selectAll'),
+    		hidden: isSingleSelect,
     		handler: function(b, e) {
     			menu.query('menucheckitem').forEach(function(item) {
     				item.setChecked(true);
@@ -93,12 +99,20 @@ Ext.define('Voyant.widget.DocumentSelector', {
     		scope: this
     	},{xtype: 'menuseparator'}]);
     	
-    	docs.forEach(function(doc) {
+    	var groupId = 'docGroup'+Ext.id();
+    	docs.forEach(function(doc, index) {
     		menu.add({
     			xtype: 'menucheckitem',
     			text: doc.getShortTitle(),
     			docId: doc.get('id'),
-    			checked: true
+    			checked: isSingleSelect && index == 0 || !isSingleSelect,
+    			group: isSingleSelect ? groupId : undefined,
+    			checkHandler: function(item, checked) {
+    				if (this.getSingleSelect() && checked) {
+    					this.findParentByType('panel').fireEvent('documentsSelected', this, [item.docId]);
+    				}
+    			},
+    			scope: this
     		});
     	}, this);
     	
