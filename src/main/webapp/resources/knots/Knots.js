@@ -227,7 +227,7 @@ Knots.prototype = {
 		this.cacheDocument(doc);
 	},
 	
-	addTerms: function(termsObj) {		
+	addTerms: function(termsObj) {
 		Ext.apply(this.currentDoc.terms, termsObj);
 		this.recache();
 	},

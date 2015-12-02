@@ -110,9 +110,22 @@ Ext.define('Voyant.panel.Knots', {
         	var docId = docIds[0];
         	this.setApiParam('docId', docId);
         	
-        	var doc = this.getCorpus().getDocument(docId);
+        	var terms = this.knots.currentDoc.terms;
+        	var termsToKeep = [];
+        	for (var t in terms) {
+        		termsToKeep.push(t);
+        	}
+        	
+        	this.termStore.removeAll();
+    		this.setApiParams({query: termsToKeep});
+        	
+        	var doc = this.processDocument(this.getCorpus().getDocument(docId));
         	this.knots.setCurrentDoc(doc);
-        	this.knots.buildGraph();
+        	
+        	this.getDocTermStore().load({params: {
+		    	query: termsToKeep,
+		    	stopList: this.getApiParams('stopList')
+		    }});
         }, this);
         
     },
