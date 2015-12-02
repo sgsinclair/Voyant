@@ -33,11 +33,11 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
-			items: ['cirrus','contexts','documentterms','reader','trends']
+			items: ['cirrus','contexts','documentterms','reader','trends','knots']
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
-			items: ['cirrus','bubblelines','collocatesgraph','trends','scatterplot','termsradio']
+			items: ['cirrus','bubblelines','collocatesgraph','trends','scatterplot','termsradio','knots']
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',
