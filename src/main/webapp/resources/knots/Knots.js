@@ -11,6 +11,7 @@ function Knots(config) {
 	
 	this.mouseOver = false;
 	this.refreshInterval = 100;
+	this.forceRedraw = false;
 	this.lastDrawTime = new Date().getTime();
 	this.intervalId = null;
 	this.startAngle = 315;
@@ -100,7 +101,9 @@ Knots.prototype = {
 	
 	doDraw: function(includeLegend) {
 		var time = new Date().getTime();
-		if (time - this.lastDrawTime >= this.refreshInterval) {
+		if (this.forceRedraw || time - this.lastDrawTime >= this.refreshInterval) {
+			this.forceRedraw = false;
+			
 			this.clearCanvas();
 			
 			this.ctx.save();
@@ -228,6 +231,7 @@ Knots.prototype = {
 	},
 	
 	addTerms: function(termsObj) {
+		this.forceRedraw = true;
 		Ext.apply(this.currentDoc.terms, termsObj);
 		this.recache();
 	},
