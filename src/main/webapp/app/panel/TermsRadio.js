@@ -2161,6 +2161,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 	
 	,removeFilteredCharacters: function (string) {
 		//console.log('fn: removeFilteredCharacters')
+		return string || '';
+		
 		if (string !== undefined) {
 			return string.replace("'","apostrophe-")
 				.replace("#","pound-")
