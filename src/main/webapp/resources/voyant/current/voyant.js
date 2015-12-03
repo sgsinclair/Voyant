@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Dec 01 13:59:45 EST 2015 */
+/* This file created by JSCacher. Last modified: Thu Dec 03 14:56:03 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2958,7 +2958,10 @@ Ext.define('Voyant.data.model.CorpusTerm', {
     
     getTerm: function() {
     	return this.get('term');
-    }
+    },
+	getRawFreq: function() {
+		return parseInt(this.get('rawFreq'));
+	}
 });
 Ext.define('Voyant.data.model.CorpusNgram', {
     extend: 'Ext.data.Model',
@@ -4271,20 +4274,71 @@ Ext.define('Voyant.widget.QuerySearchField', {
         }
     },
 
-    initComponent: function() {
+    initComponent: function(config) {
         var me = this;
 
         Ext.apply(me, {
+        	enableKeyEvents: true,
         	listeners: {
     		   render: function(c) {
-    		      Ext.QuickTips.register({
-    		        target: c.triggers.help.getEl(),
-    		        text: c.localize('querySearchTip'),
-    		        enabled: true,
-    		        showDelay: 20,
-    		        trackMouse: true,
-    		        autoShow: true
-    		      });
+    			  if (c.triggers && c.triggers.help) {
+        		      Ext.QuickTips.register({
+          		        target: c.triggers.help.getEl(),
+          		        text: c.localize('querySearchTip'),
+          		        enabled: true,
+          		        showDelay: 20,
+          		        trackMouse: true,
+          		        autoShow: true
+          		      });
+    			  }
+    		      this.suggest = Ext.create('Ext.tip.ToolTip', {
+    		    	    target: this.inputEl,
+    		    	    autoShow: false,
+    		    	    hidden: true,
+    		    	    html: ''
+    		    	});
+    		    },
+    		    keyup: function(c, e, eOpts) {
+    		    	if (!this.store || Ext.isString(this.store)) {
+        		        if (this.findParentByType) {
+        		        	var panel = this.findParentByType("panel");
+        		        	var corpus;
+        		        	if (panel.getCorpus) {
+        		        		corpus = panel.getCorpus()
+        		        	}
+        		        	else if (panel.getStore && panel.getStore().getCorpus) {
+        		        		corpus = panel.getStore().getCorpus();
+        		        	}
+    		        		if (corpus) {
+    		                	this.store = corpus.getCorpusTerms();
+    		        		}
+        		        }
+
+    		    	}
+    		    	if (this.store) {
+    		    		var value = c.getValue().trim().replace(/^\^/,"")
+    		    		if (/[,|^~" ]/.test(value)==false && value.length>0) {
+        		    		this.store.load({
+        		    			params: {
+            		    			query: [value+"*", "^"+value+"*"],
+            		    			limit: 5
+        		    			},
+        		    			scope: this,
+        		    			callback: function(records, operation, success) {
+        		    				suggest = ""
+        		    				records.forEach(function(record) {
+        		    					suggest+="<div>"+record.getTerm()+" ("+record.getRawFreq()+")</div>"
+        		    				})
+        		    				this.suggest.show();
+        		    				this.suggest.update(suggest)
+        		    		    }
+        		    		})
+    		    		}
+    		    		else {
+		    				this.suggest.update("")
+		    				this.suggest.hide();
+    		    		}
+    		    	}
     		    },
     		    scope: me
     		},
@@ -4383,12 +4437,15 @@ Ext.define('Voyant.widget.DocumentSelector', {
 	config: {
 		docs: undefined,
 		corpus: undefined,
-		docStore: undefined
+		docStore: undefined,
+		singleSelect: false
 	},
 	
     initComponent: function() {
 		var me = this;
-
+		
+		this.setSingleSelect(this.config.singleSelect == undefined ? this.getSingleSelect() : this.config.singleSelect);
+		
 		Ext.apply(me, {
 			text: this.localize('documents'),
 			menu: [],
@@ -4438,11 +4495,14 @@ Ext.define('Voyant.widget.DocumentSelector', {
     		menu.removeAll();
     	}
     	
+    	var isSingleSelect = this.getSingleSelect();
+    	
     	menu.add([{
     		xtype: 'button',
     		style: 'margin: 5px;',
     		itemId: 'selectAll',
     		text: this.localize('selectAll'),
+    		hidden: isSingleSelect,
     		handler: function(b, e) {
     			menu.query('menucheckitem').forEach(function(item) {
     				item.setChecked(true);
@@ -4462,12 +4522,20 @@ Ext.define('Voyant.widget.DocumentSelector', {
     		scope: this
     	},{xtype: 'menuseparator'}]);
     	
-    	docs.forEach(function(doc) {
+    	var groupId = 'docGroup'+Ext.id();
+    	docs.forEach(function(doc, index) {
     		menu.add({
     			xtype: 'menucheckitem',
     			text: doc.getShortTitle(),
     			docId: doc.get('id'),
-    			checked: true
+    			checked: isSingleSelect && index == 0 || !isSingleSelect,
+    			group: isSingleSelect ? groupId : undefined,
+    			checkHandler: function(item, checked) {
+    				if (this.getSingleSelect() && checked) {
+    					this.findParentByType('panel').fireEvent('documentsSelected', this, [item.docId]);
+    				}
+    			},
+    			scope: this
     		});
     	}, this);
     	
@@ -13128,6 +13196,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 	
 	,removeFilteredCharacters: function (string) {
 		//console.log('fn: removeFilteredCharacters')
+		return string || '';
+		
 		if (string !== undefined) {
 			return string.replace("'","apostrophe-")
 				.replace("#","pound-")
@@ -14048,11 +14118,11 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
-			items: ['cirrus','contexts','documentterms','reader','trends']
+			items: ['cirrus','contexts','documentterms','reader','trends','knots']
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
-			items: ['cirrus','bubblelines','collocatesgraph','trends','scatterplot','termsradio']
+			items: ['cirrus','bubblelines','collocatesgraph','trends','scatterplot','termsradio','knots']
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',

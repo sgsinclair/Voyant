@@ -14,5 +14,8 @@ Ext.define('Voyant.data.model.CorpusTerm', {
     
     getTerm: function() {
     	return this.get('term');
-    }
+    },
+	getRawFreq: function() {
+		return parseInt(this.get('rawFreq'));
+	}
 });

@@ -95,6 +95,11 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		    	cls: 'dtc-toolbar',
 		    	hideBorders: true,
 		    	items: [{
+		    		xtype: 'querysearchfield',
+		    		emptyText: "Word Search",
+		    		width: 135,
+		    		triggers: undefined
+		    	}/*{
 			    	xtype: 'textfield',
 			    	width: 135,
 			    	itemId: 'search',
@@ -109,7 +114,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			    		},
 			    		scope: this
 			    	}
-			    }]
+			    }*/]
 		    }),
 		    listeners: {}
 		};
@@ -261,7 +266,11 @@ Ext.define('Voyant.panel.DToC.ToC', {
 				query.push(term.get("term"));
 			});
 			this.submitQuery(query);
+		},
+		query: function(src, query) {
+			this.submitQuery(query)
 		}
+
 	},
     
     initToc: function(data, forceInit) {
@@ -881,4 +890,5 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		
 		return datas;
 	}
+	
 });
