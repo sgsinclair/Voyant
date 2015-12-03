@@ -45,7 +45,7 @@ if (isNotRealTool || new java.io.File(request.getServletContext().getRealPath("a
 
 %><%@ include file="../resources/jsp/pre_app.jsp" %>
 	
-<script type="text/javascript" src="../resources/voyant/current/voyant.jsp<%= (request.getParameter("debug")!=null ? "?debug=true" : "") %>"></script>
+<script type="text/javascript" src="../../resources/voyant/current/voyant.jsp<%= (request.getParameter("debug")!=null ? "?debug=true" : "") %>"></script>
 	
 <script>
 	Ext.Loader.setConfig({

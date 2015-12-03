@@ -31,20 +31,71 @@ Ext.define('Voyant.widget.QuerySearchField', {
         }
     },
 
-    initComponent: function() {
+    initComponent: function(config) {
         var me = this;
 
         Ext.apply(me, {
+        	enableKeyEvents: true,
         	listeners: {
     		   render: function(c) {
-    		      Ext.QuickTips.register({
-    		        target: c.triggers.help.getEl(),
-    		        text: c.localize('querySearchTip'),
-    		        enabled: true,
-    		        showDelay: 20,
-    		        trackMouse: true,
-    		        autoShow: true
-    		      });
+    			  if (c.triggers && c.triggers.help) {
+        		      Ext.QuickTips.register({
+          		        target: c.triggers.help.getEl(),
+          		        text: c.localize('querySearchTip'),
+          		        enabled: true,
+          		        showDelay: 20,
+          		        trackMouse: true,
+          		        autoShow: true
+          		      });
+    			  }
+    		      this.suggest = Ext.create('Ext.tip.ToolTip', {
+    		    	    target: this.inputEl,
+    		    	    autoShow: false,
+    		    	    hidden: true,
+    		    	    html: ''
+    		    	});
+    		    },
+    		    keyup: function(c, e, eOpts) {
+    		    	if (!this.store || Ext.isString(this.store)) {
+        		        if (this.findParentByType) {
+        		        	var panel = this.findParentByType("panel");
+        		        	var corpus;
+        		        	if (panel.getCorpus) {
+        		        		corpus = panel.getCorpus()
+        		        	}
+        		        	else if (panel.getStore && panel.getStore().getCorpus) {
+        		        		corpus = panel.getStore().getCorpus();
+        		        	}
+    		        		if (corpus) {
+    		                	this.store = corpus.getCorpusTerms();
+    		        		}
+        		        }
+
+    		    	}
+    		    	if (this.store) {
+    		    		var value = c.getValue().trim().replace(/^\^/,"")
+    		    		if (/[,|^~" ]/.test(value)==false && value.length>0) {
+        		    		this.store.load({
+        		    			params: {
+            		    			query: [value+"*", "^"+value+"*"],
+            		    			limit: 5
+        		    			},
+        		    			scope: this,
+        		    			callback: function(records, operation, success) {
+        		    				suggest = ""
+        		    				records.forEach(function(record) {
+        		    					suggest+="<div>"+record.getTerm()+" ("+record.getRawFreq()+")</div>"
+        		    				})
+        		    				this.suggest.show();
+        		    				this.suggest.update(suggest)
+        		    		    }
+        		    		})
+    		    		}
+    		    		else {
+		    				this.suggest.update("")
+		    				this.suggest.hide();
+    		    		}
+    		    	}
     		    },
     		    scope: me
     		},

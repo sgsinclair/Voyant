@@ -107,6 +107,8 @@ Ext.define('Voyant.panel.DToC.Stats', {
 		    	cls: 'dtc-toolbar',
 		    	hideBorders: true,
 		    	items: [{
+		    		xtype: 'querysearchfield'
+		    	}, { xtype: 'tbfill' }, {
 		    		text: 'Chapter Stats',
 			        itemId: 'statsPicker',
 			        menu: {
