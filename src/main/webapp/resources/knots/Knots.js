@@ -35,7 +35,7 @@ Knots.prototype = {
 	
 	initializeCanvas: function() {
 		var container = this.container;
-		var height = container.getHeight();
+		var height = container.getHeight()-5;
 		var width = container.getWidth();
 		this.MAX_LINE_LENGTH = Math.sqrt((width * width) + (height * height));
 		
@@ -65,13 +65,24 @@ Knots.prototype = {
 		this.initialized = true;
 	},
 	
+	doLayout: function() {
+		if (this.initialized) {
+			var width = this.container.getWidth();
+			var height = this.container.getHeight()-5;
+			this.canvas.width = width;
+			this.canvas.height = height;
+			this.recache();
+			this.buildGraph();
+		}
+	},
+	
 	buildGraph: function(drawStep) {
 		if (this.intervalId != null) {
 			this.progDrawDone = false;
 			clearInterval(this.intervalId);
 		}
+		this.forceRedraw = true;
 
-		this.originOpacity = 1;
 		this.drawStep = drawStep || 0;
 		
 		for (var t in this.currentDoc.terms) {
@@ -91,6 +102,7 @@ Knots.prototype = {
 			this.progDrawDone = false;
 			clearInterval(this.intervalId);
 		}
+		this.forceRedraw = true;
 		
 		if (!this.progressiveDraw) {
 			this.doDraw(false, includeLegend);
@@ -111,7 +123,7 @@ Knots.prototype = {
 			
 			this.drawDocument(this.currentDoc);
 			
-			// origin
+			// animate the origin
 	//		this.originOpacity -= 0.01;
 	//		if (this.originOpacity < 0) {
 	//			this.originOpacity = 1.0;
@@ -231,7 +243,6 @@ Knots.prototype = {
 	},
 	
 	addTerms: function(termsObj) {
-		this.forceRedraw = true;
 		Ext.apply(this.currentDoc.terms, termsObj);
 		this.recache();
 	},

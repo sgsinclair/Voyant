@@ -39,6 +39,7 @@ Ext.define('Voyant.panel.Knots', {
 	config: {
 		corpus: undefined,
 		docTermStore: undefined,
+		contextsStore: undefined,
     	options: {xtype: 'stoplistoption'},
     	refreshInterval: 100,
     	startAngle: 315,
@@ -53,17 +54,7 @@ Ext.define('Voyant.panel.Knots', {
 		'</tpl>'
 	),
 	termStore: new Ext.data.ArrayStore({
-        fields: ['term', 'color'],
-        listeners: {
-        	load: function(store, records, successful, options) {
-        		var termsView = this.down('#termsView');
-        		for (var i = 0; i < records.length; i++) {
-        			var r = records[i];
-        			termsView.select(r, true);
-        		}
-        	},
-        	scope: this
-        } 
+        fields: ['term', 'color']
     }),
 	
     constructor: function() {
@@ -82,6 +73,7 @@ Ext.define('Voyant.panel.Knots', {
     		
     		this.setApiParams({docId: firstDoc.getId()});
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
+    		this.getContextsStore().setCorpus(corpus);
     		this.down('#docSelector').setCorpus(corpus);
     		this.getDocTermStore().load({params: {
 		    	limit: 5,
@@ -134,10 +126,37 @@ Ext.define('Voyant.panel.Knots', {
 		    }});
         }, this);
         
+        this.on('termsClicked', function(src, terms) {
+    		var queryTerms = [];
+    		terms.forEach(function(term) {
+    			if (Ext.isString(term)) {queryTerms.push(term);}
+    			else if (term.term) {queryTerms.push(term.term);}
+    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
+    		});
+    		if (queryTerms.length > 0) {
+    			this.getDocTermsFromQuery(queryTerms);
+    		}
+		}, this);
+        
+		this.on('corpusTermsClicked', function(src, terms) {
+			var queryTerms = [];
+    		terms.forEach(function(term) {
+    			if (term.getTerm()) {queryTerms.push(term.getTerm());}
+    		});
+    		this.getDocTermsFromQuery(queryTerms);
+		}, this);
+		
+		this.on('documentTermsClicked', function(src, terms) {
+			var queryTerms = [];
+    		terms.forEach(function(term) {
+    			if (term.getTerm()) {queryTerms.push(term.getTerm());}
+    		});
+    		this.getDocTermsFromQuery(queryTerms);
+		}, this);
     },
     
     initComponent: function() {
-    	var docTermStore = Ext.create("Ext.data.Store", {
+    	this.setDocTermStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.DocumentTerm",
     		autoLoad: false,
     		remoteSort: false,
@@ -173,8 +192,17 @@ Ext.define('Voyant.panel.Knots', {
    				},
    				scope: this
    		     }
-    	});
-    	this.setDocTermStore(docTermStore);
+    	}));
+    	
+    	this.setContextsStore(Ext.create("Voyant.data.store.Contexts", {
+        	stripTags: "all",
+        	remoteSort: false,
+        	listeners: {
+        		load: function(store, records, successful, options) {
+        			console.log(records);
+        		}
+        	}
+        }));
     	
     	Ext.apply(this, {
     		dockedItems: [{
@@ -360,7 +388,7 @@ Ext.define('Voyant.panel.Knots', {
             			}
             		},
 	        		resize: function(cnt, width, height) {
-//	        			this.knots.doBubblelinesLayout();
+	        			this.knots.doLayout();
 	        		},
             		scope: this
             	}
@@ -510,6 +538,10 @@ Ext.define('Voyant.panel.Knots', {
 	},
 	
 	knotClickHandler: function(data) {
+		// TODO load context
+		if (!Ext.isArray(data)) {
+			data = [data];
+		}
 		this.getApplication().dispatchEvent('termsClicked', this, data);
 	}
 });
