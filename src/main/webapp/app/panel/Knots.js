@@ -14,7 +14,8 @@ Ext.define('Voyant.panel.Knots', {
 			hideTerm : {en: 'Hide Term'},
 			speed : {en: 'Speed'},
 			startAngle : {en: 'Start Angle'},
-			tangles : {en: 'Tangles'}
+			tangles : {en: 'Tangles'},
+			context : {en: 'Context'}
     	},
     	api: {
     		/**
@@ -39,11 +40,12 @@ Ext.define('Voyant.panel.Knots', {
 	config: {
 		corpus: undefined,
 		docTermStore: undefined,
-		contextsStore: undefined,
+		tokensStore: undefined,
     	options: {xtype: 'stoplistoption'},
     	refreshInterval: 100,
     	startAngle: 315,
-    	angleIncrement: 15
+    	angleIncrement: 15,
+    	currentTerm: undefined
 	},
 	
     knots: null,
@@ -73,7 +75,7 @@ Ext.define('Voyant.panel.Knots', {
     		
     		this.setApiParams({docId: firstDoc.getId()});
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
-    		this.getContextsStore().setCorpus(corpus);
+    		this.getTokensStore().setCorpus(corpus);
     		this.down('#docSelector').setCorpus(corpus);
     		this.getDocTermStore().load({params: {
 		    	limit: 5,
@@ -194,13 +196,31 @@ Ext.define('Voyant.panel.Knots', {
    		     }
     	}));
     	
-    	this.setContextsStore(Ext.create("Voyant.data.store.Contexts", {
+    	this.setTokensStore(Ext.create("Voyant.data.store.Tokens", {
         	stripTags: "all",
-        	remoteSort: false,
         	listeners: {
+        		beforeload: function(store) {
+  		    		 store.getProxy().setExtraParam('docId', this.getApiParam('docId'));
+  		    	},
         		load: function(store, records, successful, options) {
-        			console.log(records);
-        		}
+        			var context = '';
+        			var currTerm = this.getCurrentTerm();
+        			records.forEach(function(record) {
+        				if (record.getPosition() == currTerm.tokenId) {
+        					context += '<strong>'+record.getTerm()+'</strong>';
+        				} else {
+        					context += record.getTerm();
+        				}
+        			});
+        			
+        			Ext.Msg.show({
+        				title: this.localize('context'),
+        				message: context,
+        				buttons: Ext.Msg.OK,
+        			    icon: Ext.Msg.INFO
+        			});
+        		},
+   				scope: this
         	}
         }));
     	
@@ -538,10 +558,15 @@ Ext.define('Voyant.panel.Knots', {
 	},
 	
 	knotClickHandler: function(data) {
-		// TODO load context
-		if (!Ext.isArray(data)) {
-			data = [data];
-		}
+		this.setCurrentTerm(data);
+		var start = data.tokenId - 10;
+		if (start < 0) start = 0;
+		this.getTokensStore().load({
+			start: start,
+			limit: 21
+		});
+		
+		data = [data]; // make an array for the event dispatch
 		this.getApplication().dispatchEvent('termsClicked', this, data);
 	}
 });
