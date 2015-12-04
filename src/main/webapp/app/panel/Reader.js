@@ -352,53 +352,41 @@ Ext.define('Voyant.panel.Reader', {
 
 			var docTokens = {};
 			var totalTokens = 0;
-			if (info1.docIndex === info2.docIndex) {
-				totalTokens = info2.position - info1.position;
-				var tokens = corpus.getDocument(info1.docIndex).get('tokensCount-lexical');
-				docTokens[info1.docIndex] = tokens;
-			} else {
-				var currIndex = info1.docIndex;
-				while (currIndex <= info2.docIndex) {
-					var tokens = corpus.getDocument(currIndex).get('tokensCount-lexical');
-					if (partialFirstDoc && currIndex === info1.docIndex) {
-						tokens -= info1.position; // subtract missing tokens
-						totalTokens += tokens;
-					} else if (currIndex === info2.docIndex) {
-						totalTokens += info2.position; // only count tokens up until last displayed word
-					} else {
-						totalTokens += tokens;
-					}
-					docTokens[currIndex] = tokens;
-					currIndex++;
+			var currIndex = info1.docIndex;
+			while (currIndex <= info2.docIndex) {
+				var tokens = corpus.getDocument(currIndex).get('tokensCount-lexical');
+				if (currIndex === info2.docIndex) {
+					tokens = info2.position; // only count tokens up until last displayed word
 				}
+				if (currIndex === info1.docIndex) {
+					tokens -= info1.position; // subtract missing tokens, if any
+				}
+				totalTokens += tokens;
+				docTokens[currIndex] = tokens;
+				currIndex++;
 			}
 			
 			var tokenPos = Math.round(totalTokens * amount);
 			var docIndex = 0;
-			var tokenPosInDoc;
-			if (info1.docIndex === info2.docIndex) {
-				docIndex = info1.docIndex;
-				tokenPosInDoc = tokenPos;
-			} else if (partialFirstDoc && tokenPos === 0) {
-				// we're at the top of a partially loaded doc
-				docIndex = info1.docIndex;
-				tokenPosInDoc = info1.position;
-			} else {
-				var currToken = 0;
-				for (var i = info1.docIndex; i <= info2.docIndex; i++) {
-					docIndex = i;
-					currToken += docTokens[i];
-					if (currToken >= tokenPos) {
-						break;
-					}
+			var currToken = 0;
+			for (var i = info1.docIndex; i <= info2.docIndex; i++) {
+				docIndex = i;
+				currToken += docTokens[i];
+				if (currToken >= tokenPos) {
+					break;
 				}
-				tokenPosInDoc = docTokens[docIndex] - (currToken - tokenPos);
 			}
-			var fraction = tokenPosInDoc / docTokens[docIndex];
+			var remains = (currToken - tokenPos);
+			var tokenPosInDoc = docTokens[docIndex] - remains;
+			
+			if (partialFirstDoc && docIndex === info1.docIndex) {
+				tokenPosInDoc += info1.position;
+			}
+				
+			var fraction = tokenPosInDoc / corpus.getDocument(docIndex).get('tokensCount-lexical');
 			var graph = this.query('cartesian')[docIndex];
 			var locX = graph.getX() + graph.getWidth()*fraction;
 			Ext.get(this.getLocationMarker()).setX(locX);
-			
 		}
 		this.setLastLocationUpdate(new Date());
     },
@@ -500,6 +488,13 @@ Ext.define('Voyant.panel.Reader', {
     			var children = Ext.toArray(containerParent.dom.children);
     			var docIndex = children.indexOf(chartContainer.dom);
     			var doc = this.getDocumentsStore().getAt(docIndex);
+				var totalTokens = doc.get('tokensCount-lexical');
+				
+				var position = Math.floor(totalTokens * fraction);
+				var bufferPosition = position - (this.getApiParam('limit')/2);
+				
+				this.setApiParams({'skipToDocId': doc.getId(), start: bufferPosition < 0 ? 0 : bufferPosition});
+				this.load(true);
     		}, reader);
     	}
     	
