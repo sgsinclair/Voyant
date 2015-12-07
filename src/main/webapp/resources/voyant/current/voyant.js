@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Dec 03 14:56:03 EST 2015 */
+/* This file created by JSCacher. Last modified: Mon Dec 07 15:44:47 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -901,6 +901,516 @@ Bubblelines.prototype = {
 			this.calculateBubbleRadii();
 			this.drawGraph();
 		}
+	},
+	
+	clearCanvas: function() {
+		this.canvas.width = this.canvas.width;
+	}
+};
+function Knots(config) {
+	this.container = config.container;
+	this.externalClickHandler = config.clickHandler;
+	
+	this.MAX_LINE_LENGTH = 0;
+	this.LINE_SIZE = 2.5;
+	
+	this.progressiveDraw = true;
+	this.progDrawDone = false;
+	this.drawStep = 0;
+	
+	this.mouseOver = false;
+	this.refreshInterval = 100;
+	this.forceRedraw = false;
+	this.lastDrawTime = new Date().getTime();
+	this.intervalId = null;
+	this.startAngle = 315;
+	this.angleIncrement = 15;
+	
+	this.canvas = null;
+	this.ctx = null;
+	this.currentDoc = null;
+	this.maxDocLength = 0;
+	
+	this.offset = {x: 0, y: 0};
+
+	this.termsFilter = [];
+	
+	this.initialized = false;
+}
+
+
+Knots.prototype = {
+	constructor: Knots,
+	
+	initializeCanvas: function() {
+		var container = this.container;
+		var height = container.getHeight()-5;
+		var width = container.getWidth();
+		this.MAX_LINE_LENGTH = Math.sqrt((width * width) + (height * height));
+		
+		var id = Ext.id('knots');
+		container.add({
+			xtype: 'container',
+			width: width,
+			height: height,
+			html: '<canvas id="'+id+'" width="'+width+'" height="'+height+'"></canvas>',
+			border: false,
+        	listeners: {
+        		afterrender: {
+        			fn: function(cnt) {
+    					this.canvas = document.getElementById(id);
+        				this.ctx = this.canvas.getContext('2d');
+        				this.canvas.addEventListener('click', this.clickHandler.bind(this), false);
+        				this.canvas.addEventListener('mousedown', this.mouseDownHandler.bind(this), false);
+        				this.canvas.addEventListener('mouseup', this.mouseUpHandler.bind(this), false);
+        				this.canvas.addEventListener('mousemove', this.moveHandler.bind(this), false);
+        			},
+        			single: true,
+        			scope: this
+        		}
+        	}
+		});
+		container.updateLayout();
+		this.initialized = true;
+	},
+	
+	doLayout: function() {
+		if (this.initialized) {
+			var width = this.container.getWidth();
+			var height = this.container.getHeight()-5;
+			this.canvas.width = width;
+			this.canvas.height = height;
+			this.recache();
+			this.buildGraph();
+		}
+	},
+	
+	buildGraph: function(drawStep) {
+		if (this.intervalId != null) {
+			this.progDrawDone = false;
+			clearInterval(this.intervalId);
+		}
+		this.forceRedraw = true;
+
+		this.drawStep = drawStep || 0;
+		
+		for (var t in this.currentDoc.terms) {
+			var term = this.currentDoc.terms[t];
+			term.done = false;
+		}
+		
+		if (!this.progressiveDraw) {
+			this.doDraw(false);
+		} else {
+			this.intervalId = setInterval(this.doDraw.createDelegate(this, [false]), 50);
+		}
+	},
+	
+	drawGraph: function(includeLegend) {
+		if (this.intervalId != null) {
+			this.progDrawDone = false;
+			clearInterval(this.intervalId);
+		}
+		this.forceRedraw = true;
+		
+		if (!this.progressiveDraw) {
+			this.doDraw(false, includeLegend);
+		} else {
+			this.intervalId = setInterval(this.doDraw.createDelegate(this, [includeLegend]), 50);
+		}
+	},
+	
+	doDraw: function(includeLegend) {
+		var time = new Date().getTime();
+		if (this.forceRedraw || time - this.lastDrawTime >= this.refreshInterval) {
+			this.forceRedraw = false;
+			
+			this.clearCanvas();
+			
+			this.ctx.save();
+			this.ctx.translate(this.offset.x, this.offset.y);
+			
+			this.drawDocument(this.currentDoc);
+			
+			// animate the origin
+	//		this.originOpacity -= 0.01;
+	//		if (this.originOpacity < 0) {
+	//			this.originOpacity = 1.0;
+	//		}
+			this.originOpacity = 0.5;
+			this.originColor = '128,128,128';
+			this.ctx.lineWidth = Math.abs(this.originOpacity - 1) * 15;
+			this.ctx.fillStyle = 'rgba('+this.originColor+',1.0)';
+			this.ctx.strokeStyle = 'rgba('+this.originColor+','+this.originOpacity+')';
+			this.ctx.beginPath();
+			this.ctx.arc(0, 0, this.LINE_SIZE*2, 0, Math.PI*2, true);
+			this.ctx.closePath();
+			this.ctx.fill();
+			
+			if (!includeLegend) this.ctx.stroke();
+			this.ctx.restore();
+			this.ctx.lineWidth = 1;
+			
+			if (includeLegend === true) {
+				this.drawLegend();
+			}
+			
+			this.lastDrawTime = new Date().getTime();
+			
+			// test to see if each doc term is done
+			if (this.progressiveDraw) {
+				var done = true;
+				for (var t in this.currentDoc.terms) {
+					done = done && this.currentDoc.terms[t].done;
+				}
+				this.progDrawDone = done;
+				if (done) {
+					clearInterval(this.intervalId);
+					this.intervalId = null;
+				} else {
+					this.drawStep++;
+				}
+			}
+		}
+	},
+	
+	drawDocument: function(doc) {
+		var terms = doc.terms;
+		for (var t in terms) {
+			if (this.termsFilter.indexOf(t) != -1) {
+				var info = terms[t];
+				var prevXY = [[0,0],[0,0]];
+				if (this.progressiveDraw) {
+					var length = this.drawStep + 1;
+					if (info.pos.length <= this.drawStep) {
+						info.done = true;
+						length = info.pos.length;
+					} else {
+						info.done = false;
+					}
+					for (var i = 0; i < length; i++) {
+						var xy = info.pos[i];
+						this.drawPolygon(xy, prevXY, info.color);
+						prevXY = [[xy.polygon[0][3], xy.polygon[1][3]], [xy.polygon[0][2], xy.polygon[1][2]]];
+					}
+				} else {
+					for (var i = 0; i < info.pos.length; i++) {
+						var xy = info.pos[i];
+						this.drawPolygon(xy, prevXY, info.color);
+						prevXY = [[xy.polygon[0][3], xy.polygon[1][3]], [xy.polygon[0][2], xy.polygon[1][2]]];
+					}
+				}
+			}
+		}
+	},
+	
+	drawPolygon: function(xy, prevXY, color) {
+		var polyX = xy.polygon[0];
+		var polyY = xy.polygon[1];
+		
+		// connect to previous polygon to make smoother turns
+		this.ctx.beginPath();
+		this.ctx.moveTo(prevXY[0][0], prevXY[0][1]);
+		this.ctx.lineTo(polyX[0], polyY[0]);
+		this.ctx.lineTo(polyX[1], polyY[1]);
+		this.ctx.lineTo(prevXY[1][0], prevXY[1][1]);
+		this.ctx.closePath();
+		
+		this.ctx.fillStyle = 'rgba('+color+', 0.6)';
+		this.ctx.fill();
+
+		// draw the current polygon
+		this.ctx.beginPath();
+		this.ctx.moveTo(polyX[0], polyY[0]);
+		this.ctx.lineTo(polyX[1], polyY[1]);
+		this.ctx.lineTo(polyX[2], polyY[2]);
+		this.ctx.lineTo(polyX[3], polyY[3]);
+		this.ctx.closePath();
+
+		if (xy.over) this.ctx.fillStyle = 'rgba('+color+', 1.0)';
+		this.ctx.fill();
+	},
+	
+	drawLegend: function() {
+		var x = 5;
+		var y = 5;
+		this.ctx.textBaseline = 'top';
+		this.ctx.font = '16px serif';
+		this.termStore.each(function(record) {
+			var color = record.get('color');
+			this.ctx.fillStyle = 'rgb('+color+')';
+			var term = record.get('term');
+			this.ctx.fillText(term, x, y);
+			var width = this.ctx.measureText(term).width;
+			x += width + 8;
+		}, this);
+	},
+	
+	setCurrentDoc: function(doc) {
+		this.currentDoc = doc;
+		this.cacheDocument(doc);
+	},
+	
+	addTerms: function(termsObj) {
+		Ext.apply(this.currentDoc.terms, termsObj);
+		this.recache();
+	},
+	
+	removeTerm: function(term) {		
+		delete this.currentDoc.terms[term];
+		this.recache();
+	},
+	
+	removeAllTerms: function() {
+		this.currentDoc.terms = {};
+		this.recache();
+	},
+	
+	recache: function() {
+		this.MAX_LINE_LENGTH = Math.sqrt((this.canvas.width * this.canvas.width) + (this.canvas.height * this.canvas.height));
+		this.cacheDocument(this.currentDoc);
+		this.determineGraphSizeAndPosition();
+	},
+	
+	cacheDocument: function(doc) {
+		var lineLength = this.MAX_LINE_LENGTH;
+		
+		this.currentDoc.lineLength = lineLength;
+		
+		for (var term in this.currentDoc.terms) {
+			this.cacheTurns(this.currentDoc.terms[term], lineLength);
+		}
+	},
+	
+	cacheTurns: function(info, lineLength) {
+		var rawFreq = info.rawFreq;
+		if (rawFreq > 0) {
+			var doc = this.currentDoc;
+			
+			var term = info.term;
+			var color = info.color;
+
+			var cachedPositions = [];
+			
+			var tokenIds = info.positions;
+			var lastTokenId = tokenIds[tokenIds.length-1];
+			
+			var angle = this.startAngle;
+			var angleIncrement = this.angleIncrement;
+			var prevX = 0;
+			var prevY = 0;
+			var x = 0;
+			var y = 0;
+			var prevLength = 0;
+			
+			for (var i = 0; i < tokenIds.length; i++) {
+				var o = tokenIds[i];
+				
+				var length = o / lastTokenId * lineLength;
+				var segment = length - prevLength;
+				
+				prevX = x;
+				prevY = y;
+				
+				var newPoint = this.findEndPoint([x, y], segment, angle);
+				x = newPoint[0];
+				y = newPoint[1];
+				
+				var polygon = this.getPolygonFromLine([prevX, prevY], [x, y], angle, this.LINE_SIZE);
+				
+				cachedPositions.push({tokenId: o, polygon: polygon, over: false});
+				
+				prevLength = length;
+				angle += angleIncrement;
+			}
+			
+//			doc.terms[term] = {pos: cachedPositions, rawFreq: rawFreq, color: color, done: false};
+			doc.terms[term].pos = cachedPositions;
+			doc.terms[term].done = false;
+		}
+	},
+	
+	findEndPoint: function(point, length, angle) {
+		var radians = this.degreesToRadians(angle);
+		var x2 = point[0] + (length * Math.cos(radians));
+		var y2 = point[1] + (length * Math.sin(radians));
+		return [x2, y2];
+	},
+	
+	determineGraphSizeAndPosition: function() {		
+		var bb = this.findBoundingBoxForGraph();
+
+		// find the size ratio between the graph and the canvas
+		var width = bb.maxX - bb.minX;
+		var height = bb.maxY - bb.minY;
+		var widthRatio = this.canvas.width / width;
+		var heightRatio = this.canvas.height / height;
+		var ratio = Math.min(widthRatio, heightRatio);
+		ratio -= 0.05; // create some space around the borders
+		
+		width *= ratio;
+		height *= ratio;
+		
+		this.offset.x = Math.abs(bb.minX * ratio - (this.canvas.width / 2 - width / 2));
+		this.offset.y = Math.abs(bb.minY * ratio - (this.canvas.height / 2 - height / 2));
+		
+		this.MAX_LINE_LENGTH = Math.sqrt((this.canvas.width * this.canvas.width) + (this.canvas.height * this.canvas.height)) * ratio;
+		this.cacheDocument(this.currentDoc);
+	},
+	
+	findBoundingBoxForGraph: function() {
+		var minX = null;
+		var maxX = null;
+		var minY = null;
+		var maxY = null;
+		for (var t in this.currentDoc.terms) {
+			var pos = this.currentDoc.terms[t].pos;
+			for (var i = 0; i < pos.length; i++) {
+				var polygon = pos[i].polygon;
+				var bb = this.getBoundingBox(polygon[0], polygon[1]);
+				if (minX == null || bb[0] < minX) minX = bb[0];
+				if (maxX == null || bb[2] > maxX) maxX = bb[2];
+				if (minY == null || bb[1] < minY) minY = bb[1];
+				if (maxY == null || bb[3] > maxY) maxY = bb[3];
+			}
+		}
+		
+		return {minX: minX, minY: minY, maxX: maxX, maxY: maxY};
+	},
+	
+	getBoundingBox: function(polyX, polyY) {
+		var minX = Math.min(polyX[0], polyX[2]);
+		var maxX = Math.max(polyX[0], polyX[2])
+		var minY = Math.min(polyY[0], polyY[2]);
+		var maxY = Math.max(polyY[0], polyY[2]);
+		return [minX, minY, maxX, maxY];
+	},
+	
+	degreesToRadians: function(d) {
+		return d * (Math.PI / 180);
+	},
+	
+	clickHandler: function(event) {
+		var x = event.layerX - this.offset.x;
+		var y = event.layerY - this.offset.y;
+		var hit = null;
+		var tokenId = 0;
+		for (var t in this.currentDoc.terms) {
+			if (this.termsFilter.indexOf(t) != -1) {
+				var pos = this.currentDoc.terms[t].pos;
+				for (var i = 0; i < pos.length; i++) {
+					var polygon = pos[i].polygon;
+					var test = this.isPointInPolygon(polygon[0], polygon[1], x, y);
+					if (test) {
+						hit = t;
+						tokenId = pos[i].tokenId;
+						break;
+					}
+				}
+			}
+		}
+
+		if (hit) {
+			if (this.externalClickHandler !== undefined) {
+				this.externalClickHandler({term: hit, tokenId: tokenId});
+			}
+		}
+	},
+	
+	moveHandler: function(event) {
+		var x = event.layerX - this.offset.x;
+		var y = event.layerY - this.offset.y;
+		if (this.dragInfo != null) {
+			document.body.style.cursor = 'move';
+			this.dragInfo.lastX = this.dragInfo.x;
+			this.dragInfo.lastY = this.dragInfo.y;
+			this.dragInfo.x = event.layerX;
+			this.dragInfo.y = event.layerY;
+			var xDiff = this.dragInfo.x - this.dragInfo.lastX;
+			var yDiff = this.dragInfo.y - this.dragInfo.lastY;
+			this.offset.x += xDiff;
+			this.offset.y += yDiff;
+		} else {
+			this.mouseOver = false;
+			for (var t in this.currentDoc.terms) {
+				if (this.termsFilter.indexOf(t) != -1) {
+					var pos = this.currentDoc.terms[t].pos;
+					for (var i = 0; i < pos.length; i++) {
+						if (!this.mouseOver) {
+							var polygon = pos[i].polygon;
+							var test = this.isPointInPolygon(polygon[0], polygon[1], x, y);
+							if (test) {
+								this.currentDoc.terms[t].pos[i].over = true;
+								this.mouseOver = true;
+							} else {
+								this.currentDoc.terms[t].pos[i].over = false;
+							}
+						} else {
+							this.currentDoc.terms[t].pos[i].over = false;
+						}
+					}
+				}
+			}
+			if (this.mouseOver) {
+				document.body.style.cursor = 'pointer';
+				if (!this.progressiveDraw || (this.progressiveDraw && this.progDrawDone)) {
+					clearInterval(this.intervalId);
+					this.intervalId = setInterval(this.doDraw.createDelegate(this, [false]), 50);
+				}
+			} else {
+				document.body.style.cursor = 'auto';
+				if (!this.progressiveDraw || (this.progressiveDraw && this.progDrawDone)) {
+					clearInterval(this.intervalId);
+					this.doDraw(false);
+				}
+			}
+		}
+	},
+	
+	mouseDownHandler: function(event) {
+		var x = event.layerX;
+		var y = event.layerY;
+		this.dragInfo = {
+			lastX: x,
+			lastY: y,
+			x: x,
+			y: y
+		};
+	},
+	
+	mouseUpHandler: function(event) {
+		this.dragInfo = null;
+	},
+	
+	getPolygonFromLine: function(point1, point2, angle, size) {
+		var perpDown = angle + 90;
+		var perpUp = angle - 90;
+		
+		var p1 = this.findEndPoint(point1, size, perpDown);
+		var p2 = this.findEndPoint(point1, size, perpUp);
+		var p3 = this.findEndPoint(point2, size, perpUp);
+		var p4 = this.findEndPoint(point2, size, perpDown);
+		
+		var polyX = [p1[0], p2[0], p3[0], p4[0]];
+		var polyY = [p1[1], p2[1], p3[1], p4[1]];
+		return [polyX, polyY];
+	},
+	
+	// from http://alienryderflex.com/polygon/
+	isPointInPolygon: function(polyX, polyY, x, y) {
+		var i = 0;
+		var j = 3; // number of polygon sides minus 1
+		var oddNodes = false;
+		for (i = 0; i < 4; i++) {
+			if ((polyY[i] < y && polyY[j] >= y) ||
+				(polyY[j] < y && polyY[i] >= y)) {
+				if (polyX[i] + (y - polyY[i]) / (polyY[j] - polyY[i]) * (polyX[j] - polyX[i]) < x) {
+					oddNodes = !oddNodes;
+				}
+			}
+			j = i;
+		}
+		return oddNodes;
 	},
 	
 	clearCanvas: function() {
@@ -6719,6 +7229,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				    modal: true,
 	    				    items: {  // Let's put an empty grid in just to illustrate fit layout
 	    				        xtype: 'form',
+	    				        submitEmptyText: false,
 	    				        margin: '5,5,5,5',
 	    				        items: {
 	    				            xtype:'combo',
@@ -6964,7 +7475,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    labelWidth: 90, // try to align with fieldset
 						    name: 'inputFormat',
 						    queryMode:'local',
-						    store:[['',me.localize('inputFormatAuto')],['TEI',"TEI"],['RSS',"RSS"],['DToC',"DToC"]],
+						    store:[['',me.localize('inputFormatAuto')],['dtoc','DToC: Dynamic Table of Contexts'],['TEI',"TEI: Text Encoding Initative"],['TEI',"TEI Corpus"],['RSS',"Really Simple Syndication: RSS"]],
 						    forceSelection:true,
 						    value: ''
 						},{
@@ -7060,6 +7571,578 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	me.optionsWin.show();
     }
     
+});
+// assuming Knots library is loaded by containing page (via voyant.jsp)
+Ext.define('Voyant.panel.Knots', {
+	extend: 'Ext.panel.Panel',
+	mixins: ['Voyant.panel.Panel'],
+	alias: 'widget.knots',
+    statics: {
+    	i18n: {
+    		title : {en: 'Knots'},
+			type : {en: 'Visualization'},
+			findTerm : {en: 'Find Term'},
+			clearTerms : {en: 'Clear Terms'},
+			removeTerm : {en: 'Remove Term'},
+			showTerm : {en: 'Show Term'},
+			hideTerm : {en: 'Hide Term'},
+			speed : {en: 'Speed'},
+			startAngle : {en: 'Start Angle'},
+			tangles : {en: 'Tangles'},
+			context : {en: 'Context'}
+    	},
+    	api: {
+    		/**
+        	 * @property query A string to search for in a document.
+        	 * @type String
+        	 */
+    		query: null,
+    		/**
+    		 * @property stopList The stop list to use to filter results.
+    		 * Choose from a pre-defined list, or enter a comma separated list of words, or enter an URL to a list of stop words in plain text (one per line).
+    		 * @type String
+    		 */
+    		stopList: 'auto',
+    		/**
+    		 * @property docId The document ID to restrict results to.
+    		 * @type String
+    		 */
+    		docId: undefined
+    	},
+    	glyph: 'xf06e@FontAwesome'
+	},
+	config: {
+		corpus: undefined,
+		docTermStore: undefined,
+		tokensStore: undefined,
+    	options: {xtype: 'stoplistoption'},
+    	refreshInterval: 100,
+    	startAngle: 315,
+    	angleIncrement: 15,
+    	currentTerm: undefined
+	},
+	
+    knots: null,
+	
+	termTpl: new Ext.XTemplate(
+		'<tpl for=".">',
+			'<div class="term" style="color: rgb({color});float: left;padding: 3px;margin: 2px;">{term}</div>',
+		'</tpl>'
+	),
+	termStore: new Ext.data.ArrayStore({
+        fields: ['term', 'color']
+    }),
+	
+    constructor: function() {
+    	Ext.apply(this, {
+    		title: this.localize('title')
+    	});
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
+    	this.on('loadedCorpus', function(src, corpus) {
+    		this.setCorpus(corpus);
+    		
+    		var firstDoc = corpus.getDocument(0);
+    		var pDoc = this.processDocument(firstDoc);
+    		this.knots.setCurrentDoc(pDoc);
+    		
+    		this.setApiParams({docId: firstDoc.getId()});
+    		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
+    		this.getTokensStore().setCorpus(corpus);
+    		this.down('#docSelector').setCorpus(corpus);
+    		this.getDocTermStore().load({params: {
+		    	limit: 5,
+		    	stopList: this.getApiParams('stopList')
+		    }});
+    	}, this);
+    	
+        this.on('activate', function() { // load after tab activate (if we're in a tab panel)
+			if (this.getCorpus()) {				
+				Ext.Function.defer(function() {
+					this.getDocTermStore().load({params: {
+				    	limit: 5,
+				    	stopList: this.getApiParams('stopList')
+				    }});
+				}, 100, this);
+			}
+    	}, this);
+        
+        this.on('query', function(src, query) {
+    		if (query !== undefined && query != '') {
+    			this.getDocTermsFromQuery(query);
+    		}
+    	}, this);
+        
+        this.on('documentsSelected', function(src, docIds) {
+        	var docId = docIds[0];
+        	this.setApiParam('docId', docId);
+        	
+        	var terms = this.knots.currentDoc.terms;
+        	var termsToKeep = [];
+        	for (var t in terms) {
+        		termsToKeep.push(t);
+        	}
+        	
+        	this.termStore.removeAll();
+    		this.setApiParams({query: termsToKeep});
+    		
+    		var limit = termsToKeep.length;
+    		if (limit === 0) {
+    			limit = 5;
+    		}
+        	
+        	var doc = this.processDocument(this.getCorpus().getDocument(docId));
+        	this.knots.setCurrentDoc(doc);
+        	
+        	this.getDocTermStore().load({params: {
+		    	query: termsToKeep,
+		    	limit: limit,
+		    	stopList: this.getApiParams('stopList')
+		    }});
+        }, this);
+        
+        this.on('termsClicked', function(src, terms) {
+    		var queryTerms = [];
+    		terms.forEach(function(term) {
+    			if (Ext.isString(term)) {queryTerms.push(term);}
+    			else if (term.term) {queryTerms.push(term.term);}
+    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
+    		});
+    		if (queryTerms.length > 0) {
+    			this.getDocTermsFromQuery(queryTerms);
+    		}
+		}, this);
+        
+		this.on('corpusTermsClicked', function(src, terms) {
+			var queryTerms = [];
+    		terms.forEach(function(term) {
+    			if (term.getTerm()) {queryTerms.push(term.getTerm());}
+    		});
+    		this.getDocTermsFromQuery(queryTerms);
+		}, this);
+		
+		this.on('documentTermsClicked', function(src, terms) {
+			var queryTerms = [];
+    		terms.forEach(function(term) {
+    			if (term.getTerm()) {queryTerms.push(term.getTerm());}
+    		});
+    		this.getDocTermsFromQuery(queryTerms);
+		}, this);
+    },
+    
+    initComponent: function() {
+    	this.setDocTermStore(Ext.create("Ext.data.Store", {
+			model: "Voyant.data.model.DocumentTerm",
+    		autoLoad: false,
+    		remoteSort: false,
+    		proxy: {
+				type: 'ajax',
+				url: Voyant.application.getTromboneUrl(),
+				extraParams: {
+					tool: 'corpus.DocumentTerms',
+					withDistributions: 'raw',
+					withPositions: true
+				},
+				reader: {
+					type: 'json',
+		            rootProperty: 'documentTerms.terms',
+		            totalProperty: 'documentTerms.total'
+				},
+				simpleSortMode: true
+   		     },
+   		     listeners: {
+   		    	 beforeload: function(store) {
+   		    		 store.getProxy().setExtraParam('docId', this.getApiParam('docId'));
+   		    	 },
+   		    	 load: function(store, records, successful, options) {
+   		    		var termObj = {};
+   		    		records.forEach(function(record) {
+   		    			var termData = this.processTerms(record);
+   		    			var docId = record.get('docId');
+   		    			var term = record.get('term');
+   		    			termObj[term] = termData;
+   		    		}, this);
+   		    		this.knots.addTerms(termObj);
+   		    		this.knots.buildGraph();
+   				},
+   				scope: this
+   		     }
+    	}));
+    	
+    	this.setTokensStore(Ext.create("Voyant.data.store.Tokens", {
+        	stripTags: "all",
+        	listeners: {
+        		beforeload: function(store) {
+  		    		 store.getProxy().setExtraParam('docId', this.getApiParam('docId'));
+  		    	},
+        		load: function(store, records, successful, options) {
+        			var context = '';
+        			var currTerm = this.getCurrentTerm();
+        			records.forEach(function(record) {
+        				if (record.getPosition() == currTerm.tokenId) {
+        					context += '<strong>'+record.getTerm()+'</strong>';
+        				} else {
+        					context += record.getTerm();
+        				}
+        			});
+        			
+        			Ext.Msg.show({
+        				title: this.localize('context'),
+        				message: context,
+        				buttons: Ext.Msg.OK,
+        			    icon: Ext.Msg.INFO
+        			});
+        		},
+   				scope: this
+        	}
+        }));
+    	
+    	Ext.apply(this, {
+    		dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: [{
+                	xtype: 'querysearchfield'
+                },{
+	            	xtype: 'button',
+	            	text: this.localize('clearTerms'),
+	            	handler: function() {
+	            		this.down('#termsView').getSelectionModel().deselectAll(true);
+	            		this.termStore.removeAll();
+	            		this.setApiParams({query: null});
+	            		this.knots.removeAllTerms();
+	            		this.knots.drawGraph();
+	            	},
+	            	scope: this
+	            },
+	            '-',{
+	            	xtype: 'documentselector',
+	            	itemId: 'docSelector',
+	            	singleSelect: true
+	            }
+	            ,'-',{
+	            	xtype: 'slider',
+	            	itemId: 'speed',
+	            	fieldLabel: this.localize('speed'),
+	            	labelAlign: 'right',
+	            	labelWidth: 70,
+	            	width: 150,
+	            	increment: 50,
+	            	minValue: 0,
+	            	maxValue: 500,
+	            	value: this.getRefreshInterval(),
+	            	listeners: {
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setRefreshInterval(newvalue);
+	            		},
+	            		scope: this
+	            	}
+	            },{
+	            	xtype: 'slider',
+	            	itemId: 'startAngle',
+	            	fieldLabel: this.localize('startAngle'),
+	            	labelAlign: 'right',
+	            	labelWidth: 70,
+	            	width: 150,
+	            	increment: 15,
+	            	minValue: 0,
+	            	maxValue: 360,
+	            	value: this.getStartAngle(),
+	            	listeners: {
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setStartAngle(newvalue);
+	            		},
+	            		scope: this
+	            	}
+	            },{
+	            	xtype: 'slider',
+	            	itemId: 'tangles',
+	            	fieldLabel: this.localize('tangles'),
+	            	labelAlign: 'right',
+	            	labelWidth: 70,
+	            	width: 150,
+	            	increment: 5,
+	            	minValue: 5,
+	            	maxValue: 90,
+	            	value: this.getAngleIncrement(),
+	            	listeners: {
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setAngleIncrement(newvalue);
+	            		},
+	            		scope: this
+	            	}
+	            }]
+    		}],
+            border: false,
+            layout: 'fit',
+            items: {
+            	layout: {
+            		type: 'vbox',
+            		align: 'stretch'
+            	},
+            	defaults: {border: false},
+	            items: [{
+	            	height: 30,
+	            	itemId: 'termsView',
+	            	xtype: 'dataview',
+	            	store: this.termStore,
+	            	tpl: this.termTpl,
+	            	itemSelector: 'div.term',
+	            	overItemCls: 'over',
+	            	selectedItemCls: 'selected',
+	            	selectionModel: {
+	            		mode: 'SIMPLE'
+	            	},
+//	            	cls: 'selected', // default selected
+	            	focusCls: '',
+	            	listeners: {
+	            		beforeitemclick: function(dv, record, item, index, event, opts) {
+	            			event.preventDefault();
+	            			event.stopPropagation();
+	            			dv.fireEvent('itemcontextmenu', dv, record, item, index, event, opts);
+	            			return false;
+	            		},
+	            		beforecontainerclick: function() {
+	            			// cancel deselect all
+	            			event.preventDefault();
+	            			event.stopPropagation();
+	            			return false;
+	            		},
+	            		selectionchange: function(selModel, selections) {
+	            			var dv = this.down('#termsView');
+	            			var terms = [];
+	            			
+	            			dv.getStore().each(function(r) {
+	            				if (selections.indexOf(r) !== -1) {
+	            					terms.push(r.get('term'));
+	            					Ext.fly(dv.getNodeByRecord(r)).removeCls('unselected').addCls('selected');
+	            				} else {
+	            					Ext.fly(dv.getNodeByRecord(r)).removeCls('selected').addCls('unselected');
+	            				}
+	            			});
+	            			
+	            			this.knots.termsFilter = terms;
+	            			this.knots.drawGraph();
+	            		},
+	            		itemcontextmenu: function(dv, record, el, index, event) {
+	            			event.preventDefault();
+	            			event.stopPropagation();
+	            			var isSelected = dv.isSelected(el);
+	            			var menu = new Ext.menu.Menu({
+	            				floating: true,
+	            				items: [{
+	            					text: isSelected ? this.localize('hideTerm') : this.localize('showTerm'),
+	            					handler: function() {
+	            						if (isSelected) {
+	            							dv.deselect(index);
+	            						} else {
+	            							dv.select(index, true);
+	            						}
+	            					},
+	            					scope: this
+	            				},{
+	            					text: this.localize('removeTerm'),
+	            					handler: function() {
+	            						dv.deselect(index);
+	            						var term = this.termStore.getAt(index).get('term');
+	            						this.termStore.removeAt(index);
+	            						dv.refresh();
+	            						
+	            						this.knots.removeTerm(term);
+	            						this.knots.drawGraph();
+	            					},
+	            					scope: this
+	            				}]
+	            			});
+	            			menu.showAt(event.getXY());
+	            		},
+	            		scope: this
+	            	}
+	            },{
+	            	flex: 1,
+	            	xtype: 'container',
+	            	autoEl: 'div',
+	            	itemId: 'canvasParent',
+	            	layout: 'fit',
+	            	overflowY: 'auto',
+	            	overflowX: 'hidden'
+	            }],
+	            listeners: {
+	            	render: function(component) {
+	            		var canvasParent = this.down('#canvasParent');
+	                	this.knots = new Knots({
+	                		container: canvasParent,
+	                		clickHandler: this.knotClickHandler.bind(this)
+	                	});
+	            	},
+            		afterlayout: function(container) {
+            			if (this.knots.initialized === false) {
+            				this.knots.initializeCanvas();
+            			}
+            		},
+	        		resize: function(cnt, width, height) {
+	        			this.knots.doLayout();
+	        		},
+            		scope: this
+            	}
+            }
+		});
+    	
+    	this.callParent(arguments);
+    },
+    
+    updateRefreshInterval: function(value) {
+    	if (this.knots) {
+    		if (value < 50) {
+    			value = 50;
+    			this.knots.progressiveDraw = false;
+    		} else {
+    			this.knots.progressiveDraw = true;
+    		}
+    		this.knots.refreshInterval = value;
+			this.knots.buildGraph(this.knots.drawStep);
+    	}
+    },
+    
+    updateStartAngle: function(value) {
+    	if (this.knots) {
+			this.knots.startAngle = value;
+			this.knots.recache();
+			this.knots.buildGraph();
+    	}
+    },
+    
+    updateAngleIncrement: function(value) {
+    	if (this.knots) {
+	    	this.knots.angleIncrement = value;
+			this.knots.recache();
+			this.knots.buildGraph();
+    	}
+    },
+    
+    loadFromCorpusTerms: function(corpusTerms) {
+    	if (this.knots) { // get rid of existing terms
+    		this.knots.removeAllTerms();
+    		this.termStore.removeAll(true);
+    	}
+		corpusTerms.load({
+		    callback: function(records, operation, success) {
+		    	var query = []; //this.getApiParam('query') || [];
+				if (typeof query == 'string') query = [query];
+		    	records.forEach(function(record, index) {
+					query.push(record.get('term'));
+				}, this);
+		    	this.getDocTermsFromQuery(query);
+		    },
+		    scope: this,
+		    params: {
+		    	limit: 5,
+		    	stopList: this.getApiParams('stopList')
+		    }
+    	});
+    },
+    
+    /**
+     * Get the results for the query(s) for each of the corpus documents.
+     * @param query {String|Array}
+     */
+    getDocTermsFromQuery: function(query) {
+    	if (query) {this.setApiParam("query", query);} // make sure it's set for subsequent calls
+    	var corpus = this.getCorpus();
+    	if (corpus && this.isVisible()) {
+    		this.setApiParams({query: query}); // assumes docId already set
+			this.getDocTermStore().load({params: this.getApiParams()});
+    	}
+	},
+    
+	reloadTermsData: function() {
+		var terms = [];
+		for (var term in this.bubblelines.currentTerms) {
+			terms.push(term);
+		}
+		this.getDocTermsFromQuery(terms);
+	},
+	
+    filterDocuments: function() {
+		var docIds = this.getApiParam('docId');
+		if (docIds == '') {
+			docIds = [];
+			this.getCorpus().getDocuments().each(function(item, index) {
+				docIds.push(item.getId());
+			});
+			this.setApiParams({docId: docIds});
+		}
+		if (typeof docIds == 'string') docIds = [docIds];
+		
+		if (docIds == null) {
+			this.selectedDocs = this.getCorpus().getDocuments().clone();
+			var count = this.selectedDocs.getCount();
+			if (count > 10) {
+				for (var i = 10; i < count; i++) {
+					this.selectedDocs.removeAt(10);
+				}
+			}
+			docIds = [];
+			this.selectedDocs.eachKey(function(docId, doc) {
+				docIds.push(docId);
+			}, this);
+			this.setApiParams({docId: docIds});
+		} else {
+			this.selectedDocs = this.getCorpus().getDocuments().filterBy(function(doc, docId) {
+				return docIds.indexOf(docId) != -1;
+			}, this);
+		}
+	},
+	
+	// produce format that knots can use
+	processDocument: function(doc) {
+		var title = doc.getShortTitle();
+		title = title.replace('&hellip;', '...');
+	
+		return {
+			id: doc.getId(),
+			index: doc.get('index'),
+			title: title,
+			totalTokens: doc.get('tokensCount-lexical'),
+			terms: {},
+			lineLength: undefined
+		};
+	},
+	
+	processTerms: function(termRecord) {
+		var termObj;
+		var term = termRecord.get('term');
+		var rawFreq = termRecord.get('rawFreq');
+		var positions = termRecord.get('positions');
+		if (rawFreq > 0) {
+			var color = this.getApplication().getColorForTerm(term);
+			if (this.termStore.find('term', term) === -1) {
+				this.termStore.loadData([[term, color]], true);
+				var index = this.termStore.find('term', term);
+				this.down('#termsView').select(index, true); // manually select since the store's load listener isn't triggered
+			}
+			var distributions = termRecord.get('distributions');
+			termObj = {term: term, positions: positions, distributions: distributions, rawFreq: rawFreq, color: color};
+		} else {
+			termObj = false;
+		}
+		
+		return termObj;
+	},
+	
+	knotClickHandler: function(data) {
+		this.setCurrentTerm(data);
+		var start = data.tokenId - 10;
+		if (start < 0) start = 0;
+		this.getTokensStore().load({
+			start: start,
+			limit: 21
+		});
+		
+		data = [data]; // make an array for the event dispatch
+		this.getApplication().dispatchEvent('termsClicked', this, data);
+	}
 });
 Ext.define('Voyant.panel.Phrases', {
 	extend: 'Ext.grid.Panel',
@@ -9411,53 +10494,41 @@ Ext.define('Voyant.panel.Reader', {
 
 			var docTokens = {};
 			var totalTokens = 0;
-			if (info1.docIndex === info2.docIndex) {
-				totalTokens = info2.position - info1.position;
-				var tokens = corpus.getDocument(info1.docIndex).get('tokensCount-lexical');
-				docTokens[info1.docIndex] = tokens;
-			} else {
-				var currIndex = info1.docIndex;
-				while (currIndex <= info2.docIndex) {
-					var tokens = corpus.getDocument(currIndex).get('tokensCount-lexical');
-					if (partialFirstDoc && currIndex === info1.docIndex) {
-						tokens -= info1.position; // subtract missing tokens
-						totalTokens += tokens;
-					} else if (currIndex === info2.docIndex) {
-						totalTokens += info2.position; // only count tokens up until last displayed word
-					} else {
-						totalTokens += tokens;
-					}
-					docTokens[currIndex] = tokens;
-					currIndex++;
+			var currIndex = info1.docIndex;
+			while (currIndex <= info2.docIndex) {
+				var tokens = corpus.getDocument(currIndex).get('tokensCount-lexical');
+				if (currIndex === info2.docIndex) {
+					tokens = info2.position; // only count tokens up until last displayed word
 				}
+				if (currIndex === info1.docIndex) {
+					tokens -= info1.position; // subtract missing tokens, if any
+				}
+				totalTokens += tokens;
+				docTokens[currIndex] = tokens;
+				currIndex++;
 			}
 			
 			var tokenPos = Math.round(totalTokens * amount);
 			var docIndex = 0;
-			var tokenPosInDoc;
-			if (info1.docIndex === info2.docIndex) {
-				docIndex = info1.docIndex;
-				tokenPosInDoc = tokenPos;
-			} else if (partialFirstDoc && tokenPos === 0) {
-				// we're at the top of a partially loaded doc
-				docIndex = info1.docIndex;
-				tokenPosInDoc = info1.position;
-			} else {
-				var currToken = 0;
-				for (var i = info1.docIndex; i <= info2.docIndex; i++) {
-					docIndex = i;
-					currToken += docTokens[i];
-					if (currToken >= tokenPos) {
-						break;
-					}
+			var currToken = 0;
+			for (var i = info1.docIndex; i <= info2.docIndex; i++) {
+				docIndex = i;
+				currToken += docTokens[i];
+				if (currToken >= tokenPos) {
+					break;
 				}
-				tokenPosInDoc = docTokens[docIndex] - (currToken - tokenPos);
 			}
-			var fraction = tokenPosInDoc / docTokens[docIndex];
+			var remains = (currToken - tokenPos);
+			var tokenPosInDoc = docTokens[docIndex] - remains;
+			
+			if (partialFirstDoc && docIndex === info1.docIndex) {
+				tokenPosInDoc += info1.position;
+			}
+				
+			var fraction = tokenPosInDoc / corpus.getDocument(docIndex).get('tokensCount-lexical');
 			var graph = this.query('cartesian')[docIndex];
 			var locX = graph.getX() + graph.getWidth()*fraction;
 			Ext.get(this.getLocationMarker()).setX(locX);
-			
 		}
 		this.setLastLocationUpdate(new Date());
     },
@@ -9559,6 +10630,13 @@ Ext.define('Voyant.panel.Reader', {
     			var children = Ext.toArray(containerParent.dom.children);
     			var docIndex = children.indexOf(chartContainer.dom);
     			var doc = this.getDocumentsStore().getAt(docIndex);
+				var totalTokens = doc.get('tokensCount-lexical');
+				
+				var position = Math.floor(totalTokens * fraction);
+				var bufferPosition = position - (this.getApiParam('limit')/2);
+				
+				this.setApiParams({'skipToDocId': doc.getId(), start: bufferPosition < 0 ? 0 : bufferPosition});
+				this.load(true);
     		}, reader);
     	}
     	

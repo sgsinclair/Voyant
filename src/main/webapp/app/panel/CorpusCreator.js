@@ -97,6 +97,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				    modal: true,
 	    				    items: {  // Let's put an empty grid in just to illustrate fit layout
 	    				        xtype: 'form',
+	    				        submitEmptyText: false,
 	    				        margin: '5,5,5,5',
 	    				        items: {
 	    				            xtype:'combo',
@@ -342,7 +343,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    labelWidth: 90, // try to align with fieldset
 						    name: 'inputFormat',
 						    queryMode:'local',
-						    store:[['',me.localize('inputFormatAuto')],['TEI',"TEI"],['RSS',"RSS"],['DToC',"DToC"]],
+						    store:[['',me.localize('inputFormatAuto')],['dtoc','DToC: Dynamic Table of Contexts'],['TEI',"TEI: Text Encoding Initative"],['TEI',"TEI Corpus"],['RSS',"Really Simple Syndication: RSS"]],
 						    forceSelection:true,
 						    value: ''
 						},{
