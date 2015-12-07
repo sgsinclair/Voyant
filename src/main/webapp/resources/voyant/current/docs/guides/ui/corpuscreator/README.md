@@ -1,24 +1,40 @@
 # Creating a Corpus
 
+Voyant offers powerful functionality for creating your own corpus.
+
 ## Sources
 
-_To be completed_
+The following sources are supported:
 
-### Text Box
+* **Text Box**: you can type or paste text into the main text box in two different formats:
+  * regular text as one document (plain text, HTML and XML are supported)
+  * a set of URLs, one per line
+* **Open**: you can open an existing corpus that's already been created:
+  * [Austen](../?corpus=austen): Project Gutenberg's collection of 8 novels from [Jane Austen](http://www.gutenberg.org/ebooks/author/68): _Love And Freindship_, _Lady Susan_, _Sense and Sensibility_, _Pride and Prejudice_, _Mansfield Park_, _Emma_, _Northanger Abbey_, _Persuasion_
+  * [Shakespeare](../?corpus=shakespeare): Project Gutenberg's collection of 37 plays from [William Shakespeare](http://www.gutenberg.org/ebooks/author/65)
+* **Upload**: you can upload one or more files from your computer
+  * use Shift and Ctrl keys to select multiple files at once
+  * you can create a zip archive on your machine and upload it instead of selecting individual files
 
-_To be completed_
+Unlike in the previous version of Voyant, you can now [add, remove and reorder documents](#!/guide/modifyingcorpus) after a corpus has been created.
 
-### Upload
-
-_To be completed_
-
-### Open
-
-_To be completed_
+<div style="max-width: 600px; margin-left: auto; margin-right: auto">{@img corpuscreator.png Corpus Creator}</div>
 
 ## Options
 
-_To be completed_
+Options should be specified before hitting the upload button or the reveal button.
+
+<div style="max-width: 350px; margin-left: auto; margin-right: auto;">{@img options.png Input Options}</div>
+
+### Input Format
+
+Most document formats are fairly easy to detect automatically, Voyant does a decent job of extracting text from HTML, MS Word, MS Excel, ODT, Pages (Apple), PDF, plain text, RTF, XML, and others. You can also provide archives (.zip, .tar, .tgz, etc.) containing documents in those formats. If you want to specific a format (because auto-detect isn't working), you can select from the following:
+
+* **Atom Syndication Format ([Atom](https://en.wikipedia.org/wiki/Atom_(standard)))**: An XML-based format often used by news media, blogs, etc.
+* **Dynamic Table of Contexts (DToC)**: A specialized XML-based format used by the [Dynamic Table of Contexts project](http://cwrc.ca/DToC_Documentation/)
+* **Really Simple Syndication ([RSS](https://en.wikipedia.org/wiki/RSS))**: An XML-based format often used by news media, blogs, etc. Note that this is for RSS Version 2.0+, not RSS 1.0.
+* **Text Encoding Initiative ([TEI](http://www.tei-c.org/))**: An XML-based format (essentially uses `//text` for content and `//teiHeader//title` and `//teiHeader//author` for metadata)
+* **TEI Corpus**: As above, except that produces multiple documents from `//TEI` tags
 
 ### XML
 
@@ -44,10 +60,9 @@ This isn't the place to [learn XPath syntax](http://www.w3schools.com/xsl/xpath_
 * **`//dc:creator`**: select the `creator` element only when it is in the `dc` namespace
 * **`//*[local-name()='creator']`**: select any tag whose local name is `creator` regardless of namespace
 
-### Table
-
-_To be completed_
-
 ### Tokenization
 
-_To be completed_
+Tokenization (in this context) is the process of identifying words, or sequences of Unicode letter characters that should be considered as a unit. In most cases Voyant will do a decent job of tokenization, even with some languages where there's not always an indication of word boundaries (like Chinese). There are two choices:
+
+* **Automatic (highly recommended)**: this works adequately for most languages
+* **Simple Word Boundaries**: use this if you have segmented the text yourself (by adding spaces between words)
