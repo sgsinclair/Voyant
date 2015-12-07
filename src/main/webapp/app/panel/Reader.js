@@ -305,6 +305,13 @@ Ext.define('Voyant.panel.Reader', {
     					});
     				};
         		},
+        		documentIndexTermsClicked: function(src, terms) {
+        			if (terms[0] !== undefined) {
+    					var term = terms[0];
+    					var termRec = Ext.create('Voyant.data.model.Token', term);
+    					this.fireEvent('termLocationClicked', this, [termRec]);
+        			}
+        		},
         		scope: this
     		}
     	});
