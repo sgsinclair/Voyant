@@ -12,18 +12,19 @@
     		title: {en: "Trends"},
     		helpTip: {en: "<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		freqsModeTip: {en: "Determines if frequencies are expressed as raw counts or as relative counts (per document or segment)."},
-    		rawFrequencies: {en: 'raw frequencies'},
-    		relativeFrequencies: {en: 'relative frequencies'},
-    		raw: {en: 'raw'},
-    		relative: {en: 'relative'},
-    		segments: {en: 'document segments'},
-    		documents: {en: 'documents'}
+    		rawFrequencies: {en: 'Raw Frequencies'},
+    		relativeFrequencies: {en: 'Relative Frequencies'},
+    		raw: {en: 'Raw'},
+    		relative: {en: 'Relative'},
+    		segments: {en: 'Document Segments'},
+    		documents: {en: 'Documents'}
     	},
     	api: {
     		limit: 5,
     		stopList: 'auto',
     		query: undefined,
     		withDistributions: 'relative',
+    		bins: 10,
     		docIndex: undefined,
     		docId: undefined,
     		mode: undefined
@@ -54,7 +55,8 @@
     	this.on("loadedCorpus", function(src, corpus) {
     		this.setCorpus(corpus);
     		if (corpus.getDocumentsCount()==1 && this.getApiParam("mode")!=this.MODE_DOCUMENT) {
-    			this.setApiParam("mode", this.MODE_DOCUMENT)
+    			this.setApiParams({mode: this.MODE_DOCUMENT, withDistributions: 'raw'});
+    			this.down('#raw').setChecked(true);
     		}
     		if (this.isVisible()) {
         		this.loadFromCorpus(corpus);
@@ -67,11 +69,11 @@
     				this.loadFromDocument(documents[0]);
     			}
     		}
-    	})
+    	});
     	
     	this.on("query", function(src, query) {
-    		if (Ext.isString(query)) {this.fireEvent("termsClicked", src, [query])}
-    	}, this)
+    		if (Ext.isString(query)) {this.fireEvent("termsClicked", src, [query]);}
+    	}, this);
 
     	this.on("termsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
@@ -98,7 +100,7 @@
             		}
         		}
     		}
-    	})
+    	});
 
     	this.on("documentTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
@@ -107,26 +109,26 @@
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
-    				this.fireEvent("termsClicked", src, terms)
+    				this.fireEvent("termsClicked", src, terms);
     			}
     		}
-    	})
+    	});
     	this.on("corpusTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
     			if (terms[0] && terms[0].get('distributions') !== undefined && this.getCorpus().getDocumentsCount()>1) {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
-    				this.fireEvent("termsClicked", src, terms)
+    				this.fireEvent("termsClicked", src, terms);
     			}
     		}
-    	})
+    	});
     	
     	this.on("activate", function() { // tab activation
     		if (this.getCorpus()) {
-				this.loadFromCorpus(this.getCorpus())
+				this.loadFromCorpus(this.getCorpus());
     		}
-    	}, this)
+    	}, this);
     	
     	this.on("ensureCorpusView", function(src, corpus) {
     		if (this.getApiParam('mode')!=this.MODE_CORPUS && corpus.getDocumentsCount()>1) {
@@ -156,21 +158,27 @@
 		                       {
 		                           text: this.localize("relativeFrequencies"),
 		                           checked: true,
+		                           itemId: 'relative',
 		                           group: 'freqsMode',
-		                           checkHandler: function(item) {
-		                        	   item.up('button').setText(this.localize('raw'));
-		                        	   this.setApiParam('withDistributions', 'relative');
-		                        	   this.reloadFromChart();
+		                           checkHandler: function(item, checked) {
+		                        	   if (checked) {
+			                        	   item.up('button').setText(this.localize('relative'));
+			                        	   this.setApiParam('withDistributions', 'relative');
+			                        	   this.reloadFromChart();
+		                        	   }
 		                           },
 		                           scope: this
 		                       }, {
 		                           text: this.localize("rawFrequencies"),
 		                           checked: false,
+		                           itemId: 'raw',
 		                           group: 'freqsMode',
-		                           checkHandler: function(item) {
-		                        	   item.up('button').setText(this.localize('raw'));
-		                        	   this.setApiParam('withDistributions', 'raw');
-		                        	   this.reloadFromChart();
+		                           checkHandler: function(item, checked) {
+		                        	   if (checked) {
+			                        	   item.up('button').setText(this.localize('raw'));
+			                        	   this.setApiParam('withDistributions', 'raw');
+			                        	   this.reloadFromChart();
+		                        	   }
 		                           },
 		                           scope: this
 		                       }
@@ -178,7 +186,7 @@
 		                }
                 }]
             }]
-        }) 
+        });
         me.callParent(arguments);
     	 
     },
@@ -187,7 +195,7 @@
 
     	if (document.then) {
     		var me = this;
-    		document.then(function(document) {me.loadFromDocument(document)})
+    		document.then(function(document) {me.loadFromDocument(document);});
     	}
     	else {
     		var ids = [];
@@ -197,7 +205,7 @@
         			query: undefined,
         			docId: document.getId(),
         			mode: this.MODE_DOCUMENT
-        		})
+        		});
         		if (this.isVisible()) {
                 	this.loadFromDocumentTerms();
         		}
@@ -219,7 +227,7 @@
     		    	}
     		    },
     		    scope: this,
-    		    params: this.getApiParams(['limit','stopList','query','docId','withDistributions'])
+    		    params: this.getApiParams(['limit','stopList','query','docId','withDistributions','bins'])
         	});
     	}
     },
@@ -263,10 +271,10 @@
     		var term = record.get('term');
     		record.get('distributions').forEach(function(r, i) {
     			if (!terms[i]) {
-    				terms[i] = {"index": i}
+    				terms[i] = {"index": i};
     			}
     			terms[i]["_"+index] = r;
-    			if (r>max) {max=r}
+    			if (r>max) {max=r;}
     		}, this);
     		fields.push("_"+index);
         	series.push({
@@ -303,7 +311,7 @@
         	        	scope: this
                 	}
                 }
-    		})
+    		});
     	}, this);
     	
     	var store = Ext.create('Ext.data.JsonStore', {
@@ -323,7 +331,7 @@
 //                minimum: 0,
                 increment: 1,
         		title: {
-        			text: this.localize(mode==this.MODE_DOCUMENT || this.getApiParam('withDistributions') =='raw' ? 'rawFrequencies' : 'relativeFrequencies')
+        			text: this.localize(this.getApiParam('withDistributions') =='raw' ? 'rawFrequencies' : 'relativeFrequencies')
         		}
         	}, {
         		type: 'category',
@@ -338,7 +346,7 @@
 
                },
         		renderer: function(label, data) {
-        			return mode==me.MODE_DOCUMENT ? parseInt(label)+1 : me.getCorpus().getDocument(label).getTinyTitle()
+        			return mode==me.MODE_DOCUMENT ? parseInt(label)+1 : me.getCorpus().getDocument(label).getTinyTitle();
         		}
         	}]
     	});
@@ -350,8 +358,8 @@
     	if (chart) {
     		var terms = [];
     		chart.series.forEach(function(serie) {
-    			terms.push(serie.getTitle())
-    		})
+    			terms.push(serie.getTitle());
+    		});
     		this.fireEvent("termsClicked", this, terms);
     	}
     },
@@ -361,11 +369,11 @@
     		Ext.applyIf(axis, {
         		style: {opacity: .2},
         		label: {opacity: .5}
-    		})
+    		});
     		Ext.applyIf(axis.title, {
     			fontSize: 12
-    		})
-    	})
+    		});
+    	});
     	Ext.applyIf(config, {
     	    plugins: {
     	        ptype: 'chartitemevents',
@@ -375,26 +383,11 @@
     		interactions: ['itemhighlight','panzoom'],
     		innerPadding: {top: 5, right: 5, bottom: 5, left: 5},
     		border: false,
-    	    bodyBorder: false/*,
-    	    listeners: {
-    	    	// FIXME: this is a work-around because item clicking is broken in EXTJS 5.0.1 (so all hover events currently trigger event)
-    	        itemhighlight: {
-    	        	fn: function (item) {
-    	        		if (!this.isLastClickedItem(item)) {
-    	            		if (this.deferredHandleClickedItem) {
-    	            			clearTimeout(this.deferredHandleClickedItem);
-    	            		}
-        	        		this.deferredHandleClickedItem = Ext.defer(this.handleClickedItem, 250, this, arguments);
-    	            		
-    	            	}
-    	        	},
-    	        	scope: this
-    	        }
-    	    }*/
+    	    bodyBorder: false
     	});
     	
     	// remove existing chart
-    	this.query('chart').forEach(function(chart) {this.remove(chart)}, this);
+    	this.query('chart').forEach(function(chart) {this.remove(chart);}, this);
 
 		var chart = Ext.create("Ext.chart.CartesianChart", config);
     	this.add(chart);
@@ -402,7 +395,7 @@
     
     clearChart: function() {
     	// we need a way of updating data instead of this brute-force approach
-    	this.query('chart').forEach(function(chart) {this.remove(chart)}, this);
+    	this.query('chart').forEach(function(chart) {this.remove(chart);}, this);
     },
     
     handleClickedItem: function(chart, item) {
@@ -410,21 +403,28 @@
         	if (mode===this.MODE_DOCUMENT) {
         		var docId = this.getApiParam("docId");
         		if (docId) {
+        			var doc = this.getCorpus().getDocument(docId);
+        			var tokens = doc.get('tokensCount-lexical');
+        			var bins = this.getApiParam('bins');
+        			var position = item.index / bins * tokens;
             		this.dispatchEvent("documentIndexTermsClicked", this, [{
             			term: item.series.getTitle(),
-            			docId: docId
+            			docId: docId,
+            			position: position
             		}]);
         		}
         	}
         	else if (mode==this.MODE_CORPUS) {
+        		var doc = this.getCorpus().getDocument(item.index);
         		this.dispatchEvent("documentIndexTermsClicked", this, [{
         			term: item.series.getTitle(),
-        			docIndex: item.index
+        			docIndex: item.index,
+        			docId: doc.getId()
         		}]);
         	}
     },
     
     isLastClickedItem: function(item) {
-    	return this.lastClickedItem && this.lastClickedItem.term==item.term && this.lastClickedItem.index==item.index
+    	return this.lastClickedItem && this.lastClickedItem.term==item.term && this.lastClickedItem.index==item.index;
     }
-})
+});
