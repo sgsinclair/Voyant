@@ -2,9 +2,6 @@ Ext.define('Voyant.panel.Phrases', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.phrases',
-	config: {
-		corpus: undefined
-	},
     statics: {
     	i18n: {
     		title: {en: "Phrases"},
