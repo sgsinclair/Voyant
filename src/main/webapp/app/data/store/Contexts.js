@@ -10,31 +10,46 @@ Ext.define('Voyant.data.store.Contexts', {
 	constructor : function(config) {
 		
 		config = config || {};
-		
+
 		// create proxy in constructor so we can set the Trombone URL
 		Ext.apply(config, {
-			pagePurgeCount: 0,
-			pageSize: 100,
-			leadingBufferZone: 100,
-			remoteSort: true,
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.DocumentContexts',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
-		        	 stripTags: config.stripTags
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'documentContexts.contexts',
-		             totalProperty: 'documentContexts.total'
-		         },
-		         simpleSortMode: true
-		     }
-		})
+			pagePurgeCount : 0,
+			pageSize : 100,
+			leadingBufferZone : 100,
+			trailingBufferZone : 100,
+			remoteSort : true,
+			proxy : {
+				type : 'ajax',
+				url : Voyant.application.getTromboneUrl(),
+				extraParams : {
+					tool : 'corpus.DocumentContexts',
+					corpus : config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
+					stripTags : config.stripTags
+				},
+				reader : {
+					type : 'json',
+					rootProperty : 'documentContexts.contexts',
+					totalProperty : 'documentContexts.total'
+				},
+				simpleSortMode : true
+			},
+			listeners: {
+				beforeprefetch: function(store, operation) {
+					var parent = this.getParentPanel();
+					if (parent !== undefined) {
+						// need to set in proxy.extraParams since operation.params get overwritten later on
+						var params = parent.getApiParams();
+						var proxy = store.getProxy();
+						for (var key in params) {
+							proxy.extraParams[key] = params[key];
+						}
+					}
+				},
+				scope: this
+			}
+		});
 		
-//    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+		// this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.callParent([config]);
 
 	},
