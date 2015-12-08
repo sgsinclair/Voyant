@@ -23,7 +23,8 @@ Ext.define('Voyant.panel.Reader', {
     	documentTermsStore: undefined,
     	exportVisualization: false,
     	lastScrollTop: 0,
-    	scrollDownwards: true,
+    	scrollIntoView: false,
+    	insertWhere: 'beforeEnd',
     	locationMarker: undefined,
     	lastLocationUpdate: new Date()
     },
@@ -183,10 +184,10 @@ Ext.define('Voyant.panel.Reader', {
     			
     			// scroll up
     			if (!downwardsScroll && target.scrollTop < 1) {
-    				this.fetchPrevious();
+    				this.fetchPrevious(true);
     			// scroll down
     			} else if (downwardsScroll && target.scrollHeight - target.scrollTop < target.offsetHeight*1.5) {//target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
-    				this.fetchNext();
+    				this.fetchNext(false);
     			} else {
     				var now = new Date();
         			if (now - this.getLastLocationUpdate() > 250) {
@@ -222,13 +223,13 @@ Ext.define('Voyant.panel.Reader', {
                 items: [{
                 	glyph: 'xf060@FontAwesome',
             		handler: function() {
-            			this.fetchPrevious();
+            			this.fetchPrevious(true);
             		},
             		scope: this
             	},{
             		glyph: 'xf061@FontAwesome',
             		handler: function() {
-            			this.fetchNext();
+            			this.fetchNext(true);
             		},
             		scope: this
             	},{xtype: 'tbseparator'},{
@@ -559,7 +560,7 @@ Ext.define('Voyant.panel.Reader', {
 //		}
 	},
     
-	fetchPrevious: function() {
+	fetchPrevious: function(scroll) {
 		var readerContainer = this.innerContainer.first();
 		var first = readerContainer.first('.word');
 		if (first != null && first.hasCls("loading")===false) {
@@ -572,6 +573,8 @@ Ext.define('Voyant.panel.Reader', {
 					var limit = this.getApiParam('limit');
 					var getPrevDoc = false;
 					if (docIndex === 0 && start === 0) {
+						first.dom.scrollIntoView()
+						first.frame("red")
 						break;
 					}
 					if (docIndex > 0 && start === 0) {
@@ -597,7 +600,8 @@ Ext.define('Voyant.panel.Reader', {
 					
 					var id = doc.getId();
 					this.setApiParams({'skipToDocId': id, start: start});
-					this.setScrollDownwards(false);
+					this.setInsertWhere('afterBegin')
+					this.setScrollIntoView(scroll);
 					this.load();
 					this.setApiParam('limit', this.INITIAL_LIMIT);
 					break;
@@ -608,7 +612,7 @@ Ext.define('Voyant.panel.Reader', {
 		}
 	},
 	
-	fetchNext: function() {
+	fetchNext: function(scroll) {
 		var readerContainer = this.innerContainer.first();
 		var last = readerContainer.last();
 		if (last.hasCls("loading")===false) {
@@ -628,6 +632,8 @@ Ext.define('Voyant.panel.Reader', {
 					if (start + this.getApiParam('limit') >= totalTokens && docIndex == this.getCorpus().getDocumentsCount()-1) {
 						var limit = totalTokens - start;
 						if (limit <= 1) {
+							last.dom.scrollIntoView();
+							last.frame("red")
 							break;
 						} else {
 							this.setApiParam('limit', limit);
@@ -642,8 +648,9 @@ Ext.define('Voyant.panel.Reader', {
 					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
 					last.destroy();
 					this.setApiParams({'skipToDocId': id, start: info.position});
-					this.setScrollDownwards(true);
-					this.load();
+					this.setInsertWhere('beforeEnd');
+					this.setScrollIntoView(scroll);
+					this.load(); // callback not working on buffered store
 					this.setApiParam('limit', this.INITIAL_LIMIT);
 					break;
 				}
@@ -669,9 +676,15 @@ Ext.define('Voyant.panel.Reader', {
     updateText: function(contents) {
     	var loadingMask = this.innerContainer.down('.loading');
     	if (loadingMask) loadingMask.destroy();
-    	var where = this.getScrollDownwards() ? 'beforeEnd' : 'afterBegin';
-    	this.innerContainer.first().insertHtml(where, contents);
-    	
+    	var inserted = this.innerContainer.first().insertHtml(this.getInsertWhere(), contents, true); // return Element, not dom
+    	if (inserted && this.getScrollIntoView()) {
+    		inserted.dom.scrollIntoView(); // use dom
+    		// we can't rely on the returned element because it can be a transient fly element, but the id is right in a deferred call
+    		Ext.Function.defer(function() {
+    			var el = Ext.get(inserted.id); // re-get el
+    			if (el) {el.frame("red")}
+    		}, 100);
+    	}
     	var target = this.down('panel[region="center"]').body.dom;
     	this.updateLocationMarker(target);
     },

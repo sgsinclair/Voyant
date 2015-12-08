@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Dec 07 15:44:47 EST 2015 */
+/* This file created by JSCacher. Last modified: Tue Dec 08 12:10:24 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3789,31 +3789,46 @@ Ext.define('Voyant.data.store.Contexts', {
 	constructor : function(config) {
 		
 		config = config || {};
-		
+
 		// create proxy in constructor so we can set the Trombone URL
 		Ext.apply(config, {
-			pagePurgeCount: 0,
-			pageSize: 100,
-			leadingBufferZone: 100,
-			remoteSort: true,
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.DocumentContexts',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
-		        	 stripTags: config.stripTags
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'documentContexts.contexts',
-		             totalProperty: 'documentContexts.total'
-		         },
-		         simpleSortMode: true
-		     }
-		})
+			pagePurgeCount : 0,
+			pageSize : 100,
+			leadingBufferZone : 100,
+			trailingBufferZone : 100,
+			remoteSort : true,
+			proxy : {
+				type : 'ajax',
+				url : Voyant.application.getTromboneUrl(),
+				extraParams : {
+					tool : 'corpus.DocumentContexts',
+					corpus : config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
+					stripTags : config.stripTags
+				},
+				reader : {
+					type : 'json',
+					rootProperty : 'documentContexts.contexts',
+					totalProperty : 'documentContexts.total'
+				},
+				simpleSortMode : true
+			},
+			listeners: {
+				beforeprefetch: function(store, operation) {
+					var parent = this.getParentPanel();
+					if (parent !== undefined) {
+						// need to set in proxy.extraParams since operation.params get overwritten later on
+						var params = parent.getApiParams();
+						var proxy = store.getProxy();
+						for (var key in params) {
+							proxy.extraParams[key] = params[key];
+						}
+					}
+				},
+				scope: this
+			}
+		});
 		
-//    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+		// this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.callParent([config]);
 
 	},
@@ -8148,9 +8163,6 @@ Ext.define('Voyant.panel.Phrases', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.phrases',
-	config: {
-		corpus: undefined
-	},
     statics: {
     	i18n: {
     		title: {en: "Phrases"},
@@ -10165,7 +10177,8 @@ Ext.define('Voyant.panel.Reader', {
     	documentTermsStore: undefined,
     	exportVisualization: false,
     	lastScrollTop: 0,
-    	scrollDownwards: true,
+    	scrollIntoView: false,
+    	insertWhere: 'beforeEnd',
     	locationMarker: undefined,
     	lastLocationUpdate: new Date()
     },
@@ -10325,10 +10338,10 @@ Ext.define('Voyant.panel.Reader', {
     			
     			// scroll up
     			if (!downwardsScroll && target.scrollTop < 1) {
-    				this.fetchPrevious();
+    				this.fetchPrevious(true);
     			// scroll down
     			} else if (downwardsScroll && target.scrollHeight - target.scrollTop < target.offsetHeight*1.5) {//target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
-    				this.fetchNext();
+    				this.fetchNext(false);
     			} else {
     				var now = new Date();
         			if (now - this.getLastLocationUpdate() > 250) {
@@ -10364,13 +10377,13 @@ Ext.define('Voyant.panel.Reader', {
                 items: [{
                 	glyph: 'xf060@FontAwesome',
             		handler: function() {
-            			this.fetchPrevious();
+            			this.fetchPrevious(true);
             		},
             		scope: this
             	},{
             		glyph: 'xf061@FontAwesome',
             		handler: function() {
-            			this.fetchNext();
+            			this.fetchNext(true);
             		},
             		scope: this
             	},{xtype: 'tbseparator'},{
@@ -10446,6 +10459,13 @@ Ext.define('Voyant.panel.Reader', {
     						scope: this
     					});
     				};
+        		},
+        		documentIndexTermsClicked: function(src, terms) {
+        			if (terms[0] !== undefined) {
+    					var term = terms[0];
+    					var termRec = Ext.create('Voyant.data.model.Token', term);
+    					this.fireEvent('termLocationClicked', this, [termRec]);
+        			}
         		},
         		scope: this
     		}
@@ -10694,7 +10714,7 @@ Ext.define('Voyant.panel.Reader', {
 //		}
 	},
     
-	fetchPrevious: function() {
+	fetchPrevious: function(scroll) {
 		var readerContainer = this.innerContainer.first();
 		var first = readerContainer.first('.word');
 		if (first != null && first.hasCls("loading")===false) {
@@ -10707,6 +10727,8 @@ Ext.define('Voyant.panel.Reader', {
 					var limit = this.getApiParam('limit');
 					var getPrevDoc = false;
 					if (docIndex === 0 && start === 0) {
+						first.dom.scrollIntoView()
+						first.frame("red")
 						break;
 					}
 					if (docIndex > 0 && start === 0) {
@@ -10732,7 +10754,8 @@ Ext.define('Voyant.panel.Reader', {
 					
 					var id = doc.getId();
 					this.setApiParams({'skipToDocId': id, start: start});
-					this.setScrollDownwards(false);
+					this.setInsertWhere('afterBegin')
+					this.setScrollIntoView(scroll);
 					this.load();
 					this.setApiParam('limit', this.INITIAL_LIMIT);
 					break;
@@ -10743,7 +10766,7 @@ Ext.define('Voyant.panel.Reader', {
 		}
 	},
 	
-	fetchNext: function() {
+	fetchNext: function(scroll) {
 		var readerContainer = this.innerContainer.first();
 		var last = readerContainer.last();
 		if (last.hasCls("loading")===false) {
@@ -10763,6 +10786,8 @@ Ext.define('Voyant.panel.Reader', {
 					if (start + this.getApiParam('limit') >= totalTokens && docIndex == this.getCorpus().getDocumentsCount()-1) {
 						var limit = totalTokens - start;
 						if (limit <= 1) {
+							last.dom.scrollIntoView();
+							last.frame("red")
 							break;
 						} else {
 							this.setApiParam('limit', limit);
@@ -10777,8 +10802,9 @@ Ext.define('Voyant.panel.Reader', {
 					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
 					last.destroy();
 					this.setApiParams({'skipToDocId': id, start: info.position});
-					this.setScrollDownwards(true);
-					this.load();
+					this.setInsertWhere('beforeEnd');
+					this.setScrollIntoView(scroll);
+					this.load(); // callback not working on buffered store
 					this.setApiParam('limit', this.INITIAL_LIMIT);
 					break;
 				}
@@ -10804,9 +10830,15 @@ Ext.define('Voyant.panel.Reader', {
     updateText: function(contents) {
     	var loadingMask = this.innerContainer.down('.loading');
     	if (loadingMask) loadingMask.destroy();
-    	var where = this.getScrollDownwards() ? 'beforeEnd' : 'afterBegin';
-    	this.innerContainer.first().insertHtml(where, contents);
-    	
+    	var inserted = this.innerContainer.first().insertHtml(this.getInsertWhere(), contents, true); // return Element, not dom
+    	if (inserted && this.getScrollIntoView()) {
+    		inserted.dom.scrollIntoView(); // use dom
+    		// we can't rely on the returned element because it can be a transient fly element, but the id is right in a deferred call
+    		Ext.Function.defer(function() {
+    			var el = Ext.get(inserted.id); // re-get el
+    			if (el) {el.frame("red")}
+    		}, 100);
+    	}
     	var target = this.down('panel[region="center"]').body.dom;
     	this.updateLocationMarker(target);
     },
@@ -14313,18 +14345,19 @@ Ext.define('Voyant.panel.TermsRadio', {
     		title: {en: "Trends"},
     		helpTip: {en: "<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		freqsModeTip: {en: "Determines if frequencies are expressed as raw counts or as relative counts (per document or segment)."},
-    		rawFrequencies: {en: 'raw frequencies'},
-    		relativeFrequencies: {en: 'relative frequencies'},
-    		raw: {en: 'raw'},
-    		relative: {en: 'relative'},
-    		segments: {en: 'document segments'},
-    		documents: {en: 'documents'}
+    		rawFrequencies: {en: 'Raw Frequencies'},
+    		relativeFrequencies: {en: 'Relative Frequencies'},
+    		raw: {en: 'Raw'},
+    		relative: {en: 'Relative'},
+    		segments: {en: 'Document Segments'},
+    		documents: {en: 'Documents'}
     	},
     	api: {
     		limit: 5,
     		stopList: 'auto',
     		query: undefined,
     		withDistributions: 'relative',
+    		bins: 10,
     		docIndex: undefined,
     		docId: undefined,
     		mode: undefined
@@ -14355,7 +14388,8 @@ Ext.define('Voyant.panel.TermsRadio', {
     	this.on("loadedCorpus", function(src, corpus) {
     		this.setCorpus(corpus);
     		if (corpus.getDocumentsCount()==1 && this.getApiParam("mode")!=this.MODE_DOCUMENT) {
-    			this.setApiParam("mode", this.MODE_DOCUMENT)
+    			this.setApiParams({mode: this.MODE_DOCUMENT, withDistributions: 'raw'});
+    			this.down('#raw').setChecked(true);
     		}
     		if (this.isVisible()) {
         		this.loadFromCorpus(corpus);
@@ -14368,11 +14402,11 @@ Ext.define('Voyant.panel.TermsRadio', {
     				this.loadFromDocument(documents[0]);
     			}
     		}
-    	})
+    	});
     	
     	this.on("query", function(src, query) {
-    		if (Ext.isString(query)) {this.fireEvent("termsClicked", src, [query])}
-    	}, this)
+    		if (Ext.isString(query)) {this.fireEvent("termsClicked", src, [query]);}
+    	}, this);
 
     	this.on("termsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
@@ -14399,7 +14433,7 @@ Ext.define('Voyant.panel.TermsRadio', {
             		}
         		}
     		}
-    	})
+    	});
 
     	this.on("documentTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
@@ -14408,26 +14442,26 @@ Ext.define('Voyant.panel.TermsRadio', {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
-    				this.fireEvent("termsClicked", src, terms)
+    				this.fireEvent("termsClicked", src, terms);
     			}
     		}
-    	})
+    	});
     	this.on("corpusTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
     			if (terms[0] && terms[0].get('distributions') !== undefined && this.getCorpus().getDocumentsCount()>1) {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
-    				this.fireEvent("termsClicked", src, terms)
+    				this.fireEvent("termsClicked", src, terms);
     			}
     		}
-    	})
+    	});
     	
     	this.on("activate", function() { // tab activation
     		if (this.getCorpus()) {
-				this.loadFromCorpus(this.getCorpus())
+				this.loadFromCorpus(this.getCorpus());
     		}
-    	}, this)
+    	}, this);
     	
     	this.on("ensureCorpusView", function(src, corpus) {
     		if (this.getApiParam('mode')!=this.MODE_CORPUS && corpus.getDocumentsCount()>1) {
@@ -14457,21 +14491,27 @@ Ext.define('Voyant.panel.TermsRadio', {
 		                       {
 		                           text: this.localize("relativeFrequencies"),
 		                           checked: true,
+		                           itemId: 'relative',
 		                           group: 'freqsMode',
-		                           checkHandler: function(item) {
-		                        	   item.up('button').setText(this.localize('raw'));
-		                        	   this.setApiParam('withDistributions', 'relative');
-		                        	   this.reloadFromChart();
+		                           checkHandler: function(item, checked) {
+		                        	   if (checked) {
+			                        	   item.up('button').setText(this.localize('relative'));
+			                        	   this.setApiParam('withDistributions', 'relative');
+			                        	   this.reloadFromChart();
+		                        	   }
 		                           },
 		                           scope: this
 		                       }, {
 		                           text: this.localize("rawFrequencies"),
 		                           checked: false,
+		                           itemId: 'raw',
 		                           group: 'freqsMode',
-		                           checkHandler: function(item) {
-		                        	   item.up('button').setText(this.localize('raw'));
-		                        	   this.setApiParam('withDistributions', 'raw');
-		                        	   this.reloadFromChart();
+		                           checkHandler: function(item, checked) {
+		                        	   if (checked) {
+			                        	   item.up('button').setText(this.localize('raw'));
+			                        	   this.setApiParam('withDistributions', 'raw');
+			                        	   this.reloadFromChart();
+		                        	   }
 		                           },
 		                           scope: this
 		                       }
@@ -14479,7 +14519,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		                }
                 }]
             }]
-        }) 
+        });
         me.callParent(arguments);
     	 
     },
@@ -14488,7 +14528,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 
     	if (document.then) {
     		var me = this;
-    		document.then(function(document) {me.loadFromDocument(document)})
+    		document.then(function(document) {me.loadFromDocument(document);});
     	}
     	else {
     		var ids = [];
@@ -14498,7 +14538,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         			query: undefined,
         			docId: document.getId(),
         			mode: this.MODE_DOCUMENT
-        		})
+        		});
         		if (this.isVisible()) {
                 	this.loadFromDocumentTerms();
         		}
@@ -14520,7 +14560,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		    	}
     		    },
     		    scope: this,
-    		    params: this.getApiParams(['limit','stopList','query','docId','withDistributions'])
+    		    params: this.getApiParams(['limit','stopList','query','docId','withDistributions','bins'])
         	});
     	}
     },
@@ -14564,10 +14604,10 @@ Ext.define('Voyant.panel.TermsRadio', {
     		var term = record.get('term');
     		record.get('distributions').forEach(function(r, i) {
     			if (!terms[i]) {
-    				terms[i] = {"index": i}
+    				terms[i] = {"index": i};
     			}
     			terms[i]["_"+index] = r;
-    			if (r>max) {max=r}
+    			if (r>max) {max=r;}
     		}, this);
     		fields.push("_"+index);
         	series.push({
@@ -14604,7 +14644,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         	        	scope: this
                 	}
                 }
-    		})
+    		});
     	}, this);
     	
     	var store = Ext.create('Ext.data.JsonStore', {
@@ -14624,7 +14664,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 //                minimum: 0,
                 increment: 1,
         		title: {
-        			text: this.localize(mode==this.MODE_DOCUMENT || this.getApiParam('withDistributions') =='raw' ? 'rawFrequencies' : 'relativeFrequencies')
+        			text: this.localize(this.getApiParam('withDistributions') =='raw' ? 'rawFrequencies' : 'relativeFrequencies')
         		}
         	}, {
         		type: 'category',
@@ -14639,7 +14679,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 
                },
         		renderer: function(label, data) {
-        			return mode==me.MODE_DOCUMENT ? parseInt(label)+1 : me.getCorpus().getDocument(label).getTinyTitle()
+        			return mode==me.MODE_DOCUMENT ? parseInt(label)+1 : me.getCorpus().getDocument(label).getTinyTitle();
         		}
         	}]
     	});
@@ -14651,8 +14691,8 @@ Ext.define('Voyant.panel.TermsRadio', {
     	if (chart) {
     		var terms = [];
     		chart.series.forEach(function(serie) {
-    			terms.push(serie.getTitle())
-    		})
+    			terms.push(serie.getTitle());
+    		});
     		this.fireEvent("termsClicked", this, terms);
     	}
     },
@@ -14662,11 +14702,11 @@ Ext.define('Voyant.panel.TermsRadio', {
     		Ext.applyIf(axis, {
         		style: {opacity: .2},
         		label: {opacity: .5}
-    		})
+    		});
     		Ext.applyIf(axis.title, {
     			fontSize: 12
-    		})
-    	})
+    		});
+    	});
     	Ext.applyIf(config, {
     	    plugins: {
     	        ptype: 'chartitemevents',
@@ -14676,26 +14716,11 @@ Ext.define('Voyant.panel.TermsRadio', {
     		interactions: ['itemhighlight','panzoom'],
     		innerPadding: {top: 5, right: 5, bottom: 5, left: 5},
     		border: false,
-    	    bodyBorder: false/*,
-    	    listeners: {
-    	    	// FIXME: this is a work-around because item clicking is broken in EXTJS 5.0.1 (so all hover events currently trigger event)
-    	        itemhighlight: {
-    	        	fn: function (item) {
-    	        		if (!this.isLastClickedItem(item)) {
-    	            		if (this.deferredHandleClickedItem) {
-    	            			clearTimeout(this.deferredHandleClickedItem);
-    	            		}
-        	        		this.deferredHandleClickedItem = Ext.defer(this.handleClickedItem, 250, this, arguments);
-    	            		
-    	            	}
-    	        	},
-    	        	scope: this
-    	        }
-    	    }*/
+    	    bodyBorder: false
     	});
     	
     	// remove existing chart
-    	this.query('chart').forEach(function(chart) {this.remove(chart)}, this);
+    	this.query('chart').forEach(function(chart) {this.remove(chart);}, this);
 
 		var chart = Ext.create("Ext.chart.CartesianChart", config);
     	this.add(chart);
@@ -14703,7 +14728,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     
     clearChart: function() {
     	// we need a way of updating data instead of this brute-force approach
-    	this.query('chart').forEach(function(chart) {this.remove(chart)}, this);
+    	this.query('chart').forEach(function(chart) {this.remove(chart);}, this);
     },
     
     handleClickedItem: function(chart, item) {
@@ -14711,24 +14736,31 @@ Ext.define('Voyant.panel.TermsRadio', {
         	if (mode===this.MODE_DOCUMENT) {
         		var docId = this.getApiParam("docId");
         		if (docId) {
+        			var doc = this.getCorpus().getDocument(docId);
+        			var tokens = doc.get('tokensCount-lexical');
+        			var bins = this.getApiParam('bins');
+        			var position = item.index / bins * tokens;
             		this.dispatchEvent("documentIndexTermsClicked", this, [{
             			term: item.series.getTitle(),
-            			docId: docId
+            			docId: docId,
+            			position: position
             		}]);
         		}
         	}
         	else if (mode==this.MODE_CORPUS) {
+        		var doc = this.getCorpus().getDocument(item.index);
         		this.dispatchEvent("documentIndexTermsClicked", this, [{
         			term: item.series.getTitle(),
-        			docIndex: item.index
+        			docIndex: item.index,
+        			docId: doc.getId()
         		}]);
         	}
     },
     
     isLastClickedItem: function(item) {
-    	return this.lastClickedItem && this.lastClickedItem.term==item.term && this.lastClickedItem.index==item.index
+    	return this.lastClickedItem && this.lastClickedItem.term==item.term && this.lastClickedItem.index==item.index;
     }
-})
+});
 Ext.define('Voyant.panel.VoyantFooter', {
 	extend: 'Ext.container.Container',
 	mixins: ['Voyant.panel.Panel'],
