@@ -515,7 +515,7 @@ Ext.define('Voyant.panel.Reader', {
     	
 	    	var tokensTotal = corpus.getWordTokensCount();
 	    	var docInfos = [];
-	    	var docMinSize = 1000000;
+	    	var docMinSize = Number.MAX_VALUE;
 	    	var docMaxSize = -1;
 	//		for (var i = 0; i < docs.getTotalCount(); i++) {
 			for (var i = 0; i < docs.getCount(); i++) {
@@ -534,7 +534,7 @@ Ext.define('Voyant.panel.Reader', {
 			
 			for (var i = 0; i < docInfos.length; i++) {
 				var d = docInfos[i];
-				d.relativeHeight = d.count==docMaxSize ? 1 : map(d.count, docMinSize, docMaxSize, 0, 1);
+				d.relativeHeight = d.count==docMaxSize ? 1 : map(d.count, docMinSize, docMaxSize, 0.25, 1);
 				addChart(d, this);
 			}
     	}
