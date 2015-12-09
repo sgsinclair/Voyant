@@ -85,7 +85,7 @@
 		</div>
 		<div>
 			<h4>Phrases</h4>
-			<p></p>
+			<p>The Phrases tool shows repeating sequences of words organized by frequency of repetition or number of words in each repeated phrase.</p>
 		</div>
 	</dd></a>
 </div>

@@ -1,44 +1,38 @@
 # Reader
 
-The Reader tool provides a way of reading documents in the corpus, text is fetched on-demand as needed.
+The Reader tool provides a way of reading documents in the corpus, text is fetched as needed.
 
 ## Overview
 
+The Reader tool is composed of two visual components: the Text Reader and the Prospect Viewer.
 
-The table view shows the following three columns by default:
+### Text Reader
 
-- *Title*: the document's title (or its filename if no better title was found)
-- *Words*: the number of individual words (tokens) found in the document (e.g. each occurrence of "the" is counted)
-- *Types*: the number of word forms found in the document (e.g. all occurrences of "the" are counted as one word form)
-- *Ratio*: the ratio of types to tokens (types/tokens), expressed as a percentage – higher numbers generally mean greater vocabulary diversity
+This is where text is displayed for reading. The formatting will be minimal, limited especially to line breaks (depending on the format of the source document). With the text reader you can:
 
-Additional columns can be shown:
+* scroll down within the text reader to fetch more content
+* hover over a word to show its frequency in the document
+* click on a word to search for it in the Reader (and other tools if applicable)
 
-- *Author*: the document's author (if it can be determined)
-- *Language*: the document's language (if it can be guessed)
+### Prospect Viewer
 
-By default, documents are shown in the order they exist in the corpus.
+This shows an overview of the entire corpus, especially useful when there are multiple documents in a corpus. The bars represent each document in the order they appear in the corpus. The relative length of the document is represented both vertically and horizontally (in other words, the taller and wider a document is shown, the longer it is).
+
+When there's a search term, an inner sparkline is shown overtop of the bars – this shows the relative frequency of terms (by default each document is broken into segments of 25 equal parts for the sparkline).
+
+There's also a thin vertical blue bar that indicates the current position of the Text Reader in the corpus. You can click anywhere along the Prospect Viewer to jump to another location.
 
 {@img reader.png Reader}
 
 ## Options
 
-You can filter documents  by typing a query into the search box and hitting enter (see [Term Searches](#!/guide/search) for more advanced searching capabilities). Note that by default the query includes the full-text, the title and the author. You can use the author or title prefix to *only* look at one of those metadata fields (e.g. _title:love_).
+You can use the arrows to go forward or backward in the text. By default jumps are made in increments of about 1,000 words.
 
-You can modify a corpus by clicking on the _Modify_ button. Note that any modifications actually create a new corpus (so the URL will change). The following modifications are available:
-
-- *Add* more documents by clicking the _Add_ button (this will cause the [corpus creation](#!/guide/corpuscreator) window to appear, but any new documents will be added to the corpus)
-- *Remove* documents by selecting one ore more documents at once (using the shift or ctrl/command keys) and then clicking the _Remove_ button (this keeps all of the unselected documents)
-- *Keep* documents by selecting one ore more documents at once (using the shift or ctrl/command keys) and then clicking the _Keep_ button (this removes all of the unselected documents)
-- *Reorder* documents by dragging and dropping them within the grid and then hitting the _Reorder_ button
-
-Note that only one of these operations can be done at a time, so, for instance, you can first remove some documents and then in the new corpus you can reorder the remaining documents.
+You can specify terms by typing a query into the search box and hitting enter (see [Term Searches](#!/guide/search) for more advanced searching capabilities).
 
 ## Additional Information
 
-The type/token _Ratio_ value can be a useful way of expressing vocabulary richness, but the value is somewhat sensitve to document length and should be considered with circumspection. A more reliable way of measuring vocabulary richness is to average the type/token ratios from equally long segments in a text (e.g. the mean of type/token ratios for each 1,000 word segment in the text).
-
-We hope to soon offer functionality for users to edit or customize the metadata for documents, allowing you to edit the author or title, for instance. In the meantime, these metadata are defined during [corpus creation](#!/guide/corpuscreator).
+The Prospect Viewer is inspired by the work of Stan Ruecker (see [this book](http://www.ashgate.com/default.aspx?page=637&calcTitle=1&isbn=9781409404224) or [this video](https://youtu.be/Nd2h9U_H0n8?t=2m27s)).
 
 ## See Also
 

@@ -14,7 +14,7 @@ An additional column can be shown to display *Count* which is the frequency of t
 
 By default, the most frequent collocates are shown for the 10 most frequent keywords in the corpus.
 
-{@img collocates.png Collocates}
+<div style="max-width: 450px; margin-left: auto; margin-right: auto;">{@img collocates.png Collocates}</div>
 
 ## Options
 

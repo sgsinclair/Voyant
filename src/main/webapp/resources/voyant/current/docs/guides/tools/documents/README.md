@@ -4,7 +4,7 @@ The Documents tool shows a table of the documents in the corpus and includes fun
 
 ## Overview
 
-The table view shows the following three columns by default:
+The table view shows the following columns by default:
 
 - *Title*: the document's title (or its filename if no better title was found)
 - *Words*: the number of individual words (tokens) found in the document (e.g. each occurrence of "the" is counted)
