@@ -31,7 +31,6 @@ For a graphical view of corpus collocates, try the [Collocates Graph](#!/guide/c
 ## See Also
 
 - [Getting Started](#!/guide/start)
-- [Common UI](#!/guide/commonui)
 - [Grids](#!/guide/grids)
 - [Stopwords](#!/guide/stopwords)
 - [Default Skin](#!/guide/defaultskin)

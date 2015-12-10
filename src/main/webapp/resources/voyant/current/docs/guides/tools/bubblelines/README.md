@@ -36,7 +36,6 @@ Bubblelines was initially designed by Carlos Fiorentino as a student of Stan Rue
 ## See Also
 
 - [Getting Started](#!/guide/start)
-- [Common UI](#!/guide/commonui)
 - [Stopwords](#!/guide/stopwords)
 - [Term Searches](#!/guide/search)
 - [Default Skin](#!/guide/defaultskin)

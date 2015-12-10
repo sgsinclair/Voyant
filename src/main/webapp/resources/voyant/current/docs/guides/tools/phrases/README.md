@@ -45,7 +45,6 @@ Note also that for a phrase to be considered repeating it has to repeat within a
 ## See Also
 
 - [Getting Started](#!/guide/start)
-- [Common UI](#!/guide/commonui)
 - [Grids](#!/guide/grids)
 - [Default Skin](#!/guide/defaultskin)
 - [List of Tools](#!/guide/tools)

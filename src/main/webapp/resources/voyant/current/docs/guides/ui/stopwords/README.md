@@ -24,3 +24,8 @@ You can choose to apply the stopword list to the current tool or to all tools at
 
 By default the current version of Voyant uses the _Auto-detect_ option; this is different from the previous version of Voyant where the stopword list had to be manually selected.
 
+## Next Steps
+
+* [embedding Voyant](#!/guide/embedding)
+* [explore the tools](#!/guide/tools)
+* read [about Voyant Tools](#!/guide/about)
