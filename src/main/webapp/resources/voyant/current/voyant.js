@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Dec 08 12:10:24 EST 2015 */
+/* This file created by JSCacher. Last modified: Thu Dec 10 10:15:39 EST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2698,7 +2698,7 @@ Ext.define('Voyant.util.Toolable', {
 			exportGridCurrentJson: {en: "export current data as JSON"},
 			exportGridCurrentTsv: {en: "export current data as tab separated values (text)"},
 			'export': {en: 'Export'},
-			exportTitle: {en: 'Export'},
+			optionsTitle: {en: 'Options'},
 			confirmTitle: {en: 'Confirm'},
 			cancelTitle: {en: 'Cancel'},
 			exportError: {en: "Export Error"},
@@ -2780,7 +2780,7 @@ Ext.define('Voyant.util.Toolable', {
 						if (panel.isXType("voyanttabpanel")) {panel = panel.getActiveTab()}
 						// we're here because the panel hasn't overridden the click function
 						Ext.create('Ext.window.Window', {
-							title: panel.localize("exportTitle"),
+							title: panel.localize("optionsTitle"),
 							modal: true,
 			            	panel: panel,
 							items: {
@@ -4726,7 +4726,7 @@ Ext.define('Voyant.widget.StopListOption', {
 	    	        	    	    	var json = Ext.util.JSON.decode(response.responseText);
 	    	        	    	    	var store = req.combo.getStore();
 	    	        	    	    	var value = 'keywords-'+json.storedResource.id;
-	    	        	    	    	store.add({name: 'Added '+Ext.Date.format(new Date(),'M j, g:i:s a'), value: value});
+	    	        	    	    	store.add({name: value, value: value});
 	    	        	    	    	req.combo.setValue(value)
 	    	        	    	    	req.combo.updateLayout()
 	    	        	    	    },
@@ -6622,7 +6622,6 @@ Ext.define('Voyant.panel.Contexts', {
             store : Ext.create("Voyant.data.store.Contexts", {
             	parentPanel: this,
             	stripTags: "all",
-            	remoteSort: false,
             	sortOnLoad: true,
             	sorters: {
                     property: 'position',
@@ -6659,7 +6658,7 @@ Ext.define('Voyant.panel.Contexts', {
                 	width: 50,
                 	listeners: {
                 		render: function(slider) {
-                			slider.setValue(me.getApiParam('context'))
+                			slider.setValue(me.getApiParam('context'));
                 		},
                 		changecomplete: function(slider, newValue) {
                 			me.setApiParam("context", slider.getValue());
@@ -6682,12 +6681,14 @@ Ext.define('Voyant.panel.Contexts', {
                 			var view = me.getView();
                 			var recordsExpanded = me.plugins[0].recordsExpanded;
                 			var store = view.getStore();
-                			for (id in recordsExpanded) {
+                			for (var id in recordsExpanded) {
+                				var record = store.getByInternalId(id);
+            					var row = view.getRow(record);
+            					var expandRow = row.parentNode.childNodes[1];
                 				if (recordsExpanded[id]) {
-                					var record = store.getByInternalId(id);
-                					var row = view.getRow(record);
-                					var expandRow = row.parentNode.childNodes[1];
                 					view.fireEvent("expandbody", row, record, expandRow, {force: true});
+                				} else {
+                					Ext.fly(expandRow).down('.x-grid-rowbody').setHtml('');
                 				}
                 			}
                 		}
@@ -6710,7 +6711,7 @@ Ext.define('Voyant.panel.Contexts', {
     			toolTip: this.localize("documentTip"),
                 width: 'autoSize',
         		dataIndex: 'docIndex',
-                sortable: false,
+                sortable: true,
                 renderer: function (value, metaData, record, rowIndex, colIndex, store) {
                 	return store.getCorpus().getDocument(value).getTinyLabel();
                 }
@@ -6744,14 +6745,14 @@ Ext.define('Voyant.panel.Contexts', {
             listeners: {
             	documentSegmentTermClicked: {
 	           		 fn: function(src, documentSegmentTerm) {
-	           			 if (!documentSegmentTerm.term) {return}
+	           			 if (!documentSegmentTerm.term) {return;}
 	           			 params = {query: documentSegmentTerm.term};
 	           			 if (documentSegmentTerm.docId) {
-	           				 params.docId = documentSegmentTerm.docId
+	           				 params.docId = documentSegmentTerm.docId;
 	           			 }
 	           			 else {
 	           				 // default to first document
-	           				 params.docIndex = documentSegmentTerm.docIndex ?  documentSegmentTerm.docIndex : 0
+	           				 params.docIndex = documentSegmentTerm.docIndex ?  documentSegmentTerm.docIndex : 0;
 	           			 }
 	           			 this.setApiParams(params);
 	       	        	if (this.isVisible()) {
@@ -6782,7 +6783,7 @@ Ext.define('Voyant.panel.Contexts', {
 	       	        		docIndex: docIndex,
 	       	        		query: queries
 	       	        	});
-	       	        	this.down("#corpus").show()
+	       	        	this.down("#corpus").show();
 	       	        	if (this.isVisible()) {
 	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
 	       	        	}
@@ -6791,12 +6792,12 @@ Ext.define('Voyant.panel.Contexts', {
 	           	 },
                  afterrender: function(me) {
                 	 me.getView().on('expandbody', function( rowNode, record, expandRow, eOpts ) {
-                		 if (expandRow.innerText=="" || (eOpts && eOpts.force)) {
+                		 if (expandRow.innerText==="" || (eOpts && eOpts.force)) {
                 	            var store = Ext.create("Voyant.data.store.Contexts", {
                 	            	stripTags: "all",
                 	            	corpus: me.getStore().getCorpus()
-                	            })
-                	            var data = record.getData()
+                	            });
+                	            var data = record.getData();
                 	            store.load({
                 	            	params: {
                     	            	query: data.query,
@@ -6812,10 +6813,10 @@ Ext.define('Voyant.panel.Contexts', {
                 	                	}
                 	                },
                 	                expandRow : expandRow
-                	            })
+                	            });
                 	            
                 		 }
-                	 }) 
+                	 });
                  }
 
             }
@@ -6860,7 +6861,7 @@ Ext.define('Voyant.panel.Contexts', {
         
         me.on("termsClicked", function(src, terms) {
         	var documentIndexTerms = [];
-        	if (Ext.isString(terms)) {terms = [terms]}
+        	if (Ext.isString(terms)) {terms = [terms];}
         	terms.forEach(function(term) {
         		if (term.docIndex !== undefined) {
             		documentIndexTerms.push({
@@ -6878,7 +6879,7 @@ Ext.define('Voyant.panel.Contexts', {
         
      }
      
-})
+});
 Ext.define('Voyant.panel.CorpusCollocates', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -10669,7 +10670,7 @@ Ext.define('Voyant.panel.Reader', {
     	
 	    	var tokensTotal = corpus.getWordTokensCount();
 	    	var docInfos = [];
-	    	var docMinSize = 1000000;
+	    	var docMinSize = Number.MAX_VALUE;
 	    	var docMaxSize = -1;
 	//		for (var i = 0; i < docs.getTotalCount(); i++) {
 			for (var i = 0; i < docs.getCount(); i++) {
@@ -10688,7 +10689,7 @@ Ext.define('Voyant.panel.Reader', {
 			
 			for (var i = 0; i < docInfos.length; i++) {
 				var d = docInfos[i];
-				d.relativeHeight = d.count==docMaxSize ? 1 : map(d.count, docMinSize, docMaxSize, 0, 1);
+				d.relativeHeight = d.count==docMaxSize ? 1 : map(d.count, docMinSize, docMaxSize, 0.25, 1);
 				addChart(d, this);
 			}
     	}

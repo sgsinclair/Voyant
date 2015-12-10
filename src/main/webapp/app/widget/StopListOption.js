@@ -164,7 +164,7 @@ Ext.define('Voyant.widget.StopListOption', {
 	    	        	    	    	var json = Ext.util.JSON.decode(response.responseText);
 	    	        	    	    	var store = req.combo.getStore();
 	    	        	    	    	var value = 'keywords-'+json.storedResource.id;
-	    	        	    	    	store.add({name: 'Added '+Ext.Date.format(new Date(),'M j, g:i:s a'), value: value});
+	    	        	    	    	store.add({name: value, value: value});
 	    	        	    	    	req.combo.setValue(value)
 	    	        	    	    	req.combo.updateLayout()
 	    	        	    	    },
