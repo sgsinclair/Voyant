@@ -1,6 +1,6 @@
 # Getting Started
 
-Voyant Tools is a web-based text reading and analysis environment. It’s designed to make it easy for you to work with your own text or collection of texts in a variety of formats, including plain text, HTML, XML, PDF, RTF, and MS Word.
+Voyant Tools is a web-based text reading and analysis environment. It's designed to make it easy for you to work with your own text or collection of texts in a variety of formats, including plain text, HTML, XML, PDF, RTF, and MS Word.
 
 {@img getting-started.png Getting Started}
 
@@ -52,6 +52,6 @@ One of the most interesting features of Voyant Tools is the ability to bookmark 
 
 ## Next Steps
 
-* explore the [user interface guides](#!/guide/ui)
-* explore the [tools available](#!/guide/tools)
-* read more [about Voyant Tools](#!/guide/about)
+* [creating a corpus](#!/guide/corpuscreator)
+* [explore the tools](#!/guide/tools)
+* read [about Voyant Tools](#!/guide/about)

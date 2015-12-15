@@ -66,3 +66,9 @@ Tokenization (in this context) is the process of identifying words, or sequences
 
 * **Automatic (highly recommended)**: this works adequately for most languages
 * **Simple Word Boundaries**: use this if you have segmented the text yourself (by adding spaces between words)
+
+## Next Steps
+
+* [modifying a corpus](#!/guide/modifyingcorpus)
+* [explore the tools](#!/guide/tools)
+* read [about Voyant Tools](#!/guide/about)

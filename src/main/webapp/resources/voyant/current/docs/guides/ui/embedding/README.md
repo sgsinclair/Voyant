@@ -46,3 +46,9 @@ It's important to know that for security reasons some content management systems
 We assume that screen real-estate is at a premium in embedded instances of Voyant, so the default embedded URL syntax removes the top header that normally appears:
 
 <table><tr><td><div style="max-width: 350px; text-align: center"><a href="../tool/Cirrus/?corpus=austen" target="_blank">voyant-tools.org/tool/Cirrus/?corpus=austen</a><br/>{@img tool.png Tool}</div></td><td><div style="max-width: 350px; text-align: center;"><a href="../?corpus=austen&view=Cirrus">voyant-tools.org/?corpus=austen&view=Cirrus</a><br/>{@img view.png View}</td></tr></table>
+
+## Next Steps
+
+* [what's new in Version 2](#!/guide/new)
+* [explore the tools](#!/guide/tools)
+* read [about Voyant Tools](#!/guide/about)

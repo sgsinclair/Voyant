@@ -3,29 +3,13 @@
         "title": "Voyant Tools Help",
         "items": [
             {
-                "name": "start",
-                "url": "guides/start",
-                "title": "Getting Started",
-                "description": "This introduction helps you get started with Voyant Tools."
-            },
-            {
                 "title": "Guides",
                 "items": [
                     {
-                        "name": "guides",
-                        "url": "guides/ui",
-                        "title": "List of Guides",
-                        "description": "An overview of the user interface guides available."
-                    },
-                    {
-                        "name": "commonui",
-                        "url": "guides/ui/commonui",
-                        "title": "Common Interface Elements"
-                    },
-                    {
-                        "name": "new",
-                        "url": "guides/ui/new",
-                        "title": "What's New"
+                        "name": "start",
+                        "url": "guides/start",
+                        "title": "Getting Started",
+                        "description": "This introduction helps you get started with Voyant Tools."
                     },
                     {
                         "name": "corpuscreator",
@@ -46,6 +30,11 @@
                         "name": "embedding",
                         "url": "guides/ui/embedding",
                         "title": "Embedding Voyant"
+                    },
+                    {
+                        "name": "new",
+                        "url": "guides/ui/new",
+                        "title": "What's New"
                     }
                 ]
             },

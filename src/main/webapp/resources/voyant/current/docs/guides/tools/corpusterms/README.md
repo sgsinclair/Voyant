@@ -29,7 +29,6 @@ Clicking on the [Options](#!/guide/options) icon allows you to define a set of s
 ## See Also
 
 - [Getting Started](#!/guide/start)
-- [Common UI](#!/guide/commonui)
 - [Grids](#!/guide/grids)
 - [Stopwords](#!/guide/stopwords)
 - [Default Skin](#!/guide/defaultskin)

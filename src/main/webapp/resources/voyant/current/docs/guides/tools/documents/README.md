@@ -42,7 +42,6 @@ We hope to soon offer functionality for users to edit or customize the metadata 
 ## See Also
 
 - [Getting Started](#!/guide/start)
-- [Common UI](#!/guide/commonui)
 - [Grids](#!/guide/grids)
 - [Default Skin](#!/guide/defaultskin)
 - [List of Tools](#!/guide/tools)

@@ -22,7 +22,7 @@ Ext.define('Voyant.util.Toolable', {
 			exportGridCurrentJson: {en: "export current data as JSON"},
 			exportGridCurrentTsv: {en: "export current data as tab separated values (text)"},
 			'export': {en: 'Export'},
-			exportTitle: {en: 'Export'},
+			optionsTitle: {en: 'Options'},
 			confirmTitle: {en: 'Confirm'},
 			cancelTitle: {en: 'Cancel'},
 			exportError: {en: "Export Error"},
@@ -104,7 +104,7 @@ Ext.define('Voyant.util.Toolable', {
 						if (panel.isXType("voyanttabpanel")) {panel = panel.getActiveTab()}
 						// we're here because the panel hasn't overridden the click function
 						Ext.create('Ext.window.Window', {
-							title: panel.localize("exportTitle"),
+							title: panel.localize("optionsTitle"),
 							modal: true,
 			            	panel: panel,
 							items: {
