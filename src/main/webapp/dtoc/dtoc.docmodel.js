@@ -370,10 +370,12 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 		var doc = this.getCorpus().getDocument(docId);
 		var index = doc.getIndex();
 		var tokenPosition = parseInt(tokenId.split('.')[1]);
+		var tokenPercent;
 		if (tokenId.match('tag') != null) {
-			tokenPosition = tokenPosition / 10;
+			tokenPercent = tokenPosition / doc.get('lastTokenStartOffset-lexical');
+		} else {
+			tokenPercent = tokenPosition / doc.get('tokensCount-lexical');
 		}
-		var tokenPercent = tokenPosition / doc.get('tokensCount-lexical');
 		var i = Math.floor(this.documents.get(index).lines * tokenPercent);
 		try {
 			var el = Ext.get('prospect_' + index + '_' + i);
