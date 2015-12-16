@@ -33,7 +33,9 @@ Ext.define('Voyant.data.model.Document', {
     getTitle: function() {
     	var title = this.get('title');
     	if (title === undefined) title = '';
-    	return Ext.isArray(title) ? title.join("; ") : title;
+    	title = Ext.isArray(title) ? title.join("; ") : title;
+    	title = title.trim().replace(/\s+/g, ' '); // remove excess whitespace
+    	return title;
     },
     
     getTruncated: function(string, max) {
@@ -52,7 +54,7 @@ Ext.define('Voyant.data.model.Document', {
 					string = string.substring(0, space) + "…";
 				}
 		}
-  		return string
+  		return string;
     	
     },
     
