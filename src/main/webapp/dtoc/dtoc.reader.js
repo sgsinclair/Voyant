@@ -30,6 +30,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	readerContainer: null,
 	prevButton: null,
 	nextButton: null,
+	tokenToolTipsMap: {},
     
     constructor: function(config) {
     	
