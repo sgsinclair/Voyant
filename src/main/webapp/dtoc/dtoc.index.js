@@ -223,7 +223,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 	
 	updateIndexProgress: function(progress) {
 	    var msgEl = this._maskEl.down('.x-mask-msg-text');
-	    msgEl.dom.firstChild.data = 'Processing Index: '+Math.floor(progress*100)+'%';
+	    if (msgEl) {
+	    	msgEl.dom.firstChild.data = 'Processing Index: '+Math.floor(progress*100)+'%';
+	    }
 	},
 	
 	updateChapterFilter: function() {
