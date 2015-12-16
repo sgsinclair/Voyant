@@ -369,13 +369,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 	showTokenHit: function(docId, tokenId, type) {
 		var doc = this.getCorpus().getDocument(docId);
 		var index = doc.getIndex();
-		var tokenPosition = parseInt(tokenId.split('.')[1]);
-		var tokenPercent;
-		if (tokenId.match('tag') != null) {
-			tokenPercent = tokenPosition / doc.get('lastTokenStartOffset-lexical');
-		} else {
-			tokenPercent = tokenPosition / doc.get('tokensCount-lexical');
-		}
+		var tokenPercent = this.getTokenPercent(doc, tokenId);
 		var i = Math.floor(this.documents.get(index).lines * tokenPercent);
 		try {
 			var el = Ext.get('prospect_' + index + '_' + i);
@@ -385,6 +379,17 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			}
 		} catch (e) {
 		}
+	},
+	
+	getTokenPercent: function(doc, tokenId) {
+		var tokenPosition = parseInt(tokenId.split('.')[1]);
+		var tokenPercent;
+		if (tokenId.match('tag') != null) {
+			tokenPercent = tokenPosition / doc.get('lastTokenStartOffset-lexical');
+		} else {
+			tokenPercent = tokenPosition / doc.get('tokensCount-lexical');
+		}
+		return tokenPercent;
 	},
 	
 	clearHits: function(type) {
@@ -431,13 +436,10 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 		}
 	},
 	
-	highlightProspect: function(docIndex, offset, animate) {
+	highlightProspect: function(docIndex, tokenId, animate) {
 		var doc = this.documents.get(docIndex);
-		if (Ext.isString(offset)) {
-			offset = parseInt(offset);
-		}
-		var amount = offset / doc.document.get('tokensCount-lexical');
-		this.setCurrentPosition(docIndex, amount, animate);
+		var tokenPercent = this.getTokenPercent(doc.document, tokenId);
+		this.setCurrentPosition(docIndex, tokenPercent, animate);
 	},
 	
 	getSelectionsForDoc: function(docId) {
