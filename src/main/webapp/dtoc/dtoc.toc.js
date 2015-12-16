@@ -96,25 +96,11 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		    	hideBorders: true,
 		    	items: [{
 		    		xtype: 'querysearchfield',
+		    		itemId: 'search',
 		    		emptyText: "Word Search",
 		    		width: 135,
 		    		triggers: undefined
-		    	}/*{
-			    	xtype: 'textfield',
-			    	width: 135,
-			    	itemId: 'search',
-			    	emptyText: 'Word Search',
-			    	enableKeyEvents: true,
-			    	listeners: {
-			    		keydown: function(field, event) {
-			    			if (event.getCharCode() == 13) {
-			    				var query = this.getDockedItems('toolbar #search')[0].getValue();
-			    				this.submitQuery(query);
-			    			}
-			    		},
-			    		scope: this
-			    	}
-			    }*/]
+		    	}]
 		    }),
 		    listeners: {}
 		};
@@ -268,7 +254,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			this.submitQuery(query);
 		},
 		query: function(src, query) {
-			this.submitQuery(query)
+			this.submitQuery(query);
 		}
 
 	},
@@ -368,9 +354,9 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			var doc = this.getCorpus().getDocument(treeNode.getData().docId);
 			var docNode = root.findChild('docId', doc.getId());
 			if (docNode) {
-				// FIXME
+//				// FIXME
 //				var nodeEl = docNode.getUI().getEl().firstChild;
-				// TODO destroy tooltip when treenode is removed
+//				// TODO destroy tooltip when treenode is removed
 //				var tip = new Ext.ToolTip(Ext.apply({
 //					target: nodeEl,
 //					title: '',
@@ -435,6 +421,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			tool: 'corpus.DocumentContexts',
 			context: 6,
 //			limit: 50,
+			stripTags: 'all',
 			simpleSortMode: true,
 			sortBy: 'position',
 			sortDirection: 'ASC', // TODO sort direction not implemented on server
@@ -752,7 +739,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			node.collapse();
 		});
 		
-		this.getDockedItems('toolbar #search')[0].setValue('');
+		this.down('#search').setValue('');
 	},
 	
 	removeNodes: function(type, idsToKeep) {
