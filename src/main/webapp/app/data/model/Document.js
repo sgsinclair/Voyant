@@ -10,6 +10,7 @@ Ext.define('Voyant.data.model.Document', {
              {name: 'typeTokenRatio-lexical', type: 'float', calculate:  function(data) {
         	 	return data['typesCount-lexical']/data['tokensCount-lexical'];
              }},
+             {name: 'lastTokenStartOffset-lexical', type: 'int'},
              {name: 'title'},
              {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data;}}
     ],
