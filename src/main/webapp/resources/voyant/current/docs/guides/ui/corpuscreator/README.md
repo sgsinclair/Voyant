@@ -16,7 +16,7 @@ The following sources are supported:
   * use Shift and Ctrl keys to select multiple files at once
   * you can create a zip archive on your machine and upload it instead of selecting individual files
 
-Unlike in the previous version of Voyant, you can now [add, remove and reorder documents](#!/guide/modifyingcorpus) after a corpus has been created.
+Unlike in the previous version of Voyant, you can now [add, remove and reorder documents](#!/guide/documents-section-modifying-a-corpus) after a corpus has been created.
 
 <div style="max-width: 600px; margin-left: auto; margin-right: auto">{@img corpuscreator.png Corpus Creator}</div>
 
@@ -69,6 +69,6 @@ Tokenization (in this context) is the process of identifying words, or sequences
 
 ## Next Steps
 
-* [modifying a corpus](#!/guide/modifyingcorpus)
+* [embedding a corpus](#!/guide/embedding)
 * [explore the tools](#!/guide/tools)
 * read [about Voyant Tools](#!/guide/about)

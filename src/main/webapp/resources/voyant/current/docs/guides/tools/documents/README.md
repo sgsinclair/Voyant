@@ -18,11 +18,13 @@ Additional columns can be shown:
 
 By default, documents are shown in the order they exist in the corpus.
 
-{@img documents.png Documents}
+<div style="max-width: 700px; margin-left: auto; margin-right: auto;">{@img documents.png Documents}</div>
 
 ## Options
 
 You can filter documents  by typing a query into the search box and hitting enter (see [Term Searches](#!/guide/search) for more advanced searching capabilities). Note that by default the query includes the full-text, the title and the author. You can use the author or title prefix to *only* look at one of those metadata fields (e.g. _title:love_).
+
+### Modifying a Corpus
 
 You can modify a corpus by clicking on the _Modify_ button. Note that any modifications actually create a new corpus (so the URL will change). The following modifications are available:
 
