@@ -17,6 +17,17 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	titlesMode: null,
 	FULL_TITLES: 0,
 	MIN_TITLES: 1,
+	
+	toolTipConfig: {
+		cls: 'dtcReaderNote',
+		showDelay: 250,
+		hideDelay: 0,
+		constrainPosition: true,
+		border: false,
+		shadow: false,
+		padding: 5,
+		maxWidth: 400
+	},
     
     constructor: function(config) {
     	this.isCurator = config.isCurator == null ? false : config.isCurator;
@@ -300,7 +311,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 				title = doc.getTitle().normalize();
 			}
 			if (!this.isCurator) {
-				author = doc.get('author');
+				author = doc.getAuthor();
 				if (author === undefined) {
 					author = '';
 				}
@@ -315,15 +326,15 @@ Ext.define('Voyant.panel.DToC.ToC', {
 				docNode = root.appendChild(this.createChapterTreeNode(title, doc));
 			}
 			
-//			if (docNode.getData().toolTip == null) {
-//				this._createToolTipForChapterNode(docNode);
-//			} else {
-//				if (this.titlesMode == this.MIN_TITLES) {
-//					docNode.getData().toolTip.enable();
-//				} else {
-//					docNode.getData().toolTip.disable();
-//				}
-//			}
+			if (docNode.getData().toolTip == null) {
+				this._createToolTipForChapterNode(docNode);
+			} else {
+				if (this.titlesMode == this.MIN_TITLES) {
+					docNode.getData().toolTip.enable();
+				} else {
+					docNode.getData().toolTip.disable();
+				}
+			}
 		}
 	},
 	
@@ -354,39 +365,26 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			var doc = this.getCorpus().getDocument(treeNode.getData().docId);
 			var docNode = root.findChild('docId', doc.getId());
 			if (docNode) {
-//				// FIXME
-//				var nodeEl = docNode.getUI().getEl().firstChild;
-//				// TODO destroy tooltip when treenode is removed
-//				var tip = new Ext.ToolTip(Ext.apply({
-//					target: nodeEl,
-//					title: '',
-//					listeners: {
-//						show: function(tt) {
-//							var authors = doc.get('author');
-//							var names = '';
-//							for (var i = 0; i < authors.length; i++) {
-//								var author = authors[i];
-//								if (i > 0) {
-//									if (authors.length > 2) names += ', ';
-//									if (i == authors.length - 1) {
-//										names += ' and ';
-//									}
-//								}
-//								names += author.forename + ' ' + author.surname;
-//							}
-//							tt.body.update('<span class="title">'+doc.get('title').normalize()+'</span>'+
-//									'<br/><span class="author">'+names+'</span>');
-//						},
-//						scope: this
-//					}
-//				}, this.toolTipConfig));
-//				docNode.getData().toolTip = tip;
-//				
-//				if (this.titlesMode == this.MIN_TITLES) {
-//					docNode.getData().toolTip.enable();
-//				} else {
-//					docNode.getData().toolTip.disable();
-//				}
+				var nodeEl = this.getView().getNode(docNode);
+				// TODO destroy tooltip when treenode is removed
+				var tip = Ext.create('Ext.ToolTip', Ext.apply(this.toolTipConfig, {
+					target: nodeEl,
+					title: '',
+					listeners: {
+						show: function(tt) {
+							tt.update('<span class="title">'+doc.getTitle()+'</span>'+
+									'<br/><span class="author">'+doc.getAuthor()+'</span>');
+						},
+						scope: this
+					}
+				}));
+				docNode.set('toolTip', tip);
+				
+				if (this.titlesMode == this.MIN_TITLES) {
+					docNode.getData().toolTip.enable();
+				} else {
+					docNode.getData().toolTip.disable();
+				}
 			}
 		}
 	},
