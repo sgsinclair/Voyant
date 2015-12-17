@@ -88,7 +88,9 @@ public class FlexibleParametersFactory {
 				if (queryString!=null) {
 					List<NameValuePair> pairs = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
 					for (NameValuePair pair : pairs) {
-						parametersDecoder.decodeParameters(pair.getName(), new String[]{pair.getValue()}, allowLocalFileSystemAccess);
+						if (pair.getName().equals("_dc")==false) { // ignore the EXTJS param for GET requests
+							parametersDecoder.decodeParameters(pair.getName(), new String[]{pair.getValue()}, allowLocalFileSystemAccess);
+						}
 					}
 				}
 			}

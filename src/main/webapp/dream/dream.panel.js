@@ -9,7 +9,7 @@ Ext.define("Voyant.panel.Dream", {
     },
     statics: {
         api: {
-        	documentFormat: undefined,
+        	documentFormat: 'ORIGINAL',
         	documentFilename: 'pubDate,author,title'
         }
     },
@@ -113,7 +113,7 @@ Ext.define("Voyant.panel.Dream", {
 			                    				var data = operation.getProxy().getReader().rawData.documentsFinder;
 			                    				var url = this.getTromboneUrl()+"?corpus="+data.corpus+"&tool=corpus.CorpusExporter&outputFormat=zip"+
 			                    					"&zipFilename=DreamCorpus-"+data.documentsCount+"Documents.zip"+
-			                    					"&documentFormat="+(container.getApiParam("documentFormat")=="TXT" ? "TXT" : "ORIGINAL")+
+			                    					"&documentFormat="+(container.getApiParam("documentFormat"))+
 			                    					"&documentFilename="+container.getApiParam("documentFilename")
 			                    				var win = window.open(url);
 			                    				if (!win) { // popup blocked
@@ -142,15 +142,17 @@ Ext.define("Voyant.panel.Dream", {
 					    		xtype: 'radiogroup',
 					            fieldLabel: 'file format',
 					            cls: 'x-check-group-alt',
-					            width: 250,
+					            width: 500,
 					            labelWidth: 80,
 					            items: [
-					                {boxLabel: 'XML', name: 'export-format', inputValue: 'XML',checked: format!="TXT"},
+						            {boxLabel: 'Source XML', name: 'export-format', inputValue: 'SOURCE', checked: format=="SOURCE"},
+						            {boxLabel: 'XML', name: 'export-format', inputValue: 'ORIGINAL', checked: format=="ORIGINAL" || !format},
 					                {boxLabel: 'plain text', name: 'export-format', inputValue: 'TXT', checked: format=="TXT"}
 					            ],
 					            listeners: {
 					            	change: function(radio, newValue) {
-					            		container.setApiParam('documentFormat', newValue['export-format']=='TXT' ? 'TXT' : undefined);
+					            		debugger
+					            		container.setApiParam('documentFormat', newValue['export-format']);
 					            	}
 					            }
 					    	},{
