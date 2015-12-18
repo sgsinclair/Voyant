@@ -145,8 +145,8 @@ Ext.define("Voyant.panel.Dream", {
 					            width: 500,
 					            labelWidth: 80,
 					            items: [
-						            {boxLabel: 'Source XML', name: 'export-format', inputValue: 'SOURCE', checked: format=="SOURCE"},
-						            {boxLabel: 'XML', name: 'export-format', inputValue: 'ORIGINAL', checked: format=="ORIGINAL" || !format},
+						            {boxLabel: 'DREaM XML', name: 'export-format', inputValue: 'SOURCE', checked: format=="SOURCE"},
+						            {boxLabel: 'Voyant XML', name: 'export-format', inputValue: 'ORIGINAL', checked: format=="ORIGINAL" || !format},
 					                {boxLabel: 'plain text', name: 'export-format', inputValue: 'TXT', checked: format=="TXT"}
 					            ],
 					            listeners: {
