@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Dec 16 15:30:57 PST 2015 */
+/* This file created by JSCacher. Last modified: Fri Dec 18 15:18:34 PST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3571,7 +3571,9 @@ Ext.define('Voyant.data.model.Document', {
     
     getAuthor: function() {
     	var author = this.get('author');
-    	return Ext.isArray(author) ? author.join("; ") : author;
+    	author = Ext.isArray(author) ? author.join("; ") : author;
+    	author = author.trim().replace(/\s+/g, ' ');
+    	return author;
     },
     
     getCorpusId: function() {
@@ -14866,7 +14868,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
 
 Ext.define('Voyant.panel.CorpusSet', {
 	extend: 'Ext.panel.Panel',
-    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph'],
+    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph',,'Voyant.panel.Streamgraph'],
 	mixins: ['Voyant.panel.Panel'],
     alias: 'widget.corpusset',
 	statics: {

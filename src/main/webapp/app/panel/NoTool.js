@@ -17,7 +17,7 @@ Ext.define('Voyant.panel.NoTool', {
     	}
     },
     config: {
-    	notYetImplemented: ["Centroid","DocumentInputAdd","DocumentTypeCollocateFrequenciesGrid","EntitiesBrowser","Equalizer","FeatureClusters","Flowerbed","Knots","KwicsTagger","Lava","Mandala","MicroSearch","NetVizApplet","PaperDrill","RezoViz","Sunburst","Termometer","Ticker","TokensViz","ToolBrowser","ToolBrowserLarge","VoyeurTagline","WordCloud","VoyeurTagline","WordCountFountain"]
+    	notYetImplemented: ["Centroid","DocumentInputAdd","DocumentTypeCollocateFrequenciesGrid","EntitiesBrowser","Equalizer","FeatureClusters","Flowerbed","KwicsTagger","Lava","Mandala","MicroSearch","NetVizApplet","PaperDrill","RezoViz","Sunburst","Termometer","Ticker","TokensViz","ToolBrowser","ToolBrowserLarge","VoyeurTagline","WordCloud","VoyeurTagline","WordCountFountain"]
     },
     constructor: function() {
     	Ext.apply(this, {
@@ -28,7 +28,7 @@ Ext.define('Voyant.panel.NoTool', {
     },
 	listeners: {
 		boxready: function(container, width, height) {
-			var tool = this.getApiParam("tool");
+			var tool = this.getApiParam("notool");
 			if (tool) {
 				if (Ext.isArray(tool)) {tool=tool[0]}
 				
