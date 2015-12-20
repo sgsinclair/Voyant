@@ -185,3 +185,11 @@ svg#collocatesGraph line {
     .green {color:green;}
     
  
+     @font-face {
+	    font-family: 'CC-ICONS';
+	    src: url('cc-icons.ttf') format('truetype');
+    }
+    span.cc {
+	    font-family: 'CC-ICONS';
+    }
+ 
