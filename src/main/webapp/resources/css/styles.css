@@ -134,7 +134,6 @@ svg#collocatesGraph line {
 	color: grey !important;
 }
 
-
 /* used for panel tool glyphs in the header */
 .x-tool-glyph {
     font-size: 16px;
@@ -142,9 +141,12 @@ svg#collocatesGraph line {
     font-weight: normal;
      color: #157fcc;
      opacity: .75;
-    width: 20px;
+    margin-right: 2px;
+}
+.x-tool-glyph:last-child {
     margin-right: 5px;
 }
+
     .x-tool-glyph:hover {
         opacity: 1;
     }

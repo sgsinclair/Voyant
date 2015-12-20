@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Dec 20 11:59:50 PST 2015 */
+/* This file created by JSCacher. Last modified: Sun Dec 20 14:52:47 PST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2880,7 +2880,7 @@ Ext.define('Voyant.util.Toolable', {
 		})
 		this.on("afterrender", function() {
 			var header = this.getHeader();
-			if (header) {
+			if (header && Ext.os.deviceType=="Desktop") {
 				var el = header.getEl();
 				el.on("mouseover", function() {
 					this.getHeader().getTools().forEach(function(tool) {
@@ -3315,7 +3315,11 @@ Ext.define('Voyant.util.ToolMenu', {
     alias: 'widget.toolmenu',
     renderTpl: ['<div class="x-menu-tool-hover">' + '</div>'+
             '<tpl if="glyph">' + 
-            '<span id="{id}-toolEl" class="{baseCls}-glyph {childElCls}" role="presentation" style="font-family: {glyphFontFamily}">&#{glyph}</span>' + 
+            '<span id="{id}-toolEl" class="{baseCls}-glyph {childElCls}" role="presentation" style="font-family: {glyphFontFamily}; '+
+            	'<tpl if="Ext.isSafari || (Ext.isWebKit && Ext.os.name==\'iOS\')">'+ // FIXME: this is an awful hack..
+            		'margin-right: 15px; '+
+            	'</tpl>'+
+            '">&#{glyph}</span>' + 
             '<tpl else>' + 
             '<img id="{id}-toolEl" src="{blank}" class="{baseCls}-img {baseCls}-{type}' + '{childElCls}" role="presentation"/>' + 
             '</tpl>'],
