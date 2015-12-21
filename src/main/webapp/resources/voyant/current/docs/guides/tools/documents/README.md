@@ -24,16 +24,7 @@ By default, documents are shown in the order they exist in the corpus.
 
 You can filter documents  by typing a query into the search box and hitting enter (see [Term Searches](#!/guide/search) for more advanced searching capabilities). Note that by default the query includes the full-text, the title and the author. You can use the author or title prefix to *only* look at one of those metadata fields (e.g. _title:love_).
 
-### Modifying a Corpus
-
-You can modify a corpus by clicking on the _Modify_ button. Note that any modifications actually create a new corpus (so the URL will change). The following modifications are available:
-
-- *Add* more documents by clicking the _Add_ button (this will cause the [corpus creation](#!/guide/corpuscreator) window to appear, but any new documents will be added to the corpus)
-- *Remove* documents by selecting one ore more documents at once (using the shift or ctrl/command keys) and then clicking the _Remove_ button (this keeps all of the unselected documents)
-- *Keep* documents by selecting one ore more documents at once (using the shift or ctrl/command keys) and then clicking the _Keep_ button (this removes all of the unselected documents)
-- *Reorder* documents by dragging and dropping them within the grid and then hitting the _Reorder_ button
-
-Note that only one of these operations can be done at a time, so, for instance, you can first remove some documents and then in the new corpus you can reorder the remaining documents.
+You can modify a corpus by clicking on the _Modify_ button – see more information about [modifying a corpus](#!/guide/modifyingcorpus).
 
 ## Additional Information
 

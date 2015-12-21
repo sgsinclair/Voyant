@@ -1,1 +1,1 @@
-<%@ include "template.html" %>
+<%@ include page="index.html" %>

@@ -2,7 +2,6 @@
     "--title": "Voyant Tools Help",
     "--css": "#guide-body p img {max-width: 100%; height: auto; border: thin solid #efefef; thumb-list dd .thumb img {border: none;};",
     "--warnings": ["-link"],
-    "--seo": true,
     "--guides": "guides.json",
     "--output": "docs",
     "--template": "template-min",

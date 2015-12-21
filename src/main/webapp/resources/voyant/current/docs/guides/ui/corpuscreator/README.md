@@ -69,6 +69,6 @@ Tokenization (in this context) is the process of identifying words, or sequences
 
 ## Next Steps
 
-* [embedding a corpus](#!/guide/embedding)
+* [modifying a corpus](#!/guide/modifyingcorpus)
 * [explore the tools](#!/guide/tools)
 * read [about Voyant Tools](#!/guide/about)
