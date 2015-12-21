@@ -195,3 +195,8 @@ svg#collocatesGraph line {
 	    font-family: 'CC-ICONS';
     }
  
+ /* loading animation */
+#pageloading {position:absolute;top:50%;width:100%;margin-top:-70px}
+#pageloading .title{font-family:"Exo",sans-serif;font-size:2em;color:gray;text-align:center;white-space:nowrap;display:block}
+#pageloading .logo{background:url(rotating-owl.gif) no-repeat center;display:block;height:121px}
+ 
