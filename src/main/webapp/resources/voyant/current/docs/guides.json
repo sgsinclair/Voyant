@@ -7,7 +7,7 @@
                 "items": [
                     {
                         "name": "start",
-                        "url": "guides/start",
+                        "url": "guides/ui/start",
                         "title": "Getting Started",
                         "description": "This introduction helps you get started with Voyant Tools."
                     },
@@ -22,14 +22,29 @@
                         "title": "Modifying a Corpus"
                     },
                     {
+                        "name": "embedding",
+                        "url": "guides/ui/embedding",
+                        "title": "Embedding Voyant"
+                    },
+                    {
+                        "name": "skins",
+                        "url": "guides/ui/skins",
+                        "title": "Skins"
+                    },
+                    {
                         "name": "stopwords",
                         "url": "guides/ui/stopwords",
                         "title": "Stopwords"
                     },
                     {
-                        "name": "embedding",
-                        "url": "guides/ui/embedding",
-                        "title": "Embedding Voyant"
+                        "name": "search",
+                        "url": "guides/ui/search",
+                        "title": "Search"
+                    },
+                    {
+                        "name": "grids",
+                        "url": "guides/ui/grids",
+                        "title": "Grids"
                     },
                     {
                         "name": "new",
@@ -83,14 +98,19 @@
                         "title": "Documents"
                     },
                     {
-                        "name": "reader",
-                        "url": "guides/tools/reader",
-                        "title": "Reader"
+                        "name": "knots",
+                        "url": "guides/tools/knots",
+                        "title": "Knots"
                     },
                     {
                         "name": "phrases",
                         "url": "guides/tools/phrases",
                         "title": "Phrases"
+                    },
+                    {
+                        "name": "reader",
+                        "url": "guides/tools/reader",
+                        "title": "Reader"
                     },
                     {
                         "name": "scatterplot",

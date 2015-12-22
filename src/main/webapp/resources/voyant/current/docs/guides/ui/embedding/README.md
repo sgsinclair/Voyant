@@ -49,6 +49,6 @@ We assume that screen real-estate is at a premium in embedded instances of Voyan
 
 ## Next Steps
 
-* [stopwords](#!/guide/stopwords)
+* [skins](#!/guide/skins)
 * [explore the tools](#!/guide/tools)
 * read [about Voyant Tools](#!/guide/about)

@@ -26,6 +26,6 @@ By default the current version of Voyant uses the _Auto-detect_ option; this is 
 
 ## Next Steps
 
-* [what's new in Version 2](#!/guide/new)
+* [search](#!/guide/search)
 * [explore the tools](#!/guide/tools)
 * read [about Voyant Tools](#!/guide/about)

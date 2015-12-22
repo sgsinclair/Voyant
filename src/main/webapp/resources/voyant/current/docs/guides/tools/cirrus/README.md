@@ -34,5 +34,5 @@ Word clouds can be effective at very quickly drawing attention to high frequency
 
 - [Getting Started](#!/guide/start)
 - [Stopwords](#!/guide/stopwords)
-- [Default Skin](#!/guide/defaultskin)
+- [Default Skin](#!/guide/skins-section-default-skin)
 - [List of Tools](#!/guide/tools)

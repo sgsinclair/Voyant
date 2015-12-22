@@ -2,7 +2,7 @@
 
 You can modify a corpus by clicking on the _Modify_ button of the [Documents Tool](#!/guide/documents).
 
-<div style="max-width: 650px; margin-left: auto; margin-right: auto;">{@img documents.png Documents}</div>
+<div style="max-width: 600px; margin-left: auto; margin-right: auto;">{@img documents.png Documents}</div>
 
 Note that any modifications actually create a new corpus (so the URL will change). The following modifications are available:
 

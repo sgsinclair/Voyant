@@ -31,5 +31,5 @@ Clicking on the [Options](#!/guide/options) icon allows you to define a set of s
 - [Getting Started](#!/guide/start)
 - [Grids](#!/guide/grids)
 - [Stopwords](#!/guide/stopwords)
-- [Default Skin](#!/guide/defaultskin)
+- [Default Skin](#!/guide/skins-section-default-skin)
 - [List of Tools](#!/guide/tools)

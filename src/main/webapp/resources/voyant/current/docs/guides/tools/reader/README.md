@@ -37,5 +37,5 @@ The Prospect Viewer is inspired by the work of Stan Ruecker (see [this book](htt
 ## See Also
 
 - [Getting Started](#!/guide/start)
-- [Default Skin](#!/guide/defaultskin)
+- [Default Skin](#!/guide/skins-section-default-skin)
 - [List of Tools](#!/guide/tools)

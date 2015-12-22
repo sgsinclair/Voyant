@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Dec 21 17:23:14 PST 2015 */
+/* This file created by JSCacher. Last modified: Tue Dec 22 12:48:55 PST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7614,7 +7614,7 @@ Ext.define('Voyant.panel.Knots', {
 			options: {en: "Options"},
 			speed : {en: 'Speed'},
 			startAngle : {en: 'Start Angle'},
-			tangles : {en: 'Tangles'},
+			tangles : {en: 'Turn Angle'},
 			context : {en: 'Context'}
     	},
     	api: {
@@ -7850,65 +7850,66 @@ Ext.define('Voyant.panel.Knots', {
 	            ,'-',{
 	            	xtype: 'button',
 	            	text: this.localize('options'),
-	            	menu: [
-					{
-						xtype: 'slider',
-						itemId: 'speed',
-						fieldLabel: this.localize('speed'),
-						labelAlign: 'right',
-						labelWidth: 70,
-						width: 150,
-						increment: 50,
-						minValue: 0,
-						maxValue: 500,
-						value: this.getRefreshInterval(),
-						margin: "5 5 0 0",
-						listeners: {
-							changecomplete: function(slider, newvalue) {
-								this.setRefreshInterval(newvalue);
-								if (this.knots) {this.knots.buildGraph();}
-							},
-							scope: this
+	            	menu: {
+	            		width: 200,
+	            		items: [{
+							xtype: 'slider',
+							itemId: 'speed',
+							fieldLabel: this.localize('speed'),
+							labelAlign: 'right',
+							labelWidth: 70,
+	//						width: 150,
+							increment: 50,
+							minValue: 0,
+							maxValue: 500,
+							value: 500-this.getRefreshInterval(),
+	//						margin: "5 5 0 0",
+							listeners: {
+								changecomplete: function(slider, newvalue) {
+									this.setRefreshInterval(500-newvalue);
+									if (this.knots) {this.knots.buildGraph();}
+								},
+								scope: this
+							}
+						},{
+							xtype: 'slider',
+							itemId: 'startAngle',
+							fieldLabel: this.localize('startAngle'),
+							labelAlign: 'right',
+							labelWidth: 70,
+	//						width: 150,
+							increment: 15,
+							minValue: 0,
+							maxValue: 360,
+							value: this.getStartAngle(),
+							listeners: {
+								changecomplete: function(slider, newvalue) {
+									this.setStartAngle(newvalue);
+									if (this.knots) {this.knots.buildGraph();}
+								},
+								scope: this
+							}
+						},{
+							xtype: 'slider',
+							itemId: 'tangles',
+							fieldLabel: this.localize('tangles'),
+							labelAlign: 'right',
+							labelWidth: 70,
+	//						width: 150,
+							increment: 5,
+							minValue: 5,
+							maxValue: 90,
+							value: this.getAngleIncrement(),
+	//						margin: "0 5 5 0",
+							listeners: {
+								changecomplete: function(slider, newvalue) {
+									this.setAngleIncrement(newvalue);
+									if (this.knots) {this.knots.buildGraph();}
+								},
+								scope: this
+							}
 						}
-					},{
-						xtype: 'slider',
-						itemId: 'startAngle',
-						fieldLabel: this.localize('startAngle'),
-						labelAlign: 'right',
-						labelWidth: 70,
-						width: 150,
-						increment: 15,
-						minValue: 0,
-						maxValue: 360,
-						value: this.getStartAngle(),
-						listeners: {
-							changecomplete: function(slider, newvalue) {
-								this.setStartAngle(newvalue);
-								if (this.knots) {this.knots.buildGraph();}
-							},
-							scope: this
-						}
-					},{
-						xtype: 'slider',
-						itemId: 'tangles',
-						fieldLabel: this.localize('tangles'),
-						labelAlign: 'right',
-						labelWidth: 70,
-						width: 150,
-						increment: 5,
-						minValue: 5,
-						maxValue: 90,
-						value: this.getAngleIncrement(),
-						margin: "0 5 5 0",
-						listeners: {
-							changecomplete: function(slider, newvalue) {
-								this.setAngleIncrement(newvalue);
-								if (this.knots) {this.knots.buildGraph();}
-							},
-							scope: this
-						}
-					}
-	            	]
+	            	]}
 	            }]
     		}],
             border: false,
@@ -11125,8 +11126,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         },
                         scope: this
                     },{
-                    	xtype: 'textfield',
-                    	emptyText: this.localize('addTerm'),
+                    	xtype: 'querysearchfield',
+                    	emptyText: this.localize('addTerm')/*,
                     	triggers: {
                             clear: {
                                 weight: 0,
@@ -11160,7 +11161,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                                     this.triggers.search.onClick();
                                 }
                         	}
-                        }
+                        }*/
                     }]
                 }],
         		columns: [{

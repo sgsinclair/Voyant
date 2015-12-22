@@ -36,5 +36,5 @@ We hope to soon offer functionality for users to edit or customize the metadata 
 
 - [Getting Started](#!/guide/start)
 - [Grids](#!/guide/grids)
-- [Default Skin](#!/guide/defaultskin)
+- [Default Skin](#!/guide/skins-section-default-skin)
 - [List of Tools](#!/guide/tools)

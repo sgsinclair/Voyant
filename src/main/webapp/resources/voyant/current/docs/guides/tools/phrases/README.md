@@ -46,5 +46,5 @@ Note also that for a phrase to be considered repeating it has to repeat within a
 
 - [Getting Started](#!/guide/start)
 - [Grids](#!/guide/grids)
-- [Default Skin](#!/guide/defaultskin)
+- [Default Skin](#!/guide/skins-section-default-skin)
 - [List of Tools](#!/guide/tools)

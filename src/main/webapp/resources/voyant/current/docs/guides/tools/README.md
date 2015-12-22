@@ -66,6 +66,19 @@
 	</dd></a>
 </div>
 
+
+<div class="thumb-list">
+	<a href="#!/guide/knots"><dd>
+		<div class="thumb">
+			<img src="guides/knots/icon.png" />
+		</div>
+		<div>
+			<h4>Knots</h4>
+			<p>Knots is a creative visualization that represents terms in a single document as a series of twisted lines.</p>
+		</div>
+	</dd></a>
+</div>
+
 <div class="thumb-list">
 	<a href="#!/guide/documents"><dd>
 		<div class="thumb">
@@ -109,7 +122,7 @@
 		</div>
 		<div>
 			<h4>Scatterplot</h4>
-			<p></p>
+			<p>ScatterPlot is a graph visualization of how words cluster in a corpus using either correspondence analysis or principal component analysis.</p>
 		</div>
 	</dd></a>
 </div>
