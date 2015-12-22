@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Dec 20 14:52:47 PST 2015 */
+/* This file created by JSCacher. Last modified: Mon Dec 21 17:23:14 PST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7611,6 +7611,7 @@ Ext.define('Voyant.panel.Knots', {
 			removeTerm : {en: 'Remove Term'},
 			showTerm : {en: 'Show Term'},
 			hideTerm : {en: 'Hide Term'},
+			options: {en: "Options"},
 			speed : {en: 'Speed'},
 			startAngle : {en: 'Start Angle'},
 			tangles : {en: 'Tangles'},
@@ -7829,7 +7830,7 @@ Ext.define('Voyant.panel.Knots', {
                 xtype: 'toolbar',
                 items: [{
                 	xtype: 'querysearchfield'
-                },{
+                },/*{
 	            	xtype: 'button',
 	            	text: this.localize('clearTerms'),
 	            	handler: function() {
@@ -7840,63 +7841,74 @@ Ext.define('Voyant.panel.Knots', {
 	            		this.knots.drawGraph();
 	            	},
 	            	scope: this
-	            },
+	            },*/
 	            '-',{
 	            	xtype: 'documentselector',
 	            	itemId: 'docSelector',
 	            	singleSelect: true
 	            }
 	            ,'-',{
-	            	xtype: 'slider',
-	            	itemId: 'speed',
-	            	fieldLabel: this.localize('speed'),
-	            	labelAlign: 'right',
-	            	labelWidth: 70,
-	            	width: 150,
-	            	increment: 50,
-	            	minValue: 0,
-	            	maxValue: 500,
-	            	value: this.getRefreshInterval(),
-	            	listeners: {
-	            		changecomplete: function(slider, newvalue) {
-	            			this.setRefreshInterval(newvalue);
-	            		},
-	            		scope: this
-	            	}
-	            },{
-	            	xtype: 'slider',
-	            	itemId: 'startAngle',
-	            	fieldLabel: this.localize('startAngle'),
-	            	labelAlign: 'right',
-	            	labelWidth: 70,
-	            	width: 150,
-	            	increment: 15,
-	            	minValue: 0,
-	            	maxValue: 360,
-	            	value: this.getStartAngle(),
-	            	listeners: {
-	            		changecomplete: function(slider, newvalue) {
-	            			this.setStartAngle(newvalue);
-	            		},
-	            		scope: this
-	            	}
-	            },{
-	            	xtype: 'slider',
-	            	itemId: 'tangles',
-	            	fieldLabel: this.localize('tangles'),
-	            	labelAlign: 'right',
-	            	labelWidth: 70,
-	            	width: 150,
-	            	increment: 5,
-	            	minValue: 5,
-	            	maxValue: 90,
-	            	value: this.getAngleIncrement(),
-	            	listeners: {
-	            		changecomplete: function(slider, newvalue) {
-	            			this.setAngleIncrement(newvalue);
-	            		},
-	            		scope: this
-	            	}
+	            	xtype: 'button',
+	            	text: this.localize('options'),
+	            	menu: [
+					{
+						xtype: 'slider',
+						itemId: 'speed',
+						fieldLabel: this.localize('speed'),
+						labelAlign: 'right',
+						labelWidth: 70,
+						width: 150,
+						increment: 50,
+						minValue: 0,
+						maxValue: 500,
+						value: this.getRefreshInterval(),
+						margin: "5 5 0 0",
+						listeners: {
+							changecomplete: function(slider, newvalue) {
+								this.setRefreshInterval(newvalue);
+								if (this.knots) {this.knots.buildGraph();}
+							},
+							scope: this
+						}
+					},{
+						xtype: 'slider',
+						itemId: 'startAngle',
+						fieldLabel: this.localize('startAngle'),
+						labelAlign: 'right',
+						labelWidth: 70,
+						width: 150,
+						increment: 15,
+						minValue: 0,
+						maxValue: 360,
+						value: this.getStartAngle(),
+						listeners: {
+							changecomplete: function(slider, newvalue) {
+								this.setStartAngle(newvalue);
+								if (this.knots) {this.knots.buildGraph();}
+							},
+							scope: this
+						}
+					},{
+						xtype: 'slider',
+						itemId: 'tangles',
+						fieldLabel: this.localize('tangles'),
+						labelAlign: 'right',
+						labelWidth: 70,
+						width: 150,
+						increment: 5,
+						minValue: 5,
+						maxValue: 90,
+						value: this.getAngleIncrement(),
+						margin: "0 5 5 0",
+						listeners: {
+							changecomplete: function(slider, newvalue) {
+								this.setAngleIncrement(newvalue);
+								if (this.knots) {this.knots.buildGraph();}
+							},
+							scope: this
+						}
+					}
+	            	]
 	            }]
     		}],
             border: false,
