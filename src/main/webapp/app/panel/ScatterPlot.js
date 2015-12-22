@@ -253,42 +253,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         },
                         scope: this
                     },{
-                    	xtype: 'textfield',
-                    	emptyText: this.localize('addTerm'),
-                    	triggers: {
-                            clear: {
-                                weight: 0,
-                                cls: Ext.baseCSSPrefix + 'form-clear-trigger',
-                                hidden: true,
-                                handler: function(){
-                                    this.setValue('');
-                                	this.findParentByType('panel').fireEvent('query', this, undefined);
-                                    this.getTrigger('clear').hide();
-                                    this.updateLayout();
-                                }
-                            },
-                            search: {
-                                weight: 1,
-                                cls: Ext.baseCSSPrefix + 'form-search-trigger',
-                                handler: function(){
-                                    var value = this.getValue();
-                                	this.findParentByType('panel').fireEvent('query', this, value);
-                                	if (value) {
-                                        this.getTrigger('clear').show();
-                                	} else {
-                                        this.getTrigger('clear').hide();
-                                	}
-                                    this.updateLayout();
-                                }
-                            }
-                        },
-                        listeners: {
-                        	specialkey: function(field, event) {
-                        		if (event.getKey() === event.ENTER) {
-                                    this.triggers.search.onClick();
-                                }
-                        	}
-                        }
+                    	xtype: 'querysearchfield',
+                    	emptyText: this.localize('addTerm')
                     }]
                 }],
         		columns: [{
