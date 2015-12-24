@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Dec 23 16:11:10 PST 2015 */
+/* This file created by JSCacher. Last modified: Thu Dec 24 15:51:28 PST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -14328,6 +14328,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 
 	alias: 'widget.trends',
 	config: {
+    	options: {xtype: 'stoplistoption'},
 		corpus: undefined
 	},
     statics: {

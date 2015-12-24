@@ -5,6 +5,7 @@
 
 	alias: 'widget.trends',
 	config: {
+    	options: {xtype: 'stoplistoption'},
 		corpus: undefined
 	},
     statics: {
