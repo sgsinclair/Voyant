@@ -32,7 +32,8 @@ Ext.define('Voyant.panel.Summary', {
 		glyph: 'xf1ea@FontAwesome'
     },
     config: {
-    	corpus: undefined
+    	corpus: undefined,
+    	options: {xtype: 'stoplistoption'}
     },
     autoScroll: true,
     cls: 'corpus-summary',
