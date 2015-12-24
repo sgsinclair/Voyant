@@ -39,5 +39,10 @@
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
-
+	
+	<!-- make sure that Javascript is sent as UTF-8 (Jetty does this but Tomcat doesn't) -->
+	<mime-mapping>
+		<extension>js</extension>
+		<mime-type>application/javascript;charset=UTF-8</mime-type>
+	</mime-mapping>
 </web-app>
