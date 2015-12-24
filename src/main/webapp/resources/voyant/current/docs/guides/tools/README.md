@@ -135,7 +135,7 @@
 		</div>
 		<div>
 			<h4>Summary</h4>
-			<p>The Summary provides a simple, textual overview of the current corpus, including (as applicable for multiple documents) number of words, number of unique words, longest and shortest documents, highest and lowest vocabulary density, most frequent words, notable peaks in frequency, and distinctive words.</p>
+			<p>The Summary provides a simple, textual overview of the current corpus, including including information about words and documents.</p>
 		</div>
 	</dd></a>
 </div>
@@ -159,7 +159,7 @@
 		</div>
 		<div>
 			<h4>Trends</h4>
-			<p></p>
+			<p>Trends shows a line graph depicting the distribution of a word’s occurrence across a corpus or document.</p>
 		</div>
 	</dd></a>
 </div>

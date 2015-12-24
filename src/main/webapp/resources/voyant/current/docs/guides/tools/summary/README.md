@@ -13,6 +13,8 @@ The Summary displays 6 categories of information formatted in a bulleted list.
 1. The fifth point indicates the five words with the most notable peaks in frequency. The word’s frequencies are indicated to their right alongside a small thumbnail pic depicting their relative frequencies across the corpus.
 1. The sixth point indicates the top five most distinctive words of each of the documents. While only the first five documents are visible clicking “Next # of # remaining” allows the user to navigate through the remaining undisplayed documents. To the right of each of the words is the word’s frequency displayed in brackets.
 
+<div style="max-width: 600px; margin-left: auto; margin-right: auto;">{@img summary.png Summary}</div>
+
 ## Options
 
 Clicking on the [Options](#!/guide/options) icon allows you to define a set of stopwords to exclude – see the [stopwords guide](#!/guide/stopwords) for more information.
