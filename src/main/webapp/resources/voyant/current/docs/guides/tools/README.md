@@ -135,7 +135,7 @@
 		</div>
 		<div>
 			<h4>Summary</h4>
-			<p></p>
+			<p>The Summary provides a simple, textual overview of the current corpus, including (as applicable for multiple documents) number of words, number of unique words, longest and shortest documents, highest and lowest vocabulary density, most frequent words, notable peaks in frequency, and distinctive words.</p>
 		</div>
 	</dd></a>
 </div>
@@ -147,7 +147,7 @@
 		</div>
 		<div>
 			<h4>Terms Radio</h4>
-			<p></p>
+			<p>TermsRadio is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).</p>
 		</div>
 	</dd></a>
 </div>
