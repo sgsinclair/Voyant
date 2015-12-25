@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Dec 24 15:51:28 PST 2015 */
+/* This file created by JSCacher. Last modified: Thu Dec 24 17:04:22 PST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6114,7 +6114,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	api: {
     		query: undefined,
     		mode: undefined,
-    		limit: 15,
+    		limit: 5,
     		stopList: 'auto',
     		terms: undefined,
     		context: 5
@@ -6316,7 +6316,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		    },
     		    scope: this,
     		    params: {
-    				limit: 10,
+    				limit: 3,
     				stopList: this.getApiParam("stopList")
     			}
         	});
@@ -6326,11 +6326,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     loadFromQuery: function(query) {
     	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	this.setApiParams({
-    		query: query,
     		mode: 'corpus'
     	});
+    	var params = this.getApiParams();
+    	params.query = query;
     	corpusCollocates.load({
-    		params: this.getApiParams(),
+    		params: params,
     		callback: function(records, operations, success) {
     			if (success) {
     				this.loadFromCorpusCollocateRecords(records);
@@ -6351,19 +6352,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     loadFromCorpusTermStringsArray: function(corpusTermStringsArray) {
-    	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
+    	corpusTermStringsArray.forEach(function(query) {this.loadFromQuery(query)}, this)
     	this.setApiParams({
     		query: corpusTermStringsArray,
     		mode: 'corpus'
-    	});
-    	corpusCollocates.load({
-    		params: this.getApiParams(),
-    		callback: function(records, operations, success) {
-    			if (success) {
-    				this.loadFromCorpusCollocateRecords(records);
-    			}
-    		},
-    		scope: this
     	});
     },
     
@@ -6382,12 +6374,13 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     			if (corpusCollocate.getContextTerm() != corpusCollocate.getTerm()) {
     				if (keywordId === undefined) {
 		    			var keywordNode = {
-		    				id: corpusCollocate.getKeyword(),
+		    				id: corpusCollocate.getKeyword()+".keyword",
 	    					label: corpusCollocate.getKeyword(),
 	    					title: corpusCollocate.getKeyword()+' ('+corpusCollocate.getKeywordRawFreq()+')',
 	    					type: 'keyword',
 	    					value: corpusCollocate.getKeywordRawFreq(),
-	    					start: start
+	    					start: start,
+	    					font: {/*size: scaleFont(n.rawFreq),*/ color: 'green'}
 						};
 		    			keywordId = keywordNode.id;
 		    			if (existingKeys[keywordId] !== undefined) {
@@ -6398,12 +6391,13 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     				}
 	    			
 	    			var contextNode = {
-	    				id: corpusCollocate.getContextTerm(),
+	    				id: corpusCollocate.getContextTerm()+".context",
     					label: corpusCollocate.getContextTerm(),
     					title: corpusCollocate.getContextTerm()+' ('+corpusCollocate.getContextTermRawFreq()+')',
     					type: 'context',
     					value: corpusCollocate.getContextTermRawFreq(),
-    					start: 0
+    					start: 0,
+    					font: {/*size: scaleFont(n.rawFreq),*/ color: 'maroon'}
 					};
 	    			var contextNodeKey = contextNode.id;
 	    			if (existingKeys[contextNodeKey] !== undefined) {
@@ -6452,6 +6446,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    		},
 	    		physics: {
 					barnesHut: {
+						"gravitationalConstant": -1500,
+					      "centralGravity": 6,
+					      "damping": 0.5,
+					      "avoidOverlap": 0.5
 					}
 	    		},
 	    		nodes: this.nodeOptions,
