@@ -37,6 +37,20 @@
 		</div>
 		<div>
 			<h4>Corpus Collocates</h4>
+			<p>Collocates Graph represents keywords and terms that occur in close proximity as a force directed network graph.</p>
+		</div>
+	</dd></a>
+</div>
+
+.
+
+<div class="thumb-list">
+	<a href="#!/guide/corpuscollocates"><dd>
+		<div class="thumb">
+			<img src="guides/corpuscollocates/icon.png" />
+		</div>
+		<div>
+			<h4>Corpus Collocates</h4>
 			<p>Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus.</p>
 		</div>
 	</dd></a>

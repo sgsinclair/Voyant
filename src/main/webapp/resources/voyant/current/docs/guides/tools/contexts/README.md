@@ -21,7 +21,7 @@ Some context is shown for each occurrence, you can also click on the plus icon t
 
 ## Options
 
-You can add specify which keyword to use by typing a query into the search box and hitting enter (see [Term Searches](#!/guide/search) for more advanced searching capabilities).
+You can specify which keyword to use by typing a query into the search box and hitting enter (see [Term Searches](#!/guide/search) for more advanced searching capabilities).
 
 There is also a slider that determines how much context to consider when looking for collocates. The value specifies the number of words to consider on _each_ side of the keyword (so the total window of words is double). By default the context is set to 5 words per side, and the slider can have a maximum of 50. Similarly, there's an "expand" slider which determines how many words to show when you expand any given row (by clicking the plus icon in the left-most column). The default is 50, the minimum is 5 and the maximum is 500.
 
