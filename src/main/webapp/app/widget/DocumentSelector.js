@@ -1,13 +1,16 @@
 Ext.define('Voyant.widget.DocumentSelector', {
-    extend: 'Ext.button.Button',
+    extend: 'Ext.menu.Item',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.documentselector',
+	glyph: 'xf10c@FontAwesome',
 	statics: {
 		i18n: {
 			documents: {en: 'Documents'},
-			selectAll: {en: 'Select All'},
-			selectNone: {en: 'Select None'},
-			ok: {en: 'Ok'}
+			selectAll: {en: 'All'},
+			selectNone: {en: 'None'},
+			ok: {en: 'Ok'},
+			cancel: {en: "Cancel"},
+			all: {en: "all"}
 		}
 	},
 
@@ -25,9 +28,78 @@ Ext.define('Voyant.widget.DocumentSelector', {
 		
 		Ext.apply(me, {
 			text: this.localize('documents'),
-			menu: [],
+			menu: {
+				width: 250,
+				fbar: [{
+					xtype: 'checkbox',
+					hidden: this.getSingleSelect(),
+					boxLabel: this.localize("all"),
+					listeners: {
+						change: {
+							fn: function(item, checked) {
+								this.getMenu().items.each(function(item) {
+									item.setChecked(checked)
+								})
+							},
+							scope: this
+						}
+					}
+				},{xtype:'tbfill'},{
+		    		xtype: 'button',
+		    		text: this.localize('ok'),
+					hidden: this.getSingleSelect(),
+	    	    	scale: 'small',
+		    		handler: function(button, e) {
+		    			var docs = [];
+		    			this.getMenu().items.each(function(item) {
+		    				if (item.checked) {
+			    				docs.push(item.docId);
+		    				}
+		    			}, this);
+		    			
+		    			// tell parent tool
+						var panel = button.findParentBy(function(clz) {
+							return clz.mixins["Voyant.panel.Panel"];
+						})
+						if (panel) {
+			    			panel.fireEvent('documentsSelected', button, docs);
+						}
+
+		    			// hide the opened menu
+		    			button.findParentBy(function(clz) {
+		    				if (clz.isXType("button") && clz.hasVisibleMenu()) {
+		    					clz.hideMenu();
+		    					return true
+		    				}
+		    				return false;
+		    			})
+		    		},
+		    		scope: this
+		    	},{
+		    		xtype: 'button',
+		    		text: this.localize('cancel'),
+	    	    	scale: 'small',
+		    		handler: function(b, e) {
+		    			this.findParentBy(function(clz) {
+		    				if (clz.isXType("button") && clz.hasVisibleMenu()) {
+		    					clz.hideMenu();
+		    					return true
+		    				}
+		    				return false;
+		    			})
+		    		},
+		    		scope: this
+		    	}],
+				items: []
+			},
 			listeners: {
-				
+				afterrender: function(selector) {
+					var panel = selector.findParentBy(function(clz) {
+						return clz.mixins["Voyant.panel.Panel"];
+					})
+					if (panel.getCorpus) {this.setCorpus(panel.getCorpus());}
+					selector.on("loadedCorpus", function(src, corpus) {this.setCorpus(corpus)}, selector);
+				}
 			}
 		});
 
@@ -59,9 +131,12 @@ Ext.define('Voyant.widget.DocumentSelector', {
     	}));
     },
     
-    updateCorpus: function(corpus) {
-    	this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
-    	this.getDocStore().load();
+    setCorpus: function(corpus) {
+    	if (corpus) {
+        	this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
+        	this.getDocStore().load();
+    	}
+		this.callParent(arguments);
     },
     
     populate: function(docs, replace) {
@@ -74,31 +149,6 @@ Ext.define('Voyant.widget.DocumentSelector', {
     	
     	var isSingleSelect = this.getSingleSelect();
     	
-    	menu.add([{
-    		xtype: 'button',
-    		style: 'margin: 5px;',
-    		itemId: 'selectAll',
-    		text: this.localize('selectAll'),
-    		hidden: isSingleSelect,
-    		handler: function(b, e) {
-    			menu.query('menucheckitem').forEach(function(item) {
-    				item.setChecked(true);
-    			});
-    		},
-    		scope: this
-    	},{
-    		xtype: 'button',
-    		style: 'margin: 5px;',
-    		itemId: 'selectNone',
-    		text: this.localize('selectNone'),
-    		handler: function(b, e) {
-    			menu.query('menucheckitem').forEach(function(item) {
-    				item.setChecked(false);
-    			});
-    		},
-    		scope: this
-    	},{xtype: 'menuseparator'}]);
-    	
     	var groupId = 'docGroup'+Ext.id();
     	docs.forEach(function(doc, index) {
     		menu.add({
@@ -109,30 +159,17 @@ Ext.define('Voyant.widget.DocumentSelector', {
     			group: isSingleSelect ? groupId : undefined,
     			checkHandler: function(item, checked) {
     				if (this.getSingleSelect() && checked) {
-    					this.findParentByType('panel').fireEvent('documentsSelected', this, [item.docId]);
+    					var panel = this.findParentBy(function(clz) {
+    						return clz.mixins["Voyant.panel.Panel"];
+    					})
+    					if (panel) {
+	    					panel.fireEvent('documentsClicked', this, [item.docId]);
+    					}
     				}
     			},
     			scope: this
     		});
     	}, this);
     	
-    	menu.add([{xtype: 'menuseparator'},{
-    		xtype: 'button',
-    		style: 'margin: 5px;',
-    		text: this.localize('ok'),
-    		handler: function(b, e) {
-    			var docs = [];
-    			menu.query('menucheckitem').forEach(function(item) {
-    				if (item.checked) {
-	    				docs.push(item.docId);
-    				}
-    			}, this);
-    			
-    			this.hideMenu();
-    			
-    			this.findParentByType('panel').fireEvent('documentsSelected', this, docs);
-    		},
-    		scope: this
-    	}]);
     }
 });

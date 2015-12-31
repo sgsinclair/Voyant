@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Dec 24 17:04:22 PST 2015 */
+/* This file created by JSCacher. Last modified: Wed Dec 30 11:55:17 PST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4956,15 +4956,18 @@ Ext.define('Voyant.widget.TotalPropertyStatus', {
 });
 
 Ext.define('Voyant.widget.DocumentSelector', {
-    extend: 'Ext.button.Button',
+    extend: 'Ext.menu.Item',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.documentselector',
+	glyph: 'xf10c@FontAwesome',
 	statics: {
 		i18n: {
 			documents: {en: 'Documents'},
-			selectAll: {en: 'Select All'},
-			selectNone: {en: 'Select None'},
-			ok: {en: 'Ok'}
+			selectAll: {en: 'All'},
+			selectNone: {en: 'None'},
+			ok: {en: 'Ok'},
+			cancel: {en: "Cancel"},
+			all: {en: "all"}
 		}
 	},
 
@@ -4982,9 +4985,78 @@ Ext.define('Voyant.widget.DocumentSelector', {
 		
 		Ext.apply(me, {
 			text: this.localize('documents'),
-			menu: [],
+			menu: {
+				width: 250,
+				fbar: [{
+					xtype: 'checkbox',
+					hidden: this.getSingleSelect(),
+					boxLabel: this.localize("all"),
+					listeners: {
+						change: {
+							fn: function(item, checked) {
+								this.getMenu().items.each(function(item) {
+									item.setChecked(checked)
+								})
+							},
+							scope: this
+						}
+					}
+				},{xtype:'tbfill'},{
+		    		xtype: 'button',
+		    		text: this.localize('ok'),
+					hidden: this.getSingleSelect(),
+	    	    	scale: 'small',
+		    		handler: function(button, e) {
+		    			var docs = [];
+		    			this.getMenu().items.each(function(item) {
+		    				if (item.checked) {
+			    				docs.push(item.docId);
+		    				}
+		    			}, this);
+		    			
+		    			// tell parent tool
+						var panel = button.findParentBy(function(clz) {
+							return clz.mixins["Voyant.panel.Panel"];
+						})
+						if (panel) {
+			    			panel.fireEvent('documentsSelected', button, docs);
+						}
+
+		    			// hide the opened menu
+		    			button.findParentBy(function(clz) {
+		    				if (clz.isXType("button") && clz.hasVisibleMenu()) {
+		    					clz.hideMenu();
+		    					return true
+		    				}
+		    				return false;
+		    			})
+		    		},
+		    		scope: this
+		    	},{
+		    		xtype: 'button',
+		    		text: this.localize('cancel'),
+	    	    	scale: 'small',
+		    		handler: function(b, e) {
+		    			this.findParentBy(function(clz) {
+		    				if (clz.isXType("button") && clz.hasVisibleMenu()) {
+		    					clz.hideMenu();
+		    					return true
+		    				}
+		    				return false;
+		    			})
+		    		},
+		    		scope: this
+		    	}],
+				items: []
+			},
 			listeners: {
-				
+				afterrender: function(selector) {
+					var panel = selector.findParentBy(function(clz) {
+						return clz.mixins["Voyant.panel.Panel"];
+					})
+					if (panel.getCorpus) {this.setCorpus(panel.getCorpus());}
+					selector.on("loadedCorpus", function(src, corpus) {this.setCorpus(corpus)}, selector);
+				}
 			}
 		});
 
@@ -5016,9 +5088,12 @@ Ext.define('Voyant.widget.DocumentSelector', {
     	}));
     },
     
-    updateCorpus: function(corpus) {
-    	this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
-    	this.getDocStore().load();
+    setCorpus: function(corpus) {
+    	if (corpus) {
+        	this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
+        	this.getDocStore().load();
+    	}
+		this.callParent(arguments);
     },
     
     populate: function(docs, replace) {
@@ -5031,31 +5106,6 @@ Ext.define('Voyant.widget.DocumentSelector', {
     	
     	var isSingleSelect = this.getSingleSelect();
     	
-    	menu.add([{
-    		xtype: 'button',
-    		style: 'margin: 5px;',
-    		itemId: 'selectAll',
-    		text: this.localize('selectAll'),
-    		hidden: isSingleSelect,
-    		handler: function(b, e) {
-    			menu.query('menucheckitem').forEach(function(item) {
-    				item.setChecked(true);
-    			});
-    		},
-    		scope: this
-    	},{
-    		xtype: 'button',
-    		style: 'margin: 5px;',
-    		itemId: 'selectNone',
-    		text: this.localize('selectNone'),
-    		handler: function(b, e) {
-    			menu.query('menucheckitem').forEach(function(item) {
-    				item.setChecked(false);
-    			});
-    		},
-    		scope: this
-    	},{xtype: 'menuseparator'}]);
-    	
     	var groupId = 'docGroup'+Ext.id();
     	docs.forEach(function(doc, index) {
     		menu.add({
@@ -5066,35 +5116,76 @@ Ext.define('Voyant.widget.DocumentSelector', {
     			group: isSingleSelect ? groupId : undefined,
     			checkHandler: function(item, checked) {
     				if (this.getSingleSelect() && checked) {
-    					this.findParentByType('panel').fireEvent('documentsSelected', this, [item.docId]);
+    					var panel = this.findParentBy(function(clz) {
+    						return clz.mixins["Voyant.panel.Panel"];
+    					})
+    					if (panel) {
+	    					panel.fireEvent('documentsClicked', this, [item.docId]);
+    					}
     				}
     			},
     			scope: this
     		});
     	}, this);
     	
-    	menu.add([{xtype: 'menuseparator'},{
-    		xtype: 'button',
-    		style: 'margin: 5px;',
-    		text: this.localize('ok'),
-    		handler: function(b, e) {
-    			var docs = [];
-    			menu.query('menucheckitem').forEach(function(item) {
-    				if (item.checked) {
-	    				docs.push(item.docId);
-    				}
-    			}, this);
-    			
-    			this.hideMenu();
-    			
-    			this.findParentByType('panel').fireEvent('documentsSelected', this, docs);
-    		},
-    		scope: this
-    	}]);
+    }
+});
+Ext.define('Voyant.widget.CorpusDocumentSelector', {
+    extend: 'Ext.menu.Item',
+    mixins: ['Voyant.util.Localization'],
+    alias: 'widget.corpusdocumentselector',
+	statics: {
+		i18n: {
+			corpus: {en: "Corpus"},
+			scale: {en: "Scale"}
+		}
+	},
+	config: {
+		corpus: undefined,
+		singleSelect: false
+	},
+	
+    initComponent: function() {
+		var me = this;
+		
+		this.setSingleSelect(this.config.singleSelect == undefined ? this.getSingleSelect() : this.config.singleSelect);
+		
+		Ext.apply(me, {
+			text: this.localize('scale'),
+			glyph: 'xf059@FontAwesome',
+			menu: {
+				items: [{
+					text: this.localize("corpus"),
+					glyph: 'xf111@FontAwesome',
+					handler: function() {
+						var panel = this.findParentBy(function(clz) {
+							return clz.mixins["Voyant.panel.Panel"];
+						})
+						if (panel) {panel.fireEvent("corpusSelected", this, this.getCorpus())}
+					},
+					scope: this
+				},{
+					xtype: 'documentselector',
+					singleSelect: this.getSingleSelect()
+				}]
+			},
+			listeners: {
+				afterrender: function(selector) {
+					var panel = selector.findParentBy(function(clz) {
+						return clz.mixins["Voyant.panel.Panel"];
+					})
+					if (panel.getCorpus) {this.setCorpus(panel.getCorpus());}
+					selector.on("loadedCorpus", function(src, corpus) {this.setCorpus(corpus)}, selector);
+				}
+			}
+		});
+
+		me.callParent(arguments);	
     }
 });
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable',/*'Voyant.notebook.util.Embeddable',*/'Voyant.util.DetailedError','Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.TotalPropertyStatus'],
+	alias: 'widget.voyantpanel',
 	statics: {
 		i18n: {
 			term: {en: "Term"},
@@ -5204,7 +5295,8 @@ Ext.define('Voyant.panel.Bubblelines', {
 			total : {en: 'Total'},
 			corpusTooSmall : {en: 'The provided corpus is too small for this tool.'},
 			help: {en: "Bubblelines visualizes the frequency and repetition of  a term's use in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal lengths. Each term is represented as a bubble, the size of the bubble indicates its frequency in the corresponding segment of text. The larger the bubble's radius the more frequently the term occurs."},
-			adaptedFrom: {en: ''}
+			adaptedFrom: {en: ''},
+			options: {en: "Options"}
     	},
     	api: {
     		/**
@@ -5286,7 +5378,6 @@ Ext.define('Voyant.panel.Bubblelines', {
         		this.getDocStore().load();
     		}
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
-    		this.down('#docSelector').setCorpus(corpus);
     	}, this);
     	
         this.on('activate', function() { // load after tab activate (if we're in a tab panel)
@@ -5416,22 +5507,38 @@ Ext.define('Voyant.panel.Bubblelines', {
                 items: [{
                 	xtype: 'querysearchfield'
                 },{
-	            	xtype: 'button',
-	            	text: this.localize('clearTerms'),
-	            	handler: function() {
-	            		this.down('#termsView').getSelectionModel().deselectAll(true);
-	            		this.termStore.removeAll();
-	            		this.setApiParams({query: null});
-	            		this.bubblelines.removeAllTerms();
-	            		this.bubblelines.drawGraph();
-	            	},
-	            	scope: this
-	            },
-	            '-',{
-	            	xtype: 'documentselector',
-	            	itemId: 'docSelector'
-	            }
-	            ,'-',{
+                	xtype: 'button',
+                	text: this.localize('options'),
+                	menu: {
+                		items: [{
+			            	text: this.localize('clearTerms'),
+        					glyph: 'xf014@FontAwesome',
+			            	handler: function() {
+			            		this.down('#termsView').getSelectionModel().deselectAll(true);
+			            		this.termStore.removeAll();
+			            		this.setApiParams({query: null});
+			            		this.bubblelines.removeAllTerms();
+			            		this.bubblelines.drawGraph();
+			            	},
+			            	scope: this                			
+                		},{
+        	            	xtype: 'documentselector',
+    	                	listeners: {
+    	                		afterrender: function(button) {
+    	                    		if (this.getCorpus()) {
+    	                    			button.setHidden(this.getCorpus().getDocumentsCount()==1)
+    	                    		}
+    	                    		this.on("loadedCorpus", function(src, corpus) {
+    	                    			this.setHidden(corpus.getDocumentsCount()==1)
+    	                    		}, button)
+    	                		},
+    	                		scope: this
+    	                	}
+                		}]
+                	},
+                	scope: this
+                	
+                },'-',{
 	            	xtype: 'slider',
 	            	itemId: 'granularity',
 	            	fieldLabel: this.localize('granularity'),
@@ -14333,11 +14440,15 @@ Ext.define('Voyant.panel.TermsRadio', {
     	i18n: {
     		title: {en: "Trends"},
     		helpTip: {en: "<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
+    		freqsMode: {en: "Frequencies"},
     		freqsModeTip: {en: "Determines if frequencies are expressed as raw counts or as relative counts (per document or segment)."},
+    		options: {en: "Options"},
     		rawFrequencies: {en: 'Raw Frequencies'},
     		relativeFrequencies: {en: 'Relative Frequencies'},
+    		
     		raw: {en: 'Raw'},
     		relative: {en: 'Relative'},
+    		segmentsSlider: {en: 'Segments'},
     		segments: {en: 'Document Segments'},
     		documents: {en: 'Documents'}
     	},
@@ -14377,10 +14488,20 @@ Ext.define('Voyant.panel.TermsRadio', {
     	this.on("loadedCorpus", function(src, corpus) {
     		this.setCorpus(corpus);
     		if (corpus.getDocumentsCount()==1 && this.getApiParam("mode")!=this.MODE_DOCUMENT) {
-    			this.setApiParams({mode: this.MODE_DOCUMENT, withDistributions: 'raw'});
+    			this.setMode(this.MODE_DOCUMENT);
+    			this.setApiParams({withDistributions: 'raw'});
     			this.down('#raw').setChecked(true);
+    			this.down("corpusdocumentselector").hide()
     		}
     		if (this.isVisible()) {
+        		this.loadFromCorpus(corpus);
+    		}
+    	});
+    	
+    	this.on("corpusSelected", function(src, corpus) {
+    		if (src.isXType("corpusdocumentselector")) {
+    			this.setMode(this.MODE_CORPUS);
+    			this.setApiParams({docId: undefined, docIndex: undefined})
         		this.loadFromCorpus(corpus);
     		}
     	});
@@ -14408,8 +14529,8 @@ Ext.define('Voyant.panel.TermsRadio', {
         		if (queryTerms) {
         			
             		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
+            			this.setMode(this.MODE_CORPUS);
             			this.setApiParams({
-            				'mode': this.MODE_CORPUS,
             				'docIndex': undefined,
             				'docId': undefined
             			});
@@ -14426,7 +14547,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 
     	this.on("documentTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
-	    		this.setApiParam('mode', 'document');
+    			this.setMode(this.MODE_DOCUMENT);
     			if (terms[0] && terms[0].get('distributions') !== undefined) {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
@@ -14472,41 +14593,75 @@ Ext.define('Voyant.panel.TermsRadio', {
                 items: [{
                     	xtype: 'querysearchfield'
                 	},{
-		                xtype: 'button',
-		                text: this.localize('relative'),
-		                tooltip: this.localize('freqsModeTip'),
-		                menu: {
-		                	items: [
-		                       {
-		                           text: this.localize("relativeFrequencies"),
-		                           checked: true,
-		                           itemId: 'relative',
-		                           group: 'freqsMode',
-		                           checkHandler: function(item, checked) {
-		                        	   if (checked) {
-			                        	   item.up('button').setText(this.localize('relative'));
-			                        	   this.setApiParam('withDistributions', 'relative');
-			                        	   this.reloadFromChart();
-		                        	   }
-		                           },
-		                           scope: this
-		                       }, {
-		                           text: this.localize("rawFrequencies"),
-		                           checked: false,
-		                           itemId: 'raw',
-		                           group: 'freqsMode',
-		                           checkHandler: function(item, checked) {
-		                        	   if (checked) {
-			                        	   item.up('button').setText(this.localize('raw'));
-			                        	   this.setApiParam('withDistributions', 'raw');
-			                        	   this.reloadFromChart();
-		                        	   }
-		                           },
-		                           scope: this
-		                       }
-		                   ]
-		                }
-                }]
+                		xtype: "button",
+                		text: this.localize("options"),
+                		menu: {
+                			width: 150,
+                			items: [
+                			    {
+                			    	text: this.localize('segmentsSlider'),
+                					glyph: 'xf141@FontAwesome',
+                			    	itemId: 'segmentsMenu',
+                			    	tooltip: 'segmentsToolTip',
+                			    	xtype: 'menuitem',
+                			    	menu: {
+                			    		items: {
+                        			    	itemId: 'segmentsSlider',
+                        			    	xtype: 'slider',
+                        			    	minValue: 2,
+                        			    	maxValue: 100,
+                        	            	listeners: {
+                        	            		afterrender: function(slider) {
+                        	            			slider.setValue(parseInt(this.getApiParam("bins")))
+                        	            		},
+                        	            		changecomplete: function(slider, newvalue) {
+                        	            			this.setApiParams({bins: newvalue});
+                        	            			this.reloadFromChart();
+                        	            		},
+                        	            		scope: this
+                        	            	}
+                			    		}
+                			    	}
+                			    },{
+								    text: this.localize('freqsMode'),
+                					glyph: 'xf201@FontAwesome',
+								    tooltip: this.localize('freqsModeTip'),
+								    menu: {
+								    	items: [
+								           {
+								               text: this.localize("relativeFrequencies"),
+								               checked: true,
+								               itemId: 'relative',
+								               group: 'freqsMode',
+								               checkHandler: function(item, checked) {
+								            	   if (checked) {
+								                	   this.setApiParam('withDistributions', 'relative');
+								                	   this.reloadFromChart();
+								            	   }
+								               },
+								               scope: this
+								           }, {
+								               text: this.localize("rawFrequencies"),
+								               checked: false,
+								               itemId: 'raw',
+								               group: 'freqsMode',
+								               checkHandler: function(item, checked) {
+								            	   if (checked) {
+								                	   this.setApiParam('withDistributions', 'raw');
+								                	   this.reloadFromChart();
+								            	   }
+								               },
+								               scope: this
+								           }
+								       ]
+								    }
+								},{
+									xtype: 'corpusdocumentselector',
+									singleSelect: true
+								}
+                			]
+                		}
+                	}]
             }]
         });
         me.callParent(arguments);
@@ -14520,17 +14675,18 @@ Ext.define('Voyant.panel.TermsRadio', {
     		document.then(function(document) {me.loadFromDocument(document);});
     	}
     	else {
-    		var ids = [];
-    		if (Ext.getClassName(document)=="Voyant.data.model.Document") {
-        		this.setApiParams({
-        			docIndex: undefined,
-        			query: undefined,
-        			docId: document.getId(),
-        			mode: this.MODE_DOCUMENT
-        		});
-        		if (this.isVisible()) {
-                	this.loadFromDocumentTerms();
-        		}
+    		var params = {
+    			docIndex: undefined,
+    			query: undefined,
+    			docId: undefined
+    		}
+    		if (Ext.isNumber(document)) {params.docIndex=document}
+    		else if (Ext.isString(document)) {params.docId=document}
+    		else if (Ext.getClassName(document)=="Voyant.data.model.Document") {params.docId=document.getId()}
+			this.setMode(this.MODE_DOCUMENT);
+    		this.setApiParams(params);
+    		if (this.isVisible()) {
+            	this.loadFromDocumentTerms();
     		}
     	}
     },
@@ -14541,7 +14697,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		documentTerms.load({
     		    callback: function(records, operation, success) {
     		    	if (success) {
-    		    		this.setApiParam('mode', 'document');
+    	    			this.setMode(this.MODE_DOCUMENT);
     		    		this.loadFromRecords(records);
     		    	}
     		    	else {
@@ -14571,7 +14727,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		corpusTerms.load({
 		    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
 		    	if (success) {
-			    	this.setApiParam('mode', this.MODE_CORPUS);
+	    			this.setMode(this.MODE_CORPUS);
 			    	this.loadFromRecords(records);
 		    	}
 		    	else {
@@ -14579,7 +14735,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		    	}
 		    },
 		    scope: this,
-		    params: this.getApiParams(['limit','stopList','query','withDistributions'])
+		    params: this.getApiParams(['limit','stopList','query','withDistributions',"bins"])
     	});
     },
     
@@ -14748,7 +14904,15 @@ Ext.define('Voyant.panel.TermsRadio', {
     
     isLastClickedItem: function(item) {
     	return this.lastClickedItem && this.lastClickedItem.term==item.term && this.lastClickedItem.index==item.index;
+    },
+    
+    setMode: function(mode) {
+    	this.setApiParams({mode: mode});
+    	var mode = this.getApiParam("mode");    	
+    	var menu = this.queryById("segmentsMenu");
+    	menu.setHidden(mode==this.MODE_CORPUS)
     }
+    
 });
 Ext.define('Voyant.panel.VoyantFooter', {
 	extend: 'Ext.container.Container',

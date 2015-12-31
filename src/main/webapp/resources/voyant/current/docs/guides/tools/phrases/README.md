@@ -40,7 +40,7 @@ It may or may not be misleading to keep all of these entries (since there would 
 
 Note that at the moment stopwords are not used in the Phrases tool (that may change in the future).
 
-Note also that for a phrase to be considered repeating it has to repeat within a document – single occurrences of a phrase won't be included, even if they reccur elsewhere in the corpus. This isn't the ideal functionality, but it's the current reality of how phrases are identified by Voyant (for reasons of efficiency).
+Note also that for a phrase to be considered repeating it has to repeat within a document – single occurrences of a phrase won't be included, even if they recur elsewhere in the corpus. This isn't the ideal functionality, but it's the current reality of how phrases are identified by Voyant (for reasons of efficiency).
 
 ## See Also
 

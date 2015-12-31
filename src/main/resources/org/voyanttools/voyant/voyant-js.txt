@@ -55,6 +55,7 @@ app/widget/StopListOption.js
 app/widget/QuerySearchField.js
 app/widget/TotalPropertyStatus.js
 app/widget/DocumentSelector.js
+app/widget/CorpusDocumentSelector.js
 
 # PANELS
 app/panel/Panel.js

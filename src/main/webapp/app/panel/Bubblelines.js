@@ -17,7 +17,8 @@ Ext.define('Voyant.panel.Bubblelines', {
 			total : {en: 'Total'},
 			corpusTooSmall : {en: 'The provided corpus is too small for this tool.'},
 			help: {en: "Bubblelines visualizes the frequency and repetition of  a term's use in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal lengths. Each term is represented as a bubble, the size of the bubble indicates its frequency in the corresponding segment of text. The larger the bubble's radius the more frequently the term occurs."},
-			adaptedFrom: {en: ''}
+			adaptedFrom: {en: ''},
+			options: {en: "Options"}
     	},
     	api: {
     		/**
@@ -99,7 +100,6 @@ Ext.define('Voyant.panel.Bubblelines', {
         		this.getDocStore().load();
     		}
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
-    		this.down('#docSelector').setCorpus(corpus);
     	}, this);
     	
         this.on('activate', function() { // load after tab activate (if we're in a tab panel)
@@ -229,22 +229,38 @@ Ext.define('Voyant.panel.Bubblelines', {
                 items: [{
                 	xtype: 'querysearchfield'
                 },{
-	            	xtype: 'button',
-	            	text: this.localize('clearTerms'),
-	            	handler: function() {
-	            		this.down('#termsView').getSelectionModel().deselectAll(true);
-	            		this.termStore.removeAll();
-	            		this.setApiParams({query: null});
-	            		this.bubblelines.removeAllTerms();
-	            		this.bubblelines.drawGraph();
-	            	},
-	            	scope: this
-	            },
-	            '-',{
-	            	xtype: 'documentselector',
-	            	itemId: 'docSelector'
-	            }
-	            ,'-',{
+                	xtype: 'button',
+                	text: this.localize('options'),
+                	menu: {
+                		items: [{
+			            	text: this.localize('clearTerms'),
+        					glyph: 'xf014@FontAwesome',
+			            	handler: function() {
+			            		this.down('#termsView').getSelectionModel().deselectAll(true);
+			            		this.termStore.removeAll();
+			            		this.setApiParams({query: null});
+			            		this.bubblelines.removeAllTerms();
+			            		this.bubblelines.drawGraph();
+			            	},
+			            	scope: this                			
+                		},{
+        	            	xtype: 'documentselector',
+    	                	listeners: {
+    	                		afterrender: function(button) {
+    	                    		if (this.getCorpus()) {
+    	                    			button.setHidden(this.getCorpus().getDocumentsCount()==1)
+    	                    		}
+    	                    		this.on("loadedCorpus", function(src, corpus) {
+    	                    			this.setHidden(corpus.getDocumentsCount()==1)
+    	                    		}, button)
+    	                		},
+    	                		scope: this
+    	                	}
+                		}]
+                	},
+                	scope: this
+                	
+                },'-',{
 	            	xtype: 'slider',
 	            	itemId: 'granularity',
 	            	fieldLabel: this.localize('granularity'),

@@ -12,11 +12,15 @@
     	i18n: {
     		title: {en: "Trends"},
     		helpTip: {en: "<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
+    		freqsMode: {en: "Frequencies"},
     		freqsModeTip: {en: "Determines if frequencies are expressed as raw counts or as relative counts (per document or segment)."},
+    		options: {en: "Options"},
     		rawFrequencies: {en: 'Raw Frequencies'},
     		relativeFrequencies: {en: 'Relative Frequencies'},
+    		
     		raw: {en: 'Raw'},
     		relative: {en: 'Relative'},
+    		segmentsSlider: {en: 'Segments'},
     		segments: {en: 'Document Segments'},
     		documents: {en: 'Documents'}
     	},
@@ -56,10 +60,20 @@
     	this.on("loadedCorpus", function(src, corpus) {
     		this.setCorpus(corpus);
     		if (corpus.getDocumentsCount()==1 && this.getApiParam("mode")!=this.MODE_DOCUMENT) {
-    			this.setApiParams({mode: this.MODE_DOCUMENT, withDistributions: 'raw'});
+    			this.setMode(this.MODE_DOCUMENT);
+    			this.setApiParams({withDistributions: 'raw'});
     			this.down('#raw').setChecked(true);
+    			this.down("corpusdocumentselector").hide()
     		}
     		if (this.isVisible()) {
+        		this.loadFromCorpus(corpus);
+    		}
+    	});
+    	
+    	this.on("corpusSelected", function(src, corpus) {
+    		if (src.isXType("corpusdocumentselector")) {
+    			this.setMode(this.MODE_CORPUS);
+    			this.setApiParams({docId: undefined, docIndex: undefined})
         		this.loadFromCorpus(corpus);
     		}
     	});
@@ -87,8 +101,8 @@
         		if (queryTerms) {
         			
             		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
+            			this.setMode(this.MODE_CORPUS);
             			this.setApiParams({
-            				'mode': this.MODE_CORPUS,
             				'docIndex': undefined,
             				'docId': undefined
             			});
@@ -105,7 +119,7 @@
 
     	this.on("documentTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
-	    		this.setApiParam('mode', 'document');
+    			this.setMode(this.MODE_DOCUMENT);
     			if (terms[0] && terms[0].get('distributions') !== undefined) {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
@@ -151,41 +165,75 @@
                 items: [{
                     	xtype: 'querysearchfield'
                 	},{
-		                xtype: 'button',
-		                text: this.localize('relative'),
-		                tooltip: this.localize('freqsModeTip'),
-		                menu: {
-		                	items: [
-		                       {
-		                           text: this.localize("relativeFrequencies"),
-		                           checked: true,
-		                           itemId: 'relative',
-		                           group: 'freqsMode',
-		                           checkHandler: function(item, checked) {
-		                        	   if (checked) {
-			                        	   item.up('button').setText(this.localize('relative'));
-			                        	   this.setApiParam('withDistributions', 'relative');
-			                        	   this.reloadFromChart();
-		                        	   }
-		                           },
-		                           scope: this
-		                       }, {
-		                           text: this.localize("rawFrequencies"),
-		                           checked: false,
-		                           itemId: 'raw',
-		                           group: 'freqsMode',
-		                           checkHandler: function(item, checked) {
-		                        	   if (checked) {
-			                        	   item.up('button').setText(this.localize('raw'));
-			                        	   this.setApiParam('withDistributions', 'raw');
-			                        	   this.reloadFromChart();
-		                        	   }
-		                           },
-		                           scope: this
-		                       }
-		                   ]
-		                }
-                }]
+                		xtype: "button",
+                		text: this.localize("options"),
+                		menu: {
+                			width: 150,
+                			items: [
+                			    {
+                			    	text: this.localize('segmentsSlider'),
+                					glyph: 'xf141@FontAwesome',
+                			    	itemId: 'segmentsMenu',
+                			    	tooltip: 'segmentsToolTip',
+                			    	xtype: 'menuitem',
+                			    	menu: {
+                			    		items: {
+                        			    	itemId: 'segmentsSlider',
+                        			    	xtype: 'slider',
+                        			    	minValue: 2,
+                        			    	maxValue: 100,
+                        	            	listeners: {
+                        	            		afterrender: function(slider) {
+                        	            			slider.setValue(parseInt(this.getApiParam("bins")))
+                        	            		},
+                        	            		changecomplete: function(slider, newvalue) {
+                        	            			this.setApiParams({bins: newvalue});
+                        	            			this.reloadFromChart();
+                        	            		},
+                        	            		scope: this
+                        	            	}
+                			    		}
+                			    	}
+                			    },{
+								    text: this.localize('freqsMode'),
+                					glyph: 'xf201@FontAwesome',
+								    tooltip: this.localize('freqsModeTip'),
+								    menu: {
+								    	items: [
+								           {
+								               text: this.localize("relativeFrequencies"),
+								               checked: true,
+								               itemId: 'relative',
+								               group: 'freqsMode',
+								               checkHandler: function(item, checked) {
+								            	   if (checked) {
+								                	   this.setApiParam('withDistributions', 'relative');
+								                	   this.reloadFromChart();
+								            	   }
+								               },
+								               scope: this
+								           }, {
+								               text: this.localize("rawFrequencies"),
+								               checked: false,
+								               itemId: 'raw',
+								               group: 'freqsMode',
+								               checkHandler: function(item, checked) {
+								            	   if (checked) {
+								                	   this.setApiParam('withDistributions', 'raw');
+								                	   this.reloadFromChart();
+								            	   }
+								               },
+								               scope: this
+								           }
+								       ]
+								    }
+								},{
+									xtype: 'corpusdocumentselector',
+									singleSelect: true
+								}
+                			]
+                		}
+                	}]
             }]
         });
         me.callParent(arguments);
@@ -199,17 +247,18 @@
     		document.then(function(document) {me.loadFromDocument(document);});
     	}
     	else {
-    		var ids = [];
-    		if (Ext.getClassName(document)=="Voyant.data.model.Document") {
-        		this.setApiParams({
-        			docIndex: undefined,
-        			query: undefined,
-        			docId: document.getId(),
-        			mode: this.MODE_DOCUMENT
-        		});
-        		if (this.isVisible()) {
-                	this.loadFromDocumentTerms();
-        		}
+    		var params = {
+    			docIndex: undefined,
+    			query: undefined,
+    			docId: undefined
+    		}
+    		if (Ext.isNumber(document)) {params.docIndex=document}
+    		else if (Ext.isString(document)) {params.docId=document}
+    		else if (Ext.getClassName(document)=="Voyant.data.model.Document") {params.docId=document.getId()}
+			this.setMode(this.MODE_DOCUMENT);
+    		this.setApiParams(params);
+    		if (this.isVisible()) {
+            	this.loadFromDocumentTerms();
     		}
     	}
     },
@@ -220,7 +269,7 @@
     		documentTerms.load({
     		    callback: function(records, operation, success) {
     		    	if (success) {
-    		    		this.setApiParam('mode', 'document');
+    	    			this.setMode(this.MODE_DOCUMENT);
     		    		this.loadFromRecords(records);
     		    	}
     		    	else {
@@ -250,7 +299,7 @@
 		corpusTerms.load({
 		    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
 		    	if (success) {
-			    	this.setApiParam('mode', this.MODE_CORPUS);
+	    			this.setMode(this.MODE_CORPUS);
 			    	this.loadFromRecords(records);
 		    	}
 		    	else {
@@ -258,7 +307,7 @@
 		    	}
 		    },
 		    scope: this,
-		    params: this.getApiParams(['limit','stopList','query','withDistributions'])
+		    params: this.getApiParams(['limit','stopList','query','withDistributions',"bins"])
     	});
     },
     
@@ -427,5 +476,13 @@
     
     isLastClickedItem: function(item) {
     	return this.lastClickedItem && this.lastClickedItem.term==item.term && this.lastClickedItem.index==item.index;
+    },
+    
+    setMode: function(mode) {
+    	this.setApiParams({mode: mode});
+    	var mode = this.getApiParam("mode");    	
+    	var menu = this.queryById("segmentsMenu");
+    	menu.setHidden(mode==this.MODE_CORPUS)
     }
+    
 });
