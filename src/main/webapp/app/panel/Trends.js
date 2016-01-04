@@ -63,7 +63,6 @@
     			this.setMode(this.MODE_DOCUMENT);
     			this.setApiParams({withDistributions: 'raw'});
     			this.down('#raw').setChecked(true);
-    			this.down("corpusdocumentselector").hide()
     		}
     		if (this.isVisible()) {
         		this.loadFromCorpus(corpus);
@@ -78,11 +77,9 @@
     		}
     	});
     	
-    	this.on("documentsClicked", function(src, documents) {
+    	this.on("documentSelected", function(src, document) {
     		if (this.getCorpus()) {
-    			if (documents.length==1) {
-    				this.loadFromDocument(documents[0]);
-    			}
+    			this.loadFromDocument(this.getCorpus().getDocument(document))
     		}
     	});
     	
@@ -162,78 +159,65 @@
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     	xtype: 'querysearchfield'
                 	},{
-                		xtype: "button",
-                		text: this.localize("options"),
-                		menu: {
-                			width: 150,
-                			items: [
-                			    {
-                			    	text: this.localize('segmentsSlider'),
-                					glyph: 'xf141@FontAwesome',
-                			    	itemId: 'segmentsMenu',
-                			    	tooltip: 'segmentsToolTip',
-                			    	xtype: 'menuitem',
-                			    	menu: {
-                			    		items: {
-                        			    	itemId: 'segmentsSlider',
-                        			    	xtype: 'slider',
-                        			    	minValue: 2,
-                        			    	maxValue: 100,
-                        	            	listeners: {
-                        	            		afterrender: function(slider) {
-                        	            			slider.setValue(parseInt(this.getApiParam("bins")))
-                        	            		},
-                        	            		changecomplete: function(slider, newvalue) {
-                        	            			this.setApiParams({bins: newvalue});
-                        	            			this.reloadFromChart();
-                        	            		},
-                        	            		scope: this
-                        	            	}
-                			    		}
-                			    	}
-                			    },{
-								    text: this.localize('freqsMode'),
-                					glyph: 'xf201@FontAwesome',
-								    tooltip: this.localize('freqsModeTip'),
-								    menu: {
-								    	items: [
-								           {
-								               text: this.localize("relativeFrequencies"),
-								               checked: true,
-								               itemId: 'relative',
-								               group: 'freqsMode',
-								               checkHandler: function(item, checked) {
-								            	   if (checked) {
-								                	   this.setApiParam('withDistributions', 'relative');
-								                	   this.reloadFromChart();
-								            	   }
-								               },
-								               scope: this
-								           }, {
-								               text: this.localize("rawFrequencies"),
-								               checked: false,
-								               itemId: 'raw',
-								               group: 'freqsMode',
-								               checkHandler: function(item, checked) {
-								            	   if (checked) {
-								                	   this.setApiParam('withDistributions', 'raw');
-								                	   this.reloadFromChart();
-								            	   }
-								               },
-								               scope: this
-								           }
-								       ]
-								    }
-								},{
-									xtype: 'corpusdocumentselector',
-									singleSelect: true
-								}
-                			]
-                		}
-                	}]
+						xtype: 'corpusdocumentselector',
+						singleSelect: true
+					},{
+					    text: this.localize('freqsMode'),
+    					glyph: 'xf201@FontAwesome',
+					    tooltip: this.localize('freqsModeTip'),
+					    menu: {
+					    	items: [
+					           {
+					               text: this.localize("relativeFrequencies"),
+					               checked: true,
+					               itemId: 'relative',
+					               group: 'freqsMode',
+					               checkHandler: function(item, checked) {
+					            	   if (checked) {
+					                	   this.setApiParam('withDistributions', 'relative');
+					                	   this.reloadFromChart();
+					            	   }
+					               },
+					               scope: this
+					           }, {
+					               text: this.localize("rawFrequencies"),
+					               checked: false,
+					               itemId: 'raw',
+					               group: 'freqsMode',
+					               checkHandler: function(item, checked) {
+					            	   if (checked) {
+					                	   this.setApiParam('withDistributions', 'raw');
+					                	   this.reloadFromChart();
+					            	   }
+					               },
+					               scope: this
+					           }
+					       ]
+					    }
+					},{
+    			    	itemId: 'segmentsSlider',
+    			    	xtype: 'slider',
+    			    	fieldLabel: this.localize('segmentsSlider'),
+    			    	fieldAlign: 'right',
+    			    	labelWidth: 70,
+    			    	width: 150,
+    			    	minValue: 2,
+    			    	maxValue: 100,
+    	            	listeners: {
+    	            		afterrender: function(slider) {
+    	            			slider.setValue(parseInt(this.getApiParam("bins")))
+    	            		},
+    	            		changecomplete: function(slider, newvalue) {
+    	            			this.setApiParams({bins: newvalue});
+    	            			this.reloadFromChart();
+    	            		},
+    	            		scope: this
+    	            	}
+		    		}]
             }]
         });
         me.callParent(arguments);
@@ -481,7 +465,7 @@
     setMode: function(mode) {
     	this.setApiParams({mode: mode});
     	var mode = this.getApiParam("mode");    	
-    	var menu = this.queryById("segmentsMenu");
+    	var menu = this.queryById("segmentsSlider");
     	menu.setHidden(mode==this.MODE_CORPUS)
     }
     

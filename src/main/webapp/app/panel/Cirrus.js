@@ -9,8 +9,9 @@ Ext.define('Voyant.panel.Cirrus', {
     		title: {en: "Cirrus"},
     		helpTip: {en: "<p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document – this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>"},
     		visible: {en: "Show"},
-    		reset: {en: 'reset'},
-    		maxTerms: {en: "Max terms"}
+    		maxTerms: {en: "Max terms"},
+    		options: {en: "Options"},
+    		visibleTerms: {en: "Terms"}
     	},
     	api: {
     		stopList: 'auto',
@@ -70,13 +71,15 @@ Ext.define('Voyant.panel.Cirrus', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
-	            	xtype: 'slider',
-	            	itemId: 'visible',
-	            	fieldLabel: this.localize('visible'),
-	            	labelAlign: 'right',
-	            	labelWidth: 40,
-	            	width: 120,
+        			xtype: 'corpusdocumentselector',
+        			singleSelect: true
+        		},{
+        			fieldLabel: this.localize('visibleTerms'),
+        			labelWidth: 40,
+        			width: 120,
+        			xtype: 'slider',
 	            	increment: 25,
 	            	minValue: 25,
 	            	maxValue: 500,
@@ -92,16 +95,6 @@ Ext.define('Voyant.panel.Cirrus', {
 	            		},
 	            		scope: this
 	            	}
-                }, {xtype: 'tbfill'}, {
-                    text: this.localize('reset'),
-                    hidden: true,
-                    itemId: 'reset',
-                    handler: function(btn) {
-                    	btn.hide();
-                    	var corpus = this.getCorpus();
-                    	if (corpus) {this.loadFromCorpus(corpus);}
-                    },
-                    scope: this
                 }]
     		}]
     	});
@@ -136,11 +129,18 @@ Ext.define('Voyant.panel.Cirrus', {
     		this.loadFromCorpus(corpus);
     	},
     	
-    	documentsClicked: function(src, documents, corpus) {
-    		if (documents) {
-    			var doc = documents[0];
-    			this.setApiParam('docId', doc.getId());
-        		this.loadFromDocumentTerms(documents[0].getDocumentTerms({autoload: false, corpus: corpus, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
+    	corpusSelected: function(src, corpus) {
+    		this.loadFromCorpus(corpus);
+    		
+    	},
+    	
+    	documentSelected: function(src, document) {
+    		if (document) {
+        		var corpus = this.getCorpus();
+        		var document = corpus.getDocument(document);
+        		this.setApiParam('docId', document.getId());
+        		var documentTerms = document.getDocumentTerms({autoload: false, corpus: corpus, pageSize: this.getApiParam("maxVisible"), parentPanel: this});
+        		this.loadFromDocumentTerms(documentTerms);
     		}
     	},
     	
@@ -170,7 +170,6 @@ Ext.define('Voyant.panel.Cirrus', {
 		    scope: this,
 		    params: this.getApiParams()
     	});
-    	this.down("#reset").show();
     },
     
     loadFromCorpusTerms: function(corpusTerms) {

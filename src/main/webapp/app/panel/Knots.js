@@ -8,15 +8,17 @@ Ext.define('Voyant.panel.Knots', {
     		title : {en: 'Knots'},
 			type : {en: 'Visualization'},
 			findTerm : {en: 'Find Term'},
-			clearTerms : {en: 'Clear Terms'},
+			clearTerms : {en: 'Clear'},
 			removeTerm : {en: 'Remove Term'},
 			showTerm : {en: 'Show Term'},
 			hideTerm : {en: 'Hide Term'},
 			options: {en: "Options"},
 			speed : {en: 'Speed'},
-			startAngle : {en: 'Start Angle'},
-			tangles : {en: 'Turn Angle'},
-			context : {en: 'Context'}
+			startAngle : {en: 'Start'},
+			tangles : {en: 'Turn'},
+			context : {en: 'Context'},
+			noTermsFound: {en: "No terms found in this document."},
+			settings: {en: "Settings"}
     	},
     	api: {
     		/**
@@ -77,7 +79,6 @@ Ext.define('Voyant.panel.Knots', {
     		this.setApiParams({docId: firstDoc.getId()});
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
     		this.getTokensStore().setCorpus(corpus);
-    		this.down('#docSelector').setCorpus(corpus);
     		this.getDocTermStore().load({params: {
 		    	limit: 5,
 		    	stopList: this.getApiParams('stopList')
@@ -101,9 +102,10 @@ Ext.define('Voyant.panel.Knots', {
     		}
     	}, this);
         
-        this.on('documentsSelected', function(src, docIds) {
-        	var docId = docIds[0];
-        	this.setApiParam('docId', docId);
+        this.on('documentSelected', function(src, doc) {
+        	
+        	var document = this.getCorpus().getDocument(doc)
+        	this.setApiParam('docId', document.getId());
         	
         	var terms = this.knots.currentDoc.terms;
         	var termsToKeep = [];
@@ -111,7 +113,7 @@ Ext.define('Voyant.panel.Knots', {
         		termsToKeep.push(t);
         	}
         	
-        	this.termStore.removeAll();
+//        	this.termStore.removeAll();
     		this.setApiParams({query: termsToKeep});
     		
     		var limit = termsToKeep.length;
@@ -119,8 +121,7 @@ Ext.define('Voyant.panel.Knots', {
     			limit = 5;
     		}
         	
-        	var doc = this.processDocument(this.getCorpus().getDocument(docId));
-        	this.knots.setCurrentDoc(doc);
+        	this.knots.setCurrentDoc(this.processDocument(document));
         	
         	this.getDocTermStore().load({params: {
 		    	query: termsToKeep,
@@ -184,14 +185,27 @@ Ext.define('Voyant.panel.Knots', {
    		    	 },
    		    	 load: function(store, records, successful, options) {
    		    		var termObj = {};
-   		    		records.forEach(function(record) {
-   		    			var termData = this.processTerms(record);
-   		    			var docId = record.get('docId');
-   		    			var term = record.get('term');
-   		    			termObj[term] = termData;
-   		    		}, this);
-   		    		this.knots.addTerms(termObj);
-   		    		this.knots.buildGraph();
+   		    		if (records && records.length>0) {
+   	   		    		records.forEach(function(record) {
+   	   		    			var termData = this.processTerms(record);
+   	   		    			var docId = record.get('docId');
+   	   		    			var term = record.get('term');
+   	   		    			termObj[term] = termData;
+   	   		    		}, this);
+   	   		    		this.knots.addTerms(termObj);
+   	   		    		this.knots.buildGraph();
+   		    		}
+   		    		else {
+   		    			Ext.toast({
+   		    				html: this.localize("noTermsFound"),
+   		    				anchor: this.getTargetEl(),
+   		    				align: 'bl',
+   		    				header: false,
+   		    				frame: true,
+   		    				border: true,
+   		    				slideInDuration: 500
+   		    			})
+   		    		}
    				},
    				scope: this
    		     }
@@ -229,11 +243,12 @@ Ext.define('Voyant.panel.Knots', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                 	xtype: 'querysearchfield'
-                },/*{
-	            	xtype: 'button',
+                },{
 	            	text: this.localize('clearTerms'),
+	            	glyph: 'xf00d@FontAwesome',
 	            	handler: function() {
 	            		this.down('#termsView').getSelectionModel().deselectAll(true);
 	            		this.termStore.removeAll();
@@ -242,75 +257,63 @@ Ext.define('Voyant.panel.Knots', {
 	            		this.knots.drawGraph();
 	            	},
 	            	scope: this
-	            },*/
-	            '-',{
-	            	xtype: 'documentselector',
-	            	itemId: 'docSelector',
+	            },{
+	            	xtype: 'documentselectorbutton',
 	            	singleSelect: true
-	            }
-	            ,'-',{
-	            	xtype: 'button',
-	            	text: this.localize('options'),
-	            	menu: {
-	            		width: 200,
-	            		items: [{
-							xtype: 'slider',
-							itemId: 'speed',
-							fieldLabel: this.localize('speed'),
-							labelAlign: 'right',
-							labelWidth: 70,
-	//						width: 150,
-							increment: 50,
-							minValue: 0,
-							maxValue: 500,
-							value: 500-this.getRefreshInterval(),
-	//						margin: "5 5 0 0",
-							listeners: {
-								changecomplete: function(slider, newvalue) {
-									this.setRefreshInterval(500-newvalue);
-									if (this.knots) {this.knots.buildGraph();}
-								},
-								scope: this
-							}
-						},{
-							xtype: 'slider',
-							itemId: 'startAngle',
-							fieldLabel: this.localize('startAngle'),
-							labelAlign: 'right',
-							labelWidth: 70,
-	//						width: 150,
-							increment: 15,
-							minValue: 0,
-							maxValue: 360,
-							value: this.getStartAngle(),
-							listeners: {
-								changecomplete: function(slider, newvalue) {
-									this.setStartAngle(newvalue);
-									if (this.knots) {this.knots.buildGraph();}
-								},
-								scope: this
-							}
-						},{
-							xtype: 'slider',
-							itemId: 'tangles',
-							fieldLabel: this.localize('tangles'),
-							labelAlign: 'right',
-							labelWidth: 70,
-	//						width: 150,
-							increment: 5,
-							minValue: 5,
-							maxValue: 90,
-							value: this.getAngleIncrement(),
-	//						margin: "0 5 5 0",
-							listeners: {
-								changecomplete: function(slider, newvalue) {
-									this.setAngleIncrement(newvalue);
-									if (this.knots) {this.knots.buildGraph();}
-								},
-								scope: this
-							}
-						}
-	            	]}
+	            },{
+					xtype: 'slider',
+					itemId: 'speed',
+					fieldLabel: this.localize("speed"),
+					labelAlign: 'right',
+					labelWidth: 50,
+					width: 100,
+					increment: 50,
+					minValue: 0,
+					maxValue: 500,
+					value: 500-this.getRefreshInterval(),
+					listeners: {
+						changecomplete: function(slider, newvalue) {
+							this.setRefreshInterval(500-newvalue);
+							if (this.knots) {this.knots.buildGraph();}
+						},
+						scope: this
+					}
+				},{
+					xtype: 'slider',
+					itemId: 'startAngle',
+					fieldLabel: this.localize('startAngle'),
+					labelAlign: 'right',
+					labelWidth: 35,
+					width: 85,
+					increment: 15,
+					minValue: 0,
+					maxValue: 360,
+					value: this.getStartAngle(),
+					listeners: {
+						changecomplete: function(slider, newvalue) {
+							this.setStartAngle(newvalue);
+							if (this.knots) {this.knots.buildGraph();}
+						},
+						scope: this
+					}
+				},{
+					xtype: 'slider',
+					itemId: 'tangles',
+					fieldLabel: this.localize('tangles'),
+					labelAlign: 'right',
+					labelWidth: 30,
+					width: 80,
+					increment: 5,
+					minValue: 5,
+					maxValue: 90,
+					value: this.getAngleIncrement(),
+					listeners: {
+						changecomplete: function(slider, newvalue) {
+							this.setAngleIncrement(newvalue);
+							if (this.knots) {this.knots.buildGraph();}
+						},
+						scope: this
+	            	}
 	            }]
     		}],
             border: false,

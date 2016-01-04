@@ -43,6 +43,7 @@ Ext.define('Voyant.panel.Streamgraph', {
         Ext.apply(me, {
     		title: this.localize('title'),
     		tbar: new Ext.Toolbar({
+        		enableOverflow: true,
 				items: {
 					xtype: 'legend',
 					store: new Ext.data.JsonStore({
@@ -62,6 +63,7 @@ Ext.define('Voyant.panel.Streamgraph', {
 				}
 			}),
 			bbar: new Ext.Toolbar({
+        		enableOverflow: true,
 				items: [
 //				{
 //                	xtype: 'querysearchfield'
@@ -75,7 +77,7 @@ Ext.define('Voyant.panel.Streamgraph', {
 	            	scope: this
 	            },
 	            '-',{
-	            	xtype: 'documentselector',
+	            	xtype: 'documentselectorbutton',
 	            	itemId: 'docSelector',
 	            	singleSelect: true
 	            }

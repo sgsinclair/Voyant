@@ -220,6 +220,7 @@ Ext.define('Voyant.panel.Reader', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                 	glyph: 'xf060@FontAwesome',
             		handler: function() {

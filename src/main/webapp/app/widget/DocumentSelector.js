@@ -1,5 +1,5 @@
-Ext.define('Voyant.widget.DocumentSelector', {
-    extend: 'Ext.menu.Item',
+
+Ext.define('Voyant.widget.DocumentSelectorBase', {
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.documentselector',
 	glyph: 'xf10c@FontAwesome',
@@ -22,6 +22,7 @@ Ext.define('Voyant.widget.DocumentSelector', {
 	},
 	
     initComponent: function() {
+
 		var me = this;
 		
 		this.setSingleSelect(this.config.singleSelect == undefined ? this.getSingleSelect() : this.config.singleSelect);
@@ -85,26 +86,34 @@ Ext.define('Voyant.widget.DocumentSelector', {
 		    					clz.hideMenu();
 		    					return true
 		    				}
-		    				return false;
-		    			})
+		    				return false
+		    			}, this)
+		    			this.hideMenu();
 		    		},
 		    		scope: this
-		    	}],
-				items: []
+		    	}]
 			},
 			listeners: {
 				afterrender: function(selector) {
+					selector.on("loadedCorpus", function(src, corpus) {
+						this.setCorpus(corpus)
+						if (corpus.getDocumentsCount()==1) {
+							this.hide();
+						}
+					}, selector);
 					var panel = selector.findParentBy(function(clz) {
 						return clz.mixins["Voyant.panel.Panel"];
 					})
-					if (panel.getCorpus) {this.setCorpus(panel.getCorpus());}
-					selector.on("loadedCorpus", function(src, corpus) {this.setCorpus(corpus)}, selector);
+					if (panel) {
+						panel.on("loadedCorpus", function(src, corpus) {
+							selector.fireEvent("loadedCorpus", src, corpus);
+						}, selector);
+						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
+					}
 				}
 			}
 		});
 
-		me.callParent(arguments);
-		
 		this.setDocStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.Document",
     		autoLoad: false,
@@ -163,7 +172,7 @@ Ext.define('Voyant.widget.DocumentSelector', {
     						return clz.mixins["Voyant.panel.Panel"];
     					})
     					if (panel) {
-	    					panel.fireEvent('documentsClicked', this, [item.docId]);
+	    					panel.fireEvent('documentSelected', this, doc);
     					}
     				}
     			},
@@ -173,3 +182,23 @@ Ext.define('Voyant.widget.DocumentSelector', {
     	
     }
 });
+
+Ext.define('Voyant.widget.DocumentSelectorButton', {
+    extend: 'Ext.button.Button',
+    alias: 'widget.documentselectorbutton',
+    mixins: ['Voyant.widget.DocumentSelectorBase'],
+    initComponent: function() {
+    	this.mixins["Voyant.widget.DocumentSelectorBase"].initComponent.apply(this, arguments);
+		this.callParent();
+    }
+})
+    
+Ext.define('Voyant.widget.DocumentSelectorMenuItem', {
+    extend: 'Ext.menu.Item',
+    alias: 'widget.documentselectormenuitem',
+    mixins: ['Voyant.widget.DocumentSelectorBase'],
+    initComponent: function() {
+    	this.mixins["Voyant.widget.DocumentSelectorBase"].initComponent.apply(this, arguments);
+		this.callParent();
+    }
+})

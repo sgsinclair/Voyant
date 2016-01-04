@@ -69,6 +69,7 @@ Ext.define('Voyant.panel.Contexts', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'querysearchfield'
                 }, {

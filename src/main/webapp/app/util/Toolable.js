@@ -111,6 +111,22 @@ Ext.define('Voyant.util.Toolable', {
 								xtype: 'form',
 								items: panel.getOptions(),
 								buttons: [{
+					            	text: panel.localize("reset"),
+									glyph: 'xf00c@FontAwesome',
+					            	flex: 1,
+					            	panel: panel,
+					        		handler: function(btn) {
+					        			if (this.mixins && this.mixins["Voyant.util.Api"]) {
+					        				this.mixins["Voyant.util.Api"].constructor.apply(this);
+					        				if (this.getCorpus && this.getCorpus()) {
+					        					this.fireEvent("loadedCorpus", this, this.getCorpus())
+					        				}
+					        			}
+					        			btn.up('window').close();
+					        		},
+					        		scope: panel
+								
+								},{xtype: 'tbfill'},{
 					            	text: panel.localize("confirmTitle"),
 									glyph: 'xf00c@FontAwesome',
 					            	flex: 1,

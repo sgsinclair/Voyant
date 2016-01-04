@@ -88,6 +88,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'querysearchfield'
                 }, {

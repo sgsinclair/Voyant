@@ -155,6 +155,17 @@ Ext.define('Voyant.data.model.Corpus', {
 	},
 	
 	getDocument: function(config) {
+		if (this.getDocumentsStore()) {
+			if (config instanceof Voyant.data.model.Document) {
+				return config;
+			}
+			else if (Ext.isNumeric(config)) {
+				return this.getDocumentsStore().getAt(parseInt(config))
+			}
+			else if (Ext.isString(config)) {
+				return this.getDocumentsStore().getById(config)
+			}
+		}
 		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.getDocumentsStore().getDocument(config);
 	},
 	

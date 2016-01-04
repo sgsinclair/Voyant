@@ -20,7 +20,10 @@ Ext.define('Voyant.data.model.Document', {
     	Ext.apply(config, {
     		docId: this.get('id')
     	});
-    	return this.get('corpus').getDocumentTerms(config);
+    	if (config.corpus) {
+    		return config.corpus.getDocumentTerms(config);
+    	}
+    	return this.get('corpus').getDocumentTerms(config); // FIXME: when does this happen?
     },
     
     getIndex: function() {

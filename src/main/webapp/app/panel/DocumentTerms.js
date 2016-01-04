@@ -118,6 +118,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'querysearchfield'
                 }, {

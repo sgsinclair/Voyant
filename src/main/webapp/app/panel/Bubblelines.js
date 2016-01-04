@@ -8,7 +8,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     		title: {en: 'Bubblelines'},
 			type : {en: 'Visualization'},
 			findTerm : {en: 'Find Term'},
-			clearTerms : {en: 'Clear Terms'},
+			clearTerms : {en: 'Clear'},
 			removeTerm : {en: 'Remove Term'},
 			showTerm : {en: 'Show Term'},
 			hideTerm : {en: 'Hide Term'},
@@ -226,41 +226,23 @@ Ext.define('Voyant.panel.Bubblelines', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+                enableOverflow: true,
                 items: [{
                 	xtype: 'querysearchfield'
                 },{
-                	xtype: 'button',
-                	text: this.localize('options'),
-                	menu: {
-                		items: [{
-			            	text: this.localize('clearTerms'),
-        					glyph: 'xf014@FontAwesome',
-			            	handler: function() {
-			            		this.down('#termsView').getSelectionModel().deselectAll(true);
-			            		this.termStore.removeAll();
-			            		this.setApiParams({query: null});
-			            		this.bubblelines.removeAllTerms();
-			            		this.bubblelines.drawGraph();
-			            	},
-			            	scope: this                			
-                		},{
-        	            	xtype: 'documentselector',
-    	                	listeners: {
-    	                		afterrender: function(button) {
-    	                    		if (this.getCorpus()) {
-    	                    			button.setHidden(this.getCorpus().getDocumentsCount()==1)
-    	                    		}
-    	                    		this.on("loadedCorpus", function(src, corpus) {
-    	                    			this.setHidden(corpus.getDocumentsCount()==1)
-    	                    		}, button)
-    	                		},
-    	                		scope: this
-    	                	}
-                		}]
-                	},
-                	scope: this
-                	
-                },'-',{
+	            	text: this.localize('clearTerms'),
+					glyph: 'xf014@FontAwesome',
+	            	handler: function() {
+	            		this.down('#termsView').getSelectionModel().deselectAll(true);
+	            		this.termStore.removeAll();
+	            		this.setApiParams({query: null});
+	            		this.bubblelines.removeAllTerms();
+	            		this.bubblelines.drawGraph();
+	            	},
+	            	scope: this                			
+        		},{
+	            	xtype: 'documentselectorbutton'
+        		},'-',{
 	            	xtype: 'slider',
 	            	itemId: 'granularity',
 	            	fieldLabel: this.localize('granularity'),

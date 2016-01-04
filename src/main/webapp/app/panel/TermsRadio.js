@@ -441,6 +441,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         		]
         	}),
 			tbar: new Ext.Toolbar({
+        		enableOverflow: true,
 				items: {
 					xtype: 'legend',
 					store: new Ext.data.JsonStore({

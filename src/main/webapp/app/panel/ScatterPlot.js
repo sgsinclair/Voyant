@@ -102,85 +102,90 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		itemId: 'chartParent',
         		region: 'center',
         		layout: 'fit',
-        		tbar: [{
-            		text: this.localize('analysis'),
-            		itemId: 'analysis',
-            		glyph: 'xf1ec@FontAwesome',
-        			menu: {
-    					items: [
-    					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
-    					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'}
-    					],
-    					listeners: {
-    						click: function(menu, item) {
-    							if (item !== undefined) {
-    								if (item.text === this.localize('pca')) {
-    									this.setApiParam('analysis', 'pca');
-    								} else {
-    									this.setApiParam('analysis', 'ca');
-    									if (this.getCorpus().getDocumentsCount() == 3) {
-    	//									this.setApiParam('dimensions', 2);
-    	//									this.dimsButton.menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
-    									}
-    								}
-    								this.loadFromApis(true);
-    							}
-    						},
-    						scope: this
-    					}
-        			}
-            	},{
-            		text: this.localize('clusters'),
-            		itemId: 'clusters',
-            		glyph: 'xf192@FontAwesome',
-            		menu: {
-            			items: [
-            			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
-            			    {text: '2', itemId: 'clusters_2', group: 'clusters', xtype: 'menucheckitem'},
-            			    {text: '3', itemId: 'clusters_3', group: 'clusters', xtype: 'menucheckitem'},
-            			    {text: '4', itemId: 'clusters_4', group: 'clusters', xtype: 'menucheckitem'},
-            			    {text: '5', itemId: 'clusters_5', group: 'clusters', xtype: 'menucheckitem'}
-            			],
-    					listeners: {
-    						click: function(menu, item) {
-    							if (item !== undefined) {
-    								this.setApiParam('clusters', parseInt(item.text));
-    								this.loadFromApis(true);
-    							}
-    						},
-    						scope: this
-    					}
-            		}
-            	},{
-            		text: this.localize('dimensions'),
-            		itemId: 'dimensions',
-            		glyph: 'xf1b2@FontAwesome',
-            		menu: {
-            			items: [
-            			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
-            			    {text: '3', itemId: 'dimensions_3', group: 'dimensions', xtype: 'menucheckitem'}
-            			],
-    					listeners: {
-    						click: function(menu, item) {
-    							if (item !== undefined) {
-    								this.setApiParam('dimensions', parseInt(item.text));
-    								this.loadFromApis(true);
-    							}
-    						},
-    						scope: this
-    					}
-            		}
-            	},{
-            		text: this.localize('labels'),
-            		itemId: 'labels',
-            		glyph: 'xf02b@FontAwesome',
-            		handler: function() {
-            			this.labelsMode++;
-    					if (this.labelsMode > 2) this.labelsMode = 0;
-    					this.doLabels();
-					},
-					scope: this
-            	}]
+        		tbar: {
+        			enableOverflow: true,
+        			items: [{
+                		text: this.localize('analysis'),
+                		itemId: 'analysis',
+                		glyph: 'xf1ec@FontAwesome',
+                		enableOverflow: true,
+            			menu: {
+        					items: [
+        					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
+        					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'}
+        					],
+        					listeners: {
+        						click: function(menu, item) {
+        							if (item !== undefined) {
+        								if (item.text === this.localize('pca')) {
+        									this.setApiParam('analysis', 'pca');
+        								} else {
+        									this.setApiParam('analysis', 'ca');
+        									if (this.getCorpus().getDocumentsCount() == 3) {
+        	//									this.setApiParam('dimensions', 2);
+        	//									this.dimsButton.menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
+        									}
+        								}
+        								this.loadFromApis(true);
+        							}
+        						},
+        						scope: this
+        					}
+            			}
+                	},{
+                		text: this.localize('clusters'),
+                		itemId: 'clusters',
+                		glyph: 'xf192@FontAwesome',
+                		menu: {
+                			items: [
+                			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
+                			    {text: '2', itemId: 'clusters_2', group: 'clusters', xtype: 'menucheckitem'},
+                			    {text: '3', itemId: 'clusters_3', group: 'clusters', xtype: 'menucheckitem'},
+                			    {text: '4', itemId: 'clusters_4', group: 'clusters', xtype: 'menucheckitem'},
+                			    {text: '5', itemId: 'clusters_5', group: 'clusters', xtype: 'menucheckitem'}
+                			],
+        					listeners: {
+        						click: function(menu, item) {
+        							if (item !== undefined) {
+        								this.setApiParam('clusters', parseInt(item.text));
+        								this.loadFromApis(true);
+        							}
+        						},
+        						scope: this
+        					}
+                		}
+                	},{
+                		text: this.localize('dimensions'),
+                		itemId: 'dimensions',
+                		glyph: 'xf1b2@FontAwesome',
+                		menu: {
+                			items: [
+                			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
+                			    {text: '3', itemId: 'dimensions_3', group: 'dimensions', xtype: 'menucheckitem'}
+                			],
+        					listeners: {
+        						click: function(menu, item) {
+        							if (item !== undefined) {
+        								this.setApiParam('dimensions', parseInt(item.text));
+        								this.loadFromApis(true);
+        							}
+        						},
+        						scope: this
+        					}
+                		}
+                	},{
+                		text: this.localize('labels'),
+                		itemId: 'labels',
+                		glyph: 'xf02b@FontAwesome',
+                		handler: function() {
+                			this.labelsMode++;
+        					if (this.labelsMode > 2) this.labelsMode = 0;
+        					this.doLabels();
+    					},
+    					scope: this
+                	}]
+        			
+        		}
         	},{
         		itemId: 'terms',
         		xtype: 'grid',
@@ -193,6 +198,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		dockedItems: [{
                     dock: 'top',
                     xtype: 'toolbar',
+            		enableOverflow: true,
                     items: [{
                 		fieldLabel: this.localize('numTerms'),
                 		labelAlign: 'right',

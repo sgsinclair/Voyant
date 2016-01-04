@@ -1,5 +1,5 @@
 Ext.define('Voyant.widget.CorpusDocumentSelector', {
-    extend: 'Ext.menu.Item',
+    extend: 'Ext.button.Button',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.corpusdocumentselector',
 	statics: {
@@ -33,17 +33,27 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 					},
 					scope: this
 				},{
-					xtype: 'documentselector',
+					xtype: 'documentselectormenuitem',
 					singleSelect: this.getSingleSelect()
 				}]
 			},
 			listeners: {
 				afterrender: function(selector) {
+					selector.on("loadedCorpus", function(src, corpus) {
+						this.setCorpus(corpus)
+						if (corpus.getDocumentsCount()==1) {
+							this.hide();
+						}
+					}, selector);
 					var panel = selector.findParentBy(function(clz) {
 						return clz.mixins["Voyant.panel.Panel"];
 					})
-					if (panel.getCorpus) {this.setCorpus(panel.getCorpus());}
-					selector.on("loadedCorpus", function(src, corpus) {this.setCorpus(corpus)}, selector);
+					if (panel) {
+						panel.on("loadedCorpus", function(src, corpus) {
+							selector.fireEvent("loadedCorpus", src, corpus);
+						}, selector);
+						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
+					}
 				}
 			}
 		});

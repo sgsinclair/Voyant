@@ -129,6 +129,7 @@ Ext.define('Voyant.panel.Phrases', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'querysearchfield'
                 }, {

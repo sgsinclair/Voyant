@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Dec 30 11:55:17 PST 2015 */
+/* This file created by JSCacher. Last modified: Thu Dec 31 19:26:10 PST 2015 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2787,6 +2787,22 @@ Ext.define('Voyant.util.Toolable', {
 								xtype: 'form',
 								items: panel.getOptions(),
 								buttons: [{
+					            	text: panel.localize("reset"),
+									glyph: 'xf00c@FontAwesome',
+					            	flex: 1,
+					            	panel: panel,
+					        		handler: function(btn) {
+					        			if (this.mixins && this.mixins["Voyant.util.Api"]) {
+					        				this.mixins["Voyant.util.Api"].constructor.apply(this);
+					        				if (this.getCorpus && this.getCorpus()) {
+					        					this.fireEvent("loadedCorpus", this, this.getCorpus())
+					        				}
+					        			}
+					        			btn.up('window').close();
+					        		},
+					        		scope: panel
+								
+								},{xtype: 'tbfill'},{
 					            	text: panel.localize("confirmTitle"),
 									glyph: 'xf00c@FontAwesome',
 					            	flex: 1,
@@ -3515,7 +3531,10 @@ Ext.define('Voyant.data.model.Document', {
     	Ext.apply(config, {
     		docId: this.get('id')
     	});
-    	return this.get('corpus').getDocumentTerms(config);
+    	if (config.corpus) {
+    		return config.corpus.getDocumentTerms(config);
+    	}
+    	return this.get('corpus').getDocumentTerms(config); // FIXME: when does this happen?
     },
     
     getIndex: function() {
@@ -4496,6 +4515,17 @@ Ext.define('Voyant.data.model.Corpus', {
 	},
 	
 	getDocument: function(config) {
+		if (this.getDocumentsStore()) {
+			if (config instanceof Voyant.data.model.Document) {
+				return config;
+			}
+			else if (Ext.isNumeric(config)) {
+				return this.getDocumentsStore().getAt(parseInt(config))
+			}
+			else if (Ext.isString(config)) {
+				return this.getDocumentsStore().getById(config)
+			}
+		}
 		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.getDocumentsStore().getDocument(config);
 	},
 	
@@ -4955,8 +4985,8 @@ Ext.define('Voyant.widget.TotalPropertyStatus', {
     }
 });
 
-Ext.define('Voyant.widget.DocumentSelector', {
-    extend: 'Ext.menu.Item',
+
+Ext.define('Voyant.widget.DocumentSelectorBase', {
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.documentselector',
 	glyph: 'xf10c@FontAwesome',
@@ -4979,6 +5009,7 @@ Ext.define('Voyant.widget.DocumentSelector', {
 	},
 	
     initComponent: function() {
+
 		var me = this;
 		
 		this.setSingleSelect(this.config.singleSelect == undefined ? this.getSingleSelect() : this.config.singleSelect);
@@ -5042,26 +5073,34 @@ Ext.define('Voyant.widget.DocumentSelector', {
 		    					clz.hideMenu();
 		    					return true
 		    				}
-		    				return false;
-		    			})
+		    				return false
+		    			}, this)
+		    			this.hideMenu();
 		    		},
 		    		scope: this
-		    	}],
-				items: []
+		    	}]
 			},
 			listeners: {
 				afterrender: function(selector) {
+					selector.on("loadedCorpus", function(src, corpus) {
+						this.setCorpus(corpus)
+						if (corpus.getDocumentsCount()==1) {
+							this.hide();
+						}
+					}, selector);
 					var panel = selector.findParentBy(function(clz) {
 						return clz.mixins["Voyant.panel.Panel"];
 					})
-					if (panel.getCorpus) {this.setCorpus(panel.getCorpus());}
-					selector.on("loadedCorpus", function(src, corpus) {this.setCorpus(corpus)}, selector);
+					if (panel) {
+						panel.on("loadedCorpus", function(src, corpus) {
+							selector.fireEvent("loadedCorpus", src, corpus);
+						}, selector);
+						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
+					}
 				}
 			}
 		});
 
-		me.callParent(arguments);
-		
 		this.setDocStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.Document",
     		autoLoad: false,
@@ -5120,7 +5159,7 @@ Ext.define('Voyant.widget.DocumentSelector', {
     						return clz.mixins["Voyant.panel.Panel"];
     					})
     					if (panel) {
-	    					panel.fireEvent('documentsClicked', this, [item.docId]);
+	    					panel.fireEvent('documentSelected', this, doc);
     					}
     				}
     			},
@@ -5130,8 +5169,29 @@ Ext.define('Voyant.widget.DocumentSelector', {
     	
     }
 });
-Ext.define('Voyant.widget.CorpusDocumentSelector', {
+
+Ext.define('Voyant.widget.DocumentSelectorButton', {
+    extend: 'Ext.button.Button',
+    alias: 'widget.documentselectorbutton',
+    mixins: ['Voyant.widget.DocumentSelectorBase'],
+    initComponent: function() {
+    	this.mixins["Voyant.widget.DocumentSelectorBase"].initComponent.apply(this, arguments);
+		this.callParent();
+    }
+})
+    
+Ext.define('Voyant.widget.DocumentSelectorMenuItem', {
     extend: 'Ext.menu.Item',
+    alias: 'widget.documentselectormenuitem',
+    mixins: ['Voyant.widget.DocumentSelectorBase'],
+    initComponent: function() {
+    	this.mixins["Voyant.widget.DocumentSelectorBase"].initComponent.apply(this, arguments);
+		this.callParent();
+    }
+})
+
+Ext.define('Voyant.widget.CorpusDocumentSelector', {
+    extend: 'Ext.button.Button',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.corpusdocumentselector',
 	statics: {
@@ -5165,17 +5225,27 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 					},
 					scope: this
 				},{
-					xtype: 'documentselector',
+					xtype: 'documentselectormenuitem',
 					singleSelect: this.getSingleSelect()
 				}]
 			},
 			listeners: {
 				afterrender: function(selector) {
+					selector.on("loadedCorpus", function(src, corpus) {
+						this.setCorpus(corpus)
+						if (corpus.getDocumentsCount()==1) {
+							this.hide();
+						}
+					}, selector);
 					var panel = selector.findParentBy(function(clz) {
 						return clz.mixins["Voyant.panel.Panel"];
 					})
-					if (panel.getCorpus) {this.setCorpus(panel.getCorpus());}
-					selector.on("loadedCorpus", function(src, corpus) {this.setCorpus(corpus)}, selector);
+					if (panel) {
+						panel.on("loadedCorpus", function(src, corpus) {
+							selector.fireEvent("loadedCorpus", src, corpus);
+						}, selector);
+						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
+					}
 				}
 			}
 		});
@@ -5286,7 +5356,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     		title: {en: 'Bubblelines'},
 			type : {en: 'Visualization'},
 			findTerm : {en: 'Find Term'},
-			clearTerms : {en: 'Clear Terms'},
+			clearTerms : {en: 'Clear'},
 			removeTerm : {en: 'Remove Term'},
 			showTerm : {en: 'Show Term'},
 			hideTerm : {en: 'Hide Term'},
@@ -5504,41 +5574,23 @@ Ext.define('Voyant.panel.Bubblelines', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+                enableOverflow: true,
                 items: [{
                 	xtype: 'querysearchfield'
                 },{
-                	xtype: 'button',
-                	text: this.localize('options'),
-                	menu: {
-                		items: [{
-			            	text: this.localize('clearTerms'),
-        					glyph: 'xf014@FontAwesome',
-			            	handler: function() {
-			            		this.down('#termsView').getSelectionModel().deselectAll(true);
-			            		this.termStore.removeAll();
-			            		this.setApiParams({query: null});
-			            		this.bubblelines.removeAllTerms();
-			            		this.bubblelines.drawGraph();
-			            	},
-			            	scope: this                			
-                		},{
-        	            	xtype: 'documentselector',
-    	                	listeners: {
-    	                		afterrender: function(button) {
-    	                    		if (this.getCorpus()) {
-    	                    			button.setHidden(this.getCorpus().getDocumentsCount()==1)
-    	                    		}
-    	                    		this.on("loadedCorpus", function(src, corpus) {
-    	                    			this.setHidden(corpus.getDocumentsCount()==1)
-    	                    		}, button)
-    	                		},
-    	                		scope: this
-    	                	}
-                		}]
-                	},
-                	scope: this
-                	
-                },'-',{
+	            	text: this.localize('clearTerms'),
+					glyph: 'xf014@FontAwesome',
+	            	handler: function() {
+	            		this.down('#termsView').getSelectionModel().deselectAll(true);
+	            		this.termStore.removeAll();
+	            		this.setApiParams({query: null});
+	            		this.bubblelines.removeAllTerms();
+	            		this.bubblelines.drawGraph();
+	            	},
+	            	scope: this                			
+        		},{
+	            	xtype: 'documentselectorbutton'
+        		},'-',{
 	            	xtype: 'slider',
 	            	itemId: 'granularity',
 	            	fieldLabel: this.localize('granularity'),
@@ -5841,8 +5893,9 @@ Ext.define('Voyant.panel.Cirrus', {
     		title: {en: "Cirrus"},
     		helpTip: {en: "<p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document – this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>"},
     		visible: {en: "Show"},
-    		reset: {en: 'reset'},
-    		maxTerms: {en: "Max terms"}
+    		maxTerms: {en: "Max terms"},
+    		options: {en: "Options"},
+    		visibleTerms: {en: "Terms"}
     	},
     	api: {
     		stopList: 'auto',
@@ -5902,13 +5955,15 @@ Ext.define('Voyant.panel.Cirrus', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
-	            	xtype: 'slider',
-	            	itemId: 'visible',
-	            	fieldLabel: this.localize('visible'),
-	            	labelAlign: 'right',
-	            	labelWidth: 40,
-	            	width: 120,
+        			xtype: 'corpusdocumentselector',
+        			singleSelect: true
+        		},{
+        			fieldLabel: this.localize('visibleTerms'),
+        			labelWidth: 40,
+        			width: 120,
+        			xtype: 'slider',
 	            	increment: 25,
 	            	minValue: 25,
 	            	maxValue: 500,
@@ -5924,16 +5979,6 @@ Ext.define('Voyant.panel.Cirrus', {
 	            		},
 	            		scope: this
 	            	}
-                }, {xtype: 'tbfill'}, {
-                    text: this.localize('reset'),
-                    hidden: true,
-                    itemId: 'reset',
-                    handler: function(btn) {
-                    	btn.hide();
-                    	var corpus = this.getCorpus();
-                    	if (corpus) {this.loadFromCorpus(corpus);}
-                    },
-                    scope: this
                 }]
     		}]
     	});
@@ -5968,11 +6013,18 @@ Ext.define('Voyant.panel.Cirrus', {
     		this.loadFromCorpus(corpus);
     	},
     	
-    	documentsClicked: function(src, documents, corpus) {
-    		if (documents) {
-    			var doc = documents[0];
-    			this.setApiParam('docId', doc.getId());
-        		this.loadFromDocumentTerms(documents[0].getDocumentTerms({autoload: false, corpus: corpus, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
+    	corpusSelected: function(src, corpus) {
+    		this.loadFromCorpus(corpus);
+    		
+    	},
+    	
+    	documentSelected: function(src, document) {
+    		if (document) {
+        		var corpus = this.getCorpus();
+        		var document = corpus.getDocument(document);
+        		this.setApiParam('docId', document.getId());
+        		var documentTerms = document.getDocumentTerms({autoload: false, corpus: corpus, pageSize: this.getApiParam("maxVisible"), parentPanel: this});
+        		this.loadFromDocumentTerms(documentTerms);
     		}
     	},
     	
@@ -6002,7 +6054,6 @@ Ext.define('Voyant.panel.Cirrus', {
 		    scope: this,
 		    params: this.getApiParams()
     	});
-    	this.down("#reset").show();
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
@@ -6295,6 +6346,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'querysearchfield'
                 },{
@@ -6759,6 +6811,7 @@ Ext.define('Voyant.panel.Contexts', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
@@ -7166,6 +7219,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
@@ -7344,6 +7398,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		},
 	    	dockedItems: [{
 	    		xtype: 'toolbar',
+        		enableOverflow: true,
                 dock: 'bottom',
     	    	buttonAlign: 'right',
     	    	defaultButtonUI : 'default',
@@ -7712,15 +7767,17 @@ Ext.define('Voyant.panel.Knots', {
     		title : {en: 'Knots'},
 			type : {en: 'Visualization'},
 			findTerm : {en: 'Find Term'},
-			clearTerms : {en: 'Clear Terms'},
+			clearTerms : {en: 'Clear'},
 			removeTerm : {en: 'Remove Term'},
 			showTerm : {en: 'Show Term'},
 			hideTerm : {en: 'Hide Term'},
 			options: {en: "Options"},
 			speed : {en: 'Speed'},
-			startAngle : {en: 'Start Angle'},
-			tangles : {en: 'Turn Angle'},
-			context : {en: 'Context'}
+			startAngle : {en: 'Start'},
+			tangles : {en: 'Turn'},
+			context : {en: 'Context'},
+			noTermsFound: {en: "No terms found in this document."},
+			settings: {en: "Settings"}
     	},
     	api: {
     		/**
@@ -7781,7 +7838,6 @@ Ext.define('Voyant.panel.Knots', {
     		this.setApiParams({docId: firstDoc.getId()});
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
     		this.getTokensStore().setCorpus(corpus);
-    		this.down('#docSelector').setCorpus(corpus);
     		this.getDocTermStore().load({params: {
 		    	limit: 5,
 		    	stopList: this.getApiParams('stopList')
@@ -7805,9 +7861,10 @@ Ext.define('Voyant.panel.Knots', {
     		}
     	}, this);
         
-        this.on('documentsSelected', function(src, docIds) {
-        	var docId = docIds[0];
-        	this.setApiParam('docId', docId);
+        this.on('documentSelected', function(src, doc) {
+        	
+        	var document = this.getCorpus().getDocument(doc)
+        	this.setApiParam('docId', document.getId());
         	
         	var terms = this.knots.currentDoc.terms;
         	var termsToKeep = [];
@@ -7815,7 +7872,7 @@ Ext.define('Voyant.panel.Knots', {
         		termsToKeep.push(t);
         	}
         	
-        	this.termStore.removeAll();
+//        	this.termStore.removeAll();
     		this.setApiParams({query: termsToKeep});
     		
     		var limit = termsToKeep.length;
@@ -7823,8 +7880,7 @@ Ext.define('Voyant.panel.Knots', {
     			limit = 5;
     		}
         	
-        	var doc = this.processDocument(this.getCorpus().getDocument(docId));
-        	this.knots.setCurrentDoc(doc);
+        	this.knots.setCurrentDoc(this.processDocument(document));
         	
         	this.getDocTermStore().load({params: {
 		    	query: termsToKeep,
@@ -7888,14 +7944,27 @@ Ext.define('Voyant.panel.Knots', {
    		    	 },
    		    	 load: function(store, records, successful, options) {
    		    		var termObj = {};
-   		    		records.forEach(function(record) {
-   		    			var termData = this.processTerms(record);
-   		    			var docId = record.get('docId');
-   		    			var term = record.get('term');
-   		    			termObj[term] = termData;
-   		    		}, this);
-   		    		this.knots.addTerms(termObj);
-   		    		this.knots.buildGraph();
+   		    		if (records && records.length>0) {
+   	   		    		records.forEach(function(record) {
+   	   		    			var termData = this.processTerms(record);
+   	   		    			var docId = record.get('docId');
+   	   		    			var term = record.get('term');
+   	   		    			termObj[term] = termData;
+   	   		    		}, this);
+   	   		    		this.knots.addTerms(termObj);
+   	   		    		this.knots.buildGraph();
+   		    		}
+   		    		else {
+   		    			Ext.toast({
+   		    				html: this.localize("noTermsFound"),
+   		    				anchor: this.getTargetEl(),
+   		    				align: 'bl',
+   		    				header: false,
+   		    				frame: true,
+   		    				border: true,
+   		    				slideInDuration: 500
+   		    			})
+   		    		}
    				},
    				scope: this
    		     }
@@ -7933,11 +8002,12 @@ Ext.define('Voyant.panel.Knots', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                 	xtype: 'querysearchfield'
-                },/*{
-	            	xtype: 'button',
+                },{
 	            	text: this.localize('clearTerms'),
+	            	glyph: 'xf00d@FontAwesome',
 	            	handler: function() {
 	            		this.down('#termsView').getSelectionModel().deselectAll(true);
 	            		this.termStore.removeAll();
@@ -7946,75 +8016,63 @@ Ext.define('Voyant.panel.Knots', {
 	            		this.knots.drawGraph();
 	            	},
 	            	scope: this
-	            },*/
-	            '-',{
-	            	xtype: 'documentselector',
-	            	itemId: 'docSelector',
+	            },{
+	            	xtype: 'documentselectorbutton',
 	            	singleSelect: true
-	            }
-	            ,'-',{
-	            	xtype: 'button',
-	            	text: this.localize('options'),
-	            	menu: {
-	            		width: 200,
-	            		items: [{
-							xtype: 'slider',
-							itemId: 'speed',
-							fieldLabel: this.localize('speed'),
-							labelAlign: 'right',
-							labelWidth: 70,
-	//						width: 150,
-							increment: 50,
-							minValue: 0,
-							maxValue: 500,
-							value: 500-this.getRefreshInterval(),
-	//						margin: "5 5 0 0",
-							listeners: {
-								changecomplete: function(slider, newvalue) {
-									this.setRefreshInterval(500-newvalue);
-									if (this.knots) {this.knots.buildGraph();}
-								},
-								scope: this
-							}
-						},{
-							xtype: 'slider',
-							itemId: 'startAngle',
-							fieldLabel: this.localize('startAngle'),
-							labelAlign: 'right',
-							labelWidth: 70,
-	//						width: 150,
-							increment: 15,
-							minValue: 0,
-							maxValue: 360,
-							value: this.getStartAngle(),
-							listeners: {
-								changecomplete: function(slider, newvalue) {
-									this.setStartAngle(newvalue);
-									if (this.knots) {this.knots.buildGraph();}
-								},
-								scope: this
-							}
-						},{
-							xtype: 'slider',
-							itemId: 'tangles',
-							fieldLabel: this.localize('tangles'),
-							labelAlign: 'right',
-							labelWidth: 70,
-	//						width: 150,
-							increment: 5,
-							minValue: 5,
-							maxValue: 90,
-							value: this.getAngleIncrement(),
-	//						margin: "0 5 5 0",
-							listeners: {
-								changecomplete: function(slider, newvalue) {
-									this.setAngleIncrement(newvalue);
-									if (this.knots) {this.knots.buildGraph();}
-								},
-								scope: this
-							}
-						}
-	            	]}
+	            },{
+					xtype: 'slider',
+					itemId: 'speed',
+					fieldLabel: this.localize("speed"),
+					labelAlign: 'right',
+					labelWidth: 50,
+					width: 100,
+					increment: 50,
+					minValue: 0,
+					maxValue: 500,
+					value: 500-this.getRefreshInterval(),
+					listeners: {
+						changecomplete: function(slider, newvalue) {
+							this.setRefreshInterval(500-newvalue);
+							if (this.knots) {this.knots.buildGraph();}
+						},
+						scope: this
+					}
+				},{
+					xtype: 'slider',
+					itemId: 'startAngle',
+					fieldLabel: this.localize('startAngle'),
+					labelAlign: 'right',
+					labelWidth: 35,
+					width: 85,
+					increment: 15,
+					minValue: 0,
+					maxValue: 360,
+					value: this.getStartAngle(),
+					listeners: {
+						changecomplete: function(slider, newvalue) {
+							this.setStartAngle(newvalue);
+							if (this.knots) {this.knots.buildGraph();}
+						},
+						scope: this
+					}
+				},{
+					xtype: 'slider',
+					itemId: 'tangles',
+					fieldLabel: this.localize('tangles'),
+					labelAlign: 'right',
+					labelWidth: 30,
+					width: 80,
+					increment: 5,
+					minValue: 5,
+					maxValue: 90,
+					value: this.getAngleIncrement(),
+					listeners: {
+						changecomplete: function(slider, newvalue) {
+							this.setAngleIncrement(newvalue);
+							if (this.knots) {this.knots.buildGraph();}
+						},
+						scope: this
+	            	}
 	            }]
     		}],
             border: false,
@@ -8418,6 +8476,7 @@ Ext.define('Voyant.panel.Phrases', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
@@ -8663,6 +8722,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
@@ -8866,6 +8926,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
@@ -9179,6 +9240,7 @@ Ext.define('Voyant.panel.Documents', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: dockedItemsItems
             }]
     	});
@@ -9966,6 +10028,7 @@ Ext.define('Voyant.panel.RezoViz', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     xtype: 'combo',
                     queryMode: 'local',
@@ -10502,6 +10565,7 @@ Ext.define('Voyant.panel.Reader', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                 	glyph: 'xf060@FontAwesome',
             		handler: function() {
@@ -11080,85 +11144,90 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		itemId: 'chartParent',
         		region: 'center',
         		layout: 'fit',
-        		tbar: [{
-            		text: this.localize('analysis'),
-            		itemId: 'analysis',
-            		glyph: 'xf1ec@FontAwesome',
-        			menu: {
-    					items: [
-    					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
-    					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'}
-    					],
-    					listeners: {
-    						click: function(menu, item) {
-    							if (item !== undefined) {
-    								if (item.text === this.localize('pca')) {
-    									this.setApiParam('analysis', 'pca');
-    								} else {
-    									this.setApiParam('analysis', 'ca');
-    									if (this.getCorpus().getDocumentsCount() == 3) {
-    	//									this.setApiParam('dimensions', 2);
-    	//									this.dimsButton.menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
-    									}
-    								}
-    								this.loadFromApis(true);
-    							}
-    						},
-    						scope: this
-    					}
-        			}
-            	},{
-            		text: this.localize('clusters'),
-            		itemId: 'clusters',
-            		glyph: 'xf192@FontAwesome',
-            		menu: {
-            			items: [
-            			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
-            			    {text: '2', itemId: 'clusters_2', group: 'clusters', xtype: 'menucheckitem'},
-            			    {text: '3', itemId: 'clusters_3', group: 'clusters', xtype: 'menucheckitem'},
-            			    {text: '4', itemId: 'clusters_4', group: 'clusters', xtype: 'menucheckitem'},
-            			    {text: '5', itemId: 'clusters_5', group: 'clusters', xtype: 'menucheckitem'}
-            			],
-    					listeners: {
-    						click: function(menu, item) {
-    							if (item !== undefined) {
-    								this.setApiParam('clusters', parseInt(item.text));
-    								this.loadFromApis(true);
-    							}
-    						},
-    						scope: this
-    					}
-            		}
-            	},{
-            		text: this.localize('dimensions'),
-            		itemId: 'dimensions',
-            		glyph: 'xf1b2@FontAwesome',
-            		menu: {
-            			items: [
-            			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
-            			    {text: '3', itemId: 'dimensions_3', group: 'dimensions', xtype: 'menucheckitem'}
-            			],
-    					listeners: {
-    						click: function(menu, item) {
-    							if (item !== undefined) {
-    								this.setApiParam('dimensions', parseInt(item.text));
-    								this.loadFromApis(true);
-    							}
-    						},
-    						scope: this
-    					}
-            		}
-            	},{
-            		text: this.localize('labels'),
-            		itemId: 'labels',
-            		glyph: 'xf02b@FontAwesome',
-            		handler: function() {
-            			this.labelsMode++;
-    					if (this.labelsMode > 2) this.labelsMode = 0;
-    					this.doLabels();
-					},
-					scope: this
-            	}]
+        		tbar: {
+        			enableOverflow: true,
+        			items: [{
+                		text: this.localize('analysis'),
+                		itemId: 'analysis',
+                		glyph: 'xf1ec@FontAwesome',
+                		enableOverflow: true,
+            			menu: {
+        					items: [
+        					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
+        					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'}
+        					],
+        					listeners: {
+        						click: function(menu, item) {
+        							if (item !== undefined) {
+        								if (item.text === this.localize('pca')) {
+        									this.setApiParam('analysis', 'pca');
+        								} else {
+        									this.setApiParam('analysis', 'ca');
+        									if (this.getCorpus().getDocumentsCount() == 3) {
+        	//									this.setApiParam('dimensions', 2);
+        	//									this.dimsButton.menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
+        									}
+        								}
+        								this.loadFromApis(true);
+        							}
+        						},
+        						scope: this
+        					}
+            			}
+                	},{
+                		text: this.localize('clusters'),
+                		itemId: 'clusters',
+                		glyph: 'xf192@FontAwesome',
+                		menu: {
+                			items: [
+                			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
+                			    {text: '2', itemId: 'clusters_2', group: 'clusters', xtype: 'menucheckitem'},
+                			    {text: '3', itemId: 'clusters_3', group: 'clusters', xtype: 'menucheckitem'},
+                			    {text: '4', itemId: 'clusters_4', group: 'clusters', xtype: 'menucheckitem'},
+                			    {text: '5', itemId: 'clusters_5', group: 'clusters', xtype: 'menucheckitem'}
+                			],
+        					listeners: {
+        						click: function(menu, item) {
+        							if (item !== undefined) {
+        								this.setApiParam('clusters', parseInt(item.text));
+        								this.loadFromApis(true);
+        							}
+        						},
+        						scope: this
+        					}
+                		}
+                	},{
+                		text: this.localize('dimensions'),
+                		itemId: 'dimensions',
+                		glyph: 'xf1b2@FontAwesome',
+                		menu: {
+                			items: [
+                			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
+                			    {text: '3', itemId: 'dimensions_3', group: 'dimensions', xtype: 'menucheckitem'}
+                			],
+        					listeners: {
+        						click: function(menu, item) {
+        							if (item !== undefined) {
+        								this.setApiParam('dimensions', parseInt(item.text));
+        								this.loadFromApis(true);
+        							}
+        						},
+        						scope: this
+        					}
+                		}
+                	},{
+                		text: this.localize('labels'),
+                		itemId: 'labels',
+                		glyph: 'xf02b@FontAwesome',
+                		handler: function() {
+                			this.labelsMode++;
+        					if (this.labelsMode > 2) this.labelsMode = 0;
+        					this.doLabels();
+    					},
+    					scope: this
+                	}]
+        			
+        		}
         	},{
         		itemId: 'terms',
         		xtype: 'grid',
@@ -11171,6 +11240,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		dockedItems: [{
                     dock: 'top',
                     xtype: 'toolbar',
+            		enableOverflow: true,
                     items: [{
                 		fieldLabel: this.localize('numTerms'),
                 		labelAlign: 'right',
@@ -12681,6 +12751,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         		]
         	}),
 			tbar: new Ext.Toolbar({
+        		enableOverflow: true,
 				items: {
 					xtype: 'legend',
 					store: new Ext.data.JsonStore({
@@ -14491,7 +14562,6 @@ Ext.define('Voyant.panel.TermsRadio', {
     			this.setMode(this.MODE_DOCUMENT);
     			this.setApiParams({withDistributions: 'raw'});
     			this.down('#raw').setChecked(true);
-    			this.down("corpusdocumentselector").hide()
     		}
     		if (this.isVisible()) {
         		this.loadFromCorpus(corpus);
@@ -14506,11 +14576,9 @@ Ext.define('Voyant.panel.TermsRadio', {
     		}
     	});
     	
-    	this.on("documentsClicked", function(src, documents) {
+    	this.on("documentSelected", function(src, document) {
     		if (this.getCorpus()) {
-    			if (documents.length==1) {
-    				this.loadFromDocument(documents[0]);
-    			}
+    			this.loadFromDocument(this.getCorpus().getDocument(document))
     		}
     	});
     	
@@ -14590,78 +14658,65 @@ Ext.define('Voyant.panel.TermsRadio', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
+        		enableOverflow: true,
                 items: [{
                     	xtype: 'querysearchfield'
                 	},{
-                		xtype: "button",
-                		text: this.localize("options"),
-                		menu: {
-                			width: 150,
-                			items: [
-                			    {
-                			    	text: this.localize('segmentsSlider'),
-                					glyph: 'xf141@FontAwesome',
-                			    	itemId: 'segmentsMenu',
-                			    	tooltip: 'segmentsToolTip',
-                			    	xtype: 'menuitem',
-                			    	menu: {
-                			    		items: {
-                        			    	itemId: 'segmentsSlider',
-                        			    	xtype: 'slider',
-                        			    	minValue: 2,
-                        			    	maxValue: 100,
-                        	            	listeners: {
-                        	            		afterrender: function(slider) {
-                        	            			slider.setValue(parseInt(this.getApiParam("bins")))
-                        	            		},
-                        	            		changecomplete: function(slider, newvalue) {
-                        	            			this.setApiParams({bins: newvalue});
-                        	            			this.reloadFromChart();
-                        	            		},
-                        	            		scope: this
-                        	            	}
-                			    		}
-                			    	}
-                			    },{
-								    text: this.localize('freqsMode'),
-                					glyph: 'xf201@FontAwesome',
-								    tooltip: this.localize('freqsModeTip'),
-								    menu: {
-								    	items: [
-								           {
-								               text: this.localize("relativeFrequencies"),
-								               checked: true,
-								               itemId: 'relative',
-								               group: 'freqsMode',
-								               checkHandler: function(item, checked) {
-								            	   if (checked) {
-								                	   this.setApiParam('withDistributions', 'relative');
-								                	   this.reloadFromChart();
-								            	   }
-								               },
-								               scope: this
-								           }, {
-								               text: this.localize("rawFrequencies"),
-								               checked: false,
-								               itemId: 'raw',
-								               group: 'freqsMode',
-								               checkHandler: function(item, checked) {
-								            	   if (checked) {
-								                	   this.setApiParam('withDistributions', 'raw');
-								                	   this.reloadFromChart();
-								            	   }
-								               },
-								               scope: this
-								           }
-								       ]
-								    }
-								},{
-									xtype: 'corpusdocumentselector',
-									singleSelect: true
-								}
-                			]
-                		}
-                	}]
+						xtype: 'corpusdocumentselector',
+						singleSelect: true
+					},{
+					    text: this.localize('freqsMode'),
+    					glyph: 'xf201@FontAwesome',
+					    tooltip: this.localize('freqsModeTip'),
+					    menu: {
+					    	items: [
+					           {
+					               text: this.localize("relativeFrequencies"),
+					               checked: true,
+					               itemId: 'relative',
+					               group: 'freqsMode',
+					               checkHandler: function(item, checked) {
+					            	   if (checked) {
+					                	   this.setApiParam('withDistributions', 'relative');
+					                	   this.reloadFromChart();
+					            	   }
+					               },
+					               scope: this
+					           }, {
+					               text: this.localize("rawFrequencies"),
+					               checked: false,
+					               itemId: 'raw',
+					               group: 'freqsMode',
+					               checkHandler: function(item, checked) {
+					            	   if (checked) {
+					                	   this.setApiParam('withDistributions', 'raw');
+					                	   this.reloadFromChart();
+					            	   }
+					               },
+					               scope: this
+					           }
+					       ]
+					    }
+					},{
+    			    	itemId: 'segmentsSlider',
+    			    	xtype: 'slider',
+    			    	fieldLabel: this.localize('segmentsSlider'),
+    			    	fieldAlign: 'right',
+    			    	labelWidth: 70,
+    			    	width: 150,
+    			    	minValue: 2,
+    			    	maxValue: 100,
+    	            	listeners: {
+    	            		afterrender: function(slider) {
+    	            			slider.setValue(parseInt(this.getApiParam("bins")))
+    	            		},
+    	            		changecomplete: function(slider, newvalue) {
+    	            			this.setApiParams({bins: newvalue});
+    	            			this.reloadFromChart();
+    	            		},
+    	            		scope: this
+    	            	}
+		    		}]
             }]
         });
         me.callParent(arguments);
@@ -14909,7 +14964,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     setMode: function(mode) {
     	this.setApiParams({mode: mode});
     	var mode = this.getApiParam("mode");    	
-    	var menu = this.queryById("segmentsMenu");
+    	var menu = this.queryById("segmentsSlider");
     	menu.setHidden(mode==this.MODE_CORPUS)
     }
     
@@ -15197,6 +15252,7 @@ Ext.define('Voyant.panel.Streamgraph', {
         Ext.apply(me, {
     		title: this.localize('title'),
     		tbar: new Ext.Toolbar({
+        		enableOverflow: true,
 				items: {
 					xtype: 'legend',
 					store: new Ext.data.JsonStore({
@@ -15216,6 +15272,7 @@ Ext.define('Voyant.panel.Streamgraph', {
 				}
 			}),
 			bbar: new Ext.Toolbar({
+        		enableOverflow: true,
 				items: [
 //				{
 //                	xtype: 'querysearchfield'
@@ -15229,7 +15286,7 @@ Ext.define('Voyant.panel.Streamgraph', {
 	            	scope: this
 	            },
 	            '-',{
-	            	xtype: 'documentselector',
+	            	xtype: 'documentselectorbutton',
 	            	itemId: 'docSelector',
 	            	singleSelect: true
 	            }
