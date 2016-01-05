@@ -196,14 +196,9 @@ Ext.define('Voyant.panel.Knots', {
    	   		    		this.knots.buildGraph();
    		    		}
    		    		else {
-   		    			Ext.toast({
+   		    			this.toastInfo({
    		    				html: this.localize("noTermsFound"),
-   		    				anchor: this.getTargetEl(),
    		    				align: 'bl',
-   		    				header: false,
-   		    				frame: true,
-   		    				border: true,
-   		    				slideInDuration: 500
    		    			})
    		    		}
    				},

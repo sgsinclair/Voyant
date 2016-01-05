@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Jan 05 09:51:20 EST 2016 */
+/* This file created by JSCacher. Last modified: Tue Jan 05 09:56:54 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7994,14 +7994,9 @@ Ext.define('Voyant.panel.Knots', {
    	   		    		this.knots.buildGraph();
    		    		}
    		    		else {
-   		    			Ext.toast({
+   		    			this.toastInfo({
    		    				html: this.localize("noTermsFound"),
-   		    				anchor: this.getTargetEl(),
    		    				align: 'bl',
-   		    				header: false,
-   		    				frame: true,
-   		    				border: true,
-   		    				slideInDuration: 500
    		    			})
    		    		}
    				},
