@@ -477,7 +477,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 			}),
 			bbar: new Ext.Toolbar({
 	            enableOverflow: true,
-	            items: [this.toggleLeft,this.stop,this.toggleRight,'-',this.resetButton,'-',this.duration,'-',this.fraction,'-',this.segments,this.visibleSegments,'-',this.typeSearch]
+	            items: [this.toggleLeft,this.stop,this.toggleRight,'-',this.resetButton,this.duration,this.fraction,this.segments,this.visibleSegments,this.typeSearch]
 			})
 		});
 		

@@ -72,7 +72,7 @@
     	this.on("corpusSelected", function(src, corpus) {
     		if (src.isXType("corpusdocumentselector")) {
     			this.setMode(this.MODE_CORPUS);
-    			this.setApiParams({docId: undefined, docIndex: undefined})
+    			this.setApiParams({docId: undefined, docIndex: undefined, bins: undefined})
         		this.loadFromCorpus(corpus);
     		}
     	});
@@ -97,13 +97,13 @@
         		});
         		if (queryTerms) {
         			
-            		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
-            			this.setMode(this.MODE_CORPUS);
-            			this.setApiParams({
-            				'docIndex': undefined,
-            				'docId': undefined
-            			});
-            		}
+//            		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
+//            			this.setMode(this.MODE_CORPUS);
+//            			this.setApiParams({
+//            				'docIndex': undefined,
+//            				'docId': undefined
+//            			});
+//            		}
         			this.setApiParams({
         				query: queryTerms
         			});
@@ -213,7 +213,12 @@
     	            		},
     	            		changecomplete: function(slider, newvalue) {
     	            			this.setApiParams({bins: newvalue});
-    	            			this.reloadFromChart();
+    	            			if (this.getApiParam("docId") || this.getApiParam('docIndex')) {
+    	            				this.loadFromDocumentTerms();
+    	            			}
+    	            			else {
+    	            				this.loadFromCorpusTerms();
+    	            			}
     	            		},
     	            		scope: this
     	            	}
@@ -280,19 +285,22 @@
 	},
 
     loadFromCorpusTerms: function(corpusTerms) {
-		corpusTerms.load({
-		    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
-		    	if (success) {
-	    			this.setMode(this.MODE_CORPUS);
-			    	this.loadFromRecords(records);
-		    	}
-		    	else {
-					Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
-		    	}
-		    },
-		    scope: this,
-		    params: this.getApiParams(['limit','stopList','query','withDistributions',"bins"])
-    	});
+    	if (this.getCorpus()) {
+    		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
+			corpusTerms.load({
+			    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
+			    	if (success) {
+		    			this.setMode(this.MODE_CORPUS);
+				    	this.loadFromRecords(records);
+			    	}
+			    	else {
+						Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
+			    	}
+			    },
+			    scope: this,
+			    params: this.getApiParams(['limit','stopList','query','withDistributions',"bins"])
+	    	});
+    	}
     },
     
     loadFromRecords: function(records) {

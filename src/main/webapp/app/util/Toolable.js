@@ -22,6 +22,7 @@ Ext.define('Voyant.util.Toolable', {
 			exportGridCurrentJson: {en: "export current data as JSON"},
 			exportGridCurrentTsv: {en: "export current data as tab separated values (text)"},
 			'export': {en: 'Export'},
+			reset: {en: "Reset"},
 			optionsTitle: {en: 'Options'},
 			confirmTitle: {en: 'Confirm'},
 			cancelTitle: {en: 'Cancel'},
@@ -112,7 +113,7 @@ Ext.define('Voyant.util.Toolable', {
 								items: panel.getOptions(),
 								buttons: [{
 					            	text: panel.localize("reset"),
-									glyph: 'xf00c@FontAwesome',
+									glyph: 'xf0e2@FontAwesome',
 					            	flex: 1,
 					            	panel: panel,
 					        		handler: function(btn) {

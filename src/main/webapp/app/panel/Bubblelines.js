@@ -242,7 +242,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	scope: this                			
         		},{
 	            	xtype: 'documentselectorbutton'
-        		},'-',{
+        		},{
 	            	xtype: 'slider',
 	            	itemId: 'granularity',
 	            	fieldLabel: this.localize('granularity'),
@@ -260,7 +260,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            		},
 	            		scope: this
 	            	}
-	            },'-',{
+	            },{
 	            	xtype: 'checkbox',
 	            	boxLabel: this.localize('separateLines'),
 	            	boxLabelAlign: 'before',

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Dec 31 19:26:10 PST 2015 */
+/* This file created by JSCacher. Last modified: Tue Jan 05 09:13:06 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2698,6 +2698,7 @@ Ext.define('Voyant.util.Toolable', {
 			exportGridCurrentJson: {en: "export current data as JSON"},
 			exportGridCurrentTsv: {en: "export current data as tab separated values (text)"},
 			'export': {en: 'Export'},
+			reset: {en: "Reset"},
 			optionsTitle: {en: 'Options'},
 			confirmTitle: {en: 'Confirm'},
 			cancelTitle: {en: 'Cancel'},
@@ -2788,7 +2789,7 @@ Ext.define('Voyant.util.Toolable', {
 								items: panel.getOptions(),
 								buttons: [{
 					            	text: panel.localize("reset"),
-									glyph: 'xf00c@FontAwesome',
+									glyph: 'xf0e2@FontAwesome',
 					            	flex: 1,
 					            	panel: panel,
 					        		handler: function(btn) {
@@ -4675,9 +4676,6 @@ Ext.define('Voyant.widget.StopListOption', {
     		return a.name < b.name ? -1 : 1;
     	})
     	data.splice(0, 0, {name : this.localize('auto'),   value: 'auto'}, {name : this.localize('none'),   value: ''},  {name : this.localize('new'),   value: 'new'})
-    	data.forEach(function(item) {
-    		console.warn(item.name+": "+item.value)
-    	})
     	Ext.apply(me, {
 	    		items: [{
 	    	        xtype: 'combo',
@@ -5590,7 +5588,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	scope: this                			
         		},{
 	            	xtype: 'documentselectorbutton'
-        		},'-',{
+        		},{
 	            	xtype: 'slider',
 	            	itemId: 'granularity',
 	            	fieldLabel: this.localize('granularity'),
@@ -5608,7 +5606,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            		},
 	            		scope: this
 	            	}
-	            },'-',{
+	            },{
 	            	xtype: 'checkbox',
 	            	boxLabel: this.localize('separateLines'),
 	            	boxLabelAlign: 'before',
@@ -6264,7 +6262,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	i18n: {
     		title: {en: "Links"},
     		helpTip: {en: "<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:<ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		clearTerms: {en: "Clear Terms"},
+    		clearTerms: {en: "Clear"},
     		releaseToRemove: {en: "Release to remove this term"},
     		cleaning: {en: "Cleaning"},
     		context: {en: "Context"}
@@ -6351,6 +6349,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                     xtype: 'querysearchfield'
                 },{
                 	text: me.localize('clearTerms'),
+					glyph: 'xf014@FontAwesome',
                 	handler: function() {
                 		this.getNodeDataSet().clear();
                 	},
@@ -14571,7 +14570,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     	this.on("corpusSelected", function(src, corpus) {
     		if (src.isXType("corpusdocumentselector")) {
     			this.setMode(this.MODE_CORPUS);
-    			this.setApiParams({docId: undefined, docIndex: undefined})
+    			this.setApiParams({docId: undefined, docIndex: undefined, bins: undefined})
         		this.loadFromCorpus(corpus);
     		}
     	});
@@ -14596,13 +14595,13 @@ Ext.define('Voyant.panel.TermsRadio', {
         		});
         		if (queryTerms) {
         			
-            		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
-            			this.setMode(this.MODE_CORPUS);
-            			this.setApiParams({
-            				'docIndex': undefined,
-            				'docId': undefined
-            			});
-            		}
+//            		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
+//            			this.setMode(this.MODE_CORPUS);
+//            			this.setApiParams({
+//            				'docIndex': undefined,
+//            				'docId': undefined
+//            			});
+//            		}
         			this.setApiParams({
         				query: queryTerms
         			});
@@ -14712,7 +14711,12 @@ Ext.define('Voyant.panel.TermsRadio', {
     	            		},
     	            		changecomplete: function(slider, newvalue) {
     	            			this.setApiParams({bins: newvalue});
-    	            			this.reloadFromChart();
+    	            			if (this.getApiParam("docId") || this.getApiParam('docIndex')) {
+    	            				this.loadFromDocumentTerms();
+    	            			}
+    	            			else {
+    	            				this.loadFromCorpusTerms();
+    	            			}
     	            		},
     	            		scope: this
     	            	}
@@ -14779,19 +14783,22 @@ Ext.define('Voyant.panel.TermsRadio', {
 	},
 
     loadFromCorpusTerms: function(corpusTerms) {
-		corpusTerms.load({
-		    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
-		    	if (success) {
-	    			this.setMode(this.MODE_CORPUS);
-			    	this.loadFromRecords(records);
-		    	}
-		    	else {
-					Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
-		    	}
-		    },
-		    scope: this,
-		    params: this.getApiParams(['limit','stopList','query','withDistributions',"bins"])
-    	});
+    	if (this.getCorpus()) {
+    		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
+			corpusTerms.load({
+			    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
+			    	if (success) {
+		    			this.setMode(this.MODE_CORPUS);
+				    	this.loadFromRecords(records);
+			    	}
+			    	else {
+						Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
+			    	}
+			    },
+			    scope: this,
+			    params: this.getApiParams(['limit','stopList','query','withDistributions',"bins"])
+	    	});
+    	}
     },
     
     loadFromRecords: function(records) {
