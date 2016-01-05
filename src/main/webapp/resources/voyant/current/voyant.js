@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Jan 05 09:56:54 EST 2016 */
+/* This file created by JSCacher. Last modified: Tue Jan 05 16:05:30 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -12376,36 +12376,33 @@ Ext.define('Voyant.panel.TermsRadio', {
 		corpus: undefined,
 		options: [{
 			xtype: 'stoplistoption'
-		}]
+		}],
+		speed: 50
 	},
     statics: {
     	i18n: {
     		title : {en: 'TermsRadio'}
     	    ,type : {en: 'Visualization'}
     		,help: {en: 'This tool can be used to examine word occurence over a corpus spanning a period of time.'}
+    		,visibleSegments: {en: 'Visible'}	
+    		,visibleSegmentsTip: {en: 'This option determines how many of the documents/segments are displayed at once.'}
     		,segments: {en: 'Segments'}	
     		,segmentsTip: {en: 'This option allows you to define how many segments a document should be divided into (note that this option only applies to distribution within a document, not distribution across a corpus).'}
     		,displayPanel: {en: 'Display Panel'}
     		,displayPanelTip: {en: 'Panel to control settings for word display.'}
-    		,duration: {en: 'Scroll Duration'}
+    		,duration: {en: 'Speed'}
+    		,terms: {en: "Terms"}
     		,fraction: {en: 'Word Display'}	
     		,fractionTip: {en: 'This option allows you to define the number of words displayed. Ex. 20 will only keep the words that occur with the lowest 20% of frequency.'}
     		,reset: {en: 'Reset'}
     		,resetTip: {en: 'Reset the visualization to the beginning.'}
-    		,stop: {en: 'Pause'}
-    		,stopTip: {en: 'Pauses the scrolling movement.'}
-    		,toggleLeft: {en: '< Back'}
-    		,toggleLeftTip: {en: 'Toggle the values to the left.'}
-    		,toggleRight: {en: 'Forward >'}
-    		,toggleRightTip: {en: 'Toggle the values to the right.'}
-    		,visibleSegments: {en: 'Visible Segments'}	
-    		,visibleSegmentsTip: {en: 'This option allows you to define how many segments are visible at once.'}
-    		,adaptedFrom: {en: 'TermsRadio is adapted from Type frequencies chart.'}
-    		,scrollSpeed: {en: 'Scroll speed'}
+    		,speed: {en: 'Speed'}
     		,yScale: {en: 'Y-axis Scale'}
     		,linear: {en: 'Linear'}
     		,log: {en: 'Logarithmic'}
-    		,removeTerm: {en: 'Remove <b>{0}</b>'}
+    		,removeTerm: {en: 'Remove <b>{0}</b>'},
+    		completingTransition: {en: "Completing transition."},
+    		termNotFound: {en: "Term not found."}
     	},
     	api: {
     		withDistributions: true,
@@ -12474,6 +12471,8 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @default log
     		 */
     		,yAxisScale: 'log'
+    			
+    		,speed: 50
     	},
     	glyph: 'xf201@FontAwesome'
     },
@@ -12526,55 +12525,47 @@ Ext.define('Voyant.panel.TermsRadio', {
 			this.colorIndex.push(this.colorMasterList[i]);
 		}
 		
-		var onLoadHandler = function(mode, store, records, success) {
+		var onLoadHandler = function(mode, store, records, success, operation) {
+
 			this.setApiParams({mode: mode});
-			
 			var query = this.getApiParam('query');
-			var queryMatch = false;
-			if (query != null) {
-				this.setApiParams({query: null});
-				var match = false;
-				for (var i = 0; i < this.records.length; i++) {
-					var r = this.records[i];
-					if (r.getTerm() == query) {
-						queryMatch = true;
-						break;
-					}
-				}
-				if (!queryMatch) {
-					records = records.concat(this.records);
-				}
-			}
 			
-			if (!queryMatch) {
-				this.initData(records);
-				this.prepareData();
-				//for shiftcount > 0 exclusively
-				var len = this.shiftCount;
-				while(len-- > 0){
-				//for(var j = 0; j < this.shiftCount; j++){
-					this.displayData.shift();
+			// check for no results
+			if (query) {
+				if (records.length==0 || (records.length==1 && records[0].getRawFreq()==0)) {
+					this.toastInfo({
+						html: this.localize("termNotFound"),
+						align: 'bl'
+					})
+					return
 				}
-				
-				if (this.chart != null) {
-					this.redraw();
-				} else {
-					this.initializeChart();
-				}
-				
-				this.setVisibleSegments();
-				this.redrawSliderOverlay();
-			}
-			
-			if (query != null) {
 				var docId = null;
-				if (mode === 'document') {
+				if (this.getApiParam("mode") === 'document') {
 					docId = this.getCorpus().getDocument(0).getId();
 				}
 				var info = {wordString : query, docId : docId};
     			var paramsBundle = this.buildParamsBundle(info);
     			this.manageOverlaySticky(paramsBundle);
+    			return
 			}
+			
+			
+
+			this.initData(records);
+			this.prepareData();
+			//for shiftcount > 0 exclusively
+			var len = this.shiftCount;
+			while(len-- > 0){
+			//for(var j = 0; j < this.shiftCount; j++){
+				this.displayData.shift();
+			}
+			if (this.chart != null) {
+				this.redraw();
+			} else {
+				this.initializeChart();
+			}
+			
+			this.redrawSliderOverlay();
 		};
 		
 		this.corpusStore = Ext.create("Voyant.data.store.CorpusTerms", {
@@ -12593,207 +12584,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 					scope : this
 				}
 			}
-		});
-		
-		//number of segments that the document is divided into
-		var segments = 5;
-		this.segments = new Ext.Button({
-			text: this.localize('segments')
-			,tooltip : this.localize('segmentsTip')
-			,menu: new Ext.menu.Menu({
-				items : [
-						new Ext.menu.CheckItem({text:'5',checked:segments==5,group:'segments'})
-						,new Ext.menu.CheckItem({text:'10',checked:segments==10,group:'segments'})
-						,new Ext.menu.CheckItem({text:'15',checked:segments==15,group:'segments'})
-						,new Ext.menu.CheckItem({text:'20',checked:segments==20,group:'segments'})
-						,new Ext.menu.CheckItem({text:'25',checked:segments==25,group:'segments'})
-						,new Ext.menu.CheckItem({text:'30',checked:segments==30,group:'segments'})
-						,new Ext.menu.CheckItem({text:'40',checked:segments==40,group:'segments'})
-						,new Ext.menu.CheckItem({text:'50',checked:segments==50,group:'segments'})
-						,new Ext.menu.CheckItem({text:'75',checked:segments==75,group:'segments'})
-						,new Ext.menu.CheckItem({text:'100',checked:segments==100,group:'segments'})
-					]
-				,listeners : {
-					click : {
-						fn : function(menu, item) {
-							this.numDataPoints = parseInt(item.text);
-							this.setApiParams({bins: parseInt(item.text)});
-							this.loadStore();
-						}
-						,scope : this
-					}
-				}
-			})
-		});
-		
-		//number of bins that are visible
-		var visibleSegments = 5;
-		this.visibleSegments = new Ext.Button({
-			text: this.localize('visibleSegments')
-			,tooltip: this.localize('visibleSegmentsTip')
-			,menu: new Ext.menu.Menu({
-				items: [
-						new Ext.menu.CheckItem({text:'5',checked:visibleSegments==5,group:'visibleSegments'})
-						,new Ext.menu.CheckItem({text:'10',checked:visibleSegments==10,group:'visibleSegments'})
-						,new Ext.menu.CheckItem({text:'15',checked:visibleSegments==15,group:'visibleSegments'})
-						,new Ext.menu.CheckItem({text:'20',checked:visibleSegments==20,group:'visibleSegments'})
-						,new Ext.menu.CheckItem({text:'25',checked:visibleSegments==25,group:'visibleSegments'})
-						,new Ext.menu.CheckItem({text:'30',checked:visibleSegments==30,group:'visibleSegments'})
-						,new Ext.menu.CheckItem({text:'40',checked:visibleSegments==40,group:'visibleSegments'})
-						,new Ext.menu.CheckItem({text:'50',checked:visibleSegments==50,group:'visibleSegments'})
-						,new Ext.menu.CheckItem({text:'75',checked:visibleSegments==75,group:'visibleSegments'})
-						,new Ext.menu.CheckItem({text:'100',checked:visibleSegments==100,group:'visibleSegments'})
-					]
-				,listeners : {
-					click : {
-						fn: function(menu, item) {
-							//console.log('visibleSegments')
-							this.numVisPoints = parseInt(item.text);
-							this.setApiParams({visibleBins: parseInt(item.text)});
-    						this.loadStore();
-						}
-						,scope : this
-					}
-				}
-			})
-		});
-		
-		//fraction of words that are visible
-		var fraction = 50;
-		this.fraction = new Ext.form.ComboBox({
-			fieldLabel: this.localize('fraction'),
-    		labelAlign: 'right',
-    		labelWidth: 100,
-    		itemId: 'limit',
-    		width: 170,
-    		store: Ext.create('Ext.data.ArrayStore', {
-    			fields: ['count'],
-    			data: [[10],[20],[30],[40],[50],[60],[70],[80],[90],[100]]
-    		}),
-    		value: fraction,
-    		displayField: 'count',
-    		valueField: 'count',
-    		queryMode: 'local',
-    		editable: true,
-    		allowBlank: false,
-    		validator: function(val) {
-    			return val.match(/\D/) === null;
-    		},
-    		listeners: {
-				change: function(combo, newVal, oldVal) {
-					function doLoad() {
-						var val = Math.min(parseInt(newVal), 10000);
-						this.setApiParam('limit', val);
-						this.loadStore();
-					}
-					if (combo.isValid() && oldVal !== null) {
-						if (this.termsTimeout !== null) {
-							clearTimeout(this.termsTimeout);
-						}
-						this.termsTimeout = setTimeout(doLoad.bind(this), 500);
-					}
-				},
-				scope: this
-			}
-		});
-		
-		this.typeSearch = Ext.create('Voyant.widget.QuerySearchField', {
-			width: 100
-        });
-		
-		this.toggleLeft = new Ext.Button({
-			text: this.localize('toggleLeft')
-			,tooltip : this.localize('toggleLeftTip')
-			,listeners : {
-				click : {
-					fn : function() {
-						var toolObject = this;
-						
-						//if the the graphics are already in the midst of transitioning ignore any other clicks
-				    	if(!this.isTransitioning){
-				    		this.toggleLeftCheck();
-				    	} else {
-				    		if(this.transitionCall === 'right'){
-								this.continueTransition = false;
-								setTimeout(function () {
-									if (!toolObject.isTransitioning) {
-								    	toolObject.toggleLeftCheck();
-								    }
-								}, toolObject.duration.getValue() + 50);
-				    		}
-				    	}
-					}							
-					,scope : this
-				}
-			}
-		});
-		
-		this.toggleRight = new Ext.Button({
-			text: this.localize('toggleRight')
-			,tooltip : this.localize('toggleRightTip')
-			,listeners : {
-				click : {
-					fn : function() {
-						var toolObject = this;
-						
-						//if the the graphics are already in the midst of transitioning ignore any other clicks
-				    	if(!this.isTransitioning) {
-				    		this.toggleRightCheck();
-				    	} else {
-				    		if(this.transitionCall === 'left'){
-								this.continueTransition = false;
-								setTimeout(function () {
-									if (!toolObject.isTransitioning) {
-								    	toolObject.toggleRightCheck();
-								    }
-								}, toolObject.duration.getValue() + 50);
-				    		}
-				    	}
-					}							
-					,scope : this
-				}
-			}
-		});
-		
-		//stop the chained animation
-		this.stop = new Ext.Button({
-			text: this.localize('stop')
-			,tooltip : this.localize('stopTip')
-			,listeners : {
-				click : {fn : function() {
-						this.continueTransition = false;
-					}					
-					,scope : this
-				}
-			}
-		});
-		
-		//reset to beginning
-		this.resetButton = new Ext.Button({
-			text: this.localize('reset')
-			,tooltip : this.localize('resetTip')
-			,listeners : {
-				click : {fn : function() {
-					var toolObject = this;
-						//reset to beginning
-						setTimeout(function(){
-							toolObject.shiftCount = 0;
-							toolObject.prepareData();
-							toolObject.redraw();
-						}, 1000);
-					}					
-					,scope : this
-				}
-			}
-		});
-		
-		this.duration = new Ext.Slider({
-			fieldLabel : this.localize('duration')
-			,labelAlign : 'right'
-			,width : 160
-			,increment : 100
-			,minValue : 2000
-			,maxValue : 5000
 		});
 		
 		Ext.apply(config, {
@@ -12840,7 +12630,137 @@ Ext.define('Voyant.panel.TermsRadio', {
 			}),
 			bbar: new Ext.Toolbar({
 	            enableOverflow: true,
-	            items: [this.toggleLeft,this.stop,this.toggleRight,'-',this.resetButton,this.duration,this.fraction,this.segments,this.visibleSegments,this.typeSearch]
+	            items: [{
+	            	xtype: 'querysearchfield'
+	            },{
+	    			glyph: 'xf04b@FontAwesome', // start with play button, which means we're paused
+	    			itemId: 'play',
+	    			handler: function(btn) {
+	    				var playing = btn.glyph=="xf04c@FontAwesome";
+	    				if (playing) {
+	    					this.continueTransition = false;
+	    					this.mask(this.localize("completingTransition"))
+	    					btn.setPlaying(false)
+	    				}
+	    				else {
+	    					this.toggleRightCheck();
+	    					btn.setPlaying(true);
+	    				}
+	    			},
+	    			scope: this,
+	    			setPlaying: function(bool) {
+	    				this.setGlyph(bool ? "xf04c@FontAwesome" : "xf04b@FontAwesome")
+	    			}
+	    		},{
+	    			glyph: 'xf0e2@FontAwesome',
+//	    			text: this.localize('reset')
+	    			tooltip : this.localize('resetTip'),
+	    			listeners : {
+	    				click : {fn : function() {
+	    					this.queryById("play").setPlaying(false);
+	    							this.shiftCount = 0;
+	    							this.prepareData();
+	    							this.redraw();
+	    					}					
+	    					,scope : this
+	    				}
+	    			}
+	    		},{
+	    			xtype: 'label',
+	    			forId: 'terms',
+	    			text: this.localize('terms')
+	    		},{
+	    			xtype: 'slider',
+	    			itemId: 'terms',
+	    			hideLabel: true,
+	    			width : 60,
+	    			increment : 5,
+	    			minValue : 5,
+	    			maxValue : 100,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(parseInt(this.getApiParam("limit")))
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({limit: newvalue});
+	            			this.loadStore();
+	            		},
+	            		scope: this
+	            	}
+	    		},{
+	    			xtype: 'label',
+	    			forId: 'speed',
+	    			text: this.localize('speed')
+	    		},{
+	    			xtype: 'slider',
+	    			itemId: 'speed',
+	    			hideLabel: true,
+	    			width : 60,
+	    			increment : 5,
+	    			minValue : 5,
+	    			maxValue : 100,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(parseInt(this.getApiParam("speed")))
+	            			this.setSpeed(slider.getValue())
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({speed: newvalue});
+	            			this.setSpeed(newvalue)
+	            		},
+	            		scope: this
+	            	}
+	    		},{
+	    			xtype: 'label',
+	    			itemId: 'visibleSegmentsLabel',
+	    			forId: 'visibleBins',
+	    			text: this.localize('visibleSegments')
+	    		},{
+	    			xtype: 'slider',
+	    			itemId: 'visibleBins',
+	    			hideLabel: true,
+	    			width : 60,
+	    			increment : 1,
+	    			minValue : 1,
+	    			maxValue : 100,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(parseInt(this.getApiParam("visibleBins")))
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({visibleBins: newvalue});
+							this.numVisPoints = newvalue;
+							this.loadStore();
+	            		},
+	            		scope: this
+	            	}
+	    		},{
+	    			xtype: 'label',
+	    			itemId: 'segmentsLabel',
+	    			forId: 'segments',
+	    			text: this.localize('segments')
+	    		},{
+	    			xtype: 'slider',
+	    			itemId: 'segments',
+	    			hideLabel: true,
+	    			width : 60,
+	    			increment : 1,
+	    			minValue : 1,
+	    			maxValue : 100,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(parseInt(this.getApiParam("bins")))
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({bins: newvalue});
+							this.numDataPoints = newvalue;
+							this.loadStore();
+							var visibleBins = this.queryById('visibleBins');
+							visibleBins.setMaxValue(newvalue) // only relevant for doc mode
+	            		},
+	            		scope: this
+	            	}
+	    		}]
 			})
 		});
 		
@@ -12927,11 +12847,25 @@ Ext.define('Voyant.panel.TermsRadio', {
 				delete params.limit;
 			}
 			var store;
-			if (params.mode=='document' || this.getCorpus().getDocumentsCount() == 1) {
+			
+			var docsCount = this.getCorpus().getDocumentsCount();
+			var segments = this.queryById("segments");
+			var visibleBins = this.queryById("visibleBins");
+			if (params.mode=='document' || docsCount == 1) {
+				this.setApiParam("mode", "document");
 				store = this.documentStore;
+				visibleBins.setMaxValue(segments.getValue())
 			} else {
+				this.setApiParam("mode", "corpus");
 				delete params.bins;
 				store = this.corpusStore;
+				segments.hide();
+				this.queryById("segmentsLabel").hide();
+				var visibleBins = this.queryById("visibleBins");
+				visibleBins.setMaxValue(docsCount);
+				if (parseInt(this.getApiParam("visibleBins")>docsCount)) {
+					visibleBins.setValue(docsCount);
+				}
 			}
 			
 			// select top 3 words
@@ -12979,6 +12913,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 	}
 	
     ,loadStore: function () {
+    	this.queryById('play').setPlaying(false);
 		var params = this.getApiParams();
 		if(this.getApiParam('mode') === 'document') { 
 			this.documentStore.load({params: params});
@@ -13049,7 +12984,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 	        for( var p = 0; p < this.recordsLength; p++ ) {
 	        	var rec = this.records[p];
 	        	var dists = rec.get('distributions')[k];
-	        	if (dists > this.minFreq && dists <= this.absMaxFreq) {
+//	        	if (dists > this.minFreq && dists <= this.absMaxFreq) {
+	        	if (dists > 0) {
 	        		transferArray.push({
 	        			freq: dists,
 		                wordString: rec.get('term'),
@@ -13058,8 +12994,9 @@ Ext.define('Voyant.panel.TermsRadio', {
 		                numInSeries: 0,
 		                docId: rec.get('docId')
 		            });
-	        	} else { //do nothing
 	        	}
+//	        	} else { //do nothing
+//	        	}
 	        }
 	        this.counterSeries.push(transferArray);
 	        transferArray = [];
@@ -13081,20 +13018,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 		//set the number of points to be displayed at once
 		if(this.numDataPoints < this.numVisPoints) {
 			this.numVisPoints = this.numDataPoints;
-		}
-		
-		if(this.numDataPoints <= 5) {
-			this.visibleSegments.setDisabled(true);
-		} else {
-			this.visibleSegments.setDisabled(false);
-		}
-		
-		if(this.numDataPoints <= this.numVisPoints) {
-			this.toggleLeft.setDisabled(true);
-			this.toggleRight.setDisabled(true);
-		} else {
-			this.toggleLeft.setDisabled(false);
-			this.toggleRight.setDisabled(false);
 		}
 		
 		//adjust shiftCount if it for some reason is out of the normal range
@@ -13201,6 +13124,8 @@ Ext.define('Voyant.panel.TermsRadio', {
 	//disable forward back if moving, disable pause if stopped, disable back if at beginning
 	,manageMvtButtons: function () {
 		//console.log('fn: manageMvtButtons')
+		this.queryById("play").setPlaying(this.isTransitioning);
+		/*
 		if(this.isTransitioning === true) {
 			this.toggleRight.setDisabled(true);
 			this.toggleLeft.setDisabled(true);
@@ -13223,6 +13148,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 				this.toggleRight.setDisabled(false);
 			}
 		}	
+		*/
 	}
 	
     //provides the next value to the left     
@@ -13248,6 +13174,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     
     //verifies that data CAN be moved to the right
     ,toggleRightCheck: function () {
+
     	//console.log("fn: toggleRightCheck")
     	var toolObject = this;
     	if(this.numVisPoints + this.shiftCount < this.numDataPoints) {
@@ -13290,6 +13217,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         displaySetup = [];
     }
     
+    /*
     ,toggleLeftCheck: function () {    	
     	//console.log("fn: toggleLeftCheck")
     	if(this.shiftCount > 0) {
@@ -13312,6 +13240,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 			this.manageMvtButtons();
 		}
     }
+    */
     
     ,startScroll: function() {
     	//console.log("fn: startScroll")
@@ -13347,6 +13276,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 	}
 	
     ,redraw: function() {
+
 //    	console.log("fn: redraw")
     	this.transitionCall = 'redraw';
     	this.updateFullPath();
@@ -13385,11 +13315,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    this.chart.append('g')
 	    	.attr('class','overlay')
 	    	.attr("clip-path", "url(#clip1)");
-	    
-	    //disable changing the number of bins
-	    if(this.getApiParam('mode') === 'corpus') {
-			this.segments.setDisabled(true);
-		}
 	    
 		//depending on the size of display set the length that labels can be
 		this.setTitleLength();
@@ -13813,7 +13738,6 @@ Ext.define('Voyant.panel.TermsRadio', {
     }
 	
 	,animateVis: function() {
-		//console.log("fn: animateVis")
 		var toolObject = this;
 		
 		//prepare the data for the visualization
@@ -13824,12 +13748,14 @@ Ext.define('Voyant.panel.TermsRadio', {
 		var h = this.body.getHeight(),
 			w = this.body.getWidth();
 
+		var duration = this.getDuration();
+		
 		//if transitionCall === 'draw': draw the function for the first time		
 		//if not: shift displayData to a different subset of allData
 		//then display the newly shifted data	
 		if(this.transitionCall === 'left' || this.transitionCall ==='right'){
 			this.xAxis.transition()
-	            .duration(toolObject.duration.getValue())
+	            .duration(duration)
 	            .ease('linear')
 	            .call(this.xAxisScale);
 	            
@@ -13839,7 +13765,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    
         	//if call is shift move the dataPoints	
         	this.chart.selectAll('.frequencies').transition()
-        		.duration(toolObject.duration.getValue())
+        		.duration(duration)
 	            .ease('linear')
 	            .selectAll('text')
 	            .attr('x', function (d) {
@@ -13863,13 +13789,16 @@ Ext.define('Voyant.panel.TermsRadio', {
 				,offsetVisEnd = this.lPadding + (lengthHor * ((this.numVisPoints - 1) / (this.numDataPoints - 1)));
 				
         	this.chart.select('#before').transition()
-				.duration(toolObject.duration.getValue())
+				.duration(duration)
 				.ease('linear')
 			 	.attr('x1', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisStart)
 			 	.attr('x2', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisStart)
 		  	    .attr('y1', this.tPadding + this.navigationHeight)
 		  	    .attr('y2', this.tPadding)
 		  	    .each('end', function () {
+		  	    	if (toolObject.isMasked()) {
+		  	    		toolObject.unmask();
+		  	    	}
 		  	    	if(toolObject.continueTransition) { 
 		  	    		setTimeout(function () {
 		  	    			toolObject.callTransition();
@@ -13882,7 +13811,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		  	    });
         	
 	  	   this.chart.select('#after').transition()
-				.duration(toolObject.duration.getValue())
+				.duration(duration)
 				.ease('linear')
 			 	.attr('x1', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
 			 	.attr('x2', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
@@ -13890,7 +13819,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		  	    .attr('y2', this.tPadding);
 		    
 	  	   this.chart.select('#boxBefore').transition()
-				.duration(toolObject.duration.getValue())
+				.duration(duration)
 				.ease('linear')
 	  	    	.attr('x', this.lPadding)
 	  	    	.attr('y', this.tPadding)
@@ -13898,7 +13827,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 	  	    	.attr('width', lengthHor * (this.shiftCount) / (this.numDataPoints - 1));
 	    
 	  	    this.chart.select('#boxAfter').transition()
-				.duration(toolObject.duration.getValue())
+				.duration(duration)
 				.ease('linear')
 	  	    	.attr('x', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
 	  	    	.attr('y', this.tPadding)
@@ -13939,15 +13868,16 @@ Ext.define('Voyant.panel.TermsRadio', {
 	}
 	
 	,manageOverlaySlippery: function (paramsBundle) {
+
 		//console.log('fn: manageOverlaySlippery')
 		var string = paramsBundle.type
 			,selector = this.removeFilteredCharacters(paramsBundle.type) 
 			,checkOn = 'on'
 			,index;
 		
-		this.continueTransition = false;
-
-		this.transitionCall = 'draw';
+//		this.continueTransition = true;
+//
+//		this.transitionCall = 'draw';
 		
 		//check if the word that was selected was already sticky
 		//if so checkOn = off and nothing happens
@@ -14329,7 +14259,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 		if(this.transitionCall === 'left' || this.transitionCall ==='right') {
 			path.transition()
-				.duration(toolObject.duration.getValue())
+				.duration(toolObject.getDuration())
 				.ease("linear")
 			    .attr("transform", "translate(" + posDif + ")");
 		}
@@ -14452,38 +14382,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 	//
 	//MISC. FUNCTIONS
 	//
-	,setSegments: function () {
-		if(this.getApiParam('mode') === 'corpus'){
-			var documents = this.getCorpus().getDocumentsCount();
-			this.visibleSegments.menu.items.each(function(item, index, len) {
-				if(item.text > documents) {
-					item.setDisabled(true);
-				} 
-			})
-		}
-	}
-	
-	,setVisibleSegments: function () {
-		//console.log('fn: setVisibleSegments')
-		if(this.getApiParam('mode') === 'corpus'){
-			var documents = this.getCorpus().getDocumentsCount();
-			this.visibleSegments.menu.items.each(function(item, index, len) {
-				if(item.text > documents) {
-					item.setDisabled(true);
-				} 
-			});
-		}
-		if(this.getApiParam('mode') === 'document'){
-			var toolObject = this;
-			this.visibleSegments.menu.items.each(function(item, index, len) {
-				if(parseInt(item.text) > toolObject.numDataPoints) {
-					item.setDisabled(true);
-				} else {
-					item.setDisabled(false);
-				}
-			});
-		}
-	}
+
 	
 	,setTitleLength: function () {
 		//console.log('fn:setTitleLength')
@@ -14509,7 +14408,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 	}
 	
 	,callOffset: function () {
-		//console.log('fn: callOffset')
+//		console.log('fn: callOffset')
 		var callOffset;
 		if(this.transitionCall === 'draw' || this.transitionCall === 'redraw') { 
 			callOffset = 0; 
@@ -14547,7 +14446,13 @@ Ext.define('Voyant.panel.TermsRadio', {
 		} else {
 			return '';
 		}
+	},
+	
+	getDuration: function() {
+		return this.numDataPoints*(100-this.getSpeed())
 	}
+	
+	
 });
 
  Ext.define('Voyant.panel.Trends', {
