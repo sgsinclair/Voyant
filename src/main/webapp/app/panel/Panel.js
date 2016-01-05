@@ -8,7 +8,9 @@ Ext.define('Voyant.panel.Panel', {
 			relativeFreq: {en: 'Relative'},
 			trend: {en: "Trend"},
 			colon: {en: ': '},
-			loading: {en: 'Loading'}
+			loading: {en: 'Loading'},
+			error: {en: "Error"},
+			info: {en: "Information"}
 		}
 	},
 	constructor: function(config) {
@@ -52,5 +54,42 @@ Ext.define('Voyant.panel.Panel', {
 	
 	showError: function(config) {
 		this.getApplication().showError.apply(this, arguments)
+	},
+	
+	toastError: function(config) {
+		if (Ext.isString(config)) {
+			config = {html: config}
+		}
+		Ext.applyIf(config, {
+			glyph: 'xf071@FontAwesome',
+			title: this.localize("error")
+		})
+		this.toast(config);
+	},
+	
+	toastInfo: function(config) {
+		if (Ext.isString(config)) {
+			config = {html: config}
+		}
+		Ext.applyIf(config, {
+			glyph: 'xf05a@FontAwesome',
+			title: this.localize("info")
+		})
+		this.toast(config);
+	},
+	
+	toast: function(config) {
+		if (Ext.isString(config)) {
+			config = {html: config}
+		}
+		Ext.applyIf(config, {
+			 slideInDuration: 500,
+			 shadow: true,
+			 align: 'b',
+			 anchor: this.getTargetEl(),			
+		})
+		Ext.toast(config);
 	}
+	
+	
 });

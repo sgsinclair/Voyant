@@ -34,6 +34,10 @@ Ext.define('Voyant.widget.QuerySearchField', {
     initComponent: function(config) {
         var me = this;
 
+        Ext.applyIf(me, {
+        	width: 120
+        });
+        
         Ext.apply(me, {
         	enableKeyEvents: true,
         	listeners: {
@@ -99,9 +103,6 @@ Ext.define('Voyant.widget.QuerySearchField', {
     		    },
     		    scope: me
     		},
-//            labelWidth: 50,
-//            fieldLabel: me.localize('querySearch'),
-            width: 120,
             emptyText: me.localize('querySearch')
 
         })

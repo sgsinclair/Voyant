@@ -15,11 +15,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			analysis: {en: "Analysis"},
 			ca: {en: "Correspondence Analysis"},
 			pca: {en: "Principal Components Analysis"},
-			rawFreq: {en: "Raw Frequency"},
-			relFreq: {en: "Relative Frequency"},
+			rawFreq: {en: "Raw"},
+			relFreq: {en: "Relative"},
 			terms: {en: "Terms"},
 			term: {en: "Term"},
-			numTerms: {en: "Terms Count"},
+			numTerms: {en: "Terms"},
 			addTerm: {en: "Add Term"},
 			clusters: {en: "Clusters"},
 			dimensions: {en: "Dimensions"},
@@ -38,7 +38,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			loading: {en: "Loading"},
 			helpTip: {en: "<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>"},
 			tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
-			docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'}
+			docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'},
+			noTermSelected: {en: "No term selected."}
     	},
     	api: {
     		analysis: 'ca',
@@ -189,12 +190,53 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	},{
         		itemId: 'terms',
         		xtype: 'grid',
-        		title: 'Terms',
+ //       		title: 'Terms',
         		region: 'east',
-        		width: '40%',
+        		width: 225,
         		split: true,
-        		collapsible: true,
-        		border: true,
+//        		collapsible: true,
+//        		border: true,
+        		bbar: {
+            		enableOverflow: true,
+        			items: [{
+                        xtype: 'button',
+                        text: this.localize('nearby'),
+                        glyph: 'xf0b2@FontAwesome',
+                        handler: function(btn) {
+                        	var sel = this.down('#terms').getSelection()[0];
+                        	if (sel === undefined) {
+                        		this.toastError({
+                        			html: this.localize("noTermSelected"),
+                        		     anchor: btn.up("panel").getTargetEl(),
+                        		 });
+                        	}
+                        	else {
+	                        	var term = sel.get('term');
+	                        	this.getNearbyForTerm(term);
+                        	}
+                        },
+                        scope: this
+                    },{
+                        xtype: 'button',
+                        text: this.localize('remove'),
+                        glyph: 'xf068@FontAwesome',
+                        handler: function(btn) {
+                        	var sel = this.down('#terms').getSelection()[0];
+                        	if (sel === undefined) {
+                        		this.toastError({
+                        			html: this.localize("noTermSelected"),
+                        		     anchor: btn.up("panel").getTargetEl(),
+                        		 });
+                        	}
+                        	else {
+	                        	var term = sel.get('term');
+	                        	this.removeTerm(term);
+                        	}
+                        },
+                        scope: this
+                    }]
+        			
+        		},
         		dockedItems: [{
                     dock: 'top',
                     xtype: 'toolbar',
@@ -202,10 +244,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
                     items: [{
                 		fieldLabel: this.localize('numTerms'),
                 		labelAlign: 'right',
-                		labelWidth: 100,
+                		labelWidth: 40,
                 		itemId: 'limit',
                 		xtype: 'combo',
-                		width: 180,
+                		width: 100,
                 		store: Ext.create('Ext.data.ArrayStore', {
                 			fields: ['count'],
                 			data: [[10],[20],[30],[40],[50],[60],[70],[80],[90],[100]]
@@ -234,33 +276,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
     						},
     						scope: this
     					}
-                	},{xtype: 'tbseparator'},{
-                        xtype: 'button',
-                        text: this.localize('nearby'),
-                        glyph: 'xf0b2@FontAwesome',
-                        handler: function() {
-                        	var sel = this.down('#terms').getSelection()[0];
-                        	if (sel !== undefined) {
-	                        	var term = sel.get('term');
-	                        	this.getNearbyForTerm(term);
-                        	}
-                        },
-                        scope: this
-                    },{
-                        xtype: 'button',
-                        text: this.localize('remove'),
-                        glyph: 'xf068@FontAwesome',
-                        handler: function() {
-                        	var sel = this.down('#terms').getSelection()[0];
-                        	if (sel !== undefined) {
-	                        	var term = sel.get('term');
-	                        	this.removeTerm(term);
-                        	}
-                        },
-                        scope: this
-                    },{
+                	},{
                     	xtype: 'querysearchfield',
-                    	emptyText: this.localize('addTerm')
+                    	emptyText: this.localize('addTerm'),
+                    	width: 90
                     }]
                 }],
         		columns: [{
