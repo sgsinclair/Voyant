@@ -111,12 +111,13 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
 							el.child('.longText').toggleCls('hide');
 							el.child('.shortText').toggleCls('hide');
 							
+							var docId = Ext.urlDecode(record.get('uri')).docId;
 							var range = record.get('ranges')[0];
-							var parent = Ext.get('dtcReaderContainer');
-							var result = document.evaluate('/'+range.start, parent.dom.firstChild, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-							if (result !== null) {
-								Ext.get(result).scrollIntoView(parent).frame('#F47922', 1, { duration: 1000 });
-							}
+							
+							this.getApplication().dispatchEvent('annotationSelected', this, {
+								range: range,
+								docId: docId
+							});
 						}
 					},
 					scope: this
@@ -180,8 +181,11 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
 						a.shortQuote = a.shortQuote.substring(0, a.shortQuote.indexOf(' ', 40)) + '&hellip;';
 					} 
 				}
-				this.store.loadData(data.annotations);
+				this.store.loadData(data.annotations, false);
 			}
+		},
+		loadedCorpus: function(src, corpus) {
+//			this.loadAnnotationsForCorpus();
 		},
 		dtcDocumentLoaded: function(src, data) {
 			this.loadAnnotationsForDocId(data.docId);
@@ -189,6 +193,20 @@ Ext.define('Voyant.panel.DToC.AnnotatorPanel', {
 		activate: function () {
 			this.toggleView();
 		}
+	},
+	
+	loadAnnotationsForCorpus: function() {
+		var index = 0;
+		var doGet = function() {
+			var corpus = this.getApplication().getCorpus();
+			if (index < corpus.getDocumentsCount()-1) {
+				this.on('dtcAnnotationsLoaded', doGet, this, {single: true});
+			}
+			this.loadAnnotationsForDocId(corpus.getDocument(index).getId());
+			index++;
+		};
+		
+		doGet.bind(this)();
 	},
 	
 	loadAnnotationsForDocId: function(docId) {

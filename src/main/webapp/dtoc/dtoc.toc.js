@@ -58,9 +58,9 @@ Ext.define('Voyant.panel.DToC.ToC', {
 				overflowX: 'hidden',
 				overflowY: 'auto',
 				listeners: {
-					itemclick: function(view, record, el, index, event) {
+					select: function(view, record, index, opts) {
 						var data = record.getData();
-						
+
 						// document
 						if (data.isDoc) {
 			    			this.showDocument(data.docId);
@@ -215,7 +215,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			var noSubType = [];
 			var tagsByType = {};
 			var identifiers = {};
-			
+						
 			for (var i = 0; i < tags.length; i++) {
 				var docTags = tags[i];
 				// sort tags by subtype
@@ -451,6 +451,8 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	
 	addKwicsToTree: function(kwics) {
 		if (kwics.length > 0) {
+			var firstChild;
+			
 			var docsToExpand = [];
 			
 			var root = this.getRootNode();
@@ -474,7 +476,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 						docsToExpand.push(doc);
 					}
 					
-					doc.appendChild({
+					var child = doc.appendChild({
 						text: text,
 						leaf: true,
 						cls: 'kwic child',
@@ -485,11 +487,19 @@ Ext.define('Voyant.panel.DToC.ToC', {
 						docId: docId,
 						dtcType: 'kwic'
 					});
+					
+					if (firstChild === undefined) {
+						firstChild = child;
+					}
 				}
 			}
 			
 			for (var i = 0; i < docsToExpand.length; i++) {
 				docsToExpand[i].expand();
+			}
+			
+			if (firstChild !== undefined) {
+				this.setSelection(this.getStore().findRecord('id', firstChild.id));
 			}
 			
 			this.getApplication().dispatchEvent('tocUpdated', this, kwicsForEvent);
@@ -499,6 +509,8 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	
 	addTagsToTree: function(tags, subtype) {
 		if (tags.length > 0) {
+			var firstChild;
+			
 			var docsToExpand = [];
 			
 			var root = this.getRootNode();
@@ -569,13 +581,20 @@ Ext.define('Voyant.panel.DToC.ToC', {
 					if (subtypeNode) {
 						subtypeNode.appendChild(nodeConfig);
 					} else {
-						doc.appendChild(nodeConfig);
+						var child = doc.appendChild(nodeConfig);
+						if (firstChild === undefined) {
+							firstChild = child;
+						}
 					}
 				}
 			}
 			
 			for (var i = 0; i < docsToExpand.length; i++) {
 				docsToExpand[i].expand();
+			}
+			
+			if (firstChild !== undefined) {
+				this.setSelection(this.getStore().findRecord('id', firstChild.id));
 			}
 			
 //			doc.ui.addClass('hasChildren');
@@ -591,6 +610,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	addIndexesToTree: function(indexes) {
 		var root = this.getRootNode();
 		var index, doc;
+		var firstChild;
 		for (var i = 0; i < indexes.length; i++) {
 			index = indexes[i];
 			
@@ -603,7 +623,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			
 			doc = root.findChild('docId', index.docId);
 			if (doc != null) {
-				doc.appendChild({
+				var child = doc.appendChild({
 					text: text,
 					cls: 'index child',
 					leaf: true,
@@ -614,65 +634,26 @@ Ext.define('Voyant.panel.DToC.ToC', {
 					dtcType: 'index',
 					indexData: index
 				});
+				if (firstChild === undefined) {
+					firstChild = child;
+				}
 	//			doc.ui.addClass('hasChildren');
 				doc.expand();
 			}
 		}
 		
-		Ext.defer(this.updateDocModelOutline, 500, this);
-	},
-	
-	addTypesToTree: function(types) {
-		var root = this.getRootNode();
-		var type, doc, docId, word;
-		var clearedDocs = {};
-		for (var i = 0; i < types.length; i++) {
-			type = types[i];
-			docId = type['@docId'];
-			word = type['@type'];
-			doc = root.findChild('docId', docId);
-			if (doc != null) {
-				if (clearedDocs[docId] == null) {
-					doc.removeAll(true);
-	//				doc.ui.removeClass('hasChildren');
-					clearedDocs[docId] = true;
-				}
-				var tokenId;
-				for (var j = 0; j < type.tokenIds['int-array'].length; j++) {
-					tokenId = type.tokenIds['int-array'][j];
-					doc.appendChild({
-						text: word,
-						leaf: true,
-						editable: false,
-						draggable: false,
-						tokenId: tokenId,
-						typeData: word,
-						dtcType: 'type',
-						docId: docId,
-						listeners: {
-							click: function(node, event) {
-								var data = {
-									tokenId: node.getData().tokenId,
-									docId: node.getData().docId,
-									docIdType: node.getData().docId+':'+node.getData().typeData
-								};
-								this.getApplication().dispatchEvent('tokenSelected', this, data);
-							},
-							scope: this
-						}
-					});
-				}
-	//			doc.ui.addClass('hasChildren');
-				doc.expand();
-			}
+		if (firstChild !== undefined) {
+			this.setSelection(this.getStore().findRecord('id', firstChild.id));
 		}
-		Ext.getCmp('dtcMarkup').showHitsForTags();
+		
+		Ext.defer(this.updateDocModelOutline, 500, this);
 	},
 	
 	addXPathToTree: function(docId, xpath) {
 		var result = Ext.getCmp('dtcReader').getResultsForXPath(docId, xpath);
 		if (result) {
 			if (result.resultType == XPathResult.UNORDERED_NODE_ITERATOR_TYPE) {
+				var firstChild;
 				var root = this.getRootNode();
 				var doc = root.findChild('docId', docId);
 				if (doc != null) {
@@ -697,7 +678,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 						for (var i = 0; i < length; i++) {
 							text += ' '+tokens[i].textContent;
 						}
-						doc.appendChild({
+						var child = doc.appendChild({
 							text: text,
 							leaf: true,
 							expandable: false,
@@ -717,6 +698,9 @@ Ext.define('Voyant.panel.DToC.ToC', {
 								scope: this
 							}
 						});
+						if (firstChild === undefined) {
+							firstChild = child;
+						}
 						tag = result.iterateNext();
 					}
 	//				doc.ui.addClass('hasChildren');
@@ -725,6 +709,11 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			} else {
 				
 			}
+			
+			if (firstChild !== undefined) {
+				this.setSelection(this.getStore().findRecord('id', firstChild.id));
+			}
+			
 			Ext.getCmp('dtcMarkup').showHitsForTags();
 		}
 	},

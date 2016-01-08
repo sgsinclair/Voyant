@@ -152,6 +152,23 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			}
 		}, this);
 		
+		this.addListener('annotationSelected', function(src, data) {
+			function doSelect(range) {
+				if (range) {
+					var result = document.evaluate('/'+range.start, this.readerContainer.dom.firstChild, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+					if (result !== null) {
+						Ext.get(result).scrollIntoView(this.readerContainer).frame('#F47922', 1, { duration: 1000 });
+					}
+				}
+			}
+			if (data.docId != this.currentDocId) {
+				this.setApiParams({docId: data.docId});
+				this.fetchText(doSelect.bind(this, data.range));
+			} else {
+				doSelect.bind(this, data.range)();
+			}
+		}, this);
+		
 		/**
 		 * @event documentTypeSelected
 		 * @type listener
