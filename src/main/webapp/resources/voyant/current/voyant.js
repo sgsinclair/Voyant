@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Jan 05 16:05:30 EST 2016 */
+/* This file created by JSCacher. Last modified: Thu Jan 07 21:25:27 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5340,7 +5340,7 @@ Ext.define('Voyant.panel.Panel', {
 			 slideInDuration: 500,
 			 shadow: true,
 			 align: 'b',
-			 anchor: this.getTargetEl(),			
+			 anchor: this.getTargetEl()			
 		})
 		Ext.toast(config);
 	}
@@ -7996,7 +7996,7 @@ Ext.define('Voyant.panel.Knots', {
    		    		else {
    		    			this.toastInfo({
    		    				html: this.localize("noTermsFound"),
-   		    				align: 'bl',
+   		    				align: 'bl'
    		    			})
    		    		}
    				},
@@ -11283,7 +11283,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         	if (sel === undefined) {
                         		this.toastError({
                         			html: this.localize("noTermSelected"),
-                        		     anchor: btn.up("panel").getTargetEl(),
+                        		     anchor: btn.up("panel").getTargetEl()
                         		 });
                         	}
                         	else {
@@ -11301,7 +11301,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         	if (sel === undefined) {
                         		this.toastError({
                         			html: this.localize("noTermSelected"),
-                        		     anchor: btn.up("panel").getTargetEl(),
+                        		     anchor: btn.up("panel").getTargetEl()
                         		 });
                         	}
                         	else {
@@ -15037,7 +15037,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
 
 Ext.define('Voyant.panel.CorpusSet', {
 	extend: 'Ext.panel.Panel',
-    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph',,'Voyant.panel.Streamgraph'],
+    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph',,'Voyant.panel.StreamGraph'],
 	mixins: ['Voyant.panel.Panel'],
     alias: 'widget.corpusset',
 	statics: {
@@ -15173,13 +15173,14 @@ Ext.define('Voyant.panel.CorpusSet', {
     	}
     }
 })
-Ext.define('Voyant.panel.Streamgraph', {
+Ext.define('Voyant.panel.StreamGraph', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.streamgraph',
     statics: {
     	i18n: {
-    		title: {en: 'Streamgraph'},
+    		title: {en: 'StreamGraph'},
+    		
     		clearTerms : {en: 'Clear Terms'},
     		granularity : {en: 'Granularity'}
     	},

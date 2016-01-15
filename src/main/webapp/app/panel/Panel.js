@@ -86,7 +86,7 @@ Ext.define('Voyant.panel.Panel', {
 			 slideInDuration: 500,
 			 shadow: true,
 			 align: 'b',
-			 anchor: this.getTargetEl(),			
+			 anchor: this.getTargetEl()			
 		})
 		Ext.toast(config);
 	}

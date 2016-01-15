@@ -83,7 +83,7 @@ app/panel/Trends.js
 app/panel/VoyantFooter.js
 app/panel/VoyantHeader.js
 app/panel/CorpusSet.js
-app/panel/Streamgraph.js
+app/panel/StreamGraph.js
 
 # APPS
 app/VoyantApp.js
