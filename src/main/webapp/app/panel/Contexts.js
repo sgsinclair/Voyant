@@ -217,7 +217,6 @@ Ext.define('Voyant.panel.Contexts', {
 	       	        		docIndex: docIndex,
 	       	        		query: queries
 	       	        	});
-	       	        	this.down("#corpus").show();
 	       	        	if (this.isVisible()) {
 	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
 	       	        	}

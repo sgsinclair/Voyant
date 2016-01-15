@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Jan 15 16:19:40 EST 2016 */
+/* This file created by JSCacher. Last modified: Fri Jan 15 16:22:15 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6922,7 +6922,6 @@ Ext.define('Voyant.panel.Contexts', {
             listeners: {
             	scope: this,
 				corpusSelected: function() {
-					debugger
 					if (this.getStore().getCorpus()) {
 						this.setApiParams({docId: undefined, docIndex: undefined})
 						this.getStore().loadPage(1)
