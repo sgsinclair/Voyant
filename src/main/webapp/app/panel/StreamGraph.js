@@ -1,10 +1,11 @@
-Ext.define('Voyant.panel.Streamgraph', {
+Ext.define('Voyant.panel.StreamGraph', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.streamgraph',
     statics: {
     	i18n: {
-    		title: {en: 'Streamgraph'},
+    		title: {en: 'StreamGraph'},
+    		
     		clearTerms : {en: 'Clear Terms'},
     		granularity : {en: 'Granularity'}
     	},

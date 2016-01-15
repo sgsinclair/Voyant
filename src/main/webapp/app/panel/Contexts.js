@@ -270,7 +270,7 @@ Ext.define('Voyant.panel.Contexts', {
         
         me.on("query", function(src, query) {
         	this.setApiParam('query', query);
-        	this.getStore().load({params: this.getApiParams()});
+        	this.getStore().loadPage(1, {params: this.getApiParams()});
         }, me);
         
         me.on("documentTermsClicked", function(src, documentTerms) {

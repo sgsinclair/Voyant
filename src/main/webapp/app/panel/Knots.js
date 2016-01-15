@@ -198,7 +198,7 @@ Ext.define('Voyant.panel.Knots', {
    		    		else {
    		    			this.toastInfo({
    		    				html: this.localize("noTermsFound"),
-   		    				align: 'bl',
+   		    				align: 'bl'
    		    			})
    		    		}
    				},

@@ -207,7 +207,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         	if (sel === undefined) {
                         		this.toastError({
                         			html: this.localize("noTermSelected"),
-                        		     anchor: btn.up("panel").getTargetEl(),
+                        		     anchor: btn.up("panel").getTargetEl()
                         		 });
                         	}
                         	else {
@@ -225,7 +225,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         	if (sel === undefined) {
                         		this.toastError({
                         			html: this.localize("noTermSelected"),
-                        		     anchor: btn.up("panel").getTargetEl(),
+                        		     anchor: btn.up("panel").getTargetEl()
                         		 });
                         	}
                         	else {
