@@ -117,18 +117,49 @@ Ext.define('Voyant.panel.DToC.Index', {
 			    	emptyText: 'Filter',
 			    	width: 120,
 			    	enableKeyEvents: true,
+			    	
+			    	keyupDelay: 150,
+			    	lastKeyupTimestamp: undefined,
+			    	keyupTimeoutId: undefined,
+			    	
 			    	listeners: {
 			    		keyup: function(field, event) {
-		    				var value = this.getDockedItems('toolbar #filter')[0].getValue();
-		    				if (value == '') {
-		    					this.collapseAll();
-		    					this.getStore().clearFilter();
-		    				} else {
-		    					var regex = new RegExp('.*'+value+'.*', 'i');
-		    					this.getStore().filterBy(function(r) {
-		    						return r.get('text').match(regex) !== null;
-		    					});
-		    				}
+			    			clearTimeout(field.initialConfig.keyupTimeoutId);
+			    			var currTime = Date.now();
+			    			if (currTime - field.initialConfig.lastKeyupTimestamp > field.initialConfig.keyupDelay) {
+			    				var value = field.getValue();
+			    				if (value == '') {
+			    					this.getStore().clearFilter(true);
+			    					this.collapseAll();
+			    					field.initialConfig.lastKeyupTimestamp = undefined;
+			    					return;
+			    				} else {
+			    					var regex = new RegExp('.*'+value+'.*', 'i');
+			    					var nodesToExpand = [];
+			    					this.getStore().clearFilter(true);
+			    					this.getStore().filterBy(function(r) {
+			    						var match = false;
+			    						if (r.hasChildNodes()) {
+			    							r.eachChild(function(n) {
+			    								if (n.get('text').match(regex) !== null) {
+			    									match = true;
+			    									nodesToExpand.push(r);
+			    									return false;
+			    								}
+			    							}, this);
+			    						} else {
+			    							match = r.get('text').match(regex) !== null;
+			    						}
+			    						return match;
+			    					});
+			    					for (var i = 0; i < nodesToExpand.length; i++) {
+			    						nodesToExpand[i].expand();
+			    					}
+			    				}
+			    			} else {
+			    				field.initialConfig.keyupTimeoutId = setTimeout(function(){field.fireEvent('keyup', field);}.bind(this), field.initialConfig.keyupDelay);
+			    			}
+			    			field.initialConfig.lastKeyupTimestamp = currTime;
 			    		},
 			    		scope: this
 			    	}

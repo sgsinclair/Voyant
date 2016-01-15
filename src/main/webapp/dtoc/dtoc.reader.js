@@ -212,6 +212,12 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			}
 		}, this);
 		
+		this.addListener('documentTermsClicked', function(src, terms) {
+			if (terms.length === 0) {
+				this.clearHighlights('kwic');
+			}
+		}, this);
+		
 		this.addListener('tocUpdated', function(src, data) {
 			this.clearHighlights('kwic');
 			if (!Ext.isArray(data)) {

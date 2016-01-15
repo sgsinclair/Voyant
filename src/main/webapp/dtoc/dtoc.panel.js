@@ -122,11 +122,17 @@ Ext.define('Voyant.panel.DToC', {
 //                        showCollapseTool: false
 //                    }),
         			baseCls: 'x-plain dtc-panel',
+        			bodyCls: 'borderRadiusBottom',
         			deferredRender: false,
         			activeTab: 0,
         			items: dtcToolsConfig,
         			animCollapse: false,
-        			collapseDirection: 'left'
+        			collapseDirection: 'left',
+        			listeners: {
+        				collapse: function(p) {
+        					p.el.down('.x-panel-header').addCls('borderRadiusTop borderRadiusBottom');
+        				}
+        			}
         		},{
         			xtype: 'splitter',
         			width: 10,
@@ -140,13 +146,19 @@ Ext.define('Voyant.panel.DToC', {
         			title: 'Table of Contents',
         			id: 'dtcToc',
         			xtype: 'dtocToc',
+        			bodyCls: 'borderRadiusBottom',
 //        			plugins: new Ext.ux.plugins.PanelCollapseHorizontal({
 //                        showCollapseTool: false
 //                    }),
         			width: 250,
         			minWidth: 24, // needed for hboxfitsplit layout
         			animCollapse: false,
-        			collapseDirection: 'left'
+        			collapseDirection: 'left',
+        			listeners: {
+        				collapse: function(p) {
+        					p.el.down('.x-panel-header').addCls('borderRadiusTop borderRadiusBottom');
+        				}
+        			}
         		},{
         			xtype: 'splitter',
         			width: 10,
