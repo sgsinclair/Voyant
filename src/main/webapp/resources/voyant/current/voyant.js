@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jan 07 21:25:27 EST 2016 */
+/* This file created by JSCacher. Last modified: Fri Jan 15 13:05:05 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7051,7 +7051,7 @@ Ext.define('Voyant.panel.Contexts', {
         
         me.on("query", function(src, query) {
         	this.setApiParam('query', query);
-        	this.getStore().load({params: this.getApiParams()});
+        	this.getStore().loadPage(1, {params: this.getApiParams()});
         }, me);
         
         me.on("documentTermsClicked", function(src, documentTerms) {
