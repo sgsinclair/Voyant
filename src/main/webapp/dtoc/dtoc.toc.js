@@ -8,6 +8,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
     },
     statics: {
         api: {
+        	docId: undefined
         }
     },
     
@@ -262,10 +263,29 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			terms.forEach(function(term) {
 				query.push(term.get("term"));
 			});
-			this.submitQuery(query);
+			if (query.length === 0) {
+				this.removeNodes('kwic');
+			} else {
+				this.getKwics({query: query});
+			}
+		},
+		documentTermsClicked: function(src, terms) {
+			var query = [];
+			terms.forEach(function(term) {
+				query.push(term.get("term"));
+			});
+			if (query.length === 0) {
+				this.removeNodes('kwic');
+			} else {
+				this.getKwics({query: query, docId: terms[0].get('docId')});
+			}
 		},
 		query: function(src, query) {
-			this.submitQuery(query);
+			if (query == '') {
+				this.removeNodes('kwic');
+			} else {
+				this.getKwics({query: query});
+			}
 		}
 
 	},
@@ -405,14 +425,6 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	showDocument: function(docId) {
 		this.getApplication().dispatchEvent('corpusDocumentSelected', this, {docId:docId});
 	},
-	
-	submitQuery: function(query) {
-		if (query != '') {
-			this.getKwics({query: query});
-		} else {
-			this.removeNodes('kwic');
-		}
-	},
 
 	getKwics: function(config) {
 		var params = {
@@ -434,12 +446,11 @@ Ext.define('Voyant.panel.DToC.ToC', {
 				var result = Ext.decode(response.responseText);
 				var contexts = result.documentContexts.contexts;
 				contexts.sort(function(a,b) {
-					if (a.position > b.position) {
-						return 1;
-					} else if (a.position < b.position) {
-						return -1;
+					var result = a.docIndex - b.docIndex;
+					if (result === 0) {
+						result = a.position - b.position;
 					}
-					return 0;
+					return result;
 				});
 				this.addKwicsToTree(contexts);
 				

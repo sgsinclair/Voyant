@@ -30,6 +30,8 @@ Ext.define('Voyant.panel.DToC.Stats', {
     corpusStore: null,
     docStore: null,
     
+    currentDocId: null,
+    
     languageStopListMappings: {
     	'en': 'stop.en.taporware.txt',
     	'fr': 'stop.fr.veronis.txt'
@@ -49,56 +51,60 @@ Ext.define('Voyant.panel.DToC.Stats', {
     		this.corpusStore.getProxy().setExtraParam('corpus', corpus.getId());
     		this.docStore.getProxy().setExtraParam('stopList', 'auto');
     		this.corpusStore.getProxy().setExtraParam('stopList', 'auto');
-    		this.fireEvent("apiChange", this);
+    		this.updateChapterFilter(corpus);
+    		this.fireEvent('apiChange', this, true);
     	},
-    	apiChange: function() {
-    		var api = this.getApiParams(['stopList','query']);
-        	var proxy = this.getStore().getProxy();
-        	for (var key in api) {
-        		proxy.setExtraParam(key, api[key]);
+    	apiChange: function(src, doLoad) {
+    		var api = this.getApiParams(['stopList','query'], true);
+        	var proxies = [this.docStore.getProxy(), this.corpusStore.getProxy()];
+        	for (var i = 0; i < proxies.length; i++) {
+        		var proxy = proxies[i];
+	        	for (var key in api) {
+	        		proxy.setExtraParam(key, api[key]);
+	        	}
         	}
-        	this.getStore().loadPage(1);
+        	if (doLoad) {
+        		this.getStore().loadPage(1);
+        	}
     	},
     	query: function(src, query) {
     		this.setApiParam('query', query);
-    		this.fireEvent("apiChange", this);
-    		this.getStore().loadPage(1);
+    		this.fireEvent('apiChange', this, true);
     	},
     	dtcDocumentLoaded: function(src, docId) {
-    		if (this.getStore() === this.docStore) {
-    			var lang = Ext.getCmp('dtcReader').getCurrentDocLanguage();
-    			var stoplist = this.languageStopListMappings[lang] || 'auto';
-    			this.getStore().getProxy().setExtraParam('stopList', stoplist);
-	    		this.getStore().getProxy().setExtraParam('docId', docId);
-	    		this.getStore().loadPage(1);
-    		}
+//    		if (this.getStore() === this.docStore) {
+//    			var lang = Ext.getCmp('dtcReader').getCurrentDocLanguage();
+//    			var stoplist = this.languageStopListMappings[lang] || 'auto';
+//    			this.getStore().getProxy().setExtraParam('stopList', stoplist);
+//	    		this.getStore().getProxy().setExtraParam('docId', docId);
+//	    		this.getStore().loadPage(1);
+//    		}
     	}
     },
     
     initComponent: function() {
         var me = this;
 
-        this.corpusStore = Ext.create("Voyant.data.store.CorpusTerms");
-        this.corpusStore.getProxy().setExtraParam("withDistributions", true);
-//        store.on("totalcountchange", function() {
-//        	this.down('#status').update({count: this.getStore().getTotalCount()});;
-//        }, me);
+        this.corpusStore = Ext.create('Voyant.data.store.CorpusTerms');
+        this.corpusStore.getProxy().setExtraParam('withDistributions', true);
         
         this.docStore = Ext.create('Voyant.data.store.DocumentTerms');
-        this.docStore.getProxy().setExtraParam("withDistributions", true);
+        this.docStore.getProxy().setExtraParam('withDistributions', true);
         
         Ext.apply(me, {
     		title: this.localize('title'),
-            store : this.docStore,
+            store : this.corpusStore,
     		selModel: Ext.create('Ext.selection.RowModel', {
                 pruneRemoved: false,
                 listeners: {
-                    selectionchange: {
-                    	fn: function(sm, selections) {
+                    selectionchange: function(sm, selections) {
+                    	if (this.getStore() === this.corpusStore) {
                     		this.getApplication().dispatchEvent('corpusTermsClicked', this, selections);
-                    	},
-                    	scope: this
-                    }
+                    	} else {
+                    		this.getApplication().dispatchEvent('documentTermsClicked', this, selections);
+                    	}
+                	},
+                	scope: this
                 },
                 mode: 'MULTI'
             }),
@@ -107,46 +113,22 @@ Ext.define('Voyant.panel.DToC.Stats', {
 		    	cls: 'dtc-toolbar',
 		    	hideBorders: true,
 		    	items: [{
-		    		xtype: 'querysearchfield'
-		    	}, { xtype: 'tbfill' }, {
-		    		text: 'Chapter Stats',
-			        itemId: 'statsPicker',
-			        menu: {
-			        	items: [{text: 'Chapter Stats', type: 'Document'},{text: 'Collection Stats', type: 'Corpus'}],
-	                    plain: true,
-	                    showSeparator: false,
-	                    listeners: {
-	                    	click: function(menu, item) {
-	                    		var type = item.initialConfig.type;
-								if (type === 'Document') {
-									this.reconfigure(this.docStore);
-									this.queryById('statsPicker').setText('Chapter Stats');
-									var docId = Ext.getCmp('dtcReader').getCurrentDocId();
-									this.docStore.getProxy().setExtraParam('docId', docId);
-								} else {
-									this.reconfigure(this.corpusStore);
-									this.queryById('statsPicker').setText('Collection Stats');
-								}
-								this.getStore().loadPage(1);
-	                    	},
-	                    	scope: this
-	                    }
-	                }
-		    	}]
+		    		xtype: 'querysearchfield',
+		    		triggers: undefined
+		    	}, '->', {
+                    text: 'Filter by Chapter',
+                    itemId: 'chapterFilter',
+                    menu: {
+                        items: [],
+                        plain: true,
+                        showSeparator: false,
+                        listeners: {
+                            click:  this.chapterFilterHandler,
+                            scope: this
+                        }
+                    }
+                }]
             }),
-            
-//            dockedItems: [{
-//                dock: 'bottom',
-//                xtype: 'toolbar',
-//                items: [{
-//                    xtype: 'querysearchfield'
-//                },{
-//                    xtype: 'component',
-//                    itemId: 'status',
-//                    tpl: this.localize('matchingTerms'),
-//                    style: 'margin-right:5px'
-//                }]
-//            }],
 
     		columns: [{
     			text: this.localize("term"),
@@ -166,7 +148,7 @@ Ext.define('Voyant.panel.DToC.Stats', {
             	dataIndex: 'relativeFreq',
             	renderer: function(val) {
             		var percent = val*100;
-            		return Ext.util.Format.number(val*1000000, "0,000")/* + " (%"+
+            		return Ext.util.Format.number(val*1000000, "0,000");/* + " (%"+
             			(val*100 <  .1 ? "<0.1" : Ext.util.Format.number(val*100, "0.0"))+")"*/
             	},
                 flex: 1,
@@ -194,6 +176,7 @@ Ext.define('Voyant.panel.DToC.Stats', {
                 tooltip: this.localize("trendTip"),
                 flex: 1,
                 dataIndex: 'distributions',
+            	sortable: false,
                 widget: {
                     xtype: 'sparklineline'
                 }
@@ -202,5 +185,41 @@ Ext.define('Voyant.panel.DToC.Stats', {
 
         me.callParent(arguments);
         
-    }
+    },
+    
+    clearSelections: function() {
+    	this.getSelectionModel().deselectAll(true);
+    	this.down('querysearchfield').setValue('');
+    	this.setApiParam('query', '');
+    	this.fireEvent('apiChange', this, true);
+    },
+    
+    updateChapterFilter: function(corpus) {
+	    var menu = this.getDockedItems('toolbar #chapterFilter')[0].menu;
+	    menu.removeAll();
+	    
+	    var docs = corpus.getDocuments();
+		for (var i = 0, len = corpus.getDocumentsCount(); i < len; i++) {
+    		var doc = docs.getAt(i);
+    		menu.add({
+	            xtype: 'menucheckitem',
+	            docId: doc.getId(),
+	            group: 'chapters',
+	            text: doc.getShortTitle()
+	        });
+		}
+	},
+    
+    chapterFilterHandler: function(menu, item) {
+		if (this.currentDocId !== null && item.initialConfig.docId === this.currentDocId) {
+			this.currentDocId = null;
+			item.setChecked(false);
+			this.reconfigure(this.corpusStore);
+		} else {
+			this.currentDocId = item.initialConfig.docId;
+			this.reconfigure(this.docStore);
+			this.docStore.getProxy().setExtraParam('docId', this.currentDocId);
+		}
+		this.getStore().loadPage(1);
+	}
 });

@@ -78,10 +78,19 @@ body {
 }
 
 .dtc-panel {
-	border: 2px solid #818284;
+	border: 1px solid #818284;
 	background-color: #ffffff;
 	border-radius: 8px;
-	-moz-border-radius: 8px;
+}
+
+.borderRadiusTop {
+	border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.borderRadiusBottom {
+	border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
 }
 
 .dtc-panel-header {
@@ -317,7 +326,7 @@ body {
 }
 
 #docModelOutlineTop {
-	border-width: 2px 2px 0 2px;
+	border-width: 1px 1px 0 1px;
 	border-style: solid;
 	border-color: #818284;
 	border-radius: 8px 8px 0 0;
@@ -328,7 +337,7 @@ body {
 }
 
 #docModelOutlineBottom {
-	border-width: 0 2px 2px 2px;
+	border-width: 0 1px 1px 1px;
 	border-style: solid;
 	border-color: #818284;
 	border-radius: 0 0 8px 8px;
@@ -501,10 +510,10 @@ body {
 	top: 0px;
 	bottom: 0px;
 	overflow: auto;
-	padding: 10px 20px;
+	padding: 20px 50px;
 	font-family: Georgia, serif;
-	font-size: 16px;
-    line-height: 22px;
+	font-size: 18px;
+    line-height: 25px;
 }
 
 #dtcReaderContainer .coverPage note {

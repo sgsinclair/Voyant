@@ -109,6 +109,12 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			}
 		}, this);
 		
+		this.addListener('documentTermsClicked', function(src, terms) {
+			if (terms.length === 0) {
+				this.clearHits('kwic');
+			}
+		}, this);
+		
 		this.addListener('tocUpdated', function(src, data) {
 			this.clearHits('kwic');
 			
@@ -147,7 +153,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 						Ext.getCmp('dtcMarkup').clearSelections();
 						Ext.getCmp('dtcIndex').clearSelections();
 						Ext.getCmp('dtcReader').clearHighlights();
-						Ext.getCmp('dtcStats').getSelectionModel().deselectAll(true);
+						Ext.getCmp('dtcStats').clearSelections();
 						var tree = Ext.getCmp('dtcToc');
 						tree.clearTree();
 			    		tree.updateDocModelOutline();
@@ -462,6 +468,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 	},
 	
 	setOutlineDimensions: function(minMaxObj) {
+		var outlineThickness = 1;
 		var min = 0;
 		var max = 1;
 		if (minMaxObj) {
@@ -486,15 +493,15 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			
 			this.outlineTop.setBox({x: box.x, y: box.y, width: box.width, height: outlineHeight});
 			this.outlineLeft.setBox({x: box.x, y: box.y+outlineHeight, width: 0, height: 0});
-			this.outlineRight.setBox({x: box.x+box.width-2, y: box.y+outlineHeight, width: 0, height: 0});
+			this.outlineRight.setBox({x: box.x+box.width-outlineThickness, y: box.y+outlineHeight, width: 0, height: 0});
 			this.outlineBottom.setBox({x: box.x, y: box.y+outlineHeight, width: box.width, height: outlineHeight});
 			
 			this.outlineTop.setStyle('border-radius', outlineHeight+'px '+outlineHeight+'px 0 0');
 			this.outlineBottom.setStyle('border-radius', '0 0 '+outlineHeight+'px '+outlineHeight+'px');
 		} else {
 			this.outlineTop.setBox({x: box.x, y: box.y, width: box.width, height: 9});
-			this.outlineLeft.setBox({x: box.x, y: box.y+9, width: 2, height: box.height-18});
-			this.outlineRight.setBox({x: box.x+box.width-2, y: box.y+9, width: 2, height: box.height-18});
+			this.outlineLeft.setBox({x: box.x, y: box.y+9, width: outlineThickness, height: box.height-18});
+			this.outlineRight.setBox({x: box.x+box.width-outlineThickness, y: box.y+9, width: outlineThickness, height: box.height-18});
 			this.outlineBottom.setBox({x: box.x, y: box.y+box.height-12, width: box.width, height: 9});
 			
 			this.outlineTop.setStyle('border-radius', null);
