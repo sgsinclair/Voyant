@@ -161,7 +161,6 @@ Ext.define('Voyant.panel.Contexts', {
             listeners: {
             	scope: this,
 				corpusSelected: function() {
-					debugger
 					if (this.getStore().getCorpus()) {
 						this.setApiParams({docId: undefined, docIndex: undefined})
 						this.getStore().loadPage(1)
