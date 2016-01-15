@@ -17,7 +17,6 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 	config: {
 		docs: undefined,
 		corpus: undefined,
-		docStore: undefined,
 		singleSelect: false
 	},
 	
@@ -99,6 +98,8 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 						this.setCorpus(corpus)
 						if (corpus.getDocumentsCount()==1) {
 							this.hide();
+						} else {
+							selector.populate(corpus.getDocumentsStore().getRange(), true);
 						}
 					}, selector);
 					var panel = selector.findParentBy(function(clz) {
@@ -109,43 +110,15 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 							selector.fireEvent("loadedCorpus", src, corpus);
 						}, selector);
 						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
+						else if (panel.getStore && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
+							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus())
+						}
 					}
 				}
 			}
 		});
 
-		this.setDocStore(Ext.create("Ext.data.Store", {
-			model: "Voyant.data.model.Document",
-    		autoLoad: false,
-    		remoteSort: false,
-    		proxy: {
-				type: 'ajax',
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.DocumentsMetadata'
-				},
-				reader: {
-					type: 'json',
-					rootProperty: 'documentsMetadata.documents',
-					totalProperty: 'documentsMetadata.total'
-				},
-				simpleSortMode: true
-   		     },
-   		     listeners: {
-   		    	load: function(store, records, successful, options) {
-   					this.populate(records);
-   				},
-   				scope: this
-   		     }
-    	}));
-    },
-    
-    setCorpus: function(corpus) {
-    	if (corpus) {
-        	this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
-        	this.getDocStore().load();
-    	}
-		this.callParent(arguments);
+
     },
     
     populate: function(docs, replace) {

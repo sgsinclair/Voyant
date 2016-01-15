@@ -119,17 +119,8 @@ Ext.define('Voyant.panel.Contexts', {
                 		}
                 	}
                 },{
-                	text: this.localize('corpus'),
-                	tooltip: this.localize("corpusTip"),
-                	itemId: 'corpus',
-                	handler: function(btn) {
-                		btn.hide();
-                		this.setApiParams({docIndex: undefined, docId: undefined});
-                		this.getStore().load({params: this.getApiParams()});
-                	},
-                	hidden: true,
-                	scope: this
-                }]
+        			xtype: 'corpusdocumentselector'
+        		}]
             }],
     		columns: [{
     			text: this.localize("document"),
@@ -168,6 +159,25 @@ Ext.define('Voyant.panel.Contexts', {
                 flex: 1
             }],
             listeners: {
+            	scope: this,
+				corpusSelected: function() {
+					debugger
+					if (this.getStore().getCorpus()) {
+						this.setApiParams({docId: undefined, docIndex: undefined})
+						this.getStore().loadPage(1)
+					}
+				},
+				
+				documentsSelected: function(src, docs) {
+					var docIds = [];
+					var corpus = this.getStore().getCorpus();
+					docs.forEach(function(doc) {
+						docIds.push(corpus.getDocument(doc).getId())
+					}, this);
+					this.setApiParams({docId: docIds, docIndex: undefined})
+					this.getStore().loadPage(1)
+				},
+
             	documentSegmentTermClicked: {
 	           		 fn: function(src, documentSegmentTerm) {
 	           			 if (!documentSegmentTerm.term) {return;}
@@ -181,7 +191,7 @@ Ext.define('Voyant.panel.Contexts', {
 	           			 }
 	           			 this.setApiParams(params);
 	       	        	if (this.isVisible()) {
-	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
+	       		        	this.getStore().loadPage(1);
 	       	        	}
 	           		 },
 	           		 scope: this

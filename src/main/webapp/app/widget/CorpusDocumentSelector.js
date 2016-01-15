@@ -53,6 +53,9 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 							selector.fireEvent("loadedCorpus", src, corpus);
 						}, selector);
 						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
+						else if (panel.getStore && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
+							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus())
+						}
 					}
 				}
 			}

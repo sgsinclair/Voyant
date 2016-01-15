@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Jan 15 13:05:05 EST 2016 */
+/* This file created by JSCacher. Last modified: Fri Jan 15 16:19:40 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3542,6 +3542,10 @@ Ext.define('Voyant.data.model.Document', {
     	return this.get('index');
     },
     
+    getIndex: function() {
+    	return this.get('id');
+    },
+    
     getFullLabel: function() {
     	return this.getTitle(); // TODO: complete full label
     },
@@ -5003,7 +5007,6 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 	config: {
 		docs: undefined,
 		corpus: undefined,
-		docStore: undefined,
 		singleSelect: false
 	},
 	
@@ -5085,6 +5088,8 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 						this.setCorpus(corpus)
 						if (corpus.getDocumentsCount()==1) {
 							this.hide();
+						} else {
+							selector.populate(corpus.getDocumentsStore().getRange(), true);
 						}
 					}, selector);
 					var panel = selector.findParentBy(function(clz) {
@@ -5095,43 +5100,15 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 							selector.fireEvent("loadedCorpus", src, corpus);
 						}, selector);
 						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
+						else if (panel.getStore && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
+							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus())
+						}
 					}
 				}
 			}
 		});
 
-		this.setDocStore(Ext.create("Ext.data.Store", {
-			model: "Voyant.data.model.Document",
-    		autoLoad: false,
-    		remoteSort: false,
-    		proxy: {
-				type: 'ajax',
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.DocumentsMetadata'
-				},
-				reader: {
-					type: 'json',
-					rootProperty: 'documentsMetadata.documents',
-					totalProperty: 'documentsMetadata.total'
-				},
-				simpleSortMode: true
-   		     },
-   		     listeners: {
-   		    	load: function(store, records, successful, options) {
-   					this.populate(records);
-   				},
-   				scope: this
-   		     }
-    	}));
-    },
-    
-    setCorpus: function(corpus) {
-    	if (corpus) {
-        	this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
-        	this.getDocStore().load();
-    	}
-		this.callParent(arguments);
+
     },
     
     populate: function(docs, replace) {
@@ -5244,6 +5221,9 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 							selector.fireEvent("loadedCorpus", src, corpus);
 						}, selector);
 						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
+						else if (panel.getStore && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
+							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus())
+						}
 					}
 				}
 			}
@@ -6900,17 +6880,8 @@ Ext.define('Voyant.panel.Contexts', {
                 		}
                 	}
                 },{
-                	text: this.localize('corpus'),
-                	tooltip: this.localize("corpusTip"),
-                	itemId: 'corpus',
-                	handler: function(btn) {
-                		btn.hide();
-                		this.setApiParams({docIndex: undefined, docId: undefined});
-                		this.getStore().load({params: this.getApiParams()});
-                	},
-                	hidden: true,
-                	scope: this
-                }]
+        			xtype: 'corpusdocumentselector'
+        		}]
             }],
     		columns: [{
     			text: this.localize("document"),
@@ -6949,6 +6920,25 @@ Ext.define('Voyant.panel.Contexts', {
                 flex: 1
             }],
             listeners: {
+            	scope: this,
+				corpusSelected: function() {
+					debugger
+					if (this.getStore().getCorpus()) {
+						this.setApiParams({docId: undefined, docIndex: undefined})
+						this.getStore().loadPage(1)
+					}
+				},
+				
+				documentsSelected: function(src, docs) {
+					var docIds = [];
+					var corpus = this.getStore().getCorpus();
+					docs.forEach(function(doc) {
+						docIds.push(corpus.getDocument(doc).getId())
+					}, this);
+					this.setApiParams({docId: docIds, docIndex: undefined})
+					this.getStore().loadPage(1)
+				},
+
             	documentSegmentTermClicked: {
 	           		 fn: function(src, documentSegmentTerm) {
 	           			 if (!documentSegmentTerm.term) {return;}
@@ -6962,7 +6952,7 @@ Ext.define('Voyant.panel.Contexts', {
 	           			 }
 	           			 this.setApiParams(params);
 	       	        	if (this.isVisible()) {
-	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
+	       		        	this.getStore().loadPage(1);
 	       	        	}
 	           		 },
 	           		 scope: this

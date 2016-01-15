@@ -30,6 +30,10 @@ Ext.define('Voyant.data.model.Document', {
     	return this.get('index');
     },
     
+    getIndex: function() {
+    	return this.get('id');
+    },
+    
     getFullLabel: function() {
     	return this.getTitle(); // TODO: complete full label
     },
