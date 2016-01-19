@@ -25,11 +25,16 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 				items: [{
 					text: this.localize("corpus"),
 					glyph: 'xf111@FontAwesome',
-					handler: function() {
+					handler: function(button) {
 						var panel = this.findParentBy(function(clz) {
 							return clz.mixins["Voyant.panel.Panel"];
-						})
-						if (panel) {panel.fireEvent("corpusSelected", this, this.getCorpus())}
+						});
+						if (panel) {
+							button.nextSibling().menu.items.each(function(item) {
+								item.setChecked(false, true);
+							});
+							panel.fireEvent("corpusSelected", this, this.getCorpus());
+						}
 					},
 					scope: this
 				},{
@@ -40,21 +45,21 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 			listeners: {
 				afterrender: function(selector) {
 					selector.on("loadedCorpus", function(src, corpus) {
-						this.setCorpus(corpus)
+						this.setCorpus(corpus);
 						if (corpus.getDocumentsCount()==1) {
 							this.hide();
 						}
 					}, selector);
 					var panel = selector.findParentBy(function(clz) {
 						return clz.mixins["Voyant.panel.Panel"];
-					})
+					});
 					if (panel) {
 						panel.on("loadedCorpus", function(src, corpus) {
 							selector.fireEvent("loadedCorpus", src, corpus);
 						}, selector);
 						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
 						else if (panel.getStore && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
-							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus())
+							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus());
 						}
 					}
 				}

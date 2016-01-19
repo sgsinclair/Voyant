@@ -38,8 +38,8 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 						change: {
 							fn: function(item, checked) {
 								this.getMenu().items.each(function(item) {
-									item.setChecked(checked)
-								})
+									item.setChecked(checked);
+								});
 							},
 							scope: this
 						}
@@ -60,7 +60,7 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 		    			// tell parent tool
 						var panel = button.findParentBy(function(clz) {
 							return clz.mixins["Voyant.panel.Panel"];
-						})
+						});
 						if (panel) {
 			    			panel.fireEvent('documentsSelected', button, docs);
 						}
@@ -69,10 +69,10 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 		    			button.findParentBy(function(clz) {
 		    				if (clz.isXType("button") && clz.hasVisibleMenu()) {
 		    					clz.hideMenu();
-		    					return true
+		    					return true;
 		    				}
 		    				return false;
-		    			})
+		    			});
 		    		},
 		    		scope: this
 		    	},{
@@ -83,10 +83,10 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 		    			this.findParentBy(function(clz) {
 		    				if (clz.isXType("button") && clz.hasVisibleMenu()) {
 		    					clz.hideMenu();
-		    					return true
+		    					return true;
 		    				}
-		    				return false
-		    			}, this)
+		    				return false;
+		    			}, this);
 		    			this.hideMenu();
 		    		},
 		    		scope: this
@@ -95,7 +95,7 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 			listeners: {
 				afterrender: function(selector) {
 					selector.on("loadedCorpus", function(src, corpus) {
-						this.setCorpus(corpus)
+						this.setCorpus(corpus);
 						if (corpus.getDocumentsCount()==1) {
 							this.hide();
 						} else {
@@ -104,14 +104,14 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 					}, selector);
 					var panel = selector.findParentBy(function(clz) {
 						return clz.mixins["Voyant.panel.Panel"];
-					})
+					});
 					if (panel) {
 						panel.on("loadedCorpus", function(src, corpus) {
 							selector.fireEvent("loadedCorpus", src, corpus);
 						}, selector);
-						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
+						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus());}
 						else if (panel.getStore && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
-							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus())
+							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus());
 						}
 					}
 				}
@@ -143,7 +143,7 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
     				if (this.getSingleSelect() && checked) {
     					var panel = this.findParentBy(function(clz) {
     						return clz.mixins["Voyant.panel.Panel"];
-    					})
+    					});
     					if (panel) {
 	    					panel.fireEvent('documentSelected', this, doc);
     					}
