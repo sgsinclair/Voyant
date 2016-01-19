@@ -65,11 +65,9 @@ Ext.define('Voyant.panel.StreamGraph', {
 			}),
 			bbar: new Ext.Toolbar({
         		enableOverflow: true,
-				items: [
-//				{
-//                	xtype: 'querysearchfield'
-//                },
-                {
+				items: [{
+                	xtype: 'querysearchfield'
+                },{
 	            	xtype: 'button',
 	            	text: this.localize('clearTerms'),
 	            	handler: function() {
@@ -78,8 +76,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 	            	scope: this
 	            },
 	            '-',{
-	            	xtype: 'documentselectorbutton',
-	            	itemId: 'docSelector',
+	            	xtype: 'corpusdocumentselector',
 	            	singleSelect: true
 	            }
 	            ,'-',{
@@ -105,18 +102,40 @@ Ext.define('Voyant.panel.StreamGraph', {
         
         this.on('loadedCorpus', function(src, corpus) {
         	this.setCorpus(corpus);
-        	this.down('#docSelector').setCorpus(corpus);
+        	if (this.getCorpus().getDocumentsCount() == 1 && this.getMode() != this.MODE_DOCUMENT) {
+				this.setMode(this.MODE_DOCUMENT);
+			}
     		if (this.isVisible()) {
-        		this.loadFromCorpus();
+    			this.loadFromCorpus();
     		}
         }, this);
         
-        this.on('documentsSelected', function(src, docIds) {
-        	var docId = docIds[0];
+        this.on('corpusSelected', function(src, corpus) {
+    		if (src.isXType('corpusdocumentselector')) {
+    			this.setMode(this.MODE_CORPUS);
+    			this.setApiParams({docId: undefined, docIndex: undefined});
+    			this.setCorpus(corpus);
+        		this.loadFromCorpus();
+    		}
+    	});
+        
+        this.on('documentSelected', function(src, doc) {
+        	var docId = doc.getId();
         	this.setApiParam('docId', docId);
         	this.loadFromDocumentTerms();
         }, this);
         
+		this.on('query', function(src, query) {
+        	var terms = this.getCurrentTerms();
+        	terms.push(query);
+        	this.setApiParams({query: terms, limit: terms.length});
+        	if (this.getMode() === this.MODE_DOCUMENT) {
+        		this.loadFromDocumentTerms();
+        	} else {
+        		this.loadFromCorpusTerms(this.getCorpus().getCorpusTerms());
+        	}
+        }, this);
+		
         this.on('resize', function(panel, width, height) {
 
 		}, this);
@@ -186,7 +205,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     		    	}
     		    },
     		    scope: this,
-    		    params: this.getApiParams(['docId','docIndex','limit','stopList','query','docId','withDistributions','bins'])
+    		    params: this.getApiParams(['docId','docIndex','limit','stopList','query','withDistributions','bins'])
         	});
     	}
     },
@@ -235,17 +254,20 @@ Ext.define('Voyant.panel.StreamGraph', {
 //    	
 //    	var yAxis = d3.svg.axis().scale(y).orient('left');
     	
-    	var sel = this.getVis().selectAll('path');
+    	// join
+    	var paths = this.getVis().selectAll('path').data(processedLayers);
     	
-    	if (sel.size() === 0) {
-    		sel.data(processedLayers).enter().append('path')
-	    		.attr('d', function(d) { return area(d); })
-	    		.style('fill', function(d, i) { return color(i); });
-//	    		.append('title').text(function (d) { return d.key; });
-    	} else {
-    		sel.data(processedLayers).attr('d', function(d) { return area(d); });
-    	}
+    	// update
+    	paths.attr('d', function(d) { return area(d); });
     	
+    	// enter
+    	paths.enter().append('path')
+		.attr('d', function(d) { return area(d); })
+		.style('fill', function(d, i) { return color(i); });
+//		.append('title').text(function (d) { return d.key; });
+    	
+    	// exit
+    	paths.exit().remove();
     	
 //    	this.getVis().append('g')
 //    		.attr('class', 'axis axis--x')
@@ -257,6 +279,14 @@ Ext.define('Voyant.panel.StreamGraph', {
 //			.call(yAxis);
     },
     
+	getCurrentTerms: function() {
+    	var terms = [];
+    	this.down('[xtype=legend]').getStore().each(function(record) {
+    		terms.push(record.get('name'));
+    	}, this);
+    	return terms;
+    },
+	
     initGraph: function() {
     	if (this.getVisLayout() === undefined) {
 	    	var el = this.getLayout().getRenderTarget();
