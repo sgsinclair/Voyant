@@ -134,6 +134,16 @@ svg#collocatesGraph line {
 	color: grey !important;
 }
 
+/* StreamGraph */
+
+.axis path, .axis line {
+	fill: none;
+	stroke: black;
+    shape-rendering: crispEdges;
+}
+
+
+
 /* used for panel tool glyphs in the header */
 .x-tool-glyph {
     font-size: 16px;

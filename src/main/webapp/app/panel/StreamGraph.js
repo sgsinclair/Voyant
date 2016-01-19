@@ -28,7 +28,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     	mode: undefined
     },
     
-    graphMargin: {top: 0, right: 0, bottom: 0, left: 0},
+    graphMargin: {top: 10, right: 10, bottom: 50, left: 50},
     
     MODE_CORPUS: 'corpus',
     MODE_DOCUMENT: 'document',
@@ -48,16 +48,15 @@ Ext.define('Voyant.panel.StreamGraph', {
 				items: {
 					xtype: 'legend',
 					store: new Ext.data.JsonStore({
-						fields: ['name', 'mark']
+						fields: ['name', 'mark', 'active']
 					}),
 					listeners: {
 						itemclick: function(view, record, el, index) {
-							var term = record.get('name');
-//							if (this.isTermSelected(term)) {
-//								this.doTermDeselect(term);
-//							} else {
-//								this.doTermSelect(term);
-//							}
+							var isActive = Ext.fly(el.firstElementChild).hasCls('x-legend-inactive');
+							record.set('active', isActive);
+							var terms = this.getCurrentTerms();
+							this.setApiParams({query: terms, limit: terms.length});
+							this.loadFromCorpus();
 						},
 						scope: this
 					}
@@ -222,7 +221,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     			termLayer.push({x: i, y: r});
     		}, this);
     		layers.push(termLayer);
-    		legendData.push({name: record.get('term'), mark: color(index)});
+    		legendData.push({name: record.get('term'), mark: color(index), active: true});
     	}, this);
     	
     	legendStore.loadData(legendData);
@@ -250,9 +249,17 @@ Ext.define('Voyant.panel.StreamGraph', {
 			.y0(function(d) { return y(d.y0); })
 			.y1(function(d) { return y(d.y0 + d.y); });
     	
-//    	var xAxis = d3.svg.axis().scale(x).orient('bottom');
+    	var xAxis = d3.svg.axis().scale(x).orient('bottom').ticks(steps);
+    	if (this.getMode() === this.MODE_CORPUS) {
+    		// TODO change x scale to ordinal for corpus mode
+    		var docLabels = [];
+    		this.getCorpus().getDocuments().each(function(doc) {
+    			docLabels.push(doc.get('index'));//getTinyTitle());
+    		});
+    		xAxis.tickValues(docLabels);
+    	}
 //    	
-//    	var yAxis = d3.svg.axis().scale(y).orient('left');
+    	var yAxis = d3.svg.axis().scale(y).orient('left');
     	
     	// join
     	var paths = this.getVis().selectAll('path').data(processedLayers);
@@ -269,20 +276,24 @@ Ext.define('Voyant.panel.StreamGraph', {
     	// exit
     	paths.exit().remove();
     	
-//    	this.getVis().append('g')
-//    		.attr('class', 'axis axis--x')
-//    		.attr('transform', 'translate(0,'+height+')')
-//    		.call(xAxis);
-//    	this.getVis().append('g')
-//			.attr('class', 'axis axis--y')
-//			.attr('transform', 'translate('+this.graphMargin.left+',0)')
-//			.call(yAxis);
+    	this.getVis().selectAll('g.axis').remove();
+    	
+    	this.getVis().append('g')
+    		.attr('class', 'axis x')
+    		.attr('transform', 'translate(0,'+height+')')
+    		.call(xAxis);
+    	this.getVis().append('g')
+			.attr('class', 'axis y')
+			.attr('transform', 'translate(0,0)')
+			.call(yAxis);
     },
     
 	getCurrentTerms: function() {
     	var terms = [];
     	this.down('[xtype=legend]').getStore().each(function(record) {
-    		terms.push(record.get('name'));
+    		if (record.get('active')) {
+    			terms.push(record.get('name'));
+    		}
     	}, this);
     	return terms;
     },
@@ -290,9 +301,10 @@ Ext.define('Voyant.panel.StreamGraph', {
     initGraph: function() {
     	if (this.getVisLayout() === undefined) {
 	    	var el = this.getLayout().getRenderTarget();
-	    	var padding = 0;
-	    	var width = el.getWidth()-padding;
-			var height = el.getHeight()-padding;
+	    	var paddingH = this.graphMargin.left + this.graphMargin.right;
+	    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
+	    	var width = el.getWidth()-paddingH;
+			var height = el.getHeight()-paddingV;
 	    	this.setVisLayout(
 				d3.layout.stack()
 					.offset('silhouette')
@@ -302,7 +314,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 			);
 			
 			this.setVis(d3.select(el.dom).append('svg').attr('id','streamGraph')
-					.attr('width', width).attr('height', height).attr('transform', 'translate('+(padding/2)+','+(padding/2)+')')
+					.attr('width', width+paddingH).attr('height', height+paddingV).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')')
 			);
     	}
     }
