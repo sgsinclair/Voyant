@@ -30,7 +30,7 @@ Ext.define('Voyant.data.model.Document', {
     	return this.get('index');
     },
     
-    getIndex: function() {
+    getId: function() {
     	return this.get('id');
     },
     
