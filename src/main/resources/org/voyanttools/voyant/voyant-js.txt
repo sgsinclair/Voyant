@@ -44,6 +44,7 @@ app/data/store/DocumentQueryMatches.js
 app/data/store/DocumentTerms.js
 app/data/store/Documents.js
 app/data/store/PCAAnalysis.js
+app/data/store/DocSimAnalysis.js
 app/data/store/CorpusNgrams.js
 app/data/store/Tokens.js
 
@@ -76,6 +77,7 @@ app/panel/Dummy.js
 app/panel/RezoViz.js
 app/panel/Reader.js
 app/panel/ScatterPlot.js
+app/panel/DocumentSimilarity.js
 app/panel/Summary.js
 app/panel/TopicContexts.js
 app/panel/TermsRadio.js
