@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Jan 15 16:22:15 EST 2016 */
+/* This file created by JSCacher. Last modified: Tue Feb 16 08:21:47 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3542,7 +3542,7 @@ Ext.define('Voyant.data.model.Document', {
     	return this.get('index');
     },
     
-    getIndex: function() {
+    getId: function() {
     	return this.get('id');
     },
     
@@ -4239,6 +4239,49 @@ Ext.define('Voyant.data.store.PCAAnalysis', {
 		             type: 'json',
 		             rootProperty: 'pcaAnalysis',
 		             totalProperty: 'pcaAnalysis.totalTerms'
+		         },
+		         simpleSortMode: true
+			 }
+		});
+		
+		this.callParent([config]);
+
+	},
+	
+	setCorpus: function(corpus) {
+		if (corpus) {
+			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
+		}
+		this.callParent(arguments);
+	}
+});
+
+Ext.define('Voyant.data.store.DocSimAnalysis', {
+	extend: 'Ext.data.Store',
+	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
+    model: 'Voyant.data.model.StatisticalAnalysis',
+	config: {
+		corpus: undefined
+	},
+	
+	constructor : function(config) {
+		
+		config = config || {};
+		
+		// create proxy in constructor so we can set the Trombone URL
+		Ext.apply(config, {
+			proxy: {
+				type: 'ajax',
+				url: Voyant.application.getTromboneUrl(),
+				extraParams: {
+					tool: 'corpus.DocumentSimilarity',
+					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
+					withDistributions: true
+		         },
+		         reader: {
+		             type: 'json',
+		             rootProperty: 'documentSimilarity',
+		             totalProperty: 'documentSimilarity.totalTerms'
 		         },
 		         simpleSortMode: true
 			 }
@@ -5028,8 +5071,8 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 						change: {
 							fn: function(item, checked) {
 								this.getMenu().items.each(function(item) {
-									item.setChecked(checked)
-								})
+									item.setChecked(checked);
+								});
 							},
 							scope: this
 						}
@@ -5050,7 +5093,7 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 		    			// tell parent tool
 						var panel = button.findParentBy(function(clz) {
 							return clz.mixins["Voyant.panel.Panel"];
-						})
+						});
 						if (panel) {
 			    			panel.fireEvent('documentsSelected', button, docs);
 						}
@@ -5059,10 +5102,10 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 		    			button.findParentBy(function(clz) {
 		    				if (clz.isXType("button") && clz.hasVisibleMenu()) {
 		    					clz.hideMenu();
-		    					return true
+		    					return true;
 		    				}
 		    				return false;
-		    			})
+		    			});
 		    		},
 		    		scope: this
 		    	},{
@@ -5073,10 +5116,10 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 		    			this.findParentBy(function(clz) {
 		    				if (clz.isXType("button") && clz.hasVisibleMenu()) {
 		    					clz.hideMenu();
-		    					return true
+		    					return true;
 		    				}
-		    				return false
-		    			}, this)
+		    				return false;
+		    			}, this);
 		    			this.hideMenu();
 		    		},
 		    		scope: this
@@ -5085,7 +5128,7 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 			listeners: {
 				afterrender: function(selector) {
 					selector.on("loadedCorpus", function(src, corpus) {
-						this.setCorpus(corpus)
+						this.setCorpus(corpus);
 						if (corpus.getDocumentsCount()==1) {
 							this.hide();
 						} else {
@@ -5094,14 +5137,14 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 					}, selector);
 					var panel = selector.findParentBy(function(clz) {
 						return clz.mixins["Voyant.panel.Panel"];
-					})
+					});
 					if (panel) {
 						panel.on("loadedCorpus", function(src, corpus) {
 							selector.fireEvent("loadedCorpus", src, corpus);
 						}, selector);
-						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
+						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus());}
 						else if (panel.getStore && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
-							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus())
+							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus());
 						}
 					}
 				}
@@ -5133,7 +5176,7 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
     				if (this.getSingleSelect() && checked) {
     					var panel = this.findParentBy(function(clz) {
     						return clz.mixins["Voyant.panel.Panel"];
-    					})
+    					});
     					if (panel) {
 	    					panel.fireEvent('documentSelected', this, doc);
     					}
@@ -5193,11 +5236,16 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 				items: [{
 					text: this.localize("corpus"),
 					glyph: 'xf111@FontAwesome',
-					handler: function() {
+					handler: function(button) {
 						var panel = this.findParentBy(function(clz) {
 							return clz.mixins["Voyant.panel.Panel"];
-						})
-						if (panel) {panel.fireEvent("corpusSelected", this, this.getCorpus())}
+						});
+						if (panel) {
+							button.nextSibling().menu.items.each(function(item) {
+								item.setChecked(false, true);
+							});
+							panel.fireEvent("corpusSelected", this, this.getCorpus());
+						}
 					},
 					scope: this
 				},{
@@ -5208,21 +5256,21 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 			listeners: {
 				afterrender: function(selector) {
 					selector.on("loadedCorpus", function(src, corpus) {
-						this.setCorpus(corpus)
+						this.setCorpus(corpus);
 						if (corpus.getDocumentsCount()==1) {
 							this.hide();
 						}
 					}, selector);
 					var panel = selector.findParentBy(function(clz) {
 						return clz.mixins["Voyant.panel.Panel"];
-					})
+					});
 					if (panel) {
 						panel.on("loadedCorpus", function(src, corpus) {
 							selector.fireEvent("loadedCorpus", src, corpus);
 						}, selector);
 						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
 						else if (panel.getStore && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
-							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus())
+							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus());
 						}
 					}
 				}
@@ -6978,7 +7026,6 @@ Ext.define('Voyant.panel.Contexts', {
 	       	        		docIndex: docIndex,
 	       	        		query: queries
 	       	        	});
-	       	        	this.down("#corpus").show();
 	       	        	if (this.isVisible()) {
 	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
 	       	        	}
@@ -11838,6 +11885,301 @@ Ext.define('Ext.chart.series.CustomScatter', {
     	this.callParent(arguments);
     }
 });
+Ext.define('Voyant.panel.DocumentSimilarity', {
+	extend: 'Ext.panel.Panel',
+	mixins: ['Voyant.panel.Panel'],
+	requires: ['Ext.chart.CartesianChart'],
+	alias: 'widget.documentsimilarity',
+	config: {
+		corpus: undefined,
+		options: {
+    		xtype: 'stoplistoption'
+    	}
+	},
+    statics: {
+    	i18n: {
+			title: {en: "DocumentSimilarity"},
+			loading: {en: "Loading"},
+			helpTip: {en: ""},
+			tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
+			docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'},
+			noTermSelected: {en: "No term selected."}
+    	},
+    	api: {
+    		limit: 50,
+    		dimensions: 3,
+    		clusters: 3,
+    		stopList: 'auto'
+    	},
+		glyph: 'xf06e@FontAwesome'
+    },
+    
+    tokenFreqTipTemplate: null,
+    docFreqTipTemplate: null,
+    chartMenu: null,
+    labelsMode: 0, // 0 all labels, 1 word labels, 2 no labels
+    
+    constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    },
+    
+    initComponent: function() {
+        Ext.apply(this, {
+        	title: this.localize('title'),
+        	docSimStore: Ext.create('Voyant.data.store.DocSimAnalysis'),
+        	autoDestroy: true,
+        	layout: 'fit',
+    		items: {
+    			layout: 'fit',
+        		itemId: 'chartParent'
+    		}
+        });
+        
+    	this.on('loadedCorpus', function(src, corpus) {
+    		this.setCorpus(corpus);
+    		this.docSimStore.setCorpus(corpus);
+    		this.loadFromApis();
+    	}, this);
+
+        this.docSimStore.on('load', function(store, records) {
+        	this.buildChart(store);
+        }, this);
+        
+    	this.tokenFreqTipTemplate = new Ext.Template(this.localize('tokenFreqTip'));
+    	this.docFreqTipTemplate = new Ext.Template(this.localize('docFreqTip'));
+        
+    	this.callParent(arguments);
+    },
+    
+    buildChart: function(store) {
+    	var that = this; // needed for tooltip renderer
+    	
+    	var oldChart = this.queryById('chart');
+    	if (oldChart !== null) {
+    		this.queryById('chartParent').remove(oldChart);
+    	}
+    	
+    	var rec = store.getAt(0);
+        var numDims = 3;//this.getApiParam('dimensions');
+        
+        var maxFreq = 0;
+        var minFreq = Number.MAX_VALUE;
+        var maxFill = 0;
+        var minFill = Number.MAX_VALUE;
+        
+        var tokens = rec.getTokens();
+        var termData = [];
+        var docData = [];
+        tokens.forEach(function(token) {
+        	var freq = token.get('rawFreq');
+        	var isDoc = token.get('category') === 'part';
+        	if (!isDoc) {
+	        	if (freq > maxFreq) maxFreq = freq;
+	        	if (freq < minFreq) minFreq = freq;
+        	}
+        	if (numDims === 3) {
+				var z = token.get('vector')[2];
+				if (z < minFill) minFill = z;
+				if (z > maxFill) maxFill = z;
+			}
+        	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2], isDoc: isDoc};
+        	if (isDoc) {
+        		tokenData.docIndex = token.get('docIndex');
+        		var doc = this.getCorpus().getDocument(tokenData.docIndex);
+        		tokenData.term = doc.getTinyTitle();
+        		tokenData.title = doc.getTitle();
+        		docData.push(tokenData);
+        	} else {
+        		termData.push(tokenData);
+        	}
+        }, this);
+        
+    	var termSeriesStore = Ext.create('Ext.data.JsonStore', {
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc', 'docIndex'],
+    		data: termData
+    	});
+    	var docSeriesStore = Ext.create('Ext.data.JsonStore', {
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc', 'docIndex'],
+    		data: docData
+    	});
+    	
+    	var config = {
+        	itemId: 'chart',
+        	xtype: 'cartesian',
+        	interactions: ['crosszoom','panzoom','itemhighlight'],
+        	plugins: {
+                ptype: 'chartitemevents'
+            },
+        	axes: [{
+        		type: 'numeric',
+        		position: 'bottom',
+        		fields: ['x']
+        	},{
+        		type: 'numeric',
+        		position: 'left',
+        		fields: ['y']
+        	}],
+        	innerPadding: {top: 25, right: 25, bottom: 25, left: 25},
+        	series: [{
+        		type: 'customScatter',
+        		xField: 'x',
+        		yField: 'y',
+        		store: termSeriesStore,
+        		tooltip: {
+        			trackMouse: true,
+        			style: 'background: #fff',
+        			renderer: function (storeItem, item) {
+        				this.setHtml(that.tokenFreqTipTemplate.apply([storeItem.get('term'),storeItem.get('rawFreq'),storeItem.get('relativeFreq')]));
+        			}
+        		},
+        		marker: {
+        		    type: 'circle'
+        		},
+        		highlight: {
+        			fillStyle: 'yellow',
+                    strokeStyle: 'black'
+        		},
+        		renderer: function (sprite, config, rendererData, index) {
+    				var store = rendererData.store;
+    				var item = store.getAt(index);
+    				if (item !== null) {
+	    				var clusterIndex = item.get('cluster');
+	    				var scatterplot = this.getParent().up('documentsimilarity');
+	    				
+	    				if (clusterIndex === -1) {
+	    					// no clusters were specified in initial call
+	    					clusterIndex = 0;
+	    				}
+	    				
+	    				var a = 0.65;
+	    				if (numDims === 3) {
+	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
+	    				}
+	    				var color = scatterplot.getApplication().getColor(clusterIndex);
+	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
+	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
+	    				
+	    				var freq = item.get('rawFreq');
+	    				var radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
+	    				config.radius = radius;
+    				}
+    			}
+        	},{
+        		type: 'customScatter',
+        		xField: 'x',
+        		yField: 'y',
+        		store: docSeriesStore,
+        		tooltip: {
+        			trackMouse: true,
+        			style: 'background: #fff',
+        			renderer: function (storeItem, item) {
+        				this.setHtml(that.docFreqTipTemplate.apply([storeItem.get('title'),storeItem.get('rawFreq')]));
+        			}
+        		},
+        		marker: {
+        		    type: 'diamond'
+        		},
+        		highlight: {
+        			fillStyle: 'yellow',
+                    strokeStyle: 'black'
+        		},
+        		renderer: function (sprite, config, rendererData, index) {
+    				var store = rendererData.store;
+    				var item = store.getAt(index);
+    				if (item !== null) {
+	    				var clusterIndex = item.get('cluster');
+	    				var scatterplot = this.getParent().up('documentsimilarity');
+	    				
+	    				if (clusterIndex === -1) {
+	    					// no clusters were specified in initial call
+	    					clusterIndex = 0;
+	    				}
+	    				
+	    				var a = 0.65;
+	    				if (numDims === 3) {
+	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
+	    				}
+	    				var color = scatterplot.getApplication().getColor(6);
+	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
+	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
+
+	    				config.radius = 5;
+    				}
+    			}
+        	}],
+        	listeners: {
+        		itemclick: function(chart, item, event) {
+        			var data = item.record.data;
+        			if (data.isDoc) {
+        				var record = this.getCorpus().getDocument(data.docIndex);
+	            		this.getApplication().dispatchEvent('documentsClicked', this, [record]);
+        			} else {
+	        			var record = Ext.create('Voyant.data.model.CorpusTerm', data);
+	            		this.getApplication().dispatchEvent('corpusTermsClicked', this, [record]);
+        			}
+        		}
+        	}
+        };
+    	
+    	config.series[0].label = {
+			field: 'term',
+			display: 'over'
+		};
+		config.series[1].label = {
+			field: 'term',
+			display: 'over'
+		};
+    	
+    	var chart = Ext.create('Ext.chart.CartesianChart', config);
+    	this.queryById('chartParent').insert(0, chart);
+    },
+    
+    loadFromApis: function(keepCurrentTerms) {
+    	var chart = this.down('#chart');
+    	if (chart !== null) {
+    		chart.mask(this.localize('loading'));
+    	}
+    	var params = {};
+    	Ext.apply(params, this.getApiParams());
+    	this.docSimStore.load({
+			params: params
+		});
+    },
+    
+    interpolate: function(lambda, minSrc, maxSrc, minDst, maxDst) {
+        return minDst + (maxDst - minDst) * Math.max(0, Math.min(1, (lambda - minSrc) / (maxSrc - minSrc)));
+    }
+});
+
+/**
+ * Adds tool tip disabling.
+ */
+Ext.define('Ext.chart.series.CustomScatter', {
+	extend: 'Ext.chart.series.Scatter',
+	
+	alias: 'series.customScatter',
+    type: 'customScatter',
+    seriesType: 'scatterSeries',
+	
+	tipsDisabled: false,
+	
+	enableToolTips: function() {
+		this.tipsDisabled = false;
+	},
+	
+	disableToolTips: function() {
+		this.tipsDisabled = true;
+	},
+	
+    showTip: function (item, xy) {
+    	if (this.tipsDisabled) {
+    		return;
+    	}
+    	
+    	this.callParent(arguments);
+    }
+});
 Ext.define('Voyant.panel.Summary', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel', 'Voyant.util.SparkLine'],
@@ -15169,15 +15511,20 @@ Ext.define('Voyant.panel.StreamGraph', {
     statics: {
     	i18n: {
     		title: {en: 'StreamGraph'},
-    		
+    		freqsMode: {en: 'Frequencies'},
+    		freqsModeTip: {en: 'Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).'},
+    		rawFrequencies: {en: 'Raw Frequencies'},
+    		relativeFrequencies: {en: 'Relative Frequencies'},
+    		documentSegments: {en: 'Document Segments'},
+    		documents: {en: 'Documents'},
     		clearTerms : {en: 'Clear Terms'},
-    		granularity : {en: 'Granularity'}
+    		segments : {en: 'Segments'}
     	},
     	api: {
     		limit: 5,
     		stopList: 'auto',
     		query: undefined,
-    		withDistributions: 'raw',
+    		withDistributions: 'relative',
     		bins: 50,
     		docIndex: undefined,
     		docId: undefined
@@ -15192,7 +15539,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     	mode: undefined
     },
     
-    graphMargin: {top: 0, right: 0, bottom: 0, left: 0},
+    graphMargin: {top: 20, right: 60, bottom: 110, left: 80},
     
     MODE_CORPUS: 'corpus',
     MODE_DOCUMENT: 'document',
@@ -15209,47 +15556,75 @@ Ext.define('Voyant.panel.StreamGraph', {
     		title: this.localize('title'),
     		tbar: new Ext.Toolbar({
         		enableOverflow: true,
-				items: {
+				items: ['->',{
 					xtype: 'legend',
 					store: new Ext.data.JsonStore({
-						fields: ['name', 'mark']
+						fields: ['name', 'mark', 'active']
 					}),
 					listeners: {
 						itemclick: function(view, record, el, index) {
-							var term = record.get('name');
-//							if (this.isTermSelected(term)) {
-//								this.doTermDeselect(term);
-//							} else {
-//								this.doTermSelect(term);
-//							}
+							var isActive = Ext.fly(el.firstElementChild).hasCls('x-legend-inactive');
+							record.set('active', isActive);
+							var terms = this.getCurrentTerms();
+							this.setApiParams({query: terms, limit: terms.length});
+							this.loadFromCorpus();
 						},
 						scope: this
 					}
-				}
+				},'->']
 			}),
 			bbar: new Ext.Toolbar({
         		enableOverflow: true,
-				items: [
-//				{
-//                	xtype: 'querysearchfield'
-//                },
-                {
-	            	xtype: 'button',
-	            	text: this.localize('clearTerms'),
-	            	handler: function() {
-	            		
-	            	},
-	            	scope: this
-	            },
-	            '-',{
-	            	xtype: 'documentselectorbutton',
-	            	itemId: 'docSelector',
+				items: [{
+                	xtype: 'querysearchfield'
+                },
+//                {
+//	            	xtype: 'button',
+//	            	text: this.localize('clearTerms'),
+//	            	handler: function() {
+//	            		this.setApiParams({query: undefined, limit: 5, stopList: 'auto'});
+//						this.loadFromCorpus();
+//	            	},
+//	            	scope: this
+//	            },
+	            {
+	            	xtype: 'corpusdocumentselector',
 	            	singleSelect: true
-	            }
-	            ,'-',{
+	            },{
+	            	text: this.localize('freqsMode'),
+					glyph: 'xf201@FontAwesome',
+				    tooltip: this.localize('freqsModeTip'),
+				    menu: {
+				    	items: [{
+				               text: this.localize('relativeFrequencies'),
+				               checked: true,
+				               itemId: 'relative',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('withDistributions', 'relative');
+				                	   this.loadFromCorpus();
+				            	   }
+				               },
+				               scope: this
+				           }, {
+				               text: this.localize('rawFrequencies'),
+				               checked: false,
+				               itemId: 'raw',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('withDistributions', 'raw');
+				                	   this.loadFromCorpus();
+				            	   }
+				               },
+				               scope: this
+			           }]
+				    }
+	            },{
 	            	xtype: 'slider',
-	            	itemId: 'granularity',
-	            	fieldLabel: this.localize('granularity'),
+	            	itemId: 'segmentsSlider',
+	            	fieldLabel: this.localize('segments'),
 	            	labelAlign: 'right',
 	            	labelWidth: 70,
 	            	width: 150,
@@ -15257,6 +15632,9 @@ Ext.define('Voyant.panel.StreamGraph', {
 	            	minValue: 10,
 	            	maxValue: 300,
 	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(this.getApiParam('bins'));
+	            		},
 	            		changecomplete: function(slider, newvalue) {
 	            			this.setApiParams({bins: newvalue});
 	            			this.loadFromCorpus();
@@ -15269,18 +15647,40 @@ Ext.define('Voyant.panel.StreamGraph', {
         
         this.on('loadedCorpus', function(src, corpus) {
         	this.setCorpus(corpus);
-        	this.down('#docSelector').setCorpus(corpus);
+        	if (this.getCorpus().getDocumentsCount() == 1 && this.getMode() != this.MODE_DOCUMENT) {
+				this.setMode(this.MODE_DOCUMENT);
+			}
     		if (this.isVisible()) {
-        		this.loadFromCorpus();
+    			this.loadFromCorpus();
     		}
         }, this);
         
-        this.on('documentsSelected', function(src, docIds) {
-        	var docId = docIds[0];
+        this.on('corpusSelected', function(src, corpus) {
+    		if (src.isXType('corpusdocumentselector')) {
+    			this.setMode(this.MODE_CORPUS);
+    			this.setApiParams({docId: undefined, docIndex: undefined});
+    			this.setCorpus(corpus);
+        		this.loadFromCorpus();
+    		}
+    	});
+        
+        this.on('documentSelected', function(src, doc) {
+        	var docId = doc.getId();
         	this.setApiParam('docId', docId);
         	this.loadFromDocumentTerms();
         }, this);
         
+		this.on('query', function(src, query) {
+        	var terms = this.getCurrentTerms();
+        	terms.push(query);
+        	this.setApiParams({query: terms, limit: terms.length, stopList: undefined});
+        	if (this.getMode() === this.MODE_DOCUMENT) {
+        		this.loadFromDocumentTerms();
+        	} else {
+        		this.loadFromCorpusTerms(this.getCorpus().getCorpusTerms());
+        	}
+        }, this);
+		
         this.on('resize', function(panel, width, height) {
 
 		}, this);
@@ -15350,7 +15750,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     		    	}
     		    },
     		    scope: this,
-    		    params: this.getApiParams(['docId','docIndex','limit','stopList','query','docId','withDistributions','bins'])
+    		    params: this.getApiParams(['docId','docIndex','limit','stopList','query','withDistributions','bins'])
         	});
     	}
     },
@@ -15367,7 +15767,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     			termLayer.push({x: i, y: r});
     		}, this);
     		layers.push(termLayer);
-    		legendData.push({name: record.get('term'), mark: color(index)});
+    		legendData.push({name: record.get('term'), mark: color(index), active: true});
     	}, this);
     	
     	legendStore.loadData(legendData);
@@ -15376,17 +15776,18 @@ Ext.define('Voyant.panel.StreamGraph', {
     	
     	var steps;
     	if (this.getMode() === this.MODE_DOCUMENT) {
-    		steps = this.getApiParam('bins')-1;
+    		steps = this.getApiParam('bins');
     	} else {
-    		steps = this.getCorpus().getDocumentsCount()-1;
+    		steps = this.getCorpus().getDocumentsCount();
     	}
+    	steps--;
+    	
     	var width = this.body.down('svg').getWidth() - this.graphMargin.left - this.graphMargin.right;
     	var x = d3.scale.linear().domain([0, steps]).range([0, width]);
     	
     	var max = d3.max(processedLayers, function(layer) {
     		return d3.max(layer, function(d) { return d.y0 + d.y; });
     	});
-    	
     	var height = this.body.down('svg').getHeight() - this.graphMargin.top - this.graphMargin.bottom;
     	var y = d3.scale.linear().domain([0, max]).range([height, 0]);
     	
@@ -15395,38 +15796,91 @@ Ext.define('Voyant.panel.StreamGraph', {
 			.y0(function(d) { return y(d.y0); })
 			.y1(function(d) { return y(d.y0 + d.y); });
     	
-//    	var xAxis = d3.svg.axis().scale(x).orient('bottom');
-//    	
-//    	var yAxis = d3.svg.axis().scale(y).orient('left');
-    	
-    	var sel = this.getVis().selectAll('path');
-    	
-    	if (sel.size() === 0) {
-    		sel.data(processedLayers).enter().append('path')
-	    		.attr('d', function(d) { return area(d); })
-	    		.style('fill', function(d, i) { return color(i); });
-//	    		.append('title').text(function (d) { return d.key; });
-    	} else {
-    		sel.data(processedLayers).attr('d', function(d) { return area(d); });
+    	var xAxis = d3.svg.axis().scale(x).orient('bottom');
+    	if (this.getMode() === this.MODE_CORPUS) {
+    		xAxis.tickFormat(''); // hide tick numbers
     	}
     	
+    	var yAxis = d3.svg.axis().scale(y).orient('left');
     	
-//    	this.getVis().append('g')
-//    		.attr('class', 'axis axis--x')
-//    		.attr('transform', 'translate(0,'+height+')')
-//    		.call(xAxis);
-//    	this.getVis().append('g')
-//			.attr('class', 'axis axis--y')
-//			.attr('transform', 'translate('+this.graphMargin.left+',0)')
-//			.call(yAxis);
+    	// join
+    	var paths = this.getVis().selectAll('path').data(processedLayers);
+    	
+    	// update
+    	paths.attr('d', function(d) { return area(d); });
+    	
+    	// enter
+    	paths.enter().append('path')
+		.attr('d', function(d) { return area(d); })
+		.style('fill', function(d, i) { return color(i); });
+//		.append('title').text(function (d) { return d.key; });
+    	
+    	// exit
+    	paths.exit().remove();
+    	
+    	this.getVis().selectAll('g.axis').remove();
+    	
+    	this.getVis().append('g')
+    		.attr('class', 'axis x')
+    		.attr('transform', 'translate(0,'+height+')')
+    		.call(xAxis);
+    	
+    	var xAxisText;
+    	if (this.getMode() === this.MODE_CORPUS) {
+    		var stepIncrement = width / steps;
+    		var currStep = 0;
+    		this.getCorpus().getDocuments().each(function(doc) {
+    			this.getVis().select('g.x').append("text")
+					.attr('text-anchor', 'end')
+					.attr('transform', 'translate('+currStep+', 10) rotate(-45)')
+					.text(doc.getTinyTitle());
+    			
+    			currStep += stepIncrement;
+    		}, this);
+    		
+    		xAxisText = this.localize('documents');
+    	} else {
+    		xAxisText = this.localize('documentSegments');
+    	}
+    	this.getVis().select('g.x').append("text")
+			.attr('text-anchor', 'middle')
+			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-20)+')')
+			.text(xAxisText);
+    	
+    	this.getVis().append('g')
+			.attr('class', 'axis y')
+			.attr('transform', 'translate(0,0)')
+			.call(yAxis);
+    	
+    	var yAxisText;
+    	if (this.getApiParam('withDistributions') === 'raw') {
+    		yAxisText = this.localize('rawFrequencies');
+    	} else {
+    		yAxisText = this.localize('relativeFrequencies');
+    	}
+    	this.getVis().select('g.y').append("text")
+			.attr('text-anchor', 'middle')
+			.attr('transform', 'translate(-'+(this.graphMargin.left-20)+', '+height/2+') rotate(-90)')
+			.text(yAxisText);
     },
     
+	getCurrentTerms: function() {
+    	var terms = [];
+    	this.down('[xtype=legend]').getStore().each(function(record) {
+    		if (record.get('active')) {
+    			terms.push(record.get('name'));
+    		}
+    	}, this);
+    	return terms;
+    },
+	
     initGraph: function() {
     	if (this.getVisLayout() === undefined) {
 	    	var el = this.getLayout().getRenderTarget();
-	    	var padding = 0;
-	    	var width = el.getWidth()-padding;
-			var height = el.getHeight()-padding;
+	    	var paddingH = this.graphMargin.left + this.graphMargin.right;
+	    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
+	    	var width = el.getWidth()-paddingH;
+			var height = el.getHeight()-paddingV;
 	    	this.setVisLayout(
 				d3.layout.stack()
 					.offset('silhouette')
@@ -15436,9 +15890,13 @@ Ext.define('Voyant.panel.StreamGraph', {
 			);
 			
 			this.setVis(d3.select(el.dom).append('svg').attr('id','streamGraph')
-					.attr('width', width).attr('height', height).attr('transform', 'translate('+(padding/2)+','+(padding/2)+')')
+					.attr('width', width+paddingH).attr('height', height+paddingV).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')')
 			);
     	}
+    },
+    
+    updateMode: function(mode) {
+    	this.queryById('segmentsSlider').setHidden(mode==this.MODE_CORPUS);
     }
 });
 
