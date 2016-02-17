@@ -257,11 +257,12 @@ Ext.define('Voyant.panel.StreamGraph', {
     	var layers = [];
     	records.forEach(function(record, index) {
     		var termLayer = [];
+    		var key = record.getTerm();
     		record.get('distributions').forEach(function(r, i) {
     			termLayer.push({x: i, y: r});
     		}, this);
-    		layers.push(termLayer);
-    		legendData.push({name: record.get('term'), mark: color(index), active: true});
+    		layers.push({name: key, values: termLayer});
+    		legendData.push({id: key, name: key, mark: color(index), active: true});
     	}, this);
     	
     	legendStore.loadData(legendData);
@@ -280,7 +281,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     	var x = d3.scale.linear().domain([0, steps]).range([0, width]);
     	
     	var max = d3.max(processedLayers, function(layer) {
-    		return d3.max(layer, function(d) { return d.y0 + d.y; });
+    		return d3.max(layer.values, function(d) { return d.y0 + d.y; });
     	});
     	var height = this.body.down('svg').getHeight() - this.graphMargin.top - this.graphMargin.bottom;
     	var y = d3.scale.linear().domain([0, max]).range([height, 0]);
@@ -292,22 +293,27 @@ Ext.define('Voyant.panel.StreamGraph', {
     	
     	var xAxis = d3.svg.axis().scale(x).orient('bottom');
     	if (this.getMode() === this.MODE_CORPUS) {
+    		var tickvals = [];
+    		for (var i = 0; i <= steps; i++) {
+    			tickvals.push(i);
+    		}
+    		xAxis.tickValues(tickvals); // force number of ticks
     		xAxis.tickFormat(''); // hide tick numbers
     	}
     	
     	var yAxis = d3.svg.axis().scale(y).orient('left');
     	
     	// join
-    	var paths = this.getVis().selectAll('path').data(processedLayers);
+    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d.name; });
     	
     	// update
-    	paths.attr('d', function(d) { return area(d); });
+    	paths.attr('d', function(d) { return area(d.values); }).style('fill', function(d, i) { return color(i); });
     	
     	// enter
     	paths.enter().append('path')
-		.attr('d', function(d) { return area(d); })
-		.style('fill', function(d, i) { return color(i); });
-//		.append('title').text(function (d) { return d.key; });
+		.attr('d', function(d) { return area(d.values); })
+		.style('fill', function(d, i) { return color(i); })
+		.append('title').text(function (d) { return d.name; });
     	
     	// exit
     	paths.exit().remove();
@@ -378,9 +384,9 @@ Ext.define('Voyant.panel.StreamGraph', {
 	    	this.setVisLayout(
 				d3.layout.stack()
 					.offset('silhouette')
-//					.values(function(d) {
-//						return d.values;
-//					})
+					.values(function(d) {
+						return d.values;
+					})
 			);
 			
 			this.setVis(d3.select(el.dom).append('svg').attr('id','streamGraph')
