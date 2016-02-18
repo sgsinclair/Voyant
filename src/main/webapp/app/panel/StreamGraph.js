@@ -60,7 +60,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 							var isActive = Ext.fly(el.firstElementChild).hasCls('x-legend-inactive');
 							record.set('active', isActive);
 							var terms = this.getCurrentTerms();
-							this.setApiParams({query: terms, limit: terms.length});
+							this.setApiParams({query: terms, limit: terms.length, stopList: undefined});
 							this.loadFromCorpus();
 						},
 						scope: this
