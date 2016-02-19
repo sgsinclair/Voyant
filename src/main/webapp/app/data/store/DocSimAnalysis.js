@@ -23,7 +23,7 @@ Ext.define('Voyant.data.store.DocSimAnalysis', {
 		         reader: {
 		             type: 'json',
 		             rootProperty: 'documentSimilarity',
-		             totalProperty: 'documentSimilarity.totalTerms'
+		             totalProperty: 'documentSimilarity.totalDocs'
 		         },
 		         simpleSortMode: true
 			 }

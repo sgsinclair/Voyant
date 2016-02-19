@@ -22,7 +22,8 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
     		limit: 50,
     		dimensions: 3,
     		clusters: 3,
-    		stopList: 'auto'
+    		stopList: 'auto',
+    		docId: undefined
     	},
 		glyph: 'xf06e@FontAwesome'
     },
@@ -46,12 +47,22 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
     		items: {
     			layout: 'fit',
         		itemId: 'chartParent'
-    		}
+    		},
+    		bbar: new Ext.Toolbar({
+    			items: [{
+	            	xtype: 'documentselectorbutton'
+	            }]
+    		})
         });
         
     	this.on('loadedCorpus', function(src, corpus) {
     		this.setCorpus(corpus);
     		this.docSimStore.setCorpus(corpus);
+    		this.loadFromApis();
+    	}, this);
+    	
+    	this.on('documentsSelected', function(src, docIds) {
+    		this.setApiParam('docId', docIds);
     		this.loadFromApis();
     	}, this);
 
@@ -231,7 +242,8 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
 	        			var record = Ext.create('Voyant.data.model.CorpusTerm', data);
 	            		this.getApplication().dispatchEvent('corpusTermsClicked', this, [record]);
         			}
-        		}
+        		},
+        		scope: this
         	}
         };
     	
