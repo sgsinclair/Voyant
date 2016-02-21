@@ -12,7 +12,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		gearWinTitle: {en: "Options"},
     		inputFormat: {en: "Input Format"},
     		inputFormatAuto: {en: "Auto-Detect (recommended)"},
-    		advancedOptionsText: {en: "The advanced options below only apply to certain input formats. See the documentation on <a href='{0}' target='voyantdocs'>creating a corpus</a>."},
+    		advancedOptionsText: {en: "For more information on the advanced options below, see the documentation on <a href='{0}' target='voyantdocs'>creating a corpus</a>."},
     		xmlOptions: {en: "XML"},
     		xmlOptionsText: {en: "Define XPath Expressions for any of the following:"},
     		xpathDocuments: {en: "Documents"},
@@ -29,6 +29,15 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tokenization: {en: "Tokenization"},
     		tokenizationAuto: {en: "Automatic (highly recommended)"},
     		tokenizationWordBoundaries: {en: "Simple Word Boundaries"},
+    		accessOptions: {en: "Access Management"},
+    		accessOptionsText: {en: "If desired, specify one or more access passwords (separated by commas)."},
+    		adminPassword: {en: "admin password"},
+    		accessPassword: {en: "access password"},
+    		accessMode: {en: "access password"},
+    		accessModeWithoutPassword: {en: "other access"},
+    		accessModeWithoutPasswordText: {en: "If you specify an <i>access password</i> you can also specify what access is granted to users without the password."},
+    		accessModeNonConsumptive: {en: "limited (non-consumptive)"},
+    		accessModeNone: {en: "none"},
     		emptyInput: {en: "Type in one or more URLs on separate lines or paste in a full text."},
     		uploadingCorpus: {en: "Uploading corpus…"},
     		fileTypesWarning: {en: "File Types Warning"},
@@ -48,7 +57,10 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		xmlContentXpath: undefined,
     		xmlTitleXpath: undefined,
     		xmlAuthorXpath: undefined,
-    		tokenization: undefined
+    		tokenization: undefined,
+    		adminPassword: undefined,
+    		accessPassword: undefined,
+    		accessModeWithoutPassword: undefined
     	}
     },
     config: {
@@ -307,17 +319,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		win.close();
     	}
     	
-		var app = this.getApplication();
-    	var view = app.getViewport();
-		view.mask();
-		new Corpus(params).then(function(corpus) {
-			view.unmask();
-			app.dispatchEvent('loadedCorpus', app, corpus);
-		}).fail(function(message, response) {
-			view.unmask();
-			app.showErrorResponse({message: message}, response);
-		});
-		
+		this.getApplication().loadCorpusFromParams(params);
     },
     
     showOptionsClick: function(panel) {
@@ -334,8 +336,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
     				defaultType: 'textfield',
     				fieldDefaults: {
     					labelAlign: 'right',
-    					labelWidth: 80,
-    					width: 320
+    					labelWidth: 110,
+    					width: 350
     				},
     				items: [
 						{
@@ -412,6 +414,37 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								    name: 'tokenization',
 								    queryMode:'local',
 								    store:[['',me.localize('tokenizationAuto')],['wordBoundaries',me.localize("tokenizationWordBoundaries")]],
+								    forceSelection:true,
+								    value: ''
+								}
+							]
+						},{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-access' target='voyantdocs'>"+me.localize('accessOptions')+"</a>",
+	                        collapsible: true,
+	                        collapsed: true,
+	                        defaultType: 'textfield',
+	                        items: [
+	                            {
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("accessOptionsText")+'</i></p>',
+	    							width: 375
+	                            },{
+									fieldLabel: me.localize('adminPassword'),
+									name: 'adminPassword'
+								},{
+									fieldLabel: me.localize('accessPassword'),
+									name: 'accessPassword'
+								},{
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("accessModeWithoutPasswordText")+'</i></p>',
+	    							width: 375
+	                            },{
+								    xtype:'combo',
+									fieldLabel: me.localize('accessModeWithoutPassword'),
+								    name: 'noPassordAccess',
+								    queryMode:'local',
+								    store:[['',me.localize('accessModeNonConsumptive')],['none',me.localize("accessModeNone")]],
 								    forceSelection:true,
 								    value: ''
 								}

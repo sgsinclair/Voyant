@@ -184,6 +184,16 @@ Ext.define('Voyant.data.model.Corpus', {
 	getCreatedTime: function() {
     	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('createdTime');		
 	},
+	
+	requiresPassword: function() {
+		var noPasswordAccess = this.getNoPasswordAccess();
+		return noPasswordAccess=='NONE' || noPasswordAccess=='NONCONSUMPTIVE';
+	},
+	
+	getNoPasswordAccess: function() {
+		// overrides the getId() function from the model to handle promises
+    	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('noPasswordAccess');		
+	},
 
     show: function(config) {
     	return this.then ?  Voyant.application.getDeferredNestedPromise(this, arguments) : this.getShow().show();

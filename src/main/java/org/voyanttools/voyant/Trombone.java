@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
@@ -28,9 +29,12 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.voyanttools.trombone.Controller;
+import org.voyanttools.trombone.model.Corpus;
+import org.voyanttools.trombone.model.CorpusAccess;
 import org.voyanttools.trombone.results.ResultsOutputFormat;
 import org.voyanttools.trombone.storage.Storage;
 import org.voyanttools.trombone.storage.file.FileStorage;
+import org.voyanttools.trombone.tool.corpus.CorpusManager;
 import org.voyanttools.trombone.util.FlexibleParameters;
 
 /**
@@ -40,9 +44,6 @@ public class Trombone extends HttpServlet {
 
 	private static final long serialVersionUID = 392155275393370320L;
 
-	private static final String ALCHEMY_API_KEY_LABEL = "alchemyApiKey";
-	private static final String ALCHEMY_API_KEY_FILE_LABEL = "alchemyApiKeyFile";	
-	private String alchemyApiKey = null;
 	private final Set<String> hiddenParameters = new HashSet<String>();
 	private Storage storage;
 
@@ -50,39 +51,14 @@ public class Trombone extends HttpServlet {
 	
 	public Trombone() {
 		
-		this.hiddenParameters.add(ALCHEMY_API_KEY_LABEL);
 		this.flexibleParametersFactory = new FlexibleParametersFactory();
 		this.storage = new FileStorage();
 	}
 	
 	@Override
 	public void init() {
-
-		loadAlchemiApiKey(getServletContext().getInitParameter(ALCHEMY_API_KEY_FILE_LABEL));
-		
 	}
 	
-	private void loadAlchemiApiKey(String alchemyApiKeyFilePath) {
-
-		if ((alchemyApiKeyFilePath == null) || (alchemyApiKeyFilePath.isEmpty() == true)) {
-			this.log("WARNING: No AlchemyAPI set. Check web.xml for the '"+ALCHEMY_API_KEY_FILE_LABEL+"' context param.");
-		}
-		else {
-			final File file = new File(alchemyApiKeyFilePath);
-            if (((file.exists() == false) || (file.canRead() == false)) && (this.alchemyApiKey == null)) {
-                this.log("ERROR: Unable to load AlchemyAPI key from "+alchemyApiKeyFilePath+". Check web.xml for the '"+ALCHEMY_API_KEY_FILE_LABEL+"' context param.");
-            }
-
-            try {	
-	        	this.alchemyApiKey = FileUtils.readFileToString(file).replaceAll("\\n", "").replaceAll("\\r", "");
-	        }
-			catch (IOException e) {
-				this.log("ERROR: Unable to load AlchemyAPI key from "+alchemyApiKeyFilePath+". Check web.xml for the '"+ALCHEMY_API_KEY_FILE_LABEL+"' context param.", e);
-			}
-		}
-		
-	}
-
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		
@@ -97,7 +73,7 @@ public class Trombone extends HttpServlet {
 	
 	}
 	
-	private void doRequest(HttpServletRequest req, HttpServletResponse resp) {
+	private void doRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 		if (req == null) {
 			throw new NullPointerException("illegal servlet request");
@@ -107,6 +83,40 @@ public class Trombone extends HttpServlet {
 		}
 
 		final FlexibleParameters parameters = getFlexibleParameters(req);
+		
+		// append accessIP in case it's needed
+		parameters.setParameter("accessIP", req.getRemoteAddr());
+	
+		if (parameters.containsKey("corpus")) {
+			
+			String id = parameters.getParameterValue("corpus");
+			
+			// check for password, for now just setting the session value (error will be raised later if needed)
+			if (parameters.containsKey("password")) {
+				String password = parameters.getParameterValue("password");
+				Corpus corpus = CorpusManager.getCorpus(storage, new FlexibleParameters(new String[]{"corpus="+id}));
+				CorpusAccess corpusAccess = corpus.validateAccess(password);
+				if (corpusAccess==CorpusAccess.ADMIN || corpusAccess==CorpusAccess.ACCESS) {
+					req.getSession().setAttribute("password-"+id, password);
+				}
+				resp.setContentType("text/plain");
+				resp.getWriter().write(corpusAccess.name());
+				return;
+			}
+			
+			// see if we have a session-stored password
+			else {
+				HttpSession session = req.getSession();
+				String password = (String) session.getAttribute("password-"+id);
+				if (password!=null) {
+					password = password.trim();
+					if (password.isEmpty()==false) {
+						parameters.setParameter("password", password);
+					}
+				}
+			}
+		}
+
 		if (parameters == null) {
 			return;
 		}
@@ -141,13 +151,7 @@ public class Trombone extends HttpServlet {
 		}
 
 		try {
-			final FlexibleParameters parameters = this.flexibleParametersFactory.getInstance(req);
-			
-			if ((this.alchemyApiKey != null) && (this.alchemyApiKey.isEmpty() == false)) {
-				parameters.setParameter(ALCHEMY_API_KEY_LABEL, this.alchemyApiKey);
-			}
-			
-			return parameters;
+			return this.flexibleParametersFactory.getInstance(req);
 		}
 		catch (Exception e) {
 			this.log("ERROR: Unable to create parameters", e);
