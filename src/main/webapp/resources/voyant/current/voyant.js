@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Feb 16 08:21:47 EST 2016 */
+/* This file created by JSCacher. Last modified: Sun Feb 21 17:54:58 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4592,6 +4592,16 @@ Ext.define('Voyant.data.model.Corpus', {
 	getCreatedTime: function() {
     	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('createdTime');		
 	},
+	
+	requiresPassword: function() {
+		var noPasswordAccess = this.getNoPasswordAccess();
+		return noPasswordAccess=='NONE' || noPasswordAccess=='NONCONSUMPTIVE';
+	},
+	
+	getNoPasswordAccess: function() {
+		// overrides the getId() function from the model to handle promises
+    	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('noPasswordAccess');		
+	},
 
     show: function(config) {
     	return this.then ?  Voyant.application.getDeferredNestedPromise(this, arguments) : this.getShow().show();
@@ -7403,7 +7413,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		gearWinTitle: {en: "Options"},
     		inputFormat: {en: "Input Format"},
     		inputFormatAuto: {en: "Auto-Detect (recommended)"},
-    		advancedOptionsText: {en: "The advanced options below only apply to certain input formats. See the documentation on <a href='{0}' target='voyantdocs'>creating a corpus</a>."},
+    		advancedOptionsText: {en: "For more information on the advanced options below, see the documentation on <a href='{0}' target='voyantdocs'>creating a corpus</a>."},
     		xmlOptions: {en: "XML"},
     		xmlOptionsText: {en: "Define XPath Expressions for any of the following:"},
     		xpathDocuments: {en: "Documents"},
@@ -7420,6 +7430,15 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tokenization: {en: "Tokenization"},
     		tokenizationAuto: {en: "Automatic (highly recommended)"},
     		tokenizationWordBoundaries: {en: "Simple Word Boundaries"},
+    		accessOptions: {en: "Access Management"},
+    		accessOptionsText: {en: "If desired, specify one or more access passwords (separated by commas)."},
+    		adminPassword: {en: "admin password"},
+    		accessPassword: {en: "access password"},
+    		accessMode: {en: "access password"},
+    		accessModeWithoutPassword: {en: "other access"},
+    		accessModeWithoutPasswordText: {en: "If you specify an <i>access password</i> you can also specify what access is granted to users without the password."},
+    		accessModeNonConsumptive: {en: "limited (non-consumptive)"},
+    		accessModeNone: {en: "none"},
     		emptyInput: {en: "Type in one or more URLs on separate lines or paste in a full text."},
     		uploadingCorpus: {en: "Uploading corpus…"},
     		fileTypesWarning: {en: "File Types Warning"},
@@ -7439,7 +7458,10 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		xmlContentXpath: undefined,
     		xmlTitleXpath: undefined,
     		xmlAuthorXpath: undefined,
-    		tokenization: undefined
+    		tokenization: undefined,
+    		adminPassword: undefined,
+    		accessPassword: undefined,
+    		accessModeWithoutPassword: undefined
     	}
     },
     config: {
@@ -7698,17 +7720,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		win.close();
     	}
     	
-		var app = this.getApplication();
-    	var view = app.getViewport();
-		view.mask();
-		new Corpus(params).then(function(corpus) {
-			view.unmask();
-			app.dispatchEvent('loadedCorpus', app, corpus);
-		}).fail(function(message, response) {
-			view.unmask();
-			app.showErrorResponse({message: message}, response);
-		});
-		
+		this.getApplication().loadCorpusFromParams(params);
     },
     
     showOptionsClick: function(panel) {
@@ -7725,8 +7737,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
     				defaultType: 'textfield',
     				fieldDefaults: {
     					labelAlign: 'right',
-    					labelWidth: 80,
-    					width: 320
+    					labelWidth: 110,
+    					width: 350
     				},
     				items: [
 						{
@@ -7803,6 +7815,37 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								    name: 'tokenization',
 								    queryMode:'local',
 								    store:[['',me.localize('tokenizationAuto')],['wordBoundaries',me.localize("tokenizationWordBoundaries")]],
+								    forceSelection:true,
+								    value: ''
+								}
+							]
+						},{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-access' target='voyantdocs'>"+me.localize('accessOptions')+"</a>",
+	                        collapsible: true,
+	                        collapsed: true,
+	                        defaultType: 'textfield',
+	                        items: [
+	                            {
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("accessOptionsText")+'</i></p>',
+	    							width: 375
+	                            },{
+									fieldLabel: me.localize('adminPassword'),
+									name: 'adminPassword'
+								},{
+									fieldLabel: me.localize('accessPassword'),
+									name: 'accessPassword'
+								},{
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("accessModeWithoutPasswordText")+'</i></p>',
+	    							width: 375
+	                            },{
+								    xtype:'combo',
+									fieldLabel: me.localize('accessModeWithoutPassword'),
+								    name: 'noPassordAccess',
+								    queryMode:'local',
+								    store:[['',me.localize('accessModeNonConsumptive')],['none',me.localize("accessModeNone")]],
 								    forceSelection:true,
 								    value: ''
 								}
@@ -15566,7 +15609,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 							var isActive = Ext.fly(el.firstElementChild).hasCls('x-legend-inactive');
 							record.set('active', isActive);
 							var terms = this.getCurrentTerms();
-							this.setApiParams({query: terms, limit: terms.length});
+							this.setApiParams({query: terms, limit: terms.length, stopList: undefined});
 							this.loadFromCorpus();
 						},
 						scope: this
@@ -15763,11 +15806,12 @@ Ext.define('Voyant.panel.StreamGraph', {
     	var layers = [];
     	records.forEach(function(record, index) {
     		var termLayer = [];
+    		var key = record.getTerm();
     		record.get('distributions').forEach(function(r, i) {
     			termLayer.push({x: i, y: r});
     		}, this);
-    		layers.push(termLayer);
-    		legendData.push({name: record.get('term'), mark: color(index), active: true});
+    		layers.push({name: key, values: termLayer});
+    		legendData.push({id: key, name: key, mark: color(index), active: true});
     	}, this);
     	
     	legendStore.loadData(legendData);
@@ -15786,7 +15830,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     	var x = d3.scale.linear().domain([0, steps]).range([0, width]);
     	
     	var max = d3.max(processedLayers, function(layer) {
-    		return d3.max(layer, function(d) { return d.y0 + d.y; });
+    		return d3.max(layer.values, function(d) { return d.y0 + d.y; });
     	});
     	var height = this.body.down('svg').getHeight() - this.graphMargin.top - this.graphMargin.bottom;
     	var y = d3.scale.linear().domain([0, max]).range([height, 0]);
@@ -15798,22 +15842,27 @@ Ext.define('Voyant.panel.StreamGraph', {
     	
     	var xAxis = d3.svg.axis().scale(x).orient('bottom');
     	if (this.getMode() === this.MODE_CORPUS) {
+    		var tickvals = [];
+    		for (var i = 0; i <= steps; i++) {
+    			tickvals.push(i);
+    		}
+    		xAxis.tickValues(tickvals); // force number of ticks
     		xAxis.tickFormat(''); // hide tick numbers
     	}
     	
     	var yAxis = d3.svg.axis().scale(y).orient('left');
     	
     	// join
-    	var paths = this.getVis().selectAll('path').data(processedLayers);
+    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d.name; });
     	
     	// update
-    	paths.attr('d', function(d) { return area(d); });
+    	paths.attr('d', function(d) { return area(d.values); }).style('fill', function(d, i) { return color(i); });
     	
     	// enter
     	paths.enter().append('path')
-		.attr('d', function(d) { return area(d); })
-		.style('fill', function(d, i) { return color(i); });
-//		.append('title').text(function (d) { return d.key; });
+		.attr('d', function(d) { return area(d.values); })
+		.style('fill', function(d, i) { return color(i); })
+		.append('title').text(function (d) { return d.name; });
     	
     	// exit
     	paths.exit().remove();
@@ -15884,9 +15933,9 @@ Ext.define('Voyant.panel.StreamGraph', {
 	    	this.setVisLayout(
 				d3.layout.stack()
 					.offset('silhouette')
-//					.values(function(d) {
-//						return d.values;
-//					})
+					.values(function(d) {
+						return d.values;
+					})
 			);
 			
 			this.setVis(d3.select(el.dom).append('svg').attr('id','streamGraph')
@@ -16113,7 +16162,15 @@ Ext.define('Voyant.VoyantCorpusApp', {
     		moreToolsType: {en: 'Tools by Type'},
     		moreToolsTypeViz: {en: 'Visualization Tools'},
     		moreToolsTypeGrid: {en: 'Grid Tools'},
-    		moreToolsTypeOther: {en: 'Other Tools'}
+    		moreToolsTypeOther: {en: 'Other Tools'},
+    		passwordRequiredTitle: {en: "Access Code Required"},
+    		passwordRequiredMessage: {en: "This corpus requires an access code."},
+    		nonConsumptiveMessage: {en: "Alternatively, you can click on the <i>Limited Access</i> button to continue with limited functionality (generally speaking, this non-consumpive access allows you to explore derivative data from the corpus without allowing you to read text from the corpus)."},
+    		nonConsumptiveButton: {en: "Limited Access"}, 
+    		passwordValidateButton: {en: "Validate"},
+    		password: {en: "access code"},
+    		noPasswordGiven: {en: "Please provide an access code."},
+    		badPassword: {en: "Sorry, that doesn't seem to be a valid access code."}
     	}
     },
     
@@ -16152,17 +16209,110 @@ Ext.define('Voyant.VoyantCorpusApp', {
 
     	if (this.hasQueryToLoad()) {
         	var queryParams = Ext.Object.fromQueryString(document.location.search);
-    		var me = this;
-    		var view = me.getViewport()
-    		view.mask(this.localize("fetchingCorpus"));
-    		new Corpus(queryParams).then(function(corpus) {
-    			view.unmask();
-    			me.dispatchEvent('loadedCorpus', this, corpus);
-    		}).fail(function(message, response) {
-    			view.unmask();
-    			//me.showErrorResponse({message: message}, response);
-    		});
+        	this.loadCorpusFromParams(queryParams)
     	}
+    },
+    
+    loadCorpusFromParams: function(params) {
+		var me = this;
+		var view = me.getViewport()
+		view.mask(this.localize("fetchingCorpus"));
+		
+		new Corpus(params).then(function(corpus) {
+			if (corpus.requiresPassword()) {
+				var noPasswordAccess = corpus.getNoPasswordAccess();
+				var buttons = [
+				       { text: 'Validate' }
+				]
+				if (noPasswordAccess=='NONCONSUMPTIVE') {
+					buttons.push({text: 'Limited'})
+				}
+				var passWin = Ext.create('Ext.window.Window', {
+                    title: me.localize('passwordRequiredTitle'),
+				    layout: 'fit',
+				    items: {
+				    	padding: 10,
+	                    flex: 1,
+	                    width: 300,
+	                    layout: {
+	                        type: 'vbox',
+	                        align: 'stretch'
+	                    },
+	                    items: [
+	                        {
+	                            html: '<p>'+me.localize('passwordRequiredMessage')+'</p>' + (noPasswordAccess=='NONCONSUMPTIVE' ? '<p>'+me.localize('nonConsumptiveMessage')+"</p>" : "")+'</p>'
+	                        },{
+	                        	xtype: 'textfield',
+	                        	fieldLabel: me.localize('password')
+	                        }
+	                    ],
+	                    bbar: {
+//	                    	ui: 'footer',
+	                    	layout: {pack: 'center'},
+	                    	items: [{
+		                    	text: me.localize('passwordValidateButton'),
+		                    	ui: 'default',
+		                    	handler: function() {
+		                    		var password = passWin.query("textfield")[0].getValue().trim();
+		                    		if (password.length==0) {
+		                    			me.showError({
+		                    				message: me.localize('noPasswordGiven')
+		                    			})
+		                    			return;
+		                    		}
+		                    		passWin.mask();
+		                    		Ext.Ajax.request({
+		                    			  url: me.getTromboneUrl(),
+		                    			  params: {
+		                    				  corpus: corpus.getId(),
+		                    				  password: password
+		                    			  },
+		                    			  method: 'POST',
+		                    			  success: function(result, request) {
+		                    				  passWin.unmask();
+		                    				  var access = result.responseText;
+		                    				  if (access=="ADMIN" || access=="ACCESS") {
+				                    			    passWin.close();
+				                    			    view.unmask();
+						            				me.dispatchEvent('loadedCorpus', this, corpus);
+		                    				  }
+		                    				  else {
+		  		                    			me.showError({
+				                    				message: me.localize('badPassword')
+				                    			})
+		                    				  }
+		                    			  },
+		                    			  failure: function(result, request) {
+		                    				  passWin.unmask();
+		  		                    			me.showError({
+				                    				message: me.localize('passwordValidationError')
+				                    			})
+		                    			  } 
+		                    		});
+		                    	}
+		                    },{
+		                    	text: me.localize('nonConsumptiveButton'),
+		                    	handler: function() {
+		                    		passWin.close();
+		            				view.unmask();
+		            				me.dispatchEvent('loadedCorpus', me, corpus);
+		                    	}
+		                    }]
+	                    }
+	                }
+				}).show();
+//				passWin.show();
+				
+			}
+			else {
+				view.unmask();
+				me.dispatchEvent('loadedCorpus', this, corpus);
+			}
+		}).fail(function(message, response) {
+			debugger
+			view.unmask();
+			//me.showErrorResponse({message: message}, response);
+		});
     },
     
     hasQueryToLoad: function(params) {
