@@ -72,6 +72,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     chartMenu: null,
     labelsMode: 0, // 0 all labels, 1 word labels, 2 no labels
     
+    highlightData: {x: 0, y: 0, r: 0},
+    highlightTask: null,
+    
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -662,7 +665,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     },
     
     selectTerm: function(term) {
-    	var series = this.down('#chart').getSeries()[0];
+    	var chart = this.down('#chart');
+    	var series = chart.getSeries()[0];
     	var index = series.getStore().findExact('term', term);
     	if (index !== -1) {
     		var record = series.getStore().getAt(index);
@@ -676,8 +680,67 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 field: series.getYField(),
                 sprite: sprite
     		};
-    		
     		series.setHighlightItem(item);
+    		
+    		var point = this.getPointFromIndex(series, index);
+    		this.highlightData = {x: point[0], y: point[1], r: 50};
+    		
+    		if (this.highlightTask == null) {
+    			this.highlightTask = Ext.TaskManager.newTask({
+        			run: this.doHighlight,
+        			scope: this,
+        			interval: 25,
+        			repeat: this.highlightData.r
+        		});
+    		}
+    		this.highlightTask.restart();
+    	}
+    },
+    
+    getPointFromIndex: function(series, index) {
+		var sprite = series.getSprites()[0];
+		var matrix = sprite.attr.matrix.clone().prependMatrix(sprite.surfaceMatrix);
+		var dataX = sprite.attr.dataX[index];
+		var dataY = sprite.attr.dataY[index];
+		return matrix.transformPoint([dataX, dataY]);
+    },
+    
+    doHighlight: function() {
+    	var chart = this.down('#chart');
+    	if (this.highlightData.r > 0) {
+	    	var surf = chart.getSurface();
+			var highlight = null;
+			var items = surf.getItems();
+			for (var i = 0; i < items.length; i++) {
+				var item = items[i];
+				if (item.id == 'customHighlight') {
+					highlight = item;
+					break;
+				}
+			}
+			if (highlight == null) {
+				surf.add({
+					id: 'customHighlight',
+					type: 'circle',
+					strokeStyle: 'red',
+					fillStyle: 'none',
+					radius: this.highlightData.r,
+					x: this.highlightData.x,
+					y: this.highlightData.y
+				});
+			} else {
+				highlight.setAttributes({
+					x: this.highlightData.x,
+					y: this.highlightData.y,
+					radius: this.highlightData.r
+				});
+				this.highlightData.r -= 1.5;
+				if (this.highlightData.r <= 0) {
+					this.highlightData.r = 0;
+					surf.remove(highlight, true);
+				}
+			}
+			chart.redraw();
     	}
     },
     
