@@ -20,7 +20,8 @@ Ext.define('Voyant.panel.Contexts', {
     		context: {en: "context"},
     		expand: {en: "expand"},
     		corpus: {en: "corpus"},
-    		corpusTip: {en: "Reset to corpus mode (contexts from all documents)."}
+    		corpusTip: {en: "Reset to corpus mode (contexts from all documents)."},
+    		limitedAccess: {en: "This is a limited access corpus and this tool's functionality is restricted."}
     	},
     	api: {
     		query: undefined,
@@ -257,7 +258,10 @@ Ext.define('Voyant.panel.Contexts', {
         
         me.on("loadedCorpus", function(src, corpus) {
         	this.getStore().setCorpus(corpus);
-//        	if (this.getApiParam("query")) {
+        	if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+        		this.mask(this.localize('limitedAccess'), 'mask-no-spinner');
+        	}
+        	else {
         		var corpusTerms = Ext.create("Voyant.data.store.CorpusTerms", {corpus: corpus});
         		corpusTerms.load({
         		    callback: function(records, operation, success) {
@@ -272,8 +276,7 @@ Ext.define('Voyant.panel.Contexts', {
         				stopList: this.getApiParam("stopList")
         			}
             	});
- //       	}
-//            	this.getStore().load({params: this.getApiParams()});
+        	}
         });
         
         me.on("query", function(src, query) {

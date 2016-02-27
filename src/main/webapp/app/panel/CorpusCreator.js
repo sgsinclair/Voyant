@@ -22,9 +22,18 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		xpathAuthor: {en: "Author"},
     		tableOptions: {en: "Tabular Data"},
     		tableDocuments: {en: "Documents"},
+    		tableDocumentsTable: {en: "from entire table"},
+    		tableDocumentsRows: {en: "from cells in each row"},
+    		tableDocumentsColumns: {en: "from entire columns"},
     		tableContent: {en: "Content"},
     		tableTitle: {en: "Title"},
     		tableAuthor: {en: "Author"},
+    		tableOptionsText: {en: "Specify how documents should be extracted."},
+    		tableMetadata: {en: "These options are only used when extracting documents from cells in each row. Specify one or more column numbers (the left-most is column one), separated by commas. Defaults will be used if these remain blank."},
+    		tableNoHeadersRow: {en: "No Headers Row"},
+    		numberZero: {en: "0 is invalid, the first column is 1"},
+    		numberEmpty: {en: "At least one column number is currently empty."},
+    		numbersNeedCommas: {en: "Please use a comma to separate multiple numbers."},
     		tokenizationOptions: {en: "Tokenization"},
     		tokenization: {en: "Tokenization"},
     		tokenizationAuto: {en: "Automatic (highly recommended)"},
@@ -49,7 +58,9 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		errorNotXmlContinue: {en: "You've selected an XML input format but the input doesn't appear to be XML. Are you sure you wish to continue?"},
     		reveal: {en: "Reveal"},
     		ok: {en: "OK"},
-    		cancel: {en: "Cancel"}
+    		cancel: {en: "Cancel"},
+    		invalidForm: {en: "Invalid values have been used, please hover over fields with red boxes for explanations."},
+    		numbersCommasOnly: {en: "Comma-separated numbers only."}
     	},
     	api: {
     		inputFormat: undefined,
@@ -60,7 +71,11 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tokenization: undefined,
     		adminPassword: undefined,
     		accessPassword: undefined,
-    		accessModeWithoutPassword: undefined
+    		accessModeWithoutPassword: undefined,
+    		tableDocuments: undefined,
+    		tableContent: undefined,
+    		tableTitle: undefined,
+    		tableAuthor: undefined
     	}
     },
     config: {
@@ -180,7 +195,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
             	            	if (form.isValid()) {
             	            		var files = filefield.fileInputEl.dom.files;
             	            		var badFilesRe = /\.(png|gif|jpe?g|xls|mp[234a]|mpeg|exe|wmv|avi|ppt|mpg|tif|wav|mov|psd|wma|ai|bmp|pps|aif|pub|dwg|indd|swf|asf|mbd|dmg|flv)$/i;
-            	            		var goodFilesRe = /\.(txt|pdf|html?|xml|docx?|rtf|pages|odt|zip|jar|tar|gz|ar|cpio|bzip2|bz2|gzip)$/i;
+            	            		var goodFilesRe = /\.(txt|pdf|html?|xml|docx?|rtf|pages|odt|zip|jar|tar|gz|ar|cpio|bzip2|bz2|gzip|xlsx?)$/i;
             	            		var badFiles = [];
             	            		var unknownFiles = [];
             	            		for (var i = 0, len = files.length; i<len; i++) {
@@ -334,6 +349,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
     			items: [{
     				xtype: 'form',
     				defaultType: 'textfield',
+        			maxHeight: panel.up('viewport').getHeight()-300,
+        			scrollable: true,
     				fieldDefaults: {
     					labelAlign: 'right',
     					labelWidth: 110,
@@ -381,28 +398,48 @@ Ext.define('Voyant.panel.CorpusCreator', {
 									name: 'xmlGroupByXpath'
 								}
 							]
-						},/*{
+						},{
 	        				xtype: 'fieldset',
 	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-table' target='voyantdocs'>"+me.localize('tableOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        defaultType: 'textfield',
-	                        items: [
-								{
+	                        items: [{
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("tableOptionsText")+'</i></p>',
+	    							width: 375
+	                        	},{
+								    xtype:'combo',
 									fieldLabel: me.localize('tableDocuments'),
-									name: 'tableDocuments'
+								    name: 'tableDocuments',
+								    queryMode:'local',
+								    store:[['',me.localize('tableDocumentsTable')],['rows',me.localize('tableDocumentsRows')],['columns',me.localize("tableDocumentsColumns")]],
+								    forceSelection:true,
+								    value: ''
 								},{
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("tableMetadata")+'</i></p>',
+	    							width: 375
+	                            },{
 									fieldLabel: me.localize('tableContent'),
+									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableContent'
 								},{
 									fieldLabel: me.localize('tableAuthor'),
+									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableAuthor'
 								},{
 									fieldLabel: me.localize('tableTitle'),
+									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableTitle'
+								},{
+									fieldLabel: me.localize("tableNoHeadersRow"),
+									xtype: 'checkboxfield',
+									name: 'tableNoHeadersRow',
+									inputValue: "true"
 								}
 							]
-						},*/{
+						},{
 	        				xtype: 'fieldset',
 	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-tokenization' target='voyantdocs'>"+me.localize('tokenizationOptions')+"</a>",
 	                        collapsible: true,
@@ -458,9 +495,16 @@ Ext.define('Voyant.panel.CorpusCreator', {
     				handler: function(button, event) {
     					var win = button.findParentByType('window');
     					var form = win.down('form');
-    					var params = form.getValues();
-    					me.setApiParams(params);
-    					win.hide();
+    					if (form.isValid()) {
+        					var params = form.getValues();
+        					me.setApiParams(params);
+        					win.hide();
+    					}
+    					else {
+    						me.showError({
+    							message: me.localize("invalidForm")
+    						})
+    					}
     				}
     			},{
     				text: me.localize('cancel'),
@@ -471,6 +515,29 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		});
     	}
     	me.optionsWin.show();
-    }
+    },
+    
+    validatePositiveNumbersCsv: function(val) {
+    	val = val.trim();
+    	if (val.length>0) {
+        	if (/[^\d,+ ]/.test(val)) {
+        		return this.localize("numbersCommasOnly");
+        	}
+        	if (/\d\s+\d/.test(val)) {
+        		return this.localize("numbersNeedCommas");
+        	}
+        	var numbers = val.split(/\s*[,+]\s*/), number;
+        	for (var i=0, len=numbers.length; i<len; i++) {
+        		number = numbers[i];
+        		if (number.length==0) {
+        			return this.localize("numberEmpty")
+        		}
+        		if (parseInt(number)==0) {
+        			return this.localize("numberZero")
+        		}
+        	}
+    	}
+    	return true;
+	}
     
 });

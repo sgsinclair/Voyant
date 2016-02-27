@@ -210,3 +210,8 @@ svg#collocatesGraph line {
 #pageloading .title{font-family:"Exo",sans-serif;font-size:2em;color:gray;text-align:center;white-space:nowrap;display:block}
 #pageloading .logo{background:url(rotating-owl.gif) no-repeat center;display:block;height:121px}
  
+ 
+.mask-no-spinner .x-mask-msg-text {
+    background: transparent !important;
+    padding: 5px !important
+}

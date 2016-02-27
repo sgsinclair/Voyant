@@ -92,10 +92,12 @@ public class Trombone extends HttpServlet {
 			String id = parameters.getParameterValue("corpus");
 			
 			// check for password, for now just setting the session value (error will be raised later if needed)
-			if (parameters.containsKey("password")) {
-				String password = parameters.getParameterValue("password");
+			if (parameters.containsKey("passwordForSession")) {
+				String password = parameters.getParameterValue("passwordForSession");
 				Corpus corpus = CorpusManager.getCorpus(storage, new FlexibleParameters(new String[]{"corpus="+id}));
-				CorpusAccess corpusAccess = corpus.validateAccess(password);
+				FlexibleParameters newParams = parameters.clone();
+				newParams.setParameter("password", password);
+				CorpusAccess corpusAccess = corpus.getValidatedCorpusAccess(newParams);
 				if (corpusAccess==CorpusAccess.ADMIN || corpusAccess==CorpusAccess.ACCESS) {
 					req.getSession().setAttribute("password-"+id, password);
 				}
@@ -103,7 +105,11 @@ public class Trombone extends HttpServlet {
 				resp.getWriter().write(corpusAccess.name());
 				return;
 			}
-			
+			else if (parameters.containsKey("passwordForSessionRemove")) {
+				HttpSession session = req.getSession();
+				session.removeAttribute("password-"+id);
+				return;
+			}
 			// see if we have a session-stored password
 			else {
 				HttpSession session = req.getSession();

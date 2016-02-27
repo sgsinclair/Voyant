@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Feb 21 17:54:58 EST 2016 */
+/* This file created by JSCacher. Last modified: Sat Feb 27 14:31:43 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3846,6 +3846,9 @@ Ext.define('Voyant.data.store.Contexts', {
 				simpleSortMode : true
 			},
 			listeners: {
+				beforeload: function(store) {
+					return store.getCorpus().getNoPasswordAccess()!='NONCONSUMPTIVE';
+				},
 				beforeprefetch: function(store, operation) {
 					var parent = this.getParentPanel();
 					if (parent !== undefined) {
@@ -4281,7 +4284,7 @@ Ext.define('Voyant.data.store.DocSimAnalysis', {
 		         reader: {
 		             type: 'json',
 		             rootProperty: 'documentSimilarity',
-		             totalProperty: 'documentSimilarity.totalTerms'
+		             totalProperty: 'documentSimilarity.totalDocs'
 		         },
 		         simpleSortMode: true
 			 }
@@ -6839,7 +6842,8 @@ Ext.define('Voyant.panel.Contexts', {
     		context: {en: "context"},
     		expand: {en: "expand"},
     		corpus: {en: "corpus"},
-    		corpusTip: {en: "Reset to corpus mode (contexts from all documents)."}
+    		corpusTip: {en: "Reset to corpus mode (contexts from all documents)."},
+    		limitedAccess: {en: "This is a limited access corpus and this tool's functionality is restricted."}
     	},
     	api: {
     		query: undefined,
@@ -7076,7 +7080,10 @@ Ext.define('Voyant.panel.Contexts', {
         
         me.on("loadedCorpus", function(src, corpus) {
         	this.getStore().setCorpus(corpus);
-//        	if (this.getApiParam("query")) {
+        	if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+        		this.mask(this.localize('limitedAccess'), 'mask-no-spinner');
+        	}
+        	else {
         		var corpusTerms = Ext.create("Voyant.data.store.CorpusTerms", {corpus: corpus});
         		corpusTerms.load({
         		    callback: function(records, operation, success) {
@@ -7091,8 +7098,7 @@ Ext.define('Voyant.panel.Contexts', {
         				stopList: this.getApiParam("stopList")
         			}
             	});
- //       	}
-//            	this.getStore().load({params: this.getApiParams()});
+        	}
         });
         
         me.on("query", function(src, query) {
@@ -7423,9 +7429,18 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		xpathAuthor: {en: "Author"},
     		tableOptions: {en: "Tabular Data"},
     		tableDocuments: {en: "Documents"},
+    		tableDocumentsTable: {en: "from entire table"},
+    		tableDocumentsRows: {en: "from cells in each row"},
+    		tableDocumentsColumns: {en: "from entire columns"},
     		tableContent: {en: "Content"},
     		tableTitle: {en: "Title"},
     		tableAuthor: {en: "Author"},
+    		tableOptionsText: {en: "Specify how documents should be extracted."},
+    		tableMetadata: {en: "These options are only used when extracting documents from cells in each row. Specify one or more column numbers (the left-most is column one), separated by commas. Defaults will be used if these remain blank."},
+    		tableNoHeadersRow: {en: "No Headers Row"},
+    		numberZero: {en: "0 is invalid, the first column is 1"},
+    		numberEmpty: {en: "At least one column number is currently empty."},
+    		numbersNeedCommas: {en: "Please use a comma to separate multiple numbers."},
     		tokenizationOptions: {en: "Tokenization"},
     		tokenization: {en: "Tokenization"},
     		tokenizationAuto: {en: "Automatic (highly recommended)"},
@@ -7450,7 +7465,9 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		errorNotXmlContinue: {en: "You've selected an XML input format but the input doesn't appear to be XML. Are you sure you wish to continue?"},
     		reveal: {en: "Reveal"},
     		ok: {en: "OK"},
-    		cancel: {en: "Cancel"}
+    		cancel: {en: "Cancel"},
+    		invalidForm: {en: "Invalid values have been used, please hover over fields with red boxes for explanations."},
+    		numbersCommasOnly: {en: "Comma-separated numbers only."}
     	},
     	api: {
     		inputFormat: undefined,
@@ -7461,7 +7478,11 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tokenization: undefined,
     		adminPassword: undefined,
     		accessPassword: undefined,
-    		accessModeWithoutPassword: undefined
+    		accessModeWithoutPassword: undefined,
+    		tableDocuments: undefined,
+    		tableContent: undefined,
+    		tableTitle: undefined,
+    		tableAuthor: undefined
     	}
     },
     config: {
@@ -7581,7 +7602,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
             	            	if (form.isValid()) {
             	            		var files = filefield.fileInputEl.dom.files;
             	            		var badFilesRe = /\.(png|gif|jpe?g|xls|mp[234a]|mpeg|exe|wmv|avi|ppt|mpg|tif|wav|mov|psd|wma|ai|bmp|pps|aif|pub|dwg|indd|swf|asf|mbd|dmg|flv)$/i;
-            	            		var goodFilesRe = /\.(txt|pdf|html?|xml|docx?|rtf|pages|odt|zip|jar|tar|gz|ar|cpio|bzip2|bz2|gzip)$/i;
+            	            		var goodFilesRe = /\.(txt|pdf|html?|xml|docx?|rtf|pages|odt|zip|jar|tar|gz|ar|cpio|bzip2|bz2|gzip|xlsx?)$/i;
             	            		var badFiles = [];
             	            		var unknownFiles = [];
             	            		for (var i = 0, len = files.length; i<len; i++) {
@@ -7735,6 +7756,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
     			items: [{
     				xtype: 'form',
     				defaultType: 'textfield',
+        			maxHeight: panel.up('viewport').getHeight()-300,
+        			scrollable: true,
     				fieldDefaults: {
     					labelAlign: 'right',
     					labelWidth: 110,
@@ -7782,28 +7805,48 @@ Ext.define('Voyant.panel.CorpusCreator', {
 									name: 'xmlGroupByXpath'
 								}
 							]
-						},/*{
+						},{
 	        				xtype: 'fieldset',
 	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-table' target='voyantdocs'>"+me.localize('tableOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        defaultType: 'textfield',
-	                        items: [
-								{
+	                        items: [{
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("tableOptionsText")+'</i></p>',
+	    							width: 375
+	                        	},{
+								    xtype:'combo',
 									fieldLabel: me.localize('tableDocuments'),
-									name: 'tableDocuments'
+								    name: 'tableDocuments',
+								    queryMode:'local',
+								    store:[['',me.localize('tableDocumentsTable')],['rows',me.localize('tableDocumentsRows')],['columns',me.localize("tableDocumentsColumns")]],
+								    forceSelection:true,
+								    value: ''
 								},{
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("tableMetadata")+'</i></p>',
+	    							width: 375
+	                            },{
 									fieldLabel: me.localize('tableContent'),
+									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableContent'
 								},{
 									fieldLabel: me.localize('tableAuthor'),
+									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableAuthor'
 								},{
 									fieldLabel: me.localize('tableTitle'),
+									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableTitle'
+								},{
+									fieldLabel: me.localize("tableNoHeadersRow"),
+									xtype: 'checkboxfield',
+									name: 'tableNoHeadersRow',
+									inputValue: "true"
 								}
 							]
-						},*/{
+						},{
 	        				xtype: 'fieldset',
 	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-tokenization' target='voyantdocs'>"+me.localize('tokenizationOptions')+"</a>",
 	                        collapsible: true,
@@ -7859,9 +7902,16 @@ Ext.define('Voyant.panel.CorpusCreator', {
     				handler: function(button, event) {
     					var win = button.findParentByType('window');
     					var form = win.down('form');
-    					var params = form.getValues();
-    					me.setApiParams(params);
-    					win.hide();
+    					if (form.isValid()) {
+        					var params = form.getValues();
+        					me.setApiParams(params);
+        					win.hide();
+    					}
+    					else {
+    						me.showError({
+    							message: me.localize("invalidForm")
+    						})
+    					}
     				}
     			},{
     				text: me.localize('cancel'),
@@ -7872,7 +7922,30 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		});
     	}
     	me.optionsWin.show();
-    }
+    },
+    
+    validatePositiveNumbersCsv: function(val) {
+    	val = val.trim();
+    	if (val.length>0) {
+        	if (/[^\d,+ ]/.test(val)) {
+        		return this.localize("numbersCommasOnly");
+        	}
+        	if (/\d\s+\d/.test(val)) {
+        		return this.localize("numbersNeedCommas");
+        	}
+        	var numbers = val.split(/\s*[,+]\s*/), number;
+        	for (var i=0, len=numbers.length; i<len; i++) {
+        		number = numbers[i];
+        		if (number.length==0) {
+        			return this.localize("numberEmpty")
+        		}
+        		if (parseInt(number)==0) {
+        			return this.localize("numberZero")
+        		}
+        	}
+    	}
+    	return true;
+	}
     
 });
 // assuming Knots library is loaded by containing page (via voyant.jsp)
@@ -10465,7 +10538,8 @@ Ext.define('Voyant.panel.Reader', {
     	i18n: {
     		title: {en: "Reader"},
     		helpTip: {en: "<p>The Reader tool provides a view of text from the corpus. Features include:</p><ul><li>frequency information appears when hovering over a word</li><li>distribution information appears in a graph at the bottom when clicking on a word</li><li>a bar graph at the bottom indicates the relative size of each document in the corpus</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		documentFrequency: {en: "document frequency:"}
+    		documentFrequency: {en: "document frequency:"},
+    		limitedAccess: {en: "This is a limited access corpus and this tool's functionality is restricted."}
     	},
     	api: {
     		start: 0,
@@ -10527,6 +10601,9 @@ Ext.define('Voyant.panel.Reader', {
     
     initComponent: function() {
     	var tokensStore = Ext.create("Voyant.data.store.Tokens");
+    	tokensStore.on("beforeload", function(store) {
+    		return store.getCorpus().getNoPasswordAccess()!='NONCONSUMPTIVE';
+    	})
     	tokensStore.on("load", function(s, records, success) {
     		if (success) {
 	    		var contents = "";
@@ -10711,7 +10788,11 @@ Ext.define('Voyant.panel.Reader', {
     	    		
     	    		if (this.rendered) {
     	    			this.load();
+        	    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+        	    			this.mask(this.localize("limitedAccess"), 'mask-no-spinner')
+        	    		}
     	    		}
+    	    		
     			},
             	termsClicked: function(src, terms) {
             		var queryTerms = [];
@@ -11226,6 +11307,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	termsTimeout: null,
     chartMenu: null,
     labelsMode: 0, // 0 all labels, 1 word labels, 2 no labels
+    
+    highlightData: {x: 0, y: 0, r: 0},
+    highlightTask: null,
     
     constructor: function(config) {
         this.callParent(arguments);
@@ -11817,7 +11901,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     },
     
     selectTerm: function(term) {
-    	var series = this.down('#chart').getSeries()[0];
+    	var chart = this.down('#chart');
+    	var series = chart.getSeries()[0];
     	var index = series.getStore().findExact('term', term);
     	if (index !== -1) {
     		var record = series.getStore().getAt(index);
@@ -11831,8 +11916,67 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 field: series.getYField(),
                 sprite: sprite
     		};
-    		
     		series.setHighlightItem(item);
+    		
+    		var point = this.getPointFromIndex(series, index);
+    		this.highlightData = {x: point[0], y: point[1], r: 50};
+    		
+    		if (this.highlightTask == null) {
+    			this.highlightTask = Ext.TaskManager.newTask({
+        			run: this.doHighlight,
+        			scope: this,
+        			interval: 25,
+        			repeat: this.highlightData.r
+        		});
+    		}
+    		this.highlightTask.restart();
+    	}
+    },
+    
+    getPointFromIndex: function(series, index) {
+		var sprite = series.getSprites()[0];
+		var matrix = sprite.attr.matrix.clone().prependMatrix(sprite.surfaceMatrix);
+		var dataX = sprite.attr.dataX[index];
+		var dataY = sprite.attr.dataY[index];
+		return matrix.transformPoint([dataX, dataY]);
+    },
+    
+    doHighlight: function() {
+    	var chart = this.down('#chart');
+    	if (this.highlightData.r > 0) {
+	    	var surf = chart.getSurface();
+			var highlight = null;
+			var items = surf.getItems();
+			for (var i = 0; i < items.length; i++) {
+				var item = items[i];
+				if (item.id == 'customHighlight') {
+					highlight = item;
+					break;
+				}
+			}
+			if (highlight == null) {
+				surf.add({
+					id: 'customHighlight',
+					type: 'circle',
+					strokeStyle: 'red',
+					fillStyle: 'none',
+					radius: this.highlightData.r,
+					x: this.highlightData.x,
+					y: this.highlightData.y
+				});
+			} else {
+				highlight.setAttributes({
+					x: this.highlightData.x,
+					y: this.highlightData.y,
+					radius: this.highlightData.r
+				});
+				this.highlightData.r -= 1.5;
+				if (this.highlightData.r <= 0) {
+					this.highlightData.r = 0;
+					surf.remove(highlight, true);
+				}
+			}
+			chart.redraw();
     	}
     },
     
@@ -11952,7 +12096,8 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
     		limit: 50,
     		dimensions: 3,
     		clusters: 3,
-    		stopList: 'auto'
+    		stopList: 'auto',
+    		docId: undefined
     	},
 		glyph: 'xf06e@FontAwesome'
     },
@@ -11976,12 +12121,22 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
     		items: {
     			layout: 'fit',
         		itemId: 'chartParent'
-    		}
+    		},
+    		bbar: new Ext.Toolbar({
+    			items: [{
+	            	xtype: 'documentselectorbutton'
+	            }]
+    		})
         });
         
     	this.on('loadedCorpus', function(src, corpus) {
     		this.setCorpus(corpus);
     		this.docSimStore.setCorpus(corpus);
+    		this.loadFromApis();
+    	}, this);
+    	
+    	this.on('documentsSelected', function(src, docIds) {
+    		this.setApiParam('docId', docIds);
     		this.loadFromApis();
     	}, this);
 
@@ -12161,7 +12316,8 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
 	        			var record = Ext.create('Voyant.data.model.CorpusTerm', data);
 	            		this.getApplication().dispatchEvent('corpusTermsClicked', this, [record]);
         			}
-        		}
+        		},
+        		scope: this
         	}
         };
     	
@@ -15451,7 +15607,7 @@ Ext.define('Voyant.panel.CorpusSet', {
         xtype: 'voyanttabpanel',
     	tabBarHeaderPosition: 0,
         items: [{
-	        xtype: 'reader'
+	        xtype: 'reader' // termsradio added and set to default during loadedCorpus below when in non-consumptive mode
         }]
     }, {
     	region: 'east',
@@ -15503,7 +15659,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     			items: [{
 	    			xtype: 'contexts'
     			},{
-	    			xtype: 'bubblelines'
+	    			xtype: 'bubblelines' // is set to default during loadedCorpus below when in non-consumptive mode
     			}]
     	}]
     }],
@@ -15531,6 +15687,12 @@ Ext.define('Voyant.panel.CorpusSet', {
     		}
     	},
     	loadedCorpus: function(src, corpus) {
+    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE' && !this.getApiParam('panels')) {
+    			var tabpanels = this.query("voyanttabpanel");
+    			tabpanels[1].add({xtype: 'termsradio'}); // reader
+    			tabpanels[1].setActiveTab(1); // reader
+    			tabpanels[4].setActiveTab(1); // contexts
+    		}
     		if (corpus.getDocumentsCount()>30) {
     			var bubblelines = this.down('bubblelines');
     			if (bubblelines) {
@@ -16170,7 +16332,8 @@ Ext.define('Voyant.VoyantCorpusApp', {
     		passwordValidateButton: {en: "Validate"},
     		password: {en: "access code"},
     		noPasswordGiven: {en: "Please provide an access code."},
-    		badPassword: {en: "Sorry, that doesn't seem to be a valid access code."}
+    		badPassword: {en: "Sorry, that doesn't seem to be a valid access code."},
+    		passwordValidationError: {en: "Sorry, an unexpected error occurred while trying to validate your access code."}
     	}
     },
     
@@ -16265,7 +16428,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		                    			  url: me.getTromboneUrl(),
 		                    			  params: {
 		                    				  corpus: corpus.getId(),
-		                    				  password: password
+		                    				  passwordForSession: password
 		                    			  },
 		                    			  method: 'POST',
 		                    			  success: function(result, request) {
@@ -16293,9 +16456,21 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		                    },{
 		                    	text: me.localize('nonConsumptiveButton'),
 		                    	handler: function() {
-		                    		passWin.close();
-		            				view.unmask();
-		            				me.dispatchEvent('loadedCorpus', me, corpus);
+		                    		passWin.mask();
+		                    		Ext.Ajax.request({
+		                    			  url: me.getTromboneUrl(),
+		                    			  params: {
+		                    				  corpus: corpus.getId(),
+		                    				  passwordForSessionRemove: true
+		                    			  },
+		                    			  method: 'POST',
+		                    			  callback: function(result, request) { // do this even if request fails
+		                    				  passWin.unmask();
+		                    				  passWin.close();
+		                    				  view.unmask();
+		                    				  me.dispatchEvent('loadedCorpus', me, corpus);
+		                    			  }
+		                    		});
 		                    	}
 		                    }]
 	                    }

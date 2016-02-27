@@ -7,7 +7,8 @@ Ext.define('Voyant.panel.Reader', {
     	i18n: {
     		title: {en: "Reader"},
     		helpTip: {en: "<p>The Reader tool provides a view of text from the corpus. Features include:</p><ul><li>frequency information appears when hovering over a word</li><li>distribution information appears in a graph at the bottom when clicking on a word</li><li>a bar graph at the bottom indicates the relative size of each document in the corpus</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		documentFrequency: {en: "document frequency:"}
+    		documentFrequency: {en: "document frequency:"},
+    		limitedAccess: {en: "This is a limited access corpus and this tool's functionality is restricted."}
     	},
     	api: {
     		start: 0,
@@ -69,6 +70,9 @@ Ext.define('Voyant.panel.Reader', {
     
     initComponent: function() {
     	var tokensStore = Ext.create("Voyant.data.store.Tokens");
+    	tokensStore.on("beforeload", function(store) {
+    		return store.getCorpus().getNoPasswordAccess()!='NONCONSUMPTIVE';
+    	})
     	tokensStore.on("load", function(s, records, success) {
     		if (success) {
 	    		var contents = "";
@@ -253,7 +257,11 @@ Ext.define('Voyant.panel.Reader', {
     	    		
     	    		if (this.rendered) {
     	    			this.load();
+        	    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+        	    			this.mask(this.localize("limitedAccess"), 'mask-no-spinner')
+        	    		}
     	    		}
+    	    		
     			},
             	termsClicked: function(src, terms) {
             		var queryTerms = [];

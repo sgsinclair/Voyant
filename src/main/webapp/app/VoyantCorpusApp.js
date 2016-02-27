@@ -119,7 +119,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		                    			  url: me.getTromboneUrl(),
 		                    			  params: {
 		                    				  corpus: corpus.getId(),
-		                    				  password: password
+		                    				  passwordForSession: password
 		                    			  },
 		                    			  method: 'POST',
 		                    			  success: function(result, request) {
@@ -147,9 +147,21 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		                    },{
 		                    	text: me.localize('nonConsumptiveButton'),
 		                    	handler: function() {
-		                    		passWin.close();
-		            				view.unmask();
-		            				me.dispatchEvent('loadedCorpus', me, corpus);
+		                    		passWin.mask();
+		                    		Ext.Ajax.request({
+		                    			  url: me.getTromboneUrl(),
+		                    			  params: {
+		                    				  corpus: corpus.getId(),
+		                    				  passwordForSessionRemove: true
+		                    			  },
+		                    			  method: 'POST',
+		                    			  callback: function(result, request) { // do this even if request fails
+		                    				  passWin.unmask();
+		                    				  passWin.close();
+		                    				  view.unmask();
+		                    				  me.dispatchEvent('loadedCorpus', me, corpus);
+		                    			  }
+		                    		});
 		                    	}
 		                    }]
 	                    }

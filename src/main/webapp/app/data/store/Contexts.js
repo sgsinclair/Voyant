@@ -34,6 +34,9 @@ Ext.define('Voyant.data.store.Contexts', {
 				simpleSortMode : true
 			},
 			listeners: {
+				beforeload: function(store) {
+					return store.getCorpus().getNoPasswordAccess()!='NONCONSUMPTIVE';
+				},
 				beforeprefetch: function(store, operation) {
 					var parent = this.getParentPanel();
 					if (parent !== undefined) {
