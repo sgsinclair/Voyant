@@ -35,13 +35,14 @@ Ext.onReady(function(){
 			viewport.mask();
 			Ext.create('Ext.window.Window', {
 			    title: 'Voyant Tools 2.0 Preview Release',
-			    width: 825,
-			    layout: 'fit',
+		    	margin: '20 200 10 10',
 			    modal: true,
-			    layout: 'vbox',
+			    maxWidth: 800,
+			    layout: 'fit',
 			    items: [{
-			    	width: 800,
 			    	margin: '10 5 3 10',
+				    layout: 'fit',
+				    scrollable: true,
 				    html: "<h2 style='text-align: center;'>Welcome to this Preview Release of Voyant Tools 2.0!</h2>"+
 				    "<p>We've tried to make things usable in order to give a glimpse of what's to come, "+
 				    "but this is an early preview release with lots of missing goodies and a whole bunch of bugs. "+
@@ -54,18 +55,20 @@ Ext.onReady(function(){
 			    		"<li>much better support for larger corpora</li>"+
 			    		"<li>vastly improved performance throughout (corpus reader and collocates are notable examples)</li>"+
 				    	"<li>adding and reordering documents (new in 2.0)</li>"+
+				    	"<li>corpus-level management (permissions for access and modifications)</li>"+
 			    	"</ul><li>some things not yet fully implemented:<ul>"+
 				    	"<li>full list of tools and skins from 1.0</li>"+
-				    	"<li>corpus-level management (permissions for access and modifications)</li>"+
 				    	"<!--<li>part-of-speech tagging and lemmatization (new in 2.0)</li>-->"+
 			    	"</ul></li></ul>"+
 			    	"<p>It's best to assume that this preview release may be incompatible with future releases and that "+
 			    	"any stored corpora will no longer be available after your session. Of course, you can keep using "+
 			    	"<a href='http://voyant-tools.org'>Voyant Tools 1.0</a> "+
 			    	"if you want persistence (normal persistence will be avilable with the full release of Voyant Tools 2.0). Have fun and please give us your <a href='http://twitter.com/voyanttools'>feeback</a>!</p>"
-			    }, {
+			    }],
+			    bbar: [{
 			    	xtype: 'button',
 	                glyph: 'xf00c@FontAwesome',
+	                ui: 'default',
 			    	width: '100%',
 			    	scale: 'medium',
 			    	text: 'Continue',
@@ -74,6 +77,9 @@ Ext.onReady(function(){
 			    	}
 			    }],
 			    listeners: {
+				    beforerender: function(panel) {
+				    	panel.items.get(0).setMaxHeight(me.getApplication().getViewport().getHeight()-150);
+					},
 			    	close: function(panel) {
 			    		viewport.unmask();
 			    	}
