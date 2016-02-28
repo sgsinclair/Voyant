@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Feb 27 14:31:43 EST 2016 */
+/* This file created by JSCacher. Last modified: Sun Feb 28 11:42:37 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7427,7 +7427,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		xpathContent: {en: "Content"},
     		xpathTitle: {en: "Title"},
     		xpathAuthor: {en: "Author"},
-    		tableOptions: {en: "Tabular Data"},
+    		tableOptions: {en: "Tables"},
     		tableDocuments: {en: "Documents"},
     		tableDocumentsTable: {en: "from entire table"},
     		tableDocumentsRows: {en: "from cells in each row"},
@@ -7435,8 +7435,10 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tableContent: {en: "Content"},
     		tableTitle: {en: "Title"},
     		tableAuthor: {en: "Author"},
-    		tableOptionsText: {en: "Specify how documents should be extracted."},
-    		tableMetadata: {en: "These options are only used when extracting documents from cells in each row. Specify one or more column numbers (the left-most is column one), separated by commas. Defaults will be used if these remain blank."},
+    		tableOptionsText: {en: "Specify how documents should be extracted (currently only supported for MS Excel: .xls, xlsx). For more information see the documentation on creating a corpus with <a href='{0}' target='voyantdocs'>tabular data</a>."},
+    		tableContentText: {en: "Specify which column numbers contain content (or leave blank to use all columns). The left-most columnn is column 1. Define multiple documents by separating columns with a comma or combine columns by using the plus sign. For example 1+2,3 would combine columns 1 and 2 into one document and use column 3 for  a second document."},
+    		tableMetadataText: {en: "These options are only used when documents are extracted from cells in each row (see the first option in this section). Same syntax as the Content option above: column numbers separated by commas or combined with a plus sign."},
+    		tableNoHeadersRowText: {en: "Determines whether or not to skip the first row (if there's a header row). When there is a header row, it can be used to define the document title automatically when documents are extracted from entire columns (in this case leave the title field blank)."},
     		tableNoHeadersRow: {en: "No Headers Row"},
     		numberZero: {en: "0 is invalid, the first column is 1"},
     		numberEmpty: {en: "At least one column number is currently empty."},
@@ -7447,9 +7449,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tokenizationWordBoundaries: {en: "Simple Word Boundaries"},
     		accessOptions: {en: "Access Management"},
     		accessOptionsText: {en: "If desired, specify one or more access passwords (separated by commas)."},
-    		adminPassword: {en: "admin password"},
-    		accessPassword: {en: "access password"},
-    		accessMode: {en: "access password"},
+    		adminPassword: {en: "admin code"},
+    		accessPassword: {en: "access code"},
     		accessModeWithoutPassword: {en: "other access"},
     		accessModeWithoutPasswordText: {en: "If you specify an <i>access password</i> you can also specify what access is granted to users without the password."},
     		accessModeNonConsumptive: {en: "limited (non-consumptive)"},
@@ -7775,7 +7776,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    value: ''
 						},{
 							xtype: 'container',
-							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator'])+'</i></p>',
+							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-xml'])+'</i></p>',
 							width: 375
 						},{
 	        				xtype: 'fieldset',
@@ -7807,13 +7808,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
 							]
 						},{
 	        				xtype: 'fieldset',
-	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-table' target='voyantdocs'>"+me.localize('tableOptions')+"</a>",
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-tables' target='voyantdocs'>"+me.localize('tableOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        defaultType: 'textfield',
 	                        items: [{
 	    							xtype: 'container',
-	    							html: '<p><i>'+me.localize("tableOptionsText")+'</i></p>',
+	    							html: '<p><i>'+new Ext.Template(me.localize('tableOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-tables'])+'</i></p>',
 	    							width: 375
 	                        	},{
 								    xtype:'combo',
@@ -7825,13 +7826,26 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								    value: ''
 								},{
 	    							xtype: 'container',
-	    							html: '<p><i>'+me.localize("tableMetadata")+'</i></p>',
+	    							html: '<p><i>'+me.localize("tableNoHeadersRowText")+'</i></p>',
+	    							width: 375
+	                            },{
+									fieldLabel: me.localize("tableNoHeadersRow"),
+									xtype: 'checkboxfield',
+									name: 'tableNoHeadersRow',
+									inputValue: "true"
+								},{
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("tableContentText")+'</i></p>',
 	    							width: 375
 	                            },{
 									fieldLabel: me.localize('tableContent'),
 									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableContent'
 								},{
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("tableMetadataText")+'</i></p>',
+	    							width: 375
+	                            },{
 									fieldLabel: me.localize('tableAuthor'),
 									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableAuthor'
@@ -7839,11 +7853,6 @@ Ext.define('Voyant.panel.CorpusCreator', {
 									fieldLabel: me.localize('tableTitle'),
 									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableTitle'
-								},{
-									fieldLabel: me.localize("tableNoHeadersRow"),
-									xtype: 'checkboxfield',
-									name: 'tableNoHeadersRow',
-									inputValue: "true"
 								}
 							]
 						},{
@@ -12379,6 +12388,409 @@ Ext.define('Ext.chart.series.CustomScatter', {
     	this.callParent(arguments);
     }
 });
+Ext.define('Voyant.panel.StreamGraph', {
+	extend: 'Ext.panel.Panel',
+	mixins: ['Voyant.panel.Panel'],
+	alias: 'widget.streamgraph',
+    statics: {
+    	i18n: {
+    		title: {en: 'StreamGraph'},
+    		freqsMode: {en: 'Frequencies'},
+    		freqsModeTip: {en: 'Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).'},
+    		rawFrequencies: {en: 'Raw Frequencies'},
+    		relativeFrequencies: {en: 'Relative Frequencies'},
+    		documentSegments: {en: 'Document Segments'},
+    		documents: {en: 'Documents'},
+    		clearTerms : {en: 'Clear Terms'},
+    		segments : {en: 'Segments'}
+    	},
+    	api: {
+    		limit: 5,
+    		stopList: 'auto',
+    		query: undefined,
+    		withDistributions: 'relative',
+    		bins: 50,
+    		docIndex: undefined,
+    		docId: undefined
+    	},
+		glyph: 'xf1cb@FontAwesome'
+    },
+    
+    config: {
+    	corpus: undefined,
+    	visLayout: undefined,
+    	vis: undefined,
+    	mode: undefined
+    },
+    
+    graphMargin: {top: 20, right: 60, bottom: 110, left: 80},
+    
+    MODE_CORPUS: 'corpus',
+    MODE_DOCUMENT: 'document',
+    
+    constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    },
+    
+    initComponent: function() {
+        var me = this;
+        
+        Ext.apply(me, {
+    		title: this.localize('title'),
+    		tbar: new Ext.Toolbar({
+        		enableOverflow: true,
+				items: ['->',{
+					xtype: 'legend',
+					store: new Ext.data.JsonStore({
+						fields: ['name', 'mark', 'active']
+					}),
+					listeners: {
+						itemclick: function(view, record, el, index) {
+							var isActive = Ext.fly(el.firstElementChild).hasCls('x-legend-inactive');
+							record.set('active', isActive);
+							var terms = this.getCurrentTerms();
+							this.setApiParams({query: terms, limit: terms.length, stopList: undefined});
+							this.loadFromCorpus();
+						},
+						scope: this
+					}
+				},'->']
+			}),
+			bbar: new Ext.Toolbar({
+        		enableOverflow: true,
+				items: [{
+                	xtype: 'querysearchfield'
+                },
+//                {
+//	            	xtype: 'button',
+//	            	text: this.localize('clearTerms'),
+//	            	handler: function() {
+//	            		this.setApiParams({query: undefined, limit: 5, stopList: 'auto'});
+//						this.loadFromCorpus();
+//	            	},
+//	            	scope: this
+//	            },
+	            {
+	            	xtype: 'corpusdocumentselector',
+	            	singleSelect: true
+	            },{
+	            	text: this.localize('freqsMode'),
+					glyph: 'xf201@FontAwesome',
+				    tooltip: this.localize('freqsModeTip'),
+				    menu: {
+				    	items: [{
+				               text: this.localize('relativeFrequencies'),
+				               checked: true,
+				               itemId: 'relative',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('withDistributions', 'relative');
+				                	   this.loadFromCorpus();
+				            	   }
+				               },
+				               scope: this
+				           }, {
+				               text: this.localize('rawFrequencies'),
+				               checked: false,
+				               itemId: 'raw',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('withDistributions', 'raw');
+				                	   this.loadFromCorpus();
+				            	   }
+				               },
+				               scope: this
+			           }]
+				    }
+	            },{
+	            	xtype: 'slider',
+	            	itemId: 'segmentsSlider',
+	            	fieldLabel: this.localize('segments'),
+	            	labelAlign: 'right',
+	            	labelWidth: 70,
+	            	width: 150,
+	            	increment: 10,
+	            	minValue: 10,
+	            	maxValue: 300,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(this.getApiParam('bins'));
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({bins: newvalue});
+	            			this.loadFromCorpus();
+	            		},
+	            		scope: this
+	            	}
+	            }]
+			})
+        });
+        
+        this.on('loadedCorpus', function(src, corpus) {
+        	this.setCorpus(corpus);
+        	if (this.getCorpus().getDocumentsCount() == 1 && this.getMode() != this.MODE_DOCUMENT) {
+				this.setMode(this.MODE_DOCUMENT);
+			}
+    		if (this.isVisible()) {
+    			this.loadFromCorpus();
+    		}
+        }, this);
+        
+        this.on('corpusSelected', function(src, corpus) {
+    		if (src.isXType('corpusdocumentselector')) {
+    			this.setMode(this.MODE_CORPUS);
+    			this.setApiParams({docId: undefined, docIndex: undefined});
+    			this.setCorpus(corpus);
+        		this.loadFromCorpus();
+    		}
+    	});
+        
+        this.on('documentSelected', function(src, doc) {
+        	var docId = doc.getId();
+        	this.setApiParam('docId', docId);
+        	this.loadFromDocumentTerms();
+        }, this);
+        
+		this.on('query', function(src, query) {
+        	var terms = this.getCurrentTerms();
+        	terms.push(query);
+        	this.setApiParams({query: terms, limit: terms.length, stopList: undefined});
+        	if (this.getMode() === this.MODE_DOCUMENT) {
+        		this.loadFromDocumentTerms();
+        	} else {
+        		this.loadFromCorpusTerms(this.getCorpus().getCorpusTerms());
+        	}
+        }, this);
+		
+        this.on('resize', function(panel, width, height) {
+
+		}, this);
+        
+        this.on('boxready', this.initGraph, this);
+        
+    	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
+        me.callParent(arguments);
+    },
+    
+    loadFromCorpus: function() {
+    	var corpus = this.getCorpus();
+		if (this.getApiParam('docId') || this.getApiParam('docIndex')) {
+			this.loadFromDocumentTerms();
+		} else if (corpus.getDocumentsCount() == 1) {
+			this.loadFromDocument(corpus.getDocument(0));
+		} else {
+			this.loadFromCorpusTerms(corpus.getCorpusTerms());
+		}
+	},
+
+    loadFromCorpusTerms: function(corpusTerms) {
+		corpusTerms.load({
+		    callback: function(records, operation, success) {
+		    	if (success) {
+		    		this.setMode(this.MODE_CORPUS);
+			    	this.loadFromRecords(records);
+		    	} else {
+					Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
+		    	}
+		    },
+		    scope: this,
+		    params: this.getApiParams(['limit','stopList','query','withDistributions'])
+    	});
+    },
+    
+    loadFromDocument: function(document) {
+    	if (document.then) {
+    		var me = this;
+    		document.then(function(document) {me.loadFromDocument(document);});
+    	} else {
+    		var ids = [];
+    		if (Ext.getClassName(document)=="Voyant.data.model.Document") {
+        		this.setApiParams({
+        			docIndex: undefined,
+        			query: undefined,
+        			docId: document.getId()
+        		});
+        		if (this.isVisible()) {
+                	this.loadFromDocumentTerms();
+        		}
+    		}
+    	}
+    },
+    
+    loadFromDocumentTerms: function(documentTerms) {
+    	if (this.getCorpus()) {
+        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({autoLoad: false});
+    		documentTerms.load({
+    		    callback: function(records, operation, success) {
+    		    	if (success) {
+    		    		this.setMode(this.MODE_DOCUMENT);
+    		    		this.loadFromRecords(records);
+    		    	}
+    		    	else {
+    					Voyant.application.showResponseError(this.localize('failedGetDocumentTerms'), operation);
+    		    	}
+    		    },
+    		    scope: this,
+    		    params: this.getApiParams(['docId','docIndex','limit','stopList','query','withDistributions','bins'])
+        	});
+    	}
+    },
+    
+    loadFromRecords: function(records) {
+    	var color = d3.scale.category10();
+    	
+    	var legendStore = this.down('[xtype=legend]').getStore();
+    	var legendData = [];
+    	var layers = [];
+    	records.forEach(function(record, index) {
+    		var termLayer = [];
+    		var key = record.getTerm();
+    		record.get('distributions').forEach(function(r, i) {
+    			termLayer.push({x: i, y: r});
+    		}, this);
+    		layers.push({name: key, values: termLayer});
+    		legendData.push({id: key, name: key, mark: color(index), active: true});
+    	}, this);
+    	
+    	legendStore.loadData(legendData);
+    	
+    	var processedLayers = this.getVisLayout()(layers);
+    	
+    	var steps;
+    	if (this.getMode() === this.MODE_DOCUMENT) {
+    		steps = this.getApiParam('bins');
+    	} else {
+    		steps = this.getCorpus().getDocumentsCount();
+    	}
+    	steps--;
+    	
+    	var width = this.body.down('svg').getWidth() - this.graphMargin.left - this.graphMargin.right;
+    	var x = d3.scale.linear().domain([0, steps]).range([0, width]);
+    	
+    	var max = d3.max(processedLayers, function(layer) {
+    		return d3.max(layer.values, function(d) { return d.y0 + d.y; });
+    	});
+    	var height = this.body.down('svg').getHeight() - this.graphMargin.top - this.graphMargin.bottom;
+    	var y = d3.scale.linear().domain([0, max]).range([height, 0]);
+    	
+    	var area = d3.svg.area()
+	    	.x(function(d) { return x(d.x); })
+			.y0(function(d) { return y(d.y0); })
+			.y1(function(d) { return y(d.y0 + d.y); });
+    	
+    	var xAxis = d3.svg.axis().scale(x).orient('bottom');
+    	if (this.getMode() === this.MODE_CORPUS) {
+    		var tickvals = [];
+    		for (var i = 0; i <= steps; i++) {
+    			tickvals.push(i);
+    		}
+    		xAxis.tickValues(tickvals); // force number of ticks
+    		xAxis.tickFormat(''); // hide tick numbers
+    	}
+    	
+    	var yAxis = d3.svg.axis().scale(y).orient('left');
+    	
+    	// join
+    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d.name; });
+    	
+    	// update
+    	paths.attr('d', function(d) { return area(d.values); }).style('fill', function(d, i) { return color(i); });
+    	
+    	// enter
+    	paths.enter().append('path')
+		.attr('d', function(d) { return area(d.values); })
+		.style('fill', function(d, i) { return color(i); })
+		.append('title').text(function (d) { return d.name; });
+    	
+    	// exit
+    	paths.exit().remove();
+    	
+    	this.getVis().selectAll('g.axis').remove();
+    	
+    	this.getVis().append('g')
+    		.attr('class', 'axis x')
+    		.attr('transform', 'translate(0,'+height+')')
+    		.call(xAxis);
+    	
+    	var xAxisText;
+    	if (this.getMode() === this.MODE_CORPUS) {
+    		var stepIncrement = width / steps;
+    		var currStep = 0;
+    		this.getCorpus().getDocuments().each(function(doc) {
+    			this.getVis().select('g.x').append("text")
+					.attr('text-anchor', 'end')
+					.attr('transform', 'translate('+currStep+', 10) rotate(-45)')
+					.text(doc.getTinyTitle());
+    			
+    			currStep += stepIncrement;
+    		}, this);
+    		
+    		xAxisText = this.localize('documents');
+    	} else {
+    		xAxisText = this.localize('documentSegments');
+    	}
+    	this.getVis().select('g.x').append("text")
+			.attr('text-anchor', 'middle')
+			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-20)+')')
+			.text(xAxisText);
+    	
+    	this.getVis().append('g')
+			.attr('class', 'axis y')
+			.attr('transform', 'translate(0,0)')
+			.call(yAxis);
+    	
+    	var yAxisText;
+    	if (this.getApiParam('withDistributions') === 'raw') {
+    		yAxisText = this.localize('rawFrequencies');
+    	} else {
+    		yAxisText = this.localize('relativeFrequencies');
+    	}
+    	this.getVis().select('g.y').append("text")
+			.attr('text-anchor', 'middle')
+			.attr('transform', 'translate(-'+(this.graphMargin.left-20)+', '+height/2+') rotate(-90)')
+			.text(yAxisText);
+    },
+    
+	getCurrentTerms: function() {
+    	var terms = [];
+    	this.down('[xtype=legend]').getStore().each(function(record) {
+    		if (record.get('active')) {
+    			terms.push(record.get('name'));
+    		}
+    	}, this);
+    	return terms;
+    },
+	
+    initGraph: function() {
+    	if (this.getVisLayout() === undefined) {
+	    	var el = this.getLayout().getRenderTarget();
+	    	var paddingH = this.graphMargin.left + this.graphMargin.right;
+	    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
+	    	var width = el.getWidth()-paddingH;
+			var height = el.getHeight()-paddingV;
+	    	this.setVisLayout(
+				d3.layout.stack()
+					.offset('silhouette')
+					.values(function(d) {
+						return d.values;
+					})
+			);
+			
+			this.setVis(d3.select(el.dom).append('svg').attr('id','streamGraph')
+					.attr('width', width+paddingH).attr('height', height+paddingV).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')')
+			);
+    	}
+    },
+    
+    updateMode: function(mode) {
+    	this.queryById('segmentsSlider').setHidden(mode==this.MODE_CORPUS);
+    }
+});
+
+
 Ext.define('Voyant.panel.Summary', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel', 'Voyant.util.SparkLine'],
@@ -13440,6 +13852,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 				this.redrawSliderOverlay();
 			}
 		}, this);
+		
 	}
 	
     ,loadStore: function () {
@@ -15567,7 +15980,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
 
 Ext.define('Voyant.panel.CorpusSet', {
 	extend: 'Ext.panel.Panel',
-    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph',,'Voyant.panel.StreamGraph'],
+    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph','Voyant.panel.StreamGraph'],
 	mixins: ['Voyant.panel.Panel'],
     alias: 'widget.corpusset',
 	statics: {
@@ -15691,6 +16104,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     			var tabpanels = this.query("voyanttabpanel");
     			tabpanels[1].add({xtype: 'termsradio'}); // reader
     			tabpanels[1].setActiveTab(1); // reader
+    			tabpanels[1].getActiveTab().fireEvent("loadedCorpus", src, corpus); // make sure to load corpus
     			tabpanels[4].setActiveTab(1); // contexts
     		}
     		if (corpus.getDocumentsCount()>30) {
@@ -15709,409 +16123,6 @@ Ext.define('Voyant.panel.CorpusSet', {
     	}
     }
 })
-Ext.define('Voyant.panel.StreamGraph', {
-	extend: 'Ext.panel.Panel',
-	mixins: ['Voyant.panel.Panel'],
-	alias: 'widget.streamgraph',
-    statics: {
-    	i18n: {
-    		title: {en: 'StreamGraph'},
-    		freqsMode: {en: 'Frequencies'},
-    		freqsModeTip: {en: 'Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).'},
-    		rawFrequencies: {en: 'Raw Frequencies'},
-    		relativeFrequencies: {en: 'Relative Frequencies'},
-    		documentSegments: {en: 'Document Segments'},
-    		documents: {en: 'Documents'},
-    		clearTerms : {en: 'Clear Terms'},
-    		segments : {en: 'Segments'}
-    	},
-    	api: {
-    		limit: 5,
-    		stopList: 'auto',
-    		query: undefined,
-    		withDistributions: 'relative',
-    		bins: 50,
-    		docIndex: undefined,
-    		docId: undefined
-    	},
-		glyph: 'xf1cb@FontAwesome'
-    },
-    
-    config: {
-    	corpus: undefined,
-    	visLayout: undefined,
-    	vis: undefined,
-    	mode: undefined
-    },
-    
-    graphMargin: {top: 20, right: 60, bottom: 110, left: 80},
-    
-    MODE_CORPUS: 'corpus',
-    MODE_DOCUMENT: 'document',
-    
-    constructor: function(config) {
-        this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-    },
-    
-    initComponent: function() {
-        var me = this;
-        
-        Ext.apply(me, {
-    		title: this.localize('title'),
-    		tbar: new Ext.Toolbar({
-        		enableOverflow: true,
-				items: ['->',{
-					xtype: 'legend',
-					store: new Ext.data.JsonStore({
-						fields: ['name', 'mark', 'active']
-					}),
-					listeners: {
-						itemclick: function(view, record, el, index) {
-							var isActive = Ext.fly(el.firstElementChild).hasCls('x-legend-inactive');
-							record.set('active', isActive);
-							var terms = this.getCurrentTerms();
-							this.setApiParams({query: terms, limit: terms.length, stopList: undefined});
-							this.loadFromCorpus();
-						},
-						scope: this
-					}
-				},'->']
-			}),
-			bbar: new Ext.Toolbar({
-        		enableOverflow: true,
-				items: [{
-                	xtype: 'querysearchfield'
-                },
-//                {
-//	            	xtype: 'button',
-//	            	text: this.localize('clearTerms'),
-//	            	handler: function() {
-//	            		this.setApiParams({query: undefined, limit: 5, stopList: 'auto'});
-//						this.loadFromCorpus();
-//	            	},
-//	            	scope: this
-//	            },
-	            {
-	            	xtype: 'corpusdocumentselector',
-	            	singleSelect: true
-	            },{
-	            	text: this.localize('freqsMode'),
-					glyph: 'xf201@FontAwesome',
-				    tooltip: this.localize('freqsModeTip'),
-				    menu: {
-				    	items: [{
-				               text: this.localize('relativeFrequencies'),
-				               checked: true,
-				               itemId: 'relative',
-				               group: 'freqsMode',
-				               checkHandler: function(item, checked) {
-				            	   if (checked) {
-				                	   this.setApiParam('withDistributions', 'relative');
-				                	   this.loadFromCorpus();
-				            	   }
-				               },
-				               scope: this
-				           }, {
-				               text: this.localize('rawFrequencies'),
-				               checked: false,
-				               itemId: 'raw',
-				               group: 'freqsMode',
-				               checkHandler: function(item, checked) {
-				            	   if (checked) {
-				                	   this.setApiParam('withDistributions', 'raw');
-				                	   this.loadFromCorpus();
-				            	   }
-				               },
-				               scope: this
-			           }]
-				    }
-	            },{
-	            	xtype: 'slider',
-	            	itemId: 'segmentsSlider',
-	            	fieldLabel: this.localize('segments'),
-	            	labelAlign: 'right',
-	            	labelWidth: 70,
-	            	width: 150,
-	            	increment: 10,
-	            	minValue: 10,
-	            	maxValue: 300,
-	            	listeners: {
-	            		afterrender: function(slider) {
-	            			slider.setValue(this.getApiParam('bins'));
-	            		},
-	            		changecomplete: function(slider, newvalue) {
-	            			this.setApiParams({bins: newvalue});
-	            			this.loadFromCorpus();
-	            		},
-	            		scope: this
-	            	}
-	            }]
-			})
-        });
-        
-        this.on('loadedCorpus', function(src, corpus) {
-        	this.setCorpus(corpus);
-        	if (this.getCorpus().getDocumentsCount() == 1 && this.getMode() != this.MODE_DOCUMENT) {
-				this.setMode(this.MODE_DOCUMENT);
-			}
-    		if (this.isVisible()) {
-    			this.loadFromCorpus();
-    		}
-        }, this);
-        
-        this.on('corpusSelected', function(src, corpus) {
-    		if (src.isXType('corpusdocumentselector')) {
-    			this.setMode(this.MODE_CORPUS);
-    			this.setApiParams({docId: undefined, docIndex: undefined});
-    			this.setCorpus(corpus);
-        		this.loadFromCorpus();
-    		}
-    	});
-        
-        this.on('documentSelected', function(src, doc) {
-        	var docId = doc.getId();
-        	this.setApiParam('docId', docId);
-        	this.loadFromDocumentTerms();
-        }, this);
-        
-		this.on('query', function(src, query) {
-        	var terms = this.getCurrentTerms();
-        	terms.push(query);
-        	this.setApiParams({query: terms, limit: terms.length, stopList: undefined});
-        	if (this.getMode() === this.MODE_DOCUMENT) {
-        		this.loadFromDocumentTerms();
-        	} else {
-        		this.loadFromCorpusTerms(this.getCorpus().getCorpusTerms());
-        	}
-        }, this);
-		
-        this.on('resize', function(panel, width, height) {
-
-		}, this);
-        
-        this.on('boxready', this.initGraph, this);
-        
-    	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
-        me.callParent(arguments);
-    },
-    
-    loadFromCorpus: function() {
-    	var corpus = this.getCorpus();
-		if (this.getApiParam('docId') || this.getApiParam('docIndex')) {
-			this.loadFromDocumentTerms();
-		} else if (corpus.getDocumentsCount() == 1) {
-			this.loadFromDocument(corpus.getDocument(0));
-		} else {
-			this.loadFromCorpusTerms(corpus.getCorpusTerms());
-		}
-	},
-
-    loadFromCorpusTerms: function(corpusTerms) {
-		corpusTerms.load({
-		    callback: function(records, operation, success) {
-		    	if (success) {
-		    		this.setMode(this.MODE_CORPUS);
-			    	this.loadFromRecords(records);
-		    	} else {
-					Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
-		    	}
-		    },
-		    scope: this,
-		    params: this.getApiParams(['limit','stopList','query','withDistributions'])
-    	});
-    },
-    
-    loadFromDocument: function(document) {
-    	if (document.then) {
-    		var me = this;
-    		document.then(function(document) {me.loadFromDocument(document);});
-    	} else {
-    		var ids = [];
-    		if (Ext.getClassName(document)=="Voyant.data.model.Document") {
-        		this.setApiParams({
-        			docIndex: undefined,
-        			query: undefined,
-        			docId: document.getId()
-        		});
-        		if (this.isVisible()) {
-                	this.loadFromDocumentTerms();
-        		}
-    		}
-    	}
-    },
-    
-    loadFromDocumentTerms: function(documentTerms) {
-    	if (this.getCorpus()) {
-        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({autoLoad: false});
-    		documentTerms.load({
-    		    callback: function(records, operation, success) {
-    		    	if (success) {
-    		    		this.setMode(this.MODE_DOCUMENT);
-    		    		this.loadFromRecords(records);
-    		    	}
-    		    	else {
-    					Voyant.application.showResponseError(this.localize('failedGetDocumentTerms'), operation);
-    		    	}
-    		    },
-    		    scope: this,
-    		    params: this.getApiParams(['docId','docIndex','limit','stopList','query','withDistributions','bins'])
-        	});
-    	}
-    },
-    
-    loadFromRecords: function(records) {
-    	var color = d3.scale.category10();
-    	
-    	var legendStore = this.down('[xtype=legend]').getStore();
-    	var legendData = [];
-    	var layers = [];
-    	records.forEach(function(record, index) {
-    		var termLayer = [];
-    		var key = record.getTerm();
-    		record.get('distributions').forEach(function(r, i) {
-    			termLayer.push({x: i, y: r});
-    		}, this);
-    		layers.push({name: key, values: termLayer});
-    		legendData.push({id: key, name: key, mark: color(index), active: true});
-    	}, this);
-    	
-    	legendStore.loadData(legendData);
-    	
-    	var processedLayers = this.getVisLayout()(layers);
-    	
-    	var steps;
-    	if (this.getMode() === this.MODE_DOCUMENT) {
-    		steps = this.getApiParam('bins');
-    	} else {
-    		steps = this.getCorpus().getDocumentsCount();
-    	}
-    	steps--;
-    	
-    	var width = this.body.down('svg').getWidth() - this.graphMargin.left - this.graphMargin.right;
-    	var x = d3.scale.linear().domain([0, steps]).range([0, width]);
-    	
-    	var max = d3.max(processedLayers, function(layer) {
-    		return d3.max(layer.values, function(d) { return d.y0 + d.y; });
-    	});
-    	var height = this.body.down('svg').getHeight() - this.graphMargin.top - this.graphMargin.bottom;
-    	var y = d3.scale.linear().domain([0, max]).range([height, 0]);
-    	
-    	var area = d3.svg.area()
-	    	.x(function(d) { return x(d.x); })
-			.y0(function(d) { return y(d.y0); })
-			.y1(function(d) { return y(d.y0 + d.y); });
-    	
-    	var xAxis = d3.svg.axis().scale(x).orient('bottom');
-    	if (this.getMode() === this.MODE_CORPUS) {
-    		var tickvals = [];
-    		for (var i = 0; i <= steps; i++) {
-    			tickvals.push(i);
-    		}
-    		xAxis.tickValues(tickvals); // force number of ticks
-    		xAxis.tickFormat(''); // hide tick numbers
-    	}
-    	
-    	var yAxis = d3.svg.axis().scale(y).orient('left');
-    	
-    	// join
-    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d.name; });
-    	
-    	// update
-    	paths.attr('d', function(d) { return area(d.values); }).style('fill', function(d, i) { return color(i); });
-    	
-    	// enter
-    	paths.enter().append('path')
-		.attr('d', function(d) { return area(d.values); })
-		.style('fill', function(d, i) { return color(i); })
-		.append('title').text(function (d) { return d.name; });
-    	
-    	// exit
-    	paths.exit().remove();
-    	
-    	this.getVis().selectAll('g.axis').remove();
-    	
-    	this.getVis().append('g')
-    		.attr('class', 'axis x')
-    		.attr('transform', 'translate(0,'+height+')')
-    		.call(xAxis);
-    	
-    	var xAxisText;
-    	if (this.getMode() === this.MODE_CORPUS) {
-    		var stepIncrement = width / steps;
-    		var currStep = 0;
-    		this.getCorpus().getDocuments().each(function(doc) {
-    			this.getVis().select('g.x').append("text")
-					.attr('text-anchor', 'end')
-					.attr('transform', 'translate('+currStep+', 10) rotate(-45)')
-					.text(doc.getTinyTitle());
-    			
-    			currStep += stepIncrement;
-    		}, this);
-    		
-    		xAxisText = this.localize('documents');
-    	} else {
-    		xAxisText = this.localize('documentSegments');
-    	}
-    	this.getVis().select('g.x').append("text")
-			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-20)+')')
-			.text(xAxisText);
-    	
-    	this.getVis().append('g')
-			.attr('class', 'axis y')
-			.attr('transform', 'translate(0,0)')
-			.call(yAxis);
-    	
-    	var yAxisText;
-    	if (this.getApiParam('withDistributions') === 'raw') {
-    		yAxisText = this.localize('rawFrequencies');
-    	} else {
-    		yAxisText = this.localize('relativeFrequencies');
-    	}
-    	this.getVis().select('g.y').append("text")
-			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate(-'+(this.graphMargin.left-20)+', '+height/2+') rotate(-90)')
-			.text(yAxisText);
-    },
-    
-	getCurrentTerms: function() {
-    	var terms = [];
-    	this.down('[xtype=legend]').getStore().each(function(record) {
-    		if (record.get('active')) {
-    			terms.push(record.get('name'));
-    		}
-    	}, this);
-    	return terms;
-    },
-	
-    initGraph: function() {
-    	if (this.getVisLayout() === undefined) {
-	    	var el = this.getLayout().getRenderTarget();
-	    	var paddingH = this.graphMargin.left + this.graphMargin.right;
-	    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
-	    	var width = el.getWidth()-paddingH;
-			var height = el.getHeight()-paddingV;
-	    	this.setVisLayout(
-				d3.layout.stack()
-					.offset('silhouette')
-					.values(function(d) {
-						return d.values;
-					})
-			);
-			
-			this.setVis(d3.select(el.dom).append('svg').attr('id','streamGraph')
-					.attr('width', width+paddingH).attr('height', height+paddingV).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')')
-			);
-    	}
-    },
-    
-    updateMode: function(mode) {
-    	this.queryById('segmentsSlider').setHidden(mode==this.MODE_CORPUS);
-    }
-});
-
-
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
@@ -16347,7 +16358,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','phrases','documents','summary','trends','scatterplot','termsradio']
+			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','documentsimilarity','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
@@ -16355,7 +16366,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
-			items: ['cirrus','bubblelines','collocatesgraph','trends','scatterplot','termsradio','knots']
+			items: ['cirrus','bubblelines','collocatesgraph','knots','trends','streamgraph','documentsimilarity','scatterplot','termsradio']
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',

@@ -547,6 +547,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 				this.redrawSliderOverlay();
 			}
 		}, this);
+		
 	}
 	
     ,loadStore: function () {

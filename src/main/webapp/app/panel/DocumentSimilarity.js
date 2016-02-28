@@ -11,7 +11,7 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
 	},
     statics: {
     	i18n: {
-			title: {en: "DocumentSimilarity"},
+			title: {en: "Document Similarity"},
 			loading: {en: "Loading"},
 			helpTip: {en: ""},
 			tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},

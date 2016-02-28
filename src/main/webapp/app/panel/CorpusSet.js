@@ -1,6 +1,6 @@
 Ext.define('Voyant.panel.CorpusSet', {
 	extend: 'Ext.panel.Panel',
-    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph',,'Voyant.panel.StreamGraph'],
+    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph','Voyant.panel.StreamGraph'],
 	mixins: ['Voyant.panel.Panel'],
     alias: 'widget.corpusset',
 	statics: {
@@ -124,6 +124,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     			var tabpanels = this.query("voyanttabpanel");
     			tabpanels[1].add({xtype: 'termsradio'}); // reader
     			tabpanels[1].setActiveTab(1); // reader
+    			tabpanels[1].getActiveTab().fireEvent("loadedCorpus", src, corpus); // make sure to load corpus
     			tabpanels[4].setActiveTab(1); // contexts
     		}
     		if (corpus.getDocumentsCount()>30) {

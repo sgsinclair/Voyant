@@ -78,6 +78,7 @@ app/panel/RezoViz.js
 app/panel/Reader.js
 app/panel/ScatterPlot.js
 app/panel/DocumentSimilarity.js
+app/panel/StreamGraph.js
 app/panel/Summary.js
 app/panel/TopicContexts.js
 app/panel/TermsRadio.js
@@ -85,7 +86,6 @@ app/panel/Trends.js
 app/panel/VoyantFooter.js
 app/panel/VoyantHeader.js
 app/panel/CorpusSet.js
-app/panel/StreamGraph.js
 
 # APPS
 app/VoyantApp.js

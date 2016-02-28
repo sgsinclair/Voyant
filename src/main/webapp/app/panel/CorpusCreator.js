@@ -20,7 +20,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		xpathContent: {en: "Content"},
     		xpathTitle: {en: "Title"},
     		xpathAuthor: {en: "Author"},
-    		tableOptions: {en: "Tabular Data"},
+    		tableOptions: {en: "Tables"},
     		tableDocuments: {en: "Documents"},
     		tableDocumentsTable: {en: "from entire table"},
     		tableDocumentsRows: {en: "from cells in each row"},
@@ -28,8 +28,10 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tableContent: {en: "Content"},
     		tableTitle: {en: "Title"},
     		tableAuthor: {en: "Author"},
-    		tableOptionsText: {en: "Specify how documents should be extracted."},
-    		tableMetadata: {en: "These options are only used when extracting documents from cells in each row. Specify one or more column numbers (the left-most is column one), separated by commas. Defaults will be used if these remain blank."},
+    		tableOptionsText: {en: "Specify how documents should be extracted (currently only supported for MS Excel: .xls, xlsx). For more information see the documentation on creating a corpus with <a href='{0}' target='voyantdocs'>tabular data</a>."},
+    		tableContentText: {en: "Specify which column numbers contain content (or leave blank to use all columns). The left-most columnn is column 1. Define multiple documents by separating columns with a comma or combine columns by using the plus sign. For example 1+2,3 would combine columns 1 and 2 into one document and use column 3 for  a second document."},
+    		tableMetadataText: {en: "These options are only used when documents are extracted from cells in each row (see the first option in this section). Same syntax as the Content option above: column numbers separated by commas or combined with a plus sign."},
+    		tableNoHeadersRowText: {en: "Determines whether or not to skip the first row (if there's a header row). When there is a header row, it can be used to define the document title automatically when documents are extracted from entire columns (in this case leave the title field blank)."},
     		tableNoHeadersRow: {en: "No Headers Row"},
     		numberZero: {en: "0 is invalid, the first column is 1"},
     		numberEmpty: {en: "At least one column number is currently empty."},
@@ -40,9 +42,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tokenizationWordBoundaries: {en: "Simple Word Boundaries"},
     		accessOptions: {en: "Access Management"},
     		accessOptionsText: {en: "If desired, specify one or more access passwords (separated by commas)."},
-    		adminPassword: {en: "admin password"},
-    		accessPassword: {en: "access password"},
-    		accessMode: {en: "access password"},
+    		adminPassword: {en: "admin code"},
+    		accessPassword: {en: "access code"},
     		accessModeWithoutPassword: {en: "other access"},
     		accessModeWithoutPasswordText: {en: "If you specify an <i>access password</i> you can also specify what access is granted to users without the password."},
     		accessModeNonConsumptive: {en: "limited (non-consumptive)"},
@@ -368,7 +369,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    value: ''
 						},{
 							xtype: 'container',
-							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator'])+'</i></p>',
+							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-xml'])+'</i></p>',
 							width: 375
 						},{
 	        				xtype: 'fieldset',
@@ -400,13 +401,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
 							]
 						},{
 	        				xtype: 'fieldset',
-	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-table' target='voyantdocs'>"+me.localize('tableOptions')+"</a>",
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-tables' target='voyantdocs'>"+me.localize('tableOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        defaultType: 'textfield',
 	                        items: [{
 	    							xtype: 'container',
-	    							html: '<p><i>'+me.localize("tableOptionsText")+'</i></p>',
+	    							html: '<p><i>'+new Ext.Template(me.localize('tableOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-tables'])+'</i></p>',
 	    							width: 375
 	                        	},{
 								    xtype:'combo',
@@ -418,13 +419,26 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								    value: ''
 								},{
 	    							xtype: 'container',
-	    							html: '<p><i>'+me.localize("tableMetadata")+'</i></p>',
+	    							html: '<p><i>'+me.localize("tableNoHeadersRowText")+'</i></p>',
+	    							width: 375
+	                            },{
+									fieldLabel: me.localize("tableNoHeadersRow"),
+									xtype: 'checkboxfield',
+									name: 'tableNoHeadersRow',
+									inputValue: "true"
+								},{
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("tableContentText")+'</i></p>',
 	    							width: 375
 	                            },{
 									fieldLabel: me.localize('tableContent'),
 									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableContent'
 								},{
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("tableMetadataText")+'</i></p>',
+	    							width: 375
+	                            },{
 									fieldLabel: me.localize('tableAuthor'),
 									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableAuthor'
@@ -432,11 +446,6 @@ Ext.define('Voyant.panel.CorpusCreator', {
 									fieldLabel: me.localize('tableTitle'),
 									validator: function(val) {return me.validatePositiveNumbersCsv.call(me, val)},
 									name: 'tableTitle'
-								},{
-									fieldLabel: me.localize("tableNoHeadersRow"),
-									xtype: 'checkboxfield',
-									name: 'tableNoHeadersRow',
-									inputValue: "true"
 								}
 							]
 						},{
