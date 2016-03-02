@@ -70,6 +70,7 @@ Ext.define('Voyant.panel.Documents', {
             	tooltip: this.localize("modifyTip"),
     			glyph: 'xf044@FontAwesome',
     			scope: this,
+    			itemId: 'modifyButton',
             	handler: function(btn) {
             		var win = Ext.create('Ext.window.Window', {
             		    title: this.localize("title"),
@@ -236,6 +237,30 @@ Ext.define('Voyant.panel.Documents', {
     	this.on('loadedCorpus', function(src, corpus) {
     		this.store.setCorpus(corpus);
     		this.store.load({params: this.getApiParams()});
+    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+    			this.queryById('modifyButton').hide();
+    		}
+    		/*
+    		var me = this;
+    		Ext.Ajax.request({
+    			url: this.getApplication().getTromboneUrl(),
+    			params: {
+    				corpus: corpus.getId(),
+    				tool: 'corpus.CorpusManager',
+    				getAccess: true
+    			},
+    		    success: function(response, opts) {
+    		        var obj = Ext.decode(response.responseText);
+    		        if (obj && obj)
+    		        debugger
+    		        console.dir(obj);
+    		        me
+    		    },
+    		    failure: function(response, opts) {
+    		    	me.showError(response);
+    		    }
+    		})
+    		*/
     	})
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)

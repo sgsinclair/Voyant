@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Feb 28 11:42:37 EST 2016 */
+/* This file created by JSCacher. Last modified: Wed Mar 02 14:40:32 EST 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -9042,6 +9042,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
+    		store.loadPage(1);
     	});
     	
     	if (config.embedded) {
@@ -9281,6 +9282,7 @@ Ext.define('Voyant.panel.Documents', {
             	tooltip: this.localize("modifyTip"),
     			glyph: 'xf044@FontAwesome',
     			scope: this,
+    			itemId: 'modifyButton',
             	handler: function(btn) {
             		var win = Ext.create('Ext.window.Window', {
             		    title: this.localize("title"),
@@ -9447,6 +9449,30 @@ Ext.define('Voyant.panel.Documents', {
     	this.on('loadedCorpus', function(src, corpus) {
     		this.store.setCorpus(corpus);
     		this.store.load({params: this.getApiParams()});
+    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+    			this.queryById('modifyButton').hide();
+    		}
+    		/*
+    		var me = this;
+    		Ext.Ajax.request({
+    			url: this.getApplication().getTromboneUrl(),
+    			params: {
+    				corpus: corpus.getId(),
+    				tool: 'corpus.CorpusManager',
+    				getAccess: true
+    			},
+    		    success: function(response, opts) {
+    		        var obj = Ext.decode(response.responseText);
+    		        if (obj && obj)
+    		        debugger
+    		        console.dir(obj);
+    		        me
+    		    },
+    		    failure: function(response, opts) {
+    		    	me.showError(response);
+    		    }
+    		})
+    		*/
     	})
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
@@ -10829,7 +10855,7 @@ Ext.define('Voyant.panel.Reader', {
             		this.loadQueryTerms(queryTerms);
         		},
         		documentsClicked: function(src, documents, corpus) {
-        			if (documents) {
+        			if (documents.length > 0) {
             			var doc = documents[0];
             			this.setApiParams({'skipToDocId': doc.getId(), start: 0});
 						this.load(true);
@@ -12094,7 +12120,7 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
 	},
     statics: {
     	i18n: {
-			title: {en: "DocumentSimilarity"},
+			title: {en: "Document Similarity"},
 			loading: {en: "Loading"},
 			helpTip: {en: ""},
 			tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
