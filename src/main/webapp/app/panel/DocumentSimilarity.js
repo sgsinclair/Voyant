@@ -14,6 +14,13 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
 			title: {en: "Document Similarity"},
 			loading: {en: "Loading"},
 			helpTip: {en: ""},
+			
+			freqsMode: {en: "Frequencies"},
+			freqsModeTip: {en: "Determines if frequencies are expressed as relative counts or as TF-IDF."},
+    		options: {en: "Options"},
+    		tfidf: {en: 'TF-IDF'},
+    		relativeFrequencies: {en: 'Relative Frequencies'},
+    		
 			tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
 			docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'},
 			noTermSelected: {en: "No term selected."}
@@ -23,7 +30,8 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
     		dimensions: 3,
     		clusters: 3,
     		stopList: 'auto',
-    		docId: undefined
+    		docId: undefined,
+    		comparisonType: 'relative'
     	},
 		glyph: 'xf06e@FontAwesome'
     },
@@ -51,6 +59,39 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
     		bbar: new Ext.Toolbar({
     			items: [{
 	            	xtype: 'documentselectorbutton'
+	            },{
+	            	text: this.localize('freqsMode'),
+					glyph: 'xf201@FontAwesome',
+				    tooltip: this.localize('freqsModeTip'),
+				    menu: {
+				    	items: [
+				           {
+				               text: this.localize("relativeFrequencies"),
+				               checked: true,
+				               itemId: 'relative',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('comparisonType', 'relative');
+				                	   this.loadFromApis();
+				            	   }
+				               },
+				               scope: this
+				           }, {
+				               text: this.localize("tfidf"),
+				               checked: false,
+				               itemId: 'tfidf',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('comparisonType', 'tfidf');
+				                	   this.loadFromApis();
+				            	   }
+				               },
+				               scope: this
+				           }
+				       ]
+				    }
 	            }]
     		})
         });
