@@ -72,11 +72,11 @@ The first option is for defining how Voyant should extract text from the table (
 
 <b>2: _from cells in each row_</b>: this option assumes that each row has one or more documents, either the entire row or specific cells
 
-<div style="max-width: 841px; margin-left: auto; margin-right: auto;">{@img fromcellsineachrow.png From Cells in Each Row}</div>
+<div style="max-width: 476px; margin-left: auto; margin-right: auto;">{@img fromcellsineachrow.png From Cells in Each Row}</div>
 
 <b>3: _from entire columns_</b>: this option assumes that documents should be extracted from one or more columns
 
-<div style="max-width: 658px; margin-left: auto; margin-right: auto;">{@img fromentirecolumns.png From Entire Columns}</div>
+<div style="max-width: 371px; margin-left: auto; margin-right: auto;">{@img fromentirecolumns.png From Entire Columns}</div>
 
 Whether you use _from cells in each row_ or _from entire columns_ you can also choose one or more columns for content. Columns are specified by number (even when there's a header row), and the left-most column is column 1. Content from multiple columns can be combined using the plus sign and columns can be specified separately by using commas. Here are some examples:
 
@@ -104,7 +104,10 @@ Tokenization (in this context) is the process of identifying words, or sequences
 
 ## Access Management
 
-Voyant provides some basic access management functions that are intended to help control who can access a given corpus. It's worth mentioning that each corpus is given a unique 32-character code when it's created, which amounts to 2^128 or 340,282,366,920,938,463,463,374,607,431,768,211,456 possibilities. In other words, it's extremely unlikely that anyone would stumble upon your corpus by accident or by luck. That doesn't mean that your corpus is entirely safe from prying eyes, it's possible for a URL or for parameters to be detected during usual web communication, for instance.
+<div style="max-width: 400px; float: right; padding: 1em;">{@img access-management.png Access Management}</div>
+
+
+Voyant provides some basic access management functions that are intended to help control who can access a given corpus. It's worth mentioning that each corpus is given a unique 32-character code when it's created, which amounts to 2<sup>128</sup> or 340,282,366,920,938,463,463,374,607,431,768,211,456 possibilities. In other words, it's extremely unlikely that anyone would stumble upon your corpus by accident or by luck. That doesn't mean that your corpus is entirely safe from prying eyes, it's possible for a URL or for parameters to be detected during usual web communication, for instance.
 
 The access codes that can be specified in Voyant are an additional level of protection. These shouldn't be considered as passwords, not least because Voyant is not normally hosted on a secure server (with https traffic), so any access codes are transmitted in the clear. Still, under normal circumstances, the access codes can help further restrict access, if needed.
 
@@ -114,12 +117,22 @@ Access management must be specified during corpus creation, it can't be specifie
 
 ### Admin Codes
 
-The first option allows you to specify one or more admin(istration) codes. Admin codes give you access to the corpus as well as to the access management options (if ever you want to later modify any of the access management options). If you don't specify admin codes, the access codes will still be in effect, but you won't be able to change them. You can specify one or more different admin codes separated by commas (any one of the codes will work).
+The first option allows you to specify one or more admin(istration) codes. Admin codes give you access to the corpus as well as to the access management options (if ever you want to later modify any of the access management options). If you don't specify admin codes, the access codes (if provided) will still be in effect, but you won't be able to change them. You can specify one or more different admin codes separated by commas (any one of the codes will work).
 
 ### Access Codes
 
+The second option allows you to specify one or more full access codes (without a valid code, access is either restricted or completely blocked – see the next option for more details). You can specify multiple codes separated by commas, which allows you to  assign and modify access independently for multiple groups and users. If no access codes are provided, access will be limited either to admin codes (if any are provided) or the corpus will be open.
 
+### Other Access
 
+This option determines what happens when an admin or access code is required but no valid code is provided by the user:
+
+* **limited (non-consumptive)**: users can access analytic tools and views of the corpus but not any tool that allows text to be read or reconstituted
+* **none**: no access is provided to this corpus
+
+Although it might be tempting to select "none" for simplicity or by force of habit, the non-consumptive option is more nuanced solution and recognizes that much analytic work can be done with derivative data while protecting principles of copyright (since the text in its original form can't be recovered with non-consumptive access). These issues have been explored by [digital humanities scholars](http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2102542), as well as by the courts in cases like [Authors Guild v. HathiTrust](https://en.wikipedia.org/wiki/Authors_Guild,_Inc._v._HathiTrust).
+
+We believe that the non-consumptive option is on firm ethical and legal footing, even for copyright text, but responsibilty lies with the creator of the corpus. It's also worth reiterating that any access management provided by Voyant is only one line of defense, so unintended access may occur and the hosted version should not be used when confidentiality is important.
 
 ## Next Steps
 

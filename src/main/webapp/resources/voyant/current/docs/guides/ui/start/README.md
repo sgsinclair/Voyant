@@ -48,6 +48,8 @@ For more information about the available tools, consult the [List of Tools](#!/g
 
 One of the most interesting features of Voyant Tools is the ability to bookmark and share URLs that refer to your collection of texts. Among other advantages, this allows you to work with the same texts during different sessions, without having to reload all the documents each time. You can export a link for your corpus and the current set of tools clicking on the “Export” (diskette) icon in the blue bar at the top, or export a link for an individual tool by clicking on the “Export” icon in one of the tool panes.
 
+Generally speaking, a corpus will remain accessible as long as it accessed at least once a month.
+
 {@img save-bookmark.png Export Bookmark}
 
 ## Next Steps

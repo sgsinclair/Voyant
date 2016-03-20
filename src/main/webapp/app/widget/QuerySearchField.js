@@ -8,6 +8,10 @@ Ext.define('Voyant.widget.QuerySearchField', {
 			querySearchTip: {en: '<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,&quot;coat mittens&quot;~5</b>: combine syntaxes</li></ul>'}
 		}
 	},
+	config: {
+		tokenType: 'lexical',
+		inDocumentsCountOnly: undefined
+	},
     triggers: {
     	/*
         clear: {
@@ -82,14 +86,16 @@ Ext.define('Voyant.widget.QuerySearchField', {
         		    		this.store.load({
         		    			params: {
             		    			query: [value+"*", "^"+value+"*"],
-            		    			limit: 5
+            		    			limit: 5,
+            		    			tokenType: this.tokenType,
+            		    			inDocumentsCountOnly: this.inDocumentsCountOnly
         		    			},
         		    			scope: this,
         		    			callback: function(records, operation, success) {
         		    				suggest = ""
         		    				records.forEach(function(record) {
-        		    					suggest+="<div>"+record.getTerm()+" ("+record.getRawFreq()+")</div>"
-        		    				})
+        		    					suggest+="<div>"+record.getTerm()+" ("+(this.inDocumentsCountOnly ? record.getInDocumentsCount() : record.getRawFreq())+")</div>"
+        		    				}, this)
         		    				this.suggest.show();
         		    				this.suggest.update(suggest)
         		    		    }

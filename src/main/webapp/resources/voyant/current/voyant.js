@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Mar 02 14:40:32 EST 2016 */
+/* This file created by JSCacher. Last modified: Sun Mar 20 15:37:59 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3457,6 +3457,23 @@ Ext.define('Voyant.data.model.Context', {
              {name: 'right'}
         ]
 });
+Ext.define('Voyant.data.model.CorpusFacet', {
+    extend: 'Ext.data.Model',
+    fields: [
+             {name: 'facet'},
+             {name: 'label'},
+             {name: 'inDocumentsCount', type: 'int'}
+    ],
+    getLabel: function() {
+    	return this.get('label')
+    },
+    getFacet: function() {
+    	return this.get('facet')
+    },
+	getInDocumentsCount: function() {
+		return this.get('inDocumentsCount')
+	}
+});
 Ext.define('Voyant.data.model.CorpusCollocate', {
     extend: 'Ext.data.Model',
     fields: [
@@ -3478,6 +3495,7 @@ Ext.define('Voyant.data.model.CorpusTerm', {
     fields: [
              {name: 'id'},
              {name: 'rawFreq', type: 'int'},
+             {name: 'inDocumentsCount', type: 'int'},
              {name: 'relativeFreq', type: 'float'},
              {name: 'relativePeakedness', type: 'float'},
              {name: 'relativeSkewness', type: 'float'},
@@ -3492,6 +3510,9 @@ Ext.define('Voyant.data.model.CorpusTerm', {
     },
 	getRawFreq: function() {
 		return parseInt(this.get('rawFreq'));
+	},
+	getInDocumentsCount: function() {
+		return parseInt(this.get('inDocumentsCount'));
 	}
 });
 Ext.define('Voyant.data.model.CorpusNgram', {
@@ -3625,7 +3646,8 @@ Ext.define('Voyant.data.model.DocumentQueryMatch', {
              {name: 'distributions'}
         ],
     getCount: function() {return this.get('count')},
-    getDistributions: function() {return this.get("distributions")}
+    getDistributions: function() {return this.get("distributions")},
+    getDocIds: function() {return this.get("docIds")}
 });
 Ext.define('Voyant.data.model.DocumentTerm', {
     extend: 'Ext.data.Model',
@@ -3916,6 +3938,70 @@ Ext.define('Voyant.data.store.CorpusCollocates', {
 		
 //    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.callParent([config]);
+
+	},
+	
+	setCorpus: function(corpus) {
+		if (corpus) {
+			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
+		}
+		this.callParent(arguments);
+	}
+
+});
+
+Ext.define("Voyant.data.proxy.CorpusFacets", {
+	extend: 'Ext.data.proxy.Ajax',
+	constructor: function(config) {
+		config = config || {};
+		Ext.apply(config, {
+            extraParams: Ext.apply(config.extraParams || {}, {
+				 tool: 'corpus.CorpusFacets'
+			})
+		});
+		Ext.applyIf(config, {
+			url: Voyant.application.getTromboneUrl()
+		})
+		this.callParent([config]);
+	},
+	reader: {
+	    type: 'json',
+	    rootProperty: 'corpusFacets.facets',
+	    totalProperty: 'corpusFacets.total'
+	},
+    simpleSortMode: true
+})
+
+Ext.define('Voyant.data.store.CorpusFacets', {
+	extend: 'Voyant.data.store.VoyantStore',
+    model: 'Voyant.data.model.CorpusFacet',
+    transferable: ['setCorpus'],
+	config: {
+		corpus: undefined
+	},
+	constructor : function(config) {
+		
+		config = config || {};
+		
+		Ext.applyIf(config, {
+			pagePurgeCount: 0,
+			pageSize: 100,
+			leadingBufferZone: 100,
+			remoteSort: true,
+			autoLoad: false, // needs to be false until there's a corpus
+		    proxy: Ext.create("Voyant.data.proxy.CorpusFacets", {
+		    	extraParams: {
+		    		facet: config.facet
+		    	}
+		    })
+		})
+
+		this.callParent([config]);
+		
+		if (config && config.corpus) {
+			this.setCorpus(config.corpus);
+		}
+
 
 	},
 	
@@ -4873,6 +4959,10 @@ Ext.define('Voyant.widget.QuerySearchField', {
 			querySearchTip: {en: '<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,&quot;coat mittens&quot;~5</b>: combine syntaxes</li></ul>'}
 		}
 	},
+	config: {
+		tokenType: 'lexical',
+		inDocumentsCountOnly: undefined
+	},
     triggers: {
     	/*
         clear: {
@@ -4947,14 +5037,16 @@ Ext.define('Voyant.widget.QuerySearchField', {
         		    		this.store.load({
         		    			params: {
             		    			query: [value+"*", "^"+value+"*"],
-            		    			limit: 5
+            		    			limit: 5,
+            		    			tokenType: this.tokenType,
+            		    			inDocumentsCountOnly: this.inDocumentsCountOnly
         		    			},
         		    			scope: this,
         		    			callback: function(records, operation, success) {
         		    				suggest = ""
         		    				records.forEach(function(record) {
-        		    					suggest+="<div>"+record.getTerm()+" ("+record.getRawFreq()+")</div>"
-        		    				})
+        		    					suggest+="<div>"+record.getTerm()+" ("+(this.inDocumentsCountOnly ? record.getInDocumentsCount() : record.getRawFreq())+")</div>"
+        		    				}, this)
         		    				this.suggest.show();
         		    				this.suggest.update(suggest)
         		    		    }
@@ -5425,6 +5517,69 @@ Ext.define('Voyant.panel.VoyantTabPanel', {
 		}
 	}
 });
+Ext.define('Voyant.widget.Facet', {
+	extend: 'Ext.grid.Panel',
+    mixins: ['Voyant.panel.Panel'],
+    alias: 'widget.facet',
+	statics: {
+		i18n: {
+		},
+		api: {
+			stopList: 'auto',
+			query: undefined
+		}
+	},
+
+	config: {
+		corpus: undefined
+	},
+	constructor: function(config) {
+        this.callParent(arguments);
+        Ext.applyIf(config || {}, {
+        	includeTools: [], // don't show tools in header
+        	rowLines: false,
+        	columnLines: false // ignored?
+       
+        })
+        this.mixins['Voyant.panel.Panel'].constructor.apply(this, [config]);
+	},
+	
+	rowLines: false,
+	
+    initComponent: function(){
+
+    	if (!this.store) {
+    		this.store = new Ext.create("Voyant.data.store.CorpusFacets", {
+    			facet: this.facet,
+    			parentPanel: this
+    		})
+    	}
+
+        Ext.applyIf(this, {
+        	hideHeaders: true,
+        	selType: 'checkboxmodel',
+        	columns: [
+        	          { renderer: function(value, metaData, record) {return "("+record.getInDocumentsCount()+") "+record.getLabel()}, flex: 1 }
+        	]
+        });
+        this.callParent();
+        
+        this.on("query", function(src, query) {
+        	this.setApiParam("query", query);
+        	this.store.loadPage(1);
+        	
+        })
+    },
+    
+    setCorpus: function(corpus) {
+    	this.callParent(arguments)
+    	if (this.getStore()) {
+        	this.getStore().setCorpus(corpus);
+        	this.getStore().load();
+    	}
+    }
+});
+
 // assuming Bubblelines library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Bubblelines', {
 	extend: 'Ext.panel.Panel',
@@ -5961,6 +6116,284 @@ Ext.define('Voyant.panel.Bubblelines', {
 		this.getApplication().dispatchEvent('termsClicked', this, data);
 	}
 });
+Ext.define('Voyant.panel.Catalogue', {
+	extend: 'Ext.panel.Panel',
+	requires: ['Voyant.widget.Facet'],
+	mixins: ['Voyant.panel.Panel'],
+	
+	alias: 'widget.catalogue',
+    statics: {
+    	i18n: {
+    		title: {en: "Catalogue"},
+    		helpTip: {en: "<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>"},
+    		"facet.authorTitle": {en: "Authors"},
+    		"facet.languageTitle": {en: "Languages"},
+    		"facet.titleTitle": {en: "Titles"},
+    		"facet.keywordTitle": {en: "Keywords"},
+    		"facet.pubDateTitle": {en: "Publication Dates"},
+    		"facet.publisherTitle": {en: "Publishers"},
+    		"facet.pubPlaceTitle": {en: "Publication Locations"},
+    		lexicalTitle: {en: "Terms"},
+    		noMatches: {'en': new Ext.Template('No matches (out of {0} documents).', {compiled: true})},
+    		queryMatches: {en: new Ext.Template("{0} matching documents (out of {1}).", {compiled: true})},
+    		clickToOpenCorpus: {'en': new Ext.Template('<a href="{0}" target="_blank" class="link">Click here</a> to access your new corpus', {compiled: true})},
+    		"export": {en: "Export"},
+    		exportTip: {en: "Create a new Voyant corpus with the selected documents."}
+    	},
+    	api: {
+    		config: undefined,
+    		stopList: 'auto',
+    		facet: ['facet.title','facet.author','facet.language']
+    	},
+		glyph: 'xf1ea@FontAwesome'
+    },
+    config: {
+    	corpus: undefined,
+    	facets: {},
+    	matchingDocIds: []
+    },
+    
+    constructor: function(config) {
+
+    	Ext.apply(this, {
+    		title: this.localize('title'),
+    		layout: 'hbox',
+    		items: [
+    		        {
+    		        	layout: 'vbox',
+    		        	height: '100%',
+    		        	align: 'stretch',
+    		        	itemId: 'facets',
+    		        	defaults: {
+    		        		width: 250,
+    		        		flex: 1,
+    		        		xtype: 'facet',
+    		        		margin: 5,
+    		        		border: true,
+    		        		frame: true
+    		        	},
+    		        	items: []
+    		        },
+    		        {
+    		        	xtype: 'panel',
+    		        	html: '',
+    		        	flex: 1,
+    		        	itemId: 'results',
+    		        	height: '100%',
+    		        	align: 'stretch',
+    		        	scrollable: true,
+    		        	margin: 5,
+    		        	getCorpus: function() { // for query search field
+    		        		return this.findParentByType('panel').getCorpus();
+    		        	},
+    		        	listeners: {
+    		        		query: function(src, query) {
+    		        			this.findParentByType('panel').updateResults([query])
+    		        		}
+    		        	},
+    		        	bbar: [{
+    		        		itemId: 'export',
+    		        		text: this.localize('export'),
+    		        		tooltip: this.localize('exportTip'),
+    		        		disabled: true,
+    		        		handler: function() {
+    		        			this.mask(this.localize("exportInProgress"));
+    		        			var catalogue = this;
+    		            		Ext.Ajax.request({
+    		            			url: this.getApplication().getTromboneUrl(),
+    		            			params: {
+    		            				corpus: this.getCorpus().getId(),
+    		            				tool: 'corpus.CorpusManager',
+    		            				keepDocuments: true,
+    		            				docId: this.getMatchingDocIds()
+    		            			},
+    		            		    success: function(response, opts) {
+    		            		    	catalogue.unmask();
+    		            		    	var json = Ext.JSON.decode(response.responseText);
+	                    				var url = catalogue.getBaseUrl()+"?corpus="+json.corpus.id;
+	                    				var win = window.open(url);
+	                    				if (!win) { // popup blocked
+	                    					win = Ext.Msg.show({
+	                    						buttons: Ext.MessageBox.OK,
+	                    						buttonText: {ok: "Close"},
+	                    						icon: Ext.MessageBox.INFO,
+	                    						message: catalogue.localize('clickToOpenCorpus', [url])
+	                    					});
+	                    					Ext.Msg.getEl().dom.querySelector("a").addEventListener("click", function() {
+	                    						win.close()
+	                    					})
+	                    				}
+    		            		    },
+    		            		    failure: function(response, opts) {
+    		            		    	catalogue.unmask();
+    		            		    	me.showError(response);
+    		            		    }
+    		            		})
+
+    		        		},
+    		        		scope: this
+    		        	},{
+    		        		xtype: 'querysearchfield',
+    		        		width: 200,
+    		        		flex: 1
+    		        	},{
+    		        		itemId: 'status',
+    		        		xtype: 'tbtext'
+    		        	}]
+    		        }]
+    	});
+
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
+        // create a listener for corpus loading (defined here, in case we need to load it next)
+    	this.on('loadedCorpus', function(src, corpus) {
+    		this.setCorpus(corpus);
+    		this.queryById('status').update(this.localize('noMatches', [corpus.getDocumentsCount()]))
+    		this.query("facet").forEach(function(facet) {
+    			facet.setCorpus(corpus);
+    		})
+    	});
+    	
+    	this.on('afterrender', function(panel) {
+    		var facets = this.getApiParam('facet');
+    		if (Ext.isString(facets)) {facets = [facets]}
+    		var facetsCmp = this.queryById('facets');
+    		facets.forEach(function(facet) {
+    			var facetCmp = facetsCmp.add({
+    				title: panel.localize(facet+"Title"),
+    				facet: facet,
+    				bbar: [{
+    					xtype: 'querysearchfield',
+    					tokenType: facet.replace("facet.", ""),
+    					inDocumentsCountOnly: true
+    				}]
+    			})
+    			facetCmp.getSelectionModel().on('selectionchange', function(model, selected) {
+    				var labels = [];
+    				selected.forEach(function(model) {
+    					labels.push({facet: model.getFacet(), label: model.getLabel()})
+    				})
+    				panel.getFacets()[facet] = labels;
+    				panel.updateResults();
+    			})
+    			facetCmp.on('query', function(model, selected) {
+    				panel.getFacets()[facetCmp.facet] = [];
+    				panel.updateResults();
+    			})
+    		})
+    		var facetCmp = facetsCmp.add({
+    			title: panel.localize('lexicalTitle'),
+    			store: Ext.create("Voyant.data.store.CorpusTerms", {parentPanel: this}),
+    			facet: 'lexical',
+    			columns: [{
+    				renderer: function(value, metaData, record) {return "("+record.getRawFreq()+") "+record.getTerm()},
+    				flex: 1
+    			}],
+				bbar: [{
+					xtype: 'querysearchfield'
+				}]
+    		})
+			facetCmp.getSelectionModel().on('selectionchange', function(model, selected) {
+				var labels = [];
+				selected.forEach(function(model) {
+					labels.push({facet: 'lexical', label: model.getTerm()})
+				})
+				panel.getFacets()['lexical'] = labels;
+				panel.updateResults();
+			})
+    	})
+    	
+    },
+    
+    updateResults: function(queries) {
+    	var facets = this.getFacets();
+    	if (!queries) {
+	    	var queries = [];
+	    	for (facet in facets) {
+	    		facets[facet].forEach(function(label) {
+	        		queries.push(label.facet+":"+label.label);
+	    		})
+	    	}
+	    	if (queries) {
+		    	return this.updateResults(queries)
+	    	}
+    	}
+		var results = this.queryById("results").getTargetEl();
+		results.update("");
+		this.queryById('export').setDisabled(true);
+    	if (queries.length>0) {
+    		this.mask(this.localize("loading"));
+    		var documentQueryMatches = this.getCorpus().getDocumentQueryMatches();
+    		documentQueryMatches.load({
+    			params: {query: queries, includeDocIds: true},
+    			callback: function(records, operation, success) {
+    				this.unmask();
+    				if (records && records.length>0) {
+    					this.queryById('status').setHtml(records.length)
+    					var list = "<ul>";
+    					var matchingDocIds = [];
+    					records.forEach(function(record) {
+    						record.getDocIds().forEach(function(docId) {
+    							matchingDocIds.push(docId);
+    							var doc = documentQueryMatches.getCorpus().getDocument(docId);
+    							var item = "<li>";
+    							item += "<i>"+doc.getTitle()+"</i>";
+    							for (facet in facets) {
+    								if (facets[facet].length==0) {continue;}
+    								var labelItems = "";
+    								if (facet!='facet.title') {
+    									var suffix = facet.replace(/^.+?\./,"");
+    									var label = doc.get(suffix);
+    									if (label) {
+    										var isArray = Ext.isArray(label);
+    										if (isArray) {
+    											labelItems+="<li>"+suffix+"<ul>"
+    										} else {
+    											label = [label];
+    										}
+    										label.forEach(function(l) {
+    											var isMatch = false;
+    											facets[facet].forEach(function(f) {
+    												if (f.label==l) {isMatch=true}
+    												else if (f.facet.indexOf('facet')==-1) {
+    													f.label.split(/\W+/).forEach(function(part) {
+    														if (part.trim().length>0 && l.toLowerCase().indexOf(part.toLowerCase())>-1) {
+    															isMatch=true;
+    														}
+    													})
+    												}
+    											})
+    											labelItems+="<li>"+(isArray ? '' : suffix+": ")+(isMatch ? '<span class="keyword">'+l+'</span>' : l)+"</li>"
+    										})
+    										if (isArray) {
+    											labelItems+="</ul></li>";
+    										}
+    									}
+    								}
+    								if (labelItems) {
+    									item+="<ul>"+labelItems+"</ul>";
+    								}
+    							}
+    							item += "</li>";
+    							list += item;
+    						})
+    					})
+    					list += "</ul>";
+    					results.update(list);
+    					this.queryById('status').update(this.localize('queryMatches', [matchingDocIds.length,this.getCorpus().getDocumentsCount()]))
+    					this.setMatchingDocIds(matchingDocIds);
+    					if (matchingDocIds.length>0) {
+    						this.queryById('export').setDisabled(false);
+    					}
+    				}
+    			},
+    			scope: this
+    		})    		
+    	}
+    }
+});
+
 
 // assuming Cirrus library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Cirrus', {
@@ -7873,7 +8306,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 							]
 						},{
 	        				xtype: 'fieldset',
-	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-access' target='voyantdocs'>"+me.localize('accessOptions')+"</a>",
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-access-management' target='voyantdocs'>"+me.localize('accessOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        defaultType: 'textfield',
@@ -12123,6 +12556,13 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
 			title: {en: "Document Similarity"},
 			loading: {en: "Loading"},
 			helpTip: {en: ""},
+			
+			freqsMode: {en: "Frequencies"},
+			freqsModeTip: {en: "Determines if frequencies are expressed as relative counts or as TF-IDF."},
+    		options: {en: "Options"},
+    		tfidf: {en: 'TF-IDF'},
+    		relativeFrequencies: {en: 'Relative Frequencies'},
+    		
 			tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
 			docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'},
 			noTermSelected: {en: "No term selected."}
@@ -12132,7 +12572,8 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
     		dimensions: 3,
     		clusters: 3,
     		stopList: 'auto',
-    		docId: undefined
+    		docId: undefined,
+    		comparisonType: 'relative'
     	},
 		glyph: 'xf06e@FontAwesome'
     },
@@ -12160,6 +12601,39 @@ Ext.define('Voyant.panel.DocumentSimilarity', {
     		bbar: new Ext.Toolbar({
     			items: [{
 	            	xtype: 'documentselectorbutton'
+	            },{
+	            	text: this.localize('freqsMode'),
+					glyph: 'xf201@FontAwesome',
+				    tooltip: this.localize('freqsModeTip'),
+				    menu: {
+				    	items: [
+				           {
+				               text: this.localize("relativeFrequencies"),
+				               checked: true,
+				               itemId: 'relative',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('comparisonType', 'relative');
+				                	   this.loadFromApis();
+				            	   }
+				               },
+				               scope: this
+				           }, {
+				               text: this.localize("tfidf"),
+				               checked: false,
+				               itemId: 'tfidf',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('comparisonType', 'tfidf');
+				                	   this.loadFromApis();
+				            	   }
+				               },
+				               scope: this
+				           }
+				       ]
+				    }
 	            }]
     		})
         });
@@ -15458,7 +15932,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		bins: 10,
     		docIndex: undefined,
     		docId: undefined,
-    		mode: undefined
+    		mode: "corpus"
     	},
 		glyph: 'xf201@FontAwesome'
     },
@@ -15490,6 +15964,12 @@ Ext.define('Voyant.panel.TermsRadio', {
     			this.setApiParams({withDistributions: 'raw'});
     			this.down('#raw').setChecked(true);
     		}
+    		if (!("bins" in this.getModifiedApiParams())) {
+    			if (this.getApiParam('mode')==this.MODE_CORPUS) {
+    				var count = corpus.getDocumentsCount();
+    				this.setApiParam("bins", count > 100 ? 100 : count);
+    			}
+    		}
     		if (this.isVisible()) {
         		this.loadFromCorpus(corpus);
     		}
@@ -15498,7 +15978,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     	this.on("corpusSelected", function(src, corpus) {
     		if (src.isXType("corpusdocumentselector")) {
     			this.setMode(this.MODE_CORPUS);
-    			this.setApiParams({docId: undefined, docIndex: undefined, bins: undefined})
+    			this.setApiParams({docId: undefined, docIndex: undefined})
         		this.loadFromCorpus(corpus);
     		}
     	});
@@ -15899,10 +16379,9 @@ Ext.define('Voyant.panel.TermsRadio', {
     setMode: function(mode) {
     	this.setApiParams({mode: mode});
     	var mode = this.getApiParam("mode");    	
-    	var menu = this.queryById("segmentsSlider");
-    	menu.setHidden(mode==this.MODE_CORPUS)
-    }
-    
+//    	var menu = this.queryById("segmentsSlider");
+//    	menu.setHidden(mode==this.MODE_CORPUS)
+    }        
 });
 Ext.define('Voyant.panel.VoyantFooter', {
 	extend: 'Ext.container.Container',

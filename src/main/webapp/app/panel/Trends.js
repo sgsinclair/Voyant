@@ -32,7 +32,7 @@
     		bins: 10,
     		docIndex: undefined,
     		docId: undefined,
-    		mode: undefined
+    		mode: "corpus"
     	},
 		glyph: 'xf201@FontAwesome'
     },
@@ -64,6 +64,12 @@
     			this.setApiParams({withDistributions: 'raw'});
     			this.down('#raw').setChecked(true);
     		}
+    		if (!("bins" in this.getModifiedApiParams())) {
+    			if (this.getApiParam('mode')==this.MODE_CORPUS) {
+    				var count = corpus.getDocumentsCount();
+    				this.setApiParam("bins", count > 100 ? 100 : count);
+    			}
+    		}
     		if (this.isVisible()) {
         		this.loadFromCorpus(corpus);
     		}
@@ -72,7 +78,7 @@
     	this.on("corpusSelected", function(src, corpus) {
     		if (src.isXType("corpusdocumentselector")) {
     			this.setMode(this.MODE_CORPUS);
-    			this.setApiParams({docId: undefined, docIndex: undefined, bins: undefined})
+    			this.setApiParams({docId: undefined, docIndex: undefined})
         		this.loadFromCorpus(corpus);
     		}
     	});
@@ -473,8 +479,7 @@
     setMode: function(mode) {
     	this.setApiParams({mode: mode});
     	var mode = this.getApiParam("mode");    	
-    	var menu = this.queryById("segmentsSlider");
-    	menu.setHidden(mode==this.MODE_CORPUS)
-    }
-    
+//    	var menu = this.queryById("segmentsSlider");
+//    	menu.setHidden(mode==this.MODE_CORPUS)
+    }        
 });

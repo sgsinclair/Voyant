@@ -23,6 +23,7 @@ app/util/Variants.js
 # MODELS
 app/data/model/AnalysisToken.js
 app/data/model/Context.js
+app/data/model/CorpusFacet.js
 app/data/model/CorpusCollocate.js
 app/data/model/CorpusTerm.js
 app/data/model/CorpusNgram.js
@@ -39,6 +40,7 @@ app/data/store/VoyantStore.js
 app/data/store/CAAnalysis.js
 app/data/store/Contexts.js
 app/data/store/CorpusCollocates.js
+app/data/store/CorpusFacets.js
 app/data/store/CorpusTerms.js
 app/data/store/DocumentQueryMatches.js
 app/data/store/DocumentTerms.js
@@ -58,10 +60,14 @@ app/widget/TotalPropertyStatus.js
 app/widget/DocumentSelector.js
 app/widget/CorpusDocumentSelector.js
 
+
 # PANELS
 app/panel/Panel.js
 app/panel/VoyantTabPanel.js
+# we need facet after panel but before catalogue
+app/widget/Facet.js
 app/panel/Bubblelines.js
+app/panel/Catalogue.js
 app/panel/Cirrus.js
 app/panel/CollocatesGraph.js
 app/panel/Contexts.js

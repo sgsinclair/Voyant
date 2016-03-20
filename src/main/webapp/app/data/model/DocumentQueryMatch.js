@@ -7,5 +7,6 @@ Ext.define('Voyant.data.model.DocumentQueryMatch', {
              {name: 'distributions'}
         ],
     getCount: function() {return this.get('count')},
-    getDistributions: function() {return this.get("distributions")}
+    getDistributions: function() {return this.get("distributions")},
+    getDocIds: function() {return this.get("docIds")}
 });

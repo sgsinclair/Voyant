@@ -62,11 +62,12 @@
 /Users/sgs/.m2/repository/com/uwyn/jhighlight/1.0/jhighlight-1.0.jar
 /Users/sgs/.m2/repository/com/pff/java-libpst/0.8.1/java-libpst-0.8.1.jar
 /Users/sgs/.m2/repository/org/apache/lucene/lucene-core/5.3.1/lucene-core-5.3.1.jar
+/Users/sgs/.m2/repository/org/apache/lucene/lucene-facet/5.3.1/lucene-facet-5.3.1.jar
+/Users/sgs/.m2/repository/org/apache/lucene/lucene-queries/5.3.1/lucene-queries-5.3.1.jar
 /Users/sgs/.m2/repository/org/apache/lucene/lucene-analyzers-icu/5.3.1/lucene-analyzers-icu-5.3.1.jar
 /Users/sgs/.m2/repository/org/apache/lucene/lucene-analyzers-common/5.3.1/lucene-analyzers-common-5.3.1.jar
 /Users/sgs/.m2/repository/com/ibm/icu/icu4j/54.1/icu4j-54.1.jar
 /Users/sgs/.m2/repository/org/apache/lucene/lucene-queryparser/5.3.1/lucene-queryparser-5.3.1.jar
-/Users/sgs/.m2/repository/org/apache/lucene/lucene-queries/5.3.1/lucene-queries-5.3.1.jar
 /Users/sgs/.m2/repository/org/apache/lucene/lucene-sandbox/5.3.1/lucene-sandbox-5.3.1.jar
 /Users/sgs/.m2/repository/org/apache/lucene/lucene-analyzers-smartcn/5.3.1/lucene-analyzers-smartcn-5.3.1.jar
 /Users/sgs/.m2/repository/org/apache/lucene/lucene-test-framework/5.3.1/lucene-test-framework-5.3.1.jar
