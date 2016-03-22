@@ -490,7 +490,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
         var docData = [];
         tokens.forEach(function(token) {
         	var freq = token.get('rawFreq');
-        	var isTerm = token.get('category') === 'term';
+        	var category = token.get('category');
+        	if (category === undefined) category = 'term'; // PCA doesn't define categories
+        	var isTerm = category === 'term';
         	if (isTerm) {
 	        	if (freq > maxFreq) maxFreq = freq;
 	        	if (freq < minFreq) minFreq = freq;
@@ -506,7 +508,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			}
         	var tokenData = {
         		x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2],
-    			term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), category: token.get('category')
+    			term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), category: category
         	};
         	if (!isTerm) {
         		if (token.get('category') === 'bin') {
