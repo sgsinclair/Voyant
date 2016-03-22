@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Mar 20 15:37:59 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue Mar 22 15:31:18 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6116,6 +6116,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		this.getApplication().dispatchEvent('termsClicked', this, data);
 	}
 });
+
 Ext.define('Voyant.panel.Catalogue', {
 	extend: 'Ext.panel.Panel',
 	requires: ['Voyant.widget.Facet'],
@@ -6136,7 +6137,7 @@ Ext.define('Voyant.panel.Catalogue', {
     		lexicalTitle: {en: "Terms"},
     		noMatches: {'en': new Ext.Template('No matches (out of {0} documents).', {compiled: true})},
     		queryMatches: {en: new Ext.Template("{0} matching documents (out of {1}).", {compiled: true})},
-    		clickToOpenCorpus: {'en': new Ext.Template('<a href="{0}" target="_blank" class="link">Click here</a> to access your new corpus', {compiled: true})},
+    		clickToOpenCorpus: {'en': new Ext.Template('Please <a href="{0}" target="_blank" class="link">click here</a> to access your new corpus (since popup windows are blocked).', {compiled: true})},
     		"export": {en: "Export"},
     		exportTip: {en: "Create a new Voyant corpus with the selected documents."}
     	},
@@ -6213,15 +6214,28 @@ Ext.define('Voyant.panel.Catalogue', {
 	                    				var url = catalogue.getBaseUrl()+"?corpus="+json.corpus.id;
 	                    				var win = window.open(url);
 	                    				if (!win) { // popup blocked
-	                    					win = Ext.Msg.show({
-	                    						buttons: Ext.MessageBox.OK,
-	                    						buttonText: {ok: "Close"},
+	                    					var msg = Ext.create('Ext.window.MessageBox', {
+	                    						makeButton: function(btnIdx) {
+	                    					        return new Ext.button.Button({
+	                    					            handler: this.btnCallback,
+//	                    					            itemId: btnId,
+	                    					            scope: this,
+	                    					            text: catalogue.localize('cancel'),
+	                    					            ui: 'default-toolbar',
+	                    					            minWidth: 75
+	                    					        });
+	                    						}
+	                    					}).show({
+	                    						title: catalogue.localize('export'),
+	                    						buttons: Ext.MessageBox.CANCEL,
 	                    						icon: Ext.MessageBox.INFO,
 	                    						message: catalogue.localize('clickToOpenCorpus', [url])
 	                    					});
-	                    					Ext.Msg.getEl().dom.querySelector("a").addEventListener("click", function() {
+	                    					var link = msg.getTargetEl().dom.querySelector("a");
+	                    					link.addEventListener("click", function() {
 	                    						win.close()
 	                    					})
+	                    					Ext.get(link).frame().frame();
 	                    				}
     		            		    },
     		            		    failure: function(response, opts) {
@@ -11719,6 +11733,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			analysis: {en: "Analysis"},
 			ca: {en: "Correspondence Analysis"},
 			pca: {en: "Principal Components Analysis"},
+			docSim: {en: "Document Similarity"},
+			
+			freqsMode: {en: "Frequencies"},
+			freqsModeTip: {en: "Determines if frequencies are expressed as relative counts, raw counts, or as TF-IDF."},
+    		tfidf: {en: 'TF-IDF'},
+    		rawFrequencies: {en: 'Raw Frequencies'},
+    		relativeFrequencies: {en: 'Relative Frequencies'},
+			
 			rawFreq: {en: "Raw"},
 			relFreq: {en: "Relative"},
 			terms: {en: "Terms"},
@@ -11746,13 +11768,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			noTermSelected: {en: "No term selected."}
     	},
     	api: {
+    		docId: undefined,
     		analysis: 'ca',
     		limit: 50,
     		dimensions: 3,
     		bins: 10,
     		clusters: 3,
+    		comparisonType: 'relative',
     		stopList: 'auto',
     		target: undefined,
+    		term: undefined,
     		query: undefined
     	},
 		glyph: 'xf06e@FontAwesome'
@@ -11762,6 +11787,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     docFreqTipTemplate: null,
     caStore: null,
     pcaStore: null,
+    docSimStore: null,
     termStore: Ext.create('Ext.data.JsonStore', {
 		fields: [
 			{name: 'term'},
@@ -11789,6 +11815,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	title: this.localize('title'),
         	caStore: Ext.create('Voyant.data.store.CAAnalysis'),
         	pcaStore: Ext.create('Voyant.data.store.PCAAnalysis'),
+        	docSimStore: Ext.create('Voyant.data.store.DocSimAnalysis'),
         	termStore: this.termStore,
         	chartMenu: Ext.create('Ext.menu.Menu', {
         		items: [
@@ -11813,6 +11840,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		tbar: {
         			enableOverflow: true,
         			items: [{
+    	            	xtype: 'documentselectorbutton'
+    	            },{
                 		text: this.localize('analysis'),
                 		itemId: 'analysis',
                 		glyph: 'xf1ec@FontAwesome',
@@ -11820,13 +11849,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
             			menu: {
         					items: [
         					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
-        					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'}
+        					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'},
+        					    {text: this.localize('docSim'), itemId: 'analysis_docSim', group:'analysis', xtype: 'menucheckitem'}
         					],
         					listeners: {
         						click: function(menu, item) {
         							if (item !== undefined) {
         								if (item.text === this.localize('pca')) {
         									this.setApiParam('analysis', 'pca');
+        								} else if (item.text === this.localize('docSim')) {
+        									this.setApiParam('analysis', 'docSim');
         								} else {
         									this.setApiParam('analysis', 'ca');
         									if (this.getCorpus().getDocumentsCount() == 3) {
@@ -11840,6 +11872,49 @@ Ext.define('Voyant.panel.ScatterPlot', {
         						scope: this
         					}
             			}
+    	            },{
+    	            	text: this.localize('freqsMode'),
+    					glyph: 'xf201@FontAwesome',
+    				    tooltip: this.localize('freqsModeTip'),
+    				    menu: {
+    				    	items: [{
+				               text: this.localize("rawFrequencies"),
+				               checked: false,
+				               itemId: 'raw',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('comparisonType', 'raw');
+				                	   this.loadFromApis();
+				            	   }
+				               },
+				               scope: this
+				           },{
+				               text: this.localize("relativeFrequencies"),
+				               checked: true,
+				               itemId: 'relative',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('comparisonType', 'relative');
+				                	   this.loadFromApis();
+				            	   }
+				               },
+				               scope: this
+				           },{
+				               text: this.localize("tfidf"),
+				               checked: false,
+				               itemId: 'tfidf',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('comparisonType', 'tfidf');
+				                	   this.loadFromApis();
+				            	   }
+				               },
+				               scope: this
+				           }]
+    				    }
                 	},{
                 		text: this.localize('clusters'),
                 		itemId: 'clusters',
@@ -11899,10 +11974,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xtype: 'grid',
  //       		title: 'Terms',
         		region: 'east',
-        		width: 225,
+        		width: '50%',
         		split: true,
 //        		collapsible: true,
 //        		border: true,
+        		forceFit: true,
         		bbar: {
             		enableOverflow: true,
         			items: [{
@@ -11944,9 +12020,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                     }]
         			
         		},
-        		dockedItems: [{
-                    dock: 'top',
-                    xtype: 'toolbar',
+        		tbar: {
             		enableOverflow: true,
                     items: [{
                 		fieldLabel: this.localize('numTerms'),
@@ -11988,7 +12062,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                     	emptyText: this.localize('addTerm'),
                     	width: 90
                     }]
-                }],
+                },
         		columns: [{
         			text: this.localize('term'),
     				dataIndex: 'term',
@@ -11997,12 +12071,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
     			},{
     				text: this.localize('rawFreq'),
     				dataIndex: 'rawFreq',
-    				width: 'autoSize',
                     sortable: true
     			},{
     				text: this.localize('relFreq'),
     				dataIndex: 'relativeFreq',
-    				width: 'autoSize',
                     sortable: true,
                     hidden: true
     			}],
@@ -12053,6 +12125,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		this.setCorpus(corpus);
     		this.caStore.setCorpus(corpus);
     		this.pcaStore.setCorpus(corpus);
+    		this.docSimStore.setCorpus(corpus);
+    		this.loadFromApis();
+    	}, this);
+    	
+    	this.on('documentsSelected', function(src, docIds) {
+    		this.setApiParam('docId', docIds);
     		this.loadFromApis();
     	}, this);
         
@@ -12060,6 +12138,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	this.buildChart(store);
         }, this);
         this.pcaStore.on('load', function(store, records) {
+        	this.buildChart(store);
+        }, this);
+        this.docSimStore.on('load', function(store, records) {
         	this.buildChart(store);
         }, this);
         
@@ -12081,7 +12162,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         var numDims = this.getApiParam('dimensions');
         
     	var summary = '';    	
-    	if (this.getApiParam('analysis') == 'pca') {
+    	if (this.getApiParam('analysis') === 'pca') {
     		// calculate the percentage of original data represented by the dominant principal components
 			var pcs = rec.getPrincipalComponents();
 			var eigenTotal = 0;
@@ -12116,16 +12197,19 @@ Ext.define('Voyant.panel.ScatterPlot', {
         var minFreq = Number.MAX_VALUE;
         var maxFill = 0;
         var minFill = Number.MAX_VALUE;
-                
-        this.termStore.removeAll();
         
+        
+        if (this.getApiParam('analysis') !== 'docSim') { // docSim doesn't return terms so keep the current ones
+	        this.termStore.removeAll();
+        }
+	        
         var tokens = rec.getTokens();
         var termData = [];
         var docData = [];
         tokens.forEach(function(token) {
         	var freq = token.get('rawFreq');
-        	var isDoc = token.get('category') === 'part';
-        	if (!isDoc) {
+        	var isTerm = token.get('category') === 'term';
+        	if (isTerm) {
 	        	if (freq > maxFreq) maxFreq = freq;
 	        	if (freq < minFreq) minFreq = freq;
 	        	
@@ -12138,12 +12222,21 @@ Ext.define('Voyant.panel.ScatterPlot', {
 				if (z < minFill) minFill = z;
 				if (z > maxFill) maxFill = z;
 			}
-        	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2], isDoc: isDoc};
-        	if (isDoc) {
-        		tokenData.docIndex = token.get('docIndex');
-        		var doc = this.getCorpus().getDocument(tokenData.docIndex);
-        		tokenData.term = doc.getTinyTitle();
-        		tokenData.title = doc.getTitle();
+        	var tokenData = {
+        		x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2],
+    			term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), category: token.get('category')
+        	};
+        	if (!isTerm) {
+        		if (token.get('category') === 'bin') {
+        			tokenData.term = tokenData.title = "Bin "+token.get('docIndex');
+        		} else {
+	        		tokenData.docIndex = token.get('docIndex');
+	        		var doc = this.getCorpus().getDocument(tokenData.docIndex);
+	        		if (doc !== null) {
+		        		tokenData.term = doc.getTinyTitle();
+		        		tokenData.title = doc.getTitle();
+	        		}
+        		}
         		docData.push(tokenData);
         	} else {
         		termData.push(tokenData);
@@ -12156,11 +12249,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         
         
     	var termSeriesStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc', 'docIndex'],
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'category', 'docIndex'],
     		data: termData
     	});
     	var docSeriesStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc', 'docIndex'],
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'category', 'docIndex'],
     		data: docData
     	});
     	
@@ -12258,16 +12351,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				var clusterIndex = item.get('cluster');
 	    				var scatterplot = this.getParent().up('scatterplot');
 	    				
-	    				if (clusterIndex === -1) {
+	    				if (clusterIndex === -1 || scatterplot.getApiParam('analysis') !== 'docSim') {
 	    					// no clusters were specified in initial call
-	    					clusterIndex = 0;
+	    					clusterIndex = 6; // default doc color
 	    				}
 	    				
 	    				var a = 0.65;
 	    				if (numDims === 3) {
 	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
 	    				}
-	    				var color = scatterplot.getApplication().getColor(6);
+	    				var color = scatterplot.getApplication().getColor(clusterIndex);
 	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
 	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
 
@@ -12278,10 +12371,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	listeners: {
         		itemclick: function(chart, item, event) {
         			var data = item.record.data;
-        			if (data.isDoc) {
+        			if (data.category === 'doc') {
         				var record = this.getCorpus().getDocument(data.docIndex);
 	            		this.getApplication().dispatchEvent('documentsClicked', this, [record]);
-        			} else {
+        			} else if (data.category === 'term') {
 	        			var record = Ext.create('Voyant.data.model.CorpusTerm', data);
 	            		this.getApplication().dispatchEvent('corpusTermsClicked', this, [record]);
         			}
@@ -12295,7 +12388,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		            	var x = xy[0] - parentXY[0];
 		            	var y = xy[1] - parentXY[1];
 		            	var chartItem = this.down('#chart').getItemForPoint(x,y);
-		            	if (chartItem != null && chartItem.record.get('isDoc') != true) {
+		            	if (chartItem != null && chartItem.record.get('category') === 'term') {
 		            		var series = this.down('#chart').getSeries();
 		            		series[0].disableToolTips();
 		            		series[1].disableToolTips();
@@ -12451,7 +12544,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     getCurrentTerms: function() {
     	var terms = [];
     	this.termStore.each(function(r) {
-    		if (!r.get('isDoc')) {
+    		if (r.get('category') === 'term') {
     			terms.push(r.get('term'));
     		}
     	});
@@ -12492,367 +12585,26 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		if (this.newTerm !== null || keepCurrentTerms) {
     			params.query = terms.join(',');
     		}
-    		params.term = terms;
+//    		params.term = terms;
     	}
     	Ext.apply(params, this.getApiParams());
-//    	delete params.stopList;
+    	if (params.target != null) {
+    		params.term = terms;
+    	}
+
     	if (params.analysis === 'pca') {
     		this.pcaStore.load({
 	    		params: params
 	    	});
+    	} else if (params.analysis === 'docSim'){
+    		this.docSimStore.load({
+	    		params: params
+	    	});
     	} else {
-	    	this.caStore.load({
+    		this.caStore.load({
 	    		params: params
 	    	});
     	}
-    },
-    
-    interpolate: function(lambda, minSrc, maxSrc, minDst, maxDst) {
-        return minDst + (maxDst - minDst) * Math.max(0, Math.min(1, (lambda - minSrc) / (maxSrc - minSrc)));
-    }
-});
-
-/**
- * Adds tool tip disabling.
- */
-Ext.define('Ext.chart.series.CustomScatter', {
-	extend: 'Ext.chart.series.Scatter',
-	
-	alias: 'series.customScatter',
-    type: 'customScatter',
-    seriesType: 'scatterSeries',
-	
-	tipsDisabled: false,
-	
-	enableToolTips: function() {
-		this.tipsDisabled = false;
-	},
-	
-	disableToolTips: function() {
-		this.tipsDisabled = true;
-	},
-	
-    showTip: function (item, xy) {
-    	if (this.tipsDisabled) {
-    		return;
-    	}
-    	
-    	this.callParent(arguments);
-    }
-});
-Ext.define('Voyant.panel.DocumentSimilarity', {
-	extend: 'Ext.panel.Panel',
-	mixins: ['Voyant.panel.Panel'],
-	requires: ['Ext.chart.CartesianChart'],
-	alias: 'widget.documentsimilarity',
-	config: {
-		corpus: undefined,
-		options: {
-    		xtype: 'stoplistoption'
-    	}
-	},
-    statics: {
-    	i18n: {
-			title: {en: "Document Similarity"},
-			loading: {en: "Loading"},
-			helpTip: {en: ""},
-			
-			freqsMode: {en: "Frequencies"},
-			freqsModeTip: {en: "Determines if frequencies are expressed as relative counts or as TF-IDF."},
-    		options: {en: "Options"},
-    		tfidf: {en: 'TF-IDF'},
-    		relativeFrequencies: {en: 'Relative Frequencies'},
-    		
-			tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
-			docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'},
-			noTermSelected: {en: "No term selected."}
-    	},
-    	api: {
-    		limit: 50,
-    		dimensions: 3,
-    		clusters: 3,
-    		stopList: 'auto',
-    		docId: undefined,
-    		comparisonType: 'relative'
-    	},
-		glyph: 'xf06e@FontAwesome'
-    },
-    
-    tokenFreqTipTemplate: null,
-    docFreqTipTemplate: null,
-    chartMenu: null,
-    labelsMode: 0, // 0 all labels, 1 word labels, 2 no labels
-    
-    constructor: function(config) {
-        this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-    },
-    
-    initComponent: function() {
-        Ext.apply(this, {
-        	title: this.localize('title'),
-        	docSimStore: Ext.create('Voyant.data.store.DocSimAnalysis'),
-        	autoDestroy: true,
-        	layout: 'fit',
-    		items: {
-    			layout: 'fit',
-        		itemId: 'chartParent'
-    		},
-    		bbar: new Ext.Toolbar({
-    			items: [{
-	            	xtype: 'documentselectorbutton'
-	            },{
-	            	text: this.localize('freqsMode'),
-					glyph: 'xf201@FontAwesome',
-				    tooltip: this.localize('freqsModeTip'),
-				    menu: {
-				    	items: [
-				           {
-				               text: this.localize("relativeFrequencies"),
-				               checked: true,
-				               itemId: 'relative',
-				               group: 'freqsMode',
-				               checkHandler: function(item, checked) {
-				            	   if (checked) {
-				                	   this.setApiParam('comparisonType', 'relative');
-				                	   this.loadFromApis();
-				            	   }
-				               },
-				               scope: this
-				           }, {
-				               text: this.localize("tfidf"),
-				               checked: false,
-				               itemId: 'tfidf',
-				               group: 'freqsMode',
-				               checkHandler: function(item, checked) {
-				            	   if (checked) {
-				                	   this.setApiParam('comparisonType', 'tfidf');
-				                	   this.loadFromApis();
-				            	   }
-				               },
-				               scope: this
-				           }
-				       ]
-				    }
-	            }]
-    		})
-        });
-        
-    	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
-    		this.docSimStore.setCorpus(corpus);
-    		this.loadFromApis();
-    	}, this);
-    	
-    	this.on('documentsSelected', function(src, docIds) {
-    		this.setApiParam('docId', docIds);
-    		this.loadFromApis();
-    	}, this);
-
-        this.docSimStore.on('load', function(store, records) {
-        	this.buildChart(store);
-        }, this);
-        
-    	this.tokenFreqTipTemplate = new Ext.Template(this.localize('tokenFreqTip'));
-    	this.docFreqTipTemplate = new Ext.Template(this.localize('docFreqTip'));
-        
-    	this.callParent(arguments);
-    },
-    
-    buildChart: function(store) {
-    	var that = this; // needed for tooltip renderer
-    	
-    	var oldChart = this.queryById('chart');
-    	if (oldChart !== null) {
-    		this.queryById('chartParent').remove(oldChart);
-    	}
-    	
-    	var rec = store.getAt(0);
-        var numDims = 3;//this.getApiParam('dimensions');
-        
-        var maxFreq = 0;
-        var minFreq = Number.MAX_VALUE;
-        var maxFill = 0;
-        var minFill = Number.MAX_VALUE;
-        
-        var tokens = rec.getTokens();
-        var termData = [];
-        var docData = [];
-        tokens.forEach(function(token) {
-        	var freq = token.get('rawFreq');
-        	var isDoc = token.get('category') === 'part';
-        	if (!isDoc) {
-	        	if (freq > maxFreq) maxFreq = freq;
-	        	if (freq < minFreq) minFreq = freq;
-        	}
-        	if (numDims === 3) {
-				var z = token.get('vector')[2];
-				if (z < minFill) minFill = z;
-				if (z > maxFill) maxFill = z;
-			}
-        	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2], isDoc: isDoc};
-        	if (isDoc) {
-        		tokenData.docIndex = token.get('docIndex');
-        		var doc = this.getCorpus().getDocument(tokenData.docIndex);
-        		tokenData.term = doc.getTinyTitle();
-        		tokenData.title = doc.getTitle();
-        		docData.push(tokenData);
-        	} else {
-        		termData.push(tokenData);
-        	}
-        }, this);
-        
-    	var termSeriesStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc', 'docIndex'],
-    		data: termData
-    	});
-    	var docSeriesStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc', 'docIndex'],
-    		data: docData
-    	});
-    	
-    	var config = {
-        	itemId: 'chart',
-        	xtype: 'cartesian',
-        	interactions: ['crosszoom','panzoom','itemhighlight'],
-        	plugins: {
-                ptype: 'chartitemevents'
-            },
-        	axes: [{
-        		type: 'numeric',
-        		position: 'bottom',
-        		fields: ['x']
-        	},{
-        		type: 'numeric',
-        		position: 'left',
-        		fields: ['y']
-        	}],
-        	innerPadding: {top: 25, right: 25, bottom: 25, left: 25},
-        	series: [{
-        		type: 'customScatter',
-        		xField: 'x',
-        		yField: 'y',
-        		store: termSeriesStore,
-        		tooltip: {
-        			trackMouse: true,
-        			style: 'background: #fff',
-        			renderer: function (storeItem, item) {
-        				this.setHtml(that.tokenFreqTipTemplate.apply([storeItem.get('term'),storeItem.get('rawFreq'),storeItem.get('relativeFreq')]));
-        			}
-        		},
-        		marker: {
-        		    type: 'circle'
-        		},
-        		highlight: {
-        			fillStyle: 'yellow',
-                    strokeStyle: 'black'
-        		},
-        		renderer: function (sprite, config, rendererData, index) {
-    				var store = rendererData.store;
-    				var item = store.getAt(index);
-    				if (item !== null) {
-	    				var clusterIndex = item.get('cluster');
-	    				var scatterplot = this.getParent().up('documentsimilarity');
-	    				
-	    				if (clusterIndex === -1) {
-	    					// no clusters were specified in initial call
-	    					clusterIndex = 0;
-	    				}
-	    				
-	    				var a = 0.65;
-	    				if (numDims === 3) {
-	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
-	    				}
-	    				var color = scatterplot.getApplication().getColor(clusterIndex);
-	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
-	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
-	    				
-	    				var freq = item.get('rawFreq');
-	    				var radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
-	    				config.radius = radius;
-    				}
-    			}
-        	},{
-        		type: 'customScatter',
-        		xField: 'x',
-        		yField: 'y',
-        		store: docSeriesStore,
-        		tooltip: {
-        			trackMouse: true,
-        			style: 'background: #fff',
-        			renderer: function (storeItem, item) {
-        				this.setHtml(that.docFreqTipTemplate.apply([storeItem.get('title'),storeItem.get('rawFreq')]));
-        			}
-        		},
-        		marker: {
-        		    type: 'diamond'
-        		},
-        		highlight: {
-        			fillStyle: 'yellow',
-                    strokeStyle: 'black'
-        		},
-        		renderer: function (sprite, config, rendererData, index) {
-    				var store = rendererData.store;
-    				var item = store.getAt(index);
-    				if (item !== null) {
-	    				var clusterIndex = item.get('cluster');
-	    				var scatterplot = this.getParent().up('documentsimilarity');
-	    				
-	    				if (clusterIndex === -1) {
-	    					// no clusters were specified in initial call
-	    					clusterIndex = 0;
-	    				}
-	    				
-	    				var a = 0.65;
-	    				if (numDims === 3) {
-	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
-	    				}
-	    				var color = scatterplot.getApplication().getColor(6);
-	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
-	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
-
-	    				config.radius = 5;
-    				}
-    			}
-        	}],
-        	listeners: {
-        		itemclick: function(chart, item, event) {
-        			var data = item.record.data;
-        			if (data.isDoc) {
-        				var record = this.getCorpus().getDocument(data.docIndex);
-	            		this.getApplication().dispatchEvent('documentsClicked', this, [record]);
-        			} else {
-	        			var record = Ext.create('Voyant.data.model.CorpusTerm', data);
-	            		this.getApplication().dispatchEvent('corpusTermsClicked', this, [record]);
-        			}
-        		},
-        		scope: this
-        	}
-        };
-    	
-    	config.series[0].label = {
-			field: 'term',
-			display: 'over'
-		};
-		config.series[1].label = {
-			field: 'term',
-			display: 'over'
-		};
-    	
-    	var chart = Ext.create('Ext.chart.CartesianChart', config);
-    	this.queryById('chartParent').insert(0, chart);
-    },
-    
-    loadFromApis: function(keepCurrentTerms) {
-    	var chart = this.down('#chart');
-    	if (chart !== null) {
-    		chart.mask(this.localize('loading'));
-    	}
-    	var params = {};
-    	Ext.apply(params, this.getApiParams());
-    	this.docSimStore.load({
-			params: params
-		});
     },
     
     interpolate: function(lambda, minSrc, maxSrc, minDst, maxDst) {
