@@ -15,6 +15,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			analysis: {en: "Analysis"},
 			ca: {en: "Correspondence Analysis"},
 			pca: {en: "Principal Components Analysis"},
+			docSim: {en: "Document Similarity"},
+			
+			freqsMode: {en: "Frequencies"},
+			freqsModeTip: {en: "Determines if frequencies are expressed as relative counts, raw counts, or as TF-IDF."},
+    		tfidf: {en: 'TF-IDF'},
+    		rawFrequencies: {en: 'Raw Frequencies'},
+    		relativeFrequencies: {en: 'Relative Frequencies'},
+			
 			rawFreq: {en: "Raw"},
 			relFreq: {en: "Relative"},
 			terms: {en: "Terms"},
@@ -42,13 +50,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			noTermSelected: {en: "No term selected."}
     	},
     	api: {
+    		docId: undefined,
     		analysis: 'ca',
     		limit: 50,
     		dimensions: 3,
     		bins: 10,
     		clusters: 3,
+    		comparisonType: 'relative',
     		stopList: 'auto',
     		target: undefined,
+    		term: undefined,
     		query: undefined
     	},
 		glyph: 'xf06e@FontAwesome'
@@ -58,6 +69,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     docFreqTipTemplate: null,
     caStore: null,
     pcaStore: null,
+    docSimStore: null,
     termStore: Ext.create('Ext.data.JsonStore', {
 		fields: [
 			{name: 'term'},
@@ -85,6 +97,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	title: this.localize('title'),
         	caStore: Ext.create('Voyant.data.store.CAAnalysis'),
         	pcaStore: Ext.create('Voyant.data.store.PCAAnalysis'),
+        	docSimStore: Ext.create('Voyant.data.store.DocSimAnalysis'),
         	termStore: this.termStore,
         	chartMenu: Ext.create('Ext.menu.Menu', {
         		items: [
@@ -109,6 +122,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		tbar: {
         			enableOverflow: true,
         			items: [{
+    	            	xtype: 'documentselectorbutton'
+    	            },{
                 		text: this.localize('analysis'),
                 		itemId: 'analysis',
                 		glyph: 'xf1ec@FontAwesome',
@@ -116,13 +131,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
             			menu: {
         					items: [
         					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
-        					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'}
+        					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'},
+        					    {text: this.localize('docSim'), itemId: 'analysis_docSim', group:'analysis', xtype: 'menucheckitem'}
         					],
         					listeners: {
         						click: function(menu, item) {
         							if (item !== undefined) {
         								if (item.text === this.localize('pca')) {
         									this.setApiParam('analysis', 'pca');
+        								} else if (item.text === this.localize('docSim')) {
+        									this.setApiParam('analysis', 'docSim');
         								} else {
         									this.setApiParam('analysis', 'ca');
         									if (this.getCorpus().getDocumentsCount() == 3) {
@@ -136,6 +154,49 @@ Ext.define('Voyant.panel.ScatterPlot', {
         						scope: this
         					}
             			}
+    	            },{
+    	            	text: this.localize('freqsMode'),
+    					glyph: 'xf201@FontAwesome',
+    				    tooltip: this.localize('freqsModeTip'),
+    				    menu: {
+    				    	items: [{
+				               text: this.localize("rawFrequencies"),
+				               checked: false,
+				               itemId: 'raw',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('comparisonType', 'raw');
+				                	   this.loadFromApis();
+				            	   }
+				               },
+				               scope: this
+				           },{
+				               text: this.localize("relativeFrequencies"),
+				               checked: true,
+				               itemId: 'relative',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('comparisonType', 'relative');
+				                	   this.loadFromApis();
+				            	   }
+				               },
+				               scope: this
+				           },{
+				               text: this.localize("tfidf"),
+				               checked: false,
+				               itemId: 'tfidf',
+				               group: 'freqsMode',
+				               checkHandler: function(item, checked) {
+				            	   if (checked) {
+				                	   this.setApiParam('comparisonType', 'tfidf');
+				                	   this.loadFromApis();
+				            	   }
+				               },
+				               scope: this
+				           }]
+    				    }
                 	},{
                 		text: this.localize('clusters'),
                 		itemId: 'clusters',
@@ -195,10 +256,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xtype: 'grid',
  //       		title: 'Terms',
         		region: 'east',
-        		width: 225,
+        		width: '50%',
         		split: true,
 //        		collapsible: true,
 //        		border: true,
+        		forceFit: true,
         		bbar: {
             		enableOverflow: true,
         			items: [{
@@ -240,9 +302,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                     }]
         			
         		},
-        		dockedItems: [{
-                    dock: 'top',
-                    xtype: 'toolbar',
+        		tbar: {
             		enableOverflow: true,
                     items: [{
                 		fieldLabel: this.localize('numTerms'),
@@ -284,7 +344,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                     	emptyText: this.localize('addTerm'),
                     	width: 90
                     }]
-                }],
+                },
         		columns: [{
         			text: this.localize('term'),
     				dataIndex: 'term',
@@ -293,12 +353,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
     			},{
     				text: this.localize('rawFreq'),
     				dataIndex: 'rawFreq',
-    				width: 'autoSize',
                     sortable: true
     			},{
     				text: this.localize('relFreq'),
     				dataIndex: 'relativeFreq',
-    				width: 'autoSize',
                     sortable: true,
                     hidden: true
     			}],
@@ -349,6 +407,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		this.setCorpus(corpus);
     		this.caStore.setCorpus(corpus);
     		this.pcaStore.setCorpus(corpus);
+    		this.docSimStore.setCorpus(corpus);
+    		this.loadFromApis();
+    	}, this);
+    	
+    	this.on('documentsSelected', function(src, docIds) {
+    		this.setApiParam('docId', docIds);
     		this.loadFromApis();
     	}, this);
         
@@ -356,6 +420,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	this.buildChart(store);
         }, this);
         this.pcaStore.on('load', function(store, records) {
+        	this.buildChart(store);
+        }, this);
+        this.docSimStore.on('load', function(store, records) {
         	this.buildChart(store);
         }, this);
         
@@ -377,7 +444,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         var numDims = this.getApiParam('dimensions');
         
     	var summary = '';    	
-    	if (this.getApiParam('analysis') == 'pca') {
+    	if (this.getApiParam('analysis') === 'pca') {
     		// calculate the percentage of original data represented by the dominant principal components
 			var pcs = rec.getPrincipalComponents();
 			var eigenTotal = 0;
@@ -412,16 +479,19 @@ Ext.define('Voyant.panel.ScatterPlot', {
         var minFreq = Number.MAX_VALUE;
         var maxFill = 0;
         var minFill = Number.MAX_VALUE;
-                
-        this.termStore.removeAll();
         
+        
+        if (this.getApiParam('analysis') !== 'docSim') { // docSim doesn't return terms so keep the current ones
+	        this.termStore.removeAll();
+        }
+	        
         var tokens = rec.getTokens();
         var termData = [];
         var docData = [];
         tokens.forEach(function(token) {
         	var freq = token.get('rawFreq');
-        	var isDoc = token.get('category') === 'part';
-        	if (!isDoc) {
+        	var isTerm = token.get('category') === 'term';
+        	if (isTerm) {
 	        	if (freq > maxFreq) maxFreq = freq;
 	        	if (freq < minFreq) minFreq = freq;
 	        	
@@ -434,12 +504,21 @@ Ext.define('Voyant.panel.ScatterPlot', {
 				if (z < minFill) minFill = z;
 				if (z > maxFill) maxFill = z;
 			}
-        	var tokenData = {term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2], isDoc: isDoc};
-        	if (isDoc) {
-        		tokenData.docIndex = token.get('docIndex');
-        		var doc = this.getCorpus().getDocument(tokenData.docIndex);
-        		tokenData.term = doc.getTinyTitle();
-        		tokenData.title = doc.getTitle();
+        	var tokenData = {
+        		x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2],
+    			term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), category: token.get('category')
+        	};
+        	if (!isTerm) {
+        		if (token.get('category') === 'bin') {
+        			tokenData.term = tokenData.title = "Bin "+token.get('docIndex');
+        		} else {
+	        		tokenData.docIndex = token.get('docIndex');
+	        		var doc = this.getCorpus().getDocument(tokenData.docIndex);
+	        		if (doc !== null) {
+		        		tokenData.term = doc.getTinyTitle();
+		        		tokenData.title = doc.getTitle();
+	        		}
+        		}
         		docData.push(tokenData);
         	} else {
         		termData.push(tokenData);
@@ -452,11 +531,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         
         
     	var termSeriesStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc', 'docIndex'],
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'category', 'docIndex'],
     		data: termData
     	});
     	var docSeriesStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'isDoc', 'docIndex'],
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'category', 'docIndex'],
     		data: docData
     	});
     	
@@ -554,16 +633,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				var clusterIndex = item.get('cluster');
 	    				var scatterplot = this.getParent().up('scatterplot');
 	    				
-	    				if (clusterIndex === -1) {
+	    				if (clusterIndex === -1 || scatterplot.getApiParam('analysis') !== 'docSim') {
 	    					// no clusters were specified in initial call
-	    					clusterIndex = 0;
+	    					clusterIndex = 6; // default doc color
 	    				}
 	    				
 	    				var a = 0.65;
 	    				if (numDims === 3) {
 	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
 	    				}
-	    				var color = scatterplot.getApplication().getColor(6);
+	    				var color = scatterplot.getApplication().getColor(clusterIndex);
 	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
 	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
 
@@ -574,10 +653,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	listeners: {
         		itemclick: function(chart, item, event) {
         			var data = item.record.data;
-        			if (data.isDoc) {
+        			if (data.category === 'doc') {
         				var record = this.getCorpus().getDocument(data.docIndex);
 	            		this.getApplication().dispatchEvent('documentsClicked', this, [record]);
-        			} else {
+        			} else if (data.category === 'term') {
 	        			var record = Ext.create('Voyant.data.model.CorpusTerm', data);
 	            		this.getApplication().dispatchEvent('corpusTermsClicked', this, [record]);
         			}
@@ -591,7 +670,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		            	var x = xy[0] - parentXY[0];
 		            	var y = xy[1] - parentXY[1];
 		            	var chartItem = this.down('#chart').getItemForPoint(x,y);
-		            	if (chartItem != null && chartItem.record.get('isDoc') != true) {
+		            	if (chartItem != null && chartItem.record.get('category') === 'term') {
 		            		var series = this.down('#chart').getSeries();
 		            		series[0].disableToolTips();
 		            		series[1].disableToolTips();
@@ -747,7 +826,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     getCurrentTerms: function() {
     	var terms = [];
     	this.termStore.each(function(r) {
-    		if (!r.get('isDoc')) {
+    		if (r.get('category') === 'term') {
     			terms.push(r.get('term'));
     		}
     	});
@@ -788,16 +867,23 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		if (this.newTerm !== null || keepCurrentTerms) {
     			params.query = terms.join(',');
     		}
-    		params.term = terms;
+//    		params.term = terms;
     	}
     	Ext.apply(params, this.getApiParams());
-//    	delete params.stopList;
+    	if (params.target != null) {
+    		params.term = terms;
+    	}
+
     	if (params.analysis === 'pca') {
     		this.pcaStore.load({
 	    		params: params
 	    	});
+    	} else if (params.analysis === 'docSim'){
+    		this.docSimStore.load({
+	    		params: params
+	    	});
     	} else {
-	    	this.caStore.load({
+    		this.caStore.load({
 	    		params: params
 	    	});
     	}
