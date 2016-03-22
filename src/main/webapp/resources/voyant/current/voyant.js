@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Mar 22 15:46:03 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue Mar 22 16:13:45 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5523,6 +5523,7 @@ Ext.define('Voyant.widget.Facet', {
     alias: 'widget.facet',
 	statics: {
 		i18n: {
+			emptyText: {en: "No values found."}
 		},
 		api: {
 			stopList: 'auto',
@@ -5539,7 +5540,6 @@ Ext.define('Voyant.widget.Facet', {
         	includeTools: [], // don't show tools in header
         	rowLines: false,
         	columnLines: false // ignored?
-       
         })
         this.mixins['Voyant.panel.Panel'].constructor.apply(this, [config]);
 	},
@@ -5548,14 +5548,19 @@ Ext.define('Voyant.widget.Facet', {
 	
     initComponent: function(){
 
+    	var me = this;
     	if (!this.store) {
     		this.store = new Ext.create("Voyant.data.store.CorpusFacets", {
     			facet: this.facet,
     			parentPanel: this
     		})
+    		this.store.getProxy().on("exception", function(proxy, request, operation, eOpts) {
+    			me.showError(Ext.create("Voyant.util.ResponseError", {response: request}));
+    		})
     	}
 
         Ext.applyIf(this, {
+        	emptyText: this.localize("emptyText"),
         	hideHeaders: true,
         	selType: 'checkboxmodel',
         	columns: [
