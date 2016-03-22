@@ -18,7 +18,7 @@ Ext.define('Voyant.panel.Catalogue', {
     		lexicalTitle: {en: "Terms"},
     		noMatches: {'en': new Ext.Template('No matches (out of {0} documents).', {compiled: true})},
     		queryMatches: {en: new Ext.Template("{0} matching documents (out of {1}).", {compiled: true})},
-    		clickToOpenCorpus: {'en': new Ext.Template('<a href="{0}" target="_blank" class="link">Click here</a> to access your new corpus', {compiled: true})},
+    		clickToOpenCorpus: {'en': new Ext.Template('Please <a href="{0}" target="_blank" class="link">click here</a> to access your new corpus (since popup windows are blocked).', {compiled: true})},
     		"export": {en: "Export"},
     		exportTip: {en: "Create a new Voyant corpus with the selected documents."}
     	},
@@ -95,15 +95,28 @@ Ext.define('Voyant.panel.Catalogue', {
 	                    				var url = catalogue.getBaseUrl()+"?corpus="+json.corpus.id;
 	                    				var win = window.open(url);
 	                    				if (!win) { // popup blocked
-	                    					win = Ext.Msg.show({
-	                    						buttons: Ext.MessageBox.OK,
-	                    						buttonText: {ok: "Close"},
+	                    					var msg = Ext.create('Ext.window.MessageBox', {
+	                    						makeButton: function(btnIdx) {
+	                    					        return new Ext.button.Button({
+	                    					            handler: this.btnCallback,
+//	                    					            itemId: btnId,
+	                    					            scope: this,
+	                    					            text: catalogue.localize('cancel'),
+	                    					            ui: 'default-toolbar',
+	                    					            minWidth: 75
+	                    					        });
+	                    						}
+	                    					}).show({
+	                    						title: catalogue.localize('export'),
+	                    						buttons: Ext.MessageBox.CANCEL,
 	                    						icon: Ext.MessageBox.INFO,
 	                    						message: catalogue.localize('clickToOpenCorpus', [url])
 	                    					});
-	                    					Ext.Msg.getEl().dom.querySelector("a").addEventListener("click", function() {
+	                    					var link = msg.getTargetEl().dom.querySelector("a");
+	                    					link.addEventListener("click", function() {
 	                    						win.close()
 	                    					})
+	                    					Ext.get(link).frame().frame();
 	                    				}
     		            		    },
     		            		    failure: function(response, opts) {
