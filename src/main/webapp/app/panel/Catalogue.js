@@ -152,11 +152,15 @@ Ext.define('Voyant.panel.Catalogue', {
     	
     	this.on('afterrender', function(panel) {
     		var facets = this.getApiParam('facet');
-    		if (Ext.isString(facets)) {facets = [facets]}
+    		if (Ext.isString(facets)) {facets = facets.split(",")}
     		var facetsCmp = this.queryById('facets');
     		facets.forEach(function(facet) {
+    			var title = panel.localize(facet+"Title");
+    			if (title=="["+facet+"Title]") {
+    				title = facet.replace(/^facet\./,"").replace(/^extra./,"");
+    			}
     			var facetCmp = facetsCmp.add({
-    				title: panel.localize(facet+"Title"),
+    				title: title,
     				facet: facet,
     				bbar: [{
     					xtype: 'querysearchfield',

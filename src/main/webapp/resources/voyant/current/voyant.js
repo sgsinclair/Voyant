@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Mar 22 15:31:18 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue Mar 22 15:46:03 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6116,7 +6116,6 @@ Ext.define('Voyant.panel.Bubblelines', {
 		this.getApplication().dispatchEvent('termsClicked', this, data);
 	}
 });
-
 Ext.define('Voyant.panel.Catalogue', {
 	extend: 'Ext.panel.Panel',
 	requires: ['Voyant.widget.Facet'],
@@ -6271,11 +6270,15 @@ Ext.define('Voyant.panel.Catalogue', {
     	
     	this.on('afterrender', function(panel) {
     		var facets = this.getApiParam('facet');
-    		if (Ext.isString(facets)) {facets = [facets]}
+    		if (Ext.isString(facets)) {facets = facets.split(",")}
     		var facetsCmp = this.queryById('facets');
     		facets.forEach(function(facet) {
+    			var title = panel.localize(facet+"Title");
+    			if (title=="["+facet+"Title]") {
+    				title = facet.replace(/^facet\./,"").replace(/^extra./,"");
+    			}
     			var facetCmp = facetsCmp.add({
-    				title: panel.localize(facet+"Title"),
+    				title: title,
     				facet: facet,
     				bbar: [{
     					xtype: 'querysearchfield',
@@ -16807,7 +16810,12 @@ Ext.define('Voyant.VoyantDefaultApp', {
     			var url = this.getBaseUrl()+'?corpus='+corpusId;
     			for (var key in queryParams) {
     				if (key !== 'corpus') {
-    					url += '&'+key+'='+queryParams[key];
+    					var vals = Ext.isString(queryParams[key]) ? [queryParams[key]] : queryParams[key];
+    					if (Ext.isArray(vals)) {
+    						vals.forEach(function(val) {
+    	    					url += '&'+key+'='+val;
+    						})
+    					}
     				}
     			}
     			window.history.pushState({

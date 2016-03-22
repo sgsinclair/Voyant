@@ -33,7 +33,12 @@ Ext.define('Voyant.VoyantDefaultApp', {
     			var url = this.getBaseUrl()+'?corpus='+corpusId;
     			for (var key in queryParams) {
     				if (key !== 'corpus') {
-    					url += '&'+key+'='+queryParams[key];
+    					var vals = Ext.isString(queryParams[key]) ? [queryParams[key]] : queryParams[key];
+    					if (Ext.isArray(vals)) {
+    						vals.forEach(function(val) {
+    	    					url += '&'+key+'='+val;
+    						})
+    					}
     				}
     			}
     			window.history.pushState({
