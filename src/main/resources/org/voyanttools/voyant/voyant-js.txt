@@ -83,7 +83,6 @@ app/panel/Dummy.js
 app/panel/RezoViz.js
 app/panel/Reader.js
 app/panel/ScatterPlot.js
-app/panel/DocumentSimilarity.js
 app/panel/StreamGraph.js
 app/panel/Summary.js
 app/panel/TopicContexts.js
