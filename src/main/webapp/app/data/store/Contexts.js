@@ -21,6 +21,7 @@ Ext.define('Voyant.data.store.Contexts', {
 			proxy : {
 				type : 'ajax',
 				url : Voyant.application.getTromboneUrl(),
+				actionMethods: {read: 'POST'},
 				extraParams : {
 					tool : 'corpus.DocumentContexts',
 					corpus : config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,

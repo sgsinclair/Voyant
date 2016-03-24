@@ -149,6 +149,10 @@ Ext.define('Voyant.data.model.Corpus', {
 		return Ext.create("Voyant.data.store.DocumentTerms", Ext.apply(config || {}, {corpus: this}));
 	},
 	
+	getContexts: function(config) {
+		return Ext.create("Voyant.data.store.Contexts", Ext.apply(config || {}, {corpus: this}));
+	},
+	
 	getDocuments: function(config) {
 		return this.getDocumentsStore() ? this.getDocumentsStore() : Ext.create("Voyant.data.store.Documents", Ext.apply(config || {}, {corpus: this}));
 		//this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.getDocumentsStore();

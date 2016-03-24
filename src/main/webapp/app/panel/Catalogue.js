@@ -15,12 +15,16 @@ Ext.define('Voyant.panel.Catalogue', {
     		"facet.pubDateTitle": {en: "Publication Dates"},
     		"facet.publisherTitle": {en: "Publishers"},
     		"facet.pubPlaceTitle": {en: "Publication Locations"},
+    		loadingSnippets: {en: "loading text snippets…"},
     		lexicalTitle: {en: "Terms"},
     		noMatches: {'en': new Ext.Template('No matches (out of {0} documents).', {compiled: true})},
     		queryMatches: {en: new Ext.Template("{0} matching documents (out of {1}).", {compiled: true})},
     		clickToOpenCorpus: {'en': new Ext.Template('Please <a href="{0}" target="_blank" class="link">click here</a> to access your new corpus (since popup windows are blocked).', {compiled: true})},
     		"export": {en: "Export"},
-    		exportTip: {en: "Create a new Voyant corpus with the selected documents."}
+    		exportTip: {en: "Create a new Voyant corpus with the selected documents."},
+    		matchingDocuments: {'en': "number of matching documents"},
+    		rawFreqs: {'en': "total occurrences (raw frequency)"},
+    		exportInProgress: {en: "Preparing your corpus for export…"}
     	},
     	api: {
     		config: undefined,
@@ -162,6 +166,12 @@ Ext.define('Voyant.panel.Catalogue', {
     			var facetCmp = facetsCmp.add({
     				title: title,
     				facet: facet,
+        			columns: [{
+        				renderer: function(value, metaData, record) {
+        					return '<span style="font-size: smaller;">(<span class="info-tip" data-qtip="'+catalogue.localize('matchingDocuments')+'">'+record.getInDocumentsCount()+"</span>) </span>"+record.getLabel()
+        				},
+        				flex: 1
+        			}],
     				bbar: [{
     					xtype: 'querysearchfield',
     					tokenType: facet.replace("facet.", ""),
@@ -181,12 +191,15 @@ Ext.define('Voyant.panel.Catalogue', {
     				panel.updateResults();
     			})
     		})
+    		var catalogue = this;
     		var facetCmp = facetsCmp.add({
     			title: panel.localize('lexicalTitle'),
     			store: Ext.create("Voyant.data.store.CorpusTerms", {parentPanel: this}),
     			facet: 'lexical',
     			columns: [{
-    				renderer: function(value, metaData, record) {return "("+record.getRawFreq()+") "+record.getTerm()},
+    				renderer: function(value, metaData, record) {
+    					return '<span style="font-size: smaller;">(<span class="info-tip" data-qtip="'+catalogue.localize('matchingDocuments')+'">'+record.getInDocumentsCount()+"</span>) </span>"+record.getTerm()+'<span style="font-size: smaller;"> (<span class="info-tip" data-qtip="'+catalogue.localize('rawFreqs')+'">'+record.getRawFreq()+"</span>)</span>"
+    				},
     				flex: 1
     			}],
 				bbar: [{
@@ -219,6 +232,7 @@ Ext.define('Voyant.panel.Catalogue', {
 	    	}
     	}
 		var results = this.queryById("results").getTargetEl();
+		var catalogue = this;
 		results.update("");
 		this.queryById('export').setDisabled(true);
     	if (queries.length>0) {
@@ -236,7 +250,7 @@ Ext.define('Voyant.panel.Catalogue', {
     						record.getDocIds().forEach(function(docId) {
     							matchingDocIds.push(docId);
     							var doc = documentQueryMatches.getCorpus().getDocument(docId);
-    							var item = "<li>";
+    							var item = "<li id='"+results.getId()+'_'+docId+"' class='cataloguedoc'>";
     							item += "<i>"+doc.getTitle()+"</i>";
     							for (facet in facets) {
     								if (facets[facet].length==0) {continue;}
@@ -285,10 +299,67 @@ Ext.define('Voyant.panel.Catalogue', {
     					if (matchingDocIds.length>0) {
     						this.queryById('export').setDisabled(false);
     					}
+    					
+    					// now try to load some snippets, if need be
+    					if (facets['lexical']) {
+    						var firstDocIds = matchingDocIds.splice(0,5);
+    						this.loadSnippets(firstDocIds, results.first().first());
+    						if (matchingDocIds) {
+        						this.loadSnippets(matchingDocIds); // load the rest
+    						}
+    					}
     				}
     			},
     			scope: this
     		})    		
     	}
+    },
+    
+    loadSnippets: function(docIds, elToMask) {
+		var results = this.queryById("results").getTargetEl();
+    	var facets = this.getFacets();
+    	if (facets['lexical']) {
+    		var queries = facets['lexical'].map(function(label) {return label.facet+":"+label.label});
+    		var contexts = this.getCorpus().getContexts({buffered: false});
+    		if (elToMask) {
+    			elToMask.mask(this.localize("loadingSnippets"));
+    		}
+    		contexts.load({
+    			method: 'POST',
+    			params: {
+                	stripTags: "all",
+    				query: queries,
+    				docId: docIds,
+    				perDocLimit: 3,
+    				limit: 100,
+    				accurateTotalNotNeeded: true
+    			},
+    			scope: this,
+    			callback: function(records, operation, success) {
+    				if (elToMask) {
+    					elToMask.unmask();
+    				}
+    				if (success && Ext.isArray(records) && records.length>0) {
+    					var snippets = {};
+    					records.forEach(function(record) {
+    						if (!snippets[record.getDocIndex()]) {snippets[record.getDocIndex()]=[]}
+    						snippets[record.getDocIndex()].push(record);
+    					})
+    					for (docIndex in snippets) {
+    						var id = this.getCorpus().getDocument(docIndex).getId();
+    						var html = '<li style="list-style-type: none; font-size: smaller;">'+snippets[docIndex].map(function(snippet) {
+    							return snippet.getHighlightedContext();
+    						}).join(" … ")+'</li>'
+    						var docItem = results.down("#"+results.getId()+"_"+id);
+    						if (docItem.query("ul")) {
+    							html="<ul>"+html+"</ul>";
+    						}
+    						docItem.insertHtml('beforeEnd', html)
+    					}
+    				}
+    			}
+        	})        		
+    	}
+	
     }
 });

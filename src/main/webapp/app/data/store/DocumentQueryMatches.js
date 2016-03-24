@@ -18,6 +18,7 @@ Ext.define('Voyant.data.store.DocumentQueryMatches', {
 		        	 tool: 'corpus.DocumentsFinder',
 		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
 		         },
+		         actionMethods: {read: 'POST'},
 		         reader: {
 		             type: 'json',
 		             rootProperty: 'documentsFinder.queries'

@@ -37,7 +37,7 @@ for (String notRealTool : notRealTools) {
 }
 
 // check to make sure that the indicated tool exists, otherwise redirect
-if (isNotRealTool || new java.io.File(new java.io.File(request.getServletContext().getRealPath("app"), "Panel"), tool + ".js").exists()==false) {
+if (isNotRealTool || new java.io.File(new java.io.File(request.getServletContext().getRealPath("app"), "panel"), tool + ".js").exists()==false) {
 	response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 	response.setHeader("Location", "../NoTool/?notool="+tool+(query!=null ? "&"+query : ""));
 	return;
