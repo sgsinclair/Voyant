@@ -13,7 +13,8 @@ Ext.define('Voyant.panel.Reader', {
     	api: {
     		start: 0,
     		limit: 1000,
-    		skipToDocId: undefined
+    		skipToDocId: undefined,
+    		query: undefined
     	},
     	glyph: 'xf0f6@FontAwesome'
 	},
@@ -216,7 +217,13 @@ Ext.define('Voyant.panel.Reader', {
     			}
     		}, this);
     		
-    		if (this.getCorpus()) {this.load();}
+    		if (this.getCorpus()) {
+    			this.load();
+	    		var query = this.getApiParam('query');
+	    		if (query) {
+	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
+	    		}
+    		}
     	}, this);
     	
     	Ext.apply(this, {
@@ -259,6 +266,10 @@ Ext.define('Voyant.panel.Reader', {
     	    			this.load();
         	    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
         	    			this.mask(this.localize("limitedAccess"), 'mask-no-spinner')
+        	    		}
+        	    		var query = this.getApiParam('query');
+        	    		if (query) {
+        	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
         	    		}
     	    		}
     	    		

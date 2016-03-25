@@ -77,6 +77,18 @@ if (isNotRealTool || new java.io.File(new java.io.File(request.getServletContext
 				}
 				window.location.replace(url)
 			}
+			this.on("unhandledEvent", function(eventName, src, data) {
+				if (src && src.getModifiedApiParams && this.getCorpus && this.getCorpus()) {
+					var url = this.getBaseUrl() + '?corpus='+this.getCorpus().getId();
+					var api = this.getModifiedApiParams() || {}; // use application, not tool
+					if (eventName=='termsClicked') {
+						api.query=data;
+					}
+					else {return;}
+					url += "&"+Ext.Object.toQueryString(api)
+					this.openUrl(url)
+				}
+			})
 		}
 	});
 	

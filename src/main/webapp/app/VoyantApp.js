@@ -29,7 +29,7 @@ Ext.define('Voyant.VoyantApp', {
 		Voyant.application = this;
 		
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-
+		
 		// call the parent constructor
         this.callParent(arguments);
         
@@ -40,6 +40,9 @@ Ext.define('Voyant.VoyantApp', {
     },
     
     launch: function() {
+		this.on("unhandledEvent", function(eventName) {
+			if (console) {console.warn("unhandled event: ", eventName, arguments)}
+		})
 		this.callParent(arguments);
     },
     
@@ -87,7 +90,10 @@ Ext.define('Voyant.VoyantApp', {
 		}
 		
 		if (!isHeard) {
-			if (console) {console.info("Unhandled event: "+eventName, arguments)}
+			// let the application know that we have an unhandledEvent
+			var args = ["unhandledEvent"];
+			for (var i=0; i<arguments.length; i++) {args.push(arguments[i])}
+			this.fireEvent.apply(this, args);
 		}
     },
     
@@ -190,6 +196,24 @@ Ext.define('Voyant.VoyantApp', {
 			color = this.rgbToHex(color);
 		}
 		return color;
+	},
+
+	/**
+	 * Opens a URL in a new window (handling the case when popup windows aren't allowed).
+	 * @param {String} url The URL to open.
+	 */
+	openUrl: function(url) {
+		var win = window.open(url);
+		if (!win) { // popup blocked
+			Ext.Msg.show({
+				title: "Popup Blocked",
+				buttonText: {ok: "Close"},
+				icon: Ext.MessageBox.INFO,
+				message: "A popup window was blocked. <a href='"+url+"' target='_blank' class='link'>Click here</a> to open the new window.",
+				buttons: Ext.Msg.OK
+			});
+		}
 	}
+
     
 });

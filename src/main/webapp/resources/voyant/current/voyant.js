@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Mar 23 14:45:22 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Mar 25 10:27:24 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5432,16 +5432,7 @@ Ext.define('Voyant.panel.Panel', {
 	},
 	
 	openUrl: function(url) {
-		var win = window.open(url);
-		if (!win) { // popup blocked
-			Ext.Msg.show({
-				title: "Popup Blocked",
-				buttonText: {ok: "Close"},
-				icon: Ext.MessageBox.INFO,
-				message: "A popup window was blocked. <a href='"+url+"' target='_blank' class='link'>Click here</a> to open the new window.",
-				buttons: Ext.Msg.OK
-			});
-		}
+		this.getApplication.openUrl.apply(this, arguments);
 	},
 	
 	getTromboneUrl: function() {
@@ -7635,6 +7626,7 @@ Ext.define('Voyant.panel.Contexts', {
         		    scope: me,
         		    params: {
         				limit: 1,
+        				query: this.getApiParam("query"),
         				stopList: this.getApiParam("stopList")
         			}
             	});
@@ -11119,7 +11111,8 @@ Ext.define('Voyant.panel.Reader', {
     	api: {
     		start: 0,
     		limit: 1000,
-    		skipToDocId: undefined
+    		skipToDocId: undefined,
+    		query: undefined
     	},
     	glyph: 'xf0f6@FontAwesome'
 	},
@@ -11322,7 +11315,13 @@ Ext.define('Voyant.panel.Reader', {
     			}
     		}, this);
     		
-    		if (this.getCorpus()) {this.load();}
+    		if (this.getCorpus()) {
+    			this.load();
+	    		var query = this.getApiParam('query');
+	    		if (query) {
+	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
+	    		}
+    		}
     	}, this);
     	
     	Ext.apply(this, {
@@ -11365,6 +11364,10 @@ Ext.define('Voyant.panel.Reader', {
     	    			this.load();
         	    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
         	    			this.mask(this.localize("limitedAccess"), 'mask-no-spinner')
+        	    		}
+        	    		var query = this.getApiParam('query');
+        	    		if (query) {
+        	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
         	    		}
     	    		}
     	    		
@@ -16506,7 +16509,7 @@ Ext.define('Voyant.VoyantApp', {
 		Voyant.application = this;
 		
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-
+		
 		// call the parent constructor
         this.callParent(arguments);
         
@@ -16517,6 +16520,9 @@ Ext.define('Voyant.VoyantApp', {
     },
     
     launch: function() {
+		this.on("unhandledEvent", function(eventName) {
+			if (console) {console.warn("unhandled event: ", eventName, arguments)}
+		})
 		this.callParent(arguments);
     },
     
@@ -16564,7 +16570,10 @@ Ext.define('Voyant.VoyantApp', {
 		}
 		
 		if (!isHeard) {
-			if (console) {console.info("Unhandled event: "+eventName, arguments)}
+			// let the application know that we have an unhandledEvent
+			var args = ["unhandledEvent"];
+			for (var i=0; i<arguments.length; i++) {args.push(arguments[i])}
+			this.fireEvent.apply(this, args);
 		}
     },
     
@@ -16667,7 +16676,25 @@ Ext.define('Voyant.VoyantApp', {
 			color = this.rgbToHex(color);
 		}
 		return color;
+	},
+
+	/**
+	 * Opens a URL in a new window (handling the case when popup windows aren't allowed).
+	 * @param {String} url The URL to open.
+	 */
+	openUrl: function(url) {
+		var win = window.open(url);
+		if (!win) { // popup blocked
+			Ext.Msg.show({
+				title: "Popup Blocked",
+				buttonText: {ok: "Close"},
+				icon: Ext.MessageBox.INFO,
+				message: "A popup window was blocked. <a href='"+url+"' target='_blank' class='link'>Click here</a> to open the new window.",
+				buttons: Ext.Msg.OK
+			});
+		}
 	}
+
     
 });
 Ext.define('Voyant.VoyantCorpusApp', {

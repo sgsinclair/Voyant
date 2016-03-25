@@ -31,16 +31,7 @@ Ext.define('Voyant.panel.Panel', {
 	},
 	
 	openUrl: function(url) {
-		var win = window.open(url);
-		if (!win) { // popup blocked
-			Ext.Msg.show({
-				title: "Popup Blocked",
-				buttonText: {ok: "Close"},
-				icon: Ext.MessageBox.INFO,
-				message: "A popup window was blocked. <a href='"+url+"' target='_blank' class='link'>Click here</a> to open the new window.",
-				buttons: Ext.Msg.OK
-			});
-		}
+		this.getApplication.openUrl.apply(this, arguments);
 	},
 	
 	getTromboneUrl: function() {
