@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Mar 25 10:27:24 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Mar 25 19:58:44 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -13149,28 +13149,23 @@ Ext.define('Voyant.panel.Summary', {
     	i18n: {
     		title: {en: "Summary"},
     		helpTip: {en: "<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>"},
-    		corpusType: {en: '<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordId="{id}">{type}</a> ({val})<tpl if="xindex &lt; len">, </tpl></tpl>'},
-    		documentType: {en: '<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:recordId="{id}" voyant:val="{docId}:{type}">{type}</a> ({val})<tpl if="xindex &lt; len">, </tpl></tpl>'},
+    		corpusType: {en: '<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordId="{id}">{type}</a> ({val})<tpl if="xindex &lt; xcount">, </tpl></tpl>'},
+    		documentType: {en: '<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:recordId="{id}" voyant:val="{docId}:{type}">{type}</a> ({val})<tpl if="xindex &lt; xcount">, </tpl></tpl>'},
     		mostFrequentWords: {en: 'Most <b>frequent words</b> in the corpus: '},
-    		docsLength: {en: '<ul><tpl for="docs"><li><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({totalWordTokens})</li></tpl></ul>'},
-    		docsLengthLongest: {en: '<b>Longest documents</b> (by words {0})'},
-    		docsLengthShortest: {en: 'Shortest documents'},
-    		docsLengthAll: {en: 'Documents ordered by number of words ({0})'},
-    		docsDensity: {en: '<ul><tpl for="docs"><li><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({wordDensity})</li></tpl></ul>'},
-    		docsDensityHighest: {en: 'Highest <b>vocabulary density</b> ({0})'},
-    		docsDensityLowest: {en: 'Lowest density'},
-    		docsDensityAll: {en: 'Documents ordered by vocabulary density ({0})'},
+    		docsLength: {en: '<b>Document Length</b> ({spark})<ul><li>longest: <tpl for="longestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({totalWordTokens})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li><li>shortest: <tpl for="shortestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({totalWordTokens})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li></ul>'},
+    		docsDensity: {en: '<b>Vocabulary Density</b> ({spark})<ul><li>highest: <tpl for="highestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({wordDensity})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li><li>lowest: <tpl for="lowestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({wordDensity})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li></ul>'},
     		distinctiveWords: {en: '<b>Distinctive words</b> (compared to the rest of the corpus): '},
     		moreDistinctiveWords: {en: '<a href="#" onclick="return false">Next {0} of {1} remaining</a>'},
     		seeAll: {en: 'All&hellip;'},
-    		more: {en: 'More&hellip;'}
+    		more: {en: 'More&hellip;'},
+    		items: {en: "items"}
     	},
     	api: {
     		stopList: 'auto',
     		start: 0,
     		limit: 5,
     		// The maximum number of documents to show distinctive words for.
-    		numberOfDocumentsForDistinctiveWords: 5
+    		numberOfDocumentsForDistinctiveWords: 10
     	},
 		glyph: 'xf1ea@FontAwesome'
     },
@@ -13190,7 +13185,31 @@ Ext.define('Voyant.panel.Summary', {
     constructor: function(config ) {
 
     	Ext.apply(this, {
-    		title: this.localize('title')
+    		title: this.localize('title'),
+    		dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+        		enableOverflow: true,
+                items: [{
+        			fieldLabel: this.localize('items'),
+        			labelWidth: 40,
+        			width: 120,
+        			xtype: 'slider',
+	            	increment: 5,
+	            	minValue: 5,
+	            	maxValue: 59,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(this.getApiParam("visible"))
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({limit: newvalue});
+	            			this.loadSummary();
+	            		},
+	            		scope: this
+	            	}
+                }]
+    		}]
     	});
 
         this.callParent(arguments);
@@ -13256,26 +13275,7 @@ Ext.define('Voyant.panel.Summary', {
         	});
     		
     		if (this.rendered) {
-    			var el = this.getLayout().getRenderTarget();
-    			el.update('');
-    			this.summaryListParent = Ext.dom.Helper.append(el, '<ul></ul>');
-    			Ext.dom.Helper.append(this.summaryListParent, '<li>'+corpus.getShow()+'</li>');
-    			
-    			var size = corpus.getDocumentsCount();
-    			
-    			if (size>1) {this.showLongestDocuments();}
-    			if (size>1) {this.showMostDenseDocuments();}
-    			this.showMostFrequentWords();
-    			if (size>1) {this.showDistinctiveWords();}
-    			
-    			var params = Ext.apply({}, {
-    	    		limit: null
-    	    	}, this.getApiParams());
-    	    	this.docStore.load({
-    				params: params
-    			});
-    	    	
-    	    	this.addLinksHandler();
+    			this.loadSummary();
     		}
     		else {
     			Ext.defer(this.fireEvent, 100, this);
@@ -13303,6 +13303,30 @@ Ext.define('Voyant.panel.Summary', {
     	}
     },
     
+    loadSummary: function() {
+		var el = this.getLayout().getRenderTarget();
+		el.update('');
+		this.summaryListParent = Ext.dom.Helper.append(el, '<ul></ul>');
+		Ext.dom.Helper.append(this.summaryListParent, '<li>'+this.getCorpus().getShow()+'</li>');
+		
+		var size = this.getCorpus().getDocumentsCount();
+		
+		if (size>1) {this.showLongestDocuments();}
+		if (size>1) {this.showMostDenseDocuments();}
+		this.showMostFrequentWords();
+		if (size>1) {this.showDistinctiveWords();}
+		
+		var params = Ext.apply({}, {
+    		limit: null
+    	}, this.getApiParams());
+    	this.docStore.load({
+			params: params
+		});
+    	
+    	this.addLinksHandler();
+    	
+    },
+    
     showLongestDocuments: function() {
     	var parent = Ext.dom.Helper.append(this.summaryListParent, '<li></li>');
     	this.docStore.on('load', function(store, records, success) {
@@ -13316,9 +13340,10 @@ Ext.define('Voyant.panel.Summary', {
     			
     			store.sort('tokensCount-lexical', 'DESC');
     			
+    			var limit = parseInt(this.getApiParam("limit"));
     			var data = {
-    				shortest: store.getRange(count-2,count).reverse(),
-    				longest: store.getRange(0,1),
+    				shortest: store.getRange(count-limit,count).reverse(),
+    				longest: store.getRange(0,limit),
     				all: store.getRange(0,count)
     			};
     			
@@ -13337,19 +13362,8 @@ Ext.define('Voyant.panel.Summary', {
     				}
     			}
     			
-    			var tpl = new Ext.XTemplate(this.localize('docsLength'));
-    			var out = '';
-    			if (count>5) {
-    				out += new Ext.Template(this.localize('docsLengthLongest')).applyTemplate([this.getSparkLine(lengths)]) + this.localize('colon') + tpl.apply({docs: data.longest});
-    				out += this.localize('docsLengthShortest') + this.localize('colon') + tpl.apply({docs: data.shortest});
-    				out += "<a href='#' onclick='return false' class='corpus-documents corpus-documents-length'>"+this.localize('seeAll')+'</a>';
-    			}
-    			else {
-    				out += new Ext.Template(this.localize('docsLengthAll')).apply([this.getSparkLine(lengths)]) + this.localize('colon') + tpl.apply({docs: data.all});
-    			}
+    			out = new Ext.XTemplate(this.localize('docsLength')).apply({spark: this.getSparkLine(lengths), longestDocs: data.longest, shortestDocs: data.shortest});
     			Ext.dom.Helper.append(parent, out);
-    		} else {
-    			
     		}
 
 		}, this);
@@ -13368,9 +13382,10 @@ Ext.define('Voyant.panel.Summary', {
     			
     			store.sort('typeTokenRatio-lexical', 'DESC');
     			
+    			var limit = parseInt(this.getApiParam("limit"));
     			var data = {
-    				lowest: store.getRange(count-2,count).reverse(),
-    				highest: store.getRange(0,1),
+    				lowest: store.getRange(count-limit,count).reverse(),
+    				highest: store.getRange(0,limit),
     				all: store.getRange(0,count)
     			};
     			
@@ -13389,17 +13404,7 @@ Ext.define('Voyant.panel.Summary', {
     				}
     			}
     			
-    			var tpl = new Ext.XTemplate(this.localize('docsDensity'));
-    			var out = '';
-    			if (count>5) {
-    				out += new Ext.Template(this.localize('docsDensityHighest')).applyTemplate([this.getSparkLine(densities)]) + this.localize('colon') + tpl.apply({docs: data.highest});
-    				out += this.localize('docsDensityLowest') + this.localize('colon') + tpl.apply({docs: data.lowest});
-    				out += "<a href='#' onclick='return false' class='corpus-documents corpus-documents-density'>"+this.localize('seeAll')+'</a>';
-    			}
-    			else {
-    				out += new Ext.Template(this.localize('docsDensityAll')).applyTemplate([this.getSparkLine(densities)])  + this.localize('colon') + tpl.apply({docs: data.all});
-    			}
-    			
+    			out = new Ext.XTemplate(this.localize('docsDensity')).apply({spark: this.getSparkLine(densities), highestDocs: data.highest, lowestDocs: data.lowest});
     			Ext.dom.Helper.append(parent, out);
     		}
     	}, this);
@@ -13430,76 +13435,68 @@ Ext.define('Voyant.panel.Summary', {
     },
     
     showDistinctiveWords: function() {
-    	var disParent = Ext.dom.Helper.append(this.summaryListParent, '<li>'+this.localize('distinctiveWords')+'<ol></ol></li>', true);
-    	var listParent = disParent.first('ol');
-    	
-    	this.docStore.on('load', function(store, records, success) {
-    		var count = store.getTotalCount();
-    		if (count > 1) {
-    			store.sort('index', 'ASC');
-    			var len = this.getApiParam('numberOfDocumentsForDistinctiveWords');
-    			store.each(function(item, index, length) {
-    				Ext.dom.Helper.append(listParent, {tag: 'li', 'voyant:index': String(index), cls: (index>len-1 ? 'x-hidden' : ''), html: '<a href="#" onclick="return false" class="document-id document-id-distinctive" voyant:val="'+item.get('id')+'">'+item.getShortTitle()+'</a>'});
-    			}, this);
-    			
-    			if (count > len) {
-    				var tpl = new Ext.Template(this.localize('moreDistinctiveWords'));
-					var remaining = count-len;
-					var more = Ext.dom.Helper.append(this.summaryListParent, {tag: 'div', html: tpl.apply([len>remaining ? remaining : len,remaining])}, true);
-					more.addListener('click', function() {
-						var hidden = listParent.select('li[class="x-hidden"]');
-						var item;
-						for (i=0;i<hidden.getCount();i++) {
-							if (i==len) {break;}
-							item = hidden.item(i).removeCls('x-hidden');
-						}
-						this.showDistinctiveWordsStep(hidden.item(0));
-						var remaining = hidden.getCount()-len;
-						if (remaining>0) {
-							more.update(tpl.apply([len>remaining ? remaining : len,remaining]));
-						}
-						else {more.remove();}
-					}, this);
-    			}
-    			
-    			this.showDistinctiveWordsStep(listParent.first('li'));
-    		}
-    	}, this);
+    	var disParent = Ext.dom.Helper.append(this.summaryListParent, '<li id="distinctiveWords">'+this.localize('distinctiveWords')+'<ol></ol></li>', true);
+    	this.showMoreDistinctiveWords();
     },
     
-    showDistinctiveWordsStep: function(el) {
-    	var index = Number(el.getAttribute('index','voyant'));
-		this.documentTermsStore.load({
-			addRecords: true,
-			params: {
-				docIndex: index,
-				limit: 5,
-				sort: 'TFIDF',
-				dir: 'DESC'
-			},
-			scope: this,
-			callback: function(records, operation, success) {
-				var data = [];
-				if (records) { // TODO: why wouldn't we have records here?
-					var len = records.length;
-					records.forEach(function(r, index, array) {
-						data.push({
-							id: r.getId(),
-							type: r.getTerm(),
-							val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
-							docId: r.get('docId'),
-							len: len
-						});
-					});
-					Ext.dom.Helper.append(el, this.localize('colon')+new Ext.XTemplate(this.localize('documentType')).apply({types: data})+'.');
-					
-					var nextEl = el.next('li');
-					if (nextEl && !nextEl.hasCls('x-hidden')) {
-						this.showDistinctiveWordsStep(nextEl);
-					}
-				}
-			}
-		});
+    showMoreDistinctiveWords: function() {
+    	var list = Ext.dom.Query.selectNode("#distinctiveWords > ol", this.summaryListParent);
+    	var count = Ext.dom.Query.select("li:not(.more)", list).length;
+    	var numberOfDocumentsForDistinctiveWords = parseInt(this.getApiParam('numberOfDocumentsForDistinctiveWords'));
+    	var range = this.getCorpus().getDocumentsStore().getRange(count, count+numberOfDocumentsForDistinctiveWords-1);
+    	if (range && Ext.isArray(range)) {
+    		var docIndex = [];
+    		range.forEach(function(doc) {
+    			docIndex.push(doc.getIndex())
+    		})
+    		if (docIndex.length>0) {
+    			this.documentTermsStore.load({
+    				addRecords: true,
+    				params: {
+    					docIndex: docIndex,
+    					perDocLimit: parseInt(this.getApiParam("limit")),
+    					limit: numberOfDocumentsForDistinctiveWords*parseInt(this.getApiParam("limit")),
+    					sort: 'TFIDF',
+    					dir: 'DESC'
+    				},
+    				scope: this,
+    				callback: function(records, operation, success) {
+    					var docs = {};
+    					if (success && records && Ext.isArray(records)) { // TODO: why wouldn't we have records here?
+    						records.forEach(function(r, index, array) {
+    							var i = r.getDocIndex();
+    							if (!(i in docs)) {docs[i]=[]};
+    							docs[i].push({
+    								id: r.getId(),
+    								type: r.getTerm(),
+    								val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
+    								docId: r.get('docId')
+    							});
+
+    						});
+    						docIndex.forEach(function(index) {
+    							var doc = this.getCorpus().getDocument(index);
+    							len = docs[index].length; // declare for template
+    		    				Ext.dom.Helper.append(list, {tag: 'li', 'voyant:index': String(index), html: 
+    		    					'<a href="#" onclick="return false" class="document-id document-id-distinctive" voyant:val="'+doc.get('id')+'">'+doc.getShortTitle()+'</a>'+
+    		    					this.localize('colon')+ new Ext.XTemplate(this.localize('documentType')).apply({types: docs[index]})+'.'
+    		    				});
+    						}, this);
+    						len = numberOfDocumentsForDistinctiveWords;
+    						remaining = this.getCorpus().getDocumentsStore().getTotalCount() - count - docIndex.length;
+    						if (remaining>0) {
+        	    				var tpl = new Ext.Template(this.localize('moreDistinctiveWords'));
+        						var more = Ext.dom.Helper.append(list, {tag: 'li', cls: 'more', html: tpl.apply([len>remaining ? remaining : len,remaining])}, true);
+        						more.on("click", function() {
+        							more.remove();
+        							this.showMoreDistinctiveWords();
+        						}, this)
+    						}
+    					}
+    				}
+    			});
+    		}
+    	}
     },
     
     addLinksHandler: function() {
