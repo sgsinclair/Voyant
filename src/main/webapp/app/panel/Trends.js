@@ -293,6 +293,11 @@
     loadFromCorpusTerms: function(corpusTerms) {
     	if (this.getCorpus()) {
     		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
+    		var params = this.getApiParams(['limit','stopList','query','withDistributions',"bins"]);
+    		// ensure that we're not beyond the number of documents
+    		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
+    			params.bins = this.getCorpus().getDocumentsCount();
+    		}
 			corpusTerms.load({
 			    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
 			    	if (success) {
@@ -304,7 +309,7 @@
 			    	}
 			    },
 			    scope: this,
-			    params: this.getApiParams(['limit','stopList','query','withDistributions',"bins"])
+			    params: params
 	    	});
     	}
     },
@@ -394,7 +399,12 @@
 
                },
         		renderer: function(label, data) {
-        			return mode==me.MODE_DOCUMENT ? parseInt(label)+1 : me.getCorpus().getDocument(label).getTinyTitle();
+        			if (mode==me.MODE_DOCUMENT) {
+        				return parseInt(label)+1;
+        			} else {
+        				var doc = me.getCorpus().getDocument(label);
+        				return doc ? doc.getTinyLabel() : '?';
+        			}
         		}
         	}]
     	});

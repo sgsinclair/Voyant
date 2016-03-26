@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Mar 25 19:58:44 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Mar 25 21:27:28 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -13215,6 +13215,10 @@ Ext.define('Voyant.panel.Summary', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
+    	this.on("afterrender", function() {
+    		this.addLinksHandler();
+    	})
+    	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		
@@ -13322,8 +13326,6 @@ Ext.define('Voyant.panel.Summary', {
     	this.docStore.load({
 			params: params
 		});
-    	
-    	this.addLinksHandler();
     	
     },
     
@@ -16040,6 +16042,12 @@ Ext.define('Voyant.panel.TermsRadio', {
     loadFromCorpusTerms: function(corpusTerms) {
     	if (this.getCorpus()) {
     		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
+    		var params = this.getApiParams(['limit','stopList','query','withDistributions',"bins"]);
+    		debugger
+    		// ensure that we're not beyond the number of documents
+    		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
+    			params.bins = this.getCorpus().getDocumentsCount();
+    		}
 			corpusTerms.load({
 			    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
 			    	if (success) {
@@ -16051,7 +16059,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 			    	}
 			    },
 			    scope: this,
-			    params: this.getApiParams(['limit','stopList','query','withDistributions',"bins"])
+			    params: params
 	    	});
     	}
     },
@@ -16141,7 +16149,12 @@ Ext.define('Voyant.panel.TermsRadio', {
 
                },
         		renderer: function(label, data) {
-        			return mode==me.MODE_DOCUMENT ? parseInt(label)+1 : me.getCorpus().getDocument(label).getTinyTitle();
+        			if (mode==me.MODE_DOCUMENT) {
+        				return parseInt(label)+1;
+        			} else {
+        				var doc = me.getCorpus().getDocument(label);
+        				return doc ? doc.getTinyLabel() : '?';
+        			}
         		}
         	}]
     	});
@@ -16517,9 +16530,6 @@ Ext.define('Voyant.VoyantApp', {
     },
     
     launch: function() {
-		this.on("unhandledEvent", function(eventName) {
-			if (console) {console.warn("unhandled event: ", eventName, arguments)}
-		})
 		this.callParent(arguments);
     },
     
@@ -16568,8 +16578,8 @@ Ext.define('Voyant.VoyantApp', {
 		
 		if (!isHeard) {
 			// let the application know that we have an unhandledEvent
-			var args = ["unhandledEvent"];
-			for (var i=0; i<arguments.length; i++) {args.push(arguments[i])}
+			var args = ["unhandledEvent", src, eventName];
+			for (var i=2; i<arguments.length; i++) {args.push(arguments[i])}
 			this.fireEvent.apply(this, args);
 		}
     },
@@ -16887,6 +16897,39 @@ Ext.define('Voyant.VoyantCorpusApp', {
     listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
+    		this.on("unhandledEvent", function(src, eventName, data) {
+				var url = this.getBaseUrl() + '?corpus='+corpus.getId();
+				var api = this.getModifiedApiParams() || {}; // use application, not tool
+				delete api.view; // make sure we show default view
+				if (eventName=='termsClicked') {
+					api.query=data;
+				}
+				else if (eventName=='documentsClicked') {
+					var docIndex = [];
+					if (data.forEach) {
+						data.forEach(function(doc) {
+							docIndex.push(doc.getIndex())
+						})
+					}
+					api.docIndex=docIndex
+				}
+				else if (eventName=='corpusTermsClicked') {
+					if (data.map) {
+						api.query = data.map(function(corpusTerm) {return corpusTerm.getTerm()});
+					}
+				}
+				else if (eventName=='documentTermsClicked') {
+					if (data.map) {
+						api.query = data.map(function(documentTerm) {return documentTerm.getTerm()});
+						api.docIndex = data.map(function(documentTerm) {return documentTerm.getDocIndex()});
+					}
+				}
+				else {
+					if (console) {console.warn("Unhandled event: "+eventName, data)}
+				}
+				url += "&"+Ext.Object.toQueryString(api)
+				this.openUrl(url)
+			})
     	}
     }
 

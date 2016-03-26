@@ -191,6 +191,39 @@ Ext.define('Voyant.VoyantCorpusApp', {
     listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
+    		this.on("unhandledEvent", function(src, eventName, data) {
+				var url = this.getBaseUrl() + '?corpus='+corpus.getId();
+				var api = this.getModifiedApiParams() || {}; // use application, not tool
+				delete api.view; // make sure we show default view
+				if (eventName=='termsClicked') {
+					api.query=data;
+				}
+				else if (eventName=='documentsClicked') {
+					var docIndex = [];
+					if (data.forEach) {
+						data.forEach(function(doc) {
+							docIndex.push(doc.getIndex())
+						})
+					}
+					api.docIndex=docIndex
+				}
+				else if (eventName=='corpusTermsClicked') {
+					if (data.map) {
+						api.query = data.map(function(corpusTerm) {return corpusTerm.getTerm()});
+					}
+				}
+				else if (eventName=='documentTermsClicked') {
+					if (data.map) {
+						api.query = data.map(function(documentTerm) {return documentTerm.getTerm()});
+						api.docIndex = data.map(function(documentTerm) {return documentTerm.getDocIndex()});
+					}
+				}
+				else {
+					if (console) {console.warn("Unhandled event: "+eventName, data)}
+				}
+				url += "&"+Ext.Object.toQueryString(api)
+				this.openUrl(url)
+			})
     	}
     }
 

@@ -40,9 +40,6 @@ Ext.define('Voyant.VoyantApp', {
     },
     
     launch: function() {
-		this.on("unhandledEvent", function(eventName) {
-			if (console) {console.warn("unhandled event: ", eventName, arguments)}
-		})
 		this.callParent(arguments);
     },
     
@@ -91,8 +88,8 @@ Ext.define('Voyant.VoyantApp', {
 		
 		if (!isHeard) {
 			// let the application know that we have an unhandledEvent
-			var args = ["unhandledEvent"];
-			for (var i=0; i<arguments.length; i++) {args.push(arguments[i])}
+			var args = ["unhandledEvent", src, eventName];
+			for (var i=2; i<arguments.length; i++) {args.push(arguments[i])}
 			this.fireEvent.apply(this, args);
 		}
     },

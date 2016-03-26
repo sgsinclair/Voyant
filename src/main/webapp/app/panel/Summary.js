@@ -72,6 +72,10 @@ Ext.define('Voyant.panel.Summary', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
+    	this.on("afterrender", function() {
+    		this.addLinksHandler();
+    	})
+    	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		
@@ -179,8 +183,6 @@ Ext.define('Voyant.panel.Summary', {
     	this.docStore.load({
 			params: params
 		});
-    	
-    	this.addLinksHandler();
     	
     },
     
