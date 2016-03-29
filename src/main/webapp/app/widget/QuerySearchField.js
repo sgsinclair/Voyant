@@ -12,14 +12,6 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		tokenType: 'lexical',
 		inDocumentsCountOnly: undefined
 	},
-    triggers: {
-        help: {
-            weight: 2,
-            cls: 'fa-trigger form-fa-help-trigger',
-            handler: 'onHelpClick',
-            scope: 'this'
-        }
-    },
     
     constructor: function(config) {
     	config = config || {};
@@ -35,7 +27,15 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    	'<ul class="x-list-plain"><tpl for=".">',
     	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">{term} ({rawFreq})</li>',
     	    	'</tpl></ul>'
-    	    )
+    	    ),
+    	    triggers: {
+    	        help: {
+    	            weight: 2,
+    	            cls: 'fa-trigger form-fa-help-trigger',
+    	            handler: 'onHelpClick',
+    	            scope: 'this'
+    	        }
+    	   }
     	})
         this.callParent(arguments);
     },

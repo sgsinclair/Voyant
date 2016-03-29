@@ -109,7 +109,7 @@ Ext.define('Voyant.panel.DToC.Stats', {
                 mode: 'MULTI'
             }),
             
-            tbar: new Ext.Toolbar({
+            tbar: {
 		    	cls: 'dtc-toolbar',
 		    	hideBorders: true,
 		    	items: [{
@@ -128,7 +128,7 @@ Ext.define('Voyant.panel.DToC.Stats', {
                         }
                     }
                 }]
-            }),
+            },
 
     		columns: [{
     			text: this.localize("term"),

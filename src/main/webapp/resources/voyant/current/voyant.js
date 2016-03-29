@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Mar 29 15:51:30 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue Mar 29 16:04:30 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4765,14 +4765,6 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		tokenType: 'lexical',
 		inDocumentsCountOnly: undefined
 	},
-    triggers: {
-        help: {
-            weight: 2,
-            cls: 'fa-trigger form-fa-help-trigger',
-            handler: 'onHelpClick',
-            scope: 'this'
-        }
-    },
     
     constructor: function(config) {
     	config = config || {};
@@ -4788,7 +4780,15 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    	'<ul class="x-list-plain"><tpl for=".">',
     	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">{term} ({rawFreq})</li>',
     	    	'</tpl></ul>'
-    	    )
+    	    ),
+    	    triggers: {
+    	        help: {
+    	            weight: 2,
+    	            cls: 'fa-trigger form-fa-help-trigger',
+    	            handler: 'onHelpClick',
+    	            scope: 'this'
+    	        }
+    	   }
     	})
         this.callParent(arguments);
     },

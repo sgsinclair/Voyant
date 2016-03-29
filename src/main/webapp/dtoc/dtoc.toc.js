@@ -103,17 +103,17 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			},
 		    store: treeStore,
 		    tools: null,
-			tbar: new Ext.Toolbar({
+			tbar: {
 		    	cls: 'dtc-toolbar',
 		    	hideBorders: true,
 		    	items: [{
 		    		xtype: 'querysearchfield',
 		    		itemId: 'search',
-		    		emptyText: "Word Search",
+//		    		emptyText: "Word Search",
 		    		width: 135,
 		    		triggers: undefined
 		    	}]
-		    }),
+		    },
 		    listeners: {}
 		};
 		if (config.doInit) {
