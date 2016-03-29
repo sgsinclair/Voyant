@@ -1,49 +1,31 @@
-Ext.define('Voyant.data.store.CorpusCollocates', {
-	extend: 'Voyant.data.store.VoyantStore',
-	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
+Ext.define('Voyant.data.store.CorpusCollocatesMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.CorpusCollocate',
-//    transferable: ['setCorpus'],
-//    embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
-	config: {
-		corpus: undefined
-	},
 	constructor : function(config) {
-		
-		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-			pagePurgeCount: 0,
-			pageSize: 100,
-			leadingBufferZone: 100,
-			remoteSort: true,
-			autoLoad: false, // needs to be false until there's a corpus
-		     proxy: { // TODO: configure proxy to handle error
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.CorpusCollocates',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'corpusCollocates.collocates',
-		             totalProperty: 'corpusCollocates.total'
-		         },
-		         simpleSortMode: true
-		     }
-		})
-		
-//    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
-		this.callParent([config]);
-
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.CorpusCollocates',
+			'proxy.reader.rootProperty': 'corpusCollocates.collocates',
+			'proxy.reader.totalProperty': 'corpusCollocates.total'
+		}])
 	}
+});
 
+Ext.define('Voyant.data.store.CorpusCollocates', {
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.CorpusCollocatesMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.CorpusCollocatesMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.CorpusCollocatesBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.CorpusCollocatesMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.CorpusCollocatesMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
 });

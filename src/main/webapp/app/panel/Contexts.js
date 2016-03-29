@@ -44,14 +44,18 @@ Ext.define('Voyant.panel.Contexts', {
         Ext.apply(me, { 
     		title: this.localize('title'),
     		emptyText: this.localize("emptyText"),
-            store : Ext.create("Voyant.data.store.Contexts", {
+            store : Ext.create("Voyant.data.store.ContextsBuffered", {
             	parentPanel: this,
-            	stripTags: "all",
-            	sortOnLoad: true,
-            	sorters: {
-                    property: 'position',
-                    direction: 'ASC'
+            	proxy: {
+            		extraParams: {
+                    	stripTags: "all"            			
+            		}
             	}
+//            	sortOnLoad: true,
+//            	sorters: {
+//                    property: 'position',
+//                    direction: 'ASC'
+//            	}
             }),
     		selModel: Ext.create('Ext.selection.RowModel', {
                 listeners: {
@@ -257,12 +261,11 @@ Ext.define('Voyant.panel.Contexts', {
         });
         
         me.on("loadedCorpus", function(src, corpus) {
-        	this.getStore().setCorpus(corpus);
         	if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
         		this.mask(this.localize('limitedAccess'), 'mask-no-spinner');
         	}
         	else {
-        		var corpusTerms = Ext.create("Voyant.data.store.CorpusTerms", {corpus: corpus});
+        		var corpusTerms = corpus.getCorpusTerms({autoLoad: false});
         		corpusTerms.load({
         		    callback: function(records, operation, success) {
         		    	if (success && records.length>0) {

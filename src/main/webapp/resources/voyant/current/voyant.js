@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Mar 25 21:27:28 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue Mar 29 15:51:30 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3775,26 +3775,66 @@ Ext.define('Voyant.data.model.Token', {
 	}
 });
 Ext.define('Voyant.data.store.VoyantStore', {
-	extend: 'Ext.data.BufferedStore',
 	config: {
+		corpus: undefined,
 		parentPanel: undefined
 	},
-	constructor: function(config) {
+	constructor: function(config, extras) {
+		config = config || {};
+		Ext.applyIf(config, {
+			remoteSort: true,
+			autoLoad: false,
+			listeners: {
+				beforeload: this.applyApiParams
+			},
+			scope: this,
+			// define buffered configuration even if ignored when this isn't a buffered store
+			pagePurgeCount : 0, // don't purge any data
+			pageSize : 100, // each request is more intenstive, so do fewer of them then default
+			leadingBufferZone : 200 // stay two pages ahead
+		});
+		config.proxy = config.proxy || {};
+		Ext.applyIf(config.proxy, {
+			type: 'ajax',
+			url: Voyant.application.getTromboneUrl(),
+			actionMethods: {read: 'POST'},
+			reader: {
+				type: 'json',
+				rootProperty: extras['proxy.reader.rootProperty'],
+				totalProperty: extras['proxy.reader.totalProperty']
+			},
+			simpleSortMode: true
+		})
+		config.proxy.extraParams = config.proxy.extraParams || {};
+		Ext.applyIf(config.proxy.extraParams, {
+			tool: extras['proxy.extraParams.tool']
+		});
+		
 		if (config.parentPanel !== undefined) {
 			this.setParentPanel(config.parentPanel);
+			config.parentPanel.on("loadedCorpus", function(src, corpus) {
+				this.setCorpus(corpus);
+			}, this);
 		}
-		this.callParent([config]);
-		this.on('beforeload', this.applyApiParams, this);
+		
+		Ext.apply(this, config);
 	},
 	applyApiParams: function(store, operation) {
 		var parent = this.getParentPanel();
 		if (parent !== undefined) {
 			var params = parent.getApiParams();
-			if (operation.params === undefined) operation.params = {};
+			operation = operation ? (operation===1 ? {} : operation) : {};
+			operation.params = operation.params || {};
 			for (var key in params) {
 				operation.params[key] = params[key];
 			}
 		}
+	},
+	setCorpus: function(corpus) {
+		if (corpus && this.getProxy && this.getProxy()) {
+			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
+		}
+		this.callParent(arguments);
 	}
 });
 Ext.define('Voyant.data.store.CAAnalysis', {
@@ -3840,385 +3880,199 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 	}
 });
 
-Ext.define('Voyant.data.store.Contexts', {
-	extend: 'Voyant.data.store.VoyantStore',
-	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
+Ext.define('Voyant.data.store.ContextsMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.Context',
-//    transferable: ['setCorpus'],
-//    embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
-	config: {
-		corpus: undefined
-	},
 	constructor : function(config) {
-		
-		config = config || {};
-
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-			pagePurgeCount : 0,
-			pageSize : 100,
-			leadingBufferZone : 100,
-			trailingBufferZone : 100,
-			remoteSort : true,
-			proxy : {
-				type : 'ajax',
-				url : Voyant.application.getTromboneUrl(),
-				actionMethods: {read: 'POST'},
-				extraParams : {
-					tool : 'corpus.DocumentContexts',
-					corpus : config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
-					stripTags : config.stripTags
-				},
-				reader : {
-					type : 'json',
-					rootProperty : 'documentContexts.contexts',
-					totalProperty : 'documentContexts.total'
-				},
-				simpleSortMode : true
-			},
-			listeners: {
-				beforeload: function(store) {
-					return store.getCorpus().getNoPasswordAccess()!='NONCONSUMPTIVE';
-				},
-				beforeprefetch: function(store, operation) {
-					var parent = this.getParentPanel();
-					if (parent !== undefined) {
-						// need to set in proxy.extraParams since operation.params get overwritten later on
-						var params = parent.getApiParams();
-						var proxy = store.getProxy();
-						for (var key in params) {
-							proxy.extraParams[key] = params[key];
-						}
-					}
-				},
-				scope: this
-			}
-		});
-		
-		// this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
-		this.callParent([config]);
-
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.DocumentContexts',
+			'proxy.reader.rootProperty': 'documentContexts.contexts',
+			'proxy.reader.totalProperty': 'documentContexts.total'
+		}])
 	}
+});
 
+Ext.define('Voyant.data.store.Contexts', {
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.ContextsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.ContextsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.ContextsBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.ContextsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.ContextsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+Ext.define('Voyant.data.store.CorpusCollocatesMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.CorpusCollocate',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.CorpusCollocates',
+			'proxy.reader.rootProperty': 'corpusCollocates.collocates',
+			'proxy.reader.totalProperty': 'corpusCollocates.total'
+		}])
+	}
 });
 
 Ext.define('Voyant.data.store.CorpusCollocates', {
-	extend: 'Voyant.data.store.VoyantStore',
-	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.CorpusCollocate',
-//    transferable: ['setCorpus'],
-//    embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
-	config: {
-		corpus: undefined
-	},
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.CorpusCollocatesMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-			pagePurgeCount: 0,
-			pageSize: 100,
-			leadingBufferZone: 100,
-			remoteSort: true,
-			autoLoad: false, // needs to be false until there's a corpus
-		     proxy: { // TODO: configure proxy to handle error
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.CorpusCollocates',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'corpusCollocates.collocates',
-		             totalProperty: 'corpusCollocates.total'
-		         },
-		         simpleSortMode: true
-		     }
-		})
-		
-//    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+		this.mixins['Voyant.data.store.CorpusCollocatesMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
 	}
-
 });
 
-Ext.define("Voyant.data.proxy.CorpusFacets", {
-	extend: 'Ext.data.proxy.Ajax',
-	constructor: function(config) {
+Ext.define('Voyant.data.store.CorpusCollocatesBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.CorpusCollocatesMixin'],
+	constructor : function(config) {
 		config = config || {};
-		Ext.apply(config, {
-            extraParams: Ext.apply(config.extraParams || {}, {
-				 tool: 'corpus.CorpusFacets'
-			})
-		});
-		Ext.applyIf(config, {
-			url: Voyant.application.getTromboneUrl()
-		})
+		this.mixins['Voyant.data.store.CorpusCollocatesMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-	},
-	reader: {
-	    type: 'json',
-	    rootProperty: 'corpusFacets.facets',
-	    totalProperty: 'corpusFacets.total'
-	},
-    simpleSortMode: true
-})
+	}
+});
+Ext.define('Voyant.data.store.CorpusFacetsMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.CorpusFacet',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpusFacets.facets',
+			'proxy.reader.rootProperty': 'corpusFacets.facets',
+			'proxy.reader.totalProperty': 'corpusFacets.total'
+		}])
+	}
+});
 
 Ext.define('Voyant.data.store.CorpusFacets', {
-	extend: 'Voyant.data.store.VoyantStore',
-    model: 'Voyant.data.model.CorpusFacet',
-    transferable: ['setCorpus'],
-	config: {
-		corpus: undefined
-	},
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.CorpusFacetsMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		Ext.applyIf(config, {
-			pagePurgeCount: 0,
-			pageSize: 100,
-			leadingBufferZone: 100,
-			remoteSort: true,
-			autoLoad: false, // needs to be false until there's a corpus
-		    proxy: Ext.create("Voyant.data.proxy.CorpusFacets", {
-		    	extraParams: {
-		    		facet: config.facet
-		    	}
-		    })
-		})
-
+		this.mixins['Voyant.data.store.CorpusFacetsMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-		
-		if (config && config.corpus) {
-			this.setCorpus(config.corpus);
-		}
-
-
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
 	}
-
 });
 
-Ext.define("Voyant.data.proxy.CorpusTerms", {
-	extend: 'Ext.data.proxy.Ajax',
-	constructor: function(config) {
+Ext.define('Voyant.data.store.CorpusFacetsBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.CorpusFacetsMixin'],
+	constructor : function(config) {
 		config = config || {};
-		Ext.apply(config, {
-            extraParams: Ext.apply(config.extraParams || {}, {
-				 tool: 'corpus.CorpusTerms'
-			})
-		});
-		Ext.applyIf(config, {
-			url: Voyant.application.getTromboneUrl()
-		})
+		this.mixins['Voyant.data.store.CorpusFacetsMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-	},
-	reader: {
-	    type: 'json',
-	    rootProperty: 'corpusTerms.terms',
-	    totalProperty: 'corpusTerms.total'
-	},
-    simpleSortMode: true
-})
+	}
+});
+
+Ext.define('Voyant.data.store.CorpusTermsMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.CorpusTerm',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.CorpusTerms',
+			'proxy.reader.rootProperty': 'corpusTerms.terms',
+			'proxy.reader.totalProperty': 'corpusTerms.total'
+		}])
+	}
+});
 
 Ext.define('Voyant.data.store.CorpusTerms', {
-	extend: 'Voyant.data.store.VoyantStore',
-	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.CorpusTerm',
-    transferable: ['setCorpus'],
-    // requires: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
-    // embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
-	config: {
-		corpus: undefined
-	},
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.CorpusTermsMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		Ext.applyIf(config, {
-			pagePurgeCount: 0,
-			pageSize: 100,
-			leadingBufferZone: 100,
-			remoteSort: true,
-			autoLoad: false, // needs to be false until there's a corpus
-		    proxy: Ext.create("Voyant.data.proxy.CorpusTerms")
-		})
-
-    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+		this.mixins['Voyant.data.store.CorpusTermsMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-		
-		if (config && config.corpus) {
-			if (config.corpus.then) {
-				var dfd = Voyant.application.getDeferred(this);
-				var me = this;
-				config.corpus.then(function(corpus) {
-					me.setCorpus(corpus);
-					if (me.getAutoLoad()) {
-						me.load({
-							callback: function() {
-								dfd.resolve(me);
-							}
-						})
-					}
-					else {
-						dfd.resolve(me);
-					}
-				});
-				var promise = Voyant.application.getPromiseFromDeferred(dfd);
-				return promise;
-			}
-			else {
-				this.setCorpus(config.corpus);
-			}
-		}
-
-
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
 	}
+});
 
+Ext.define('Voyant.data.store.CorpusTermsBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.CorpusTermsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.CorpusTermsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.DocumentQueryMatchesMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.CorpusTerm',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.DocumentsFinder',
+			'proxy.reader.rootProperty': 'documentsFinder.queries',
+			'proxy.reader.totalProperty': undefined
+		}])
+	}
 });
 
 Ext.define('Voyant.data.store.DocumentQueryMatches', {
 	extend: 'Ext.data.Store',
-    model: 'Voyant.data.model.DocumentQueryMatch',
-	config: {
-		corpus: undefined
-	},
+	mixins: ['Voyant.data.store.DocumentQueryMatchesMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.applyIf(config, {
-			autoLoad: false,
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.DocumentsFinder',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
-		         },
-		         actionMethods: {read: 'POST'},
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'documentsFinder.queries'
-		         }
-		     }
-		})
-		
+		this.mixins['Voyant.data.store.DocumentQueryMatchesMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-
-		if (config && config.corpus) {
-			this.setCorpus(config.corpus);
-		}
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
 	}
+});
 
+Ext.define('Voyant.data.store.DocumentQueryMatchesBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.DocumentQueryMatchesMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.DocumentQueryMatchesMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.DocumentTermsMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.DocumentTerm',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.DocumentTerms',
+			'proxy.reader.rootProperty': 'documentTerms.terms',
+			'proxy.reader.totalProperty': 'documentTerms.total'
+		}])
+	}
 });
 
 Ext.define('Voyant.data.store.DocumentTerms', {
-	extend: 'Voyant.data.store.VoyantStore',
-	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.DocumentTerm',
-    transferable: ['setCorpus'],
-    //requires: ['Voyant.panel.DocumentTerms','Voyant.panel.Cirrus'],
-    //embeddable: ['Voyant.panel.DocumentTerms','Voyant.panel.Cirrus'],
-	config: {
-		corpus: undefined
-	},
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.DocumentTermsMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.applyIf(config, {
-			pagePurgeCount: 0,
-			pageSize: 100,
-			leadingBufferZone: 100,
-			remoteSort: true,
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.DocumentTerms',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'documentTerms.terms',
-		             totalProperty: 'documentTerms.total'
-		         },
-		         simpleSortMode: true
-		     }
-		})
-		
-    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+		this.mixins['Voyant.data.store.DocumentTermsMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-
-		if (config && config.corpus) {
-			if (config.corpus.then) {
-				var dfd = Voyant.application.getDeferred(this);
-				var me = this;
-				config.corpus.then(function(corpus) {
-					me.setCorpus(corpus);
-					dfd.resolve(me);
-				});
-				var promise = Voyant.application.getPromiseFromDeferred(dfd);
-				return promise;
-			}
-			else {
-				this.setCorpus(config.corpus);
-			}
-		}
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
 	}
+});
 
+Ext.define('Voyant.data.store.DocumentTermsBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.DocumentTermsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.DocumentTermsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
 });
 
 Ext.define("Voyant.data.store.Documents", {
-	extend: "Ext.data.Store",
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.VoyantStore'],
 	model: "Voyant.data.model.Document",
 	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     // embeddable: ['Voyant.panel.Documents'],
@@ -4312,199 +4166,133 @@ Ext.define("Voyant.data.store.Documents", {
 		return Ext.isNumber(config) ? this.getAt(config) : this.getById(config);
 	}
 })
+Ext.define('Voyant.data.store.PCAAnalysisMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.StatisticalAnalysis',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.PCA',
+			'proxy.reader.rootProperty': 'pcaAnalysis',
+			'proxy.reader.totalProperty': 'pcaAnalysis.totalTerms'
+		}])
+		config.proxy.extraParams.withDistributions = true;
+	}
+});
+
 Ext.define('Voyant.data.store.PCAAnalysis', {
 	extend: 'Ext.data.Store',
-	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.StatisticalAnalysis',
-	config: {
-		corpus: undefined
-	},
-	
+	mixins: ['Voyant.data.store.PCAAnalysisMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-			proxy: {
-				type: 'ajax',
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.PCA',
-					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
-					withDistributions: true
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'pcaAnalysis',
-		             totalProperty: 'pcaAnalysis.totalTerms'
-		         },
-		         simpleSortMode: true
-			 }
-		});
-		
+		this.mixins['Voyant.data.store.PCAAnalysisMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
+	}
+});
 
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
+Ext.define('Voyant.data.store.PCAAnalysisBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.PCAAnalysisMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.PCAAnalysisMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+Ext.define('Voyant.data.store.DocSimAnalysisMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.StatisticalAnalysis',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.DocumentSimilarity',
+			'proxy.reader.rootProperty': 'documentSimilarity',
+			'proxy.reader.totalProperty': 'documentSimilarity.total'
+		}])
+		config.proxy.extraParams.withDistributions = true;
 	}
 });
 
 Ext.define('Voyant.data.store.DocSimAnalysis', {
 	extend: 'Ext.data.Store',
-	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.StatisticalAnalysis',
-	config: {
-		corpus: undefined
-	},
-	
+	mixins: ['Voyant.data.store.DocSimAnalysisMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-			proxy: {
-				type: 'ajax',
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.DocumentSimilarity',
-					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
-					withDistributions: true
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'documentSimilarity',
-		             totalProperty: 'documentSimilarity.totalDocs'
-		         },
-		         simpleSortMode: true
-			 }
-		});
-		
+		this.mixins['Voyant.data.store.DocSimAnalysisMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
+	}
+});
 
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
+Ext.define('Voyant.data.store.DocSimAnalysisBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.DocSimAnalysisMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.DocSimAnalysisMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+Ext.define('Voyant.data.store.CorpusNgramsMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.CorpusNgram',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.CorpusNgrams',
+			'proxy.reader.rootProperty': 'corpusNgrams.ngrams',
+			'proxy.reader.totalProperty': 'corpusNgrams.total'
+		}])
 	}
 });
 
 Ext.define('Voyant.data.store.CorpusNgrams', {
-	extend: 'Ext.data.BufferedStore',
-    model: 'Voyant.data.model.CorpusNgram',
-    config: {
-    	corpus: undefined
-    },
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.CorpusNgramsMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.applyIf(config, {
-			pagePurgeCount: 0,
-			pageSize: 100,
-			leadingBufferZone: 100,
-			remoteSort: true,
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.CorpusNgrams',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'corpusNgrams.ngrams',
-		             totalProperty: 'corpusNgrams.total'
-		         },
-		         simpleSortMode: true
-		     }
-		})
-		
-    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+		this.mixins['Voyant.data.store.CorpusNgramsMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-
-		if (config && config.corpus) {
-			if (config.corpus.then) {
-				var dfd = Voyant.application.getDeferred(this);
-				var me = this;
-				config.corpus.then(function(corpus) {
-					me.setCorpus(corpus);
-					dfd.resolve(me);
-				});
-				var promise = Voyant.application.getPromiseFromDeferred(dfd);
-				return promise;
-			}
-			else {
-				this.setCorpus(config.corpus);
-			}
-		}
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
 	}
+});
 
+Ext.define('Voyant.data.store.CorpusNgramsBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.CorpusNgramsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.CorpusNgramsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.TokensMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.Token',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.DocumentTokens',
+			'proxy.reader.rootProperty': 'documentTokens.tokens',
+			'proxy.reader.totalProperty': 'documentTokens.total'
+		}])
+	}
 });
 
 Ext.define('Voyant.data.store.Tokens', {
 	extend: 'Ext.data.Store',
-	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.Token',
-//    transferable: ['setCorpus'],
-//    embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
-	config: {
-		corpus: undefined
-	},
+	mixins: ['Voyant.data.store.TokensMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.DocumentTokens',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
-		        	 stripTags: config.stripTags
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'documentTokens.tokens',
-		             totalProperty: 'documentTokens.total'
-		         },
-		         simpleSortMode: true
-		     }
-		})
-		
-//    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+		this.mixins['Voyant.data.store.TokensMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
 	}
-
 });
 
+Ext.define('Voyant.data.store.TokensBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.TokensMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.TokensMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
 var Corpus = function(source, config) {
 	return Ext.create("Voyant.data.model.Corpus", source, config);
 }
@@ -4964,7 +4752,7 @@ Ext.define('Voyant.widget.StopListOption', {
     }
 })
 Ext.define('Voyant.widget.QuerySearchField', {
-    extend: 'Ext.form.field.Text',
+    extend: 'Ext.form.field.Tag',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.querysearchfield',
 	statics: {
@@ -4978,20 +4766,6 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		inDocumentsCountOnly: undefined
 	},
     triggers: {
-    	/*
-        clear: {
-            weight: 0,
-            cls: 'fa-trigger form-fa-clear-trigger',
-            hidden: true,
-            handler: 'onClearClick',
-            scope: 'this'
-        },
-        search: {
-            weight: 1,
-            cls: 'fa-trigger form-fa-search-trigger',
-            handler: 'onSearchClick',
-            scope: 'this'
-        },*/
         help: {
             weight: 2,
             cls: 'fa-trigger form-fa-help-trigger',
@@ -4999,123 +4773,99 @@ Ext.define('Voyant.widget.QuerySearchField', {
             scope: 'this'
         }
     },
-
-    initComponent: function(config) {
-        var me = this;
-
-        Ext.applyIf(me, {
-        	width: 120
-        });
-        
-        Ext.apply(me, {
-        	enableKeyEvents: true,
-        	listeners: {
-    		   render: function(c) {
-    			  if (c.triggers && c.triggers.help) {
-        		      Ext.QuickTips.register({
-          		        target: c.triggers.help.getEl(),
-          		        text: c.localize('querySearchTip'),
-          		        enabled: true,
-          		        showDelay: 20,
-          		        trackMouse: true,
-          		        autoShow: true
-          		      });
-    			  }
-    		      this.suggest = Ext.create('Ext.tip.ToolTip', {
-    		    	    target: this.inputEl,
-    		    	    autoShow: false,
-    		    	    hidden: true,
-    		    	    html: ''
-    		    	});
-    		    },
-    		    keyup: function(c, e, eOpts) {
-    		    	if (!this.store || Ext.isString(this.store)) {
-        		        if (this.findParentByType) {
-        		        	var panel = this.findParentByType("panel");
-        		        	var corpus;
-        		        	if (panel.getCorpus) {
-        		        		corpus = panel.getCorpus()
-        		        	}
-        		        	else if (panel.getStore && panel.getStore().getCorpus) {
-        		        		corpus = panel.getStore().getCorpus();
-        		        	}
-    		        		if (corpus) {
-    		                	this.store = corpus.getCorpusTerms();
-    		        		}
-        		        }
-
-    		    	}
-    		    	if (this.store) {
-    		    		var value = c.getValue().trim().replace(/^\^/,"")
-    		    		if (/[,|^~" ]/.test(value)==false && value.length>0) {
-        		    		this.store.load({
-        		    			params: {
-            		    			query: [value+"*", "^"+value+"*"],
-            		    			limit: 5,
-            		    			tokenType: this.tokenType,
-            		    			inDocumentsCountOnly: this.inDocumentsCountOnly
-        		    			},
-        		    			scope: this,
-        		    			callback: function(records, operation, success) {
-        		    				suggest = ""
-        		    				records.forEach(function(record) {
-        		    					suggest+="<div>"+record.getTerm()+" ("+(this.inDocumentsCountOnly ? record.getInDocumentsCount() : record.getRawFreq())+")</div>"
-        		    				}, this)
-        		    				this.suggest.show();
-        		    				this.suggest.update(suggest)
-        		    		    }
-        		    		})
-    		    		}
-    		    		else {
-		    				this.suggest.update("")
-		    				this.suggest.hide();
-    		    		}
-    		    	}
-    		    },
-    		    scope: me
-    		},
-            emptyText: me.localize('querySearch')
-
-        })
-
-        me.callParent(arguments);
-        me.on('specialkey', function(f, e){
-            if (e.getKey() == e.ENTER) {
-                me.doSearch();
-            }
-        });
-
-    },
-
-    onClearClick : function(){
-        this.setValue('');
-    	this.findParentByType("panel").fireEvent("query", this, undefined);
-        //this.getTrigger('clear').hide();
-        this.updateLayout();
-    },
-
-    onHelpClick : function(){
-    	Ext.Msg.show({
-    	    title: this.localize('querySearch'),
-    	    message: this.localize('querySearchTip'),
-    	    buttons: Ext.Msg.OK,
-    	    icon: Ext.Msg.INFO
-    	});
-    },
     
-    doSearch: function() {
-        var value = this.getValue();
-    	this.findParentByType("panel").fireEvent("query", this, value.length==0 ? undefined : value);
-    	/*
-    	if (value) {
-            this.getTrigger('clear').show();
-    	}
-    	else {
-            this.getTrigger('clear').hide();
-    	}
-    	*/
-        this.updateLayout();
+    constructor: function(config) {
+    	config = config || {};
+    	Ext.applyIf(config, {
+    		minWidth: 100,
+    		matchFieldWidth : false,
+    	    displayField: 'term',
+    	    valueField: 'term',
+    	    filterPickList: true,
+    	    createNewOnEnter: true,
+    	    createNewOnBlur: false,
+    	    tpl: Ext.create('Ext.XTemplate',
+    	    	'<ul class="x-list-plain"><tpl for=".">',
+    	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">{term} ({rawFreq})</li>',
+    	    	'</tpl></ul>'
+    	    )
+    	})
+        this.callParent(arguments);
+    },
+    initComponent: function(config) {
+    	var me = this;
+    	me.on("beforequery", function(queryPlan) {
+    		if (queryPlan.query) {
+    			queryPlan.query = queryPlan.query.trim();
+    			if (queryPlan.query.charAt(0)=="^") {
+    				queryPlan.query=queryPlan.query.substring(1)
+    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+    			}
+    			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*') {
+    				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
+    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+    			}
+    			try {
+                    new RegExp(queryPlan.query);
+	            }
+	            catch(e) {
+	            	queryPlan.cancel = true;
+	            }
+	            if (queryPlan.query.indexOf('"')>-1) { // deal with unfinished phrases
+	            	if (queryPlan.query.indexOf(" ")==-1) {queryPlan.cancel=true} // no space in phrase
+	            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
+	            }
+        		queryPlan.query = queryPlan.query+"*,"+"^"+queryPlan.query+"*"
+    		}
+    	}, me);
+    	
+    	me.on("change", function(tags, queries) {
+    		me.up('panel').fireEvent("query", me, queries)
+    	})
+    	
+    	me.up("panel").on("loadedCorpus", function(src, corpus) {
+    		var stopList = undefined;
+    		if (this.getApiParam) {stopList = this.getApiParam("stopList")}
+    		else {
+    			var parent = this.up("panel");
+    			if (parent && parent.getApiParam) {
+    				stopList = parent.getApiParam("stopList")
+    			}
+    		}
+			me.setStore(corpus.getCorpusTerms({
+				corpus: corpus,
+				proxy: {
+					extraParams: {
+		    			limit: 10,
+		    			tokenType: me.tokenType,
+		    			inDocumentsCountOnly: me.inDocumentsCountOnly,
+		    			stopList: stopList
+					}
+				}
+    		}));
+    	})
+    	
+    	me.on("afterrender", function(c) {
+			  if (c.triggers && c.triggers.help) {
+			      Ext.QuickTips.register({
+			        target: c.triggers.help.getEl(),
+			        text: c.localize('querySearchTip'),
+			        enabled: true,
+			        showDelay: 20,
+			        trackMouse: true,
+			        autoShow: true
+			      });
+			  }
+			  this.suggest = Ext.create('Ext.tip.ToolTip', {
+			    target: this.inputEl,
+			    autoShow: false,
+			    hidden: true,
+			    html: ''
+			  });
+    	})
+    	me.callParent(arguments);
     }
+    
 });
 Ext.define('Voyant.widget.TotalPropertyStatus', {
     extend: 'Ext.Component',
@@ -5262,7 +5012,7 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 							selector.fireEvent("loadedCorpus", src, corpus);
 						}, selector);
 						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus());}
-						else if (panel.getStore && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
+						else if (panel.getStore && panel.getStore() && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
 							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus());
 						}
 					}
@@ -5388,7 +5138,7 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 							selector.fireEvent("loadedCorpus", src, corpus);
 						}, selector);
 						if (panel.getCorpus && panel.getCorpus()) {selector.fireEvent("loadedCorpus", selector, panel.getCorpus())}
-						else if (panel.getStore && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
+						else if (panel.getStore && panel.getStore() && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
 							selector.fireEvent("loadedCorpus", selector, panel.getStore().getCorpus());
 						}
 					}
@@ -6593,15 +6343,6 @@ Ext.define('Voyant.panel.Cirrus', {
     		}]
     	});
 
-    	if (config && config.embedded) {
-    		var cls = Ext.getClass(config.embedded).getName();
-    		if (cls=="Voyant.data.store.CorpusTerms") {
-    	    	this.loadFromCorpusTerms(config.embedded);
-    		}
-    		if (cls=="Voyant.data.model.Corpus") {
-    	    	this.loadFromCorpusTerms(config.embedded.getCorpusTerms());
-    		}
-    	}
     	this.callParent(arguments);
     },
     
@@ -6958,7 +6699,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 xtype: 'toolbar',
         		enableOverflow: true,
                 items: [{
-                    xtype: 'querysearchfield'
+                   // xtype: Ext.create("Voyant.widget.QuerySearchField")
                 },{
                 	text: me.localize('clearTerms'),
 					glyph: 'xf014@FontAwesome',
@@ -7397,14 +7138,18 @@ Ext.define('Voyant.panel.Contexts', {
         Ext.apply(me, { 
     		title: this.localize('title'),
     		emptyText: this.localize("emptyText"),
-            store : Ext.create("Voyant.data.store.Contexts", {
+            store : Ext.create("Voyant.data.store.ContextsBuffered", {
             	parentPanel: this,
-            	stripTags: "all",
-            	sortOnLoad: true,
-            	sorters: {
-                    property: 'position',
-                    direction: 'ASC'
+            	proxy: {
+            		extraParams: {
+                    	stripTags: "all"            			
+            		}
             	}
+//            	sortOnLoad: true,
+//            	sorters: {
+//                    property: 'position',
+//                    direction: 'ASC'
+//            	}
             }),
     		selModel: Ext.create('Ext.selection.RowModel', {
                 listeners: {
@@ -7610,12 +7355,11 @@ Ext.define('Voyant.panel.Contexts', {
         });
         
         me.on("loadedCorpus", function(src, corpus) {
-        	this.getStore().setCorpus(corpus);
         	if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
         		this.mask(this.localize('limitedAccess'), 'mask-no-spinner');
         	}
         	else {
-        		var corpusTerms = Ext.create("Voyant.data.store.CorpusTerms", {corpus: corpus});
+        		var corpusTerms = corpus.getCorpusTerms({autoLoad: false});
         		corpusTerms.load({
         		    callback: function(records, operation, success) {
         		    	if (success && records.length>0) {
@@ -7723,12 +7467,9 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		var store = this.getStore();
-    		store.setCorpus(corpus);
     		if (this.isVisible()) {
     			this.loadFromApis();
     		}
-    		
     	});
     	
     	if (config.embedded) {
@@ -7818,7 +7559,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusCollocates", {parentPanel: this});
+        var store = Ext.create("Voyant.data.store.CorpusCollocatesBuffered", {parentPanel: this});
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -9115,8 +8856,6 @@ Ext.define('Voyant.panel.Phrases', {
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		var store = this.getStore();
-    		store.setCorpus(corpus);
     		if (this.isVisible()) {
     			this.loadFromApis();
     		}
@@ -9170,8 +8909,8 @@ Ext.define('Voyant.panel.Phrases', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusNgrams", {
-        	autoLoad: false
+        var store = Ext.create("Voyant.data.store.CorpusNgramsBuffered", {
+        	parentPanel: me
         });
         me.on("sortchange", function( ct, column, direction, eOpts ) {
         	this.setApiParam('sort', column.dataIndex);
@@ -9390,43 +9129,19 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	}
     },
     constructor: function(config) {
-    	
         this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-    	
-        // create a listener for corpus loading (defined here, in case we need to load it next)
-    	this.on('loadedCorpus', function(src, corpus) {
-    		var store = this.getStore();
-    		store.setCorpus(corpus);
-    		store.getProxy().setExtraParam('corpus', corpus.getId());
-    		store.loadPage(1);
-    	});
-    	
-    	this.on("query", function(src, query) {
-    		this.setApiParam('query', query);
-    		this.getStore().loadPage(1);
-    	}, this);
-    	
-    	if (config.embedded) {
-    		var cls = Ext.getClass(config.embedded).getName();
-    		if (cls=="Voyant.data.store.CorpusTerms") {
-    			this.fireEvent('loadedCorpus', this, config.embedded.getCorpus())
-    		}
-    		if (cls=="Voyant.data.model.Corpus") {
-        		this.fireEvent('loadedCorpus', this, config.embedded)
-    		}
-    	}
-    	else if (config.corpus) {
-    		this.fireEvent('loadedCorpus', this, config.corpus)
-    	}
-
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);    	
     },
     
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusTerms", {parentPanel: this});
-        store.getProxy().setExtraParam("withDistributions", "relative");
+        var store = Ext.create("Voyant.data.store.CorpusTermsBuffered", {
+        	parentPanel: this,
+        	proxy: {
+        		extraParams: {withDistributions: 'relative'}
+        	}
+        });
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -9518,18 +9233,20 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 }
             }]
         });
+        
+    	me.on('loadedCorpus', function(src, corpus) {
+    		this.setApiParam('query', undefined);
+    		this.getStore().loadPage(1);
+    	}, me);
+    	
+    	me.on("query", function(src, query) {
+    		this.setApiParam('query', query);
+    		this.getStore().loadPage(1);
+    	}, me);
+
 
         me.callParent(arguments);
         
-    },
-    
-    load: function() {
-    	if (this.rendered) {
-    		this.store.loadPage(1)
-    	}
-    	else {
-			Ext.defer(this.load, 100, this);
-    	}
     }
 })
 
@@ -9633,7 +9350,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.DocumentTerms", {parentPanel: this});
+        var store = Ext.create("Voyant.data.store.DocumentTermsBuffered", {parentPanel: this});
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -11205,14 +10922,14 @@ Ext.define('Voyant.panel.Reader', {
 	    		
 	    		var keyword = this.down('querysearchfield').getValue();
 	    		if (keyword != '') {
-	    			this.highlightKeywords(keyword);
+//	    			this.highlightKeywords(keyword);
 	    		}
     		}
     	}, this);
     	this.setTokensStore(tokensStore);
     	
-    	this.on("query", function(src, query) {
-    		this.loadQueryTerms([query]);
+    	this.on("query", function(src, queries) {
+    		this.loadQueryTerms(queries);
     	}, this);
     	
     	this.setDocumentTermsStore(Ext.create("Ext.data.Store", {
@@ -11258,7 +10975,7 @@ Ext.define('Voyant.panel.Reader', {
    		    		 }, this);
    		    		 
    		    		 this.highlightKeywords(term);
-   		    		 this.down('querysearchfield').setValue(term);
+//   		    		 this.down('querysearchfield').setValue(term);
    		    		 
    		    		 var graphs = this.query('cartesian');
    		    		 for (var i = 0; i < graphs.length; i++) {
@@ -11442,12 +11159,12 @@ Ext.define('Voyant.panel.Reader', {
     	if (queryTerms && queryTerms.length > 0) {
 			this.getDocumentTermsStore().load({
 				params: {
-					query: queryTerms,
+					query: queryTerms/*,
     				docIndex: undefined,
     				docId: undefined,
     				page: undefined,
     				start: undefined,
-    				limit: undefined
+    				limit: undefined*/
     			}
 			});
 		}
@@ -12807,7 +12524,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 					}
 				},'->']
 			}),
-			bbar: new Ext.Toolbar({
+			bbar: {
         		enableOverflow: true,
 				items: [{
                 	xtype: 'querysearchfield'
@@ -12876,7 +12593,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 	            		scope: this
 	            	}
 	            }]
-			})
+			}
         });
         
         this.on('loadedCorpus', function(src, corpus) {
@@ -13919,7 +13636,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 					}
 				}
 			}),
-			bbar: new Ext.Toolbar({
+			bbar: {
 	            enableOverflow: true,
 	            items: [{
 	            	xtype: 'querysearchfield'
@@ -14052,7 +13769,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 	            		scope: this
 	            	}
 	    		}]
-			})
+			}
 		});
 		
 		// need to add option here so we have access to localize
@@ -15839,7 +15556,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     	});
     	
     	this.on("query", function(src, query) {
-    		if (Ext.isString(query)) {this.fireEvent("termsClicked", src, [query]);}
+    		this.fireEvent("termsClicked", src, query);
     	}, this);
 
     	this.on("termsClicked", function(src, terms) {
@@ -15851,14 +15568,6 @@ Ext.define('Voyant.panel.TermsRadio', {
         			else if (term.getTerm) {queryTerms.push(term.getTerm());}
         		});
         		if (queryTerms) {
-        			
-//            		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
-//            			this.setMode(this.MODE_CORPUS);
-//            			this.setApiParams({
-//            				'docIndex': undefined,
-//            				'docId': undefined
-//            			});
-//            		}
         			this.setApiParams({
         				query: queryTerms
         			});
@@ -16043,7 +15752,6 @@ Ext.define('Voyant.panel.TermsRadio', {
     	if (this.getCorpus()) {
     		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
     		var params = this.getApiParams(['limit','stopList','query','withDistributions',"bins"]);
-    		debugger
     		// ensure that we're not beyond the number of documents
     		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
     			params.bins = this.getCorpus().getDocumentsCount();
@@ -16744,7 +16452,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','documentsimilarity','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio']
+			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
@@ -16752,7 +16460,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
-			items: ['cirrus','bubblelines','collocatesgraph','knots','trends','streamgraph','documentsimilarity','scatterplot','termsradio']
+			items: ['cirrus','bubblelines','collocatesgraph','knots','trends','streamgraph','scatterplot','termsradio']
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',
@@ -16926,6 +16634,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 				}
 				else {
 					if (console) {console.warn("Unhandled event: "+eventName, data)}
+					return;
 				}
 				url += "&"+Ext.Object.toQueryString(api)
 				this.openUrl(url)

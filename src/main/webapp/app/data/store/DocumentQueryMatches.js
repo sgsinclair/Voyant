@@ -1,43 +1,31 @@
+Ext.define('Voyant.data.store.DocumentQueryMatchesMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.CorpusTerm',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.DocumentsFinder',
+			'proxy.reader.rootProperty': 'documentsFinder.queries',
+			'proxy.reader.totalProperty': undefined
+		}])
+	}
+});
+
 Ext.define('Voyant.data.store.DocumentQueryMatches', {
 	extend: 'Ext.data.Store',
-    model: 'Voyant.data.model.DocumentQueryMatch',
-	config: {
-		corpus: undefined
-	},
+	mixins: ['Voyant.data.store.DocumentQueryMatchesMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.applyIf(config, {
-			autoLoad: false,
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.DocumentsFinder',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
-		         },
-		         actionMethods: {read: 'POST'},
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'documentsFinder.queries'
-		         }
-		     }
-		})
-		
+		this.mixins['Voyant.data.store.DocumentQueryMatchesMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-
-		if (config && config.corpus) {
-			this.setCorpus(config.corpus);
-		}
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
 	}
+});
 
+Ext.define('Voyant.data.store.DocumentQueryMatchesBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.DocumentQueryMatchesMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.DocumentQueryMatchesMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
 });

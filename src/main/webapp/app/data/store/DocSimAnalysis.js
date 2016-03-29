@@ -1,42 +1,32 @@
+Ext.define('Voyant.data.store.DocSimAnalysisMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.StatisticalAnalysis',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.DocumentSimilarity',
+			'proxy.reader.rootProperty': 'documentSimilarity',
+			'proxy.reader.totalProperty': 'documentSimilarity.total'
+		}])
+		config.proxy.extraParams.withDistributions = true;
+	}
+});
+
 Ext.define('Voyant.data.store.DocSimAnalysis', {
 	extend: 'Ext.data.Store',
-	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.StatisticalAnalysis',
-	config: {
-		corpus: undefined
-	},
-	
+	mixins: ['Voyant.data.store.DocSimAnalysisMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-			proxy: {
-				type: 'ajax',
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.DocumentSimilarity',
-					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
-					withDistributions: true
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'documentSimilarity',
-		             totalProperty: 'documentSimilarity.totalDocs'
-		         },
-		         simpleSortMode: true
-			 }
-		});
-		
+		this.mixins['Voyant.data.store.DocSimAnalysisMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
+	}
+});
 
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
+Ext.define('Voyant.data.store.DocSimAnalysisBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.DocSimAnalysisMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.DocSimAnalysisMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
 	}
 });

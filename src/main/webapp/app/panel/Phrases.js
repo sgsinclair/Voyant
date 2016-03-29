@@ -41,8 +41,6 @@ Ext.define('Voyant.panel.Phrases', {
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		var store = this.getStore();
-    		store.setCorpus(corpus);
     		if (this.isVisible()) {
     			this.loadFromApis();
     		}
@@ -96,8 +94,8 @@ Ext.define('Voyant.panel.Phrases', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusNgrams", {
-        	autoLoad: false
+        var store = Ext.create("Voyant.data.store.CorpusNgramsBuffered", {
+        	parentPanel: me
         });
         me.on("sortchange", function( ct, column, direction, eOpts ) {
         	this.setApiParam('sort', column.dataIndex);

@@ -51,12 +51,9 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		var store = this.getStore();
-    		store.setCorpus(corpus);
     		if (this.isVisible()) {
     			this.loadFromApis();
     		}
-    		
     	});
     	
     	if (config.embedded) {
@@ -146,7 +143,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusCollocates", {parentPanel: this});
+        var store = Ext.create("Voyant.data.store.CorpusCollocatesBuffered", {parentPanel: this});
         
         Ext.apply(me, {
     		title: this.localize('title'),

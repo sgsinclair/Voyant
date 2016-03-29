@@ -90,7 +90,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 xtype: 'toolbar',
         		enableOverflow: true,
                 items: [{
-                    xtype: 'querysearchfield'
+                   // xtype: Ext.create("Voyant.widget.QuerySearchField")
                 },{
                 	text: me.localize('clearTerms'),
 					glyph: 'xf014@FontAwesome',

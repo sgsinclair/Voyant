@@ -1,5 +1,5 @@
 Ext.define('Voyant.widget.QuerySearchField', {
-    extend: 'Ext.form.field.Text',
+    extend: 'Ext.form.field.Tag',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.querysearchfield',
 	statics: {
@@ -13,20 +13,6 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		inDocumentsCountOnly: undefined
 	},
     triggers: {
-    	/*
-        clear: {
-            weight: 0,
-            cls: 'fa-trigger form-fa-clear-trigger',
-            hidden: true,
-            handler: 'onClearClick',
-            scope: 'this'
-        },
-        search: {
-            weight: 1,
-            cls: 'fa-trigger form-fa-search-trigger',
-            handler: 'onSearchClick',
-            scope: 'this'
-        },*/
         help: {
             weight: 2,
             cls: 'fa-trigger form-fa-help-trigger',
@@ -34,121 +20,97 @@ Ext.define('Voyant.widget.QuerySearchField', {
             scope: 'this'
         }
     },
-
-    initComponent: function(config) {
-        var me = this;
-
-        Ext.applyIf(me, {
-        	width: 120
-        });
-        
-        Ext.apply(me, {
-        	enableKeyEvents: true,
-        	listeners: {
-    		   render: function(c) {
-    			  if (c.triggers && c.triggers.help) {
-        		      Ext.QuickTips.register({
-          		        target: c.triggers.help.getEl(),
-          		        text: c.localize('querySearchTip'),
-          		        enabled: true,
-          		        showDelay: 20,
-          		        trackMouse: true,
-          		        autoShow: true
-          		      });
-    			  }
-    		      this.suggest = Ext.create('Ext.tip.ToolTip', {
-    		    	    target: this.inputEl,
-    		    	    autoShow: false,
-    		    	    hidden: true,
-    		    	    html: ''
-    		    	});
-    		    },
-    		    keyup: function(c, e, eOpts) {
-    		    	if (!this.store || Ext.isString(this.store)) {
-        		        if (this.findParentByType) {
-        		        	var panel = this.findParentByType("panel");
-        		        	var corpus;
-        		        	if (panel.getCorpus) {
-        		        		corpus = panel.getCorpus()
-        		        	}
-        		        	else if (panel.getStore && panel.getStore().getCorpus) {
-        		        		corpus = panel.getStore().getCorpus();
-        		        	}
-    		        		if (corpus) {
-    		                	this.store = corpus.getCorpusTerms();
-    		        		}
-        		        }
-
-    		    	}
-    		    	if (this.store) {
-    		    		var value = c.getValue().trim().replace(/^\^/,"")
-    		    		if (/[,|^~" ]/.test(value)==false && value.length>0) {
-        		    		this.store.load({
-        		    			params: {
-            		    			query: [value+"*", "^"+value+"*"],
-            		    			limit: 5,
-            		    			tokenType: this.tokenType,
-            		    			inDocumentsCountOnly: this.inDocumentsCountOnly
-        		    			},
-        		    			scope: this,
-        		    			callback: function(records, operation, success) {
-        		    				suggest = ""
-        		    				records.forEach(function(record) {
-        		    					suggest+="<div>"+record.getTerm()+" ("+(this.inDocumentsCountOnly ? record.getInDocumentsCount() : record.getRawFreq())+")</div>"
-        		    				}, this)
-        		    				this.suggest.show();
-        		    				this.suggest.update(suggest)
-        		    		    }
-        		    		})
-    		    		}
-    		    		else {
-		    				this.suggest.update("")
-		    				this.suggest.hide();
-    		    		}
-    		    	}
-    		    },
-    		    scope: me
-    		},
-            emptyText: me.localize('querySearch')
-
-        })
-
-        me.callParent(arguments);
-        me.on('specialkey', function(f, e){
-            if (e.getKey() == e.ENTER) {
-                me.doSearch();
-            }
-        });
-
-    },
-
-    onClearClick : function(){
-        this.setValue('');
-    	this.findParentByType("panel").fireEvent("query", this, undefined);
-        //this.getTrigger('clear').hide();
-        this.updateLayout();
-    },
-
-    onHelpClick : function(){
-    	Ext.Msg.show({
-    	    title: this.localize('querySearch'),
-    	    message: this.localize('querySearchTip'),
-    	    buttons: Ext.Msg.OK,
-    	    icon: Ext.Msg.INFO
-    	});
-    },
     
-    doSearch: function() {
-        var value = this.getValue();
-    	this.findParentByType("panel").fireEvent("query", this, value.length==0 ? undefined : value);
-    	/*
-    	if (value) {
-            this.getTrigger('clear').show();
-    	}
-    	else {
-            this.getTrigger('clear').hide();
-    	}
-    	*/
-        this.updateLayout();
+    constructor: function(config) {
+    	config = config || {};
+    	Ext.applyIf(config, {
+    		minWidth: 100,
+    		matchFieldWidth : false,
+    	    displayField: 'term',
+    	    valueField: 'term',
+    	    filterPickList: true,
+    	    createNewOnEnter: true,
+    	    createNewOnBlur: false,
+    	    tpl: Ext.create('Ext.XTemplate',
+    	    	'<ul class="x-list-plain"><tpl for=".">',
+    	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">{term} ({rawFreq})</li>',
+    	    	'</tpl></ul>'
+    	    )
+    	})
+        this.callParent(arguments);
+    },
+    initComponent: function(config) {
+    	var me = this;
+    	me.on("beforequery", function(queryPlan) {
+    		if (queryPlan.query) {
+    			queryPlan.query = queryPlan.query.trim();
+    			if (queryPlan.query.charAt(0)=="^") {
+    				queryPlan.query=queryPlan.query.substring(1)
+    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+    			}
+    			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*') {
+    				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
+    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+    			}
+    			try {
+                    new RegExp(queryPlan.query);
+	            }
+	            catch(e) {
+	            	queryPlan.cancel = true;
+	            }
+	            if (queryPlan.query.indexOf('"')>-1) { // deal with unfinished phrases
+	            	if (queryPlan.query.indexOf(" ")==-1) {queryPlan.cancel=true} // no space in phrase
+	            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
+	            }
+        		queryPlan.query = queryPlan.query+"*,"+"^"+queryPlan.query+"*"
+    		}
+    	}, me);
+    	
+    	me.on("change", function(tags, queries) {
+    		me.up('panel').fireEvent("query", me, queries)
+    	})
+    	
+    	me.up("panel").on("loadedCorpus", function(src, corpus) {
+    		var stopList = undefined;
+    		if (this.getApiParam) {stopList = this.getApiParam("stopList")}
+    		else {
+    			var parent = this.up("panel");
+    			if (parent && parent.getApiParam) {
+    				stopList = parent.getApiParam("stopList")
+    			}
+    		}
+			me.setStore(corpus.getCorpusTerms({
+				corpus: corpus,
+				proxy: {
+					extraParams: {
+		    			limit: 10,
+		    			tokenType: me.tokenType,
+		    			inDocumentsCountOnly: me.inDocumentsCountOnly,
+		    			stopList: stopList
+					}
+				}
+    		}));
+    	})
+    	
+    	me.on("afterrender", function(c) {
+			  if (c.triggers && c.triggers.help) {
+			      Ext.QuickTips.register({
+			        target: c.triggers.help.getEl(),
+			        text: c.localize('querySearchTip'),
+			        enabled: true,
+			        showDelay: 20,
+			        trackMouse: true,
+			        autoShow: true
+			      });
+			  }
+			  this.suggest = Ext.create('Ext.tip.ToolTip', {
+			    target: this.inputEl,
+			    autoShow: false,
+			    hidden: true,
+			    html: ''
+			  });
+    	})
+    	me.callParent(arguments);
     }
+    
 });

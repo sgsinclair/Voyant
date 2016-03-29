@@ -90,7 +90,7 @@
     	});
     	
     	this.on("query", function(src, query) {
-    		if (Ext.isString(query)) {this.fireEvent("termsClicked", src, [query]);}
+    		this.fireEvent("termsClicked", src, query);
     	}, this);
 
     	this.on("termsClicked", function(src, terms) {
@@ -102,14 +102,6 @@
         			else if (term.getTerm) {queryTerms.push(term.getTerm());}
         		});
         		if (queryTerms) {
-        			
-//            		if (this.getApiParam('mode')!=this.MODE_CORPUS && this.getCorpus().getDocumentsCount()>1) {
-//            			this.setMode(this.MODE_CORPUS);
-//            			this.setApiParams({
-//            				'docIndex': undefined,
-//            				'docId': undefined
-//            			});
-//            		}
         			this.setApiParams({
         				query: queryTerms
         			});

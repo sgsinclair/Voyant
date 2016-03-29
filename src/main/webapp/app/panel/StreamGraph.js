@@ -67,7 +67,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 					}
 				},'->']
 			}),
-			bbar: new Ext.Toolbar({
+			bbar: {
         		enableOverflow: true,
 				items: [{
                 	xtype: 'querysearchfield'
@@ -136,7 +136,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 	            		scope: this
 	            	}
 	            }]
-			})
+			}
         });
         
         this.on('loadedCorpus', function(src, corpus) {

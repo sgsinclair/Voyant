@@ -1,45 +1,31 @@
+Ext.define('Voyant.data.store.TokensMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.Token',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.DocumentTokens',
+			'proxy.reader.rootProperty': 'documentTokens.tokens',
+			'proxy.reader.totalProperty': 'documentTokens.total'
+		}])
+	}
+});
+
 Ext.define('Voyant.data.store.Tokens', {
 	extend: 'Ext.data.Store',
-	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.Token',
-//    transferable: ['setCorpus'],
-//    embeddable: ['Voyant.panel.CorpusTerms','Voyant.panel.Cirrus'],
-	config: {
-		corpus: undefined
-	},
+	mixins: ['Voyant.data.store.TokensMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.DocumentTokens',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
-		        	 stripTags: config.stripTags
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'documentTokens.tokens',
-		             totalProperty: 'documentTokens.total'
-		         },
-		         simpleSortMode: true
-		     }
-		})
-		
-//    	this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
+		this.mixins['Voyant.data.store.TokensMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
 	}
+});
 
+Ext.define('Voyant.data.store.TokensBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.TokensMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.TokensMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
 });

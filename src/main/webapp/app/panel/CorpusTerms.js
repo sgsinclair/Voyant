@@ -29,43 +29,19 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	}
     },
     constructor: function(config) {
-    	
         this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-    	
-        // create a listener for corpus loading (defined here, in case we need to load it next)
-    	this.on('loadedCorpus', function(src, corpus) {
-    		var store = this.getStore();
-    		store.setCorpus(corpus);
-    		store.getProxy().setExtraParam('corpus', corpus.getId());
-    		store.loadPage(1);
-    	});
-    	
-    	this.on("query", function(src, query) {
-    		this.setApiParam('query', query);
-    		this.getStore().loadPage(1);
-    	}, this);
-    	
-    	if (config.embedded) {
-    		var cls = Ext.getClass(config.embedded).getName();
-    		if (cls=="Voyant.data.store.CorpusTerms") {
-    			this.fireEvent('loadedCorpus', this, config.embedded.getCorpus())
-    		}
-    		if (cls=="Voyant.data.model.Corpus") {
-        		this.fireEvent('loadedCorpus', this, config.embedded)
-    		}
-    	}
-    	else if (config.corpus) {
-    		this.fireEvent('loadedCorpus', this, config.corpus)
-    	}
-
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);    	
     },
     
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.CorpusTerms", {parentPanel: this});
-        store.getProxy().setExtraParam("withDistributions", "relative");
+        var store = Ext.create("Voyant.data.store.CorpusTermsBuffered", {
+        	parentPanel: this,
+        	proxy: {
+        		extraParams: {withDistributions: 'relative'}
+        	}
+        });
         
         Ext.apply(me, {
     		title: this.localize('title'),
@@ -157,17 +133,19 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 }
             }]
         });
+        
+    	me.on('loadedCorpus', function(src, corpus) {
+    		this.setApiParam('query', undefined);
+    		this.getStore().loadPage(1);
+    	}, me);
+    	
+    	me.on("query", function(src, query) {
+    		this.setApiParam('query', query);
+    		this.getStore().loadPage(1);
+    	}, me);
+
 
         me.callParent(arguments);
         
-    },
-    
-    load: function() {
-    	if (this.rendered) {
-    		this.store.loadPage(1)
-    	}
-    	else {
-			Ext.defer(this.load, 100, this);
-    	}
     }
 })

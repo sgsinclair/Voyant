@@ -98,7 +98,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     initComponent: function() {
         var me = this;
 
-        var store = Ext.create("Voyant.data.store.DocumentTerms", {parentPanel: this});
+        var store = Ext.create("Voyant.data.store.DocumentTermsBuffered", {parentPanel: this});
         
         Ext.apply(me, {
     		title: this.localize('title'),

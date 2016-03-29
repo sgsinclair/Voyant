@@ -1,5 +1,6 @@
 Ext.define("Voyant.data.store.Documents", {
-	extend: "Ext.data.Store",
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.VoyantStore'],
 	model: "Voyant.data.model.Document",
 	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
     // embeddable: ['Voyant.panel.Documents'],

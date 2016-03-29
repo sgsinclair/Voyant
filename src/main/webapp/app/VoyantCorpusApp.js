@@ -38,7 +38,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','documentsimilarity','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio']
+			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
@@ -46,7 +46,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
-			items: ['cirrus','bubblelines','collocatesgraph','knots','trends','streamgraph','documentsimilarity','scatterplot','termsradio']
+			items: ['cirrus','bubblelines','collocatesgraph','knots','trends','streamgraph','scatterplot','termsradio']
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',
@@ -220,6 +220,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 				}
 				else {
 					if (console) {console.warn("Unhandled event: "+eventName, data)}
+					return;
 				}
 				url += "&"+Ext.Object.toQueryString(api)
 				this.openUrl(url)

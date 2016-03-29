@@ -99,15 +99,6 @@ Ext.define('Voyant.panel.Cirrus', {
     		}]
     	});
 
-    	if (config && config.embedded) {
-    		var cls = Ext.getClass(config.embedded).getName();
-    		if (cls=="Voyant.data.store.CorpusTerms") {
-    	    	this.loadFromCorpusTerms(config.embedded);
-    		}
-    		if (cls=="Voyant.data.model.Corpus") {
-    	    	this.loadFromCorpusTerms(config.embedded.getCorpusTerms());
-    		}
-    	}
     	this.callParent(arguments);
     },
     

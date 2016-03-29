@@ -265,7 +265,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 					}
 				}
 			}),
-			bbar: new Ext.Toolbar({
+			bbar: {
 	            enableOverflow: true,
 	            items: [{
 	            	xtype: 'querysearchfield'
@@ -398,7 +398,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 	            		scope: this
 	            	}
 	    		}]
-			})
+			}
 		});
 		
 		// need to add option here so we have access to localize
