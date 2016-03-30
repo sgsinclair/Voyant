@@ -8,6 +8,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
     },
     statics: {
         api: {
+        	stopList: 'auto',
         	docId: undefined
         }
     },
@@ -109,8 +110,10 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		    	items: [{
 		    		xtype: 'querysearchfield',
 		    		itemId: 'search',
+		    		grow: false,
+		    		width: '100%',
 //		    		emptyText: "Word Search",
-		    		width: 135,
+//		    		maxWidth: 155,
 		    		triggers: undefined
 		    	}]
 		    },

@@ -114,7 +114,8 @@ Ext.define('Voyant.panel.DToC.Stats', {
 		    	hideBorders: true,
 		    	items: [{
 		    		xtype: 'querysearchfield',
-		    		triggers: undefined
+		    		triggers: undefined,
+		    		grow: false
 		    	}, '->', {
                     text: 'Filter by Chapter',
                     itemId: 'chapterFilter',
