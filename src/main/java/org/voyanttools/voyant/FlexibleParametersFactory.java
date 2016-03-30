@@ -61,7 +61,7 @@ public class FlexibleParametersFactory {
 
 		final HttpParametersDecoder parametersDecoder = new HttpParametersDecoder(parameters);
 		
-		if (ServletFileUpload.isMultipartContent(request)) {
+		if (ServletFileUpload.isMultipartContent(request) && !(request instanceof Voyant.PostedInputRequestWrapper)) {
 			final List<FileItem> items = getRequestItems(request);
 			Path tmpPath = Paths.get(Paths.get(doPrivileged(new GetPropertyAction("java.io.tmpdir"))).toString(), "tmp.voyant.uploads");
 			if (!Files.exists(tmpPath)) {
@@ -96,7 +96,7 @@ public class FlexibleParametersFactory {
 			}
 			else {
 				for (Map.Entry<String, String[]> param : ((Map<String, String[]>) request.getParameterMap()).entrySet()) {
-					parametersDecoder.decodeParameters(param.getKey(), param.getValue(), allowLocalFileSystemAccess);
+					parametersDecoder.decodeParameters(param.getKey(), param.getValue(), allowLocalFileSystemAccess || (request instanceof Voyant.PostedInputRequestWrapper && param.getKey().equals("upload")));
 				}		
 			}
 		}

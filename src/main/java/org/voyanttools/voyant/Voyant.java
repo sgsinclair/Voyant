@@ -74,7 +74,7 @@ public class Voyant {
 			HttpServletResponse response, FlexibleParameters params) throws IOException, TransformerException, ServletException {
 		
 		PostedInputResponseWrapper postedInputResponseWrapper = new PostedInputResponseWrapper(response);
-		request.getRequestDispatcher("trombone").include(new PostedInputRequestWrapper(request), postedInputResponseWrapper);
+		request.getRequestDispatcher("/trombone").include(new PostedInputRequestWrapper(request, params), postedInputResponseWrapper);
 
 		String responseString = postedInputResponseWrapper.toString();
 		JSONObject obj= (JSONObject) JSONValue.parse(responseString);
@@ -113,10 +113,12 @@ public class Voyant {
 		return false;
 	}
 	
-	private static class PostedInputRequestWrapper extends HttpServletRequestWrapper {
+	static class PostedInputRequestWrapper extends HttpServletRequestWrapper {
 		private final String TOOL = "corpus.CorpusCreator";
-		private PostedInputRequestWrapper(HttpServletRequest request) {
+		private FlexibleParameters params;
+		private PostedInputRequestWrapper(HttpServletRequest request, FlexibleParameters params) {
 			super(request);
+			this.params = params;
 		}
 		@Override
 		public Map<String,String[]> getParameterMap() {
@@ -132,20 +134,17 @@ public class Voyant {
 		@Override
 		public Enumeration<String> getParameterNames() {
 			Set<String> names = new HashSet<String>();
-			Enumeration<String> e = super.getParameterNames();
-			while (e.hasMoreElements()) {
-				names.add(e.nextElement());
-			}
-			names.add("tool");
+			names.addAll(params.getKeys());
+			if (!names.contains("tool")) {names.add("tool");}
 			return Collections.enumeration(names);
 		}
 		@Override
 		public String getParameter(String name) {
-			return name.equals("tool") ? TOOL : super.getParameter(name);
+			return name.equals("tool") ? TOOL : params.getParameterValue(name);
 		}
 		@Override
 		public String[] getParameterValues(String name) {
-			return name.equals("tool") ? new String[]{getParameter("tool")} : super.getParameterValues(name);
+			return name.equals("tool") ? new String[]{getParameter("tool")} : params.getParameterValues(name);
 		}
 	}
 	
