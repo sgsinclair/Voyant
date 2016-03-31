@@ -3,7 +3,7 @@ Ext.define('Voyant.data.store.CorpusFacetsMixin', {
     model: 'Voyant.data.model.CorpusFacet',
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
-			'proxy.extraParams.tool': 'corpusFacets.facets',
+			'proxy.extraParams.tool': 'corpus.CorpusFacets',
 			'proxy.reader.rootProperty': 'corpusFacets.facets',
 			'proxy.reader.totalProperty': 'corpusFacets.total'
 		}])

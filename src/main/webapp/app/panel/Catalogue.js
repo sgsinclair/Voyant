@@ -158,13 +158,16 @@ Ext.define('Voyant.panel.Catalogue', {
     		var facets = this.getApiParam('facet');
     		if (Ext.isString(facets)) {facets = facets.split(",")}
     		var facetsCmp = this.queryById('facets');
+			var itemTpl = '<span style="font-size: smaller;">(<span class="info-tip" data-qtip="'+panel.localize('matchingDocuments')+'">{inDocumentsCount}</span>)</span> {term}'+'<span style="font-size: smaller;"> (<span class="info-tip" data-qtip="'+panel.localize('rawFreqs')+'">{rawFreq}</span>)</span>'
     		facets.forEach(function(facet) {
     			var title = panel.localize(facet+"Title");
     			if (title=="["+facet+"Title]") {
     				title = facet.replace(/^facet\./,"").replace(/^extra./,"");
     			}
+    			var matchingDocumentsLabel = panel.localize('matchingDocuments');
     			var facetCmp = facetsCmp.add({
     				title: title,
+        			collapsible: true,
     				facet: facet,
         			columns: [{
         				renderer: function(value, metaData, record) {
@@ -174,8 +177,10 @@ Ext.define('Voyant.panel.Catalogue', {
         			}],
     				bbar: [{
     					xtype: 'querysearchfield',
+    					width: '100%',
     					tokenType: facet.replace("facet.", ""),
-    					inDocumentsCountOnly: true
+//    					inDocumentsCountOnly: true,
+    					itemTpl: itemTpl
     				}]
     			})
     			facetCmp.getSelectionModel().on('selectionchange', function(model, selected) {
@@ -194,7 +199,16 @@ Ext.define('Voyant.panel.Catalogue', {
     		var catalogue = this;
     		var facetCmp = facetsCmp.add({
     			title: panel.localize('lexicalTitle'),
-    			store: Ext.create("Voyant.data.store.CorpusTerms", {parentPanel: this}),
+    			collapsible: true,
+    			store: Ext.create("Voyant.data.store.CorpusTerms", {
+    				parentPanel: this,
+    				// this isn't being set by the beforeload call in the store, so set it here
+    				proxy: {
+    					extraParams: {
+    	    				stopList: this.getApiParam("stopList")
+    					}
+    				}
+    			}),
     			facet: 'lexical',
     			columns: [{
     				renderer: function(value, metaData, record) {
@@ -203,7 +217,11 @@ Ext.define('Voyant.panel.Catalogue', {
     				flex: 1
     			}],
 				bbar: [{
-					xtype: 'querysearchfield'
+					xtype: 'querysearchfield',
+//					width: '100%',
+					itemTpl: itemTpl,
+					grow: false,
+					growMax: 10
 				}]
     		})
 			facetCmp.getSelectionModel().on('selectionchange', function(model, selected) {
@@ -304,7 +322,7 @@ Ext.define('Voyant.panel.Catalogue', {
     					if (facets['lexical']) {
     						var firstDocIds = matchingDocIds.splice(0,5);
     						this.loadSnippets(firstDocIds, results.first().first());
-    						if (matchingDocIds) {
+    						if (matchingDocIds && matchingDocIds.length>0) {
         						this.loadSnippets(matchingDocIds); // load the rest
     						}
     					}

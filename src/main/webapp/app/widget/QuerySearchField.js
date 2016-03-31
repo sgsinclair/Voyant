@@ -15,9 +15,11 @@ Ext.define('Voyant.widget.QuerySearchField', {
     
     constructor: function(config) {
     	config = config || {};
+    	var itemTpl = config.itemTpl ? config.itemTpl : '{term} ({rawFreq})';
     	Ext.applyIf(config, {
     		minWidth: 100,
     		matchFieldWidth : false,
+    		minChars: 2,
     	    displayField: 'term',
     	    valueField: 'term',
     	    filterPickList: true,
@@ -25,7 +27,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    createNewOnBlur: false,
     	    tpl: Ext.create('Ext.XTemplate',
     	    	'<ul class="x-list-plain"><tpl for=".">',
-    	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">{term} ({rawFreq})</li>',
+    	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">'+itemTpl+'</li>',
     	    	'</tpl></ul>'
     	    ),
     	    triggers: {

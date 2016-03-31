@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Mar 29 16:04:30 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Mar 31 08:30:24 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3947,7 +3947,7 @@ Ext.define('Voyant.data.store.CorpusFacetsMixin', {
     model: 'Voyant.data.model.CorpusFacet',
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
-			'proxy.extraParams.tool': 'corpusFacets.facets',
+			'proxy.extraParams.tool': 'corpus.CorpusFacets',
 			'proxy.reader.rootProperty': 'corpusFacets.facets',
 			'proxy.reader.totalProperty': 'corpusFacets.total'
 		}])
@@ -4008,7 +4008,7 @@ Ext.define('Voyant.data.store.CorpusTermsBuffered', {
 
 Ext.define('Voyant.data.store.DocumentQueryMatchesMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
-    model: 'Voyant.data.model.CorpusTerm',
+    model: 'Voyant.data.model.DocumentQueryMatch',
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.DocumentsFinder',
@@ -4768,9 +4768,12 @@ Ext.define('Voyant.widget.QuerySearchField', {
     
     constructor: function(config) {
     	config = config || {};
+    	var itemTpl = config.itemTpl ? config.itemTpl : '{term} ({rawFreq})';
     	Ext.applyIf(config, {
     		minWidth: 100,
+    		maxGrow: 300,
     		matchFieldWidth : false,
+    		minChars: 2,
     	    displayField: 'term',
     	    valueField: 'term',
     	    filterPickList: true,
@@ -4778,7 +4781,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    createNewOnBlur: false,
     	    tpl: Ext.create('Ext.XTemplate',
     	    	'<ul class="x-list-plain"><tpl for=".">',
-    	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">{term} ({rawFreq})</li>',
+    	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">'+itemTpl+'</li>',
     	    	'</tpl></ul>'
     	    ),
     	    triggers: {
@@ -5306,7 +5309,11 @@ Ext.define('Voyant.widget.Facet', {
     	var me = this;
     	if (!this.store) {
     		this.store = new Ext.create("Voyant.data.store.CorpusFacets", {
-    			facet: this.facet,
+    			proxy: {
+    				extraParams: {
+    					facet: this.facet
+    				}
+    			},
     			parentPanel: this
     		})
     		this.store.getProxy().on("exception", function(proxy, request, operation, eOpts) {
@@ -5326,7 +5333,10 @@ Ext.define('Voyant.widget.Facet', {
         
         this.on("query", function(src, query) {
         	this.setApiParam("query", query);
-        	this.store.loadPage(1);
+        	// not getting set from beforeload, so set params here
+        	this.store.load({
+        		params: this.getApiParams()
+        	})
         	
         })
     },
@@ -6036,13 +6046,16 @@ Ext.define('Voyant.panel.Catalogue', {
     		var facets = this.getApiParam('facet');
     		if (Ext.isString(facets)) {facets = facets.split(",")}
     		var facetsCmp = this.queryById('facets');
+			var itemTpl = '<span style="font-size: smaller;">(<span class="info-tip" data-qtip="'+panel.localize('matchingDocuments')+'">{inDocumentsCount}</span>)</span> {term}'+'<span style="font-size: smaller;"> (<span class="info-tip" data-qtip="'+panel.localize('rawFreqs')+'">{rawFreq}</span>)</span>'
     		facets.forEach(function(facet) {
     			var title = panel.localize(facet+"Title");
     			if (title=="["+facet+"Title]") {
     				title = facet.replace(/^facet\./,"").replace(/^extra./,"");
     			}
+    			var matchingDocumentsLabel = panel.localize('matchingDocuments');
     			var facetCmp = facetsCmp.add({
     				title: title,
+        			collapsible: true,
     				facet: facet,
         			columns: [{
         				renderer: function(value, metaData, record) {
@@ -6052,8 +6065,10 @@ Ext.define('Voyant.panel.Catalogue', {
         			}],
     				bbar: [{
     					xtype: 'querysearchfield',
+    					width: '100%',
     					tokenType: facet.replace("facet.", ""),
-    					inDocumentsCountOnly: true
+//    					inDocumentsCountOnly: true,
+    					itemTpl: itemTpl
     				}]
     			})
     			facetCmp.getSelectionModel().on('selectionchange', function(model, selected) {
@@ -6072,7 +6087,16 @@ Ext.define('Voyant.panel.Catalogue', {
     		var catalogue = this;
     		var facetCmp = facetsCmp.add({
     			title: panel.localize('lexicalTitle'),
-    			store: Ext.create("Voyant.data.store.CorpusTerms", {parentPanel: this}),
+    			collapsible: true,
+    			store: Ext.create("Voyant.data.store.CorpusTerms", {
+    				parentPanel: this,
+    				// this isn't being set by the beforeload call in the store, so set it here
+    				proxy: {
+    					extraParams: {
+    	    				stopList: this.getApiParam("stopList")
+    					}
+    				}
+    			}),
     			facet: 'lexical',
     			columns: [{
     				renderer: function(value, metaData, record) {
@@ -6081,7 +6105,11 @@ Ext.define('Voyant.panel.Catalogue', {
     				flex: 1
     			}],
 				bbar: [{
-					xtype: 'querysearchfield'
+					xtype: 'querysearchfield',
+//					width: '100%',
+					itemTpl: itemTpl,
+					grow: false,
+					growMax: 10
 				}]
     		})
 			facetCmp.getSelectionModel().on('selectionchange', function(model, selected) {
@@ -6182,7 +6210,7 @@ Ext.define('Voyant.panel.Catalogue', {
     					if (facets['lexical']) {
     						var firstDocIds = matchingDocIds.splice(0,5);
     						this.loadSnippets(firstDocIds, results.first().first());
-    						if (matchingDocIds) {
+    						if (matchingDocIds && matchingDocIds.length>0) {
         						this.loadSnippets(matchingDocIds); // load the rest
     						}
     					}

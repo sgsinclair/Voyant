@@ -32,7 +32,11 @@ Ext.define('Voyant.widget.Facet', {
     	var me = this;
     	if (!this.store) {
     		this.store = new Ext.create("Voyant.data.store.CorpusFacets", {
-    			facet: this.facet,
+    			proxy: {
+    				extraParams: {
+    					facet: this.facet
+    				}
+    			},
     			parentPanel: this
     		})
     		this.store.getProxy().on("exception", function(proxy, request, operation, eOpts) {
@@ -52,7 +56,10 @@ Ext.define('Voyant.widget.Facet', {
         
         this.on("query", function(src, query) {
         	this.setApiParam("query", query);
-        	this.store.loadPage(1);
+        	// not getting set from beforeload, so set params here
+        	this.store.load({
+        		params: this.getApiParams()
+        	})
         	
         })
     },
