@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Mar 31 08:30:24 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Apr 01 15:52:00 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4771,7 +4771,6 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	var itemTpl = config.itemTpl ? config.itemTpl : '{term} ({rawFreq})';
     	Ext.applyIf(config, {
     		minWidth: 100,
-    		maxGrow: 300,
     		matchFieldWidth : false,
     		minChars: 2,
     	    displayField: 'term',
@@ -4818,7 +4817,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	            	if (queryPlan.query.indexOf(" ")==-1) {queryPlan.cancel=true} // no space in phrase
 	            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
 	            }
-        		queryPlan.query = queryPlan.query+"*,"+"^"+queryPlan.query+"*"
+        		queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1 ? ","+"^"+queryPlan.query+"*" : "");
     		}
     	}, me);
     	

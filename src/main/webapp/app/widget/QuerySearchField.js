@@ -64,7 +64,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	            	if (queryPlan.query.indexOf(" ")==-1) {queryPlan.cancel=true} // no space in phrase
 	            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
 	            }
-        		queryPlan.query = queryPlan.query+"*,"+"^"+queryPlan.query+"*"
+        		queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1 ? ","+"^"+queryPlan.query+"*" : "");
     		}
     	}, me);
     	
