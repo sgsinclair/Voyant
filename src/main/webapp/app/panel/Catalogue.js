@@ -118,7 +118,7 @@ Ext.define('Voyant.panel.Catalogue', {
 	                    					});
 	                    					var link = msg.getTargetEl().dom.querySelector("a");
 	                    					link.addEventListener("click", function() {
-	                    						win.close()
+	                    						msg.close()
 	                    					})
 	                    					Ext.get(link).frame().frame();
 	                    				}
@@ -313,7 +313,7 @@ Ext.define('Voyant.panel.Catalogue', {
     					list += "</ul>";
     					results.update(list);
     					this.queryById('status').update(this.localize('queryMatches', [matchingDocIds.length,this.getCorpus().getDocumentsCount()]))
-    					this.setMatchingDocIds(matchingDocIds);
+    					this.setMatchingDocIds(Ext.Array.clone(matchingDocIds));
     					if (matchingDocIds.length>0) {
     						this.queryById('export').setDisabled(false);
     					}

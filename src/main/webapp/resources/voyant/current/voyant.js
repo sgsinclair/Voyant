@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Apr 01 15:52:00 EDT 2016 */
+/* This file created by JSCacher. Last modified: Sat Apr 02 13:23:25 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -3780,14 +3780,25 @@ Ext.define('Voyant.data.store.VoyantStore', {
 		parentPanel: undefined
 	},
 	constructor: function(config, extras) {
+		var me = this;
 		config = config || {};
 		Ext.applyIf(config, {
 			remoteSort: true,
 			autoLoad: false,
-			listeners: {
-				beforeload: this.applyApiParams
-			},
-			scope: this,
+//			listeners: {
+//				beforeload: function(store, operation) {
+//					var parent = this.getParentPanel();
+//					if (parent !== undefined) {
+//						var params = parent.getApiParams();
+//						operation = operation ? (operation===1 ? {} : operation) : {};
+//						operation.params = operation.params || {};
+//						for (var key in params) {
+//							operation.params[key] = params[key];
+//						}
+//					}
+//				}
+//			},
+//			scope: this,
 			// define buffered configuration even if ignored when this isn't a buffered store
 			pagePurgeCount : 0, // don't purge any data
 			pageSize : 100, // each request is more intenstive, so do fewer of them then default
@@ -3815,20 +3826,25 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			config.parentPanel.on("loadedCorpus", function(src, corpus) {
 				this.setCorpus(corpus);
 			}, this);
+			config.listeners = config.listeners || {};
+			config.listeners.beforeload = {
+					fn: function(store, operation) {
+						var parent = this.getParentPanel();
+						if (parent !== undefined) {
+							var params = parent.getApiParams();
+							operation = operation ? (operation===1 ? {} : operation) : {};
+							operation.params = operation.params || {};
+							for (var key in params) {
+								operation.params[key] = params[key];
+							}
+						}
+					},
+					scope: this
+					
+			}
 		}
 		
 		Ext.apply(this, config);
-	},
-	applyApiParams: function(store, operation) {
-		var parent = this.getParentPanel();
-		if (parent !== undefined) {
-			var params = parent.getApiParams();
-			operation = operation ? (operation===1 ? {} : operation) : {};
-			operation.params = operation.params || {};
-			for (var key in params) {
-				operation.params[key] = params[key];
-			}
-		}
 	},
 	setCorpus: function(corpus) {
 		if (corpus && this.getProxy && this.getProxy()) {
@@ -6005,7 +6021,7 @@ Ext.define('Voyant.panel.Catalogue', {
 	                    					});
 	                    					var link = msg.getTargetEl().dom.querySelector("a");
 	                    					link.addEventListener("click", function() {
-	                    						win.close()
+	                    						msg.close()
 	                    					})
 	                    					Ext.get(link).frame().frame();
 	                    				}
@@ -6200,7 +6216,8 @@ Ext.define('Voyant.panel.Catalogue', {
     					list += "</ul>";
     					results.update(list);
     					this.queryById('status').update(this.localize('queryMatches', [matchingDocIds.length,this.getCorpus().getDocumentsCount()]))
-    					this.setMatchingDocIds(matchingDocIds);
+    					this.setMatchingDocIds(Ext.Array.clone(matchingDocIds));
+    					debugger
     					if (matchingDocIds.length>0) {
     						this.queryById('export').setDisabled(false);
     					}

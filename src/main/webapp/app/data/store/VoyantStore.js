@@ -4,14 +4,25 @@ Ext.define('Voyant.data.store.VoyantStore', {
 		parentPanel: undefined
 	},
 	constructor: function(config, extras) {
+		var me = this;
 		config = config || {};
 		Ext.applyIf(config, {
 			remoteSort: true,
 			autoLoad: false,
-			listeners: {
-				beforeload: this.applyApiParams
-			},
-			scope: this,
+//			listeners: {
+//				beforeload: function(store, operation) {
+//					var parent = this.getParentPanel();
+//					if (parent !== undefined) {
+//						var params = parent.getApiParams();
+//						operation = operation ? (operation===1 ? {} : operation) : {};
+//						operation.params = operation.params || {};
+//						for (var key in params) {
+//							operation.params[key] = params[key];
+//						}
+//					}
+//				}
+//			},
+//			scope: this,
 			// define buffered configuration even if ignored when this isn't a buffered store
 			pagePurgeCount : 0, // don't purge any data
 			pageSize : 100, // each request is more intenstive, so do fewer of them then default
@@ -39,20 +50,25 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			config.parentPanel.on("loadedCorpus", function(src, corpus) {
 				this.setCorpus(corpus);
 			}, this);
+			config.listeners = config.listeners || {};
+			config.listeners.beforeload = {
+					fn: function(store, operation) {
+						var parent = this.getParentPanel();
+						if (parent !== undefined) {
+							var params = parent.getApiParams();
+							operation = operation ? (operation===1 ? {} : operation) : {};
+							operation.params = operation.params || {};
+							for (var key in params) {
+								operation.params[key] = params[key];
+							}
+						}
+					},
+					scope: this
+					
+			}
 		}
 		
 		Ext.apply(this, config);
-	},
-	applyApiParams: function(store, operation) {
-		var parent = this.getParentPanel();
-		if (parent !== undefined) {
-			var params = parent.getApiParams();
-			operation = operation ? (operation===1 ? {} : operation) : {};
-			operation.params = operation.params || {};
-			for (var key in params) {
-				operation.params[key] = params[key];
-			}
-		}
 	},
 	setCorpus: function(corpus) {
 		if (corpus && this.getProxy && this.getProxy()) {
