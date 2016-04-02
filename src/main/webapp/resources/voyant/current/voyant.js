@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Apr 02 13:23:25 EDT 2016 */
+/* This file created by JSCacher. Last modified: Sat Apr 02 15:02:36 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6217,7 +6217,6 @@ Ext.define('Voyant.panel.Catalogue', {
     					results.update(list);
     					this.queryById('status').update(this.localize('queryMatches', [matchingDocIds.length,this.getCorpus().getDocumentsCount()]))
     					this.setMatchingDocIds(Ext.Array.clone(matchingDocIds));
-    					debugger
     					if (matchingDocIds.length>0) {
     						this.queryById('export').setDisabled(false);
     					}
@@ -9279,7 +9278,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
         });
         
     	me.on('loadedCorpus', function(src, corpus) {
-    		this.setApiParam('query', undefined);
+//    		this.setApiParam('query', undefined);
     		this.getStore().loadPage(1);
     	}, me);
     	

@@ -135,7 +135,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
         });
         
     	me.on('loadedCorpus', function(src, corpus) {
-    		this.setApiParam('query', undefined);
+//    		this.setApiParam('query', undefined);
     		this.getStore().loadPage(1);
     	}, me);
     	
