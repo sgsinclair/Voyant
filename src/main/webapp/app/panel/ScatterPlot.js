@@ -256,7 +256,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xtype: 'grid',
  //       		title: 'Terms',
         		region: 'east',
-        		width: '50%',
+        		width: 250,
         		split: true,
 //        		collapsible: true,
 //        		border: true,
@@ -341,8 +341,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     					}
                 	},{
                     	xtype: 'querysearchfield',
-                    	emptyText: this.localize('addTerm'),
-                    	width: 90
+//                    	emptyText: this.localize('addTerm'),
+                    	flex: 1
                     }]
                 },
         		columns: [{

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Apr 02 15:02:36 EDT 2016 */
+/* This file created by JSCacher. Last modified: Sun Apr 03 16:14:31 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -11830,7 +11830,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xtype: 'grid',
  //       		title: 'Terms',
         		region: 'east',
-        		width: '50%',
+        		width: 250,
         		split: true,
 //        		collapsible: true,
 //        		border: true,
@@ -11915,8 +11915,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     					}
                 	},{
                     	xtype: 'querysearchfield',
-                    	emptyText: this.localize('addTerm'),
-                    	width: 90
+//                    	emptyText: this.localize('addTerm'),
+                    	flex: 1
                     }]
                 },
         		columns: [{
@@ -16239,6 +16239,150 @@ Ext.define('Voyant.panel.CorpusSet', {
     	}
     }
 })
+Ext.define('Voyant.panel.ScatterSet', {
+	extend: 'Ext.panel.Panel',
+    requires: ['Voyant.panel.ScatterPlot','Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts'],
+	mixins: ['Voyant.panel.Panel'],
+    alias: 'widget.scatterset',
+	statics: {
+		i18n: {
+			title: {en: "Scatter"},
+			helpTip: {en: "This is a specialized view for working with scatterplots."}
+		},
+		glyph: 'xf17a@FontAwesome'
+	},
+	constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+	},
+	layout: 'hbox',
+	header: false,
+	items: [{
+    	flex: 3,
+    	height: '100%',
+        xtype: 'scatterplot'
+    },{
+    	split: {width: 5},
+        flex: 1,
+    	height: '100%',
+        layout: 'vbox',
+        defaults: {
+        	width: '100%',
+        	flex: 1
+        },
+        items: [{
+        	xtype: 'documents',
+        	collapsible: true
+        },{
+        	xtype: 'trends',
+        	collapsible: true
+        },{
+        	xtype: 'contexts',
+        	collapsible: true
+        }]
+    }]
+})
+Ext.define('Voyant.panel.CollocatesSet', {
+	extend: 'Ext.panel.Panel',
+    requires: ['Voyant.panel.ScatterPlot','Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts'],
+	mixins: ['Voyant.panel.Panel'],
+    alias: 'widget.collocatesset',
+	statics: {
+		i18n: {
+			title: {en: "Scatter"},
+			helpTip: {en: "This is a specialized view for working with scatterplots."}
+		},
+		glyph: 'xf17a@FontAwesome'
+	},
+	constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+	},
+	layout: 'vbox',
+	header: false,
+	items: [{
+		layout: 'hbox',
+		align: 'stretch',
+		width: '100%',
+		height: '100%',
+		flex: 2,
+        defaults: {
+        	width: '100%',
+        	height: '100%',
+        	flex: 1,
+        	frame: true,
+        	border: true
+        },
+        items: [{
+        	xtype: 'corpusterms'
+        },{
+        	xtype: 'documentterms'
+        },{
+        	xtype: 'corpuscollocates'
+        }]
+    },{
+    	width: '100%',
+    	height: '100%',
+    	split: {width: 5},
+		layout: 'hbox',
+		flex: 3,
+        defaults: {
+        	width: '100%',
+        	height: '100%',
+        	flex: 1,
+        	frame: true,
+        	border: true
+        },
+        items: [{
+        	xtype: 'contexts'
+        },{
+        	xtype: 'collocatesgraph'
+        }]
+    }]
+})
+Ext.define('Voyant.panel.BubblelinesSet', {
+	extend: 'Ext.panel.Panel',
+    requires: ['Voyant.panel.Bubblelines','Voyant.panel.Contexts', 'Voyant.panel.Reader'],
+	mixins: ['Voyant.panel.Panel'],
+    alias: 'widget.bubblelinesset',
+	statics: {
+		i18n: {
+			title: {en: "Bubblelines Skin"},
+			helpTip: {en: "This is a specialized view for working with Bubblelines."}
+		},
+		glyph: 'xf17a@FontAwesome'
+	},
+	constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+	},
+	layout: 'vbox',
+	header: false,
+	items: [{
+		width: '100%',
+		height: '100%',
+    	xtype: 'bubblelines',
+    	flex: 5
+    },{
+    	width: '100%',
+    	height: '100%',
+    	split: {width: 5},
+		layout: 'hbox',
+		flex: 4,
+        defaults: {
+        	width: '100%',
+        	height: '100%',
+        	flex: 1,
+        	frame: true,
+        	border: true
+        },
+        items: [{
+        	xtype: 'contexts'
+        },{
+        	xtype: 'reader'
+        }]
+    }]
+})
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
@@ -16697,7 +16841,9 @@ Ext.define('Voyant.VoyantDefaultApp', {
 	statics: {
 		i18n: {
 			'noViewErrorTitle': {en: "View Error"},
-			'noViewErrorTpl': {en: 'No view was found with the name "{view}". You can <a href="{url}">try with the default view</a> instead'},
+			'noViewErrorTpl': {en: 'No view was found with the name "<i>{view}</i>". The default view will be used instead.'},
+			'noViewKnownErrorTpl': {en: 'The selected view ({view}) has not been migrated from the previous version of Voyant (and probably won\'t be). {additional} The default view will be used instead.'},
+			convertSkinMsg: {en: 'The convert skin was used for document exporting and that functionality is now available from the Documents tool.'},
 			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts. <a href='/docs/'>Find out more</a>.</p>"},
 			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts.</p>"}
 		},
@@ -16739,17 +16885,20 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		return this.viewport.down('#toolsContainer-main')
 	},
 	launch: function() {
+		var queryParams = Ext.Object.fromQueryString(document.location.search) || {};
 		var view = this.getApiParam('view', 'CorpusSet');
 		var xtype = view.toLowerCase();
-		if (!Ext.ClassManager.getByAlias("widget."+xtype)) {
-			var url = document.location.href.replace(/view=.*?&/,'');
+		if (!Ext.ClassManager.getByAlias("widget."+xtype) || queryParams.noskin) {
 			Ext.Msg.show({
 			    title: this.localize('noViewErrorTitle'),
-			    message: new Ext.Template(this.localize('noViewErrorTpl')).apply({view: view, url: url}),
+			    message: new Ext.Template(this.localize(queryParams.noskin ? 'noViewKnownErrorTpl' : 'noViewErrorTpl')).apply({
+			    	view: queryParams.noskin ? queryParams.noskin : view,
+			    	additional: queryParams.noskin && queryParams.noskin == 'convert' ? this.localize(queryParams.noskin+'SkinMsg') : ''
+			    }),
 			    buttons: Ext.Msg.OK,
 			    icon: Ext.Msg.ERROR
 			});
-			return;
+			xtype = 'corpusset'; // switch to default view
 		}
 		var SPLIT_SIZE = 5;
 		this.viewport = Ext.create('Ext.container.Viewport', {

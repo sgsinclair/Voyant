@@ -3,7 +3,29 @@
         response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 		response.setHeader("Location", "dream/"+(query!=null ? "?"+query : "?corpus=dream"));
         return;
-   } %><%@ include file="resources/jsp/pre_app.jsp" %>
+   } 
+   String skin = request.getParameter("skin");
+   if (skin!=null && skin.isEmpty()==false && query.isEmpty()==false) {
+	   skin = skin.toLowerCase();
+	   String view = "corpusset";
+	   if (skin.equals("scatter")) {view="scatterset";}
+	   else if (skin.equals("collocates")) {view="collocatesset";}
+	   else if (skin.equals("bubblelines")) {view="bubblelinesset";}
+	   else if (skin.equals("simple")==false){view="noskin";}
+       query = query.replace("skin="+skin, "");
+       if (query.length()>0 && query.endsWith("&")==false) {query+="&";}
+       if (view.equals("noskin")) {
+    	   query+="noskin="+skin;
+       }
+       else if (view.equals("corpusset")==false) {
+    	   query+="view="+view;
+       }
+       response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+	   response.setHeader("Location", "./?"+query);
+       return;
+   }
+   
+   %><%@ include file="resources/jsp/pre_app.jsp" %>
 <script>
 	Ext.Loader.setConfig({
 		enabled : true,

@@ -91,6 +91,9 @@ app/panel/Trends.js
 app/panel/VoyantFooter.js
 app/panel/VoyantHeader.js
 app/panel/CorpusSet.js
+app/panel/ScatterSet.js
+app/panel/CollocatesSet.js
+app/panel/BubblelinesSet.js
 
 # APPS
 app/VoyantApp.js
