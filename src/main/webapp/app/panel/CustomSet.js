@@ -6,7 +6,8 @@ Ext.define('Voyant.panel.CustomSet', {
 	statics: {
 		i18n: {
 			title: {en: "Custom View"},
-			helpTip: {en: "This is a custom view."}
+			helpTip: {en: "This is a custom view."},
+			noSuchTool: {en: "The specified tool ({0}) does not exist."}
 		},
 		api: {
 			panels: undefined
@@ -18,8 +19,13 @@ Ext.define('Voyant.panel.CustomSet', {
 	height: '100%',
 	width: '100%',
 	
+    constructor: function() {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    },
+	
 	listeners: {
-		afterrender: function() {
+		afterrender: function(panel) {
 	    	var params = Ext.urlDecode(window.location.search.substring(1));
 	        var layoutString = decodeURI(params.layout)
 	        	.replace(/r1/g, 'region')
@@ -50,7 +56,7 @@ Ext.define('Voyant.panel.CustomSet', {
 			            else if (tool=="VisualCollocator") {tool="CollocatesGraph";}
 			            else {tool="NoTool"}
 	            	}
-	            	return '"xtype":"'+tool.toLowerCase()+'"'
+	            	return '"xtype":"'+tool.toLowerCase()+'"'+(tool=="NoTool" ? ',"html":"'+new Ext.Template(panel.localize('noSuchTool')).applyTemplate([tool])+'"' : '')
 			    })
 	        
 	        var items;

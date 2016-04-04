@@ -88,6 +88,7 @@ app/panel/Summary.js
 app/panel/TopicContexts.js
 app/panel/TermsRadio.js
 app/panel/Trends.js
+app/panel/NoTool.js
 app/panel/VoyantFooter.js
 app/panel/VoyantHeader.js
 app/panel/CorpusSet.js

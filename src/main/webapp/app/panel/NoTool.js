@@ -17,6 +17,7 @@ Ext.define('Voyant.panel.NoTool', {
     	}
     },
     config: {
+    	html: undefined,
     	notYetImplemented: ["Centroid","DocumentInputAdd","DocumentTypeCollocateFrequenciesGrid","EntitiesBrowser","Equalizer","FeatureClusters","Flowerbed","KwicsTagger","Lava","Mandala","MicroSearch","NetVizApplet","PaperDrill","RezoViz","Sunburst","Termometer","Ticker","TokensViz","ToolBrowser","ToolBrowserLarge","VoyeurTagline","WordCloud","VoyeurTagline","WordCountFountain"]
     },
     constructor: function() {
@@ -29,6 +30,7 @@ Ext.define('Voyant.panel.NoTool', {
 	listeners: {
 		boxready: function(container, width, height) {
 			var tool = this.getApiParam("notool");
+
 			if (tool) {
 				if (Ext.isArray(tool)) {tool=tool[0]}
 				
@@ -79,7 +81,7 @@ Ext.define('Voyant.panel.NoTool', {
 			}
 			
 			// no tool specified, so just redirect
-			else {
+			else if (!this.config.html) {
 				Ext.Msg.show({
 				    title: this.localize('error'),
 				    message: this.localize('noToolSpecified'),
