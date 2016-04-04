@@ -12,7 +12,6 @@ Ext.define('Voyant.VoyantDefaultApp', {
 			'noViewErrorTpl': {en: 'No view was found with the name "<i>{view}</i>". The default view will be used instead.'},
 			'noViewKnownErrorTpl': {en: 'The selected view ({view}) has not been migrated from the previous version of Voyant (and probably won\'t be). {additional} The default view will be used instead.'},
 			convertSkinMsg: {en: 'The convert skin was used for document exporting and that functionality is now available from the Documents tool.'},
-			customSkinMsg: {en: "The custom skin isn't yet available, but should be available fairly soon."},
 			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts. <a href='/docs/'>Find out more</a>.</p>"},
 			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts.</p>"}
 		},

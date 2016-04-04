@@ -11,6 +11,7 @@
 	   if (skin.equals("scatter")) {view="scatterset";}
 	   else if (skin.equals("collocates")) {view="collocatesset";}
 	   else if (skin.equals("bubblelines")) {view="bubblelinesset";}
+	   else if (skin.equals("custom")) {view="customset";}
 	   else if (skin.equals("simple")==false){view="noskin";}
        query = query.replace("skin="+skin, "");
        if (query.length()>0 && query.endsWith("&")==false) {query+="&";}
