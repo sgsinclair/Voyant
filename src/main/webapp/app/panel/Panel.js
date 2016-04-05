@@ -31,7 +31,7 @@ Ext.define('Voyant.panel.Panel', {
 	},
 	
 	openUrl: function(url) {
-		this.getApplication.openUrl.apply(this, arguments);
+		this.getApplication().openUrl.apply(this, arguments);
 	},
 	
 	getTromboneUrl: function() {
