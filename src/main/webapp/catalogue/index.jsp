@@ -35,6 +35,11 @@ String corpus = parts[1];
 		launch: function() {
 			this.setApiParam('corpus', this.getCorpusId())
 			this.setApiParam('view', 'catalogue');
+			if (!this.getApiParam('facet')) {
+				if (this.getCorpusId()=='docsouth') {
+					this.setApiParam('facet', ['facet.keyword','facet.author'])
+				}
+			}
 			this.callParent(arguments);
 		}
 	});

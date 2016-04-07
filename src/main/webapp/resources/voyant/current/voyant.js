@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 07 12:12:05 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 07 13:08:47 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -17199,8 +17199,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
     	loadedCorpus: function(src, corpus) {
     		this.viewport.down('voyantheader').collapse();
     		this.viewport.down('#toolsContainer').setActiveItem(1);
-    		
-    		if (window.history.pushState && !this.getCorpusId && !this.getCorpusId()) {
+    		var corpusId = this.getCorpusId && this.getCorpusId() ? this.getCorpusId() : undefined;
+    		if (window.history.pushState && !corpusId) {
     			// add the corpusId to the url
     			var corpusId = corpus.getId();
         		var queryParams = Ext.Object.fromQueryString(document.location.search);
