@@ -47,7 +47,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			helpTip: {en: "<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>"},
 			tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
 			docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'},
-			noTermSelected: {en: "No term selected."}
+			noTermSelected: {en: "No term selected."},
+			
+			summaryLabel: {en: "Summary"},
+			docsLabel: {en: "Documents"},
+			termsLabel: {en: "Terms"},
     	},
     	api: {
     		docId: undefined,
@@ -60,7 +64,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		stopList: 'auto',
     		target: undefined,
     		term: undefined,
-    		query: undefined
+    		query: undefined,
+    		label: ['summary', 'docs', 'terms']
     	},
 		glyph: 'xf06e@FontAwesome'
     },
@@ -242,12 +247,35 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('labels'),
                 		itemId: 'labels',
                 		glyph: 'xf02b@FontAwesome',
-                		handler: function() {
-                			this.labelsMode++;
-        					if (this.labelsMode > 3) this.labelsMode = 0;
-        					this.doLabels();
-    					},
-    					scope: this
+                		menu: {
+                			items: [
+                			    {text: this.localize("summaryLabel"), itemId: 'summary', xtype: 'menucheckitem'},
+                			    {text: this.localize("docsLabel"), itemId: 'docs', xtype: 'menucheckitem'},
+                			    {text: this.localize("termsLabel"), itemId: 'terms', xtype: 'menucheckitem'}
+                			],
+        					listeners: {
+        						afterrender: function(menu) {
+        							var labels = this.getApiParam('label');
+        							menu.items.each(function(item) {
+        								item.setChecked(labels.indexOf(item.getItemId())>-1)
+        							})
+        						},
+        						click: function(menu, item) {
+        							var labels = this.getApiParam("label");
+        							var label = item.getItemId();
+        							if (Ext.isString(labels)) {labels = [labels]}
+        							if (item.checked && labels.indexOf(label)==-1) {
+        								labels.push(label)
+        							} else if (!item.checked && labels.indexOf(label)>-1) {
+        								labels = labels.filter(function(item) {return item!=label})
+        							}
+        							this.setApiParam("label", labels);
+        							this.doLabels();
+        							this.queryById('chart').redraw();
+        						},
+        						scope: this
+        					}
+                		}
                 	}]
         			
         		}
@@ -702,19 +730,18 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	}
         };
     	
-    	if (this.labelsMode < 3) {
-    		config.series[0].label = {
-    			field: 'term',
-    			display: 'over'
-    		};
-    		config.series[1].label = {
-    			field: 'term',
-    			display: 'over'
-    		};
-    	}
+		config.series[0].label = {
+			field: 'term',
+			display: 'over'
+		};
+		config.series[1].label = {
+			field: 'term',
+			display: 'over'
+		};
     	
     	var chart = Ext.create('Ext.chart.CartesianChart', config);
     	this.queryById('chartParent').insert(0, chart);
+    	this.doLabels();
     	
     	if (this.newTerm !== null) {
         	this.selectTerm(this.newTerm);
@@ -726,28 +753,13 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	var chart = this.queryById('chart');
     	var series = chart.getSeries();
     	var summary = chart.getSurface('chart').getItems()[0];
-    	switch (this.labelsMode) {
-    		case 0:
-    			series[0].getLabel().show();
-        		series[1].getLabel().show();
-        		summary.show();
-        		break;
-    		case 1:
-    			series[0].getLabel().show();
-        		series[1].getLabel().hide();
-    			summary.hide();
-    			break;
-    		case 2:
-    			series[0].getLabel().hide();
-        		series[1].getLabel().show();
-    			summary.hide();
-    			break;
-    		case 3:
-    			series[0].getLabel().hide();
-        		series[1].getLabel().hide();
-        		summary.hide();
-    	}
-    	chart.redraw();
+    	var labels = this.getApiParam("label");
+    	if (labels.indexOf("summary")>-1) {summary.show();}
+    	else {summary.hide();}
+    	if (labels.indexOf("terms")>-1) {series[0].getLabel().show();}
+    	else {series[0].getLabel().hide();}
+    	if (labels.indexOf("docs")>-1) {series[1].getLabel().show();}
+    	else {series[1].getLabel().hide();}
     },
     
     selectTerm: function(term) {
