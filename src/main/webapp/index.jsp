@@ -13,7 +13,7 @@
 	   else if (skin.equals("bubblelines")) {view="bubblelinesset";}
 	   else if (skin.equals("custom")) {view="customset";}
 	   else if (skin.equals("simple")==false){view="noskin";}
-       query = query.replace("skin="+skin, "");
+       query = query.replaceAll("skin="+skin, "");
        if (query.length()>0 && query.endsWith("&")==false) {query+="&";}
        if (view.equals("noskin")) {
     	   query+="noskin="+skin;

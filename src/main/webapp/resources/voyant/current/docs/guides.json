@@ -118,6 +118,11 @@
                         "title": "Scatter Plot"
                     },
                     {
+                        "name": "streamgraph",
+                        "url": "guides/tools/streamgraph",
+                        "title": "Stream Graph"
+                    },
+                    {
                         "name": "summary",
                         "url": "guides/tools/summary",
                         "title": "Summary"

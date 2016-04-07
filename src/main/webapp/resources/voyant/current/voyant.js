@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 07 11:51:30 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 07 15:06:41 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5912,7 +5912,7 @@ Ext.define('Voyant.panel.Catalogue', {
     statics: {
     	i18n: {
     		title: {en: "Catalogue"},
-    		helpTip: {en: "<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>"},
+    		helpTip: {en: "<p>The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents."},
     		"facet.authorTitle": {en: "Authors"},
     		"facet.languageTitle": {en: "Languages"},
     		"facet.titleTitle": {en: "Titles"},
@@ -12642,6 +12642,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     statics: {
     	i18n: {
     		title: {en: 'StreamGraph'},
+    		helpTip: {en: 'StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).'},
     		freqsMode: {en: 'Frequencies'},
     		freqsModeTip: {en: 'Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).'},
     		rawFrequencies: {en: 'Raw Frequencies'},
@@ -12708,17 +12709,15 @@ Ext.define('Voyant.panel.StreamGraph', {
         		enableOverflow: true,
 				items: [{
                 	xtype: 'querysearchfield'
-                },
-//                {
-//	            	xtype: 'button',
-//	            	text: this.localize('clearTerms'),
-//	            	handler: function() {
-//	            		this.setApiParams({query: undefined, limit: 5, stopList: 'auto'});
-//						this.loadFromCorpus();
-//	            	},
-//	            	scope: this
-//	            },
-	            {
+                },{
+	            	xtype: 'button',
+	            	text: this.localize('clearTerms'),
+	            	handler: function() {
+	            		this.setApiParams({query: undefined});
+	            		this.loadFromRecords([])
+	            	},
+	            	scope: this
+	            },{
 	            	xtype: 'corpusdocumentselector',
 	            	singleSelect: true
 	            },{
@@ -16256,7 +16255,7 @@ Ext.define('Voyant.panel.VoyantFooter', {
 				", <a href='http://stefansinclair.name/'>St&eacute;fan Sinclair</a> &amp; <a href='http://geoffreyrockwell.com'>Geoffrey Rockwell</a>",
 				" (<a href='http://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> "+ new Date().getFullYear() +")",
 				" <a href='http://docs.voyant-tools.org/privacy/' target='top' data-qtip='"+container.localize('privacyMsg')+"'>"+container.localize('privacy')+"</a>",
-				" v. "+Voyant.application.getVersion() + " ("+Voyant.application.getBuild()+")"
+				" v. "+Voyant.application.getVersion() + (Voyant.application.getBuild() ? " ("+Voyant.application.getBuild()+")" : "")
 			];
 			var footer = '';
 			var footerWidth = 0;
@@ -17002,6 +17001,9 @@ Ext.define('Voyant.VoyantCorpusApp', {
 
     	if (this.hasQueryToLoad()) {
         	var queryParams = Ext.Object.fromQueryString(document.location.search);
+        	if (!queryParams.corpus && this.getCorpusId && this.getCorpusId()) {
+        		queryParams.corpus = this.getCorpusId();
+        	}
         	this.loadCorpusFromParams(queryParams)
     	}
     },
@@ -17124,7 +17126,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	if (!params) {
     		params = Ext.Object.fromQueryString(document.location.search);
     	}
-    	return params.corpus || params.input; // TODO: should this include "archive" from V1?
+    	return params.corpus || params.input || (this.getCorpusId && this.getCorpusId()); // TODO: should this include "archive" from V1?
     },
     
     listeners: {
@@ -17196,8 +17198,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
     	loadedCorpus: function(src, corpus) {
     		this.viewport.down('voyantheader').collapse();
     		this.viewport.down('#toolsContainer').setActiveItem(1);
-    		
-    		if (window.history.pushState) {
+    		var corpusId = this.getCorpusId && this.getCorpusId() ? this.getCorpusId() : undefined;
+    		if (window.history.pushState && !corpusId) {
     			// add the corpusId to the url
     			var corpusId = corpus.getId();
         		var queryParams = Ext.Object.fromQueryString(document.location.search);

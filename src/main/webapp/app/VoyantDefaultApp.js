@@ -26,8 +26,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
     	loadedCorpus: function(src, corpus) {
     		this.viewport.down('voyantheader').collapse();
     		this.viewport.down('#toolsContainer').setActiveItem(1);
-    		
-    		if (window.history.pushState) {
+    		var corpusId = this.getCorpusId && this.getCorpusId() ? this.getCorpusId() : undefined;
+    		if (window.history.pushState && !corpusId) {
     			// add the corpusId to the url
     			var corpusId = corpus.getId();
         		var queryParams = Ext.Object.fromQueryString(document.location.search);
