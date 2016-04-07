@@ -5,6 +5,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     statics: {
     	i18n: {
     		title: {en: 'StreamGraph'},
+    		helpTip: {en: 'StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).'},
     		freqsMode: {en: 'Frequencies'},
     		freqsModeTip: {en: 'Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).'},
     		rawFrequencies: {en: 'Raw Frequencies'},
@@ -71,17 +72,15 @@ Ext.define('Voyant.panel.StreamGraph', {
         		enableOverflow: true,
 				items: [{
                 	xtype: 'querysearchfield'
-                },
-//                {
-//	            	xtype: 'button',
-//	            	text: this.localize('clearTerms'),
-//	            	handler: function() {
-//	            		this.setApiParams({query: undefined, limit: 5, stopList: 'auto'});
-//						this.loadFromCorpus();
-//	            	},
-//	            	scope: this
-//	            },
-	            {
+                },{
+	            	xtype: 'button',
+	            	text: this.localize('clearTerms'),
+	            	handler: function() {
+	            		this.setApiParams({query: undefined});
+	            		this.loadFromRecords([])
+	            	},
+	            	scope: this
+	            },{
 	            	xtype: 'corpusdocumentselector',
 	            	singleSelect: true
 	            },{

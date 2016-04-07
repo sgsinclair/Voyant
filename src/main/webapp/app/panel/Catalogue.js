@@ -7,7 +7,7 @@ Ext.define('Voyant.panel.Catalogue', {
     statics: {
     	i18n: {
     		title: {en: "Catalogue"},
-    		helpTip: {en: "<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>"},
+    		helpTip: {en: "<p>The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents."},
     		"facet.authorTitle": {en: "Authors"},
     		"facet.languageTitle": {en: "Languages"},
     		"facet.titleTitle": {en: "Titles"},
