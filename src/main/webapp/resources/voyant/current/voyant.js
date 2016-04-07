@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 07 13:08:47 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 07 14:23:03 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -16256,7 +16256,7 @@ Ext.define('Voyant.panel.VoyantFooter', {
 				", <a href='http://stefansinclair.name/'>St&eacute;fan Sinclair</a> &amp; <a href='http://geoffreyrockwell.com'>Geoffrey Rockwell</a>",
 				" (<a href='http://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> "+ new Date().getFullYear() +")",
 				" <a href='http://docs.voyant-tools.org/privacy/' target='top' data-qtip='"+container.localize('privacyMsg')+"'>"+container.localize('privacy')+"</a>",
-				" v. "+Voyant.application.getVersion() + " ("+Voyant.application.getBuild()+")"
+				" v. "+Voyant.application.getVersion() + (Voyant.application.getBuild() ? " ("+Voyant.application.getBuild()+")" : "")
 			];
 			var footer = '';
 			var footerWidth = 0;
