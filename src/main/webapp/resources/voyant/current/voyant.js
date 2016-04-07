@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 07 11:51:30 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 07 12:12:05 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -17002,6 +17002,9 @@ Ext.define('Voyant.VoyantCorpusApp', {
 
     	if (this.hasQueryToLoad()) {
         	var queryParams = Ext.Object.fromQueryString(document.location.search);
+        	if (!queryParams.corpus && this.getCorpusId && this.getCorpusId()) {
+        		queryParams.corpus = this.getCorpusId();
+        	}
         	this.loadCorpusFromParams(queryParams)
     	}
     },
@@ -17124,7 +17127,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	if (!params) {
     		params = Ext.Object.fromQueryString(document.location.search);
     	}
-    	return params.corpus || params.input; // TODO: should this include "archive" from V1?
+    	return params.corpus || params.input || (this.getCorpusId && this.getCorpusId()); // TODO: should this include "archive" from V1?
     },
     
     listeners: {
@@ -17197,7 +17200,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
     		this.viewport.down('voyantheader').collapse();
     		this.viewport.down('#toolsContainer').setActiveItem(1);
     		
-    		if (window.history.pushState) {
+    		if (window.history.pushState && !this.getCorpusId && !this.getCorpusId()) {
     			// add the corpusId to the url
     			var corpusId = corpus.getId();
         		var queryParams = Ext.Object.fromQueryString(document.location.search);

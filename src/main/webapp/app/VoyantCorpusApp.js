@@ -63,6 +63,9 @@ Ext.define('Voyant.VoyantCorpusApp', {
 
     	if (this.hasQueryToLoad()) {
         	var queryParams = Ext.Object.fromQueryString(document.location.search);
+        	if (!queryParams.corpus && this.getCorpusId && this.getCorpusId()) {
+        		queryParams.corpus = this.getCorpusId();
+        	}
         	this.loadCorpusFromParams(queryParams)
     	}
     },
@@ -185,7 +188,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	if (!params) {
     		params = Ext.Object.fromQueryString(document.location.search);
     	}
-    	return params.corpus || params.input; // TODO: should this include "archive" from V1?
+    	return params.corpus || params.input || (this.getCorpusId && this.getCorpusId()); // TODO: should this include "archive" from V1?
     },
     
     listeners: {

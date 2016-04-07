@@ -21,10 +21,20 @@
 	</servlet>
 
 	<servlet-mapping>
+		<servlet-name>catalogue</servlet-name>
+		<url-pattern>/catalogue/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>catalogue</servlet-name>
+		<jsp-file>/catalogue/index.jsp</jsp-file>
+	</servlet>
+	
+	<servlet-mapping>
 		<servlet-name>tool</servlet-name>
 		<url-pattern>/tool/*</url-pattern>
 	</servlet-mapping>
-
+	
 	<!-- available from http://localhost:8080/trombone?param=...&param=...&param=... -->
 	<servlet>
 		<servlet-name>trombone</servlet-name>
