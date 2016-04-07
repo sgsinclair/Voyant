@@ -43,7 +43,7 @@ public class JSCacher {
 		
 		File cachedFile = new File(basePath, "/resources/voyant/current/"+CACHED_FILENAME);
         File cachedFileMinified = new File(basePath, "/resources/voyant/current/"+CACHED_FILENAME_MINIFIED);
-		if (debug!=null && debug.equals("true")) {
+		if (debug!=null && debug.equals("true") && cachedFile.canWrite() && cachedFileMinified.canWrite()) {
 			long lastModifiedCachedFile = cachedFile.lastModified();
 			List<File> files = getCacheableFiles(basePath);
 
