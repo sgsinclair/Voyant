@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 07 11:07:56 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 07 11:51:30 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5941,7 +5941,8 @@ Ext.define('Voyant.panel.Catalogue', {
     config: {
     	corpus: undefined,
     	facets: {},
-    	matchingDocIds: []
+    	matchingDocIds: [],
+    	customResultsHtml: undefined
     },
     
     constructor: function(config) {
@@ -5979,7 +5980,7 @@ Ext.define('Voyant.panel.Catalogue', {
     		        	},
     		        	listeners: {
     		        		query: function(src, query) {
-    		        			this.findParentByType('panel').updateResults([query])
+    		        			this.findParentByType('panel').updateResults(Ext.isString(query) ? [query] : query)
     		        		}
     		        	},
     		        	bbar: [{
@@ -6056,7 +6057,40 @@ Ext.define('Voyant.panel.Catalogue', {
     		this.queryById('status').update(this.localize('noMatches', [corpus.getDocumentsCount()]))
     		this.query("facet").forEach(function(facet) {
     			facet.setCorpus(corpus);
-    		})
+    		});
+    		if (!this.getCustomResultsHtml()) {
+    			this.setCustomResultsHtml(this.localize('noMatches',  [corpus.getDocumentsCount()]));
+    			this.updateResults();
+    	    	Ext.Ajax.request({
+    	    	    url: this.getTromboneUrl(),
+    	    	    params: {
+    	        		tool: 'resource.StoredResource',
+    	        		verifyResourceId: 'customhtml-'+corpus.getId()
+    	    	    },
+    	    	    success: function(response, req) {
+    	    	    	var json = Ext.util.JSON.decode(response.responseText);
+    	    	    	if (json && json.storedResource && json.storedResource.id) {
+    	        	    	Ext.Ajax.request({
+    	        	    	    url: this.getTromboneUrl(),
+    	        	    	    params: {
+    	        	        		tool: 'resource.StoredResource',
+    	        	        		retrieveResourceId: 'customhtml-'+corpus.getId()
+    	        	    	    },
+    	        	    	    success: function(response, req) {
+    	        	    	    	var json = Ext.util.JSON.decode(response.responseText);
+    	        	    	    	if (json && json.storedResource && json.storedResource.resource) {
+    	        	    	    		this.setCustomResultsHtml(json.storedResource.resource);
+    	        	    	    		this.updateResults()
+    	        	    	    	}
+    	        	    	    },
+    	        	    	    scope: this
+    	        	    	})
+    	    	    	}
+    	    	    },
+    	    	    scope: this
+    	    	})
+
+    		}
     	});
     	
     	this.on('afterrender', function(panel) {
@@ -6156,9 +6190,10 @@ Ext.define('Voyant.panel.Catalogue', {
     	}
 		var results = this.queryById("results").getTargetEl();
 		var catalogue = this;
-		results.update("");
+		results.update(this.getCustomResultsHtml() ? this.getCustomResultsHtml() : this.localize('noMatches', [this.getCorpus().getDocumentsCount()]));
+		this.queryById('status').update(this.localize('noMatches', [this.getCorpus().getDocumentsCount()]))
 		this.queryById('export').setDisabled(true);
-    	if (queries.length>0) {
+    	if (queries && queries.length>0) {
     		this.mask(this.localize("loading"));
     		var documentQueryMatches = this.getCorpus().getDocumentQueryMatches();
     		documentQueryMatches.load({
@@ -11710,7 +11745,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			
 			summaryLabel: {en: "Summary"},
 			docsLabel: {en: "Documents"},
-			termsLabel: {en: "Terms"},
+			termsLabel: {en: "Terms"}
     	},
     	api: {
     		docId: undefined,
@@ -12204,7 +12239,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	        		tokenData.docIndex = token.get('docIndex');
 	        		var doc = this.getCorpus().getDocument(tokenData.docIndex);
 	        		if (doc !== null) {
-		        		tokenData.term = doc.getTinyTitle();
+		        		tokenData.term = doc.getShortTitle();
 		        		tokenData.title = doc.getTitle();
 	        		}
         		}
