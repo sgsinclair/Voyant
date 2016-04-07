@@ -53,11 +53,11 @@ Ext.onReady(function(){
 		   	var me = this;
 			this.callParent(arguments);
 			var params = Ext.Object.fromQueryString(document.location.search);
-			if (params && params.debug && params.debug=='true') { return}
+			if (params && ((params.debug && params.debug=='true') || this.hasQueryToLoad())) {return}
 			var viewport = this.getViewport();
 			viewport.mask();
 			Ext.create('Ext.window.Window', {
-			    title: 'Voyant Tools 2.0 Preview Release',
+			    title: 'Voyant Tools 2.0',
 		    	margin: '20 200 10 10',
 			    modal: true,
 			    maxWidth: 800,
@@ -66,27 +66,19 @@ Ext.onReady(function(){
 			    	margin: '10 5 3 10',
 				    layout: 'fit',
 				    scrollable: true,
-				    html: "<h2 style='text-align: center;'>Welcome to this Preview Release of Voyant Tools 2.0!</h2>"+
-				    "<p>We've tried to make things usable in order to give a glimpse of what's to come, "+
-				    "but this is an early preview release with lots of missing goodies and a whole bunch of bugs. "+
-				    "Please kick the tires and let us know if you have suggestions on <a href='https://github.com/sgsinclair/Voyant/issues'>Github</a> or <a href='http://twitter.com/voyanttools'>Twitter</a>."+
-				    "<ul>"+
-			    	"<li>some new features and functionality:<ul>"+
-			    		"<li>flexible search (wildcards, phrases, proximity) – hover over help icon in search boxes for more details</li>"+
-				    	"<li>new <i>Phrases</i> tool for analyzing repeating n-grams</li>"+
-			    		"<li>better cross-platform and device support (all tools in HTML5, no Flash or Java Applets)</li>"+
-			    		"<li>much better support for larger corpora</li>"+
-			    		"<li>vastly improved performance throughout (corpus reader and collocates are notable examples)</li>"+
-				    	"<li>adding and reordering documents (new in 2.0)</li>"+
-				    	"<li>corpus-level management (permissions for access and modifications)</li>"+
-			    	"</ul><li>some things not yet fully implemented:<ul>"+
-				    	"<li>full list of tools and skins from 1.0</li>"+
-				    	"<!--<li>part-of-speech tagging and lemmatization (new in 2.0)</li>-->"+
-			    	"</ul></li></ul>"+
-			    	"<p>It's best to assume that this preview release may be incompatible with future releases and that "+
-			    	"any stored corpora will no longer be available after your session. Of course, you can keep using "+
-			    	"<a href='http://voyant-tools.org'>Voyant Tools 1.0</a> "+
-			    	"if you want persistence (normal persistence will be avilable with the full release of Voyant Tools 2.0). Have fun and please give us your <a href='http://twitter.com/voyanttools'>feeback</a>!</p>"
+				    html: "<h2 style='text-align: center;'>Welcome to Voyant Tools 2.0!</h2>"+
+				    "<p>We've completely reworked Voyant to make it even more powerful and flexible than before. "+
+				    "Some highlights of <a href='docs/#!/guide/new' target='_blank'>what's new</a> include more options for <a href='docs/#!/guide/corpuscreator' target='_blank'>creating</a>, "+
+				    "<a href='docs/#!/guide/modifyingcorpus' target='_blank'>modifying</a> and <a href='docs/#!/guide/corpuscreator-section-access-management' target='_blank'>accessing</a> corpora, "+
+				    "more powerful <a href='docs/#!/guide/search' target='_blank'>search</a> capabilities, "+
+				    "new tools (like <a href='docs/#!/guide/phrases' target='_blank'>Phrases</a>) and tools rewritten HTML5 (like <a href='docs/#!/guide/cirrus' target='_blank'>Cirrus</a>), "+
+				    "as well as significant speed and scale improvements all around.</p>"+
+				    "<p>If you're new to Voyant, you may want to consult our guide to <a href='docs/#!/guide/start' target='_blank'>Getting Started</a>, as well as our companion site "+
+				    "<a href='http://hermeneuti.ca/' target='_blank'>Hermeneuti.ca: Computer-Assisted Interpretation in the Humanities</a>. You might be interested in "+
+				    "using our downloadable standalone version of <a href='https://github.com/sgsinclair/VoyantServer/#voyant-server' target='_blank'>VoyantServer</a> or in accessing the previous <a href='http://v1.voyant-tools.org' target='_blank'>Version 1</a> of Voyant Tool.</p>"+
+				    "<p>We're always grateful for any feedback, bug reports and feature requests, you can find us on <a href='http://twitter.com/voyanttools' target='_blank'>Twitter</a> and <a href='http://github.com/sgsinclair/Voyant' target='_blank'>GitHub</a>.</p>"+
+				    (window.location.hostname=='beta.voyant-tools.org' ? "<p class='keyword' style='text-align: center; font-weight: bold;'>Please note that this is the beta server and you should not count on corpora persisting (for bookmarks, embedding, etc.)." : '')+
+				    "<p style='text-align: center'>We hope you enjoy! - <a href='http://stefansinclair.name' target='_blank'>St&eacute;fan Sinclair</a> &amp; <a href='http://geoffreyrockwell.com' target='_blank'>Geoffrey Rockwell</a></p>"
 			    }],
 			    bbar: [{
 			    	xtype: 'button',

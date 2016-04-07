@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Apr 03 22:06:24 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 07 10:21:51 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2942,7 +2942,9 @@ Ext.define('Voyant.util.Toolable', {
 	},
 	exportToolClick: function(panel) {
 		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
-		var items = [{
+		var items = window.location.hostname=='beta.voyant-tools.org' ? [{html: "<p class='keyword' style='text-align: center; font-weight: bold; padding: 4px;'>Please note that this is the beta server and you should not count on corpora persisting (for bookmarks, embedding, etc.)."}] : [];
+		debugger
+		items.push({
 	       		xtype: 'radio',
 	       		name: 'export',
 	       		inputValue: 'url',
@@ -2971,7 +2973,7 @@ Ext.define('Voyant.util.Toolable', {
 	       		inputValue: 'biblio',
 	       		boxLabel: panel.localize('exportViewBiblio')
 	       	}]
-		}]
+		})
 		if (panel.isXType('grid')) {
 			items.push({
 		       xtype: 'fieldset',
@@ -5200,7 +5202,7 @@ Ext.define('Voyant.panel.Panel', {
 	},
 	
 	openUrl: function(url) {
-		this.getApplication.openUrl.apply(this, arguments);
+		this.getApplication().openUrl.apply(this, arguments);
 	},
 	
 	getTromboneUrl: function() {
@@ -11656,7 +11658,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	newTerm: null,
 	termsTimeout: null,
     chartMenu: null,
-    labelsMode: 0, // 0 all labels, 1 word labels, 2 no labels
+    labelsMode: 0, // 0 all labels, 1 doc labels, 2 word labels, 3 no labels
     
     highlightData: {x: 0, y: 0, r: 0},
     highlightTask: null,
@@ -11818,7 +11820,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		glyph: 'xf02b@FontAwesome',
                 		handler: function() {
                 			this.labelsMode++;
-        					if (this.labelsMode > 2) this.labelsMode = 0;
+        					if (this.labelsMode > 3) this.labelsMode = 0;
         					this.doLabels();
     					},
     					scope: this
@@ -12276,7 +12278,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	}
         };
     	
-    	if (this.labelsMode < 2) {
+    	if (this.labelsMode < 3) {
     		config.series[0].label = {
     			field: 'term',
     			display: 'over'
@@ -12300,6 +12302,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	var chart = this.queryById('chart');
     	var series = chart.getSeries();
     	var summary = chart.getSurface('chart').getItems()[0];
+    	debugger
     	switch (this.labelsMode) {
     		case 0:
     			series[0].getLabel().show();
@@ -12308,10 +12311,15 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		break;
     		case 1:
     			series[0].getLabel().show();
-        		series[1].getLabel().show();
+        		series[1].getLabel().hide();
     			summary.hide();
     			break;
     		case 2:
+    			series[0].getLabel().hide();
+        		series[1].getLabel().show();
+    			summary.hide();
+    			break;
+    		case 3:
     			series[0].getLabel().hide();
         		series[1].getLabel().hide();
         		summary.hide();
@@ -17045,7 +17053,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 			'noViewErrorTpl': {en: 'No view was found with the name "<i>{view}</i>". The default view will be used instead.'},
 			'noViewKnownErrorTpl': {en: 'The selected view ({view}) has not been migrated from the previous version of Voyant (and probably won\'t be). {additional} The default view will be used instead.'},
 			convertSkinMsg: {en: 'The convert skin was used for document exporting and that functionality is now available from the Documents tool.'},
-			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts. <a href='/docs/'>Find out more</a>.</p>"},
+			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts – please visit <a href='http://hermeneuti.ca/' target='_blank'>Hermeneuti.ca</a> for more information..</p>"},
 			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts.</p>"}
 		},
 		api: {

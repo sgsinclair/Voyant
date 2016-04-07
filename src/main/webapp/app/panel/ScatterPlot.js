@@ -82,7 +82,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	newTerm: null,
 	termsTimeout: null,
     chartMenu: null,
-    labelsMode: 0, // 0 all labels, 1 word labels, 2 no labels
+    labelsMode: 0, // 0 all labels, 1 doc labels, 2 word labels, 3 no labels
     
     highlightData: {x: 0, y: 0, r: 0},
     highlightTask: null,
@@ -244,7 +244,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		glyph: 'xf02b@FontAwesome',
                 		handler: function() {
                 			this.labelsMode++;
-        					if (this.labelsMode > 2) this.labelsMode = 0;
+        					if (this.labelsMode > 3) this.labelsMode = 0;
         					this.doLabels();
     					},
     					scope: this
@@ -702,7 +702,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	}
         };
     	
-    	if (this.labelsMode < 2) {
+    	if (this.labelsMode < 3) {
     		config.series[0].label = {
     			field: 'term',
     			display: 'over'
@@ -734,10 +734,15 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		break;
     		case 1:
     			series[0].getLabel().show();
-        		series[1].getLabel().show();
+        		series[1].getLabel().hide();
     			summary.hide();
     			break;
     		case 2:
+    			series[0].getLabel().hide();
+        		series[1].getLabel().show();
+    			summary.hide();
+    			break;
+    		case 3:
     			series[0].getLabel().hide();
         		series[1].getLabel().hide();
         		summary.hide();

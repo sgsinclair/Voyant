@@ -266,7 +266,9 @@ Ext.define('Voyant.util.Toolable', {
 	},
 	exportToolClick: function(panel) {
 		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
-		var items = [{
+		var items = window.location.hostname=='beta.voyant-tools.org' ? [{html: "<p class='keyword' style='text-align: center; font-weight: bold; padding: 4px;'>Please note that this is the beta server and you should not count on corpora persisting (for bookmarks, embedding, etc.)."}] : [];
+		debugger
+		items.push({
 	       		xtype: 'radio',
 	       		name: 'export',
 	       		inputValue: 'url',
@@ -295,7 +297,7 @@ Ext.define('Voyant.util.Toolable', {
 	       		inputValue: 'biblio',
 	       		boxLabel: panel.localize('exportViewBiblio')
 	       	}]
-		}]
+		})
 		if (panel.isXType('grid')) {
 			items.push({
 		       xtype: 'fieldset',
