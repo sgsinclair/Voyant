@@ -545,7 +545,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	        		tokenData.docIndex = token.get('docIndex');
 	        		var doc = this.getCorpus().getDocument(tokenData.docIndex);
 	        		if (doc !== null) {
-		        		tokenData.term = doc.getTinyTitle();
+		        		tokenData.term = doc.getShortTitle();
 		        		tokenData.title = doc.getTitle();
 	        		}
         		}
