@@ -51,7 +51,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			
 			summaryLabel: {en: "Summary"},
 			docsLabel: {en: "Documents"},
-			termsLabel: {en: "Terms"},
+			termsLabel: {en: "Terms"}
     	},
     	api: {
     		docId: undefined,
