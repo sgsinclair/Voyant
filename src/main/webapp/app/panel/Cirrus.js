@@ -216,7 +216,7 @@ Ext.define('Voyant.panel.Cirrus', {
 				'}'+
 				'function cirrusLoaded'+id+'() {'+
 				'if (window.console && console.info) console.info("cirrus flash loaded");'+
-				'Ext.getCmp("'+this.id+'").loadInitialData();'+
+				//'Ext.getCmp("'+this.id+'").loadInitialData();'+
 				'}'+
 				'function cirrusPNGHandler'+id+'(base64String) {'+
 				'var cirrusTool = Ext.getCmp("'+this.id+'");'+
@@ -299,14 +299,15 @@ Ext.define('Voyant.panel.Cirrus', {
     	var terms = this.getTerms();
     	if (this.rendered && terms) {
     		if (this.getApiParam('cirrusForceFlash') === true) {
-    			if (this.cirrusFlashApp) {
+    			if (this.cirrusFlashApp !== undefined && this.cirrusFlashApp.clearAll !== undefined) {
 	    			var words = [];
 	    			for (var i = 0; i < terms.length; i++) {
 	    				var t = terms[i];
 	    				words.push({word: t.text, size: t.rawFreq, label: t.rawFreq});
 	    			}
+	    			this.cirrusFlashApp.clearAll();
 	    			this.cirrusFlashApp.addWords(words);
-	                this.cirrusFlashApp.arrangeWords();
+	    			this.cirrusFlashApp.arrangeWords();
     			} else {
     				Ext.defer(this.buildFromTerms, 50, this);
     			}
