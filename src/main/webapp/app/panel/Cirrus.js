@@ -19,7 +19,13 @@ Ext.define('Voyant.panel.Cirrus', {
     		visible: 50,
     		terms: undefined,
     		docId: undefined,
-    		docIndex: undefined
+    		docIndex: undefined,
+    		
+    		cirrusForceFlash: false,
+    		background: '0xffffff',
+    		fade: true,
+    		smoothness: 2,
+    		diagonals: 'none' // all, bigrams, none
     	},
 		glyph: 'xf06e@FontAwesome'
     },
@@ -189,65 +195,142 @@ Ext.define('Voyant.panel.Cirrus', {
     
     initVisLayout: function() {
     	if (this.getVisLayout() == undefined) {
-	    	var el = this.getLayout().getRenderTarget();
-	    	var width = el.getWidth();
-			var height = el.getHeight();
-			this.setVisLayout(
-				d3.layout.cloud()
-					.size([width, height])
-					.padding(1)
-					.rotate(function() { return ~~(Math.random() * 2) * 90; })
-					.spiral('archimedean')
-					.font('Impact')
-					.fontSize(function(d) {
-						return d.fontSize;
-					}.bind(this))
-					.text(function(d) {
-						return d.text;
-					})
-					.on('end', this.draw.bind(this))
-			);
-			
-			var svg = d3.select(el.dom).append('svg').attr('id','cirrusGraph').attr('width', width).attr('height', height);
-			this.setVis(svg.append('g').attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')'));
-			
-			var tip = Ext.create('Ext.tip.ToolTip', {
-				target: svg.node(),
-				delegate: 'text',
-				trackMouse: true,
-				listeners: {
-					beforeshow: function(tip) {
-						var el = tip.triggerElement;
-						var freq = el.getAttribute('data-freq');
-						tip.update(freq);
+    		var cirrusForceFlash = this.getApiParam('cirrusForceFlash');
+    		if (cirrusForceFlash == 'true') {
+    			this.setApiParam('cirrusForceFlash', true);
+    			var id = this.id.replace(/-/g,'_')+'_cirrus';
+    			var appVars = {
+    				id: id
+    			};
+    			var keys = ['background','fade','smoothness','diagonals'];
+    			for (var i = 0; i < keys.length; i++) {
+    				appVars[keys[i]] = this.getApiParam(keys[i]);
+    			}
+    			
+    			var swfscript = '<script type="text/javascript" src="'+this.getApplication().getBaseUrl()+'resources/swfobject/swfobject.js'+'"></script>';
+    			var cirrusLinks = '<script type="text/javascript">'+
+				'function cirrusClickHandler'+id+'(word, value) {'+
+				'if (window.console && console.info) console.info(word, value);'+
+				'var cirrusTool = Ext.getCmp("'+this.id+'");'+
+				'cirrusTool.cirrusClickHandler(word, value);'+
+				'}'+
+				'function cirrusLoaded'+id+'() {'+
+				'if (window.console && console.info) console.info("cirrus flash loaded");'+
+				'Ext.getCmp("'+this.id+'").loadInitialData();'+
+				'}'+
+				'function cirrusPNGHandler'+id+'(base64String) {'+
+				'var cirrusTool = Ext.getCmp("'+this.id+'");'+
+				'cirrusTool.cirrusPNGHandler(base64String);'+
+				'}'+
+				'</script>';
+    			this.update(swfscript+cirrusLinks, true, function() {
+    				function loadFlash(component) {
+    					if (typeof swfobject !== 'undefined') {
+    						var el = component.getLayout().getRenderTarget();
+    						var width = el.getWidth();
+    						var height = el.getHeight();
+    		    			
+	        				var cirrusFlash = component.getApplication().getBaseUrl()+'resources/cirrus/flash/Cirrus.swf';
+	        				component.add({
+	        					xtype: 'flash',
+	        					id: appVars.id,
+	        					url: cirrusFlash,
+	        					width: width,
+	        					height: height,
+	        					flashVars: appVars,
+	        					flashParams: {
+									menu: 'false',
+									scale: 'showall',
+									allowScriptAccess: 'always',
+									bgcolor: '#222222',
+									wmode: 'opaque'
+	        		            }
+	        				});
+	        				
+	        				component.cirrusFlashApp = Ext.get(appVars.id).first().dom;
+    					} else {
+    						setTimeout(loadFlash, 50, component);
+    					}
+        			}
+    				loadFlash(this.component);
+    				
+    			}, this);
+    		} else {
+    			var el = this.getLayout().getRenderTarget();
+    	    	var width = el.getWidth();
+    			var height = el.getHeight();
+    			
+				this.setVisLayout(
+					d3.layout.cloud()
+						.size([width, height])
+						.padding(1)
+						.rotate(function() { return ~~(Math.random() * 2) * 90; })
+						.spiral('archimedean')
+						.font('Impact')
+						.fontSize(function(d) {
+							return d.fontSize;
+						}.bind(this))
+						.text(function(d) {
+							return d.text;
+						})
+						.on('end', this.draw.bind(this))
+				);
+				
+				var svg = d3.select(el.dom).append('svg').attr('id','cirrusGraph').attr('width', width).attr('height', height);
+				this.setVis(svg.append('g').attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')'));
+				
+				var tip = Ext.create('Ext.tip.ToolTip', {
+					target: svg.node(),
+					delegate: 'text',
+					trackMouse: true,
+					listeners: {
+						beforeshow: function(tip) {
+							var el = tip.triggerElement;
+							var freq = el.getAttribute('data-freq');
+							tip.update(freq);
+						}
 					}
-				}
-			});
+				});
+    		}
     	}
     },
     
     buildFromTerms: function() {
     	var terms = this.getTerms();
     	if (this.rendered && terms) {
-    		var minSize = 1000;
-    		var maxSize = -1;
-    		for (var i = 0; i < terms.length; i++) {
-    			var size = terms[i].rawFreq;
-    			if (size < minSize) minSize = size;
-    			if (size > maxSize) maxSize = size;
+    		if (this.getApiParam('cirrusForceFlash') === true) {
+    			if (this.cirrusFlashApp) {
+	    			var words = [];
+	    			for (var i = 0; i < terms.length; i++) {
+	    				var t = terms[i];
+	    				words.push({word: t.text, size: t.rawFreq, label: t.rawFreq});
+	    			}
+	    			this.cirrusFlashApp.addWords(words);
+	                this.cirrusFlashApp.arrangeWords();
+    			} else {
+    				Ext.defer(this.buildFromTerms, 50, this);
+    			}
+    		} else {
+	    		var minSize = 1000;
+	    		var maxSize = -1;
+	    		for (var i = 0; i < terms.length; i++) {
+	    			var size = terms[i].rawFreq;
+	    			if (size < minSize) minSize = size;
+	    			if (size > maxSize) maxSize = size;
+	    		}
+	    		this.setSmallestWordSize(minSize);
+	    		this.setLargestWordSize(maxSize);
+	    		
+	    		// set the relative sizes for each word (0.0 to 1.0), then adjust based on available area
+	    		this.setRelativeSizes();
+	    		this.setAdjustedSizes();
+	    		
+	//    		var fontSizer = d3.scale.pow().range([10, 100]).domain([minSize, maxSize]);
+	    		
+	    		this.getVisLayout().words(terms).start();
     		}
-    		this.setSmallestWordSize(minSize);
-    		this.setLargestWordSize(maxSize);
-    		
-    		// set the relative sizes for each word (0.0 to 1.0), then adjust based on available area
-    		this.setRelativeSizes();
-    		this.setAdjustedSizes();
-    		
-//    		var fontSizer = d3.scale.pow().range([10, 100]).domain([minSize, maxSize]);
-    		
-    		this.getVisLayout().words(terms).start();
     	} else {
-    		Ext.defer(this.buidlFromTerms, 50, this);
+    		Ext.defer(this.buildFromTerms, 50, this);
     	}
     },
     
