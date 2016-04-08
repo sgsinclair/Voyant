@@ -136,11 +136,22 @@
 		</div>
 		<div>
 			<h4>Scatterplot</h4>
-			<p>ScatterPlot is a graph visualization of how words cluster in a corpus using either correspondence analysis or principal component analysis.</p>
+			<p>ScatterPlot is a graph visualization of how words cluster in a corpus using document similarity, correspondence analysis or principal component analysis.</p>
 		</div>
 	</dd></a>
 </div>
 
+<div class="thumb-list">
+	<a href="#!/guide/streamgraph"><dd>
+		<div class="thumb">
+			<img src="guides/streamgraph/icon.png" />
+		</div>
+		<div>
+			<h4>StreamGraph</h4>
+			<p>StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).</p>
+		</div>
+	</dd></a>
+</div>
 
 <div class="thumb-list">
 	<a href="#!/guide/summary"><dd>

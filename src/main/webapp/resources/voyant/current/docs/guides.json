@@ -68,6 +68,11 @@
                         "title": "Bubblelines"
                     },
                     {
+                        "name": "catalogue",
+                        "url": "guides/tools/catalogue",
+                        "title": "Catalogue"
+                    },
+                    {
                         "name": "cirrus",
                         "url": "guides/tools/cirrus",
                         "title": "Cirrus"
@@ -120,7 +125,7 @@
                     {
                         "name": "streamgraph",
                         "url": "guides/tools/streamgraph",
-                        "title": "Stream Graph"
+                        "title": "StreamGraph"
                     },
                     {
                         "name": "summary",
