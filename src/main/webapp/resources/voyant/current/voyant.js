@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 07 22:19:53 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Apr 08 07:53:43 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6863,7 +6863,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 xtype: 'toolbar',
         		enableOverflow: true,
                 items: [{
-                   // xtype: Ext.create("Voyant.widget.QuerySearchField")
+                   xtype: 'querysearchfield'
                 },{
                 	text: me.localize('clearTerms'),
 					glyph: 'xf014@FontAwesome',
