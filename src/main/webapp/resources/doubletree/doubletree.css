@@ -1,0 +1,45 @@
+.node {
+	cursor: pointer;
+}
+
+.node circle {
+  /*cursor: pointer;*/
+  /* fill: #fff; */
+  /* stroke: steelblue; */
+  /* stroke-width: 1.5px; */
+}
+
+.node text {
+  font: 14px sans-serif;
+  fill: #444;
+}
+tspan.tokenExtra {
+	font-size: 0.8em;
+}
+text.foundText {
+	font-size: 1.1em;
+     font-weight:bold;
+	fill: aqua; /* should be background color */
+	stroke: #444; /* same as regular fill */
+  	stroke-width: 0.5;
+}
+
+text.continuation {
+  font-weight:bold;
+  font-size: 1.1em;
+}
+
+text.continuation.foundText {
+	fill:white;
+	stroke: red;
+
+}
+
+
+path.link {
+  /*
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+  */
+}

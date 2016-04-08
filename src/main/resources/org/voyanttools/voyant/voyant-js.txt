@@ -9,6 +9,11 @@ resources/cirrus/html5/Cirrus.js
 resources/cirrus/html5/Word.js
 resources/cirrus/html5/WordController.js
 
+# WORDTREE
+resources/doubletree/classListSubstitute.js
+resources/doubletree/DoubleTree.js
+resources/doubletree/Trie.js
+
 # UTILS
 app/util/Api.js
 app/util/Localization.js
@@ -96,6 +101,7 @@ app/panel/ScatterSet.js
 app/panel/CollocatesSet.js
 app/panel/BubblelinesSet.js
 app/panel/CustomSet.js
+app/panel/WordTree.js
 
 # APPS
 app/VoyantApp.js
