@@ -74,6 +74,13 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		var me = this;
 		var view = me.getViewport()
 		view.mask(this.localize("fetchingCorpus"));
+		if (params.archive) { // fix a few URLs we know about
+			if (Ext.isString(params.archive)) {params.archive=[params.archive]}
+			params.archive = params.archive.map(function(archive) {
+				return archive.replace('/blogs.sub.uni-hamburg.de/hup/lhn/', '/wikis.sub.uni-hamburg.de/lhn/index.php/')
+					.replace('/hup.sub.uni-hamburg.de/', '/wikis.sub.uni-hamburg.de/')
+			})
+		}
 		
 		new Corpus(params).then(function(corpus) {
 			if (corpus.requiresPassword() && !me.getViewport().query("panel").every(function(panel) {

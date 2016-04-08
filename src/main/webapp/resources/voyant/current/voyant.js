@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Apr 08 09:52:55 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Apr 08 17:05:47 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7261,6 +7261,7 @@ Ext.define('Voyant.panel.Contexts', {
 	mixins: ['Voyant.panel.Panel'],
 	requires: ['Voyant.data.store.Contexts'],
 	alias: 'widget.contexts',
+	isConsumptive: true,
     statics: {
     	i18n: {
     		title: {en: "Contexts"},
@@ -7848,6 +7849,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	requires: ['Voyant.data.model.Corpus'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.corpuscreator',
+	isConsumptive: true,
     statics: {
     	i18n: {
     		title: {en: "Add Texts"},
@@ -9627,6 +9629,7 @@ Ext.define('Voyant.panel.Documents', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'/*,'Voyant.util.Localization'*/],
 	alias: 'widget.documents',
+	isConsumptive: true,
     statics: {
     	i18n: {
     		title: {en: "Documents"},
@@ -16341,6 +16344,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph','Voyant.panel.StreamGraph'],
 	mixins: ['Voyant.panel.Panel'],
     alias: 'widget.corpusset',
+	isConsumptive: true,
 	statics: {
 		i18n: {
 			title: {en: "Corpus View"},
@@ -17014,10 +17018,16 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		var me = this;
 		var view = me.getViewport()
 		view.mask(this.localize("fetchingCorpus"));
+		if (params.archive) { // fix a few URLs we know about
+			if (Ext.isString(params.archive)) {params.archive=[params.archive]}
+			params.archive = params.archive.map(function(archive) {
+				return archive.replace('/blogs.sub.uni-hamburg.de/hup/lhn/', '/wikis.sub.uni-hamburg.de/lhn/index.php/')
+					.replace('/hup.sub.uni-hamburg.de/', '/wikis.sub.uni-hamburg.de/')
+			})
+		}
 		
 		new Corpus(params).then(function(corpus) {
 			if (corpus.requiresPassword() && !me.getViewport().query("panel").every(function(panel) {
-					console.warn(!panel.isConsumptive)
 					return !panel.isConsumptive
 				})) {
 				var noPasswordAccess = corpus.getNoPasswordAccess();

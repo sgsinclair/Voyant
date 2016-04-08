@@ -71,7 +71,7 @@ Ext.onReady(function(){
 				    "Some highlights of <a href='docs/#!/guide/new' target='_blank'>what's new</a> include more options for <a href='docs/#!/guide/corpuscreator' target='_blank'>creating</a>, "+
 				    "<a href='docs/#!/guide/modifyingcorpus' target='_blank'>modifying</a> and <a href='docs/#!/guide/corpuscreator-section-access-management' target='_blank'>accessing</a> corpora, "+
 				    "more powerful <a href='docs/#!/guide/search' target='_blank'>search</a> capabilities, "+
-				    "new tools (like <a href='docs/#!/guide/phrases' target='_blank'>Phrases</a>) and tools rewritten in HTML5 (like <a href='docs/#!/guide/cirrus' target='_blank'>Cirrus</a> – no more Flash!), "+
+				    "new tools (like <a href='docs/#!/guide/phrases' target='_blank'>Phrases</a>) and tools rewritten in HTML5 (like <a href='docs/#!/guide/cirrus' target='_blank'>Cirrus</a> - no more Flash!), "+
 				    "as well as significant speed and scale improvements all around.</p>"+
 				    "<p>If you're new to Voyant, you may want to consult our guide to <a href='docs/#!/guide/start' target='_blank'>Getting Started</a>, as well as our companion book <a href='http://https://mitpress.mit.edu/books/hermeneutica' target='_blank'>Hermeneutica: Computer-Assisted Interpretation in the Humanities</a> and site <a href='http://https://mitpress.mit.edu/books/hermeneutica' target='_blank'>Hermeneuti.ca</a>. "+
 				    "You might be interested in "+
