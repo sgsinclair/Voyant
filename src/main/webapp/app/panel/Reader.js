@@ -3,6 +3,7 @@ Ext.define('Voyant.panel.Reader', {
 	requires: ['Voyant.data.store.Tokens'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.reader',
+	isConsumptive: true,
     statics: {
     	i18n: {
     		title: {en: "Reader"},

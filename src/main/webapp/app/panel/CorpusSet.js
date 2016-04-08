@@ -3,6 +3,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph','Voyant.panel.StreamGraph'],
 	mixins: ['Voyant.panel.Panel'],
     alias: 'widget.corpusset',
+	isConsumptive: true,
 	statics: {
 		i18n: {
 			title: {en: "Corpus View"},

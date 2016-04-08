@@ -76,7 +76,9 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		view.mask(this.localize("fetchingCorpus"));
 		
 		new Corpus(params).then(function(corpus) {
-			if (corpus.requiresPassword()) {
+			if (corpus.requiresPassword() && !me.getViewport().query("panel").every(function(panel) {
+					return !panel.isConsumptive
+				})) {
 				var noPasswordAccess = corpus.getNoPasswordAccess();
 				var buttons = [
 				       { text: 'Validate' }

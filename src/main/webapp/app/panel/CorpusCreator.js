@@ -4,6 +4,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	requires: ['Voyant.data.model.Corpus'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.corpuscreator',
+	isConsumptive: true,
     statics: {
     	i18n: {
     		title: {en: "Add Texts"},

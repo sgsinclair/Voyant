@@ -2,6 +2,7 @@ Ext.define('Voyant.panel.Documents', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'/*,'Voyant.util.Localization'*/],
 	alias: 'widget.documents',
+	isConsumptive: true,
     statics: {
     	i18n: {
     		title: {en: "Documents"},

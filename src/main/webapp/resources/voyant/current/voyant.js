@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Apr 08 07:53:43 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Apr 08 09:52:55 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -10982,6 +10982,7 @@ Ext.define('Voyant.panel.Reader', {
 	requires: ['Voyant.data.store.Tokens'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.reader',
+	isConsumptive: true,
     statics: {
     	i18n: {
     		title: {en: "Reader"},
@@ -17015,7 +17016,10 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		view.mask(this.localize("fetchingCorpus"));
 		
 		new Corpus(params).then(function(corpus) {
-			if (corpus.requiresPassword()) {
+			if (corpus.requiresPassword() && !me.getViewport().query("panel").every(function(panel) {
+					console.warn(!panel.isConsumptive)
+					return !panel.isConsumptive
+				})) {
 				var noPasswordAccess = corpus.getNoPasswordAccess();
 				var buttons = [
 				       { text: 'Validate' }

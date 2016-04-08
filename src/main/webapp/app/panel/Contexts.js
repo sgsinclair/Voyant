@@ -3,6 +3,7 @@ Ext.define('Voyant.panel.Contexts', {
 	mixins: ['Voyant.panel.Panel'],
 	requires: ['Voyant.data.store.Contexts'],
 	alias: 'widget.contexts',
+	isConsumptive: true,
     statics: {
     	i18n: {
     		title: {en: "Contexts"},
