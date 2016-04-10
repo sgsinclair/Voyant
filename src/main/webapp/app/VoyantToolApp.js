@@ -1,6 +1,5 @@
 Ext.define('Voyant.VoyantToolApp', {
 	extend : 'Voyant.VoyantCorpusApp',
-	//requires: ['Voyant.panel.*'],
 	name : 'VoyantToolApp',
 	launch: function() {
 		Ext.create('Ext.container.Viewport', {

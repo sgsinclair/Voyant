@@ -9,10 +9,10 @@
 
 <link rel="shortcut icon" type="image/ico" href="<%= base %>/resources/voyant/favicon.ico" />
 
-<!-- EXTJS -->
+<!-- EXTJS 5-->
+<!--
 <script type="text/javascript" src="<%= base %>/resources/ext/current/ext-all.js"></script>
 <script type="text/javascript" src="<%= base %>/resources/ext/current/sencha-charts.js"></script>
-
 <%
 
 String ua=request.getHeader("User-Agent").toLowerCase();
@@ -23,84 +23,13 @@ String touch = ua.matches("(?i).*((android|bb\\d+|meego).+mobile|avantgo|bada\\/
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/current/ext-theme-crisp<%= touch %>/ext-theme-crisp<%= touch %>-all_01.css" />
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/current/ext-theme-crisp<%= touch %>/ext-theme-crisp<%= touch %>-all_02.css" />
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/current/sencha-charts-all.css" />
-<script>
-Ext.layout.container.boxOverflow.Menu.override({
-    createMenuConfig: function (component, hideOnClick) {
-        var config = Ext.apply({}, component.initialConfig),
-        group  = component.toggleGroup;
-
-    Ext.copyTo(config, component, [
-        'iconCls', 'icon', 'itemId', 'disabled', 'handler', 'scope', 'menu', 'tabIndex'
-    ]);
-
-    Ext.applyIf(config, {
-        text: component.overflowText || component.text,
-        hideOnClick: hideOnClick,
-        destroyMenu: false,
-        listeners: null
-    });
-
-    // Clone must have same value, and must sync original's value on change
-    if (component.isFormField) {
-        config.value = component.getValue();
-
-        // Sync the original component's value when the clone changes value.
-        // This intentionally overwrites any developer-configured change listener on the clone.
-        // That's because we monitor the clone's change event, and sync the
-        // original field by calling setValue, so the original field's change
-        // event will still fire.
-        config.listeners = {
-            change: function(c, newVal, oldVal) {                            
-                component.setValue(newVal);
-            },
-            changecomplete: function(slider, newvalue) {
-                component.fireEvent("changecomplete", slider, newvalue);
-            }
-        };
-    }
-
-    // ToggleButtons become CheckItems
-    else if (group || component.enableToggle) {
-        Ext.apply(config, {
-            hideOnClick: false,
-            group: group,
-            checked: component.pressed,
-            handler: function (item, e) {
-                component.onClick(e);
-            }
-        });
-    }
-
-    // Buttons may have their text or icon changed - this must be propagated to the clone in the overflow menu
-    if (component.isButton && !component.changeListenersAdded) {
-        component.on({
-            textchange: this.onButtonAttrChange,
-            iconchange: this.onButtonAttrChange,
-            toggle: this.onButtonToggle
-        });
-        component.changeListenersAdded = true;
-    }
-
-    // Typically margins are used to separate items in a toolbar
-    // but don't really make a lot of sense in a menu, so we strip
-    // them out here.
-    delete config.margin;
-    delete config.ownerCt;
-    delete config.xtype;
-    delete config.id;
-    delete config.itemId;
-    return config;
-    }
-});
-</script>
-<!--
-<script type="text/javascript" src="<%= base %>/resources/ext/6.0.0/ext-all.js"></script>
-<script type="text/javascript" src="<%= base %>/resources/ext/6.0.0/charts.js"></script>
-<script type="text/javascript" src="<%= base %>/resources/ext/6.0.0/theme-crisp.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.0/theme-crisp-all_1.css" />
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.0/theme-crisp-all_2.css" />
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.0/charts-all.css" />
 -->
+<script type="text/javascript" src="<%= base %>/resources/ext/6.0.1/ext-all.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/ext/6.0.1/charts.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.1/charts-all.css" />
+<script type="text/javascript" src="<%= base %>/resources/ext/6.0.1/theme-crisp/theme-crisp.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.1/theme-crisp/resources/theme-crisp-all_1.css" />
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.1/theme-crisp/resources/theme-crisp-all_2.css" />
 
 <!-- jQuery -->
 <script type="text/javascript" src="<%= base %>/resources/jquery/current/jquery.min.js"></script>
