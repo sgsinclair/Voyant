@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Apr 10 15:19:24 EDT 2016 */
+/* This file created by JSCacher. Last modified: Sun Apr 10 16:43:00 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4690,7 +4690,6 @@ Ext.define('Voyant.util.Toolable', {
 	exportToolClick: function(panel) {
 		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
 		var items = window.location.hostname=='beta.voyant-tools.org' ? [{html: "<p class='keyword' style='text-align: center; font-weight: bold; padding: 4px;'>Please note that this is the beta server and you should not count on corpora persisting (for bookmarks, embedding, etc.)."}] : [];
-		debugger
 		items.push({
 	       		xtype: 'radio',
 	       		name: 'export',
@@ -8585,11 +8584,11 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			color: 'white'
 		},
 		color: {
-			background: 'black'/*,
+			background: 'black',
 			hover: {
 				border: '#CB157F',
 				background: '#EB42A5'
-			}*/
+			}
 		}
 	},
     
@@ -8617,6 +8616,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 					glyph: 'xf014@FontAwesome',
                 	handler: function() {
                 		this.getNodeDataSet().clear();
+                		this.getEdgeDataSet().clear();
                 	},
                 	scope: me
                 },this.localize('context'),{
@@ -8782,6 +8782,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     loadFromCorpusCollocateRecords: function(records, keywordId) {
+
     	if (Ext.isArray(records)) {
     		var existingKeys = {};
     		this.getNodeDataSet().forEach(function(item) {
@@ -8837,13 +8838,13 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			
 	    			
 	    			if (!linkExists) {
-	    				newEdges.push({from: keywordId, to: contextNodeKey});
+	    				newEdges.push({from: keywordId, to: contextNodeKey, value: corpusCollocate.getContextTermRawFreq()});
 	    			}
     			}
     		});
     		
     		this.getNodeDataSet().add(newNodes);
-    		edgeDS.add(newEdges);
+    		this.getEdgeDataSet().add(newEdges);
     		
     		this.forceUpdate();
     		
@@ -8978,6 +8979,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			return {id: item.id};
 		});
 		this.getNodeDataSet().update(ids);
+		ids = this.getEdgeDataSet().map(function(edge) {
+			return {id: edge.id}
+		})
+		this.getEdgeDataSet().update(ids);
     },
     
     isOffCanvas: function(d) {

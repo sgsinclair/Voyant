@@ -64,11 +64,11 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			color: 'white'
 		},
 		color: {
-			background: 'black'/*,
+			background: 'black',
 			hover: {
 				border: '#CB157F',
 				background: '#EB42A5'
-			}*/
+			}
 		}
 	},
     
@@ -96,6 +96,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 					glyph: 'xf014@FontAwesome',
                 	handler: function() {
                 		this.getNodeDataSet().clear();
+                		this.getEdgeDataSet().clear();
                 	},
                 	scope: me
                 },this.localize('context'),{
@@ -261,6 +262,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     loadFromCorpusCollocateRecords: function(records, keywordId) {
+
     	if (Ext.isArray(records)) {
     		var existingKeys = {};
     		this.getNodeDataSet().forEach(function(item) {
@@ -316,13 +318,13 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			
 	    			
 	    			if (!linkExists) {
-	    				newEdges.push({from: keywordId, to: contextNodeKey});
+	    				newEdges.push({from: keywordId, to: contextNodeKey, value: corpusCollocate.getContextTermRawFreq()});
 	    			}
     			}
     		});
     		
     		this.getNodeDataSet().add(newNodes);
-    		edgeDS.add(newEdges);
+    		this.getEdgeDataSet().add(newEdges);
     		
     		this.forceUpdate();
     		
@@ -457,6 +459,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			return {id: item.id};
 		});
 		this.getNodeDataSet().update(ids);
+		ids = this.getEdgeDataSet().map(function(edge) {
+			return {id: edge.id}
+		})
+		this.getEdgeDataSet().update(ids);
     },
     
     isOffCanvas: function(d) {

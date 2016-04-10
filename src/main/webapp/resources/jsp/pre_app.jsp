@@ -42,8 +42,8 @@ String touch = ua.matches("(?i).*((android|bb\\d+|meego).+mobile|avantgo|bada\\/
 <script type="text/javascript" src="<%= base %>/resources/cirrus/html5/d3.layout.cloud.js"></script>
 
 <!-- vis.js -->
-<script type="text/javascript" src="<%= base %>/resources/visjs/vis.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/visjs/vis.css" />
+<script type="text/javascript" src="<%= base %>/resources/visjs/vis.min.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/visjs/vis.min.css" />
 
 <!-- FontAwesome -->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/fontawesome/current/css/font-awesome.min.css" />
