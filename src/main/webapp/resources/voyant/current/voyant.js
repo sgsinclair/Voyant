@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Apr 10 13:30:17 EDT 2016 */
+/* This file created by JSCacher. Last modified: Sun Apr 10 15:19:24 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -10722,7 +10722,7 @@ Ext.define('Voyant.panel.Knots', {
 			limit: 21
 		});
 		
-		data = [data]; // make an array for the event dispatch
+		data = [data].map(function(item) {return item.term}); // make an array for the event dispatch
 		this.getApplication().dispatchEvent('termsClicked', this, data);
 	}
 });
@@ -14047,8 +14047,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
-        			renderer: function (storeItem, item) {
-        				this.setHtml(that.tokenFreqTipTemplate.apply([storeItem.get('term'),storeItem.get('rawFreq'),storeItem.get('relativeFreq')]));
+        			renderer: function (toolTip, record, ctx) {
+        				toolTip.setHtml(that.tokenFreqTipTemplate.apply([record.get('term'),record.get('rawFreq'),record.get('relativeFreq')]));
         			}
         		},
         		marker: {
@@ -14063,7 +14063,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     				var item = store.getAt(index);
     				if (item !== null) {
 	    				var clusterIndex = item.get('cluster');
-	    				var scatterplot = this.getParent().up('scatterplot');
+	    				var scatterplot = that;
 	    				
 	    				if (clusterIndex === -1) {
 	    					// no clusters were specified in initial call
@@ -14082,7 +14082,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				var radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
 	    				config.radius = radius;
     				}
-    			}
+    			},
+    			scope: this
         	},{
         		type: 'customScatter',
         		xField: 'x',
@@ -14091,8 +14092,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
-        			renderer: function (storeItem, item) {
-        				this.setHtml(that.docFreqTipTemplate.apply([storeItem.get('title'),storeItem.get('rawFreq')]));
+        			renderer: function (toolTip, record, ctx) {
+        				toolTip.setHtml(that.docFreqTipTemplate.apply([record.get('title'),record.get('rawFreq')]));
         			}
         		},
         		marker: {
@@ -14107,7 +14108,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     				var item = store.getAt(index);
     				if (item !== null) {
 	    				var clusterIndex = item.get('cluster');
-	    				var scatterplot = this.getParent().up('scatterplot');
+	    				var scatterplot = that;
 	    				
 	    				if (clusterIndex === -1 || scatterplot.getApiParam('analysis') !== 'docSim') {
 	    					// no clusters were specified in initial call
@@ -14124,7 +14125,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
 
 	    				config.radius = 5;
     				}
-    			}
+    			},
+    			scope: this
+        		
+        		
         	}],
         	listeners: {
         		itemclick: function(chart, item, event) {
@@ -14569,7 +14573,6 @@ Ext.define('Voyant.panel.StreamGraph', {
         
         this.on('boxready', this.initGraph, this);
         
-    	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
         me.callParent(arguments);
     },
     
@@ -17735,15 +17738,15 @@ Ext.define('Voyant.panel.TermsRadio', {
                 tooltip: {
                     trackMouse: true,
                     style: 'background: #fff',
-                    renderer: function(storeItem, item) {
-                    	var html = "<i>"+item.series.getTitle()+"</i>: "+storeItem.get(item.series.getYField());
-                    	if (mode==this.panel.MODE_CORPUS) {
-                    		var corpus = this.panel.getCorpus();
-                    		if (corpus && corpus.getDocumentsCount() == storeItem.store.getCount()) {
-                    			html += '<br/><i>'+this.panel.getCorpus().getDocument(item.index).getShortTitle()+"</i>";
+                    renderer: function(toolTip, record, item) {
+                    	var html = "<i>"+item.series.getTitle()+"</i>: "+record.get(item.series.getYField());
+                    	if (mode==toolTip.panel.MODE_CORPUS) {
+                    		var corpus = toolTip.panel.getCorpus();
+                    		if (corpus && corpus.getDocumentsCount() == record.store.getCount()) {
+                    			html += '<br/><i>'+toolTip.panel.getCorpus().getDocument(item.index).getShortTitle()+"</i>";
                     		}
                     	}
-                    	this.setHtml(html);
+                    	toolTip.setHtml(html);
                     },
                     panel: this
                 },

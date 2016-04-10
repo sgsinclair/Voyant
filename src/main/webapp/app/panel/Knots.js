@@ -577,7 +577,7 @@ Ext.define('Voyant.panel.Knots', {
 			limit: 21
 		});
 		
-		data = [data]; // make an array for the event dispatch
+		data = [data].map(function(item) {return item.term}); // make an array for the event dispatch
 		this.getApplication().dispatchEvent('termsClicked', this, data);
 	}
 });

@@ -338,15 +338,15 @@
                 tooltip: {
                     trackMouse: true,
                     style: 'background: #fff',
-                    renderer: function(storeItem, item) {
-                    	var html = "<i>"+item.series.getTitle()+"</i>: "+storeItem.get(item.series.getYField());
-                    	if (mode==this.panel.MODE_CORPUS) {
-                    		var corpus = this.panel.getCorpus();
-                    		if (corpus && corpus.getDocumentsCount() == storeItem.store.getCount()) {
-                    			html += '<br/><i>'+this.panel.getCorpus().getDocument(item.index).getShortTitle()+"</i>";
+                    renderer: function(toolTip, record, item) {
+                    	var html = "<i>"+item.series.getTitle()+"</i>: "+record.get(item.series.getYField());
+                    	if (mode==toolTip.panel.MODE_CORPUS) {
+                    		var corpus = toolTip.panel.getCorpus();
+                    		if (corpus && corpus.getDocumentsCount() == record.store.getCount()) {
+                    			html += '<br/><i>'+toolTip.panel.getCorpus().getDocument(item.index).getShortTitle()+"</i>";
                     		}
                     	}
-                    	this.setHtml(html);
+                    	toolTip.setHtml(html);
                     },
                     panel: this
                 },

@@ -601,8 +601,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
-        			renderer: function (storeItem, item) {
-        				this.setHtml(that.tokenFreqTipTemplate.apply([storeItem.get('term'),storeItem.get('rawFreq'),storeItem.get('relativeFreq')]));
+        			renderer: function (toolTip, record, ctx) {
+        				toolTip.setHtml(that.tokenFreqTipTemplate.apply([record.get('term'),record.get('rawFreq'),record.get('relativeFreq')]));
         			}
         		},
         		marker: {
@@ -617,7 +617,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     				var item = store.getAt(index);
     				if (item !== null) {
 	    				var clusterIndex = item.get('cluster');
-	    				var scatterplot = this.getParent().up('scatterplot');
+	    				var scatterplot = that;
 	    				
 	    				if (clusterIndex === -1) {
 	    					// no clusters were specified in initial call
@@ -636,7 +636,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				var radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
 	    				config.radius = radius;
     				}
-    			}
+    			},
+    			scope: this
         	},{
         		type: 'customScatter',
         		xField: 'x',
@@ -645,8 +646,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
-        			renderer: function (storeItem, item) {
-        				this.setHtml(that.docFreqTipTemplate.apply([storeItem.get('title'),storeItem.get('rawFreq')]));
+        			renderer: function (toolTip, record, ctx) {
+        				toolTip.setHtml(that.docFreqTipTemplate.apply([record.get('title'),record.get('rawFreq')]));
         			}
         		},
         		marker: {
@@ -661,7 +662,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     				var item = store.getAt(index);
     				if (item !== null) {
 	    				var clusterIndex = item.get('cluster');
-	    				var scatterplot = this.getParent().up('scatterplot');
+	    				var scatterplot = that;
 	    				
 	    				if (clusterIndex === -1 || scatterplot.getApiParam('analysis') !== 'docSim') {
 	    					// no clusters were specified in initial call
@@ -678,7 +679,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
 
 	    				config.radius = 5;
     				}
-    			}
+    			},
+    			scope: this
+        		
+        		
         	}],
         	listeners: {
         		itemclick: function(chart, item, event) {

@@ -180,7 +180,6 @@ Ext.define('Voyant.panel.StreamGraph', {
         
         this.on('boxready', this.initGraph, this);
         
-    	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
         me.callParent(arguments);
     },
     
