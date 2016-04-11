@@ -71,6 +71,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			}
 		}
 	},
+	keywordColor: 'green',
+	contextColor: 'maroon',
     
     constructor: function(config) {
 
@@ -262,69 +264,75 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     loadFromCorpusCollocateRecords: function(records, keywordId) {
-
     	if (Ext.isArray(records)) {
+    		var start = this.getApiParam('limit');
+    		var nodeDS = this.getNodeDataSet();
+    		var edgeDS = this.getEdgeDataSet();
     		var existingKeys = {};
-    		this.getNodeDataSet().forEach(function(item) {
+    		nodeDS.forEach(function(item) {
     			existingKeys[item.id] = true;
     		});
     		var newNodes = [];
     		var newEdges = [];
-    		var edgeDS = this.getEdgeDataSet();
     		
-    		var start = this.getApiParam('limit');
-    		records.forEach(function(corpusCollocate) {
-    			if (corpusCollocate.getContextTerm() != corpusCollocate.getTerm()) {
-    				if (keywordId === undefined) {
-		    			var keywordNode = {
-		    				id: corpusCollocate.getKeyword()+".keyword",
-	    					label: corpusCollocate.getKeyword(),
-	    					title: corpusCollocate.getKeyword()+' ('+corpusCollocate.getKeywordRawFreq()+')',
+    		records.forEach(function(corpusCollocate, index) {
+    			var term = corpusCollocate.getTerm();
+    			var contextTerm = corpusCollocate.getContextTerm();
+    			var termFreq = corpusCollocate.getKeywordRawFreq();
+    			var contextFreq = corpusCollocate.getContextTermRawFreq();
+    			
+    			if (index == 0) { // only process keyword once
+    				if (keywordId === undefined) keywordId = term;
+	    			if (existingKeys[keywordId] !== undefined) {
+	    				nodeDS.update({id: keywordId, value: termFreq, title: term+' ('+termFreq+')', type: 'keyword', font: {color: this.keywordColor}});
+	    			} else {
+	    				existingKeys[keywordId] = true;
+	    				newNodes.push({
+		    				id: term,
+	    					label: term,
+	    					title: term+' ('+termFreq+')',
 	    					type: 'keyword',
-	    					value: corpusCollocate.getKeywordRawFreq(),
+	    					value: termFreq,
 	    					start: start,
-	    					font: {/*size: scaleFont(n.rawFreq),*/ color: 'green'}
-						};
-		    			keywordId = keywordNode.id;
-		    			if (existingKeys[keywordId] !== undefined) {
-		    			} else {
-		    				existingKeys[keywordId] = true;
-		    				newNodes.push(keywordNode);
-		    			}
-    				}
-	    			
-	    			var contextNode = {
-	    				id: corpusCollocate.getContextTerm()+".context",
-    					label: corpusCollocate.getContextTerm(),
-    					title: corpusCollocate.getContextTerm()+' ('+corpusCollocate.getContextTermRawFreq()+')',
-    					type: 'context',
-    					value: corpusCollocate.getContextTermRawFreq(),
-    					start: 0,
-    					font: {/*size: scaleFont(n.rawFreq),*/ color: 'maroon'}
-					};
-	    			var contextNodeKey = contextNode.id;
+	    					font: {color: this.keywordColor}
+						});
+	    			}
+				}
+    			
+    			if (term != contextTerm) {
+	    			var contextNodeKey = contextTerm;
 	    			if (existingKeys[contextNodeKey] !== undefined) {
 	    			} else {
-	    				existingKeys[contextNodeKey] = true;
-	    				newNodes.push(contextNode);
+	    				existingKeys[contextNodeKey] = true; 
+	    				newNodes.push({
+    	    				id: contextTerm,
+        					label: contextTerm,
+        					title: contextTerm+' ('+contextFreq+')',
+        					type: 'context',
+        					value: contextFreq,
+        					start: 0,
+        					font: {color: this.contextColor}
+    					});
 	    			}
 	    			
-	    			var linkExists = false;
+	    			var existingLink = null;
 	    			edgeDS.forEach(function(item) {
 	    				if ((item.from == keywordId && item.to == contextNodeKey) || (item.from == contextNodeKey && item.to == keywordId)) {
-	    					linkExists = true;
+	    					existingLink = item;
 	    				}
 	    			});
 	    			
-	    			
-	    			if (!linkExists) {
-	    				newEdges.push({from: keywordId, to: contextNodeKey, value: corpusCollocate.getContextTermRawFreq()});
+	    			var linkValue = corpusCollocate.getContextTermRawFreq();
+	    			if (existingLink === null) {
+	    				newEdges.push({from: keywordId, to: contextNodeKey, value: linkValue});
+	    			} else if (existingLink.value < linkValue) {
+    					edgeDS.update({id: existingLink.id, value: linkValue});
 	    			}
     			}
-    		});
+    		}, this);
     		
-    		this.getNodeDataSet().add(newNodes);
-    		this.getEdgeDataSet().add(newEdges);
+    		nodeDS.add(newNodes);
+    		edgeDS.add(newEdges);
     		
     		this.forceUpdate();
     		
@@ -350,9 +358,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    		physics: {
 					barnesHut: {
 						"gravitationalConstant": -1500,
-					      "centralGravity": 6,
-					      "damping": 0.5,
-					      "avoidOverlap": 0.5
+						"centralGravity": 6,
+						"damping": 0.5,
+						"avoidOverlap": 0.5
 					}
 	    		},
 	    		nodes: this.nodeOptions,
@@ -473,12 +481,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	var limit = this.getApiParam('limit');
     	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	corpusCollocates.load({
-    		params: Ext.apply(this.getApiParams(), {query: d.label, start: d.start, limit: limit}),
+    		params: Ext.apply(this.getApiParams(), {query: d.id, start: d.start, limit: limit}),
     		callback: function(records, operation, success) {
     			if (success) {
     	    		this.getNodeDataSet().update({id: d.id, start: d.start+limit});
     	    		
-	    			var keywordNodeKey = d.label;
+	    			var keywordNodeKey = d.id;
 	    			
     	    		this.loadFromCorpusCollocateRecords(records, keywordNodeKey);
     			}
