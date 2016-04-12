@@ -165,13 +165,15 @@ Ext.define('Voyant.panel.DToC.Index', {
 			    	}
 			    }, '->', {
 			        text: 'Filter by Chapter',
-			        itemId: 'chapterFilter',
+			        itemId: 'indexChapterFilter',
 			        menu: {
 	                    items: [],
 	                    plain: true,
 	                    showSeparator: false,
 	                    listeners: {
-	                    	click: this.chapterFilterHandler,
+	                    	click: function(menu, item) {
+	                    		this.doChapterFilter(item.initialConfig.docId, true);
+	                    	},
 	                    	scope: this
 	                    }
 	                }
@@ -210,6 +212,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 //			var selNodes = sm.getSelection();
 //			sm.clearSelections();
 //			sm.select(selNodes, null, true);
+		},
+		chapterFilterSelected: function(src, docId) {
+			this.doChapterFilter(docId, false);
 		}
 	},
 	
@@ -260,7 +265,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 	},
 	
 	updateChapterFilter: function() {
-	    var menu = this.getDockedItems('toolbar #chapterFilter')[0].menu;
+	    var menu = this.down('#indexChapterFilter').getMenu();
 	    menu.removeAll();
 	    
 	    var docs = this.getCorpus().getDocuments();
@@ -269,22 +274,31 @@ Ext.define('Voyant.panel.DToC.Index', {
     		menu.add({
 	            xtype: 'menucheckitem',
 	            docId: doc.getId(),
-	            group: 'chapters',
+	            group: 'indexchapters',
 	            text: doc.getShortTitle()
 	        });
 		}
 	},
 	
-	chapterFilterHandler: function(menu, item) {
-		if (this.currentChapterFilter !== null && item.getId() === this.currentChapterFilter) {
+	doChapterFilter: function(docId, local) {
+		var menuItem;
+		this.down('#indexChapterFilter').getMenu().items.each(function(item) {
+			if (item.initialConfig.docId === docId) {
+				menuItem = item;
+			} else {
+				item.setChecked(false);
+			}
+		}, this);
+		
+		if (docId === null || docId === this.currentChapterFilter) {
 			this.currentChapterFilter = null;
-			item.setChecked(false);
 			this.collapseAll();
 			this.getStore().clearFilter();
+			docId = null;
 		} else {
-			this.currentChapterFilter = item.getId();
-	        var docId = item.initialConfig.docId;
-	        this.getStore().clearFilter();
+			menuItem.setChecked(true);
+			this.currentChapterFilter = docId;
+			this.getStore().clearFilter();
 	        this.getStore().filterBy(function(record, id) {
 	            var t = record.getData().targets || [];
 	            for (var i = 0; i < t.length; i++) {
@@ -296,6 +310,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 	                return false;
 	            }
 	        }, this);
+		}
+		if (local) {
+			this.getApplication().dispatchEvent('chapterFilterSelected', this, docId);
 		}
 	},
 	
@@ -318,6 +335,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 				var items = Ext.DomQuery.select('div/list/item', indexDoc);
 				if (items.length == 0) {
 					this.showError({title: 'DToC Indexer', message:'No index items were found!'});
+					this.body.unmask();
 				} else {
 //					var root = this.getRootNode();
 					var rootConfig = {
