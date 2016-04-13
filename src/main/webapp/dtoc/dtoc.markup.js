@@ -476,6 +476,7 @@ Ext.define('Voyant.panel.DToC.Markup', {
         Ext.apply(me, {
     		title: me.localize('title'),
             store : tagStore,
+            deferRowRender: true,
             viewConfig: {
             	markDirty: false
             },
@@ -505,13 +506,15 @@ Ext.define('Voyant.panel.DToC.Markup', {
 			    	}
 			    }, '->', {
                     text: 'Filter by Chapter',
-                    itemId: 'chapterFilter',
+                    itemId: 'markupChapterFilter',
                     menu: {
                         items: [],
                         plain: true,
                         showSeparator: false,
                         listeners: {
-                            click:  this.chapterFilterHandler,
+                            click:  function(menu, item) {
+                            	this.doChapterFilter(item.initialConfig.docId, true);
+                            },
                             scope: this
                         }
                     }
@@ -529,7 +532,7 @@ Ext.define('Voyant.panel.DToC.Markup', {
     
     handleSelections: function(selections) {
 	    var docIdFilter;
-	    this.getDockedItems('toolbar #chapterFilter')[0].menu.items.each(function(item) {
+	    this.down('#markupChapterFilter').getMenu().items.each(function(item) {
 	        if (item.checked) {
 	            docIdFilter = item.initialConfig.docId;
 	            return false;
@@ -557,7 +560,7 @@ Ext.define('Voyant.panel.DToC.Markup', {
 	},
     
 	updateChapterFilter: function() {
-	    var menu = this.getDockedItems('toolbar #chapterFilter')[0].menu;
+	    var menu = this.down('#markupChapterFilter').getMenu();
 	    menu.removeAll();
 	    
 	    var docs = this.getCorpus().getDocuments();
@@ -566,14 +569,14 @@ Ext.define('Voyant.panel.DToC.Markup', {
     		menu.add({
 	            xtype: 'menucheckitem',
 	            docId: doc.getId(),
-	            group: 'chapters',
+	            group: 'markupchapters',
 	            text: doc.getShortTitle()
 	        });
 		}
 	},
 	
 	textFilterHandler: function() {
-		var value = this.getDockedItems('toolbar #filter')[0].getValue();
+		var value = this.down('#filter').getValue();
 		if (value == '') {
 			this.getStore().clearFilter();
 		} else {
@@ -584,13 +587,21 @@ Ext.define('Voyant.panel.DToC.Markup', {
 		}
 	},
 	
-	chapterFilterHandler: function(menu, item) {
-		var textFilter = this.getDockedItems('toolbar #filter')[0].getValue();
+	doChapterFilter: function(docId, local) {
+		var menuItem;
+		this.down('#markupChapterFilter').getMenu().items.each(function(item) {
+			if (item.initialConfig.docId === docId) {
+				menuItem = item;
+			} else {
+				item.setChecked(false);
+			}
+		}, this);
+		
+		var textFilter = this.down('#filter').getValue();
 		var regex = new RegExp('.*'+textFilter+'.*', 'i');
 		
-		if (this.currentChapterFilter !== null && item.getId() === this.currentChapterFilter) {
+		if (docId === null || docId === this.currentChapterFilter) {
 			this.currentChapterFilter = null;
-			item.setChecked(false);
 			this.getStore().clearFilter();
 			this.getStore().each(function(record) {
 				var freqTotal = this.tagTotals[record.get('tagName')].freq;
@@ -599,9 +610,10 @@ Ext.define('Voyant.panel.DToC.Markup', {
 			if (textFilter != '') {
 				this.textFilterHandler();
 			}
+			docId = null;
 		} else {
-			this.currentChapterFilter = item.getId();
-	        var docId = item.initialConfig.docId;
+			menuItem.setChecked(true);
+			this.currentChapterFilter = docId;
 	        var docTags = this.savedTags[docId];
 	        this.getStore().clearFilter();
 	        this.getStore().filterBy(function(record, id) {
@@ -616,6 +628,9 @@ Ext.define('Voyant.panel.DToC.Markup', {
 				}
 				return false;
 	        }, this);
+		}
+		if (local) {
+			this.getApplication().dispatchEvent('chapterFilterSelected', this, docId);
 		}
 	},
 	
@@ -632,6 +647,9 @@ Ext.define('Voyant.panel.DToC.Markup', {
 		},
 		indexProcessed: function() {
 			this.loadAllTags();
+		},
+		chapterFilterSelected: function(src, docId) {
+			this.doChapterFilter(docId, false);
 		}
 	}
 });

@@ -516,7 +516,7 @@ Ext.define('Voyant.tool.DToC.AnnotatorBridge', {
 				var header = Ext.getCmp('header');
 				header.setHeight(header.getHeight() + paddingTop);
 				header.body.first().setStyle('marginTop', paddingTop+'px');
-				this.getApplication().getViewport().doLayout(false, true);
+				this.getApplication().getViewport().updateLayout();
 				
 				this.adjustForToolbar = false;
 			}
