@@ -15,6 +15,14 @@ Ext.define('Voyant.data.model.Document', {
              {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data;}}
     ],
     
+    getLexicalTokensCount: function() {
+    	return this.get('tokensCount-lexical')
+    },
+    
+    getLexicalTypeTokenRatio: function() {
+    	return this.get('typeTokenRatio-lexical')
+    },
+    
     getDocumentTerms: function(config) {
     	config = config || {};
     	Ext.apply(config, {

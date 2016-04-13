@@ -73,7 +73,18 @@ a {
  *************************/
 
 /* Summary */
+.corpus-summary .section {
+    margin-top: 1em;
+}
+.corpus-summary .header .x-autocontainer-innerCt {
+    font-weight: bold; padding-right: 1em;
+}
 
+.corpus-summary ul, .corpus-summary ol {
+    margin-top: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0;
+}
+
+/*
 .corpus-summary .x-autocontainer-innerCt {
 	padding: 10px;
 }
@@ -91,6 +102,7 @@ a {
 	padding: 0;
     margin: 0 0 0 10px;
 }
+*/
 
 /* Reader */
 

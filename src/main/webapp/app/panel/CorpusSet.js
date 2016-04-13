@@ -30,9 +30,10 @@ Ext.define('Voyant.panel.CorpusSet', {
     	tabBarHeaderPosition: 0,
     	items: [{
 	    	xtype: 'cirrus'
-    		
     	},{
 	    	xtype: 'corpusterms'
+    	}, {
+    		xtype: 'collocatesgraph'
     	}]
     },{
         region: 'center',
@@ -54,9 +55,7 @@ Ext.define('Voyant.panel.CorpusSet', {
         items: [{
 	    	xtype: 'trends'
         },{
-	    	xtype: 'collocatesgraph'
-        },{
-	    	xtype: 'corpuscollocates'
+	    	xtype: 'documentterms'
         }]
     }, {
     	region: 'south',
