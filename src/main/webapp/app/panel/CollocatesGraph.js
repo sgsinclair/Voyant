@@ -428,6 +428,15 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    	
 	    	network.on('click', function(params) {
 	    		this.getContextMenu().hide();
+	    		if (params) {
+	    			var nodes = this.getNodeDataSet();
+	    			if (params.nodes && params.nodes.length>0) {
+		    			this.dispatchEvent("termsClicked", this, [nodes.get(params.nodes[0]).label])
+		    		} else if (params.edges && params.edges.length>0) {
+		    			var edge = this.getEdgeDataSet().get(params.edges[0]);
+		    			this.dispatchEvent("termsClicked", this, ['"'+nodes.get(edge.from).label+' '+nodes.get(edge.to).label+'"~'+this.getApiParam('context')])
+		    		}
+	    		}
 	    	}.bind(this));
 	    	
 	    	network.on('doubleClick', function(params) {

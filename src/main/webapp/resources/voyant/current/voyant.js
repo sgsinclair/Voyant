@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 14 14:20:32 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 14 14:32:15 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8916,6 +8916,15 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    	
 	    	network.on('click', function(params) {
 	    		this.getContextMenu().hide();
+	    		if (params) {
+	    			var nodes = this.getNodeDataSet();
+	    			if (params.nodes && params.nodes.length>0) {
+		    			this.dispatchEvent("termsClicked", this, [nodes.get(params.nodes[0]).label])
+		    		} else if (params.edges && params.edges.length>0) {
+		    			var edge = this.getEdgeDataSet().get(params.edges[0]);
+		    			this.dispatchEvent("termsClicked", this, ['"'+nodes.get(edge.from).label+' '+nodes.get(edge.to).label+'"~'+this.getApiParam('context')])
+		    		}
+	    		}
 	    	}.bind(this));
 	    	
 	    	network.on('doubleClick', function(params) {
