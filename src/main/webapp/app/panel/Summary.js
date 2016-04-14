@@ -246,7 +246,8 @@ Ext.define('Voyant.panel.Summary', {
     				me.getCorpus().getCorpusTerms().load({
     					params: {
     						limit: me.getApiParam('limit'),
-    						stopList: me.getApiParam('stopList')
+    						stopList: me.getApiParam('stopList'),
+    						forTool: this.xtype
     					},
     					callback: function(records, operation, success) {
     						if (success && records && records.length>0) {
@@ -305,7 +306,8 @@ Ext.define('Voyant.panel.Summary', {
     					limit: numberOfDocumentsForDistinctiveWords*parseInt(this.getApiParam("limit")),
 						stopList: this.getApiParam('stopList'),
     					sort: 'TFIDF',
-    					dir: 'DESC'
+    					dir: 'DESC',
+    					forTool: this.xtype
     				},
     				scope: this,
     				callback: function(records, operation, success) {

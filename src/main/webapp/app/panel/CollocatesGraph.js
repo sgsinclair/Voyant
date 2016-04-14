@@ -228,21 +228,21 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     loadFromQuery: function(query) {
-    	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	this.setApiParams({
     		mode: 'corpus'
     	});
     	var params = this.getApiParams();
-    	params.query = query;
-    	corpusCollocates.load({
-    		params: params,
-    		callback: function(records, operations, success) {
-    			if (success) {
-    				this.loadFromCorpusCollocateRecords(records);
-    			}
-    		},
-    		scope: this
-    	});
+    	(Ext.isString(query) ? [query] : query).forEach(function(q) {
+        	this.getCorpus().getCorpusCollocates({autoLoad: false}).load({
+        		params: Ext.apply(Ext.clone(params), {query: q}),
+        		callback: function(records, operations, success) {
+        			if (success) {
+        				this.loadFromCorpusCollocateRecords(records);
+        			}
+        		},
+        		scope: this
+        	});
+    	}, this)
     },
     
     loadFromCorpusTermRecords: function(corpusTerms) {
@@ -251,16 +251,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		corpusTerms.forEach(function(corpusTerm) {
     			terms.push(corpusTerm.getTerm());
     		});
-    		this.loadFromCorpusTermStringsArray(terms);
+    		this.loadFromQuery(terms);
     	}
-    },
-    
-    loadFromCorpusTermStringsArray: function(corpusTermStringsArray) {
-    	corpusTermStringsArray.forEach(function(query) {this.loadFromQuery(query)}, this)
-    	this.setApiParams({
-    		query: corpusTermStringsArray,
-    		mode: 'corpus'
-    	});
     },
     
     loadFromCorpusCollocateRecords: function(records, keywordId) {

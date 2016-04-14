@@ -26,7 +26,8 @@ Ext.define('Voyant.panel.DocumentTerms', {
     		stopList: 'auto',
     		query: undefined,
     		docId: undefined,
-    		docIndex: undefined
+    		docIndex: undefined,
+    		bins: 10
     	},
 		glyph: 'xf0ce@FontAwesome'
     },

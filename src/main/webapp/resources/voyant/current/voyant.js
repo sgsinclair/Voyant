@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Apr 13 15:14:48 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 14 13:12:42 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8756,21 +8756,21 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     loadFromQuery: function(query) {
-    	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	this.setApiParams({
     		mode: 'corpus'
     	});
     	var params = this.getApiParams();
-    	params.query = query;
-    	corpusCollocates.load({
-    		params: params,
-    		callback: function(records, operations, success) {
-    			if (success) {
-    				this.loadFromCorpusCollocateRecords(records);
-    			}
-    		},
-    		scope: this
-    	});
+    	(Ext.isString(query) ? [query] : query).forEach(function(q) {
+        	this.getCorpus().getCorpusCollocates({autoLoad: false}).load({
+        		params: Ext.apply(Ext.clone(params), {query: q}),
+        		callback: function(records, operations, success) {
+        			if (success) {
+        				this.loadFromCorpusCollocateRecords(records);
+        			}
+        		},
+        		scope: this
+        	});
+    	}, this)
     },
     
     loadFromCorpusTermRecords: function(corpusTerms) {
@@ -8779,16 +8779,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		corpusTerms.forEach(function(corpusTerm) {
     			terms.push(corpusTerm.getTerm());
     		});
-    		this.loadFromCorpusTermStringsArray(terms);
+    		this.loadFromQuery(terms);
     	}
-    },
-    
-    loadFromCorpusTermStringsArray: function(corpusTermStringsArray) {
-    	corpusTermStringsArray.forEach(function(query) {this.loadFromQuery(query)}, this)
-    	this.setApiParams({
-    		query: corpusTermStringsArray,
-    		mode: 'corpus'
-    	});
     },
     
     loadFromCorpusCollocateRecords: function(records, keywordId) {
@@ -11053,7 +11045,8 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	},
     	api: {
     		stopList: 'auto',
-    		query: undefined
+    		query: undefined,
+    		maxBins: 100
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
@@ -11073,7 +11066,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
         var store = Ext.create("Voyant.data.store.CorpusTermsBuffered", {
         	parentPanel: this,
         	proxy: {
-        		extraParams: {withDistributions: 'relative'}
+        		extraParams: {withDistributions: 'relative', forTool: this.xtype}
         	}
         });
         
@@ -11170,6 +11163,9 @@ Ext.define('Voyant.panel.CorpusTerms', {
         
     	me.on('loadedCorpus', function(src, corpus) {
 //    		this.setApiParam('query', undefined);
+    		if (corpus.getDocumentsCount()>100) {
+    			this.getStore().getProxy().setExtraParam('bins', this.getApiParam('maxBins'));
+    		}
     		this.getStore().loadPage(1);
     	}, me);
     	
@@ -11212,7 +11208,8 @@ Ext.define('Voyant.panel.DocumentTerms', {
     		stopList: 'auto',
     		query: undefined,
     		docId: undefined,
-    		docIndex: undefined
+    		docIndex: undefined,
+    		bins: 10
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
@@ -14619,7 +14616,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 		    	}
 		    },
 		    scope: this,
-		    params: this.getApiParams(['limit','stopList','query','withDistributions'])
+		    params: this.getApiParams(['limit','stopList','query','withDistributions','bins'])
     	});
     },
     
@@ -15061,7 +15058,8 @@ Ext.define('Voyant.panel.Summary', {
     				me.getCorpus().getCorpusTerms().load({
     					params: {
     						limit: me.getApiParam('limit'),
-    						stopList: me.getApiParam('stopList')
+    						stopList: me.getApiParam('stopList'),
+    						forTool: this.xtype
     					},
     					callback: function(records, operation, success) {
     						if (success && records && records.length>0) {
@@ -15120,7 +15118,8 @@ Ext.define('Voyant.panel.Summary', {
     					limit: numberOfDocumentsForDistinctiveWords*parseInt(this.getApiParam("limit")),
 						stopList: this.getApiParam('stopList'),
     					sort: 'TFIDF',
-    					dir: 'DESC'
+    					dir: 'DESC',
+    					forTool: this.xtype
     				},
     				scope: this,
     				callback: function(records, operation, success) {

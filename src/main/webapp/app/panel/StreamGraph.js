@@ -205,7 +205,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 		    	}
 		    },
 		    scope: this,
-		    params: this.getApiParams(['limit','stopList','query','withDistributions'])
+		    params: this.getApiParams(['limit','stopList','query','withDistributions','bins'])
     	});
     },
     

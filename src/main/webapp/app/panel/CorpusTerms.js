@@ -19,7 +19,8 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	},
     	api: {
     		stopList: 'auto',
-    		query: undefined
+    		query: undefined,
+    		maxBins: 100
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
@@ -39,7 +40,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
         var store = Ext.create("Voyant.data.store.CorpusTermsBuffered", {
         	parentPanel: this,
         	proxy: {
-        		extraParams: {withDistributions: 'relative'}
+        		extraParams: {withDistributions: 'relative', forTool: this.xtype}
         	}
         });
         
@@ -136,6 +137,9 @@ Ext.define('Voyant.panel.CorpusTerms', {
         
     	me.on('loadedCorpus', function(src, corpus) {
 //    		this.setApiParam('query', undefined);
+    		if (corpus.getDocumentsCount()>100) {
+    			this.getStore().getProxy().setExtraParam('bins', this.getApiParam('maxBins'));
+    		}
     		this.getStore().loadPage(1);
     	}, me);
     	
