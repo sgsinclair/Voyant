@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 14 13:12:42 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 14 14:20:32 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5842,15 +5842,9 @@ Ext.define('Voyant.data.store.DocumentTermsBuffered', {
 	}
 });
 
-Ext.define("Voyant.data.store.Documents", {
-	extend: 'Ext.data.Store',
+Ext.define('Voyant.data.store.DocumentsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
-	model: "Voyant.data.model.Document",
-	// mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    // embeddable: ['Voyant.panel.Documents'],
-	config: {
-		corpus: undefined
-	},
+    model: 'Voyant.data.model.Document',
     statics: {
     	i18n: {
     		failedGetDocuments: {en: 'Failed attempt to get documents.'}
@@ -5862,82 +5856,48 @@ Ext.define("Voyant.data.store.Documents", {
 	},
 	remoteSort: true,
 	constructor : function(config) {
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-//			pagePurgeCount: 0,
-//			pageSize: 1000,
-//			leadingBufferZone: 100,
-		     proxy: {
-		         type: 'ajax',
-		         url: Voyant.application.getTromboneUrl(),
-		         extraParams: {
-		        	 tool: 'corpus.DocumentsMetadata',
-		        	 corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'documentsMetadata.documents',
-		             totalProperty: 'documentsMetadata.total'
-		         },
-		         simpleSortMode: true
-		     },
-	         listeners: {
-	        	 load: function(store, records, successful, opts) {
-	        		 if (successful) {
-		        		 var corpus = store.getCorpus();
-		        		 records.forEach(function(record) {
-		        			 record.set('corpus', corpus);
-		        		 });
-	        		 }
-	        	 }
-	         }
-		});
-    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
-		this.callParent([config]);
-		
-		if (config && config.corpus) {
-			if (config.corpus.then) {
-				var dfd = Voyant.application.getDeferred(this);
-				var me = this;
-				config.corpus.then(function(corpus) {
-					me.setCorpus(corpus);
-					dfd.resolve(me);
-				});
-				var promise = Voyant.application.getPromiseFromDeferred(dfd);
-				return promise;
-			}
-			else {
-				this.setCorpus(config.corpus);
-			}
-		}
-
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.DocumentsMetadata',
+			'proxy.reader.rootProperty': 'documentsMetadata.documents',
+			'proxy.reader.totalProperty': 'documentsMetadata.total'
+		}])
 	},
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
+	listeners: {
+		 load: function(store, records, successful, opts) {
+			 if (successful) {
+				 var corpus = store.getCorpus();
+				 records.forEach(function(record) {
+					 record.set('corpus', corpus);
+				 });
+			 }
+		 }
 	},
-	
 	getDocument: function(config) {
-		if (this.getCorpus().getDocumentsCount()!=this.getTotalCount()) {
-			var dfd = Voyant.application.getDeferred();
-			var me = this;
-			this.load({
-			    scope: this,
-			    callback: function(records, operation, success) {
-			    	if (success) {dfd.resolve(this.getDocument(config))}
-			    	else {
-						Voyant.application.showResponseError(this.localize('failedGetDocuments'), response);
-						dfd.reject(); // don't send error since we've already shown it
-			    	}
-			    }
-			});
-			return dfd.promise();
-		}
 		return Ext.isNumber(config) ? this.getAt(config) : this.getById(config);
 	}
-})
+	
+});
+
+Ext.define('Voyant.data.store.Documents', {
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.DocumentsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.DocumentsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.DocumentsBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.DocumentsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.DocumentsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
 Ext.define('Voyant.data.store.PCAAnalysisMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.StatisticalAnalysis',
@@ -6176,7 +6136,7 @@ Ext.define('Voyant.data.model.Corpus', {
 					me.setDocumentsStore(store);
 					store.load({
 						params: {
-							limit: 1000
+							limit: 100000
 						},
 						callback: function(records, st, success) {
 							me.setDocumentsStore(this);
