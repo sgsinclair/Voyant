@@ -1,6 +1,6 @@
 Ext.define('Voyant.data.store.CorpusTermsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
-    model: 'Voyant.data.model.CorpusTerm',
+    model: Voyant.data.model.CorpusTerm,
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.CorpusTerms',

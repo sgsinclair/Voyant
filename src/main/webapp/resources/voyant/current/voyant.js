@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 14 14:32:15 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 14 20:13:57 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5748,7 +5748,7 @@ Ext.define('Voyant.data.store.CorpusFacetsBuffered', {
 
 Ext.define('Voyant.data.store.CorpusTermsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
-    model: 'Voyant.data.model.CorpusTerm',
+    model: Voyant.data.model.CorpusTerm,
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.CorpusTerms',
@@ -6510,6 +6510,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    filterPickList: true,
     	    createNewOnEnter: true,
     	    createNewOnBlur: false,
+    	    autoSelect: false,
     	    tpl: Ext.create('Ext.XTemplate',
     	    	'<ul class="x-list-plain"><tpl for=".">',
     	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">'+itemTpl+'</li>',
