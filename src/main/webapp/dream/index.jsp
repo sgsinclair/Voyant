@@ -20,7 +20,10 @@
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>'			
 		},
-		launch: function() {
+		validateCorpusLoadParams: function(params) {
+			params.docsLimit=0
+		},
+	    launch: function() {
 
 	    	if (!this.hasQueryToLoad()) {
 		    	location.replace("?corpus=dream")

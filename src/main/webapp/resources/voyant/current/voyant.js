@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 14 20:13:57 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Apr 15 15:26:45 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5716,7 +5716,7 @@ Ext.define('Voyant.data.store.CorpusCollocatesBuffered', {
 });
 Ext.define('Voyant.data.store.CorpusFacetsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
-    model: 'Voyant.data.model.CorpusFacet',
+    model: Voyant.data.model.CorpusFacet,
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.CorpusFacets',
@@ -6134,16 +6134,21 @@ Ext.define('Voyant.data.model.Corpus', {
 					me.set(data.corpus.metadata)
 					var store = Ext.create("Voyant.data.store.Documents", {corpus: me});
 					me.setDocumentsStore(store);
-					store.load({
-						params: {
-							limit: 100000
-						},
-						callback: function(records, st, success) {
-							me.setDocumentsStore(this);
-							dfd.resolve(me);
-						},
-						scope: store
-				})
+					if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {
+						debugger
+						store.load({
+							params: {
+								limit: ('docsLimit' in config) ? config.docsLimit : me.getDocumentsCount()
+							},
+							callback: function(records, st, success) {
+								me.setDocumentsStore(this);
+								dfd.resolve(me);
+							},
+							scope: store
+						})
+					} else {
+						dfd.resolve(me);
+					}
 				}).fail(function(response) {
 					Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
 					dfd.reject(); // don't send error since we've already shown it
@@ -18824,115 +18829,124 @@ Ext.define('Voyant.VoyantCorpusApp', {
 			})
 		}
 		
+		this.validateCorpusLoadParams(params);
 		new Corpus(params).then(function(corpus) {
-			if (corpus.requiresPassword() && !me.getViewport().query("panel").every(function(panel) {
-					return !panel.isConsumptive
-				})) {
-				var noPasswordAccess = corpus.getNoPasswordAccess();
-				var buttons = [
-				       { text: 'Validate' }
-				]
-				if (noPasswordAccess=='NONCONSUMPTIVE') {
-					buttons.push({text: 'Limited'})
-				}
-				var passWin = Ext.create('Ext.window.Window', {
-                    title: me.localize('passwordRequiredTitle'),
-				    layout: 'fit',
-				    items: {
-				    	padding: 10,
-	                    flex: 1,
-	                    width: 300,
-	                    layout: {
-	                        type: 'vbox',
-	                        align: 'stretch'
-	                    },
-	                    items: [
-	                        {
-	                            html: '<p>'+me.localize('passwordRequiredMessage')+'</p>' + (noPasswordAccess=='NONCONSUMPTIVE' ? '<p>'+me.localize('nonConsumptiveMessage')+"</p>" : "")+'</p>'
-	                        },{
-	                        	xtype: 'textfield',
-	                        	fieldLabel: me.localize('password')
-	                        }
-	                    ],
-	                    bbar: {
-//	                    	ui: 'footer',
-	                    	layout: {pack: 'center'},
-	                    	items: [{
-		                    	text: me.localize('passwordValidateButton'),
-		                    	ui: 'default',
-		                    	handler: function() {
-		                    		var password = passWin.query("textfield")[0].getValue().trim();
-		                    		if (password.length==0) {
-		                    			me.showError({
-		                    				message: me.localize('noPasswordGiven')
-		                    			})
-		                    			return;
-		                    		}
-		                    		passWin.mask();
-		                    		Ext.Ajax.request({
-		                    			  url: me.getTromboneUrl(),
-		                    			  params: {
-		                    				  corpus: corpus.getId(),
-		                    				  passwordForSession: password
-		                    			  },
-		                    			  method: 'POST',
-		                    			  success: function(result, request) {
-		                    				  passWin.unmask();
-		                    				  var access = result.responseText;
-		                    				  if (access=="ADMIN" || access=="ACCESS") {
-				                    			    passWin.close();
-				                    			    view.unmask();
-						            				me.dispatchEvent('loadedCorpus', this, corpus);
-		                    				  }
-		                    				  else {
-		  		                    			me.showError({
-				                    				message: me.localize('badPassword')
-				                    			})
-		                    				  }
-		                    			  },
-		                    			  failure: function(result, request) {
-		                    				  passWin.unmask();
-		  		                    			me.showError({
-				                    				message: me.localize('passwordValidationError')
-				                    			})
-		                    			  } 
-		                    		});
-		                    	}
-		                    },{
-		                    	text: me.localize('nonConsumptiveButton'),
-		                    	handler: function() {
-		                    		passWin.mask();
-		                    		Ext.Ajax.request({
-		                    			  url: me.getTromboneUrl(),
-		                    			  params: {
-		                    				  corpus: corpus.getId(),
-		                    				  passwordForSessionRemove: true
-		                    			  },
-		                    			  method: 'POST',
-		                    			  callback: function(result, request) { // do this even if request fails
-		                    				  passWin.unmask();
-		                    				  passWin.close();
-		                    				  view.unmask();
-		                    				  me.dispatchEvent('loadedCorpus', me, corpus);
-		                    			  }
-		                    		});
-		                    	}
-		                    }]
-	                    }
-	                }
-				}).show();
-//				passWin.show();
-				
-			}
-			else {
-				view.unmask();
+			view.unmask();
+			me.setCorpus(corpus);
+			if (me.validateCorpusAccess()) {
 				me.dispatchEvent('loadedCorpus', this, corpus);
 			}
 		}).fail(function(message, response) {
-			debugger
-			view.unmask();
-			//me.showErrorResponse({message: message}, response);
+			view.unmask(); // error is shown by corpus constructor if needed be
 		});
+    },
+    
+    validateCorpusLoadParams: function(params) {
+    	// leave untouched by default, this can be overridden
+    },
+    
+    validateCorpusAccess: function() {
+		var me = this, view = me.getViewport(), corpus = this.getCorpus();
+		if (corpus && corpus.requiresPassword() && !me.getViewport().query("panel").every(function(panel) {
+			return !panel.isConsumptive
+		})) {
+			var noPasswordAccess = corpus.getNoPasswordAccess();
+			var buttons = [
+			       { text: 'Validate' }
+			]
+			if (noPasswordAccess=='NONCONSUMPTIVE') {
+				buttons.push({text: 'Limited'})
+			}
+			var passWin = Ext.create('Ext.window.Window', {
+	            title: me.localize('passwordRequiredTitle'),
+			    layout: 'fit',
+			    items: {
+			    	padding: 10,
+	                flex: 1,
+	                width: 300,
+	                layout: {
+	                    type: 'vbox',
+	                    align: 'stretch'
+	                },
+	                items: [
+	                    {
+	                        html: '<p>'+me.localize('passwordRequiredMessage')+'</p>' + (noPasswordAccess=='NONCONSUMPTIVE' ? '<p>'+me.localize('nonConsumptiveMessage')+"</p>" : "")+'</p>'
+	                    },{
+	                    	xtype: 'textfield',
+	                    	fieldLabel: me.localize('password')
+	                    }
+	                ],
+	                bbar: {
+	//                	ui: 'footer',
+	                	layout: {pack: 'center'},
+	                	items: [{
+	                    	text: me.localize('passwordValidateButton'),
+	                    	ui: 'default',
+	                    	handler: function() {
+	                    		var password = passWin.query("textfield")[0].getValue().trim();
+	                    		if (password.length==0) {
+	                    			me.showError({
+	                    				message: me.localize('noPasswordGiven')
+	                    			})
+	                    			return;
+	                    		}
+	                    		passWin.mask();
+	                    		Ext.Ajax.request({
+	                    			  url: me.getTromboneUrl(),
+	                    			  params: {
+	                    				  corpus: corpus.getId(),
+	                    				  passwordForSession: password
+	                    			  },
+	                    			  method: 'POST',
+	                    			  success: function(result, request) {
+	                    				  passWin.unmask();
+	                    				  var access = result.responseText;
+	                    				  if (access=="ADMIN" || access=="ACCESS") {
+			                    			    passWin.close();
+			                    			    view.unmask();
+					            				me.dispatchEvent('loadedCorpus', this, corpus);
+	                    				  }
+	                    				  else {
+	  		                    			me.showError({
+			                    				message: me.localize('badPassword')
+			                    			})
+	                    				  }
+	                    			  },
+	                    			  failure: function(result, request) {
+	                    				  passWin.unmask();
+	  		                    			me.showError({
+			                    				message: me.localize('passwordValidationError')
+			                    			})
+	                    			  } 
+	                    		});
+	                    	}
+	                    },{
+	                    	text: me.localize('nonConsumptiveButton'),
+	                    	handler: function() {
+	                    		passWin.mask();
+	                    		Ext.Ajax.request({
+	                    			  url: me.getTromboneUrl(),
+	                    			  params: {
+	                    				  corpus: corpus.getId(),
+	                    				  passwordForSessionRemove: true
+	                    			  },
+	                    			  method: 'POST',
+	                    			  callback: function(result, request) { // do this even if request fails
+	                    				  passWin.unmask();
+	                    				  passWin.close();
+	                    				  view.unmask();
+	                    				  me.dispatchEvent('loadedCorpus', me, corpus);
+	                    			  }
+	                    		});
+	                    	}
+	                    }]
+	                }
+	            }
+			}).show();
+			return false;
+		} else {
+			return true
+		}
     },
     
     hasQueryToLoad: function(params) {

@@ -1,6 +1,6 @@
 Ext.define('Voyant.data.store.CorpusFacetsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
-    model: 'Voyant.data.model.CorpusFacet',
+    model: Voyant.data.model.CorpusFacet,
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.CorpusFacets',
