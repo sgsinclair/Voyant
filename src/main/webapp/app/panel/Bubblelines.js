@@ -179,6 +179,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     	
     	var docTermStore = Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.DocumentTerm",
+			asynchronousLoad: false,
     		autoLoad: false,
     		remoteSort: false,
     		proxy: {
