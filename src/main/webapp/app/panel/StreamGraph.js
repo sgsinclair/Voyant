@@ -31,7 +31,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     	corpus: undefined,
     	visLayout: undefined,
     	vis: undefined,
-    	mode: undefined
+    	mode: 'corpus'
     },
     
     graphMargin: {top: 20, right: 60, bottom: 110, left: 80},
@@ -143,6 +143,13 @@ Ext.define('Voyant.panel.StreamGraph', {
         	if (this.getCorpus().getDocumentsCount() == 1 && this.getMode() != this.MODE_DOCUMENT) {
 				this.setMode(this.MODE_DOCUMENT);
 			}
+			if (!('bins' in this.getModifiedApiParams())) {
+				if (this.getMode() == this.MODE_CORPUS) {
+					var count = corpus.getDocumentsCount();
+					var binsMax = 100;
+					this.setApiParam('bins', count > binsMax ? binsMax : count);
+				}
+			}
     		if (this.isVisible()) {
     			this.loadFromCorpus();
     		}
@@ -195,6 +202,11 @@ Ext.define('Voyant.panel.StreamGraph', {
 	},
 
     loadFromCorpusTerms: function(corpusTerms) {
+    	var params = this.getApiParams(['limit','stopList','query','withDistributions','bins']);
+		// ensure that we're not beyond the number of documents
+		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
+			params.bins = this.getCorpus().getDocumentsCount();
+		}
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
 		    	if (success) {
@@ -205,7 +217,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 		    	}
 		    },
 		    scope: this,
-		    params: this.getApiParams(['limit','stopList','query','withDistributions','bins'])
+		    params: params
     	});
     },
     
@@ -271,7 +283,9 @@ Ext.define('Voyant.panel.StreamGraph', {
     	if (this.getMode() === this.MODE_DOCUMENT) {
     		steps = this.getApiParam('bins');
     	} else {
-    		steps = this.getCorpus().getDocumentsCount();
+    		var bins = this.getApiParam('bins');
+    		var docsCount = this.getCorpus().getDocumentsCount();
+    		steps = bins < docsCount ? bins : docsCount;
     	}
     	steps--;
     	
@@ -391,10 +405,6 @@ Ext.define('Voyant.panel.StreamGraph', {
 					.attr('width', width+paddingH).attr('height', height+paddingV).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')')
 			);
     	}
-    },
-    
-    updateMode: function(mode) {
-    	this.queryById('segmentsSlider').setHidden(mode==this.MODE_CORPUS);
     }
 });
 
