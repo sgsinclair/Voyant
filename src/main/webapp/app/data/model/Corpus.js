@@ -108,7 +108,6 @@ Ext.define('Voyant.data.model.Corpus', {
 					var store = Ext.create("Voyant.data.store.Documents", {corpus: me});
 					me.setDocumentsStore(store);
 					if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {
-						debugger
 						store.load({
 							params: {
 								limit: ('docsLimit' in config) ? config.docsLimit : me.getDocumentsCount()

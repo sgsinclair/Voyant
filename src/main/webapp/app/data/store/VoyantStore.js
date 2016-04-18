@@ -36,7 +36,8 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			reader: {
 				type: 'json',
 				rootProperty: extras['proxy.reader.rootProperty'],
-				totalProperty: extras['proxy.reader.totalProperty']
+				totalProperty: extras['proxy.reader.totalProperty'],
+				metaProperty: extras['proxy.reader.metaProperty'] || 'metaData'
 			},
 			simpleSortMode: true
 		})

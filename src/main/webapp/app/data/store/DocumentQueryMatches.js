@@ -5,7 +5,8 @@ Ext.define('Voyant.data.store.DocumentQueryMatchesMixin', {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.DocumentsFinder',
 			'proxy.reader.rootProperty': 'documentsFinder.queries',
-			'proxy.reader.totalProperty': undefined
+			'proxy.reader.totalProperty': undefined,
+			'proxy.reader.metaProperty': 'documentsFinder.corpus'
 		}])
 	}
 });

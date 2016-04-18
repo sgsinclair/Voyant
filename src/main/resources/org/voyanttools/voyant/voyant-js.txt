@@ -74,6 +74,7 @@ app/widget/Facet.js
 app/panel/Bubblelines.js
 app/panel/Catalogue.js
 app/panel/Cirrus.js
+app/panel/Collection.js
 app/panel/CollocatesGraph.js
 app/panel/Contexts.js
 app/panel/CorpusCollocates.js

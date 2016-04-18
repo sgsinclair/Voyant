@@ -45,8 +45,6 @@ if (isNotRealTool || new java.io.File(new java.io.File(request.getServletContext
 
 %><%@ include file="../resources/jsp/pre_app.jsp" %>
 	
-<script type="text/javascript" src="../../resources/voyant/current/voyant.jsp<%= (request.getParameter("debug")!=null ? "?debug=true" : "") %>"></script>
-	
 <script>
 	Ext.Loader.setConfig({
 		enabled : true,

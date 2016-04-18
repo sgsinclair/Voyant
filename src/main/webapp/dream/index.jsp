@@ -1,7 +1,5 @@
 <%@ include file="../resources/jsp/pre_app.jsp" %>
 
-<script type="text/javascript" src="../resources/voyant/current/voyant.jsp<%= (request.getParameter("debug")!=null ? "?debug=true" : "") %>"></script>
-
 <script>
 	Ext.Loader.setConfig({
 		enabled : true,
@@ -20,6 +18,14 @@
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>'			
 		},
+		statics: {
+	    	i18n: {
+	    		pubDateTip: {en: "Workset Builder"},
+	    		pubDate: {en: "Publication Year"},
+	    		pubDateCountTip: {en: "This is the number of documents whose publication year matches the specified range."},
+	    		pubDateHelpTip: {en: "Use the slider to determine the start and end year range of publications."}
+	    	}
+		},
 		validateCorpusLoadParams: function(params) {
 			params.docsLimit=0
 		},
@@ -30,72 +36,104 @@
 	    	}
 
 			// get current markup and then dispose of it
-			var html = $('body').html();
+			var introHtml = document.body.querySelector("header").outerHTML + document.body.querySelector("#intro").outerHTML;
+			document.body.innerHTML = "";
 			$('body').html("");
-			
 
+			var me = this;
 
 			Ext.create('Ext.container.Viewport', {
-			    layout: 'border',
-			    cls: 'dream-body',
 			    layout: 'fit',
+			    cls: 'dream-body',
 			    items: [{
-			    	html: html,
-			    	xtype: 'dream',
-			    	header: false,
+				    xtype: 'collection',
+            		inDocumentsCountOnly: true,
+            		stopList: 'stop.en.taporware.txt',
+				    header: false,
+				    title: false,
 			    	autoScroll: true,
-			    	listeners: {
-			    		afterrender: function() {
-			    		      Ext.create('Ext.tip.ToolTip', {
-							        target: this.getEl().dom.querySelector(".search-tips"),
-        							html: Voyant.widget.QuerySearchField.i18n.querySearchTip.en
-      							});
-			    		}
-			    	}
+				    margin: '0, 40, 20, 40',
+				    introHtml: introHtml,
+				    fieldItems: [{
+		        		xtype: 'querysearchfield',
+		        		tokenType: 'title'
+	        		},{
+		        		xtype: 'querysearchfield',
+		        		tokenType: 'author'
+	        		},{
+		        		xtype: 'querysearchfield'
+	        		},{
+		        		xtype: 'querysearchfield',
+		        		tokenType: 'publisher'
+	        		},{
+		        		layout: 'hbox',
+		        		tokenType: 'pubDate',
+ 		        		width: 340,
+		        		items: [{
+			        		xtype: 'container',
+			        		html: this.localize('pubDate'),
+			        		cls: 'x-form-item-label x-form-item-label-default x-form-item-label-right x-unselectable x-form-item-label-default',
+			        		width: 105
+			        	},{
+				        	flex: 1,
+				        	layout: 'hbox',
+				        	cls: "x-form-trigger-wrap x-form-trigger-wrap-default",
+			        		bodyStyle: 'background-color: white; padding-left: 5px',
+				        	items: [{
+				        		xtype: 'multislider',
+						        minValue: 1450,
+						        maxValue: 1700,
+						        values: [ 1450, 1450 ],
+//						        width: 200
+						        flex: 1
+					        	},{
+						        	html: '<div class=""><div class="x-form-text-wrap x-form-text-wrap-default">'+
+						        		'<div class="x-form-trigger x-form-trigger-default form-fa-count-trigger fa-trigger fa-trigger-default" style="height: 22px"></div>'+
+						        		'<div class="x-form-trigger x-form-trigger-default fa-trigger form-fa-help-trigger fa-trigger form-fa-help-trigger-default "></div>'+
+						        		'</div></div>',
+						        	listeners: {
+							        	afterrender: function(cmp) {
+								        	var collection = cmp.up('collection');
+								        	var count = Ext.get(cmp.getTargetEl().dom.querySelector(".form-fa-count-trigger"));
+								             /*
+								              Ext.QuickTips.register({
+//											        target: count.dom,
+											        text: me.localize('pubDateTip'),
+											        enabled: true,
+											        showDelay: 20,
+											        autoShow: true
+											      });*/
+								        	count.on("click", function() {
+						    	            	Ext.Msg.show({
+						    	            	    title: me.localize('pubDate'),
+						    	            	    message: me.localize('pubDateCountTip'),
+						    	            	    buttons: Ext.OK,
+						    	            	    icon: Ext.Msg.INFO
+						    	            	});
+									        });
+								        	var help = Ext.get(cmp.getTargetEl().dom.querySelector(".form-fa-help-trigger"));
+								        	help.on("click", function() {
+						    	            	Ext.Msg.show({
+						    	            	    title: me.localize('pubDate'),
+						    	            	    message: me.localize('pubDateHelpTip'),
+						    	            	    buttons: Ext.OK,
+						    	            	    icon: Ext.Msg.INFO
+						    	            	});
+									        });
+								        }
+						        	},
+						        	scope: this
+					        }]
+			        	}]
+		        	}]
 			    }]
 			});
 
 			this.callParent(arguments);
 
-			var viewport = this.getViewport();
-			viewport.mask();
-			Ext.create('Ext.window.Window', {
-			    title: 'DREaM Preview Release',
-			    width: 825,
-			    layout: 'fit',
-			    modal: true,
-			    layout: 'vbox',
-			    items: [{
-			    	width: 800,
-			    	margin: '10 5 3 10',
-				    html: "<h2 style='text-align: center;'>Welcome to this Preview Release of DREaM!</h2>"+
-				    "<p>The <i>Distant Reading Early Modernity</i> (DREaM) is an experimental interface produced by members of the <a href='http://earlymodernconversions.com/'>Early Modern Conversions</a> "+
-				    "In particular, DREaM is an attempt to bridge the gap between the <a href='http://www.textcreationpartnership.org/tcp-eebo/'>TCP-EEBO</a> text repository and the reading and analysis funcitonality of <a href='http://voyant-tools.org'>Voyant Tools</a>. "+
-				    "Because of licensing restrictions, this instance of DREaM is limited to most of the 25,000 texts from Phase I of TCP-EEBO.</p>"+
-				    "<p>For a bit more information about DREaM please see <a href='http://earlymodernconversions.com/introducing-dream/'>this article</a> or <a href='https://youtu.be/A4ftsPlsGtU'>this video</a>.</p> "+
-				    "<p>Please be aware that this is an early preview release and things may not work as expected (or not work at all). We're still working on some refinements, including faster exporting of large document sets and a more advanced catalogue interface. "+
-				    "Have fun and please give us your feedback via <a href='http://twitter.com/voyanttools'>twitter</a> or <a href='https://github.com/sgsinclair/Voyant/issues?q=is%3Aopen+is%3Aissue+label%3Adream'>GitHub</a>!</p>"
-			    }, {
-			    	xtype: 'button',
-	                glyph: 'xf00c@FontAwesome',
-			    	width: '100%',
-			    	scale: 'medium',
-			    	text: 'Continue',
-			    	handler: function(btn) {
-			    		btn.up('window').close();
-			    	}
-			    }],
-			    listeners: {
-			    	close: function(panel) {
-			    		viewport.unmask();
-			    	}
-			    }
-			}).show();
-			
 		}
 	});
 </script>
-<script src="dream.panel.js"></script>
 <link href='http://fonts.googleapis.com/css?family=Cinzel+Decorative:400,900' rel='stylesheet' type='text/css'>
 <style>
 	.dream-body {
@@ -106,7 +144,6 @@
 		background: none;
 	}
 	.dream-body header {
-		text-align: center;
 		font-family: 'Cinzel Decorative', cursive;
 	}
 	.dream-body h1 {
@@ -122,77 +159,7 @@
 		padding: 1em;
 		vertical-align: top;
 	}
-	.badge { /* http://cssdeck.com/labs/menu-with-notification-badges */
-	  position: relative;
-	  top: -10px;
-	  right: 12px;
-	  line-height: 16px;
-	  height: 16px;
-	  padding: 0 5px;
-	  font-family: Arial, sans-serif;
-	  color: black;
-	  /*text-shadow: 0 1px rgba(0, 0, 0, 0.25);*/
-	  border: 1px solid;
-	  border-radius: 10px;
-	  -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
-	  box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
-	  /*background: #fa623f;
-	  border-color: #fa5a35;
-	  background-image: -webkit-linear-gradient(top, #fc9f8a, #fa623f);
-	  background-image: -moz-linear-gradient(top, #fc9f8a, #fa623f);
-	  background-image: -o-linear-gradient(top, #fc9f8a, #fa623f);
-	  background-image: linear-gradient(to bottom, #fc9f8a, #fa623f);*/
-	  background: white;
-	  border-color: #aaa;
-	  background-image: -webkit-linear-gradient(top, white, #eee);
-	  background-image: -moz-linear-gradient(top, white, #eee);
-	  background-image: -o-linear-gradient(top, white, #eee);
-	  background-image: linear-gradient(to bottom, white, #eee);
- 	  display: none;
-	}
-	.ui-autocomplete-loading {
-    	background: white url("../resources/jquery/current/images/ui-anim_basic_16x16.gif") right center no-repeat;
-  	}
-  	
-  	.btn {
-  		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
-	}
-	.btn-default {
-		text-shadow: 0 1px 0 #fff;
-	}	
-	.btn-default {
-		color: #333333;
-		background-color: #ffffff;
-		border-color: #333;
-	}
-	.btn {
-		display: inline-block;
-		margin-bottom: 0;
-		font-weight: normal;
-		text-align: center;
-		vertical-align: middle;
-		cursor: pointer;
-		background-image: none;
-		border: 1px solid #999;
-		white-space: nowrap;
-		padding: 6px 12px;
-		font-size: 14px;
-		line-height: 1.42857143;
-		border-radius: 4px;
-		-webkit-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-	}
-	input.dream-terms-search {
-		width: 200px;
-	}
-	#slider-pubDate-range {
-		width: 150px;
-	}
-	#pubDate-badge {
-		right: 9px;
-	}
+
 	.filename ul.filenamegroup {
 		margin: 0px;
 		padding: 0px;
@@ -214,7 +181,6 @@
 		background-color: white;
 		z-index: 3;
 	}
-	.search-tips {caption-side: top; text-align: right; font-size: smaller; color: #157fcc}
 	
 </style>
 </head>
@@ -223,83 +189,31 @@
 <header>
 	<table style="width: 100%">
 		<tr>
-			<td>
-				<h1>DREaM</h1>
-				<h3>Distant Reading Early Modernity</h3>
+			<td align="right" style="width: 50%">
+				<table>
+					<tr>
+						<td style="text-align: center">
+							<h1>DREaM</h1>
+							<h3>Distant Reading Early Modernity</h3>
+						</td>
+					</tr>
+				</table>
 			</td>
-			<td style="width: 500px">
+			<td style="width: 2em">&nbsp:</td>
+			<td>
 				<img src="EMC-logo.gif" style="height: 100px; " alt="Early Modern Conversions" />
 				<img src="voyant-tools.png" style="height: 100px; margin-right: 1em;" alt="Voyant Tool" />
 			</td>			
 		</tr>
 	</table>
 </header>
-
-<table class='intro'>
+<table id='intro'>
 	<tr>
 		<td>The DREaM Database indexes 44,000+ early modern texts, thus making long-neglected material more amenable to marco-scale textual analysis. The corpus comprises approximately one-third of all the titles in the Stationer&rsquo;s Register and all of the texts transcribed thus far by the <a href='http://www.textcreationpartnership.org' target='_blank'>Text Creation Partnership</a>, an initiative that aims to create standardized, accurate XML/SGML encoded full text editions of all documents available from <a href='http://eebo.chadwyck.com/home' target='_blank'>Early English Books Online</a>.</td>
+		<td style="width: 2em">&nbsp:</td>
 		<td>Unlike similar databases, DREaM enables mass downloading of custom-defined subsets rather than obliging users to download individual texts one-by-one. In other words, it functions at the level of &lsquo;sets of texts,&rsquo; rather than &lsquo;individual texts.&rsquo; Examples of subsets one might potentially generate include &lsquo;all texts by Ben Jonson,&rsquo; &lsquo;all texts published in 1623,&rsquo; or &lsquo;all texts printed by John Wolfe.&rsquo; The subsets are available as either plain text or XML encoded files, and users have the option to automatically name individual files by date, author, title, or combinations thereof. There is also an option to download subsets in the original spelling, or in an automatically normalized version.</td>
 	</tr>
 </table>
-
-<div align="center">
-	<table>
-		<caption class='search-tips'>search tips</caption>
-		<tr>
-			<td valign="top">
-				<table>
-					<tr>
-						<td>Select by keywords in the full-text</td>
-						<td>
-							<div><input class="dream-terms-search" name="lexical" /><span class="badge" id="lexical-badge"></span></div>
-						</td>
-					</tr>
-					<tr>
-						<td>Select by keywords in the title</td>
-						<td><div><input class="dream-terms-search" name="title" /><span class="badge" id="title-badge"></span></div></td>
-					</tr>
-					<tr>
-						<td>Select by year (<span id="pubDate-label">test</span>)</td>
-						<td>
-							<table width="100%">
-								<tr>
-									<td>
-										<div id="slider-pubDate"></div>
-									</td>
-									<td width="10"><span class="badge" id="pubDate-badge"></span></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-			</td>
-			<td style="width: 5em;">&nbsp;</td>
-			<td valign="top">
-				<table>
-					<tr>
-						<td>Select by keywords in author</td>
-						<td><div><input class="dream-terms-search" name="author" /><span class="badge" id="author-badge"></span></div></td>
-					</tr>
-					<tr>
-						<td>Select by keywords in publisher</td>
-						<td><div><input class="dream-terms-search" name="publisher" /><span class="badge" id="publisher-badge"></span></div></td>
-					</tr>
-					<!-- <tr>
-						<td colspan="2"><input type="checkbox" id="variants" checked=""> use spelling variants for keywords</td>
-					</tr> -->
-				</table>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="3" style="text-align: center" id="export">
-			<br />
-			<span>
-				<a class="btn btn-default btn-lg" href="#"> <i class="fa fa-external-link"></i> Export</a>
-				<span class="badge" id="total-badge" title="total number of matching documents">0</span>
-			</td>
-		</tr>
-	</table>
-</div>
 
 </body>
 </html>
