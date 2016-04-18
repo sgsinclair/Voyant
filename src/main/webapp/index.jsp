@@ -27,7 +27,7 @@
    }
    
    %><%@ include file="resources/jsp/pre_app.jsp" %>
-<script>
+<!-- <script>
 	Ext.Loader.setConfig({
 		enabled : true,
 		paths : {
@@ -36,9 +36,7 @@
 		}
 	});
 </script>
-
-<script type="text/javascript" src="resources/voyant/current/voyant.jsp<%= (request.getParameter("debug")!=null ? "?debug=true" : "") %>"></script>
-
+ -->
 <script>
 Ext.onReady(function(){
 	Ext.application({

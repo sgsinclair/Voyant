@@ -72,3 +72,5 @@ String touch = ua.matches("(?i).*((android|bb\\d+|meego).+mobile|avantgo|bada\\/
 		<link rel="stylesheet" href="<%= cssUri %>" type="text/css" charset="utf-8">
 	<% } 
 } %>
+
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp<%= (request.getParameter("debug")!=null ? "?debug=true" : "") %>"></script>

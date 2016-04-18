@@ -107,16 +107,20 @@ Ext.define('Voyant.data.model.Corpus', {
 					me.set(data.corpus.metadata)
 					var store = Ext.create("Voyant.data.store.Documents", {corpus: me});
 					me.setDocumentsStore(store);
-					store.load({
-						params: {
-							limit: 100000
-						},
-						callback: function(records, st, success) {
-							me.setDocumentsStore(this);
-							dfd.resolve(me);
-						},
-						scope: store
-				})
+					if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {
+						store.load({
+							params: {
+								limit: ('docsLimit' in config) ? config.docsLimit : me.getDocumentsCount()
+							},
+							callback: function(records, st, success) {
+								me.setDocumentsStore(this);
+								dfd.resolve(me);
+							},
+							scope: store
+						})
+					} else {
+						dfd.resolve(me);
+					}
 				}).fail(function(response) {
 					Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
 					dfd.reject(); // don't send error since we've already shown it

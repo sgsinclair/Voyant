@@ -5,19 +5,26 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	statics: {
 		i18n: {
 			querySearch: {en: 'Search'},
-			querySearchTip: {en: '<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,&quot;coat mittens&quot;~5</b>: combine syntaxes</li></ul>'}
+			querySearchTip: {en: '<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,&quot;coat mittens&quot;~5</b>: combine syntaxes</li></ul>'},
+			querySearchDocsModeTip: {en: '<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+"winter coat" +mitten*</b>: combine syntaxes</li></ul>'},
+			aggregateInDocumentsCount: {en: "This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms)."}
 		}
 	},
 	config: {
+		corpus: undefined,
 		tokenType: 'lexical',
-		inDocumentsCountOnly: undefined
+		isDocsMode: false,
+		inDocumentsCountOnly: undefined,
+		stopList: undefined,
+		showAggregateInDocumentsCount: false
 	},
     
     constructor: function(config) {
     	config = config || {};
-    	var itemTpl = config.itemTpl ? config.itemTpl : '{term} ({rawFreq})';
+    	var itemTpl = config.itemTpl ? config.itemTpl : '{term} ({'+(config.inDocumentsCountOnly ? 'inDocumentsCount' : 'rawFreq')+'})';
     	Ext.applyIf(config, {
     		minWidth: 100,
+    		maxWidth: 200,
     		matchFieldWidth : false,
     		minChars: 2,
     	    displayField: 'term',
@@ -35,11 +42,26 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	        help: {
     	            weight: 2,
     	            cls: 'fa-trigger form-fa-help-trigger',
-    	            handler: 'onHelpClick',
+    	            handler: function() {
+    	            	Ext.Msg.show({
+    	            	    title: this.localize('querySearch'),
+    	            	    message: this.getIsDocsMode() ? this.localize('querySearchDocsModeTip') : this.localize('querySearchTip'),
+    	            	    buttons: Ext.OK,
+    	            	    icon: Ext.Msg.INFO
+    	            	});
+    	            },
     	            scope: 'this'
     	        }
     	   }
     	})
+    	if (config.showAggregateInDocumentsCount) {
+    		config.triggers.count = {
+	            cls: 'fa-trigger',
+	            handler: 'onHelpClick',
+	            scope: 'this',
+	            hidden: true
+    		}
+    	}
         this.callParent(arguments);
     },
     initComponent: function(config) {
@@ -70,26 +92,51 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	}, me);
     	
     	me.on("change", function(tags, queries) {
-    		me.up('panel').fireEvent("query", me, queries)
+    		me.up('panel').fireEvent("query", me, queries);
+    		if (me.triggers.count) {
+    			me.triggers.count.show();
+    			me.triggers.count.getEl().setHtml('0');
+    			if (queries.length>0) {
+    				me.getCorpus().getCorpusTerms().load({
+    					params: {
+    						query: queries.map(function(q) {return '('+q+')'}).join("|"),
+			    			tokenType: me.getTokenType(),
+			    			stopList: me.getStopList(),
+			    			inDocumentsCountOnly: true
+    					},
+    					callback: function(records, operation, success) {
+    						if (success && records && records.length==1) {
+    							me.triggers.count.getEl().setHtml(records[0].getInDocumentsCount())
+    						}
+    					}
+    				})
+    			} else {
+    				me.triggers.count.hide();
+    			}
+    		}
     	})
     	
     	me.up("panel").on("loadedCorpus", function(src, corpus) {
-    		var stopList = undefined;
-    		if (this.getApiParam) {stopList = this.getApiParam("stopList")}
-    		else {
-    			var parent = this.up("panel");
-    			if (parent && parent.getApiParam) {
-    				stopList = parent.getApiParam("stopList")
-    			}
+    		me.setCorpus(corpus);
+    		var stopList = me.getStopList();
+    		if (stopList==undefined) {
+        		if (this.getApiParam) {me.setStopList(this.getApiParam("stopList"))}
+        		else {
+        			var parent = this.up("panel");
+        			if (parent && parent.getApiParam) {
+        				me.setStopList(parent.getApiParam("stopList"))
+        			}
+        		}
     		}
+
 			me.setStore(corpus.getCorpusTerms({
 				corpus: corpus,
 				proxy: {
 					extraParams: {
 		    			limit: 10,
 		    			tokenType: me.tokenType,
-		    			inDocumentsCountOnly: me.inDocumentsCountOnly,
-		    			stopList: stopList
+		    			stopList: me.getStopList(),
+		    			inDocumentsCountOnly: me.getInDocumentsCountOnly()
 					}
 				}
     		}));
@@ -99,10 +146,18 @@ Ext.define('Voyant.widget.QuerySearchField', {
 			  if (c.triggers && c.triggers.help) {
 			      Ext.QuickTips.register({
 			        target: c.triggers.help.getEl(),
-			        text: c.localize('querySearchTip'),
+			        text: c.getIsDocsMode() ? c.localize('querySearchDocsModeTip') : c.localize('querySearchTip'),
 			        enabled: true,
 			        showDelay: 20,
-			        trackMouse: true,
+			        autoShow: true
+			      });
+			  }
+			  if (c.triggers && c.triggers.count) {
+			      Ext.QuickTips.register({
+			        target: c.triggers.count.getEl(),
+			        text: c.localize('aggregateInDocumentsCount'),
+			        enabled: true,
+			        showDelay: 20,
 			        autoShow: true
 			      });
 			  }
@@ -112,7 +167,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 			    hidden: true,
 			    html: ''
 			  });
-    	})
+    	}, me)
     	me.callParent(arguments);
     }
     

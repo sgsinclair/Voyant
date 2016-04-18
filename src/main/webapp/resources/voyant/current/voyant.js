@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 14 20:13:57 EDT 2016 */
+/* This file created by JSCacher. Last modified: Mon Apr 18 15:26:59 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4068,7 +4068,7 @@ Ext.define('Voyant.util.Api', {
 		}
 
 		this.addParentApi(apis, Ext.ClassManager.getClass(this)); // add params from this class and parents
-		
+
 		this.api = {};
 		apis.forEach(function(a) {
 			for (key in a) {
@@ -5568,7 +5568,8 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			reader: {
 				type: 'json',
 				rootProperty: extras['proxy.reader.rootProperty'],
-				totalProperty: extras['proxy.reader.totalProperty']
+				totalProperty: extras['proxy.reader.totalProperty'],
+				metaProperty: extras['proxy.reader.metaProperty'] || 'metaData'
 			},
 			simpleSortMode: true
 		})
@@ -5716,7 +5717,7 @@ Ext.define('Voyant.data.store.CorpusCollocatesBuffered', {
 });
 Ext.define('Voyant.data.store.CorpusFacetsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
-    model: 'Voyant.data.model.CorpusFacet',
+    model: Voyant.data.model.CorpusFacet,
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.CorpusFacets',
@@ -5785,7 +5786,8 @@ Ext.define('Voyant.data.store.DocumentQueryMatchesMixin', {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.DocumentsFinder',
 			'proxy.reader.rootProperty': 'documentsFinder.queries',
-			'proxy.reader.totalProperty': undefined
+			'proxy.reader.totalProperty': undefined,
+			'proxy.reader.metaProperty': 'documentsFinder.corpus'
 		}])
 	}
 });
@@ -6134,16 +6136,20 @@ Ext.define('Voyant.data.model.Corpus', {
 					me.set(data.corpus.metadata)
 					var store = Ext.create("Voyant.data.store.Documents", {corpus: me});
 					me.setDocumentsStore(store);
-					store.load({
-						params: {
-							limit: 100000
-						},
-						callback: function(records, st, success) {
-							me.setDocumentsStore(this);
-							dfd.resolve(me);
-						},
-						scope: store
-				})
+					if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {
+						store.load({
+							params: {
+								limit: ('docsLimit' in config) ? config.docsLimit : me.getDocumentsCount()
+							},
+							callback: function(records, st, success) {
+								me.setDocumentsStore(this);
+								dfd.resolve(me);
+							},
+							scope: store
+						})
+					} else {
+						dfd.resolve(me);
+					}
 				}).fail(function(response) {
 					Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
 					dfd.reject(); // don't send error since we've already shown it
@@ -6490,19 +6496,26 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	statics: {
 		i18n: {
 			querySearch: {en: 'Search'},
-			querySearchTip: {en: '<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,&quot;coat mittens&quot;~5</b>: combine syntaxes</li></ul>'}
+			querySearchTip: {en: '<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,&quot;coat mittens&quot;~5</b>: combine syntaxes</li></ul>'},
+			querySearchDocsModeTip: {en: '<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+"winter coat" +mitten*</b>: combine syntaxes</li></ul>'},
+			aggregateInDocumentsCount: {en: "This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms)."}
 		}
 	},
 	config: {
+		corpus: undefined,
 		tokenType: 'lexical',
-		inDocumentsCountOnly: undefined
+		isDocsMode: false,
+		inDocumentsCountOnly: undefined,
+		stopList: undefined,
+		showAggregateInDocumentsCount: false
 	},
     
     constructor: function(config) {
     	config = config || {};
-    	var itemTpl = config.itemTpl ? config.itemTpl : '{term} ({rawFreq})';
+    	var itemTpl = config.itemTpl ? config.itemTpl : '{term} ({'+(config.inDocumentsCountOnly ? 'inDocumentsCount' : 'rawFreq')+'})';
     	Ext.applyIf(config, {
     		minWidth: 100,
+    		maxWidth: 200,
     		matchFieldWidth : false,
     		minChars: 2,
     	    displayField: 'term',
@@ -6520,11 +6533,26 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	        help: {
     	            weight: 2,
     	            cls: 'fa-trigger form-fa-help-trigger',
-    	            handler: 'onHelpClick',
+    	            handler: function() {
+    	            	Ext.Msg.show({
+    	            	    title: this.localize('querySearch'),
+    	            	    message: this.getIsDocsMode() ? this.localize('querySearchDocsModeTip') : this.localize('querySearchTip'),
+    	            	    buttons: Ext.OK,
+    	            	    icon: Ext.Msg.INFO
+    	            	});
+    	            },
     	            scope: 'this'
     	        }
     	   }
     	})
+    	if (config.showAggregateInDocumentsCount) {
+    		config.triggers.count = {
+	            cls: 'fa-trigger',
+	            handler: 'onHelpClick',
+	            scope: 'this',
+	            hidden: true
+    		}
+    	}
         this.callParent(arguments);
     },
     initComponent: function(config) {
@@ -6555,26 +6583,51 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	}, me);
     	
     	me.on("change", function(tags, queries) {
-    		me.up('panel').fireEvent("query", me, queries)
+    		me.up('panel').fireEvent("query", me, queries);
+    		if (me.triggers.count) {
+    			me.triggers.count.show();
+    			me.triggers.count.getEl().setHtml('0');
+    			if (queries.length>0) {
+    				me.getCorpus().getCorpusTerms().load({
+    					params: {
+    						query: queries.map(function(q) {return '('+q+')'}).join("|"),
+			    			tokenType: me.getTokenType(),
+			    			stopList: me.getStopList(),
+			    			inDocumentsCountOnly: true
+    					},
+    					callback: function(records, operation, success) {
+    						if (success && records && records.length==1) {
+    							me.triggers.count.getEl().setHtml(records[0].getInDocumentsCount())
+    						}
+    					}
+    				})
+    			} else {
+    				me.triggers.count.hide();
+    			}
+    		}
     	})
     	
     	me.up("panel").on("loadedCorpus", function(src, corpus) {
-    		var stopList = undefined;
-    		if (this.getApiParam) {stopList = this.getApiParam("stopList")}
-    		else {
-    			var parent = this.up("panel");
-    			if (parent && parent.getApiParam) {
-    				stopList = parent.getApiParam("stopList")
-    			}
+    		me.setCorpus(corpus);
+    		var stopList = me.getStopList();
+    		if (stopList==undefined) {
+        		if (this.getApiParam) {me.setStopList(this.getApiParam("stopList"))}
+        		else {
+        			var parent = this.up("panel");
+        			if (parent && parent.getApiParam) {
+        				me.setStopList(parent.getApiParam("stopList"))
+        			}
+        		}
     		}
+
 			me.setStore(corpus.getCorpusTerms({
 				corpus: corpus,
 				proxy: {
 					extraParams: {
 		    			limit: 10,
 		    			tokenType: me.tokenType,
-		    			inDocumentsCountOnly: me.inDocumentsCountOnly,
-		    			stopList: stopList
+		    			stopList: me.getStopList(),
+		    			inDocumentsCountOnly: me.getInDocumentsCountOnly()
 					}
 				}
     		}));
@@ -6584,10 +6637,18 @@ Ext.define('Voyant.widget.QuerySearchField', {
 			  if (c.triggers && c.triggers.help) {
 			      Ext.QuickTips.register({
 			        target: c.triggers.help.getEl(),
-			        text: c.localize('querySearchTip'),
+			        text: c.getIsDocsMode() ? c.localize('querySearchDocsModeTip') : c.localize('querySearchTip'),
 			        enabled: true,
 			        showDelay: 20,
-			        trackMouse: true,
+			        autoShow: true
+			      });
+			  }
+			  if (c.triggers && c.triggers.count) {
+			      Ext.QuickTips.register({
+			        target: c.triggers.count.getEl(),
+			        text: c.localize('aggregateInDocumentsCount'),
+			        enabled: true,
+			        showDelay: 20,
 			        autoShow: true
 			      });
 			  }
@@ -6597,7 +6658,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 			    hidden: true,
 			    html: ''
 			  });
-    	})
+    	}, me)
     	me.callParent(arguments);
     }
     
@@ -8487,6 +8548,398 @@ Ext.define('Voyant.panel.Cirrus', {
         return newRelativeSize;
     }
 });
+Ext.define('Voyant.panel.Collection', {
+	extend: 'Ext.panel.Panel',
+	mixins: ['Voyant.panel.Panel'],
+	alias: 'widget.collection',
+    statics: {
+    	i18n: {
+    		title: {en: "Workset Builder"},
+    		titleLabel: {en: "Titles"},
+    		authorLabel: {en: "Authors"},
+    		lexicalLabel: {en: "Full-text"},
+    		publisherLabel: {en: "Publishers"},
+    		sendToVoyantButton: {en: "New Voyant Corpus"},
+    		downloadButton: {en: "Download Zip Archive"},
+    		sendToVoyantNoQuery: {en: "There's currently no query specified, but you can <a href='{0}' target='_blank'>open the current corpus in a new window</a>."}
+    	},
+    	api: {
+    		stopList: 'auto',
+    		documentFilename: undefined,
+    		documentFormat: undefined
+    	},
+		glyph: 'xf0ce@FontAwesome'
+    },
+    config: {
+    	options: {
+    		xtype: 'stoplistoption'
+    	},
+		inDocumentsCountOnly: false,
+		stopList: 'auto',
+		store: undefined
+    },
+    constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);    	
+    },
+    
+    
+    initComponent: function(config) {
+        var me = this;
+
+        Ext.applyIf(me, {
+        	introHtml: '',
+        	fieldItems: [{
+	        		xtype: 'querysearchfield',
+	        		fieldLabel: this.localize('titleLabel'),
+	        		tokenType: 'title'
+        		},{
+	        		xtype: 'querysearchfield',
+	        		fieldLabel: this.localize('authorLabel'),
+	        		tokenType: 'author'
+        		},{
+	        		xtype: 'querysearchfield',
+	        		fieldLabel: this.localize('termsLabel')
+        	}],
+        	fieldColumns: 2
+        });
+        
+        Ext.applyIf(me, {
+        	intro: {
+        		margin: '5 0 5 0',
+        		layout: 'center',
+        		items: {
+        			itemId: 'intro',
+            		html: me.introHtml
+        		}
+        	},
+        	fields: {
+				xtype: 'container',
+        		layout: 'center',
+        		items: {
+    				xtype: 'container',
+        			maxWidth: 1200,
+        			layout: {
+        				type: 'table',
+        				columns: me.fieldColumns
+        			},
+        			// wrap in another container otherwise the tip won't work
+        			items: me.fieldItems.map(function(item) {return {
+        				xtype: 'container',
+            			defaults: {
+            				margin: '5 10 5 10',
+                    		inDocumentsCountOnly: me.getInDocumentsCountOnly(),
+                    		stopList: me.getStopList(),
+                    		showAggregateInDocumentsCount: true,
+                    		isDocsMode: true,
+                    		flex: 1,
+                    		maxWidth: 800,
+                    		labelAlign: 'right'
+            			},
+        				items: Ext.applyIf(item, {
+        					fieldLabel: me.localize((item.tokenType ? item.tokenType : 'lexical')+'Label')
+        				})
+        			}}, this)
+        		}
+        	},
+        	foot: {
+        		layout: 'center',
+        		margin: '20 0 0 0',
+        		items: {
+        			xtype: 'container',
+        			layout: {
+        				type: 'hbox',
+        				align: 'middle'
+        			},
+        			defaults: {
+    	        		margin: '0 5 0 5',
+//    	        		scale: 'large',
+    	        		width: 200
+        			},
+        			items:  [{
+    	        		xtype: 'button',
+    	        		itemId: 'export',
+	                    glyph: 'xf08e@FontAwesome',
+    	        		text: this.localize('sendToVoyantButton'),
+    	        		handler: me.handleSendToVoyant,
+    	        		scope: me
+            		},{
+    	        		xtype: 'button',
+				    	glyph: 'xf019@FontAwesome',
+    	        		itemId: 'download',
+    	        		text: this.localize('downloadButton'),
+    	        		handler: me.handleExport,
+    	        		scope: me
+            		},{
+            			xtype: 'container',
+            			hidden: true,
+            			itemId: 'statuscontainer',
+            			layout: 'vbox',
+            			items: [{
+            				itemId: 'status',
+            				bodyStyle: 'text-align: center',
+            				width: 200
+            			},{
+            				xtype: 'container',
+            				width: 200,
+            				items: {
+            	    			xtype: 'sparklineline',
+            	    			chartRangeMin: 0,
+            	    			itemId: 'sparkline',
+            	    			margin: '0 0 0 10',
+            	    			values: [1,1],
+            	    			height: 20,
+            	    			width: 200
+            				}
+            			}]
+            		}]
+        		}
+        	}
+        })
+
+        Ext.applyIf(me, {
+        	items: [me.intro, me.fields, me.foot]
+        });
+        
+    	me.on('loadedCorpus', function(src, corpus) {
+    		me.getStore().setCorpus(corpus);
+    		if (me.getInitialConfig('introHtml')==undefined && me.getInitialConfig('intro')==undefined) {
+    			 me.queryById('intro').setHtml(corpus.getShow())
+    		}
+    	}, me);
+    	
+    	me.on('query', function(src, queries) {
+    		this.performAggregateQuery(this.getAggregateQuery());
+    	});
+    	
+    	me.setStore(Ext.create('Voyant.data.store.DocumentQueryMatches'))
+        me.callParent([config]);
+        
+    },
+    
+    handleSendToVoyant: function() {
+    	if (!this.getStore().lastOptions || !this.getStore().lastOptions.params.query) {
+    		// there's currently no query, so give the option of opening the current corpus in a new window
+    		Ext.Msg.alert(this.localize('sendToVoyantButton'), new Ext.XTemplate(this.localize('sendToVoyantNoQuery')).apply([this.getBaseUrl()+"?corpus="+this.getStore().getCorpus().getId()]))
+    	} else {
+    		// try spawning a new corpus with the query
+    		var me = this;
+        	this.mask("Creating corpus…");
+        	this.getStore().load({
+        		params: {
+        			query: this.getStore().lastOptions.params.query,
+        			createNewCorpus: true
+        		},
+        		callback: function(records, operation, success) {
+        			me.unmask();
+        			if (success && records && records.length==1) {
+            			var corpus = operation.getProxy().getReader().metaData;
+        				var url = me.getBaseUrl()+"?corpus="+corpus;
+        				me.openUrl(url);
+        			}
+        		}
+        	})
+    	}
+    },
+    
+    handleExport: function() {
+    	if (!this.getStore().lastOptions || !this.getStore().lastOptions.params.query) {
+    		this.openDownloadCorpus(this.getStore().getCorpus().getId());
+    	} else {
+	    	this.getStore().load({
+	    		params: {
+	    			query: this.getStore().lastOptions.params.query,
+	    			createNewCorpus: true,
+	    			temporaryCorpus: true
+	    		},
+	    		callback: function(records, operation, success) {
+	    			if (success && records && records.length==1) {
+	    				this.openDownloadCorpus(operation.getProxy().getReader().metaData);
+	    			}
+	    		},
+	    		scope: this
+	    	})
+    	}
+    },
+    
+    openDownloadCorpus: function(corpus) {
+		var url = this.getTromboneUrl()+"?corpus="+corpus+"&tool=corpus.CorpusExporter&outputFormat=zip"+
+			"&zipFilename=DownloadedVoyantCorpus-"+corpus+".zip"+
+			(this.getApiParam("documentFormat") ? "&documentFormat="+this.getApiParam("documentFormat") : '')+
+			(this.getApiParam("documentFilename") ? "&documentFilename="+this.getApiParam("documentFilename") : '')
+		console.warn(url)
+//		me.openUrl(url)
+    },
+
+    handleEhxport: function() {
+    	var me = this, format="SOURCE", filenameHtml='[filename html]';
+		Ext.create('Ext.window.Window', {
+		    title: 'Export DREaM Corpus',
+		    modal: true,
+		    width: 500,
+		    items: [{
+		    	xtype: 'container',
+		    	layout: 'hbox',
+		    	defaults: {
+		    		flex: 1,
+		    		margin: 5,
+			    	xtype: 'button'
+		    	},
+		    	items: [{
+			    	text: 'Send to Voyant Tools',
+                    glyph: 'xf08e@FontAwesome',
+                    cls: 'send-voyant',
+                    handler: function(button) {
+                    	var dlg = button.findParentByType("window");
+                    	dlg.mask("Creating corpus…");
+                    	container.getAggregateSearchDocumentQueryMatches({
+                    		params: {createNewCorpus: true},
+                    		callback: function(records, operation, success) {
+                    			if (success) {
+                    				var corpus = operation.getProxy().getReader().rawData.documentsFinder.corpus;
+                    				var url = this.getBaseUrl()+"?corpus="+corpus;
+                    				var win = window.open(url);
+                    				if (!win) { // popup blocked
+                    					win = Ext.Msg.show({
+                    						buttons: Ext.MessageBox.OK,
+                    						buttonText: {ok: "Close"},
+                    						icon: Ext.MessageBox.INFO,
+                    						message: "<a href='"+url+"' target='_blank' class='link'>Click here</a> to access your new corpus.",
+                    						buttonText: 'Close'
+                    					});
+                    					Ext.Msg.getEl().dom.querySelector("a").addEventListener("click", function() {
+                    						win.close()
+                    					})
+                    				}
+                    				dlg.destroy();
+                    			}
+                    		}
+                    	})
+                    }
+			    },{
+			    	text: 'Download a ZIP Archive',
+			    	glyph: 'xf019@FontAwesome',
+                    handler: function(button) {
+                    	var dlg = button.findParentByType("window");
+                    	dlg.mask("Creating corpus…");
+                    	me.getStore().load({
+                    		params: {
+                    			query: me.getStore().lastOptions.params.query,
+                    			createNewCorpus: true,
+                    			temporaryCorpus: true
+                    		},
+                    		callback: function(records, operation, success) {
+                    			var corpus = operation.getProxy().getReader().metaData;
+                				var url = me.getTromboneUrl()+"?corpus="+corpus+"&tool=corpus.CorpusExporter&outputFormat=zip"+
+	            					"&zipFilename=DownloadedVoyantCorpus-"+operation.getParams().query.replace(/\W+/g, '_')+".zip"+
+	            					"&documentFormat="+(me.getApiParam("documentFormat"))+
+	            					"&documentFilename="+me.getApiParam("documentFilename")
+	            				me.openUrl(url)
+                    		}
+                    	})
+                    }
+			    }]
+		    },{
+		    	xtype: 'fieldset',
+		    	title: 'Download Details',
+		    	collapsible: true,
+		    	collapsed: true,
+		    	items: [{
+		    		xtype: 'radiogroup',
+		            fieldLabel: 'file format',
+		            cls: 'x-check-group-alt',
+		            width: 500,
+		            labelWidth: 80,
+		            items: [
+			            {boxLabel: 'DREaM XML', name: 'export-format', inputValue: 'SOURCE', checked: format=="SOURCE"},
+			            {boxLabel: 'Voyant XML', name: 'export-format', inputValue: 'ORIGINAL', checked: format=="ORIGINAL" || !format},
+		                {boxLabel: 'plain text', name: 'export-format', inputValue: 'TXT', checked: format=="TXT"}
+		            ],
+		            listeners: {
+		            	change: function(radio, newValue) {
+		            		debugger
+		            		container.setApiParam('documentFormat', newValue['export-format']);
+		            	}
+		            }
+		    	},{
+		    		xtype: 'fieldset',
+		    		title: 'File Name',
+		    		cls: 'filename',
+			    	html: filenameHtml,
+			    	listeners: {
+			    		afterrender: {
+			    			fn: function() {
+			    				$( "#filename-use, #filename-ignore" ).sortable({
+			    				      connectWith: ".filenamegroup",
+			    				      update: function( event, ui ) {
+			    				    	  if (this.id=="filename-use") {
+			    				    		  var items = this.querySelectorAll("li");
+			    				    		  var fields = [];
+			    				    		  for (var i=0, len=items.length; i<len; i++) {
+			    				    			  fields.push(items[i].getAttribute('data-field'))
+			    				    		  }
+			    				    		  container.setApiParam("documentFilename", fields.length>0 ? fields.join(",") : undefined);
+			    				    	  }
+			    				      }
+			    				    }).disableSelection();
+			    			}
+			    		}
+			    	}
+		    	}]
+		    }]
+		}).show();
+    },
+    
+    performAggregateQuery: function(query) {
+    	var me = this, statuscontainer = me.queryById('statuscontainer'), status = me.queryById('status'), spark = me.queryById('sparkline');
+		if (statuscontainer) {statuscontainer.show();}
+		if (status) {status.setHtml(new Ext.XTemplate('{0:plural("documents")} matching.').apply([0]))}
+		if (spark) {spark.setValues([0,0]);}
+    	if (query) {
+        	var docsCount = this.getStore().getCorpus().getDocumentsCount();
+        	this.getStore().load({
+        		params: {
+        			query: query,
+        			withDistributions: true,
+        			bins: docsCount > 100 ? 100 : docsCount 
+        		},
+        		callback: function(records, operation, success) {
+        			var exp = me.queryById('export');
+        			var spark = me.queryById('sparkline');
+        			if (success && records && records.length==1) {
+        				if (status) {
+        					status.setHtml(new Ext.XTemplate('{0:plural("document")} matching.').apply([records[0].getCount()]))
+        				}
+        				if (spark) {
+            				spark.setValues(records[0].getDistributions())
+        				}
+        			}
+        		}
+        	})
+    	} else if (this.getStore().lastOptions) { // set query to undefined so that send/export buttons work properly
+    		this.getStore().lastOptions.params.query = undefined
+    	}
+    },
+    
+    getAggregateQuery: function() {
+		var aggregateQueries = [];
+		Ext.ComponentQuery.query('field', this).forEach(function(field) {
+			if (field.getTokenType && field.getValue) {
+				var tokenType = field.getTokenType();
+				var vals = Ext.Array.from(field.getValue());
+				if (vals.length>0) {
+					if (vals.length>0) {
+        				aggregateQueries.push("+("+vals.map(function(val) {
+        					return tokenType+":"+val
+        				}).join("|")+")");
+					}
+				}
+			}
+		})
+		return aggregateQueries.join(" ");
+    }
+})
+
 Ext.define('Voyant.panel.CollocatesGraph', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -18824,115 +19277,124 @@ Ext.define('Voyant.VoyantCorpusApp', {
 			})
 		}
 		
+		this.validateCorpusLoadParams(params);
 		new Corpus(params).then(function(corpus) {
-			if (corpus.requiresPassword() && !me.getViewport().query("panel").every(function(panel) {
-					return !panel.isConsumptive
-				})) {
-				var noPasswordAccess = corpus.getNoPasswordAccess();
-				var buttons = [
-				       { text: 'Validate' }
-				]
-				if (noPasswordAccess=='NONCONSUMPTIVE') {
-					buttons.push({text: 'Limited'})
-				}
-				var passWin = Ext.create('Ext.window.Window', {
-                    title: me.localize('passwordRequiredTitle'),
-				    layout: 'fit',
-				    items: {
-				    	padding: 10,
-	                    flex: 1,
-	                    width: 300,
-	                    layout: {
-	                        type: 'vbox',
-	                        align: 'stretch'
-	                    },
-	                    items: [
-	                        {
-	                            html: '<p>'+me.localize('passwordRequiredMessage')+'</p>' + (noPasswordAccess=='NONCONSUMPTIVE' ? '<p>'+me.localize('nonConsumptiveMessage')+"</p>" : "")+'</p>'
-	                        },{
-	                        	xtype: 'textfield',
-	                        	fieldLabel: me.localize('password')
-	                        }
-	                    ],
-	                    bbar: {
-//	                    	ui: 'footer',
-	                    	layout: {pack: 'center'},
-	                    	items: [{
-		                    	text: me.localize('passwordValidateButton'),
-		                    	ui: 'default',
-		                    	handler: function() {
-		                    		var password = passWin.query("textfield")[0].getValue().trim();
-		                    		if (password.length==0) {
-		                    			me.showError({
-		                    				message: me.localize('noPasswordGiven')
-		                    			})
-		                    			return;
-		                    		}
-		                    		passWin.mask();
-		                    		Ext.Ajax.request({
-		                    			  url: me.getTromboneUrl(),
-		                    			  params: {
-		                    				  corpus: corpus.getId(),
-		                    				  passwordForSession: password
-		                    			  },
-		                    			  method: 'POST',
-		                    			  success: function(result, request) {
-		                    				  passWin.unmask();
-		                    				  var access = result.responseText;
-		                    				  if (access=="ADMIN" || access=="ACCESS") {
-				                    			    passWin.close();
-				                    			    view.unmask();
-						            				me.dispatchEvent('loadedCorpus', this, corpus);
-		                    				  }
-		                    				  else {
-		  		                    			me.showError({
-				                    				message: me.localize('badPassword')
-				                    			})
-		                    				  }
-		                    			  },
-		                    			  failure: function(result, request) {
-		                    				  passWin.unmask();
-		  		                    			me.showError({
-				                    				message: me.localize('passwordValidationError')
-				                    			})
-		                    			  } 
-		                    		});
-		                    	}
-		                    },{
-		                    	text: me.localize('nonConsumptiveButton'),
-		                    	handler: function() {
-		                    		passWin.mask();
-		                    		Ext.Ajax.request({
-		                    			  url: me.getTromboneUrl(),
-		                    			  params: {
-		                    				  corpus: corpus.getId(),
-		                    				  passwordForSessionRemove: true
-		                    			  },
-		                    			  method: 'POST',
-		                    			  callback: function(result, request) { // do this even if request fails
-		                    				  passWin.unmask();
-		                    				  passWin.close();
-		                    				  view.unmask();
-		                    				  me.dispatchEvent('loadedCorpus', me, corpus);
-		                    			  }
-		                    		});
-		                    	}
-		                    }]
-	                    }
-	                }
-				}).show();
-//				passWin.show();
-				
-			}
-			else {
-				view.unmask();
+			view.unmask();
+			me.setCorpus(corpus);
+			if (me.validateCorpusAccess()) {
 				me.dispatchEvent('loadedCorpus', this, corpus);
 			}
 		}).fail(function(message, response) {
-			debugger
-			view.unmask();
-			//me.showErrorResponse({message: message}, response);
+			view.unmask(); // error is shown by corpus constructor if needed be
 		});
+    },
+    
+    validateCorpusLoadParams: function(params) {
+    	// leave untouched by default, this can be overridden
+    },
+    
+    validateCorpusAccess: function() {
+		var me = this, view = me.getViewport(), corpus = this.getCorpus();
+		if (corpus && corpus.requiresPassword() && !me.getViewport().query("panel").every(function(panel) {
+			return !panel.isConsumptive
+		})) {
+			var noPasswordAccess = corpus.getNoPasswordAccess();
+			var buttons = [
+			       { text: 'Validate' }
+			]
+			if (noPasswordAccess=='NONCONSUMPTIVE') {
+				buttons.push({text: 'Limited'})
+			}
+			var passWin = Ext.create('Ext.window.Window', {
+	            title: me.localize('passwordRequiredTitle'),
+			    layout: 'fit',
+			    items: {
+			    	padding: 10,
+	                flex: 1,
+	                width: 300,
+	                layout: {
+	                    type: 'vbox',
+	                    align: 'stretch'
+	                },
+	                items: [
+	                    {
+	                        html: '<p>'+me.localize('passwordRequiredMessage')+'</p>' + (noPasswordAccess=='NONCONSUMPTIVE' ? '<p>'+me.localize('nonConsumptiveMessage')+"</p>" : "")+'</p>'
+	                    },{
+	                    	xtype: 'textfield',
+	                    	fieldLabel: me.localize('password')
+	                    }
+	                ],
+	                bbar: {
+	//                	ui: 'footer',
+	                	layout: {pack: 'center'},
+	                	items: [{
+	                    	text: me.localize('passwordValidateButton'),
+	                    	ui: 'default',
+	                    	handler: function() {
+	                    		var password = passWin.query("textfield")[0].getValue().trim();
+	                    		if (password.length==0) {
+	                    			me.showError({
+	                    				message: me.localize('noPasswordGiven')
+	                    			})
+	                    			return;
+	                    		}
+	                    		passWin.mask();
+	                    		Ext.Ajax.request({
+	                    			  url: me.getTromboneUrl(),
+	                    			  params: {
+	                    				  corpus: corpus.getId(),
+	                    				  passwordForSession: password
+	                    			  },
+	                    			  method: 'POST',
+	                    			  success: function(result, request) {
+	                    				  passWin.unmask();
+	                    				  var access = result.responseText;
+	                    				  if (access=="ADMIN" || access=="ACCESS") {
+			                    			    passWin.close();
+			                    			    view.unmask();
+					            				me.dispatchEvent('loadedCorpus', this, corpus);
+	                    				  }
+	                    				  else {
+	  		                    			me.showError({
+			                    				message: me.localize('badPassword')
+			                    			})
+	                    				  }
+	                    			  },
+	                    			  failure: function(result, request) {
+	                    				  passWin.unmask();
+	  		                    			me.showError({
+			                    				message: me.localize('passwordValidationError')
+			                    			})
+	                    			  } 
+	                    		});
+	                    	}
+	                    },{
+	                    	text: me.localize('nonConsumptiveButton'),
+	                    	handler: function() {
+	                    		passWin.mask();
+	                    		Ext.Ajax.request({
+	                    			  url: me.getTromboneUrl(),
+	                    			  params: {
+	                    				  corpus: corpus.getId(),
+	                    				  passwordForSessionRemove: true
+	                    			  },
+	                    			  method: 'POST',
+	                    			  callback: function(result, request) { // do this even if request fails
+	                    				  passWin.unmask();
+	                    				  passWin.close();
+	                    				  view.unmask();
+	                    				  me.dispatchEvent('loadedCorpus', me, corpus);
+	                    			  }
+	                    		});
+	                    	}
+	                    }]
+	                }
+	            }
+			}).show();
+			return false;
+		} else {
+			return true
+		}
     },
     
     hasQueryToLoad: function(params) {

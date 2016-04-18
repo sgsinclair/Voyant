@@ -10,7 +10,7 @@ Ext.define('Voyant.util.Api', {
 		}
 
 		this.addParentApi(apis, Ext.ClassManager.getClass(this)); // add params from this class and parents
-		
+
 		this.api = {};
 		apis.forEach(function(a) {
 			for (key in a) {
