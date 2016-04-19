@@ -144,29 +144,17 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	
     	me.on("afterrender", function(c) {
 			  if (c.triggers && c.triggers.help) {
-			      Ext.QuickTips.register({
-			        target: c.triggers.help.getEl(),
-			        text: c.getIsDocsMode() ? c.localize('querySearchDocsModeTip') : c.localize('querySearchTip'),
-			        enabled: true,
-			        showDelay: 20,
-			        autoShow: true
-			      });
+		        	Ext.tip.QuickTipManager.register({
+		                 target: c.triggers.help.getEl(),
+		                 text: c.getIsDocsMode() ? c.localize('querySearchDocsModeTip') : c.localize('querySearchTip')
+		             });
 			  }
 			  if (c.triggers && c.triggers.count) {
-			      Ext.QuickTips.register({
-			        target: c.triggers.count.getEl(),
-			        text: c.localize('aggregateInDocumentsCount'),
-			        enabled: true,
-			        showDelay: 20,
-			        autoShow: true
-			      });
+		        	Ext.tip.QuickTipManager.register({
+		                 target: c.triggers.count.getEl(),
+		                 text: c.localize('aggregateInDocumentsCount')
+		             });
 			  }
-			  this.suggest = Ext.create('Ext.tip.ToolTip', {
-			    target: this.inputEl,
-			    autoShow: false,
-			    hidden: true,
-			    html: ''
-			  });
     	}, me)
     	me.callParent(arguments);
     }

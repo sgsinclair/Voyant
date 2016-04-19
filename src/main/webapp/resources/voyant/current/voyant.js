@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Apr 18 15:26:59 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue Apr 19 16:00:05 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4534,6 +4534,13 @@ Ext.define('Voyant.util.Toolable', {
 							items: {
 								xtype: 'form',
 								items: panel.getOptions(),
+								listeners: {
+									afterrender: function(form) {
+										var api = panel.getApiParams(form.getForm().getFields().collect('name'));
+										debugger
+										form.getForm().setValues(api);
+									}
+								},
 								buttons: [{
 					            	text: panel.localize("reset"),
 									glyph: 'xf0e2@FontAwesome',
@@ -6635,29 +6642,17 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	
     	me.on("afterrender", function(c) {
 			  if (c.triggers && c.triggers.help) {
-			      Ext.QuickTips.register({
-			        target: c.triggers.help.getEl(),
-			        text: c.getIsDocsMode() ? c.localize('querySearchDocsModeTip') : c.localize('querySearchTip'),
-			        enabled: true,
-			        showDelay: 20,
-			        autoShow: true
-			      });
+		        	Ext.tip.QuickTipManager.register({
+		                 target: c.triggers.help.getEl(),
+		                 text: c.getIsDocsMode() ? c.localize('querySearchDocsModeTip') : c.localize('querySearchTip')
+		             });
 			  }
 			  if (c.triggers && c.triggers.count) {
-			      Ext.QuickTips.register({
-			        target: c.triggers.count.getEl(),
-			        text: c.localize('aggregateInDocumentsCount'),
-			        enabled: true,
-			        showDelay: 20,
-			        autoShow: true
-			      });
+		        	Ext.tip.QuickTipManager.register({
+		                 target: c.triggers.count.getEl(),
+		                 text: c.localize('aggregateInDocumentsCount')
+		             });
 			  }
-			  this.suggest = Ext.create('Ext.tip.ToolTip', {
-			    target: this.inputEl,
-			    autoShow: false,
-			    hidden: true,
-			    html: ''
-			  });
     	}, me)
     	me.callParent(arguments);
     }
@@ -6945,6 +6940,175 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 		me.callParent(arguments);	
     }
 });
+Ext.define('Voyant.widget.DownloadFilenameBuilder', {
+    extend: 'Ext.form.FieldContainer', //'Ext.container.Container',
+    mixins: ['Voyant.util.Localization'],
+    alias: 'widget.downloadfilenamebuilder',
+	statics: {
+		i18n: {
+			fieldLabel: {en: 'Filenames'},
+			titleLabel: {en: 'title'},
+			authorLabel: {en: 'author'},
+			pubDateLabel: {en: 'date'},
+			enabledLabel: {en: 'include: '},
+			availableLabel: {en: 'exclude: '}
+		}
+	},
+	config: {
+		forPanel: undefined,
+		labels: {
+			title: undefined,
+			author: undefined,
+			pubDate: undefined
+		},
+		enabled: ['pubDate', 'title'],
+		available: ['author']
+	},
+	
+    initComponent: function(config) {
+    	config = config || {};
+        var me = this;
+        
+        Ext.apply(this, {
+        	fieldLabel: config.fieldLabel ? config.fieldLabel : this.localize('fieldLabel'),
+        	labelAlign: config.labelAlign ? config.labelAlign : 'right',
+        	width: config.width ? config.width : 400
+        })
+
+        me.on('afterrender', function() {
+        	var labels = this.getLabels();
+        	['enabled','available'].forEach(function(mode) {
+        		var cmp = this.queryById(mode);
+        		this.enabledDropZone = new Ext.dd.DropZone(cmp.getTargetEl(), {
+        			getTargetFromEvent: function(e) {
+        				return cmp;
+        	        },
+        	        onNodeDrop : function(target, dd, e, data){
+        	        	cmp.getTargetEl().appendChild(dd.el.dom);
+        	        	// update the enabled values (for this field)
+        	        	me.setEnabled(me.queryById("enabled").getTargetEl().query('.dragsource').map(function(dom) {
+        	        		return dom.getAttribute('data-value')
+        	        	}))
+        	            return true;
+        	        }
+        		})
+        		Ext.create('Ext.dd.DropZone', cmp.getTargetEl(), {ddGroup: 'downloadfilename'});
+    			var el = Ext.dom.Helper.append(cmp.getTargetEl(), {
+    				tag: 'span',
+    				html: this.localize(mode+"Label"),
+    				cls: ''
+    			});
+        		this.getConfig(mode).forEach(function(key) {
+        			var el = Ext.dom.Helper.append(cmp.getTargetEl(), {
+        				tag: 'span',
+        				html: labels[key] ? labels[key] : this.localize(key+"Label"),
+        				'data-value': key,
+        				cls: 'dragsource'
+        			});
+        			Ext.create('Ext.dd.DragSource', el, {
+        				ddGroup: 'downloadfilename'
+                    });
+        		}, this)
+        	}, this)
+        }, me);
+        me.callParent(arguments);
+    }, 
+    defaults: {
+    	xtype: 'container',
+    	width: '100%'
+    },
+    items: [{
+    	itemId: 'enabled',
+    	cls: 'dropzone dropzone-enabled'
+    }, {
+    	itemId: 'available',
+    	cls: 'dropzone dropzone-disabled'
+    }],
+    
+    name: 'documentFilename',
+    itemId: 'documentFilename',
+    
+    getValue: function() {
+    	return this.getEnabled();
+    },
+    
+    setValue: function(val) {
+    	debugger
+    }
+    
+    
+});
+
+Ext.define('Voyant.widget.DownloadFileFormat', {
+    extend: 'Ext.form.RadioGroup', //'Ext.container.Container',
+    mixins: ['Voyant.util.Localization'],
+    alias: 'widget.downloadfileformat',
+	statics: {
+		i18n: {
+			fieldLabel: {en: 'File Format'},
+			voyantXml: {en: 'Voyant XML'},
+			VOYANTTip: {en: "This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content." },
+			SOURCETip: {en: "This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided."},
+			TXTTip: {en: "This will produce a plain text version of each document." },
+			original: {en: 'original'},
+			plainText: {en: 'plain text'}
+		}
+	},
+    initComponent: function(config) {
+    	config = config || {};
+        var me = this;
+        
+        Ext.apply(this, {
+        	labelAlign: config.labelAlign ? config.labelAlign : 'right'
+        })
+
+        Ext.applyIf(this, {
+        	fieldLabel: this.localize('fieldLabel'),
+        	items: [
+	            {boxLabel: this.localize('original'), name: 'documentFormat', inputValue: 'SOURCE'},
+	            {boxLabel: this.localize('voyantXml'), name: 'documentFormat', inputValue: 'VOYANT'},
+                {boxLabel: this.localize('plainText'), name: 'documentFormat', inputValue: 'TXT'}
+        	],
+        	width: 450
+        })
+        me.on('afterrender', function() {
+        	this.query('checkbox').forEach(function(cmp) {
+        		var tooltip = this.localize(cmp.inputValue+"Tip");
+        		if (tooltip.indexOf(cmp.inputValue+"Tip")==-1) {
+		        	Ext.tip.QuickTipManager.register({
+		                 target:cmp.getEl(),
+		                 text: tooltip
+		             });
+        		}
+        	}, this)
+        }, this)
+        me.callParent(arguments);
+    }
+});
+
+Ext.define('Voyant.widget.DownloadOptions', {
+    extend: 'Ext.form.FieldSet',
+    mixins: ['Voyant.util.Localization'],
+    requires: ['Voyant.widget.DownloadFileFormat', 'Voyant.widget.DownloadFilenameBuilder'],
+    alias: 'widget.downloadoptions',
+	statics: {
+		i18n: {
+			title: {en: 'Download Options'}
+		}
+	},
+	config: {
+		items: [{xtype: 'downloadfileformat'}, {xtype: 'downloadfilenamebuilder'}]
+	},
+    initComponent: function(config) {
+    	config = config || {};
+    	var me = this;
+        Ext.apply(this, {
+        	title: config.title ? config.title : this.localize('title')
+        })
+        me.callParent(arguments);
+    }
+});
+
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable','Voyant.util.DetailedError'],
 	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.TotalPropertyStatus'],
@@ -7325,6 +7489,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     	
     	var docTermStore = Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.DocumentTerm",
+			asynchronousLoad: false,
     		autoLoad: false,
     		remoteSort: false,
     		proxy: {
@@ -8565,15 +8730,17 @@ Ext.define('Voyant.panel.Collection', {
     	},
     	api: {
     		stopList: 'auto',
-    		documentFilename: undefined,
-    		documentFormat: undefined
+    		documentFilename: ['pubDate','title'],
+    		documentFormat: 'SOURCE'
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
-    	options: {
+    	options: [{
     		xtype: 'stoplistoption'
-    	},
+    	},{
+			xtype: 'downloadoptions'
+    	}],
 		inDocumentsCountOnly: false,
 		stopList: 'auto',
 		store: undefined
@@ -8669,6 +8836,7 @@ Ext.define('Voyant.panel.Collection', {
     	        		itemId: 'download',
     	        		text: this.localize('downloadButton'),
     	        		handler: me.handleExport,
+    	        		tooltip: 'test',
     	        		scope: me
             		},{
             			xtype: 'container',
@@ -8767,129 +8935,9 @@ Ext.define('Voyant.panel.Collection', {
 			"&zipFilename=DownloadedVoyantCorpus-"+corpus+".zip"+
 			(this.getApiParam("documentFormat") ? "&documentFormat="+this.getApiParam("documentFormat") : '')+
 			(this.getApiParam("documentFilename") ? "&documentFilename="+this.getApiParam("documentFilename") : '')
-		console.warn(url)
-//		me.openUrl(url)
+		this.openUrl(url)
     },
 
-    handleEhxport: function() {
-    	var me = this, format="SOURCE", filenameHtml='[filename html]';
-		Ext.create('Ext.window.Window', {
-		    title: 'Export DREaM Corpus',
-		    modal: true,
-		    width: 500,
-		    items: [{
-		    	xtype: 'container',
-		    	layout: 'hbox',
-		    	defaults: {
-		    		flex: 1,
-		    		margin: 5,
-			    	xtype: 'button'
-		    	},
-		    	items: [{
-			    	text: 'Send to Voyant Tools',
-                    glyph: 'xf08e@FontAwesome',
-                    cls: 'send-voyant',
-                    handler: function(button) {
-                    	var dlg = button.findParentByType("window");
-                    	dlg.mask("Creating corpus…");
-                    	container.getAggregateSearchDocumentQueryMatches({
-                    		params: {createNewCorpus: true},
-                    		callback: function(records, operation, success) {
-                    			if (success) {
-                    				var corpus = operation.getProxy().getReader().rawData.documentsFinder.corpus;
-                    				var url = this.getBaseUrl()+"?corpus="+corpus;
-                    				var win = window.open(url);
-                    				if (!win) { // popup blocked
-                    					win = Ext.Msg.show({
-                    						buttons: Ext.MessageBox.OK,
-                    						buttonText: {ok: "Close"},
-                    						icon: Ext.MessageBox.INFO,
-                    						message: "<a href='"+url+"' target='_blank' class='link'>Click here</a> to access your new corpus.",
-                    						buttonText: 'Close'
-                    					});
-                    					Ext.Msg.getEl().dom.querySelector("a").addEventListener("click", function() {
-                    						win.close()
-                    					})
-                    				}
-                    				dlg.destroy();
-                    			}
-                    		}
-                    	})
-                    }
-			    },{
-			    	text: 'Download a ZIP Archive',
-			    	glyph: 'xf019@FontAwesome',
-                    handler: function(button) {
-                    	var dlg = button.findParentByType("window");
-                    	dlg.mask("Creating corpus…");
-                    	me.getStore().load({
-                    		params: {
-                    			query: me.getStore().lastOptions.params.query,
-                    			createNewCorpus: true,
-                    			temporaryCorpus: true
-                    		},
-                    		callback: function(records, operation, success) {
-                    			var corpus = operation.getProxy().getReader().metaData;
-                				var url = me.getTromboneUrl()+"?corpus="+corpus+"&tool=corpus.CorpusExporter&outputFormat=zip"+
-	            					"&zipFilename=DownloadedVoyantCorpus-"+operation.getParams().query.replace(/\W+/g, '_')+".zip"+
-	            					"&documentFormat="+(me.getApiParam("documentFormat"))+
-	            					"&documentFilename="+me.getApiParam("documentFilename")
-	            				me.openUrl(url)
-                    		}
-                    	})
-                    }
-			    }]
-		    },{
-		    	xtype: 'fieldset',
-		    	title: 'Download Details',
-		    	collapsible: true,
-		    	collapsed: true,
-		    	items: [{
-		    		xtype: 'radiogroup',
-		            fieldLabel: 'file format',
-		            cls: 'x-check-group-alt',
-		            width: 500,
-		            labelWidth: 80,
-		            items: [
-			            {boxLabel: 'DREaM XML', name: 'export-format', inputValue: 'SOURCE', checked: format=="SOURCE"},
-			            {boxLabel: 'Voyant XML', name: 'export-format', inputValue: 'ORIGINAL', checked: format=="ORIGINAL" || !format},
-		                {boxLabel: 'plain text', name: 'export-format', inputValue: 'TXT', checked: format=="TXT"}
-		            ],
-		            listeners: {
-		            	change: function(radio, newValue) {
-		            		debugger
-		            		container.setApiParam('documentFormat', newValue['export-format']);
-		            	}
-		            }
-		    	},{
-		    		xtype: 'fieldset',
-		    		title: 'File Name',
-		    		cls: 'filename',
-			    	html: filenameHtml,
-			    	listeners: {
-			    		afterrender: {
-			    			fn: function() {
-			    				$( "#filename-use, #filename-ignore" ).sortable({
-			    				      connectWith: ".filenamegroup",
-			    				      update: function( event, ui ) {
-			    				    	  if (this.id=="filename-use") {
-			    				    		  var items = this.querySelectorAll("li");
-			    				    		  var fields = [];
-			    				    		  for (var i=0, len=items.length; i<len; i++) {
-			    				    			  fields.push(items[i].getAttribute('data-field'))
-			    				    		  }
-			    				    		  container.setApiParam("documentFilename", fields.length>0 ? fields.join(",") : undefined);
-			    				    	  }
-			    				      }
-			    				    }).disableSelection();
-			    			}
-			    		}
-			    	}
-		    	}]
-		    }]
-		}).show();
-    },
-    
     performAggregateQuery: function(query) {
     	var me = this, statuscontainer = me.queryById('statuscontainer'), status = me.queryById('status'), spark = me.queryById('sparkline');
 		if (statuscontainer) {statuscontainer.show();}
@@ -10210,14 +10258,10 @@ Ext.define('Voyant.panel.CorpusCreator', {
         	    	listeners: {
         	    		render: function(filefield) {
         	    			filefield.fileInputEl.dom.setAttribute('multiple', true);
-        	    		      Ext.QuickTips.register({
-        	      		        target: filefield.getEl(),
-        	      		        text: 'Upload one or more documents from your computer',
-        	      		        enabled: true,
-        	      		        showDelay: 20,
-        	      		        trackMouse: true,
-        	      		        autoShow: true
-        	      		      });
+        		        	Ext.tip.QuickTipManager.register({
+       		                 target: filefield.getEl(),
+       		                 text: 'Upload one or more documents from your computer'
+       		             	});
         	            },
         	            change: function(filefield, value) {
         	            	if (value) {
@@ -19019,6 +19063,10 @@ Ext.define('Voyant.VoyantApp', {
     },
     
     launch: function() {
+    	Ext.tip.QuickTipManager.init();
+    	Ext.apply(Ext.tip.QuickTipManager.getQuickTip(), {
+    	    showDelay: 50 // shorten the delay before showing
+    	});
 		this.callParent(arguments);
     },
     

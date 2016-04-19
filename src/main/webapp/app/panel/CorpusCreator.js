@@ -182,14 +182,10 @@ Ext.define('Voyant.panel.CorpusCreator', {
         	    	listeners: {
         	    		render: function(filefield) {
         	    			filefield.fileInputEl.dom.setAttribute('multiple', true);
-        	    		      Ext.QuickTips.register({
-        	      		        target: filefield.getEl(),
-        	      		        text: 'Upload one or more documents from your computer',
-        	      		        enabled: true,
-        	      		        showDelay: 20,
-        	      		        trackMouse: true,
-        	      		        autoShow: true
-        	      		      });
+        		        	Ext.tip.QuickTipManager.register({
+       		                 target: filefield.getEl(),
+       		                 text: 'Upload one or more documents from your computer'
+       		             	});
         	            },
         	            change: function(filefield, value) {
         	            	if (value) {
