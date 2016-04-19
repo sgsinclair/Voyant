@@ -318,12 +318,14 @@ Ext.define('Voyant.panel.Summary', {
     							if (!(i in docs)) {docs[i]=[]};
     							docs[i].push({
     								id: r.getId(),
+    								docIndex: r.getDocIndex(),
     								type: r.getTerm(),
     								val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
     								docId: r.get('docId')
     							});
 
     						});
+    						var len;
     						docIndex.forEach(function(index) {
     							var doc = this.getCorpus().getDocument(index);
     							len = docs[index].length; // declare for template
