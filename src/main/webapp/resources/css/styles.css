@@ -227,3 +227,26 @@ svg#collocatesGraph line {
     background: transparent !important;
     padding: 5px !important
 }
+
+.dropzone {
+    border: thin dotted #999;
+    padding: 5px;
+    margin: 5px;
+    min-height: 16px;
+}
+
+.dropzone-enabled {
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.dropzone-disabled {
+    background-color: rgba(0, 255, 0, 0.1);
+}
+
+.dragsource {
+    border: thin solid #999;
+    background-color: rgb(245, 245, 245);
+    padding: 2px;
+    margin: 2px;
+    cursor: move;
+}

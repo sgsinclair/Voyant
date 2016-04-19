@@ -40,6 +40,10 @@ Ext.define('Voyant.VoyantApp', {
     },
     
     launch: function() {
+    	Ext.tip.QuickTipManager.init();
+    	Ext.apply(Ext.tip.QuickTipManager.getQuickTip(), {
+    	    showDelay: 50 // shorten the delay before showing
+    	});
 		this.callParent(arguments);
     },
     

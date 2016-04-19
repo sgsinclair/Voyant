@@ -111,6 +111,12 @@ Ext.define('Voyant.util.Toolable', {
 							items: {
 								xtype: 'form',
 								items: panel.getOptions(),
+								listeners: {
+									afterrender: function(form) {
+//										var api = panel.getApiParams(form.getForm().getFields().collect('name'));
+//										form.getForm().setValues(api);
+									}
+								},
 								buttons: [{
 					            	text: panel.localize("reset"),
 									glyph: 'xf0e2@FontAwesome',
