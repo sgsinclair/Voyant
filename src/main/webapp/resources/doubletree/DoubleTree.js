@@ -1,3 +1,10 @@
+/**
+ * Voyant changes & additions:
+ * - height setter, height no longer calculated based on content
+ * - replaced tree.size with tree.nodeSize
+ * - pointer cursor for node
+ */
+
 /* (This is the new BSD license.)
 * Copyright (c) 2012-2014, Chris Culy
 * All rights reserved.
@@ -43,7 +50,7 @@ var doubletree = {};
     var containers = []; //nominally for allowing the same tree in multiple places, but not tested and probably doesn't work right (e.g. for search)
     //defaults. see below for getter/setters
     var visWidth = 600;
-    var visHt; //calculated, not settable
+    var visHt = 400; //calculated, not settable
     var prefixesOnRight = false; //true for right to left writing systems
     var filters = {"left":[], "right":[]};
     var handlers = {"alt":noOp, "shift":noOp};
@@ -194,7 +201,7 @@ var doubletree = {};
         textScale.domain = function(){};
       }
       
-      visHt = Math.max(200, maxChildren * (kBigFontSize-2));//TBD ?? fix was 16; 18 is the continuation font size
+//      visHt = Math.max(200, maxChildren * (kBigFontSize-2));//TBD ?? fix was 16; 18 is the continuation font size
       
       var maxLen = Math.max(leftTrieTree.maxLen, rtTrieTree.maxLen);
       var brLen = Math.max(80, maxLen*0.6*kBigFontSize); //TBD ?? fix was 10.5; 18 is the continuation font size
@@ -431,6 +438,13 @@ var doubletree = {};
       return mine;
     }
     
+    // ADDED
+    mine.visHeight = function(value) {
+        if (!arguments.length) return visHt;
+        visHt = value;
+        return mine;
+      }
+    
     /**
      * Getter/setter for whether the prefixes are displayed on the right or the left.
      * <p>
@@ -644,7 +658,8 @@ var doubletree = {};
     }
     
     var tree = d3.layout.tree()
-	.size([height, width])
+//	.size([height, width])
+    .nodeSize([30, 30])
 	.sort( sortFun )
 	;
     
@@ -710,7 +725,8 @@ var doubletree = {};
     
       // Enter any new nodes at the parent's previous position.
       var nodeEnter = node.enter().append("g")
-	  .attr("class", "node node_" + toLeft)	
+	  .attr("class", "node node_" + toLeft)
+	  .attr("cursor", "pointer")
 	  .attr("transform", function(d) { return "translate(" + positionX(source.y0) + "," + positionY(source.x0) + ")"; })
 	  /* doesn't work for webkit; svg really wants the title as separate element, see below
 	   .attr("title", function(d) {
