@@ -488,8 +488,8 @@ Ext.define('Voyant.panel.Reader', {
                         showDelay: 0,
                         dismissDelay: 500,
                         hideDelay: 5,
-                        renderer: function(storeItem, item) {
-                            this.setHtml(corpus.getDocument(storeItem.get('docIndex')).getTitle()+"<br>"+storeItem.get('term') + ': ' + storeItem.get('distribution'));
+                        renderer: function(toolTip, record, ctx) {
+                        	toolTip.setHtml(corpus.getDocument(record.get('docIndex')).getTitle()+"<br>"+record.get('term') + ': ' + record.get('distribution'));
                         }
                     }
         		}],
