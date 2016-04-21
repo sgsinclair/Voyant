@@ -30,9 +30,7 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     initComponent: function() {
-        var me = this;
-        
-        Ext.apply(me, {
+        Ext.apply(this, {
     		title: this.localize('title')
         });
         
@@ -49,9 +47,9 @@ Ext.define('Voyant.panel.WordTree', {
         				var prefix = [], hit = [], suffix = [], id = [];
         				for (var i = 0; i < records.length; i++) {
         					var r = records[i];
-        					prefix.push(r.getLeft().split(/\s+/));
+        					prefix.push(r.getLeft().trim().split(/\s+/));
         					hit.push(r.getMiddle());
-        					suffix.push(r.getRight().split(/\s+/));
+        					suffix.push(r.getRight().trim().split(/\s+/));
         					id.push(i);
         				}
         				var caseSensitive = false;
@@ -59,6 +57,10 @@ Ext.define('Voyant.panel.WordTree', {
         				var fieldDelim = "/";
         				var distinguishingFieldsArray = ["token", "POS"];
         				this.getTree().setupFromArrays(prefix, hit, suffix, id, caseSensitive, fieldNames, fieldDelim, distinguishingFieldsArray);
+        				
+        				if (!this.getTree().succeeded()) {
+        					// no records were added
+        				}
         			}
         		},
         		scope: this
@@ -75,7 +77,7 @@ Ext.define('Voyant.panel.WordTree', {
     		    		this.getKwicStore().load({params: this.getApiParams()});
     		    	}
     		    },
-    		    scope: me,
+    		    scope: this,
     		    params: {
     				limit: 1,
     				query: this.getApiParam('query'),
@@ -90,8 +92,7 @@ Ext.define('Voyant.panel.WordTree', {
         
         this.on('boxready', this.initGraph, this);
         
-    	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
-        me.callParent(arguments);
+        this.callParent(arguments);
     },
         
     initGraph: function() {
@@ -100,15 +101,25 @@ Ext.define('Voyant.panel.WordTree', {
     	var h = el.getHeight();
     	
     	var dt = new doubletree.DoubleTree();
-    	dt.init('#'+el.getId());
-//    		.visWidth(w)
-//    		.handlers({alt: null, shift: null});
+    	dt.init('#'+el.getId())
+    		.visWidth(w).visHeight(h)
+    		.handlers({
+    			alt: function(node) {
+    				this.setRoot(node.name);
+    			}.bind(this),
+    			shift: null
+    		});
     	
     	this.setTree(dt);
     	
     	// explicitly set dimensions
 //    	el.setWidth(el.getWidth());
 //    	el.setHeight(el.getHeight());
+    },
+    
+    setRoot: function(query) {
+    	this.setApiParam('query', query);
+		this.getKwicStore().load({params: this.getApiParams()});
     }
 });
 
