@@ -42,7 +42,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
-    		store.loadPage(1);
+    		store.load();
     	});
     	
     	if (config.embedded) {
@@ -74,7 +74,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
         			docIndex: undefined
         		});
         		if (this.isVisible()) {
-            		this.getStore().loadPage(1, {params: this.getApiParams()});
+            		this.getStore().load({params: this.getApiParams()});
         		}
     		}
     	});
@@ -87,13 +87,13 @@ Ext.define('Voyant.panel.DocumentTerms', {
     			query: undefined
     		});
     		if (this.isVisible()) {
-        		this.getStore().loadPage(1, {params: this.getApiParams()});
+        		this.getStore().load({params: this.getApiParams()});
     		}
     	});
     	
     	this.on("activate", function() { // load after tab activate (if we're in a tab panel)
     		if (this.getStore().getCorpus()) {
-    			this.getStore().loadPage(1, {params: this.getApiParams()});
+    			this.getStore().load({params: this.getApiParams()});
     		}
     	}, this);
     },
@@ -199,7 +199,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
                     			});
                         		if (this.isVisible()) {
                             		if (this.isVisible()) {
-                                		this.getStore().loadPage(1, {params: this.getApiParams()});
+                                		this.getStore().load({params: this.getApiParams()});
                             		}
                         		}
                     		}

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 21 17:44:33 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 21 17:56:05 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -247,7 +247,9 @@ Bubblelines.prototype = {
 				child.setHeight(height);
 			}
 		}
-		this.canvas.height = height;
+		if (this.canvas) {
+			this.canvas.height = height;
+		}
 	},
 	
 	/**
@@ -11485,7 +11487,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
-    		store.loadPage(1);
+    		store.load();
     	});
     	
     	if (config.embedded) {
@@ -11517,7 +11519,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
         			docIndex: undefined
         		});
         		if (this.isVisible()) {
-            		this.getStore().loadPage(1, {params: this.getApiParams()});
+            		this.getStore().load({params: this.getApiParams()});
         		}
     		}
     	});
@@ -11530,13 +11532,13 @@ Ext.define('Voyant.panel.DocumentTerms', {
     			query: undefined
     		});
     		if (this.isVisible()) {
-        		this.getStore().loadPage(1, {params: this.getApiParams()});
+        		this.getStore().load({params: this.getApiParams()});
     		}
     	});
     	
     	this.on("activate", function() { // load after tab activate (if we're in a tab panel)
     		if (this.getStore().getCorpus()) {
-    			this.getStore().loadPage(1, {params: this.getApiParams()});
+    			this.getStore().load({params: this.getApiParams()});
     		}
     	}, this);
     },
@@ -11642,7 +11644,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
                     			});
                         		if (this.isVisible()) {
                             		if (this.isVisible()) {
-                                		this.getStore().loadPage(1, {params: this.getApiParams()});
+                                		this.getStore().load({params: this.getApiParams()});
                             		}
                         		}
                     		}

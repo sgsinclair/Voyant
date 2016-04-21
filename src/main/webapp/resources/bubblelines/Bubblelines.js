@@ -246,7 +246,9 @@ Bubblelines.prototype = {
 				child.setHeight(height);
 			}
 		}
-		this.canvas.height = height;
+		if (this.canvas) {
+			this.canvas.height = height;
+		}
 	},
 	
 	/**
