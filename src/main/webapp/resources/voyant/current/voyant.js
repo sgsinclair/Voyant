@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 21 11:50:14 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 21 13:48:23 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8795,7 +8795,8 @@ Ext.define('Voyant.panel.Subset', {
     		publisherLabel: {en: "Publishers"},
     		sendToVoyantButton: {en: "New Voyant Corpus"},
     		downloadButton: {en: "Download Zip Archive"},
-    		sendToVoyantNoQuery: {en: "There's currently no query specified, but you can <a href='{0}' target='_blank'>open the current corpus in a new window</a>."}
+    		sendToVoyantNoQuery: {en: "There's currently no query specified, but you can <a href='{0}' target='_blank'>open the current corpus in a new window</a>."},
+    		noMatches: {en: "The current query criteria don't match any documents, please modifying the search first."}
     	},
     	api: {
     		stopList: 'auto',
@@ -8980,19 +8981,24 @@ Ext.define('Voyant.panel.Subset', {
     	if (!this.getStore().lastOptions || !this.getStore().lastOptions.params.query) {
     		this.downloadFromCorpusId(this.getStore().getCorpus().getId());
     	} else {
-	    	this.getStore().load({
-	    		params: {
-	    			query: this.getStore().lastOptions.params.query,
-	    			createNewCorpus: true,
-	    			temporaryCorpus: true
-	    		},
-	    		callback: function(records, operation, success) {
-	    			if (success && records && records.length==1) {
-	    	    		this.downloadFromCorpusId(operation.getProxy().getReader().metaData);
-	    			}
-	    		},
-	    		scope: this
-	    	})
+    		var record = this.getStore().getAt(0);
+    		if (this.getStore().lastOptions.params.query && record && record.getCount()==0) {
+    			this.showMsg({message: this.localize('noMatches')})
+    		} else {
+    	    	this.getStore().load({
+    	    		params: {
+    	    			query: this.getStore().lastOptions.params.query,
+    	    			createNewCorpus: true,
+    	    			temporaryCorpus: true
+    	    		},
+    	    		callback: function(records, operation, success) {
+    	    			if (success && records && records.length==1) {
+    	    	    		this.downloadFromCorpusId(operation.getProxy().getReader().metaData);
+    	    			}
+    	    		},
+    	    		scope: this
+    	    	})
+    		}
     	}
     },
     
@@ -9038,6 +9044,7 @@ Ext.define('Voyant.panel.Subset', {
     getAggregateQuery: function() {
 		var aggregateQueries = [];
 		Ext.ComponentQuery.query('field', this).forEach(function(field) {
+			console.warn(field, field.getTokenType, field.value)
 			if (field.getTokenType && field.getValue) {
 				var tokenType = field.getTokenType();
 				var vals = Ext.Array.from(field.getValue());
@@ -18804,7 +18811,8 @@ Ext.define('Voyant.panel.Subset', {
     		publisherLabel: {en: "Publishers"},
     		sendToVoyantButton: {en: "New Voyant Corpus"},
     		downloadButton: {en: "Download Zip Archive"},
-    		sendToVoyantNoQuery: {en: "There's currently no query specified, but you can <a href='{0}' target='_blank'>open the current corpus in a new window</a>."}
+    		sendToVoyantNoQuery: {en: "There's currently no query specified, but you can <a href='{0}' target='_blank'>open the current corpus in a new window</a>."},
+    		noMatches: {en: "The current query criteria don't match any documents, please modifying the search first."}
     	},
     	api: {
     		stopList: 'auto',
@@ -18989,19 +18997,24 @@ Ext.define('Voyant.panel.Subset', {
     	if (!this.getStore().lastOptions || !this.getStore().lastOptions.params.query) {
     		this.downloadFromCorpusId(this.getStore().getCorpus().getId());
     	} else {
-	    	this.getStore().load({
-	    		params: {
-	    			query: this.getStore().lastOptions.params.query,
-	    			createNewCorpus: true,
-	    			temporaryCorpus: true
-	    		},
-	    		callback: function(records, operation, success) {
-	    			if (success && records && records.length==1) {
-	    	    		this.downloadFromCorpusId(operation.getProxy().getReader().metaData);
-	    			}
-	    		},
-	    		scope: this
-	    	})
+    		var record = this.getStore().getAt(0);
+    		if (this.getStore().lastOptions.params.query && record && record.getCount()==0) {
+    			this.showMsg({message: this.localize('noMatches')})
+    		} else {
+    	    	this.getStore().load({
+    	    		params: {
+    	    			query: this.getStore().lastOptions.params.query,
+    	    			createNewCorpus: true,
+    	    			temporaryCorpus: true
+    	    		},
+    	    		callback: function(records, operation, success) {
+    	    			if (success && records && records.length==1) {
+    	    	    		this.downloadFromCorpusId(operation.getProxy().getReader().metaData);
+    	    			}
+    	    		},
+    	    		scope: this
+    	    	})
+    		}
     	}
     },
     
@@ -19047,6 +19060,7 @@ Ext.define('Voyant.panel.Subset', {
     getAggregateQuery: function() {
 		var aggregateQueries = [];
 		Ext.ComponentQuery.query('field', this).forEach(function(field) {
+			console.warn(field, field.getTokenType, field.value)
 			if (field.getTokenType && field.getValue) {
 				var tokenType = field.getTokenType();
 				var vals = Ext.Array.from(field.getValue());

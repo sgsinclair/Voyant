@@ -60,25 +60,28 @@
 					    	this.showMsg({message: "No queries have been selected, please select a subset of documents by specifying at least one query."});
 				    	} else {
 					    	var record = this.getStore().getAt(0);
-					    	if (record && record.getCount()>1000) {
-						    	return this.showMsg({message: "Too many matching documents to export, please specify a query that matches fewer than 1,000 documents."});
-						    } else {
-						    	this.getStore().load({
-						    		params: {
-						    			query: this.getStore().lastOptions.params.query,
-						    			createNewCorpus: true,
-						    			temporaryCorpus: true
-						    		},
-						    		callback: function(records, operation, success) {
-						    			if (success && records && records.length==1) {
-						    	    		this.downloadFromCorpusId(operation.getProxy().getReader().metaData);
-						    			}
-						    		},
-						    		scope: this
-						    	})
-							}
-						    
-
+					    	if (record) {
+						    	if (record.getCount()==0) {
+							    	return this.showMsg({message: "The current query criteria don't match any documents, please modifying the search first."});
+							    }
+						    	else if (record.getCount()>1000) {
+							    	return this.showMsg({message: "Too many matching documents to export, please specify a query that matches fewer than 1,000 documents."});
+							    } else {
+							    	this.getStore().load({
+							    		params: {
+							    			query: this.getStore().lastOptions.params.query,
+							    			createNewCorpus: true,
+							    			temporaryCorpus: true
+							    		},
+							    		callback: function(records, operation, success) {
+							    			if (success && records && records.length==1) {
+							    	    		this.downloadFromCorpusId(operation.getProxy().getReader().metaData);
+							    			}
+							    		},
+							    		scope: this
+							    	})
+								}
+						    }
 				    	}
 				    },
 				    fieldItems: [{
@@ -112,15 +115,43 @@
 						        maxValue: 1700,
 						        values: [ 1450, 1450 ],
 //						        width: 200
-						        flex: 1
-					        	},{
-						        	html: '<div class=""><div class="x-form-text-wrap x-form-text-wrap-default">'+
-						        		'<div class="x-form-trigger x-form-trigger-default form-fa-count-trigger fa-trigger fa-trigger-default" style="height: 22px"></div>'+
-						        		'<div class="x-form-trigger x-form-trigger-default fa-trigger form-fa-help-trigger fa-trigger form-fa-help-trigger-default "></div>'+
+						        flex: 1,
+						        getValue: function() {
+							        return '['+this.getValues().join("-")+"]"
+							    },
+							    getTokenType: function() {return 'pubDate'},
+						        listeners: {
+							        changecomplete: function(slider) {
+								        var query = this.getTokenType()+':'+this.getValue();
+							        	var subset = slider.up('subset');
+							    		subset.fireEvent("query", me, [query]);
+							        	var countEl = Ext.get(slider.ownerCt.getTargetEl().dom.querySelector('.form-fa-count-trigger'));
+							        	countEl.setHtml('0')
+							        	countEl.show();
+					    				subset.getStore().getCorpus().getCorpusTerms().load({
+					    					params: {
+					    						query: query,
+								    			tokenType: 'pubDate',
+								    			inDocumentsCountOnly: true
+					    					},
+					    					callback: function(records, operation, success) {
+					    						if (success && records && records.length==1) {
+					    							countEl.setHtml(Ext.util.Format.number(records[0].getInDocumentsCount(), '0,000'))
+						    						slider.ownerCt.updateLayout()
+					    						}
+					    					}
+					    				})
+								    }
+						    	},
+						    	scope: this
+					        },{
+						        	html: '<div><div class="x-form-text-wrap x-form-text-wrap-default" style="height: 22px">'+
+						        		'<div class="x-form-trigger x-form-trigger-default form-fa-count-trigger fa-trigger fa-trigger-default" style="display: none;"></div>'+
+						        		'<div class="x-form-trigger x-form-trigger-default fa-trigger form-fa-help-trigger fa-trigger form-fa-help-trigger-default" style="height: 22px;"></div>'+
 						        		'</div></div>',
 						        	listeners: {
 							        	afterrender: function(cmp) {
-								        	var collection = cmp.up('collection');
+								        	var subset = cmp.up('subset');
 								        	var count = Ext.get(cmp.getTargetEl().dom.querySelector(".form-fa-count-trigger"));
 								        	Ext.tip.QuickTipManager.register({
 								                 target: count,
@@ -147,9 +178,7 @@
 						    	            	    icon: Ext.Msg.INFO
 						    	            	});
 									        });
-								        },
-								        change: function() {
-									    }
+								        }
 						        	},
 						        	scope: this
 					        }]
