@@ -103,6 +103,11 @@
                         "title": "Documents"
                     },
                     {
+                        "name": "documentterms",
+                        "url": "guides/tools/documentterms",
+                        "title": "Document Terms"
+                    },
+                    {
                         "name": "knots",
                         "url": "guides/tools/knots",
                         "title": "Knots"

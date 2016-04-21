@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 21 15:02:00 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 21 17:44:33 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5259,7 +5259,7 @@ Ext.define("Voyant.util.Downloadable", {
 			(this.getApiParam("documentFormat") ? "&documentFormat="+this.getApiParam("documentFormat") : '')+
 			(this.getApiParam("documentFilename") ? "&documentFilename="+this.getApiParam("documentFilename") : '')
 		this.openUrl(url)
-    },
+    }
 })
 Ext.define('Voyant.data.model.AnalysisToken', {
     extend: 'Ext.data.Model',
@@ -13506,8 +13506,8 @@ Ext.define('Voyant.panel.Reader', {
                         showDelay: 0,
                         dismissDelay: 500,
                         hideDelay: 5,
-                        renderer: function(storeItem, item) {
-                            this.setHtml(corpus.getDocument(storeItem.get('docIndex')).getTitle()+"<br>"+storeItem.get('term') + ': ' + storeItem.get('distribution'));
+                        renderer: function(toolTip, record, ctx) {
+                        	toolTip.setHtml(corpus.getDocument(record.get('docIndex')).getTitle()+"<br>"+record.get('term') + ': ' + record.get('distribution'));
                         }
                     }
         		}],

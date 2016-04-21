@@ -69,6 +69,18 @@
 </div>
 
 <div class="thumb-list">
+	<a href="#!/guide/documentterms"><dd>
+		<div class="thumb">
+			<img src="guides/documentterms/icon.png" />
+		</div>
+		<div>
+			<h4>Document Terms</h4>
+			<p>Document Terms is a table view of document term frequencies.</p>
+		</div>
+	</dd></a>
+</div>
+
+<div class="thumb-list">
 	<a href="#!/guide/corpusterms"><dd>
 		<div class="thumb">
 			<img src="guides/corpusterms/icon.png" />
