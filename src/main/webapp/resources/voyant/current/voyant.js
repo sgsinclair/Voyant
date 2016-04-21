@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 21 14:13:37 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 21 15:02:00 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -17757,7 +17757,11 @@ Ext.define('Voyant.panel.TermsRadio', {
         				query: queryTerms
         			});
             		if (this.isVisible()) {
-                		this.loadFromCorpusTerms();
+            			if (queryTerms.length>0) {
+                    		this.loadFromCorpusTerms();
+            			} else {
+            				this.loadFromCorpus()
+            			}
             		}
         		}
     		}

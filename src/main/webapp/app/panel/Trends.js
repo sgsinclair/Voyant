@@ -110,7 +110,11 @@
         				query: queryTerms
         			});
             		if (this.isVisible()) {
-                		this.loadFromCorpusTerms();
+            			if (queryTerms.length>0) {
+                    		this.loadFromCorpusTerms();
+            			} else {
+            				this.loadFromCorpus()
+            			}
             		}
         		}
     		}
