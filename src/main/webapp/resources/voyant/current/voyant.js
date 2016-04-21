@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Apr 19 16:00:05 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 21 09:55:58 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4537,7 +4537,6 @@ Ext.define('Voyant.util.Toolable', {
 								listeners: {
 									afterrender: function(form) {
 										var api = panel.getApiParams(form.getForm().getFields().collect('name'));
-										debugger
 										form.getForm().setValues(api);
 									}
 								},
@@ -6942,7 +6941,7 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 });
 Ext.define('Voyant.widget.DownloadFilenameBuilder', {
     extend: 'Ext.form.FieldContainer', //'Ext.container.Container',
-    mixins: ['Voyant.util.Localization'],
+    mixins: ['Voyant.util.Localization', 'Ext.form.field.Field'],
     alias: 'widget.downloadfilenamebuilder',
 	statics: {
 		i18n: {
@@ -6955,60 +6954,45 @@ Ext.define('Voyant.widget.DownloadFilenameBuilder', {
 		}
 	},
 	config: {
-		forPanel: undefined,
-		labels: {
-			title: undefined,
-			author: undefined,
-			pubDate: undefined
-		},
-		enabled: ['pubDate', 'title'],
-		available: ['author']
+	    name: 'documentFilename',
+	    itemId: 'documentFilename',
+		fields: ['pubDate', 'title', 'author'],
+		values: ['pubDate', 'title'],
+		width: 400
 	},
 	
+
     initComponent: function(config) {
     	config = config || {};
         var me = this;
         
-        Ext.apply(this, {
-        	fieldLabel: config.fieldLabel ? config.fieldLabel : this.localize('fieldLabel'),
-        	labelAlign: config.labelAlign ? config.labelAlign : 'right',
-        	width: config.width ? config.width : 400
-        })
+        me.initField();
 
         me.on('afterrender', function() {
-        	var labels = this.getLabels();
-        	['enabled','available'].forEach(function(mode) {
-        		var cmp = this.queryById(mode);
-        		this.enabledDropZone = new Ext.dd.DropZone(cmp.getTargetEl(), {
+        	this.items.eachKey(function(key) {
+        		new Ext.dd.DropZone(this.items.get(key).getTargetEl(), {
+        			ddGroup: 'downloadfilename',
         			getTargetFromEvent: function(e) {
-        				return cmp;
+        				return e.getTarget();
         	        },
         	        onNodeDrop : function(target, dd, e, data){
-        	        	cmp.getTargetEl().appendChild(dd.el.dom);
-        	        	// update the enabled values (for this field)
-        	        	me.setEnabled(me.queryById("enabled").getTargetEl().query('.dragsource').map(function(dom) {
-        	        		return dom.getAttribute('data-value')
-        	        	}))
+        	        	target.appendChild(dd.el.dom);
         	            return true;
         	        }
-        		})
-        		Ext.create('Ext.dd.DropZone', cmp.getTargetEl(), {ddGroup: 'downloadfilename'});
-    			var el = Ext.dom.Helper.append(cmp.getTargetEl(), {
-    				tag: 'span',
-    				html: this.localize(mode+"Label"),
-    				cls: ''
-    			});
-        		this.getConfig(mode).forEach(function(key) {
-        			var el = Ext.dom.Helper.append(cmp.getTargetEl(), {
-        				tag: 'span',
-        				html: labels[key] ? labels[key] : this.localize(key+"Label"),
-        				'data-value': key,
-        				cls: 'dragsource'
-        			});
-        			Ext.create('Ext.dd.DragSource', el, {
-        				ddGroup: 'downloadfilename'
-                    });
-        		}, this)
+        		});
+        	}, this)
+        	
+        	this.getFields().map(function(item) {
+        		item = Ext.isString(item) ? {
+            		tag: 'span',
+            		html: this.localize(item+"Label"),
+            		value: item
+        		} : item;
+        		var container = this.queryById(Ext.Array.contains(this.values, item.value) ? 'enabled' : 'available')
+				var el = Ext.dom.Helper.append(container.getTargetEl(), Ext.apply(item, {cls: 'dragsource'}));
+    			Ext.create('Ext.dd.DragSource', el, {
+    				ddGroup: 'downloadfilename'
+                });
         	}, this)
         }, me);
         me.callParent(arguments);
@@ -7025,15 +7009,15 @@ Ext.define('Voyant.widget.DownloadFilenameBuilder', {
     	cls: 'dropzone dropzone-disabled'
     }],
     
-    name: 'documentFilename',
-    itemId: 'documentFilename',
     
     getValue: function() {
-    	return this.getEnabled();
+//    	return this.getEnabled();
     },
     
     setValue: function(val) {
-    	debugger
+    	this.getTargetEl().query(".dragsource", false).forEach(function(source) {
+    		debugger
+    	})
     }
     
     
@@ -8866,7 +8850,7 @@ Ext.define('Voyant.panel.Collection', {
         })
 
         Ext.applyIf(me, {
-        	items: [me.intro, me.fields, me.foot]
+        	items: [me.intro, me.fields, me.foot, {xtype: 'downloadoptions'}]
         });
         
     	me.on('loadedCorpus', function(src, corpus) {
@@ -14909,7 +14893,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     	corpus: undefined,
     	visLayout: undefined,
     	vis: undefined,
-    	mode: undefined
+    	mode: 'corpus'
     },
     
     graphMargin: {top: 20, right: 60, bottom: 110, left: 80},
@@ -15021,6 +15005,13 @@ Ext.define('Voyant.panel.StreamGraph', {
         	if (this.getCorpus().getDocumentsCount() == 1 && this.getMode() != this.MODE_DOCUMENT) {
 				this.setMode(this.MODE_DOCUMENT);
 			}
+			if (!('bins' in this.getModifiedApiParams())) {
+				if (this.getMode() == this.MODE_CORPUS) {
+					var count = corpus.getDocumentsCount();
+					var binsMax = 100;
+					this.setApiParam('bins', count > binsMax ? binsMax : count);
+				}
+			}
     		if (this.isVisible()) {
     			this.loadFromCorpus();
     		}
@@ -15073,6 +15064,11 @@ Ext.define('Voyant.panel.StreamGraph', {
 	},
 
     loadFromCorpusTerms: function(corpusTerms) {
+    	var params = this.getApiParams(['limit','stopList','query','withDistributions','bins']);
+		// ensure that we're not beyond the number of documents
+		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
+			params.bins = this.getCorpus().getDocumentsCount();
+		}
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
 		    	if (success) {
@@ -15083,7 +15079,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 		    	}
 		    },
 		    scope: this,
-		    params: this.getApiParams(['limit','stopList','query','withDistributions','bins'])
+		    params: params
     	});
     },
     
@@ -15149,7 +15145,9 @@ Ext.define('Voyant.panel.StreamGraph', {
     	if (this.getMode() === this.MODE_DOCUMENT) {
     		steps = this.getApiParam('bins');
     	} else {
-    		steps = this.getCorpus().getDocumentsCount();
+    		var bins = this.getApiParam('bins');
+    		var docsCount = this.getCorpus().getDocumentsCount();
+    		steps = bins < docsCount ? bins : docsCount;
     	}
     	steps--;
     	
@@ -15269,10 +15267,6 @@ Ext.define('Voyant.panel.StreamGraph', {
 					.attr('width', width+paddingH).attr('height', height+paddingV).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')')
 			);
     	}
-    },
-    
-    updateMode: function(mode) {
-    	this.queryById('segmentsSlider').setHidden(mode==this.MODE_CORPUS);
     }
 });
 
@@ -15597,12 +15591,14 @@ Ext.define('Voyant.panel.Summary', {
     							if (!(i in docs)) {docs[i]=[]};
     							docs[i].push({
     								id: r.getId(),
+    								docIndex: r.getDocIndex(),
     								type: r.getTerm(),
     								val: Ext.util.Format.number(r.get('rawFreq'),'0,000'),
     								docId: r.get('docId')
     							});
 
     						});
+    						var len;
     						docIndex.forEach(function(index) {
     							var doc = this.getCorpus().getDocument(index);
     							len = docs[index].length; // declare for template
@@ -17902,7 +17898,11 @@ Ext.define('Voyant.panel.TermsRadio', {
     			}
     		}
     		if (this.isVisible()) {
-        		this.loadFromCorpus(corpus);
+    			if (this.getApiParam('query')) {
+    				this.loadFromCorpusTerms();
+    			} else {
+    				this.loadFromCorpus();
+    			}
     		}
     	});
     	
@@ -17910,7 +17910,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		if (src.isXType("corpusdocumentselector")) {
     			this.setMode(this.MODE_CORPUS);
     			this.setApiParams({docId: undefined, docIndex: undefined})
-        		this.loadFromCorpus(corpus);
+        		this.loadFromCorpus();
     		}
     	});
     	
@@ -17937,7 +17937,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         				query: queryTerms
         			});
             		if (this.isVisible()) {
-                		this.loadFromCorpus(this.getCorpus());
+                		this.loadFromCorpusTerms();
             		}
         		}
     		}
@@ -17967,14 +17967,14 @@ Ext.define('Voyant.panel.TermsRadio', {
     	
     	this.on("activate", function() { // tab activation
     		if (this.getCorpus()) {
-				this.loadFromCorpus(this.getCorpus());
+				this.loadFromCorpus();
     		}
     	}, this);
     	
     	this.on("ensureCorpusView", function(src, corpus) {
     		if (this.getApiParam('mode')!=this.MODE_CORPUS && corpus.getDocumentsCount()>1) {
     			this.setApiParam('docId', undefined);
-    			this.loadFromCorpus(corpus);
+    			this.loadFromCorpus();
     		}
     	}, this);
 
@@ -18059,31 +18059,21 @@ Ext.define('Voyant.panel.TermsRadio', {
     },
     
     loadFromDocument: function(document) {
-
-    	if (document.then) {
-    		var me = this;
-    		document.then(function(document) {me.loadFromDocument(document);});
-    	}
-    	else {
-    		var params = {
-    			docIndex: undefined,
-    			query: undefined,
-    			docId: undefined
-    		}
-    		if (Ext.isNumber(document)) {params.docIndex=document}
-    		else if (Ext.isString(document)) {params.docId=document}
-    		else if (Ext.getClassName(document)=="Voyant.data.model.Document") {params.docId=document.getId()}
-			this.setMode(this.MODE_DOCUMENT);
-    		this.setApiParams(params);
-    		if (this.isVisible()) {
-            	this.loadFromDocumentTerms();
-    		}
+    	this.setApiParam({docId: this.getCorpus().getDocument(document).getId(), docIndex: undefined})
+    	if (this.isVisible()) {
+    		this.loadFromDocumentTerms(this.getApiParam('query') ? undefined : this.getCorpus().getDocumentTerms({
+    			proxy: {
+    				extraParams: {
+    					limit: this.getApiParam('limit')
+    				}
+    			}
+    		}))
     	}
     },
     
     loadFromDocumentTerms: function(documentTerms) {
     	if (this.getCorpus()) {
-        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({autoLoad: false});
+        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({});
     		documentTerms.load({
     		    callback: function(records, operation, success) {
     		    	if (success) {
@@ -18095,12 +18085,13 @@ Ext.define('Voyant.panel.TermsRadio', {
     		    	}
     		    },
     		    scope: this,
-    		    params: this.getApiParams(['limit','stopList','query','docId','withDistributions','bins'])
+    		    params: this.getApiParams(['stopList','query','docId','withDistributions','bins'])
         	});
     	}
     },
     
     loadFromCorpus: function(corpus) {
+    	corpus = corpus || this.getCorpus();
 		this.setCorpus(corpus);
 		if (this.getApiParam("docId")) {
 			this.loadFromDocumentTerms();
@@ -18109,31 +18100,41 @@ Ext.define('Voyant.panel.TermsRadio', {
 			this.loadFromDocument(corpus.getDocument(0));
 		}
 		else {
-    		this.loadFromCorpusTerms(corpus.getCorpusTerms());
+			this.loadFromCorpusTerms(corpus.getCorpusTerms({
+				proxy: {
+					extraParams: {
+						limit: this.getApiParam('limit')
+					}
+				}
+			}))
 		}
 	},
 
     loadFromCorpusTerms: function(corpusTerms) {
     	if (this.getCorpus()) {
-    		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
-    		var params = this.getApiParams(['limit','stopList','query','withDistributions',"bins"]);
-    		// ensure that we're not beyond the number of documents
-    		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
-    			params.bins = this.getCorpus().getDocumentsCount();
+    		if (this.getCorpus().getDocumentsCount()==1) {
+    			this.loadFromDocumentTerms();
+    		} else {
+        		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
+        		var params = this.getApiParams(['stopList','query','withDistributions',"bins"]);
+        		// ensure that we're not beyond the number of documents
+        		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
+        			params.bins = this.getCorpus().getDocumentsCount();
+        		}
+    			corpusTerms.load({
+    			    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
+    			    	if (success) {
+    		    			this.setMode(this.MODE_CORPUS);
+    				    	this.loadFromRecords(records);
+    			    	}
+    			    	else {
+    						Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
+    			    	}
+    			    },
+    			    scope: this,
+    			    params: params
+    	    	});
     		}
-			corpusTerms.load({
-			    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
-			    	if (success) {
-		    			this.setMode(this.MODE_CORPUS);
-				    	this.loadFromRecords(records);
-			    	}
-			    	else {
-						Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
-			    	}
-			    },
-			    scope: this,
-			    params: params
-	    	});
     	}
     },
     
@@ -18221,7 +18222,7 @@ Ext.define('Voyant.panel.TermsRadio', {
                     textAlign: 'end'
 
                },
-        		renderer: function(label, data) {
+        		renderer: function(axis, label) {
         			if (mode==me.MODE_DOCUMENT) {
         				return parseInt(label)+1;
         			} else {

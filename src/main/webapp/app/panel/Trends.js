@@ -71,7 +71,11 @@
     			}
     		}
     		if (this.isVisible()) {
-        		this.loadFromCorpus(corpus);
+    			if (this.getApiParam('query')) {
+    				this.loadFromCorpusTerms();
+    			} else {
+    				this.loadFromCorpus();
+    			}
     		}
     	});
     	
@@ -79,7 +83,7 @@
     		if (src.isXType("corpusdocumentselector")) {
     			this.setMode(this.MODE_CORPUS);
     			this.setApiParams({docId: undefined, docIndex: undefined})
-        		this.loadFromCorpus(corpus);
+        		this.loadFromCorpus();
     		}
     	});
     	
@@ -106,7 +110,7 @@
         				query: queryTerms
         			});
             		if (this.isVisible()) {
-                		this.loadFromCorpus(this.getCorpus());
+                		this.loadFromCorpusTerms();
             		}
         		}
     		}
@@ -136,14 +140,14 @@
     	
     	this.on("activate", function() { // tab activation
     		if (this.getCorpus()) {
-				this.loadFromCorpus(this.getCorpus());
+				this.loadFromCorpus();
     		}
     	}, this);
     	
     	this.on("ensureCorpusView", function(src, corpus) {
     		if (this.getApiParam('mode')!=this.MODE_CORPUS && corpus.getDocumentsCount()>1) {
     			this.setApiParam('docId', undefined);
-    			this.loadFromCorpus(corpus);
+    			this.loadFromCorpus();
     		}
     	}, this);
 
@@ -228,31 +232,21 @@
     },
     
     loadFromDocument: function(document) {
-
-    	if (document.then) {
-    		var me = this;
-    		document.then(function(document) {me.loadFromDocument(document);});
-    	}
-    	else {
-    		var params = {
-    			docIndex: undefined,
-    			query: undefined,
-    			docId: undefined
-    		}
-    		if (Ext.isNumber(document)) {params.docIndex=document}
-    		else if (Ext.isString(document)) {params.docId=document}
-    		else if (Ext.getClassName(document)=="Voyant.data.model.Document") {params.docId=document.getId()}
-			this.setMode(this.MODE_DOCUMENT);
-    		this.setApiParams(params);
-    		if (this.isVisible()) {
-            	this.loadFromDocumentTerms();
-    		}
+    	this.setApiParam({docId: this.getCorpus().getDocument(document).getId(), docIndex: undefined})
+    	if (this.isVisible()) {
+    		this.loadFromDocumentTerms(this.getApiParam('query') ? undefined : this.getCorpus().getDocumentTerms({
+    			proxy: {
+    				extraParams: {
+    					limit: this.getApiParam('limit')
+    				}
+    			}
+    		}))
     	}
     },
     
     loadFromDocumentTerms: function(documentTerms) {
     	if (this.getCorpus()) {
-        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({autoLoad: false});
+        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({});
     		documentTerms.load({
     		    callback: function(records, operation, success) {
     		    	if (success) {
@@ -264,12 +258,13 @@
     		    	}
     		    },
     		    scope: this,
-    		    params: this.getApiParams(['limit','stopList','query','docId','withDistributions','bins'])
+    		    params: this.getApiParams(['stopList','query','docId','withDistributions','bins'])
         	});
     	}
     },
     
     loadFromCorpus: function(corpus) {
+    	corpus = corpus || this.getCorpus();
 		this.setCorpus(corpus);
 		if (this.getApiParam("docId")) {
 			this.loadFromDocumentTerms();
@@ -278,31 +273,41 @@
 			this.loadFromDocument(corpus.getDocument(0));
 		}
 		else {
-    		this.loadFromCorpusTerms(corpus.getCorpusTerms());
+			this.loadFromCorpusTerms(corpus.getCorpusTerms({
+				proxy: {
+					extraParams: {
+						limit: this.getApiParam('limit')
+					}
+				}
+			}))
 		}
 	},
 
     loadFromCorpusTerms: function(corpusTerms) {
     	if (this.getCorpus()) {
-    		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
-    		var params = this.getApiParams(['limit','stopList','query','withDistributions',"bins"]);
-    		// ensure that we're not beyond the number of documents
-    		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
-    			params.bins = this.getCorpus().getDocumentsCount();
+    		if (this.getCorpus().getDocumentsCount()==1) {
+    			this.loadFromDocumentTerms();
+    		} else {
+        		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
+        		var params = this.getApiParams(['stopList','query','withDistributions',"bins"]);
+        		// ensure that we're not beyond the number of documents
+        		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
+        			params.bins = this.getCorpus().getDocumentsCount();
+        		}
+    			corpusTerms.load({
+    			    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
+    			    	if (success) {
+    		    			this.setMode(this.MODE_CORPUS);
+    				    	this.loadFromRecords(records);
+    			    	}
+    			    	else {
+    						Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
+    			    	}
+    			    },
+    			    scope: this,
+    			    params: params
+    	    	});
     		}
-			corpusTerms.load({
-			    callback: function(records, operation, success) { // not called in EXT JS 6.0.0
-			    	if (success) {
-		    			this.setMode(this.MODE_CORPUS);
-				    	this.loadFromRecords(records);
-			    	}
-			    	else {
-						Voyant.application.showResponseError(this.localize('failedGetCorpusTerms'), operation);
-			    	}
-			    },
-			    scope: this,
-			    params: params
-	    	});
     	}
     },
     
@@ -390,7 +395,7 @@
                     textAlign: 'end'
 
                },
-        		renderer: function(label, data) {
+        		renderer: function(axis, label) {
         			if (mode==me.MODE_DOCUMENT) {
         				return parseInt(label)+1;
         			} else {
