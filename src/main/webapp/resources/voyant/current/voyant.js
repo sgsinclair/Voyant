@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 21 09:55:58 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 21 11:50:14 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2399,6 +2399,13 @@ function classListToString(elt) {
 	}
 	return elt.class;
 }
+/**
+ * Voyant changes & additions:
+ * - height setter, height no longer calculated based on content
+ * - replaced tree.size with tree.nodeSize
+ * - pointer cursor for node
+ */
+
 /* (This is the new BSD license.)
 * Copyright (c) 2012-2014, Chris Culy
 * All rights reserved.
@@ -2444,7 +2451,7 @@ var doubletree = {};
     var containers = []; //nominally for allowing the same tree in multiple places, but not tested and probably doesn't work right (e.g. for search)
     //defaults. see below for getter/setters
     var visWidth = 600;
-    var visHt; //calculated, not settable
+    var visHt = 400; //calculated, not settable
     var prefixesOnRight = false; //true for right to left writing systems
     var filters = {"left":[], "right":[]};
     var handlers = {"alt":noOp, "shift":noOp};
@@ -2595,7 +2602,7 @@ var doubletree = {};
         textScale.domain = function(){};
       }
       
-      visHt = Math.max(200, maxChildren * (kBigFontSize-2));//TBD ?? fix was 16; 18 is the continuation font size
+//      visHt = Math.max(200, maxChildren * (kBigFontSize-2));//TBD ?? fix was 16; 18 is the continuation font size
       
       var maxLen = Math.max(leftTrieTree.maxLen, rtTrieTree.maxLen);
       var brLen = Math.max(80, maxLen*0.6*kBigFontSize); //TBD ?? fix was 10.5; 18 is the continuation font size
@@ -2832,6 +2839,13 @@ var doubletree = {};
       return mine;
     }
     
+    // ADDED
+    mine.visHeight = function(value) {
+        if (!arguments.length) return visHt;
+        visHt = value;
+        return mine;
+      }
+    
     /**
      * Getter/setter for whether the prefixes are displayed on the right or the left.
      * <p>
@@ -3045,7 +3059,8 @@ var doubletree = {};
     }
     
     var tree = d3.layout.tree()
-	.size([height, width])
+//	.size([height, width])
+    .nodeSize([30, 30])
 	.sort( sortFun )
 	;
     
@@ -3111,7 +3126,8 @@ var doubletree = {};
     
       // Enter any new nodes at the parent's previous position.
       var nodeEnter = node.enter().append("g")
-	  .attr("class", "node node_" + toLeft)	
+	  .attr("class", "node node_" + toLeft)
+	  .attr("cursor", "pointer")
 	  .attr("transform", function(d) { return "translate(" + positionX(source.y0) + "," + positionY(source.x0) + ")"; })
 	  /* doesn't work for webkit; svg really wants the title as separate element, see below
 	   .attr("title", function(d) {
@@ -5187,6 +5203,64 @@ Ext.define("Voyant.util.Variants", {
 		return variants
 	}
 })
+Ext.define("Voyant.util.Downloadable", {
+	mixins: ['Voyant.util.Localization'],
+	statics: {
+		i18n: {
+			exportTitle: {en: "Export"},
+			downloadButton: {en: "Download"},
+			cancelButton: {en: "Cancel"}
+		}
+	},
+
+	downloadFromCorpusId: function(corpusId) {
+		var panel = this;
+		Ext.create('Ext.window.Window', {
+			title: this.localize('exportTitle'),
+			modal: true,
+			items: {
+				xtype: 'form',
+				items: {xtype: 'downloadoptions'},
+				listeners: {
+					afterrender: function(form) {
+						// make sure defaults are set based on panel's API
+						form.getForm().setValues(panel.getApiParams(['documentFilename','documentFormat']));
+						
+					}
+				},
+				buttons: [{
+	            	text: this.localize("cancelButton"),
+	                glyph: 'xf00d@FontAwesome',
+	        		flex: 1,
+		            ui: 'default-toolbar',
+	        		handler: function(btn) {
+	        			btn.up('window').close();
+	        		}
+				},{
+	            	text: this.localize('downloadButton'),
+					glyph: 'xf00c@FontAwesome',
+	            	flex: 1,
+	        		handler: function(btn) {
+	        			var values = btn.up('form').getValues();
+	        			panel.setApiParams(values);
+	        			panel.openDownloadCorpus(corpusId);
+	        			btn.up('window').close();
+	        		},
+	        		scope: this
+	            }]
+			},
+			bodyPadding: 5
+		}).show()
+	},
+	
+    openDownloadCorpus: function(corpusId) {
+		var url = this.getTromboneUrl()+"?corpus="+corpusId+"&tool=corpus.CorpusExporter&outputFormat=zip"+
+			"&zipFilename=DownloadedVoyantCorpus-"+corpusId+".zip"+
+			(this.getApiParam("documentFormat") ? "&documentFormat="+this.getApiParam("documentFormat") : '')+
+			(this.getApiParam("documentFilename") ? "&documentFilename="+this.getApiParam("documentFilename") : '')
+		this.openUrl(url)
+    },
+})
 Ext.define('Voyant.data.model.AnalysisToken', {
     extend: 'Ext.data.Model',
     idProperty: 'term',
@@ -6957,7 +7031,7 @@ Ext.define('Voyant.widget.DownloadFilenameBuilder', {
 	    name: 'documentFilename',
 	    itemId: 'documentFilename',
 		fields: ['pubDate', 'title', 'author'],
-		values: ['pubDate', 'title'],
+		value: ['pubDate', 'title'],
 		width: 400
 	},
 	
@@ -6973,7 +7047,9 @@ Ext.define('Voyant.widget.DownloadFilenameBuilder', {
         		new Ext.dd.DropZone(this.items.get(key).getTargetEl(), {
         			ddGroup: 'downloadfilename',
         			getTargetFromEvent: function(e) {
-        				return e.getTarget();
+        				var target = e.getTarget();
+        				// check that we're not dropping on another source
+        				return target.className && target.className.indexOf('dragsource')>-1 ? target.parentNode : target;
         	        },
         	        onNodeDrop : function(target, dd, e, data){
         	        	target.appendChild(dd.el.dom);
@@ -6988,7 +7064,7 @@ Ext.define('Voyant.widget.DownloadFilenameBuilder', {
             		html: this.localize(item+"Label"),
             		value: item
         		} : item;
-        		var container = this.queryById(Ext.Array.contains(this.values, item.value) ? 'enabled' : 'available')
+        		var container = this.queryById(Ext.Array.contains(this.getValue(), item.value) ? 'enabled' : 'available')
 				var el = Ext.dom.Helper.append(container.getTargetEl(), Ext.apply(item, {cls: 'dragsource'}));
     			Ext.create('Ext.dd.DragSource', el, {
     				ddGroup: 'downloadfilename'
@@ -7011,13 +7087,22 @@ Ext.define('Voyant.widget.DownloadFilenameBuilder', {
     
     
     getValue: function() {
-//    	return this.getEnabled();
+    	return this.rendered ? this.getTargetEl().query('.dropzone-enabled .dragsource').map(function(source) {return source.getAttribute('value')}) : this.value;
     },
     
     setValue: function(val) {
-    	this.getTargetEl().query(".dragsource", false).forEach(function(source) {
-    		debugger
-    	})
+    	if (this.rendered) {
+        	this.getTargetEl().query(".dragsource", false).forEach(function(source) {
+        		var enabled = Ext.Array.contains(this.value, source.getAttribute('value'))
+        		if (enabled && source.parent().hasCls('dropzone-disabled')) {
+        			this.queryById('enabled').getTargetEl().appendChild(source.dom);
+        		} else if (!enabled && source.parent().hasCls('dropzone-enabled')) {
+        			this.queryById('available').getTargetEl().appendChild(source.dom);
+        		}
+        	}, this)
+    	} else {
+    		this.value = val;
+    	}
     }
     
     
@@ -8697,10 +8782,10 @@ Ext.define('Voyant.panel.Cirrus', {
         return newRelativeSize;
     }
 });
-Ext.define('Voyant.panel.Collection', {
+Ext.define('Voyant.panel.Subset', {
 	extend: 'Ext.panel.Panel',
-	mixins: ['Voyant.panel.Panel'],
-	alias: 'widget.collection',
+	mixins: ['Voyant.panel.Panel','Voyant.util.Downloadable'],
+	alias: 'widget.subset',
     statics: {
     	i18n: {
     		title: {en: "Workset Builder"},
@@ -8720,11 +8805,9 @@ Ext.define('Voyant.panel.Collection', {
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
-    	options: [{
+    	options: {
     		xtype: 'stoplistoption'
-    	},{
-			xtype: 'downloadoptions'
-    	}],
+    	},
 		inDocumentsCountOnly: false,
 		stopList: 'auto',
 		store: undefined
@@ -8820,7 +8903,6 @@ Ext.define('Voyant.panel.Collection', {
     	        		itemId: 'download',
     	        		text: this.localize('downloadButton'),
     	        		handler: me.handleExport,
-    	        		tooltip: 'test',
     	        		scope: me
             		},{
             			xtype: 'container',
@@ -8850,7 +8932,7 @@ Ext.define('Voyant.panel.Collection', {
         })
 
         Ext.applyIf(me, {
-        	items: [me.intro, me.fields, me.foot, {xtype: 'downloadoptions'}]
+        	items: [me.intro, me.fields, me.foot]
         });
         
     	me.on('loadedCorpus', function(src, corpus) {
@@ -8896,7 +8978,7 @@ Ext.define('Voyant.panel.Collection', {
     
     handleExport: function() {
     	if (!this.getStore().lastOptions || !this.getStore().lastOptions.params.query) {
-    		this.openDownloadCorpus(this.getStore().getCorpus().getId());
+    		this.downloadFromCorpusId(this.getStore().getCorpus().getId());
     	} else {
 	    	this.getStore().load({
 	    		params: {
@@ -8906,7 +8988,7 @@ Ext.define('Voyant.panel.Collection', {
 	    		},
 	    		callback: function(records, operation, success) {
 	    			if (success && records && records.length==1) {
-	    				this.openDownloadCorpus(operation.getProxy().getReader().metaData);
+	    	    		this.downloadFromCorpusId(operation.getProxy().getReader().metaData);
 	    			}
 	    		},
 	    		scope: this
@@ -18709,6 +18791,278 @@ Ext.define('Voyant.panel.ScatterSet', {
         }]
     }]
 })
+Ext.define('Voyant.panel.Subset', {
+	extend: 'Ext.panel.Panel',
+	mixins: ['Voyant.panel.Panel','Voyant.util.Downloadable'],
+	alias: 'widget.subset',
+    statics: {
+    	i18n: {
+    		title: {en: "Workset Builder"},
+    		titleLabel: {en: "Titles"},
+    		authorLabel: {en: "Authors"},
+    		lexicalLabel: {en: "Full-text"},
+    		publisherLabel: {en: "Publishers"},
+    		sendToVoyantButton: {en: "New Voyant Corpus"},
+    		downloadButton: {en: "Download Zip Archive"},
+    		sendToVoyantNoQuery: {en: "There's currently no query specified, but you can <a href='{0}' target='_blank'>open the current corpus in a new window</a>."}
+    	},
+    	api: {
+    		stopList: 'auto',
+    		documentFilename: ['pubDate','title'],
+    		documentFormat: 'SOURCE'
+    	},
+		glyph: 'xf0ce@FontAwesome'
+    },
+    config: {
+    	options: {
+    		xtype: 'stoplistoption'
+    	},
+		inDocumentsCountOnly: false,
+		stopList: 'auto',
+		store: undefined
+    },
+    constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);    	
+    },
+    
+    
+    initComponent: function(config) {
+        var me = this;
+
+        Ext.applyIf(me, {
+        	introHtml: '',
+        	fieldItems: [{
+	        		xtype: 'querysearchfield',
+	        		fieldLabel: this.localize('titleLabel'),
+	        		tokenType: 'title'
+        		},{
+	        		xtype: 'querysearchfield',
+	        		fieldLabel: this.localize('authorLabel'),
+	        		tokenType: 'author'
+        		},{
+	        		xtype: 'querysearchfield',
+	        		fieldLabel: this.localize('termsLabel')
+        	}],
+        	fieldColumns: 2
+        });
+        
+        Ext.applyIf(me, {
+        	intro: {
+        		margin: '5 0 5 0',
+        		layout: 'center',
+        		items: {
+        			itemId: 'intro',
+            		html: me.introHtml
+        		}
+        	},
+        	fields: {
+				xtype: 'container',
+        		layout: 'center',
+        		items: {
+    				xtype: 'container',
+        			maxWidth: 1200,
+        			layout: {
+        				type: 'table',
+        				columns: me.fieldColumns
+        			},
+        			// wrap in another container otherwise the tip won't work
+        			items: me.fieldItems.map(function(item) {return {
+        				xtype: 'container',
+            			defaults: {
+            				margin: '5 10 5 10',
+                    		inDocumentsCountOnly: me.getInDocumentsCountOnly(),
+                    		stopList: me.getStopList(),
+                    		showAggregateInDocumentsCount: true,
+                    		isDocsMode: true,
+                    		flex: 1,
+                    		maxWidth: 800,
+                    		labelAlign: 'right'
+            			},
+        				items: Ext.applyIf(item, {
+        					fieldLabel: me.localize((item.tokenType ? item.tokenType : 'lexical')+'Label')
+        				})
+        			}}, this)
+        		}
+        	},
+        	foot: {
+        		layout: 'center',
+        		margin: '20 0 0 0',
+        		items: {
+        			xtype: 'container',
+        			layout: {
+        				type: 'hbox',
+        				align: 'middle'
+        			},
+        			defaults: {
+    	        		margin: '0 5 0 5',
+//    	        		scale: 'large',
+    	        		width: 200
+        			},
+        			items:  [{
+    	        		xtype: 'button',
+    	        		itemId: 'export',
+	                    glyph: 'xf08e@FontAwesome',
+    	        		text: this.localize('sendToVoyantButton'),
+    	        		handler: me.handleSendToVoyant,
+    	        		scope: me
+            		},{
+    	        		xtype: 'button',
+				    	glyph: 'xf019@FontAwesome',
+    	        		itemId: 'download',
+    	        		text: this.localize('downloadButton'),
+    	        		handler: me.handleExport,
+    	        		scope: me
+            		},{
+            			xtype: 'container',
+            			hidden: true,
+            			itemId: 'statuscontainer',
+            			layout: 'vbox',
+            			items: [{
+            				itemId: 'status',
+            				bodyStyle: 'text-align: center',
+            				width: 200
+            			},{
+            				xtype: 'container',
+            				width: 200,
+            				items: {
+            	    			xtype: 'sparklineline',
+            	    			chartRangeMin: 0,
+            	    			itemId: 'sparkline',
+            	    			margin: '0 0 0 10',
+            	    			values: [1,1],
+            	    			height: 20,
+            	    			width: 200
+            				}
+            			}]
+            		}]
+        		}
+        	}
+        })
+
+        Ext.applyIf(me, {
+        	items: [me.intro, me.fields, me.foot]
+        });
+        
+    	me.on('loadedCorpus', function(src, corpus) {
+    		me.getStore().setCorpus(corpus);
+    		if (me.getInitialConfig('introHtml')==undefined && me.getInitialConfig('intro')==undefined) {
+    			 me.queryById('intro').setHtml(corpus.getShow())
+    		}
+    	}, me);
+    	
+    	me.on('query', function(src, queries) {
+    		this.performAggregateQuery(this.getAggregateQuery());
+    	});
+    	
+    	me.setStore(Ext.create('Voyant.data.store.DocumentQueryMatches'))
+        me.callParent([config]);
+        
+    },
+    
+    handleSendToVoyant: function() {
+    	if (!this.getStore().lastOptions || !this.getStore().lastOptions.params.query) {
+    		// there's currently no query, so give the option of opening the current corpus in a new window
+    		Ext.Msg.alert(this.localize('sendToVoyantButton'), new Ext.XTemplate(this.localize('sendToVoyantNoQuery')).apply([this.getBaseUrl()+"?corpus="+this.getStore().getCorpus().getId()]))
+    	} else {
+    		// try spawning a new corpus with the query
+    		var me = this;
+        	this.mask("Creating corpus…");
+        	this.getStore().load({
+        		params: {
+        			query: this.getStore().lastOptions.params.query,
+        			createNewCorpus: true
+        		},
+        		callback: function(records, operation, success) {
+        			me.unmask();
+        			if (success && records && records.length==1) {
+            			var corpus = operation.getProxy().getReader().metaData;
+        				var url = me.getBaseUrl()+"?corpus="+corpus;
+        				me.openUrl(url);
+        			}
+        		}
+        	})
+    	}
+    },
+    
+    handleExport: function() {
+    	if (!this.getStore().lastOptions || !this.getStore().lastOptions.params.query) {
+    		this.downloadFromCorpusId(this.getStore().getCorpus().getId());
+    	} else {
+	    	this.getStore().load({
+	    		params: {
+	    			query: this.getStore().lastOptions.params.query,
+	    			createNewCorpus: true,
+	    			temporaryCorpus: true
+	    		},
+	    		callback: function(records, operation, success) {
+	    			if (success && records && records.length==1) {
+	    	    		this.downloadFromCorpusId(operation.getProxy().getReader().metaData);
+	    			}
+	    		},
+	    		scope: this
+	    	})
+    	}
+    },
+    
+    openDownloadCorpus: function(corpus) {
+		var url = this.getTromboneUrl()+"?corpus="+corpus+"&tool=corpus.CorpusExporter&outputFormat=zip"+
+			"&zipFilename=DownloadedVoyantCorpus-"+corpus+".zip"+
+			(this.getApiParam("documentFormat") ? "&documentFormat="+this.getApiParam("documentFormat") : '')+
+			(this.getApiParam("documentFilename") ? "&documentFilename="+this.getApiParam("documentFilename") : '')
+		this.openUrl(url)
+    },
+
+    performAggregateQuery: function(query) {
+    	var me = this, statuscontainer = me.queryById('statuscontainer'), status = me.queryById('status'), spark = me.queryById('sparkline');
+		if (statuscontainer) {statuscontainer.show();}
+		if (status) {status.setHtml(new Ext.XTemplate('{0:plural("documents")} matching.').apply([0]))}
+		if (spark) {spark.setValues([0,0]);}
+    	if (query) {
+        	var docsCount = this.getStore().getCorpus().getDocumentsCount();
+        	this.getStore().load({
+        		params: {
+        			query: query,
+        			withDistributions: true,
+        			bins: docsCount > 100 ? 100 : docsCount 
+        		},
+        		callback: function(records, operation, success) {
+        			var exp = me.queryById('export');
+        			var spark = me.queryById('sparkline');
+        			if (success && records && records.length==1) {
+        				if (status) {
+        					status.setHtml(new Ext.XTemplate('{0:plural("document")} matching.').apply([records[0].getCount()]))
+        				}
+        				if (spark) {
+            				spark.setValues(records[0].getDistributions())
+        				}
+        			}
+        		}
+        	})
+    	} else if (this.getStore().lastOptions) { // set query to undefined so that send/export buttons work properly
+    		this.getStore().lastOptions.params.query = undefined
+    	}
+    },
+    
+    getAggregateQuery: function() {
+		var aggregateQueries = [];
+		Ext.ComponentQuery.query('field', this).forEach(function(field) {
+			if (field.getTokenType && field.getValue) {
+				var tokenType = field.getTokenType();
+				var vals = Ext.Array.from(field.getValue());
+				if (vals.length>0) {
+					if (vals.length>0) {
+        				aggregateQueries.push("+("+vals.map(function(val) {
+        					return tokenType+":"+val
+        				}).join("|")+")");
+					}
+				}
+			}
+		})
+		return aggregateQueries.join(" ");
+    }
+})
+
 Ext.define('Voyant.panel.CollocatesSet', {
 	extend: 'Ext.panel.Panel',
     requires: ['Voyant.panel.ScatterPlot','Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts'],
@@ -18939,9 +19293,7 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     initComponent: function() {
-        var me = this;
-        
-        Ext.apply(me, {
+        Ext.apply(this, {
     		title: this.localize('title')
         });
         
@@ -18958,9 +19310,9 @@ Ext.define('Voyant.panel.WordTree', {
         				var prefix = [], hit = [], suffix = [], id = [];
         				for (var i = 0; i < records.length; i++) {
         					var r = records[i];
-        					prefix.push(r.getLeft().split(/\s+/));
+        					prefix.push(r.getLeft().trim().split(/\s+/));
         					hit.push(r.getMiddle());
-        					suffix.push(r.getRight().split(/\s+/));
+        					suffix.push(r.getRight().trim().split(/\s+/));
         					id.push(i);
         				}
         				var caseSensitive = false;
@@ -18968,6 +19320,10 @@ Ext.define('Voyant.panel.WordTree', {
         				var fieldDelim = "/";
         				var distinguishingFieldsArray = ["token", "POS"];
         				this.getTree().setupFromArrays(prefix, hit, suffix, id, caseSensitive, fieldNames, fieldDelim, distinguishingFieldsArray);
+        				
+        				if (!this.getTree().succeeded()) {
+        					// no records were added
+        				}
         			}
         		},
         		scope: this
@@ -18984,7 +19340,7 @@ Ext.define('Voyant.panel.WordTree', {
     		    		this.getKwicStore().load({params: this.getApiParams()});
     		    	}
     		    },
-    		    scope: me,
+    		    scope: this,
     		    params: {
     				limit: 1,
     				query: this.getApiParam('query'),
@@ -18999,8 +19355,7 @@ Ext.define('Voyant.panel.WordTree', {
         
         this.on('boxready', this.initGraph, this);
         
-    	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
-        me.callParent(arguments);
+        this.callParent(arguments);
     },
         
     initGraph: function() {
@@ -19009,15 +19364,25 @@ Ext.define('Voyant.panel.WordTree', {
     	var h = el.getHeight();
     	
     	var dt = new doubletree.DoubleTree();
-    	dt.init('#'+el.getId());
-//    		.visWidth(w)
-//    		.handlers({alt: null, shift: null});
+    	dt.init('#'+el.getId())
+    		.visWidth(w).visHeight(h)
+    		.handlers({
+    			alt: function(node) {
+    				this.setRoot(node.name);
+    			}.bind(this),
+    			shift: null
+    		});
     	
     	this.setTree(dt);
     	
     	// explicitly set dimensions
 //    	el.setWidth(el.getWidth());
 //    	el.setHeight(el.getHeight());
+    },
+    
+    setRoot: function(query) {
+    	this.setApiParam('query', query);
+		this.getKwicStore().load({params: this.getApiParams()});
     }
 });
 

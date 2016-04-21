@@ -113,8 +113,8 @@ Ext.define('Voyant.util.Toolable', {
 								items: panel.getOptions(),
 								listeners: {
 									afterrender: function(form) {
-//										var api = panel.getApiParams(form.getForm().getFields().collect('name'));
-//										form.getForm().setValues(api);
+										var api = panel.getApiParams(form.getForm().getFields().collect('name'));
+										form.getForm().setValues(api);
 									}
 								},
 								buttons: [{

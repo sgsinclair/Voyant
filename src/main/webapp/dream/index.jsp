@@ -11,7 +11,7 @@
 
 	Ext.application({
 		extend : 'Voyant.VoyantCorpusApp',
-		requires: ['Voyant.panel.Collection'],
+		requires: ['Voyant.panel.Subset'],
 		name: 'VoyantDreamApp',
 		config: {
 			baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/',
@@ -47,7 +47,7 @@
 			    layout: 'fit',
 			    cls: 'dream-body',
 			    items: [{
-				    xtype: 'collection',
+				    xtype: 'subset',
             		inDocumentsCountOnly: true,
             		stopList: 'stop.en.taporware.txt',
 				    header: false,
@@ -55,9 +55,6 @@
 			    	autoScroll: true,
 				    margin: '0, 40, 20, 40',
 				    introHtml: introHtml,
-				    options: {
-						xtype: 'downloadoptions'
-			    	},
 				    handleExport: function() {
 				    	if (!this.getStore().lastOptions || !this.getStore().lastOptions.params.query) {
 					    	this.showMsg({message: "No queries have been selected, please select a subset of documents by specifying at least one query."});
@@ -65,56 +62,23 @@
 					    	var record = this.getStore().getAt(0);
 					    	if (record && record.getCount()>1000) {
 						    	return this.showMsg({message: "Too many matching documents to export, please specify a query that matches fewer than 1,000 documents."});
-						    }
-						    var panel = this;
-							Ext.create('Ext.window.Window', {
-								title: 'Export',
-								modal: true,
-				            	panel: panel,
-								items: {
-									xtype: 'form',
-									items: panel.getOptions(),
-									buttons: [{
-						            	text: "Download",
-										glyph: 'xf00c@FontAwesome',
-						            	flex: 1,
-						            	panel: panel,
-						        		handler: function(btn) {
-						        			var values = btn.up('form').getValues();
-						        			
-						        			// set api values (all of them, not just global ones)
-						        			this.setApiParams(values);
+						    } else {
+						    	this.getStore().load({
+						    		params: {
+						    			query: this.getStore().lastOptions.params.query,
+						    			createNewCorpus: true,
+						    			temporaryCorpus: true
+						    		},
+						    		callback: function(records, operation, success) {
+						    			if (success && records && records.length==1) {
+						    	    		this.downloadFromCorpusId(operation.getProxy().getReader().metaData);
+						    			}
+						    		},
+						    		scope: this
+						    	})
+							}
+						    
 
-						        			this.mask("Preparing Download...")
-											this.getStore().load({
-									    		params: {
-									    			query: this.getStore().lastOptions.params.query,
-									    			createNewCorpus: true,
-									    			temporaryCorpus: true
-									    		},
-									    		callback: function(records, operation, success) {
-										    		this.unmask();
-									    			if (success && records && records.length==1) {
-									    				this.openDownloadCorpus(operation.getProxy().getReader().metaData);
-									    			}
-									    		},
-									    		scope: this
-									    	})
-
-						        			btn.up('window').close();
-						        		},
-						        		scope: panel
-						            }, {
-						            	text: panel.localize("cancelTitle"),
-						                glyph: 'xf00d@FontAwesome',
-						        		flex: 1,
-						        		handler: function(btn) {
-						        			btn.up('window').close();
-						        		}
-									}]
-								},
-								bodyPadding: 5
-							}).show()
 				    	}
 				    },
 				    fieldItems: [{
@@ -183,7 +147,9 @@
 						    	            	    icon: Ext.Msg.INFO
 						    	            	});
 									        });
-								        }
+								        },
+								        change: function() {
+									    }
 						        	},
 						        	scope: this
 					        }]

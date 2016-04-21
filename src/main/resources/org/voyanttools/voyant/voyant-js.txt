@@ -24,6 +24,7 @@ app/util/SparkLine.js
 app/util/Toolable.js
 app/util/Transferable.js
 app/util/Variants.js
+app/util/Downloadable.js
 
 # MODELS
 app/data/model/AnalysisToken.js
@@ -76,7 +77,7 @@ app/widget/Facet.js
 app/panel/Bubblelines.js
 app/panel/Catalogue.js
 app/panel/Cirrus.js
-app/panel/Collection.js
+app/panel/Subset.js
 app/panel/CollocatesGraph.js
 app/panel/Contexts.js
 app/panel/CorpusCollocates.js
@@ -101,6 +102,7 @@ app/panel/VoyantFooter.js
 app/panel/VoyantHeader.js
 app/panel/CorpusSet.js
 app/panel/ScatterSet.js
+app/panel/Subset.js
 app/panel/CollocatesSet.js
 app/panel/BubblelinesSet.js
 app/panel/CustomSet.js
