@@ -20,7 +20,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
     		relativeFreqTip: {en: "The relative frequency (per million) of this term in each document."},
     		trendTip: {en: 'This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).'},
     		tfidf: {en: 'Significance'},
-    		tfidfTip: {en: 'The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.'}
+    		tfidfTip: {en: 'The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.'},
+    		zscore: {en: 'Z-Score'},
+    		zscoreTip: {en: "The Z-Score, or standard score, is a normalized value for the term's raw frequency compared to other term frequencies in the same document.<table><tr><td style='text-align: center; font-size: smaller; font-family: mono;'>frequency of term - mean of term frequencies<hr/>standard deviation of term frequencies</td></tr></table>."}
     	},
     	api: {
     		stopList: 'auto',
@@ -156,6 +158,14 @@ Ext.define('Voyant.panel.DocumentTerms', {
             	text: this.localize("tfidf"),
             	tooltip: this.localize("tfidfTip"),
             	dataIndex: 'tfidf',
+            	width: 'autoSize',
+            	sortable: true,
+            	hidden: true,
+            	renderer: Ext.util.Format.numberRenderer('0,000.000')
+            },{
+            	text: this.localize("zscore"),
+            	tooltip: this.localize("zscoreTip"),
+            	dataIndex: 'zscore',
             	width: 'autoSize',
             	sortable: true,
             	hidden: true,
