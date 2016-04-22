@@ -93,6 +93,7 @@ Ext.define('Voyant.widget.StopListOption', {
 	    		}, {width: 10}, {xtype: 'tbspacer'}, {
 	    			xtype: 'button',
 	    			text: this.localize('editList'),
+		            ui: 'default-toolbar',
 	    			handler: this.editList,
 	    			scope: this
 	    		}, {width: 10}, {

@@ -118,7 +118,9 @@ Ext.define('Voyant.panel.Cirrus', {
     			height = el.getHeight();
     			
     			el.down('svg').set({width: width, height: height});
-    			this.getVisLayout().size([width, height]).stop().words(this.getTerms()).start();
+    			if (this.getTerms()) {
+        			this.getVisLayout().size([width, height]).stop().words(this.getTerms()).start();
+    			}
     		}
     	},
     	

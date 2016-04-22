@@ -114,7 +114,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
         		enableOverflow: true,
                 dock: 'bottom',
     	    	buttonAlign: 'right',
-    	    	defaultButtonUI : 'default',
+//    	    	defaultButtonUI : 'default',
 	    		items: [{
 	    			text: 'Open',
                     glyph: 'xf115@FontAwesome', // not visible
@@ -172,13 +172,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				}).show();
 	    			}
 	    		},{
-    	        	xtype: 'filefield',
+    	        	xtype: 'fileuploadfield',
                     glyph: 'xf093@FontAwesome',
     	        	name: 'upload',
         	    	buttonOnly: true,
         	    	hideLabel: true,
+		            ui: 'default-toolbar',
         	    	buttonText: 'Upload',
-        	    	tooltip: 'test',
         	    	listeners: {
         	    		render: function(filefield) {
         	    			filefield.fileInputEl.dom.setAttribute('multiple', true);
@@ -251,6 +251,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	    	scale: 'large',
                     glyph: 'xf00c@FontAwesome',
 	    	    	text: this.localize('reveal'),
+	    	    	ui: 'default',
+	    	    	width: 200,
 	    	    	handler: function(btn) {
 	    	        	var input = btn.up('form').down('#input').getValue();
 	    	        	if (input !== '') {

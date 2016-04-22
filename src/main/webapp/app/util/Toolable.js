@@ -122,6 +122,7 @@ Ext.define('Voyant.util.Toolable', {
 									glyph: 'xf0e2@FontAwesome',
 					            	flex: 1,
 					            	panel: panel,
+						            ui: 'default-toolbar',
 					        		handler: function(btn) {
 					        			if (this.mixins && this.mixins["Voyant.util.Api"]) {
 					        				this.mixins["Voyant.util.Api"].constructor.apply(this);
@@ -133,7 +134,15 @@ Ext.define('Voyant.util.Toolable', {
 					        		},
 					        		scope: panel
 								
-								},{xtype: 'tbfill'},{
+								},{xtype: 'tbfill'}, {
+					            	text: panel.localize("cancelTitle"),
+						            ui: 'default-toolbar',
+					                glyph: 'xf00d@FontAwesome',
+					        		flex: 1,
+					        		handler: function(btn) {
+					        			btn.up('window').close();
+					        		}
+								},{
 					            	text: panel.localize("confirmTitle"),
 									glyph: 'xf00c@FontAwesome',
 					            	flex: 1,
@@ -180,14 +189,7 @@ Ext.define('Voyant.util.Toolable', {
 					        			btn.up('window').close();
 					        		},
 					        		scope: panel
-					            }, {
-					            	text: panel.localize("cancelTitle"),
-					                glyph: 'xf00d@FontAwesome',
-					        		flex: 1,
-					        		handler: function(btn) {
-					        			btn.up('window').close();
-					        		}
-								}]
+					            }]
 							},
 							bodyPadding: 5
 						}).show()

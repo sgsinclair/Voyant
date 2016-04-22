@@ -127,12 +127,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		tbar: {
         			enableOverflow: true,
         			items: [{
-    	            	xtype: 'documentselectorbutton'
+    	            	xtype: 'documentselectorbutton',
+    	            	flex: 1
     	            },{
                 		text: this.localize('analysis'),
                 		itemId: 'analysis',
                 		glyph: 'xf1ec@FontAwesome',
                 		enableOverflow: true,
+    	            	flex: 1,
             			menu: {
         					items: [
         					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
@@ -163,6 +165,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	            	text: this.localize('freqsMode'),
     					glyph: 'xf201@FontAwesome',
     				    tooltip: this.localize('freqsModeTip'),
+    	            	flex: 1,
     				    menu: {
     				    	items: [{
 				               text: this.localize("rawFrequencies"),
@@ -206,6 +209,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('clusters'),
                 		itemId: 'clusters',
                 		glyph: 'xf192@FontAwesome',
+    	            	flex: 1,
                 		menu: {
                 			items: [
                 			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
@@ -228,6 +232,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('dimensions'),
                 		itemId: 'dimensions',
                 		glyph: 'xf1b2@FontAwesome',
+    	            	flex: 1,
                 		menu: {
                 			items: [
                 			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
@@ -247,6 +252,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('labels'),
                 		itemId: 'labels',
                 		glyph: 'xf02b@FontAwesome',
+    	            	flex: 1,
                 		menu: {
                 			items: [
                 			    {text: this.localize("summaryLabel"), itemId: 'summary', xtype: 'menucheckitem'},
@@ -295,6 +301,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         xtype: 'button',
                         text: this.localize('nearby'),
                         glyph: 'xf0b2@FontAwesome',
+                        flex: 1,
                         handler: function(btn) {
                         	var sel = this.down('#terms').getSelection()[0];
                         	if (sel === undefined) {
@@ -313,6 +320,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         xtype: 'button',
                         text: this.localize('remove'),
                         glyph: 'xf068@FontAwesome',
+                        flex: 1,
                         handler: function(btn) {
                         	var sel = this.down('#terms').getSelection()[0];
                         	if (sel === undefined) {

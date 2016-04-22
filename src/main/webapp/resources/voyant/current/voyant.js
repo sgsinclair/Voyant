@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 21 17:56:05 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Apr 21 20:34:56 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4563,6 +4563,7 @@ Ext.define('Voyant.util.Toolable', {
 									glyph: 'xf0e2@FontAwesome',
 					            	flex: 1,
 					            	panel: panel,
+						            ui: 'default-toolbar',
 					        		handler: function(btn) {
 					        			if (this.mixins && this.mixins["Voyant.util.Api"]) {
 					        				this.mixins["Voyant.util.Api"].constructor.apply(this);
@@ -4574,7 +4575,15 @@ Ext.define('Voyant.util.Toolable', {
 					        		},
 					        		scope: panel
 								
-								},{xtype: 'tbfill'},{
+								},{xtype: 'tbfill'}, {
+					            	text: panel.localize("cancelTitle"),
+						            ui: 'default-toolbar',
+					                glyph: 'xf00d@FontAwesome',
+					        		flex: 1,
+					        		handler: function(btn) {
+					        			btn.up('window').close();
+					        		}
+								},{
 					            	text: panel.localize("confirmTitle"),
 									glyph: 'xf00c@FontAwesome',
 					            	flex: 1,
@@ -4621,14 +4630,7 @@ Ext.define('Voyant.util.Toolable', {
 					        			btn.up('window').close();
 					        		},
 					        		scope: panel
-					            }, {
-					            	text: panel.localize("cancelTitle"),
-					                glyph: 'xf00d@FontAwesome',
-					        		flex: 1,
-					        		handler: function(btn) {
-					        			btn.up('window').close();
-					        		}
-								}]
+					            }]
 							},
 							bodyPadding: 5
 						}).show()
@@ -6463,6 +6465,7 @@ Ext.define('Voyant.widget.StopListOption', {
 	    		}, {width: 10}, {xtype: 'tbspacer'}, {
 	    			xtype: 'button',
 	    			text: this.localize('editList'),
+		            ui: 'default-toolbar',
 	    			handler: this.editList,
 	    			scope: this
 	    		}, {width: 10}, {
@@ -8455,7 +8458,9 @@ Ext.define('Voyant.panel.Cirrus', {
     			height = el.getHeight();
     			
     			el.down('svg').set({width: width, height: height});
-    			this.getVisLayout().size([width, height]).stop().words(this.getTerms()).start();
+    			if (this.getTerms()) {
+        			this.getVisLayout().size([width, height]).stop().words(this.getTerms()).start();
+    			}
     		}
     	},
     	
@@ -9986,7 +9991,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
         		enableOverflow: true,
                 dock: 'bottom',
     	    	buttonAlign: 'right',
-    	    	defaultButtonUI : 'default',
+//    	    	defaultButtonUI : 'default',
 	    		items: [{
 	    			text: 'Open',
                     glyph: 'xf115@FontAwesome', // not visible
@@ -10044,13 +10049,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				}).show();
 	    			}
 	    		},{
-    	        	xtype: 'filefield',
+    	        	xtype: 'fileuploadfield',
                     glyph: 'xf093@FontAwesome',
     	        	name: 'upload',
         	    	buttonOnly: true,
         	    	hideLabel: true,
+		            ui: 'default-toolbar',
         	    	buttonText: 'Upload',
-        	    	tooltip: 'test',
         	    	listeners: {
         	    		render: function(filefield) {
         	    			filefield.fileInputEl.dom.setAttribute('multiple', true);
@@ -10123,6 +10128,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	    	scale: 'large',
                     glyph: 'xf00c@FontAwesome',
 	    	    	text: this.localize('reveal'),
+	    	    	ui: 'default',
+	    	    	width: 200,
 	    	    	handler: function(btn) {
 	    	        	var input = btn.up('form').down('#input').getValue();
 	    	        	if (input !== '') {
@@ -11293,7 +11300,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
 	alias: 'widget.corpusterms',
     statics: {
     	i18n: {
-    		title: {en: "Corpus Terms"},
+    		title: {en: "Terms"},
     		emptyText: {en: "No matching results."},
     		helpTip: {en: "<p>Corpus Terms is a table view of terms that appear in the entire corpus. Features include:</p><ul><li>reordering by <i>term</i> and <i>count</i> (click on the column headers)</li><li>a sparkline graph of the term frequency trends across the corpus (if the corpus has multiple documents) or across the document (if the corpus has only one document)</li><li>additional columns available (relative frequency, distribution peakedness and skew) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
     		matchingTerms: {en: 'Matching terms: {count}'},
@@ -13864,12 +13871,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		tbar: {
         			enableOverflow: true,
         			items: [{
-    	            	xtype: 'documentselectorbutton'
+    	            	xtype: 'documentselectorbutton',
+    	            	flex: 1
     	            },{
                 		text: this.localize('analysis'),
                 		itemId: 'analysis',
                 		glyph: 'xf1ec@FontAwesome',
                 		enableOverflow: true,
+    	            	flex: 1,
             			menu: {
         					items: [
         					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
@@ -13900,6 +13909,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	            	text: this.localize('freqsMode'),
     					glyph: 'xf201@FontAwesome',
     				    tooltip: this.localize('freqsModeTip'),
+    	            	flex: 1,
     				    menu: {
     				    	items: [{
 				               text: this.localize("rawFrequencies"),
@@ -13943,6 +13953,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('clusters'),
                 		itemId: 'clusters',
                 		glyph: 'xf192@FontAwesome',
+    	            	flex: 1,
                 		menu: {
                 			items: [
                 			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
@@ -13965,6 +13976,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('dimensions'),
                 		itemId: 'dimensions',
                 		glyph: 'xf1b2@FontAwesome',
+    	            	flex: 1,
                 		menu: {
                 			items: [
                 			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
@@ -13984,6 +13996,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('labels'),
                 		itemId: 'labels',
                 		glyph: 'xf02b@FontAwesome',
+    	            	flex: 1,
                 		menu: {
                 			items: [
                 			    {text: this.localize("summaryLabel"), itemId: 'summary', xtype: 'menucheckitem'},
@@ -14032,6 +14045,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         xtype: 'button',
                         text: this.localize('nearby'),
                         glyph: 'xf0b2@FontAwesome',
+                        flex: 1,
                         handler: function(btn) {
                         	var sel = this.down('#terms').getSelection()[0];
                         	if (sel === undefined) {
@@ -14050,6 +14064,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         xtype: 'button',
                         text: this.localize('remove'),
                         glyph: 'xf068@FontAwesome',
+                        flex: 1,
                         handler: function(btn) {
                         	var sel = this.down('#terms').getSelection()[0];
                         	if (sel === undefined) {
