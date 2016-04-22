@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 21 20:34:56 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Apr 22 14:47:03 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -18482,6 +18482,24 @@ Ext.define('Voyant.panel.CorpusSet', {
     				}
     			}
     		}
+    		// add an easter egg
+    		var cirrus = this.down('cirrus');
+    		var me = this;
+    		if (cirrus) {
+    			var toolbar = cirrus.down('toolbar');
+    			toolbar.add({xtype: 'tbfill'})
+    			var b = toolbar.add({
+    				text: ' ',
+    				handler: function() {
+    					me.add({
+    						region: 'north',
+    						width: '100%',
+							html: '<div align="center"><table><tr><td><img src="http://stefansinclair.name/wordpress/wp-content/uploads/2011/07/Sinclair_Stefan_small.jpg" style="height: 60px"></td><td style="text-align: center; padding-left: 2em; padding-right: 2em;">By Athena, you found us hidden<br>up here between the panels!</td><td><img src="http://geoffreyrockwell.com/images/home_09.jpg" style="height: 60px"></td></tr></table></div>'
+    					})
+    				}
+    			}).getTargetEl().dom.className=''
+    		}
+    		
     	},
     	loadedCorpus: function(src, corpus) {
     		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE' && !this.getApiParam('panels')) {
@@ -19647,7 +19665,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		api: {
 			view: 'corpusset',
 			stopList: 'auto',
-			panels: undefined
+			panels: undefined,
+			rtl: undefined
 		}
 	},
 	
@@ -19700,6 +19719,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		var SPLIT_SIZE = 5;
 		this.viewport = Ext.create('Ext.container.Viewport', {
 		    layout: 'border',
+		    rtl: this.getApiParam('rtl')!==undefined,
 		    items: [{
 		    	xtype: 'voyantheader',
 		    	region: 'north'

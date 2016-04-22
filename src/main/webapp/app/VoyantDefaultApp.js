@@ -18,7 +18,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		api: {
 			view: 'corpusset',
 			stopList: 'auto',
-			panels: undefined
+			panels: undefined,
+			rtl: undefined
 		}
 	},
 	
@@ -71,6 +72,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		var SPLIT_SIZE = 5;
 		this.viewport = Ext.create('Ext.container.Viewport', {
 		    layout: 'border',
+		    rtl: this.getApiParam('rtl')!==undefined,
 		    items: [{
 		    	xtype: 'voyantheader',
 		    	region: 'north'
