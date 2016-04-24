@@ -1,5 +1,4 @@
-
-Ext.define('Voyant.widget.DocumentSelectorBase', {
+Ext.define('Voyant.widget.DocumentSelector', {
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.documentselector',
 	glyph: 'xf10c@FontAwesome',
@@ -159,7 +158,7 @@ Ext.define('Voyant.widget.DocumentSelectorBase', {
 Ext.define('Voyant.widget.DocumentSelectorButton', {
     extend: 'Ext.button.Button',
     alias: 'widget.documentselectorbutton',
-    mixins: ['Voyant.widget.DocumentSelectorBase'],
+    mixins: ['Voyant.widget.DocumentSelector'],
     initComponent: function() {
     	this.mixins["Voyant.widget.DocumentSelectorBase"].initComponent.apply(this, arguments);
 		this.callParent();
@@ -169,7 +168,7 @@ Ext.define('Voyant.widget.DocumentSelectorButton', {
 Ext.define('Voyant.widget.DocumentSelectorMenuItem', {
     extend: 'Ext.menu.Item',
     alias: 'widget.documentselectormenuitem',
-    mixins: ['Voyant.widget.DocumentSelectorBase'],
+    mixins: ['Voyant.widget.DocumentSelector'],
     initComponent: function() {
     	this.mixins["Voyant.widget.DocumentSelectorBase"].initComponent.apply(this, arguments);
 		this.callParent();
