@@ -1,0 +1,1 @@
+<% org.voyanttools.voyant.Localizer.sendCache(request, response); // should always redirect %>

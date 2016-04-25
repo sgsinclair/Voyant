@@ -4,12 +4,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	alias: 'widget.collocatesgraph',
     statics: {
     	i18n: {
-    		title: {en: "Links"},
-    		helpTip: {en: "<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:<ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		clearTerms: {en: "Clear"},
-    		releaseToRemove: {en: "Release to remove this term"},
-    		cleaning: {en: "Cleaning"},
-    		context: {en: "Context"}
     	},
     	api: {
     		query: undefined,

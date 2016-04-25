@@ -18,28 +18,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 	},
     statics: {
     	i18n: {
-    		title : {en: 'TermsRadio'}
-    	    ,type : {en: 'Visualization'}
-    		,help: {en: 'This tool can be used to examine word occurence over a corpus spanning a period of time.'}
-    		,visibleSegments: {en: 'Visible'}	
-    		,visibleSegmentsTip: {en: 'This option determines how many of the documents/segments are displayed at once.'}
-    		,segments: {en: 'Segments'}	
-    		,segmentsTip: {en: 'This option allows you to define how many segments a document should be divided into (note that this option only applies to distribution within a document, not distribution across a corpus).'}
-    		,displayPanel: {en: 'Display Panel'}
-    		,displayPanelTip: {en: 'Panel to control settings for word display.'}
-    		,duration: {en: 'Speed'}
-    		,terms: {en: "Terms"}
-    		,fraction: {en: 'Word Display'}	
-    		,fractionTip: {en: 'This option allows you to define the number of words displayed. Ex. 20 will only keep the words that occur with the lowest 20% of frequency.'}
-    		,reset: {en: 'Reset'}
-    		,resetTip: {en: 'Reset the visualization to the beginning.'}
-    		,speed: {en: 'Speed'}
-    		,yScale: {en: 'Y-axis Scale'}
-    		,linear: {en: 'Linear'}
-    		,log: {en: 'Logarithmic'}
-    		,removeTerm: {en: 'Remove <b>{0}</b>'},
-    		completingTransition: {en: "Completing transition."},
-    		termNotFound: {en: "Term not found."}
     	},
     	api: {
     		withDistributions: true,

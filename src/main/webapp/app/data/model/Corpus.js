@@ -13,59 +13,8 @@ Ext.define('Voyant.data.model.Corpus', {
     	documentsStore: undefined
     },
     statics: {
-    	i18n: {
-    		failedCreateCorpus: {en: 'Failed attempt to create a Corpus.'},
-			thisCorpus: {en: 'This corpus'},
-			isEmpty: {en: 'is empty'},
-			hasNdocuments: {
-				en: new Ext.Template("has {count} documents")
-			},
-			has1document: {en: "has 1 document"},
-			widthNwordsAndNTypes: {
-				en: new Ext.Template("with {words} <span class='info-tip' data-qtip='every occurrence of every word (like multiple occurrences of \"the\") is counted'>total words</span> and {types} <span class='info-tip' data-qtip='multiple occurrences of words (like \"the\") are counted once'>unique word forms</span>")
-			},
-			yearAgo: {
-				en: new Ext.Template("about a year ago")
-			},
-			yearsAgo: {
-				en: new Ext.Template("about {count} years ago")
-			},
-			monthAgo: {
-				en: new Ext.Template("about a month ago")
-			},
-			monthsAgo: {
-				en: new Ext.Template("about {count} months ago")
-			},
-			dayAgo: {
-				en: new Ext.Template("about a day ago")
-			},
-			daysAgo: {
-				en: new Ext.Template("about {count} days ago")
-			},
-			hourAgo: {
-				en: new Ext.Template("about an hour ago")
-			},
-			hoursAgo: {
-				en: new Ext.Template("about {count} hours ago")
-			},
-			minuteAgo: {
-				en: new Ext.Template("about a minute ago")
-			},
-			minutesAgo: {
-				en: new Ext.Template("about {count} minutes ago")
-			},
-			secondAgo: {
-				en: new Ext.Template("about a second ago")
-			},
-			secondsAgo: {
-				en: new Ext.Template("{count} seconds ago")
-			},
-			now: {
-				en: 'now'
-			}
-    	}
+    	i18n: {}
     },
-    
     fields: [
          {name: 'documentsCount', type: 'int'},
          {name: 'lexicalTokensCount', type: 'int'},
@@ -218,12 +167,12 @@ Ext.define('Voyant.data.model.Corpus', {
 		else {
 			message+=' ';
 			if (size>1) {
-				message+=this.localize('hasNdocuments', {count: Ext.util.Format.number(size,"0,000")});
+				message+=new Ext.XTemplate(this.localize('hasNdocuments')).apply({count: Ext.util.Format.number(size,"0,000")});
 			}
 			else {
 				message+=this.localize('has1document');
 			}
-			message+=' '+this.localize('widthNwordsAndNTypes', {words: Ext.util.Format.number(this.getWordTokensCount(),"0,000"), types: Ext.util.Format.number(this.getWordTypesCount(),"0,000")})+'.'
+			message+=' '+new Ext.XTemplate(this.localize('widthNwordsAndNTypes')).apply({words: Ext.util.Format.number(this.getWordTokensCount(),"0,000"), types: Ext.util.Format.number(this.getWordTypesCount(),"0,000")})+'.'
 			message+=" Created "
 			var createdDate = this.get('createdDate');
 			var now = new Date();
@@ -238,8 +187,8 @@ Ext.define('Voyant.data.model.Corpus', {
         			if (Ext.Date.diff(createdDate, now, time[1])>(time[0]=='second' ? 1 : 0)) {
         				var count = Ext.Date.diff(createdDate, now, time[1]);
         				message+="<span class='info-tip' data-qtip='"+Ext.Date.format(createdDate, "Y-m-d, H:i:s")+"'>";
-        				if (count==1) {message+=this.localize(time[0]+'Ago', {count: count, date: createdDate})}
-        				else {message+=this.localize(time[0]+'sAgo', {count: count, date: createdDate})}
+        				if (count==1) {message+=new Ext.XTemplate(this.localize(time[0]+'Ago')).apply({count: count, date: createdDate})}
+        				else {message+=new Ext.XTemplate(this.localize(time[0]+'sAgo')).apply({count: count, date: createdDate})}
         				message+="</span>";
         				return false
         			}

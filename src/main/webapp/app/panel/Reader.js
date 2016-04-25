@@ -6,10 +6,6 @@ Ext.define('Voyant.panel.Reader', {
 	isConsumptive: true,
     statics: {
     	i18n: {
-    		title: {en: "Reader"},
-    		helpTip: {en: "<p>The Reader tool provides a view of text from the corpus. Features include:</p><ul><li>frequency information appears when hovering over a word</li><li>distribution information appears in a graph at the bottom when clicking on a word</li><li>a bar graph at the bottom indicates the relative size of each document in the corpus</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		documentFrequency: {en: "document frequency:"},
-    		limitedAccess: {en: "This is a limited access corpus and this tool's functionality is restricted."}
     	},
     	api: {
     		start: 0,

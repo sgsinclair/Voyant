@@ -8,8 +8,6 @@ Ext.define('Voyant.VoyantApp', {
     
     statics: {
     	i18n: {
-    		error: {en: 'Error'},
-			serverResponseError: {en: 'The server error reponse:'}
     	}
     },
     

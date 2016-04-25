@@ -6,8 +6,6 @@ Ext.define('Voyant.panel.CorpusSet', {
 	isConsumptive: true,
 	statics: {
 		i18n: {
-			title: {en: "Corpus View"},
-			helpTip: {en: "This is the default, general-purpose corpus view."}
 		},
 		api: {
 			panels: undefined

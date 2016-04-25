@@ -2,9 +2,6 @@ Ext.define("Voyant.util.Downloadable", {
 	mixins: ['Voyant.util.Localization'],
 	statics: {
 		i18n: {
-			exportTitle: {en: "Export"},
-			downloadButton: {en: "Download"},
-			cancelButton: {en: "Cancel"}
 		}
 	},
 

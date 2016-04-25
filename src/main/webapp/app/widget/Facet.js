@@ -4,7 +4,6 @@ Ext.define('Voyant.widget.Facet', {
     alias: 'widget.facet',
 	statics: {
 		i18n: {
-			emptyText: {en: "No values found."}
 		},
 		api: {
 			stopList: 'auto',

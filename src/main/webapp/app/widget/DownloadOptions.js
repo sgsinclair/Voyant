@@ -5,7 +5,6 @@ Ext.define('Voyant.widget.DownloadOptions', {
     alias: 'widget.downloadoptions',
 	statics: {
 		i18n: {
-			title: {en: 'Download Options'}
 		}
 	},
 	config: {

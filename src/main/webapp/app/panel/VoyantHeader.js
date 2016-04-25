@@ -4,11 +4,6 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	alias: 'widget.voyantheader',
     statics: {
     	i18n: {
-    		title: {en: "Voyant Tools"},
-			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts."},
-    		home: {en: "Start Over"},
-    		homeTip: {en: "Click to start over from the corpus creation screen."},
-    		homeConfirm: {en: "Are you sure you want to start over (and leave the current corpus)?"}
     	}
     },
     constructor: function(config) {

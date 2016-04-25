@@ -3,7 +3,6 @@ Ext.define('Voyant.data.store.DocumentsMixin', {
     model: 'Voyant.data.model.Document',
     statics: {
     	i18n: {
-    		failedGetDocuments: {en: 'Failed attempt to get documents.'}
     	}
     },
 	sorters: {

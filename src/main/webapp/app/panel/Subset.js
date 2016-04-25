@@ -6,15 +6,6 @@ Ext.define('Voyant.panel.Subset', {
 	alias: 'widget.subset',
     statics: {
     	i18n: {
-    		title: {en: "Workset Builder"},
-    		titleLabel: {en: "Titles"},
-    		authorLabel: {en: "Authors"},
-    		lexicalLabel: {en: "Full-text"},
-    		publisherLabel: {en: "Publishers"},
-    		sendToVoyantButton: {en: "New Voyant Corpus"},
-    		downloadButton: {en: "Download Zip Archive"},
-    		sendToVoyantNoQuery: {en: "There's currently no query specified, but you can <a href='{0}' target='_blank'>open the current corpus in a new window</a>."},
-    		noMatches: {en: "The current query criteria don't match any documents, please modifying the search first."}
     	},
     	api: {
     		stopList: 'auto',

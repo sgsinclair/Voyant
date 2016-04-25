@@ -6,23 +6,6 @@ Ext.define('Voyant.panel.Contexts', {
 	isConsumptive: true,
     statics: {
     	i18n: {
-    		title: {en: "Contexts"},
-    		emptyText: {en: "No matching results."},
-    		document: {en: "Document"},
-    		documentTip: {en: "The document of the occurrence."},
-    		helpTip: {en: "The Keywords in Context tool shows each occurrence of a keyword with a bit of surounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:</p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		termTip: {en: "The keyword for the context."},
-    		left: {en: "Left"},
-    		leftTip: {en: "Context to the left of the keyword."},
-    		right: {en: "Right"},
-    		rightTip: {en: "Context to the right of the keyword."},
-    		position: {en: "Position"},
-    		positionTip: {en: "The position of the keyword within the document."},
-    		context: {en: "context"},
-    		expand: {en: "expand"},
-    		corpus: {en: "corpus"},
-    		corpusTip: {en: "Reset to corpus mode (contexts from all documents)."},
-    		limitedAccess: {en: "This is a limited access corpus and this tool's functionality is restricted."}
     	},
     	api: {
     		query: undefined,

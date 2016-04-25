@@ -8,23 +8,6 @@ Ext.define('Voyant.VoyantCorpusApp', {
     
     statics: {
     	i18n: {
-    		fetchingCorpus: {en: 'Fetching your corpus'},
-    		moreToolsScale: {en: 'Tools by Scale'},
-    		moreToolsScaleCorpus: {en: 'Corpus Tools'},
-    		moreToolsScaleDocument: {en: 'Document Tools'},
-    		moreToolsType: {en: 'Tools by Type'},
-    		moreToolsTypeViz: {en: 'Visualization Tools'},
-    		moreToolsTypeGrid: {en: 'Grid Tools'},
-    		moreToolsTypeOther: {en: 'Other Tools'},
-    		passwordRequiredTitle: {en: "Access Code Required"},
-    		passwordRequiredMessage: {en: "This corpus requires an access code."},
-    		nonConsumptiveMessage: {en: "Alternatively, you can click on the <i>Limited Access</i> button to continue with limited functionality (generally speaking, this non-consumpive access allows you to explore derivative data from the corpus without allowing you to read text from the corpus)."},
-    		nonConsumptiveButton: {en: "Limited Access"}, 
-    		passwordValidateButton: {en: "Validate"},
-    		password: {en: "access code"},
-    		noPasswordGiven: {en: "Please provide an access code."},
-    		badPassword: {en: "Sorry, that doesn't seem to be a valid access code."},
-    		passwordValidationError: {en: "Sorry, an unexpected error occurred while trying to validate your access code."}
     	}
     },
     

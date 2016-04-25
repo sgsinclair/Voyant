@@ -1,0 +1,561 @@
+Location	ID	English (en)	French (fr)
+Voyant.VoyantApp	translatedBy	English translation by your names here.	
+Voyant.util.DetailedError	error	Error	
+Voyant.util.Toolable	maximizeTip	Open this tool in a new window	
+Voyant.util.Toolable	plusTip	Click to choose another tool for this panel location (this will replace the current tool).	
+Voyant.util.Toolable	saveTip	Export a URL, an embeddable tool, data or a bibliographic reference.	
+Voyant.util.Toolable	gearTip	Define options for this tool.	
+Voyant.util.Toolable	helpTip	No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.	
+Voyant.util.Toolable	moreHelp	More help…	
+Voyant.util.Toolable	exportTitle	Export	
+Voyant.util.Toolable	exportViewUrl	a URL for this view (tools and data)	
+Voyant.util.Toolable	exportViewFieldset	Export View (Tools and Data)	
+Voyant.util.Toolable	exportViewHtmlEmbed	an HTML snippet for embedding this view in another web page	
+Voyant.util.Toolable	exportViewEmbedTitle	Embed HTML Snippet	
+Voyant.util.Toolable	exportViewEmbedMessage	You can copy and paste the HTML snippet from the box below into another web page. Note that some content management systems (like WordPress) may need a special plugin to handle &lt;iframe&gt; tags.	
+Voyant.util.Toolable	exportBiblioTitle	Export Bibliographic Reference	
+Voyant.util.Toolable	exportViewBiblio	a bibliographic reference for this view	
+Voyant.util.Toolable	exportGridCurrent	Export Current Data	
+Voyant.util.Toolable	exportGridCurrentHtml	export current data as HTML	
+Voyant.util.Toolable	exportGridCurrentJson	export current data as JSON	
+Voyant.util.Toolable	exportGridCurrentTsv	export current data as tab separated values (text)	
+Voyant.util.Toolable	export	Export	
+Voyant.util.Toolable	reset	Reset	
+Voyant.util.Toolable	optionsTitle	Options	
+Voyant.util.Toolable	confirmTitle	Confirm	
+Voyant.util.Toolable	cancelTitle	Cancel	
+Voyant.util.Toolable	exportError	Export Error	
+Voyant.util.Toolable	exportNoFunction	An export function has been defined by is not availble.	
+Voyant.util.Toolable	exportDataHtmlMessage	Copy the data below, they can be pasted into an HTML page or used as XML.	
+Voyant.util.Toolable	exportDataTsvMessage	Copy data below, they can be pasted into a spreadsheet or text file.	
+Voyant.util.Toolable	exportDataJsonMessage	Copy the data below, they can be used in other web-based applications.	
+Voyant.util.Toolable	exportPng	export a PNG image of this visualization	
+Voyant.util.Toolable	exportDataTitle	Export Data	
+Voyant.util.Toolable	exportVizTitle	Export Visualization	
+Voyant.util.Toolable	exportPngTitle	Export PNG	
+Voyant.util.Toolable	exportSvg	export the SVG of this visualization	
+Voyant.util.Toolable	exportPngMessage	<p>This is a thumbnail of the PNG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the HTML code below.</p>	
+Voyant.util.Toolable	exportSvgTitle	Export SVG	
+Voyant.util.Toolable	exportSvgMessage	<p>This is a thumbnail of the SVG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the SVG code below.</p>	
+Voyant.util.Downloadable	exportTitle	Export	
+Voyant.util.Downloadable	downloadButton	Download	
+Voyant.util.Downloadable	cancelButton	Cancel	
+Voyant.data.model.Corpus	failedCreateCorpus	Failed attempt to create a Corpus.	
+Voyant.data.model.Corpus	thisCorpus	This corpus	
+Voyant.data.model.Corpus	isEmpty	is empty	
+Voyant.data.model.Corpus	hasNdocuments	has {count} documents	
+Voyant.data.model.Corpus	has1document	has 1 document	
+Voyant.data.model.Corpus	widthNwordsAndNTypes	with {words} <span class="info-tip" data-qtip="every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted">total words</span> and {types} <span class="info-tip" data-qtip="multiple occurrences of words (like &quot;the&quot;) are counted once">unique word forms</span>	
+Voyant.data.model.Corpus	yearAgo	about a year ago	
+Voyant.data.model.Corpus	yearsAgo	about {count} years ago	
+Voyant.data.model.Corpus	monthAgo	about a month ago	
+Voyant.data.model.Corpus	monthsAgo	about {count} months ago	
+Voyant.data.model.Corpus	dayAgo	about a day ago	
+Voyant.data.model.Corpus	daysAgo	about {count} days ago	
+Voyant.data.model.Corpus	hourAgo	about an hour ago	
+Voyant.data.model.Corpus	hoursAgo	about {count} hours ago	
+Voyant.data.model.Corpus	minuteAgo	about a minute ago	
+Voyant.data.model.Corpus	minutesAgo	about {count} minutes ago	
+Voyant.data.model.Corpus	secondAgo	about a second ago	
+Voyant.data.model.Corpus	secondsAgo	{count} seconds ago	
+Voyant.data.model.Corpus	now	now	
+Voyant.widget.StopListOption	label	Stopwords:	
+Voyant.widget.StopListOption	editList	Edit List	
+Voyant.widget.StopListOption	noEditAutoTitle	Edit Stoplist Error	
+Voyant.widget.StopListOption	noEditAutoMessage	The auto-detected stoplist cannot be edited, please select a specifc stoplist such as the "New User-Defined List".	
+Voyant.widget.StopListOption	auto	Auto-detect	
+Voyant.widget.StopListOption	none	None	
+Voyant.widget.StopListOption	new	New User-Defined List	
+Voyant.widget.StopListOption	ar	Arabic	
+Voyant.widget.StopListOption	bg	Bulgarian	
+Voyant.widget.StopListOption	br	Breton	
+Voyant.widget.StopListOption	ca	Catalan	
+Voyant.widget.StopListOption	ckb	Kurdish	
+Voyant.widget.StopListOption	cn	Chinese	
+Voyant.widget.StopListOption	cz	Czech	
+Voyant.widget.StopListOption	de	German	
+Voyant.widget.StopListOption	el	Greek	
+Voyant.widget.StopListOption	en	English	
+Voyant.widget.StopListOption	es	Spanish	
+Voyant.widget.StopListOption	eu	Basque	
+Voyant.widget.StopListOption	fa	Farsi	
+Voyant.widget.StopListOption	fr	French	
+Voyant.widget.StopListOption	ga	Irish	
+Voyant.widget.StopListOption	gl	Galician	
+Voyant.widget.StopListOption	hi	Hindi	
+Voyant.widget.StopListOption	hu	Hungarian	
+Voyant.widget.StopListOption	hy	Armenian	
+Voyant.widget.StopListOption	id	Indonesian	
+Voyant.widget.StopListOption	it	Italian	
+Voyant.widget.StopListOption	ja	Japanese	
+Voyant.widget.StopListOption	lt	Latvian	
+Voyant.widget.StopListOption	lv	Lithuanian	
+Voyant.widget.StopListOption	mu	Multilingual	
+Voyant.widget.StopListOption	nl	Dutch	
+Voyant.widget.StopListOption	no	Norwegian	
+Voyant.widget.StopListOption	ro	Romanian	
+Voyant.widget.StopListOption	se	Swedish	
+Voyant.widget.StopListOption	th	Thai	
+Voyant.widget.StopListOption	tr	Turkish	
+Voyant.widget.StopListOption	ok	Save	
+Voyant.widget.StopListOption	cancel	Cancel	
+Voyant.widget.StopListOption	editStopListTitle	Edit Stoplist	
+Voyant.widget.StopListOption	editStopListMessage	This is the stoplist, one term per line.	
+Voyant.widget.StopListOption	applyGlobally	apply globally	
+Voyant.widget.QuerySearchField	querySearch	Search	
+Voyant.widget.QuerySearchField	querySearchTip	<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>"winter coat"</b>: <i>winter coat</i> as a phrase</li><li><b>"coat mittens"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,"coat mittens"~5</b>: combine syntaxes</li></ul>	
+Voyant.widget.QuerySearchField	querySearchDocsModeTip	<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>"winter coat"</b>: <i>winter coat</i> as a phrase</li><li><b>"coat mittens"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+"winter coat" +mitten*</b>: combine syntaxes</li></ul>	
+Voyant.widget.QuerySearchField	aggregateInDocumentsCount	This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms).	
+Voyant.widget.TotalPropertyStatus	totalPropertyStatus	{count:number("0,000")}	
+Voyant.widget.DocumentSelector	documents	Documents	
+Voyant.widget.DocumentSelector	selectAll	All	
+Voyant.widget.DocumentSelector	selectNone	None	
+Voyant.widget.DocumentSelector	ok	Ok	
+Voyant.widget.DocumentSelector	cancel	Cancel	
+Voyant.widget.DocumentSelector	all	all	
+Voyant.widget.CorpusDocumentSelector	corpus	Corpus	
+Voyant.widget.CorpusDocumentSelector	scale	Scale	
+Voyant.widget.DownloadFilenameBuilder	fieldLabel	Filenames	
+Voyant.widget.DownloadFilenameBuilder	titleLabel	title	
+Voyant.widget.DownloadFilenameBuilder	authorLabel	author	
+Voyant.widget.DownloadFilenameBuilder	pubDateLabel	date	
+Voyant.widget.DownloadFilenameBuilder	enabledLabel	include: 	
+Voyant.widget.DownloadFilenameBuilder	availableLabel	exclude: 	
+Voyant.widget.DownloadFileFormat	fieldLabel	File Format	
+Voyant.widget.DownloadFileFormat	voyantXml	Voyant XML	
+Voyant.widget.DownloadFileFormat	VOYANTTip	This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content.	
+Voyant.widget.DownloadFileFormat	SOURCETip	This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided.	
+Voyant.widget.DownloadFileFormat	TXTTip	This will produce a plain text version of each document.	
+Voyant.widget.DownloadFileFormat	original	original	
+Voyant.widget.DownloadFileFormat	plainText	plain text	
+Voyant.widget.DownloadOptions	title	Download Options	
+Voyant.panel.Panel	term	Term	
+Voyant.panel.Panel	rawFreq	Count	
+Voyant.panel.Panel	relativeFreq	Relative	
+Voyant.panel.Panel	trend	Trend	
+Voyant.panel.Panel	colon	: 	
+Voyant.panel.Panel	loading	Loading	
+Voyant.panel.Panel	error	Error	
+Voyant.panel.Panel	info	Information	
+Voyant.widget.Facet	emptyText	No values found.	
+Voyant.panel.Bubblelines	title	Bubblelines	
+Voyant.panel.Bubblelines	type	Visualization	
+Voyant.panel.Bubblelines	findTerm	Find Term	
+Voyant.panel.Bubblelines	clearTerms	Clear	
+Voyant.panel.Bubblelines	removeTerm	Remove Term	
+Voyant.panel.Bubblelines	showTerm	Show Term	
+Voyant.panel.Bubblelines	hideTerm	Hide Term	
+Voyant.panel.Bubblelines	granularity	Granularity	
+Voyant.panel.Bubblelines	separateLines	Separate Lines for Terms	
+Voyant.panel.Bubblelines	total	Total	
+Voyant.panel.Bubblelines	corpusTooSmall	The provided corpus is too small for this tool.	
+Voyant.panel.Bubblelines	help	Bubblelines visualizes the frequency and repetition of  a term's use in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal lengths. Each term is represented as a bubble, the size of the bubble indicates its frequency in the corresponding segment of text. The larger the bubble's radius the more frequently the term occurs.	
+Voyant.panel.Bubblelines	adaptedFrom		
+Voyant.panel.Bubblelines	options	Options	
+Voyant.panel.Catalogue	title	Catalogue	
+Voyant.panel.Catalogue	helpTip	<p>The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.	
+Voyant.panel.Catalogue	facet.authorTitle	Authors	
+Voyant.panel.Catalogue	facet.languageTitle	Languages	
+Voyant.panel.Catalogue	facet.titleTitle	Titles	
+Voyant.panel.Catalogue	facet.keywordTitle	Keywords	
+Voyant.panel.Catalogue	facet.pubDateTitle	Publication Dates	
+Voyant.panel.Catalogue	facet.publisherTitle	Publishers	
+Voyant.panel.Catalogue	facet.pubPlaceTitle	Publication Locations	
+Voyant.panel.Catalogue	loadingSnippets	loading text snippets…	
+Voyant.panel.Catalogue	lexicalTitle	Terms	
+Voyant.panel.Catalogue	noMatches	No matches (out of {0} documents).	
+Voyant.panel.Catalogue	queryMatches	{0} matching documents (out of {1}).	
+Voyant.panel.Catalogue	clickToOpenCorpus	Please <a href="{0}" target="_blank" class="link">click here</a> to access your new corpus (since popup windows are blocked).	
+Voyant.panel.Catalogue	export	Export	
+Voyant.panel.Catalogue	exportTip	Create a new Voyant corpus with the selected documents.	
+Voyant.panel.Catalogue	matchingDocuments	number of matching documents	
+Voyant.panel.Catalogue	rawFreqs	total occurrences (raw frequency)	
+Voyant.panel.Catalogue	exportInProgress	Preparing your corpus for export…	
+Voyant.panel.Cirrus	title	Cirrus	
+Voyant.panel.Cirrus	helpTip	</p><p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document –&nbsp;this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>	
+Voyant.panel.Cirrus	visible	Show	
+Voyant.panel.Cirrus	maxTerms	Max terms	
+Voyant.panel.Cirrus	options	Options	
+Voyant.panel.Cirrus	visibleTerms	Terms	
+Voyant.panel.CollocatesGraph	title	Links	
+Voyant.panel.CollocatesGraph	helpTip	<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:</p><ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>	
+Voyant.panel.CollocatesGraph	clearTerms	Clear	
+Voyant.panel.CollocatesGraph	releaseToRemove	Release to remove this term	
+Voyant.panel.CollocatesGraph	cleaning	Cleaning	
+Voyant.panel.CollocatesGraph	context	Context	
+Voyant.panel.Contexts	title	Contexts	
+Voyant.panel.Contexts	emptyText	No matching results.	
+Voyant.panel.Contexts	document	Document	
+Voyant.panel.Contexts	documentTip	The document of the occurrence.	
+Voyant.panel.Contexts	helpTip	The Keywords in Context tool shows each occurrence of a keyword with a bit of surounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:<p></p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>	
+Voyant.panel.Contexts	termTip	The keyword for the context.	
+Voyant.panel.Contexts	left	Left	
+Voyant.panel.Contexts	leftTip	Context to the left of the keyword.	
+Voyant.panel.Contexts	right	Right	
+Voyant.panel.Contexts	rightTip	Context to the right of the keyword.	
+Voyant.panel.Contexts	position	Position	
+Voyant.panel.Contexts	positionTip	The position of the keyword within the document.	
+Voyant.panel.Contexts	context	context	
+Voyant.panel.Contexts	expand	expand	
+Voyant.panel.Contexts	corpus	corpus	
+Voyant.panel.Contexts	corpusTip	Reset to corpus mode (contexts from all documents).	
+Voyant.panel.Contexts	limitedAccess	This is a limited access corpus and this tool's functionality is restricted.	
+Voyant.panel.CorpusCollocates	title	Collocates	
+Voyant.panel.CorpusCollocates	emptyText	No matching results.	
+Voyant.panel.CorpusCollocates	helpTip	<p>Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus. Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>	
+Voyant.panel.CorpusCollocates	term	Term	
+Voyant.panel.CorpusCollocates	termTip	This is the keyword term around which collocate (context) terms are counted.	
+Voyant.panel.CorpusCollocates	termRawFreq	Count (keyword)	
+Voyant.panel.CorpusCollocates	termRawFreqTip	The number of times the keyword term occurs in the corpus.	
+Voyant.panel.CorpusCollocates	contextTerm	Collocate	
+Voyant.panel.CorpusCollocates	contextTermTip	This is the collocate (context) term that occurs near the keyword term.	
+Voyant.panel.CorpusCollocates	contextTermRawFreq	Count (context)	
+Voyant.panel.CorpusCollocates	contextTermRawFreqTip	The number of times this collocate occurs near the keyword term in the corpus.	
+Voyant.panel.CorpusCollocates	matchingTerms	{count}	
+Voyant.panel.CorpusCollocates	context	context	
+Voyant.panel.CorpusCreator	title	Add Texts	
+Voyant.panel.CorpusCreator	helpTip	This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from you computer (you can select multiple files by using the Ctrl and/or Shift keys)</li>	
+Voyant.panel.CorpusCreator	gearTip	Options	
+Voyant.panel.CorpusCreator	gearWinTitle	Options	
+Voyant.panel.CorpusCreator	inputFormat	Input Format	
+Voyant.panel.CorpusCreator	inputFormatAuto	Auto-Detect (recommended)	
+Voyant.panel.CorpusCreator	advancedOptionsText	For more information on the advanced options below, see the documentation on <a href="{0}" target="voyantdocs">creating a corpus</a>.	
+Voyant.panel.CorpusCreator	xmlOptions	XML	
+Voyant.panel.CorpusCreator	xmlOptionsText	Define XPath Expressions for any of the following:	
+Voyant.panel.CorpusCreator	xpathDocuments	Documents	
+Voyant.panel.CorpusCreator	xpathGroupBy	Group by	
+Voyant.panel.CorpusCreator	xpathContent	Content	
+Voyant.panel.CorpusCreator	xpathTitle	Title	
+Voyant.panel.CorpusCreator	xpathAuthor	Author	
+Voyant.panel.CorpusCreator	tableOptions	Tables	
+Voyant.panel.CorpusCreator	tableDocuments	Documents	
+Voyant.panel.CorpusCreator	tableDocumentsTable	from entire table	
+Voyant.panel.CorpusCreator	tableDocumentsRows	from cells in each row	
+Voyant.panel.CorpusCreator	tableDocumentsColumns	from entire columns	
+Voyant.panel.CorpusCreator	tableContent	Content	
+Voyant.panel.CorpusCreator	tableTitle	Title	
+Voyant.panel.CorpusCreator	tableAuthor	Author	
+Voyant.panel.CorpusCreator	tableOptionsText	Specify how documents should be extracted (currently only supported for MS Excel: .xls, xlsx). For more information see the documentation on creating a corpus with <a href="{0}" target="voyantdocs">tabular data</a>.	
+Voyant.panel.CorpusCreator	tableContentText	Specify which column numbers contain content (or leave blank to use all columns). The left-most columnn is column 1. Define multiple documents by separating columns with a comma or combine columns by using the plus sign. For example 1+2,3 would combine columns 1 and 2 into one document and use column 3 for  a second document.	
+Voyant.panel.CorpusCreator	tableMetadataText	These options are only used when documents are extracted from cells in each row (see the first option in this section). Same syntax as the Content option above: column numbers separated by commas or combined with a plus sign.	
+Voyant.panel.CorpusCreator	tableNoHeadersRowText	Determines whether or not to skip the first row (if there's a header row). When there is a header row, it can be used to define the document title automatically when documents are extracted from entire columns (in this case leave the title field blank).	
+Voyant.panel.CorpusCreator	tableNoHeadersRow	No Headers Row	
+Voyant.panel.CorpusCreator	numberZero	0 is invalid, the first column is 1	
+Voyant.panel.CorpusCreator	numberEmpty	At least one column number is currently empty.	
+Voyant.panel.CorpusCreator	numbersNeedCommas	Please use a comma to separate multiple numbers.	
+Voyant.panel.CorpusCreator	tokenizationOptions	Tokenization	
+Voyant.panel.CorpusCreator	tokenization	Tokenization	
+Voyant.panel.CorpusCreator	tokenizationAuto	Automatic (highly recommended)	
+Voyant.panel.CorpusCreator	tokenizationWordBoundaries	Simple Word Boundaries	
+Voyant.panel.CorpusCreator	accessOptions	Access Management	
+Voyant.panel.CorpusCreator	accessOptionsText	If desired, specify one or more access passwords (separated by commas).	
+Voyant.panel.CorpusCreator	adminPassword	admin code	
+Voyant.panel.CorpusCreator	accessPassword	access code	
+Voyant.panel.CorpusCreator	accessModeWithoutPassword	other access	
+Voyant.panel.CorpusCreator	accessModeWithoutPasswordText	If you specify an <i>access password</i> you can also specify what access is granted to users without the password.	
+Voyant.panel.CorpusCreator	accessModeNonConsumptive	limited (non-consumptive)	
+Voyant.panel.CorpusCreator	accessModeNone	none	
+Voyant.panel.CorpusCreator	emptyInput	Type in one or more URLs on separate lines or paste in a full text.	
+Voyant.panel.CorpusCreator	uploadingCorpus	Uploading corpus…	
+Voyant.panel.CorpusCreator	fileTypesWarning	File Types Warning	
+Voyant.panel.CorpusCreator	fileTypesMessage	You have one or more files with incompatible or unrecognized file extensions that may cause problems.	
+Voyant.panel.CorpusCreator	badFiles	incompatible (likely error): 	
+Voyant.panel.CorpusCreator	unknownFiles	unrecognized (possible error): 	
+Voyant.panel.CorpusCreator	sureContinue	Are you sure you wish to continue?	
+Voyant.panel.CorpusCreator	error	Error	
+Voyant.panel.CorpusCreator	errorNotXmlContinue	You've selected an XML input format but the input doesn't appear to be XML. Are you sure you wish to continue?	
+Voyant.panel.CorpusCreator	reveal	Reveal	
+Voyant.panel.CorpusCreator	ok	OK	
+Voyant.panel.CorpusCreator	cancel	Cancel	
+Voyant.panel.CorpusCreator	invalidForm	Invalid values have been used, please hover over fields with red boxes for explanations.	
+Voyant.panel.CorpusCreator	numbersCommasOnly	Comma-separated numbers only.	
+Voyant.panel.Knots	title	Knots	
+Voyant.panel.Knots	type	Visualization	
+Voyant.panel.Knots	findTerm	Find Term	
+Voyant.panel.Knots	clearTerms	Clear	
+Voyant.panel.Knots	removeTerm	Remove Term	
+Voyant.panel.Knots	showTerm	Show Term	
+Voyant.panel.Knots	hideTerm	Hide Term	
+Voyant.panel.Knots	options	Options	
+Voyant.panel.Knots	speed	Speed	
+Voyant.panel.Knots	startAngle	Start	
+Voyant.panel.Knots	tangles	Turn	
+Voyant.panel.Knots	context	Context	
+Voyant.panel.Knots	noTermsFound	No terms found in this document.	
+Voyant.panel.Knots	settings	Settings	
+Voyant.panel.Phrases	title	Phrases	
+Voyant.panel.Phrases	emptyText	No matching results.	
+Voyant.panel.Phrases	helpTip	<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->	
+Voyant.panel.Phrases	term	Term	
+Voyant.panel.Phrases	termTip	This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence).	
+Voyant.panel.Phrases	termRawFreq	Count	
+Voyant.panel.Phrases	termRawFreqTip	The number of times the phrase occurs in the corpus.	
+Voyant.panel.Phrases	matchingTerms	{count}	
+Voyant.panel.Phrases	length	Length	
+Voyant.panel.Phrases	lengthTip	The upper and lower bounds of phrase lengths (how many words in each phrase).	
+Voyant.panel.Phrases	overlap	Overlap	
+Voyant.panel.Phrases	overlapTip	This determines how overlapping phrases are filtered.	
+Voyant.panel.Phrases	overlapMenu	Choose an overlap filter:	
+Voyant.panel.Phrases	overlapNone	none (keep all)	
+Voyant.panel.Phrases	overlapLength	prioritize longest phrases	
+Voyant.panel.Phrases	overlapFreq	prioritize most frequent phrases	
+Voyant.panel.CorpusTerms	title	Terms	
+Voyant.panel.CorpusTerms	emptyText	No matching results.	
+Voyant.panel.CorpusTerms	helpTip	</p><p>Corpus Terms is a table view of terms that appear in the entire corpus. Features include:</p><ul><li>reordering by <i>term</i> and <i>count</i> (click on the column headers)</li><li>a sparkline graph of the term frequency trends across the corpus (if the corpus has multiple documents) or across the document (if the corpus has only one document)</li><li>additional columns available (relative frequency, distribution peakedness and skew) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>	
+Voyant.panel.CorpusTerms	matchingTerms	Matching terms: {count}	
+Voyant.panel.CorpusTerms	termTip	The term in the corpus.	
+Voyant.panel.CorpusTerms	rawFreqTip	The total count (raw frequency) of this term in the entire corpus.	
+Voyant.panel.CorpusTerms	relativeFreqTip	The relative frequency (per million) of this term in the entire corpus.	
+Voyant.panel.CorpusTerms	relativePeakedness	Peakedness	
+Voyant.panel.CorpusTerms	relativePeakednessTip	This is a statistical measure of how much the relative frequencies of a term in a corpus are bunched up into peaks (regions with higher values where the rest are lower).	
+Voyant.panel.CorpusTerms	relativeSkewness	Skew	
+Voyant.panel.CorpusTerms	relativeSkewnessTip	This is a statistical measure of the symmetry of the relative frequencies of a term across the corpus.	
+Voyant.panel.CorpusTerms	trendTip	This represents the trend of the relative frequencies for each term in each document in the corpus.	
+Voyant.panel.DocumentTerms	title	Document Terms	
+Voyant.panel.DocumentTerms	emptyText	No matching results.	
+Voyant.panel.DocumentTerms	helpTip	<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>	
+Voyant.panel.DocumentTerms	matchingTerms	Matching terms: {count}	
+Voyant.panel.DocumentTerms	termTip	The term in a single, specific document.	
+Voyant.panel.DocumentTerms	rawFreqTip	The count (raw frequency) of this term in this document.	
+Voyant.panel.DocumentTerms	relativeFreqTip	The relative frequency (per million) of this term in each document.	
+Voyant.panel.DocumentTerms	trendTip	This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).	
+Voyant.panel.DocumentTerms	tfidf	Significance	
+Voyant.panel.DocumentTerms	tfidfTip	The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.	
+Voyant.panel.DocumentTerms	zscore	Z-Score	
+Voyant.panel.DocumentTerms	zscoreTip	The Z-Score, or standard score, is a normalized value for the term's raw frequency compared to other term frequencies in the same document.<table><tbody><tr><td style="text-align: center; font-size: smaller; font-family: mono;">frequency of term - mean of term frequencies<hr>standard deviation of term frequencies</td></tr></tbody></table>.	
+Voyant.panel.Documents	title	Documents	
+Voyant.panel.Documents	emptyText	No matching results.	
+Voyant.panel.Documents	helpTip	<p>Documents is a table view of the documents in the corpus. Features include:</p><ul><li>reordering by <i>Title</i>, <i>Words</i> count (tokens), word forms count (<i>Types</i>), and <i>Ratio</i> (Types/Tokens Ratio) (click on the column headers)</li><li>a search box for queries (by default in the full-text, title and author fields —&nbsp;hover over the magnifying icon for help with the syntax)</li></ul>	
+Voyant.panel.Documents	id	ID	
+Voyant.panel.Documents	documentTitle	Title	
+Voyant.panel.Documents	documentAuthor	Author	
+Voyant.panel.Documents	tokensCountLexical	Words	
+Voyant.panel.Documents	typesCountLexical	Types	
+Voyant.panel.Documents	typeTokenRatioLexical	Ratio	
+Voyant.panel.Documents	language	Language	
+Voyant.panel.Documents	matchingDocuments	Matching documents: {count}	
+Voyant.panel.Documents	error	Error	
+Voyant.panel.Documents	add	Add	
+Voyant.panel.Documents	addTip	Click here to add new documents to this corpus.	
+Voyant.panel.Documents	remove	Remove	
+Voyant.panel.Documents	removeTip	Click here to create a new corpus that excludes selected or filtered (search query) documents.	
+Voyant.panel.Documents	reorder	Reorder	
+Voyant.panel.Documents	reorderTip	Click here to create a new corpus based on a reordering of documents (drag and drop rows to reorder).	
+Voyant.panel.Documents	keep	Keep	
+Voyant.panel.Documents	keepTip	Click here to create a new corpus that only includes selected or filtered (search query) documents.	
+Voyant.panel.Documents	modify	Modify	
+Voyant.panel.Documents	newCorpus	New Corpus	
+Voyant.panel.Documents	modifyTip	Click this button to create a new corpus by adding new documents, by selecting a subset of documents or by re-ordering documents.	
+Voyant.panel.Documents	allSelectedError	You have selected all documents, you must select a subset of documents to remove or keep.	
+Voyant.panel.Documents	removeSelectedDocuments	Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('selected document')}?	
+Voyant.panel.Documents	removeFilteredDocuments	Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('filtered document')}?	
+Voyant.panel.Documents	keepSelectedDocuments	Create a <i>new</i> corpus that only keeps the {0:plural('selected document')}?	
+Voyant.panel.Documents	keepFilteredDocuments	Create a <i>new</i> corpus that only keeps the {0:plural('filtered document')}?	
+Voyant.panel.Documents	selectOrFilterError	You need to first select documents by clicking on one or more rows or by performing a search query.	
+Voyant.panel.Documents	onlyOneError	Your corpus has only one document, you can't remove or keep documents to create a new corpus.	
+Voyant.panel.Documents	reorderFilteredError	You cannot reorder a filtered (after search query) corpus. Please create a new corpus first (with the <i>Remove</i> or <i>Keep</i> button) and then reorder the new corpus.	
+Voyant.panel.Documents	reorderOriginalError	Please reorder the corpus first (drag and drop the rows in the table).	
+Voyant.panel.Documents	reorderDocuments	Create a <i>new</i> corpus based on the order shown?	
+Voyant.panel.DocumentsFinder	title	Documents Finder	
+Voyant.panel.DocumentsFinder	emptyText	No matching results.	
+Voyant.panel.DocumentsFinder	operator	Operator	
+Voyant.panel.DocumentsFinder	field	Field	
+Voyant.panel.DocumentsFinder	query	Query	
+Voyant.panel.DocumentsFinder	count	Count	
+Voyant.panel.DocumentsFinder	emptyQuery	type query here	
+Voyant.panel.DocumentsFinder	titleField	title	
+Voyant.panel.DocumentsFinder	authorField	author	
+Voyant.panel.DocumentsFinder	pubDateField	publication date	
+Voyant.panel.DocumentsFinder	publisherField	publisher	
+Voyant.panel.DocumentsFinder	pubPlaceField	publication location	
+Voyant.panel.DocumentsFinder	advancedField	<i>advanced query</i>	
+Voyant.panel.DocumentsFinder	textField	text (default)	
+Voyant.panel.DocumentsFinder	loading	loading corpus	
+Voyant.panel.DocumentsFinder	unsuccessfulQuery	Unable to complete query.	
+Voyant.panel.DocumentsFinder	addRow	Add Row	
+Voyant.panel.DocumentsFinder	deleteRowTip	Click to delete this row	
+Voyant.panel.DocumentsFinder	noMatches	No matches (out of {0} documents).	
+Voyant.panel.DocumentsFinder	queryMatches	A total of {0} matching documents (out of {1}).	
+Voyant.panel.DocumentsFinder	exportNewCorpus	New Corpus	
+Voyant.panel.DocumentsFinder	exportNewCorpusTip	Create a new corpus from matching documents (button will be disabled if there are no matches).	
+Voyant.panel.RezoViz	title	RezoViz	
+Voyant.panel.RezoViz	categories	Categories	
+Voyant.panel.RezoViz	people	People	
+Voyant.panel.RezoViz	locations	Locations	
+Voyant.panel.RezoViz	organizations	Organizations	
+Voyant.panel.RezoViz	reload	Reload	
+Voyant.panel.RezoViz	minEdgeCount	Min. Edge Count	
+Voyant.panel.RezoViz	repulsion	Repulsion	
+Voyant.panel.RezoViz	stiffness	Stiffness	
+Voyant.panel.RezoViz	friction	Friction	
+Voyant.panel.RezoViz	noEntities	No entities to graph.	
+Voyant.panel.RezoViz	noEntitiesForEdgeCount	No entities were found. Would you like to reduce the minimum edge count to improve results?	
+Voyant.panel.RezoViz	loadingEntities	Loading entities…	
+Voyant.panel.Reader	title	Reader	
+Voyant.panel.Reader	helpTip	<p>The Reader tool provides a view of text from the corpus. Features include:</p><ul><li>frequency information appears when hovering over a word</li><li>distribution information appears in a graph at the bottom when clicking on a word</li><li>a bar graph at the bottom indicates the relative size of each document in the corpus</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>	
+Voyant.panel.Reader	documentFrequency	document frequency:	
+Voyant.panel.Reader	limitedAccess	This is a limited access corpus and this tool's functionality is restricted.	
+Voyant.panel.ScatterPlot	title	ScatterPlot	
+Voyant.panel.ScatterPlot	analysis	Analysis	
+Voyant.panel.ScatterPlot	ca	Correspondence Analysis	
+Voyant.panel.ScatterPlot	pca	Principal Components Analysis	
+Voyant.panel.ScatterPlot	docSim	Document Similarity	
+Voyant.panel.ScatterPlot	freqsMode	Frequencies	
+Voyant.panel.ScatterPlot	freqsModeTip	Determines if frequencies are expressed as relative counts, raw counts, or as TF-IDF.	
+Voyant.panel.ScatterPlot	tfidf	TF-IDF	
+Voyant.panel.ScatterPlot	rawFrequencies	Raw Frequencies	
+Voyant.panel.ScatterPlot	relativeFrequencies	Relative Frequencies	
+Voyant.panel.ScatterPlot	rawFreq	Raw	
+Voyant.panel.ScatterPlot	relFreq	Relative	
+Voyant.panel.ScatterPlot	terms	Terms	
+Voyant.panel.ScatterPlot	term	Term	
+Voyant.panel.ScatterPlot	numTerms	Terms	
+Voyant.panel.ScatterPlot	addTerm	Add Term	
+Voyant.panel.ScatterPlot	clusters	Clusters	
+Voyant.panel.ScatterPlot	dimensions	Dimensions	
+Voyant.panel.ScatterPlot	labels	Labels	
+Voyant.panel.ScatterPlot	remove	Remove	
+Voyant.panel.ScatterPlot	removeTerm	Remove <b>{0}</b>	
+Voyant.panel.ScatterPlot	nearby	Nearby	
+Voyant.panel.ScatterPlot	nearbyTerm	Nearby <b>{0}</b>	
+Voyant.panel.ScatterPlot	pcTitle	Percentage of Total Variation Explained by Each Component	
+Voyant.panel.ScatterPlot	pc	PC	
+Voyant.panel.ScatterPlot	caTitle	Percentage of Total Assocation Explained by Each Dimension	
+Voyant.panel.ScatterPlot	dimension	Dimension	
+Voyant.panel.ScatterPlot	xAxis	X Axis	
+Voyant.panel.ScatterPlot	yAxis	Y Axis	
+Voyant.panel.ScatterPlot	fill	Fill	
+Voyant.panel.ScatterPlot	loading	Loading	
+Voyant.panel.ScatterPlot	helpTip	<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>	
+Voyant.panel.ScatterPlot	tokenFreqTip	<b>{0}</b><br><b>Raw Frequency</b><br>{1}<br><b>Relative Frequency</b><br>{2}	
+Voyant.panel.ScatterPlot	docFreqTip	<b>{0}</b><br><b>Word Count</b><br>{1}	
+Voyant.panel.ScatterPlot	noTermSelected	No term selected.	
+Voyant.panel.ScatterPlot	summaryLabel	Summary	
+Voyant.panel.ScatterPlot	docsLabel	Documents	
+Voyant.panel.ScatterPlot	termsLabel	Terms	
+Voyant.panel.StreamGraph	title	StreamGraph	
+Voyant.panel.StreamGraph	helpTip	StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).	
+Voyant.panel.StreamGraph	freqsMode	Frequencies	
+Voyant.panel.StreamGraph	freqsModeTip	Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).	
+Voyant.panel.StreamGraph	rawFrequencies	Raw Frequencies	
+Voyant.panel.StreamGraph	relativeFrequencies	Relative Frequencies	
+Voyant.panel.StreamGraph	documentSegments	Document Segments	
+Voyant.panel.StreamGraph	documents	Documents	
+Voyant.panel.StreamGraph	clearTerms	Clear Terms	
+Voyant.panel.StreamGraph	segments	Segments	
+Voyant.panel.Summary	title	Summary	
+Voyant.panel.Summary	helpTip	<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>	
+Voyant.panel.Summary	corpusType	<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordid="{id}">{type}</a> ({val})<tpl if="xindex < xcount">, </tpl></tpl>	
+Voyant.panel.Summary	documentType	<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:recordid="{id}" voyant:docindex="{docIndex}">{type}</a> ({val})<tpl if="xindex < xcount">, </tpl></tpl>	
+Voyant.panel.Summary	mostFrequentWords	Most <b>frequent words</b> in the corpus: 	
+Voyant.panel.Summary	distinctiveWords	<b>Distinctive words</b> (compared to the rest of the corpus): 	
+Voyant.panel.Summary	moreDistinctiveWords	<a href="#" onclick="return false">Next {0} of {1} remaining</a>	
+Voyant.panel.Summary	seeAll	All…	
+Voyant.panel.Summary	more	More…	
+Voyant.panel.Summary	items	items	
+Voyant.panel.Summary	numberOfTerms	number of words in this document	
+Voyant.panel.Summary	longest	Longest: 	
+Voyant.panel.Summary	shortest	Shortest: 	
+Voyant.panel.Summary	highest	Highest: 	
+Voyant.panel.Summary	lowest	Lowest: 	
+Voyant.panel.Summary	docsLength	Document Length: 	
+Voyant.panel.Summary	docsDensity	Vocabulary Density: 	
+Voyant.panel.TopicContexts	title	Topic Contexts	
+Voyant.panel.TopicContexts	helpTip	Topic Contexts	
+Voyant.panel.TopicContexts	reset	reset	
+Voyant.panel.TermsRadio	title	TermsRadio	
+Voyant.panel.TermsRadio	type	Visualization	
+Voyant.panel.TermsRadio	help	This tool can be used to examine word occurence over a corpus spanning a period of time.	
+Voyant.panel.TermsRadio	visibleSegments	Visible	
+Voyant.panel.TermsRadio	visibleSegmentsTip	This option determines how many of the documents/segments are displayed at once.	
+Voyant.panel.TermsRadio	segments	Segments	
+Voyant.panel.TermsRadio	segmentsTip	This option allows you to define how many segments a document should be divided into (note that this option only applies to distribution within a document, not distribution across a corpus).	
+Voyant.panel.TermsRadio	displayPanel	Display Panel	
+Voyant.panel.TermsRadio	displayPanelTip	Panel to control settings for word display.	
+Voyant.panel.TermsRadio	duration	Speed	
+Voyant.panel.TermsRadio	terms	Terms	
+Voyant.panel.TermsRadio	fraction	Word Display	
+Voyant.panel.TermsRadio	fractionTip	This option allows you to define the number of words displayed. Ex. 20 will only keep the words that occur with the lowest 20% of frequency.	
+Voyant.panel.TermsRadio	reset	Reset	
+Voyant.panel.TermsRadio	resetTip	Reset the visualization to the beginning.	
+Voyant.panel.TermsRadio	speed	Speed	
+Voyant.panel.TermsRadio	yScale	Y-axis Scale	
+Voyant.panel.TermsRadio	linear	Linear	
+Voyant.panel.TermsRadio	log	Logarithmic	
+Voyant.panel.TermsRadio	removeTerm	Remove <b>{0}</b>	
+Voyant.panel.TermsRadio	completingTransition	Completing transition.	
+Voyant.panel.TermsRadio	termNotFound	Term not found.	
+Voyant.panel.Trends	title	Trends	
+Voyant.panel.Trends	helpTip	<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>	
+Voyant.panel.Trends	freqsMode	Frequencies	
+Voyant.panel.Trends	freqsModeTip	Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).	
+Voyant.panel.Trends	options	Options	
+Voyant.panel.Trends	rawFrequencies	Raw Frequencies	
+Voyant.panel.Trends	relativeFrequencies	Relative Frequencies	
+Voyant.panel.Trends	raw	Raw	
+Voyant.panel.Trends	relative	Relative	
+Voyant.panel.Trends	segmentsSlider	Segments	
+Voyant.panel.Trends	segments	Document Segments	
+Voyant.panel.Trends	documents	Documents	
+Voyant.panel.NoTool	title	No Such Tool	
+Voyant.panel.NoTool	error	Error	
+Voyant.panel.NoTool	currentButton	Use Current Version	
+Voyant.panel.NoTool	oldButton	Use Old Version	
+Voyant.panel.NoTool	noToolSpecified	No tool has been specified. You will be redirected to the main page of Voyant Tools.	
+Voyant.panel.NoTool	badToolSpecified	The <i>{0}</i> tool doesn't exist. You will be redirected to the main page of Voyant Tools.	
+Voyant.panel.NoTool	notImplemented	<p>The <i>{0}</i> tool existed in a previous version of Voyant Tools but has not been implemented in this version. Some tools may be reimplemented eventually while others are unlikely to be implemented because they were experimental, unuseful or dependent on technologies that are no longer supported (like Adobe Flash and Java Applets).</p><p>Please decide if you'd like to use the new version of Voyant or if you'd rather try using the <i>{0}</i> tool in the old version.</p>	
+Voyant.panel.VoyantFooter	voyantTools	Voyant Tools	
+Voyant.panel.VoyantFooter	voyantLink	<a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools</a>	
+Voyant.panel.VoyantFooter	privacy	Privacy	
+Voyant.panel.VoyantFooter	privacyMsg	The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see &lt;a href="http://www.google.ca/intl/en/policies/privacy/" target="_blank"&gt;Google's Privacy Policy&lt;/a&gt; and the &lt;em&gt;Log Information&lt;/em&gt; section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact &lt;a href="http://stefansinclair.name/contact/"&gt;Stéfan Sinclair&lt;/a&gt;.	
+Voyant.panel.VoyantHeader	title	Voyant Tools	
+Voyant.panel.VoyantHeader	helpTip	Voyant Tools is a web-based reading and analysis environment for digital texts.	
+Voyant.panel.VoyantHeader	home	Start Over	
+Voyant.panel.VoyantHeader	homeTip	Click to start over from the corpus creation screen.	
+Voyant.panel.VoyantHeader	homeConfirm	Are you sure you want to start over (and leave the current corpus)?	
+Voyant.panel.CorpusSet	title	Corpus View	
+Voyant.panel.CorpusSet	helpTip	This is the default, general-purpose corpus view.	
+Voyant.panel.ScatterSet	title	Scatter	
+Voyant.panel.ScatterSet	helpTip	This is a specialized view for working with scatterplots.	
+Voyant.panel.Subset	title	Workset Builder	
+Voyant.panel.Subset	titleLabel	Titles	
+Voyant.panel.Subset	authorLabel	Authors	
+Voyant.panel.Subset	lexicalLabel	Full-text	
+Voyant.panel.Subset	publisherLabel	Publishers	
+Voyant.panel.Subset	sendToVoyantButton	New Voyant Corpus	
+Voyant.panel.Subset	downloadButton	Download Zip Archive	
+Voyant.panel.Subset	sendToVoyantNoQuery	There's currently no query specified, but you can <a href="{0}" target="_blank">open the current corpus in a new window</a>.	
+Voyant.panel.Subset	noMatches	The current query criteria don't match any documents, please modifying the search first.	
+Voyant.panel.CollocatesSet	title	Scatter	
+Voyant.panel.CollocatesSet	helpTip	This is a specialized view for working with scatterplots.	
+Voyant.panel.BubblelinesSet	title	Bubblelines Skin	
+Voyant.panel.BubblelinesSet	helpTip	This is a specialized view for working with Bubblelines.	
+Voyant.panel.CustomSet	title	Custom View	
+Voyant.panel.CustomSet	helpTip	This is a custom view.	
+Voyant.panel.CustomSet	noSuchTool	The specified tool ({0}) does not exist.	
+Voyant.panel.WordTree	title	WordTree	
+Voyant.VoyantApp	error	Error	
+Voyant.VoyantApp	serverResponseError	The server error reponse:	
+Voyant.VoyantCorpusApp	fetchingCorpus	Fetching your corpus	
+Voyant.VoyantCorpusApp	moreToolsScale	Tools by Scale	
+Voyant.VoyantCorpusApp	moreToolsScaleCorpus	Corpus Tools	
+Voyant.VoyantCorpusApp	moreToolsScaleDocument	Document Tools	
+Voyant.VoyantCorpusApp	moreToolsType	Tools by Type	
+Voyant.VoyantCorpusApp	moreToolsTypeViz	Visualization Tools	
+Voyant.VoyantCorpusApp	moreToolsTypeGrid	Grid Tools	
+Voyant.VoyantCorpusApp	moreToolsTypeOther	Other Tools	
+Voyant.VoyantCorpusApp	passwordRequiredTitle	Access Code Required	
+Voyant.VoyantCorpusApp	passwordRequiredMessage	This corpus requires an access code.	
+Voyant.VoyantCorpusApp	nonConsumptiveMessage	Alternatively, you can click on the <i>Limited Access</i> button to continue with limited functionality (generally speaking, this non-consumpive access allows you to explore derivative data from the corpus without allowing you to read text from the corpus).	
+Voyant.VoyantCorpusApp	nonConsumptiveButton	Limited Access	
+Voyant.VoyantCorpusApp	passwordValidateButton	Validate	
+Voyant.VoyantCorpusApp	password	access code	
+Voyant.VoyantCorpusApp	noPasswordGiven	Please provide an access code.	
+Voyant.VoyantCorpusApp	badPassword	Sorry, that doesn't seem to be a valid access code.	
+Voyant.VoyantCorpusApp	passwordValidationError	Sorry, an unexpected error occurred while trying to validate your access code.	
+Voyant.VoyantDefaultApp	noViewErrorTitle	View Error	
+Voyant.VoyantDefaultApp	noViewErrorTpl	No view was found with the name "<i>{view}</i>". The default view will be used instead.	
+Voyant.VoyantDefaultApp	noViewKnownErrorTpl	The selected view ({view}) has not been migrated from the previous version of Voyant (and probably won't be). {additional} The default view will be used instead.	
+Voyant.VoyantDefaultApp	convertSkinMsg	The convert skin was used for document exporting and that functionality is now available from the Documents tool.	
+Voyant.VoyantDefaultApp	voyantIs	<p style="text-align: center; font-style: italic;">Voyant Tools is a web-based reading and analysis environment for digital texts – please visit <a href="http://hermeneuti.ca/" target="_blank">Hermeneuti.ca</a> for more information..</p>	
+Voyant.VoyantDefaultApp	helpTip	Voyant Tools is a web-based reading and analysis environment for digital texts.<p></p>	

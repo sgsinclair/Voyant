@@ -4,13 +4,6 @@ Ext.define('Voyant.widget.DownloadFileFormat', {
     alias: 'widget.downloadfileformat',
 	statics: {
 		i18n: {
-			fieldLabel: {en: 'File Format'},
-			voyantXml: {en: 'Voyant XML'},
-			VOYANTTip: {en: "This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content." },
-			SOURCETip: {en: "This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided."},
-			TXTTip: {en: "This will produce a plain text version of each document." },
-			original: {en: 'original'},
-			plainText: {en: 'plain text'}
 		}
 	},
     initComponent: function(config) {

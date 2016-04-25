@@ -5,20 +5,6 @@ Ext.define('Voyant.panel.Bubblelines', {
 	alias: 'widget.bubblelines',
     statics: {
     	i18n: {
-    		title: {en: 'Bubblelines'},
-			type : {en: 'Visualization'},
-			findTerm : {en: 'Find Term'},
-			clearTerms : {en: 'Clear'},
-			removeTerm : {en: 'Remove Term'},
-			showTerm : {en: 'Show Term'},
-			hideTerm : {en: 'Hide Term'},
-			granularity : {en: 'Granularity'},
-			separateLines : {en: 'Separate Lines for Terms'},
-			total : {en: 'Total'},
-			corpusTooSmall : {en: 'The provided corpus is too small for this tool.'},
-			help: {en: "Bubblelines visualizes the frequency and repetition of  a term's use in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal lengths. Each term is represented as a bubble, the size of the bubble indicates its frequency in the corresponding segment of text. The larger the bubble's radius the more frequently the term occurs."},
-			adaptedFrom: {en: ''},
-			options: {en: "Options"}
     	},
     	api: {
     		/**

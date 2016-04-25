@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Apr 24 18:23:00 EDT 2016 */
+/* This file created by JSCacher. Last modified: Mon Apr 25 11:16:04 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4190,6 +4190,10 @@ Ext.define('Voyant.util.Localization', {
 	_localizeClass: function(clazz, key, config) {
 		if (clazz && clazz.i18n && clazz.i18n[key]) {
 			var use = false;
+			if (clazz.i18n[key]) {
+				use = clazz.i18n[key];
+			}
+			/*
 			if (config && config.lang && clazz.i18n[key][config.lang]) {
 				use = clazz.i18n[key][config.lang];
 			}
@@ -4199,6 +4203,7 @@ Ext.define('Voyant.util.Localization', {
 			else if (clazz.i18n[key][Voyant.util.Localization.DEFAULT_LANGUAGE]) {
 				use = clazz.i18n[key][Voyant.util.Localization.DEFAULT_LANGUAGE];
 			}
+			*/
 			if (use) {
 				if (use.isTemplate) { // template
 					return use.apply(config);
@@ -4272,7 +4277,6 @@ Ext.define("Voyant.util.DetailedError", {
 	},
 	statics: {
 		i18n: {
-			error: {en: "Error"}
 		}
 	},
 	constructor: function(config) {
@@ -4443,43 +4447,6 @@ Ext.define('Voyant.util.Toolable', {
 	requires: ['Voyant.util.Localization'],
 	statics: {
 		i18n: {
-			maximizeTip: {en: 'Open this tool in a new window'},
-			plusTip: {en: 'Click to choose another tool for this panel location (this will replace the current tool).'},
-			saveTip: {en: 'Export a URL, an embeddable tool, data or a bibliographic reference.'},
-			gearTip: {en: 'Define options for this tool.'},
-			helpTip: {en: 'No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.'},
-			moreHelp: {en: 'More help…'},
-			exportTitle: {en: "Export"},
-			exportViewUrl: {en: 'a URL for this view (tools and data)'},
-			exportViewFieldset: {en: 'Export View (Tools and Data)'},
-			exportViewHtmlEmbed: {en: "an HTML snippet for embedding this view in another web page"},
-			exportViewHtmlEmbed: {en: "an HTML snippet for embedding this view in another web page"},
-			exportViewEmbedTitle: {en: "Embed HTML Snippet"},
-			exportViewEmbedMessage: {en: "You can copy and paste the HTML snippet from the box below into another web page. Note that some content management systems (like WordPress) may need a special plugin to handle &lt;iframe&gt; tags."},
-			exportBiblioTitle: {en: "Export Bibliographic Reference"},
-			exportViewBiblio: {en: "a bibliographic reference for this view"},
-			exportGridCurrent: {en: "Export Current Data"},
-			exportGridCurrentHtml: {en: "export current data as HTML"},
-			exportGridCurrentJson: {en: "export current data as JSON"},
-			exportGridCurrentTsv: {en: "export current data as tab separated values (text)"},
-			'export': {en: 'Export'},
-			reset: {en: "Reset"},
-			optionsTitle: {en: 'Options'},
-			confirmTitle: {en: 'Confirm'},
-			cancelTitle: {en: 'Cancel'},
-			exportError: {en: "Export Error"},
-			exportNoFunction: {en: "An export function has been defined by is not availble."},
-			exportDataHtmlMessage: {en: "Copy the data below, they can be pasted into an HTML page or used as XML."},
-			exportDataTsvMessage: {en: "Copy data below, they can be pasted into a spreadsheet or text file."},
-			exportDataJsonMessage: {en: "Copy the data below, they can be used in other web-based applications."},
-    		exportPng: {en: "export a PNG image of this visualization"},
-			exportDataTitle: {en: "Export Data"},
-			exportVizTitle: {en: "Export Visualization"},
-			exportPngTitle: {en: "Export PNG"},
-    		exportSvg: {en: "export the SVG of this visualization"},
-			exportPngMessage: {en: "<p>This is a thumbnail of the PNG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the HTML code below.</p>"},
-			exportSvgTitle: {en: "Export SVG"},
-			exportSvgMessage: {en: "<p>This is a thumbnail of the SVG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the SVG code below.</p>"}
 		}
 	},
 	constructor: function(config) {
@@ -5211,9 +5178,6 @@ Ext.define("Voyant.util.Downloadable", {
 	mixins: ['Voyant.util.Localization'],
 	statics: {
 		i18n: {
-			exportTitle: {en: "Export"},
-			downloadButton: {en: "Download"},
-			cancelButton: {en: "Cancel"}
 		}
 	},
 
@@ -5933,7 +5897,6 @@ Ext.define('Voyant.data.store.DocumentsMixin', {
     model: 'Voyant.data.model.Document',
     statics: {
     	i18n: {
-    		failedGetDocuments: {en: 'Failed attempt to get documents.'}
     	}
     },
 	sorters: {
@@ -6126,59 +6089,8 @@ Ext.define('Voyant.data.model.Corpus', {
     	documentsStore: undefined
     },
     statics: {
-    	i18n: {
-    		failedCreateCorpus: {en: 'Failed attempt to create a Corpus.'},
-			thisCorpus: {en: 'This corpus'},
-			isEmpty: {en: 'is empty'},
-			hasNdocuments: {
-				en: new Ext.Template("has {count} documents")
-			},
-			has1document: {en: "has 1 document"},
-			widthNwordsAndNTypes: {
-				en: new Ext.Template("with {words} <span class='info-tip' data-qtip='every occurrence of every word (like multiple occurrences of \"the\") is counted'>total words</span> and {types} <span class='info-tip' data-qtip='multiple occurrences of words (like \"the\") are counted once'>unique word forms</span>")
-			},
-			yearAgo: {
-				en: new Ext.Template("about a year ago")
-			},
-			yearsAgo: {
-				en: new Ext.Template("about {count} years ago")
-			},
-			monthAgo: {
-				en: new Ext.Template("about a month ago")
-			},
-			monthsAgo: {
-				en: new Ext.Template("about {count} months ago")
-			},
-			dayAgo: {
-				en: new Ext.Template("about a day ago")
-			},
-			daysAgo: {
-				en: new Ext.Template("about {count} days ago")
-			},
-			hourAgo: {
-				en: new Ext.Template("about an hour ago")
-			},
-			hoursAgo: {
-				en: new Ext.Template("about {count} hours ago")
-			},
-			minuteAgo: {
-				en: new Ext.Template("about a minute ago")
-			},
-			minutesAgo: {
-				en: new Ext.Template("about {count} minutes ago")
-			},
-			secondAgo: {
-				en: new Ext.Template("about a second ago")
-			},
-			secondsAgo: {
-				en: new Ext.Template("{count} seconds ago")
-			},
-			now: {
-				en: 'now'
-			}
-    	}
+    	i18n: {}
     },
-    
     fields: [
          {name: 'documentsCount', type: 'int'},
          {name: 'lexicalTokensCount', type: 'int'},
@@ -6331,12 +6243,12 @@ Ext.define('Voyant.data.model.Corpus', {
 		else {
 			message+=' ';
 			if (size>1) {
-				message+=this.localize('hasNdocuments', {count: Ext.util.Format.number(size,"0,000")});
+				message+=new Ext.XTemplate(this.localize('hasNdocuments')).apply({count: Ext.util.Format.number(size,"0,000")});
 			}
 			else {
 				message+=this.localize('has1document');
 			}
-			message+=' '+this.localize('widthNwordsAndNTypes', {words: Ext.util.Format.number(this.getWordTokensCount(),"0,000"), types: Ext.util.Format.number(this.getWordTypesCount(),"0,000")})+'.'
+			message+=' '+new Ext.XTemplate(this.localize('widthNwordsAndNTypes')).apply({words: Ext.util.Format.number(this.getWordTokensCount(),"0,000"), types: Ext.util.Format.number(this.getWordTypesCount(),"0,000")})+'.'
 			message+=" Created "
 			var createdDate = this.get('createdDate');
 			var now = new Date();
@@ -6351,8 +6263,8 @@ Ext.define('Voyant.data.model.Corpus', {
         			if (Ext.Date.diff(createdDate, now, time[1])>(time[0]=='second' ? 1 : 0)) {
         				var count = Ext.Date.diff(createdDate, now, time[1]);
         				message+="<span class='info-tip' data-qtip='"+Ext.Date.format(createdDate, "Y-m-d, H:i:s")+"'>";
-        				if (count==1) {message+=this.localize(time[0]+'Ago', {count: count, date: createdDate})}
-        				else {message+=this.localize(time[0]+'sAgo', {count: count, date: createdDate})}
+        				if (count==1) {message+=new Ext.XTemplate(this.localize(time[0]+'Ago')).apply({count: count, date: createdDate})}
+        				else {message+=new Ext.XTemplate(this.localize(time[0]+'sAgo')).apply({count: count, date: createdDate})}
         				message+="</span>";
         				return false
         			}
@@ -6377,51 +6289,39 @@ Ext.define('Voyant.widget.StopListOption', {
     layout: 'hbox',
     statics: {
     	i18n: {
-    		label: {en: "Stopwords:"},
-    		editList: {en: "Edit List"},
-    		noEditAutoTitle: {en: "Edit Stoplist Error"},
-    		noEditAutoMessage: {en: 'The auto-detected stoplist cannot be edited, please select a specifc stoplist such as the "New User-Defined List".'},
-    		auto: {en: "Auto-detect"},
-    		none: {en: "None"},
-    		'new': {en: "New User-Defined List"},
     		
-    		ar: {en: "Arabic", value: 'stop.ar.arabic-lucene.txt'},
-    		bg: {en: "Bulgarian", value: 'stop.bu.bulgarian-lucene.txt'},
-    		br: {en: "Breton", value: 'stop.br.breton-lucene.txt'},
-    		ca: {en: "Catalan", value: 'stop.ca.catalan-lucene.txt'},
-    		ckb: {en: "Kurdish", value: 'stop.ckb-turkish-lucene.txt'},
-    		cn: {en: "Chinese", value: 'stop.cn.chinese-lawrence.txt'},
-    		cz: {en: "Czech", value: 'stop.cz.czech-lucene.txt'},
-    		de: {en: "German", value: 'stop.de.german.txt'},
-    		el: {en: "Greek", value: 'stop.el.greek-lucene.txt'},
-    		en: {en: "English", value: 'stop.en.taporware.txt'},
-    		es: {en: "Spanish", value: 'stop.es.spanish.txt'},
-    		eu: {en: "Basque", value: 'stop.eu.basque-lucene.txt'},
-    		fa: {en: "Farsi", value: 'stop.fa.farsi-lucene.txt'},
-    		fr: {en: "French", value: 'stop.fr.veronis.txt'},
-    		ga: {en: "Irish", value: 'stop.ga-irish-lucene.txt'},
-    		gl: {en: "Galician", value: 'stop.ga.galician-lucene.txt'},
-    		hi: {en: "Hindi", value: 'stop.hi.hindi-lucene.txt'},
-    		hu: {en: "Hungarian", value: 'stop.hu.hungarian.txt'},
-    		hy: {en: "Armenian", value: 'stop.hy.armenian-lucene.txt'},
-    		id: {en: "Indonesian", value: 'stop.id.indonesian-lucene.txt'},
-    		it: {en: "Italian", value: 'stop.it.italian.txt'},
-    		ja: {en: "Japanese", value: 'stop.ja.japanese-lucene.txt'},
-    		lt: {en: "Latvian", value: 'stop.lv.latvian-lucene.txt'},
-    		lv: {en: "Lithuanian", value: 'stop.lt.lithuanian-lucene.txt'},
-    		mu: {en: "Multilingual", value: 'stop.mu.multi.txt'},
-    		nl: {en: "Dutch", value: 'stop.nl.dutch.txt'},
-    		no: {en: "Norwegian", value: 'stop.no.norwegian.txt'},
-    		ro: {en: "Romanian", value: 'stop.ro.romanian-lucene.txt'},
-    		se: {en: "Swedish", value: 'stop.se.swedish-long.txt'},
-    		th: {en: "Thai", value: 'stop.th.thai-lucene.txt'},
-    		tr: {en: "Turkish", value: 'stop.tr.turkish-lucene.txt'},
+//    		ar: {en: "Arabic", value: 'stop.ar.arabic-lucene.txt'},
+//    		bg: {en: "Bulgarian", value: 'stop.bu.bulgarian-lucene.txt'},
+//    		br: {en: "Breton", value: 'stop.br.breton-lucene.txt'},
+//    		ca: {en: "Catalan", value: 'stop.ca.catalan-lucene.txt'},
+//    		ckb: {en: "Kurdish", value: 'stop.ckb-turkish-lucene.txt'},
+//    		cn: {en: "Chinese", value: 'stop.cn.chinese-lawrence.txt'},
+//    		cz: {en: "Czech", value: 'stop.cz.czech-lucene.txt'},
+//    		de: {en: "German", value: 'stop.de.german.txt'},
+//    		el: {en: "Greek", value: 'stop.el.greek-lucene.txt'},
+//    		en: {en: "English", value: 'stop.en.taporware.txt'},
+//    		es: {en: "Spanish", value: 'stop.es.spanish.txt'},
+//    		eu: {en: "Basque", value: 'stop.eu.basque-lucene.txt'},
+//    		fa: {en: "Farsi", value: 'stop.fa.farsi-lucene.txt'},
+//    		fr: {en: "French", value: 'stop.fr.veronis.txt'},
+//    		ga: {en: "Irish", value: 'stop.ga-irish-lucene.txt'},
+//    		gl: {en: "Galician", value: 'stop.ga.galician-lucene.txt'},
+//    		hi: {en: "Hindi", value: 'stop.hi.hindi-lucene.txt'},
+//    		hu: {en: "Hungarian", value: 'stop.hu.hungarian.txt'},
+//    		hy: {en: "Armenian", value: 'stop.hy.armenian-lucene.txt'},
+//    		id: {en: "Indonesian", value: 'stop.id.indonesian-lucene.txt'},
+//    		it: {en: "Italian", value: 'stop.it.italian.txt'},
+//    		ja: {en: "Japanese", value: 'stop.ja.japanese-lucene.txt'},
+//    		lt: {en: "Latvian", value: 'stop.lv.latvian-lucene.txt'},
+//    		lv: {en: "Lithuanian", value: 'stop.lt.lithuanian-lucene.txt'},
+//    		mu: {en: "Multilingual", value: 'stop.mu.multi.txt'},
+//    		nl: {en: "Dutch", value: 'stop.nl.dutch.txt'},
+//    		no: {en: "Norwegian", value: 'stop.no.norwegian.txt'},
+//    		ro: {en: "Romanian", value: 'stop.ro.romanian-lucene.txt'},
+//    		se: {en: "Swedish", value: 'stop.se.swedish-long.txt'},
+//    		th: {en: "Thai", value: 'stop.th.thai-lucene.txt'},
+//    		tr: {en: "Turkish", value: 'stop.tr.turkish-lucene.txt'},
     		
-    		ok: {en: "Save"},
-    		cancel: {en: "Cancel"},
-    		editStopListTitle: {en: "Edit Stoplist"},
-    		editStopListMessage: {en: "This is the stoplist, one term per line."},
-    		applyGlobally: {en: "apply globally"}
     	}
     },
     initComponent: function(config) {
@@ -6580,10 +6480,6 @@ Ext.define('Voyant.widget.QuerySearchField', {
     alias: 'widget.querysearchfield',
 	statics: {
 		i18n: {
-			querySearch: {en: 'Search'},
-			querySearchTip: {en: '<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,&quot;coat mittens&quot;~5</b>: combine syntaxes</li></ul>'},
-			querySearchDocsModeTip: {en: '<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>&quot;winter coat&quot;</b>: <i>winter coat</i> as a phrase</li><li><b>&quot;coat mittens&quot;~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+"winter coat" +mitten*</b>: combine syntaxes</li></ul>'},
-			aggregateInDocumentsCount: {en: "This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms)."}
 		}
 	},
 	config: {
@@ -6742,7 +6638,6 @@ Ext.define('Voyant.widget.TotalPropertyStatus', {
     alias: 'widget.totalpropertystatus',
 	statics: {
 		i18n: {
-    		totalPropertyStatus: {en: '{count:number("0,000")}'}
 		}
 	},
     initComponent: function() {
@@ -6775,12 +6670,6 @@ Ext.define('Voyant.widget.DocumentSelector', {
 	glyph: 'xf10c@FontAwesome',
 	statics: {
 		i18n: {
-			documents: {en: 'Documents'},
-			selectAll: {en: 'All'},
-			selectNone: {en: 'None'},
-			ok: {en: 'Ok'},
-			cancel: {en: "Cancel"},
-			all: {en: "all"}
 		}
 	},
 
@@ -6931,7 +6820,7 @@ Ext.define('Voyant.widget.DocumentSelectorButton', {
     alias: 'widget.documentselectorbutton',
     mixins: ['Voyant.widget.DocumentSelector'],
     initComponent: function() {
-    	this.mixins["Voyant.widget.DocumentSelectorBase"].initComponent.apply(this, arguments);
+    	this.mixins["Voyant.widget.DocumentSelector"].initComponent.apply(this, arguments);
 		this.callParent();
     }
 })
@@ -6941,7 +6830,7 @@ Ext.define('Voyant.widget.DocumentSelectorMenuItem', {
     alias: 'widget.documentselectormenuitem',
     mixins: ['Voyant.widget.DocumentSelector'],
     initComponent: function() {
-    	this.mixins["Voyant.widget.DocumentSelectorBase"].initComponent.apply(this, arguments);
+    	this.mixins["Voyant.widget.DocumentSelector"].initComponent.apply(this, arguments);
 		this.callParent();
     }
 })
@@ -6952,8 +6841,6 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
     alias: 'widget.corpusdocumentselector',
 	statics: {
 		i18n: {
-			corpus: {en: "Corpus"},
-			scale: {en: "Scale"}
 		}
 	},
 	config: {
@@ -7023,12 +6910,6 @@ Ext.define('Voyant.widget.DownloadFilenameBuilder', {
     alias: 'widget.downloadfilenamebuilder',
 	statics: {
 		i18n: {
-			fieldLabel: {en: 'Filenames'},
-			titleLabel: {en: 'title'},
-			authorLabel: {en: 'author'},
-			pubDateLabel: {en: 'date'},
-			enabledLabel: {en: 'include: '},
-			availableLabel: {en: 'exclude: '}
 		}
 	},
 	config: {
@@ -7118,13 +6999,6 @@ Ext.define('Voyant.widget.DownloadFileFormat', {
     alias: 'widget.downloadfileformat',
 	statics: {
 		i18n: {
-			fieldLabel: {en: 'File Format'},
-			voyantXml: {en: 'Voyant XML'},
-			VOYANTTip: {en: "This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content." },
-			SOURCETip: {en: "This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided."},
-			TXTTip: {en: "This will produce a plain text version of each document." },
-			original: {en: 'original'},
-			plainText: {en: 'plain text'}
 		}
 	},
     initComponent: function(config) {
@@ -7166,7 +7040,6 @@ Ext.define('Voyant.widget.DownloadOptions', {
     alias: 'widget.downloadoptions',
 	statics: {
 		i18n: {
-			title: {en: 'Download Options'}
 		}
 	},
 	config: {
@@ -7188,14 +7061,6 @@ Ext.define('Voyant.panel.Panel', {
 	alias: 'widget.voyantpanel',
 	statics: {
 		i18n: {
-			term: {en: "Term"},
-			rawFreq: {en: "Count"},
-			relativeFreq: {en: 'Relative'},
-			trend: {en: "Trend"},
-			colon: {en: ': '},
-			loading: {en: 'Loading'},
-			error: {en: "Error"},
-			info: {en: "Information"}
 		}
 	},
 	constructor: function(config) {
@@ -7312,7 +7177,6 @@ Ext.define('Voyant.widget.Facet', {
     alias: 'widget.facet',
 	statics: {
 		i18n: {
-			emptyText: {en: "No values found."}
 		},
 		api: {
 			stopList: 'auto',
@@ -7388,20 +7252,6 @@ Ext.define('Voyant.panel.Bubblelines', {
 	alias: 'widget.bubblelines',
     statics: {
     	i18n: {
-    		title: {en: 'Bubblelines'},
-			type : {en: 'Visualization'},
-			findTerm : {en: 'Find Term'},
-			clearTerms : {en: 'Clear'},
-			removeTerm : {en: 'Remove Term'},
-			showTerm : {en: 'Show Term'},
-			hideTerm : {en: 'Hide Term'},
-			granularity : {en: 'Granularity'},
-			separateLines : {en: 'Separate Lines for Terms'},
-			total : {en: 'Total'},
-			corpusTooSmall : {en: 'The provided corpus is too small for this tool.'},
-			help: {en: "Bubblelines visualizes the frequency and repetition of  a term's use in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal lengths. Each term is represented as a bubble, the size of the bubble indicates its frequency in the corresponding segment of text. The larger the bubble's radius the more frequently the term occurs."},
-			adaptedFrom: {en: ''},
-			options: {en: "Options"}
     	},
     	api: {
     		/**
@@ -7926,25 +7776,6 @@ Ext.define('Voyant.panel.Catalogue', {
 	alias: 'widget.catalogue',
     statics: {
     	i18n: {
-    		title: {en: "Catalogue"},
-    		helpTip: {en: "<p>The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents."},
-    		"facet.authorTitle": {en: "Authors"},
-    		"facet.languageTitle": {en: "Languages"},
-    		"facet.titleTitle": {en: "Titles"},
-    		"facet.keywordTitle": {en: "Keywords"},
-    		"facet.pubDateTitle": {en: "Publication Dates"},
-    		"facet.publisherTitle": {en: "Publishers"},
-    		"facet.pubPlaceTitle": {en: "Publication Locations"},
-    		loadingSnippets: {en: "loading text snippets…"},
-    		lexicalTitle: {en: "Terms"},
-    		noMatches: {'en': new Ext.Template('No matches (out of {0} documents).', {compiled: true})},
-    		queryMatches: {en: new Ext.Template("{0} matching documents (out of {1}).", {compiled: true})},
-    		clickToOpenCorpus: {'en': new Ext.Template('Please <a href="{0}" target="_blank" class="link">click here</a> to access your new corpus (since popup windows are blocked).', {compiled: true})},
-    		"export": {en: "Export"},
-    		exportTip: {en: "Create a new Voyant corpus with the selected documents."},
-    		matchingDocuments: {'en': "number of matching documents"},
-    		rawFreqs: {'en': "total occurrences (raw frequency)"},
-    		exportInProgress: {en: "Preparing your corpus for export…"}
     	},
     	api: {
     		config: undefined,
@@ -8035,7 +7866,7 @@ Ext.define('Voyant.panel.Catalogue', {
 	                    						title: catalogue.localize('export'),
 	                    						buttons: Ext.MessageBox.CANCEL,
 	                    						icon: Ext.MessageBox.INFO,
-	                    						message: catalogue.localize('clickToOpenCorpus', [url])
+	                    						message: new Ext.XTemplate(catalogue.localize('clickToOpenCorpus')).apply([url])
 	                    					});
 	                    					var link = msg.getTargetEl().dom.querySelector("a");
 	                    					link.addEventListener("click", function() {
@@ -8069,12 +7900,12 @@ Ext.define('Voyant.panel.Catalogue', {
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		this.setCorpus(corpus);
-    		this.queryById('status').update(this.localize('noMatches', [corpus.getDocumentsCount()]))
+    		this.queryById('status').update(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]))
     		this.query("facet").forEach(function(facet) {
     			facet.setCorpus(corpus);
     		});
     		if (!this.getCustomResultsHtml()) {
-    			this.setCustomResultsHtml(this.localize('noMatches',  [corpus.getDocumentsCount()]));
+    			this.setCustomResultsHtml(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]));
     			this.updateResults();
     	    	Ext.Ajax.request({
     	    	    url: this.getTromboneUrl(),
@@ -8345,12 +8176,6 @@ Ext.define('Voyant.panel.Cirrus', {
 	alias: 'widget.cirrus',
     statics: {
     	i18n: {
-    		title: {en: "Cirrus"},
-    		helpTip: {en: "<p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document – this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>"},
-    		visible: {en: "Show"},
-    		maxTerms: {en: "Max terms"},
-    		options: {en: "Options"},
-    		visibleTerms: {en: "Terms"}
     	},
     	api: {
     		stopList: 'auto',
@@ -8794,12 +8619,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	alias: 'widget.collocatesgraph',
     statics: {
     	i18n: {
-    		title: {en: "Links"},
-    		helpTip: {en: "<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:<ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		clearTerms: {en: "Clear"},
-    		releaseToRemove: {en: "Release to remove this term"},
-    		cleaning: {en: "Cleaning"},
-    		context: {en: "Context"}
     	},
     	api: {
     		query: undefined,
@@ -9295,23 +9114,6 @@ Ext.define('Voyant.panel.Contexts', {
 	isConsumptive: true,
     statics: {
     	i18n: {
-    		title: {en: "Contexts"},
-    		emptyText: {en: "No matching results."},
-    		document: {en: "Document"},
-    		documentTip: {en: "The document of the occurrence."},
-    		helpTip: {en: "The Keywords in Context tool shows each occurrence of a keyword with a bit of surounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:</p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		termTip: {en: "The keyword for the context."},
-    		left: {en: "Left"},
-    		leftTip: {en: "Context to the left of the keyword."},
-    		right: {en: "Right"},
-    		rightTip: {en: "Context to the right of the keyword."},
-    		position: {en: "Position"},
-    		positionTip: {en: "The position of the keyword within the document."},
-    		context: {en: "context"},
-    		expand: {en: "expand"},
-    		corpus: {en: "corpus"},
-    		corpusTip: {en: "Reset to corpus mode (contexts from all documents)."},
-    		limitedAccess: {en: "This is a limited access corpus and this tool's functionality is restricted."}
     	},
     	api: {
     		query: undefined,
@@ -9619,29 +9421,6 @@ Ext.define('Voyant.panel.CorpusCollocates', {
 	},
     statics: {
     	i18n: {
-    		title: {en: "Collocates"},
-    		emptyText: {en: "No matching results."},
-    		helpTip: {en: "<p>Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus. Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		term: {en: "Term"},
-    		termTip: {en: "This is the keyword term around which collocate (context) terms are counted."},
-    		termRawFreq: {en: "Count (keyword)"},
-    		termRawFreqTip: {en: "The number of times the keyword term occurs in the corpus."},
-    		contextTerm: {en: "Collocate"},
-    		contextTermTip: {en: "This is the collocate (context) term that occurs near the keyword term."},
-    		contextTermRawFreq: {en: "Count (context)"},
-    		contextTermRawFreqTip: {en: "The number of times this collocate occurs near the keyword term in the corpus."},
-    		matchingTerms: {en: '{count}'},
-    		context: {en: 'context'}
-    		
-    		/*,
-    		matchingTerms: {en: 'Matching terms: {count}'},
-    		termTip: {en: "The term in a single, specific document."},
-    		rawFreqTip: {en: "The count (raw frequency) of this term in this document."},
-    		relativeFreqTip: {en: "The relative frequency (per million) of this term in each document."},
-    		trendTip: {en: 'This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).'},
-    		tfidf: {en: 'Significance'},
-    		tfidfTip: {en: 'The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.'}
-			*/
     	},
     	api: {
     		stopList: 'auto',
@@ -9883,62 +9662,6 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	isConsumptive: true,
     statics: {
     	i18n: {
-    		title: {en: "Add Texts"},
-    		helpTip: {en: "This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from you computer (you can select multiple files by using the Ctrl and/or Shift keys)</li></ul>"},
-    		gearTip: {en: "Options"},
-    		gearWinTitle: {en: "Options"},
-    		inputFormat: {en: "Input Format"},
-    		inputFormatAuto: {en: "Auto-Detect (recommended)"},
-    		advancedOptionsText: {en: "For more information on the advanced options below, see the documentation on <a href='{0}' target='voyantdocs'>creating a corpus</a>."},
-    		xmlOptions: {en: "XML"},
-    		xmlOptionsText: {en: "Define XPath Expressions for any of the following:"},
-    		xpathDocuments: {en: "Documents"},
-    		xpathGroupBy: {en: "Group by"},
-    		xpathContent: {en: "Content"},
-    		xpathTitle: {en: "Title"},
-    		xpathAuthor: {en: "Author"},
-    		tableOptions: {en: "Tables"},
-    		tableDocuments: {en: "Documents"},
-    		tableDocumentsTable: {en: "from entire table"},
-    		tableDocumentsRows: {en: "from cells in each row"},
-    		tableDocumentsColumns: {en: "from entire columns"},
-    		tableContent: {en: "Content"},
-    		tableTitle: {en: "Title"},
-    		tableAuthor: {en: "Author"},
-    		tableOptionsText: {en: "Specify how documents should be extracted (currently only supported for MS Excel: .xls, xlsx). For more information see the documentation on creating a corpus with <a href='{0}' target='voyantdocs'>tabular data</a>."},
-    		tableContentText: {en: "Specify which column numbers contain content (or leave blank to use all columns). The left-most columnn is column 1. Define multiple documents by separating columns with a comma or combine columns by using the plus sign. For example 1+2,3 would combine columns 1 and 2 into one document and use column 3 for  a second document."},
-    		tableMetadataText: {en: "These options are only used when documents are extracted from cells in each row (see the first option in this section). Same syntax as the Content option above: column numbers separated by commas or combined with a plus sign."},
-    		tableNoHeadersRowText: {en: "Determines whether or not to skip the first row (if there's a header row). When there is a header row, it can be used to define the document title automatically when documents are extracted from entire columns (in this case leave the title field blank)."},
-    		tableNoHeadersRow: {en: "No Headers Row"},
-    		numberZero: {en: "0 is invalid, the first column is 1"},
-    		numberEmpty: {en: "At least one column number is currently empty."},
-    		numbersNeedCommas: {en: "Please use a comma to separate multiple numbers."},
-    		tokenizationOptions: {en: "Tokenization"},
-    		tokenization: {en: "Tokenization"},
-    		tokenizationAuto: {en: "Automatic (highly recommended)"},
-    		tokenizationWordBoundaries: {en: "Simple Word Boundaries"},
-    		accessOptions: {en: "Access Management"},
-    		accessOptionsText: {en: "If desired, specify one or more access passwords (separated by commas)."},
-    		adminPassword: {en: "admin code"},
-    		accessPassword: {en: "access code"},
-    		accessModeWithoutPassword: {en: "other access"},
-    		accessModeWithoutPasswordText: {en: "If you specify an <i>access password</i> you can also specify what access is granted to users without the password."},
-    		accessModeNonConsumptive: {en: "limited (non-consumptive)"},
-    		accessModeNone: {en: "none"},
-    		emptyInput: {en: "Type in one or more URLs on separate lines or paste in a full text."},
-    		uploadingCorpus: {en: "Uploading corpus…"},
-    		fileTypesWarning: {en: "File Types Warning"},
-    		fileTypesMessage: {en: "You have one or more files with incompatible or unrecognized file extensions that may cause problems."},
-    		badFiles: {en: "incompatible (likely error): "},
-    		unknownFiles: {en: "unrecognized (possible error): "},
-    		sureContinue: {en: "Are you sure you wish to continue?"},
-    		error: {en: "Error"},
-    		errorNotXmlContinue: {en: "You've selected an XML input format but the input doesn't appear to be XML. Are you sure you wish to continue?"},
-    		reveal: {en: "Reveal"},
-    		ok: {en: "OK"},
-    		cancel: {en: "Cancel"},
-    		invalidForm: {en: "Invalid values have been used, please hover over fields with red boxes for explanations."},
-    		numbersCommasOnly: {en: "Comma-separated numbers only."}
     	},
     	api: {
     		inputFormat: undefined,
@@ -10432,20 +10155,6 @@ Ext.define('Voyant.panel.Knots', {
 	alias: 'widget.knots',
     statics: {
     	i18n: {
-    		title : {en: 'Knots'},
-			type : {en: 'Visualization'},
-			findTerm : {en: 'Find Term'},
-			clearTerms : {en: 'Clear'},
-			removeTerm : {en: 'Remove Term'},
-			showTerm : {en: 'Show Term'},
-			hideTerm : {en: 'Hide Term'},
-			options: {en: "Options"},
-			speed : {en: 'Speed'},
-			startAngle : {en: 'Start'},
-			tangles : {en: 'Turn'},
-			context : {en: 'Context'},
-			noTermsFound: {en: "No terms found in this document."},
-			settings: {en: "Settings"}
     	},
     	api: {
     		/**
@@ -11014,22 +10723,6 @@ Ext.define('Voyant.panel.Phrases', {
 	alias: 'widget.phrases',
     statics: {
     	i18n: {
-    		title: {en: "Phrases"},
-    		emptyText: {en: "No matching results."},
-    		helpTip: {en: "<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->"},
-    		term: {en: "Term"},
-    		termTip: {en: "This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence)."},
-    		termRawFreq: {en: "Count"},
-    		termRawFreqTip: {en: "The number of times the phrase occurs in the corpus."},
-    		matchingTerms: {en: '{count}'},
-    		length: {en: "Length"},
-    		lengthTip: {en: "The upper and lower bounds of phrase lengths (how many words in each phrase)."},
-    		overlap: {en: "Overlap"},
-    		overlapTip: {en: "This determines how overlapping phrases are filtered."},
-    		overlapMenu: {en: "Choose an overlap filter:"},
-    		overlapNone: {en: "none (keep all)"},
-    		overlapLength: {en: "prioritize longest phrases"},
-    		overlapFreq: {en: "prioritize most frequent phrases"}
     	},
     	api: {
     		stopList: 'auto',
@@ -11299,18 +10992,6 @@ Ext.define('Voyant.panel.CorpusTerms', {
 	alias: 'widget.corpusterms',
     statics: {
     	i18n: {
-    		title: {en: "Terms"},
-    		emptyText: {en: "No matching results."},
-    		helpTip: {en: "<p>Corpus Terms is a table view of terms that appear in the entire corpus. Features include:</p><ul><li>reordering by <i>term</i> and <i>count</i> (click on the column headers)</li><li>a sparkline graph of the term frequency trends across the corpus (if the corpus has multiple documents) or across the document (if the corpus has only one document)</li><li>additional columns available (relative frequency, distribution peakedness and skew) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		matchingTerms: {en: 'Matching terms: {count}'},
-    		termTip: {en: "The term in the corpus."},
-    		rawFreqTip: {en: "The total count (raw frequency) of this term in the entire corpus."},
-    		relativeFreqTip: {en: "The relative frequency (per million) of this term in the entire corpus"/*, also expressed as a percentage*/+"."},
-    		relativePeakedness: {en: "Peakedness"},
-    		relativePeakednessTip: {en: "This is a statistical measure of how much the relative frequencies of a term in a corpus are bunched up into peaks (regions with higher values where the rest are lower)."},
-    		relativeSkewness: {en: "Skew"},
-    		relativeSkewnessTip: {en: "This is a statistical measure of the symmetry of the relative frequencies of a term across the corpus."},
-    		trendTip: {en: "This represents the trend of the relative frequencies for each term in each document in the corpus."}
     	},
     	api: {
     		stopList: 'auto',
@@ -11462,18 +11143,6 @@ Ext.define('Voyant.panel.DocumentTerms', {
 	},
     statics: {
     	i18n: {
-    		title: {en: "Document Terms"},
-    		emptyText: {en: "No matching results."},
-    		helpTip: {en: "<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		matchingTerms: {en: 'Matching terms: {count}'},
-    		termTip: {en: "The term in a single, specific document."},
-    		rawFreqTip: {en: "The count (raw frequency) of this term in this document."},
-    		relativeFreqTip: {en: "The relative frequency (per million) of this term in each document."},
-    		trendTip: {en: 'This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).'},
-    		tfidf: {en: 'Significance'},
-    		tfidfTip: {en: 'The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.'},
-    		zscore: {en: 'Z-Score'},
-    		zscoreTip: {en: "The Z-Score, or standard score, is a normalized value for the term's raw frequency compared to other term frequencies in the same document.<table><tr><td style='text-align: center; font-size: smaller; font-family: mono;'>frequency of term - mean of term frequencies<hr/>standard deviation of term frequencies</td></tr></table>."}
     	},
     	api: {
     		stopList: 'auto',
@@ -11676,39 +11345,6 @@ Ext.define('Voyant.panel.Documents', {
 	isConsumptive: true,
     statics: {
     	i18n: {
-    		title: {en: "Documents"},
-    		emptyText: {en: "No matching results."},
-    		helpTip: {en: "<p>Documents is a table view of the documents in the corpus. Features include:</p><ul><li>reordering by <i>Title</i>, <i>Words</i> count (tokens), word forms count (<i>Types</i>), and <i>Ratio</i> (Types/Tokens Ratio) (click on the column headers)</li><li>a search box for queries (by default in the full-text, title and author fields &mdash; hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		id: {en: "ID"},
-    		documentTitle: {en: "Title"},
-    		documentAuthor: {en: "Author"},
-    		tokensCountLexical: {en: "Words"},
-    		typesCountLexical: {en: "Types"},
-    		typeTokenRatioLexical: {en: "Ratio"},
-    		language: {en: "Language"},
-    		matchingDocuments: {en: "Matching documents: {count}"},
-    		error: {en: "Error"},
-    		add: {en: "Add"},
-    		addTip: {en: "Click here to add new documents to this corpus."},
-    		remove: {en: "Remove"},
-    		removeTip: {en: "Click here to create a new corpus that excludes selected or filtered (search query) documents."},
-    		reorder: {en: "Reorder"},
-    		reorderTip: {en: "Click here to create a new corpus based on a reordering of documents (drag and drop rows to reorder)."},
-    		keep: {en: "Keep"},
-    		keepTip: {en: "Click here to create a new corpus that only includes selected or filtered (search query) documents."},
-    		modify: {en: "Modify"},
-    		newCorpus: {en: "New Corpus"},
-    		modifyTip: {en: "Click this button to create a new corpus by adding new documents, by selecting a subset of documents or by re-ordering documents."},
-    		allSelectedError: {en: "You have selected all documents, you must select a subset of documents to remove or keep."},
-    		removeSelectedDocuments: {en: "Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('selected document')}?"},
-    		removeFilteredDocuments: {en: "Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('filtered document')}?"},
-    		keepSelectedDocuments: {en: "Create a <i>new</i> corpus that only keeps the {0:plural('selected document')}?"},
-    		keepFilteredDocuments: {en: "Create a <i>new</i> corpus that only keeps the {0:plural('filtered document')}?"},
-    		selectOrFilterError: {en: "You need to first select documents by clicking on one or more rows or by performing a search query."},
-    		onlyOneError: {en: "Your corpus has only one document, you can't remove or keep documents to create a new corpus."},
-    		reorderFilteredError: {en: "You cannot reorder a filtered (after search query) corpus. Please create a new corpus first (with the <i>Remove</i> or <i>Keep</i> button) and then reorder the new corpus."},
-    		reorderOriginalError: {en: "Please reorder the corpus first (drag and drop the rows in the table)."},
-    		reorderDocuments: {en: "Create a <i>new</i> corpus based on the order shown?"}
     	},
     	api: {
     		query: undefined,
@@ -12102,28 +11738,8 @@ Ext.define('Voyant.panel.DocumentsFinder', {
 	alias: 'widget.documentsfinder',
     statics: {
     	i18n: {
-    		title: {en: "Documents Finder"},
-    		emptyText: {en: "No matching results."},
-    		operator: {en: "Operator"},
-    		field: {en: "Field"},
-    		query: {en: "Query"},
-    		count: {en: "Count"},
-    		emptyQuery: {en: 'type query here'},
-    		titleField: {en: 'title'},
-    		authorField: {en: 'author'},
-    		pubDateField: {en: "publication date"},
-    		publisherField: {en: "publisher"},
-    		pubPlaceField: {en: "publication location"},
-    		advancedField: {en: '<i>advanced query</i>'},
-    		textField: {en: 'text (default)'},
-    		loading: {en: 'loading corpus'},
-    		unsuccessfulQuery: {en: "Unable to complete query."},
-    		addRow: {en: 'Add Row'},
-    		deleteRowTip: {en: 'Click to delete this row'},
     		noMatches: {'en': new Ext.Template('No matches (out of {0} documents).', {compiled: true})},
     		queryMatches: {en: new Ext.Template("A total of {0} matching documents (out of {1}).", {compiled: true})},
-    		exportNewCorpus: {en: "New Corpus"},
-    		exportNewCorpusTip: {en: "Create a new corpus from matching documents (button will be disabled if there are no matches)."}
     	}
     },
     
@@ -12427,10 +12043,10 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     	if (!this.status) {this.status=this.down("[cls~=status]")}
     	if (!this.exportBtn) {this.exportBtn=this.down("[cls~=exportBtn]")}
     	if (count==0) {
-        	this.status.update(this.localize('noMatches', [this.getCorpus().getDocumentsCount()]))
+        	this.status.update(new Ext.XTemplate(this.localize('noMatches')).apply([this.getCorpus().getDocumentsCount()]))
     	}
     	else {
-    		this.status.update(this.localize('queryMatches', [count,this.getCorpus().getDocumentsCount()]))
+    		this.status.update(new Ext.XTemplate(this.localize('queryMatches')).apply([count,this.getCorpus().getDocumentsCount()]))
     	}
     	this.exportBtn.setDisabled(count==0);
     	
@@ -12480,19 +12096,6 @@ Ext.define('Voyant.panel.RezoViz', {
 	alias: 'widget.rezoviz',
     statics: {
     	i18n: {
-    		title: {en: 'RezoViz'},
-    		categories: {en: 'Categories'},
-    		people: {en: 'People'},
-    		locations: {en: 'Locations'},
-    		organizations: {en: 'Organizations'},
-    		reload: {en: 'Reload'},
-    		minEdgeCount: {en: 'Min. Edge Count'},
-    		repulsion: {en: 'Repulsion'},
-    		stiffness: {en: 'Stiffness'},
-    		friction: {en: 'Friction'},
-    		noEntities: {en: 'No entities to graph.'},
-    		noEntitiesForEdgeCount: {en: 'No entities were found. Would you like to reduce the minimum edge count to improve results?'},
-    		loadingEntities: {en: 'Loading entities…'}
     	},
     	api: {
     		query: undefined,
@@ -12906,10 +12509,6 @@ Ext.define('Voyant.panel.Reader', {
 	isConsumptive: true,
     statics: {
     	i18n: {
-    		title: {en: "Reader"},
-    		helpTip: {en: "<p>The Reader tool provides a view of text from the corpus. Features include:</p><ul><li>frequency information appears when hovering over a word</li><li>distribution information appears in a graph at the bottom when clicking on a word</li><li>a bar graph at the bottom indicates the relative size of each document in the corpus</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		documentFrequency: {en: "document frequency:"},
-    		limitedAccess: {en: "This is a limited access corpus and this tool's functionality is restricted."}
     	},
     	api: {
     		start: 0,
@@ -13628,47 +13227,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	},
     statics: {
     	i18n: {
-			title: {en: "ScatterPlot"},
-			analysis: {en: "Analysis"},
-			ca: {en: "Correspondence Analysis"},
-			pca: {en: "Principal Components Analysis"},
-			docSim: {en: "Document Similarity"},
-			
-			freqsMode: {en: "Frequencies"},
-			freqsModeTip: {en: "Determines if frequencies are expressed as relative counts, raw counts, or as TF-IDF."},
-    		tfidf: {en: 'TF-IDF'},
-    		rawFrequencies: {en: 'Raw Frequencies'},
-    		relativeFrequencies: {en: 'Relative Frequencies'},
-			
-			rawFreq: {en: "Raw"},
-			relFreq: {en: "Relative"},
-			terms: {en: "Terms"},
-			term: {en: "Term"},
-			numTerms: {en: "Terms"},
-			addTerm: {en: "Add Term"},
-			clusters: {en: "Clusters"},
-			dimensions: {en: "Dimensions"},
-			labels: {en: "Labels"},
-			remove: {en: "Remove"},
-			removeTerm: {en: 'Remove <b>{0}</b>'},
-			nearby: {en: "Nearby"},
-			nearbyTerm: {en: 'Nearby <b>{0}</b>'},
-			pcTitle: {en: 'Percentage of Total Variation Explained by Each Component'},
-			pc: {en: 'PC'},
-			caTitle: {en :'Percentage of Total Assocation Explained by Each Dimension'},
-			dimension: {en :'Dimension'},
-			xAxis: {en :'X Axis'},
-			yAxis: {en :'Y Axis'},
-			fill: {en :'Fill'},
-			loading: {en: "Loading"},
-			helpTip: {en: "<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>"},
-			tokenFreqTip: {en: '<b>{0}</b><br/><b>Raw Frequency</b><br/>{1}</b><br/><b>Relative Frequency</b><br/>{2}</b>'},
-			docFreqTip: {en: '<b>{0}</b><br/><b>Word Count</b><br/>{1}</b>'},
-			noTermSelected: {en: "No term selected."},
-			
-			summaryLabel: {en: "Summary"},
-			docsLabel: {en: "Documents"},
-			termsLabel: {en: "Terms"}
     	},
     	api: {
     		docId: undefined,
@@ -14576,16 +14134,6 @@ Ext.define('Voyant.panel.StreamGraph', {
 	alias: 'widget.streamgraph',
     statics: {
     	i18n: {
-    		title: {en: 'StreamGraph'},
-    		helpTip: {en: 'StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).'},
-    		freqsMode: {en: 'Frequencies'},
-    		freqsModeTip: {en: 'Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).'},
-    		rawFrequencies: {en: 'Raw Frequencies'},
-    		relativeFrequencies: {en: 'Relative Frequencies'},
-    		documentSegments: {en: 'Document Segments'},
-    		documents: {en: 'Documents'},
-    		clearTerms : {en: 'Clear Terms'},
-    		segments : {en: 'Segments'}
     	},
     	api: {
     		limit: 5,
@@ -14987,25 +14535,6 @@ Ext.define('Voyant.panel.Summary', {
 	alias: 'widget.summary',
     statics: {
     	i18n: {
-    		title: {en: "Summary"},
-    		helpTip: {en: "<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>"},
-    		corpusType: {en: '<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordId="{id}">{type}</a> ({val})<tpl if="xindex &lt; xcount">, </tpl></tpl>'},
-    		documentType: {en: '<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:recordId="{id}" voyant:docIndex="{docIndex}">{type}</a> ({val})<tpl if="xindex &lt; xcount">, </tpl></tpl>'},
-    		mostFrequentWords: {en: 'Most <b>frequent words</b> in the corpus: '},
-//    		docsLength: {en: '<b>Document Length</b> (<span class="spark"></span>)<ul><li>longest: <tpl for="longestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({totalWordTokens})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li><li>shortest: <tpl for="shortestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({totalWordTokens})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li></ul>'},
-//    		docsDensity: {en: '<b>Vocabulary Density</b> ({spark})<ul><li>highest: <tpl for="highestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({wordDensity})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li><li>lowest: <tpl for="lowestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({wordDensity})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li></ul>'},
-    		distinctiveWords: {en: '<b>Distinctive words</b> (compared to the rest of the corpus): '},
-    		moreDistinctiveWords: {en: '<a href="#" onclick="return false">Next {0} of {1} remaining</a>'},
-    		seeAll: {en: 'All&hellip;'},
-    		more: {en: 'More&hellip;'},
-    		items: {en: "items"},
-    		numberOfTerms: {en: "number of words in this document"},
-    		longest: {en: "Longest: "},
-    		shortest: {en: "Shortest: "},
-    		highest: {en: "Highest: "},
-    		lowest: {en: "Lowest: "},
-    		docsLength: {en: "Document Length: "},
-    		docsDensity: {en: "Vocabulary Density: "}
     	},
     	api: {
     		stopList: 'auto',
@@ -15024,7 +14553,7 @@ Ext.define('Voyant.panel.Summary', {
     cls: 'corpus-summary',
     
     constructor: function(config ) {
-debugger
+
     	Ext.apply(this, {
     		title: this.localize('title'),
     		items: {
@@ -15357,9 +14886,6 @@ Ext.define('Voyant.panel.TopicContexts', {
 	alias: 'widget.topiccontexts',
     statics: {
     	i18n: {
-    		title: {en: "Topic Contexts"},
-    		helpTip: {en: "Topic Contexts"},
-    		reset: {en: 'reset'}
     	},
     	api: {
     	},
@@ -15460,28 +14986,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 	},
     statics: {
     	i18n: {
-    		title : {en: 'TermsRadio'}
-    	    ,type : {en: 'Visualization'}
-    		,help: {en: 'This tool can be used to examine word occurence over a corpus spanning a period of time.'}
-    		,visibleSegments: {en: 'Visible'}	
-    		,visibleSegmentsTip: {en: 'This option determines how many of the documents/segments are displayed at once.'}
-    		,segments: {en: 'Segments'}	
-    		,segmentsTip: {en: 'This option allows you to define how many segments a document should be divided into (note that this option only applies to distribution within a document, not distribution across a corpus).'}
-    		,displayPanel: {en: 'Display Panel'}
-    		,displayPanelTip: {en: 'Panel to control settings for word display.'}
-    		,duration: {en: 'Speed'}
-    		,terms: {en: "Terms"}
-    		,fraction: {en: 'Word Display'}	
-    		,fractionTip: {en: 'This option allows you to define the number of words displayed. Ex. 20 will only keep the words that occur with the lowest 20% of frequency.'}
-    		,reset: {en: 'Reset'}
-    		,resetTip: {en: 'Reset the visualization to the beginning.'}
-    		,speed: {en: 'Speed'}
-    		,yScale: {en: 'Y-axis Scale'}
-    		,linear: {en: 'Linear'}
-    		,log: {en: 'Logarithmic'}
-    		,removeTerm: {en: 'Remove <b>{0}</b>'},
-    		completingTransition: {en: "Completing transition."},
-    		termNotFound: {en: "Term not found."}
     	},
     	api: {
     		withDistributions: true,
@@ -17547,19 +17051,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 	},
     statics: {
     	i18n: {
-    		title: {en: "Trends"},
-    		helpTip: {en: "<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		freqsMode: {en: "Frequencies"},
-    		freqsModeTip: {en: "Determines if frequencies are expressed as raw counts or as relative counts (per document or segment)."},
-    		options: {en: "Options"},
-    		rawFrequencies: {en: 'Raw Frequencies'},
-    		relativeFrequencies: {en: 'Relative Frequencies'},
-    		
-    		raw: {en: 'Raw'},
-    		relative: {en: 'Relative'},
-    		segmentsSlider: {en: 'Segments'},
-    		segments: {en: 'Document Segments'},
-    		documents: {en: 'Documents'}
     	},
     	api: {
     		limit: 5,
@@ -18037,13 +17528,6 @@ Ext.define('Voyant.panel.NoTool', {
 	alias: 'widget.notool',
     statics: {
     	i18n: {
-    		title: {en: 'No Such Tool'},
-    		error: {en: "Error"},
-    		currentButton: {en: "Use Current Version"},
-    		oldButton: {en: "Use Old Version"},
-    		noToolSpecified: {en: 'No tool has been specified. You will be redirected to the main page of Voyant Tools.'},
-    		badToolSpecified: {en: "The <i>{0}</i> tool doesn't exist. You will be redirected to the main page of Voyant Tools."},
-    		notImplemented: {en: "<p>The <i>{0}</i> tool existed in a previous version of Voyant Tools but has not been implemented in this version. Some tools may be reimplemented eventually while others are unlikely to be implemented because they were experimental, unuseful or dependent on technologies that are no longer supported (like Adobe Flash and Java Applets).</p><p>Please decide if you'd like to use the new version of Voyant or if you'd rather try using the <i>{0}</i> tool in the old version.</p>"}
     	},
     	api: {
     		tool: undefined
@@ -18141,10 +17625,6 @@ Ext.define('Voyant.panel.VoyantFooter', {
 	alias: 'widget.voyantfooter',
     statics: {
     	i18n: {
-    		voyantTools: {en: 'Voyant Tools'},
-       		voyantLink: {en: '<a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools</a>'},
-       		privacy: {en: 'Privacy'},
-       		privacyMsg: {en: "The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see &lt;a href=\"http://www.google.ca/intl/en/policies/privacy/\" target=\"_blank\"&gt;Google&apos;s Privacy Policy&lt;/a&gt; and the &lt;em&gt;Log Information&lt;/em&gt; section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact &lt;a href=\"http://stefansinclair.name/contact/\"&gt;Stéfan Sinclair&lt;/a&gt;."}
     	}
     },
 	height: 18,
@@ -18179,11 +17659,6 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	alias: 'widget.voyantheader',
     statics: {
     	i18n: {
-    		title: {en: "Voyant Tools"},
-			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts."},
-    		home: {en: "Start Over"},
-    		homeTip: {en: "Click to start over from the corpus creation screen."},
-    		homeConfirm: {en: "Are you sure you want to start over (and leave the current corpus)?"}
     	}
     },
     constructor: function(config) {
@@ -18243,8 +17718,6 @@ Ext.define('Voyant.panel.CorpusSet', {
 	isConsumptive: true,
 	statics: {
 		i18n: {
-			title: {en: "Corpus View"},
-			helpTip: {en: "This is the default, general-purpose corpus view."}
 		},
 		api: {
 			panels: undefined
@@ -18405,8 +17878,6 @@ Ext.define('Voyant.panel.ScatterSet', {
     alias: 'widget.scatterset',
 	statics: {
 		i18n: {
-			title: {en: "Scatter"},
-			helpTip: {en: "This is a specialized view for working with scatterplots."}
 		},
 		glyph: 'xf17a@FontAwesome'
 	},
@@ -18449,15 +17920,6 @@ Ext.define('Voyant.panel.Subset', {
 	alias: 'widget.subset',
     statics: {
     	i18n: {
-    		title: {en: "Workset Builder"},
-    		titleLabel: {en: "Titles"},
-    		authorLabel: {en: "Authors"},
-    		lexicalLabel: {en: "Full-text"},
-    		publisherLabel: {en: "Publishers"},
-    		sendToVoyantButton: {en: "New Voyant Corpus"},
-    		downloadButton: {en: "Download Zip Archive"},
-    		sendToVoyantNoQuery: {en: "There's currently no query specified, but you can <a href='{0}' target='_blank'>open the current corpus in a new window</a>."},
-    		noMatches: {en: "The current query criteria don't match any documents, please modifying the search first."}
     	},
     	api: {
     		stopList: 'auto',
@@ -18729,8 +18191,6 @@ Ext.define('Voyant.panel.CollocatesSet', {
     alias: 'widget.collocatesset',
 	statics: {
 		i18n: {
-			title: {en: "Scatter"},
-			helpTip: {en: "This is a specialized view for working with scatterplots."}
 		},
 		glyph: 'xf17a@FontAwesome'
 	},
@@ -18787,8 +18247,6 @@ Ext.define('Voyant.panel.BubblelinesSet', {
     alias: 'widget.bubblelinesset',
 	statics: {
 		i18n: {
-			title: {en: "Bubblelines Skin"},
-			helpTip: {en: "This is a specialized view for working with Bubblelines."}
 		},
 		glyph: 'xf17a@FontAwesome'
 	},
@@ -18830,9 +18288,6 @@ Ext.define('Voyant.panel.CustomSet', {
     alias: 'widget.customset',
 	statics: {
 		i18n: {
-			title: {en: "Custom View"},
-			helpTip: {en: "This is a custom view."},
-			noSuchTool: {en: "The specified tool ({0}) does not exist."}
 		},
 		api: {
 			panels: undefined
@@ -18926,7 +18381,6 @@ Ext.define('Voyant.panel.WordTree', {
 	alias: 'widget.wordtree',
     statics: {
     	i18n: {
-    		title: {en: 'WordTree'}
     	},
     	api: {
     		query: undefined,
@@ -19056,8 +18510,6 @@ Ext.define('Voyant.VoyantApp', {
     
     statics: {
     	i18n: {
-    		error: {en: 'Error'},
-			serverResponseError: {en: 'The server error reponse:'}
     	}
     },
     
@@ -19276,23 +18728,6 @@ Ext.define('Voyant.VoyantCorpusApp', {
     
     statics: {
     	i18n: {
-    		fetchingCorpus: {en: 'Fetching your corpus'},
-    		moreToolsScale: {en: 'Tools by Scale'},
-    		moreToolsScaleCorpus: {en: 'Corpus Tools'},
-    		moreToolsScaleDocument: {en: 'Document Tools'},
-    		moreToolsType: {en: 'Tools by Type'},
-    		moreToolsTypeViz: {en: 'Visualization Tools'},
-    		moreToolsTypeGrid: {en: 'Grid Tools'},
-    		moreToolsTypeOther: {en: 'Other Tools'},
-    		passwordRequiredTitle: {en: "Access Code Required"},
-    		passwordRequiredMessage: {en: "This corpus requires an access code."},
-    		nonConsumptiveMessage: {en: "Alternatively, you can click on the <i>Limited Access</i> button to continue with limited functionality (generally speaking, this non-consumpive access allows you to explore derivative data from the corpus without allowing you to read text from the corpus)."},
-    		nonConsumptiveButton: {en: "Limited Access"}, 
-    		passwordValidateButton: {en: "Validate"},
-    		password: {en: "access code"},
-    		noPasswordGiven: {en: "Please provide an access code."},
-    		badPassword: {en: "Sorry, that doesn't seem to be a valid access code."},
-    		passwordValidationError: {en: "Sorry, an unexpected error occurred while trying to validate your access code."}
     	}
     },
     
@@ -19528,12 +18963,6 @@ Ext.define('Voyant.VoyantDefaultApp', {
 	},
 	statics: {
 		i18n: {
-			'noViewErrorTitle': {en: "View Error"},
-			'noViewErrorTpl': {en: 'No view was found with the name "<i>{view}</i>". The default view will be used instead.'},
-			'noViewKnownErrorTpl': {en: 'The selected view ({view}) has not been migrated from the previous version of Voyant (and probably won\'t be). {additional} The default view will be used instead.'},
-			convertSkinMsg: {en: 'The convert skin was used for document exporting and that functionality is now available from the Documents tool.'},
-			voyantIs: {en: "<p style='text-align: center; font-style: italic;'>Voyant Tools is a web-based reading and analysis environment for digital texts – please visit <a href='http://hermeneuti.ca/' target='_blank'>Hermeneuti.ca</a> for more information..</p>"},
-			helpTip: {en: "Voyant Tools is a web-based reading and analysis environment for digital texts.</p>"}
 		},
 		api: {
 			view: 'corpusset',

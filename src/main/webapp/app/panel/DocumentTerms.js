@@ -11,18 +11,6 @@ Ext.define('Voyant.panel.DocumentTerms', {
 	},
     statics: {
     	i18n: {
-    		title: {en: "Document Terms"},
-    		emptyText: {en: "No matching results."},
-    		helpTip: {en: "<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		matchingTerms: {en: 'Matching terms: {count}'},
-    		termTip: {en: "The term in a single, specific document."},
-    		rawFreqTip: {en: "The count (raw frequency) of this term in this document."},
-    		relativeFreqTip: {en: "The relative frequency (per million) of this term in each document."},
-    		trendTip: {en: 'This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).'},
-    		tfidf: {en: 'Significance'},
-    		tfidfTip: {en: 'The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.'},
-    		zscore: {en: 'Z-Score'},
-    		zscoreTip: {en: "The Z-Score, or standard score, is a normalized value for the term's raw frequency compared to other term frequencies in the same document.<table><tr><td style='text-align: center; font-size: smaller; font-family: mono;'>frequency of term - mean of term frequencies<hr/>standard deviation of term frequencies</td></tr></table>."}
     	},
     	api: {
     		stopList: 'auto',

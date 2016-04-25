@@ -7,29 +7,6 @@ Ext.define('Voyant.panel.CorpusCollocates', {
 	},
     statics: {
     	i18n: {
-    		title: {en: "Collocates"},
-    		emptyText: {en: "No matching results."},
-    		helpTip: {en: "<p>Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus. Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		term: {en: "Term"},
-    		termTip: {en: "This is the keyword term around which collocate (context) terms are counted."},
-    		termRawFreq: {en: "Count (keyword)"},
-    		termRawFreqTip: {en: "The number of times the keyword term occurs in the corpus."},
-    		contextTerm: {en: "Collocate"},
-    		contextTermTip: {en: "This is the collocate (context) term that occurs near the keyword term."},
-    		contextTermRawFreq: {en: "Count (context)"},
-    		contextTermRawFreqTip: {en: "The number of times this collocate occurs near the keyword term in the corpus."},
-    		matchingTerms: {en: '{count}'},
-    		context: {en: 'context'}
-    		
-    		/*,
-    		matchingTerms: {en: 'Matching terms: {count}'},
-    		termTip: {en: "The term in a single, specific document."},
-    		rawFreqTip: {en: "The count (raw frequency) of this term in this document."},
-    		relativeFreqTip: {en: "The relative frequency (per million) of this term in each document."},
-    		trendTip: {en: 'This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).'},
-    		tfidf: {en: 'Significance'},
-    		tfidfTip: {en: 'The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.'}
-			*/
     	},
     	api: {
     		stopList: 'auto',

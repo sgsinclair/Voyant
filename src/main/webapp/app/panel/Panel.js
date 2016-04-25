@@ -4,14 +4,6 @@ Ext.define('Voyant.panel.Panel', {
 	alias: 'widget.voyantpanel',
 	statics: {
 		i18n: {
-			term: {en: "Term"},
-			rawFreq: {en: "Count"},
-			relativeFreq: {en: 'Relative'},
-			trend: {en: "Trend"},
-			colon: {en: ': '},
-			loading: {en: 'Loading'},
-			error: {en: "Error"},
-			info: {en: "Information"}
 		}
 	},
 	constructor: function(config) {

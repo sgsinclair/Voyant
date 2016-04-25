@@ -4,12 +4,6 @@ Ext.define('Voyant.widget.DownloadFilenameBuilder', {
     alias: 'widget.downloadfilenamebuilder',
 	statics: {
 		i18n: {
-			fieldLabel: {en: 'Filenames'},
-			titleLabel: {en: 'title'},
-			authorLabel: {en: 'author'},
-			pubDateLabel: {en: 'date'},
-			enabledLabel: {en: 'include: '},
-			availableLabel: {en: 'exclude: '}
 		}
 	},
 	config: {

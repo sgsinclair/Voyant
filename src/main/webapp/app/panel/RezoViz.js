@@ -4,19 +4,6 @@ Ext.define('Voyant.panel.RezoViz', {
 	alias: 'widget.rezoviz',
     statics: {
     	i18n: {
-    		title: {en: 'RezoViz'},
-    		categories: {en: 'Categories'},
-    		people: {en: 'People'},
-    		locations: {en: 'Locations'},
-    		organizations: {en: 'Organizations'},
-    		reload: {en: 'Reload'},
-    		minEdgeCount: {en: 'Min. Edge Count'},
-    		repulsion: {en: 'Repulsion'},
-    		stiffness: {en: 'Stiffness'},
-    		friction: {en: 'Friction'},
-    		noEntities: {en: 'No entities to graph.'},
-    		noEntitiesForEdgeCount: {en: 'No entities were found. Would you like to reduce the minimum edge count to improve results?'},
-    		loadingEntities: {en: 'Loading entities…'}
     	},
     	api: {
     		query: undefined,

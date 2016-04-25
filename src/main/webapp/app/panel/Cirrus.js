@@ -6,12 +6,6 @@ Ext.define('Voyant.panel.Cirrus', {
 	alias: 'widget.cirrus',
     statics: {
     	i18n: {
-    		title: {en: "Cirrus"},
-    		helpTip: {en: "<p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document – this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>"},
-    		visible: {en: "Show"},
-    		maxTerms: {en: "Max terms"},
-    		options: {en: "Options"},
-    		visibleTerms: {en: "Terms"}
     	},
     	api: {
     		stopList: 'auto',

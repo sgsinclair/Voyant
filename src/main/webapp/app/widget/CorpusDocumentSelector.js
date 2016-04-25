@@ -4,8 +4,6 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
     alias: 'widget.corpusdocumentselector',
 	statics: {
 		i18n: {
-			corpus: {en: "Corpus"},
-			scale: {en: "Scale"}
 		}
 	},
 	config: {

@@ -5,28 +5,8 @@ Ext.define('Voyant.panel.DocumentsFinder', {
 	alias: 'widget.documentsfinder',
     statics: {
     	i18n: {
-    		title: {en: "Documents Finder"},
-    		emptyText: {en: "No matching results."},
-    		operator: {en: "Operator"},
-    		field: {en: "Field"},
-    		query: {en: "Query"},
-    		count: {en: "Count"},
-    		emptyQuery: {en: 'type query here'},
-    		titleField: {en: 'title'},
-    		authorField: {en: 'author'},
-    		pubDateField: {en: "publication date"},
-    		publisherField: {en: "publisher"},
-    		pubPlaceField: {en: "publication location"},
-    		advancedField: {en: '<i>advanced query</i>'},
-    		textField: {en: 'text (default)'},
-    		loading: {en: 'loading corpus'},
-    		unsuccessfulQuery: {en: "Unable to complete query."},
-    		addRow: {en: 'Add Row'},
-    		deleteRowTip: {en: 'Click to delete this row'},
     		noMatches: {'en': new Ext.Template('No matches (out of {0} documents).', {compiled: true})},
     		queryMatches: {en: new Ext.Template("A total of {0} matching documents (out of {1}).", {compiled: true})},
-    		exportNewCorpus: {en: "New Corpus"},
-    		exportNewCorpusTip: {en: "Create a new corpus from matching documents (button will be disabled if there are no matches)."}
     	}
     },
     
@@ -330,10 +310,10 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     	if (!this.status) {this.status=this.down("[cls~=status]")}
     	if (!this.exportBtn) {this.exportBtn=this.down("[cls~=exportBtn]")}
     	if (count==0) {
-        	this.status.update(this.localize('noMatches', [this.getCorpus().getDocumentsCount()]))
+        	this.status.update(new Ext.XTemplate(this.localize('noMatches')).apply([this.getCorpus().getDocumentsCount()]))
     	}
     	else {
-    		this.status.update(this.localize('queryMatches', [count,this.getCorpus().getDocumentsCount()]))
+    		this.status.update(new Ext.XTemplate(this.localize('queryMatches')).apply([count,this.getCorpus().getDocumentsCount()]))
     	}
     	this.exportBtn.setDisabled(count==0);
     	

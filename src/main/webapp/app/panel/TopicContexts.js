@@ -19,9 +19,6 @@ Ext.define('Voyant.panel.TopicContexts', {
 	alias: 'widget.topiccontexts',
     statics: {
     	i18n: {
-    		title: {en: "Topic Contexts"},
-    		helpTip: {en: "Topic Contexts"},
-    		reset: {en: 'reset'}
     	},
     	api: {
     	},

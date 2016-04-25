@@ -4,7 +4,6 @@ Ext.define('Voyant.widget.TotalPropertyStatus', {
     alias: 'widget.totalpropertystatus',
 	statics: {
 		i18n: {
-    		totalPropertyStatus: {en: '{count:number("0,000")}'}
 		}
 	},
     initComponent: function() {

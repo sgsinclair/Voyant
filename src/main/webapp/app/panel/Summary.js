@@ -4,25 +4,6 @@ Ext.define('Voyant.panel.Summary', {
 	alias: 'widget.summary',
     statics: {
     	i18n: {
-    		title: {en: "Summary"},
-    		helpTip: {en: "<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>"},
-    		corpusType: {en: '<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordId="{id}">{type}</a> ({val})<tpl if="xindex &lt; xcount">, </tpl></tpl>'},
-    		documentType: {en: '<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:recordId="{id}" voyant:docIndex="{docIndex}">{type}</a> ({val})<tpl if="xindex &lt; xcount">, </tpl></tpl>'},
-    		mostFrequentWords: {en: 'Most <b>frequent words</b> in the corpus: '},
-//    		docsLength: {en: '<b>Document Length</b> (<span class="spark"></span>)<ul><li>longest: <tpl for="longestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({totalWordTokens})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li><li>shortest: <tpl for="shortestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({totalWordTokens})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li></ul>'},
-//    		docsDensity: {en: '<b>Vocabulary Density</b> ({spark})<ul><li>highest: <tpl for="highestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({wordDensity})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li><li>lowest: <tpl for="lowestDocs"><a href="#" onclick="return false" class="document-id" voyant:val="{id}">{title}</a> ({wordDensity})</a><tpl if="xindex &lt; xcount">; </tpl></tpl></li></ul>'},
-    		distinctiveWords: {en: '<b>Distinctive words</b> (compared to the rest of the corpus): '},
-    		moreDistinctiveWords: {en: '<a href="#" onclick="return false">Next {0} of {1} remaining</a>'},
-    		seeAll: {en: 'All&hellip;'},
-    		more: {en: 'More&hellip;'},
-    		items: {en: "items"},
-    		numberOfTerms: {en: "number of words in this document"},
-    		longest: {en: "Longest: "},
-    		shortest: {en: "Shortest: "},
-    		highest: {en: "Highest: "},
-    		lowest: {en: "Lowest: "},
-    		docsLength: {en: "Document Length: "},
-    		docsDensity: {en: "Vocabulary Density: "}
     	},
     	api: {
     		stopList: 'auto',

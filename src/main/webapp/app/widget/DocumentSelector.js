@@ -4,12 +4,6 @@ Ext.define('Voyant.widget.DocumentSelector', {
 	glyph: 'xf10c@FontAwesome',
 	statics: {
 		i18n: {
-			documents: {en: 'Documents'},
-			selectAll: {en: 'All'},
-			selectNone: {en: 'None'},
-			ok: {en: 'Ok'},
-			cancel: {en: "Cancel"},
-			all: {en: "all"}
 		}
 	},
 
@@ -160,7 +154,7 @@ Ext.define('Voyant.widget.DocumentSelectorButton', {
     alias: 'widget.documentselectorbutton',
     mixins: ['Voyant.widget.DocumentSelector'],
     initComponent: function() {
-    	this.mixins["Voyant.widget.DocumentSelectorBase"].initComponent.apply(this, arguments);
+    	this.mixins["Voyant.widget.DocumentSelector"].initComponent.apply(this, arguments);
 		this.callParent();
     }
 })
@@ -170,7 +164,7 @@ Ext.define('Voyant.widget.DocumentSelectorMenuItem', {
     alias: 'widget.documentselectormenuitem',
     mixins: ['Voyant.widget.DocumentSelector'],
     initComponent: function() {
-    	this.mixins["Voyant.widget.DocumentSelectorBase"].initComponent.apply(this, arguments);
+    	this.mixins["Voyant.widget.DocumentSelector"].initComponent.apply(this, arguments);
 		this.callParent();
     }
 })

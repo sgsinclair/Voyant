@@ -5,8 +5,6 @@ Ext.define('Voyant.panel.CollocatesSet', {
     alias: 'widget.collocatesset',
 	statics: {
 		i18n: {
-			title: {en: "Scatter"},
-			helpTip: {en: "This is a specialized view for working with scatterplots."}
 		},
 		glyph: 'xf17a@FontAwesome'
 	},

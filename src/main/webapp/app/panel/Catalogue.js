@@ -6,25 +6,6 @@ Ext.define('Voyant.panel.Catalogue', {
 	alias: 'widget.catalogue',
     statics: {
     	i18n: {
-    		title: {en: "Catalogue"},
-    		helpTip: {en: "<p>The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents."},
-    		"facet.authorTitle": {en: "Authors"},
-    		"facet.languageTitle": {en: "Languages"},
-    		"facet.titleTitle": {en: "Titles"},
-    		"facet.keywordTitle": {en: "Keywords"},
-    		"facet.pubDateTitle": {en: "Publication Dates"},
-    		"facet.publisherTitle": {en: "Publishers"},
-    		"facet.pubPlaceTitle": {en: "Publication Locations"},
-    		loadingSnippets: {en: "loading text snippets…"},
-    		lexicalTitle: {en: "Terms"},
-    		noMatches: {'en': new Ext.Template('No matches (out of {0} documents).', {compiled: true})},
-    		queryMatches: {en: new Ext.Template("{0} matching documents (out of {1}).", {compiled: true})},
-    		clickToOpenCorpus: {'en': new Ext.Template('Please <a href="{0}" target="_blank" class="link">click here</a> to access your new corpus (since popup windows are blocked).', {compiled: true})},
-    		"export": {en: "Export"},
-    		exportTip: {en: "Create a new Voyant corpus with the selected documents."},
-    		matchingDocuments: {'en': "number of matching documents"},
-    		rawFreqs: {'en': "total occurrences (raw frequency)"},
-    		exportInProgress: {en: "Preparing your corpus for export…"}
     	},
     	api: {
     		config: undefined,
@@ -115,7 +96,7 @@ Ext.define('Voyant.panel.Catalogue', {
 	                    						title: catalogue.localize('export'),
 	                    						buttons: Ext.MessageBox.CANCEL,
 	                    						icon: Ext.MessageBox.INFO,
-	                    						message: catalogue.localize('clickToOpenCorpus', [url])
+	                    						message: new Ext.XTemplate(catalogue.localize('clickToOpenCorpus')).apply([url])
 	                    					});
 	                    					var link = msg.getTargetEl().dom.querySelector("a");
 	                    					link.addEventListener("click", function() {
@@ -149,12 +130,12 @@ Ext.define('Voyant.panel.Catalogue', {
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		this.setCorpus(corpus);
-    		this.queryById('status').update(this.localize('noMatches', [corpus.getDocumentsCount()]))
+    		this.queryById('status').update(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]))
     		this.query("facet").forEach(function(facet) {
     			facet.setCorpus(corpus);
     		});
     		if (!this.getCustomResultsHtml()) {
-    			this.setCustomResultsHtml(this.localize('noMatches',  [corpus.getDocumentsCount()]));
+    			this.setCustomResultsHtml(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]));
     			this.updateResults();
     	    	Ext.Ajax.request({
     	    	    url: this.getTromboneUrl(),

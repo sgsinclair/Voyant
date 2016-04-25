@@ -4,22 +4,6 @@ Ext.define('Voyant.panel.Phrases', {
 	alias: 'widget.phrases',
     statics: {
     	i18n: {
-    		title: {en: "Phrases"},
-    		emptyText: {en: "No matching results."},
-    		helpTip: {en: "<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->"},
-    		term: {en: "Term"},
-    		termTip: {en: "This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence)."},
-    		termRawFreq: {en: "Count"},
-    		termRawFreqTip: {en: "The number of times the phrase occurs in the corpus."},
-    		matchingTerms: {en: '{count}'},
-    		length: {en: "Length"},
-    		lengthTip: {en: "The upper and lower bounds of phrase lengths (how many words in each phrase)."},
-    		overlap: {en: "Overlap"},
-    		overlapTip: {en: "This determines how overlapping phrases are filtered."},
-    		overlapMenu: {en: "Choose an overlap filter:"},
-    		overlapNone: {en: "none (keep all)"},
-    		overlapLength: {en: "prioritize longest phrases"},
-    		overlapFreq: {en: "prioritize most frequent phrases"}
     	},
     	api: {
     		stopList: 'auto',

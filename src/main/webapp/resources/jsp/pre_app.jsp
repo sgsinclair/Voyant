@@ -53,3 +53,4 @@
 } %>
 
 <script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp<%= (request.getParameter("debug")!=null ? "?debug=true" : "") %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?lang=<%= (request.getParameter("lang")==null ? "en" : request.getParameter("lang")) %>"></script>

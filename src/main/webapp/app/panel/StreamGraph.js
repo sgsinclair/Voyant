@@ -4,16 +4,6 @@ Ext.define('Voyant.panel.StreamGraph', {
 	alias: 'widget.streamgraph',
     statics: {
     	i18n: {
-    		title: {en: 'StreamGraph'},
-    		helpTip: {en: 'StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).'},
-    		freqsMode: {en: 'Frequencies'},
-    		freqsModeTip: {en: 'Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).'},
-    		rawFrequencies: {en: 'Raw Frequencies'},
-    		relativeFrequencies: {en: 'Relative Frequencies'},
-    		documentSegments: {en: 'Document Segments'},
-    		documents: {en: 'Documents'},
-    		clearTerms : {en: 'Clear Terms'},
-    		segments : {en: 'Segments'}
     	},
     	api: {
     		limit: 5,

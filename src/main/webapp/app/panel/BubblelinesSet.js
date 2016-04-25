@@ -5,8 +5,6 @@ Ext.define('Voyant.panel.BubblelinesSet', {
     alias: 'widget.bubblelinesset',
 	statics: {
 		i18n: {
-			title: {en: "Bubblelines Skin"},
-			helpTip: {en: "This is a specialized view for working with Bubblelines."}
 		},
 		glyph: 'xf17a@FontAwesome'
 	},

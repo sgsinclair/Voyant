@@ -4,7 +4,6 @@ Ext.define('Voyant.panel.WordTree', {
 	alias: 'widget.wordtree',
     statics: {
     	i18n: {
-    		title: {en: 'WordTree'}
     	},
     	api: {
     		query: undefined,

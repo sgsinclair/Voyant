@@ -5,9 +5,6 @@ Ext.define('Voyant.panel.CustomSet', {
     alias: 'widget.customset',
 	statics: {
 		i18n: {
-			title: {en: "Custom View"},
-			helpTip: {en: "This is a custom view."},
-			noSuchTool: {en: "The specified tool ({0}) does not exist."}
 		},
 		api: {
 			panels: undefined

@@ -5,20 +5,6 @@ Ext.define('Voyant.panel.Knots', {
 	alias: 'widget.knots',
     statics: {
     	i18n: {
-    		title : {en: 'Knots'},
-			type : {en: 'Visualization'},
-			findTerm : {en: 'Find Term'},
-			clearTerms : {en: 'Clear'},
-			removeTerm : {en: 'Remove Term'},
-			showTerm : {en: 'Show Term'},
-			hideTerm : {en: 'Hide Term'},
-			options: {en: "Options"},
-			speed : {en: 'Speed'},
-			startAngle : {en: 'Start'},
-			tangles : {en: 'Turn'},
-			context : {en: 'Context'},
-			noTermsFound: {en: "No terms found in this document."},
-			settings: {en: "Settings"}
     	},
     	api: {
     		/**

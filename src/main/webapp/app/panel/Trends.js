@@ -10,19 +10,6 @@
 	},
     statics: {
     	i18n: {
-    		title: {en: "Trends"},
-    		helpTip: {en: "<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		freqsMode: {en: "Frequencies"},
-    		freqsModeTip: {en: "Determines if frequencies are expressed as raw counts or as relative counts (per document or segment)."},
-    		options: {en: "Options"},
-    		rawFrequencies: {en: 'Raw Frequencies'},
-    		relativeFrequencies: {en: 'Relative Frequencies'},
-    		
-    		raw: {en: 'Raw'},
-    		relative: {en: 'Relative'},
-    		segmentsSlider: {en: 'Segments'},
-    		segments: {en: 'Document Segments'},
-    		documents: {en: 'Documents'}
     	},
     	api: {
     		limit: 5,

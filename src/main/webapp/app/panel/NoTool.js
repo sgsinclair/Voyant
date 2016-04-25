@@ -4,13 +4,6 @@ Ext.define('Voyant.panel.NoTool', {
 	alias: 'widget.notool',
     statics: {
     	i18n: {
-    		title: {en: 'No Such Tool'},
-    		error: {en: "Error"},
-    		currentButton: {en: "Use Current Version"},
-    		oldButton: {en: "Use Old Version"},
-    		noToolSpecified: {en: 'No tool has been specified. You will be redirected to the main page of Voyant Tools.'},
-    		badToolSpecified: {en: "The <i>{0}</i> tool doesn't exist. You will be redirected to the main page of Voyant Tools."},
-    		notImplemented: {en: "<p>The <i>{0}</i> tool existed in a previous version of Voyant Tools but has not been implemented in this version. Some tools may be reimplemented eventually while others are unlikely to be implemented because they were experimental, unuseful or dependent on technologies that are no longer supported (like Adobe Flash and Java Applets).</p><p>Please decide if you'd like to use the new version of Voyant or if you'd rather try using the <i>{0}</i> tool in the old version.</p>"}
     	},
     	api: {
     		tool: undefined
