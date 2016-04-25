@@ -40,17 +40,17 @@ public class Localizer {
 			throw new IllegalArgumentException("Unable to find language: "+lang);
 		}
 		int column = StringUtils.countMatches(header.substring(0, pos), "\t");
-		int english = 2;
+		int english = 3;
 		lines.remove(0);
 		Map<String, Map<String, String>> locationsMap = new HashMap<String, Map<String, String>>();
 		for (String line : lines) {
 			String[] cells = line.split("\t");
-			if (cells.length < 3 || cells[0].isEmpty() || cells[1].isEmpty() || cells[2].isEmpty()) {continue;}
-			String location = cells[0];
+			if (cells.length < 4 || cells[0].isEmpty() || cells[1].isEmpty() || cells[2].isEmpty() || cells[3].isEmpty()) {continue;}
+			String location = cells[1];
 			if (locationsMap.containsKey(location)==false) {
 				locationsMap.put(location, new HashMap<String, String>());
 			}
-			locationsMap.get(location).put(cells[1], cells.length>=column-1 && cells[column].isEmpty()==false ? cells[column] : cells[english]);
+			locationsMap.get(location).put(cells[2], cells.length>=column-1 && cells[column].isEmpty()==false ? cells[column] : cells[english]);
 		}
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, Map<String, String>> locationEntry : locationsMap.entrySet()) {
