@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Apr 25 11:16:04 EDT 2016 */
+/* This file created by JSCacher. Last modified: Mon Apr 25 13:13:20 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6329,8 +6329,10 @@ Ext.define('Voyant.widget.StopListOption', {
     	var value = this.up('window').panel.getApiParam('stopList');
     	
     	var data = [];
-    	"ar,bg,br,ca,ckb,cn,cz,de,el,en,es,eu,fa,fr,ga,gl,hi,hu,hy,id,it,ja,lv,lt,mu,nl,no,ro,se,th,tr".split(",").forEach(function(lang) {
-    		data.push({name: this.localize(lang), value: this.localize(lang, {lang: 'value'})})
+    	"ar:stop.ar.arabic-lucene.txt,bg:stop.bu.bulgarian-lucene.txt,br:stop.br.breton-lucene.txt,ca:stop.ca.catalan-lucene.txt,ckb:stop.ckb-turkish-lucene.txt,cn:stop.cn.chinese-lawrence.txt,cz:stop.cz.czech-lucene.txt,de:stop.de.german.txt,el:stop.el.greek-lucene.txt,en:stop.en.taporware.txt,es:stop.es.spanish.txt,eu:stop.eu.basque-lucene.txt,fa:stop.fa.farsi-lucene.txt,fr:stop.fr.veronis.txt,ga:stop.ga-irish-lucene.txt,gl:stop.ga.galician-lucene.txt,hi:stop.hi.hindi-lucene.txt,hu:stop.hu.hungarian.txt,hy:stop.hy.armenian-lucene.txt,id:stop.id.indonesian-lucene.txt,it:stop.it.italian.txt,ja:stop.ja.japanese-lucene.txt,lv:stop.lv.latvian-lucene.txt,lt:stop.lt.lithuanian-lucene.txt,mu:stop.mu.multi.txt,nl:stop.nl.dutch.txt,no:stop.no.norwegian.txt,ro:stop.ro.romanian-lucene.txt,se:stop.se.swedish-long.txt,th:stop.th.thai-lucene.txt,tr:stop.tr.turkish-lucene.txt".split(",").forEach(function(lang) {
+    		var parts = lang.split(":")
+    		console.warn(parts[0]+":\t\t"+parts[1])
+    		data.push({name: this.localize(parts[0]), value: parts[1]})
     	}, this);
 //    	debugger
 //        var data = [{name : this.localize('en'),   value: 'stop.en.taporware.txt'},
