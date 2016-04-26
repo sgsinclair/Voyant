@@ -4,6 +4,7 @@ Ext.define('Voyant.panel.Subset', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel','Voyant.util.Downloadable'],
 	alias: 'widget.subset',
+	isConsumptive: true,
     statics: {
     	i18n: {
     	},

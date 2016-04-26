@@ -4,7 +4,11 @@ String query = request.getQueryString();
 String[] parts = request.getRequestURI().substring(request.getContextPath().length()+1).split("/");
 if (parts.length<2) {
 	response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-	response.setHeader("Location", request.getContextPath()+"/"+(query!=null ? "?"+query : ""));
+	if (parts.length==1 && parts[0].equals("CollocatesGraph")) { // handle bad URL from Hermeneutica book
+		response.setHeader("Location", request.getContextPath()+"/?view=CollocatesGraph");
+	} else {
+		response.setHeader("Location", request.getContextPath()+"/"+(query!=null ? "?"+query : ""));
+	}
 	return;
 }
 String tool = parts[1];

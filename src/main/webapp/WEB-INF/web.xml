@@ -35,6 +35,16 @@
 		<url-pattern>/tool/*</url-pattern>
 	</servlet-mapping>
 	
+	<!-- this is to handle a bad URL in Hermeneutica the book -->
+	<servlet-mapping>
+		<servlet-name>collocatesgraph</servlet-name>
+		<url-pattern>/CollocatesGraph/*</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>collocatesgraph</servlet-name>
+		<jsp-file>/tool/index.jsp</jsp-file>
+	</servlet>
+	
 	<!-- available from http://localhost:8080/trombone?param=...&param=...&param=... -->
 	<servlet>
 		<servlet-name>trombone</servlet-name>
