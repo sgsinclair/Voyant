@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Apr 25 13:13:20 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue Apr 26 11:27:53 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6289,39 +6289,6 @@ Ext.define('Voyant.widget.StopListOption', {
     layout: 'hbox',
     statics: {
     	i18n: {
-    		
-//    		ar: {en: "Arabic", value: 'stop.ar.arabic-lucene.txt'},
-//    		bg: {en: "Bulgarian", value: 'stop.bu.bulgarian-lucene.txt'},
-//    		br: {en: "Breton", value: 'stop.br.breton-lucene.txt'},
-//    		ca: {en: "Catalan", value: 'stop.ca.catalan-lucene.txt'},
-//    		ckb: {en: "Kurdish", value: 'stop.ckb-turkish-lucene.txt'},
-//    		cn: {en: "Chinese", value: 'stop.cn.chinese-lawrence.txt'},
-//    		cz: {en: "Czech", value: 'stop.cz.czech-lucene.txt'},
-//    		de: {en: "German", value: 'stop.de.german.txt'},
-//    		el: {en: "Greek", value: 'stop.el.greek-lucene.txt'},
-//    		en: {en: "English", value: 'stop.en.taporware.txt'},
-//    		es: {en: "Spanish", value: 'stop.es.spanish.txt'},
-//    		eu: {en: "Basque", value: 'stop.eu.basque-lucene.txt'},
-//    		fa: {en: "Farsi", value: 'stop.fa.farsi-lucene.txt'},
-//    		fr: {en: "French", value: 'stop.fr.veronis.txt'},
-//    		ga: {en: "Irish", value: 'stop.ga-irish-lucene.txt'},
-//    		gl: {en: "Galician", value: 'stop.ga.galician-lucene.txt'},
-//    		hi: {en: "Hindi", value: 'stop.hi.hindi-lucene.txt'},
-//    		hu: {en: "Hungarian", value: 'stop.hu.hungarian.txt'},
-//    		hy: {en: "Armenian", value: 'stop.hy.armenian-lucene.txt'},
-//    		id: {en: "Indonesian", value: 'stop.id.indonesian-lucene.txt'},
-//    		it: {en: "Italian", value: 'stop.it.italian.txt'},
-//    		ja: {en: "Japanese", value: 'stop.ja.japanese-lucene.txt'},
-//    		lt: {en: "Latvian", value: 'stop.lv.latvian-lucene.txt'},
-//    		lv: {en: "Lithuanian", value: 'stop.lt.lithuanian-lucene.txt'},
-//    		mu: {en: "Multilingual", value: 'stop.mu.multi.txt'},
-//    		nl: {en: "Dutch", value: 'stop.nl.dutch.txt'},
-//    		no: {en: "Norwegian", value: 'stop.no.norwegian.txt'},
-//    		ro: {en: "Romanian", value: 'stop.ro.romanian-lucene.txt'},
-//    		se: {en: "Swedish", value: 'stop.se.swedish-long.txt'},
-//    		th: {en: "Thai", value: 'stop.th.thai-lucene.txt'},
-//    		tr: {en: "Turkish", value: 'stop.tr.turkish-lucene.txt'},
-    		
     	}
     },
     initComponent: function(config) {
@@ -6331,19 +6298,8 @@ Ext.define('Voyant.widget.StopListOption', {
     	var data = [];
     	"ar:stop.ar.arabic-lucene.txt,bg:stop.bu.bulgarian-lucene.txt,br:stop.br.breton-lucene.txt,ca:stop.ca.catalan-lucene.txt,ckb:stop.ckb-turkish-lucene.txt,cn:stop.cn.chinese-lawrence.txt,cz:stop.cz.czech-lucene.txt,de:stop.de.german.txt,el:stop.el.greek-lucene.txt,en:stop.en.taporware.txt,es:stop.es.spanish.txt,eu:stop.eu.basque-lucene.txt,fa:stop.fa.farsi-lucene.txt,fr:stop.fr.veronis.txt,ga:stop.ga-irish-lucene.txt,gl:stop.ga.galician-lucene.txt,hi:stop.hi.hindi-lucene.txt,hu:stop.hu.hungarian.txt,hy:stop.hy.armenian-lucene.txt,id:stop.id.indonesian-lucene.txt,it:stop.it.italian.txt,ja:stop.ja.japanese-lucene.txt,lv:stop.lv.latvian-lucene.txt,lt:stop.lt.lithuanian-lucene.txt,mu:stop.mu.multi.txt,nl:stop.nl.dutch.txt,no:stop.no.norwegian.txt,ro:stop.ro.romanian-lucene.txt,se:stop.se.swedish-long.txt,th:stop.th.thai-lucene.txt,tr:stop.tr.turkish-lucene.txt".split(",").forEach(function(lang) {
     		var parts = lang.split(":")
-    		console.warn(parts[0]+":\t\t"+parts[1])
     		data.push({name: this.localize(parts[0]), value: parts[1]})
     	}, this);
-//    	debugger
-//        var data = [{name : this.localize('en'),   value: 'stop.en.taporware.txt'},
-//               {name : this.localize('de'),   value: 'stop.de.german.txt'},
-//               {name : this.localize('es'),   value: 'stop.es.spanish.txt'},
-//               {name : this.localize('fr'),   value: 'stop.fr.veronis.txt'},
-//               {name : this.localize('hu'),   value: 'stop.hu.hungarian.txt'},
-//               {name : this.localize('it'),   value: 'stop.it.italian.txt'},
-//               {name : this.localize('no'),   value: 'stop.no.norwegian.txt'},
-//               {name : this.localize('se'),   value: 'stop.se.swedish-long.txt'},
-//               {name : this.localize('mu'),   value: 'stop.mu.multi.txt'}]
     	data.sort(function(a,b) { // sort by label
     		return a.name < b.name ? -1 : 1;
     	})
@@ -12321,7 +12277,6 @@ Ext.define('Voyant.panel.RezoViz', {
 
 		}, this);
         
-    	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
         me.callParent(arguments);
     },
     
@@ -17920,6 +17875,7 @@ Ext.define('Voyant.panel.Subset', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel','Voyant.util.Downloadable'],
 	alias: 'widget.subset',
+	isConsumptive: true,
     statics: {
     	i18n: {
     	},

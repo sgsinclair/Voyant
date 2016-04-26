@@ -227,7 +227,6 @@ Ext.define('Voyant.panel.RezoViz', {
 
 		}, this);
         
-    	this.mixins['Voyant.panel.Panel'].initComponent.apply(this, arguments);
         me.callParent(arguments);
     },
     
