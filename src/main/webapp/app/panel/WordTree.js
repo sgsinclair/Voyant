@@ -10,8 +10,7 @@ Ext.define('Voyant.panel.WordTree', {
     		docId: undefined,
     		docIndex: undefined,
     		stopList: 'auto',
-    		context: 5,
-    		expand: 50,
+    		context: 10,
     		limit: 5
     	},
 		glyph: 'xf1cb@FontAwesome'
@@ -30,7 +29,15 @@ Ext.define('Voyant.panel.WordTree', {
     
     initComponent: function() {
         Ext.apply(this, {
-    		title: this.localize('title')
+    		title: this.localize('title'),
+    		dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                enableOverflow: true,
+                items: [{
+                	xtype: 'querysearchfield'
+                }]
+    		}]
         });
         
         this.setKwicStore(Ext.create('Voyant.data.store.Contexts', {
@@ -46,8 +53,10 @@ Ext.define('Voyant.panel.WordTree', {
         				var prefix = [], hit = [], suffix = [], id = [];
         				for (var i = 0; i < records.length; i++) {
         					var r = records[i];
+        					//prefix.push([r.getLeft().trim().replace(/\s+/g, ' ')]);
         					prefix.push(r.getLeft().trim().split(/\s+/));
         					hit.push(r.getMiddle());
+//        					suffix.push([r.getRight().trim().replace(/\s+/g, ' ')]);
         					suffix.push(r.getRight().trim().split(/\s+/));
         					id.push(i);
         				}
@@ -83,6 +92,13 @@ Ext.define('Voyant.panel.WordTree', {
     				stopList: this.getApiParam('stopList')
     			}
         	});
+        }, this);
+        
+        this.on('query', function(src, query) {
+    		if (query !== undefined && query != '') {
+    			this.setApiParam('query', query);
+	    		this.getKwicStore().load({params: this.getApiParams()});
+    		}
         }, this);
         
         this.on('resize', function(panel, width, height) {

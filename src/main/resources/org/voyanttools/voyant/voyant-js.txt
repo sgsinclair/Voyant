@@ -10,7 +10,6 @@ resources/cirrus/html5/Word.js
 resources/cirrus/html5/WordController.js
 
 # WORDTREE
-resources/doubletree/classListSubstitute.js
 resources/doubletree/DoubleTree.js
 resources/doubletree/Trie.js
 
