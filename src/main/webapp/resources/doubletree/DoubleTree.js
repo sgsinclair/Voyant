@@ -5,6 +5,8 @@
  * - pointer cursor for node
  * - rect now behind text, made opaque to block paths obscuring text
  * - branch length based on text length on per node basis
+ * - click handler
+ * - zoom fixes
  */
 
 /*
@@ -61,7 +63,8 @@ doubletree.DoubleTree = function() {
 	};
 	var handlers = {
 		"alt" : noOp,
-		"shift" : noOp
+		"shift" : noOp,
+		"click" : noOp
 	};
 	var showTokenExtra = true;
 	var scaleLabels = true;
@@ -245,49 +248,31 @@ doubletree.DoubleTree = function() {
 			var thisContainer = d;
 			var thisVis;
 
-			function zoomF() {
-				if (d3.event.sourceEvent.type !== 'mousemove') {
-					return;
-				}
-				d3.select(thisContainer).select("svg > g").attr("transform", "translate(" + d3.event.translate + ")");
-							// scale("
-							// +
-							// d3.event.scale
-							// + ")
-							// //don't
-							// zoom
+			function zoom() {
+			    var scale = d3.event.scale,
+			        translation = d3.event.translate;
+//			        tbound = -h * scale,
+//			        bbound = h * scale,
+//			        lbound = (-w + m[1]) * scale,
+//			        rbound = (w - m[3]) * scale;
+			    // limit translation to thresholds
+//			    translation = [
+//			        Math.max(Math.min(translation[0], rbound), lbound),
+//			        Math.max(Math.min(translation[1], bbound), tbound)
+//			    ];
+			    
+			    d3.select(thisContainer).select("svg > g").attr("transform", "translate(" + translation + ")" + " scale(" + scale + ")");
 			}
 
 			var tmp = d3.select(thisContainer).select("svg");
 			if (tmp[0][0] == null) {
 				thisVis = d3
-						.select(thisContainer)
-						.append("svg")
-						.attr("width", width + margin.right + margin.left)
-						.attr("height", height + margin.top + margin.bottom)
-						.attr("cursor", "move")
-						// should use drag, but didn't work right --
-						// keeps bouncing back
-						/*
-						 * .call(d3.behavior.drag()
-						 * .origin(function() {return {'x':width/2,
-						 * 'y':height/2}}) .on("drag", function() {
-						 * var delta = [d3.event.dx, d3.event.dy];
-						 * thisVis.attr("transform", "translate(" +
-						 * delta + ")"); }));
-						 */
-						.call(d3.behavior.zoom().on("zoom", function() {
-							if (d3.event.sourceEvent.type !== 'mousemove') {
-								return;
-							}
-							d3.select(thisContainer).select("svg > g").attr("transform","translate("+ d3.event.translate+ ")");
-									// scale("
-									// +
-									// d3.event.scale
-									// + ")
-									// //don't
-									// zoom
-						}));
+					.select(thisContainer)
+					.append("svg")
+					.attr("width", width + margin.right + margin.left)
+					.attr("height", height + margin.top + margin.bottom)
+					.attr("cursor", "move")
+					.call(d3.behavior.zoom().scaleExtent([1,1]).on("zoom", zoom));
 
 				thisVis.append("g"); // container for both trees
 
@@ -317,6 +302,9 @@ doubletree.DoubleTree = function() {
 
 		leftTree.handleShiftPress = handlers.shift;
 		rtTree.handleShiftPress = handlers.shift;
+		
+		leftTree.handleClick = handlers.click;
+		rtTree.handleClick = handlers.click;
 
 		succeeded = true;
 		return mine;
@@ -1072,6 +1060,8 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 			return;
 		}
 
+		that.handleClick(d, i);
+		
 		if (!d.parent) {
 			return;
 		}
@@ -1177,6 +1167,8 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 	this.handleAltPress = function() {
 	};
 	this.handleShifttPress = function() {
+	};
+	this.handleClick = function() {
 	};
 
 	this.readJSONTree(data);
@@ -1302,7 +1294,11 @@ doubletree.fieldText = function(info, fieldName) {
  * @returns the value of the "token" field of the information object
  */
 doubletree.tokenText = function(info) {
-	return doubletree.fieldText(info, "token");
+	var tokenText = '';
+	if (info.token !== undefined) {
+		tokenText = info.token;//info.token[0]; // don't return all token values, just the first
+	}
+	return tokenText;
 }
 
 /**

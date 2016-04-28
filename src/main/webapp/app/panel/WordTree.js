@@ -22,6 +22,9 @@ Ext.define('Voyant.panel.WordTree', {
     	kwicStore: undefined
     },
     
+    clickTimeout: null,
+    doubleClickDelay: 300,
+    
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -67,7 +70,10 @@ Ext.define('Voyant.panel.WordTree', {
         				this.getTree().setupFromArrays(prefix, hit, suffix, id, caseSensitive, fieldNames, fieldDelim, distinguishingFieldsArray);
         				
         				if (!this.getTree().succeeded()) {
-        					// no records were added
+        					this.toastInfo({
+       		    				html: this.localize("emptyText"),
+       		    				align: 'bl'
+       		    			});
         				}
         			}
         		},
@@ -96,10 +102,27 @@ Ext.define('Voyant.panel.WordTree', {
         
         this.on('query', function(src, query) {
     		if (query !== undefined && query != '') {
-    			this.setApiParam('query', query);
-	    		this.getKwicStore().load({params: this.getApiParams()});
+    			this.setRoot(query);
     		}
         }, this);
+        
+        this.on('termsClicked', function(src, terms) {
+        	var queryTerms = [];
+    		terms.forEach(function(term) {
+    			if (Ext.isString(term)) {queryTerms.push(term);}
+    			else if (term.term) {queryTerms.push(term.term);}
+    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
+    		});
+    		this.setRoot(queryTerms);
+		}, this);
+        
+        this.on('documentTermsClicked', function(src, terms) {
+    		var queryTerms = [];
+    		terms.forEach(function(term) {
+    			if (term.getTerm()) {queryTerms.push(term.getTerm());}
+    		});
+    		this.setRoot(queryTerms);
+    	}, this);
         
         this.on('resize', function(panel, width, height) {
 
@@ -119,10 +142,7 @@ Ext.define('Voyant.panel.WordTree', {
     	dt.init('#'+el.getId())
     		.visWidth(w).visHeight(h)
     		.handlers({
-    			alt: function(node) {
-    				this.setRoot(node.name);
-    			}.bind(this),
-    			shift: null
+    			click: this.clickHandler.bind(this)
     		});
     	
     	this.setTree(dt);
@@ -130,6 +150,30 @@ Ext.define('Voyant.panel.WordTree', {
     	// explicitly set dimensions
 //    	el.setWidth(el.getWidth());
 //    	el.setHeight(el.getHeight());
+    },
+    
+    clickHandler: function(node) {
+    	function doDispatch() {
+    		this.clickTimeout = null;
+    		var terms = [];
+	    	var parent = node;
+	    	while (parent != null) {
+	    		terms.push(parent.name);
+	    		parent = parent.parent;
+	    	}
+	    	this.getApplication().dispatchEvent('termsClicked', this, terms);
+    	}
+    	if (this.clickTimeout == null) {
+    		this.clickTimeout = window.setTimeout(doDispatch.bind(this), this.doubleClickDelay);
+    	} else {
+	    	window.clearTimeout(this.clickTimeout);
+	    	this.clickTimeout = null;
+	    	this.doubleClickHandler(node);
+    	}
+    },
+    
+    doubleClickHandler: function(node) {
+    	this.setRoot(node.name);
     },
     
     setRoot: function(query) {

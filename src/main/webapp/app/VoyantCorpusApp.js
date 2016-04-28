@@ -29,7 +29,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
-			items: ['cirrus','bubblelines','collocatesgraph','knots','trends','streamgraph','scatterplot','termsradio']
+			items: ['cirrus','bubblelines','collocatesgraph','knots','trends','streamgraph','scatterplot','termsradio','wordtree']
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',
