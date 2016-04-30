@@ -1,561 +1,563 @@
-Last Modified	Location	ID	English (en)	French (fr)	Italian (it)
-2016-04-25	Voyant.VoyantApp	translatedBy	English translation by your names here.		
-2016-04-25	Voyant.util.DetailedError	error	Error		
-2016-04-25	Voyant.util.Toolable	maximizeTip	Open this tool in a new window		
-2016-04-25	Voyant.util.Toolable	plusTip	Click to choose another tool for this panel location (this will replace the current tool).		
-2016-04-25	Voyant.util.Toolable	saveTip	Export a URL, an embeddable tool, data or a bibliographic reference.		
-2016-04-25	Voyant.util.Toolable	gearTip	Define options for this tool.		
-2016-04-25	Voyant.util.Toolable	helpTip	No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.		
-2016-04-25	Voyant.util.Toolable	moreHelp	More help…		
-2016-04-25	Voyant.util.Toolable	exportTitle	Export		
-2016-04-25	Voyant.util.Toolable	exportViewUrl	a URL for this view (tools and data)		
-2016-04-25	Voyant.util.Toolable	exportViewFieldset	Export View (Tools and Data)		
-2016-04-25	Voyant.util.Toolable	exportViewHtmlEmbed	an HTML snippet for embedding this view in another web page		
-2016-04-25	Voyant.util.Toolable	exportViewEmbedTitle	Embed HTML Snippet		
-2016-04-25	Voyant.util.Toolable	exportViewEmbedMessage	You can copy and paste the HTML snippet from the box below into another web page. Note that some content management systems (like WordPress) may need a special plugin to handle &lt;iframe&gt; tags.		
-2016-04-25	Voyant.util.Toolable	exportBiblioTitle	Export Bibliographic Reference		
-2016-04-25	Voyant.util.Toolable	exportViewBiblio	a bibliographic reference for this view		
-2016-04-25	Voyant.util.Toolable	exportGridCurrent	Export Current Data		
-2016-04-25	Voyant.util.Toolable	exportGridCurrentHtml	export current data as HTML		
-2016-04-25	Voyant.util.Toolable	exportGridCurrentJson	export current data as JSON		
-2016-04-25	Voyant.util.Toolable	exportGridCurrentTsv	export current data as tab separated values (text)		
-2016-04-25	Voyant.util.Toolable	export	Export		
-2016-04-25	Voyant.util.Toolable	reset	Reset		
-2016-04-25	Voyant.util.Toolable	optionsTitle	Options		
-2016-04-25	Voyant.util.Toolable	confirmTitle	Confirm		
-2016-04-25	Voyant.util.Toolable	cancelTitle	Cancel		
-2016-04-25	Voyant.util.Toolable	exportError	Export Error		
-2016-04-25	Voyant.util.Toolable	exportNoFunction	An export function has been defined by is not availble.		
-2016-04-25	Voyant.util.Toolable	exportDataHtmlMessage	Copy the data below, they can be pasted into an HTML page or used as XML.		
-2016-04-25	Voyant.util.Toolable	exportDataTsvMessage	Copy data below, they can be pasted into a spreadsheet or text file.		
-2016-04-25	Voyant.util.Toolable	exportDataJsonMessage	Copy the data below, they can be used in other web-based applications.		
-2016-04-25	Voyant.util.Toolable	exportPng	export a PNG image of this visualization		
-2016-04-25	Voyant.util.Toolable	exportDataTitle	Export Data		
-2016-04-25	Voyant.util.Toolable	exportVizTitle	Export Visualization		
-2016-04-25	Voyant.util.Toolable	exportPngTitle	Export PNG		
-2016-04-25	Voyant.util.Toolable	exportSvg	export the SVG of this visualization		
-2016-04-25	Voyant.util.Toolable	exportPngMessage	<p>This is a thumbnail of the PNG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the HTML code below.</p>		
-2016-04-25	Voyant.util.Toolable	exportSvgTitle	Export SVG		
-2016-04-25	Voyant.util.Toolable	exportSvgMessage	<p>This is a thumbnail of the SVG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the SVG code below.</p>		
-2016-04-25	Voyant.util.Downloadable	exportTitle	Export		
-2016-04-25	Voyant.util.Downloadable	downloadButton	Download		
-2016-04-25	Voyant.util.Downloadable	cancelButton	Cancel		
-2016-04-25	Voyant.data.model.Corpus	failedCreateCorpus	Failed attempt to create a Corpus.		
-2016-04-25	Voyant.data.model.Corpus	thisCorpus	This corpus		
-2016-04-25	Voyant.data.model.Corpus	isEmpty	is empty		
-2016-04-25	Voyant.data.model.Corpus	hasNdocuments	has {count} documents		
-2016-04-25	Voyant.data.model.Corpus	has1document	has 1 document		
-2016-04-25	Voyant.data.model.Corpus	widthNwordsAndNTypes	with {words} <span class="info-tip" data-qtip="every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted">total words</span> and {types} <span class="info-tip" data-qtip="multiple occurrences of words (like &quot;the&quot;) are counted once">unique word forms</span>		
-2016-04-25	Voyant.data.model.Corpus	yearAgo	about a year ago		
-2016-04-25	Voyant.data.model.Corpus	yearsAgo	about {count} years ago		
-2016-04-25	Voyant.data.model.Corpus	monthAgo	about a month ago		
-2016-04-25	Voyant.data.model.Corpus	monthsAgo	about {count} months ago		
-2016-04-25	Voyant.data.model.Corpus	dayAgo	about a day ago		
-2016-04-25	Voyant.data.model.Corpus	daysAgo	about {count} days ago		
-2016-04-25	Voyant.data.model.Corpus	hourAgo	about an hour ago		
-2016-04-25	Voyant.data.model.Corpus	hoursAgo	about {count} hours ago		
-2016-04-25	Voyant.data.model.Corpus	minuteAgo	about a minute ago		
-2016-04-25	Voyant.data.model.Corpus	minutesAgo	about {count} minutes ago		
-2016-04-25	Voyant.data.model.Corpus	secondAgo	about a second ago		
-2016-04-25	Voyant.data.model.Corpus	secondsAgo	{count} seconds ago		
-2016-04-25	Voyant.data.model.Corpus	now	now		
-2016-04-25	Voyant.widget.StopListOption	label	Stopwords:		
-2016-04-25	Voyant.widget.StopListOption	editList	Edit List		
-2016-04-25	Voyant.widget.StopListOption	noEditAutoTitle	Edit Stoplist Error		
-2016-04-25	Voyant.widget.StopListOption	noEditAutoMessage	The auto-detected stoplist cannot be edited, please select a specifc stoplist such as the "New User-Defined List".		
-2016-04-25	Voyant.widget.StopListOption	auto	Auto-detect		
-2016-04-25	Voyant.widget.StopListOption	none	None		
-2016-04-25	Voyant.widget.StopListOption	new	New User-Defined List		
-2016-04-25	Voyant.widget.StopListOption	ar	Arabic		
-2016-04-25	Voyant.widget.StopListOption	bg	Bulgarian		
-2016-04-25	Voyant.widget.StopListOption	br	Breton		
-2016-04-25	Voyant.widget.StopListOption	ca	Catalan		
-2016-04-25	Voyant.widget.StopListOption	ckb	Kurdish		
-2016-04-25	Voyant.widget.StopListOption	cn	Chinese		
-2016-04-25	Voyant.widget.StopListOption	cz	Czech		
-2016-04-25	Voyant.widget.StopListOption	de	German		
-2016-04-25	Voyant.widget.StopListOption	el	Greek		
-2016-04-25	Voyant.widget.StopListOption	en	English		
-2016-04-25	Voyant.widget.StopListOption	es	Spanish		
-2016-04-25	Voyant.widget.StopListOption	eu	Basque		
-2016-04-25	Voyant.widget.StopListOption	fa	Farsi		
-2016-04-25	Voyant.widget.StopListOption	fr	French		
-2016-04-25	Voyant.widget.StopListOption	ga	Irish		
-2016-04-25	Voyant.widget.StopListOption	gl	Galician		
-2016-04-25	Voyant.widget.StopListOption	hi	Hindi		
-2016-04-25	Voyant.widget.StopListOption	hu	Hungarian		
-2016-04-25	Voyant.widget.StopListOption	hy	Armenian		
-2016-04-25	Voyant.widget.StopListOption	id	Indonesian		
-2016-04-25	Voyant.widget.StopListOption	it	Italian		
-2016-04-25	Voyant.widget.StopListOption	ja	Japanese		
-2016-04-25	Voyant.widget.StopListOption	lt	Latvian		
-2016-04-25	Voyant.widget.StopListOption	lv	Lithuanian		
-2016-04-25	Voyant.widget.StopListOption	mu	Multilingual		
-2016-04-25	Voyant.widget.StopListOption	nl	Dutch		
-2016-04-25	Voyant.widget.StopListOption	no	Norwegian		
-2016-04-25	Voyant.widget.StopListOption	ro	Romanian		
-2016-04-25	Voyant.widget.StopListOption	se	Swedish		
-2016-04-25	Voyant.widget.StopListOption	th	Thai		
-2016-04-25	Voyant.widget.StopListOption	tr	Turkish		
-2016-04-25	Voyant.widget.StopListOption	ok	Save		
-2016-04-25	Voyant.widget.StopListOption	cancel	Cancel		
-2016-04-25	Voyant.widget.StopListOption	editStopListTitle	Edit Stoplist		
-2016-04-25	Voyant.widget.StopListOption	editStopListMessage	This is the stoplist, one term per line.		
-2016-04-25	Voyant.widget.StopListOption	applyGlobally	apply globally		
-2016-04-25	Voyant.widget.QuerySearchField	querySearch	Search		
-2016-04-25	Voyant.widget.QuerySearchField	querySearchTip	<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>"winter coat"</b>: <i>winter coat</i> as a phrase</li><li><b>"coat mittens"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,"coat mittens"~5</b>: combine syntaxes</li></ul>		
-2016-04-25	Voyant.widget.QuerySearchField	querySearchDocsModeTip	<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>"winter coat"</b>: <i>winter coat</i> as a phrase</li><li><b>"coat mittens"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+"winter coat" +mitten*</b>: combine syntaxes</li></ul>		
-2016-04-25	Voyant.widget.QuerySearchField	aggregateInDocumentsCount	This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms).		
-2016-04-25	Voyant.widget.TotalPropertyStatus	totalPropertyStatus	{count:number("0,000")}		
-2016-04-25	Voyant.widget.DocumentSelector	documents	Documents		
-2016-04-25	Voyant.widget.DocumentSelector	selectAll	All		
-2016-04-25	Voyant.widget.DocumentSelector	selectNone	None		
-2016-04-25	Voyant.widget.DocumentSelector	ok	Ok		
-2016-04-25	Voyant.widget.DocumentSelector	cancel	Cancel		
-2016-04-25	Voyant.widget.DocumentSelector	all	all		
-2016-04-25	Voyant.widget.CorpusDocumentSelector	corpus	Corpus		
-2016-04-25	Voyant.widget.CorpusDocumentSelector	scale	Scale		
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	fieldLabel	Filenames		
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	titleLabel	title		
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	authorLabel	author		
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	pubDateLabel	date		
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	enabledLabel	include: 		
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	availableLabel	exclude: 		
-2016-04-25	Voyant.widget.DownloadFileFormat	fieldLabel	File Format		
-2016-04-25	Voyant.widget.DownloadFileFormat	voyantXml	Voyant XML		
-2016-04-25	Voyant.widget.DownloadFileFormat	VOYANTTip	This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content.		
-2016-04-25	Voyant.widget.DownloadFileFormat	SOURCETip	This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided.		
-2016-04-25	Voyant.widget.DownloadFileFormat	TXTTip	This will produce a plain text version of each document.		
-2016-04-25	Voyant.widget.DownloadFileFormat	original	original		
-2016-04-25	Voyant.widget.DownloadFileFormat	plainText	plain text		
-2016-04-25	Voyant.widget.DownloadOptions	title	Download Options		
-2016-04-25	Voyant.panel.Panel	term	Term		
-2016-04-25	Voyant.panel.Panel	rawFreq	Count		
-2016-04-25	Voyant.panel.Panel	relativeFreq	Relative		
-2016-04-25	Voyant.panel.Panel	trend	Trend		
-2016-04-25	Voyant.panel.Panel	colon	: 		
-2016-04-25	Voyant.panel.Panel	loading	Loading		
-2016-04-25	Voyant.panel.Panel	error	Error		
-2016-04-25	Voyant.panel.Panel	info	Information		
-2016-04-25	Voyant.widget.Facet	emptyText	No values found.		
-2016-04-25	Voyant.panel.Bubblelines	title	Bubblelines		
-2016-04-25	Voyant.panel.Bubblelines	type	Visualization		
-2016-04-25	Voyant.panel.Bubblelines	findTerm	Find Term		
-2016-04-25	Voyant.panel.Bubblelines	clearTerms	Clear		
-2016-04-25	Voyant.panel.Bubblelines	removeTerm	Remove Term		
-2016-04-25	Voyant.panel.Bubblelines	showTerm	Show Term		
-2016-04-25	Voyant.panel.Bubblelines	hideTerm	Hide Term		
-2016-04-25	Voyant.panel.Bubblelines	granularity	Granularity		
-2016-04-25	Voyant.panel.Bubblelines	separateLines	Separate Lines for Terms		
-2016-04-25	Voyant.panel.Bubblelines	total	Total		
-2016-04-25	Voyant.panel.Bubblelines	corpusTooSmall	The provided corpus is too small for this tool.		
-2016-04-25	Voyant.panel.Bubblelines	help	Bubblelines visualizes the frequency and repetition of  a term's use in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal lengths. Each term is represented as a bubble, the size of the bubble indicates its frequency in the corresponding segment of text. The larger the bubble's radius the more frequently the term occurs.		
-2016-04-25	Voyant.panel.Bubblelines	adaptedFrom			
-2016-04-25	Voyant.panel.Bubblelines	options	Options		
-2016-04-25	Voyant.panel.Catalogue	title	Catalogue		
-2016-04-25	Voyant.panel.Catalogue	helpTip	<p>The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.		
-2016-04-25	Voyant.panel.Catalogue	facet.authorTitle	Authors		
-2016-04-25	Voyant.panel.Catalogue	facet.languageTitle	Languages		
-2016-04-25	Voyant.panel.Catalogue	facet.titleTitle	Titles		
-2016-04-25	Voyant.panel.Catalogue	facet.keywordTitle	Keywords		
-2016-04-25	Voyant.panel.Catalogue	facet.pubDateTitle	Publication Dates		
-2016-04-25	Voyant.panel.Catalogue	facet.publisherTitle	Publishers		
-2016-04-25	Voyant.panel.Catalogue	facet.pubPlaceTitle	Publication Locations		
-2016-04-25	Voyant.panel.Catalogue	loadingSnippets	loading text snippets…		
-2016-04-25	Voyant.panel.Catalogue	lexicalTitle	Terms		
-2016-04-25	Voyant.panel.Catalogue	noMatches	No matches (out of {0} documents).		
-2016-04-25	Voyant.panel.Catalogue	queryMatches	{0} matching documents (out of {1}).		
-2016-04-25	Voyant.panel.Catalogue	clickToOpenCorpus	Please <a href="{0}" target="_blank" class="link">click here</a> to access your new corpus (since popup windows are blocked).		
-2016-04-25	Voyant.panel.Catalogue	export	Export		
-2016-04-25	Voyant.panel.Catalogue	exportTip	Create a new Voyant corpus with the selected documents.		
-2016-04-25	Voyant.panel.Catalogue	matchingDocuments	number of matching documents		
-2016-04-25	Voyant.panel.Catalogue	rawFreqs	total occurrences (raw frequency)		
-2016-04-25	Voyant.panel.Catalogue	exportInProgress	Preparing your corpus for export…		
-2016-04-25	Voyant.panel.Cirrus	title	Cirrus		
-2016-04-25	Voyant.panel.Cirrus	helpTip	</p><p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document –&nbsp;this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>		
-2016-04-25	Voyant.panel.Cirrus	visible	Show		
-2016-04-25	Voyant.panel.Cirrus	maxTerms	Max terms		
-2016-04-25	Voyant.panel.Cirrus	options	Options		
-2016-04-25	Voyant.panel.Cirrus	visibleTerms	Terms		
-2016-04-25	Voyant.panel.CollocatesGraph	title	Links		
-2016-04-25	Voyant.panel.CollocatesGraph	helpTip	<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:</p><ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>		
-2016-04-25	Voyant.panel.CollocatesGraph	clearTerms	Clear		
-2016-04-25	Voyant.panel.CollocatesGraph	releaseToRemove	Release to remove this term		
-2016-04-25	Voyant.panel.CollocatesGraph	cleaning	Cleaning		
-2016-04-25	Voyant.panel.CollocatesGraph	context	Context		
-2016-04-25	Voyant.panel.Contexts	title	Contexts		
-2016-04-25	Voyant.panel.Contexts	emptyText	No matching results.		
-2016-04-25	Voyant.panel.Contexts	document	Document		
-2016-04-25	Voyant.panel.Contexts	documentTip	The document of the occurrence.		
-2016-04-25	Voyant.panel.Contexts	helpTip	The Keywords in Context tool shows each occurrence of a keyword with a bit of surounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:<p></p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>		
-2016-04-25	Voyant.panel.Contexts	termTip	The keyword for the context.		
-2016-04-25	Voyant.panel.Contexts	left	Left		
-2016-04-25	Voyant.panel.Contexts	leftTip	Context to the left of the keyword.		
-2016-04-25	Voyant.panel.Contexts	right	Right		
-2016-04-25	Voyant.panel.Contexts	rightTip	Context to the right of the keyword.		
-2016-04-25	Voyant.panel.Contexts	position	Position		
-2016-04-25	Voyant.panel.Contexts	positionTip	The position of the keyword within the document.		
-2016-04-25	Voyant.panel.Contexts	context	context		
-2016-04-25	Voyant.panel.Contexts	expand	expand		
-2016-04-25	Voyant.panel.Contexts	corpus	corpus		
-2016-04-25	Voyant.panel.Contexts	corpusTip	Reset to corpus mode (contexts from all documents).		
-2016-04-25	Voyant.panel.Contexts	limitedAccess	This is a limited access corpus and this tool's functionality is restricted.		
-2016-04-25	Voyant.panel.CorpusCollocates	title	Collocates		
-2016-04-25	Voyant.panel.CorpusCollocates	emptyText	No matching results.		
-2016-04-25	Voyant.panel.CorpusCollocates	helpTip	<p>Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus. Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>		
-2016-04-25	Voyant.panel.CorpusCollocates	term	Term		
-2016-04-25	Voyant.panel.CorpusCollocates	termTip	This is the keyword term around which collocate (context) terms are counted.		
-2016-04-25	Voyant.panel.CorpusCollocates	termRawFreq	Count (keyword)		
-2016-04-25	Voyant.panel.CorpusCollocates	termRawFreqTip	The number of times the keyword term occurs in the corpus.		
-2016-04-25	Voyant.panel.CorpusCollocates	contextTerm	Collocate		
-2016-04-25	Voyant.panel.CorpusCollocates	contextTermTip	This is the collocate (context) term that occurs near the keyword term.		
-2016-04-25	Voyant.panel.CorpusCollocates	contextTermRawFreq	Count (context)		
-2016-04-25	Voyant.panel.CorpusCollocates	contextTermRawFreqTip	The number of times this collocate occurs near the keyword term in the corpus.		
-2016-04-25	Voyant.panel.CorpusCollocates	matchingTerms	{count}		
-2016-04-25	Voyant.panel.CorpusCollocates	context	context		
-2016-04-25	Voyant.panel.CorpusCreator	title	Add Texts		
-2016-04-25	Voyant.panel.CorpusCreator	helpTip	This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from you computer (you can select multiple files by using the Ctrl and/or Shift keys)</li>		
-2016-04-25	Voyant.panel.CorpusCreator	gearTip	Options		
-2016-04-25	Voyant.panel.CorpusCreator	gearWinTitle	Options		
-2016-04-25	Voyant.panel.CorpusCreator	inputFormat	Input Format		
-2016-04-25	Voyant.panel.CorpusCreator	inputFormatAuto	Auto-Detect (recommended)		
-2016-04-25	Voyant.panel.CorpusCreator	advancedOptionsText	For more information on the advanced options below, see the documentation on <a href="{0}" target="voyantdocs">creating a corpus</a>.		
-2016-04-25	Voyant.panel.CorpusCreator	xmlOptions	XML		
-2016-04-25	Voyant.panel.CorpusCreator	xmlOptionsText	Define XPath Expressions for any of the following:		
-2016-04-25	Voyant.panel.CorpusCreator	xpathDocuments	Documents		
-2016-04-25	Voyant.panel.CorpusCreator	xpathGroupBy	Group by		
-2016-04-25	Voyant.panel.CorpusCreator	xpathContent	Content		
-2016-04-25	Voyant.panel.CorpusCreator	xpathTitle	Title		
-2016-04-25	Voyant.panel.CorpusCreator	xpathAuthor	Author		
-2016-04-25	Voyant.panel.CorpusCreator	tableOptions	Tables		
-2016-04-25	Voyant.panel.CorpusCreator	tableDocuments	Documents		
-2016-04-25	Voyant.panel.CorpusCreator	tableDocumentsTable	from entire table		
-2016-04-25	Voyant.panel.CorpusCreator	tableDocumentsRows	from cells in each row		
-2016-04-25	Voyant.panel.CorpusCreator	tableDocumentsColumns	from entire columns		
-2016-04-25	Voyant.panel.CorpusCreator	tableContent	Content		
-2016-04-25	Voyant.panel.CorpusCreator	tableTitle	Title		
-2016-04-25	Voyant.panel.CorpusCreator	tableAuthor	Author		
-2016-04-25	Voyant.panel.CorpusCreator	tableOptionsText	Specify how documents should be extracted (currently only supported for MS Excel: .xls, xlsx). For more information see the documentation on creating a corpus with <a href="{0}" target="voyantdocs">tabular data</a>.		
-2016-04-25	Voyant.panel.CorpusCreator	tableContentText	Specify which column numbers contain content (or leave blank to use all columns). The left-most columnn is column 1. Define multiple documents by separating columns with a comma or combine columns by using the plus sign. For example 1+2,3 would combine columns 1 and 2 into one document and use column 3 for  a second document.		
-2016-04-25	Voyant.panel.CorpusCreator	tableMetadataText	These options are only used when documents are extracted from cells in each row (see the first option in this section). Same syntax as the Content option above: column numbers separated by commas or combined with a plus sign.		
-2016-04-25	Voyant.panel.CorpusCreator	tableNoHeadersRowText	Determines whether or not to skip the first row (if there's a header row). When there is a header row, it can be used to define the document title automatically when documents are extracted from entire columns (in this case leave the title field blank).		
-2016-04-25	Voyant.panel.CorpusCreator	tableNoHeadersRow	No Headers Row		
-2016-04-25	Voyant.panel.CorpusCreator	numberZero	0 is invalid, the first column is 1		
-2016-04-25	Voyant.panel.CorpusCreator	numberEmpty	At least one column number is currently empty.		
-2016-04-25	Voyant.panel.CorpusCreator	numbersNeedCommas	Please use a comma to separate multiple numbers.		
-2016-04-25	Voyant.panel.CorpusCreator	tokenizationOptions	Tokenization		
-2016-04-25	Voyant.panel.CorpusCreator	tokenization	Tokenization		
-2016-04-25	Voyant.panel.CorpusCreator	tokenizationAuto	Automatic (highly recommended)		
-2016-04-25	Voyant.panel.CorpusCreator	tokenizationWordBoundaries	Simple Word Boundaries		
-2016-04-25	Voyant.panel.CorpusCreator	accessOptions	Access Management		
-2016-04-25	Voyant.panel.CorpusCreator	accessOptionsText	If desired, specify one or more access passwords (separated by commas).		
-2016-04-25	Voyant.panel.CorpusCreator	adminPassword	admin code		
-2016-04-25	Voyant.panel.CorpusCreator	accessPassword	access code		
-2016-04-25	Voyant.panel.CorpusCreator	accessModeWithoutPassword	other access		
-2016-04-25	Voyant.panel.CorpusCreator	accessModeWithoutPasswordText	If you specify an <i>access password</i> you can also specify what access is granted to users without the password.		
-2016-04-25	Voyant.panel.CorpusCreator	accessModeNonConsumptive	limited (non-consumptive)		
-2016-04-25	Voyant.panel.CorpusCreator	accessModeNone	none		
-2016-04-25	Voyant.panel.CorpusCreator	emptyInput	Type in one or more URLs on separate lines or paste in a full text.		
-2016-04-25	Voyant.panel.CorpusCreator	uploadingCorpus	Uploading corpus…		
-2016-04-25	Voyant.panel.CorpusCreator	fileTypesWarning	File Types Warning		
-2016-04-25	Voyant.panel.CorpusCreator	fileTypesMessage	You have one or more files with incompatible or unrecognized file extensions that may cause problems.		
-2016-04-25	Voyant.panel.CorpusCreator	badFiles	incompatible (likely error): 		
-2016-04-25	Voyant.panel.CorpusCreator	unknownFiles	unrecognized (possible error): 		
-2016-04-25	Voyant.panel.CorpusCreator	sureContinue	Are you sure you wish to continue?		
-2016-04-25	Voyant.panel.CorpusCreator	error	Error		
-2016-04-25	Voyant.panel.CorpusCreator	errorNotXmlContinue	You've selected an XML input format but the input doesn't appear to be XML. Are you sure you wish to continue?		
-2016-04-25	Voyant.panel.CorpusCreator	reveal	Reveal		
-2016-04-25	Voyant.panel.CorpusCreator	ok	OK		
-2016-04-25	Voyant.panel.CorpusCreator	cancel	Cancel		
-2016-04-25	Voyant.panel.CorpusCreator	invalidForm	Invalid values have been used, please hover over fields with red boxes for explanations.		
-2016-04-25	Voyant.panel.CorpusCreator	numbersCommasOnly	Comma-separated numbers only.		
-2016-04-25	Voyant.panel.Knots	title	Knots		
-2016-04-25	Voyant.panel.Knots	type	Visualization		
-2016-04-25	Voyant.panel.Knots	findTerm	Find Term		
-2016-04-25	Voyant.panel.Knots	clearTerms	Clear		
-2016-04-25	Voyant.panel.Knots	removeTerm	Remove Term		
-2016-04-25	Voyant.panel.Knots	showTerm	Show Term		
-2016-04-25	Voyant.panel.Knots	hideTerm	Hide Term		
-2016-04-25	Voyant.panel.Knots	options	Options		
-2016-04-25	Voyant.panel.Knots	speed	Speed		
-2016-04-25	Voyant.panel.Knots	startAngle	Start		
-2016-04-25	Voyant.panel.Knots	tangles	Turn		
-2016-04-25	Voyant.panel.Knots	context	Context		
-2016-04-25	Voyant.panel.Knots	noTermsFound	No terms found in this document.		
-2016-04-25	Voyant.panel.Knots	settings	Settings		
-2016-04-25	Voyant.panel.Phrases	title	Phrases		
-2016-04-25	Voyant.panel.Phrases	emptyText	No matching results.		
-2016-04-25	Voyant.panel.Phrases	helpTip	<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->		
-2016-04-25	Voyant.panel.Phrases	term	Term		
-2016-04-25	Voyant.panel.Phrases	termTip	This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence).		
-2016-04-25	Voyant.panel.Phrases	termRawFreq	Count		
-2016-04-25	Voyant.panel.Phrases	termRawFreqTip	The number of times the phrase occurs in the corpus.		
-2016-04-25	Voyant.panel.Phrases	matchingTerms	{count}		
-2016-04-25	Voyant.panel.Phrases	length	Length		
-2016-04-25	Voyant.panel.Phrases	lengthTip	The upper and lower bounds of phrase lengths (how many words in each phrase).		
-2016-04-25	Voyant.panel.Phrases	overlap	Overlap		
-2016-04-25	Voyant.panel.Phrases	overlapTip	This determines how overlapping phrases are filtered.		
-2016-04-25	Voyant.panel.Phrases	overlapMenu	Choose an overlap filter:		
-2016-04-25	Voyant.panel.Phrases	overlapNone	none (keep all)		
-2016-04-25	Voyant.panel.Phrases	overlapLength	prioritize longest phrases		
-2016-04-25	Voyant.panel.Phrases	overlapFreq	prioritize most frequent phrases		
-2016-04-25	Voyant.panel.CorpusTerms	title	Terms		
-2016-04-25	Voyant.panel.CorpusTerms	emptyText	No matching results.		
-2016-04-25	Voyant.panel.CorpusTerms	helpTip	</p><p>Corpus Terms is a table view of terms that appear in the entire corpus. Features include:</p><ul><li>reordering by <i>term</i> and <i>count</i> (click on the column headers)</li><li>a sparkline graph of the term frequency trends across the corpus (if the corpus has multiple documents) or across the document (if the corpus has only one document)</li><li>additional columns available (relative frequency, distribution peakedness and skew) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>		
-2016-04-25	Voyant.panel.CorpusTerms	matchingTerms	Matching terms: {count}		
-2016-04-25	Voyant.panel.CorpusTerms	termTip	The term in the corpus.		
-2016-04-25	Voyant.panel.CorpusTerms	rawFreqTip	The total count (raw frequency) of this term in the entire corpus.		
-2016-04-25	Voyant.panel.CorpusTerms	relativeFreqTip	The relative frequency (per million) of this term in the entire corpus.		
-2016-04-25	Voyant.panel.CorpusTerms	relativePeakedness	Peakedness		
-2016-04-25	Voyant.panel.CorpusTerms	relativePeakednessTip	This is a statistical measure of how much the relative frequencies of a term in a corpus are bunched up into peaks (regions with higher values where the rest are lower).		
-2016-04-25	Voyant.panel.CorpusTerms	relativeSkewness	Skew		
-2016-04-25	Voyant.panel.CorpusTerms	relativeSkewnessTip	This is a statistical measure of the symmetry of the relative frequencies of a term across the corpus.		
-2016-04-25	Voyant.panel.CorpusTerms	trendTip	This represents the trend of the relative frequencies for each term in each document in the corpus.		
-2016-04-25	Voyant.panel.DocumentTerms	title	Document Terms		
-2016-04-25	Voyant.panel.DocumentTerms	emptyText	No matching results.		
-2016-04-25	Voyant.panel.DocumentTerms	helpTip	<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>		
-2016-04-25	Voyant.panel.DocumentTerms	matchingTerms	Matching terms: {count}		
-2016-04-25	Voyant.panel.DocumentTerms	termTip	The term in a single, specific document.		
-2016-04-25	Voyant.panel.DocumentTerms	rawFreqTip	The count (raw frequency) of this term in this document.		
-2016-04-25	Voyant.panel.DocumentTerms	relativeFreqTip	The relative frequency (per million) of this term in each document.		
-2016-04-25	Voyant.panel.DocumentTerms	trendTip	This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).		
-2016-04-25	Voyant.panel.DocumentTerms	tfidf	Significance		
-2016-04-25	Voyant.panel.DocumentTerms	tfidfTip	The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.		
-2016-04-25	Voyant.panel.DocumentTerms	zscore	Z-Score		
-2016-04-25	Voyant.panel.DocumentTerms	zscoreTip	The Z-Score, or standard score, is a normalized value for the term's raw frequency compared to other term frequencies in the same document.<table><tbody><tr><td style="text-align: center; font-size: smaller; font-family: mono;">frequency of term - mean of term frequencies<hr>standard deviation of term frequencies</td></tr></tbody></table>.		
-2016-04-25	Voyant.panel.Documents	title	Documents		
-2016-04-25	Voyant.panel.Documents	emptyText	No matching results.		
-2016-04-25	Voyant.panel.Documents	helpTip	<p>Documents is a table view of the documents in the corpus. Features include:</p><ul><li>reordering by <i>Title</i>, <i>Words</i> count (tokens), word forms count (<i>Types</i>), and <i>Ratio</i> (Types/Tokens Ratio) (click on the column headers)</li><li>a search box for queries (by default in the full-text, title and author fields —&nbsp;hover over the magnifying icon for help with the syntax)</li></ul>		
-2016-04-25	Voyant.panel.Documents	id	ID		
-2016-04-25	Voyant.panel.Documents	documentTitle	Title		
-2016-04-25	Voyant.panel.Documents	documentAuthor	Author		
-2016-04-25	Voyant.panel.Documents	tokensCountLexical	Words		
-2016-04-25	Voyant.panel.Documents	typesCountLexical	Types		
-2016-04-25	Voyant.panel.Documents	typeTokenRatioLexical	Ratio		
-2016-04-25	Voyant.panel.Documents	language	Language		
-2016-04-25	Voyant.panel.Documents	matchingDocuments	Matching documents: {count}		
-2016-04-25	Voyant.panel.Documents	error	Error		
-2016-04-25	Voyant.panel.Documents	add	Add		
-2016-04-25	Voyant.panel.Documents	addTip	Click here to add new documents to this corpus.		
-2016-04-25	Voyant.panel.Documents	remove	Remove		
-2016-04-25	Voyant.panel.Documents	removeTip	Click here to create a new corpus that excludes selected or filtered (search query) documents.		
-2016-04-25	Voyant.panel.Documents	reorder	Reorder		
-2016-04-25	Voyant.panel.Documents	reorderTip	Click here to create a new corpus based on a reordering of documents (drag and drop rows to reorder).		
-2016-04-25	Voyant.panel.Documents	keep	Keep		
-2016-04-25	Voyant.panel.Documents	keepTip	Click here to create a new corpus that only includes selected or filtered (search query) documents.		
-2016-04-25	Voyant.panel.Documents	modify	Modify		
-2016-04-25	Voyant.panel.Documents	newCorpus	New Corpus		
-2016-04-25	Voyant.panel.Documents	modifyTip	Click this button to create a new corpus by adding new documents, by selecting a subset of documents or by re-ordering documents.		
-2016-04-25	Voyant.panel.Documents	allSelectedError	You have selected all documents, you must select a subset of documents to remove or keep.		
-2016-04-25	Voyant.panel.Documents	removeSelectedDocuments	Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('selected document')}?		
-2016-04-25	Voyant.panel.Documents	removeFilteredDocuments	Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('filtered document')}?		
-2016-04-25	Voyant.panel.Documents	keepSelectedDocuments	Create a <i>new</i> corpus that only keeps the {0:plural('selected document')}?		
-2016-04-25	Voyant.panel.Documents	keepFilteredDocuments	Create a <i>new</i> corpus that only keeps the {0:plural('filtered document')}?		
-2016-04-25	Voyant.panel.Documents	selectOrFilterError	You need to first select documents by clicking on one or more rows or by performing a search query.		
-2016-04-25	Voyant.panel.Documents	onlyOneError	Your corpus has only one document, you can't remove or keep documents to create a new corpus.		
-2016-04-25	Voyant.panel.Documents	reorderFilteredError	You cannot reorder a filtered (after search query) corpus. Please create a new corpus first (with the <i>Remove</i> or <i>Keep</i> button) and then reorder the new corpus.		
-2016-04-25	Voyant.panel.Documents	reorderOriginalError	Please reorder the corpus first (drag and drop the rows in the table).		
-2016-04-25	Voyant.panel.Documents	reorderDocuments	Create a <i>new</i> corpus based on the order shown?		
-2016-04-25	Voyant.panel.DocumentsFinder	title	Documents Finder		
-2016-04-25	Voyant.panel.DocumentsFinder	emptyText	No matching results.		
-2016-04-25	Voyant.panel.DocumentsFinder	operator	Operator		
-2016-04-25	Voyant.panel.DocumentsFinder	field	Field		
-2016-04-25	Voyant.panel.DocumentsFinder	query	Query		
-2016-04-25	Voyant.panel.DocumentsFinder	count	Count		
-2016-04-25	Voyant.panel.DocumentsFinder	emptyQuery	type query here		
-2016-04-25	Voyant.panel.DocumentsFinder	titleField	title		
-2016-04-25	Voyant.panel.DocumentsFinder	authorField	author		
-2016-04-25	Voyant.panel.DocumentsFinder	pubDateField	publication date		
-2016-04-25	Voyant.panel.DocumentsFinder	publisherField	publisher		
-2016-04-25	Voyant.panel.DocumentsFinder	pubPlaceField	publication location		
-2016-04-25	Voyant.panel.DocumentsFinder	advancedField	<i>advanced query</i>		
-2016-04-25	Voyant.panel.DocumentsFinder	textField	text (default)		
-2016-04-25	Voyant.panel.DocumentsFinder	loading	loading corpus		
-2016-04-25	Voyant.panel.DocumentsFinder	unsuccessfulQuery	Unable to complete query.		
-2016-04-25	Voyant.panel.DocumentsFinder	addRow	Add Row		
-2016-04-25	Voyant.panel.DocumentsFinder	deleteRowTip	Click to delete this row		
-2016-04-25	Voyant.panel.DocumentsFinder	noMatches	No matches (out of {0} documents).		
-2016-04-25	Voyant.panel.DocumentsFinder	queryMatches	A total of {0} matching documents (out of {1}).		
-2016-04-25	Voyant.panel.DocumentsFinder	exportNewCorpus	New Corpus		
-2016-04-25	Voyant.panel.DocumentsFinder	exportNewCorpusTip	Create a new corpus from matching documents (button will be disabled if there are no matches).		
-2016-04-25	Voyant.panel.RezoViz	title	RezoViz		
-2016-04-25	Voyant.panel.RezoViz	categories	Categories		
-2016-04-25	Voyant.panel.RezoViz	people	People		
-2016-04-25	Voyant.panel.RezoViz	locations	Locations		
-2016-04-25	Voyant.panel.RezoViz	organizations	Organizations		
-2016-04-25	Voyant.panel.RezoViz	reload	Reload		
-2016-04-25	Voyant.panel.RezoViz	minEdgeCount	Min. Edge Count		
-2016-04-25	Voyant.panel.RezoViz	repulsion	Repulsion		
-2016-04-25	Voyant.panel.RezoViz	stiffness	Stiffness		
-2016-04-25	Voyant.panel.RezoViz	friction	Friction		
-2016-04-25	Voyant.panel.RezoViz	noEntities	No entities to graph.		
-2016-04-25	Voyant.panel.RezoViz	noEntitiesForEdgeCount	No entities were found. Would you like to reduce the minimum edge count to improve results?		
-2016-04-25	Voyant.panel.RezoViz	loadingEntities	Loading entities…		
-2016-04-25	Voyant.panel.Reader	title	Reader		
-2016-04-25	Voyant.panel.Reader	helpTip	<p>The Reader tool provides a view of text from the corpus. Features include:</p><ul><li>frequency information appears when hovering over a word</li><li>distribution information appears in a graph at the bottom when clicking on a word</li><li>a bar graph at the bottom indicates the relative size of each document in the corpus</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>		
-2016-04-25	Voyant.panel.Reader	documentFrequency	document frequency:		
-2016-04-25	Voyant.panel.Reader	limitedAccess	This is a limited access corpus and this tool's functionality is restricted.		
-2016-04-25	Voyant.panel.ScatterPlot	title	ScatterPlot		
-2016-04-25	Voyant.panel.ScatterPlot	analysis	Analysis		
-2016-04-25	Voyant.panel.ScatterPlot	ca	Correspondence Analysis		
-2016-04-25	Voyant.panel.ScatterPlot	pca	Principal Components Analysis		
-2016-04-25	Voyant.panel.ScatterPlot	docSim	Document Similarity		
-2016-04-25	Voyant.panel.ScatterPlot	freqsMode	Frequencies		
-2016-04-25	Voyant.panel.ScatterPlot	freqsModeTip	Determines if frequencies are expressed as relative counts, raw counts, or as TF-IDF.		
-2016-04-25	Voyant.panel.ScatterPlot	tfidf	TF-IDF		
-2016-04-25	Voyant.panel.ScatterPlot	rawFrequencies	Raw Frequencies		
-2016-04-25	Voyant.panel.ScatterPlot	relativeFrequencies	Relative Frequencies		
-2016-04-25	Voyant.panel.ScatterPlot	rawFreq	Raw		
-2016-04-25	Voyant.panel.ScatterPlot	relFreq	Relative		
-2016-04-25	Voyant.panel.ScatterPlot	terms	Terms		
-2016-04-25	Voyant.panel.ScatterPlot	term	Term		
-2016-04-25	Voyant.panel.ScatterPlot	numTerms	Terms		
-2016-04-25	Voyant.panel.ScatterPlot	addTerm	Add Term		
-2016-04-25	Voyant.panel.ScatterPlot	clusters	Clusters		
-2016-04-25	Voyant.panel.ScatterPlot	dimensions	Dimensions		
-2016-04-25	Voyant.panel.ScatterPlot	labels	Labels		
-2016-04-25	Voyant.panel.ScatterPlot	remove	Remove		
-2016-04-25	Voyant.panel.ScatterPlot	removeTerm	Remove <b>{0}</b>		
-2016-04-25	Voyant.panel.ScatterPlot	nearby	Nearby		
-2016-04-25	Voyant.panel.ScatterPlot	nearbyTerm	Nearby <b>{0}</b>		
-2016-04-25	Voyant.panel.ScatterPlot	pcTitle	Percentage of Total Variation Explained by Each Component		
-2016-04-25	Voyant.panel.ScatterPlot	pc	PC		
-2016-04-25	Voyant.panel.ScatterPlot	caTitle	Percentage of Total Assocation Explained by Each Dimension		
-2016-04-25	Voyant.panel.ScatterPlot	dimension	Dimension		
-2016-04-25	Voyant.panel.ScatterPlot	xAxis	X Axis		
-2016-04-25	Voyant.panel.ScatterPlot	yAxis	Y Axis		
-2016-04-25	Voyant.panel.ScatterPlot	fill	Fill		
-2016-04-25	Voyant.panel.ScatterPlot	loading	Loading		
-2016-04-25	Voyant.panel.ScatterPlot	helpTip	<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>		
-2016-04-25	Voyant.panel.ScatterPlot	tokenFreqTip	<b>{0}</b><br><b>Raw Frequency</b><br>{1}<br><b>Relative Frequency</b><br>{2}		
-2016-04-25	Voyant.panel.ScatterPlot	docFreqTip	<b>{0}</b><br><b>Word Count</b><br>{1}		
-2016-04-25	Voyant.panel.ScatterPlot	noTermSelected	No term selected.		
-2016-04-25	Voyant.panel.ScatterPlot	summaryLabel	Summary		
-2016-04-25	Voyant.panel.ScatterPlot	docsLabel	Documents		
-2016-04-25	Voyant.panel.ScatterPlot	termsLabel	Terms		
-2016-04-25	Voyant.panel.StreamGraph	title	StreamGraph		
-2016-04-25	Voyant.panel.StreamGraph	helpTip	StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).		
-2016-04-25	Voyant.panel.StreamGraph	freqsMode	Frequencies		
-2016-04-25	Voyant.panel.StreamGraph	freqsModeTip	Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).		
-2016-04-25	Voyant.panel.StreamGraph	rawFrequencies	Raw Frequencies		
-2016-04-25	Voyant.panel.StreamGraph	relativeFrequencies	Relative Frequencies		
-2016-04-25	Voyant.panel.StreamGraph	documentSegments	Document Segments		
-2016-04-25	Voyant.panel.StreamGraph	documents	Documents		
-2016-04-25	Voyant.panel.StreamGraph	clearTerms	Clear Terms		
-2016-04-25	Voyant.panel.StreamGraph	segments	Segments		
-2016-04-25	Voyant.panel.Summary	title	Summary		
-2016-04-25	Voyant.panel.Summary	helpTip	<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>		
-2016-04-25	Voyant.panel.Summary	corpusType	<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordid="{id}">{type}</a> ({val})<tpl if="xindex < xcount">, </tpl></tpl>		
-2016-04-25	Voyant.panel.Summary	documentType	<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:recordid="{id}" voyant:docindex="{docIndex}">{type}</a> ({val})<tpl if="xindex < xcount">, </tpl></tpl>		
-2016-04-25	Voyant.panel.Summary	mostFrequentWords	Most <b>frequent words</b> in the corpus: 		
-2016-04-25	Voyant.panel.Summary	distinctiveWords	<b>Distinctive words</b> (compared to the rest of the corpus): 		
-2016-04-25	Voyant.panel.Summary	moreDistinctiveWords	<a href="#" onclick="return false">Next {0} of {1} remaining</a>		
-2016-04-25	Voyant.panel.Summary	seeAll	All…		
-2016-04-25	Voyant.panel.Summary	more	More…		
-2016-04-25	Voyant.panel.Summary	items	items		
-2016-04-25	Voyant.panel.Summary	numberOfTerms	number of words in this document		
-2016-04-25	Voyant.panel.Summary	longest	Longest: 		
-2016-04-25	Voyant.panel.Summary	shortest	Shortest: 		
-2016-04-25	Voyant.panel.Summary	highest	Highest: 		
-2016-04-25	Voyant.panel.Summary	lowest	Lowest: 		
-2016-04-25	Voyant.panel.Summary	docsLength	Document Length: 		
-2016-04-25	Voyant.panel.Summary	docsDensity	Vocabulary Density: 		
-2016-04-25	Voyant.panel.TopicContexts	title	Topic Contexts		
-2016-04-25	Voyant.panel.TopicContexts	helpTip	Topic Contexts		
-2016-04-25	Voyant.panel.TopicContexts	reset	reset		
-2016-04-25	Voyant.panel.TermsRadio	title	TermsRadio		
-2016-04-25	Voyant.panel.TermsRadio	type	Visualization		
-2016-04-25	Voyant.panel.TermsRadio	help	This tool can be used to examine word occurence over a corpus spanning a period of time.		
-2016-04-25	Voyant.panel.TermsRadio	visibleSegments	Visible		
-2016-04-25	Voyant.panel.TermsRadio	visibleSegmentsTip	This option determines how many of the documents/segments are displayed at once.		
-2016-04-25	Voyant.panel.TermsRadio	segments	Segments		
-2016-04-25	Voyant.panel.TermsRadio	segmentsTip	This option allows you to define how many segments a document should be divided into (note that this option only applies to distribution within a document, not distribution across a corpus).		
-2016-04-25	Voyant.panel.TermsRadio	displayPanel	Display Panel		
-2016-04-25	Voyant.panel.TermsRadio	displayPanelTip	Panel to control settings for word display.		
-2016-04-25	Voyant.panel.TermsRadio	duration	Speed		
-2016-04-25	Voyant.panel.TermsRadio	terms	Terms		
-2016-04-25	Voyant.panel.TermsRadio	fraction	Word Display		
-2016-04-25	Voyant.panel.TermsRadio	fractionTip	This option allows you to define the number of words displayed. Ex. 20 will only keep the words that occur with the lowest 20% of frequency.		
-2016-04-25	Voyant.panel.TermsRadio	reset	Reset		
-2016-04-25	Voyant.panel.TermsRadio	resetTip	Reset the visualization to the beginning.		
-2016-04-25	Voyant.panel.TermsRadio	speed	Speed		
-2016-04-25	Voyant.panel.TermsRadio	yScale	Y-axis Scale		
-2016-04-25	Voyant.panel.TermsRadio	linear	Linear		
-2016-04-25	Voyant.panel.TermsRadio	log	Logarithmic		
-2016-04-25	Voyant.panel.TermsRadio	removeTerm	Remove <b>{0}</b>		
-2016-04-25	Voyant.panel.TermsRadio	completingTransition	Completing transition.		
-2016-04-25	Voyant.panel.TermsRadio	termNotFound	Term not found.		
-2016-04-25	Voyant.panel.Trends	title	Trends		
-2016-04-25	Voyant.panel.Trends	helpTip	<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>		
-2016-04-25	Voyant.panel.Trends	freqsMode	Frequencies		
-2016-04-25	Voyant.panel.Trends	freqsModeTip	Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).		
-2016-04-25	Voyant.panel.Trends	options	Options		
-2016-04-25	Voyant.panel.Trends	rawFrequencies	Raw Frequencies		
-2016-04-25	Voyant.panel.Trends	relativeFrequencies	Relative Frequencies		
-2016-04-25	Voyant.panel.Trends	raw	Raw		
-2016-04-25	Voyant.panel.Trends	relative	Relative		
-2016-04-25	Voyant.panel.Trends	segmentsSlider	Segments		
-2016-04-25	Voyant.panel.Trends	segments	Document Segments		
-2016-04-25	Voyant.panel.Trends	documents	Documents		
-2016-04-25	Voyant.panel.NoTool	title	No Such Tool		
-2016-04-25	Voyant.panel.NoTool	error	Error		
-2016-04-25	Voyant.panel.NoTool	currentButton	Use Current Version		
-2016-04-25	Voyant.panel.NoTool	oldButton	Use Old Version		
-2016-04-25	Voyant.panel.NoTool	noToolSpecified	No tool has been specified. You will be redirected to the main page of Voyant Tools.		
-2016-04-25	Voyant.panel.NoTool	badToolSpecified	The <i>{0}</i> tool doesn't exist. You will be redirected to the main page of Voyant Tools.		
-2016-04-25	Voyant.panel.NoTool	notImplemented	<p>The <i>{0}</i> tool existed in a previous version of Voyant Tools but has not been implemented in this version. Some tools may be reimplemented eventually while others are unlikely to be implemented because they were experimental, unuseful or dependent on technologies that are no longer supported (like Adobe Flash and Java Applets).</p><p>Please decide if you'd like to use the new version of Voyant or if you'd rather try using the <i>{0}</i> tool in the old version.</p>		
-2016-04-25	Voyant.panel.VoyantFooter	voyantTools	Voyant Tools		
-2016-04-25	Voyant.panel.VoyantFooter	voyantLink	<a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools</a>		
-2016-04-25	Voyant.panel.VoyantFooter	privacy	Privacy		
-2016-04-25	Voyant.panel.VoyantFooter	privacyMsg	The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see &lt;a href="http://www.google.ca/intl/en/policies/privacy/" target="_blank"&gt;Google's Privacy Policy&lt;/a&gt; and the &lt;em&gt;Log Information&lt;/em&gt; section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact &lt;a href="http://stefansinclair.name/contact/"&gt;Stéfan Sinclair&lt;/a&gt;.		
-2016-04-25	Voyant.panel.VoyantHeader	title	Voyant Tools		
-2016-04-25	Voyant.panel.VoyantHeader	helpTip	Voyant Tools is a web-based reading and analysis environment for digital texts.		
-2016-04-25	Voyant.panel.VoyantHeader	home	Start Over		
-2016-04-25	Voyant.panel.VoyantHeader	homeTip	Click to start over from the corpus creation screen.		
-2016-04-25	Voyant.panel.VoyantHeader	homeConfirm	Are you sure you want to start over (and leave the current corpus)?		
-2016-04-25	Voyant.panel.CorpusSet	title	Corpus View		
-2016-04-25	Voyant.panel.CorpusSet	helpTip	This is the default, general-purpose corpus view.		
-2016-04-25	Voyant.panel.ScatterSet	title	Scatter		
-2016-04-25	Voyant.panel.ScatterSet	helpTip	This is a specialized view for working with scatterplots.		
-2016-04-25	Voyant.panel.Subset	title	Workset Builder		
-2016-04-25	Voyant.panel.Subset	titleLabel	Titles		
-2016-04-25	Voyant.panel.Subset	authorLabel	Authors		
-2016-04-25	Voyant.panel.Subset	lexicalLabel	Full-text		
-2016-04-25	Voyant.panel.Subset	publisherLabel	Publishers		
-2016-04-25	Voyant.panel.Subset	sendToVoyantButton	New Voyant Corpus		
-2016-04-25	Voyant.panel.Subset	downloadButton	Download Zip Archive		
-2016-04-25	Voyant.panel.Subset	sendToVoyantNoQuery	There's currently no query specified, but you can <a href="{0}" target="_blank">open the current corpus in a new window</a>.		
-2016-04-25	Voyant.panel.Subset	noMatches	The current query criteria don't match any documents, please modifying the search first.		
-2016-04-25	Voyant.panel.CollocatesSet	title	Scatter		
-2016-04-25	Voyant.panel.CollocatesSet	helpTip	This is a specialized view for working with scatterplots.		
-2016-04-25	Voyant.panel.BubblelinesSet	title	Bubblelines Skin		
-2016-04-25	Voyant.panel.BubblelinesSet	helpTip	This is a specialized view for working with Bubblelines.		
-2016-04-25	Voyant.panel.CustomSet	title	Custom View		
-2016-04-25	Voyant.panel.CustomSet	helpTip	This is a custom view.		
-2016-04-25	Voyant.panel.CustomSet	noSuchTool	The specified tool ({0}) does not exist.		
-2016-04-25	Voyant.panel.WordTree	title	WordTree		
-2016-04-25	Voyant.VoyantApp	error	Error		
-2016-04-25	Voyant.VoyantApp	serverResponseError	The server error reponse:		
-2016-04-25	Voyant.VoyantCorpusApp	fetchingCorpus	Fetching your corpus		
-2016-04-25	Voyant.VoyantCorpusApp	moreToolsScale	Tools by Scale		
-2016-04-25	Voyant.VoyantCorpusApp	moreToolsScaleCorpus	Corpus Tools		
-2016-04-25	Voyant.VoyantCorpusApp	moreToolsScaleDocument	Document Tools		
-2016-04-25	Voyant.VoyantCorpusApp	moreToolsType	Tools by Type		
-2016-04-25	Voyant.VoyantCorpusApp	moreToolsTypeViz	Visualization Tools		
-2016-04-25	Voyant.VoyantCorpusApp	moreToolsTypeGrid	Grid Tools		
-2016-04-25	Voyant.VoyantCorpusApp	moreToolsTypeOther	Other Tools		
-2016-04-25	Voyant.VoyantCorpusApp	passwordRequiredTitle	Access Code Required		
-2016-04-25	Voyant.VoyantCorpusApp	passwordRequiredMessage	This corpus requires an access code.		
-2016-04-25	Voyant.VoyantCorpusApp	nonConsumptiveMessage	Alternatively, you can click on the <i>Limited Access</i> button to continue with limited functionality (generally speaking, this non-consumpive access allows you to explore derivative data from the corpus without allowing you to read text from the corpus).		
-2016-04-25	Voyant.VoyantCorpusApp	nonConsumptiveButton	Limited Access		
-2016-04-25	Voyant.VoyantCorpusApp	passwordValidateButton	Validate		
-2016-04-25	Voyant.VoyantCorpusApp	password	access code		
-2016-04-25	Voyant.VoyantCorpusApp	noPasswordGiven	Please provide an access code.		
-2016-04-25	Voyant.VoyantCorpusApp	badPassword	Sorry, that doesn't seem to be a valid access code.		
-2016-04-25	Voyant.VoyantCorpusApp	passwordValidationError	Sorry, an unexpected error occurred while trying to validate your access code.		
-2016-04-25	Voyant.VoyantDefaultApp	noViewErrorTitle	View Error		
-2016-04-25	Voyant.VoyantDefaultApp	noViewErrorTpl	No view was found with the name "<i>{view}</i>". The default view will be used instead.		
-2016-04-25	Voyant.VoyantDefaultApp	noViewKnownErrorTpl	The selected view ({view}) has not been migrated from the previous version of Voyant (and probably won't be). {additional} The default view will be used instead.		
-2016-04-25	Voyant.VoyantDefaultApp	convertSkinMsg	The convert skin was used for document exporting and that functionality is now available from the Documents tool.		
-2016-04-25	Voyant.VoyantDefaultApp	voyantIs	<p style="text-align: center; font-style: italic;">Voyant Tools is a web-based reading and analysis environment for digital texts – please visit <a href="http://hermeneuti.ca/" target="_blank">Hermeneuti.ca</a> for more information..</p>		
-2016-04-25	Voyant.VoyantDefaultApp	helpTip	Voyant Tools is a web-based reading and analysis environment for digital texts.<p></p>		
+Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Croatian (hr)	Serbian (sr)	Bosnian (bs)	Japanese (ja)	Hebrew ()	Czech (cz)													
+2016-04-25	Voyant.VoyantApp	translatedBy	English translation by your names here.	Traduction française de Stéfan Sinclair			Téa Rokolj	Téa Rokolj	Téa Rokolj		(Sinai Rusinek) סיני רוסינק	Radim Hladík													
+2016-04-25	Voyant.util.DetailedError	error	Error	Erreur			Greška	Грешка	Greška	エラー	טעות	Chyba													Chyba
+2016-04-25	Voyant.util.Toolable	maximizeTip	Open this tool in a new window	Ouvrir cet outil dans une autre fenêtre.			Otvorite ovu alatku u novom prozoru	Oтворитe ову алатку у новом прозору	Otvorite ovu alatku u novom prozoru	新しいウインドウでこのツールを開く	פתיחה בחלון נפרד	Otevřít tento nástroj v novém okně													Otevřít tento nástroj v novém okně
+2016-04-25	Voyant.util.Toolable	plusTip	Click to choose another tool for this panel location (this will replace the current tool).				Kliknite za odabir druge alatke unutar ovog panela	Kликните да изаберете другу алатку унутар овог панела	Kliknite da izaberete drugu alatku unutar ovog panela		לפתיחת כלי אחר במיקום זה (הכלי יחליף את זה הנוכחי)	Klikněte zde pro volbu jiného nástroje v tomto umístění panelu (aktuální nástroj bude nahrazen)													
+2016-04-25	Voyant.util.Toolable	saveTip	Export a URL, an embeddable tool, data or a bibliographic reference.				Eksportirajte URL, alatku, podatak ili bibliografsku referencu	Експортујте URL, алатку, податак или библиографску референцу	Eksportirajte URL, alatku, podatak ili bibliografsku referencu		ייצא URL, כלי להטמעה, דאטה או הפנייה ביבליוגרפית	Export URL, vložitelného nástroje, dat nebo bibliografického odkazu.													
+2016-04-25	Voyant.util.Toolable	gearTip	Define options for this tool.				Definirajte opcije	Дефинишите опције	Definišite opcije		הגדרת אפשרויות לכלי זה	Definovat možnosti pro tento nástroj.													
+2016-04-25	Voyant.util.Toolable	helpTip	No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.				Trenutačno ne postoje specifičnije upute. Kliknite na slijedecu ikonu za posjet <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> web stranici.	Тренутно не постоје специфичније упуте. Кликните на следећy иконy да посетите <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> web страницу.	Trenutno ne postoje specifičnije upute. Kliknite na slijedecu ikonu za posjet <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> web stranici.			V současnosti není dostupná žádná specifická nápověda pro zvolený nástroj. Klikněte na tuto ikonu pro navštívení stránky <a href="http://docs.voyant-tools.org/" target="_blank">Dokumentace Voyant Tools</a>.													
+2016-04-25	Voyant.util.Toolable	moreHelp	More help…				Opširnije upute...	Опширније упуте…	Opširnije upute…		עזרה נוספת	Další nápověda…													
+2016-04-25	Voyant.util.Toolable	exportTitle	Export				Eksport	Експорт	Eksport		ייצוא	Export													
+2016-04-25	Voyant.util.Toolable	exportViewUrl	a URL for this view (tools and data)				URL za ovaj prikaz	URL за овај приказ	URL za ovaj prikaz		URL לתצוגה זו (כלים ודאטה)	odkaz URL pro toto zobrazení (nástroje a data)													
+2016-04-25	Voyant.util.Toolable	exportViewFieldset	Export View (Tools and Data)				Eksport prikaza	Експорт приказа	Eksport prikaza		תצוגת ייצוא (כלים ודאטה)	Export zobrazení (Nástroje a Data)													
+2016-04-25	Voyant.util.Toolable	exportViewHtmlEmbed	an HTML snippet for embedding this view in another web page				HTML isječak za ugradnju unutar druge web stranice	HTML фрагмент за уградњу унутар друге web странице	HTML isječak za ugradnju unutar druge web stranice			fragment HTML kódu pro vložení tohoto zobrazení do jiné webové stránky													
+2016-04-25	Voyant.util.Toolable	exportViewEmbedTitle	Embed HTML Snippet				Ugradite HTML isječak	Уградите HTML фрагмент	Ugradite HTML isječak			Vlož fragment HTML kódu													
+2016-04-25	Voyant.util.Toolable	exportViewEmbedMessage	You can copy and paste the HTML snippet from the box below into another web page. Note that some content management systems (like WordPress) may need a special plugin to handle &lt;iframe&gt; tags.				HTML isječak u donjem okviru možete prekopirati na drugu web stranicu	HTML фрагмент у доњем оквиру мозете да прекопирате на другу web страницу	HTML isječak u donjem okviru možete prekopirati na drugu web stranicu			Fragment HTML kódu z níže uvedeného rámečku můžete zkopírovat a vložit do jiné webové stránky. Pamatujte, že některé systémy pro správu obsahu (např. WordPress) mohou vyžadovat zvláštní plugin pro zacházení s &lt;iframe&gt; značkami.													
+2016-04-25	Voyant.util.Toolable	exportBiblioTitle	Export Bibliographic Reference				Eksportirajte bibliografsku referencu	Експортујте библиографску референцу	Eksportirajte bibliografsku referencu		ייצוא הפניה ביבליוגרפית	Export bibliografického odkazu													
+2016-04-25	Voyant.util.Toolable	exportViewBiblio	a bibliographic reference for this view				Bibliografska referenca za ovaj prikaz	Библиографска референца за овај приказ	Bibliografska referenca za ovaj prikaz		הפניה ביבליוגרפית לתצוגה זו	bibliografický odkaz pro toto zobrazení													
+2016-04-25	Voyant.util.Toolable	exportGridCurrent	Export Current Data				Eksportirajte trenutne podatake	Експортујте тренутне податке	Eksport trenutnih podataka		ייצא דאטה נוכחי	Export aktuálních dat													
+2016-04-25	Voyant.util.Toolable	exportGridCurrentHtml	export current data as HTML				Eksportirajte trenutne podatake u HTML	Експортујте тренутне податке у HTML	Eksport trenutnih podataka u HTML 		ייצא דאטה נוכחי כ-HTML	export aktuálních dat v HTML													
+2016-04-25	Voyant.util.Toolable	exportGridCurrentJson	export current data as JSON				Eksportirajte trenutne podatake u JSON	Експортујте тренутне податке у JSON	Eksport trenutnih podataka u JSON 		ייצא דאטה נוכחי כ-JSON	export aktuálních dat v JSON													
+2016-04-25	Voyant.util.Toolable	exportGridCurrentTsv	export current data as tab separated values (text)				Eksportirajte trenutne podatake kao vrijednosti razdvojene tabulatorom	Експортујте тренутне податке као вредности раздојене табулатором	Eksportirajte trenutne podatake kao vrijednosti razdvojene tabulatorom			export aktuálních dat v textovém souboru s hodnotami oddělenými tabulátory													
+2016-04-25	Voyant.util.Toolable	export	Export				Eksport	Експорт	Eksport		ייצוא	Export													
+2016-04-25	Voyant.util.Toolable	reset	Reset				Resetiranje	Ресетовање	Resetiranje		איפוס	Obnovení													
+2016-04-25	Voyant.util.Toolable	optionsTitle	Options				Opcije	Oпције	Opcije		אפשרויות	Možnosti													
+2016-04-25	Voyant.util.Toolable	confirmTitle	Confirm				Potvrdite izbor	Потврдите избор	Potvrdite izbor		אישור	Potvrdit													
+2016-04-25	Voyant.util.Toolable	cancelTitle	Cancel				Poništite izbor	Поништите избор	Poništite izbor		ביטול	Zrušit													
+2016-04-25	Voyant.util.Toolable	exportError	Export Error				Greška pri eksportu	Грешка при експорту	Greška pri eksportu		טעות בייצוא	Chyba exportu													
+2016-04-25	Voyant.util.Toolable	exportNoFunction	An export function has been defined by is not availble.				Definirana eksport funkcija nije raspoloživa	Дефинисана експорт функција није расположива	Definisana eksport funkcija nije raspoloživa																
+2016-04-25	Voyant.util.Toolable	exportDataHtmlMessage	Copy the data below, they can be pasted into an HTML page or used as XML.				Podaci u dnu se mogu prekopirati na HTML stranicu ili koristiti kao XML	Подаци у дну могу да се прекопирају на HTML страницу или користе као XML	Podaci u dnu se mogu prekopirati na HTML stranicu ili koristiti kao XML			Zkopírovat níže uvedená data, lze je vložit do HTML stránky nebo použít jako XML													
+2016-04-25	Voyant.util.Toolable	exportDataTsvMessage	Copy data below, they can be pasted into a spreadsheet or text file.				Podaci u dnu se mogu prekopirati u proračunske tablice ili tekstualnu datoteku	Подаци у дну могу да се прекопирају y прорачунске таблице или текстуалну датотеку	Podaci u dnu se mogu prekopirati u proračunske tablice ili tekstualnu datoteku			Zkopírovat níže uvedená data, lze je vložit do tabulky nebo textového souboru.													
+2016-04-25	Voyant.util.Toolable	exportDataJsonMessage	Copy the data below, they can be used in other web-based applications.				Podaci u dnu se mogu koristiti u drugim web aplikacijama	Подаци у дну могу да се користе y другим web апликацијама	Podaci u dnu se mogu koristiti u drugim web aplikacijama			Zkopírovat níže uvedená data, lze je použít v jiných webových aplikacích.													
+2016-04-25	Voyant.util.Toolable	exportPng	export a PNG image of this visualization				Eksportirajte ovu vizualizaciju u PNG formatu	Експортујте ову визуализацијy у PNG формату	Eksportirajte ovu vizualizaciju u PNG formatu			export této vizualizace jako PNG obrázku													
+2016-04-25	Voyant.util.Toolable	exportDataTitle	Export Data				Eksportirajte podatke	Експортујте податке	Eksportirajte podatke		ייצוא דאטה	Exportovat Data													
+2016-04-25	Voyant.util.Toolable	exportVizTitle	Export Visualization				Eksportirajte vizualizaciju	Експортујте визуализацијy	Eksportirajte vizualizaciju			Exportovat Vizualizaci													
+2016-04-25	Voyant.util.Toolable	exportPngTitle	Export PNG				Eksportirajte PNG	Експортујте PNG	Eksportirajte PNG			Exportovat PNG													
+2016-04-25	Voyant.util.Toolable	exportSvg	export the SVG of this visualization				Eksportirajte ovu vizualizaciju u SVG formatu	Експортујте ову визуализацијy у SVG формату	Eksportirajte ovu vizualizaciju u SVG formatu			export této vizualizace v SVG formátu													
+2016-04-25	Voyant.util.Toolable	exportPngMessage	<p>This is a thumbnail of the PNG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the HTML code below.</p>				Ovo je umanjeni prikaz PNG slike; kliknite na desnu tipku miša ili CTRL+Click na sliku da biste je snimili u punoj veličini na tvrdi disk. Alternativno, prekopirajte HTML kôd ispod.	Ово је умањени приказ PNG слике; кликните на десну типку миша или CTRL+Click на слику да је снимите у пуној величини на тврди диск. Алтернативно, прекопирајте HTML кôд испод.	Ovo je umanjeni prikaz PNG slike; kliknite na desnu tipku miša ili CTRL+Click na sliku da biste je snimili u punoj veličini na tvrdi disk. Alternativno, prekopirajte HTML kôd ispod.			<p>Toto je náhled PNG obrázku. Pro uložení origináu v plné velikosti na pevný disk klikněte na obrázek pravým tlačítkem myši nebo na něj klikněte při současném stisknutí klávesy ctrl .</p><p>Můžete také zkopírovat níže uvedený HTML kód.</p>													
+2016-04-25	Voyant.util.Toolable	exportSvgTitle	Export SVG				Eksportirajte SVG	Експортујте SVG	Eksportirajte SVG			Exportovat SVG													
+2016-04-25	Voyant.util.Toolable	exportSvgMessage	<p>This is a thumbnail of the SVG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the SVG code below.</p>				Ovo je umanjeni prikaz SVG slike; kliknite na desnu tipku miša ili CTRL+Click na sliku da biste je snimili u punoj veličini na tvrdi disk. Alternativno, prekopirajte HTML kôd ispod.	Ово је умањени приказ SVG слике; кликните на десну типку миша или CTRL+Click на слику да је снимите у пуној величини на тврди диск. Алтернативно, прекопирајте HTML кôд испод.	Ovo je umanjeni prikaz SVG slike; kliknite na desnu tipku miša ili CTRL+Click na sliku da biste je snimili u punoj veličini na tvrdi disk. Alternativno, prekopirajte HTML kôd ispod.			<p>Toto je náhled SVG obrázku. Pro uložení origináu v plné velikosti na pevný disk klikněte na obrázek pravým tlačítkem myši nebo na něj klikněte při současném stisknutí klávesy ctrl .</p><p>Můžete také zkopírovat níže uvedený SVG kód.</p>													
+2016-04-25	Voyant.util.Downloadable	exportTitle	Export				Eksport	Експорт	Eksport		ייצוא	Exportovat													
+2016-04-25	Voyant.util.Downloadable	downloadButton	Download				Preuzimanje	Преузимање	Preuzimanje		הורדה	Stáhnout													
+2016-04-25	Voyant.util.Downloadable	cancelButton	Cancel				Poništite izbor	Поништите избор	Poništite izbor		ביטול	Zrušit													
+2016-04-25	Voyant.data.model.Corpus	failedCreateCorpus	Failed attempt to create a Corpus.				Neuspjeli pokušaj stvaranja korpusa	Неуспешан покушај стварања корпуса	Neuspješan pokušaj stvaranja korpusa		נסיון כושל ליצירת קורפוס	Pokus vytvořit korpus se nezdařil.													
+2016-04-25	Voyant.data.model.Corpus	thisCorpus	This corpus				Ovaj korpus	Овај корпус	Ovaj korpus		קורפוס זה	Tento korpus													
+2016-04-25	Voyant.data.model.Corpus	isEmpty	is empty				je prazan	је празан	je prazan		ריק	je prázdný													
+2016-04-25	Voyant.data.model.Corpus	hasNdocuments	has {count} documents				sadrži {} dokumenata	садржи {} докумената	sadrži {} dokumenata		כולל {} מסמכים	obsahuje {0} dokumentů													
+2016-04-25	Voyant.data.model.Corpus	has1document	has 1 document				sadrži 1 dokument	садржи 1 документ	sadrži 1 dokument		כולל מסמך אחד	obsahuje 1 dokument													
+2016-04-25	Voyant.data.model.Corpus	widthNwordsAndNTypes	with {words} <span class="info-tip" data-qtip="every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted">total words</span> and {types} <span class="info-tip" data-qtip="multiple occurrences of words (like &quot;the&quot;) are counted once">unique word forms</span>									s použitím {words} <span class="info-tip" data-qtip="se počítá každý výskyt každého slova (jako např. vícenásobné výskyty slova &quot;tento&quot;)">celkem slov</span> a {types} <span class="info-tip" data-qtip="vícenásobné výskyty slov (jako např. &quot;tento&quot;) jsou počítány jen jednou">unikátní slovní formy</span>													
+2016-04-25	Voyant.data.model.Corpus	yearAgo	about a year ago				otprilike prije godinu dana	отприлике пре годину дана	otprilike prije godinu dana		לפני כשנה	asi před rokem													
+2016-04-25	Voyant.data.model.Corpus	yearsAgo	about {count} years ago				otprilike prije {} godin-e/a/u	отприлике пре {} годин-e/а/у	otprilike prije {} godin-e/a/u		לפני כ-{} שנים	asi před {count} lety													
+2016-04-25	Voyant.data.model.Corpus	monthAgo	about a month ago				otprilike prije mjesec dana	отприлике пре месец дана	otprilike prije mjesec dana		לפני כחודש	asi před měsícem													
+2016-04-25	Voyant.data.model.Corpus	monthsAgo	about {count} months ago				otprilike prije {} mjesec-a/i	отприлике пре {} месец-а/и	otprilike prije {} mjesec-a/i		לפני כ-{} חודשים	asi před {count} měsíci													
+2016-04-25	Voyant.data.model.Corpus	dayAgo	about a day ago				otprilike prije jednog dana	отприлике пре једног дана	otprilike prije jednog dana		לפני כיום	asi před jedním dnem													
+2016-04-25	Voyant.data.model.Corpus	daysAgo	about {count} days ago				otprilike prije {} dana	отприлике пре {} дана	otprilike prije {} dana		לפני כ-{} ימים	asi před {count} dny													
+2016-04-25	Voyant.data.model.Corpus	hourAgo	about an hour ago				otprilike prije sat vremena	отприлике пре сат времена	otprilike prije sat vremena		לפני כשעה	asi před hodinou													
+2016-04-25	Voyant.data.model.Corpus	hoursAgo	about {count} hours ago				otprilike prije {} sat-a/i	отприлике пре {} сат-a/и	otprilike prije {} sat-a/i		לפני כ-{} ימים	asi před {count} hodinami													
+2016-04-25	Voyant.data.model.Corpus	minuteAgo	about a minute ago				otprilike prije jedne minute	отприлике пре једне минуте	otprilike prije jedne minute		לפני כדקה	asi před minutou													
+2016-04-25	Voyant.data.model.Corpus	minutesAgo	about {count} minutes ago				otprilike prije {} minut-e/i	отприлике пре {} минут-е/и	otprilike prije {} minut-e/i		לפני כ-{} דקות	asi před {count} minutami													
+2016-04-25	Voyant.data.model.Corpus	secondAgo	about a second ago				otprilike prije jedne sekunde	отприлике пре једне секунде	otprilike prije jedne sekunde		לפני כשנייה	asi před vteřinou													
+2016-04-25	Voyant.data.model.Corpus	secondsAgo	{count} seconds ago				prije {} sekund-e/i	пре {} секунд-е/и	prije {} sekund-e/i		לפני כ-{} שניות	asi před {count} vteřinami													
+2016-04-25	Voyant.data.model.Corpus	now	now				sada	сада	sada		כעת	nyní													
+2016-04-25	Voyant.widget.StopListOption	label	Stopwords:				Prazne riječi:	Празне речи:	Prazne riječi:			Stop slova:													
+2016-04-25	Voyant.widget.StopListOption	editList	Edit List								עריכת רשימה	Editace seznamu													
+2016-04-25	Voyant.widget.StopListOption	noEditAutoTitle	Edit Stoplist Error								טעות בעריכת הרשימה	Chyba editace seznamu stop slov													
+2016-04-25	Voyant.widget.StopListOption	noEditAutoMessage	The auto-detected stoplist cannot be edited, please select a specifc stoplist such as the "New User-Defined List".									Automaticky detekovaný seznam stop slov nelze editovat, zvolte prosím specifický seznam stop slov, jako např. "Nový uživatelský seznam".													
+2016-04-25	Voyant.widget.StopListOption	auto	Auto-detect									Automatická detekce													
+2016-04-25	Voyant.widget.StopListOption	none	None								ללא	Žádný													
+2016-04-25	Voyant.widget.StopListOption	new	New User-Defined List								רשימה מוגדרת על ידי המשתמש/ת	Nový uživatelský seznam													
+2016-04-25	Voyant.widget.StopListOption	ar	Arabic				arapski	арапски	arapski		ערבית	arabština													
+2016-04-25	Voyant.widget.StopListOption	bg	Bulgarian				bugarski	бугарски	bugarski		בולגרית	bulharština													
+2016-04-25	Voyant.widget.StopListOption	br	Breton				bretonski	бретонски	bretonski			bretonština													
+2016-04-25	Voyant.widget.StopListOption	ca	Catalan				katalonski	каталонски	katalonski		קטלנית	katalánština													
+2016-04-25	Voyant.widget.StopListOption	ckb	Kurdish				kurdski	курдски	kurdski		כורדית	kurdština													
+2016-04-25	Voyant.widget.StopListOption	cn	Chinese				kineski	кинески	kineski		סינית	čínština													
+2016-04-25	Voyant.widget.StopListOption	cz	Czech				češki	чешки	češki		צ'כית	čeština													
+2016-04-25	Voyant.widget.StopListOption	de	German				njemački	немачки	njemački		גרמנית	němčina													
+2016-04-25	Voyant.widget.StopListOption	el	Greek				grčki	грчки	grčki		יוונית	řečtina													
+2016-04-25	Voyant.widget.StopListOption	en	English				engleski	енглески	engleski		אנגלית	angličtina													
+2016-04-25	Voyant.widget.StopListOption	es	Spanish				španjolski	шпански	španski		ספרדית	španělština													
+2016-04-25	Voyant.widget.StopListOption	eu	Basque				baskijski	баскијски	baskijski		בסקית	baskičtina													
+2016-04-25	Voyant.widget.StopListOption	fa	Farsi				perzijski	персијски	perzijski		פרסית	fársí													
+2016-04-25	Voyant.widget.StopListOption	fr	French				francuski	француски	francuski		צרפתית	francouzština													
+2016-04-25	Voyant.widget.StopListOption	ga	Irish				irski	ирски	irski		אירית	irština													
+2016-04-25	Voyant.widget.StopListOption	gl	Galician				galicijski	галисијски	galicijski			galicijština													
+2016-04-25	Voyant.widget.StopListOption	hi	Hindi				hindski	хинди	hindski		הינדי	hindī													
+2016-04-25	Voyant.widget.StopListOption	hu	Hungarian				madžarski	мађарски	mađarski		הונגרית	maďarština													
+2016-04-25	Voyant.widget.StopListOption	hy	Armenian				jermenski	јерменски	jermenski		ארמנית	arménština													
+2016-04-25	Voyant.widget.StopListOption	id	Indonesian				indonezijski	индонежански	indonezijski		אינדונזית	indonéština													
+2016-04-25	Voyant.widget.StopListOption	it	Italian				talijanski	италијански	italijanski		איטלקית	italština													
+2016-04-25	Voyant.widget.StopListOption	ja	Japanese				japanski	јапански	japanski		יפנית	japonština													
+2016-04-25	Voyant.widget.StopListOption	lt	Latvian				letonski	летонски	letonski		לטבית	lotyština													
+2016-04-25	Voyant.widget.StopListOption	lv	Lithuanian				litvanski	литвански	litvanski		ליטאית	litevština													
+2016-04-25	Voyant.widget.StopListOption	mu	Multilingual				višejezični	вишејезични	višejezični		רב-לשוני	vícejazyčná													
+2016-04-25	Voyant.widget.StopListOption	nl	Dutch				nizozemski	холандски	holandski		הולנדית	holandština													
+2016-04-25	Voyant.widget.StopListOption	no	Norwegian				norveški	норвешки	norveški		נורבגית	norština													
+2016-04-25	Voyant.widget.StopListOption	ro	Romanian				rumunjski	румунски	rumunski		רומנית	rumunština													
+2016-04-25	Voyant.widget.StopListOption	se	Swedish				švedski	шведски	švedski		שבדית	švédština													
+2016-04-25	Voyant.widget.StopListOption	th	Thai				tajski	тајландски	tajlandski			thajština													
+2016-04-25	Voyant.widget.StopListOption	tr	Turkish				turski	турски	turski		טורקית	turečtina													
+2016-04-25	Voyant.widget.StopListOption	ok	Save								שמירה	Uložit													
+2016-04-25	Voyant.widget.StopListOption	cancel	Cancel								ביטול	Zrušit													
+2016-04-25	Voyant.widget.StopListOption	editStopListTitle	Edit Stoplist									Editace seznamu stop slov													
+2016-04-25	Voyant.widget.StopListOption	editStopListMessage	This is the stoplist, one term per line.									Toto je seznam stop slov s jedním termínem na řádek.													
+2016-04-25	Voyant.widget.StopListOption	applyGlobally	apply globally								החלה כוללת	použít globálně													
+2016-04-25	Voyant.widget.QuerySearchField	querySearch	Search								חיפוש	Vyhledávání													
+2016-04-25	Voyant.widget.QuerySearchField	querySearchTip	<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>"winter coat"</b>: <i>winter coat</i> as a phrase</li><li><b>"coat mittens"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,"coat mittens"~5</b>: combine syntaxes</li></ul>									<div>Syntax vyhledávání (stisknutím klávesy enter/return zahájíte vyhledávání):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^kabátt*</b>: vyhledat termíny začínající na <i>kabát</i> jako samostatné termíny (kabát, kabáty, atd.)</li><li><b>kabát,bunda</b>: vyhledat termíny oddělené čárkami jako samostatné termíny</li><li><b>kabátt|bunda</b>: vyhledat termíny oddělené svislou čárou jako jeden termín</li><li><b>"zimní kabát"</b>: <i>zimní kabát</i>jako frázi</li><li><b>"kabát rukavice"~5</b>: <i>kabát</i> v blízkosti <i>rukavice</i> (v okolí 5 slov)</li><li><b>^kabát*,bunda|parka,"kabát rukavice"~5</b>: kombinovaná syntax</li></ul>													
+2016-04-25	Voyant.widget.QuerySearchField	querySearchDocsModeTip	<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>"winter coat"</b>: <i>winter coat</i> as a phrase</li><li><b>"coat mittens"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+"winter coat" +mitten*</b>: combine syntaxes</li></ul>									<div>Syntax pro vyhledávání v dokumentech  (p(stisknutím klávesy enter/return zahájíte vyhledávání):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>kabát</b>: vyhledat přesné znění<i>kabát</i></li><li><b>kabát*</b>: vyhledat termíny začínající na <i>kabát</i></li><li><b>kabát,bunda</b>: vyhledat termíny oddělené čárkami jako samostatné termíny</li><li><b>"zimní kabát"</b>: <i>zimní kabát</i> jako sousloví</li><li><b>"kabát rukavice"~5</b>: <i>kabát</i> v blízskosti <i>rukavice</i> (v okolí 5 slov)</li><li><b>+zimní +kabát</b>: vyhledat každý termín, kterému předchází plus (+)</li><li><b>+"zimní kabát" +rukavice*</b>: kombinovaná syntax</li></ul>													
+2016-04-25	Voyant.widget.QuerySearchField	aggregateInDocumentsCount	This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms).										Toto je počet dokumentů vyhovujících kritériím vyhledávání (každý započtený dokument obsahuje aspoň jeden vyhledávaný termín).												
+2016-04-25	Voyant.widget.TotalPropertyStatus	totalPropertyStatus	{count:number("0,000")}										{count:number("0,000")}												
+2016-04-25	Voyant.widget.DocumentSelector	documents	Documents								מסמכים		Dokumenty												
+2016-04-25	Voyant.widget.DocumentSelector	selectAll	All								הכל		Vše												
+2016-04-25	Voyant.widget.DocumentSelector	selectNone	None								ללא		Žádný												
+2016-04-25	Voyant.widget.DocumentSelector	ok	Ok								אישור		Ok												
+2016-04-25	Voyant.widget.DocumentSelector	cancel	Cancel								ביטול		Zrušit												
+2016-04-25	Voyant.widget.DocumentSelector	all	all								הכל		vše												
+2016-04-25	Voyant.widget.CorpusDocumentSelector	corpus	Corpus								קורפוס		Korpus												
+2016-04-25	Voyant.widget.CorpusDocumentSelector	scale	Scale										Měřítko												
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	fieldLabel	Filenames								שמות הקבצים		Názvy souborů												
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	titleLabel	title								כותרת		název												
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	authorLabel	author								מחבר		autor												
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	pubDateLabel	date								תאריך		datum												
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	enabledLabel	include: 								כולל:		zahrnout:												
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	availableLabel	exclude: 								לא כולל:		vyloučit:												
+2016-04-25	Voyant.widget.DownloadFileFormat	fieldLabel	File Format										Formát souboru												
+2016-04-25	Voyant.widget.DownloadFileFormat	voyantXml	Voyant XML								וויאנט XML		Voyant XML												
+2016-04-25	Voyant.widget.DownloadFileFormat	VOYANTTip	This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content.										Toto je normalizovaná verze obsahu: pokud jsou zdrojové dokumenty v XML, půjde především o původní obsah, zatímco pro většinu ostatních zdrojových dokumentů se bude jednat o prostý HTML obsah.												
+2016-04-25	Voyant.widget.DownloadFileFormat	SOURCETip	This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided.										Poskytnutí zdrojových dokumentů v jejich původních formátech. V některých případech to znamená, že  může být poskytnut jeden archiv (např. soubor ZIP).												
+2016-04-25	Voyant.widget.DownloadFileFormat	TXTTip	This will produce a plain text version of each document.										Vytvoření prosté textové verze každého dokumentu.												
+2016-04-25	Voyant.widget.DownloadFileFormat	original	original								מקורי		originál												
+2016-04-25	Voyant.widget.DownloadFileFormat	plainText	plain text										prostý text												
+2016-04-25	Voyant.widget.DownloadOptions	title	Download Options								אפשרויות הורדה		Možnosti stažení												
+2016-04-25	Voyant.panel.Panel	term	Term								מונח		Termín												
+2016-04-25	Voyant.panel.Panel	rawFreq	Count								מספר		Počet												
+2016-04-25	Voyant.panel.Panel	relativeFreq	Relative								יחסי		Relativní												
+2016-04-25	Voyant.panel.Panel	trend	Trend								מגמה		Trend												
+2016-04-25	Voyant.panel.Panel	colon	: 								:		: 												
+2016-04-25	Voyant.panel.Panel	loading	Loading								טוען		Nahrávání												
+2016-04-25	Voyant.panel.Panel	error	Error										Chyba												
+2016-04-25	Voyant.panel.Panel	info	Information								מידע		Informace												
+2016-04-25	Voyant.widget.Facet	emptyText	No values found.								לא נמצאו ערכים.		Nebyly nalezeny žádné hodnoty												
+2016-04-25	Voyant.panel.Bubblelines	title	Bubblelines										Bublinový graf												
+2016-04-25	Voyant.panel.Bubblelines	type	Visualization										Vizualizace												
+2016-04-25	Voyant.panel.Bubblelines	findTerm	Find Term								חיפוש מונח		Najdi termín												
+2016-04-25	Voyant.panel.Bubblelines	clearTerms	Clear								ניקוי		Vymazat												
+2016-04-25	Voyant.panel.Bubblelines	removeTerm	Remove Term								הסרת מונח		Odstranit termín												
+2016-04-25	Voyant.panel.Bubblelines	showTerm	Show Term								הצגת מונח		Ukázat termín												
+2016-04-25	Voyant.panel.Bubblelines	hideTerm	Hide Term								החבאת מונח		Schovej termín												
+2016-04-25	Voyant.panel.Bubblelines	granularity	Granularity										Granularita												
+2016-04-25	Voyant.panel.Bubblelines	separateLines	Separate Lines for Terms										Oddělené řádky pro termíny												
+2016-04-25	Voyant.panel.Bubblelines	total	Total								סך הכל		Celkem												
+2016-04-25	Voyant.panel.Bubblelines	corpusTooSmall	The provided corpus is too small for this tool.								הקורפוס קטן מדי עבור כלי זה.		Zadaný korpus je pro tento nástroj příliš malý.												
+2016-04-25	Voyant.panel.Bubblelines	help	Bubblelines visualizes the frequency and repetition of  a term's use in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal lengths. Each term is represented as a bubble, the size of the bubble indicates its frequency in the corresponding segment of text. The larger the bubble's radius the more frequently the term occurs.										Bubblelines (bublinový graf) vizualizuje frekvenci a opakování užití termínu v korpusu. Každý dokument v korpusu je reprezentován jako horizontální přímka a rozdělen do segmentů stejné délky. Každý termín je reprezentován jako bublina, přičemž velikost bubliny ukazuje frekvenci termínu v odpovídajícím úseku textu. Čím větší je průměr bubliny, tím častěji se termín vyskytuje.												
+2016-04-25	Voyant.panel.Bubblelines	adaptedFrom																							
+2016-04-25	Voyant.panel.Bubblelines	options	Options								אפשרויות		Možnosti												
+2016-04-25	Voyant.panel.Catalogue	title	Catalogue	Catalogue							קטלוג		Katalog												
+2016-04-25	Voyant.panel.Catalogue	helpTip	The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.	Le <i>catalogue</i> est une interface pour explorer le contenu de corpus plus larges à plusieurs documents, ainsi que pour la création de sous-ensembles de textes qui correspondent à certains critères de recherche. Le catalogue fonctionne un peu comme une base de données de bibliothèque ou d'un magain en ligne.									<p>Nástroj <i>Katalog</i> poskytuje rozhraní pro prozkoumání obsahu větších korpusů složených z více dokumentů. Rovněž umožňuje vytvářet podmnožiny (nebo pracovní sady) podle vyhledávacích kritérií. Funguje podobně jako knihovnická databáze nebo eshop v tom smyslu, že umožňuje filtrovat dokumenty.												
+2016-04-25	Voyant.panel.Catalogue	facet.authorTitle	Authors	Auteurs							מחברים		Autoři												
+2016-04-25	Voyant.panel.Catalogue	facet.languageTitle	Languages	Langues							שפות		Jazyky												
+2016-04-25	Voyant.panel.Catalogue	facet.titleTitle	Titles	Titres							כותרות		Názvy												
+2016-04-29	Voyant.panel.Catalogue	facet.collectionTitle	Collections	Collections																					
+2016-04-25	Voyant.panel.Catalogue	facet.keywordTitle	Keywords	Mots-clés							מילות מפתח		Klíčová slova												
+2016-04-25	Voyant.panel.Catalogue	facet.pubDateTitle	Publication Dates	Dates de publication							תאריכי פרסום		Data vydání												
+2016-04-25	Voyant.panel.Catalogue	facet.publisherTitle	Publishers	Maisons d'édition							מוציאים לאור		Vydavatelé												
+2016-04-25	Voyant.panel.Catalogue	facet.pubPlaceTitle	Publication Locations	Lieux de publication							מקומות הוצאה לאור		Místa vydání												
+2016-04-25	Voyant.panel.Catalogue	loadingSnippets	loading text snippets…	recherche de texte…									nahrávání textových fragmentů												
+2016-04-25	Voyant.panel.Catalogue	lexicalTitle	Terms	Termes							מונחים		Termíny												
+2016-04-25	Voyant.panel.Catalogue	noMatches	No matches (out of {0} documents).	Aucun résultat (dans {0} documents).								Nebyla nalezena žádná shoda (z {0} dokumentů).													
+2016-04-25	Voyant.panel.Catalogue	queryMatches	{0} matching documents (out of {1}).	{0} documents correspondants (sur {1})								Hledanému výrazu odpovídá celkem {0} dokumentů (z {1}).													
+2016-04-25	Voyant.panel.Catalogue	clickToOpenCorpus	Please <a href="{0}" target="_blank" class="link">click here</a> to access your new corpus (since popup windows are blocked).	Veuillez <a href="{0}" target="_blank" class="link">cliquer ici pour ouvrir votre corpus</a> (puisque les fenêtres surgissantes sont bloquées).								Prosím <a href="{0}" target="_blank" class="link">klikněte zde</a> pro přístup k vašemu novému korpusu (jelikož vyskakovací okna jsou blokována).													
+2016-04-25	Voyant.panel.Catalogue	export	Export	Exporter							ייצוא	Exportovat													
+2016-04-25	Voyant.panel.Catalogue	exportTip	Create a new Voyant corpus with the selected documents.	Créer un nouveau corpus Voyant à partir des documents correspondants.							יצירת קורפוס וויאנט חדש מן המסמכים שנבחרו	Vytvořit nový Voyant korpus z vybraných dokumentů.													
+2016-04-25	Voyant.panel.Catalogue	matchingDocuments	number of matching documents	nombre de documents correspondants							מספר המסמכים התואמים	počet dokumentů odpovídajících vyhledávacím kritériím													
+2016-04-25	Voyant.panel.Catalogue	rawFreqs	total occurrences (raw frequency)	occurrences								celkový výskyt (absolutní frekvence)													
+2016-04-25	Voyant.panel.Catalogue	exportInProgress	Preparing your corpus for export…	Préparation de votre corpus pour l'exportation…								Příprava vašeho korpusu pro exportt…													
+2016-04-25	Voyant.panel.Cirrus	title	Cirrus								ענן מילים	Cirrus													
+2016-04-25	Voyant.panel.Cirrus	helpTip	</p><p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document –&nbsp;this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>									</p><p>Cirrus poskytuje zobrazení slovních mraků (wordclouds) slov s nejvyšší frekvencí výskytu v korpusu nebo dokumentu –&nbsp;to zajišťuje snadný (i když reduktivní) přehled o obsahu. Funkce zahrnují:</p><ul><li>frekvence termínů se ukáže po najetí kurzorem na slova</li><li>kliknutím na termíny mohou být vytvořeny výsledky v dalších nástrojích, pokud jsou tyto zobrazeny</li></ul>													
+2016-04-25	Voyant.panel.Cirrus	visible	Show								הצגה	Ukázat													
+2016-04-25	Voyant.panel.Cirrus	maxTerms	Max terms								מקסימום מונחים	Maximum termínů													
+2016-04-25	Voyant.panel.Cirrus	options	Options								אפשרויות	Možnosti													
+2016-04-25	Voyant.panel.Cirrus	visibleTerms	Terms								מונחים	Termíny													
+2016-04-25	Voyant.panel.CollocatesGraph	title	Links								קישורים	Odkazy													
+2016-04-25	Voyant.panel.CollocatesGraph	helpTip	<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:</p><ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>									<p>Graf kolokátů ukazuje síťový graf termínu s vyšší frekvencí, které se objevují ve vzájemné blízkosti. Klíčová slova jsou vyobrazena modře a kolokáty (slova v blízkosti) oranžově. Funkce zahrnují:</p><ul><li>po najetí kurzoru na klíčová slova se ukáže jejich frekvence v korpusu</li><li>po najetí kurzoru na kolokáty se ukáže jejich frekvence v blízkosti (nikoliv jejich celková frekvence)</li><li>dvojitým kliknutím myši na kterékoliv slovo budou načteny další výsledky</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu lupy pro nápovědu syntaxe</li></ul>													
+2016-04-25	Voyant.panel.CollocatesGraph	clearTerms	Clear								ניקוי	Vymazat													
+2016-04-25	Voyant.panel.CollocatesGraph	releaseToRemove	Release to remove this term								שחרר/י להסרת מונח זה	Uvolněte pro odstranění tohoto termínu													
+2016-04-25	Voyant.panel.CollocatesGraph	cleaning	Cleaning								ניקוי	Čištění													
+2016-04-25	Voyant.panel.CollocatesGraph	context	Context								הקשר	Kontext													
+2016-04-25	Voyant.panel.Contexts	title	Contexts								הקשרים	Kontexty													
+2016-04-25	Voyant.panel.Contexts	emptyText	No matching results.								אין תוצאות תואמות	Vyhledávacím kritériím neodpovídají žádné výsledky.													
+2016-04-25	Voyant.panel.Contexts	document	Document								מסמך	Dokument													
+2016-04-25	Voyant.panel.Contexts	documentTip	The document of the occurrence.								מסמך ההיקרות	Dokument se zaznamenaným výskytem													
+2016-04-25	Voyant.panel.Contexts	helpTip	The Keywords in Context tool shows each occurrence of a keyword with a bit of surounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:<p></p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>									Nástroj Kíčová slova v kontextu ukazuje každý výskyt slova s malým množstvím okolního textu (kontext). Lze jej využít pro bližší výzkum toho, jak jsou termíny používány v ruzných kontextech. Funkce zahrnují:<p></p><ul><li>změna uspořádání dokumentu podle klíčového slova, nebo podle pravého, či levého kontextu</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud chcete získat nápovědu k syntaxi)</li></ul>													
+2016-04-25	Voyant.panel.Contexts	termTip	The keyword for the context.								מילת המפתח להקשר.	Klíčové slovo pro kontext													
+2016-04-25	Voyant.panel.Contexts	left	Left								שמאל	Vlevo													
+2016-04-25	Voyant.panel.Contexts	leftTip	Context to the left of the keyword.								הקשר משמאל למילת המפתח	Kontext nalevo od klíčového slova													
+2016-04-25	Voyant.panel.Contexts	right	Right								ימין	Vpravo													
+2016-04-25	Voyant.panel.Contexts	rightTip	Context to the right of the keyword.								הקשר מימין למילת המפתח	Kontext napravo od klíčového slova													
+2016-04-25	Voyant.panel.Contexts	position	Position								מיקום	Pozice													
+2016-04-25	Voyant.panel.Contexts	positionTip	The position of the keyword within the document.								מיקום מילת המפתח במסמך	Pozice klíčového slova v dokumentu													
+2016-04-25	Voyant.panel.Contexts	context	context								הקשר	kontext													
+2016-04-25	Voyant.panel.Contexts	expand	expand								הרחבה	rozšířit													
+2016-04-25	Voyant.panel.Contexts	corpus	corpus								קורפוס	korpus													
+2016-04-25	Voyant.panel.Contexts	corpusTip	Reset to corpus mode (contexts from all documents).								איפוס למצב קורפוס (הקשרים מכלל המסמכים)	Obnovit v režimu korpusu (kontexty ze všech dokumentů).													
+2016-04-25	Voyant.panel.Contexts	limitedAccess	This is a limited access corpus and this tool's functionality is restricted.									Toto je korpus s omezeným přístupem a funkčnost tohoto nástroje je omezena.													
+2016-04-25	Voyant.panel.CorpusCollocates	title	Collocates									Kolokáty													
+2016-04-25	Voyant.panel.CorpusCollocates	emptyText	No matching results.								אין תוצאות תואמות.	Vyhledávacím kritériím neodpovídají žádné výsledky.													
+2016-04-25	Voyant.panel.CorpusCollocates	helpTip	<p>Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus. Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>									<p>Korpusové kolokáty poskytují tabulkové zobrazení toho, které termíny se objevují s vyšší frekvencí v blízkosti klíčových slov napříč celým korpusem. Funkce zahrnují:</p><ul><li>změna uspořádání podle klíčového slova, kolokátu, četnosti kolokátu reordering by keyword, collocate word, collocate word count</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu lupy pro nápovědu syntaxe</li></ul>													
+2016-04-25	Voyant.panel.CorpusCollocates	term	Term								מונח	Termín													
+2016-04-25	Voyant.panel.CorpusCollocates	termTip	This is the keyword term around which collocate (context) terms are counted.									Toto je klíčové slovo, v jehož okolí jsou počítány kolokáty (kontext).													
+2016-04-25	Voyant.panel.CorpusCollocates	termRawFreq	Count (keyword)									Počet (klíčového slova)													
+2016-04-25	Voyant.panel.CorpusCollocates	termRawFreqTip	The number of times the keyword term occurs in the corpus.									Kolikrát se klíčové slovo vyskytuje v korpusu													
+2016-04-25	Voyant.panel.CorpusCollocates	contextTerm	Collocate									Kolokát													
+2016-04-25	Voyant.panel.CorpusCollocates	contextTermTip	This is the collocate (context) term that occurs near the keyword term.									Toto je kolokační termín (kontext), který se vyskytuje v blízkosti klíčového slova.													
+2016-04-25	Voyant.panel.CorpusCollocates	contextTermRawFreq	Count (context)									Počet (kontext)													
+2016-04-25	Voyant.panel.CorpusCollocates	contextTermRawFreqTip	The number of times this collocate occurs near the keyword term in the corpus.									Kolikrát se daný kolokát vyskytuje v blízkosti klíčového slova napříč korpusem.													
+2016-04-25	Voyant.panel.CorpusCollocates	matchingTerms	{count}									{count}													
+2016-04-25	Voyant.panel.CorpusCollocates	context	context									kontext													
+2016-04-25	Voyant.panel.CorpusCreator	title	Add Texts									Přidat texty													
+2016-04-25	Voyant.panel.CorpusCreator	helpTip	This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from you computer (you can select multiple files by using the Ctrl and/or Shift keys)</li>									Tento nástroj umožňuje vytvořit korpus jedním ze tří způsobů:<ol><li>napsáním nebo vložením textu do textového pole a kliknutím na <i>Odkrýt</i>; pokud je každý řádek v textovém poli adresou URL, text se načte z těchto URL odkazů, v jiném případě je obsah považován za jeden dokuement </li><li>klikněte na tlačítko <i>Otevřít</i> pro otevření existujícího korpusu</li><li>klikněte na tlačítko <i>Nahrát</i> pro nahrání jednoho nebo více souborů ze svého počítače (více souborů můžete vybrat při stisknutí klávesy Ctrl a/nebo Shift)</li>													
+2016-04-25	Voyant.panel.CorpusCreator	gearTip	Options									Možnosti													
+2016-04-25	Voyant.panel.CorpusCreator	gearWinTitle	Options									Možnosti													
+2016-04-25	Voyant.panel.CorpusCreator	inputFormat	Input Format									Formát vstupu													
+2016-04-25	Voyant.panel.CorpusCreator	inputFormatAuto	Auto-Detect (recommended)									Autodetekce (doporučeno)													
+2016-04-25	Voyant.panel.CorpusCreator	advancedOptionsText	For more information on the advanced options below, see the documentation on <a href="{0}" target="voyantdocs">creating a corpus</a>.									Pro více informací o níže uvedeném pokročilém nastavení konzultujte dokumentaci k<a href="{0}" target="voyantdocs">vytvoření nového korpusu</a>													
+2016-04-25	Voyant.panel.CorpusCreator	xmlOptions	XML									XML													
+2016-04-25	Voyant.panel.CorpusCreator	xmlOptionsText	Define XPath Expressions for any of the following:									Definovat XPath výrazy pro následující:													
+2016-04-25	Voyant.panel.CorpusCreator	xpathDocuments	Documents									Dokumenty													
+2016-04-25	Voyant.panel.CorpusCreator	xpathGroupBy	Group by									Seskupit podle													
+2016-04-25	Voyant.panel.CorpusCreator	xpathContent	Content									Obsah													
+2016-04-25	Voyant.panel.CorpusCreator	xpathTitle	Title									Název													
+2016-04-25	Voyant.panel.CorpusCreator	xpathAuthor	Author									Autor													
+2016-04-25	Voyant.panel.CorpusCreator	tableOptions	Tables									Tabulky													
+2016-04-25	Voyant.panel.CorpusCreator	tableDocuments	Documents									Dokumenty													
+2016-04-25	Voyant.panel.CorpusCreator	tableDocumentsTable	from entire table									z celé tabulky													
+2016-04-25	Voyant.panel.CorpusCreator	tableDocumentsRows	from cells in each row									z buněk každé řádky													
+2016-04-25	Voyant.panel.CorpusCreator	tableDocumentsColumns	from entire columns									z celých sloupců													
+2016-04-25	Voyant.panel.CorpusCreator	tableContent	Content									Obsah													
+2016-04-25	Voyant.panel.CorpusCreator	tableTitle	Title									Název													
+2016-04-25	Voyant.panel.CorpusCreator	tableAuthor	Author									Autor													
+2016-04-25	Voyant.panel.CorpusCreator	tableOptionsText	Specify how documents should be extracted (currently only supported for MS Excel: .xls, xlsx). For more information see the documentation on creating a corpus with <a href="{0}" target="voyantdocs">tabular data</a>.									Specifikujte, jak by měly být dokumenty extrahovány (v současnosti podporováno pro MS Excel: .xls, xlsx). Pro více informací konzultujte dokumentaci o vytváření korpusu s <a href="{0}" target="voyantdocs">takulkovými daty</a>.													
+2016-04-25	Voyant.panel.CorpusCreator	tableContentText	Specify which column numbers contain content (or leave blank to use all columns). The left-most columnn is column 1. Define multiple documents by separating columns with a comma or combine columns by using the plus sign. For example 1+2,3 would combine columns 1 and 2 into one document and use column 3 for  a second document.									Specifikujte, která čísla sloupců mají obsah (nebo nevyplňujte, pokud chcete použít všechny sloupce). Sloupec nejvíce vlevo má číslo 1.Definujte více dokumentů pomocí oddělení sloupců čárkou, nebo sloupce slučte použitím znaménka plus. Například 1+2,3 slučí sloupce 1 a 2 do jednoho dokumentu a použije sloupec 3 pro druhý dokument.													
+2016-04-25	Voyant.panel.CorpusCreator	tableMetadataText	These options are only used when documents are extracted from cells in each row (see the first option in this section). Same syntax as the Content option above: column numbers separated by commas or combined with a plus sign.									Tyto možnosti nastavení se použijí pouze pokud jsou dokumenty extrahovány z buňek na každém řádku (viz první možnost v této sekci). Syntax je stejná jako u výše uvedených možností nastavení Obsahu: čísla sloupců oddělených čárkami, nebo sloučených znaménkem plus.													
+2016-04-25	Voyant.panel.CorpusCreator	tableNoHeadersRowText	Determines whether or not to skip the first row (if there's a header row). When there is a header row, it can be used to define the document title automatically when documents are extracted from entire columns (in this case leave the title field blank).									Určuje, zda má být přeskočen první řádek (pokud obsahuje záhlaví tabulky). Pokud tabulka obsahuje záhlaví, lze toto použít k automatickému přiřazení názvu dokumentu, když jsou dokumenty extrahovány z celých sloupců (v tomto případě ponechte pole názvu nevyplněné).													
+2016-04-25	Voyant.panel.CorpusCreator	tableNoHeadersRow	No Headers Row									Bez řádku záhlaví													
+2016-04-25	Voyant.panel.CorpusCreator	numberZero	0 is invalid, the first column is 1									0 je neplatné označení, první sloupec musí mít číslo 1													
+2016-04-25	Voyant.panel.CorpusCreator	numberEmpty	At least one column number is currently empty.									Nejméně jedno číslo sloupce je aktuálně prázdné.													
+2016-04-25	Voyant.panel.CorpusCreator	numbersNeedCommas	Please use a comma to separate multiple numbers.									Prosím použijte čárku k oddělení více čísel.													
+2016-04-25	Voyant.panel.CorpusCreator	tokenizationOptions	Tokenization									Tokenizace													
+2016-04-25	Voyant.panel.CorpusCreator	tokenization	Tokenization									Tokenizace													
+2016-04-25	Voyant.panel.CorpusCreator	tokenizationAuto	Automatic (highly recommended)									Automatická (velmi doporučováno)													
+2016-04-25	Voyant.panel.CorpusCreator	tokenizationWordBoundaries	Simple Word Boundaries									Jednoduché hranice slov													
+2016-04-25	Voyant.panel.CorpusCreator	accessOptions	Access Management									Správa přístupu													
+2016-04-25	Voyant.panel.CorpusCreator	accessOptionsText	If desired, specify one or more access passwords (separated by commas).									Přejete-li si, můžete zadat jedno, nebo více přístupových hesel (oddělených čárkou).													
+2016-04-25	Voyant.panel.CorpusCreator	adminPassword	admin code									administrátorský kód													
+2016-04-25	Voyant.panel.CorpusCreator	accessPassword	access code									přístupový kód													
+2016-04-25	Voyant.panel.CorpusCreator	accessModeWithoutPassword	other access									jiný typ přístupu													
+2016-04-25	Voyant.panel.CorpusCreator	accessModeWithoutPasswordText	If you specify an <i>access password</i> you can also specify what access is granted to users without the password.									Pokud zadáte <i>přístupové heslo</i> můžete také specifikovat, jaký typ přístupu bude poskytnut uživatelům bez hesla.													
+2016-04-25	Voyant.panel.CorpusCreator	accessModeNonConsumptive	limited (non-consumptive)									omezený (bez uživatelských oprávnění)													
+2016-04-25	Voyant.panel.CorpusCreator	accessModeNone	none									žádný													
+2016-04-25	Voyant.panel.CorpusCreator	emptyInput	Type in one or more URLs on separate lines or paste in a full text.									Zadejte jednu nebo více URL adres na zvláštní řádky, nebo vložte plný text.													
+2016-04-25	Voyant.panel.CorpusCreator	uploadingCorpus	Uploading corpus…									Nahrávání korpusu…													
+2016-04-25	Voyant.panel.CorpusCreator	fileTypesWarning	File Types Warning									Varování o typech souborů													
+2016-04-25	Voyant.panel.CorpusCreator	fileTypesMessage	You have one or more files with incompatible or unrecognized file extensions that may cause problems.									Máte jeden nebo více souborů s nekompatibilní nebo nerozpoznanou příponou souboru, což může způsobit problémy.													
+2016-04-25	Voyant.panel.CorpusCreator	badFiles	incompatible (likely error): 									nekompatibilní (pravděpodobná chyba):													
+2016-04-25	Voyant.panel.CorpusCreator	unknownFiles	unrecognized (possible error): 									nerozpoznané (pravděpodobná chyba):													
+2016-04-25	Voyant.panel.CorpusCreator	sureContinue	Are you sure you wish to continue?									Jste si jisti, že chcete pokračovat?													
+2016-04-25	Voyant.panel.CorpusCreator	error	Error									Chyba													
+2016-04-25	Voyant.panel.CorpusCreator	errorNotXmlContinue	You've selected an XML input format but the input doesn't appear to be XML. Are you sure you wish to continue?									Zvolili jste XML formát vstupu, ale vstup se nezdá být v tomto formátu. Jste si jisti, že chcete pokračovat?													
+2016-04-25	Voyant.panel.CorpusCreator	reveal	Reveal									Odkrýt													
+2016-04-25	Voyant.panel.CorpusCreator	ok	OK									OK													
+2016-04-25	Voyant.panel.CorpusCreator	cancel	Cancel									Zrušit													
+2016-04-25	Voyant.panel.CorpusCreator	invalidForm	Invalid values have been used, please hover over fields with red boxes for explanations.									Byly použity neplatné hodnoty, prosím najeďte kurzorem na červeně označená pole pro vysvětlení.													
+2016-04-25	Voyant.panel.CorpusCreator	numbersCommasOnly	Comma-separated numbers only.									Pouze čísla oddělená čárkou.													
+2016-04-25	Voyant.panel.Knots	title	Knots									Uzly													
+2016-04-25	Voyant.panel.Knots	type	Visualization									Vizualizace													
+2016-04-25	Voyant.panel.Knots	findTerm	Find Term									Najít termín													
+2016-04-25	Voyant.panel.Knots	clearTerms	Clear									Vyčisit													
+2016-04-25	Voyant.panel.Knots	removeTerm	Remove Term									Odstranit termín													
+2016-04-25	Voyant.panel.Knots	showTerm	Show Term									Ukázat termín													
+2016-04-25	Voyant.panel.Knots	hideTerm	Hide Term									Skrýt termín													
+2016-04-25	Voyant.panel.Knots	options	Options									Možnosti													
+2016-04-25	Voyant.panel.Knots	speed	Speed									Rychlost													
+2016-04-25	Voyant.panel.Knots	startAngle	Start									Start													
+2016-04-25	Voyant.panel.Knots	tangles	Turn									Odbočka													
+2016-04-25	Voyant.panel.Knots	context	Context									Kontext													
+2016-04-25	Voyant.panel.Knots	noTermsFound	No terms found in this document.									V tomto dokumentu nebyly nalezeny žádné termíny													
+2016-04-25	Voyant.panel.Knots	settings	Settings									Nastavení													
+2016-04-25	Voyant.panel.Phrases	title	Phrases									Slovní spojení													
+2016-04-25	Voyant.panel.Phrases	emptyText	No matching results.									Vyhledávacím kritériím neodpovídají žádné výsledky.													
+2016-04-25	Voyant.panel.Phrases	helpTip	<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->									<p>Nástroj Slovní spojení v korpusu poskytuje tabulkové zobrazení opakujících se slovních spojení v celém korpusu.<!-- Funkce zahrnují:</p><ul><li>změna uspořádání podle klíčového slova, kolokátu, četnosti kolokátu</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu lupy pro nápovědu syntaxe</li></ul>-->													
+2016-04-25	Voyant.panel.Phrases	term	Term									Termín													
+2016-04-25	Voyant.panel.Phrases	termTip	This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence).									Toto je klíčové slovní spojení (jde o obecnou formu, při každém výskytu se může objevit trochu jinak).													
+2016-04-25	Voyant.panel.Phrases	termRawFreq	Count									Počet													
+2016-04-25	Voyant.panel.Phrases	termRawFreqTip	The number of times the phrase occurs in the corpus.									Kolikrát se slovní spojení vyskytuje v korpusu.													
+2016-04-25	Voyant.panel.Phrases	matchingTerms	{count}									{count}													
+2016-04-25	Voyant.panel.Phrases	length	Length									Délka													
+2016-04-25	Voyant.panel.Phrases	lengthTip	The upper and lower bounds of phrase lengths (how many words in each phrase).									Horní a dolní hranice délky slovních spojení (kolik slov je obsaženo v každém slovním spojení).													
+2016-04-25	Voyant.panel.Phrases	overlap	Overlap									Překrývání													
+2016-04-25	Voyant.panel.Phrases	overlapTip	This determines how overlapping phrases are filtered.									Toto určuje, jak se mají filtrovat překrývající se slovní spojení.													
+2016-04-25	Voyant.panel.Phrases	overlapMenu	Choose an overlap filter:									Zvolte filtr pro překrývání:													
+2016-04-25	Voyant.panel.Phrases	overlapNone	none (keep all)									žádný (ponechat všechny)													
+2016-04-25	Voyant.panel.Phrases	overlapLength	prioritize longest phrases									upřednostňovat nejdelší slovní spojení													
+2016-04-25	Voyant.panel.Phrases	overlapFreq	prioritize most frequent phrases									upřednostňovat nejfrekventovanější slovní spojení													
+2016-04-25	Voyant.panel.CorpusTerms	title	Terms									Termíny													
+2016-04-25	Voyant.panel.CorpusTerms	emptyText	No matching results.									Vyhledávacím kritériím neodpovídají žádné výsledky.													
+2016-04-25	Voyant.panel.CorpusTerms	helpTip	</p><p>Corpus Terms is a table view of terms that appear in the entire corpus. Features include:</p><ul><li>reordering by <i>term</i> and <i>count</i> (click on the column headers)</li><li>a sparkline graph of the term frequency trends across the corpus (if the corpus has multiple documents) or across the document (if the corpus has only one document)</li><li>additional columns available (relative frequency, distribution peakedness and skew) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>									</p><p>Nástroj Termíny korpusu poskytuje tabulkové zobrazení termínů, které se objevují v celém korpusu. Funkce zahrnují:</p><ul><li>změna uspořádání pomocí <i>termín</i> a <i>počet</i> (klikněte na záhlaví sloupců)</li><li>řádkový minigraf (sparkline) trendů frekvence termínu napříč korpusem (pokud korpus obsahuje více dokumentů) nebo napříč dokumentem (pokud korpus obsahuje pouze jeden dokument)</li><li>zpřístupnění dodatečných sloupců (relativní frekvence, špičatost a šikmost rozdělení) pomocí kliknutí na šipku, která se objeví po najetí kurzoru na záhlaví</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu lupy pro nápovědu syntaxe</li></ul>													
+2016-04-25	Voyant.panel.CorpusTerms	matchingTerms	Matching terms: {count}									Termíny odpovídající kritériím vyhledávání: {count}													
+2016-04-25	Voyant.panel.CorpusTerms	termTip	The term in the corpus.									Termín v korpusu													
+2016-04-25	Voyant.panel.CorpusTerms	rawFreqTip	The total count (raw frequency) of this term in the entire corpus.									Celkový počet (absolutní četnost) tohoto termínu v celém korpusu.													
+2016-04-25	Voyant.panel.CorpusTerms	relativeFreqTip	The relative frequency (per million) of this term in the entire corpus.									Relativní četnost (na milion) tohoto termínu v celém korpusu.													
+2016-04-25	Voyant.panel.CorpusTerms	relativePeakedness	Peakedness									Špičatost													
+2016-04-25	Voyant.panel.CorpusTerms	relativePeakednessTip	This is a statistical measure of how much the relative frequencies of a term in a corpus are bunched up into peaks (regions with higher values where the rest are lower).									Toto je statistická míra toho, jaké množství relativních četností je nahromaděno do špičatých vrcholů (oblastí s vyššími hodnotami, přičemž zbývající jsou nižší).													
+2016-04-25	Voyant.panel.CorpusTerms	relativeSkewness	Skew									Šikmost													
+2016-04-25	Voyant.panel.CorpusTerms	relativeSkewnessTip	This is a statistical measure of the symmetry of the relative frequencies of a term across the corpus.									Toto je statistická míra symetrie relativních četností termínu napříč korpusem.													
+2016-04-25	Voyant.panel.CorpusTerms	trendTip	This represents the trend of the relative frequencies for each term in each document in the corpus.									Toto reprezentuje trend relativních četností pro každý termín v každém dokumentu korpusu.													
+2016-04-25	Voyant.panel.DocumentTerms	title	Document Terms									Termíny dokumentu													
+2016-04-25	Voyant.panel.DocumentTerms	emptyText	No matching results.									Vyhledávacím kritériím neodpovídají žádné výsledky.													
+2016-04-25	Voyant.panel.DocumentTerms	helpTip	<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>									</p><p>Nástroj Termíny dokumentu poskytuje tabulkové zobrazení termínů, které se objevují v každém dokumentu. Funkce zahrnují: Funkce zahrnují:</p><ul><li>změna uspořádání pomocí <i>termín</i> a <i>počet</i> (absolutní četnost), a <i>relativní</i> četnost (klikněte na záhlaví sloupců)</li><li>řádkový minigraf (sparkline) trendů frekvence termínu napříč dokumenty</li><li>zpřístupnění dodatečných sloupců (<i>Významnost</i> nebo TF-IDF, tj. četnost slova v dokumentu - převrácená četnost slova ve všech dokumentech) pomocí kliknutí na šipku, která se objeví po najetí kurzoru na záhlaví</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu lupy pro nápovědu syntaxe</li></ul>													
+2016-04-25	Voyant.panel.DocumentTerms	matchingTerms	Matching terms: {count}									Termíny odpovídající kritériím vyhledávání: {count}													
+2016-04-25	Voyant.panel.DocumentTerms	termTip	The term in a single, specific document.									Termín v jednom specifickém dokumentu.													
+2016-04-25	Voyant.panel.DocumentTerms	rawFreqTip	The count (raw frequency) of this term in this document.									Počet (absolutní četnost) tohoto termínu v tomto dokumentu.													
+2016-04-25	Voyant.panel.DocumentTerms	relativeFreqTip	The relative frequency (per million) of this term in each document.									Relativní četnost (na milion) tohoto termínu v každém dokumentu.													
+2016-04-25	Voyant.panel.DocumentTerms	trendTip	This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).									Toto je řádkový minigraf (sparkline), který reprezentuje rozdělení termínu uvnitř lineárních segmentů dokumentu (ve výchozím nastavení 10 segmentů stejné velikosti).													
+2016-04-25	Voyant.panel.DocumentTerms	tfidf	Significance									Významnost													
+2016-04-25	Voyant.panel.DocumentTerms	tfidfTip	The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.									Významnost se zde měří pomocí hodnoty TF-IDF, což je běžný způsob vyjádření důležitosti termínu v dokumentu v poměru ke zbytku korpusu.													
+2016-04-25	Voyant.panel.DocumentTerms	zscore	Z-Score									Z-skóre													
+2016-04-25	Voyant.panel.DocumentTerms	zscoreTip	The Z-Score, or standard score, is a normalized value for the term's raw frequency compared to other term frequencies in the same document.<table><tbody><tr><td style="text-align: center; font-size: smaller; font-family: mono;">frequency of term - mean of term frequencies<hr>standard deviation of term frequencies</td></tr></tbody></table>.									Z-skóre nebo standardizované skóre představuje normalizovanou hodnotu absolutní četnosti termínu ve srovnání s četnostmi dalších termínů ve stejném dokumentu.<table><tbody><tr><td style="text-align: center; font-size: smaller; font-family: mono;">četnost termínu - průměrná hodnota četností termínů<hr>směrodatná odchylka četností termínů</td></tr></tbody></table>.													
+2016-04-25	Voyant.panel.Documents	title	Documents									Dokumenty													
+2016-04-25	Voyant.panel.Documents	emptyText	No matching results.									Vyhledávacím kritériím neodpovídají žádné výsledky.													
+2016-04-25	Voyant.panel.Documents	helpTip	<p>Documents is a table view of the documents in the corpus. Features include:</p><ul><li>reordering by <i>Title</i>, <i>Words</i> count (tokens), word forms count (<i>Types</i>), and <i>Ratio</i> (Types/Tokens Ratio) (click on the column headers)</li><li>a search box for queries (by default in the full-text, title and author fields —&nbsp;hover over the magnifying icon for help with the syntax)</li></ul>									<p>Nástroj Dokumenty poskytuje tabulkové zobrazení dokuemntů v korpusu. Funkce zahrnují:</p><ul><li>změna uspořádání pomocí <i>Název</i>, <i>Slova</i> počet (tokenů), počet slovních forem (<i>Typů</i>), a <i>Poměr</i> (poměr typů/tokenů) (klikněte na záhlaví sloupců)</li><li>vyhledávací pole pro dotazy (ve výchozím nastavení pro plný text, pole názvu a autora —&nbsp;najeďte kurzorem na ikonu lupy pro nápovědu syntaxe)</li></ul>													
+2016-04-25	Voyant.panel.Documents	id	ID									ID													
+2016-04-25	Voyant.panel.Documents	documentTitle	Title									Název													
+2016-04-25	Voyant.panel.Documents	documentAuthor	Author									Autor													
+2016-04-25	Voyant.panel.Documents	tokensCountLexical	Words									Slova													
+2016-04-25	Voyant.panel.Documents	typesCountLexical	Types									Typy													
+2016-04-25	Voyant.panel.Documents	typeTokenRatioLexical	Ratio									Poměr													
+2016-04-25	Voyant.panel.Documents	language	Language									Jazyk													
+2016-04-25	Voyant.panel.Documents	matchingDocuments	Matching documents: {count}									Dokumenty, v nichž byla nalezena shoda: {count}													
+2016-04-25	Voyant.panel.Documents	error	Error									Chyba													
+2016-04-25	Voyant.panel.Documents	add	Add									Přidat													
+2016-04-25	Voyant.panel.Documents	addTip	Click here to add new documents to this corpus.									Klikněte zde pro přidání nových dokumentů do tohoto korpusu.													
+2016-04-25	Voyant.panel.Documents	remove	Remove									Odstranit													
+2016-04-25	Voyant.panel.Documents	removeTip	Click here to create a new corpus that excludes selected or filtered (search query) documents.        									Klikněte zde pro vytvoření nového korpusu, který vyloučí vybrané nebo filtrované (pomocí vyhledávacího dotazu) dokumenty.													
+2016-04-25	Voyant.panel.Documents	reorder	Reorder									Změnit uspořádání													
+2016-04-25	Voyant.panel.Documents	reorderTip	Click here to create a new corpus based on a reordering of documents (drag and drop rows to reorder).									Klikněte zde pro vytvoření nového korpusu založeného na změněném uspořádání (přetáhněte řádky pomocí myši, abyste změnili uspořádání).													
+2016-04-25	Voyant.panel.Documents	keep	Keep									Ponechat													
+2016-04-25	Voyant.panel.Documents	keepTip	Click here to create a new corpus that only includes selected or filtered (search query) documents.									Klikněte zde pro vytvoření nového korpusu, který bude zahrnovat pouze vybrané nebo filtrované (pomocí vyhledávacího dotazu) dokumenty.													
+2016-04-25	Voyant.panel.Documents	modify	Modify									Změnit													
+2016-04-25	Voyant.panel.Documents	newCorpus	New Corpus									Nový korpus													
+2016-04-25	Voyant.panel.Documents	modifyTip	Click this button to create a new corpus by adding new documents, by selecting a subset of documents or by re-ordering documents.									Klikněte na toto tlačítko pro vytvoření nového korpusu pomocí přidání nových dokumentů, vybráním podmnožiny dokumentů nebo změnou pořadí dokumentů.													
+2016-04-25	Voyant.panel.Documents	allSelectedError	You have selected all documents, you must select a subset of documents to remove or keep.									Vybrali jste všechny dokumenty, musíte zvolit podmnožinu dokumentů, které si přejete odstranit, nebo ponechat.													
+2016-04-25	Voyant.panel.Documents	removeSelectedDocuments	Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('selected document')}?									Vytvořit <i>nový</i> korpus, který odebere (nebude obsahovat) {0:plural('selected document')}?													
+2016-04-25	Voyant.panel.Documents	removeFilteredDocuments	Create a <i>new</i> corpus that removes (does NOT include) the {0:plural('filtered document')}?									Vytvořit <i>nový</i> korpus, který odebere (nebude obsahovat) {0:plural('filtered document')}?													
+2016-04-25	Voyant.panel.Documents	keepSelectedDocuments	Create a <i>new</i> corpus that only keeps the {0:plural('selected document')}?									Vytvořit <i>nový</i> korpus, který ponechá pouze {0:plural('selected document')}?													
+2016-04-25	Voyant.panel.Documents	keepFilteredDocuments	Create a <i>new</i> corpus that only keeps the {0:plural('filtered document')}?									Vytvořit <i>nový</i> korpus, který ponechá pouze {0:plural('filtered document')}?													
+2016-04-25	Voyant.panel.Documents	selectOrFilterError	You need to first select documents by clicking on one or more rows or by performing a search query.									Nejdříve musíte vybrat dokumenty pomocí kliknutí myši na jeden nebo více řádků nebo provedením vyhledávacího dotazu.													
+2016-04-25	Voyant.panel.Documents	onlyOneError	Your corpus has only one document, you can't remove or keep documents to create a new corpus.									Váš korpus obsahuje pouze jeden dokument, nemůžete dokumenty odstranit ani ponechat dokumenty, abyste vytvořili nový korpus.													
+2016-04-25	Voyant.panel.Documents	reorderFilteredError	You cannot reorder a filtered (after search query) corpus. Please create a new corpus first (with the <i>Remove</i> or <i>Keep</i> button) and then reorder the new corpus.									U filtrovaného (po zadání vyhledávacího dotazu) korpusu nelze změnit uspořádání. Nejdříve prosím vytvořte nový korpus (pomocí tlačítek <i>Odstranit</i> nebo <i>Ponechat</i> button) a následně změňte uspořádání nového korpusu.													
+2016-04-25	Voyant.panel.Documents	reorderOriginalError	Please reorder the corpus first (drag and drop the rows in the table).									Nejdříve prosím změňte uspořádání korpusu (pomocí myši přetáhněte řádky v tabulce).													
+2016-04-25	Voyant.panel.Documents	reorderDocuments	Create a <i>new</i> corpus based on the order shown?									Vytvořit <i>nový</i> korpus na základě zobrazeného pořadí?													
+2016-04-25	Voyant.panel.DocumentsFinder	title	Documents Finder									Vyhledávač dokumentů													
+2016-04-25	Voyant.panel.DocumentsFinder	emptyText	No matching results.									Žádné odpovídající výsledky.													
+2016-04-25	Voyant.panel.DocumentsFinder	operator	Operator									Operátor													
+2016-04-25	Voyant.panel.DocumentsFinder	field	Field									Pole													
+2016-04-25	Voyant.panel.DocumentsFinder	query	Query									Dotaz													
+2016-04-25	Voyant.panel.DocumentsFinder	count	Count									Počet													
+2016-04-25	Voyant.panel.DocumentsFinder	emptyQuery	type query here									zde zadejte dotaz													
+2016-04-25	Voyant.panel.DocumentsFinder	titleField	title									název													
+2016-04-25	Voyant.panel.DocumentsFinder	authorField	author									autor													
+2016-04-25	Voyant.panel.DocumentsFinder	pubDateField	publication date									datum vydání													
+2016-04-25	Voyant.panel.DocumentsFinder	publisherField	publisher									vydavatel													
+2016-04-25	Voyant.panel.DocumentsFinder	pubPlaceField	publication location									místo vydání													
+2016-04-25	Voyant.panel.DocumentsFinder	advancedField	<i>advanced query</i>									<i>pokročilý dotaz</i>													
+2016-04-25	Voyant.panel.DocumentsFinder	textField	text (default)									text (výchozí)													
+2016-04-25	Voyant.panel.DocumentsFinder	loading	loading corpus									nahrávání korpusu													
+2016-04-25	Voyant.panel.DocumentsFinder	unsuccessfulQuery	Unable to complete query.									Dotaz se nepodařilo dokončit.													
+2016-04-25	Voyant.panel.DocumentsFinder	addRow	Add Row									Přidat řádek													
+2016-04-25	Voyant.panel.DocumentsFinder	deleteRowTip	Click to delete this row									Pro vymazání řádku klikněte zde													
+2016-04-25	Voyant.panel.DocumentsFinder	noMatches	No matches (out of {0} documents).									Nebyla nalezena žádná shoda (z {0} dokumentů).													
+2016-04-25	Voyant.panel.DocumentsFinder	queryMatches	A total of {0} matching documents (out of {1}).									Hledanému výrazu odpovídá celkem {0} dokumentů (z {1}).													
+2016-04-25	Voyant.panel.DocumentsFinder	exportNewCorpus	New Corpus									Nový korpus													
+2016-04-25	Voyant.panel.DocumentsFinder	exportNewCorpusTip	Create a new corpus from matching documents (button will be disabled if there are no matches).									Vytvořit nový korpus z dokumentů odpovídajících hledanému výrazu (tlačítko bude neaktivní, pokud nejsou nalezeny žádné shody).													
+2016-04-25	Voyant.panel.RezoViz	title	RezoViz									RezoViz													
+2016-04-25	Voyant.panel.RezoViz	categories	Categories									Kategorie													
+2016-04-25	Voyant.panel.RezoViz	people	People									Lidé													
+2016-04-25	Voyant.panel.RezoViz	locations	Locations									Místa													
+2016-04-25	Voyant.panel.RezoViz	organizations	Organizations									Organizace													
+2016-04-25	Voyant.panel.RezoViz	reload	Reload									Znovu načíst													
+2016-04-25	Voyant.panel.RezoViz	minEdgeCount	Min. Edge Count									Minimální počet hran													
+2016-04-25	Voyant.panel.RezoViz	repulsion	Repulsion									Odpudivá síla													
+2016-04-25	Voyant.panel.RezoViz	stiffness	Stiffness									Tuhost													
+2016-04-25	Voyant.panel.RezoViz	friction	Friction									Napětí													
+2016-04-25	Voyant.panel.RezoViz	noEntities	No entities to graph.									Žádné entity k vykreslení.													
+2016-04-25	Voyant.panel.RezoViz	noEntitiesForEdgeCount	No entities were found. Would you like to reduce the minimum edge count to improve results?									Nebyly nalezeny žádné entity. Chcete snížit minimální počet hran, aby se výsledky zlepšily?													
+2016-04-25	Voyant.panel.RezoViz	loadingEntities	Loading entities…									Nahrávání entit…													
+2016-04-25	Voyant.panel.Reader	title	Reader									Čtenář													
+2016-04-25	Voyant.panel.Reader	helpTip	<p>The Reader tool provides a view of text from the corpus. Features include:</p><ul><li>frequency information appears when hovering over a word</li><li>distribution information appears in a graph at the bottom when clicking on a word</li><li>a bar graph at the bottom indicates the relative size of each document in the corpus</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>									<p>Nástroj Čtenář nabízí zobrazení textu z korpusu. Funkce zahrnují:</p><ul><li>informace o četnosti se objeví při najetí kurzoru na slovo</li><li>informace o distribuci se objeví v grafu ve spodní části stránky po kliknutí na slovo</li><li>sloupcový graf ve spodní části stránky ukazuje relativní velikost každého dokumentu v korpusu</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu lupy, pokud chcete pomoc se syntaxí)</li></ul>													
+2016-04-25	Voyant.panel.Reader	documentFrequency	document frequency:									četnost v dokumentu:													
+2016-04-25	Voyant.panel.Reader	limitedAccess	This is a limited access corpus and this tool's functionality is restricted.									Toto je korpus s omezeným přístupem a funkčnost tohoto nástroje je omezena.													
+2016-04-25	Voyant.panel.ScatterPlot	title	ScatterPlot									Bodový graf													
+2016-04-25	Voyant.panel.ScatterPlot	analysis	Analysis									Analýza													
+2016-04-25	Voyant.panel.ScatterPlot	ca	Correspondence Analysis									Analýza souvztažnosti (korespondence)													
+2016-04-25	Voyant.panel.ScatterPlot	pca	Principal Components Analysis									Analýza hlavních komponent													
+2016-04-25	Voyant.panel.ScatterPlot	docSim	Document Similarity									Podobnost dokumentů													
+2016-04-25	Voyant.panel.ScatterPlot	freqsMode	Frequencies									Četnosti (frekvence)													
+2016-04-25	Voyant.panel.ScatterPlot	freqsModeTip	Determines if frequencies are expressed as relative counts, raw counts, or as TF-IDF.									Určuje, zda jsou četnosti vyjádřeny jako relativní počty, absolutní počty, nebo jako TF-IDF.													
+2016-04-25	Voyant.panel.ScatterPlot	tfidf	TF-IDF									TF-IDF													
+2016-04-25	Voyant.panel.ScatterPlot	rawFrequencies	Raw Frequencies									Absolutní četnosti													
+2016-04-25	Voyant.panel.ScatterPlot	relativeFrequencies	Relative Frequencies									Relativní četnosti													
+2016-04-25	Voyant.panel.ScatterPlot	rawFreq	Raw									Absolutní													
+2016-04-25	Voyant.panel.ScatterPlot	relFreq	Relative									Relativní													
+2016-04-25	Voyant.panel.ScatterPlot	terms	Terms									Termíny													
+2016-04-25	Voyant.panel.ScatterPlot	term	Term									Termín													
+2016-04-25	Voyant.panel.ScatterPlot	numTerms	Terms									Termíny													
+2016-04-25	Voyant.panel.ScatterPlot	addTerm	Add Term									Přidej termín													
+2016-04-25	Voyant.panel.ScatterPlot	clusters	Clusters									Klastry													
+2016-04-25	Voyant.panel.ScatterPlot	dimensions	Dimensions									Dimenze													
+2016-04-25	Voyant.panel.ScatterPlot	labels	Labels									Popisky													
+2016-04-25	Voyant.panel.ScatterPlot	remove	Remove									Odstranit													
+2016-04-25	Voyant.panel.ScatterPlot	removeTerm	Remove <b>{0}</b>									Odstranit <b>{0}</b>													
+2016-04-25	Voyant.panel.ScatterPlot	nearby	Nearby									V blízkosti													
+2016-04-25	Voyant.panel.ScatterPlot	nearbyTerm	Nearby <b>{0}</b>									V blízkosti <b>{0}</b>													
+2016-04-25	Voyant.panel.ScatterPlot	pcTitle	Percentage of Total Variation Explained by Each Component									Procentuální podíl celkové variace vysvětlený každým komponentem													
+2016-04-25	Voyant.panel.ScatterPlot	pc	PC									PC													
+2016-04-25	Voyant.panel.ScatterPlot	caTitle	Percentage of Total Assocation Explained by Each Dimension									Procentuální podíl celkové asociace vysvětlené každou dimenzí													
+2016-04-25	Voyant.panel.ScatterPlot	dimension	Dimension									Rozměr													
+2016-04-25	Voyant.panel.ScatterPlot	xAxis	X Axis									Osa X													
+2016-04-25	Voyant.panel.ScatterPlot	yAxis	Y Axis									Osa Y													
+2016-04-25	Voyant.panel.ScatterPlot	fill	Fill									Vyplnit													
+2016-04-25	Voyant.panel.ScatterPlot	loading	Loading									Nahrávání													
+2016-04-25	Voyant.panel.ScatterPlot	helpTip	<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>									<p>Bodový graf ukazuje souvztažnost (korespondenci) užití slov v korpusu. Tato vizualizace se odvíjí od statistické analýzy, která vezme souvztažnost  daných slov za každý dokument (kde každý dokument reprezentuje jeden rozměr) a redukuje ji do trojrozměrného prostoru, aby přístupným způsobem vizualizovala data pomocí bodového grafu.</p>													
+2016-04-25	Voyant.panel.ScatterPlot	tokenFreqTip	<b>{0}</b><br><b>Raw Frequency</b><br>{1}<br><b>Relative Frequency</b><br>{2}									<b>{0}</b><br><b>Absolutní četnost</b><br>{1}<br><b>Relativní četnost</b><br>{2}													
+2016-04-25	Voyant.panel.ScatterPlot	docFreqTip	<b>{0}</b><br><b>Word Count</b><br>{1}									<b>{0}</b><br><b>Počet slov</b><br>{1}													
+2016-04-25	Voyant.panel.ScatterPlot	noTermSelected	No term selected.									Nebyl vybrán žádný termín.													
+2016-04-25	Voyant.panel.ScatterPlot	summaryLabel	Summary									Shnrutí													
+2016-04-25	Voyant.panel.ScatterPlot	docsLabel	Documents									Dokumenty													
+2016-04-25	Voyant.panel.ScatterPlot	termsLabel	Terms									Termíny													
+2016-04-25	Voyant.panel.StreamGraph	title	StreamGraph									Tokový graf													
+2016-04-25	Voyant.panel.StreamGraph	helpTip	StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).									Tokový graf je vizualizace, která zobrazuje změny četnosti slov v korpusu (nebo v jednom dokumentu).													
+2016-04-25	Voyant.panel.StreamGraph	freqsMode	Frequencies									Četnosti (frekvence)													
+2016-04-25	Voyant.panel.StreamGraph	freqsModeTip	Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).									Určuje, zda jsou četnosti vyjádřeny jako absolutní hodnoty, nebo jako relativní hodnoty (za dokument či segment).													
+2016-04-25	Voyant.panel.StreamGraph	rawFrequencies	Raw Frequencies									Absolutní četnosti													
+2016-04-25	Voyant.panel.StreamGraph	relativeFrequencies	Relative Frequencies									Relativní četnosti													
+2016-04-25	Voyant.panel.StreamGraph	documentSegments	Document Segments									Segmenty dokumentu													
+2016-04-25	Voyant.panel.StreamGraph	documents	Documents									Dokumenty													
+2016-04-25	Voyant.panel.StreamGraph	clearTerms	Clear Terms									Vymazat termíny													
+2016-04-25	Voyant.panel.StreamGraph	segments	Segments									Segmenty													
+2016-04-25	Voyant.panel.Summary	title	Summary									Shrnutí													
+2016-04-25	Voyant.panel.Summary	helpTip	<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>									<p>Nástroj <i>Shrnutí</i> poskytuje souhrnné informace o korpusu. Mnoho prvků v tomto nástroji jsou odkazy, kterými se spouští další zobrazení. Funkce zahrnují:</p><ul><li>celkový počet slov (tokenů) a slovních forem (typů) a stáří korpusu</li><li>nejvíce frekventovaná slova v korpusu</li><li>pro korpusy s více než jedním dokumentem<ul><li>řazení dokumentu podle délky a slovní hustoty</li><li>charakteristická slova pro každý dokument (podle hodnoty TF-IDF)</li></ul></li></ul>													
+2016-04-25	Voyant.panel.Summary	corpusType	<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordid="{id}">{type}</a> ({val})<tpl if="xindex < xcount">, </tpl></tpl>									<tpl for="types"><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordid="{id}">{type}</a> ({val})<tpl if="xindex < xcount">, </tpl></tpl>													
+2016-04-25	Voyant.panel.Summary	documentType	<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:recordid="{id}" voyant:docindex="{docIndex}">{type}</a> ({val})<tpl if="xindex < xcount">, </tpl></tpl>									<tpl for="types"><a href="#" onclick="return false" class="document-type keyword" voyant:recordid="{id}" voyant:docindex="{docIndex}">{type}</a> ({val})<tpl if="xindex < xcount">, </tpl></tpl>													
+2016-04-25	Voyant.panel.Summary	mostFrequentWords	Most <b>frequent words</b> in the corpus: 									Nejvíce <b>frekventovaná slova</b> v korpusu: 													
+2016-04-25	Voyant.panel.Summary	distinctiveWords	<b>Distinctive words</b> (compared to the rest of the corpus): 									<b>Charakteristická slova</b> (ve srovnání se zbytkem korpusu): 													
+2016-04-25	Voyant.panel.Summary	moreDistinctiveWords	<a href="#" onclick="return false">Next {0} of {1} remaining</a>									<a href="#" onclick="return false">Další {0} z {1} zbývajících</a>													
+2016-04-25	Voyant.panel.Summary	seeAll	All…									Vše..													
+2016-04-25	Voyant.panel.Summary	more	More…									Více...													
+2016-04-25	Voyant.panel.Summary	items	items									položky													
+2016-04-25	Voyant.panel.Summary	numberOfTerms	number of words in this document									počet slov v dokumentu													
+2016-04-25	Voyant.panel.Summary	longest	Longest: 									Nejdelší:													
+2016-04-25	Voyant.panel.Summary	shortest	Shortest: 									Nejkratší:													
+2016-04-25	Voyant.panel.Summary	highest	Highest: 									Nejvyšší:													
+2016-04-25	Voyant.panel.Summary	lowest	Lowest: 									Nejnižší:													
+2016-04-25	Voyant.panel.Summary	docsLength	Document Length: 									Délka dokumentu:													
+2016-04-25	Voyant.panel.Summary	docsDensity	Vocabulary Density: 									Hustota slovní zásoby:													
+2016-04-25	Voyant.panel.TopicContexts	title	Topic Contexts									Tematické kontexty													
+2016-04-25	Voyant.panel.TopicContexts	helpTip	Topic Contexts									Tematické kontexty													
+2016-04-25	Voyant.panel.TopicContexts	reset	reset									obnovit													
+2016-04-25	Voyant.panel.TermsRadio	title	TermsRadio									TermsRadio													
+2016-04-25	Voyant.panel.TermsRadio	type	Visualization									Vizualizace													
+2016-04-25	Voyant.panel.TermsRadio	help	This tool can be used to examine word occurence over a corpus spanning a period of time.									Tento nástroj lze použít pro sledování výskytu slov napříč korpusem ve vymezeném časovém období.													
+2016-04-25	Voyant.panel.TermsRadio	visibleSegments	Visible									Zobrazené													
+2016-04-25	Voyant.panel.TermsRadio	visibleSegmentsTip	This option determines how many of the documents/segments are displayed at once.									Tato možnost dovoluje definovat počet zobrazených slov. Např. 20 zachová pouze ta slova, která se vykytují s nejméně 20% četností.													
+2016-04-25	Voyant.panel.TermsRadio	segments	Segments									Segmenty													
+2016-04-25	Voyant.panel.TermsRadio	segmentsTip	This option allows you to define how many segments a document should be divided into (note that this option only applies to distribution within a document, not distribution across a corpus).									Tato možnost dovoluje definovat počet zobrazených slov. Např. 20 zachová pouze ta slova, která se vykytují s nejméně 20% četností.													
+2016-04-25	Voyant.panel.TermsRadio	displayPanel	Display Panel									Zobrazovací panel													
+2016-04-25	Voyant.panel.TermsRadio	displayPanelTip	Panel to control settings for word display.									Panel kontroly nastavení pro slovní zobrazení													
+2016-04-25	Voyant.panel.TermsRadio	duration	Speed									Rychlost													
+2016-04-25	Voyant.panel.TermsRadio	terms	Terms									Termíny													
+2016-04-25	Voyant.panel.TermsRadio	fraction	Word Display									Slovní zobrazení													
+2016-04-25	Voyant.panel.TermsRadio	fractionTip	This option allows you to define the number of words displayed. Ex. 20 will only keep the words that occur with the lowest 20% of frequency.									Tato možnost dovoluje definovat počet zobrazených slov. Např. 20 zachová pouze ta slova, která se vykytují s nejméně 20% četností.													
+2016-04-25	Voyant.panel.TermsRadio	reset	Reset									Obnovit													
+2016-04-25	Voyant.panel.TermsRadio	resetTip	Reset the visualization to the beginning.									Obnovit vizualizaci do počátečního stavu.													
+2016-04-25	Voyant.panel.TermsRadio	speed	Speed									Rychlost													
+2016-04-25	Voyant.panel.TermsRadio	yScale	Y-axis Scale									Měřítko osy Y													
+2016-04-25	Voyant.panel.TermsRadio	linear	Linear									Lineární													
+2016-04-25	Voyant.panel.TermsRadio	log	Logarithmic									Logaritimická													
+2016-04-25	Voyant.panel.TermsRadio	removeTerm	Remove <b>{0}</b>									Odstranit<b>{0}</b>													
+2016-04-25	Voyant.panel.TermsRadio	completingTransition	Completing transition.									Dokončování přechodu.													
+2016-04-25	Voyant.panel.TermsRadio	termNotFound	Term not found.									Termín nenalezen													
+2016-04-25	Voyant.panel.Trends	title	Trends									Trendy													
+2016-04-25	Voyant.panel.Trends	helpTip	<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>									<p><i>Trendy</i> ukazují čárový graf relativních četností napříč korpusem (pro více dokumentů), nebo uvnitř dokumentu. Funkce zahrnují </p><ul><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud chcete získat nápovědu k syntaxi)</li></ul>													
+2016-04-25	Voyant.panel.Trends	freqsMode	Frequencies									Četnosti (frekvence)													
+2016-04-25	Voyant.panel.Trends	freqsModeTip	Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).									Určuje, zda jsou četnosti vyjádřeny jako absolutní hodnoty, nebo jako relativní hodnoty (za dokument či segment).													
+2016-04-25	Voyant.panel.Trends	options	Options									Možnosti													
+2016-04-25	Voyant.panel.Trends	rawFrequencies	Raw Frequencies									Absolutní četnosti													
+2016-04-25	Voyant.panel.Trends	relativeFrequencies	Relative Frequencies									Relativní četnosti													
+2016-04-25	Voyant.panel.Trends	raw	Raw									Absolutní													
+2016-04-25	Voyant.panel.Trends	relative	Relative									Relativní													
+2016-04-25	Voyant.panel.Trends	segmentsSlider	Segments									Segmenty													
+2016-04-25	Voyant.panel.Trends	segments	Document Segments									Segmenty dokumentu													
+2016-04-25	Voyant.panel.Trends	documents	Documents									Dokumenty													
+2016-04-25	Voyant.panel.NoTool	title	No Such Tool									Žádný takový nástroj neexistuje.													
+2016-04-25	Voyant.panel.NoTool	error	Error									Chyba.													
+2016-04-25	Voyant.panel.NoTool	currentButton	Use Current Version									Použít aktuální verzi													
+2016-04-25	Voyant.panel.NoTool	oldButton	Use Old Version									Použít starou verzi													
+2016-04-25	Voyant.panel.NoTool	noToolSpecified	No tool has been specified. You will be redirected to the main page of Voyant Tools.									Nebyl zvolen žádný nástroj.  Budete přesměrováni na hlavní stránku Voyant Tools.													
+2016-04-25	Voyant.panel.NoTool	badToolSpecified	The <i>{0}</i> tool doesn't exist. You will be redirected to the main page of Voyant Tools.									Nástroj <i>{0}</i> neexistuje. Budete přesměrováni na hlavní stránku Voyant Tools.													
+2016-04-25	Voyant.panel.NoTool	notImplemented	<p>The <i>{0}</i> tool existed in a previous version of Voyant Tools but has not been implemented in this version. Some tools may be reimplemented eventually while others are unlikely to be implemented because they were experimental, unuseful or dependent on technologies that are no longer supported (like Adobe Flash and Java Applets).</p><p>Please decide if you'd like to use the new version of Voyant or if you'd rather try using the <i>{0}</i> tool in the old version.</p>									<p>The <i>{0}</i> tool existed in a previous version of Voyant Tools but has not been implemented in this version. Some tools may be reimplemented eventually while others are unlikely to be implemented because they were experimental, unuseful or dependent on technologies that are no longer supported (like Adobe Flash and Java Applets).</p><p>Please decide if you'd like to use the new version of Voyant or if you'd rather try using the <i>{0}</i> tool in the old version.</p> <p>Nástroj <i>{0}</i> existoval v předchozí verzi Voyant Tools, ale v této verzi nebyl implementován. Některé nástroje mohou být výhledově opět implementovány, avšak u dalších je pravděpodobnost opětovné implementace nízká, neboť byly experimentální, neužitečné nebo závisely na technologiích, kiteré již nejsou podporované (jako Adobe Flash nebo Java aplety).</p><p> Rozhodněte se prosím, zda chcete použít novou verzi Voyant, nebo chcete zkusit použít nástroj <i>{0}</i> ve staré verzi.</p> 													
+2016-04-25	Voyant.panel.VoyantFooter	voyantTools	Voyant Tools									Voyant Tools													
+2016-04-25	Voyant.panel.VoyantFooter	voyantLink	<a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools</a>									<a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools</a>													
+2016-04-25	Voyant.panel.VoyantFooter	privacy	Privacy									Ochrana soukromí													
+2016-04-25	Voyant.panel.VoyantFooter	privacyMsg	The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see &lt;a href="http://www.google.ca/intl/en/policies/privacy/" target="_blank"&gt;Google's Privacy Policy&lt;/a&gt; and the &lt;em&gt;Log Information&lt;/em&gt; section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact &lt;a href="http://stefansinclair.name/contact/"&gt;Stéfan Sinclair&lt;/a&gt;.									Vývojáři Voyant Tools sbírají ze stránky data o tom, jaké nástroje jsou používány a s jakými parametry (také IP adresy jsou protokolovány, aby bylo možné identifikovat vícenásobné požadavky během jedné relace). Kromě toho Voyant Tools používají Google Analytics (viz &lt;a href="http://www.google.ca/intl/en/policies/privacy/" target="_blank"&gt;Google's Privacy Policy&lt;/a&gt; především sekce &lt;em&gt;Log Information&lt;/em&gt; ). Lokálně protokolovaná data a data z Google Analytics budou vývojářským týmem použita k odstranění chyb a vylepšení nástrojů a také k lepšímu porozumění tomu, jak je badatelé využívají. Tato data mohou být také v anonymizované a agregované formě využita pro výzkumné účely. Upozorňujeme, že texty odeslané do Voyant Tools jsou ukládány, aby byl umožněn soustavný přístup během pracovní relace a mezi nimi. Pokud máte dotazy ohledně sbíraných dat a jejich použití nebo chcete-li požádat o odstranění korpusu, kontaktujte prosím  &lt;a href="http://stefansinclair.name/contact/"&gt;Stéfana Sinclaira&lt;/a&gt;.													
+2016-04-25	Voyant.panel.VoyantHeader	title	Voyant Tools									Voyant Tools													
+2016-04-25	Voyant.panel.VoyantHeader	helpTip	Voyant Tools is a web-based reading and analysis environment for digital texts.									Voyant Tools jsou webovým prostředím pro čtení a analýzu digitálních textů.													
+2016-04-25	Voyant.panel.VoyantHeader	home	Start Over									Obnovení													
+2016-04-25	Voyant.panel.VoyantHeader	homeTip	Click to start over from the corpus creation screen.									Klikněte zde pro návrat do obrazovky pro vytvoření korpusu.													
+2016-04-25	Voyant.panel.VoyantHeader	homeConfirm	Are you sure you want to start over (and leave the current corpus)?									Opravdu chcete začít znovu (a opustit stávající korpus)?													
+2016-04-25	Voyant.panel.CorpusSet	title	Corpus View									Zobrazení korpusu													
+2016-04-25	Voyant.panel.CorpusSet	helpTip	This is the default, general-purpose corpus view.									Toto je výchozí zobrazení korpusu pro obecné účely.													
+2016-04-25	Voyant.panel.ScatterSet	title	Scatter									Bodový graf													
+2016-04-25	Voyant.panel.ScatterSet	helpTip	This is a specialized view for working with scatterplots.									Toto je specializované zobrazení pro práci s bodovými grafy.													
+2016-04-25	Voyant.panel.Subset	title	Workset Builder									Vytvoření pracovní sady													
+2016-04-25	Voyant.panel.Subset	titleLabel	Titles									Názvy													
+2016-04-25	Voyant.panel.Subset	authorLabel	Authors									Autoři													
+2016-04-25	Voyant.panel.Subset	lexicalLabel	Full-text									Plný text													
+2016-04-25	Voyant.panel.Subset	publisherLabel	Publishers									Vydavatelé													
+2016-04-25	Voyant.panel.Subset	sendToVoyantButton	New Voyant Corpus									Nový Voyant korpus													
+2016-04-25	Voyant.panel.Subset	downloadButton	Download Zip Archive									Archiv ke stažení ve formátu ZIP.													
+2016-04-25	Voyant.panel.Subset	sendToVoyantNoQuery	There's currently no query specified, but you can <a href="{0}" target="_blank">open the current corpus in a new window</a>.									Aktuálně není zvoleno žádné kritérium vyhledávání, ale můžete <a href="{0}" target="_blank">otevřít stávájící korpus v novém okně</a>.													
+2016-04-25	Voyant.panel.Subset	noMatches	The current query criteria don't match any documents, please modifying the search first.									Stávajícím kritériím vyhledávání neodpovídá žádný dokument, prosím nejdříve změňte kritéria vyhledávání.													
+2016-04-25	Voyant.panel.CollocatesSet	title	Scatter									Bodový graf													
+2016-04-25	Voyant.panel.CollocatesSet	helpTip	This is a specialized view for working with scatterplots.									Toto je specializované zobrazení pro práci s bodovými grafy.													
+2016-04-25	Voyant.panel.BubblelinesSet	title	Bubblelines Skin									Motiv vzhledu Bubblelines.													
+2016-04-25	Voyant.panel.BubblelinesSet	helpTip	This is a specialized view for working with Bubblelines.									Toto je specializované zobrazení pro práci s Bubblelines.													
+2016-04-25	Voyant.panel.CustomSet	title	Custom View									Uživatelsky definované zobrazení.													
+2016-04-25	Voyant.panel.CustomSet	helpTip	This is a custom view.									Toto je uživatelsky definované zobrazení.													
+2016-04-25	Voyant.panel.CustomSet	noSuchTool	The specified tool ({0}) does not exist.									Zvolený nástroj ({0}) neexistuje.													
+2016-04-25	Voyant.panel.WordTree	title	WordTree									Slovní strom													
+2016-04-28	Voyant.panel.WordTree	emptyText	No matching results.																						
+2016-04-25	Voyant.VoyantApp	error	Error									Chyba zobrazení.													
+2016-04-25	Voyant.VoyantApp	serverResponseError	The server error reponse:									Chybové hlášení serveru:													
+2016-04-25	Voyant.VoyantCorpusApp	fetchingCorpus	Fetching your corpus									Načítání vašeho korpusu													
+2016-04-25	Voyant.VoyantCorpusApp	moreToolsScale	Tools by Scale									Nástroje podle měřítka													
+2016-04-25	Voyant.VoyantCorpusApp	moreToolsScaleCorpus	Corpus Tools									Korpusové nástroje													
+2016-04-25	Voyant.VoyantCorpusApp	moreToolsScaleDocument	Document Tools									Dokumentové nástroje													
+2016-04-25	Voyant.VoyantCorpusApp	moreToolsType	Tools by Type									Nástroje podle typu													
+2016-04-25	Voyant.VoyantCorpusApp	moreToolsTypeViz	Visualization Tools									Vizualizační nástroje													
+2016-04-25	Voyant.VoyantCorpusApp	moreToolsTypeGrid	Grid Tools									Maticové nástroje													
+2016-04-25	Voyant.VoyantCorpusApp	moreToolsTypeOther	Other Tools									Jiné nástroje													
+2016-04-25	Voyant.VoyantCorpusApp	passwordRequiredTitle	Access Code Required									Je vyžadováno heslo													
+2016-04-25	Voyant.VoyantCorpusApp	passwordRequiredMessage	This corpus requires an access code.									Tento korpus vyžaduje přístupové heslo.													
+2016-04-25	Voyant.VoyantCorpusApp	nonConsumptiveMessage	Alternatively, you can click on the <i>Limited Access</i> button to continue with limited functionality (generally speaking, this non-consumpive access allows you to explore derivative data from the corpus without allowing you to read text from the corpus).									Pro pokračování s omezenou funkčností můžete kliknout na tlačítko  <i>omezený přístup</i> (obecně vzato, tento přístup bez uživatelských práv vám dovolí prozkoumávat odvozená data, aniž by vám umožnil číst text v korpusu).													
+2016-04-25	Voyant.VoyantCorpusApp	nonConsumptiveButton	Limited Access									Omezený přístup													
+2016-04-25	Voyant.VoyantCorpusApp	passwordValidateButton	Validate									Ověřit													
+2016-04-25	Voyant.VoyantCorpusApp	password	access code									přístupové heslo													
+2016-04-25	Voyant.VoyantCorpusApp	noPasswordGiven	Please provide an access code.									Prosím vložte přístupové heslo.													
+2016-04-25	Voyant.VoyantCorpusApp	badPassword	Sorry, that doesn't seem to be a valid access code.									Promiňte, toto heslo není platné.													
+2016-04-25	Voyant.VoyantCorpusApp	passwordValidationError	Sorry, an unexpected error occurred while trying to validate your access code.									Promiňte, během ověřování platnosti vašeho přístupového hesla se vyskytla nečekaná chyba.													
+2016-04-25	Voyant.VoyantDefaultApp	noViewErrorTitle	View Error									Chyba zobrazení.													
+2016-04-25	Voyant.VoyantDefaultApp	noViewErrorTpl	No view was found with the name "<i>{view}</i>". The default view will be used instead.									Nebylo nalezeno žádné zobrazení s názvem "<i>{view}</i>". Místo něj bude použito výchozí zobrazení.													
+2016-04-25	Voyant.VoyantDefaultApp	noViewKnownErrorTpl	The selected view ({view}) has not been migrated from the previous version of Voyant (and probably won't be). {additional} The default view will be used instead.									Zvolené zobrazení ({view}) nebylo z předchozí verze Voyant převedeno (a nejspíše ani nebude). {additional} Místo něj bude použito výchozí zobrazení. 													
+2016-04-25	Voyant.VoyantDefaultApp	convertSkinMsg	The convert skin was used for document exporting and that functionality is now available from the Documents tool.									Pro export dokumentu byla použita změna motivu vzhledu a tato funkce je nyní dostupná v nástroji Dokumenty.													
+2016-04-25	Voyant.VoyantDefaultApp	voyantIs	<p style="text-align: center; font-style: italic;">Voyant Tools is a web-based reading and analysis environment for digital texts – please visit <a href="http://hermeneuti.ca/" target="_blank">Hermeneuti.ca</a> for more information..</p>									<p style="text-align: center; font-style: italic;">Voyant Tools jsou webovým prostředím pro čtení a analýzu digitálních textů – pro více informací navštivte stránky <a href="http://hermeneuti.ca/" target="_blank">Hermeneuti.ca</a>.</p>													
+2016-04-25	Voyant.VoyantDefaultApp	helpTip	Voyant Tools is a web-based reading and analysis environment for digital texts.<p></p>									Voyant Tools jsou webovým prostředím pro čtení a analýzu digitálních textů. <p></p>													

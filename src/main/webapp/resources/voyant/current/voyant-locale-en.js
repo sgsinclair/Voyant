@@ -75,6 +75,7 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "pubDateField":"publication date",
 "exportNewCorpusTip":"Create a new corpus from matching documents (button will be disabled if there are no matches)."});
 Ext.apply(Voyant.panel.WordTree.i18n, {
+"emptyText":"No matching results.",
 "title":"WordTree"});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "original":"original",
@@ -194,7 +195,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "selectOrFilterError":"You need to first select documents by clicking on one or more rows or by performing a search query.",
 "keepSelectedDocuments":"Create a <i>new</i> corpus that only keeps the {0:plural('selected document')}?",
 "tokensCountLexical":"Words",
-"removeTip":"Click here to create a new corpus that excludes selected or filtered (search query) documents.",
+"removeTip":"Click here to create a new corpus that excludes selected or filtered (search query) documents.        ",
 "matchingDocuments":"Matching documents: {count}",
 "id":"ID",
 "documentTitle":"Title",
@@ -377,8 +378,9 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "facet.languageTitle":"Languages",
 "noMatches":"No matches (out of {0} documents).",
 "loadingSnippets":"loading text snippets…",
+"facet.collectionTitle":"Collections",
 "matchingDocuments":"number of matching documents",
-"helpTip":"<p>The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.",
+"helpTip":"The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.",
 "facet.pubDateTitle":"Publication Dates",
 "export":"Export",
 "facet.publisherTitle":"Publishers"});

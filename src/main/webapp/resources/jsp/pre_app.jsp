@@ -53,4 +53,6 @@
 } %>
 
 <script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp<%= (request.getParameter("debug")!=null ? "?debug=true" : "") %>"></script>
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?lang=<%= (request.getParameter("lang")==null ? "en" : request.getParameter("lang")) %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?lang=<%
+if (request.getParameter("lang")!=null) { %><%= request.getParameter("lang") %><% } 
+else if (request.getAttribute("lang")!=null) {%><%= request.getAttribute("lang") %><% } else { %>en<% } %>"></script>

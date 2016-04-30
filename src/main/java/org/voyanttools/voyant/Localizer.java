@@ -50,7 +50,7 @@ public class Localizer {
 			if (locationsMap.containsKey(location)==false) {
 				locationsMap.put(location, new HashMap<String, String>());
 			}
-			locationsMap.get(location).put(cells[2], cells.length>=column-1 && cells[column].isEmpty()==false ? cells[column] : cells[english]);
+			locationsMap.get(location).put(cells[2], cells.length>column && cells[column].isEmpty()==false ? cells[column] : cells[english]);
 		}
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, Map<String, String>> locationEntry : locationsMap.entrySet()) {

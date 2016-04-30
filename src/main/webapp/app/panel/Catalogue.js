@@ -22,6 +22,7 @@ Ext.define('Voyant.panel.Catalogue', {
     },
     
     constructor: function(config) {
+    	config = config || {};
 
     	Ext.apply(this, {
     		title: this.localize('title'),
@@ -44,7 +45,7 @@ Ext.define('Voyant.panel.Catalogue', {
     		        },
     		        {
     		        	xtype: 'panel',
-    		        	html: '',
+    		        	html: config.customResultsHtml || '',
     		        	flex: 1,
     		        	itemId: 'results',
     		        	height: '100%',

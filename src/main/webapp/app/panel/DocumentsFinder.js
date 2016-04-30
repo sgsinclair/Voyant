@@ -5,8 +5,6 @@ Ext.define('Voyant.panel.DocumentsFinder', {
 	alias: 'widget.documentsfinder',
     statics: {
     	i18n: {
-    		noMatches: {'en': new Ext.Template('No matches (out of {0} documents).', {compiled: true})},
-    		queryMatches: {en: new Ext.Template("A total of {0} matching documents (out of {1}).", {compiled: true})},
     	}
     },
     
