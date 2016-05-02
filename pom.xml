@@ -40,6 +40,7 @@
                 <configuration>
                   <outputDirectory>${basedir}/src/main/webapp/WEB-INF/lib</outputDirectory>
 				  <includeScope>runtime</includeScope>
+				  <!-- we have to skip trombone to ensure that we're using compiled classes from project -->
 				  <excludeArtifactIds>trombone</excludeArtifactIds>
                 </configuration>
               </execution>

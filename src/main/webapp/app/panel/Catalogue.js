@@ -267,8 +267,8 @@ Ext.define('Voyant.panel.Catalogue', {
     	}
 		var results = this.queryById("results").getTargetEl();
 		var catalogue = this;
-		results.update(this.getCustomResultsHtml() ? this.getCustomResultsHtml() : this.localize('noMatches', [this.getCorpus().getDocumentsCount()]));
-		this.queryById('status').update(this.localize('noMatches', [this.getCorpus().getDocumentsCount()]))
+		results.update(this.getCustomResultsHtml() ? this.getCustomResultsHtml() : new Ext.XTemplate(this.localize('noMatches')).apply([this.getCorpus().getDocumentsCount()]));
+		this.queryById('status').update(new Ext.XTemplate(this.localize('noMatches')).apply([this.getCorpus().getDocumentsCount()]))
 		this.queryById('export').setDisabled(true);
     	if (queries && queries.length>0) {
     		this.mask(this.localize("loading"));
@@ -312,7 +312,7 @@ Ext.define('Voyant.panel.Catalogue', {
     													})
     												}
     											})
-    											labelItems+="<li>"+(isArray ? '' : suffix+": ")+(isMatch ? '<span class="keyword">'+l+'</span>' : l)+"</li>"
+    											labelItems+="<li>"+(isArray ? '' : suffix.replace('extra.','')+": ")+(isMatch ? '<span class="keyword">'+l+'</span>' : l)+"</li>"
     										})
     										if (isArray) {
     											labelItems+="</ul></li>";
@@ -329,7 +329,7 @@ Ext.define('Voyant.panel.Catalogue', {
     					})
     					list += "</ul>";
     					results.update(list);
-    					this.queryById('status').update(this.localize('queryMatches', [matchingDocIds.length,this.getCorpus().getDocumentsCount()]))
+    					this.queryById('status').update(new Ext.XTemplate(this.localize('queryMatches')).apply([matchingDocIds.length,this.getCorpus().getDocumentsCount()]))
     					this.setMatchingDocIds(Ext.Array.clone(matchingDocIds));
     					if (matchingDocIds.length>0) {
     						this.queryById('export').setDisabled(false);

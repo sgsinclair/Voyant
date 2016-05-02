@@ -55,7 +55,50 @@
 			    	autoScroll: true,
 				    margin: '0, 40, 20, 40',
 				    introHtml: introHtml,
-				    handleExport: function() {
+				    listeners: {
+					    loadedCorpus: function(src, corpus) {
+						    // make sure corpus is set
+						    this.getStore().setCorpus(corpus);
+						    var slider = this.down('multislider');
+						    slider.fireEvent("changecomplete", slider)
+						}
+					},
+				    handleExport: function(a, b, withBadPassword) {
+					    var corpus = this.getStore().getCorpus();
+					    if (corpus && corpus.getNoPasswordAccess()=='NONCONSUMPTIVE' && !this.getCorpusAccessValidated()) {
+						    return Ext.Msg.prompt("Access Code Required", (withBadPassword ? "<p style='color: red'>"+me.localize('badPassword')+"</p>" : '') + "<p>Access to this corpus is restricted. Please provide a valid access code to continue with the download.</p>", function(btn, code) {
+								if (btn=='ok' && code.trim().length>0) {
+									this.mask("Verifying password…");
+		                    		Ext.Ajax.request({
+		                    			  url: me.getTromboneUrl(),
+		                    			  params: {
+		                    				  corpus: corpus.getId(),
+		                    				  passwordForSession: code
+		                    			  },
+		                    			  method: 'POST',
+		                    			  success: function(result, request) {
+		                    				  this.unmask();
+		                    				  var access = result.responseText;
+		                    				  if (access=="ADMIN" || access=="ACCESS") {
+			                    				  this.setCorpusAccessValidated(true);
+			                    				  this.handleExport(); // try again with password set
+		                    				  }
+		                    				  else {
+			                    				  this.handleExport(a, b, true);
+		                    				  }
+		                    			  },
+		                    			  failure: function(result, request) {
+		                    				  this.unmask();
+		  		                    			this.showError({
+				                    				message: me.localize('passwordValidationError')
+				                    			})
+		                    			  },
+		                    			  scope: this 
+		                    		});
+										
+								}
+							}, this); 
+						}
 				    	if (!this.getStore().lastOptions || !this.getStore().lastOptions.params.query) {
 					    	this.showMsg({message: "No queries have been selected, please select a subset of documents by specifying at least one query."});
 				    	} else {
@@ -113,34 +156,38 @@
 				        		xtype: 'multislider',
 						        minValue: 1450,
 						        maxValue: 1700,
-						        values: [ 1450, 1450 ],
+						        values: [ 1450, 1700 ],
 //						        width: 200
 						        flex: 1,
 						        getValue: function() {
-							        return '['+this.getValues().join("-")+"]"
+							        var values = this.getValues();
+							        return this.minValue==values[0] && this.maxValue==values[1] ? "" : '['+values.join("-")+"]"
 							    },
 							    getTokenType: function() {return 'pubDate'},
 						        listeners: {
 							        changecomplete: function(slider) {
-								        var query = this.getTokenType()+':'+this.getValue();
+								        var query = this.getValue();
+								        if (query) {query = this.getTokenType()+':'+query;}
 							        	var subset = slider.up('subset');
 							    		subset.fireEvent("query", me, [query]);
 							        	var countEl = Ext.get(slider.ownerCt.getTargetEl().dom.querySelector('.form-fa-count-trigger'));
-							        	countEl.setHtml('0')
+							        	countEl.setHtml(query.length>0 ? '0' : subset.getStore().getCorpus().getDocumentsCount())
 							        	countEl.show();
-					    				subset.getStore().getCorpus().getCorpusTerms().load({
-					    					params: {
-					    						query: query,
-								    			tokenType: 'pubDate',
-								    			inDocumentsCountOnly: true
-					    					},
-					    					callback: function(records, operation, success) {
-					    						if (success && records && records.length==1) {
-					    							countEl.setHtml(Ext.util.Format.number(records[0].getInDocumentsCount(), '0,000'))
-						    						slider.ownerCt.updateLayout()
-					    						}
-					    					}
-					    				})
+							        	if (query) {
+						    				subset.getStore().getCorpus().getCorpusTerms().load({
+						    					params: {
+						    						query: query,
+									    			tokenType: 'pubDate',
+									    			inDocumentsCountOnly: true
+						    					},
+						    					callback: function(records, operation, success) {
+						    						if (success && records && records.length==1) {
+						    							countEl.setHtml(Ext.util.Format.number(records[0].getInDocumentsCount(), '0,000'))
+							    						slider.ownerCt.updateLayout()
+						    						}
+						    					}
+						    				})
+								        }
 								    }
 						    	},
 						    	scope: this
@@ -192,7 +239,7 @@
 		}
 	});
 </script>
-<link href='http://fonts.googleapis.com/css?family=Cinzel+Decorative:400,900' rel='stylesheet' type='text/css'>
+<!link href='http://fonts.googleapis.com/css?family=Cinzel+Decorative:400,900' rel='stylesheet' type='text/css'>
 <style>
 	.dream-body {
 		background-image: url(dream-tp-transparent.png);

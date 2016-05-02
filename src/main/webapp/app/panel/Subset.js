@@ -254,7 +254,6 @@ Ext.define('Voyant.panel.Subset', {
     getAggregateQuery: function() {
 		var aggregateQueries = [];
 		Ext.ComponentQuery.query('field', this).forEach(function(field) {
-			console.warn(field, field.getTokenType, field.value)
 			if (field.getTokenType && field.getValue) {
 				var tokenType = field.getTokenType();
 				var vals = Ext.Array.from(field.getValue());

@@ -386,6 +386,12 @@ Ext.define('Voyant.util.Toolable', {
 	},
 	exportPng: function() {
 		var img;
+		
+		var draw = this.down('draw');
+		if (draw) {
+			return this.exportPngData(draw.getImage().data);
+		}
+		
 		var chart = this.down('chart'); // first try finding a chart
 		if (chart) {
 			return this.exportPngData(this.down('chart').getImage().data);

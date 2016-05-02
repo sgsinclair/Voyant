@@ -9,6 +9,21 @@
 		}
 	});
 
+ 	Ext.define('Voyant.panel.Pblit', {
+ 	 	extend: 'Voyant.panel.Catalogue',
+ 	 	statics: {
+ 	 	 	i18n: {
+ 	 	 	 	"facet.extra.collectionTitle": "Collections",
+ 	 	 	 	helpTip: "PBLit (PolyBase littéraire) est un projet expérimental qui vise à développer des stratégies pour l'exploitation simultanée de multiples base de données et sources de textes numérisés. De nombreuses ressources existent pour les littéraires, mais les données sont presque toujours disponibles uniquement à partir de l'interface de chaque ressource individuelle. PBLit offre un modèle prototype pour la navigation et la recherche dans de multiples ressources littéraires."
+ 	 	 	}
+ 	 	},
+		alias: 'widget.pblit',
+		helpToolClick: function() {
+			panel = this.up('panel');
+			Ext.Msg.alert('PBLit', panel.localize('helpTip')+"<p>Pour plus d'informations, visiter <a href='http://digihum.mcgill.ca/pblit/' target='_blank'>digihum.mcgill.ca/pblit</a>.</p>")
+		}
+	})
+	
 	Ext.application({
 		extend : 'Voyant.VoyantCorpusApp',
 		requires: ['Voyant.panel.Subset'],
@@ -25,9 +40,6 @@
 	    		pubDateCountTip: {en: "This is the number of documents whose publication year matches the specified range."},
 	    		pubDateHelpTip: {en: "Use the slider to determine the start and end year range of publications."}
 	    	}
-		},
-		validateCorpusLoadParams: function(params) {
-			params.docsLimit=0
 		},
 	    launch: function() {
 
@@ -47,12 +59,12 @@
 			    layout: 'fit',
 			    cls: 'dream-body',
 			    items: [{
-				    xtype: 'catalogue',
+				    xtype: 'pblit',
 				    title: 'PBLit',
 				    customResultsHtml:introHtml,
 				    listeners: {
 					    beforerender: function() {
-						    this.setApiParam('facet', ['facet.collection', 'facet.category', 'facet.author'])
+						    this.setApiParam('facet', ['facet.extra.collection', 'facet.author', 'facet.title', 'facet.extra.topos'])
 						}
 					}
 			    }]

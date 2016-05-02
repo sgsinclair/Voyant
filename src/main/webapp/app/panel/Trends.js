@@ -330,7 +330,7 @@
                     radius: 3
                 },
                 highlight: true,
-                smooth: true,
+                smooth: false,
                 tooltip: {
                     trackMouse: true,
                     style: 'background: #fff',

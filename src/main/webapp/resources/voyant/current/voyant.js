@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Apr 29 13:14:34 EDT 2016 */
+/* This file created by JSCacher. Last modified: Mon May 02 16:25:56 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4869,6 +4869,12 @@ Ext.define('Voyant.util.Toolable', {
 	},
 	exportPng: function() {
 		var img;
+		
+		var draw = this.down('draw');
+		if (draw) {
+			return this.exportPngData(draw.getImage().data);
+		}
+		
 		var chart = this.down('chart'); // first try finding a chart
 		if (chart) {
 			return this.exportPngData(this.down('chart').getImage().data);
@@ -7057,6 +7063,9 @@ Ext.define('Voyant.panel.Panel', {
 	alias: 'widget.voyantpanel',
 	statics: {
 		i18n: {
+		},
+		config: {
+			corpusValidated: false
 		}
 	},
 	constructor: function(config) {
@@ -8033,8 +8042,8 @@ Ext.define('Voyant.panel.Catalogue', {
     	}
 		var results = this.queryById("results").getTargetEl();
 		var catalogue = this;
-		results.update(this.getCustomResultsHtml() ? this.getCustomResultsHtml() : this.localize('noMatches', [this.getCorpus().getDocumentsCount()]));
-		this.queryById('status').update(this.localize('noMatches', [this.getCorpus().getDocumentsCount()]))
+		results.update(this.getCustomResultsHtml() ? this.getCustomResultsHtml() : new Ext.XTemplate(this.localize('noMatches')).apply([this.getCorpus().getDocumentsCount()]));
+		this.queryById('status').update(new Ext.XTemplate(this.localize('noMatches')).apply([this.getCorpus().getDocumentsCount()]))
 		this.queryById('export').setDisabled(true);
     	if (queries && queries.length>0) {
     		this.mask(this.localize("loading"));
@@ -8078,7 +8087,7 @@ Ext.define('Voyant.panel.Catalogue', {
     													})
     												}
     											})
-    											labelItems+="<li>"+(isArray ? '' : suffix+": ")+(isMatch ? '<span class="keyword">'+l+'</span>' : l)+"</li>"
+    											labelItems+="<li>"+(isArray ? '' : suffix.replace('extra.','')+": ")+(isMatch ? '<span class="keyword">'+l+'</span>' : l)+"</li>"
     										})
     										if (isArray) {
     											labelItems+="</ul></li>";
@@ -8095,7 +8104,7 @@ Ext.define('Voyant.panel.Catalogue', {
     					})
     					list += "</ul>";
     					results.update(list);
-    					this.queryById('status').update(this.localize('queryMatches', [matchingDocIds.length,this.getCorpus().getDocumentsCount()]))
+    					this.queryById('status').update(new Ext.XTemplate(this.localize('queryMatches')).apply([matchingDocIds.length,this.getCorpus().getDocumentsCount()]))
     					this.setMatchingDocIds(Ext.Array.clone(matchingDocIds));
     					if (matchingDocIds.length>0) {
     						this.queryById('export').setDisabled(false);
@@ -17365,7 +17374,7 @@ Ext.define('Voyant.panel.TermsRadio', {
                     radius: 3
                 },
                 highlight: true,
-                smooth: true,
+                smooth: false,
                 tooltip: {
                     trackMouse: true,
                     style: 'background: #fff',
@@ -18162,7 +18171,6 @@ Ext.define('Voyant.panel.Subset', {
     getAggregateQuery: function() {
 		var aggregateQueries = [];
 		Ext.ComponentQuery.query('field', this).forEach(function(field) {
-			console.warn(field, field.getTokenType, field.value)
 			if (field.getTokenType && field.getValue) {
 				var tokenType = field.getTokenType();
 				var vals = Ext.Array.from(field.getValue());

@@ -4,6 +4,9 @@ Ext.define('Voyant.panel.Panel', {
 	alias: 'widget.voyantpanel',
 	statics: {
 		i18n: {
+		},
+		config: {
+			corpusValidated: false
 		}
 	},
 	constructor: function(config) {
