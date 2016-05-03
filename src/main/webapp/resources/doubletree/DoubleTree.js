@@ -241,8 +241,9 @@ doubletree.DoubleTree = function() {
 			right : 20,
 			bottom : 20,
 			left : 20
-		}, width = visWidth - margin.right - margin.left, height = visHt
-				- margin.top - margin.bottom;
+		};
+		var width = visWidth - margin.right - margin.left;
+		var height = visHt - margin.top - margin.bottom;
 
 		containers[0].forEach(function(d, i) {
 			var thisContainer = d;

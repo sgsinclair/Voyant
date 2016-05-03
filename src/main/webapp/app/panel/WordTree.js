@@ -59,7 +59,7 @@ Ext.define('Voyant.panel.WordTree', {
         					//prefix.push([r.getLeft().trim().replace(/\s+/g, ' ')]);
         					prefix.push(r.getLeft().trim().split(/\s+/));
         					hit.push(r.getMiddle());
-//        					suffix.push([r.getRight().trim().replace(/\s+/g, ' ')]);
+        					//suffix.push([r.getRight().trim().replace(/\s+/g, ' ')]);
         					suffix.push(r.getRight().trim().split(/\s+/));
         					id.push(i);
         				}
@@ -87,8 +87,8 @@ Ext.define('Voyant.panel.WordTree', {
     		corpusTerms.load({
     		    callback: function(records, operation, success) {
     		    	if (success && records.length>0) {
-    		    		this.setApiParam('query', records[0].getTerm());
-    		    		this.getKwicStore().load({params: this.getApiParams()});
+    		    		var firstTerm = records[0].getTerm();
+    		    		this.setRoot(firstTerm);
     		    	}
     		    },
     		    scope: this,
@@ -177,8 +177,20 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     setRoot: function(query) {
-    	this.setApiParam('query', query);
+    	this.setApiParam('query', this.stripPunctuation(query));
 		this.getKwicStore().load({params: this.getApiParams()});
+    },
+    
+    stripPunctuation: function(value) {
+    	if (Ext.isString(value)) return value.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+    	else {
+    		var values = [];
+    		value.forEach(function(v) {
+    			values.push(v.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
+    		});
+    		return values;
+    	}
+    	return '';
     }
 });
 
