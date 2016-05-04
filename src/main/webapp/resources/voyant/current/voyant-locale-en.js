@@ -1,49 +1,9 @@
-Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
-"titleLabel":"title",
-"authorLabel":"author",
-"availableLabel":"exclude: ",
-"enabledLabel":"include: ",
-"fieldLabel":"Filenames",
-"pubDateLabel":"date"});
-Ext.apply(Voyant.panel.DocumentTerms.i18n, {
-"matchingTerms":"Matching terms: {count}",
-"tfidfTip":"The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.",
-"rawFreqTip":"The count (raw frequency) of this term in this document.",
-"emptyText":"No matching results.",
-"relativeFreqTip":"The relative frequency (per million) of this term in each document.",
-"termTip":"The term in a single, specific document.",
-"zscore":"Z-Score",
-"trendTip":"This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).",
-"tfidf":"Significance",
-"title":"Document Terms",
-"helpTip":"<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
-"zscoreTip":"The Z-Score, or standard score, is a normalized value for the term's raw frequency compared to other term frequencies in the same document.<table><tbody><tr><td style=\"text-align: center; font-size: smaller; font-family: mono;\">frequency of term - mean of term frequencies<hr>standard deviation of term frequencies</td></tr></tbody></table>."});
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"Are you sure you want to start over (and leave the current corpus)?",
 "title":"Voyant Tools",
 "helpTip":"Voyant Tools is a web-based reading and analysis environment for digital texts.",
 "homeTip":"Click to start over from the corpus creation screen.",
 "home":"Start Over"});
-Ext.apply(Voyant.data.model.Corpus.i18n, {
-"hasNdocuments":"has {count} documents",
-"daysAgo":"about {count} days ago",
-"monthsAgo":"about {count} months ago",
-"thisCorpus":"This corpus",
-"isEmpty":"is empty",
-"widthNwordsAndNTypes":"with {words} <span class=\"info-tip\" data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted\">total words</span> and {types} <span class=\"info-tip\" data-qtip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">unique word forms</span>",
-"hoursAgo":"about {count} hours ago",
-"minutesAgo":"about {count} minutes ago",
-"minuteAgo":"about a minute ago",
-"monthAgo":"about a month ago",
-"hourAgo":"about an hour ago",
-"failedCreateCorpus":"Failed attempt to create a Corpus.",
-"has1document":"has 1 document",
-"yearsAgo":"about {count} years ago",
-"secondAgo":"about a second ago",
-"now":"now",
-"yearAgo":"about a year ago",
-"secondsAgo":"{count} seconds ago",
-"dayAgo":"about a day ago"});
 Ext.apply(Voyant.panel.Cirrus.i18n, {
 "maxTerms":"Max terms",
 "visible":"Show",
@@ -74,20 +34,6 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"publisher",
 "pubDateField":"publication date",
 "exportNewCorpusTip":"Create a new corpus from matching documents (button will be disabled if there are no matches)."});
-Ext.apply(Voyant.panel.WordTree.i18n, {
-"emptyText":"No matching results.",
-"title":"WordTree"});
-Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
-"original":"original",
-"VOYANTTip":"This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content.",
-"fieldLabel":"File Format",
-"voyantXml":"Voyant XML",
-"plainText":"plain text",
-"SOURCETip":"This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided.",
-"TXTTip":"This will produce a plain text version of each document."});
-Ext.apply(Voyant.panel.ScatterSet.i18n, {
-"title":"Scatter",
-"helpTip":"This is a specialized view for working with scatterplots."});
 Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"Panel to control settings for word display.",
 "linear":"Linear",
@@ -111,58 +57,10 @@ Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "segmentsTip":"This option allows you to define how many segments a document should be divided into (note that this option only applies to distribution within a document, not distribution across a corpus).",
 "termNotFound":"Term not found.",
 "fractionTip":"This option allows you to define the number of words displayed. Ex. 20 will only keep the words that occur with the lowest 20% of frequency."});
-Ext.apply(Voyant.util.Toolable.i18n, {
-"exportTitle":"Export",
-"exportError":"Export Error",
-"exportDataTsvMessage":"Copy data below, they can be pasted into a spreadsheet or text file.",
-"exportViewFieldset":"Export View (Tools and Data)",
-"exportSvgMessage":"<p>This is a thumbnail of the SVG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the SVG code below.</p>",
-"exportDataJsonMessage":"Copy the data below, they can be used in other web-based applications.",
-"plusTip":"Click to choose another tool for this panel location (this will replace the current tool).",
-"gearTip":"Define options for this tool.",
-"cancelTitle":"Cancel",
-"exportViewHtmlEmbed":"an HTML snippet for embedding this view in another web page",
-"exportGridCurrent":"Export Current Data",
-"exportSvgTitle":"Export SVG",
-"maximizeTip":"Open this tool in a new window",
-"exportGridCurrentTsv":"export current data as tab separated values (text)",
-"exportVizTitle":"Export Visualization",
-"exportDataTitle":"Export Data",
-"optionsTitle":"Options",
-"exportBiblioTitle":"Export Bibliographic Reference",
-"confirmTitle":"Confirm",
-"moreHelp":"More help…",
-"exportViewUrl":"a URL for this view (tools and data)",
-"helpTip":"No tool-specific help is currently available. Click this icon to visit the <a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools Documentation</a> site.",
-"export":"Export",
-"exportDataHtmlMessage":"Copy the data below, they can be pasted into an HTML page or used as XML.",
-"exportPngTitle":"Export PNG",
-"exportPngMessage":"<p>This is a thumbnail of the PNG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the HTML code below.</p>",
-"exportGridCurrentHtml":"export current data as HTML",
-"exportViewEmbedMessage":"You can copy and paste the HTML snippet from the box below into another web page. Note that some content management systems (like WordPress) may need a special plugin to handle &lt;iframe&gt; tags.",
-"exportPng":"export a PNG image of this visualization",
-"reset":"Reset",
-"exportViewBiblio":"a bibliographic reference for this view",
-"exportViewEmbedTitle":"Embed HTML Snippet",
-"exportNoFunction":"An export function has been defined by is not availble.",
-"exportGridCurrentJson":"export current data as JSON",
-"exportSvg":"export the SVG of this visualization",
-"saveTip":"Export a URL, an embeddable tool, data or a bibliographic reference."});
 Ext.apply(Voyant.util.Downloadable.i18n, {
 "exportTitle":"Export",
 "downloadButton":"Download",
 "cancelButton":"Cancel"});
-Ext.apply(Voyant.panel.StreamGraph.i18n, {
-"freqsMode":"Frequencies",
-"freqsModeTip":"Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).",
-"relativeFrequencies":"Relative Frequencies",
-"documents":"Documents",
-"documentSegments":"Document Segments",
-"clearTerms":"Clear Terms",
-"title":"StreamGraph",
-"rawFrequencies":"Raw Frequencies",
-"helpTip":"StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).",
-"segments":"Segments"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"Count (context)",
 "matchingTerms":"{count}",
@@ -223,40 +121,6 @@ Ext.apply(Voyant.panel.Panel.i18n, {
 Ext.apply(Voyant.widget.CorpusDocumentSelector.i18n, {
 "corpus":"Corpus",
 "scale":"Scale"});
-Ext.apply(Voyant.widget.DownloadOptions.i18n, {
-"title":"Download Options"});
-Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
-"totalPropertyStatus":"{count:number(\"0,000\")}"});
-Ext.apply(Voyant.panel.Phrases.i18n, {
-"overlapNone":"none (keep all)",
-"overlapTip":"This determines how overlapping phrases are filtered.",
-"matchingTerms":"{count}",
-"overlapFreq":"prioritize most frequent phrases",
-"emptyText":"No matching results.",
-"length":"Length",
-"termTip":"This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence).",
-"termRawFreqTip":"The number of times the phrase occurs in the corpus.",
-"title":"Phrases",
-"lengthTip":"The upper and lower bounds of phrase lengths (how many words in each phrase).",
-"termRawFreq":"Count",
-"overlap":"Overlap",
-"overlapLength":"prioritize longest phrases",
-"overlapMenu":"Choose an overlap filter:",
-"term":"Term",
-"helpTip":"<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->"});
-Ext.apply(Voyant.panel.Trends.i18n, {
-"freqsMode":"Frequencies",
-"freqsModeTip":"Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).",
-"relativeFrequencies":"Relative Frequencies",
-"documents":"Documents",
-"options":"Options",
-"raw":"Raw",
-"segmentsSlider":"Segments",
-"title":"Trends",
-"rawFrequencies":"Raw Frequencies",
-"helpTip":"<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
-"relative":"Relative",
-"segments":"Document Segments"});
 Ext.apply(Voyant.panel.Reader.i18n, {
 "documentFrequency":"document frequency:",
 "limitedAccess":"This is a limited access corpus and this tool's functionality is restricted.",
@@ -280,50 +144,6 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "passwordValidateButton":"Validate",
 "moreToolsScale":"Tools by Scale",
 "badPassword":"Sorry, that doesn't seem to be a valid access code."});
-Ext.apply(Voyant.widget.StopListOption.i18n, {
-"cancel":"Cancel",
-"de":"German",
-"hi":"Hindi",
-"no":"Norwegian",
-"auto":"Auto-detect",
-"bg":"Bulgarian",
-"noEditAutoMessage":"The auto-detected stoplist cannot be edited, please select a specifc stoplist such as the \"New User-Defined List\".",
-"lt":"Latvian",
-"lv":"Lithuanian",
-"none":"None",
-"fr":"French",
-"hu":"Hungarian",
-"br":"Breton",
-"editStopListTitle":"Edit Stoplist",
-"hy":"Armenian",
-"se":"Swedish",
-"ga":"Irish",
-"id":"Indonesian",
-"ok":"Save",
-"ca":"Catalan",
-"new":"New User-Defined List",
-"gl":"Galician",
-"el":"Greek",
-"mu":"Multilingual",
-"en":"English",
-"label":"Stopwords:",
-"cn":"Chinese",
-"it":"Italian",
-"noEditAutoTitle":"Edit Stoplist Error",
-"es":"Spanish",
-"editStopListMessage":"This is the stoplist, one term per line.",
-"applyGlobally":"apply globally",
-"eu":"Basque",
-"editList":"Edit List",
-"ar":"Arabic",
-"th":"Thai",
-"cz":"Czech",
-"ja":"Japanese",
-"ckb":"Kurdish",
-"fa":"Farsi",
-"ro":"Romanian",
-"nl":"Dutch",
-"tr":"Turkish"});
 Ext.apply(Voyant.panel.Bubblelines.i18n, {
 "findTerm":"Find Term",
 "showTerm":"Show Term",
@@ -339,17 +159,20 @@ Ext.apply(Voyant.panel.Bubblelines.i18n, {
 "granularity":"Granularity",
 "options":"Options"});
 Ext.apply(Voyant.panel.CorpusTerms.i18n, {
-"relativePeakedness":"Peakedness",
+"corpusComparisonDifference":"Comparison",
 "matchingTerms":"Matching terms: {count}",
+"corpusComparisonDifferenceTip":"This is the difference between the term's relative frequency in this corpus and the relative frequency in a comparison corpus (you can define a comparison corpus in the tool's options).",
+"emptyText":"No matching results.",
+"termTip":"The term in the corpus.",
+"title":"Terms",
+"relativePeakednessTip":"This is a statistical measure of how much the relative frequencies of a term in a corpus are bunched up into peaks (regions with higher values where the rest are lower).",
+"relativePeakedness":"Peakedness",
+"noCorpusComparison":"You have selected to show the <i>Comparison</i> column but you haven't yet defined a comparison corpus (you can do so in the tool's options).",
 "rawFreqTip":"The total count (raw frequency) of this term in the entire corpus.",
 "relativeSkewness":"Skew",
-"emptyText":"No matching results.",
 "relativeFreqTip":"The relative frequency (per million) of this term in the entire corpus.",
-"termTip":"The term in the corpus.",
 "trendTip":"This represents the trend of the relative frequencies for each term in each document in the corpus.",
-"title":"Terms",
 "helpTip":"</p><p>Corpus Terms is a table view of terms that appear in the entire corpus. Features include:</p><ul><li>reordering by <i>term</i> and <i>count</i> (click on the column headers)</li><li>a sparkline graph of the term frequency trends across the corpus (if the corpus has multiple documents) or across the document (if the corpus has only one document)</li><li>additional columns available (relative frequency, distribution peakedness and skew) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
-"relativePeakednessTip":"This is a statistical measure of how much the relative frequencies of a term in a corpus are bunched up into peaks (regions with higher values where the rest are lower).",
 "relativeSkewnessTip":"This is a statistical measure of the symmetry of the relative frequencies of a term across the corpus."});
 Ext.apply(Voyant.panel.NoTool.i18n, {
 "notImplemented":"<p>The <i>{0}</i> tool existed in a previous version of Voyant Tools but has not been implemented in this version. Some tools may be reimplemented eventually while others are unlikely to be implemented because they were experimental, unuseful or dependent on technologies that are no longer supported (like Adobe Flash and Java Applets).</p><p>Please decide if you'd like to use the new version of Voyant or if you'd rather try using the <i>{0}</i> tool in the old version.</p>",
@@ -363,27 +186,6 @@ Ext.apply(Voyant.panel.CustomSet.i18n, {
 "noSuchTool":"The specified tool ({0}) does not exist.",
 "title":"Custom View",
 "helpTip":"This is a custom view."});
-Ext.apply(Voyant.panel.Catalogue.i18n, {
-"facet.pubPlaceTitle":"Publication Locations",
-"queryMatches":"{0} matching documents (out of {1}).",
-"exportInProgress":"Preparing your corpus for export…",
-"facet.keywordTitle":"Keywords",
-"exportTip":"Create a new Voyant corpus with the selected documents.",
-"facet.titleTitle":"Titles",
-"title":"Catalogue",
-"lexicalTitle":"Terms",
-"facet.authorTitle":"Authors",
-"clickToOpenCorpus":"Please <a href=\"{0}\" target=\"_blank\" class=\"link\">click here</a> to access your new corpus (since popup windows are blocked).",
-"rawFreqs":"total occurrences (raw frequency)",
-"facet.languageTitle":"Languages",
-"noMatches":"No matches (out of {0} documents).",
-"loadingSnippets":"loading text snippets…",
-"facet.collectionTitle":"Collections",
-"matchingDocuments":"number of matching documents",
-"helpTip":"The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.",
-"facet.pubDateTitle":"Publication Dates",
-"export":"Export",
-"facet.publisherTitle":"Publishers"});
 Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 "cleaning":"Cleaning",
 "releaseToRemove":"Release to remove this term",
@@ -391,9 +193,6 @@ Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 "clearTerms":"Clear",
 "title":"Links",
 "helpTip":"<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:</p><ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"});
-Ext.apply(Voyant.panel.CollocatesSet.i18n, {
-"title":"Scatter",
-"helpTip":"This is a specialized view for working with scatterplots."});
 Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "cancel":"Cancel",
 "accessModeWithoutPassword":"other access",
@@ -453,10 +252,6 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableNoHeadersRowText":"Determines whether or not to skip the first row (if there's a header row). When there is a header row, it can be used to define the document title automatically when documents are extracted from entire columns (in this case leave the title field blank)."});
 Ext.apply(Voyant.util.DetailedError.i18n, {
 "error":"Error"});
-Ext.apply(Voyant.panel.TopicContexts.i18n, {
-"reset":"reset",
-"title":"Topic Contexts",
-"helpTip":"Topic Contexts"});
 Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"Longest: ",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
@@ -475,6 +270,230 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Next {0} of {1} remaining</a>",
 "items":"items",
 "shortest":"Shortest: "});
+Ext.apply(Voyant.panel.CorpusSet.i18n, {
+"title":"Corpus View",
+"helpTip":"This is the default, general-purpose corpus view."});
+Ext.apply(Voyant.panel.Subset.i18n, {
+"publisherLabel":"Publishers",
+"sendToVoyantButton":"New Voyant Corpus",
+"downloadButton":"Download Zip Archive",
+"sendToVoyantNoQuery":"There's currently no query specified, but you can <a href=\"{0}\" target=\"_blank\">open the current corpus in a new window</a>.",
+"lexicalLabel":"Full-text",
+"noMatches":"The current query criteria don't match any documents, please modifying the search first.",
+"titleLabel":"Titles",
+"authorLabel":"Authors",
+"title":"Workset Builder"});
+Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
+"titleLabel":"title",
+"authorLabel":"author",
+"availableLabel":"exclude: ",
+"enabledLabel":"include: ",
+"fieldLabel":"Filenames",
+"pubDateLabel":"date"});
+Ext.apply(Voyant.panel.DocumentTerms.i18n, {
+"matchingTerms":"Matching terms: {count}",
+"tfidfTip":"The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.",
+"rawFreqTip":"The count (raw frequency) of this term in this document.",
+"emptyText":"No matching results.",
+"relativeFreqTip":"The relative frequency (per million) of this term in each document.",
+"termTip":"The term in a single, specific document.",
+"zscore":"Z-Score",
+"trendTip":"This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).",
+"tfidf":"Significance",
+"title":"Document Terms",
+"helpTip":"<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
+"zscoreTip":"The Z-Score, or standard score, is a normalized value for the term's raw frequency compared to other term frequencies in the same document.<table><tbody><tr><td style=\"text-align: center; font-size: smaller; font-family: mono;\">frequency of term - mean of term frequencies<hr>standard deviation of term frequencies</td></tr></tbody></table>."});
+Ext.apply(Voyant.data.model.Corpus.i18n, {
+"hasNdocuments":"has {count} documents",
+"daysAgo":"about {count} days ago",
+"monthsAgo":"about {count} months ago",
+"thisCorpus":"This corpus",
+"isEmpty":"is empty",
+"widthNwordsAndNTypes":"with {words} <span class=\"info-tip\" data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted\">total words</span> and {types} <span class=\"info-tip\" data-qtip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">unique word forms</span>",
+"hoursAgo":"about {count} hours ago",
+"minutesAgo":"about {count} minutes ago",
+"minuteAgo":"about a minute ago",
+"monthAgo":"about a month ago",
+"hourAgo":"about an hour ago",
+"failedCreateCorpus":"Failed attempt to create a Corpus.",
+"has1document":"has 1 document",
+"yearsAgo":"about {count} years ago",
+"secondAgo":"about a second ago",
+"now":"now",
+"yearAgo":"about a year ago",
+"secondsAgo":"{count} seconds ago",
+"dayAgo":"about a day ago"});
+Ext.apply(Voyant.panel.WordTree.i18n, {
+"emptyText":"No matching results.",
+"title":"WordTree"});
+Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
+"original":"original",
+"VOYANTTip":"This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content.",
+"fieldLabel":"File Format",
+"voyantXml":"Voyant XML",
+"plainText":"plain text",
+"SOURCETip":"This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided.",
+"TXTTip":"This will produce a plain text version of each document."});
+Ext.apply(Voyant.panel.ScatterSet.i18n, {
+"title":"Scatter",
+"helpTip":"This is a specialized view for working with scatterplots."});
+Ext.apply(Voyant.util.Toolable.i18n, {
+"exportTitle":"Export",
+"exportError":"Export Error",
+"exportDataTsvMessage":"Copy data below, they can be pasted into a spreadsheet or text file.",
+"exportViewFieldset":"Export View (Tools and Data)",
+"exportSvgMessage":"<p>This is a thumbnail of the SVG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the SVG code below.</p>",
+"exportDataJsonMessage":"Copy the data below, they can be used in other web-based applications.",
+"plusTip":"Click to choose another tool for this panel location (this will replace the current tool).",
+"gearTip":"Define options for this tool.",
+"cancelTitle":"Cancel",
+"exportViewHtmlEmbed":"an HTML snippet for embedding this view in another web page",
+"exportGridCurrent":"Export Current Data",
+"exportSvgTitle":"Export SVG",
+"maximizeTip":"Open this tool in a new window",
+"exportGridCurrentTsv":"export current data as tab separated values (text)",
+"exportVizTitle":"Export Visualization",
+"exportDataTitle":"Export Data",
+"optionsTitle":"Options",
+"exportBiblioTitle":"Export Bibliographic Reference",
+"confirmTitle":"Confirm",
+"moreHelp":"More help…",
+"exportViewUrl":"a URL for this view (tools and data)",
+"helpTip":"No tool-specific help is currently available. Click this icon to visit the <a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools Documentation</a> site.",
+"export":"Export",
+"exportDataHtmlMessage":"Copy the data below, they can be pasted into an HTML page or used as XML.",
+"exportPngTitle":"Export PNG",
+"exportPngMessage":"<p>This is a thumbnail of the PNG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the HTML code below.</p>",
+"exportGridCurrentHtml":"export current data as HTML",
+"exportViewEmbedMessage":"You can copy and paste the HTML snippet from the box below into another web page. Note that some content management systems (like WordPress) may need a special plugin to handle &lt;iframe&gt; tags.",
+"exportPng":"export a PNG image of this visualization",
+"reset":"Reset",
+"exportViewBiblio":"a bibliographic reference for this view",
+"exportViewEmbedTitle":"Embed HTML Snippet",
+"exportNoFunction":"An export function has been defined by is not availble.",
+"exportGridCurrentJson":"export current data as JSON",
+"exportSvg":"export the SVG of this visualization",
+"saveTip":"Export a URL, an embeddable tool, data or a bibliographic reference."});
+Ext.apply(Voyant.panel.StreamGraph.i18n, {
+"freqsMode":"Frequencies",
+"freqsModeTip":"Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).",
+"relativeFrequencies":"Relative Frequencies",
+"documents":"Documents",
+"documentSegments":"Document Segments",
+"clearTerms":"Clear Terms",
+"title":"StreamGraph",
+"rawFrequencies":"Raw Frequencies",
+"helpTip":"StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).",
+"segments":"Segments"});
+Ext.apply(Voyant.notebook.util.Embed.i18n, {
+"tryWidget":"Try one of the following widgets: ",
+"widgetNotRecognized":"Unable to embed (invalid or no embed tool specified)."});
+Ext.apply(Voyant.widget.DownloadOptions.i18n, {
+"title":"Download Options"});
+Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
+"totalPropertyStatus":"{count:number(\"0,000\")}"});
+Ext.apply(Voyant.panel.Phrases.i18n, {
+"overlapNone":"none (keep all)",
+"overlapTip":"This determines how overlapping phrases are filtered.",
+"matchingTerms":"{count}",
+"overlapFreq":"prioritize most frequent phrases",
+"emptyText":"No matching results.",
+"length":"Length",
+"termTip":"This is the keyword phrase (this is a generalized form, it may appear slightly differently for each occurrence).",
+"termRawFreqTip":"The number of times the phrase occurs in the corpus.",
+"title":"Phrases",
+"lengthTip":"The upper and lower bounds of phrase lengths (how many words in each phrase).",
+"termRawFreq":"Count",
+"overlap":"Overlap",
+"overlapLength":"prioritize longest phrases",
+"overlapMenu":"Choose an overlap filter:",
+"term":"Term",
+"helpTip":"<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->"});
+Ext.apply(Voyant.panel.Trends.i18n, {
+"freqsMode":"Frequencies",
+"freqsModeTip":"Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).",
+"relativeFrequencies":"Relative Frequencies",
+"documents":"Documents",
+"options":"Options",
+"raw":"Raw",
+"segmentsSlider":"Segments",
+"title":"Trends",
+"rawFrequencies":"Raw Frequencies",
+"helpTip":"<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
+"relative":"Relative",
+"segments":"Document Segments"});
+Ext.apply(Voyant.widget.StopListOption.i18n, {
+"cancel":"Cancel",
+"de":"German",
+"hi":"Hindi",
+"no":"Norwegian",
+"auto":"Auto-detect",
+"bg":"Bulgarian",
+"noEditAutoMessage":"The auto-detected stoplist cannot be edited, please select a specifc stoplist such as the \"New User-Defined List\".",
+"lt":"Latvian",
+"lv":"Lithuanian",
+"none":"None",
+"fr":"French",
+"hu":"Hungarian",
+"br":"Breton",
+"editStopListTitle":"Edit Stoplist",
+"hy":"Armenian",
+"se":"Swedish",
+"ga":"Irish",
+"id":"Indonesian",
+"ok":"Save",
+"ca":"Catalan",
+"new":"New User-Defined List",
+"gl":"Galician",
+"el":"Greek",
+"mu":"Multilingual",
+"en":"English",
+"label":"Stopwords:",
+"cn":"Chinese",
+"it":"Italian",
+"noEditAutoTitle":"Edit Stoplist Error",
+"es":"Spanish",
+"editStopListMessage":"This is the stoplist, one term per line.",
+"applyGlobally":"apply globally",
+"eu":"Basque",
+"editList":"Edit List",
+"ar":"Arabic",
+"th":"Thai",
+"cz":"Czech",
+"ja":"Japanese",
+"ckb":"Kurdish",
+"fa":"Farsi",
+"ro":"Romanian",
+"nl":"Dutch",
+"tr":"Turkish"});
+Ext.apply(Voyant.panel.Catalogue.i18n, {
+"facet.pubPlaceTitle":"Publication Locations",
+"queryMatches":"{0} matching documents (out of {1}).",
+"exportInProgress":"Preparing your corpus for export…",
+"facet.keywordTitle":"Keywords",
+"exportTip":"Create a new Voyant corpus with the selected documents.",
+"facet.titleTitle":"Titles",
+"title":"Catalogue",
+"lexicalTitle":"Terms",
+"facet.authorTitle":"Authors",
+"clickToOpenCorpus":"Please <a href=\"{0}\" target=\"_blank\" class=\"link\">click here</a> to access your new corpus (since popup windows are blocked).",
+"rawFreqs":"total occurrences (raw frequency)",
+"facet.languageTitle":"Languages",
+"noMatches":"No matches (out of {0} documents).",
+"loadingSnippets":"loading text snippets…",
+"facet.collectionTitle":"Collections",
+"matchingDocuments":"number of matching documents",
+"helpTip":"The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.",
+"facet.pubDateTitle":"Publication Dates",
+"export":"Export",
+"facet.publisherTitle":"Publishers"});
+Ext.apply(Voyant.panel.CollocatesSet.i18n, {
+"title":"Scatter",
+"helpTip":"This is a specialized view for working with scatterplots."});
+Ext.apply(Voyant.panel.TopicContexts.i18n, {
+"reset":"reset",
+"title":"Topic Contexts",
+"helpTip":"Topic Contexts"});
 Ext.apply(Voyant.panel.BubblelinesSet.i18n, {
 "title":"Bubblelines Skin",
 "helpTip":"This is a specialized view for working with Bubblelines."});
@@ -493,9 +512,6 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 "speed":"Speed",
 "options":"Options",
 "context":"Context"});
-Ext.apply(Voyant.panel.CorpusSet.i18n, {
-"title":"Corpus View",
-"helpTip":"This is the default, general-purpose corpus view."});
 Ext.apply(Voyant.VoyantApp.i18n, {
 "serverResponseError":"The server error reponse:",
 "error":"Error",
@@ -597,13 +613,3 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as a phrase</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+\"winter coat\" +mitten*</b>: combine syntaxes</li></ul>",
 "querySearch":"Search",
 "aggregateInDocumentsCount":"This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms)."});
-Ext.apply(Voyant.panel.Subset.i18n, {
-"publisherLabel":"Publishers",
-"sendToVoyantButton":"New Voyant Corpus",
-"downloadButton":"Download Zip Archive",
-"sendToVoyantNoQuery":"There's currently no query specified, but you can <a href=\"{0}\" target=\"_blank\">open the current corpus in a new window</a>.",
-"lexicalLabel":"Full-text",
-"noMatches":"The current query criteria don't match any documents, please modifying the search first.",
-"titleLabel":"Titles",
-"authorLabel":"Authors",
-"title":"Workset Builder"});

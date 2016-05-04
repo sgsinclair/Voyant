@@ -39,7 +39,14 @@ Ext.define('Voyant.data.store.VoyantStore', {
 				totalProperty: extras['proxy.reader.totalProperty'],
 				metaProperty: extras['proxy.reader.metaProperty'] || 'metaData'
 			},
-			simpleSortMode: true
+			simpleSortMode: true,
+			listeners: {
+				exception: function(proxy, request, operation) {
+					if (me.parentPanel && me.parentPanel.showError) {
+						me.parentPanel.showError(new Voyant.util.ResponseError({response: request}))
+					}
+				}
+			}
 		})
 		config.proxy.extraParams = config.proxy.extraParams || {};
 		Ext.applyIf(config.proxy.extraParams, {

@@ -11,11 +11,11 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 	    xtype: 'toolbar',
 	    dock: 'left',
 	    items: [
-			{
-		    	xtype: 'notebookwrappermovement'
-		    },' ',{
-		    	xtype: 'notebookwrapperadd'
-			}
+//			{
+//		    	xtype: 'notebookwrappermovement'
+//		    },' ',{
+//		    	xtype: 'notebookwrapperadd'
+//			}
 	    ]
 	}],
 	constructor: function(config) {

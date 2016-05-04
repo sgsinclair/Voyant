@@ -109,6 +109,9 @@ Ext.define('Voyant.VoyantApp', {
 					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.responseText)+"</pre>')); return false;\">more</a></pre>"
 			})
 		}
+		if (Ext.isString(config)) {
+			config = {message: config}
+		}
 		Ext.applyIf(config, {
 			title: this.localize("error"),
 		    buttons: Ext.Msg.OK,

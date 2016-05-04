@@ -24,6 +24,8 @@ app/util/Toolable.js
 app/util/Transferable.js
 app/util/Variants.js
 app/util/Downloadable.js
+app/notebook/util/Show.js
+app/notebook/util/Embed.js
 
 # MODELS
 app/data/model/AnalysisToken.js
@@ -59,6 +61,7 @@ app/data/store/Tokens.js
 app/data/model/Corpus.js
 
 # WIDGETS
+app/widget/CorpusSelector.js
 app/widget/StopListOption.js
 app/widget/QuerySearchField.js
 app/widget/TotalPropertyStatus.js

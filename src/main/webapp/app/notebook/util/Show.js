@@ -1,58 +1,18 @@
 Ext.define("Voyant.notebook.util.Show", {
-	extend: 'Ext.Base',
-	requires: [/*FIXME: 'Ext.data.identifier.Uuid'*//*,'Voyant.util.ResponseError'*/],
+	transferable: ['show'],
+	show: function() { // this is for instances
+		show.apply(this, arguments);
+	},
 	statics: {
 		show: function(contents) {
 			if (this.then) {
-				var dfd = Voyant.application.getDeferred();
-				return this.then(function(val) {
-					val.show();
-					dfd.resolve();
-				}).fail(function(val) {
-					if (val) {showError(val)}
-					dfd.reject();
-				});
-			}
-			
-			// we have at least one argument passed to this function
-			if (arguments.length>0) {
-				
-				// if we have more than one argument, treat them as a single line
-				if (arguments.length>1) {
-					show("<div class='"+Voyant.notebook.util.Show.MODE+"'>")
-					Voyant.notebook.util.Show.SINGLE_LINE_MODE = true;
-					for (var i=0;i<arguments.length;i++) {
-						arguments[i].show.call(arguments[i]);
-					}
-					Voyant.notebook.util.Show.SINGLE_LINE_MODE = false;
-					show("</div>")
-				}
-				
-				// otherwise, process normally
-				else {
-					arguments[0].show.call(arguments[0]);
-				}
-			}
-			
-			// not a promise, no arguments, so try showing the actual object
-			else {
-				var contents = contents || (this==window ? '[empty]' : this);
-				if (Voyant.notebook.util.Show.TARGET) {
-					if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
-					if (Voyant.notebook.util.Show.TARGET.insertHtml) {
-						Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
-					} 
-					else if (Voyant.notebook.util.Show.TARGET.innerHTML) {
-						Voyant.notebook.util.Show.TARGET.innerHTML=Voyant.notebook.util.Show.TARGET.innerHTML+contents;
-					}
-				}
-				else {
-					Ext.Msg.show({
-					    msg: contents,
-					    buttons: Ext.Msg.OK,
-					    icon: Voyant.notebook.util.Show.MODE=='error' ? Ext.window.MessageBox.ERROR : Ext.window.MessageBox.INFO
-					})
-				}
+				this.then(function(val) {
+					show.apply(val, arguments);
+				})
+			} else {
+				contents = contents.toString();
+				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
+				Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
 			}
 		},
 		showError: function(error, more) {
@@ -89,14 +49,5 @@ Ext.define("Voyant.notebook.util.Show", {
 	}
 });
 
-// FIXME: commented out to allow for no notebooks version to load
-/*
-// alias show(contents) as global
-show = Voyant.notebook.util.Show.show;
-showError = Voyant.notebook.util.Show.showError;
-Number.prototype.show = show
-String.prototype.show = show;
-Boolean.prototype.show = show;
-Array.prototype.show = show;
-Error.prototype.show = showError;
-*/
+var show = Voyant.notebook.util.Show.show;
+var showError = Voyant.notebook.util.Show.showError;

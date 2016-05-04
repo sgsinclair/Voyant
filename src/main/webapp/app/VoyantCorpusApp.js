@@ -66,15 +66,16 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		}
 		
 		this.validateCorpusLoadParams(params);
+
 		new Corpus(params).then(function(corpus) {
 			view.unmask();
 			me.setCorpus(corpus);
 			if (me.validateCorpusAccess()) {
 				me.dispatchEvent('loadedCorpus', this, corpus);
 			}
-		}).fail(function(message, response) {
-			view.unmask(); // error is shown by corpus constructor if needed be
-		});
+		}).otherwise(function() {
+			view.unmask();
+		})
     },
     
     validateCorpusLoadParams: function(params) {

@@ -8,18 +8,24 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	api: {
     		stopList: 'auto',
     		query: undefined,
-    		maxBins: 100
+    		maxBins: 100,
+    		comparisonCorpus: undefined
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
-    	options: {
+    	options: [{
     		xtype: 'stoplistoption'
-    	}
+    	},{
+    		xtype: 'corpusselector',
+    		name: 'comparisonCorpus',
+    		fieldLabel: 'comparison corpus'
+    	}]
     },
     constructor: function(config) {
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
         this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);    	
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
     
     initComponent: function() {
@@ -105,6 +111,21 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 width: 'autoSize',
                 hidden: true,
             	sortable: true
+            },{
+            	text: this.localize("corpusComparisonDifference"),
+            	tooltip: this.localize("corpusComparisonDifferenceTip"),
+            	dataIndex: 'relativeSkewness',
+            	renderer: Ext.util.Format.numberRenderer("0,000.0"),
+                width: 'autoSize',
+                hidden: !this.getApiParam('comparisonCorpus'),
+            	sortable: true,
+            	listeners: {
+            		show: function(ct, column, eopts) {
+            			if (!me.getApiParam('comparisonCorpus')) {
+            				me.showError(me.localize('noCorpusComparison'))
+            			}
+            		}
+            	}
             },{
                 xtype: 'widgetcolumn',
                 text: this.localize("trend"),

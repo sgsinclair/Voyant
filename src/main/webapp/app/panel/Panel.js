@@ -7,6 +7,11 @@ Ext.define('Voyant.panel.Panel', {
 		},
 		config: {
 			corpusValidated: false
+		},
+		api: {
+			corpus: undefined,
+			input: undefined,
+			inputFormat: undefined
 		}
 	},
 	constructor: function(config) {

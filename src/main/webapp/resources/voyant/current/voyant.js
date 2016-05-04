@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 02 16:25:56 EDT 2016 */
+/* This file created by JSCacher. Last modified: Wed May 04 17:51:50 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2554,8 +2554,9 @@ doubletree.DoubleTree = function() {
 			right : 20,
 			bottom : 20,
 			left : 20
-		}, width = visWidth - margin.right - margin.left, height = visHt
-				- margin.top - margin.bottom;
+		};
+		var width = visWidth - margin.right - margin.left;
+		var height = visHt - margin.top - margin.bottom;
 
 		containers[0].forEach(function(d, i) {
 			var thisContainer = d;
@@ -4117,6 +4118,16 @@ Ext.define('Voyant.util.Api', {
 		var apis = [];
 		if (!this.isApplication) {
 			var app = this.getApplication();
+			
+			// try to load from first-level mixins
+			if (this.mixins) {
+				for (key in this.mixins) {
+					var clz = Ext.ClassManager.get(key);
+					if (clz && clz.api) {
+						apis.splice(0, 0, clz.api)
+					}
+				}
+			}
 			this.addParentApi(apis, Ext.ClassManager.getClass(app)); // gather class params
 			if (app.getApiParams) {
 				apis.push(this.getApplication().getApiParams()); // now add instance params, last
@@ -4268,24 +4279,25 @@ Ext.define('Voyant.util.Deferrable', {
 	
 	getDeferred: function(transferable) {
 
-		var deferred = jQuery.Deferred();
+//		var deferred = jQuery.Deferred();
+		var deferred = new Ext.Deferred();
 		
+		var pomise = deferred
 		// transfer methods to the promise
-		var promise = this.getPromiseFromDeferred(deferred);
+//		var promise = this.getPromiseFromDeferred(deferred);
 
 		if (transferable && transferable.transfer) {
-			transferable.transfer(transferable, promise)
+			transferable.transfer(transferable, deferred.promise)
 		}
 		
-		if (!promise.show && window.show) {promise.show=show}
+		if (!deferred.promise.show && window.show) {deferred.promise.show=show}
 
 		this.deferredStack.push(deferred);
 		
 		var me = this;
-		promise.always(function() {
+		deferred.promise.always(function() {
 			me.deferredStack.pop();
 		});
-			
 		return deferred;
 	},
 	
@@ -4298,9 +4310,9 @@ Ext.define('Voyant.util.Deferrable', {
 		var dfd = Voyant.application.getDeferred(transferable);
 		promise.then(function(promised) {
 			dfd.resolve(callee.apply(promised, args))
-		}).fail(function() {
+		})/*.fail(function() {
 			dfd.reject.apply(this, arguments)
-		});
+		})*/;
 		return dfd.promise;
 	}
 });
@@ -5273,6 +5285,135 @@ Ext.define("Voyant.util.Downloadable", {
 		this.openUrl(url)
     }
 })
+Ext.define("Voyant.notebook.util.Show", {
+	transferable: ['show'],
+	show: function() { // this is for instances
+		show.apply(this, arguments);
+	},
+	statics: {
+		show: function(contents) {
+			if (this.then) {
+				this.then(function(val) {
+					show.apply(val, arguments);
+				})
+			} else {
+				contents = contents.toString();
+				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
+				Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
+			}
+		},
+		showError: function(error, more) {
+			var mode = Voyant.notebook.util.Show.MODE;
+			Voyant.notebook.util.Show.MODE='error';
+			
+			if (this instanceof Voyant.util.ResponseError) {
+				error = this;
+			}
+			if (error instanceof Voyant.util.ResponseError) {
+				if (console) {console.error(error.getResponse())}
+				more = error.getResponse().responseText
+				error = error.getMsg();
+			}
+			
+			else {
+
+				if (error.stack && !more) {more=error.stack}
+				if (more && Ext.isString(more)===false) {more=more.toString()}
+				
+			}
+
+			if (console) {console.error(error)}
+			if (more) {
+				if (console) {console.error(more);}
+				error="<h3>"+error.toString()+"</h3><pre>"+Ext.String.htmlEncode(more)+'</pre>';
+			}
+			show(error);
+			Voyant.notebook.util.Show.MODE = mode;
+		},
+		TARGET : null,
+		MODE: 'info',
+		SINGLE_LINE_MODE : false
+	}
+});
+
+var show = Voyant.notebook.util.Show.show;
+var showError = Voyant.notebook.util.Show.showError;
+Ext.define("Voyant.notebook.util.Embed", {
+	transferable: ['embed'],
+	embed: function() { // this is for instances
+		embed.apply(this, arguments);
+	},
+	statics: {
+		i18n: {},
+		embed: function(cmp, config) {
+			if (this.then) {
+				this.then(function(embedded) {
+					embed.call(embedded, cmp, config)
+				})
+			} else {
+				// use the default (first) embeddable panel if no panel is specified
+				if (this.embeddable && (!cmp || Ext.isObject(cmp))) {
+					// if the first argument is an object, use it as config instead
+					if (Ext.isObject(cmp)) {config = cmp;}
+					cmp = this.embeddable[0];
+				}
+				if (Ext.isString(cmp)) {
+					cmp = Ext.ClassManager.getByAlias('widget.'+cmp) || Ext.ClassManager.get(cmp);
+				}
+				if (Ext.isFunction(cmp)) {
+					var name = cmp.getName();
+					if (this.embeddable && Ext.Array.each(this.embeddable, function(item) {
+						return item!=name
+					}, this)) {
+						Voyant.notebook.util.Embed.showWidgetNotRecognized.call(this);
+					} else {
+						config = config || {};
+						var cmpInstance = new cmp();
+						cmpInstance.setApiParams(config);
+						var embeddedParams = cmpInstance.getModifiedApiParams();
+						cmpInstance.destroy();
+						if (!embeddedParams.corpus) {
+							var thisClassName = Ext.getClassName(this);
+							if (thisClassName=='Voyant.data.model.Corpus') {
+								embeddedParams.corpus = this.getId();
+							} else if (this.getCorpus) {
+								embeddedParams.corpus = this.getCorpus().getId();
+							}
+						}
+						Ext.applyIf(config, {
+							width: '100%',
+							height: '300px'
+						});
+						var embeddedConfigParam = Ext.Object.toQueryString(embeddedParams);
+						var tpl = new Ext.XTemplate('<iframe style="width: '+config.width+'; height: '+config.height+'" '+
+								'src="'+Voyant.application.getBaseUrl()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/?{0}"></iframe>');
+						if (embeddedConfigParam.length<1950) {
+							show(tpl.apply([embeddedConfigParam]));
+						} else {
+							showError("Long arguments are not yet implemented.")
+							debugger
+						}
+					}
+				} else {
+					Voyant.notebook.util.Embed.showWidgetNotRecognized.call(this);
+				}
+			}
+		},
+		showWidgetNotRecognized: function() {
+			var msg = Voyant.notebook.util.Embed.i18n.widgetNotRecognized;
+			if (this.embeddable) {
+				msg += Voyant.notebook.util.Embed.i18n.tryWidget+'<ul>'+this.embeddable.map(function(cmp) {
+					var widget = cmp.substring(cmp.lastIndexOf(".")+1).toLowerCase()
+					return "\"<a href='"+Voyant.application.getBaseUrl()+"/docs/#!/guide/"+widget+"' target='voyantdocs'>"+widget+"</a>\""
+				}).join(", ")+"</ul>"
+			}
+			showError(msg)
+		}
+
+	}
+})
+
+embed = Voyant.notebook.util.Embed.embed
 Ext.define('Voyant.data.model.AnalysisToken', {
     extend: 'Ext.data.Model',
     idProperty: 'term',
@@ -5663,7 +5804,14 @@ Ext.define('Voyant.data.store.VoyantStore', {
 				totalProperty: extras['proxy.reader.totalProperty'],
 				metaProperty: extras['proxy.reader.metaProperty'] || 'metaData'
 			},
-			simpleSortMode: true
+			simpleSortMode: true,
+			listeners: {
+				exception: function(proxy, request, operation) {
+					if (me.parentPanel && me.parentPanel.showError) {
+						me.parentPanel.showError(new Voyant.util.ResponseError({response: request}))
+					}
+				}
+			}
 		})
 		config.proxy.extraParams = config.proxy.extraParams || {};
 		Ext.applyIf(config.proxy.extraParams, {
@@ -6122,11 +6270,15 @@ var Corpus = function(source, config) {
 	return Ext.create("Voyant.data.model.Corpus", source, config);
 }
 
+function loadCorpus(source, config) {
+	return new Corpus(source, config);
+}
+
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
-    mixins: [/*'Voyant.notebook.util.Embeddable','Voyant.util.Transferable',*/'Voyant.util.Localization'],
-    transferable: ['show',/*'embed','embedSummary',*/'getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
-    //embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
+    mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization'],
+//    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
+    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
@@ -6164,39 +6316,36 @@ Ext.define('Voyant.data.model.Corpus', {
 			else if (Ext.isObject(source)) {Ext.apply(config, source)}
 
 			var dfd = Voyant.application.getDeferred(this);
-			var me = this;	
-//			config.input="http://asdfasfa/"
+			var me = this;
 			
-			$.ajax({
-				  type: "POST",
-				  url: Voyant.application.getTromboneUrl(),
-				  data: config,
-				  dataType: "json"
-				}).done(function(data) {
-					me.set(data.corpus.metadata)
-					var store = Ext.create("Voyant.data.store.Documents", {corpus: me});
-					me.setDocumentsStore(store);
-					if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {
-						store.load({
-							params: {
-								limit: ('docsLimit' in config) ? config.docsLimit : me.getDocumentsCount()
-							},
-							callback: function(records, st, success) {
+			var promise = Ext.Ajax.request({
+				url: Voyant.application.getTromboneUrl(),
+				params: config
+			}).then(function(response) {
+				me.set(Ext.JSON.decode(response.responseText).corpus.metadata);
+				return me
+			}).otherwise(function(response){
+				Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
+			}).then(function(corpus) {
+				if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {
+					me.getDocuments().load({
+						params: {
+							limit: ('docsLimit' in config) ? config.docsLimit : me.getDocumentsCount()
+						},
+						callback: function(records, operation, success) {
+							if (success) {
 								me.setDocumentsStore(this);
-								dfd.resolve(me);
-							},
-							scope: store
-						})
-					} else {
-						dfd.resolve(me);
-					}
-				}).fail(function(response) {
-					Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
-					dfd.reject(); // don't send error since we've already shown it
-				});
-			
-			return Voyant.application.getPromiseFromDeferred(dfd);
-
+								dfd.resolve(corpus)
+							} else {
+								dfd.reject(operation)
+							}
+						}
+					})
+				} else {
+					dfd.resolve(corpus)
+				}
+			})
+			return dfd.promise
 		}
 	},
 	
@@ -6272,15 +6421,7 @@ Ext.define('Voyant.data.model.Corpus', {
     	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('noPasswordAccess');		
 	},
 
-    show: function(config) {
-    	return this.then ?  Voyant.application.getDeferredNestedPromise(this, arguments) : this.getShow().show();
-    },
-    
-    getShow: function(config) {
-    	if (this.then) {
-    		return Voyant.application.getDeferredNestedPromise(this, arguments);
-    	}
-
+    toString: function(config) {
 		var size = this.getDocumentsCount();
 		var message = this.localize('thisCorpus');
 		if (size==0) {message += ' '+this.localize('isEmpty')+'.';}
@@ -6326,6 +6467,29 @@ Ext.define('Voyant.data.model.Corpus', {
     
 
 });
+Ext.define('Voyant.widget.CorpusSelector', {
+    extend: 'Ext.form.field.ComboBox',
+    mixins: ['Voyant.util.Localization'],
+    alias: 'widget.corpusselector',
+    statics: {
+    	i18n: {
+    	}
+    },
+    
+    config: {
+        labelWidth: 150,
+        labelAlign: 'right',
+        fieldLabel:'Choose a corpus:',
+        name:'corpus',
+        queryMode:'local',
+        store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],				            
+        forceSelection:true
+    },
+    initComponent: function(config) {
+    	var me = this;
+        me.callParent(arguments);
+    }
+})
 Ext.define('Voyant.widget.StopListOption', {
     extend: 'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
@@ -7066,6 +7230,11 @@ Ext.define('Voyant.panel.Panel', {
 		},
 		config: {
 			corpusValidated: false
+		},
+		api: {
+			corpus: undefined,
+			input: undefined,
+			inputFormat: undefined
 		}
 	},
 	constructor: function(config) {
@@ -9735,13 +9904,14 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				        submitEmptyText: false,
 	    				        margin: '5,5,5,5',
 	    				        items: {
-	    				            xtype:'combo',
-	    				            labelWidth: 150,
-	    				            fieldLabel:'Choose a corpus:',
-	    				            name:'corpus',
-	    				            queryMode:'local',
-	    				            store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],				            
-	    				            forceSelection:true
+	    				        	xtype: 'corpusselector'
+//	    				            xtype:'combo',
+//	    				            labelWidth: 150,
+//	    				            fieldLabel:'Choose a corpus:',
+//	    				            name:'corpus',
+//	    				            queryMode:'local',
+//	    				            store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],				            
+//	    				            forceSelection:true
 	    				        },
 	    				        buttons: [
 	    				        	{
@@ -11002,18 +11172,24 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	api: {
     		stopList: 'auto',
     		query: undefined,
-    		maxBins: 100
+    		maxBins: 100,
+    		comparisonCorpus: undefined
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
-    	options: {
+    	options: [{
     		xtype: 'stoplistoption'
-    	}
+    	},{
+    		xtype: 'corpusselector',
+    		name: 'comparisonCorpus',
+    		fieldLabel: 'comparison corpus'
+    	}]
     },
     constructor: function(config) {
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
         this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);    	
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
     
     initComponent: function() {
@@ -11099,6 +11275,21 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 width: 'autoSize',
                 hidden: true,
             	sortable: true
+            },{
+            	text: this.localize("corpusComparisonDifference"),
+            	tooltip: this.localize("corpusComparisonDifferenceTip"),
+            	dataIndex: 'relativeSkewness',
+            	renderer: Ext.util.Format.numberRenderer("0,000.0"),
+                width: 'autoSize',
+                hidden: !this.getApiParam('comparisonCorpus'),
+            	sortable: true,
+            	listeners: {
+            		show: function(ct, column, eopts) {
+            			if (!me.getApiParam('comparisonCorpus')) {
+            				me.showError(me.localize('noCorpusComparison'))
+            			}
+            		}
+            	}
             },{
                 xtype: 'widgetcolumn',
                 text: this.localize("trend"),
@@ -14652,7 +14843,7 @@ Ext.define('Voyant.panel.Summary', {
     	
     	main.removeAll();
     	main.add({
-    		html: this.getCorpus().getShow()
+    		html: this.getCorpus().toString()
     	});
     	
     	var docs = this.getCorpus().getDocuments().getRange();
@@ -18066,7 +18257,7 @@ Ext.define('Voyant.panel.Subset', {
     	me.on('loadedCorpus', function(src, corpus) {
     		me.getStore().setCorpus(corpus);
     		if (me.getInitialConfig('introHtml')==undefined && me.getInitialConfig('intro')==undefined) {
-    			 me.queryById('intro').setHtml(corpus.getShow())
+    			 me.queryById('intro').setHtml(corpus.toString())
     		}
     	}, me);
     	
@@ -18439,7 +18630,7 @@ Ext.define('Voyant.panel.WordTree', {
         					//prefix.push([r.getLeft().trim().replace(/\s+/g, ' ')]);
         					prefix.push(r.getLeft().trim().split(/\s+/));
         					hit.push(r.getMiddle());
-//        					suffix.push([r.getRight().trim().replace(/\s+/g, ' ')]);
+        					//suffix.push([r.getRight().trim().replace(/\s+/g, ' ')]);
         					suffix.push(r.getRight().trim().split(/\s+/));
         					id.push(i);
         				}
@@ -18467,8 +18658,8 @@ Ext.define('Voyant.panel.WordTree', {
     		corpusTerms.load({
     		    callback: function(records, operation, success) {
     		    	if (success && records.length>0) {
-    		    		this.setApiParam('query', records[0].getTerm());
-    		    		this.getKwicStore().load({params: this.getApiParams()});
+    		    		var firstTerm = records[0].getTerm();
+    		    		this.setRoot(firstTerm);
     		    	}
     		    },
     		    scope: this,
@@ -18557,8 +18748,20 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     setRoot: function(query) {
-    	this.setApiParam('query', query);
+    	this.setApiParam('query', this.stripPunctuation(query));
 		this.getKwicStore().load({params: this.getApiParams()});
+    },
+    
+    stripPunctuation: function(value) {
+    	if (Ext.isString(value)) return value.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+    	else {
+    		var values = [];
+    		value.forEach(function(v) {
+    			values.push(v.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
+    		});
+    		return values;
+    	}
+    	return '';
     }
 });
 
@@ -18673,6 +18876,9 @@ Ext.define('Voyant.VoyantApp', {
 					"<pre class='error'>\n"+response.responseText.substring(0,response.responseText.indexOf("\n\t"))+"… "+
 					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.responseText)+"</pre>')); return false;\">more</a></pre>"
 			})
+		}
+		if (Ext.isString(config)) {
+			config = {message: config}
 		}
 		Ext.applyIf(config, {
 			title: this.localize("error"),
@@ -18849,15 +19055,16 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		}
 		
 		this.validateCorpusLoadParams(params);
+
 		new Corpus(params).then(function(corpus) {
 			view.unmask();
 			me.setCorpus(corpus);
 			if (me.validateCorpusAccess()) {
 				me.dispatchEvent('loadedCorpus', this, corpus);
 			}
-		}).fail(function(message, response) {
-			view.unmask(); // error is shown by corpus constructor if needed be
-		});
+		}).otherwise(function() {
+			view.unmask();
+		})
     },
     
     validateCorpusLoadParams: function(params) {

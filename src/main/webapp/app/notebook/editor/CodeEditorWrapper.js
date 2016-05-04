@@ -33,11 +33,12 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								scope: this
 							}
 						}
-					},' ',{
-						xtype: 'notebookwrappermovement'
-					},' ',{
-						xtype: 'notebookwrapperadd'
 					}
+//					,' ',{
+//						xtype: 'notebookwrappermovement'
+//					},' ',{
+//						xtype: 'notebookwrapperadd'
+//					}
 			    ]
 			}],
 			items: [this.editor, this.results]
@@ -77,7 +78,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			}
 			this.results.unmask();
 			if (this.results.getEl().dom.textContent.trim().length==0) {
-				this.results.hide();
+//				this.results.hide();
 			}
 			this.fireEvent('editorresize'); 
 		}

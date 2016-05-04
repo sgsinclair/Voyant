@@ -2,11 +2,15 @@ var Corpus = function(source, config) {
 	return Ext.create("Voyant.data.model.Corpus", source, config);
 }
 
+function loadCorpus(source, config) {
+	return new Corpus(source, config);
+}
+
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
-    mixins: [/*'Voyant.notebook.util.Embeddable','Voyant.util.Transferable',*/'Voyant.util.Localization'],
-    transferable: ['show',/*'embed','embedSummary',*/'getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
-    //embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
+    mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization'],
+//    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
+    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
@@ -44,39 +48,36 @@ Ext.define('Voyant.data.model.Corpus', {
 			else if (Ext.isObject(source)) {Ext.apply(config, source)}
 
 			var dfd = Voyant.application.getDeferred(this);
-			var me = this;	
-//			config.input="http://asdfasfa/"
+			var me = this;
 			
-			$.ajax({
-				  type: "POST",
-				  url: Voyant.application.getTromboneUrl(),
-				  data: config,
-				  dataType: "json"
-				}).done(function(data) {
-					me.set(data.corpus.metadata)
-					var store = Ext.create("Voyant.data.store.Documents", {corpus: me});
-					me.setDocumentsStore(store);
-					if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {
-						store.load({
-							params: {
-								limit: ('docsLimit' in config) ? config.docsLimit : me.getDocumentsCount()
-							},
-							callback: function(records, st, success) {
+			var promise = Ext.Ajax.request({
+				url: Voyant.application.getTromboneUrl(),
+				params: config
+			}).then(function(response) {
+				me.set(Ext.JSON.decode(response.responseText).corpus.metadata);
+				return me
+			}).otherwise(function(response){
+				Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
+			}).then(function(corpus) {
+				if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {
+					me.getDocuments().load({
+						params: {
+							limit: ('docsLimit' in config) ? config.docsLimit : me.getDocumentsCount()
+						},
+						callback: function(records, operation, success) {
+							if (success) {
 								me.setDocumentsStore(this);
-								dfd.resolve(me);
-							},
-							scope: store
-						})
-					} else {
-						dfd.resolve(me);
-					}
-				}).fail(function(response) {
-					Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
-					dfd.reject(); // don't send error since we've already shown it
-				});
-			
-			return Voyant.application.getPromiseFromDeferred(dfd);
-
+								dfd.resolve(corpus)
+							} else {
+								dfd.reject(operation)
+							}
+						}
+					})
+				} else {
+					dfd.resolve(corpus)
+				}
+			})
+			return dfd.promise
 		}
 	},
 	
@@ -152,15 +153,7 @@ Ext.define('Voyant.data.model.Corpus', {
     	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('noPasswordAccess');		
 	},
 
-    show: function(config) {
-    	return this.then ?  Voyant.application.getDeferredNestedPromise(this, arguments) : this.getShow().show();
-    },
-    
-    getShow: function(config) {
-    	if (this.then) {
-    		return Voyant.application.getDeferredNestedPromise(this, arguments);
-    	}
-
+    toString: function(config) {
 		var size = this.getDocumentsCount();
 		var message = this.localize('thisCorpus');
 		if (size==0) {message += ' '+this.localize('isEmpty')+'.';}

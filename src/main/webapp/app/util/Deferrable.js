@@ -11,24 +11,25 @@ Ext.define('Voyant.util.Deferrable', {
 	
 	getDeferred: function(transferable) {
 
-		var deferred = jQuery.Deferred();
+//		var deferred = jQuery.Deferred();
+		var deferred = new Ext.Deferred();
 		
+		var pomise = deferred
 		// transfer methods to the promise
-		var promise = this.getPromiseFromDeferred(deferred);
+//		var promise = this.getPromiseFromDeferred(deferred);
 
 		if (transferable && transferable.transfer) {
-			transferable.transfer(transferable, promise)
+			transferable.transfer(transferable, deferred.promise)
 		}
 		
-		if (!promise.show && window.show) {promise.show=show}
+		if (!deferred.promise.show && window.show) {deferred.promise.show=show}
 
 		this.deferredStack.push(deferred);
 		
 		var me = this;
-		promise.always(function() {
+		deferred.promise.always(function() {
 			me.deferredStack.pop();
 		});
-			
 		return deferred;
 	},
 	
@@ -41,9 +42,9 @@ Ext.define('Voyant.util.Deferrable', {
 		var dfd = Voyant.application.getDeferred(transferable);
 		promise.then(function(promised) {
 			dfd.resolve(callee.apply(promised, args))
-		}).fail(function() {
+		})/*.fail(function() {
 			dfd.reject.apply(this, arguments)
-		});
+		})*/;
 		return dfd.promise;
 	}
 });

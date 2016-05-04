@@ -1,9 +1,9 @@
 Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Croatian (hr)	Serbian (sr)	Bosnian (bs)	Japanese (ja)	Hebrew ()	Czech (cz)													
-2016-04-25	Voyant.VoyantApp	translatedBy	English translation by your names here.	Traduction française de Stéfan Sinclair			Téa Rokolj	Téa Rokolj	Téa Rokolj		(Sinai Rusinek) סיני רוסינק	Radim Hladík													
+2016-04-25	Voyant.VoyantApp	translatedBy	English translation by your names here.	Traduction française de Stéfan Sinclair			Téa Rokolj	Téa Rokolj	Téa Rokolj		התרגום לעברית ע"י סיני רוסינק	Do češtiny přeložil Radim Hladík													
 2016-04-25	Voyant.util.DetailedError	error	Error	Erreur			Greška	Грешка	Greška	エラー	טעות	Chyba													Chyba
 2016-04-25	Voyant.util.Toolable	maximizeTip	Open this tool in a new window	Ouvrir cet outil dans une autre fenêtre.			Otvorite ovu alatku u novom prozoru	Oтворитe ову алатку у новом прозору	Otvorite ovu alatku u novom prozoru	新しいウインドウでこのツールを開く	פתיחה בחלון נפרד	Otevřít tento nástroj v novém okně													Otevřít tento nástroj v novém okně
 2016-04-25	Voyant.util.Toolable	plusTip	Click to choose another tool for this panel location (this will replace the current tool).				Kliknite za odabir druge alatke unutar ovog panela	Kликните да изаберете другу алатку унутар овог панела	Kliknite da izaberete drugu alatku unutar ovog panela		לפתיחת כלי אחר במיקום זה (הכלי יחליף את זה הנוכחי)	Klikněte zde pro volbu jiného nástroje v tomto umístění panelu (aktuální nástroj bude nahrazen)													
-2016-04-25	Voyant.util.Toolable	saveTip	Export a URL, an embeddable tool, data or a bibliographic reference.				Eksportirajte URL, alatku, podatak ili bibliografsku referencu	Експортујте URL, алатку, податак или библиографску референцу	Eksportirajte URL, alatku, podatak ili bibliografsku referencu		ייצא URL, כלי להטמעה, דאטה או הפנייה ביבליוגרפית	Export URL, vložitelného nástroje, dat nebo bibliografického odkazu.													
+2016-04-25	Voyant.util.Toolable	saveTip	Export a URL, an embeddable tool, data or a bibliographic reference.				Eksportirajte URL, alatku, podatak ili bibliografsku referencu	Експортујте URL, алатку, податак или библиографску референцу	Eksportirajte URL, alatku, podatak ili bibliografsku referencu		ייצא URL, כלי להטמעה, דאטה או הפנייה ביבליוגרפית	Exportovat URL, vložitelný nástroj, data nebo bibliografický odkaz.													
 2016-04-25	Voyant.util.Toolable	gearTip	Define options for this tool.				Definirajte opcije	Дефинишите опције	Definišite opcije		הגדרת אפשרויות לכלי זה	Definovat možnosti pro tento nástroj.													
 2016-04-25	Voyant.util.Toolable	helpTip	No tool-specific help is currently available. Click this icon to visit the <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> site.				Trenutačno ne postoje specifičnije upute. Kliknite na slijedecu ikonu za posjet <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> web stranici.	Тренутно не постоје специфичније упуте. Кликните на следећy иконy да посетите <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> web страницу.	Trenutno ne postoje specifičnije upute. Kliknite na slijedecu ikonu za posjet <a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools Documentation</a> web stranici.			V současnosti není dostupná žádná specifická nápověda pro zvolený nástroj. Klikněte na tuto ikonu pro navštívení stránky <a href="http://docs.voyant-tools.org/" target="_blank">Dokumentace Voyant Tools</a>.													
 2016-04-25	Voyant.util.Toolable	moreHelp	More help…				Opširnije upute...	Опширније упуте…	Opširnije upute…		עזרה נוספת	Další nápověda…													
@@ -16,9 +16,9 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.util.Toolable	exportBiblioTitle	Export Bibliographic Reference				Eksportirajte bibliografsku referencu	Експортујте библиографску референцу	Eksportirajte bibliografsku referencu		ייצוא הפניה ביבליוגרפית	Export bibliografického odkazu													
 2016-04-25	Voyant.util.Toolable	exportViewBiblio	a bibliographic reference for this view				Bibliografska referenca za ovaj prikaz	Библиографска референца за овај приказ	Bibliografska referenca za ovaj prikaz		הפניה ביבליוגרפית לתצוגה זו	bibliografický odkaz pro toto zobrazení													
 2016-04-25	Voyant.util.Toolable	exportGridCurrent	Export Current Data				Eksportirajte trenutne podatake	Експортујте тренутне податке	Eksport trenutnih podataka		ייצא דאטה נוכחי	Export aktuálních dat													
-2016-04-25	Voyant.util.Toolable	exportGridCurrentHtml	export current data as HTML				Eksportirajte trenutne podatake u HTML	Експортујте тренутне податке у HTML	Eksport trenutnih podataka u HTML 		ייצא דאטה נוכחי כ-HTML	export aktuálních dat v HTML													
-2016-04-25	Voyant.util.Toolable	exportGridCurrentJson	export current data as JSON				Eksportirajte trenutne podatake u JSON	Експортујте тренутне податке у JSON	Eksport trenutnih podataka u JSON 		ייצא דאטה נוכחי כ-JSON	export aktuálních dat v JSON													
-2016-04-25	Voyant.util.Toolable	exportGridCurrentTsv	export current data as tab separated values (text)				Eksportirajte trenutne podatake kao vrijednosti razdvojene tabulatorom	Експортујте тренутне податке као вредности раздојене табулатором	Eksportirajte trenutne podatake kao vrijednosti razdvojene tabulatorom			export aktuálních dat v textovém souboru s hodnotami oddělenými tabulátory													
+2016-04-25	Voyant.util.Toolable	exportGridCurrentHtml	export current data as HTML				Eksportirajte trenutne podatake u HTML	Експортујте тренутне податке у HTML	Eksport trenutnih podataka u HTML 		ייצא דאטה נוכחי כ-HTML	exportovat aktuální data ve formátu HTML													
+2016-04-25	Voyant.util.Toolable	exportGridCurrentJson	export current data as JSON				Eksportirajte trenutne podatake u JSON	Експортујте тренутне податке у JSON	Eksport trenutnih podataka u JSON 		ייצא דאטה נוכחי כ-JSON	exportovat aktuální data ve formátu JSON													
+2016-04-25	Voyant.util.Toolable	exportGridCurrentTsv	export current data as tab separated values (text)				Eksportirajte trenutne podatake kao vrijednosti razdvojene tabulatorom	Експортујте тренутне податке као вредности раздојене табулатором	Eksportirajte trenutne podatake kao vrijednosti razdvojene tabulatorom			exportovat aktuální data jako text s hodnotami oddělenými tabulátory													
 2016-04-25	Voyant.util.Toolable	export	Export				Eksport	Експорт	Eksport		ייצוא	Export													
 2016-04-25	Voyant.util.Toolable	reset	Reset				Resetiranje	Ресетовање	Resetiranje		איפוס	Obnovení													
 2016-04-25	Voyant.util.Toolable	optionsTitle	Options				Opcije	Oпције	Opcije		אפשרויות	Možnosti													
@@ -60,15 +60,15 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.data.model.Corpus	secondsAgo	{count} seconds ago				prije {} sekund-e/i	пре {} секунд-е/и	prije {} sekund-e/i		לפני כ-{} שניות	asi před {count} vteřinami													
 2016-04-25	Voyant.data.model.Corpus	now	now				sada	сада	sada		כעת	nyní													
 2016-04-25	Voyant.widget.StopListOption	label	Stopwords:				Prazne riječi:	Празне речи:	Prazne riječi:			Stop slova:													
-2016-04-25	Voyant.widget.StopListOption	editList	Edit List								עריכת רשימה	Editace seznamu													
-2016-04-25	Voyant.widget.StopListOption	noEditAutoTitle	Edit Stoplist Error								טעות בעריכת הרשימה	Chyba editace seznamu stop slov													
-2016-04-25	Voyant.widget.StopListOption	noEditAutoMessage	The auto-detected stoplist cannot be edited, please select a specifc stoplist such as the "New User-Defined List".									Automaticky detekovaný seznam stop slov nelze editovat, zvolte prosím specifický seznam stop slov, jako např. "Nový uživatelský seznam".													
-2016-04-25	Voyant.widget.StopListOption	auto	Auto-detect									Automatická detekce													
-2016-04-25	Voyant.widget.StopListOption	none	None								ללא	Žádný													
-2016-04-25	Voyant.widget.StopListOption	new	New User-Defined List								רשימה מוגדרת על ידי המשתמש/ת	Nový uživatelský seznam													
+2016-04-25	Voyant.widget.StopListOption	editList	Edit List				Revizija liste	Pевизија листе	Revizija liste		עריכת רשימה	Editace seznamu													
+2016-04-25	Voyant.widget.StopListOption	noEditAutoTitle	Edit Stoplist Error				Greška pri reviziji liste praznih riječi	Грешка при ревизији листе празних речи	Greška pri reviziji liste praznih riječi		טעות בעריכת הרשימה	Chyba editace seznamu stop slov													
+2016-04-25	Voyant.widget.StopListOption	noEditAutoMessage	The auto-detected stoplist cannot be edited, please select a specifc stoplist such as the "New User-Defined List".				Automatski detektirana lista praznih riječi se ne može izmijeniti. Odaberite specifičnu listu, npr. "Nova osobno definirana lista"	Аутоматски детектована листа празних речи не може да се измени. Одаберите специфичну листу, нпр. "Нова лично дефинисана листа"	Automatski detektirana lista praznih riječi se ne može izmijeniti. Odaberite specifičnu listu, npr. "Nova lično definisana lista"			Automaticky detekovaný seznam stop slov nelze editovat, zvolte prosím specifický seznam stop slov, jako např. "Nový uživatelský seznam".													
+2016-04-25	Voyant.widget.StopListOption	auto	Auto-detect				Automatska detekcija	Аутоматска детекција	Automatska detekcija			Automatická detekce													
+2016-04-25	Voyant.widget.StopListOption	none	None				Ne postoji	Не постоји	Ne postoji		ללא	Žádný													
+2016-04-25	Voyant.widget.StopListOption	new	New User-Defined List				Nova osobno definirana lista	Нова лично дефинисана листа	Nova lično definisana lista		רשימה מוגדרת על ידי המשתמש/ת	Nový uživatelský seznam													
 2016-04-25	Voyant.widget.StopListOption	ar	Arabic				arapski	арапски	arapski		ערבית	arabština													
 2016-04-25	Voyant.widget.StopListOption	bg	Bulgarian				bugarski	бугарски	bugarski		בולגרית	bulharština													
-2016-04-25	Voyant.widget.StopListOption	br	Breton				bretonski	бретонски	bretonski			bretonština													
+2016-04-25	Voyant.widget.StopListOption	br	Breton				bretonski	бретонски	bretonski		ברטונית	bretonština													
 2016-04-25	Voyant.widget.StopListOption	ca	Catalan				katalonski	каталонски	katalonski		קטלנית	katalánština													
 2016-04-25	Voyant.widget.StopListOption	ckb	Kurdish				kurdski	курдски	kurdski		כורדית	kurdština													
 2016-04-25	Voyant.widget.StopListOption	cn	Chinese				kineski	кинески	kineski		סינית	čínština													
@@ -81,7 +81,7 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.widget.StopListOption	fa	Farsi				perzijski	персијски	perzijski		פרסית	fársí													
 2016-04-25	Voyant.widget.StopListOption	fr	French				francuski	француски	francuski		צרפתית	francouzština													
 2016-04-25	Voyant.widget.StopListOption	ga	Irish				irski	ирски	irski		אירית	irština													
-2016-04-25	Voyant.widget.StopListOption	gl	Galician				galicijski	галисијски	galicijski			galicijština													
+2016-04-25	Voyant.widget.StopListOption	gl	Galician				galicijski	галисијски	galicijski		גליסית	galicijština													
 2016-04-25	Voyant.widget.StopListOption	hi	Hindi				hindski	хинди	hindski		הינדי	hindī													
 2016-04-25	Voyant.widget.StopListOption	hu	Hungarian				madžarski	мађарски	mađarski		הונגרית	maďarština													
 2016-04-25	Voyant.widget.StopListOption	hy	Armenian				jermenski	јерменски	jermenski		ארמנית	arménština													
@@ -90,12 +90,12 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.widget.StopListOption	ja	Japanese				japanski	јапански	japanski		יפנית	japonština													
 2016-04-25	Voyant.widget.StopListOption	lt	Latvian				letonski	летонски	letonski		לטבית	lotyština													
 2016-04-25	Voyant.widget.StopListOption	lv	Lithuanian				litvanski	литвански	litvanski		ליטאית	litevština													
-2016-04-25	Voyant.widget.StopListOption	mu	Multilingual				višejezični	вишејезични	višejezični		רב-לשוני	vícejazyčná													
+2016-04-25	Voyant.widget.StopListOption	mu	Multilingual				višejezični	вишејезични	višejezični		רב-לשוני	více jazyků													
 2016-04-25	Voyant.widget.StopListOption	nl	Dutch				nizozemski	холандски	holandski		הולנדית	holandština													
 2016-04-25	Voyant.widget.StopListOption	no	Norwegian				norveški	норвешки	norveški		נורבגית	norština													
 2016-04-25	Voyant.widget.StopListOption	ro	Romanian				rumunjski	румунски	rumunski		רומנית	rumunština													
 2016-04-25	Voyant.widget.StopListOption	se	Swedish				švedski	шведски	švedski		שבדית	švédština													
-2016-04-25	Voyant.widget.StopListOption	th	Thai				tajski	тајландски	tajlandski			thajština													
+2016-04-25	Voyant.widget.StopListOption	th	Thai				tajski	тајландски	tajlandski		תאית	thajština													
 2016-04-25	Voyant.widget.StopListOption	tr	Turkish				turski	турски	turski		טורקית	turečtina													
 2016-04-25	Voyant.widget.StopListOption	ok	Save								שמירה	Uložit													
 2016-04-25	Voyant.widget.StopListOption	cancel	Cancel								ביטול	Zrušit													
@@ -105,65 +105,65 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.widget.QuerySearchField	querySearch	Search								חיפוש	Vyhledávání													
 2016-04-25	Voyant.widget.QuerySearchField	querySearchTip	<div>Search syntax (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>"winter coat"</b>: <i>winter coat</i> as a phrase</li><li><b>"coat mittens"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,"coat mittens"~5</b>: combine syntaxes</li></ul>									<div>Syntax vyhledávání (stisknutím klávesy enter/return zahájíte vyhledávání):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^kabátt*</b>: vyhledat termíny začínající na <i>kabát</i> jako samostatné termíny (kabát, kabáty, atd.)</li><li><b>kabát,bunda</b>: vyhledat termíny oddělené čárkami jako samostatné termíny</li><li><b>kabátt|bunda</b>: vyhledat termíny oddělené svislou čárou jako jeden termín</li><li><b>"zimní kabát"</b>: <i>zimní kabát</i>jako frázi</li><li><b>"kabát rukavice"~5</b>: <i>kabát</i> v blízkosti <i>rukavice</i> (v okolí 5 slov)</li><li><b>^kabát*,bunda|parka,"kabát rukavice"~5</b>: kombinovaná syntax</li></ul>													
 2016-04-25	Voyant.widget.QuerySearchField	querySearchDocsModeTip	<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>"winter coat"</b>: <i>winter coat</i> as a phrase</li><li><b>"coat mittens"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+"winter coat" +mitten*</b>: combine syntaxes</li></ul>									<div>Syntax pro vyhledávání v dokumentech  (p(stisknutím klávesy enter/return zahájíte vyhledávání):</div><ul style="margin-top: 3px; margin-bottom: 3px;"><li><b>kabát</b>: vyhledat přesné znění<i>kabát</i></li><li><b>kabát*</b>: vyhledat termíny začínající na <i>kabát</i></li><li><b>kabát,bunda</b>: vyhledat termíny oddělené čárkami jako samostatné termíny</li><li><b>"zimní kabát"</b>: <i>zimní kabát</i> jako sousloví</li><li><b>"kabát rukavice"~5</b>: <i>kabát</i> v blízskosti <i>rukavice</i> (v okolí 5 slov)</li><li><b>+zimní +kabát</b>: vyhledat každý termín, kterému předchází plus (+)</li><li><b>+"zimní kabát" +rukavice*</b>: kombinovaná syntax</li></ul>													
-2016-04-25	Voyant.widget.QuerySearchField	aggregateInDocumentsCount	This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms).										Toto je počet dokumentů vyhovujících kritériím vyhledávání (každý započtený dokument obsahuje aspoň jeden vyhledávaný termín).												
-2016-04-25	Voyant.widget.TotalPropertyStatus	totalPropertyStatus	{count:number("0,000")}										{count:number("0,000")}												
-2016-04-25	Voyant.widget.DocumentSelector	documents	Documents								מסמכים		Dokumenty												
-2016-04-25	Voyant.widget.DocumentSelector	selectAll	All								הכל		Vše												
-2016-04-25	Voyant.widget.DocumentSelector	selectNone	None								ללא		Žádný												
-2016-04-25	Voyant.widget.DocumentSelector	ok	Ok								אישור		Ok												
-2016-04-25	Voyant.widget.DocumentSelector	cancel	Cancel								ביטול		Zrušit												
-2016-04-25	Voyant.widget.DocumentSelector	all	all								הכל		vše												
-2016-04-25	Voyant.widget.CorpusDocumentSelector	corpus	Corpus								קורפוס		Korpus												
-2016-04-25	Voyant.widget.CorpusDocumentSelector	scale	Scale										Měřítko												
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	fieldLabel	Filenames								שמות הקבצים		Názvy souborů												
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	titleLabel	title								כותרת		název												
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	authorLabel	author								מחבר		autor												
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	pubDateLabel	date								תאריך		datum												
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	enabledLabel	include: 								כולל:		zahrnout:												
-2016-04-25	Voyant.widget.DownloadFilenameBuilder	availableLabel	exclude: 								לא כולל:		vyloučit:												
-2016-04-25	Voyant.widget.DownloadFileFormat	fieldLabel	File Format										Formát souboru												
-2016-04-25	Voyant.widget.DownloadFileFormat	voyantXml	Voyant XML								וויאנט XML		Voyant XML												
-2016-04-25	Voyant.widget.DownloadFileFormat	VOYANTTip	This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content.										Toto je normalizovaná verze obsahu: pokud jsou zdrojové dokumenty v XML, půjde především o původní obsah, zatímco pro většinu ostatních zdrojových dokumentů se bude jednat o prostý HTML obsah.												
-2016-04-25	Voyant.widget.DownloadFileFormat	SOURCETip	This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided.										Poskytnutí zdrojových dokumentů v jejich původních formátech. V některých případech to znamená, že  může být poskytnut jeden archiv (např. soubor ZIP).												
-2016-04-25	Voyant.widget.DownloadFileFormat	TXTTip	This will produce a plain text version of each document.										Vytvoření prosté textové verze každého dokumentu.												
-2016-04-25	Voyant.widget.DownloadFileFormat	original	original								מקורי		originál												
-2016-04-25	Voyant.widget.DownloadFileFormat	plainText	plain text										prostý text												
-2016-04-25	Voyant.widget.DownloadOptions	title	Download Options								אפשרויות הורדה		Možnosti stažení												
-2016-04-25	Voyant.panel.Panel	term	Term								מונח		Termín												
-2016-04-25	Voyant.panel.Panel	rawFreq	Count								מספר		Počet												
-2016-04-25	Voyant.panel.Panel	relativeFreq	Relative								יחסי		Relativní												
-2016-04-25	Voyant.panel.Panel	trend	Trend								מגמה		Trend												
-2016-04-25	Voyant.panel.Panel	colon	: 								:		: 												
-2016-04-25	Voyant.panel.Panel	loading	Loading								טוען		Nahrávání												
-2016-04-25	Voyant.panel.Panel	error	Error										Chyba												
-2016-04-25	Voyant.panel.Panel	info	Information								מידע		Informace												
-2016-04-25	Voyant.widget.Facet	emptyText	No values found.								לא נמצאו ערכים.		Nebyly nalezeny žádné hodnoty												
-2016-04-25	Voyant.panel.Bubblelines	title	Bubblelines										Bublinový graf												
-2016-04-25	Voyant.panel.Bubblelines	type	Visualization										Vizualizace												
-2016-04-25	Voyant.panel.Bubblelines	findTerm	Find Term								חיפוש מונח		Najdi termín												
-2016-04-25	Voyant.panel.Bubblelines	clearTerms	Clear								ניקוי		Vymazat												
-2016-04-25	Voyant.panel.Bubblelines	removeTerm	Remove Term								הסרת מונח		Odstranit termín												
-2016-04-25	Voyant.panel.Bubblelines	showTerm	Show Term								הצגת מונח		Ukázat termín												
-2016-04-25	Voyant.panel.Bubblelines	hideTerm	Hide Term								החבאת מונח		Schovej termín												
-2016-04-25	Voyant.panel.Bubblelines	granularity	Granularity										Granularita												
-2016-04-25	Voyant.panel.Bubblelines	separateLines	Separate Lines for Terms										Oddělené řádky pro termíny												
-2016-04-25	Voyant.panel.Bubblelines	total	Total								סך הכל		Celkem												
-2016-04-25	Voyant.panel.Bubblelines	corpusTooSmall	The provided corpus is too small for this tool.								הקורפוס קטן מדי עבור כלי זה.		Zadaný korpus je pro tento nástroj příliš malý.												
-2016-04-25	Voyant.panel.Bubblelines	help	Bubblelines visualizes the frequency and repetition of  a term's use in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal lengths. Each term is represented as a bubble, the size of the bubble indicates its frequency in the corresponding segment of text. The larger the bubble's radius the more frequently the term occurs.										Bubblelines (bublinový graf) vizualizuje frekvenci a opakování užití termínu v korpusu. Každý dokument v korpusu je reprezentován jako horizontální přímka a rozdělen do segmentů stejné délky. Každý termín je reprezentován jako bublina, přičemž velikost bubliny ukazuje frekvenci termínu v odpovídajícím úseku textu. Čím větší je průměr bubliny, tím častěji se termín vyskytuje.												
+2016-04-25	Voyant.widget.QuerySearchField	aggregateInDocumentsCount	This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms).									Toto je počet dokumentů vyhovujících kritériím vyhledávání (každý započtený dokument obsahuje aspoň jeden vyhledávaný termín).													
+2016-04-25	Voyant.widget.TotalPropertyStatus	totalPropertyStatus	{count:number("0,000")}									{count:number("0,000")}													
+2016-04-25	Voyant.widget.DocumentSelector	documents	Documents								מסמכים	Dokumenty													
+2016-04-25	Voyant.widget.DocumentSelector	selectAll	All								הכל	Vše													
+2016-04-25	Voyant.widget.DocumentSelector	selectNone	None								ללא	Žádný													
+2016-04-25	Voyant.widget.DocumentSelector	ok	Ok								אישור	Ok													
+2016-04-25	Voyant.widget.DocumentSelector	cancel	Cancel								ביטול	Zrušit													
+2016-04-25	Voyant.widget.DocumentSelector	all	all								הכל	vše													
+2016-04-25	Voyant.widget.CorpusDocumentSelector	corpus	Corpus								קורפוס	Korpus													
+2016-04-25	Voyant.widget.CorpusDocumentSelector	scale	Scale									Měřítko													
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	fieldLabel	Filenames								שמות הקבצים	Názvy souborů													
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	titleLabel	title								כותרת	název													
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	authorLabel	author								מחבר	autor													
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	pubDateLabel	date								תאריך	datum													
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	enabledLabel	include: 								כולל:	zahrnout:													
+2016-04-25	Voyant.widget.DownloadFilenameBuilder	availableLabel	exclude: 								לא כולל:	vyloučit:													
+2016-04-25	Voyant.widget.DownloadFileFormat	fieldLabel	File Format									Formát souboru													
+2016-04-25	Voyant.widget.DownloadFileFormat	voyantXml	Voyant XML								וויאנט XML	Voyant XML													
+2016-04-25	Voyant.widget.DownloadFileFormat	VOYANTTip	This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content.									Toto je normalizovaná verze obsahu: pokud jsou zdrojové dokumenty v XML, půjde především o původní obsah, zatímco pro většinu ostatních zdrojových dokumentů se bude jednat o prostý HTML obsah.													
+2016-04-25	Voyant.widget.DownloadFileFormat	SOURCETip	This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided.									Poskytnutí zdrojových dokumentů v jejich původních formátech. V některých případech to znamená, že  může být poskytnut jeden archiv (např. soubor ZIP).													
+2016-04-25	Voyant.widget.DownloadFileFormat	TXTTip	This will produce a plain text version of each document.									Vytvoření prosté textové verze každého dokumentu.													
+2016-04-25	Voyant.widget.DownloadFileFormat	original	original								מקורי	originál													
+2016-04-25	Voyant.widget.DownloadFileFormat	plainText	plain text									prostý text													
+2016-04-25	Voyant.widget.DownloadOptions	title	Download Options								אפשרויות הורדה	Možnosti stažení													
+2016-04-25	Voyant.panel.Panel	term	Term								מונח	Termín													
+2016-04-25	Voyant.panel.Panel	rawFreq	Count								מספר	Počet													
+2016-04-25	Voyant.panel.Panel	relativeFreq	Relative								יחסי	Relativní													
+2016-04-25	Voyant.panel.Panel	trend	Trend								מגמה	Trend													
+2016-04-25	Voyant.panel.Panel	colon	: 								:	: 													
+2016-04-25	Voyant.panel.Panel	loading	Loading								טוען	Nahrávání													
+2016-04-25	Voyant.panel.Panel	error	Error									Chyba													
+2016-04-25	Voyant.panel.Panel	info	Information								מידע	Informace													
+2016-04-25	Voyant.widget.Facet	emptyText	No values found.								לא נמצאו ערכים.	Nebyly nalezeny žádné hodnoty													
+2016-04-25	Voyant.panel.Bubblelines	title	Bubblelines									Bublinový graf													
+2016-04-25	Voyant.panel.Bubblelines	type	Visualization									Vizualizace													
+2016-04-25	Voyant.panel.Bubblelines	findTerm	Find Term								חיפוש מונח	Najdi termín													
+2016-04-25	Voyant.panel.Bubblelines	clearTerms	Clear								ניקוי	Vymazat													
+2016-04-25	Voyant.panel.Bubblelines	removeTerm	Remove Term								הסרת מונח	Odstranit termín													
+2016-04-25	Voyant.panel.Bubblelines	showTerm	Show Term								הצגת מונח	Ukázat termín													
+2016-04-25	Voyant.panel.Bubblelines	hideTerm	Hide Term								החבאת מונח	Schovej termín													
+2016-04-25	Voyant.panel.Bubblelines	granularity	Granularity									Granularita													
+2016-04-25	Voyant.panel.Bubblelines	separateLines	Separate Lines for Terms									Oddělené řádky pro termíny													
+2016-04-25	Voyant.panel.Bubblelines	total	Total								סך הכל	Celkem													
+2016-04-25	Voyant.panel.Bubblelines	corpusTooSmall	The provided corpus is too small for this tool.								הקורפוס קטן מדי עבור כלי זה.	Zadaný korpus je pro tento nástroj příliš malý.													
+2016-04-25	Voyant.panel.Bubblelines	help	Bubblelines visualizes the frequency and repetition of  a term's use in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal lengths. Each term is represented as a bubble, the size of the bubble indicates its frequency in the corresponding segment of text. The larger the bubble's radius the more frequently the term occurs.									Bublinový graf (Bubblelines) vizualizuje frekvenci a opakování užití termínu v korpusu. Každý dokument v korpusu je reprezentován jako horizontální přímka a rozdělen do segmentů stejné délky. Každý termín je reprezentován jako bublina, přičemž velikost bubliny ukazuje frekvenci termínu v odpovídajícím úseku textu. Čím větší je průměr bubliny, tím častěji se termín vyskytuje.													
 2016-04-25	Voyant.panel.Bubblelines	adaptedFrom																							
-2016-04-25	Voyant.panel.Bubblelines	options	Options								אפשרויות		Možnosti												
-2016-04-25	Voyant.panel.Catalogue	title	Catalogue	Catalogue							קטלוג		Katalog												
-2016-04-25	Voyant.panel.Catalogue	helpTip	The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.	Le <i>catalogue</i> est une interface pour explorer le contenu de corpus plus larges à plusieurs documents, ainsi que pour la création de sous-ensembles de textes qui correspondent à certains critères de recherche. Le catalogue fonctionne un peu comme une base de données de bibliothèque ou d'un magain en ligne.									<p>Nástroj <i>Katalog</i> poskytuje rozhraní pro prozkoumání obsahu větších korpusů složených z více dokumentů. Rovněž umožňuje vytvářet podmnožiny (nebo pracovní sady) podle vyhledávacích kritérií. Funguje podobně jako knihovnická databáze nebo eshop v tom smyslu, že umožňuje filtrovat dokumenty.												
-2016-04-25	Voyant.panel.Catalogue	facet.authorTitle	Authors	Auteurs							מחברים		Autoři												
-2016-04-25	Voyant.panel.Catalogue	facet.languageTitle	Languages	Langues							שפות		Jazyky												
-2016-04-25	Voyant.panel.Catalogue	facet.titleTitle	Titles	Titres							כותרות		Názvy												
+2016-04-25	Voyant.panel.Bubblelines	options	Options								אפשרויות	Možnosti													
+2016-04-25	Voyant.panel.Catalogue	title	Catalogue	Catalogue							קטלוג	Katalog													
+2016-04-25	Voyant.panel.Catalogue	helpTip	The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.	Le <i>catalogue</i> est une interface pour explorer le contenu de corpus plus larges à plusieurs documents, ainsi que pour la création de sous-ensembles de textes qui correspondent à certains critères de recherche. Le catalogue fonctionne un peu comme une base de données de bibliothèque ou d'un magain en ligne.								<p>Nástroj <i>Katalog</i> poskytuje rozhraní pro prozkoumání obsahu větších korpusů složených z více dokumentů. Rovněž umožňuje vytvářet podmnožiny (nebo pracovní sady) podle vyhledávacích kritérií. Funguje podobně jako knihovnická databáze nebo eshop v tom smyslu, že umožňuje filtrovat dokumenty.													
+2016-04-25	Voyant.panel.Catalogue	facet.authorTitle	Authors	Auteurs							מחברים	Autoři													
+2016-04-25	Voyant.panel.Catalogue	facet.languageTitle	Languages	Langues							שפות	Jazyky													
+2016-04-25	Voyant.panel.Catalogue	facet.titleTitle	Titles	Titres							כותרות	Názvy													
 2016-04-29	Voyant.panel.Catalogue	facet.collectionTitle	Collections	Collections																					
-2016-04-25	Voyant.panel.Catalogue	facet.keywordTitle	Keywords	Mots-clés							מילות מפתח		Klíčová slova												
-2016-04-25	Voyant.panel.Catalogue	facet.pubDateTitle	Publication Dates	Dates de publication							תאריכי פרסום		Data vydání												
-2016-04-25	Voyant.panel.Catalogue	facet.publisherTitle	Publishers	Maisons d'édition							מוציאים לאור		Vydavatelé												
-2016-04-25	Voyant.panel.Catalogue	facet.pubPlaceTitle	Publication Locations	Lieux de publication							מקומות הוצאה לאור		Místa vydání												
-2016-04-25	Voyant.panel.Catalogue	loadingSnippets	loading text snippets…	recherche de texte…									nahrávání textových fragmentů												
-2016-04-25	Voyant.panel.Catalogue	lexicalTitle	Terms	Termes							מונחים		Termíny												
+2016-04-25	Voyant.panel.Catalogue	facet.keywordTitle	Keywords	Mots-clés							מילות מפתח	Klíčová slova													
+2016-04-25	Voyant.panel.Catalogue	facet.pubDateTitle	Publication Dates	Dates de publication							תאריכי פרסום	Data vydání													
+2016-04-25	Voyant.panel.Catalogue	facet.publisherTitle	Publishers	Maisons d'édition							מוציאים לאור	Vydavatelé													
+2016-04-25	Voyant.panel.Catalogue	facet.pubPlaceTitle	Publication Locations	Lieux de publication							מקומות הוצאה לאור	Místa vydání													
+2016-04-25	Voyant.panel.Catalogue	loadingSnippets	loading text snippets…	recherche de texte…								nahrávání textových fragmentů													
+2016-04-25	Voyant.panel.Catalogue	lexicalTitle	Terms	Termes							מונחים	Termíny													
 2016-04-25	Voyant.panel.Catalogue	noMatches	No matches (out of {0} documents).	Aucun résultat (dans {0} documents).								Nebyla nalezena žádná shoda (z {0} dokumentů).													
 2016-04-25	Voyant.panel.Catalogue	queryMatches	{0} matching documents (out of {1}).	{0} documents correspondants (sur {1})								Hledanému výrazu odpovídá celkem {0} dokumentů (z {1}).													
 2016-04-25	Voyant.panel.Catalogue	clickToOpenCorpus	Please <a href="{0}" target="_blank" class="link">click here</a> to access your new corpus (since popup windows are blocked).	Veuillez <a href="{0}" target="_blank" class="link">cliquer ici pour ouvrir votre corpus</a> (puisque les fenêtres surgissantes sont bloquées).								Prosím <a href="{0}" target="_blank" class="link">klikněte zde</a> pro přístup k vašemu novému korpusu (jelikož vyskakovací okna jsou blokována).													
@@ -219,7 +219,7 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.panel.CorpusCreator	gearTip	Options									Možnosti													
 2016-04-25	Voyant.panel.CorpusCreator	gearWinTitle	Options									Možnosti													
 2016-04-25	Voyant.panel.CorpusCreator	inputFormat	Input Format									Formát vstupu													
-2016-04-25	Voyant.panel.CorpusCreator	inputFormatAuto	Auto-Detect (recommended)									Autodetekce (doporučeno)													
+2016-04-25	Voyant.panel.CorpusCreator	inputFormatAuto	Auto-Detect (recommended)									Automatická detekce (doporučeno)													
 2016-04-25	Voyant.panel.CorpusCreator	advancedOptionsText	For more information on the advanced options below, see the documentation on <a href="{0}" target="voyantdocs">creating a corpus</a>.									Pro více informací o níže uvedeném pokročilém nastavení konzultujte dokumentaci k<a href="{0}" target="voyantdocs">vytvoření nového korpusu</a>													
 2016-04-25	Voyant.panel.CorpusCreator	xmlOptions	XML									XML													
 2016-04-25	Voyant.panel.CorpusCreator	xmlOptionsText	Define XPath Expressions for any of the following:									Definovat XPath výrazy pro následující:													
@@ -293,7 +293,7 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.panel.Phrases	termRawFreqTip	The number of times the phrase occurs in the corpus.									Kolikrát se slovní spojení vyskytuje v korpusu.													
 2016-04-25	Voyant.panel.Phrases	matchingTerms	{count}									{count}													
 2016-04-25	Voyant.panel.Phrases	length	Length									Délka													
-2016-04-25	Voyant.panel.Phrases	lengthTip	The upper and lower bounds of phrase lengths (how many words in each phrase).									Horní a dolní hranice délky slovních spojení (kolik slov je obsaženo v každém slovním spojení).													
+2016-04-25	Voyant.panel.Phrases	lengthTip	The upper and lower bounds of phrase lengths (how many words in each phrase).									Horní a spodní hranice délky slovních spojení (kolik slov je obsaženo v každém slovním spojení).													
 2016-04-25	Voyant.panel.Phrases	overlap	Overlap									Překrývání													
 2016-04-25	Voyant.panel.Phrases	overlapTip	This determines how overlapping phrases are filtered.									Toto určuje, jak se mají filtrovat překrývající se slovní spojení.													
 2016-04-25	Voyant.panel.Phrases	overlapMenu	Choose an overlap filter:									Zvolte filtr pro překrývání:													
@@ -312,6 +312,9 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.panel.CorpusTerms	relativeSkewness	Skew									Šikmost													
 2016-04-25	Voyant.panel.CorpusTerms	relativeSkewnessTip	This is a statistical measure of the symmetry of the relative frequencies of a term across the corpus.									Toto je statistická míra symetrie relativních četností termínu napříč korpusem.													
 2016-04-25	Voyant.panel.CorpusTerms	trendTip	This represents the trend of the relative frequencies for each term in each document in the corpus.									Toto reprezentuje trend relativních četností pro každý termín v každém dokumentu korpusu.													
+2016-05-04	Voyant.panel.CorpusTerms	corpusComparisonDifference	Comparison																						
+2016-05-04	Voyant.panel.CorpusTerms	corpusComparisonDifferenceTip	This is the difference between the term's relative frequency in this corpus and the relative frequency in a comparison corpus (you can define a comparison corpus in the tool's options).																						
+2016-05-04	Voyant.panel.CorpusTerms	noCorpusComparison	You have selected to show the <i>Comparison</i> column but you haven't yet defined a comparison corpus (you can do so in the tool's options).																						
 2016-04-25	Voyant.panel.DocumentTerms	title	Document Terms									Termíny dokumentu													
 2016-04-25	Voyant.panel.DocumentTerms	emptyText	No matching results.									Vyhledávacím kritériím neodpovídají žádné výsledky.													
 2016-04-25	Voyant.panel.DocumentTerms	helpTip	<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>									</p><p>Nástroj Termíny dokumentu poskytuje tabulkové zobrazení termínů, které se objevují v každém dokumentu. Funkce zahrnují: Funkce zahrnují:</p><ul><li>změna uspořádání pomocí <i>termín</i> a <i>počet</i> (absolutní četnost), a <i>relativní</i> četnost (klikněte na záhlaví sloupců)</li><li>řádkový minigraf (sparkline) trendů frekvence termínu napříč dokumenty</li><li>zpřístupnění dodatečných sloupců (<i>Významnost</i> nebo TF-IDF, tj. četnost slova v dokumentu - převrácená četnost slova ve všech dokumentech) pomocí kliknutí na šipku, která se objeví po najetí kurzoru na záhlaví</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu lupy pro nápovědu syntaxe</li></ul>													
@@ -464,7 +467,7 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.panel.TopicContexts	title	Topic Contexts									Tematické kontexty													
 2016-04-25	Voyant.panel.TopicContexts	helpTip	Topic Contexts									Tematické kontexty													
 2016-04-25	Voyant.panel.TopicContexts	reset	reset									obnovit													
-2016-04-25	Voyant.panel.TermsRadio	title	TermsRadio									TermsRadio													
+2016-04-25	Voyant.panel.TermsRadio	title	TermsRadio									Rádius termínů													
 2016-04-25	Voyant.panel.TermsRadio	type	Visualization									Vizualizace													
 2016-04-25	Voyant.panel.TermsRadio	help	This tool can be used to examine word occurence over a corpus spanning a period of time.									Tento nástroj lze použít pro sledování výskytu slov napříč korpusem ve vymezeném časovém období.													
 2016-04-25	Voyant.panel.TermsRadio	visibleSegments	Visible									Zobrazené													
@@ -504,7 +507,7 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.panel.NoTool	oldButton	Use Old Version									Použít starou verzi													
 2016-04-25	Voyant.panel.NoTool	noToolSpecified	No tool has been specified. You will be redirected to the main page of Voyant Tools.									Nebyl zvolen žádný nástroj.  Budete přesměrováni na hlavní stránku Voyant Tools.													
 2016-04-25	Voyant.panel.NoTool	badToolSpecified	The <i>{0}</i> tool doesn't exist. You will be redirected to the main page of Voyant Tools.									Nástroj <i>{0}</i> neexistuje. Budete přesměrováni na hlavní stránku Voyant Tools.													
-2016-04-25	Voyant.panel.NoTool	notImplemented	<p>The <i>{0}</i> tool existed in a previous version of Voyant Tools but has not been implemented in this version. Some tools may be reimplemented eventually while others are unlikely to be implemented because they were experimental, unuseful or dependent on technologies that are no longer supported (like Adobe Flash and Java Applets).</p><p>Please decide if you'd like to use the new version of Voyant or if you'd rather try using the <i>{0}</i> tool in the old version.</p>									<p>The <i>{0}</i> tool existed in a previous version of Voyant Tools but has not been implemented in this version. Some tools may be reimplemented eventually while others are unlikely to be implemented because they were experimental, unuseful or dependent on technologies that are no longer supported (like Adobe Flash and Java Applets).</p><p>Please decide if you'd like to use the new version of Voyant or if you'd rather try using the <i>{0}</i> tool in the old version.</p> <p>Nástroj <i>{0}</i> existoval v předchozí verzi Voyant Tools, ale v této verzi nebyl implementován. Některé nástroje mohou být výhledově opět implementovány, avšak u dalších je pravděpodobnost opětovné implementace nízká, neboť byly experimentální, neužitečné nebo závisely na technologiích, kiteré již nejsou podporované (jako Adobe Flash nebo Java aplety).</p><p> Rozhodněte se prosím, zda chcete použít novou verzi Voyant, nebo chcete zkusit použít nástroj <i>{0}</i> ve staré verzi.</p> 													
+2016-04-25	Voyant.panel.NoTool	notImplemented	<p>The <i>{0}</i> tool existed in a previous version of Voyant Tools but has not been implemented in this version. Some tools may be reimplemented eventually while others are unlikely to be implemented because they were experimental, unuseful or dependent on technologies that are no longer supported (like Adobe Flash and Java Applets).</p><p>Please decide if you'd like to use the new version of Voyant or if you'd rather try using the <i>{0}</i> tool in the old version.</p>									<p>Nástroj <i>{0}</i> existoval v předchozí verzi Voyant Tools, ale v této verzi nebyl implementován. Některé nástroje mohou být výhledově opět implementovány, avšak u dalších je pravděpodobnost opětovné implementace nízká, neboť byly experimentální, neužitečné nebo závisely na technologiích, kiteré již nejsou podporované (jako Adobe Flash nebo Java aplety).</p><p> Rozhodněte se prosím, zda chcete použít novou verzi Voyant, nebo chcete zkusit použít nástroj <i>{0}</i> ve staré verzi.</p> 													
 2016-04-25	Voyant.panel.VoyantFooter	voyantTools	Voyant Tools									Voyant Tools													
 2016-04-25	Voyant.panel.VoyantFooter	voyantLink	<a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools</a>									<a href="http://docs.voyant-tools.org/" target="_blank">Voyant Tools</a>													
 2016-04-25	Voyant.panel.VoyantFooter	privacy	Privacy									Ochrana soukromí													
@@ -529,8 +532,8 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.panel.Subset	noMatches	The current query criteria don't match any documents, please modifying the search first.									Stávajícím kritériím vyhledávání neodpovídá žádný dokument, prosím nejdříve změňte kritéria vyhledávání.													
 2016-04-25	Voyant.panel.CollocatesSet	title	Scatter									Bodový graf													
 2016-04-25	Voyant.panel.CollocatesSet	helpTip	This is a specialized view for working with scatterplots.									Toto je specializované zobrazení pro práci s bodovými grafy.													
-2016-04-25	Voyant.panel.BubblelinesSet	title	Bubblelines Skin									Motiv vzhledu Bubblelines.													
-2016-04-25	Voyant.panel.BubblelinesSet	helpTip	This is a specialized view for working with Bubblelines.									Toto je specializované zobrazení pro práci s Bubblelines.													
+2016-04-25	Voyant.panel.BubblelinesSet	title	Bubblelines Skin									Motiv vzhledu bublinového grafu.													
+2016-04-25	Voyant.panel.BubblelinesSet	helpTip	This is a specialized view for working with Bubblelines.									Toto je specializované zobrazení pro práci s bublinovvými grafy.													
 2016-04-25	Voyant.panel.CustomSet	title	Custom View									Uživatelsky definované zobrazení.													
 2016-04-25	Voyant.panel.CustomSet	helpTip	This is a custom view.									Toto je uživatelsky definované zobrazení.													
 2016-04-25	Voyant.panel.CustomSet	noSuchTool	The specified tool ({0}) does not exist.									Zvolený nástroj ({0}) neexistuje.													
@@ -561,3 +564,5 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-04-25	Voyant.VoyantDefaultApp	convertSkinMsg	The convert skin was used for document exporting and that functionality is now available from the Documents tool.									Pro export dokumentu byla použita změna motivu vzhledu a tato funkce je nyní dostupná v nástroji Dokumenty.													
 2016-04-25	Voyant.VoyantDefaultApp	voyantIs	<p style="text-align: center; font-style: italic;">Voyant Tools is a web-based reading and analysis environment for digital texts – please visit <a href="http://hermeneuti.ca/" target="_blank">Hermeneuti.ca</a> for more information..</p>									<p style="text-align: center; font-style: italic;">Voyant Tools jsou webovým prostředím pro čtení a analýzu digitálních textů – pro více informací navštivte stránky <a href="http://hermeneuti.ca/" target="_blank">Hermeneuti.ca</a>.</p>													
 2016-04-25	Voyant.VoyantDefaultApp	helpTip	Voyant Tools is a web-based reading and analysis environment for digital texts.<p></p>									Voyant Tools jsou webovým prostředím pro čtení a analýzu digitálních textů. <p></p>													
+5/4/2016	Voyant.notebook.util.Embed	widgetNotRecognized	Unable to embed (invalid or no embed tool specified).																						
+5/4/2016	Voyant.notebook.util.Embed	tryWidget	Try one of the following widgets: 																						

@@ -74,13 +74,14 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				        submitEmptyText: false,
 	    				        margin: '5,5,5,5',
 	    				        items: {
-	    				            xtype:'combo',
-	    				            labelWidth: 150,
-	    				            fieldLabel:'Choose a corpus:',
-	    				            name:'corpus',
-	    				            queryMode:'local',
-	    				            store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],				            
-	    				            forceSelection:true
+	    				        	xtype: 'corpusselector'
+//	    				            xtype:'combo',
+//	    				            labelWidth: 150,
+//	    				            fieldLabel:'Choose a corpus:',
+//	    				            name:'corpus',
+//	    				            queryMode:'local',
+//	    				            store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],				            
+//	    				            forceSelection:true
 	    				        },
 	    				        buttons: [
 	    				        	{

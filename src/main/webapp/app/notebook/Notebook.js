@@ -5,24 +5,14 @@ Ext.define('Voyant.notebook.Notebook', {
 	alias: 'widget.notebook',
     statics: {
     	i18n: {
-    		title: {en: "Voyant Notebook"},
-			eror: {en: "Error"},
-			cannotMoveHigher: {en: "This block is already at the top and cannot be moved higher."},
-			cannotMoveLower: {en: "This block is already at the bottom and cannot be moved lower."},
-			defaultBlocks: {en: [
-			    {
-			    	type: 'text',
-			    	content: "<h1 style='text-align: center;'>Voyant Notebook Template (title)</h1><p>This is a Voyant Notebook, a dynamic document that combines writing, code and data in service of reading, analyzing and interpreting digital texts.</p><p>Voyant Notebooks are composed of text blocks (like this one) and code blocks (like the one below). You can <span class='marker'>click on the blocks to edit</span> them and add new blocks by clicking add icon that appears in the left column when hovering over a block.</p>"
-			    },{
-			    	content: "// create a new corpus and embed the default visualization for its terms\n"+'var corpus = new Corpus("Hello world!");'+"\ncorpus.getCorpusTerms().embed();"
-			    }
-			]},
-			failedNotebookLoad: {en: "Failed to load the specified notebook. A new notebook template will be presented instead."},
-			failedNotebookParse: {en: "The loaded notebook appears to have a syntax error and will probably not run as is."},
-			exportAllLinks: {
-				en: "<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>"
-			},
-			originalJson: {en: "Original JSON string"}
+    		title: "Voyant Notebook",
+			eror: "Error",
+			cannotMoveHigher: "This block is already at the top and cannot be moved higher.",
+			cannotMoveLower: "This block is already at the bottom and cannot be moved lower.",
+			failedNotebookLoad: "Failed to load the specified notebook. A new notebook template will be presented instead.",
+			failedNotebookParse: "The loaded notebook appears to have a syntax error and will probably not run as is.",
+			exportAllLinks: "<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
+			originalJson: "Original JSON string"
     	}
     },
     constructor: function() {
@@ -65,7 +55,7 @@ Ext.define('Voyant.notebook.Notebook', {
         						msg: me.localize('failedNotebookLoad'),
         						response: response
         					}).showMsg();
-            				me.loadBlocks(me.localize("defaultBlocks"));
+        					me.loadDefaultBlocks();
         				}
         			}).always(function() {
         				me.unmask()
@@ -73,7 +63,7 @@ Ext.define('Voyant.notebook.Notebook', {
         			})
         		}
         		else {
-            		this.loadBlocks(this.localize("defaultBlocks"));
+					this.loadDefaultBlocks();
                 	if (queryParams.run) {this.runAllCode()}
         		}
         	}
@@ -141,6 +131,17 @@ Ext.define('Voyant.notebook.Notebook', {
     	else {
     		this.loadBlocks([string]) // treat as single content block
     	}
+    },
+    
+    loadDefaultBlocks: function() {
+    	this.loadBlocks([
+		    {
+		    	type: 'text',
+		    	content: "<h1 style='text-align: center;'>Voyant Notebook Template (title)</h1><p>This is a Voyant Notebook, a dynamic document that combines writing, code and data in service of reading, analyzing and interpreting digital texts.</p><p>Voyant Notebooks are composed of text blocks (like this one) and code blocks (like the one below). You can <span class='marker'>click on the blocks to edit</span> them and add new blocks by clicking add icon that appears in the left column when hovering over a block.</p>"
+		    },{
+		    	content: 'loadCorpus("Hello world!").embed();'
+		    }
+		])
     },
     
     loadBlocks: function(blocks) {
