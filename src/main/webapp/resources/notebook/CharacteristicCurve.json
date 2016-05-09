@@ -1,0 +1,83 @@
+[
+    {
+        "type": "text",
+        "input": [
+            "<h1>Mendenhall&#39;s Characteristic Curve (1887): Early Stylometrics</",
+            "h1>\n\n<p>In 1887 the polymath T. C. Mendenhall published an article in ",
+            "Science titled, &quot;The Characteristic Curves of Composition&quot; w",
+            "hich is both one of the earliest examples of quantitative stylistics b",
+            "ut also one of the first studies to present text visualizations based ",
+            "on the (manual) count of words. Mendenhall thought that different auth",
+            "ors would have distinctive curves of word length frequencies which cou",
+            "ld help with authorship attribution.</p>\n\n<p>Here you can see an examp",
+            "le of the characteristic curve of <em>Oliver Twist</em>. Mendenhall to",
+            "ok the first 1000 words, counted the length in characters of these 100",
+            "0 words and then graphed the number of words of each length. Thus one ",
+            "can see that there is just under 50 words of one letter length in the ",
+            "first one thousand words.</p>\n\n<p><img alt=\"Mendhall Characteristic Cu",
+            "rve\" src=\"//github.com/sgsinclair/epistemologica/raw/c55822b3d4080c758",
+            "a168a252eb02ca4e8d1ba07/data/Mendenhall-CharacteristicCurve/OliverTwis",
+            "t-CharacteristicCurve.png\" /></p>\n\n<p>Mendenhall thought this method o",
+            "f analysis would help with the &quot;identification or discrimination ",
+            "of authorship&quot; or authorship attribution as we call it today.</p>",
+            "\n\n<h2>Acquiring the Text</h2>\n\n<p>We&#39;ll begin by fetching the edit",
+            "ion of <a href=\"http://www.gutenberg.org/cache/epub/730/pg730.txt\">Oli",
+            "ver Twist</a> that&#39;s available from the <a href=\"http://en.wikiped",
+            "ia.org/wiki/Project_Gutenberg\">Gutenberg Project</a>. It&#39;s always ",
+            "worth noting that other editions are available and may be preferable f",
+            "or various reasons, but the Gutenberg edition has the benefit of conve",
+            "nience and longevity.</p>\n\n<p>The code block below uses the <a href=\".",
+            "./../docs/#!/api/Voyant.data.model.Corpus-static-method-loadCorpus\">lo",
+            "adCorpus</a> function. The first time it was run without the corpus op",
+            "tion, and then the corpus ID was added for future runs.</p>\n\n<div clas",
+            "s=\"x-size-monitors scroll\" id=\"ext-element-8\">\n<div class=\"expand\">&nb",
+            "sp;</div>\n\n<div class=\"shrink\">&nbsp;</div>\n</div>\n\n<div class=\"x-pain",
+            "t-monitor cssanimation\" id=\"ext-element-9\">&nbsp;</div>\n"
+        ]
+    },
+    {
+        "type": "code",
+        "input": [
+            " new Corpus(\"austen\").loadCorpusTerms(20).then(function(corpusTerms) {",
+            "    var table = new VoyantTable({rowKey: 0}); // use first column as row key",
+            "    corpusTerms.each(function(corpusTerm) {",
+            "        table.addRow([corpusTerm.getTerm(), corpusTerm.getRawFreq()]);",
+            "    });",
+            "    table.embed(\"voyantchart\"); // graph table",
+            "});"
+        ]
+    },
+    {
+        "type": "code",
+        "input": [
+            "var corpus;",
+            "new Corpus({",
+            "    corpus: '8a846e684da3751de7711f33f0419b9c', // specify corpus ID (copied from output below after first run)",
+            "    input: 'http://www.gutenberg.org/cache/epub/730/pg730.txt' // backup if corpus not available",
+            "}).then(function(data) {",
+            "    corpus = data; // store value for when we leave this function",
+            "    corpus.show(true); // short short summary with corpus ID",
+            "});"
+        ]
+    },
+    {
+        "type": "code",
+        "input": [
+            "corpus.loadCorpusTerms().then(function(corpusTerms) {",
+            "",
+            "    // build table of word lengths from corpus terms",
+            "    var lengths = new VoyantTable();",
+            "    corpusTerms.each(function(corpusTerm) {",
+            "        // update word count for row (term length) and column (0)",
+            "        lengths.updateCell(corpusTerm.getTerm().length, 0, corpusTerm.getRawFreq());",
+            "    });",
+            "",
+            "    // now embed table as chart",
+            "    lengths.embed('voyantchart', {",
+            "        series: [{showMarkers: false}], // don't show item markers (like original)",
+            "        width: 500",
+            "    });",
+            "});"
+        ]
+    }
+]

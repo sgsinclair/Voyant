@@ -1,4 +1,5 @@
 Ext.define('Voyant.data.store.VoyantStore', {
+	mixins: ['Voyant.util.Localization'],
 	config: {
 		corpus: undefined,
 		parentPanel: undefined

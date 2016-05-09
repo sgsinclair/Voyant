@@ -67,7 +67,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		
 		this.validateCorpusLoadParams(params);
 
-		new Corpus(params).then(function(corpus) {
+		new Voyant.data.model.Corpus(params).then(function(corpus) {
 			view.unmask();
 			me.setCorpus(corpus);
 			if (me.validateCorpusAccess()) {

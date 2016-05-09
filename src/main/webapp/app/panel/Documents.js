@@ -376,7 +376,7 @@ Ext.define('Voyant.panel.Documents', {
     			view.unmask();
     			var obj = Ext.decode(response.responseText);
     			view.mask("Loading new corpus…")
-    			new Corpus({corpus: obj.corpus.id}).then(function(corpus) {
+    			new Voyant.data.model.Corpus({corpus: obj.corpus.id}).then(function(corpus) {
     				view.unmask();
     				app.dispatchEvent('loadedCorpus', app, corpus);
     			}).fail(function(message, response) {

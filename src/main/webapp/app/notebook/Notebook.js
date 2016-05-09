@@ -59,7 +59,7 @@ Ext.define('Voyant.notebook.Notebook', {
         				}
         			}).always(function() {
         				me.unmask()
-        				if (queryParams && queryParams.run) {me.runAllCode()}
+        				if (queryParams && (queryParams.run || queryParams.debug)) {me.runAllCode()}
         			})
         		}
         		else {
@@ -112,7 +112,7 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     loadBlocksFromString: function(string) {
-    	if (/^\s*[\[\{].*?[\}\]]\s*$/.test(string)) {
+    	if (/^\s*[\[\{]/m.test(string)) {
     		var json = undefined;
     		try {
     			json = jQuery.parseJSON(string);
@@ -139,7 +139,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		    	type: 'text',
 		    	content: "<h1 style='text-align: center;'>Voyant Notebook Template (title)</h1><p>This is a Voyant Notebook, a dynamic document that combines writing, code and data in service of reading, analyzing and interpreting digital texts.</p><p>Voyant Notebooks are composed of text blocks (like this one) and code blocks (like the one below). You can <span class='marker'>click on the blocks to edit</span> them and add new blocks by clicking add icon that appears in the left column when hovering over a block.</p>"
 		    },{
-		    	content: 'loadCorpus("Hello world!").embed();'
+		    	content: "loadCorpus('hello world!').loadCorpusTerms().then(function(corpusTerms) { var lengths = {}, len; corpusTerms.eachRow(function(row) { len = row.term.length; console.warn(row, len) for (var i=0; i<row.rawFreq;i++) { lengths[len] = lengths[len] ? lengths[len]+1 : 1 } }, true) console.warn(lengths) })"
 		    }
 		])
     },
@@ -147,29 +147,28 @@ Ext.define('Voyant.notebook.Notebook', {
     loadBlocks: function(blocks) {
     	blocks.forEach(function(block) {
     		if (block) {
-        		if (Ext.isString(block) && block!='') {this.addCode(block);}
-        		else if (block.content) {
-            		if (block.type=='text') {this.addText(block.content);}
-            		else {this.addCode(block.content);}
+        		if (Ext.isString(block) && block!='') {this.addCode({input: block});}
+        		else if (block.input) {
+            		if (block.type=='text') {this.addText(block);}
+            		else {this.addCode(block);}
         		}
     		}
     	}, this)
     },
     
-    addText: function(content, position) {
-    	this._add(content, position, 'notebooktexteditorwrapper');
+    addText: function(block, position) {
+    	this._add(block, position, 'notebooktexteditorwrapper');
     },
  
-    addCode: function(content, position) {
-    	this._add(content, position, 'notebookcodeeditorwrapper');
+    addCode: function(block, position) {
+    	this._add(block, position, 'notebookcodeeditorwrapper');
     },
     
-    _add: function(content, position, xtype) {
+    _add: function(block, position, xtype) {
     	position = (typeof position === 'undefined') ? this.items.getCount() : position;
-    	this.insert(position, {
-    		xtype: xtype,
-    		content: content
-    	})
+    	this.insert(position, Ext.apply(block, {
+    		xtype: xtype
+    	}))
     },
     
     runAllCode: function() {
@@ -193,22 +192,41 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     exportAll: function() {
-    	var blocks = [];
+    	var blocks = [], maxLen=70, block, type, input, output;
     	this.items.each(function(item) {
-    		blocks.push({
-    			type: item.isXType('notebookcodeeditorwrapper') ? 'code' : 'text',
-    			content: item.getContent()
-    		})
+    		type = item.isXType('notebookcodeeditorwrapper') ? 'code' : 'text';
+    		input = item.getContent();
+    		if (type=='code') { 
+    			if (/[\r\n]/.test(input)) {input = input.replace(/\r\n?/, "\n").split(/\n/)}
+    		} else {
+    			if (input.length>70) {
+    				var inputs = [];
+    				for (var i=0, len=Math.ceil(input.length/maxLen); i<len; i++) {
+    					inputs.push(input.substr(i*maxLen, maxLen))
+    				}
+    				input = inputs
+    			}
+    		}
+    		block = {
+    			type: type,
+    			input: input
+    		}
+    		if (block.type=='code') {
+    			
+    		}
+    		blocks.push(block)
     	})
     	
     	// if we have one code block, just show the code
     	if (blocks.length==1 && blocks[0].type=='code') {
-    		blocks = blocks[0].content
+    		blocks = blocks[0].input
     	}
+
+    	Ext.Msg.prompt("Export Notebook", "Currently only copying and pasting the notebook is available.", undefined, undefined, true, JSON && JSON.stringify ? JSON.stringify(blocks, undefined, 4) : Ext.encode(blocks))
     	
-    	var url = "./?input=" + encodeURIComponent(Ext.encode(blocks));
-    	var openurl = "window.open().document.write(unescape('"+escape(Ext.encode(blocks))+"')); return false";
-    	Ext.Msg.alert('', new Ext.Template(this.localize('exportAllLinks')).apply([url,openurl]));
+//    	var url = "./?input=" + encodeURIComponent(Ext.encode(blocks));
+//    	var openurl = "window.open().document.write(unescape('"+escape(Ext.encode(blocks))+"')); return false";
+//    	Ext.Msg.alert('', new Ext.Template(this.localize('exportAllLinks')).apply([url,openurl]));
     	
     }
     

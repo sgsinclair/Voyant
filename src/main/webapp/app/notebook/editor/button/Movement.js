@@ -22,8 +22,7 @@ Ext.define("Voyant.notebook.editor.button.Movement", {
         	xtype: 'notebookwrappermoveup'
         },{
         	xtype: 'notebookwrappermovedown'
-        },
-        ' ',{
+        },{
         	xtype: 'notebookwrapperremove'
         }
 	]

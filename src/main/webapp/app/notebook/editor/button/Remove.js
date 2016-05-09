@@ -4,20 +4,14 @@ Ext.define("Voyant.notebook.editor.button.Remove", {
 	alias: 'widget.notebookwrapperremove',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Remove"
-			},
-			confirmRemoveTitle: {
-				en: "Confirm Remove"
-			},
-			confirmRemove: {
-				en: "Are you sure you want to remove this block (and lose any content in the editor)?"
-			}
+			tip: "remove this block",
+			confirmRemoveTitle: "Confirm Remove",
+			confirmRemove: "Are you sure you want to remove this block (and lose any content in the editor)?"
 		}
 	},
 	constructor: function(config) {
     	Ext.apply(this, {
-    		text: this.localize('tip')
+    		tooltip: this.localize('tip')
     	})
         this.callParent(arguments);
 	},

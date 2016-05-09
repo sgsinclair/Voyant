@@ -1,10 +1,9 @@
-/**
+/*
  * @class Voyant.panel.TermsRadio
+ * @private
  * @author Mark Turcato
  * @author Andrew MacDonald
  */
-
-
 Ext.define('Voyant.panel.TermsRadio', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -25,6 +24,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property bins How many segments, i.e. 'bins', to seperate separate a document into.
     		 * @type Integer
     		 * @default 10
+    		 * @private
     		 */
     		bins: 5
     	
@@ -32,6 +32,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property visibleBins How many visible segments to be displayed at once.
     		 * @type Integer
     		 * @default 5
+    		 * @private
     		 */
     		,visibleBins: 5
     		
@@ -39,6 +40,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property docIdType The document type(s) to restrict results to.
     		 * @type String|Array
     		 * @default null
+    		 * @private
     		 */
     		,docIdType: null
     		
@@ -47,6 +49,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		/**
         	 * @property mode What mode to operate at, either document or corpus.
         	 * @choices document, corpus
+    		 * @private
         	 */
     		,mode: null
     		
@@ -54,6 +57,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         	 * @property position The current shifted position of the visualization.
         	 * @type Integer
         	 * @default 0
+    		 * @private
         	 */
     		,position: 0
     		
@@ -61,6 +65,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property selectedWords The words that have been selected.
     		 * @type String|Array
     		 * @default null
+    		 * @private
     		 */
     		,selectedWords: []
     		
@@ -70,6 +75,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @type String
     		 * @default null
     		 * @choices stop.en.taporware.txt, stop.fr.veronis.txt
+    		 * @private
     		 */
     		,stopList: 'auto'
     		
@@ -77,6 +83,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property query The corpus type(s) to restrict results to.
     		 * @type String
     		 * @default null
+    		 * @private
     		 */
     		,query: null
     		
@@ -84,6 +91,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property yAxisScale The scale for the y axis.
     		 * @type String
     		 * @default log
+    		 * @private
     		 */
     		,yAxisScale: 'log'
     			
@@ -413,6 +421,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		/**
 		 * @event corpusTypesSelected
 		 * @type listener
+		 * @private
 		 */
 		this.addListener('corpusTermsClicked', function(src, terms){
 			if (this.getCorpus().getDocumentsCount() > 1) {
@@ -498,7 +507,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		/**
 		 * @event resize
 		 * @type listener
-		 * 
+		 * @private
 		 */
 		this.addListener('resize', function() {
 			//console.log('resize')

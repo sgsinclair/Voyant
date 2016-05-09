@@ -5,6 +5,7 @@ Ext.define('Voyant.util.SparkLine', {
 	 * @param {Array} values An array of numerical values.
 	 * @param {Integer} stretch The width to stretch the spark line towards (currently unused).
 	 * @return {String} The image(s) of the spark line.
+	 * @private
 	 */
 	getSparkLine : function(values, stretch) {
 		if (values.length < 2) {

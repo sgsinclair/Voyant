@@ -10,32 +10,38 @@ Ext.define('Voyant.panel.Bubblelines', {
     		/**
     		 * @property bins How many "bins" to separate a document into.
     		 * @type Integer
+    		 * @private
     		 */
     		bins: 50,
         	/**
         	 * @property query A string to search for in a document.
         	 * @type String
+    		 * @private
         	 */
     		query: null,
     		/**
     		 * @property stopList The stop list to use to filter results.
     		 * Choose from a pre-defined list, or enter a comma separated list of words, or enter an URL to a list of stop words in plain text (one per line).
     		 * @type String
+    		 * @private
     		 */
     		stopList: 'auto',
     		/**
     		 * @property docId The document ID to restrict results to.
     		 * @type String
+    		 * @private
     		 */
     		docId: undefined,
     		/**
     		 * @property docIndex The document index to restrict results to.
     		 * @type Integer
+    		 * @private
     		 */
     		docIndex: undefined,
     		/**
     		 * @property maxDocs The maximum number of documents to show.
     		 * @type Integer
+    		 * @private
     		 */
     		maxDocs: 50
     	},

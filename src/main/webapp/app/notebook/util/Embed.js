@@ -28,30 +28,47 @@ Ext.define("Voyant.notebook.util.Embed", {
 						Voyant.notebook.util.Embed.showWidgetNotRecognized.call(this);
 					} else {
 						config = config || {};
-						var cmpInstance = new cmp();
-						cmpInstance.setApiParams(config);
-						var embeddedParams = cmpInstance.getModifiedApiParams();
-						cmpInstance.destroy();
+						var embeddedParams = {};
+						for (key in Ext.ClassManager.get(Ext.getClassName(cmp)).api) {
+							if (key in config) {
+								embeddedParams[key] = config[key]
+							}
+						}
 						if (!embeddedParams.corpus) {
-							var thisClassName = Ext.getClassName(this);
-							if (thisClassName=='Voyant.data.model.Corpus') {
+							if (Ext.getClassName(this)=='Voyant.data.model.Corpus') {
 								embeddedParams.corpus = this.getId();
 							} else if (this.getCorpus) {
 								embeddedParams.corpus = this.getCorpus().getId();
 							}
 						}
 						Ext.applyIf(config, {
-							width: '100%',
-							height: '300px'
+							style: 'width: '+(config.width || '90%') + (Ext.isNumber(config.width) ? 'px' : '')+
+								'; height: '+(config.height  || '400px') + (Ext.isNumber(config.height) ? 'px' : '')
 						});
+						delete config.width;
+						delete config.height;
+						
+						if (document.location.search.indexOf("debug=true")>-1) {
+							embeddedParams.debug=true
+						}
 						var embeddedConfigParam = Ext.Object.toQueryString(embeddedParams);
-						var tpl = new Ext.XTemplate('<iframe style="width: '+config.width+'; height: '+config.height+'" '+
+						var tpl = new Ext.XTemplate('<iframe style="'+config.style+'" '+
 								'src="'+Voyant.application.getBaseUrl()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/?{0}"></iframe>');
 						if (embeddedConfigParam.length<1950) {
-							show(tpl.apply([embeddedConfigParam]));
+							show(tpl.apply(["minimal=true&"+embeddedConfigParam]));
 						} else {
-							showError("Long arguments are not yet implemented.")
-							debugger
+			    	    	Ext.Ajax.request({
+			    	    	    url: Voyant.application.getTromboneUrl(),
+			    	    	    params: {
+			    	        		tool: 'resource.StoredResource',
+			    	        		storeResource: embeddedConfigParam
+			    	    	    }
+			    	    	}).then(function(response) {
+		    	    	    	var json = Ext.util.JSON.decode(response.responseText);
+								show(tpl.apply(["minimal=true&embeddedConfig="+json.storedResource.id]));
+			    	    	}).otherwise(function(response) {
+			    	    		showError(response)
+			    	    	})
 						}
 					}
 				} else {

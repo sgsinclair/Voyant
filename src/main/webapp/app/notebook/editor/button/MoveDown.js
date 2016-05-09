@@ -4,14 +4,12 @@ Ext.define("Voyant.notebook.editor.button.MoveDown", {
 	alias: 'widget.notebookwrappermovedown',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Move Down"
-			}
+			tip: "move this block down"
 		}
 	},
 	constructor: function(config) {
     	Ext.apply(this, {
-    		text: this.localize('tip')
+    		tooltip: this.localize('tip')
     	})
         this.callParent(arguments);
 	},

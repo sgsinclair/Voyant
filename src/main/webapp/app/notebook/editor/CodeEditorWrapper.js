@@ -10,14 +10,15 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	height: 130,
 	border: false,
 	constructor: function(config) {
-		
+
 		this.results = Ext.create('Ext.Component', {
 			align: 'stretch',
-			cls: 'notebook-code-results'
+			cls: 'notebook-code-results',
+			html: Ext.Array.from(config.output).join("")
 		});
 		
 		this.editor = Ext.create("Voyant.notebook.editor.CodeEditor", {
-			content: config.content			
+			content: Ext.Array.from(config.input).join("\n")
 		})
 		
 		Ext.apply(this, {
@@ -33,12 +34,19 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								scope: this
 							}
 						}
-					}
-//					,' ',{
-//						xtype: 'notebookwrappermovement'
-//					},' ',{
-//						xtype: 'notebookwrapperadd'
-//					}
+					},{
+						xtype: 'tbspacer'
+					},{
+						xtype: 'notebookwrapperadd'
+					},{
+						xtype: 'tbspacer'
+					},{
+			        	xtype: 'notebookwrappermoveup'
+			        },{
+			        	xtype: 'notebookwrappermovedown'
+			        },{
+			        	xtype: 'notebookwrapperremove'
+			        }
 			    ]
 			}],
 			items: [this.editor, this.results]

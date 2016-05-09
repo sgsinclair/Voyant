@@ -1,19 +1,48 @@
-var Corpus = function(source, config) {
-	return Ext.create("Voyant.data.model.Corpus", source, config);
-}
-
-function loadCorpus(source, config) {
-	return new Corpus(source, config);
-}
-
+/**
+ * @class Corpus
+ * Testin
+ */
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization'],
+    transferable: ['loadCorpusTerms'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
     embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
+    	
+    	/**
+    	 * @cfg {String} corpus The ID of a previously created corpus.
+    	 * 
+    	 * A corpus ID can be used to try to retrieve a corpus that has been previously created.
+    	 * 
+    	 * This is especially useful if the input sources are long strings, local files, or content
+    	 * that's otherwise difficult or impossible to recreate.
+    	 * 
+    	 * Note that it's possible to also specify input sources as a fall-back if the corpus
+    	 * is no longer available in Voyant.
+    	 * 
+    	 * 		new Corpus({
+    	 * 			corpus: "some.long.corpus.id.generated.by.voyant",
+    	 * 			input: "http://hermeneuti.ca/" // use this as a fallback 
+    	 * 		});
+    	 */
+    	
+    	/**
+    	 * @cfg {String/String[]} input Input sources for the corpus.
+    	 * 
+    	 * The input sources can be either normal text or URLs (starting with `http`):
+    	 * 
+    	 * 		input: "Hello Voyant!" // one document with this string
+    	 * 
+    	 * 		input: ["Hello Voyant!", "How are you?"] // two documents with these strings
+    	 * 
+    	 * 		input: "http://hermeneuti.ca/" // one document from URL
+    	 * 
+    	 * 		input: ["Hello Voyant!", "http://hermeneuti.ca/"] // two documents, one from string and one from URL
+    	 */
+    	
     	documentsStore: undefined
     },
     statics: {
@@ -26,26 +55,51 @@ Ext.define('Voyant.data.model.Corpus', {
          {name: 'createdTime', type: 'int'},
          {name: 'createdDate', type: 'date', dateFormat: 'c'}
     ],
-
-    /**
-     * Create a new Corpus.
-     * @param {Mixed} [source] The source document(s) as a text string, a URL, or an Array of text strings and URLs.
-     * @param {Object} [config] Configuration options for creating the {@link Corpus}.
-     */
-	constructor : function(source, config) {
+    
+	/**
+     * Create a promise for a new Corpus with relevant data loaded.
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the Corpus as an argument.
+     * 
+     * 	var corpus;
+     * 	new Corpus("Hello Voyant!").then(function(data) {
+     * 		corpus = data;
+     * 	});
+     * 
+     * The following scenarios are possible for the config argument:
+     * 
+     * - a string that looks like a corpus ID (not a URL and no spaces): treated as a {@link #corpus} config
+     * - a string that doesn't look like a corpus ID: treated as an {@link #input} config
+     * - an array of strings: treated as an array of {@link #input} config values
+     * - an object: treated a normal config object
+     * 
+     * As such, these two constructions do the same thing:
+     * 
+     * 	new Corpus("Hello World!");
+     * 	new Corpus({input: "Hello World!"});
+     * 
+     * @param {String/String[]/Object} config The source document(s) as a text string, a URL, an array of text strings and URLs, or a config object.
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return a Corpus but a promise to return a Corpus when it's finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * Corpus as an argument, as per the example above).
+	 */
+	constructor : function(config) {
+		
+		config = config || {};
 				
-		this.callParent([config]); // only send config, not source
-    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this);
-
-		if (source) {
+		this.callParent([]); // only send config, not source
+		if (config) {
 			
-			config = config || {};
-			Ext.apply(config, {tool: 'corpus.CorpusMetadata'})
-
-			if (Ext.isString(source) || Ext.isArray(source)) {
-				config.input = source;
+			if (Ext.isString(config) || Ext.isArray(config)) {
+				if (Ext.isString(config) && /\s/.test(config)==false && config.indexOf(":")==-1) {
+					config = {corpus: config};
+				} else {
+					config = {input: config};
+				}
 			}
-			else if (Ext.isObject(source)) {Ext.apply(config, source)}
+
+			Ext.apply(config, {tool: 'corpus.CorpusMetadata'})
 
 			var dfd = Voyant.application.getDeferred(this);
 			var me = this;
@@ -84,6 +138,53 @@ Ext.define('Voyant.data.model.Corpus', {
 	getId: function() {
 		// overrides the getId() function from the model to handle promises
     	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('id');		
+	},
+	
+	
+	/**
+     * Create a promise for {@link Voyant.data.store.CorpusTerms Corpus Terms}.
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the {@link Voyant.data.store.CorpusTerms Corpus Terms} as an argument.
+     * 
+     * 	new Corpus("Hello Voyant!").loadCorpusTerms().then(function(corpusTerms) {
+     * 		corpusTerms.show();
+     * 	});
+     * 
+     * @param {Number/Object} config
+     * 
+     * - when this is a number, it's the maximum number of corpus terms to load (see {@link Voyant.data.store.CorpusTerms#limit})
+     * - otherwise this is a regular config object
+     * 
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return corpus terms but a promise to return a corpus terms when they're finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * corpus terms as an argument, as per the example above).
+	 */
+	loadCorpusTerms: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0
+			})
+			var corpusTerms = this.getCorpusTerms();
+			corpusTerms.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(corpusTerms)
+					} else {
+						dfd.reject(operation)
+					}
+				}
+			})
+			return dfd.promise
+		}
 	},
 	
 	getCorpusTerms: function(config) {
@@ -152,6 +253,21 @@ Ext.define('Voyant.data.model.Corpus', {
 		// overrides the getId() function from the model to handle promises
     	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('noPasswordAccess');		
 	},
+	
+	/**
+	 * Shows a one-line summary of this corpus.
+	 * 
+	 * 	new Corpus("Hello World!").then(function(corpus) {corpus.show(true);});
+	 * 
+	 * @params {boolean} [withID] Includes the corpus ID in parentheses at the end, if true.
+	 */
+	show: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			show(this.toString(config))
+		}
+	},
 
     toString: function(config) {
 		var size = this.getDocumentsCount();
@@ -193,6 +309,7 @@ Ext.define('Voyant.data.model.Corpus', {
 			
 			message+='';
 		}
+		if (config===true) {message+=' ('+this.getId()+")";}
 		return message;
     }
     

@@ -135,6 +135,7 @@ Ext.define('Voyant.VoyantApp', {
 	
 	/**
 	 * A universal palette of colors for use with terms and documents.
+	 * @private
 	 */
 	colors: [[0, 0, 255], [51, 197, 51], [255, 0, 255], [121, 51, 255], [28, 255, 255], [255, 174, 0], [30, 177, 255], [182, 242, 58], [255, 0, 164], [51, 102, 153], [34, 111, 52], [155, 20, 104], [109, 43, 157], [128, 130, 33], [111, 76, 10], [119, 115, 165], [61, 177, 169], [202, 135, 115], [194, 169, 204], [181, 212, 228], [182, 197, 174], [255, 197, 197], [228, 200, 124], [197, 179, 159]],
 	
@@ -146,6 +147,7 @@ Ext.define('Voyant.VoyantApp', {
 	 * Gets the whole color palette.
 	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of each color (optional, defaults to rgb values).
 	 * @return {Array} The color palette.
+	 * @private
 	 */
 	getColorPalette: function(returnHex) {
 		if (returnHex) {
@@ -164,6 +166,7 @@ Ext.define('Voyant.VoyantApp', {
 	 * @param {Integer} index The index of the color to get.
 	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of the color (optional, defaults to rgb values).
 	 * @return {Mixed} The requested color, either a hex string or array of rgb values.
+	 * @private
 	 */
 	getColor: function(index, returnHex) {
 		if (returnHex) {
@@ -175,6 +178,7 @@ Ext.define('Voyant.VoyantApp', {
 	
 	/**
 	 * For tracking associations between a term and a color, to ensure consistent coloring across tools.
+	 * @private
 	 */
 	colorTermAssociations: new Ext.util.MixedCollection(),
 	
@@ -183,6 +187,7 @@ Ext.define('Voyant.VoyantApp', {
 	 * @param {String} term The term to get the color for.
 	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of the color (optional, defaults to rgb values).
 	 * @return {Mixed} The requested color, either a hex string or array of rgb values.
+	 * @private
 	 */
 	getColorForTerm: function(term, returnHex) {
 		if (term.indexOf(':') != -1) {
@@ -203,6 +208,7 @@ Ext.define('Voyant.VoyantApp', {
 	/**
 	 * Opens a URL in a new window (handling the case when popup windows aren't allowed).
 	 * @param {String} url The URL to open.
+	 * @private
 	 */
 	openUrl: function(url) {
 		var win = window.open(url);

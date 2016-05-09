@@ -1,3 +1,6 @@
+/**
+ * Corpus Term
+ */
 Ext.define('Voyant.data.model.CorpusTerm', {
     extend: 'Ext.data.Model',
     fields: [
@@ -13,13 +16,34 @@ Ext.define('Voyant.data.model.CorpusTerm', {
              }}
     ],
     
+    /**
+     * Get the term.
+     * @returns {String} Returns the term.
+     */
     getTerm: function() {
     	return this.get('term');
     },
+    
+    /**
+     * Get the term's raw frequency.
+     * @returns {Number} Returns the term's frequency.
+     */
 	getRawFreq: function() {
 		return parseInt(this.get('rawFreq'));
 	},
+	
 	getInDocumentsCount: function() {
 		return parseInt(this.get('inDocumentsCount'));
+	},
+	
+	/**
+	 * Show a one line summary of this term.
+	 */
+	show: function(config) {
+		show(this.toString(config))
+	},
+	
+	toString: function() {
+		return this.getTerm()+": "+this.getRawFreq();
 	}
 });

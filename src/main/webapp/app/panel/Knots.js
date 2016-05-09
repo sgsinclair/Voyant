@@ -10,17 +10,20 @@ Ext.define('Voyant.panel.Knots', {
     		/**
         	 * @property query A string to search for in a document.
         	 * @type String
+    		 * @private
         	 */
     		query: null,
     		/**
     		 * @property stopList The stop list to use to filter results.
     		 * Choose from a pre-defined list, or enter a comma separated list of words, or enter an URL to a list of stop words in plain text (one per line).
     		 * @type String
+    		 * @private
     		 */
     		stopList: 'auto',
     		/**
     		 * @property docId The document ID to restrict results to.
     		 * @type String
+    		 * @private
     		 */
     		docId: undefined
     	},
@@ -469,6 +472,7 @@ Ext.define('Voyant.panel.Knots', {
     /**
      * Get the results for the query(s) for each of the corpus documents.
      * @param query {String|Array}
+     * @private
      */
     getDocTermsFromQuery: function(query) {
     	if (query) {this.setApiParam("query", query);} // make sure it's set for subsequent calls

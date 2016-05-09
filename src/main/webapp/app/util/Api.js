@@ -2,7 +2,7 @@ Ext.define('Voyant.util.Api', {
 	constructor: function(config) {
 		var apis = [];
 		if (!this.isApplication) {
-			var app = this.getApplication();
+			var app = this.getApplication ? this.getApplication() : Voyant.application;
 			
 			// try to load from first-level mixins
 			if (this.mixins) {
@@ -15,7 +15,7 @@ Ext.define('Voyant.util.Api', {
 			}
 			this.addParentApi(apis, Ext.ClassManager.getClass(app)); // gather class params
 			if (app.getApiParams) {
-				apis.push(this.getApplication().getApiParams()); // now add instance params, last
+				apis.push(app.getApiParams()); // now add instance params, last
 			}
 		}
 

@@ -2,19 +2,22 @@
 <script src="../../resources/ckeditor/current/ckeditor.js"></script>
 <script src="../../resources/ace/current/ace.js"></script>
 <style>
-	.notebook-code-wrapper, .notebook-text-wrapper {
-		margin-right: 1em;
-	}
-	.notebook-code-editor {
-		position: relative;
-		width: 100%;
-		height: 100px;
-	}
-	.notebook-editor-wrapper {
-		margin: 1em;
+	.notebook-text-editor, .notebook-code-editor, .notebook-code-results {
+		padding: 6px;
+		margin: 6px;
 	}
 	.notebook-editor-wrapper-hover {
 		border: thin dashed #ccc !important;
+	}
+	.notebook-code-editor, .notebook-code-results {
+		margin-left: 2em;
+	}
+	.notebook-code-editor {
+		border-left: thin solid rgb(240, 240, 240);
+	}
+	.notebook-code-results {
+		background-color: rgb(252, 252, 252);
+		border: thin solid rgb(240, 240, 240);
 	}
 	.notebook-code-results .error {
 		color: red;

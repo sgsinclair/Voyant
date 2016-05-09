@@ -41,7 +41,7 @@ for (String notRealTool : notRealTools) {
 }
 
 // check to make sure that the indicated tool exists, otherwise redirect
-if (isNotRealTool || new java.io.File(new java.io.File(request.getServletContext().getRealPath("app"), "panel"), tool + ".js").exists()==false) {
+if (isNotRealTool || (new java.io.File(new java.io.File(request.getServletContext().getRealPath("app"), "panel"), tool + ".js").exists()==false && new java.io.File(new java.io.File(request.getServletContext().getRealPath("app"), "widget"), tool + ".js").exists()==false)) {
 	response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 	response.setHeader("Location", "../NoTool/?notool="+tool+(query!=null ? "&"+query : ""));
 	return;
@@ -60,7 +60,7 @@ if (isNotRealTool || new java.io.File(new java.io.File(request.getServletContext
 	});
 	Ext.application({
 		extend : 'Voyant.VoyantToolApp',
-		requires: ['Voyant.panel.VoyantHeader','Voyant.panel.<%= tool %>','Voyant.panel.VoyantFooter'],
+//		requires: ['Voyant.panel.VoyantHeader','Voyant.panel.<%= tool %>','Voyant.panel.VoyantFooter'],
 		name : 'VoyantToolApp',
 		config: {
 			baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/',
@@ -69,15 +69,14 @@ if (isNotRealTool || new java.io.File(new java.io.File(request.getServletContext
 			tool: '<%= tool.toLowerCase() %>'
 		},
 		launch: function() {
-			if (this.hasQueryToLoad()) {
-				this.callParent(arguments);
-			}
-			else {
+			if (document.location.search.length==0) {
 				var url = "../../?view=<%= tool %>";
 				if (document.location.search) {
 					url+="&"+document.location.search.substring(1)
 				}
 				window.location.replace(url)
+			} else {
+				this.callParent(arguments);
 			}
 		}
 	});

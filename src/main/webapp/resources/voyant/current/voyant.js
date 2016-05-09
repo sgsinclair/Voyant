@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 04 17:51:50 EDT 2016 */
+/* This file created by JSCacher. Last modified: Sun May 08 11:56:00 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4117,7 +4117,7 @@ Ext.define('Voyant.util.Api', {
 	constructor: function(config) {
 		var apis = [];
 		if (!this.isApplication) {
-			var app = this.getApplication();
+			var app = this.getApplication ? this.getApplication() : Voyant.application;
 			
 			// try to load from first-level mixins
 			if (this.mixins) {
@@ -4130,7 +4130,7 @@ Ext.define('Voyant.util.Api', {
 			}
 			this.addParentApi(apis, Ext.ClassManager.getClass(app)); // gather class params
 			if (app.getApiParams) {
-				apis.push(this.getApplication().getApiParams()); // now add instance params, last
+				apis.push(app.getApiParams()); // now add instance params, last
 			}
 		}
 
@@ -4187,13 +4187,6 @@ Ext.define('Voyant.util.Api', {
 		if (this.api && this.api[key]) {this.api[key].value=value;}
 	}
 });
-/**
- * This is a test
- * 
- * @author Stéfan Sinclair
- * @since 4.0
- * @class Voyant.util.Localization
- */
 Ext.define('Voyant.util.Localization', {
 	statics: {
 		DEFAULT_LANGUAGE: 'en',
@@ -4212,9 +4205,6 @@ Ext.define('Voyant.util.Localization', {
 		if (record) {return record.get(code.length==2 ? 'language' : 'code');}
 	},
 	
-	/**
-	 * This is a test
-	 */
 	localize: function(key, config) {
 		return this._localizeObject(this, key, config);
 	},
@@ -4381,6 +4371,7 @@ Ext.define('Voyant.util.SparkLine', {
 	 * @param {Array} values An array of numerical values.
 	 * @param {Integer} stretch The width to stretch the spark line towards (currently unused).
 	 * @return {String} The image(s) of the spark line.
+	 * @private
 	 */
 	getSparkLine : function(values, stretch) {
 		if (values.length < 2) {
@@ -5368,30 +5359,47 @@ Ext.define("Voyant.notebook.util.Embed", {
 						Voyant.notebook.util.Embed.showWidgetNotRecognized.call(this);
 					} else {
 						config = config || {};
-						var cmpInstance = new cmp();
-						cmpInstance.setApiParams(config);
-						var embeddedParams = cmpInstance.getModifiedApiParams();
-						cmpInstance.destroy();
+						var embeddedParams = {};
+						for (key in Ext.ClassManager.get(Ext.getClassName(cmp)).api) {
+							if (key in config) {
+								embeddedParams[key] = config[key]
+							}
+						}
 						if (!embeddedParams.corpus) {
-							var thisClassName = Ext.getClassName(this);
-							if (thisClassName=='Voyant.data.model.Corpus') {
+							if (Ext.getClassName(this)=='Voyant.data.model.Corpus') {
 								embeddedParams.corpus = this.getId();
 							} else if (this.getCorpus) {
 								embeddedParams.corpus = this.getCorpus().getId();
 							}
 						}
 						Ext.applyIf(config, {
-							width: '100%',
-							height: '300px'
+							style: 'width: '+(config.width || '90%') + (Ext.isNumber(config.width) ? 'px' : '')+
+								'; height: '+(config.height  || '400px') + (Ext.isNumber(config.height) ? 'px' : '')
 						});
+						delete config.width;
+						delete config.height;
+						
+						if (document.location.search.indexOf("debug=true")>-1) {
+							embeddedParams.debug=true
+						}
 						var embeddedConfigParam = Ext.Object.toQueryString(embeddedParams);
-						var tpl = new Ext.XTemplate('<iframe style="width: '+config.width+'; height: '+config.height+'" '+
+						var tpl = new Ext.XTemplate('<iframe style="'+config.style+'" '+
 								'src="'+Voyant.application.getBaseUrl()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/?{0}"></iframe>');
 						if (embeddedConfigParam.length<1950) {
-							show(tpl.apply([embeddedConfigParam]));
+							show(tpl.apply(["minimal=true&"+embeddedConfigParam]));
 						} else {
-							showError("Long arguments are not yet implemented.")
-							debugger
+			    	    	Ext.Ajax.request({
+			    	    	    url: Voyant.application.getTromboneUrl(),
+			    	    	    params: {
+			    	        		tool: 'resource.StoredResource',
+			    	        		storeResource: embeddedConfigParam
+			    	    	    }
+			    	    	}).then(function(response) {
+		    	    	    	var json = Ext.util.JSON.decode(response.responseText);
+								show(tpl.apply(["minimal=true&embeddedConfig="+json.storedResource.id]));
+			    	    	}).otherwise(function(response) {
+			    	    		showError(response)
+			    	    	})
 						}
 					}
 				} else {
@@ -5479,6 +5487,9 @@ Ext.define('Voyant.data.model.CorpusCollocate', {
     getContextTerm: function() {return this.get('contextTerm');},
     getContextTermRawFreq: function() {return this.get('contextTermRawFreq');}
 });
+/**
+ * Corpus Term
+ */
 Ext.define('Voyant.data.model.CorpusTerm', {
     extend: 'Ext.data.Model',
     fields: [
@@ -5494,14 +5505,35 @@ Ext.define('Voyant.data.model.CorpusTerm', {
              }}
     ],
     
+    /**
+     * Get the term.
+     * @returns {String} Returns the term.
+     */
     getTerm: function() {
     	return this.get('term');
     },
+    
+    /**
+     * Get the term's raw frequency.
+     * @returns {Number} Returns the term's frequency.
+     */
 	getRawFreq: function() {
 		return parseInt(this.get('rawFreq'));
 	},
+	
 	getInDocumentsCount: function() {
 		return parseInt(this.get('inDocumentsCount'));
+	},
+	
+	/**
+	 * Show a one line summary of this term.
+	 */
+	show: function(config) {
+		show(this.toString(config))
+	},
+	
+	toString: function() {
+		return this.getTerm()+": "+this.getRawFreq();
 	}
 });
 Ext.define('Voyant.data.model.CorpusNgram', {
@@ -5764,6 +5796,7 @@ Ext.define('Voyant.data.model.Token', {
 	}
 });
 Ext.define('Voyant.data.store.VoyantStore', {
+	mixins: ['Voyant.util.Localization'],
 	config: {
 		corpus: undefined,
 		parentPanel: undefined
@@ -5990,23 +6023,65 @@ Ext.define('Voyant.data.store.CorpusFacetsBuffered', {
 Ext.define('Voyant.data.store.CorpusTermsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: Voyant.data.model.CorpusTerm,
+    statics: {
+    	i18n: {
+    		toString: "This store has {0} terms with a total of {1} occurrences."
+    	}
+    },
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.CorpusTerms',
 			'proxy.reader.rootProperty': 'corpusTerms.terms',
 			'proxy.reader.totalProperty': 'corpusTerms.total'
 		}])
+	},
+
+	show: function(config) {
+		show(this.toString(config))
 	}
+
 });
 
+/**
+ * Corpus Terms store.
+ */
 Ext.define('Voyant.data.store.CorpusTerms', {
 	extend: 'Ext.data.Store',
 	mixins: ['Voyant.data.store.CorpusTermsMixin'],
+	
+	/**
+	 * @method each
+	 * Iterate over each {@link Voyant.data.model.CorpusTerm corpus term} in this store.
+	 * 
+	 * 	new Corpus("Hello Voyant!").loadCorpusTerms().then(function(corpusTerms) {
+	 * 		corpusTerms.each(function(corpusTerm) {
+	 * 			corpusTerm.show();
+	 * 		});
+	 * 	});
+	 * 
+	 * @param {function} function The function to call for each corpus term.
+	 */
+	
+	/**
+	 * @method show
+	 * Shows a one line summary of the corpus terms.
+	 * 
+	 * 	new Corpus("Hello Voyant!").loadCorpusTerms().then(function(corpusTerms) {
+	 * 		corpusTerms.show();
+	 * 	});
+	 */
+	
 	constructor : function(config) {
 		config = config || {};
 		this.mixins['Voyant.data.store.CorpusTermsMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
+	},
+	
+	toString: function(config) {
+		return new Ext.XTemplate(this.localize("toString")).apply([this.getCount(), this.sum("rawFreq")])
 	}
+
+
 });
 
 Ext.define('Voyant.data.store.CorpusTermsBuffered', {
@@ -6266,22 +6341,268 @@ Ext.define('Voyant.data.store.TokensBuffered', {
 		this.callParent([config]);
 	}
 });
-var Corpus = function(source, config) {
-	return Ext.create("Voyant.data.model.Corpus", source, config);
-}
+/**
+ * @class VoyantTable
+ * A VoyantTable can facilitate working with tabular data structures, as well as
+ * displaying results (especially with {@link #embed} and {@link show}). 
+ * Here's a simple example showing the Zipf-Law distribution of the top 20 frequency terms.
+ * 
+ * 	new Corpus("austen").loadCorpusTerms(20).then(function(corpusTerms) {
+ * 		var table = new VoyantTable({rowKey: 0}); // use first column as row key
+ * 		corpusTerms.each(function(corpusTerm) {
+ *			table.addRow([corpusTerm.getTerm(), corpusTerm.getRawFreq()]);
+ * 		});
+ * 		table.embed("voyantchart"); // graph table as line chart
+ * 	});
+ */
+Ext.define('Voyant.data.table.Table', {
+	alternateClassName: ["VoyantTable"],
+	mixins: ['Voyant.notebook.util.Embed'],
+	embeddable: ['Voyant.widget.VoyantChart'],
+	config: {
+		
+		/**
+		 * @private
+		 */
+		rows: [],
 
-function loadCorpus(source, config) {
-	return new Corpus(source, config);
-}
+		/**
+		 * @private
+		 */
+		headers: [],
 
+		/**
+		 * @private
+		 */
+		rowKey: undefined,
+		
+		/**
+		 * @private
+		 */
+		model: undefined
+	},
+
+	constructor: function(config) {
+
+		config = config || {};
+		
+		// not sure why config isn't working
+		this.rows = Ext.Array.from(Ext.isArray(config) ? config : config.rows);
+		this.headers = Ext.Array.from(config.headers);
+		this.rowKey = config.rowKey;
+		
+		if (config.isStore) {
+			this.model = config.getModel();
+			if (config.getCount()>0) {
+				this.headers = Object.keys(config.getAt(0).data);
+			}
+			config.each(function(item) {
+				this.addRow(item.data);
+			}, this)
+		}
+		this.callParent();
+	},
+	addRow: function(row) {
+		if (Ext.isObject(row)) {
+			this.rows.push(this.headers.map(function(key) {return row[key]}))
+		} else if (Ext.isArray(row)) {
+			this.rows.push(row);
+		}
+	},
+	eachRecord: function(fn, scope) {
+		var item, i=0, len=this.rows.length;
+		for (; i<len; i++) {
+            item = this.getRecord(i);
+			if (fn.call(scope || item, item, i, len) === false) {
+                break;
+            }			
+		}
+	},
+	eachRow: function(fn, asMap, scope) {
+		var item, i=0, len=this.rows.length;
+		for (; i<len; i++) {
+            item = this.getRow(i, asMap);
+			if (fn.call(scope || item, item, i, len) === false) {
+                break;
+            }			
+		}
+	},
+	getRow: function(index, asMap) {
+		if (asMap) {
+			var row = {};
+			Ext.Array.from(this.rows[index]).forEach(function(item, i) {
+				row[this.headers[i] || i] = item;
+			}, this);
+			return row;
+		} else {
+			return this.rows[index];
+		}
+	},
+	getRecord: function(index) {
+		if (this.model) {return new this.model(this.getRow(index, true))}
+	},
+	mapRows: function(fn, asMap, scope) {
+		var rows = [];
+		this.eachRow(function(row, i) {
+//			if (Object.keys(row).length>0) {
+				rows.push(fn.call(scope || this, row, i))
+//			}
+		}, asMap, this)
+		return rows;
+	},
+	
+	/**
+	 * Update the cell value at the specified row and column.
+	 * 
+	 * This will create the row and column as needed. If there's an existing value in the cell,
+	 * it will be added to the new value, unless the `replace` argument is set to true.
+	 * 
+	 * @param {Number/String} row The cell's row.
+	 * @param {Number/String} column The cell's column.
+	 * @param {Mixed} value The cell's value.
+	 * @param {boolean} [replace] Replace the current value (if it exists), otherwise
+	 * the value is added to any current value (which is the default behaviour).
+	 */
+	updateCell: function(row, column, value, replace) {
+		if (this.rows[row]===undefined) {this.rows[row]=[]}
+		if (this.rows[row][column]===undefined || replace) {this.rows[row][column]=value}
+		else {this.rows[row][column]+=value}
+	},
+	embed: function(cmp, config) {
+
+		if (Ext.isObject(cmp) && !config) {
+			config = cmp;
+			cmp = this.embeddabled[0];
+		}
+		config = config || {};
+		chart = {};
+		if (this.rowKey===undefined) {
+			debugger
+		}
+		var data = this.mapRows(function(row, i) {
+			return this.rowKey===undefined ? Ext.apply(row, {"row-index": i}) : row;
+		}, true, this)
+		
+		// determine columns/headers/fields
+		var fields = Ext.Array.merge(this.rowKey===undefined ? ["row-index"] : [], this.headers);
+		if (this.headers.length==0) {
+			var max = Ext.Array.max(this.mapRows(function(row) {return row ? row.length : 0}));
+			for (var i=0;i<max;i++) {fields.push(fields.length)}
+		}
+
+		Ext.apply(chart, {
+			store: {
+		        fields: fields,
+		        data: data
+		    }
+		})
+		
+		if (config.axes) {
+			Ext.apply(chart, {axes: config.axes});
+			var positions = ["left", "bottom"]
+			chart.axes.forEach(function(axis, i) {
+				Ext.applyIf(axis, {
+			        type: 'numeric',
+			        position: positions[i]
+				})
+			})
+			delete config.axes;
+		} else {
+			Ext.apply(chart, {
+				axes:  [{
+			        type: 'numeric',
+			        position: 'left'
+			    }, {
+			        type: 'category', // row numbers (discrete)
+			        position: 'bottom'
+			    }]
+			})
+		}
+		
+		if (config.series) {
+			Ext.apply(chart, {series: config.series});
+			chart.series.forEach(function(axis, i) {
+				Ext.applyIf(axis, {
+					type: 'line',
+					xField: this.rowKey===undefined ? 'row-index' : this.rowKey,
+					yField: i
+				})
+			})
+			delete config.series;
+		} else {
+			var series = [];
+			for (var i=0, len=fields.length; i<len;i++) {
+				
+				// skip if this is the row key
+				if (i===this.rowKey || (this.rowKey==undefined && i+1==len)) {continue;}
+				
+				series.push({
+			        type: 'line',
+			        xField: this.rowKey===undefined ? 'row-index' : this.rowKey,
+			        yField: i
+				})
+			}
+			Ext.apply(chart, {
+				series: series
+			});
+		}
+		Ext.apply(config, {
+			chartJson: JSON.stringify(chart)
+		})
+		embed(cmp, config);
+	}
+})
+Ext.define('Voyant.data.table.CorpusTerms', {
+	extend: 'Voyant.data.table.Table',
+	eachCorpusTerm: function() {
+		this.eachRecord.apply(this, arguments);
+	}
+})
+/**
+ * @class Corpus
+ * Testin
+ */
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization'],
+    transferable: ['loadCorpusTerms'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
     embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
+    	
+    	/**
+    	 * @cfg {String} corpus The ID of a previously created corpus.
+    	 * 
+    	 * A corpus ID can be used to try to retrieve a corpus that has been previously created.
+    	 * 
+    	 * This is especially useful if the input sources are long strings, local files, or content
+    	 * that's otherwise difficult or impossible to recreate.
+    	 * 
+    	 * Note that it's possible to also specify input sources as a fall-back if the corpus
+    	 * is no longer available in Voyant.
+    	 * 
+    	 * 		new Corpus({
+    	 * 			corpus: "some.long.corpus.id.generated.by.voyant",
+    	 * 			input: "http://hermeneuti.ca/" // use this as a fallback 
+    	 * 		});
+    	 */
+    	
+    	/**
+    	 * @cfg {String/String[]} input Input sources for the corpus.
+    	 * 
+    	 * The input sources can be either normal text or URLs (starting with `http`):
+    	 * 
+    	 * 		input: "Hello Voyant!" // one document with this string
+    	 * 
+    	 * 		input: ["Hello Voyant!", "How are you?"] // two documents with these strings
+    	 * 
+    	 * 		input: "http://hermeneuti.ca/" // one document from URL
+    	 * 
+    	 * 		input: ["Hello Voyant!", "http://hermeneuti.ca/"] // two documents, one from string and one from URL
+    	 */
+    	
     	documentsStore: undefined
     },
     statics: {
@@ -6294,26 +6615,51 @@ Ext.define('Voyant.data.model.Corpus', {
          {name: 'createdTime', type: 'int'},
          {name: 'createdDate', type: 'date', dateFormat: 'c'}
     ],
-
-    /**
-     * Create a new Corpus.
-     * @param {Mixed} [source] The source document(s) as a text string, a URL, or an Array of text strings and URLs.
-     * @param {Object} [config] Configuration options for creating the {@link Corpus}.
-     */
-	constructor : function(source, config) {
+    
+	/**
+     * Create a promise for a new Corpus with relevant data loaded.
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the Corpus as an argument.
+     * 
+     * 	var corpus;
+     * 	new Corpus("Hello Voyant!").then(function(data) {
+     * 		corpus = data;
+     * 	});
+     * 
+     * The following scenarios are possible for the config argument:
+     * 
+     * - a string that looks like a corpus ID (not a URL and no spaces): treated as a {@link #corpus} config
+     * - a string that doesn't look like a corpus ID: treated as an {@link #input} config
+     * - an array of strings: treated as an array of {@link #input} config values
+     * - an object: treated a normal config object
+     * 
+     * As such, these two constructions do the same thing:
+     * 
+     * 	new Corpus("Hello World!");
+     * 	new Corpus({input: "Hello World!"});
+     * 
+     * @param {String/String[]/Object} config The source document(s) as a text string, a URL, an array of text strings and URLs, or a config object.
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return a Corpus but a promise to return a Corpus when it's finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * Corpus as an argument, as per the example above).
+	 */
+	constructor : function(config) {
+		
+		config = config || {};
 				
-		this.callParent([config]); // only send config, not source
-    	//this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this);
-
-		if (source) {
+		this.callParent([]); // only send config, not source
+		if (config) {
 			
-			config = config || {};
-			Ext.apply(config, {tool: 'corpus.CorpusMetadata'})
-
-			if (Ext.isString(source) || Ext.isArray(source)) {
-				config.input = source;
+			if (Ext.isString(config) || Ext.isArray(config)) {
+				if (Ext.isString(config) && /\s/.test(config)==false && config.indexOf(":")==-1) {
+					config = {corpus: config};
+				} else {
+					config = {input: config};
+				}
 			}
-			else if (Ext.isObject(source)) {Ext.apply(config, source)}
+
+			Ext.apply(config, {tool: 'corpus.CorpusMetadata'})
 
 			var dfd = Voyant.application.getDeferred(this);
 			var me = this;
@@ -6352,6 +6698,53 @@ Ext.define('Voyant.data.model.Corpus', {
 	getId: function() {
 		// overrides the getId() function from the model to handle promises
     	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('id');		
+	},
+	
+	
+	/**
+     * Create a promise for {@link Voyant.data.store.CorpusTerms Corpus Terms}.
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the {@link Voyant.data.store.CorpusTerms Corpus Terms} as an argument.
+     * 
+     * 	new Corpus("Hello Voyant!").loadCorpusTerms().then(function(corpusTerms) {
+     * 		corpusTerms.show();
+     * 	});
+     * 
+     * @param {Number/Object} config
+     * 
+     * - when this is a number, it's the maximum number of corpus terms to load (see {@link Voyant.data.store.CorpusTerms#limit})
+     * - otherwise this is a regular config object
+     * 
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return corpus terms but a promise to return a corpus terms when they're finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * corpus terms as an argument, as per the example above).
+	 */
+	loadCorpusTerms: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0
+			})
+			var corpusTerms = this.getCorpusTerms();
+			corpusTerms.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(corpusTerms)
+					} else {
+						dfd.reject(operation)
+					}
+				}
+			})
+			return dfd.promise
+		}
 	},
 	
 	getCorpusTerms: function(config) {
@@ -6420,6 +6813,21 @@ Ext.define('Voyant.data.model.Corpus', {
 		// overrides the getId() function from the model to handle promises
     	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('noPasswordAccess');		
 	},
+	
+	/**
+	 * Shows a one-line summary of this corpus.
+	 * 
+	 * 	new Corpus("Hello World!").then(function(corpus) {corpus.show(true);});
+	 * 
+	 * @params {boolean} [withID] Includes the corpus ID in parentheses at the end, if true.
+	 */
+	show: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			show(this.toString(config))
+		}
+	},
 
     toString: function(config) {
 		var size = this.getDocumentsCount();
@@ -6461,6 +6869,7 @@ Ext.define('Voyant.data.model.Corpus', {
 			
 			message+='';
 		}
+		if (config===true) {message+=' ('+this.getId()+")";}
 		return message;
     }
     
@@ -7221,6 +7630,32 @@ Ext.define('Voyant.widget.DownloadOptions', {
     }
 });
 
+Ext.define('Voyant.widget.VoyantChart', {
+    extend: 'Ext.chart.CartesianChart',
+    mixins: ['Voyant.util.Localization','Voyant.util.Api'],
+    alias: 'widget.voyantchart',
+    statics: {
+    	i18n: {
+    	},
+    	api: {
+    		chartJson: undefined
+    	}
+    },
+    constructor: function(config) {
+    	config = config || {};
+    	var me = this;
+    	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	if (this.getApiParam('chartJson')) {
+    		var json = JSON.parse(this.getApiParam('chartJson'));
+    		Ext.apply(config, json);
+    	}
+    	this.callParent(arguments)
+    },
+    initComponent: function(config) {
+    	this.callParent(arguments)
+    }
+
+})
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable','Voyant.util.DetailedError'],
 	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.TotalPropertyStatus'],
@@ -7431,32 +7866,38 @@ Ext.define('Voyant.panel.Bubblelines', {
     		/**
     		 * @property bins How many "bins" to separate a document into.
     		 * @type Integer
+    		 * @private
     		 */
     		bins: 50,
         	/**
         	 * @property query A string to search for in a document.
         	 * @type String
+    		 * @private
         	 */
     		query: null,
     		/**
     		 * @property stopList The stop list to use to filter results.
     		 * Choose from a pre-defined list, or enter a comma separated list of words, or enter an URL to a list of stop words in plain text (one per line).
     		 * @type String
+    		 * @private
     		 */
     		stopList: 'auto',
     		/**
     		 * @property docId The document ID to restrict results to.
     		 * @type String
+    		 * @private
     		 */
     		docId: undefined,
     		/**
     		 * @property docIndex The document index to restrict results to.
     		 * @type Integer
+    		 * @private
     		 */
     		docIndex: undefined,
     		/**
     		 * @property maxDocs The maximum number of documents to show.
     		 * @type Integer
+    		 * @private
     		 */
     		maxDocs: 50
     	},
@@ -10336,17 +10777,20 @@ Ext.define('Voyant.panel.Knots', {
     		/**
         	 * @property query A string to search for in a document.
         	 * @type String
+    		 * @private
         	 */
     		query: null,
     		/**
     		 * @property stopList The stop list to use to filter results.
     		 * Choose from a pre-defined list, or enter a comma separated list of words, or enter an URL to a list of stop words in plain text (one per line).
     		 * @type String
+    		 * @private
     		 */
     		stopList: 'auto',
     		/**
     		 * @property docId The document ID to restrict results to.
     		 * @type String
+    		 * @private
     		 */
     		docId: undefined
     	},
@@ -10795,6 +11239,7 @@ Ext.define('Voyant.panel.Knots', {
     /**
      * Get the results for the query(s) for each of the corpus documents.
      * @param query {String|Array}
+     * @private
      */
     getDocTermsFromQuery: function(query) {
     	if (query) {this.setApiParam("query", query);} // make sure it's set for subsequent calls
@@ -11913,7 +12358,7 @@ Ext.define('Voyant.panel.Documents', {
     			view.unmask();
     			var obj = Ext.decode(response.responseText);
     			view.mask("Loading new corpus…")
-    			new Corpus({corpus: obj.corpus.id}).then(function(corpus) {
+    			new Voyant.data.model.Corpus({corpus: obj.corpus.id}).then(function(corpus) {
     				view.unmask();
     				app.dispatchEvent('loadedCorpus', app, corpus);
     			}).fail(function(message, response) {
@@ -12248,10 +12693,6 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     }
     
 })
-/**
- * Marked splines are multi-series splines displaying smooth curves across multiple
- * categories. Markers are placed at each connected point to clearly depict their position.
- */
 Ext.define('Voyant.panel.Dummy', {
     extend: 'Ext.Panel',
     xtype: 'dummy',
@@ -14294,7 +14735,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     }
 });
 
-/**
+/*
  * Adds tool tip disabling.
  */
 Ext.define('Ext.chart.series.CustomScatter', {
@@ -15160,13 +15601,12 @@ Ext.define('Voyant.panel.TopicContexts', {
     }
     
 })
-/**
+/*
  * @class Voyant.panel.TermsRadio
+ * @private
  * @author Mark Turcato
  * @author Andrew MacDonald
  */
-
-
 Ext.define('Voyant.panel.TermsRadio', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -15187,6 +15627,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property bins How many segments, i.e. 'bins', to seperate separate a document into.
     		 * @type Integer
     		 * @default 10
+    		 * @private
     		 */
     		bins: 5
     	
@@ -15194,6 +15635,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property visibleBins How many visible segments to be displayed at once.
     		 * @type Integer
     		 * @default 5
+    		 * @private
     		 */
     		,visibleBins: 5
     		
@@ -15201,6 +15643,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property docIdType The document type(s) to restrict results to.
     		 * @type String|Array
     		 * @default null
+    		 * @private
     		 */
     		,docIdType: null
     		
@@ -15209,6 +15652,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		/**
         	 * @property mode What mode to operate at, either document or corpus.
         	 * @choices document, corpus
+    		 * @private
         	 */
     		,mode: null
     		
@@ -15216,6 +15660,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         	 * @property position The current shifted position of the visualization.
         	 * @type Integer
         	 * @default 0
+    		 * @private
         	 */
     		,position: 0
     		
@@ -15223,6 +15668,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property selectedWords The words that have been selected.
     		 * @type String|Array
     		 * @default null
+    		 * @private
     		 */
     		,selectedWords: []
     		
@@ -15232,6 +15678,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @type String
     		 * @default null
     		 * @choices stop.en.taporware.txt, stop.fr.veronis.txt
+    		 * @private
     		 */
     		,stopList: 'auto'
     		
@@ -15239,6 +15686,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property query The corpus type(s) to restrict results to.
     		 * @type String
     		 * @default null
+    		 * @private
     		 */
     		,query: null
     		
@@ -15246,6 +15694,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 * @property yAxisScale The scale for the y axis.
     		 * @type String
     		 * @default log
+    		 * @private
     		 */
     		,yAxisScale: 'log'
     			
@@ -15575,6 +16024,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		/**
 		 * @event corpusTypesSelected
 		 * @type listener
+		 * @private
 		 */
 		this.addListener('corpusTermsClicked', function(src, terms){
 			if (this.getCorpus().getDocumentsCount() > 1) {
@@ -15660,7 +16110,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		/**
 		 * @event resize
 		 * @type listener
-		 * 
+		 * @private
 		 */
 		this.addListener('resize', function() {
 			//console.log('resize')
@@ -18903,6 +19353,7 @@ Ext.define('Voyant.VoyantApp', {
 	
 	/**
 	 * A universal palette of colors for use with terms and documents.
+	 * @private
 	 */
 	colors: [[0, 0, 255], [51, 197, 51], [255, 0, 255], [121, 51, 255], [28, 255, 255], [255, 174, 0], [30, 177, 255], [182, 242, 58], [255, 0, 164], [51, 102, 153], [34, 111, 52], [155, 20, 104], [109, 43, 157], [128, 130, 33], [111, 76, 10], [119, 115, 165], [61, 177, 169], [202, 135, 115], [194, 169, 204], [181, 212, 228], [182, 197, 174], [255, 197, 197], [228, 200, 124], [197, 179, 159]],
 	
@@ -18914,6 +19365,7 @@ Ext.define('Voyant.VoyantApp', {
 	 * Gets the whole color palette.
 	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of each color (optional, defaults to rgb values).
 	 * @return {Array} The color palette.
+	 * @private
 	 */
 	getColorPalette: function(returnHex) {
 		if (returnHex) {
@@ -18932,6 +19384,7 @@ Ext.define('Voyant.VoyantApp', {
 	 * @param {Integer} index The index of the color to get.
 	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of the color (optional, defaults to rgb values).
 	 * @return {Mixed} The requested color, either a hex string or array of rgb values.
+	 * @private
 	 */
 	getColor: function(index, returnHex) {
 		if (returnHex) {
@@ -18943,6 +19396,7 @@ Ext.define('Voyant.VoyantApp', {
 	
 	/**
 	 * For tracking associations between a term and a color, to ensure consistent coloring across tools.
+	 * @private
 	 */
 	colorTermAssociations: new Ext.util.MixedCollection(),
 	
@@ -18951,6 +19405,7 @@ Ext.define('Voyant.VoyantApp', {
 	 * @param {String} term The term to get the color for.
 	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of the color (optional, defaults to rgb values).
 	 * @return {Mixed} The requested color, either a hex string or array of rgb values.
+	 * @private
 	 */
 	getColorForTerm: function(term, returnHex) {
 		if (term.indexOf(':') != -1) {
@@ -18971,6 +19426,7 @@ Ext.define('Voyant.VoyantApp', {
 	/**
 	 * Opens a URL in a new window (handling the case when popup windows aren't allowed).
 	 * @param {String} url The URL to open.
+	 * @private
 	 */
 	openUrl: function(url) {
 		var win = window.open(url);
@@ -19056,7 +19512,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		
 		this.validateCorpusLoadParams(params);
 
-		new Corpus(params).then(function(corpus) {
+		new Voyant.data.model.Corpus(params).then(function(corpus) {
 			view.unmask();
 			me.setCorpus(corpus);
 			if (me.validateCorpusAccess()) {

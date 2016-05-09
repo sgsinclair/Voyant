@@ -1,7 +1,3 @@
-/**
- * Marked splines are multi-series splines displaying smooth curves across multiple
- * categories. Markers are placed at each connected point to clearly depict their position.
- */
 Ext.define('Voyant.panel.Dummy', {
     extend: 'Ext.Panel',
     xtype: 'dummy',

@@ -32,15 +32,19 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 	border: false,
 	constructor: function(config) {
 		Ext.apply(this, {
-			html: '<div contenteditable="true">'+(config.content ? config.content : this.localize("emptyText"))+"</div>"
+			html: config.content ? config.content : this.localize("emptyText")
 		});
         this.callParent(arguments);
 	},
 	listeners: {
 		boxready: function() {
 			var me = this;
-			this.getEl().set({contenteditable: true});
-			var editor = CKEDITOR.inline( Ext.getDom(this.getEl()), this.getCkeditorConfig() );
+			var el = this.getTargetEl();
+			el.set({contenteditable: true});
+			el.on("resize", function() {
+				setTimeout(function() {me.ownerCt.fireEvent("editorresize",me);}, 500)
+			})
+			var editor = CKEDITOR.inline( el.dom, this.getCkeditorConfig() );
 			editor.on("focus", function(evt, ed) {
 				me.findParentByType("notebookeditorwrapper").setIsEditing(true);
 			})
@@ -53,7 +57,7 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 				if (lastHeight!=me.getHeight()) {
 					me.ownerCt.fireEvent("editorresize",me);
 					lastHeight = me.getHeight();
-					me.setContent(ed.getValue())
+//					me.setContent(ed.getValue())
 				}
 			})
 			this.setEditor(editor);

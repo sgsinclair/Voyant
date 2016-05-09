@@ -884,7 +884,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     }
 });
 
-/**
+/*
  * Adds tool tip disabling.
  */
 Ext.define('Ext.chart.series.CustomScatter', {

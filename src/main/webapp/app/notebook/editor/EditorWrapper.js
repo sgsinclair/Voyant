@@ -34,7 +34,7 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 			this.on("editorresize", function(editor) {
 				
 				// calculate the total height of the components
-				var height = 0;
+				var height = 20;
 				this.items.each(function(item) {height+=item.getHeight();})
 
 				// the calculated height is more than the current space of the wrapper

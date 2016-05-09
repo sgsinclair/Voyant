@@ -1,19 +1,29 @@
 Ext.define('Voyant.VoyantToolApp', {
 	extend : 'Voyant.VoyantCorpusApp',
 	name : 'VoyantToolApp',
+	statics: {
+		api: {
+			minimal: undefined
+		}
+	},
 	launch: function() {
-		Ext.create('Ext.container.Viewport', {
-		    layout: 'border',
-		    items: [{
+		var items = [];
+		if (!this.getApiParam('minimal')) {
+			items.push({
 		        region: 'south',
 		        xtype: 'voyantfooter'
-		    }, {
-		        region: 'center',
-		        layout: 'fit',
-		        items: {
-			        xtype: this.getTool()
-		        }
-		    }]
+		    })
+		};
+		items.push({
+	        region: 'center',
+	        layout: 'fit',
+	        items: {
+		        xtype: this.getTool()
+	        }
+	    });
+		Ext.create('Ext.container.Viewport', {
+		    layout: 'border',
+		    items: items
 		});
 		this.callParent(arguments);
 	}

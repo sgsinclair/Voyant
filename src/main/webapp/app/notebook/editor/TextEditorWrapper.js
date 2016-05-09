@@ -10,19 +10,24 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 	dockedItems: [{
 	    xtype: 'toolbar',
 	    dock: 'left',
-	    items: [
-//			{
-//		    	xtype: 'notebookwrappermovement'
-//		    },' ',{
-//		    	xtype: 'notebookwrapperadd'
-//			}
+	    items: [{
+		    	xtype: 'notebookwrapperadd'
+			},{
+				xtype: 'tbspacer'
+			},{
+	        	xtype: 'notebookwrappermoveup'
+	        },{
+	        	xtype: 'notebookwrappermovedown'
+	        },{
+	        	xtype: 'notebookwrapperremove'
+	        }
 	    ]
 	}],
 	constructor: function(config) {
 		Ext.apply(this, {
 			items: [{
 				xtype: 'notebooktexteditor',
-				content: config.content
+				content: Ext.Array.from(config.input).join("")
 			}]
 		});
         this.callParent(arguments);
