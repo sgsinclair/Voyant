@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 10 11:18:07 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue May 10 13:51:30 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -19260,11 +19260,12 @@ Ext.define('Voyant.panel.WordTree', {
     config: {
     	corpus: undefined,
     	tree: undefined,
-    	kwicStore: undefined
+    	kwicStore: undefined,
+    	options: {xtype: 'stoplistoption'}
     },
     
-    clickTimeout: null,
     doubleClickDelay: 300,
+    lastClick: 1,
     
     constructor: function(config) {
         this.callParent(arguments);
@@ -19394,27 +19395,24 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     clickHandler: function(node) {
-    	function doDispatch() {
-    		this.clickTimeout = null;
-    		var terms = [];
-	    	var parent = node;
-	    	while (parent != null) {
-	    		terms.push(parent.name);
-	    		parent = parent.parent;
-	    	}
-	    	this.getApplication().dispatchEvent('termsClicked', this, terms);
-    	}
-    	if (this.clickTimeout == null) {
-    		this.clickTimeout = window.setTimeout(doDispatch.bind(this), this.doubleClickDelay);
+    	var now = new Date().getTime();
+    	console.warn(this.lastClick, now, now-this.lastClick)
+    	if (this.lastClick && now-this.lastClick<this.doubleClickDelay) {
+    		this.lastClick=1;
+    		var terms = [], parent = node;
+        	while (parent != null) {
+        		terms.push(parent.name);
+        		parent = parent.parent;
+        	}
+        	this.getApplication().dispatchEvent('termsClicked', this, [terms.reverse().join(" ")]);
     	} else {
-	    	window.clearTimeout(this.clickTimeout);
-	    	this.clickTimeout = null;
-	    	this.doubleClickHandler(node);
+    		this.lastClick = now;
     	}
     },
     
     doubleClickHandler: function(node) {
-    	this.setRoot(node.name);
+// dispatch phrase click instead of recentering (which can be done with search)
+//    	this.setRoot(node.name);
     },
     
     setRoot: function(query) {
@@ -19686,7 +19684,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio']
+			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','wordtree']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
@@ -19694,7 +19692,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
-			items: ['cirrus','bubblelines','collocatesgraph','knots','trends','streamgraph','scatterplot','termsradio','wordtree']
+			items: ['cirrus','bubblelines','collocatesgraph','knots','microsearch','streamgraph','scatterplot','trends','termsradio','wordtree']
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',

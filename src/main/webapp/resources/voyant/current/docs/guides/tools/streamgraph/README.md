@@ -11,7 +11,7 @@ Each horizontal line in the graph is coloured according to the word it represent
 
 You can toggle specific terms by clicking on them in the legend at the top.
 
-<div style="max-width: 600px; margin-left: auto; margin-right: auto;">{@img streamgraph.png Collocates Graph}</div>
+<iframe src="../tool/StreamGraph/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
 
 ## Options
 

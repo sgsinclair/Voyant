@@ -17,7 +17,7 @@ By default, contexts are shown for the most frequent in the term corpus.
 
 Some context is shown for each occurrence, you can also click on the plus icon to expand any given row to show more context.
 
-{@img contexts.png Contexts}
+<iframe src="../tool/Contexts/?corpus=austen" style="width: 90%; height: 350px;"></iframe>
 
 ## Options
 

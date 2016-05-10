@@ -7,7 +7,7 @@ Bubblelines visualizes the frequency and distribution of terms in a corpus.
 
 Each document in the corpus is represented as a horizontal line and divided into segments of equal length (50 segments by default). Each selected word is represented as a bubble with the size of the bubble indicating the word’s frequency in the corresponding segment of text. The larger the bubble the more frequently the word occurs.
 
-{@img bubblelines.png Bubblelines}
+<iframe src="../tool/Bubblelines/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
 
 Hovering over a location on the document line will cause a bubble to appear with term frequencies for that segment. At the end of the document line is a label that indicates the count of all terms selected for that document; hovering over the label shows a break-down of the term frequencies for that document.
 

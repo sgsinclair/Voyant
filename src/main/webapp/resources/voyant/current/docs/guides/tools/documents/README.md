@@ -18,7 +18,7 @@ Additional columns can be shown:
 
 By default, documents are shown in the order they exist in the corpus.
 
-<div style="max-width: 700px; margin-left: auto; margin-right: auto;">{@img documents.png Documents}</div>
+<iframe src="../tool/Documents/?corpus=austen" style="width: 90%; height: 350px;"></iframe>
 
 ## Options
 

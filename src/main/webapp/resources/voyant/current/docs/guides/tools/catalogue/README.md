@@ -11,7 +11,7 @@ By default the following facets are shown:
 - *Language*: the document's automatically detected language 
 - *Terms*: all of the terms in the document
 
-<div style="max-width: 700px; margin-left: auto; margin-right: auto;">{@img catalogue.png Catalogue}</div>
+<iframe src="../tool/Catalogue/?corpus=austen" style="width: 90%; height: 600px;"></iframe>
 
 ## Options
 

@@ -8,7 +8,7 @@ This represents a network graph where keywords in green are shown linked to coll
 
 You can drag and drop terms to move them. You can drag terms off the canvas to remove them.
 
-<div style="max-width: 600px; margin-left: auto; margin-right: auto;">{@img collocatesgraph.png Collocates Graph}</div>
+<iframe src="../tool/CollocatesGraph/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
 
 ## Options
 

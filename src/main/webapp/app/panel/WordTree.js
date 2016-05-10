@@ -19,11 +19,12 @@ Ext.define('Voyant.panel.WordTree', {
     config: {
     	corpus: undefined,
     	tree: undefined,
-    	kwicStore: undefined
+    	kwicStore: undefined,
+    	options: {xtype: 'stoplistoption'}
     },
     
-    clickTimeout: null,
     doubleClickDelay: 300,
+    lastClick: 1,
     
     constructor: function(config) {
         this.callParent(arguments);
@@ -153,29 +154,25 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     clickHandler: function(node) {
-    	function doDispatch() {
-    		this.clickTimeout = null;
-    		var terms = [];
-	    	var parent = node;
-	    	while (parent != null) {
-	    		terms.push(parent.name);
-	    		parent = parent.parent;
-	    	}
-	    	this.getApplication().dispatchEvent('termsClicked', this, terms);
-    	}
-    	if (this.clickTimeout == null) {
-    		this.clickTimeout = window.setTimeout(doDispatch.bind(this), this.doubleClickDelay);
+    	var now = new Date().getTime();
+    	if (this.lastClick && now-this.lastClick<this.doubleClickDelay) {
+    		this.lastClick=1;
+    		var terms = [], parent = node;
+        	while (parent != null) {
+        		terms.push(parent.name);
+        		parent = parent.parent;
+        	}
+        	this.getApplication().dispatchEvent('termsClicked', this, [terms.reverse().join(" ")]);
     	} else {
-	    	window.clearTimeout(this.clickTimeout);
-	    	this.clickTimeout = null;
-	    	this.doubleClickHandler(node);
+    		this.lastClick = now;
     	}
     },
     
-    doubleClickHandler: function(node) {
-    	this.setRoot(node.name);
-    },
-    
+//    doubleClickHandler: function(node) {
+//// dispatch phrase click instead of recentering (which can be done with search)
+////    	this.setRoot(node.name);
+//    },
+//    
     setRoot: function(query) {
     	this.setApiParam('query', this.stripPunctuation(query));
 		this.getKwicStore().load({params: this.getApiParams()});

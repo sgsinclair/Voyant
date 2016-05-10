@@ -19,7 +19,7 @@ TermsRadio has several features contained in two main components:
 	* the left y axis displays the relative document frequencies
 	* the lines show the trends of the term frequencies for the visible documents
 
-<div style="max-width: 800px; margin-left: auto; margin-right: auto;">{@img termsradio.png Termsradio}</div>
+<iframe src="../tool/TermsRadio/?corpus=austen" style="width: 90%; height: 600px;"></iframe>
 
 ## Options
 

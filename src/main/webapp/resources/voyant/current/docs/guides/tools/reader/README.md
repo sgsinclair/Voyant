@@ -22,7 +22,7 @@ When there's a search term, an inner sparkline is shown overtop of the bars â€“Â
 
 There's also a thin vertical blue bar that indicates the current position of the Text Reader in the corpus. You can click anywhere along the Prospect Viewer to jump to another location.
 
-{@img reader.png Reader}
+<iframe src="../tool/Reader/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
 
 ## Options
 

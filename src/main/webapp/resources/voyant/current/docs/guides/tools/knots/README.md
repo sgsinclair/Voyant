@@ -4,7 +4,7 @@ Knots is a creative visualization that represents terms in a single document as 
 
 By default Knots represents the most common terms in the first document of a corpus.
 
-<div style="max-width: 700px; margin-left: auto; margin-right: auto;">{@img knots.png Knots}</div>
+<iframe src="../tool/Knots/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
 
 ## Adding Terms
 
