@@ -151,6 +151,11 @@
                         "name": "trends",
                         "url": "guides/tools/trends",
                         "title": "Trends"
+                    },
+                    {
+                        "name": "wordtree",
+                        "url": "guides/tools/wordtree",
+                        "title": "Word Tree"
                     }
                 ]
             },

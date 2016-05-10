@@ -212,3 +212,15 @@
 		</div>
 	</dd></a>
 </div>
+
+<div class="thumb-list">
+	<a href="#!/guide/wordtree"><dd>
+		<div class="thumb">
+			<img src="guides/wordtree/icon.png" />
+		</div>
+		<div>
+			<h4>Word Tree</h4>
+			<p>Word Tree is a tool that allows you to explore how words are used in phrases.</p>
+		</div>
+	</dd></a>
+</div>

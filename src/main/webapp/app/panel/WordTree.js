@@ -19,11 +19,12 @@ Ext.define('Voyant.panel.WordTree', {
     config: {
     	corpus: undefined,
     	tree: undefined,
-    	kwicStore: undefined
+    	kwicStore: undefined,
+    	options: {xtype: 'stoplistoption'}
     },
     
-    clickTimeout: null,
     doubleClickDelay: 300,
+    lastClick: 1,
     
     constructor: function(config) {
         this.callParent(arguments);
@@ -153,24 +154,23 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     clickHandler: function(node) {
-    	if (this.clickTimeout == null) {
-    		this.clickTimeout = window.setTimeout("", this.doubleClickDelay);
+    	var now = new Date().getTime();
+    	if (this.lastClick && now-this.lastClick<this.doubleClickDelay) {
+    		this.lastClick=1;
+    		var terms = [], parent = node;
+        	while (parent != null) {
+        		terms.push(parent.name);
+        		parent = parent.parent;
+        	}
+        	this.getApplication().dispatchEvent('termsClicked', this, [terms.reverse().join(" ")]);
     	} else {
-	    	window.clearTimeout(this.clickTimeout);
-	    	this.clickTimeout = null;
-	    	this.doubleClickHandler(node);
+    		this.lastClick = now;
     	}
     },
     
     doubleClickHandler: function(node) {
 // dispatch phrase click instead of recentering (which can be done with search)
 //    	this.setRoot(node.name);
-		var terms = [], parent = node;
-    	while (parent != null) {
-    		terms.push(parent.name);
-    		parent = parent.parent;
-    	}
-    	this.getApplication().dispatchEvent('termsClicked', this, [terms.reverse().join(" ")]);
     },
     
     setRoot: function(query) {
