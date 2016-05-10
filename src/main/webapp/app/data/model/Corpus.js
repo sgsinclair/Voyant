@@ -265,11 +265,11 @@ Ext.define('Voyant.data.model.Corpus', {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
-			show(this.toString(config))
+			show(this.getString(config))
 		}
 	},
 
-    toString: function(config) {
+    getString: function(config) {
 		var size = this.getDocumentsCount();
 		var message = this.localize('thisCorpus');
 		if (size==0) {message += ' '+this.localize('isEmpty')+'.';}

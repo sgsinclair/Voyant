@@ -40,10 +40,10 @@ Ext.define('Voyant.data.model.CorpusTerm', {
 	 * Show a one line summary of this term.
 	 */
 	show: function(config) {
-		show(this.toString(config))
+		show(this.getString(config))
 	},
 	
-	toString: function() {
+	getString: function() {
 		return this.getTerm()+": "+this.getRawFreq();
 	}
 });

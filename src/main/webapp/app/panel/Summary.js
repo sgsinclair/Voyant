@@ -118,7 +118,7 @@ Ext.define('Voyant.panel.Summary', {
     	
     	main.removeAll();
     	main.add({
-    		html: this.getCorpus().toString()
+    		html: this.getCorpus().getString()
     	});
     	
     	var docs = this.getCorpus().getDocuments().getRange();

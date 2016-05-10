@@ -149,7 +149,7 @@ Ext.define('Voyant.panel.Subset', {
     	me.on('loadedCorpus', function(src, corpus) {
     		me.getStore().setCorpus(corpus);
     		if (me.getInitialConfig('introHtml')==undefined && me.getInitialConfig('intro')==undefined) {
-    			 me.queryById('intro').setHtml(corpus.toString())
+    			 me.queryById('intro').setHtml(corpus.getString())
     		}
     	}, me);
     	

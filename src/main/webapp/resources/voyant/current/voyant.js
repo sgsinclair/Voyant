@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 10 10:12:06 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue May 10 10:39:31 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5288,7 +5288,7 @@ Ext.define("Voyant.notebook.util.Show", {
 					show.apply(val, arguments);
 				})
 			} else {
-				contents = contents.toString();
+				contents = contents.getString ? contents.getString() : contents.toString();
 				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
 				Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
 			}
@@ -5529,10 +5529,10 @@ Ext.define('Voyant.data.model.CorpusTerm', {
 	 * Show a one line summary of this term.
 	 */
 	show: function(config) {
-		show(this.toString(config))
+		show(this.getString(config))
 	},
 	
-	toString: function() {
+	getString: function() {
 		return this.getTerm()+": "+this.getRawFreq();
 	}
 });
@@ -6027,7 +6027,7 @@ Ext.define('Voyant.data.store.CorpusTermsMixin', {
     model: Voyant.data.model.CorpusTerm,
     statics: {
     	i18n: {
-    		toString: "This store has {0} terms with a total of {1} occurrences."
+    		getString: "This store has {0} terms with a total of {1} occurrences."
     	}
     },
 	constructor : function(config) {
@@ -6039,7 +6039,7 @@ Ext.define('Voyant.data.store.CorpusTermsMixin', {
 	},
 
 	show: function(config) {
-		show(this.toString(config))
+		show(this.getString(config))
 	}
 
 });
@@ -6079,8 +6079,8 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 		this.callParent([config]);
 	},
 	
-	toString: function(config) {
-		return new Ext.XTemplate(this.localize("toString")).apply([this.getCount(), this.sum("rawFreq")])
+	getString: function(config) {
+		return new Ext.XTemplate(this.localize("getString")).apply([this.getCount(), this.sum("rawFreq")])
 	}
 
 
@@ -6828,11 +6828,11 @@ Ext.define('Voyant.data.model.Corpus', {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
-			show(this.toString(config))
+			show(this.getString(config))
 		}
 	},
 
-    toString: function(config) {
+    getString: function(config) {
 		var size = this.getDocumentsCount();
 		var message = this.localize('thisCorpus');
 		if (size==0) {message += ' '+this.localize('isEmpty')+'.';}
@@ -8939,6 +8939,7 @@ Ext.define('Voyant.panel.Cirrus', {
     loadFromCorpus: function(corpus) {    	
 		this.setCorpus(corpus);
 		this.setApiParams({docId: undefined, docIndex: undefined});
+		debugger
 		this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
     },
     
@@ -8955,6 +8956,7 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
+    	debugger
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_CORPUS);
@@ -15493,7 +15495,7 @@ Ext.define('Voyant.panel.Summary', {
     	
     	main.removeAll();
     	main.add({
-    		html: this.getCorpus().toString()
+    		html: this.getCorpus().getString()
     	});
     	
     	var docs = this.getCorpus().getDocuments().getRange();
@@ -17974,6 +17976,12 @@ Ext.define('Voyant.panel.TermsRadio', {
     		}
     	});
     	
+    	this.on("documentSelected", function(src, document) {
+    		if (this.getCorpus()) {
+    			this.loadFromDocument(this.getCorpus().getDocument(document))
+    		}
+    	});
+    	
     	this.on("query", function(src, query) {
     		this.fireEvent("termsClicked", src, query);
     	}, this);
@@ -18916,7 +18924,7 @@ Ext.define('Voyant.panel.Subset', {
     	me.on('loadedCorpus', function(src, corpus) {
     		me.getStore().setCorpus(corpus);
     		if (me.getInitialConfig('introHtml')==undefined && me.getInitialConfig('intro')==undefined) {
-    			 me.queryById('intro').setHtml(corpus.toString())
+    			 me.queryById('intro').setHtml(corpus.getString())
     		}
     	}, me);
     	

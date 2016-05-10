@@ -10,7 +10,7 @@ Ext.define("Voyant.notebook.util.Show", {
 					show.apply(val, arguments);
 				})
 			} else {
-				contents = contents.toString();
+				contents = contents.getString ? contents.getString() : contents.toString();
 				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
 				Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
 			}

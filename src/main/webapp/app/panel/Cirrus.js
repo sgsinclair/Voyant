@@ -150,6 +150,7 @@ Ext.define('Voyant.panel.Cirrus', {
     loadFromCorpus: function(corpus) {    	
 		this.setCorpus(corpus);
 		this.setApiParams({docId: undefined, docIndex: undefined});
+		debugger
 		this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
     },
     
@@ -166,6 +167,7 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
+    	debugger
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_CORPUS);

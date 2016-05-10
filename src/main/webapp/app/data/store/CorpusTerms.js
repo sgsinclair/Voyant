@@ -3,7 +3,7 @@ Ext.define('Voyant.data.store.CorpusTermsMixin', {
     model: Voyant.data.model.CorpusTerm,
     statics: {
     	i18n: {
-    		toString: "This store has {0} terms with a total of {1} occurrences."
+    		getString: "This store has {0} terms with a total of {1} occurrences."
     	}
     },
 	constructor : function(config) {
@@ -15,7 +15,7 @@ Ext.define('Voyant.data.store.CorpusTermsMixin', {
 	},
 
 	show: function(config) {
-		show(this.toString(config))
+		show(this.getString(config))
 	}
 
 });
@@ -55,8 +55,8 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 		this.callParent([config]);
 	},
 	
-	toString: function(config) {
-		return new Ext.XTemplate(this.localize("toString")).apply([this.getCount(), this.sum("rawFreq")])
+	getString: function(config) {
+		return new Ext.XTemplate(this.localize("getString")).apply([this.getCount(), this.sum("rawFreq")])
 	}
 
 

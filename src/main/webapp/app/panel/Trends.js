@@ -80,6 +80,12 @@
     		}
     	});
     	
+    	this.on("documentSelected", function(src, document) {
+    		if (this.getCorpus()) {
+    			this.loadFromDocument(this.getCorpus().getDocument(document))
+    		}
+    	});
+    	
     	this.on("query", function(src, query) {
     		this.fireEvent("termsClicked", src, query);
     	}, this);
