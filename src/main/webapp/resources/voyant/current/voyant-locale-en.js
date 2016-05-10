@@ -490,6 +490,10 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 Ext.apply(Voyant.panel.CollocatesSet.i18n, {
 "title":"Scatter",
 "helpTip":"This is a specialized view for working with scatterplots."});
+Ext.apply(Voyant.panel.MicroSearch.i18n, {
+"title":"MicroSearch",
+"loading":"Loading terms…",
+"helpTip":"This tool shows an overview of the entire corpus and allows you to visualize the distribution of search terms."});
 Ext.apply(Voyant.panel.TopicContexts.i18n, {
 "reset":"reset",
 "title":"Topic Contexts",

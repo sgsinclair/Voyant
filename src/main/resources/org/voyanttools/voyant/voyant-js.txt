@@ -96,6 +96,7 @@ app/panel/Documents.js
 app/panel/DocumentsFinder.js
 app/panel/Dummy.js
 app/panel/RezoViz.js
+app/panel/MicroSearch.js
 app/panel/Reader.js
 app/panel/ScatterPlot.js
 app/panel/StreamGraph.js

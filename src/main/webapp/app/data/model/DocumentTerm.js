@@ -13,5 +13,7 @@ Ext.define('Voyant.data.model.DocumentTerm', {
              {name: 'distributions'}
         ],
     getTerm: function() {return this.get('term');},
-    getDocIndex: function() {return this.get('docIndex')}
+    getDocIndex: function() {return this.get('docIndex')},
+    getRawFreq: function() {return this.get('rawFreq')},
+    getDistributions: function() {return this.get('distributions')}
 });

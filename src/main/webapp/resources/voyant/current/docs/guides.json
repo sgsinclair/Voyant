@@ -113,6 +113,11 @@
                         "title": "Knots"
                     },
                     {
+                        "name": "microsearch",
+                        "url": "guides/tools/microsearch",
+                        "title": "MicroSearch"
+                    },
+                    {
                         "name": "phrases",
                         "url": "guides/tools/phrases",
                         "title": "Phrases"

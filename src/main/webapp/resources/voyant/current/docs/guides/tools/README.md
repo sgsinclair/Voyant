@@ -94,6 +94,18 @@
 
 
 <div class="thumb-list">
+	<a href="#!/guide/documents"><dd>
+		<div class="thumb">
+			<img src="guides/documents/icon.png" />
+		</div>
+		<div>
+			<h4>Documents</h4>
+			<p>The Documents tool shows a table of the documents in the corpus and includes functionality for modifying the corpus.</p>
+		</div>
+	</dd></a>
+</div>
+
+<div class="thumb-list">
 	<a href="#!/guide/knots"><dd>
 		<div class="thumb">
 			<img src="guides/knots/icon.png" />
@@ -106,13 +118,13 @@
 </div>
 
 <div class="thumb-list">
-	<a href="#!/guide/documents"><dd>
+	<a href="#!/guide/microsearch"><dd>
 		<div class="thumb">
-			<img src="guides/documents/icon.png" />
+			<img src="guides/microsearch/icon.png" />
 		</div>
 		<div>
-			<h4>Documents</h4>
-			<p>The Documents tool shows a table of the documents in the corpus and includes functionality for modifying the corpus.</p>
+			<h4>MicroSearch</h4>
+			<p>Microsearch visualizes the frequency and distribution of terms in a corpus.</p>
 		</div>
 	</dd></a>
 </div>
