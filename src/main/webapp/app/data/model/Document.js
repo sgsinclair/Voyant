@@ -94,7 +94,7 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getAuthor: function() {
-    	var author = this.get('author');
+    	var author = this.get('author') || "";
     	author = Ext.isArray(author) ? author.join("; ") : author;
     	author = author.trim().replace(/\s+/g, ' ');
     	return author;
