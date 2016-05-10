@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 10 10:39:31 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue May 10 11:18:07 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8939,7 +8939,6 @@ Ext.define('Voyant.panel.Cirrus', {
     loadFromCorpus: function(corpus) {    	
 		this.setCorpus(corpus);
 		this.setApiParams({docId: undefined, docIndex: undefined});
-		debugger
 		this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
     },
     
@@ -8956,7 +8955,6 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
-    	debugger
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_CORPUS);
@@ -17972,18 +17970,23 @@ Ext.define('Voyant.panel.TermsRadio', {
     	
     	this.on("documentSelected", function(src, document) {
     		if (this.getCorpus()) {
-    			this.loadFromDocument(this.getCorpus().getDocument(document))
+    			this.loadFromDocuments([document])
     		}
     	});
     	
-    	this.on("documentSelected", function(src, document) {
+    	this.on("documentsClicked", function(src, documents) {
     		if (this.getCorpus()) {
-    			this.loadFromDocument(this.getCorpus().getDocument(document))
+    			this.loadFromDocuments(documents)
     		}
     	});
     	
     	this.on("query", function(src, query) {
-    		this.fireEvent("termsClicked", src, query);
+    		if (this.getApiParam('mode')==this.MODE_DOCUMENT) {
+    			this.setApiParam('query', query);
+    			this.loadFromDocumentTerms();
+    		} else {
+        		this.fireEvent("termsClicked", src, query);
+    		}
     	}, this);
 
     	this.on("termsClicked", function(src, terms) {
@@ -18124,8 +18127,8 @@ Ext.define('Voyant.panel.TermsRadio', {
     	 
     },
     
-    loadFromDocument: function(document) {
-    	this.setApiParam({docId: this.getCorpus().getDocument(document).getId(), docIndex: undefined})
+    loadFromDocuments: function(documents) {
+    	this.setApiParams({docId: undefined, docIndex: Ext.Array.from(documents).map(function(doc) {return this.getCorpus().getDocument(doc).getIndex()}, this)})
     	if (this.isVisible()) {
     		this.loadFromDocumentTerms(this.getApiParam('query') ? undefined : this.getCorpus().getDocumentTerms({
     			proxy: {
@@ -18151,7 +18154,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     		    	}
     		    },
     		    scope: this,
-    		    params: this.getApiParams(['stopList','query','docId','withDistributions','bins'])
+    		    params: this.getApiParams(['stopList','query','docIndex','withDistributions','bins'])
         	});
     	}
     },
@@ -18163,7 +18166,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 			this.loadFromDocumentTerms();
 		}
 		else if (corpus.getDocumentsCount()==1) {
-			this.loadFromDocument(corpus.getDocument(0));
+			this.loadFromDocuments([corpus.getDocument(0)]);
 		}
 		else {
 			this.loadFromCorpusTerms(corpus.getCorpusTerms({
