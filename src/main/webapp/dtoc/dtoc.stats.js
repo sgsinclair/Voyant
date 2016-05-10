@@ -4,17 +4,17 @@ Ext.define('Voyant.panel.DToC.Stats', {
 	alias: 'widget.dtocStats',
     statics: {
     	i18n: {
-    		title: {en: "Stats"},
-    		helpTip: {en: "<p>Corpus Terms is a table view of terms that appear in the entire corpus. Features include:</p><ul><li>reordering by <i>term</i> and <i>count</i> (click on the column headers)</li><li>a sparkline graph of the term frequency trends across the corpus (if the corpus has multiple documents) or across the document (if the corpus has only one document)</li><li>additional columns available (relative frequency, distribution peakedness and skew) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"},
-    		matchingTerms: {en: 'Matching terms: {count}'},
-    		termTip: {en: "The term in the corpus."},
-    		rawFreqTip: {en: "The total count (raw frequency) of this term in the entire corpus."},
-    		relativeFreqTip: {en: "The relative frequency (per million) of this term in the entire corpus"/*, also expressed as a percentage*/+"."},
-    		relativePeakedness: {en: "Peakedness"},
-    		relativePeakednessTip: {en: "This is a statistical measure of how much the relative frequencies of a term in a corpus are bunched up into peaks (regions with higher values where the rest are lower)."},
-    		relativeSkewness: {en: "Skew"},
-    		relativeSkewnessTip: {en: "This is a statistical measure of the symmetry of the relative frequencies of a term across the corpus."},
-    		trendTip: {en: "This represents the trend of the relative frequencies for each term in each document in the corpus."}
+    		title: "Stats",
+    		helpTip: "<p>Corpus Terms is a table view of terms that appear in the entire corpus. Features include:</p><ul><li>reordering by <i>term</i> and <i>count</i> (click on the column headers)</li><li>a sparkline graph of the term frequency trends across the corpus (if the corpus has multiple documents) or across the document (if the corpus has only one document)</li><li>additional columns available (relative frequency, distribution peakedness and skew) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
+    		matchingTerms: 'Matching terms: {count}',
+    		termTip: "The term in the corpus.",
+    		rawFreqTip: "The total count (raw frequency) of this term in the entire corpus.",
+    		relativeFreqTip: "The relative frequency (per million) of this term in the entire corpus"/*, also expressed as a percentage*/+".",
+    		relativePeakedness: "Peakedness",
+    		relativePeakednessTip: "This is a statistical measure of how much the relative frequencies of a term in a corpus are bunched up into peaks (regions with higher values where the rest are lower).",
+    		relativeSkewness: "Skew",
+    		relativeSkewnessTip: "This is a statistical measure of the symmetry of the relative frequencies of a term across the corpus.",
+    		trendTip: "This represents the trend of the relative frequencies for each term in each document in the corpus."
     	},
     	api: {
     		stopList: 'stop.en.taporware.txt',

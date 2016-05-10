@@ -9,9 +9,7 @@ Ext.define('Voyant.panel.DToC', {
     },
     statics: {
     	i18n: {
-    		'clickUrl' : {
-    			en: 'Open this <a href="{0}" target="_blank">URL</a> in a new window.'
-    		}
+    		'clickUrl' : 'Open this <a href="{0}" target="_blank">URL</a> in a new window.'
     	},
         api: {
         }

@@ -8,7 +8,7 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
     },
     statics: {
     	i18n: {
-    		title: {en: "Tags"}
+    		title: "Tags"
     	},
         api: {
         }

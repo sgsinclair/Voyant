@@ -436,7 +436,7 @@ Ext.define('Voyant.panel.DToC.Markup', {
     },
     statics: {
     	i18n: {
-    		title: {en: "Tags"}
+    		title:"Tags"
     	},
         api: {
         }
