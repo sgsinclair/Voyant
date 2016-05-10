@@ -280,7 +280,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			if (query.length === 0) {
 				this.removeNodes('kwic');
 			} else {
-				this.getKwics({query: query, docId: terms[0].get('docId')});
+				this.getKwics({query: query, docIndex: terms[0].get('docIndex')});
 			}
 		},
 		query: function(src, query) {

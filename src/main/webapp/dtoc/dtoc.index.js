@@ -351,7 +351,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 					this.getApplication().dispatchEvent('indexProcessed', this);
 				}
 			},
-			failure: function(respose) {
+			failure: function(response) {
 				this.showError({title: 'DToC Indexer', message:'Failed to get index.'});
 				this.body.unmask();
 			},

@@ -6,30 +6,34 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	tagTotals: {}, // tracks tag freq counts for entire corpus
 	
 	loadAllTags: function() {
-//		console.log('loadAllTags');
-		
-		var currDocIndex = 0;
-		
-		var me = this;
-		function doLoad(index) {
-			if (index < me.getCorpus().getDocumentsCount()) {
-				currDocIndex++;
-				var id = me.getCorpus().getDocument(index).getId();
-				me._doLoadTags(id, function() {
-					me.updateTagTotals();
-					doLoad(currDocIndex);
-				});
-			} else {
-				me.updateTagTotals(true);
-				me.getApplication().dispatchEvent('allTagsLoaded', me);
+		if (this.getCorpus() !== undefined) {
+			var currDocIndex = 0;
+			
+			var me = this;
+			function doLoad(index) {
+				if (index < me.getCorpus().getDocumentsCount()) {
+					currDocIndex++;
+					var id = me.getCorpus().getDocument(index).getId();
+					me._doLoadTags(id, function() {
+						me.updateTagTotals();
+						doLoad(currDocIndex);
+					});
+				} else {
+					me.updateTagTotals(true);
+					me.getApplication().dispatchEvent('allTagsLoaded', me);
+				}
 			}
+			
+			doLoad(currDocIndex);
+		} else {
+			this.on('loadedCorpus', function(src, corpus) {
+				this.setCorpus(corpus);
+				this.loadAllTags();
+			}, this, {single: true});
 		}
-		
-		doLoad(currDocIndex);
 	},
 	
 	_doLoadTags: function(docId, callback) {
-//		console.log('doLoadTags', docId);
 		this._getDocumentXml(docId, function(xml) {
 			var tagData = this._parseTags(xml, docId, this.curatedTags);
 			this.saveTags(tagData, docId);
@@ -419,7 +423,9 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			
 			return returnData;
 		} else {
-			console.log('parse error');
+			if (window.console) {
+				console.log('parse error');
+			}
 			return {};
 		}
 	}
@@ -644,6 +650,10 @@ Ext.define('Voyant.panel.DToC.Markup', {
 //			this.getTokensStore().load();
 			
 			this.updateChapterFilter();
+			
+			if (this.getApplication().useIndex != true) {
+				this.loadAllTags();
+			}
 		},
 		indexProcessed: function() {
 			this.loadAllTags();
