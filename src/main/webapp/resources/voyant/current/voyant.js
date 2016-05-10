@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 10 13:23:03 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue May 10 13:24:51 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -19404,8 +19404,8 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     doubleClickHandler: function(node) {
+// dispatch phrase click instead of recentering (which can be done with search)
 //    	this.setRoot(node.name);
-    	debugger
 		var terms = [], parent = node;
     	while (parent != null) {
     		terms.push(parent.name);
