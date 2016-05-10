@@ -14,7 +14,7 @@ The scatterplot is presented in the main display in the tool with a legend in th
 
 Above the main display is the primary toolbar and to the right of the display is sub-panel providing a list of words that appear in the corpus as well as their frequencies.
 
-<div style="max-width: 600px; margin-left: auto; margin-right: auto;">{@img scatter.png Scatterplot}</div>
+<iframe src="../tool/ScatterPlot/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
 
 ## Options
 

@@ -168,11 +168,11 @@ Ext.define('Voyant.panel.WordTree', {
     	}
     },
     
-    doubleClickHandler: function(node) {
-// dispatch phrase click instead of recentering (which can be done with search)
-//    	this.setRoot(node.name);
-    },
-    
+//    doubleClickHandler: function(node) {
+//// dispatch phrase click instead of recentering (which can be done with search)
+////    	this.setRoot(node.name);
+//    },
+//    
     setRoot: function(query) {
     	this.setApiParam('query', this.stripPunctuation(query));
 		this.getKwicStore().load({params: this.getApiParams()});

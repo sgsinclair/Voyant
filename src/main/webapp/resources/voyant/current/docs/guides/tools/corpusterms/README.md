@@ -18,7 +18,7 @@ Additional columns are available by clicking on the down arrow that appears in t
 
 By default, the most frequent terms in the corpus are shown.
 
-{@img corpusterms.png Corpus Terms}
+<iframe src="../tool/CorpusTerms/?corpus=austen" style="width: 90%; height: 350px;"></iframe>
 
 ## Options
 

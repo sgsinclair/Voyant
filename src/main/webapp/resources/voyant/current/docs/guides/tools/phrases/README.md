@@ -13,7 +13,7 @@ The table view shows the following columns by default:
 
 By default, phrases are shown in descending order of phrase length (the number of words in each phrase).
 
-{@img phrases.png Phrases}
+<iframe src="../tool/Phrases/?corpus=austen" style="width: 90%; height: 350px;"></iframe>
 
 ## Options
 

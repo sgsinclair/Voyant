@@ -19,9 +19,7 @@ Additional columns are available by clicking on the down arrow that appears in t
 
 By default, the terms with the highest per-document frequencies are shown.
 
-<iframe src="../?corpus=austen&view=documentterms" style="width: 90%; margin-left: auto; margin-right: auto; height: 350px">
-{@img documentterms.png Document Terms}
-</iframe>
+<iframe src="../tool/DocumentTerms/?corpus=austen" style="width: 90%; height: 350px;"></iframe>
 
 ## Options
 

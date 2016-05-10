@@ -10,7 +10,7 @@ Each line in the graph is coloured according to the word it represents, at the t
 
 You can toggle specific terms by clicking on them in the legend at the top.
 
-<div style="max-width: 800px; margin-left: auto; margin-right: auto;">{@img trends.png Trends}</div>
+<iframe src="../tool/Trends/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
 
 ## Options
 
