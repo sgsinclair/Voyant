@@ -153,18 +153,8 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     clickHandler: function(node) {
-    	function doDispatch() {
-    		this.clickTimeout = null;
-    		var terms = [];
-	    	var parent = node;
-	    	while (parent != null) {
-	    		terms.push(parent.name);
-	    		parent = parent.parent;
-	    	}
-	    	this.getApplication().dispatchEvent('termsClicked', this, terms);
-    	}
     	if (this.clickTimeout == null) {
-    		this.clickTimeout = window.setTimeout(doDispatch.bind(this), this.doubleClickDelay);
+    		this.clickTimeout = window.setTimeout("", this.doubleClickDelay);
     	} else {
 	    	window.clearTimeout(this.clickTimeout);
 	    	this.clickTimeout = null;
@@ -173,7 +163,14 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     doubleClickHandler: function(node) {
-    	this.setRoot(node.name);
+//    	this.setRoot(node.name);
+    	debugger
+		var terms = [], parent = node;
+    	while (parent != null) {
+    		terms.push(parent.name);
+    		parent = parent.parent;
+    	}
+    	this.getApplication().dispatchEvent('termsClicked', this, [terms.reverse().join(" ")]);
     },
     
     setRoot: function(query) {

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 10 11:18:07 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue May 10 13:23:03 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -19394,18 +19394,8 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     clickHandler: function(node) {
-    	function doDispatch() {
-    		this.clickTimeout = null;
-    		var terms = [];
-	    	var parent = node;
-	    	while (parent != null) {
-	    		terms.push(parent.name);
-	    		parent = parent.parent;
-	    	}
-	    	this.getApplication().dispatchEvent('termsClicked', this, terms);
-    	}
     	if (this.clickTimeout == null) {
-    		this.clickTimeout = window.setTimeout(doDispatch.bind(this), this.doubleClickDelay);
+    		this.clickTimeout = window.setTimeout("", this.doubleClickDelay);
     	} else {
 	    	window.clearTimeout(this.clickTimeout);
 	    	this.clickTimeout = null;
@@ -19414,7 +19404,14 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     doubleClickHandler: function(node) {
-    	this.setRoot(node.name);
+//    	this.setRoot(node.name);
+    	debugger
+		var terms = [], parent = node;
+    	while (parent != null) {
+    		terms.push(parent.name);
+    		parent = parent.parent;
+    	}
+    	this.getApplication().dispatchEvent('termsClicked', this, [terms.reverse().join(" ")]);
     },
     
     setRoot: function(query) {
@@ -19686,7 +19683,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio']
+			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','wordtree']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
@@ -19694,7 +19691,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
-			items: ['cirrus','bubblelines','collocatesgraph','knots','trends','streamgraph','scatterplot','termsradio','wordtree']
+			items: ['cirrus','bubblelines','collocatesgraph','knots','microsearch','streamgraph','scatterplot','trends','termsradio','wordtree']
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',
