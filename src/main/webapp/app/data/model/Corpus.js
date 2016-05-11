@@ -1,11 +1,31 @@
 /**
  * @class Corpus
- * Testin
+ * Corpus is possibly the most important class since in most cases you'll first create/load a corpus and then
+ * interact with data derived from the corpus. In the simplest scenario you can create/load a corpus with a
+ * corpus ID, a text string, a URL, or an array of text strings or URLs (see the {@link #constructor} and 
+ * {@link #input} config for a bit more information).
+ * 
+ * 	new Corpus("austen"); // load an existing corpus
+ * 
+ * 	new Corpus("Hello Voyant!"); // load a corpus with the specified text string
+ * 
+ * 	new Corpus("http://hermeneuti.ca/"); // load a corpus with a URL
+ * 
+ * It's important to understand that the constructor actually returns a promise for a corpus, since the corpus
+ * data is loaded asynchronously. All documented methods below handle the promise properly.
+ * 
+ * 	new Corpus("Hello Voyant!").show(); // the show method is called when the promise is filled
+ * 
+ * You can also handle the promise yourself using {@link Ext.promise.Promise#then then}.
+ * 
+ * 	new Corpus("Hello Voyant!").then(function(corpus) {
+ * 		corpus.show(); // essentially the same as above (but more work:)
+ * 	});
  */
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization'],
-    transferable: ['loadCorpusTerms'],
+    transferable: ['loadCorpusTerms','loadTokens'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
     embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
@@ -187,8 +207,44 @@ Ext.define('Voyant.data.model.Corpus', {
 		}
 	},
 	
+	loadTokens: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0
+			})
+			var tokens = this.getTokens();
+			tokens.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(tokens)
+					} else {
+						dfd.reject(operation)
+					}
+				}
+			})
+			return dfd.promise
+		}
+	},
+	
 	getCorpusTerms: function(config) {
 		return Ext.create("Voyant.data.store.CorpusTerms", Ext.apply(config || {}, {corpus: this}));
+	},
+	
+	getTokens: function(config) {
+		return Ext.create("Voyant.data.store.Tokens", Ext.apply(config || {}, {corpus: this}));
+	},
+	
+	each: function(config) {
+		debugger
+		this.getDocuments().each.call(this, arguments);
 	},
 	
 	getCorpusCollocates: function(config) {

@@ -127,16 +127,13 @@ Ext.define('Voyant.data.table.Table', {
 		else {this.rows[row][column]+=value}
 	},
 	embed: function(cmp, config) {
-
 		if (Ext.isObject(cmp) && !config) {
 			config = cmp;
 			cmp = this.embeddabled[0];
 		}
 		config = config || {};
 		chart = {};
-		if (this.rowKey===undefined) {
-			debugger
-		}
+
 		var data = this.mapRows(function(row, i) {
 			return this.rowKey===undefined ? Ext.apply(row, {"row-index": i}) : row;
 		}, true, this)
@@ -201,9 +198,13 @@ Ext.define('Voyant.data.table.Table', {
 				})
 			}
 			Ext.apply(chart, {
-				series: series
+				series: series,
 			});
 		}
+		if (config.title) {
+			chart.title = config.title;
+		}
+		console.warn(chart)
 		Ext.apply(config, {
 			chartJson: JSON.stringify(chart)
 		})

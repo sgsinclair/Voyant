@@ -23,6 +23,34 @@ Ext.define('Voyant.data.model.Document', {
     	return this.get('typeTokenRatio-lexical')
     },
     
+    loadDocumentTerms: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0,
+				docIndex: this.getIndex()
+			})
+			var documentTerms = this.getDocumentTerms();
+			documentTerms.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(documentTerms)
+					} else {
+						dfd.reject(operation)
+					}
+				}
+			})
+			return dfd.promise
+		}
+    	
+    },
     getDocumentTerms: function(config) {
     	config = config || {};
     	Ext.apply(config, {
@@ -109,6 +137,10 @@ Ext.define('Voyant.data.model.Document', {
     		return true
     	}
     	return false;
+    },
+    
+    show: function() {
+    	show(this.getFullLabel())
     }
     
 });

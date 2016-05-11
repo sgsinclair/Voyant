@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 10 13:51:30 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue May 10 19:47:27 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5341,6 +5341,19 @@ Ext.define("Voyant.notebook.util.Embed", {
 				this.then(function(embedded) {
 					embed.call(embedded, cmp, config)
 				})
+			} else if (Ext.isArray(cmp)) {
+				Voyant.notebook.util.Show.SINGLE_LINE_MODE=true;
+				show("<table><tr>");
+				for (var i=0; i<arguments.length; i++) {
+					var unit = arguments[i];
+					console.warn(unit)
+					show("<td>")
+					unit[0].embed.call(unit[0], unit[1], unit[2]);
+					show("</td>")
+				}
+				show("</tr></table>")
+				Voyant.notebook.util.Show.SINGLE_LINE_MODE=false;
+				return
 			} else {
 				// use the default (first) embeddable panel if no panel is specified
 				if (this.embeddable && (!cmp || Ext.isObject(cmp))) {
@@ -5577,6 +5590,34 @@ Ext.define('Voyant.data.model.Document', {
     	return this.get('typeTokenRatio-lexical')
     },
     
+    loadDocumentTerms: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0,
+				docIndex: this.getIndex()
+			})
+			var documentTerms = this.getDocumentTerms();
+			documentTerms.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(documentTerms)
+					} else {
+						dfd.reject(operation)
+					}
+				}
+			})
+			return dfd.promise
+		}
+    	
+    },
     getDocumentTerms: function(config) {
     	config = config || {};
     	Ext.apply(config, {
@@ -5663,6 +5704,10 @@ Ext.define('Voyant.data.model.Document', {
     		return true
     	}
     	return false;
+    },
+    
+    show: function() {
+    	show(this.getFullLabel())
     }
     
 });
@@ -6472,16 +6517,13 @@ Ext.define('Voyant.data.table.Table', {
 		else {this.rows[row][column]+=value}
 	},
 	embed: function(cmp, config) {
-
 		if (Ext.isObject(cmp) && !config) {
 			config = cmp;
 			cmp = this.embeddabled[0];
 		}
 		config = config || {};
 		chart = {};
-		if (this.rowKey===undefined) {
-			debugger
-		}
+
 		var data = this.mapRows(function(row, i) {
 			return this.rowKey===undefined ? Ext.apply(row, {"row-index": i}) : row;
 		}, true, this)
@@ -6546,9 +6588,13 @@ Ext.define('Voyant.data.table.Table', {
 				})
 			}
 			Ext.apply(chart, {
-				series: series
+				series: series,
 			});
 		}
+		if (config.title) {
+			chart.title = config.title;
+		}
+		console.warn(chart)
 		Ext.apply(config, {
 			chartJson: JSON.stringify(chart)
 		})
@@ -6563,12 +6609,32 @@ Ext.define('Voyant.data.table.CorpusTerms', {
 })
 /**
  * @class Corpus
- * Testin
+ * Corpus is possibly the most important class since in most cases you'll first create/load a corpus and then
+ * interact with data derived from the corpus. In the simplest scenario you can create/load a corpus with a
+ * corpus ID, a text string, a URL, or an array of text strings or URLs (see the {@link #constructor} and 
+ * {@link #input} config for a bit more information).
+ * 
+ * 	new Corpus("austen"); // load an existing corpus
+ * 
+ * 	new Corpus("Hello Voyant!"); // load a corpus with the specified text string
+ * 
+ * 	new Corpus("http://hermeneuti.ca/"); // load a corpus with a URL
+ * 
+ * It's important to understand that the constructor actually returns a promise for a corpus, since the corpus
+ * data is loaded asynchronously. All documented methods below handle the promise properly.
+ * 
+ * 	new Corpus("Hello Voyant!").show(); // the show method is called when the promise is filled
+ * 
+ * You can also handle the promise yourself using {@link Ext.promise.Promise#then then}.
+ * 
+ * 	new Corpus("Hello Voyant!").then(function(corpus) {
+ * 		corpus.show(); // essentially the same as above (but more work:)
+ * 	});
  */
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization'],
-    transferable: ['loadCorpusTerms'],
+    transferable: ['loadCorpusTerms','loadTokens'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
     embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
@@ -6750,8 +6816,44 @@ Ext.define('Voyant.data.model.Corpus', {
 		}
 	},
 	
+	loadTokens: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0
+			})
+			var tokens = this.getTokens();
+			tokens.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(tokens)
+					} else {
+						dfd.reject(operation)
+					}
+				}
+			})
+			return dfd.promise
+		}
+	},
+	
 	getCorpusTerms: function(config) {
 		return Ext.create("Voyant.data.store.CorpusTerms", Ext.apply(config || {}, {corpus: this}));
+	},
+	
+	getTokens: function(config) {
+		return Ext.create("Voyant.data.store.Tokens", Ext.apply(config || {}, {corpus: this}));
+	},
+	
+	each: function(config) {
+		debugger
+		this.getDocuments().each.call(this, arguments);
 	},
 	
 	getCorpusCollocates: function(config) {
@@ -19396,7 +19498,6 @@ Ext.define('Voyant.panel.WordTree', {
     
     clickHandler: function(node) {
     	var now = new Date().getTime();
-    	console.warn(this.lastClick, now, now-this.lastClick)
     	if (this.lastClick && now-this.lastClick<this.doubleClickDelay) {
     		this.lastClick=1;
     		var terms = [], parent = node;
@@ -19410,11 +19511,11 @@ Ext.define('Voyant.panel.WordTree', {
     	}
     },
     
-    doubleClickHandler: function(node) {
-// dispatch phrase click instead of recentering (which can be done with search)
-//    	this.setRoot(node.name);
-    },
-    
+//    doubleClickHandler: function(node) {
+//// dispatch phrase click instead of recentering (which can be done with search)
+////    	this.setRoot(node.name);
+//    },
+//    
     setRoot: function(query) {
     	this.setApiParam('query', this.stripPunctuation(query));
 		this.getKwicStore().load({params: this.getApiParams()});

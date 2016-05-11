@@ -10,6 +10,18 @@ Ext.define("Voyant.notebook.util.Embed", {
 				this.then(function(embedded) {
 					embed.call(embedded, cmp, config)
 				})
+			} else if (Ext.isArray(cmp)) {
+				Voyant.notebook.util.Show.SINGLE_LINE_MODE=true;
+				show("<table><tr>");
+				for (var i=0; i<arguments.length; i++) {
+					var unit = arguments[i];
+					show("<td>")
+					unit[0].embed.call(unit[0], unit[1], unit[2]);
+					show("</td>")
+				}
+				show("</tr></table>")
+				Voyant.notebook.util.Show.SINGLE_LINE_MODE=false;
+				return
 			} else {
 				// use the default (first) embeddable panel if no panel is specified
 				if (this.embeddable && (!cmp || Ext.isObject(cmp))) {

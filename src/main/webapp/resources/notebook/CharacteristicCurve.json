@@ -4,47 +4,31 @@
         "input": [
             "<h1>Mendenhall&#39;s Characteristic Curve (1887): Early Stylometrics</",
             "h1>\n\n<p>In 1887 the polymath T. C. Mendenhall published an article in ",
-            "Science titled, &quot;The Characteristic Curves of Composition&quot; w",
-            "hich is both one of the earliest examples of quantitative stylistics b",
-            "ut also one of the first studies to present text visualizations based ",
-            "on the (manual) count of words. Mendenhall thought that different auth",
-            "ors would have distinctive curves of word length frequencies which cou",
-            "ld help with authorship attribution.</p>\n\n<p>Here you can see an examp",
-            "le of the characteristic curve of <em>Oliver Twist</em>. Mendenhall to",
-            "ok the first 1000 words, counted the length in characters of these 100",
-            "0 words and then graphed the number of words of each length. Thus one ",
-            "can see that there is just under 50 words of one letter length in the ",
-            "first one thousand words.</p>\n\n<p><img alt=\"Mendhall Characteristic Cu",
-            "rve\" src=\"//github.com/sgsinclair/epistemologica/raw/c55822b3d4080c758",
-            "a168a252eb02ca4e8d1ba07/data/Mendenhall-CharacteristicCurve/OliverTwis",
-            "t-CharacteristicCurve.png\" /></p>\n\n<p>Mendenhall thought this method o",
-            "f analysis would help with the &quot;identification or discrimination ",
-            "of authorship&quot; or authorship attribution as we call it today.</p>",
-            "\n\n<h2>Acquiring the Text</h2>\n\n<p>We&#39;ll begin by fetching the edit",
-            "ion of <a href=\"http://www.gutenberg.org/cache/epub/730/pg730.txt\">Oli",
-            "ver Twist</a> that&#39;s available from the <a href=\"http://en.wikiped",
-            "ia.org/wiki/Project_Gutenberg\">Gutenberg Project</a>. It&#39;s always ",
-            "worth noting that other editions are available and may be preferable f",
-            "or various reasons, but the Gutenberg edition has the benefit of conve",
-            "nience and longevity.</p>\n\n<p>The code block below uses the <a href=\".",
-            "./../docs/#!/api/Voyant.data.model.Corpus-static-method-loadCorpus\">lo",
-            "adCorpus</a> function. The first time it was run without the corpus op",
-            "tion, and then the corpus ID was added for future runs.</p>\n\n<div clas",
-            "s=\"x-size-monitors scroll\" id=\"ext-element-8\">\n<div class=\"expand\">&nb",
-            "sp;</div>\n\n<div class=\"shrink\">&nbsp;</div>\n</div>\n\n<div class=\"x-pain",
-            "t-monitor cssanimation\" id=\"ext-element-9\">&nbsp;</div>\n"
-        ]
-    },
-    {
-        "type": "code",
-        "input": [
-            " new Corpus(\"austen\").loadCorpusTerms(20).then(function(corpusTerms) {",
-            "    var table = new VoyantTable({rowKey: 0}); // use first column as row key",
-            "    corpusTerms.each(function(corpusTerm) {",
-            "        table.addRow([corpusTerm.getTerm(), corpusTerm.getRawFreq()]);",
-            "    });",
-            "    table.embed(\"voyantchart\"); // graph table",
-            "});"
+            "<em>Science</em> titled, &quot;The Characteristic Curves of Compositio",
+            "n&quot; which is both one of the earliest examples of quantitative sty",
+            "listics but also one of the first studies to present text visualizatio",
+            "ns based on the (manual) count of words. Mendenhall thought that diffe",
+            "rent authors would have distinctive curves of word length frequencies ",
+            "which could help with authorship attribution.</p>\n\n<p>Here you can see",
+            " an example of the characteristic curve of <em>Oliver Twist</em>. Mend",
+            "enhall took the first 1000 words, counted the length in characters of ",
+            "these 1000 words and then graphed the number of words of each length. ",
+            "Thus one can see that there is just under 50 words of one letter lengt",
+            "h in the first one thousand words.</p>\n\n<p><img alt=\"Mendhall Characte",
+            "ristic Curve\" src=\"//github.com/sgsinclair/epistemologica/raw/c55822b3",
+            "d4080c758a168a252eb02ca4e8d1ba07/data/Mendenhall-CharacteristicCurve/O",
+            "liverTwist-CharacteristicCurve.png\" /></p>\n\n<p>Mendenhall thought this",
+            " method of analysis would help with the &quot;identification or discri",
+            "mination of authorship&quot; or authorship attribution as we call it t",
+            "oday. Let&#39;s see if we can recapitulate his technique here.</p>\n\n<h",
+            "2>Acquiring the Text</h2>\n\n<p>We&#39;ll begin by fetching the edition ",
+            "of <a href=\"http://www.gutenberg.org/cache/epub/730/pg730.txt\">Oliver ",
+            "Twist</a> that&#39;s available from the <a href=\"http://en.wikipedia.o",
+            "rg/wiki/Project_Gutenberg\">Gutenberg Project</a>.&nbsp;The code block ",
+            "below uses the <a href=\"../../docs/#!/api/Voyant.data.model.Corpus-sta",
+            "tic-method-loadCorpus\">loadCorpus</a> function. The first time it was ",
+            "run without the corpus option, and then the corpus ID was added for fu",
+            "ture runs.</p>"
         ]
     },
     {
@@ -52,7 +36,7 @@
         "input": [
             "var corpus;",
             "new Corpus({",
-            "    corpus: '8a846e684da3751de7711f33f0419b9c', // specify corpus ID (copied from output below after first run)",
+            "    corpus: '22e3b1638bf22138e92d0e3126d9726e', // specify corpus ID (copied from output below after first run)",
             "    input: 'http://www.gutenberg.org/cache/epub/730/pg730.txt' // backup if corpus not available",
             "}).then(function(data) {",
             "    corpus = data; // store value for when we leave this function",
@@ -61,15 +45,27 @@
         ]
     },
     {
+        "type": "text",
+        "input": [
+            "<p>The corpus has nearly 160,000 words, but recall that&nbsp;Mendenhal",
+            "l only considered the first 1,000 words. We can do the same by calling",
+            " the loadTokens method on our corpus and specifying arguments that lim",
+            "it the call to 1,000 word tokens while skipping non-word tokens. The c",
+            "ode below also uses the VoyantTable class to conveniently accumulate t",
+            "erm lengths with the updateCell. Finally, we can create a chart by cal",
+            "ling the embed method on the table of term lengths.</p>"
+        ]
+    },
+    {
         "type": "code",
         "input": [
-            "corpus.loadCorpusTerms().then(function(corpusTerms) {",
+            "corpus.loadTokens({limit: 1000, noOthers: true}).then(function(tokens) {",
             "",
-            "    // build table of word lengths from corpus terms",
+            "    // build table of word lengths from tokens",
             "    var lengths = new VoyantTable();",
-            "    corpusTerms.each(function(corpusTerm) {",
-            "        // update word count for row (term length) and column (0)",
-            "        lengths.updateCell(corpusTerm.getTerm().length, 0, corpusTerm.getRawFreq());",
+            "    tokens.each(function(token) {",
+            "        // in word length row (token.getTerm().length) and column (0), increase by 1",
+            "        lengths.updateCell(token.getTerm().length, 0, 1);",
             "    });",
             "",
             "    // now embed table as chart",
@@ -78,6 +74,97 @@
             "        width: 500",
             "    });",
             "});"
+        ]
+    },
+    {
+        "type": "text",
+        "input": [
+            "<p>If we compare to Mendenall&#39;s graph above, that seems pretty clo",
+            "se! It&#39;s worth noting that Mendenhall doesn&#39;t specify what exa",
+            "ctly was counted, such as chapter titles (which my account for some sl",
+            "ight variation).</p>\n\n<p>But Mendehall was counting terms by hand &nda",
+            "sh; can we do better? Let&#39;s generate a similar table but now consi",
+            "der <em>all</em> terms, not just the first 1,000.</p>"
+        ]
+    },
+    {
+        "type": "code",
+        "input": [
+            "var oliverTwistLengths;",
+            "corpus.loadCorpusTerms().then(function(corpusTerms) {",
+            "    oliverTwistLengths = new VoyantTable();",
+            "    corpusTerms.each(function(corpusTerm) {",
+            "        oliverTwistLengths.updateCell(corpusTerm.getTerm().length, 0, corpusTerm.getRawFreq());",
+            "    });",
+            "    oliverTwistLengths.embed('voyantchart', {",
+            "        series: [{showMarkers: false}],",
+            "        width: 500",
+            "    });",
+            "});"
+        ]
+    },
+    {
+        "type": "text",
+        "input": [
+            "<p>Overall we have an impression that the line gets smoother, which is",
+            "n&#39;t surprising given that we have more data points. The big questi",
+            "on is whether the smoothing actually makes the line less characteristi",
+            "c, which would somewhat contradict Mendhall&#39;s original hypothesis ",
+            "that every other has a characteristic curve. Let&#39;s compare this wi",
+            "th Austen&#39;s <i>Emma</i> which has about the same number of terms.&",
+            "nbsp;<em>Emma&nbsp;</em>is the sixth&nbsp;document in the corpus, so w",
+            "e can access it at index 5 (index is zero-based).&nbsp;</p>"
+        ]
+    },
+    {
+        "type": "code",
+        "input": [
+            "var emma;",
+            "new Corpus(\"austen\").then(function(corpus) {",
+            "    emma = corpus.getDocument(5);",
+            "    emma.show()",
+            "})"
+        ]
+    },
+    {
+        "type": "text",
+        "input": [
+            "<p>Now we&#39;ll calculate document term lengths for <em>Emma</em>&nbs",
+            "p;almost identically to how we calculated corpus term lengths for <em>",
+            "Oliver Twist</em>. Finally, we&#39;ll chart this too.</p>"
+        ]
+    },
+    {
+        "type": "code",
+        "input": [
+            "emma.loadDocumentTerms().then(function(documentTerms) {",
+            "    emmaLengths = new VoyantTable();",
+            "    documentTerms.each(function(documentTerm) {",
+            "       emmaLengths.updateCell(documentTerm.getTerm().length, 0, documentTerm.getRawFreq()); ",
+            "    });",
+            "    ",
+            "    // embed both word length tables",
+            "    embed([oliverTwistLengths,'voyantchart',{",
+            "        series: [{showMarkers: false}],",
+            "        width: 500,",
+            "        title: \"Word Lengths in <i>Oliver Twist</i>\"",
+            "    }],[emmaLengths,'voyantchart',{",
+            "        series: [{showMarkers: false}],",
+            "        width: 500,",
+            "        title: \"Word Lengths in <i>Emma</i>\"",
+            "    }]);",
+            "});",
+            ""
+        ]
+    },
+    {
+        "type": "text",
+        "input": [
+            "<p>These do seem different, among other things&nbsp;the peak has diffe",
+            "rent angles and the middle is more jagged in Emma. We can&#39;t help w",
+            "onder if Mendenhall was seeing larger differences with 1,000 word segm",
+            "ents though, which would lead him to over-estimate how distinctive an ",
+            "author&#39;s characteristic curve would be.</p>"
         ]
     }
 ]
