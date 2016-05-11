@@ -27,6 +27,9 @@ function Knots(config) {
 	this.termsFilter = [];
 	
 	this.initialized = false;
+	
+	this.audio = config.audio;
+	
 }
 
 
@@ -158,6 +161,7 @@ Knots.prototype = {
 				if (done) {
 					clearInterval(this.intervalId);
 					this.intervalId = null;
+					this.muteTerms();
 				} else {
 					this.drawStep++;
 				}
@@ -165,8 +169,22 @@ Knots.prototype = {
 		}
 	},
 	
+	setAudio: function(audio) {
+		this.audio = audio;
+		if (!audio) {this.muteTerms();}
+	},
+	
+	muteTerms: function() {
+		for (t in this.currentDoc.terms) {
+			if (this.currentDoc.terms[t].audio) {
+				this.currentDoc.terms[t].audio.gainNode.gain.value=0;
+			}
+		}
+	},
+	
 	drawDocument: function(doc) {
 		var terms = doc.terms;
+		
 		for (var t in terms) {
 			if (this.termsFilter.indexOf(t) != -1) {
 				var info = terms[t];
@@ -176,7 +194,12 @@ Knots.prototype = {
 					if (info.pos.length <= this.drawStep) {
 						info.done = true;
 						length = info.pos.length;
+						if (terms[t].audio) {terms[t].audio.gainNode.gain.value=0};
 					} else {
+						if (this.audio && terms[t].audio) {terms[t].audio.gainNode.gain.value=.1;}
+						setTimeout(function() {
+							if (terms[t]) {terms[t].audio.gainNode.gain.value=0;}
+						}, this.refreshInterval*.75)
 						info.done = false;
 					}
 					for (var i = 0; i < length; i++) {
@@ -247,12 +270,18 @@ Knots.prototype = {
 		this.recache();
 	},
 	
-	removeTerm: function(term) {		
+	removeTerm: function(term) {
+		if (this.currentDoc.terms[term].audio) {this.currentDoc.terms[term].audio.oscillator.stop();}
 		delete this.currentDoc.terms[term];
 		this.recache();
 	},
 	
 	removeAllTerms: function() {
+		for (term in this.currentDoc.terms) {
+			if (this.currentDoc.terms[term].audio) {
+				this.currentDoc.terms[term].audio.oscillator.stop();
+			}
+		}
 		this.currentDoc.terms = {};
 		this.recache();
 	},
@@ -268,7 +297,19 @@ Knots.prototype = {
 		
 		this.currentDoc.lineLength = lineLength;
 		
+		var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+		
 		for (var term in this.currentDoc.terms) {
+			if (audioCtx && !this.currentDoc.terms[term].audio) {
+				var oscillator = audioCtx.createOscillator();
+				var gainNode = audioCtx.createGain();
+				oscillator.connect(gainNode);
+				gainNode.connect(audioCtx.destination);
+				oscillator.frequency.value = (Math.random()*500)+150; // value in hertz
+				oscillator.start();
+				gainNode.gain.value = 0;
+				this.currentDoc.terms[term].audio = {oscillator: oscillator, gainNode: gainNode}
+			} 
 			this.cacheTurns(this.currentDoc.terms[term], lineLength);
 		}
 	},

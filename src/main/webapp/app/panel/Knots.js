@@ -25,7 +25,9 @@ Ext.define('Voyant.panel.Knots', {
     		 * @type String
     		 * @private
     		 */
-    		docId: undefined
+    		docId: undefined,
+    		
+    		audio: false
     	},
     	glyph: 'xf06e@FontAwesome'
 	},
@@ -52,8 +54,10 @@ Ext.define('Voyant.panel.Knots', {
     }),
 	
     constructor: function() {
+    	var rurl = this.getBaseUrl()+"resources/knots/";
     	Ext.apply(this, {
-    		title: this.localize('title')
+    		title: this.localize('title'),
+    		html: "<audio src='"+rurl+"bone-crack.m4a' preload='auto'></audio>"
     	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -297,7 +301,26 @@ Ext.define('Voyant.panel.Knots', {
 							if (this.knots) {this.knots.buildGraph();}
 						},
 						scope: this
-	            	}
+					},
+				},{
+	                xtype: 'checkbox',
+	                boxLabel: this.localize('sound'),
+	                listeners: {
+	                	render: function(cmp) {
+	                		cmp.setValue(this.getApiParam("audio")===true ||  this.getApiParam("audio")=="true")
+	    		        	Ext.tip.QuickTipManager.register({
+	    		        		target: cmp.getEl(),
+	   		                 	text: this.localize('soundTip')
+	    		        	});
+	                		
+	                	},
+	                    change: function(cmp, val) {
+	                    	if (this.knots) {
+		                    	this.knots.setAudio(val);
+	                    	}
+	                    },
+	                    scope: this
+	                }
 	            }]
     		}],
             border: false,
@@ -399,7 +422,8 @@ Ext.define('Voyant.panel.Knots', {
 	            		var canvasParent = this.down('#canvasParent');
 	                	this.knots = new Knots({
 	                		container: canvasParent,
-	                		clickHandler: this.knotClickHandler.bind(this)
+	                		clickHandler: this.knotClickHandler.bind(this),
+	                		audio: this.getApiParam("audio")===true ||  this.getApiParam("audio")=="true"
 	                	});
 	            	},
             		afterlayout: function(container) {

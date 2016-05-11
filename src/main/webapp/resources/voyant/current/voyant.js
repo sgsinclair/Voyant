@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 10 19:47:27 EDT 2016 */
+/* This file created by JSCacher. Last modified: Wed May 11 12:26:28 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -938,6 +938,9 @@ function Knots(config) {
 	this.termsFilter = [];
 	
 	this.initialized = false;
+	
+	this.audio = config.audio;
+	
 }
 
 
@@ -1069,6 +1072,7 @@ Knots.prototype = {
 				if (done) {
 					clearInterval(this.intervalId);
 					this.intervalId = null;
+					this.muteTerms();
 				} else {
 					this.drawStep++;
 				}
@@ -1076,8 +1080,22 @@ Knots.prototype = {
 		}
 	},
 	
+	setAudio: function(audio) {
+		this.audio = audio;
+		if (!audio) {this.muteTerms();}
+	},
+	
+	muteTerms: function() {
+		for (t in this.currentDoc.terms) {
+			if (this.currentDoc.terms[t].audio) {
+				this.currentDoc.terms[t].audio.gainNode.gain.value=0;
+			}
+		}
+	},
+	
 	drawDocument: function(doc) {
 		var terms = doc.terms;
+		
 		for (var t in terms) {
 			if (this.termsFilter.indexOf(t) != -1) {
 				var info = terms[t];
@@ -1087,7 +1105,12 @@ Knots.prototype = {
 					if (info.pos.length <= this.drawStep) {
 						info.done = true;
 						length = info.pos.length;
+						if (terms[t].audio) {terms[t].audio.gainNode.gain.value=0};
 					} else {
+						if (this.audio && terms[t].audio) {terms[t].audio.gainNode.gain.value=.1;}
+						setTimeout(function() {
+							if (terms[t]) {terms[t].audio.gainNode.gain.value=0;}
+						}, this.refreshInterval*.75)
 						info.done = false;
 					}
 					for (var i = 0; i < length; i++) {
@@ -1158,12 +1181,18 @@ Knots.prototype = {
 		this.recache();
 	},
 	
-	removeTerm: function(term) {		
+	removeTerm: function(term) {
+		if (this.currentDoc.terms[term].audio) {this.currentDoc.terms[term].audio.oscillator.stop();}
 		delete this.currentDoc.terms[term];
 		this.recache();
 	},
 	
 	removeAllTerms: function() {
+		for (term in this.currentDoc.terms) {
+			if (this.currentDoc.terms[term].audio) {
+				this.currentDoc.terms[term].audio.oscillator.stop();
+			}
+		}
 		this.currentDoc.terms = {};
 		this.recache();
 	},
@@ -1179,7 +1208,19 @@ Knots.prototype = {
 		
 		this.currentDoc.lineLength = lineLength;
 		
+		var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+		
 		for (var term in this.currentDoc.terms) {
+			if (audioCtx && !this.currentDoc.terms[term].audio) {
+				var oscillator = audioCtx.createOscillator();
+				var gainNode = audioCtx.createGain();
+				oscillator.connect(gainNode);
+				gainNode.connect(audioCtx.destination);
+				oscillator.frequency.value = (Math.random()*500)+150; // value in hertz
+				oscillator.start();
+				gainNode.gain.value = 0;
+				this.currentDoc.terms[term].audio = {oscillator: oscillator, gainNode: gainNode}
+			} 
 			this.cacheTurns(this.currentDoc.terms[term], lineLength);
 		}
 	},
@@ -5346,7 +5387,6 @@ Ext.define("Voyant.notebook.util.Embed", {
 				show("<table><tr>");
 				for (var i=0; i<arguments.length; i++) {
 					var unit = arguments[i];
-					console.warn(unit)
 					show("<td>")
 					unit[0].embed.call(unit[0], unit[1], unit[2]);
 					show("</td>")
@@ -5689,7 +5729,7 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getAuthor: function() {
-    	var author = this.get('author');
+    	var author = this.get('author') || "";
     	author = Ext.isArray(author) ? author.join("; ") : author;
     	author = author.trim().replace(/\s+/g, ' ');
     	return author;
@@ -6588,7 +6628,7 @@ Ext.define('Voyant.data.table.Table', {
 				})
 			}
 			Ext.apply(chart, {
-				series: series,
+				series: series
 			});
 		}
 		if (config.title) {
@@ -10897,7 +10937,9 @@ Ext.define('Voyant.panel.Knots', {
     		 * @type String
     		 * @private
     		 */
-    		docId: undefined
+    		docId: undefined,
+    		
+    		audio: false
     	},
     	glyph: 'xf06e@FontAwesome'
 	},
@@ -10924,8 +10966,10 @@ Ext.define('Voyant.panel.Knots', {
     }),
 	
     constructor: function() {
+    	var rurl = this.getBaseUrl()+"resources/knots/";
     	Ext.apply(this, {
-    		title: this.localize('title')
+    		title: this.localize('title'),
+    		html: "<audio src='"+rurl+"bone-crack.m4a' preload='auto'></audio>"
     	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -11169,7 +11213,26 @@ Ext.define('Voyant.panel.Knots', {
 							if (this.knots) {this.knots.buildGraph();}
 						},
 						scope: this
-	            	}
+					},
+				},{
+	                xtype: 'checkbox',
+	                boxLabel: this.localize('sound'),
+	                listeners: {
+	                	render: function(cmp) {
+	                		cmp.setValue(this.getApiParam("audio")===true ||  this.getApiParam("audio")=="true")
+	    		        	Ext.tip.QuickTipManager.register({
+	    		        		target: cmp.getEl(),
+	   		                 	text: this.localize('soundTip')
+	    		        	});
+	                		
+	                	},
+	                    change: function(cmp, val) {
+	                    	if (this.knots) {
+		                    	this.knots.setAudio(val);
+	                    	}
+	                    },
+	                    scope: this
+	                }
 	            }]
     		}],
             border: false,
@@ -11271,7 +11334,8 @@ Ext.define('Voyant.panel.Knots', {
 	            		var canvasParent = this.down('#canvasParent');
 	                	this.knots = new Knots({
 	                		container: canvasParent,
-	                		clickHandler: this.knotClickHandler.bind(this)
+	                		clickHandler: this.knotClickHandler.bind(this),
+	                		audio: this.getApiParam("audio")===true ||  this.getApiParam("audio")=="true"
 	                	});
 	            	},
             		afterlayout: function(container) {

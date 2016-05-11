@@ -198,7 +198,7 @@ Ext.define('Voyant.data.table.Table', {
 				})
 			}
 			Ext.apply(chart, {
-				series: series,
+				series: series
 			});
 		}
 		if (config.title) {

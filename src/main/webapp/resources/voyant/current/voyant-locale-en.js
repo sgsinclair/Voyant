@@ -507,6 +507,7 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 "startAngle":"Start",
 "tangles":"Turn",
 "showTerm":"Show Term",
+"sound":"sound",
 "clearTerms":"Clear",
 "removeTerm":"Remove Term",
 "hideTerm":"Hide Term",
@@ -514,6 +515,7 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 "type":"Visualization",
 "noTermsFound":"No terms found in this document.",
 "speed":"Speed",
+"soundTip":"Toggles the sound feature of Knots.",
 "options":"Options",
 "context":"Context"});
 Ext.apply(Voyant.VoyantApp.i18n, {
