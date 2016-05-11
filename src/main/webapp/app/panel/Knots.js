@@ -301,7 +301,7 @@ Ext.define('Voyant.panel.Knots', {
 							if (this.knots) {this.knots.buildGraph();}
 						},
 						scope: this
-					},
+					}
 				},{
 	                xtype: 'checkbox',
 	                boxLabel: this.localize('sound'),

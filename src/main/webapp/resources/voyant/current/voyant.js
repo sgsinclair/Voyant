@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 11 12:26:28 EDT 2016 */
+/* This file created by JSCacher. Last modified: Wed May 11 12:27:42 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -11213,7 +11213,7 @@ Ext.define('Voyant.panel.Knots', {
 							if (this.knots) {this.knots.buildGraph();}
 						},
 						scope: this
-					},
+					}
 				},{
 	                xtype: 'checkbox',
 	                boxLabel: this.localize('sound'),
