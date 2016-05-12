@@ -285,7 +285,7 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     			documentQueryMatches.load({
     				params: {query: query},
     				callback: function(records, operation, success) {
-    					debugger
+    					
     					this.status.unmask();
     					if (success) {
     						this.updateStatus(records[0].get('count'));

@@ -25,6 +25,9 @@ Ext.define('Voyant.data.model.Token', {
 	isWord: function() {
 		return this.getTokenType()=='lexical'; // maybe something else later?
 	},
+	isStopword: function() {
+		return this.get("stopword")=="true";
+	},
 	getTokenType: function() {
 		return this.get("tokenType");
 	},

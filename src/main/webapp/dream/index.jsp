@@ -239,7 +239,7 @@
 		}
 	});
 </script>
-<!link href='http://fonts.googleapis.com/css?family=Cinzel+Decorative:400,900' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Cinzel+Decorative:400,900' rel='stylesheet' type='text/css'>
 <style>
 	.dream-body {
 		background-image: url(dream-tp-transparent.png);

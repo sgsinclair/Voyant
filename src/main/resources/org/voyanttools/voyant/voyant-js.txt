@@ -81,6 +81,7 @@ app/panel/Panel.js
 app/panel/VoyantTabPanel.js
 # we need facet after panel but before catalogue
 app/widget/Facet.js
+app/panel/Bubbles.js
 app/panel/Bubblelines.js
 app/panel/Catalogue.js
 app/panel/Cirrus.js

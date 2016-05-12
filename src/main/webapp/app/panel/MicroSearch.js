@@ -124,7 +124,6 @@ Ext.define('Voyant.panel.MicroSearch', {
     		var me = this;
     		return this.getCorpus().loadCorpusTerms({limit: 1, stopList: this.getApiParam('stopList')}).then(function(corpusTerms) {
     			var term = corpusTerms.getAt(0).getTerm();
-    			console.warn(term)
     			var q = me.down('querysearchfield');
     			q.addValue(new Voyant.data.model.CorpusTerm({term: term}));
     			me.fireEvent("query", me, [term])

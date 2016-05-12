@@ -1,0 +1,669 @@
+// ---------------------------------------------------------------- //
+//  Kerning Pairs Visualizator
+//  2005 Martin Bereciartua - email (at) m-i-b.com.ar
+//  http://www.m-i-b.com.ar/
+// ---------------------------------------------------------------- //
+//
+//  This source is released under the creative commons license 
+//  http://creativecommons.org/licenses/by-nc-sa/1.0/
+//
+//  Thanks to:
+//  Ben Fry and Karsten Schmidt for inspiration
+//
+// ---------------------------------------------------------------- //
+//  Made with Processing (Beta) v091
+// ---------------------------------------------------------------- //
+
+
+int nro_linea = 1;
+int nro_espacio = 0;
+
+PFont font, font1, font2, font3, font4;
+String par_actual = "";               // valor actual del escaneo del texto
+String[] lines;                       // lineas del texto escaneado
+int arrastrando = -1;
+
+int pares_totales = 0;
+float k_total;
+
+int espacio_abajo;
+int espacio_arriba;
+int espacio_derecha;
+int espacio_izquierda;
+String layout_actual = "standard";
+String visual_mode = "lineal";
+int burbujas_maximas = 49;
+int burbujas_graficadas = 0;
+
+Ball[] balls = new Ball[0];
+float grav = 1.40;                    // Gravedad
+float b = 0.85;                       // Rebote
+float f = 0.90;                       // Friccion
+
+color ColorLineasGrales = color(200);
+color ColorAcento = color(255, 102, 0);
+color ColorAcentoCompanion = color(255, 180, 0);
+
+int lapso_refresh = 1;               // cada cuantos frames se renueva la info del listado
+int timer_interno = 0;
+boolean resorte_activado = false;
+boolean show_info = false;
+boolean llenar_burbujas = false;
+boolean hay_gravedad = false;
+
+String[] currentWords = new String[0];
+
+interface JavaScript {
+ 	void handleCurrentTerm(String term);
+}
+  
+void bindJavascript(JavaScript js) {
+	javascript = js;
+}
+  
+JavaScript javascript;
+
+void setup() {
+
+  size(800, 600);
+  background(255);
+  smooth();
+   hint(ENABLE_NATIVE_FONTS);
+  loop();  
+   
+  font = loadFont("Swiss721BT-Bold-48.vlw");
+  font1 = loadFont("Swiss721BT-BlackCondensed-25.vlw");
+  font2 = loadFont("Swiss721BT-BoldCondensed-18.vlw");
+  font3 = loadFont("Swiss721BT-BoldCondensed-14.vlw");
+  font4 = loadFont("Swiss721BT-RomanCondensed-18.vlw");
+
+  calcularKtotal();
+  
+  lines = new String[0]; //loadStrings("Borges.txt"); // texto a analizar
+  
+  //layout( font1, font2, font3 );
+
+}
+
+void setLines(String[] l) {
+	lines = l;
+	nro_linea = 1;
+	nro_espacio = 0;
+	currentWords = lines[nro_linea].split(" ");
+	balls = new Ball[0];
+	layout(font1, font2, font3);
+}
+
+void draw() {
+  
+	if (lines.length==0) {return;}
+	
+    //analisis del texto
+
+    if ( nro_linea < lines.length ) {
+   
+   	  
+      // si estoy dentro de los limites del texto    
+      String espacio = " ";    
+      if ( lines[nro_linea].length() > 1 ) {
+        par_actual = currentWords[nro_espacio];
+        if (javascript!=null) {javascript.handleCurrentTerm(par_actual);}
+        sumarKP( par_actual );
+      }
+    
+      nro_espacio++;
+      if ( nro_espacio >= currentWords.length() ) {
+        nro_espacio = 0;
+        nro_linea++;
+        currentWords = nro_linea < lines.length() ? lines[nro_linea].split(" ") : new String[0];
+      }    
+
+    } else {
+    	par_actual = ":::";
+    	if (javascript!=null) {javascript.handleDocFinished();}
+    }
+    
+    // refrescar orden de la info    
+      timer_interno++;
+      if ( timer_interno == lapso_refresh ) {
+        timer_interno = 0;
+        ordenarArrays();
+      }
+    
+    background(255);
+    
+    pares_totales = 0;
+    burbujas_graficadas = 0;
+    for ( int i=burbujas_maximas; i>=0; i-- ) {
+      if ( i < balls.length ) {
+        pares_totales += balls[i].ocurrencias;
+        burbujas_graficadas++;
+      }
+    }
+    
+    calcularKtotal();
+    for ( int i=0; i<balls.length; i++ ) {
+      float kprima = ( k_total * balls[i].ocurrencias ) / pares_totales;
+      balls[i].ka = kprima;
+      balls[i].r = sqrt( ( ( kprima ) / PI ) );
+    }
+        
+    textFont(font, 25);
+    for ( int i=burbujas_maximas; i>=0; i-- ) {
+      if ( i < balls.length ) {
+       if ( hay_gravedad ) balls[i].fall();
+        if ( resorte_activado ) balls[i].spring();
+        balls[i].bounce();
+        balls[i].collide();
+        balls[i].move();
+        balls[i].encima();  
+        balls[i].display();
+      }
+    }
+      
+    layout( font1, font2, font3 );
+   
+}
+
+void graficando() { // funcion para graficar los top 20
+
+  float tamanio = 45;
+  int altura = 140;
+  int alpha_value = 255;
+  
+  for (int i=0; i < 20 && i < balls.length ; i++) {
+  
+    textFont(font, tamanio);
+    textAlign(CENTER);
+    fill(0, 102, 153, alpha_value); 
+    text(balls[i].nombre, width - 50, altura);
+    
+    tamanio = tamanio * 0.94;
+    altura += tamanio-5;
+    alpha_value -= 10;
+  
+  }
+  
+}
+
+void layout( PFont font1, PFont font2, PFont font3 ) {
+
+  if ( layout_actual == "standard" ) {
+  
+    espacio_abajo = 60;
+    espacio_arriba = 15;
+    espacio_derecha = 100;
+    espacio_izquierda = 15;
+
+    rectMode(CORNERS);
+    noStroke();
+    fill(255);
+    rect(width-espacio_derecha+5, 0, width, height);
+  
+    textFont(font, 48);
+    textAlign(CENTER);
+    fill(ColorAcento); 
+    text(par_actual, width - 50, 75); 
+    
+    textFont(font3, 14);
+    textAlign(CENTER);
+    fill(180);
+  
+    graficando();   
+  
+  } else if ( layout_actual == "reducido" ) {
+  
+    espacio_abajo = 60;
+    espacio_arriba = 20;
+    espacio_derecha = 20;
+    espacio_izquierda = 20;
+    
+  }
+  
+  // datos
+  textFont(font1, 25);
+  textAlign(LEFT);
+  fill(120);
+  //text(str(burbujas_graficadas)+" / "+str(balls.length), espacio_izquierda, height-30);
+  text(str(nro_espacio)+" / "+str(currentWords.length), espacio_izquierda, height-30);
+  
+  // titulos
+  textAlign(RIGHT);
+  /*
+  textFont(font2, 18);
+  textAlign(RIGHT);
+  text("]", width - espacio_derecha, height-31);
+  fill(ColorAcento);
+  text(lines[1], width - espacio_derecha - textWidth("]"), height-31);
+  fill(120);
+  text("[", width - espacio_derecha - textWidth(lines[1]+"]"), height-31);
+  */
+  float ancho_parcial = 0; //textWidth("["+lines[1]+"]");
+  textFont(font2, 18);
+  text(lines[0]+" ", width - espacio_derecha - ancho_parcial, height-31);
+    
+  if ( nro_linea < lines.length ) {
+    barraAvance( espacio_izquierda, height - 25, width - espacio_derecha, height - 15, 
+                nro_espacio, currentWords.length(), ColorLineasGrales, ColorAcento ); 
+    //barraAvance( espacio_izquierda, height - 15, width - espacio_derecha, height - 12, 
+    //            nro_espacio, lines[nro_linea].length()-2, ColorLineasGrales, ColorAcentoCompanion );
+    //barraAvance( espacio_izquierda, height - 15, width - espacio_derecha, height - 12, 
+    //            nro_espacio, currentWords.length(), ColorLineasGrales, ColorAcentoCompanion );
+  } else {
+    barraAvance( espacio_izquierda, height - 25, width - espacio_derecha, height - 15, 
+                10, 10, ColorLineasGrales, ColorAcento ); 
+    barraAvance( espacio_izquierda, height - 15, width - espacio_derecha, height - 12, 
+                10, 10, ColorLineasGrales, ColorAcentoCompanion );
+  }
+
+}
+
+
+void sumarKP( String newKP ) {
+  int kp_encontrado = 0;
+  // buscar kp a sumar en array existente
+  for (int i=0; i < balls.length; i++) { 
+    if ( balls[i].nombre == newKP ) { // si encuentro el kp le sumo una ocurrencia
+      kp_encontrado = 1;
+      balls[i].ocurrencias++;
+    } 
+    if ( kp_encontrado == 1 ) break;
+  } 
+  
+  // si no lo encuentro lo creo
+  if ( kp_encontrado == 0 ) nuevoKP( newKP );
+
+}
+
+void nuevoKP( String newx ) {  
+  
+  calcularKtotal();
+  float ka;
+  if ( balls.length > 0 ) ka = k_total / balls.length;
+  else ka = k_total;
+  Ball[] tempBall = new Ball( newx, ka, newx, 1 );
+  balls[balls.length] = tempBall;
+
+}
+
+void ordenarArrays() {
+  
+  Ball[] temp_ocurrencias = new Ball[balls.length];
+  temp_ocurrencias = balls;
+  
+  Ball temp;
+  int i, j;
+      for (i = temp_ocurrencias.length-1; i >= 0; i--)
+         for (j = 0; j < i; j++)
+            if (temp_ocurrencias[j].ocurrencias < temp_ocurrencias[j + 1].ocurrencias) {
+               temp = temp_ocurrencias[j];
+               temp_ocurrencias[j] = temp_ocurrencias[j + 1];
+               temp_ocurrencias[j + 1] = temp;
+            }
+
+  balls = temp_ocurrencias;
+  
+}
+
+void calcularKtotal () {
+
+  // encontrar un valor de k (superficie a ocupar) que concuerde con
+  // la cantidad de burbujar a dibujar (evitar que se superpongan)
+  
+  float alto = height-espacio_arriba-espacio_abajo;
+  float ancho = width-espacio_izquierda-espacio_derecha;
+  
+  if ( burbujas_graficadas <= 1 ) {
+    if ( alto < ancho ) k_total = PI*pow(alto/2,2)*0.8;
+    else k_total = PI*pow(ancho/2,2)*0.8;
+  }
+  else if ( burbujas_graficadas > 1 && burbujas_graficadas <= 6 ) k_total = ancho * alto * 0.65;
+  else if ( burbujas_graficadas > 6 && burbujas_graficadas <= 20 ) k_total = ancho * alto * 0.75;
+  else if ( burbujas_graficadas > 20 && burbujas_graficadas <= 50 ) k_total = ancho * alto * 0.80;
+  else if ( burbujas_graficadas > 50 && burbujas_graficadas <= 200 ) k_total = ancho * alto * 0.86;
+  else if ( burbujas_graficadas > 200 ) k_total = ancho * alto * 0.92;
+
+}
+
+
+void keyPressed() {
+
+
+    if(keyCode<256) keyboard.press(keyCode);
+
+    if (key == 'a') { // viendo mas burbujas
+      if ( burbujas_maximas == 0 ) burbujas_maximas = 4;
+      else if ( burbujas_maximas == 4 ) burbujas_maximas = 19;
+      else if ( burbujas_maximas == 19 ) burbujas_maximas = 49;
+      else if ( burbujas_maximas == 49 ) burbujas_maximas = 99;
+    }
+    if (key == 's') { // viendo menos burbujas
+      if ( burbujas_maximas == 99 ) burbujas_maximas = 49;
+      else if ( burbujas_maximas == 49 ) burbujas_maximas = 19;
+      else if ( burbujas_maximas == 19 ) burbujas_maximas = 4;
+    }
+    if (key == 'r' || key == 'R') { // activando resortes
+      if ( resorte_activado == true ) resorte_activado = false;
+      else if ( resorte_activado == false ) resorte_activado = true;
+    }
+    if (key == 'i' || key == 'I') { // mostrar info en burbujas
+      if ( show_info == true ) show_info = false;
+      else if ( show_info == false ) show_info = true;
+    }
+    if (key == 'l' || key == 'L') { // mostrar burbujas opacas
+      if ( llenar_burbujas == true ) llenar_burbujas = false;
+      else if ( llenar_burbujas == false ) llenar_burbujas = true;
+    }
+    if (key == 'f' || key == 'F') { // cambiar modo de layout
+      if ( layout_actual == "standard" ) layout_actual = "reducido";
+      else if ( layout_actual == "reducido" ) layout_actual = "standard";
+    }
+    if ( keyboard.pressed(UP) || keyboard.pressed(DOWN) || keyboard.pressed(LEFT) || keyboard.pressed(RIGHT) ) { // aplicar gravedad
+      hay_gravedad = true;
+    } else hay_gravedad = false;
+    if (key == 's') { // shaking
+      for ( int i=0; i<balls.length; i++ ) {
+        balls[i].x += random(-10,10);
+        balls[i].y += random(-10,10);
+      }
+    }
+    if (key == 'd' || key == 'D') { // redistribuyendo
+      for ( int i=0; i<balls.length; i++ ) {
+        balls[i].x = random(balls[i].r+espacio_izquierda, width-espacio_derecha-balls[i].r);
+        balls[i].y = random(balls[i].r+espacio_arriba, height-espacio_abajo-balls[i].r);
+      }
+    }
+  
+}
+
+void keyReleased() { 
+  
+  if(keyCode<256) keyboard.release(keyCode);
+  
+}
+
+void mouseReleased() { 
+  
+  arrastrando = -1;
+  
+}
+
+
+
+class Ball {
+
+  float r;
+  float m;
+  
+  float x;
+  float y;
+  
+  float vx;
+  float vy;
+  
+  int id;
+  float ka;
+  
+  String nombre;
+  int ocurrencias;
+  
+  // Spring
+  float mass;                                       // Masa
+  float kspring;                                    // Constante de resorte
+  float damp;                                       // Damping 
+  float rest_posx = ( ( width-espacio_derecha ) / 2 ) + espacio_izquierda / 2;
+  float rest_posy = ( ( height-espacio_abajo ) / 2 ) + espacio_derecha / 2;
+  float accel = 0;                                  // Aceleracion 
+  float force = 0;                                  // Fuerza
+  
+  boolean estamos_encima;
+  
+  Ball( int ID, float KA, String NOMBRE, int OCURR ) {
+  
+    ka = KA;
+    r = sqrt( ka / PI );
+    m = r;
+    x = random(r+espacio_izquierda,width-espacio_derecha-r);
+    y = random(r+espacio_arriba,height-espacio_abajo-r);
+    vx = random(-3,3);
+    vy = random(-3,3);
+    id = ID;
+    nombre = NOMBRE;
+    ocurrencias = OCURR;
+    estamos_encima = false;
+    
+    mass = sqrt( ( ( (PI*pow((height-espacio_abajo-espacio_arriba)/2,2)*0.8) / 2000 ) / PI ) );
+    damp = 0.85;
+    kspring = 0.01;
+  }
+  
+  void fall() {
+  
+    if ( keyboard.pressed(UP) ) vy -= grav;
+    if ( keyboard.pressed(DOWN) ) vy += grav;
+    if ( keyboard.pressed(LEFT) ) vx -= grav;
+    if ( keyboard.pressed(RIGHT) ) vx += grav;
+  }
+  
+  void spring() {
+  
+    rest_posx = ( ( width-espacio_derecha ) / 2 ) + espacio_izquierda / 2;
+    rest_posy = ( ( height-espacio_abajo ) / 2 ) + espacio_derecha / 2; 
+
+    if ( balls.length > 0 && ( balls[0].ocurrencias - balls[burbujas_graficadas-1].ocurrencias ) > 0 ) {
+      float A = balls[0].ocurrencias;                        // maximo original
+      float C = ocurrencias;                                 // valor original
+      float B = balls[burbujas_graficadas-1].ocurrencias;    // minimo original
+      float D = 5;                                           // nuevo maximo
+      float E;                                               // nuevo minimo
+      if ( burbujas_graficadas > 20 ) E = -1;
+      else E = 0;
+      kspring = -1 * ( ( ( A - C ) / ( A - B ) ) * ( D - E ) - D );
+    }
+    if ( burbujas_graficadas == 1 ) kspring = 4;
+    
+    //mass = r;
+    
+    force = -kspring * (y - rest_posy);    // f=-ky 
+    accel = force / mass;                  // Asignar aceleracion
+    vy = damp * (vy + accel);              // Definir velocidad 
+    //y += vy;
+
+    force = -kspring * (x - rest_posx);    // f=-ky 
+    accel = force / mass;                  // Asignar aceleracion
+    vx = damp * (vx + accel);              // Definir velocidad 
+    //x += vx;
+  }
+  
+  void bounce() {
+  
+    if ( y + vy + r > height-espacio_abajo ) {
+    
+      y = height-espacio_abajo - r;
+      vx *= f;
+      vy *= -b;
+    }
+    if ( y + vy - r < espacio_arriba ) {
+    
+      y = r+espacio_arriba;
+      vx *= f;
+      vy *= -b;
+    }
+    if ( x + vx + r > width-espacio_derecha ) {
+    
+      x = width-espacio_derecha - r;
+      vx *= -b;
+      vy *= f;
+    }
+    if ( x + vx - r < espacio_izquierda ) {
+    
+      x = r+espacio_izquierda;
+      vx *= -b;
+      vy *= f;
+    }
+  }
+  
+  void collide() {
+  
+    for ( int i=burbujas_maximas; i>=0; i-- ) {
+    
+      if ( i < balls.length ) {
+      
+        float X = balls[i].x;
+        float Y = balls[i].y;
+        float R = balls[i].r;
+        float M = balls[i].m;
+      
+        float deltax = X-x;
+        float deltay = Y-y;
+        float d = sqrt(pow(deltax,2)+pow(deltay,2));
+      
+        if ( d < r + R && d > 0 ) {
+        
+          float dD = r + R - d;
+          float theta = atan2(deltay,deltax);
+        
+          vx += -dD*cos(theta)*M/(m+M);
+          vy += -dD*sin(theta)*M/(m+M);
+        
+          vx *= b;
+          vy *= b;
+        
+        }
+      }
+    }
+  }
+  
+  void move() {
+  
+    if ( estamos_encima && mousePressed && ( arrastrando == -1 || arrastrando == id ) ) {
+      x = mouseX;
+      y = mouseY;
+      vx = 0;
+      vy = 0;
+      arrastrando = id;
+    } else {
+      x += vx;
+      y += vy;
+    }
+    
+    
+  }
+  
+  void encima() {
+  
+    if ( dist(x, y, mouseX, mouseY) < r ) estamos_encima = true;
+    else estamos_encima = false;
+  
+  }
+  
+  void display() {
+  
+    float A = balls[0].ocurrencias;                        // maximo original
+    float C = ocurrencias;                                 // valor original
+    float B = balls[burbujas_graficadas-1].ocurrencias;    // minimo original
+    float D;                                               // nuevo maximo
+    float E;                                               // nuevo minimo
+    //nuevo_valor = -1 * ( ( ( A - C ) / ( A - B ) ) * ( D - E ) - D );
+  
+    if (visual_mode == "lineal" ) {
+    
+      if ( llenar_burbujas ) fill(255,255,255);
+      else if ( par_actual == nombre) fill(255,255,0);
+      else noFill();
+      if ( estamos_encima ) fill(0,0,0,15);
+      strokeWeight(r/10);
+      //stroke(ColorLineasGrales);
+      float lc = -1 * ( ( ( A - C ) / ( A - B ) ) * ( 60 - 200 ) - 60 );
+      float lcalpha = -1 * ( ( ( A - C ) / ( A - B ) ) * ( 255 - 90 ) - 255 );
+      if ( A == B ) lcalpha = 255;
+      color local = color( lc );
+      stroke( local );
+      //noFill();
+      ellipse(x,y,2*r-r/10,2*r-r/10); 
+    
+      float tamanio = ((r*0.8) / nombre.length)*4;
+//      textSize(tamanio);
+//      textFont(font, tamanio);
+      textAlign(CENTER);
+      fill(0, 102, 153, lcalpha);
+      //fill(0, 102, 153);
+      //if ( show_info || estamos_encima ) text(nombre, x, y+tamanio/5);
+      //if ( show_info ) text(nombre, x, y+tamanio/5);
+      //else text(nombre, x, y+tamanio/3);
+       text(nombre, x, y+tamanio/5);
+    
+      //if ( show_info || estamos_encima ) {
+      if ( show_info ) {
+        float tamanio1 = r*0.3;
+//        textFont(font, tamanio1);
+        fill(0, 102, 153, lcalpha);
+        text(str(ocurrencias), x, y+tamanio/3+tamanio1);
+      }
+    
+    }
+
+  }
+}
+
+
+
+
+//
+// Funcion para dibujar barra de avance
+// 23/07/05 :: P&A
+//
+
+void barraAvance( int x1, int y1, 
+                  int x2, int y2, 
+                  float ValParcial, float ValTotal, 
+                  color ColorLinea, color ColorRelleno ) {
+
+  float AnchoReal = ( ( ( ValParcial * 100 ) / ValTotal ) * ( x2 - x1 )  ) / 100;
+
+  strokeWeight(1);
+  stroke(ColorLinea);
+  noFill();
+  rectMode(CORNERS); 
+  rect(x1, y1, x2, y2);
+  
+  noStroke();
+  fill(ColorRelleno);
+  rect(x1, y1, x1+AnchoReal+1, y2+1);
+
+}
+
+
+
+Keys keyboard = new Keys();
+
+class Keys { 
+
+  boolean[] k; 
+   
+  Keys() { 
+    k=new boolean[255]; 
+    for(int i=0;i<k.length;i++) k[i]=false;  
+  } 
+ 
+  void press(int x) { 
+    k[x]=true; 
+  } 
+ 
+  void release(int x) { 
+    k[x]=false; 
+  } 
+ 
+  boolean pressed(int x) { 
+    return k[x]; 
+  } 
+ 
+  void releaseAll() { 
+    for(int i=0;i<k.length;i++) k[i]=false;  
+  } 
+ 
+  boolean anyPressed() { 
+    for(int i=0;i<k.length;i++) if(k[i]==true) return true; 
+    return false; 
+  } 
+}
