@@ -19,7 +19,9 @@ Ext.define('Voyant.panel.Bubbles', {
     		
     		limit: 100,
     		
-    		audio: false
+    		audio: false,
+    		
+    		speed: 30
     			
     			
     	},
@@ -46,6 +48,33 @@ Ext.define('Voyant.panel.Bubbles', {
 	            	xtype: 'documentselectorbutton',
 	            	singleSelect: true
 	            },{
+					xtype: 'slider',
+					fieldLabel: this.localize('speed'),
+					labelAlign: 'right',
+					labelWidth: 40,
+					width: 100,
+					increment: 1,
+					minValue: 1,
+					maxValue: 60,
+					value: 30,
+					listeners: {
+	                	render: function(cmp) {
+	                		cmp.setValue(parseInt(this.getApiParam("speed")));
+	                		if (this.bubbles) {this.bubbles.frameRate(cmp.getValue())}
+	                		this.setAudio(cmp.getValue());
+	    		        	Ext.tip.QuickTipManager.register({
+	    		        		target: cmp.getEl(),
+	   		                 	text: this.localize('speedTip')
+	    		        	});
+	                		
+	                	},
+	                    changecomplete: function(cmp, val) {
+	                    	this.setApiParam('speed', val);
+	                		if (this.bubbles) {this.bubbles.frameRate(val)}
+	                    },
+	                    scope: this
+					}
+				},{
 	                xtype: 'checkbox',
 	                boxLabel: this.localize('sound'),
 	                listeners: {
@@ -83,6 +112,7 @@ Ext.define('Voyant.panel.Bubbles', {
     			var canvas = me.getTargetEl().dom.querySelector("canvas");
     			me.bubbles = new Processing(canvas, data.responseText);
     			me.bubbles.size(me.getTargetEl().getWidth(),me.getTargetEl().getHeight());
+    			me.bubbles.frameRate(me.getApiParam('speed'));
     			me.bubbles.bindJavascript(me);
     			me.bubbles.noLoop();
     			me.loadDocument();
@@ -101,7 +131,7 @@ Ext.define('Voyant.panel.Bubbles', {
     	})
     },
     
-    setAudio(val) {
+    setAudio: function(val) {
     	if (this.gainNode) {this.gainNode.gain.value=val ? 1 : 0;}
     	this.callParent(arguments)
     },

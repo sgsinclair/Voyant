@@ -66,6 +66,7 @@ JavaScript javascript;
 void setup() {
 
   size(800, 600);
+  frameRate(5);
   background(255);
   smooth();
    hint(ENABLE_NATIVE_FONTS);
@@ -168,7 +169,7 @@ void draw() {
 void graficando() { // funcion para graficar los top 20
 
   float tamanio = height*40/600;
-  int altura = tamanio*2.5;
+  int altura = (width*40/600)+tamanio;
   int alpha_value = 255;
   
   for (int i=0; i < 30 && i < balls.length ; i++) {

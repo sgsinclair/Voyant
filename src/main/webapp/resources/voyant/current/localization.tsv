@@ -576,3 +576,5 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-05-12	Voyant.panel.Bubbles	adaptation	Adaptation of <a href="https://www.m-i-b.com.ar/letters/en/" target="_blank"><i>Letter Pairs</i> by Martin Ignacio Bereciartua</a>																						
 2016-05-12	Voyant.panel.Bubbles	sound	sound																						
 2016-05-12	Voyant.panel.Bubbles	soundTip	Togges the sound.																						
+2016-05-12	Voyant.panel.Bubbles	speed	speed																						
+2016-05-12	Voyant.panel.Bubbles	speedTip	Controls the speed of the visualization.																						
