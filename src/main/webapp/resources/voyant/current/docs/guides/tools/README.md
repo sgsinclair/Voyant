@@ -1,11 +1,5 @@
 # Tools
 
-* Corpus Tools:
-* Document Tools:
-* Visualization Tools:
-* Grid Tools:
-* Other Tools:
-
 <div class="thumb-list">
 	<a href="#!/guide/bubblelines"><dd>
 		<div class="thumb">
@@ -14,6 +8,18 @@
 		<div>
 			<h4>Bubblelines</h4>
 			<p>Bubblelines visualizes the frequency and distribution of terms in a corpus.</p>
+		</div>
+	</dd></a>
+</div>
+
+<div class="thumb-list">
+	<a href="#!/guide/bubbles"><dd>
+		<div class="thumb">
+			<img src="guides/bubbles/icon.png" />
+		</div>
+		<div>
+			<h4>Bubbles</h4>
+			<p>Bubblelines is a playful visualization of term frequencies by document.</p>
 		</div>
 	</dd></a>
 </div>

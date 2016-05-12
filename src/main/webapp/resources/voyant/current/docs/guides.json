@@ -68,6 +68,11 @@
                         "title": "Bubblelines"
                     },
                     {
+                        "name": "bubbles",
+                        "url": "guides/tools/bubbles",
+                        "title": "Bubbles"
+                    },
+                    {
                         "name": "catalogue",
                         "url": "guides/tools/catalogue",
                         "title": "Catalogue"
