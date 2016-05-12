@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 11 21:27:00 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu May 12 11:24:12 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8021,7 +8021,9 @@ Ext.define('Voyant.panel.Bubbles', {
     		
     		docIndex: 0,
     		
-    		limit: 100
+    		limit: 100,
+    		
+    		audio: false
     			
     			
     	},
@@ -8029,15 +8031,48 @@ Ext.define('Voyant.panel.Bubbles', {
 	},
 	config: {
 		corpus: undefined,
-    	options: {xtype: 'stoplistoption'}
+    	options: {xtype: 'stoplistoption'},
+    	audio: false
 	},
 	
 	
     constructor: function() {
 
+    	this.mixins['Voyant.util.Localization'].constructor.apply(this, arguments);
     	Ext.apply(this, {
     		title: this.localize('title'),
-    		html: '<canvas width="800" height="600"></canvas>'
+			html: '<canvas style="width: 100%; height: 100%"></canvas>',
+    		dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+        		enableOverflow: true,
+                items: [{
+	            	xtype: 'documentselectorbutton',
+	            	singleSelect: true
+	            },{
+	                xtype: 'checkbox',
+	                boxLabel: this.localize('sound'),
+	                listeners: {
+	                	render: function(cmp) {
+	                		cmp.setValue(this.getApiParam("audio")===true ||  this.getApiParam("audio")=="true");
+	                		this.setAudio(cmp.getValue());
+	    		        	Ext.tip.QuickTipManager.register({
+	    		        		target: cmp.getEl(),
+	   		                 	text: this.localize('soundTip')
+	    		        	});
+	                		
+	                	},
+	                    change: function(cmp, val) {
+	                    	this.setApiParam('audio', val);
+	                    	this.setAudio(val);
+	                    },
+	                    scope: this
+	                }
+	            },{xtype: 'tbfill'}, {
+	    			xtype: 'tbtext',
+	    			html: this.localize('adaptation') //https://www.m-i-b.com.ar/letters/en/
+	    		}]
+    		}]
     	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -8049,14 +8084,32 @@ Ext.define('Voyant.panel.Bubbles', {
     		Ext.Ajax.request({
     			url: this.getBaseUrl()+'resources/voyant/current/bubbles/bubbles.pjs'
     		}).then(function(data) {
-    			me.bubbles = new Processing(me.getTargetEl().dom.querySelector("canvas"), data.responseText);
+    			var canvas = me.getTargetEl().dom.querySelector("canvas");
+    			me.bubbles = new Processing(canvas, data.responseText);
+    			me.bubbles.size(me.getTargetEl().getWidth(),me.getTargetEl().getHeight());
     			me.bubbles.bindJavascript(me);
     			me.bubbles.noLoop();
     			me.loadDocument();
     		})
     	}, this);
+    	
+    	this.on("resize", function() {
+    		if (this.bubbles) {
+    			this.bubbles.size(this.body.getWidth(),this.body.getHeight());
+    		}
+    	});
+    	
+    	this.on("documentselected", function(src, doc) {
+    		this.setApiParam('docIndex', this.getCorpus().getDocument(doc).getIndex());
+    		this.loadDocument();
+    	})
     },
     
+    setAudio(val) {
+    	if (this.gainNode) {this.gainNode.gain.value=val ? 1 : 0;}
+    	this.callParent(arguments)
+    },
+
     handleCurrentTerm: function(term) {
     	if (this.oscillator) {this.oscillator.frequency.value = this.terms[term] ? parseInt((this.terms[term]-this.minFreq) * 2000 / (this.maxFreq-this.minFreq)) : 0;}
     },
@@ -8090,7 +8143,7 @@ Ext.define('Voyant.panel.Bubbles', {
         		me.bubbles.setLines([doc.getTitle(),words.join(" ")]);
         		me.bubbles.loop();
         		me.oscillator.frequency.value = 150;
-        		me.gainNode.gain.value = 1;
+        		me.gainNode.gain.value = me.getAudio() ? 1 : 0;
     		})
     	})
     },

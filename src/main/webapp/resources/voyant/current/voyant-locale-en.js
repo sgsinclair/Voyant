@@ -118,6 +118,12 @@ Ext.apply(Voyant.panel.Panel.i18n, {
 "loading":"Loading",
 "error":"Error",
 "info":"Information"});
+Ext.apply(Voyant.panel.Bubbles.i18n, {
+"soundTip":"Togges the sound.",
+"sound":"sound",
+"adaptation":"Adaptation of <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\"><i>Letter Pairs</i> by Martin Ignacio Bereciartua</a>",
+"title":"Bubbles",
+"helpTip":"Bubbles is a playful visualization of frequent terms in a document. "});
 Ext.apply(Voyant.widget.CorpusDocumentSelector.i18n, {
 "corpus":"Corpus",
 "scale":"Scale"});

@@ -71,11 +71,11 @@ void setup() {
    hint(ENABLE_NATIVE_FONTS);
   loop();  
    
-  font = loadFont("Swiss721BT-Bold-48.vlw");
-  font1 = loadFont("Swiss721BT-BlackCondensed-25.vlw");
-  font2 = loadFont("Swiss721BT-BoldCondensed-18.vlw");
-  font3 = loadFont("Swiss721BT-BoldCondensed-14.vlw");
-  font4 = loadFont("Swiss721BT-RomanCondensed-18.vlw");
+  font = loadFont("Arial");
+  font1 = loadFont("Arial");
+  font2 = loadFont("Arial");
+  font3 = loadFont("Arial");
+  font4 = loadFont("Arial");
 
   calcularKtotal();
   
@@ -167,19 +167,19 @@ void draw() {
 
 void graficando() { // funcion para graficar los top 20
 
-  float tamanio = 45;
-  int altura = 140;
+  float tamanio = height*40/600;
+  int altura = tamanio*2.5;
   int alpha_value = 255;
   
-  for (int i=0; i < 20 && i < balls.length ; i++) {
+  for (int i=0; i < 30 && i < balls.length ; i++) {
   
     textFont(font, tamanio);
     textAlign(CENTER);
     fill(0, 102, 153, alpha_value); 
-    text(balls[i].nombre, width - 50, altura);
+    text(balls[i].nombre, width - (width*80/800), altura);
     
-    tamanio = tamanio * 0.94;
-    altura += tamanio-5;
+    tamanio = tamanio * .94; //+(height*.015/600);
+    altura += tamanio;
     alpha_value -= 10;
   
   }
@@ -192,7 +192,7 @@ void layout( PFont font1, PFont font2, PFont font3 ) {
   
     espacio_abajo = 60;
     espacio_arriba = 15;
-    espacio_derecha = 100;
+    espacio_derecha = (width*150/800);
     espacio_izquierda = 15;
 
     rectMode(CORNERS);
@@ -200,10 +200,10 @@ void layout( PFont font1, PFont font2, PFont font3 ) {
     fill(255);
     rect(width-espacio_derecha+5, 0, width, height);
   
-    textFont(font, 48);
+    textFont(font, width*48/800);
     textAlign(CENTER);
     fill(ColorAcento); 
-    text(par_actual, width - 50, 75); 
+    text(par_actual, width - (width*80/800), (width*40/600)); 
     
     textFont(font3, 14);
     textAlign(CENTER);
@@ -221,7 +221,7 @@ void layout( PFont font1, PFont font2, PFont font3 ) {
   }
   
   // datos
-  textFont(font1, 25);
+  textFont(font1, (width*18/800));
   textAlign(LEFT);
   fill(120);
   //text(str(burbujas_graficadas)+" / "+str(balls.length), espacio_izquierda, height-30);
@@ -230,7 +230,7 @@ void layout( PFont font1, PFont font2, PFont font3 ) {
   // titulos
   textAlign(RIGHT);
   /*
-  textFont(font2, 18);
+  textFont(font2, (width*18/800));
   textAlign(RIGHT);
   text("]", width - espacio_derecha, height-31);
   fill(ColorAcento);
@@ -239,7 +239,7 @@ void layout( PFont font1, PFont font2, PFont font3 ) {
   text("[", width - espacio_derecha - textWidth(lines[1]+"]"), height-31);
   */
   float ancho_parcial = 0; //textWidth("["+lines[1]+"]");
-  textFont(font2, 18);
+  textFont(font2, (width*18/800));
   text(lines[0]+" ", width - espacio_derecha - ancho_parcial, height-31);
     
   if ( nro_linea < lines.length ) {
@@ -588,13 +588,11 @@ class Ball {
       textAlign(CENTER);
       fill(0, 102, 153, lcalpha);
       //fill(0, 102, 153);
-      //if ( show_info || estamos_encima ) text(nombre, x, y+tamanio/5);
-      //if ( show_info ) text(nombre, x, y+tamanio/5);
-      //else text(nombre, x, y+tamanio/3);
-       text(nombre, x, y+tamanio/5);
+       if ( estamos_encima ) text(nombre, x, y-tamanio/5);
+       else text(nombre, x, y+tamanio/5);
     
       //if ( show_info || estamos_encima ) {
-      if ( show_info ) {
+      if ( estamos_encima ) {
         float tamanio1 = r*0.3;
 //        textFont(font, tamanio1);
         fill(0, 102, 153, lcalpha);

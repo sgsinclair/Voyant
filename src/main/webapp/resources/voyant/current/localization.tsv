@@ -571,3 +571,8 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-05-10	Voyant.panel.MicroSearch	title	MicroSearch																						
 2016-05-10	Voyant.panel.MicroSearch	helpTip	This tool shows an overview of the entire corpus and allows you to visualize the distribution of search terms.																						
 2016-05-10	Voyant.panel.MicroSearch	loading	Loading terms…																						
+2016-05-12	Voyant.panel.Bubbles	title	Bubbles																						
+2016-05-12	Voyant.panel.Bubbles	helpTip	Bubbles is a playful visualization of frequent terms in a document. 																						
+2016-05-12	Voyant.panel.Bubbles	adaptation	Adaptation of <a href="https://www.m-i-b.com.ar/letters/en/" target="_blank"><i>Letter Pairs</i> by Martin Ignacio Bereciartua</a>																						
+2016-05-12	Voyant.panel.Bubbles	sound	sound																						
+2016-05-12	Voyant.panel.Bubbles	soundTip	Togges the sound.																						
