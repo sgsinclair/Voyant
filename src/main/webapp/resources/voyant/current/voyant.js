@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 16 12:53:37 EDT 2016 */
+/* This file created by JSCacher. Last modified: Mon May 16 15:02:21 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6014,12 +6014,6 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			config.listeners = config.listeners || {};
 			config.listeners.beforeload = {
 					fn: function(store, operation) {
-						operation.callback = function() {
-							debugger
-						}
-						operation.loadCallback = function() {
-							debugger
-						}
 						var parent = this.getParentPanel();
 						if (parent !== undefined) {
 							var params = parent.getApiParams();
@@ -6033,7 +6027,6 @@ Ext.define('Voyant.data.store.VoyantStore', {
 					scope: this
 					
 			}
-			config.listeners.load = function() {debugger}
 		}
 		
 		Ext.apply(this, config);
@@ -7111,8 +7104,7 @@ Ext.define('Voyant.widget.CorpusSelector', {
         fieldLabel:'Choose a corpus:',
         name:'corpus',
         queryMode:'local',
-        store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],				            
-        forceSelection:true
+        store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]]
     },
     initComponent: function(config) {
     	var me = this;
@@ -10993,7 +10985,6 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    name: 'inputFormat',
 						    queryMode:'local',
 						    store:[['',me.localize('inputFormatAuto')],['dtoc','DToC: Dynamic Table of Contexts'],['TEI',"TEI: Text Encoding Initative"],['TEI',"TEI Corpus"],['RSS',"Really Simple Syndication: RSS"]],
-						    forceSelection:true,
 						    value: ''
 						},{
 							xtype: 'container',
@@ -12078,7 +12069,12 @@ Ext.define('Voyant.panel.CorpusTerms', {
         var me = this;
 
         var store = Ext.create("Voyant.data.store.CorpusTermsBuffered", {
-        	parentPanel: this
+        	parentPanel: this,
+        	proxy: {
+        		extraParams: {
+        			withDistributions: 'relative'
+        		}
+        	}
         });
         
         Ext.apply(me, {

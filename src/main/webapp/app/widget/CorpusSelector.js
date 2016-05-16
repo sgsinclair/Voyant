@@ -13,8 +13,7 @@ Ext.define('Voyant.widget.CorpusSelector', {
         fieldLabel:'Choose a corpus:',
         name:'corpus',
         queryMode:'local',
-        store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]],				            
-        forceSelection:true
+        store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]]
     },
     initComponent: function(config) {
     	var me = this;

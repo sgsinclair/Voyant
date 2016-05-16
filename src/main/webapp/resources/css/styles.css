@@ -236,11 +236,11 @@ svg#collocatesGraph line {
 }
 
 .dropzone-enabled {
-    background-color: rgba(255, 0, 0, 0.1);
+    background-color: rgba(0, 255, 0, 0.1);
 }
 
 .dropzone-disabled {
-    background-color: rgba(0, 255, 0, 0.1);
+    background-color: rgba(255, 0, 0, 0.1);
 }
 
 .dragsource {

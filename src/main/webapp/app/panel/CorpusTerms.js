@@ -32,7 +32,12 @@ Ext.define('Voyant.panel.CorpusTerms', {
         var me = this;
 
         var store = Ext.create("Voyant.data.store.CorpusTermsBuffered", {
-        	parentPanel: this
+        	parentPanel: this,
+        	proxy: {
+        		extraParams: {
+        			withDistributions: 'relative'
+        		}
+        	}
         });
         
         Ext.apply(me, {

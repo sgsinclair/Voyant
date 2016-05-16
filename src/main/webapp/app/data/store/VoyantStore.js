@@ -65,12 +65,6 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			config.listeners = config.listeners || {};
 			config.listeners.beforeload = {
 					fn: function(store, operation) {
-						operation.callback = function() {
-							debugger
-						}
-						operation.loadCallback = function() {
-							debugger
-						}
 						var parent = this.getParentPanel();
 						if (parent !== undefined) {
 							var params = parent.getApiParams();
@@ -84,7 +78,6 @@ Ext.define('Voyant.data.store.VoyantStore', {
 					scope: this
 					
 			}
-			config.listeners.load = function() {debugger}
 		}
 		
 		Ext.apply(this, config);
