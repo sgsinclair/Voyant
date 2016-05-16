@@ -102,6 +102,7 @@ app/panel/Reader.js
 app/panel/ScatterPlot.js
 app/panel/StreamGraph.js
 app/panel/Summary.js
+app/panel/TextualArc.js
 app/panel/TopicContexts.js
 app/panel/TermsRadio.js
 app/panel/Trends.js

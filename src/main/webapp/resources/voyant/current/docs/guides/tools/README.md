@@ -207,6 +207,19 @@
 	</dd></a>
 </div>
 
+
+<div class="thumb-list">
+	<a href="#!/guide/textualarc"><dd>
+		<div class="thumb">
+			<img src="guides/textualarc/icon.png" />
+		</div>
+		<div>
+			<h4>TextualArc</h4>
+			<p>TextualArc is a visualization of the terms in a document that includes a weighted centroid of terms and an arc that follows the terms in document order.</p>
+		</div>
+	</dd></a>
+</div>
+
 <div class="thumb-list">
 	<a href="#!/guide/trends"><dd>
 		<div class="thumb">

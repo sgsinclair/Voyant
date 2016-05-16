@@ -33,8 +33,7 @@ Ext.define('Voyant.data.model.Document', {
 				config = {limit: config};
 			}
 			Ext.applyIf(config, {
-				limit: 0,
-				docIndex: this.getIndex()
+				limit: 0
 			})
 			var documentTerms = this.getDocumentTerms();
 			documentTerms.load({
@@ -51,15 +50,76 @@ Ext.define('Voyant.data.model.Document', {
 		}
     	
     },
+    
+    loadTokens: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0
+			})
+			var tokens = this.getTokens(config);
+			tokens.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(tokens)
+					} else {
+						dfd.reject(operation)
+					}
+				}
+			})
+			return dfd.promise
+		}
+    	
+    },
+    
+    getTokens: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+	    	config = config || {};
+	    	Ext.applyIf(config, {
+	    		proxy: {}
+	    	});
+	    	Ext.applyIf(config.proxy, {
+	    		extraParams: {}
+	    	})
+	    	Ext.applyIf(config.proxy.extraParams, {
+	    		docIndex: this.get('index')
+	    	})
+	    	Ext.apply(config, {
+	    		docId: this.get('id')
+	    	});
+	    	return this.get('corpus').getTokens(config);
+//	    	return new Voyant.data.store.Tokens(config);
+		}
+    },
+
     getDocumentTerms: function(config) {
-    	config = config || {};
-    	Ext.apply(config, {
-    		docId: this.get('id')
-    	});
-    	if (config.corpus) {
-    		return config.corpus.getDocumentTerms(config);
-    	}
-    	return this.get('corpus').getDocumentTerms(config); // FIXME: when does this happen?
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+	    	config = config || {};
+	    	Ext.applyIf(config, {
+	    		proxy: {}
+	    	});
+	    	Ext.applyIf(config.proxy, {
+	    		extraParams: {}
+	    	})
+	    	Ext.applyIf(config.proxy.extraParams, {
+	    		docIndex: this.get('index')
+	    	})
+	    	if (config.corpus) {
+	    		return config.corpus.getDocumentTerms(config);
+	    	}
+	    	return this.get('corpus').getDocumentTerms(config); // FIXME: when does this happen?
+		}
     },
     
     getIndex: function() {

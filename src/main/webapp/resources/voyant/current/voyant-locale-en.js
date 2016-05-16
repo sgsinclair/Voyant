@@ -382,6 +382,12 @@ Ext.apply(Voyant.util.Toolable.i18n, {
 "exportGridCurrentJson":"export current data as JSON",
 "exportSvg":"export the SVG of this visualization",
 "saveTip":"Export a URL, an embeddable tool, data or a bibliographic reference."});
+Ext.apply(Voyant.panel.TextualArc.i18n, {
+"adaptation":"Inspired by W. Bradford Paley's <a href=\"http://textarc.org\" target=\"_blank\">TextArc</a>",
+"title":"TextualArc",
+"speedTip":"Controls the speed of the visualization.",
+"helpTip":"TextualArc is a visualization of the terms in a document that includes a weighted centroid of terms and an arc that follows the terms in document order.",
+"speed":"speed"});
 Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "freqsMode":"Frequencies",
 "freqsModeTip":"Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).",

@@ -153,6 +153,11 @@
                         "title": "Terms Radio"
                     },
                     {
+                        "name": "textualarc",
+                        "url": "guides/tools/textualarc",
+                        "title": "TextualArc"
+                    },
+                    {
                         "name": "trends",
                         "url": "guides/tools/trends",
                         "title": "Trends"
