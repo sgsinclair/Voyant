@@ -307,6 +307,7 @@ return {
         }
 
         return this.owner.then(function (value) {
+        	debugger
             try {
                 onCompleted();
             }

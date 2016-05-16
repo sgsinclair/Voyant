@@ -580,6 +580,9 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-05-12	Voyant.panel.Bubbles	speedTip	Controls the speed of the visualization.																						
 2016-05-15	Voyant.panel.TextualArc	title	TextualArc																						
 2016-05-15	Voyant.panel.TextualArc	helpTip	TextualArc is a visualization of the terms in a document that includes a weighted centroid of terms and an arc that follows the terms in document order.																						
+2016-05-16	Voyant.panel.TextualArc	search	filter																						
 2016-05-15	Voyant.panel.TextualArc	speed	speed																						
 2016-05-15	Voyant.panel.TextualArc	speedTip	Controls the speed of the visualization.																						
 2016-05-15	Voyant.panel.TextualArc	adaptation	Inspired by W. Bradford Paley's <a href="http://textarc.org" target="_blank">TextArc</a>																						
+2016-05-16	Voyant.panel.TextualArc	minRawFreq	minimum frequency																						
+2016-05-16	Voyant.panel.TextualArc	minRawFreqTip	The minimum number of occurrences for terms. By default this is set to 2 (repeating words) to improve performance, setting it to 1 may slow things down considerably.																						

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun May 15 21:58:55 EDT 2016 */
+/* This file created by JSCacher. Last modified: Mon May 16 12:53:37 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5335,6 +5335,7 @@ Ext.define("Voyant.notebook.util.Show", {
 			}
 		},
 		showError: function(error, more) {
+			debugger
 			var mode = Voyant.notebook.util.Show.MODE;
 			Voyant.notebook.util.Show.MODE='error';
 			
@@ -5370,6 +5371,7 @@ Ext.define("Voyant.notebook.util.Show", {
 
 var show = Voyant.notebook.util.Show.show;
 var showError = Voyant.notebook.util.Show.showError;
+
 Ext.define("Voyant.notebook.util.Embed", {
 	transferable: ['embed'],
 	embed: function() { // this is for instances
@@ -6002,6 +6004,9 @@ Ext.define('Voyant.data.store.VoyantStore', {
 		});
 		
 		if (config.parentPanel !== undefined) {
+			Ext.applyIf(config.proxy.extraParams, {
+				forTool: config.parentPanel.xtype
+			});
 			this.setParentPanel(config.parentPanel);
 			config.parentPanel.on("loadedCorpus", function(src, corpus) {
 				this.setCorpus(corpus);
@@ -6009,6 +6014,12 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			config.listeners = config.listeners || {};
 			config.listeners.beforeload = {
 					fn: function(store, operation) {
+						operation.callback = function() {
+							debugger
+						}
+						operation.loadCallback = function() {
+							debugger
+						}
 						var parent = this.getParentPanel();
 						if (parent !== undefined) {
 							var params = parent.getApiParams();
@@ -6022,6 +6033,7 @@ Ext.define('Voyant.data.store.VoyantStore', {
 					scope: this
 					
 			}
+			config.listeners.load = function() {debugger}
 		}
 		
 		Ext.apply(this, config);
@@ -6173,11 +6185,11 @@ Ext.define('Voyant.data.store.CorpusFacetsBuffered', {
 Ext.define('Voyant.data.store.CorpusTermsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: Voyant.data.model.CorpusTerm,
-    statics: {
-    	i18n: {
-    		getString: "This store has {0} terms with a total of {1} occurrences."
-    	}
-    },
+//    statics: {
+//    	i18n: {
+//    		getString: "This store has {0} terms with a total of {1} occurrences."
+//    	}
+//    },
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.CorpusTerms',
@@ -12066,10 +12078,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
         var me = this;
 
         var store = Ext.create("Voyant.data.store.CorpusTermsBuffered", {
-        	parentPanel: this,
-        	proxy: {
-        		extraParams: {withDistributions: 'relative', forTool: this.xtype}
-        	}
+        	parentPanel: this
         });
         
         Ext.apply(me, {
@@ -12183,12 +12192,12 @@ Ext.define('Voyant.panel.CorpusTerms', {
     		if (corpus.getDocumentsCount()>100) {
     			this.getStore().getProxy().setExtraParam('bins', this.getApiParam('maxBins'));
     		}
-    		this.getStore().loadPage(1);
+    		this.getStore().load()
     	}, me);
     	
     	me.on("query", function(src, query) {
     		this.setApiParam('query', query);
-    		this.getStore().loadPage(1);
+    		this.getStore().load();
     	}, me);
 
 
@@ -16148,14 +16157,39 @@ Ext.define('Voyant.panel.TextualArc', {
     		
     		docIndex: 0,
     		
-    		speed: 50
+    		speed: 50,
+    		
+    		minRawFreq: 2
     			
     	},
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
 		corpus: undefined,
-    	options: {xtype: 'stoplistoption'}
+    	options: [{xtype: 'stoplistoption'},{
+    		xtype: 'container',
+    		items: {
+    			xtype: 'numberfield',
+	    		name: 'minRawFreq',
+	    		minValue: 1,
+	    		maxValue: 10,
+	    		value: 2,
+	    		labelWidth: 150,
+	    		labelAlign: 'right',
+	    		initComponent: function() {
+	    			var panel = this.up('window').panel;
+	    			this.fieldLabel = panel.localize(this.fieldLabel);
+	    			this.on("afterrender", function(cmp) {
+			        	Ext.tip.QuickTipManager.register({
+			                 target: cmp.getEl(),
+			                 text: panel.localize('minRawFreqTip')
+			             });
+	    			})
+	    			this.callParent(arguments);
+	    		},
+	    		fieldLabel: 'minRawFreq'
+    		}
+    	}]
 	},
 	
 	tokensFetch: 500,
@@ -16163,6 +16197,7 @@ Ext.define('Voyant.panel.TextualArc', {
     constructor: function() {
 
     	this.mixins['Voyant.util.Localization'].constructor.apply(this, arguments);
+    	this.config.options[1].fieldLabel = this.localize(this.config.options[1].fieldLabel);
     	Ext.apply(this, {
     		title: this.localize('title'),
 			html: '<canvas width="800" height="600"></canvas>',
@@ -16171,6 +16206,16 @@ Ext.define('Voyant.panel.TextualArc', {
                 xtype: 'toolbar',
         		enableOverflow: true,
                 items: [{
+                	xtype: 'combo',
+                	itemId: 'search',
+                	queryMode: 'local',
+                	displayField: 'term',
+                	valueField: 'term',
+                	width: 90,
+                	emptyText: this.localize('search'),
+                	forceSelection: true,
+                	disabled: true
+                },{
 	            	xtype: 'documentselectorbutton',
 	            	singleSelect: true
 	            },{
@@ -16284,7 +16329,6 @@ Ext.define('Voyant.panel.TextualArc', {
         		setTimeout(function() {
         			me.draw();
         		}, 10)
-//        		Ext.Function.defer(this.draw, 10, this);
         	}
     	}
     },
@@ -16431,10 +16475,13 @@ Ext.define('Voyant.panel.TextualArc', {
     				stopList: this.getApiParam('stopList'),
     				bins: this.diam,
     				withDistributions: 'raw',
-    				minRawFreq: 2
+    				minRawFreq: parseInt(this.getApiParam('minRawFreq'))
     			}
     		}
     	});
+    	var search = this.queryById('search');
+    	search.setDisabled(true);
+    	search.setStore(this.documentTerms);
     	this.fetchMoreDocumentTerms();
     },
     
@@ -16460,6 +16507,7 @@ Ext.define('Voyant.panel.TextualArc', {
     				Ext.Function.defer(this.fetchMoreDocumentTerms, 0, this);
     				this.draw();
     			} else {
+    				this.queryById('search').setDisabled(false);
     				this.termsMap = {};
     				this.documentTerms.each(function(documentTerm) {
     					this.termsMap[documentTerm.getTerm()] = documentTerm;

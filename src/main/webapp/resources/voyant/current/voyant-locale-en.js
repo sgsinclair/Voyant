@@ -383,6 +383,9 @@ Ext.apply(Voyant.util.Toolable.i18n, {
 "exportSvg":"export the SVG of this visualization",
 "saveTip":"Export a URL, an embeddable tool, data or a bibliographic reference."});
 Ext.apply(Voyant.panel.TextualArc.i18n, {
+"minRawFreqTip":"The minimum number of occurrences for terms. By default this is set to 2 (repeating words) to improve performance, setting it to 1 may slow things down considerably.",
+"search":"filter",
+"minRawFreq":"minimum frequency",
 "adaptation":"Inspired by W. Bradford Paley's <a href=\"http://textarc.org\" target=\"_blank\">TextArc</a>",
 "title":"TextualArc",
 "speedTip":"Controls the speed of the visualization.",

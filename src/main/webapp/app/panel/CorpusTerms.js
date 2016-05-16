@@ -32,10 +32,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
         var me = this;
 
         var store = Ext.create("Voyant.data.store.CorpusTermsBuffered", {
-        	parentPanel: this,
-        	proxy: {
-        		extraParams: {withDistributions: 'relative', forTool: this.xtype}
-        	}
+        	parentPanel: this
         });
         
         Ext.apply(me, {
@@ -149,12 +146,12 @@ Ext.define('Voyant.panel.CorpusTerms', {
     		if (corpus.getDocumentsCount()>100) {
     			this.getStore().getProxy().setExtraParam('bins', this.getApiParam('maxBins'));
     		}
-    		this.getStore().loadPage(1);
+    		this.getStore().load()
     	}, me);
     	
     	me.on("query", function(src, query) {
     		this.setApiParam('query', query);
-    		this.getStore().loadPage(1);
+    		this.getStore().load();
     	}, me);
 
 

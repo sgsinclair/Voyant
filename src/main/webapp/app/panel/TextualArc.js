@@ -16,14 +16,39 @@ Ext.define('Voyant.panel.TextualArc', {
     		
     		docIndex: 0,
     		
-    		speed: 50
+    		speed: 50,
+    		
+    		minRawFreq: 2
     			
     	},
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
 		corpus: undefined,
-    	options: {xtype: 'stoplistoption'}
+    	options: [{xtype: 'stoplistoption'},{
+    		xtype: 'container',
+    		items: {
+    			xtype: 'numberfield',
+	    		name: 'minRawFreq',
+	    		minValue: 1,
+	    		maxValue: 10,
+	    		value: 2,
+	    		labelWidth: 150,
+	    		labelAlign: 'right',
+	    		initComponent: function() {
+	    			var panel = this.up('window').panel;
+	    			this.fieldLabel = panel.localize(this.fieldLabel);
+	    			this.on("afterrender", function(cmp) {
+			        	Ext.tip.QuickTipManager.register({
+			                 target: cmp.getEl(),
+			                 text: panel.localize('minRawFreqTip')
+			             });
+	    			})
+	    			this.callParent(arguments);
+	    		},
+	    		fieldLabel: 'minRawFreq'
+    		}
+    	}]
 	},
 	
 	tokensFetch: 500,
@@ -31,6 +56,7 @@ Ext.define('Voyant.panel.TextualArc', {
     constructor: function() {
 
     	this.mixins['Voyant.util.Localization'].constructor.apply(this, arguments);
+    	this.config.options[1].fieldLabel = this.localize(this.config.options[1].fieldLabel);
     	Ext.apply(this, {
     		title: this.localize('title'),
 			html: '<canvas width="800" height="600"></canvas>',
@@ -39,6 +65,16 @@ Ext.define('Voyant.panel.TextualArc', {
                 xtype: 'toolbar',
         		enableOverflow: true,
                 items: [{
+                	xtype: 'combo',
+                	itemId: 'search',
+                	queryMode: 'local',
+                	displayField: 'term',
+                	valueField: 'term',
+                	width: 90,
+                	emptyText: this.localize('search'),
+                	forceSelection: true,
+                	disabled: true
+                },{
 	            	xtype: 'documentselectorbutton',
 	            	singleSelect: true
 	            },{
@@ -152,7 +188,6 @@ Ext.define('Voyant.panel.TextualArc', {
         		setTimeout(function() {
         			me.draw();
         		}, 10)
-//        		Ext.Function.defer(this.draw, 10, this);
         	}
     	}
     },
@@ -299,10 +334,13 @@ Ext.define('Voyant.panel.TextualArc', {
     				stopList: this.getApiParam('stopList'),
     				bins: this.diam,
     				withDistributions: 'raw',
-    				minRawFreq: 2
+    				minRawFreq: parseInt(this.getApiParam('minRawFreq'))
     			}
     		}
     	});
+    	var search = this.queryById('search');
+    	search.setDisabled(true);
+    	search.setStore(this.documentTerms);
     	this.fetchMoreDocumentTerms();
     },
     
@@ -328,6 +366,7 @@ Ext.define('Voyant.panel.TextualArc', {
     				Ext.Function.defer(this.fetchMoreDocumentTerms, 0, this);
     				this.draw();
     			} else {
+    				this.queryById('search').setDisabled(false);
     				this.termsMap = {};
     				this.documentTerms.each(function(documentTerm) {
     					this.termsMap[documentTerm.getTerm()] = documentTerm;

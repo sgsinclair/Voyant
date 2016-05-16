@@ -55,6 +55,9 @@ Ext.define('Voyant.data.store.VoyantStore', {
 		});
 		
 		if (config.parentPanel !== undefined) {
+			Ext.applyIf(config.proxy.extraParams, {
+				forTool: config.parentPanel.xtype
+			});
 			this.setParentPanel(config.parentPanel);
 			config.parentPanel.on("loadedCorpus", function(src, corpus) {
 				this.setCorpus(corpus);
@@ -62,6 +65,12 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			config.listeners = config.listeners || {};
 			config.listeners.beforeload = {
 					fn: function(store, operation) {
+						operation.callback = function() {
+							debugger
+						}
+						operation.loadCallback = function() {
+							debugger
+						}
 						var parent = this.getParentPanel();
 						if (parent !== undefined) {
 							var params = parent.getApiParams();
@@ -75,6 +84,7 @@ Ext.define('Voyant.data.store.VoyantStore', {
 					scope: this
 					
 			}
+			config.listeners.load = function() {debugger}
 		}
 		
 		Ext.apply(this, config);

@@ -16,6 +16,7 @@ Ext.define("Voyant.notebook.util.Show", {
 			}
 		},
 		showError: function(error, more) {
+			debugger
 			var mode = Voyant.notebook.util.Show.MODE;
 			Voyant.notebook.util.Show.MODE='error';
 			
