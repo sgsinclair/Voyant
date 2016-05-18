@@ -586,3 +586,15 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Romanian (ro)	Cr
 2016-05-15	Voyant.panel.TextualArc	adaptation	Inspired by W. Bradford Paley's <a href="http://textarc.org" target="_blank">TextArc</a>																						
 2016-05-16	Voyant.panel.TextualArc	minRawFreq	minimum frequency																						
 2016-05-16	Voyant.panel.TextualArc	minRawFreqTip	The minimum number of occurrences for terms. By default this is set to 2 (repeating words) to improve performance, setting it to 1 may slow things down considerably.																						
+2016-05-18	Voyant.panel.Mandala	title	Mandala																						
+2016-05-18	Voyant.panel.Mandala	helpTip	Mandala is a visualization that shows the relationships between terms and documents. Each search term (or magnet) pulls documents toward it based on the term's relative frequency in the corpus.																						
+2016-05-18	Voyant.panel.Mandala	add	Add																						
+2016-05-18	Voyant.panel.Mandala	addTip	Add a magnet (search term).																						
+2016-05-18	Voyant.panel.Mandala	clear	Clear																						
+2016-05-18	Voyant.panel.Mandala	clearTip	Clear all magnets (search term).																						
+2016-05-18	Voyant.panel.Mandala	labels	labels																						
+2016-05-18	Voyant.panel.Mandala	labelsTip	Toggle visibiity of labels																						
+2016-05-18	Voyant.panel.Mandala	remove	remove																						
+2016-05-18	Voyant.panel.Mandala	cancel	cancel																						
+2016-05-18	Voyant.panel.Mandala	update	update																						
+2016-05-18	Voyant.panel.Mandala	EditMagnet	Edit Magnet																						

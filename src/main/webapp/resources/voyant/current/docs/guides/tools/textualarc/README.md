@@ -8,11 +8,15 @@ The current text is represented on the perimeter of the circle, starting at the 
 
 ## Options
 
-You can switch to a different document by selecting it in the Documents selectors.
+You can filter the terms displayed using the search box. This is especially useful for locating terms of interest (and then removing the filter to see it again in with other terms). Only currently loaded document terms will be shown and used for filtering.
+
+You can switch to a different document by selecting it in the Documents selectors, this will restart the reading from the beginning of the new document.
 
 You can adjust the speed of the visualization using the speed slider. You can stop the reading by sliding the speed to 0. It's not especially recommended to slide the speed to top speed because of performance issues.
 
 Clicking on the [Options](#!/guide/options) icon allows you to define a set of stopwords to exclude – see the [stopwords guide](#!/guide/stopwords) for more information.
+
+You can adjust the minimum raw frequency to use for document terms. By default this is set to 2 (only repeating terms). You can set it to 1 to see all the document terms, but this may slow down the visualization considerably, depending on the size of the document.
 
 ## Additional Information
 

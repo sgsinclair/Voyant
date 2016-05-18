@@ -14,7 +14,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     		docIndex: undefined,
     		docId: undefined
     	},
-		glyph: 'xf1cb@FontAwesome'
+		glyph: 'xf1fe@FontAwesome'
     },
     
     config: {

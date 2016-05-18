@@ -13,7 +13,7 @@ Ext.define('Voyant.panel.WordTree', {
     		context: 10,
     		limit: 5
     	},
-		glyph: 'xf1cb@FontAwesome'
+		glyph: 'xf0e8@FontAwesome'
     },
     
     config: {

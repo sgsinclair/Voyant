@@ -13,7 +13,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		terms: undefined,
     		context: 5
     	},
-		glyph: 'xf1cb@FontAwesome'
+		glyph: 'xf1e0@FontAwesome'
     },
     
     config: {

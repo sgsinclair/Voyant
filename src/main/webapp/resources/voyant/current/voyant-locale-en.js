@@ -298,6 +298,19 @@ Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 "enabledLabel":"include: ",
 "fieldLabel":"Filenames",
 "pubDateLabel":"date"});
+Ext.apply(Voyant.panel.Mandala.i18n, {
+"add":"Add",
+"cancel":"cancel",
+"clearTip":"Clear all magnets (search term).",
+"EditMagnet":"Edit Magnet",
+"clear":"Clear",
+"labelsTip":"Toggle visibiity of labels",
+"update":"update",
+"title":"Mandala",
+"addTip":"Add a magnet (search term).",
+"helpTip":"Mandala is a visualization that shows the relationships between terms and documents. Each search term (or magnet) pulls documents toward it based on the term's relative frequency in the corpus.",
+"remove":"remove",
+"labels":"labels"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "matchingTerms":"Matching terms: {count}",
 "tfidfTip":"The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.",

@@ -36,6 +36,10 @@ Ext.define('Voyant.data.model.CorpusTerm', {
 		return parseInt(this.get('inDocumentsCount'));
 	},
 	
+	getDistributions: function() {
+		return this.get('distributions');
+	},
+	
 	/**
 	 * Show a one line summary of this term.
 	 */
