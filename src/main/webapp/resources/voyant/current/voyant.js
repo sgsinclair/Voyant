@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 18 15:26:10 EDT 2016 */
+/* This file created by JSCacher. Last modified: Wed May 18 15:52:31 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -13813,7 +13813,7 @@ Ext.define('Voyant.panel.Mandala', {
     	this.mixins['Voyant.util.Localization'].constructor.apply(this, arguments);
     	Ext.apply(this, {
     		title: this.localize('title'),
-			html: '<canvas width="800" height="600"></canvas>',
+			html: '<div style="text-align: center"><canvas width="800" height="600"></canvas></div>',
 			dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
@@ -14062,7 +14062,7 @@ Ext.define('Voyant.panel.Mandala', {
         				min = Ext.Array.min(vals), max = Ext.Array.max(vals);
         			var weights = 0;
         			doc.matches.forEach(function(term, j) {
-        				weight = max==min ? 1 : (vals[j]-min)/(max-min);
+        				weight = max==min ? 1 : ((vals[j]-min)+min)/((max-min)+min);
         				weights += weight;
         				x += this.magnets[term].x*weight;
         				y += this.magnets[term].y*weight;
@@ -14209,7 +14209,7 @@ Ext.define('Voyant.panel.Mandala', {
 				me.draw();
 			}, 100);
 		} else if (this.documents) {
-			var minDist = 15, spring = .1
+			var minDist = Math.max(radius/this.documents.length, 50), spring = .1
 			for (var i=0, len=this.documents.length; i<len; i++) {
 				for (var j=0; j<len; j++) {
 					if (i<j) {
@@ -14221,8 +14221,8 @@ Ext.define('Voyant.panel.Mandala', {
 							var ax = dx * spring, ay = dy * spring;
 							this.documents[i].targetX += ax;
 							this.documents[j].targetX -= ax;
-							this.documents[i].targetX += ay;
-							this.documents[j].targetX -= ay;
+							this.documents[i].targetY += ay;
+							this.documents[j].targetY -= ay;
 							needRedraw = true;
 						}
 					}

@@ -124,6 +124,18 @@
 </div>
 
 <div class="thumb-list">
+	<a href="#!/guide/mandala"><dd>
+		<div class="thumb">
+			<img src="guides/mandala/icon.png" />
+		</div>
+		<div>
+			<h4>Mandala</h4>
+			<p>Mandala is a conceptual visualization that shows the relationships between terms and documents.</p>
+		</div>
+	</dd></a>
+</div>
+
+<div class="thumb-list">
 	<a href="#!/guide/microsearch"><dd>
 		<div class="thumb">
 			<img src="guides/microsearch/icon.png" />

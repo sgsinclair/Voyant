@@ -118,6 +118,11 @@
                         "title": "Knots"
                     },
                     {
+                        "name": "mandala",
+                        "url": "guides/tools/mandala",
+                        "title": "Mandala"
+                    },
+                    {
                         "name": "microsearch",
                         "url": "guides/tools/microsearch",
                         "title": "MicroSearch"
