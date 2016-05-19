@@ -18,7 +18,7 @@ Clicking on the [Options](#!/guide/options) icon allows you to define a set of s
 
 ## Additional Information
 
-The Mandala is an adaptation for Voyant Tools of the [Mandala Browser](http://mandala.humviz.org/).
+The Mandala is an adaptation for Voyant Tools of the [Mandala Browser](http://mandala.humviz.org/), a project by Stéfan Sinclair, Stan Ruecker Sandra Gabriele and Teresa Dobson, based on a concept by Oksana Cheypesh.
 
 ## See Also
 
