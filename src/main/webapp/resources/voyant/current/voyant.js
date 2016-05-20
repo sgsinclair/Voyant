@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu May 19 10:11:48 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu May 19 21:20:59 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -13150,37 +13150,37 @@ Ext.define('Voyant.panel.Dummy', {
         			style: {
         				padding: '0px',
         				verticalAlign: 'top',
-        				width: '100%',
-        				height: '100%'
+        				width: '10',
+        				height: '10'
         			}
         		}
         	},
         	defaults: { // place holder values to ensure that the children are rendered
-        		width: 500,
-        		height: 500
+        		width: 10,
+        		height: 10,
+        		border: true
         	},
         	items:  [{
-        		xtype: 'summary'
+        		xtype: 'summary',
+        		colspan: 2
         	},{
         		xtype: 'documents'
         	},{
         		xtype: 'cirrus'
-        	},{
-        		xtype: 'reader'
         	}]
         })
         
         this.on("boxready", function() {
-        	var table = this.getTargetEl().dom.querySelector(".x-table-layout");
-        		rows = table.querySelectorAll("tr"), rowHeight = this.getTargetEl().getHeight() / rows.length;
+        	var table = this.getTargetEl().dom.querySelector(".x-table-layout"),
+        		rows = table.querySelectorAll("tr"),
+        		width = this.getTargetEl().getWidth(), height = this.getTargetEl().getHeight();
         	for (var i=0; i<rows.length; i++) {
-        		Ext.get(rows[i]).setHeight(rowHeight);
-        		var cells = rows[i].querySelectorAll("td"), height = rowHeight;
-        			width = rows[i].clientWidth, cellWidth = width / cells.length;
+        		Ext.get(rows[i]).setHeight(height/rows.length);
+        		var cells = rows[i].querySelectorAll("td");
         		for (j=0; j<cells.length; j++) {
         			var cmp = Ext.getCmp(cells[j].children[0].id);
-        			cmp.setWidth(cellWidth * parseInt(cells[0].getAttribute('colspan')));
-        			cmp.setHeight(height);
+        			cmp.setWidth(width/cells.length);
+        			cmp.setHeight(height/rows.length);
         			cmp.updateLayout();
         		}
         	}
