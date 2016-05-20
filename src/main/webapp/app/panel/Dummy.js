@@ -5,7 +5,7 @@ Ext.define('Voyant.panel.Dummy', {
     initComponent: function() {
         var me = this;
         
-        var columns = 2;
+        var columns = 3;
         
         Ext.apply(this, {
         	layout: {
@@ -20,9 +20,7 @@ Ext.define('Voyant.panel.Dummy', {
         		tdAttrs: {
         			style: {
         				padding: '0px',
-        				verticalAlign: 'top',
-        				width: '10',
-        				height: '10'
+        				verticalAlign: 'top'
         			}
         		}
         	},
@@ -32,29 +30,75 @@ Ext.define('Voyant.panel.Dummy', {
         		border: true
         	},
         	items:  [{
-        		xtype: 'summary',
-        		colspan: 2
+        		colspan: 2,
+        		xtype: 'summary'
         	},{
-        		xtype: 'documents'
+        		xtype: 'reader',
+        		rowspan: 2
         	},{
-        		xtype: 'cirrus'
+        		xtype: 'documentterms'
+        	},{
+        		xtype: 'corpusterms'
         	}]
         })
         
         this.on("boxready", function() {
-        	var table = this.getTargetEl().dom.querySelector(".x-table-layout"),
-        		rows = table.querySelectorAll("tr"),
-        		width = this.getTargetEl().getWidth(), height = this.getTargetEl().getHeight();
+        	this.body.setStyle('overflow', 'hidden');
+        	
+        	var sizeMap = {};
+        	
+        	var table = this.getTargetEl().down(".x-table-layout");
+        	var rows = table.dom.rows;
         	for (var i=0; i<rows.length; i++) {
-        		Ext.get(rows[i]).setHeight(height/rows.length);
-        		var cells = rows[i].querySelectorAll("td");
-        		for (j=0; j<cells.length; j++) {
-        			var cmp = Ext.getCmp(cells[j].children[0].id);
-        			cmp.setWidth(width/cells.length);
-        			cmp.setHeight(height/rows.length);
-        			cmp.updateLayout();
+        		var cells = rows[i].cells;
+        		for (var j=0; j<cells.length; j++) {
+        			var cell = cells[j];
+        			var cellEl = Ext.get(cell);
+        			var size = cellEl.getSize(false);
+        			var cmpId = cellEl.down('.x-panel').id;
+        			sizeMap[cmpId] = size;
         		}
         	}
+        	
+        	for (var id in sizeMap) {
+        		var size = sizeMap[id];
+        		Ext.getCmp(id).setSize(size);
+        	}
+
+        	this.updateLayout();
+        })
+        
+        this.on('resize', function(panel, newwidth, newheight, oldwidth, oldheight) {
+        	if (oldwidth !== undefined && oldheight !== undefined) {
+	        	var widthRatio = newwidth/oldwidth;
+	        	var heightRatio = newheight/oldheight;
+
+	        	var sizeMap = {};
+	        	
+	        	var table = this.getTargetEl().down(".x-table-layout");
+	        	var rows = table.dom.rows;
+	        	for (var i=0; i<rows.length; i++) {
+	        		var cells = rows[i].cells;
+	        		for (var j=0; j<cells.length; j++) {
+	        			var cell = cells[j];
+	        			var cellEl = Ext.get(cell);
+	        			var panelEl = cellEl.down('.x-panel');
+	        			var size = panelEl.getSize(false); // get panel size this time since table cell size will be inaccurate
+	        			var w = Math.floor(size.width * widthRatio);
+		        		var h = Math.floor(size.height * heightRatio);
+	        			var cmpId = panelEl.id;
+	        			sizeMap[cmpId] = {width: w, height: h};
+	        		}
+	        	}
+	        	
+	        	for (var id in sizeMap) {
+	        		var size = sizeMap[id];
+	        		Ext.getCmp(id).setSize(size);
+	        	}
+	
+	        	this.updateLayout();
+        	}
+        	
         })
         
         this.callParent();
