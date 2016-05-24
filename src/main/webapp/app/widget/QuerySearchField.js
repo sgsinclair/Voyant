@@ -65,6 +65,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	me.on("beforequery", function(queryPlan) {
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
+    			if (queryPlan.query.charAt(0)=="*") { // treat leading wildcard as regex .*
+    				queryPlan.query = ".*" + queryPlan.query.substring(1);
+    			}
     			if (queryPlan.query.charAt(0)=="^") {
     				queryPlan.query=queryPlan.query.substring(1)
     				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
@@ -72,6 +75,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
     			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*') {
     				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
     				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+    			}
+    			if (queryPlan.query.charAt(0)==".") {
+    				queryPlan.cancel = queryPlan.query.length< (/\W/.test(queryPlan.query.charAt(1)) ? 5 : 4) // cancel if we only have 3 or fewer after .
     			}
     			try {
                     new RegExp(queryPlan.query);
@@ -83,7 +89,13 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	            	if (queryPlan.query.indexOf(" ")==-1) {queryPlan.cancel=true} // no space in phrase
 	            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
 	            }
-        		queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1 ? ","+"^"+queryPlan.query+"*" : "");
+	            if (queryPlan.query.indexOf("*")>-1) {
+	            	if (queryPlan.query.indexOf(" ")==-1) {
+	            		queryPlan.query += ",^"+queryPlan.query;
+	            	}
+	            } else {
+	            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1 ? ","+"^"+queryPlan.query+"*" : "")
+	            }
     		}
     	}, me);
     	

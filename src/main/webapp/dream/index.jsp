@@ -284,7 +284,7 @@
 				</td>
 				<td style="width: 2em">&nbsp:</td>
 				<td>
-					<img src="EMC-logo.gif" style="height: 100px; " alt="Early Modern Conversions" />
+					<img src="EMC_WebDigital.gif" style="height: 100px;" alt="Early Modern Conversions" />
 					<img src="voyant-tools.png" style="height: 100px; margin-right: 1em;" alt="Voyant Tool" />
 				</td>			
 			</tr>
