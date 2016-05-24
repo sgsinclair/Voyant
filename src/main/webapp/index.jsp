@@ -12,6 +12,7 @@
 	   else if (skin.equals("collocates")) {view="collocatesset";}
 	   else if (skin.equals("bubblelines")) {view="bubblelinesset";}
 	   else if (skin.equals("custom")) {view="customset";}
+	   else if (skin.equals("table")) {view="tableset";}
 	   else if (skin.equals("simple")==false){view="noskin";}
        query = query.replaceAll("skin="+skin, "");
        if (query.length()>0 && query.endsWith("&")==false) {query+="&";}
