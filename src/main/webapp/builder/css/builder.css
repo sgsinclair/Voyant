@@ -1,0 +1,25 @@
+#toolsList .listTool {
+	padding: 10px 5px;
+	cursor: pointer;
+}
+
+#toolsList .listTool.over {
+	background-color: #eee;
+}
+
+#toolsList .listTool.selected {
+	background-color: #6BB8EF;
+}
+
+table.builder, .builder tbody {
+	width: 100%;
+	height: 100%;
+}
+
+.builder td {
+	border: 3px solid #bbb;
+}
+
+.builder td.selected {
+	background-color: #6BB8EF;
+}

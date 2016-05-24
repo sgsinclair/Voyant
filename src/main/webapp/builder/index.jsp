@@ -1,0 +1,38 @@
+<%@ include file="../resources/jsp/pre_app.jsp" %>
+
+<script>
+    Ext.Loader.setConfig({
+        enabled : true,
+        paths : {
+            'Voyant' : '../app',
+            'resources': '../resources'
+        }
+    });
+    
+    Ext.application({
+        extend : 'Voyant.VoyantCorpusApp',
+        name: 'VoyantSkinBuilderApp',
+        config: {
+            baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/',
+            version: '<%= application.getInitParameter("version") %>',
+            build: '<%= application.getInitParameter("build") %>'
+        },
+        
+        launch: function() {
+            Ext.create('Ext.container.Viewport', {
+                layout: 'fit',
+                items: [{xtype: 'builder'}]
+            });
+            this.callParent(arguments);
+        }
+    });
+</script>
+
+<script src="Builder.js"></script>
+<script src="TableGrid.js"></script>
+
+<link href="css/builder.css" rel="stylesheet" type="text/css" />
+
+<body>
+</body>
+</html>
