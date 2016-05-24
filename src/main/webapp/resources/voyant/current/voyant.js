@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 23 21:37:40 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue May 24 13:31:45 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7785,7 +7785,7 @@ Ext.define('Voyant.widget.DownloadFilenameBuilder', {
 });
 
 Ext.define('Voyant.widget.DownloadFileFormat', {
-    extend: 'Ext.form.RadioGroup', //'Ext.container.Container',
+    extend: 'Ext.form.CheckboxGroup', //'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.downloadfileformat',
 	statics: {
