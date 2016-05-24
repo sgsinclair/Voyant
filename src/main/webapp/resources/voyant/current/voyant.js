@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu May 19 21:20:59 EDT 2016 */
+/* This file created by JSCacher. Last modified: Mon May 23 21:37:40 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8008,7 +8008,7 @@ Ext.define('Voyant.widget.Facet', {
 			query: undefined
 		}
 	},
-
+	
 	config: {
 		corpus: undefined
 	},
@@ -8050,6 +8050,10 @@ Ext.define('Voyant.widget.Facet', {
         	]
         });
         this.callParent();
+        
+        if (this.corpus) {
+        	this.setCorpus(this.corpus)
+        }
         
         this.on("query", function(src, query) {
         	this.setApiParam("query", query);
@@ -8833,7 +8837,27 @@ Ext.define('Voyant.panel.Catalogue', {
     		        		xtype: 'facet',
     		        		margin: 5,
     		        		border: true,
-    		        		frame: true
+    		        		frame: true,
+    		            	includeTools: {
+    		            		close: {
+    		            			type: 'close',
+    		                		tooltip: this.localize('closeFacetTip'),
+    		                		callback: function(facetCmp) {
+    		                			delete this.facets[facetCmp.facet]; // remove from facets map
+    		                			facetCmp.destroy(); // remove this facet
+    		                			this.updateResults();
+    		                		},
+    		                		scope: this
+    		            		},
+    		            		add: {
+    		            			type: 'plus',
+    		                		tooltip: this.localize('plusFacetTip'),
+    		                		callback: function() {
+    		                			this.addFacet();
+    		                		},
+    		                		scope: this
+    		            		}
+    		            	}
     		        	},
     		        	items: []
     		        },
@@ -8965,34 +8989,33 @@ Ext.define('Voyant.panel.Catalogue', {
     	});
     	
     	this.on('afterrender', function(panel) {
+    		
+    		var facetsCmp = this.queryById('facets');
+			this.addFacet({
+				facet: 'lexical',
+    			includeTools: {add: {
+        			type: 'plus',
+            		tooltip: this.localize('plusFacetTip'),
+            		callback: function() {
+            			this.addFacet();
+            		},
+            		scope: this
+        		}},
+				store: new Voyant.data.store.CorpusTerms({
+					parentPanel: this,
+    				proxy: {
+    					extraParams: {
+    	    				stopList: this.getApiParam("stopList")
+    					}
+    				}
+				})
+			}, facetsCmp)
+    		
     		var facets = this.getApiParam('facet');
     		if (Ext.isString(facets)) {facets = facets.split(",")}
-    		var facetsCmp = this.queryById('facets');
-			var itemTpl = '<span style="font-size: smaller;">(<span class="info-tip" data-qtip="'+panel.localize('matchingDocuments')+'">{inDocumentsCount}</span>)</span> {term}'+'<span style="font-size: smaller;"> (<span class="info-tip" data-qtip="'+panel.localize('rawFreqs')+'">{rawFreq}</span>)</span>'
     		facets.forEach(function(facet) {
-    			var title = panel.localize(facet+"Title");
-    			if (title=="["+facet+"Title]") {
-    				title = facet.replace(/^facet\./,"").replace(/^extra./,"");
-    			}
-    			var matchingDocumentsLabel = panel.localize('matchingDocuments');
-    			var facetCmp = facetsCmp.add({
-    				title: title,
-        			collapsible: true,
-    				facet: facet,
-        			columns: [{
-        				renderer: function(value, metaData, record) {
-        					return '<span style="font-size: smaller;">(<span class="info-tip" data-qtip="'+catalogue.localize('matchingDocuments')+'">'+record.getInDocumentsCount()+"</span>) </span>"+record.getLabel()
-        				},
-        				flex: 1
-        			}],
-    				bbar: [{
-    					xtype: 'querysearchfield',
-    					width: '100%',
-    					tokenType: facet.replace("facet.", ""),
-//    					inDocumentsCountOnly: true,
-    					itemTpl: itemTpl
-    				}]
-    			})
+    			this.addFacet({facet: facet}, facetsCmp)
+    			/*
     			facetCmp.getSelectionModel().on('selectionchange', function(model, selected) {
     				var labels = [];
     				selected.forEach(function(model) {
@@ -9004,36 +9027,12 @@ Ext.define('Voyant.panel.Catalogue', {
     			facetCmp.on('query', function(model, selected) {
     				panel.getFacets()[facetCmp.facet] = [];
     				panel.updateResults();
-    			})
-    		})
-    		var catalogue = this;
-    		var facetCmp = facetsCmp.add({
-    			title: panel.localize('lexicalTitle'),
-    			collapsible: true,
-    			store: Ext.create("Voyant.data.store.CorpusTerms", {
-    				parentPanel: this,
-    				// this isn't being set by the beforeload call in the store, so set it here
-    				proxy: {
-    					extraParams: {
-    	    				stopList: this.getApiParam("stopList")
-    					}
-    				}
-    			}),
-    			facet: 'lexical',
-    			columns: [{
-    				renderer: function(value, metaData, record) {
-    					return '<span style="font-size: smaller;">(<span class="info-tip" data-qtip="'+catalogue.localize('matchingDocuments')+'">'+record.getInDocumentsCount()+"</span>) </span>"+record.getTerm()+'<span style="font-size: smaller;"> (<span class="info-tip" data-qtip="'+catalogue.localize('rawFreqs')+'">'+record.getRawFreq()+"</span>)</span>"
-    				},
-    				flex: 1
-    			}],
-				bbar: [{
-					xtype: 'querysearchfield',
-//					width: '100%',
-					itemTpl: itemTpl,
-					grow: false,
-					growMax: 10
-				}]
-    		})
+    			})*/
+    		}, this);
+			
+
+			
+    		/*
 			facetCmp.getSelectionModel().on('selectionchange', function(model, selected) {
 				var labels = [];
 				selected.forEach(function(model) {
@@ -9041,9 +9040,63 @@ Ext.define('Voyant.panel.Catalogue', {
 				})
 				panel.getFacets()['lexical'] = labels;
 				panel.updateResults();
-			})
+			})*/
     	})
     	
+    },
+    
+    addFacet: function(config, facetsCmp) {
+    	if (!config) {
+    		// select first, then add
+    		return this.selectFacet(function(facet) {
+    			this.addFacet({facet: facet})
+    		})
+    	}
+		facetsCmp = facetsCmp || this.queryById('facets');
+    	var facet = config.facet,
+    		itemTpl = '<span style="font-size: smaller;">(<span class="info-tip" data-qtip="'+this.localize('matchingDocuments')+'">{inDocumentsCount}</span>)</span> {term}'+'<span style="font-size: smaller;"> (<span class="info-tip" data-qtip="'+this.localize('rawFreqs')+'">{rawFreq}</span>)</span>'
+
+		var title = this.localize(facet+"Title");
+		if (title=="["+facet+"Title]") {
+			title = facet.replace(/^facet\./,"").replace(/^extra./,"");
+		}
+		var matchingDocumentsLabel = this.localize('matchingDocuments');
+		
+		Ext.applyIf(config, {
+			title: title,
+			collapsible: true,
+			facet: facet,
+			columns: [{
+				renderer: function(value, metaData, record) {
+					return '<span style="font-size: smaller;">(<span class="info-tip" data-qtip="'+this.localize('matchingDocuments')+'">'+record.getInDocumentsCount()+"</span>) </span>"+
+						(record.getLabel ? record.getLabel() : record.getTerm()+'<span style="font-size: smaller;"> (<span class="info-tip" data-qtip="'+this.localize('rawFreqs')+'">'+record.getRawFreq()+"</span>)</span>")
+				},
+				flex: 1
+			}],
+			bbar: [{
+				xtype: 'querysearchfield',
+				width: '100%',
+				tokenType: facet.replace("facet.", ""),
+				itemTpl: itemTpl
+			}],
+			corpus: this.getCorpus()
+		})
+		
+		var facetCmp = facetsCmp.add(config);
+		
+		facetCmp.getSelectionModel().on('selectionchange', function(model, selected) {
+			var labels = [];
+			selected.forEach(function(model) {
+				labels.push({facet: facetCmp.facet, label: model.getLabel ? model.getLabel() : model.getTerm()})
+			})
+			this.getFacets()[facet] = labels;
+			this.updateResults();
+		}, this)
+		facetCmp.on('query', function(model, selected) {
+			this.getFacets()[facetCmp.facet] = [];
+			this.updateResults();
+		}, this)
+    	return facetCmp;
     },
     
     updateResults: function(queries) {
@@ -9190,7 +9243,75 @@ Ext.define('Voyant.panel.Catalogue', {
         	})        		
     	}
 	
+    },
+    
+    selectFacet: function(callback) {
+    	if (!this.facetsSelectionStore) {
+    		var keys = {};
+    		this.getCorpus().getDocuments().each(function(doc) {
+    			for (var key in doc.getData()) {
+    				if (key!="corpus" && key.indexOf("parent")!==0 && key.indexOf("-lexical")=="-1") {
+        				keys[key] = true
+    				}
+    			}
+    		});
+    		keys = Object.keys(keys);
+    		keys.sort();
+    		this.facetsSelectionStore = Ext.create('Ext.data.ArrayStore', {
+    		    fields: ['text'],
+    		    data: keys.map(function(key) {return [key]})
+    		});
+    	}
+    	
+    	var existingFacets = {};
+    	this.queryById('facets').items.each(function(cmp) {
+    		existingFacets[cmp.facet]=true;
+    	})
+
+    	this.facetsSelectionStore.filterBy(function(record) {
+    		return !("facet."+record.get('text') in existingFacets)
+    	})
+    	
+		var win = Ext.create('Ext.window.Window', {
+			title: this.localize("selectFacet"),
+			modal: true,
+			items: {
+				xtype: 'form',
+				width: 300,
+				items: {
+					xtype: 'combo',
+					store: this.facetsSelectionStore,
+					forceSelection: true,
+					width: 300
+				},
+				buttons: [{
+	            	text: this.localize("cancel"),
+		            ui: 'default-toolbar',
+	                glyph: 'xf00d@FontAwesome',
+	        		flex: 1,
+	        		handler: function(btn) {
+	        			btn.up('window').close();
+	        		}
+				},{
+	            	text: this.localize("select"),
+					glyph: 'xf00c@FontAwesome',
+	            	flex: 1,
+	        		handler: function(btn) {
+	        			var facet = btn.up('window').down('combo').getValue();
+	        			if (!facet) {
+	        				return this.showError(this.localize('selectValidFacet'));
+	        			} else {
+	        				callback.call(this, "facet."+facet);
+		        			btn.up('window').close();
+	        			}
+	        		},
+	        		scope: this
+	            }]
+			},
+			bodyPadding: 5
+		}).show()
     }
+    
 });
 
 
@@ -13134,7 +13255,7 @@ Ext.define('Voyant.panel.Dummy', {
     initComponent: function() {
         var me = this;
         
-        var columns = 2;
+        var columns = 3;
         
         Ext.apply(this, {
         	layout: {
@@ -13149,9 +13270,7 @@ Ext.define('Voyant.panel.Dummy', {
         		tdAttrs: {
         			style: {
         				padding: '0px',
-        				verticalAlign: 'top',
-        				width: '10',
-        				height: '10'
+        				verticalAlign: 'top'
         			}
         		}
         	},
@@ -13161,29 +13280,75 @@ Ext.define('Voyant.panel.Dummy', {
         		border: true
         	},
         	items:  [{
-        		xtype: 'summary',
-        		colspan: 2
+        		colspan: 2,
+        		xtype: 'summary'
         	},{
-        		xtype: 'documents'
+        		xtype: 'reader',
+        		rowspan: 2
         	},{
-        		xtype: 'cirrus'
+        		xtype: 'documentterms'
+        	},{
+        		xtype: 'corpusterms'
         	}]
         })
         
         this.on("boxready", function() {
-        	var table = this.getTargetEl().dom.querySelector(".x-table-layout"),
-        		rows = table.querySelectorAll("tr"),
-        		width = this.getTargetEl().getWidth(), height = this.getTargetEl().getHeight();
+        	this.body.setStyle('overflow', 'hidden');
+        	
+        	var sizeMap = {};
+        	
+        	var table = this.getTargetEl().down(".x-table-layout");
+        	var rows = table.dom.rows;
         	for (var i=0; i<rows.length; i++) {
-        		Ext.get(rows[i]).setHeight(height/rows.length);
-        		var cells = rows[i].querySelectorAll("td");
-        		for (j=0; j<cells.length; j++) {
-        			var cmp = Ext.getCmp(cells[j].children[0].id);
-        			cmp.setWidth(width/cells.length);
-        			cmp.setHeight(height/rows.length);
-        			cmp.updateLayout();
+        		var cells = rows[i].cells;
+        		for (var j=0; j<cells.length; j++) {
+        			var cell = cells[j];
+        			var cellEl = Ext.get(cell);
+        			var size = cellEl.getSize(false);
+        			var cmpId = cellEl.down('.x-panel').id;
+        			sizeMap[cmpId] = size;
         		}
         	}
+        	
+        	for (var id in sizeMap) {
+        		var size = sizeMap[id];
+        		Ext.getCmp(id).setSize(size);
+        	}
+
+        	this.updateLayout();
+        })
+        
+        this.on('resize', function(panel, newwidth, newheight, oldwidth, oldheight) {
+        	if (oldwidth !== undefined && oldheight !== undefined) {
+	        	var widthRatio = newwidth/oldwidth;
+	        	var heightRatio = newheight/oldheight;
+
+	        	var sizeMap = {};
+	        	
+	        	var table = this.getTargetEl().down(".x-table-layout");
+	        	var rows = table.dom.rows;
+	        	for (var i=0; i<rows.length; i++) {
+	        		var cells = rows[i].cells;
+	        		for (var j=0; j<cells.length; j++) {
+	        			var cell = cells[j];
+	        			var cellEl = Ext.get(cell);
+	        			var panelEl = cellEl.down('.x-panel');
+	        			var size = panelEl.getSize(false); // get panel size this time since table cell size will be inaccurate
+	        			var w = Math.floor(size.width * widthRatio);
+		        		var h = Math.floor(size.height * heightRatio);
+	        			var cmpId = panelEl.id;
+	        			sizeMap[cmpId] = {width: w, height: h};
+	        		}
+	        	}
+	        	
+	        	for (var id in sizeMap) {
+	        		var size = sizeMap[id];
+	        		Ext.getCmp(id).setSize(size);
+	        	}
+	
+	        	this.updateLayout();
+        	}
+        	
         })
         
         this.callParent();

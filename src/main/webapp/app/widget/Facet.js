@@ -10,7 +10,7 @@ Ext.define('Voyant.widget.Facet', {
 			query: undefined
 		}
 	},
-
+	
 	config: {
 		corpus: undefined
 	},
@@ -52,6 +52,10 @@ Ext.define('Voyant.widget.Facet', {
         	]
         });
         this.callParent();
+        
+        if (this.corpus) {
+        	this.setCorpus(this.corpus)
+        }
         
         this.on("query", function(src, query) {
         	this.setApiParam("query", query);
