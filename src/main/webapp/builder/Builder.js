@@ -6,6 +6,7 @@ Ext.define('Voyant.panel.Builder', {
     config: {
     	corpus: undefined,
     	tableEditor: null,
+    	dropTargets: {},
     	toolsList: ["cirrus", "corpusterms", "bubblelines", "corpuscollocates", "microsearch", "streamgraph", "phrases", "documents", "summary", "trends", "scatterplot", "termsradio", "wordtree", "contexts", "documentterms", "reader", "knots", "collocatesgraph"]
     },
     statics: {
@@ -32,11 +33,11 @@ Ext.define('Voyant.panel.Builder', {
                     menu: {
                         items: [{
                             text: 'Merge cells',
-                            handler: function() { this.getTableEditor().merge(); },
+                            handler: function() { this.getTableEditor().merge(); this.setupDropTargets(); },
                             scope: this
                         },{
                             text: 'Split cells',
-                            handler: function() { this.getTableEditor().split(); },
+                            handler: function() { this.getTableEditor().split(); this.setupDropTargets(); },
                             scope: this
                         },{
 							text: 'Remove tool',
@@ -49,15 +50,15 @@ Ext.define('Voyant.panel.Builder', {
                     menu: {
                         items: [{
                             text: 'Insert row before',
-                            handler: function() { this.getTableEditor().insertRow(true); },
+                            handler: function() { this.getTableEditor().insertRow(true); this.setupDropTargets(); },
                             scope: this
                         },{
                             text: 'Insert row after',
-                            handler: function() { this.getTableEditor().insertRow(false); },
+                            handler: function() { this.getTableEditor().insertRow(false); this.setupDropTargets(); },
                             scope: this
                         },{
                             text: 'Delete row(s)',
-                            handler: function() { this.getTableEditor().deleteRows(); },
+                            handler: function() { this.getTableEditor().deleteRows(); this.setupDropTargets(); },
                             scope: this
                         }]
                     }
@@ -66,15 +67,15 @@ Ext.define('Voyant.panel.Builder', {
                     menu: {
                         items: [{
                             text: 'Insert column before',
-                            handler: function() { this.getTableEditor().insertCol(true); },
+                            handler: function() { this.getTableEditor().insertCol(true); this.setupDropTargets(); },
                             scope: this
                         },{
                             text: 'Insert column after',
-                            handler: function() { this.getTableEditor().insertCol(false); },
+                            handler: function() { this.getTableEditor().insertCol(false); this.setupDropTargets(); },
                             scope: this
                         },{
                             text: 'Delete column(s)',
-                            handler: function() { this.getTableEditor().deleteCols(); },
+                            handler: function() { this.getTableEditor().deleteCols(); this.setupDropTargets(); },
                             scope: this
                         }]
                     }
@@ -89,18 +90,26 @@ Ext.define('Voyant.panel.Builder', {
                 			for (var x = 0; x < row.length; x++) {
                 				var cell = row[x];
                 				if (cell.real) {
-                					cells.push({
-                						colspan: cell.colspan,
-                						rowspan: cell.rowspan,
-                						xtype: cell.xtype
-                					});
+                					if (cell.rowspan == 1) {
+                						if (cell.colspan == 1) {
+                							cells.push(cell.xtype);
+                						} else {
+                							cells.push([cell.colspan, cell.xtype]);
+                						}
+                					} else {
+	                					cells.push({
+	                						colspan: cell.colspan,
+	                						rowspan: cell.rowspan,
+	                						xtype: cell.xtype
+	                					});
+                					}
                 				}
                 			}
                 		}
                 		var layoutString = encodeURI(Ext.JSON.encode({numCols: numCols, cells: cells}));
                 		var params = {
-                			layout: layoutString,
-                			view: 'tableset',
+                			tableLayout: layoutString,
+                			view: 'customset',
                 			debug: true
                 		};
                 		if (this.getCorpus()) {
@@ -146,16 +155,16 @@ Ext.define('Voyant.panel.Builder', {
             	title: 'Tools',
             	width: 300,
             	split: true,
-            	tbar: [{
-            		text: 'Add tool to cell',
-            		handler: function() {
-            			var selTool = Ext.getCmp('toolsList').getSelectionModel().getSelection()[0];
-            			if (selTool !== undefined) {
-            				this.getTableEditor().addTool(selTool);
-            			}
-            		},
-            		scope: this
-            	}],
+//            	tbar: [{
+//            		text: 'Add tool to cell',
+//            		handler: function() {
+//            			var selTool = Ext.getCmp('toolsList').getSelectionModel().getSelection()[0];
+//            			if (selTool !== undefined) {
+//            				this.getTableEditor().addTool(selTool);
+//            			}
+//            		},
+//            		scope: this
+//            	}],
             	items: [{
             		id: 'toolsList',
             		xtype: 'dataview',
@@ -164,7 +173,7 @@ Ext.define('Voyant.panel.Builder', {
                 	}),
             		itemSelector: '.listTool',
             		overItemCls: 'over',
-	            	selectedItemCls: 'selected',
+	            	selectedItemCls: '',//'selected',
             		emptyText: 'No tools',
             		tpl: ['<tpl for=".">',
         					'<div class="listTool">',
@@ -187,24 +196,39 @@ Ext.define('Voyant.panel.Builder', {
 				    		        this.showFrame(x, y);
 				    		        var lel = this.getEl(),
 				    	            	del = this.getDragEl();
+				    		        
+				    		        Ext.fly(del).addCls('builder');
 				    		        del.textContent = lel.textContent;
+				    		    },
+				    		    onDragEnter: function(evt, id) {
+				    		    	Ext.fly(id).addCls('selected');
+				    		    },
+				    		    onDragOut: function(evt, id) {
+				    		    	Ext.fly(id).removeCls('selected');
 				    		    },
 				    	        onInvalidDrop: function() {
 				    	            this.invalidDrop = true;
 				    	        },
-				    	        endDrag: function() {
+				    	        endDrag: function(evt) {
 				    	        	var lel = this.getEl(),
 					    	            del = this.getDragEl();
-	
+
 					    	        del.style.visibility = "";
 	
 					    	        this.beforeMove();
 					    	        lel.style.visibility = "hidden";
+					    	        
 					    	        if (this.invalidDrop) {
 					    	        	
 					    	        } else {
-					    	        	
+					    	        	var targetEl = Ext.get(evt.target);
+					    	        	var tl = Ext.getCmp('toolsList');
+					    	        	var toolRec = tl.getRecord(lel);
+					    	        	if (toolRec != null) {
+					    	        		tl.findParentByType('builder').getTableEditor().addTool(toolRec);
+					    	        	}
 					    	        }
+					    	        
 					    	        del.style.visibility = "hidden";
 					    	        lel.style.visibility = "";
 	
@@ -223,10 +247,7 @@ Ext.define('Voyant.panel.Builder', {
     				    		Ext.apply(dd, overrides);
     				    	});
     				    	
-    				    	var tdEls = Ext.get('tableParent').select('td');
-    				    	Ext.each(tdEls.elements, function(el) {
-    				    		var toolsDDTarget = Ext.create('Ext.dd.DDTarget', el, 'toolsDDGroup');
-    				    	});
+    				    	this.setupDropTargets();
     					},
     					scope: this
     				}
@@ -244,5 +265,22 @@ Ext.define('Voyant.panel.Builder', {
     	}, this);
     	
     	this.callParent(arguments);
+    },
+    
+    setupDropTargets: function() {
+    	var tdEls = Ext.get('tableParent').select('td');
+    	Ext.each(tdEls.elements, function(el) {
+    		if (this.dropTargets[el.id] === undefined) {
+	    		var toolsDDTarget = Ext.create('Ext.dd.DDTarget', el, 'toolsDDGroup');
+	    		this.dropTargets[el.id] = toolsDDTarget;
+    		}
+    	}, this);
+    	
+    	for (var elId in this.dropTargets) {
+    		if (document.querySelectorAll('#'+elId).length == 0) {
+    			this.dropTargets[elId].destroy();
+    			delete this.dropTargets[elId];
+    		}
+    	}
     }
 });

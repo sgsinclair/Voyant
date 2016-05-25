@@ -23,3 +23,8 @@ table.builder, .builder tbody {
 .builder td.selected {
 	background-color: #6BB8EF;
 }
+
+.builder.x-dd-drag-current {
+	padding: 10px 5px;
+	background-color: rgba(246,240,177,1);
+}
