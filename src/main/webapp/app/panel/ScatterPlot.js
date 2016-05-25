@@ -262,7 +262,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         glyph: 'xf0b2@FontAwesome',
                         flex: 1,
                         handler: function(btn) {
-                        	var sel = this.down('#terms').getSelection()[0];
+                        	var sel = btn.up('panel').getSelection()[0];
                         	if (sel === undefined) {
                         		this.toastError({
                         			html: this.localize("noTermSelected"),
@@ -281,7 +281,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         glyph: 'xf068@FontAwesome',
                         flex: 1,
                         handler: function(btn) {
-                        	var sel = this.down('#terms').getSelection()[0];
+                        	var sel = btn.up('panel').getSelection()[0];
                         	if (sel === undefined) {
                         		this.toastError({
                         			html: this.localize("noTermSelected"),
