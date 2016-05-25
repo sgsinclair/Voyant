@@ -145,9 +145,30 @@ Ext.define('Voyant.panel.CustomSet', {
 	initTableLayout: function() {
     	Ext.suspendLayouts();
     	
-    	var layoutString = decodeURI(this.getApiParam('tableLayout'));
-    	var layout = Ext.decode(layoutString);
-        if (layout.numCols != null) {
+    	var tableLayout = this.getApiParam('tableLayout');
+    	if (tableLayout && tableLayout.charAt(0)!="{" && tableLayout.charAt(0)!="[") {
+    		var cells = [];
+    		tableLayout.split(/,\s*/).forEach(function(cell) {
+    			cells.push(/^"'/.test(cell) ? cell : '"'+cell+'"');
+    		})
+    		tableLayout = "["+cells.join(",")+"]"; // treat as simple comma-separated string
+    	}
+    	var layout = Ext.decode(tableLayout);
+    	if (Ext.isArray(layout)) {
+    		layout = {
+        		cells: layout
+        	}
+    	}
+    	if (!layout.numCols && layout.cells && Ext.isArray(layout.cells)) {
+    		if (layout.cells.length < 3) {
+    			layout.numCols = layout.cells.length;
+    		} else if (layout.cells.length < 5) {
+    			layout.numCols = Math.ceil(layout.cells.length / 2);
+    		} else {
+    			layout.numCols = Math.ceil(layout.cells.length / 3);
+    		}
+    	}
+        if (layout.numCols != null && layout.cells && Ext.isArray(layout.cells)) {
         	var items = [];
         	for (var i = 0; i < layout.cells.length; i++) {
         		var cell = layout.cells[i];
@@ -208,6 +229,8 @@ Ext.define('Voyant.panel.CustomSet', {
             	},
         		items: items
         	});
+        } else {
+        	this.showError("badTableLayoutDefinition")
         }
     	
     	Ext.resumeLayouts();		
