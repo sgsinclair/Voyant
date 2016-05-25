@@ -19,7 +19,8 @@ TermsRadio has several features contained in two main components:
 	* the left y axis displays the relative document frequencies
 	* the lines show the trends of the term frequencies for the visible documents
 
-<iframe src="../tool/TermsRadio/?corpus=austen" style="width: 90%; height: 600px;"></iframe>
+<iframe src="../tool/TermsRadio/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 600px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">TermsRadio with the Works of Jane Austen. You can also <a href="../?view=TermsRadio" target="_blank">use TermsRadio with your own corpus</a>.</div>
 
 ## Options
 

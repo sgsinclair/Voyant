@@ -17,7 +17,8 @@ By default, contexts are shown for the most frequent in the term corpus.
 
 Some context is shown for each occurrence, you can also click on the plus icon to expand any given row to show more context.
 
-<iframe src="../tool/Contexts/?corpus=austen" style="width: 90%; height: 350px;"></iframe>
+<iframe src="../tool/Contexts/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 350px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Contexts with the Works of Jane Austen. You can also <a href="../?view=Contexts" target="_blank">use Contexts with your own corpus</a>.</div>
 
 ## Options
 

@@ -11,7 +11,8 @@ Ext.define('Voyant.panel.Panel', {
 		api: {
 			corpus: undefined,
 			input: undefined,
-			inputFormat: undefined
+			inputFormat: undefined,
+			subtitle: undefined
 		}
 	},
 	constructor: function(config) {
@@ -21,6 +22,12 @@ Ext.define('Voyant.panel.Panel', {
 		if (!this.glyph) {
 			this.glyph = Ext.ClassManager.getClass(this).glyph
 		}
+		
+		this.on("afterrender", function() {
+			if (this.getApiParam('subtitle') && this.getTitle()) {
+				this.setTitle(this.getTitle()+" <i style='font-size: smaller;'>"+this.getApiParam('subtitle')+"</i>")
+			}
+		}, this)
 	},
 	
 	getApplication: function() {

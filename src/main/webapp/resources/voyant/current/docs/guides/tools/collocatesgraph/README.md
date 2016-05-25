@@ -8,7 +8,9 @@ This represents a network graph where keywords in green are shown linked to coll
 
 You can drag and drop terms to move them. You can drag terms off the canvas to remove them.
 
-<iframe src="../tool/CollocatesGraph/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
+<iframe src="../tool/CollocatesGraph/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 400px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Collocates Graph with the Works of Jane Austen. You can also <a href="../?view=CollocatesGraph" target="_blank">use Collocates Graph with your own corpus</a>.</div>
+
 
 ## Options
 

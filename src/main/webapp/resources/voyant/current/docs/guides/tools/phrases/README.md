@@ -13,7 +13,8 @@ The table view shows the following columns by default:
 
 By default, phrases are shown in descending order of phrase length (the number of words in each phrase).
 
-<iframe src="../tool/Phrases/?corpus=austen" style="width: 90%; height: 350px;"></iframe>
+<iframe src="../tool/Phrases/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 350px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Phrases with the Works of Jane Austen. You can also <a href="../?view=Phrases" target="_blank">use Phrases with your own corpus</a>.</div>
 
 ## Options
 

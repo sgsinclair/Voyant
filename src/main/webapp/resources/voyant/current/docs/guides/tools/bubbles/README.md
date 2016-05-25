@@ -8,7 +8,9 @@ The total number of terms to be read is shown at the bottom, along with a progre
 
 You can hover over a bubble term to see its frequency to that point. You can also drag the bubble to move it if you wish.
 
-<iframe src="../tool/Bubbles/?corpus=austen" style="width: 90%; height: 600px;"></iframe>
+<iframe src="../tool/Bubbles/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 600px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Bubbles with the Works of Jane Austen. You can also <a href="../?view=Bubbles" target="_blank">use Bubbles with your own corpus</a>.</div>
+
 
 ## Options
 

@@ -6,7 +6,8 @@ Microsearch visualizes the frequency and distribution of terms in a corpus.
 
 Each document in the corpus is represented as a vertical block where the height of the block indicates the relative size of the document compared to others in the corpus. The location of occurrences of search terms is located as red blocks (the brightness of the red further indicates the relative frequency within the corpus). Multiple search terms are collapsed together.
 
-<iframe src="../tool/MicroSearch/?corpus=austen" style="width: 90%; height: 500px"></iframe>
+<iframe src="../tool/MicroSearch/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 500px"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">MicroSearch with the Works of Jane Austen. You can also <a href="../?view=MicroSearch" target="_blank">use MicroSearch with your own corpus</a>.</div>
 
 By default the top frequency word (after filtering for [stopwords](#!/guide/stopwords)) is shown.
 

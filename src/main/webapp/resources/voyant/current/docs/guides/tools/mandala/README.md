@@ -6,7 +6,8 @@ Hover over a magnet to highlight that search term and documents that contain the
 
 You can click on a magnet to edit its search term. Full search functionality is available, though multiple terms for one magnet are combined into one boolean (a document must contain at least one of the terms).
 
-<iframe src="../tool/Mandala/?corpus=austen" style="width: 550px; height: 600px;"></iframe>
+<iframe src="../tool/Mandala/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 550px; height: 600px;"></iframe>
+<div style="width: 550px; text-align: center; margin-bottom: 1em;">Mandala with the Works of Jane Austen. <span style="white-space: nowrap;">You can also <a href="../?view=Mandala" target="_blank">use Mandala with your own corpus</a>.</span></div>
 
 ## Options
 

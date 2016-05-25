@@ -22,7 +22,8 @@ When there's a search term, an inner sparkline is shown overtop of the bars â€“Â
 
 There's also a thin vertical blue bar that indicates the current position of the Text Reader in the corpus. You can click anywhere along the Prospect Viewer to jump to another location.
 
-<iframe src="../tool/Reader/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
+<iframe src="../tool/Reader/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 400px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Reader with the Works of Jane Austen. You can also <a href="../?view=Reader" target="_blank">use Reader with your own corpus</a>.</div>
 
 ## Options
 

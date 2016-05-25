@@ -13,7 +13,8 @@ The Summary displays 6 categories of information formatted in a bulleted list.
 1. The fifth point indicates the five words with the most notable peaks in frequency. The word’s frequencies are indicated to their right alongside a small thumbnail pic depicting their relative frequencies across the corpus.
 1. The sixth point indicates the top five most distinctive words of each of the documents. While only the first five documents are visible clicking “Next # of # remaining” allows the user to navigate through the remaining undisplayed documents. To the right of each of the words is the word’s frequency displayed in brackets.
 
-<iframe src="../tool/Summary/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
+<iframe src="../tool/Summary/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 400px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Summary with the Works of Jane Austen. You can also <a href="../?view=Summary" target="_blank">use Summary with your own corpus</a>.</div>
 
 ## Options
 

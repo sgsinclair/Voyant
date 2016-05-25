@@ -19,7 +19,8 @@ Additional columns are available by clicking on the down arrow that appears in t
 
 By default, the terms with the highest per-document frequencies are shown.
 
-<iframe src="../tool/DocumentTerms/?corpus=austen" style="width: 90%; height: 350px;"></iframe>
+<iframe src="../tool/DocumentTerms/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 350px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Document Terms with the Works of Jane Austen. You can also <a href="../?view=DocumentTerms" target="_blank">use Document Terms with your own corpus</a>.</div>
 
 ## Options
 

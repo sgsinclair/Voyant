@@ -18,7 +18,9 @@ Additional columns can be shown:
 
 By default, documents are shown in the order they exist in the corpus.
 
-<iframe src="../tool/Documents/?corpus=austen" style="width: 90%; height: 350px;"></iframe>
+<iframe src="../tool/Documents/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 350px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Documents with the Works of Jane Austen. You can also <a href="../?view=Documents" target="_blank">use Documents with your own corpus</a>.</div>
+
 
 ## Options
 

@@ -11,7 +11,8 @@ By default the following facets are shown:
 - *Language*: the document's automatically detected language 
 - *Terms*: all of the terms in the document
 
-<iframe src="../tool/Catalogue/?corpus=austen" style="width: 90%; height: 600px;"></iframe>
+<iframe src="../tool/Catalogue/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 600px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Catalogue with the Works of Jane Austen. You can also <a href="../?view=Catalogue" target="_blank">use Catalogue with your own corpus</a>.</div>
 
 ## Options
 

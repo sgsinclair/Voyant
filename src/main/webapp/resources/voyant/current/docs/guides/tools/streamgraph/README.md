@@ -11,7 +11,8 @@ Each horizontal line in the graph is coloured according to the word it represent
 
 You can toggle specific terms by clicking on them in the legend at the top.
 
-<iframe src="../tool/StreamGraph/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
+<iframe src="../tool/StreamGraph/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 400px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">StreamGraph with the Works of Jane Austen. You can also <a href="../?view=StreamGraph" target="_blank">use StreamGraph with your own corpus</a>.</div>
 
 ## Options
 

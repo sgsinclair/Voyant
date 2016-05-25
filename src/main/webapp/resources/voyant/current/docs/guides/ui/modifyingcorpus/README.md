@@ -2,7 +2,9 @@
 
 You can modify a corpus by clicking on the _Modify_ button of the [Documents Tool](#!/guide/documents).
 
-<div style="max-width: 600px; margin-left: auto; margin-right: auto;">{@img documents.png Documents}</div>
+<iframe src="../tool/Documents/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 400px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Documents with the Works of Jane Austen.</div>
+
 
 Note that any modifications actually create a new corpus (so the URL will change). The following modifications are available:
 

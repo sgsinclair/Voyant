@@ -1,4 +1,4 @@
-# Word Tree
+# WordTree
 
 The Word Tree tool allows you to explore how keywords are used in different phrases in the corpus.
 
@@ -8,7 +8,8 @@ By default, the most common term is used as the first word tree root.
 
 You can click on terms to expand or collapse further branches, when they're available. Double-clicking on a term should trigger a phrase search in other Voyant panels (if applicable).
 
-<iframe src="../tool/WordTree/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
+<iframe src="../tool/WordTree/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 400px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">WordTree with the Works of Jane Austen. You can also <a href="../?view=WordTree" target="_blank">use WordTree with your own corpus</a>.</div>
 
 ## Options
 

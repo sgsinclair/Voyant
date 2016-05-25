@@ -10,7 +10,8 @@ Each line in the graph is coloured according to the word it represents, at the t
 
 You can toggle specific terms by clicking on them in the legend at the top.
 
-<iframe src="../tool/Trends/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
+<iframe src="../tool/Trends/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 400px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Trends with the Works of Jane Austen. You can also <a href="../?view=Trends" target="_blank">use Trends with your own corpus</a>.</div>
 
 ## Options
 

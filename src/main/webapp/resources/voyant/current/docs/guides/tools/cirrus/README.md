@@ -8,7 +8,8 @@ The word cloud positions the words such that the terms that occur the most frequ
 
 Clicking on words in Cirrus will usually cause one or more other tools to react (if you're in a multi-tool [skin](#!/guide/skins). Hovering over a word will cause a box to appear that displays the frequency count for that term.
 
-<iframe src="../tool/Cirrus/?corpus=austen" style="width: 90%; height: 300px;"></iframe>
+<iframe src="../tool/Cirrus/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 300px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Cirrus with the Works of Jane Austen. You can also <a href="../?view=Cirrus" target="_blank">use Cirrus with your own corpus</a>.</div>
 
 ## Options
 

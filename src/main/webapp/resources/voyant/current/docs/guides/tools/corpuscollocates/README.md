@@ -14,7 +14,8 @@ An additional column can be shown to display *Count* which is the frequency of t
 
 By default, the most frequent collocates are shown for the 10 most frequent keywords in the corpus.
 
-<iframe src="../tool/CorpusCollocates/?corpus=austen" style="width: 90%; height: 350px;"></iframe>
+<iframe src="../tool/CorpusCollocates/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 350px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Corpus Collocates with the Works of Jane Austen. You can also <a href="../?view=CorpusCollocates" target="_blank">use Corpus Collocates with your own corpus</a>.</div>
 
 ## Options
 

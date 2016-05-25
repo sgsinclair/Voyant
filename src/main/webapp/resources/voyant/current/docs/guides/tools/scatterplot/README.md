@@ -14,7 +14,8 @@ The scatterplot is presented in the main display in the tool with a legend in th
 
 Above the main display is the primary toolbar and to the right of the display is sub-panel providing a list of words that appear in the corpus as well as their frequencies.
 
-<iframe src="../tool/ScatterPlot/?corpus=austen" style="width: 90%; height: 400px;"></iframe>
+<iframe src="../tool/ScatterPlot/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 400px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">ScatterPlot with the Works of Jane Austen. You can also <a href="../?view=ScatterPlot" target="_blank">use ScatterPlot with your own corpus</a>.</div>
 
 ## Options
 

@@ -4,7 +4,8 @@ TextualArc is a visualization of the terms in a document that includes a weighte
 
 The current text is represented on the perimeter of the circle, starting at the top and looping around clockwise. Each occurrence of a term pulls the term toward its location on the perimeter and the position of the term label is the mean of these forces (or [wighted centroid](https://en.wikipedia.org/wiki/Centroid)). The text is "read" from start to finish, with repeating, non-stopword terms, visited by the animated arc. The occurrences of the currently read term are shown by lines to the perimeter. You can also hover over any term to see its occurrences on the perimeter.
 
-<iframe src="../tool/TextualArc/?corpus=austen" style="width: 90%; height: 600px;"></iframe>
+<iframe src="../tool/TextualArc/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 600px;"></iframe>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">TextualArc with the Works of Jane Austen. You can also <a href="../?view=TextualArc" target="_blank">use TextualArc with your own corpus</a>.</div>
 
 ## Options
 
