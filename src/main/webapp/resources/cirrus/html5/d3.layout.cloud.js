@@ -120,9 +120,13 @@ function cloud(d3) {
           dy;
 
       while (dxdy = s(t += dt)) {
+        if (!isFinite(dxdy[0]) || !isFinite(dxdy[1])) {
+          break; // break on infinite values caused by too small perimeter
+        }
+        
         dx = ~~dxdy[0];
         dy = ~~dxdy[1];
-
+        
         if (Math.min(Math.abs(dx), Math.abs(dy)) >= maxDelta) break;
 
         tag.x = startX + dx;
