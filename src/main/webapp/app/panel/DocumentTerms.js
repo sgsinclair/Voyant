@@ -47,7 +47,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	}
     	
     	this.on("query", function(src, query) {
-    		this.fireEvent("corpusTermsClicked", src, [query]);
+    		this.fireEvent("corpusTermsClicked", src, query);
     	}, this);
     	
     	this.on("corpusTermsClicked", function(src, terms) {

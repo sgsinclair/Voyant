@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 24 17:18:10 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue May 24 21:34:52 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6018,12 +6018,15 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			config.listeners = config.listeners || {};
 			config.listeners.beforeload = {
 					fn: function(store, operation) {
-						var parent = this.getParentPanel();
+						var parent = this.getParentPanel(), proxy = store.getProxy();
 						if (parent !== undefined) {
 							var params = parent.getApiParams();
 							operation = operation ? (operation===1 ? {} : operation) : {};
 							operation.params = operation.params || {};
 							for (var key in params) {
+								if (proxy) { // also set proxy for automatic buffering calls
+									proxy.setExtraParam(key, params[key]);
+								}
 								operation.params[key] = params[key];
 							}
 						}
@@ -7332,12 +7335,12 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	me.on("beforequery", function(queryPlan) {
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
-    			if (queryPlan.query.charAt(0)=="*") { // treat leading wildcard as regex .*
-    				queryPlan.query = ".*" + queryPlan.query.substring(1);
-    			}
     			if (queryPlan.query.charAt(0)=="^") {
     				queryPlan.query=queryPlan.query.substring(1)
     				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+    			}
+    			if (queryPlan.query.charAt(0)=="*") { // convert leading wildcard to regex
+    				queryPlan.query = "."+queryPlan.query;
     			}
     			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*') {
     				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
@@ -7367,6 +7370,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	}, me);
     	
     	me.on("change", function(tags, queries) {
+    		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
     		me.up('panel').fireEvent("query", me, queries);
     		if (me.triggers.count) {
     			me.triggers.count.show();
@@ -12330,6 +12334,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	
     	me.on("query", function(src, query) {
     		this.setApiParam('query', query);
+    		this.getStore().removeAll();
     		this.getStore().load();
     	}, me);
 
@@ -12388,7 +12393,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	}
     	
     	this.on("query", function(src, query) {
-    		this.fireEvent("corpusTermsClicked", src, [query]);
+    		this.fireEvent("corpusTermsClicked", src, query);
     	}, this);
     	
     	this.on("corpusTermsClicked", function(src, terms) {
@@ -20859,6 +20864,120 @@ Ext.define('Voyant.panel.CustomSet', {
                 item.layout = 'fit';
             }
         }
+	}
+})
+Ext.define('Voyant.panel.TableSet', {
+	extend: 'Ext.panel.Panel',
+    requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph','Voyant.panel.StreamGraph'],
+	mixins: ['Voyant.panel.Panel'],
+    alias: 'widget.tableset',
+	statics: {
+		i18n: {
+		},
+		api: {
+			panels: undefined
+		},
+		glyph: 'xf17a@FontAwesome'
+	},
+	
+	header: false,
+	
+    constructor: function() {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
+    	this.on('boxready', function(panel) {
+	    	this.doTableSizing();
+    	}, this);
+    	
+    	this.on('resize', function(panel, newwidth, newheight, oldwidth, oldheight) {
+			if (oldwidth !== undefined && oldheight !== undefined) {
+	        	var widthRatio = newwidth/oldwidth;
+	        	var heightRatio = newheight/oldheight;
+	        	this.doTableSizing(widthRatio, heightRatio);
+			}
+		}, this);
+    },
+	
+    initComponent: function() {
+    	Ext.suspendLayouts();
+    	
+    	var params = Ext.urlDecode(window.location.search.substring(1));
+    	var layoutString = decodeURI(params.layout);
+    	var layout = Ext.decode(layoutString);
+        if (layout.numCols != null) {
+        	var items = [];
+        	for (var i = 0; i < layout.cells.length; i++) {
+        		var cell = layout.cells[i];
+        		items.push(cell);
+        	}
+        	
+        	Ext.apply(this, {
+        		layout: {
+        			type: 'table',
+        			width: '100%',
+    				height: '100%',
+        			columns: layout.numCols,
+        			tableAttrs: {
+            			style: {
+            				width: '100%',
+            				height: '100%'
+            			}
+            		},
+            		tdAttrs: {
+            			style: {
+            				padding: '0px',
+            				verticalAlign: 'top'
+            			}
+            		}
+        		},
+        		defaults: { // place holder values to ensure that the children are rendered
+            		width: 10,
+            		height: 10,
+            		border: true
+            	},
+        		items: items
+        	});
+        }
+    	
+    	Ext.resumeLayouts();
+    	
+    	this.callParent();
+    },
+	
+	doTableSizing: function(widthRatio, heightRatio) {
+    	var sizeMap = {};
+    	
+    	var table = this.getTargetEl().down(".x-table-layout");
+    	var rows = table.dom.rows;
+    	for (var i=0; i<rows.length; i++) {
+    		var cells = rows[i].cells;
+    		for (var j=0; j<cells.length; j++) {
+    			var cell = cells[j];
+    			var cellEl = Ext.get(cell);
+    			var panelEl = cellEl.down('.x-panel');
+    			var cmpId = panelEl.id;
+    			
+    			var size;
+    			if (widthRatio !== undefined && heightRatio !== undefined) {
+    				size = panelEl.getSize(false);
+    				size.width = size.width * widthRatio;
+            		size.height = size.height * heightRatio;
+            		// FIXME multiple resize calls gradually reduce size
+    			} else {
+    				size = cellEl.getSize(false);
+    			}
+    			
+    			sizeMap[cmpId] = size;
+    		}
+    	}
+    	
+    	for (var id in sizeMap) {
+    		var size = sizeMap[id];
+    		Ext.getCmp(id).setSize(size);
+    	}
+
+    	this.updateLayout();
 	}
 })
 Ext.define('Voyant.panel.WordTree', {

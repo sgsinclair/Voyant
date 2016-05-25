@@ -156,6 +156,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	
     	me.on("query", function(src, query) {
     		this.setApiParam('query', query);
+    		this.getStore().removeAll();
     		this.getStore().load();
     	}, me);
 

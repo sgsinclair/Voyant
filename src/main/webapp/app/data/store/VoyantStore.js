@@ -65,12 +65,15 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			config.listeners = config.listeners || {};
 			config.listeners.beforeload = {
 					fn: function(store, operation) {
-						var parent = this.getParentPanel();
+						var parent = this.getParentPanel(), proxy = store.getProxy();
 						if (parent !== undefined) {
 							var params = parent.getApiParams();
 							operation = operation ? (operation===1 ? {} : operation) : {};
 							operation.params = operation.params || {};
 							for (var key in params) {
+								if (proxy) { // also set proxy for automatic buffering calls
+									proxy.setExtraParam(key, params[key]);
+								}
 								operation.params[key] = params[key];
 							}
 						}

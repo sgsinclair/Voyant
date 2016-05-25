@@ -65,12 +65,12 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	me.on("beforequery", function(queryPlan) {
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
-    			if (queryPlan.query.charAt(0)=="*") { // treat leading wildcard as regex .*
-    				queryPlan.query = ".*" + queryPlan.query.substring(1);
-    			}
     			if (queryPlan.query.charAt(0)=="^") {
     				queryPlan.query=queryPlan.query.substring(1)
     				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+    			}
+    			if (queryPlan.query.charAt(0)=="*") { // convert leading wildcard to regex
+    				queryPlan.query = "."+queryPlan.query;
     			}
     			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*') {
     				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
@@ -100,6 +100,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	}, me);
     	
     	me.on("change", function(tags, queries) {
+    		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
     		me.up('panel').fireEvent("query", me, queries);
     		if (me.triggers.count) {
     			me.triggers.count.show();
