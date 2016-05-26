@@ -5,7 +5,7 @@ Ext.define("Voyant.notebook.editor.button.Run", {
 	statics: {
 		i18n: {
 			tip: {
-				en: "Run the script in this block"
+				en: "Run the script in this block (Shift-Enter)"
 			}
 		}
 	},

@@ -10,7 +10,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	},
 	statics: {
 		i18n: {
-			emptyText: {en: "// click here to edit"}
+			emptyText: "// click here to edit"
 		}
 	},
 	listeners: {
@@ -30,17 +30,13 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		    })
 		    this.editor.on("blur", function() {
 		    	me.editor.renderer.setShowGutter(false);
-		    })
-		    
-		    var lastHeight = this.getHeight();
-			this.editor.on("change", function(evt, ed) {
-				// defer to try to get updated value, especially after new line
-				Ext.Function.defer(function() {
-					if (lastHeight!=me.getHeight()) {
-						me.ownerCt.fireEvent("editorresize",me);
-						lastHeight = me.getHeight();
-					}
-				}, 10);
+		    });
+			this.editor.commands.addCommand({
+				name: 'run',
+			    bindKey: {win: "Shift-Enter", mac: "Shift-Enter"}, // additional bindings like alt/cmd-enter don't seem to work
+			    exec: function(editor) {
+			    	me.up('notebookcodeeditorwrapper').run();
+			    }				
 			})
 		}
 	},

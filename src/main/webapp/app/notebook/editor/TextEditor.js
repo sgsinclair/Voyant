@@ -17,16 +17,15 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 				    	{ name: 'insert', items: [ 'Image', 'Table' ] },
 				    	{ name: 'document', items: [ 'Source' ] }
 		    ],
-//		    height: 150,
 			allowedContent: true,
-//			resize_enabled: false,
-			toolbarCanCollapse: true
+			toolbarCanCollapse: true,
+			startupFocus: true
 		},
 		editor: undefined
 	},
 	statics: {
 		i18n: {
-			emptyText: {en: "(Click here to edit.)"}
+			emptyText: "(Click here to edit.)"
 		}
 	},
 	border: false,
@@ -37,35 +36,26 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
         this.callParent(arguments);
 	},
 	listeners: {
-		boxready: function() {
-			var me = this;
-			var el = this.getTargetEl();
-			el.set({contenteditable: true});
-			el.on("resize", function() {
-				setTimeout(function() {me.ownerCt.fireEvent("editorresize",me);}, 500)
-			})
-			var editor = CKEDITOR.inline( el.dom, this.getCkeditorConfig() );
-			editor.on("focus", function(evt, ed) {
-				me.findParentByType("notebookeditorwrapper").setIsEditing(true);
-			})
-			editor.on("blur", function(evt, ed) {
-				me.findParentByType("notebookeditorwrapper").setIsEditing(false).getEl().fireEvent("mouseout");
-			})
-			
-			var lastHeight = this.getHeight();
-			editor.on("change", function(evt, ed) {
-				if (lastHeight!=me.getHeight()) {
-					me.ownerCt.fireEvent("editorresize",me);
-					lastHeight = me.getHeight();
-//					me.setContent(ed.getValue())
+		boxready: function(cmp) {
+			this.getTargetEl().on("click", function() {
+				if (!cmp.getEditor()) {
+					var el = this.getTargetEl();
+					el.set({contenteditable: true});
+					var editor = CKEDITOR.inline( el.dom, this.getCkeditorConfig() );
+					this.findParentByType("notebookeditorwrapper").setIsEditing(true);
+					editor.on("blur", function(evt) {
+						cmp.setEditor(undefined);
+						cmp.findParentByType("notebookeditorwrapper").setIsEditing(false).getEl().fireEvent("mouseout");
+						editor.destroy();
+						el.set({contenteditable: false});
+					})
+					this.setEditor(editor);
 				}
-			})
-			this.setEditor(editor);
+			}, this)
 		}
 	},
 	
 	getContent: function() {
-		var editor = this.getEditor();
-		return editor ? this.getEditor().getData() : "";
+		return this.getTargetEl().dom.innerHTML;
 	}
 })

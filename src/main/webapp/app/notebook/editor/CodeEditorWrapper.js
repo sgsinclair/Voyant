@@ -19,7 +19,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		
 		this.editor = Ext.create("Voyant.notebook.editor.CodeEditor", {
 			content: Ext.Array.from(config.input).join("\n")
-		})
+		});
 		
 		Ext.apply(this, {
 			dockedItems: [{
@@ -27,6 +27,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			    dock: 'left',
 			    items: [
 					{
+						xtype: 'notebookwrapperadd'
+					},{
 						xtype: 'notebookwrapperrun',
 						listeners: {
 							click: {
@@ -34,24 +36,25 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								scope: this
 							}
 						}
-					},{
-						xtype: 'tbspacer'
-					},{
-						xtype: 'notebookwrapperadd'
-					},{
-						xtype: 'tbspacer'
-					},{
+					}
+			    ]
+			},{
+			    xtype: 'toolbar',
+			    dock: 'right',
+			    items: [{
+		        		xtype: 'notebookwrapperremove'
+		        	},{
 			        	xtype: 'notebookwrappermoveup'
 			        },{
 			        	xtype: 'notebookwrappermovedown'
-			        },{
-			        	xtype: 'notebookwrapperremove'
 			        }
 			    ]
 			}],
 			items: [this.editor, this.results]
 		});
+		
         this.callParent(arguments);
+
 	},
 	
 	run: function() {
@@ -85,10 +88,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				}
 			}
 			this.results.unmask();
-			if (this.results.getEl().dom.textContent.trim().length==0) {
-//				this.results.hide();
-			}
-			this.fireEvent('editorresize'); 
 		}
 		else {
 			Ext.defer(this.tryToUnmask, 20, this);
@@ -96,6 +95,10 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	
 	getContent: function() {
-		return this.editor.getValue();
+		var resultEl = this.results.getTargetEl().dom.cloneNode(true);
+		return {
+			input: this.editor.getValue(),
+			output: resultEl.innerHTML
+		}
 	}
 })

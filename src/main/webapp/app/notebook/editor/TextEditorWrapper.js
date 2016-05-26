@@ -12,14 +12,17 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 	    dock: 'left',
 	    items: [{
 		    	xtype: 'notebookwrapperadd'
-			},{
-				xtype: 'tbspacer'
-			},{
+			}
+	    ]
+	},{
+	    xtype: 'toolbar',
+	    dock: 'right',
+	    items: [{
+        	xtype: 'notebookwrapperremove'
+        	},{
 	        	xtype: 'notebookwrappermoveup'
 	        },{
 	        	xtype: 'notebookwrappermovedown'
-	        },{
-	        	xtype: 'notebookwrapperremove'
 	        }
 	    ]
 	}],
