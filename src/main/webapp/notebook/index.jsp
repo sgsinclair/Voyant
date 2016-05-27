@@ -1,6 +1,6 @@
 <%@ include file="../../resources/jsp/pre_app.jsp" %>
 <script src="../../resources/ckeditor/current/ckeditor.js"></script>
-<script src="../../resources/ace/current/ace.js"></script>
+<script src="../../resources/ace/tern-src-noconflict/ace.js"></script>
 <style id="voyant-notebooks-styles">
 	body.exported-notebook {
 		font-family: helvetica, arial, verdana, sans-serif;

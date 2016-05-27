@@ -18,7 +18,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		});
 		
 		this.editor = Ext.create("Voyant.notebook.editor.CodeEditor", {
-			content: Ext.Array.from(config.input).join("\n")
+			content: Ext.Array.from(config.input).join("\n"),
+			docs: config.docs
 		});
 		
 		Ext.apply(this, {

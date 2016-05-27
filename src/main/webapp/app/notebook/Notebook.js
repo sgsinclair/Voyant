@@ -18,13 +18,52 @@ Ext.define('Voyant.notebook.Notebook', {
 			exportHtml: "HTML (suitable for saving or printing)"
     	}
     },
+    
+    docs: {
+    	"!name": "Voyant"
+    },
+    
     constructor: function() {
+    	var me = this;
+    	var libs = ["Corpus"];
+    	this.docsLoading = libs.length;
+    	libs.forEach(function(lib) {
+    		 Ext.Ajax.request({
+    			 url: this.getBaseUrl()+"docs/ace/"+lib+".json",
+    			 scope: this
+    		 }).then(function(response, opts) {
+    		     var docs = Ext.decode(response.responseText);
+    		     var moreTemplate = new Ext.XTemplate("<a href='../../docs/#!/api/"+lib+"{0}'>more…</a>");
+    		     me.docs[lib] = {
+	    	        "!type": "fn(config) -> Corpus",
+	                "!url": "",
+	                "!doc": docs.short_doc + moreTemplate.apply([])
+    		     }
+    		     docs.members.forEach(function(member) {
+    		    	 if (!member['private'] && member.tagname=='method') {
+			    		me.docs[lib][member.name] = {
+				    	        "!type": "fn()",
+				                "!url": "",
+				                "!doc": member.short_doc + moreTemplate.apply(["-"+member.id])
+			    		}
+    		    	 }
+    		     })
+    		     me.docsLoading--;
+    		 },
+    		 function(response, opts) {
+    		     console.log('server-side failure with status code ' + response.status);
+    		 });
+
+    	}, this)
+    	
+    	
     	Ext.apply(this, {
     		title: this.localize('title'),
     		includeTools: ['help']
     	})
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
     },
     autoScroll: true,
     exportToolClick: function() {
@@ -98,45 +137,55 @@ Ext.define('Voyant.notebook.Notebook', {
 			bodyPadding: 5
 		}).show()
     },
+    
+    init: function() {
+    	if (this.docsLoading>0) {
+    		var me = this;
+    		return setTimeout(function() {
+    			me.init();
+    		}, 100);
+    	}
+    	var queryParams = Ext.Object.fromQueryString(document.location.search, true);
+    	if (queryParams.input) {
+    		this.loadBlocksFromString(queryParams.input);
+        	if (queryParams.run) {this.runAllCode()}
+    	}
+    	else {
+    		var url = location.href.replace(location.hash,"").replace(location.search,'');
+    		var notebook = url.substring(url.lastIndexOf("/",url.length-2)+1, url.length-1);
+    		if (notebook && notebook!='new') {
+        		var me = this;
+        		this.mask(this.localize("fetchingNotebook"));
+    			$.getJSON(this.getTromboneUrl(), {
+    				tool: 'notebook.NotebookManager',
+    				notebook: notebook 
+    			}).done(function(data) {
+    				me.loadBlocks(data);
+    			}).fail(function(response, textStatus, error) {
+    				if (textStatus=="parsererror") { // might still be valid
+    					me.loadBlocksFromString(response.responseText);
+    				}
+    				else {
+    					Ext.create("Voyant.util.ResponseError", {
+    						msg: me.localize('failedNotebookLoad'),
+    						response: response
+    					}).showMsg();
+    					me.loadDefaultBlocks();
+    				}
+    			}).always(function() {
+    				me.unmask()
+    				if (queryParams && (queryParams.run)) {me.runAllCode()}
+    			})
+    		}
+    		else {
+				this.loadDefaultBlocks();
+            	if (queryParams.run) {this.runAllCode()}
+    		}
+    	}
+    },
     listeners: {
     	boxready: function() {
-        	var queryParams = Ext.Object.fromQueryString(document.location.search, true);
-        	if (queryParams.input) {
-        		this.loadBlocksFromString(queryParams.input);
-            	if (queryParams.run) {this.runAllCode()}
-        	}
-        	else {
-        		var url = location.href.replace(location.hash,"").replace(location.search,'');
-        		var notebook = url.substring(url.lastIndexOf("/",url.length-2)+1, url.length-1);
-        		if (notebook && notebook!='new') {
-            		var me = this;
-            		this.mask(this.localize("fetchingNotebook"));
-        			$.getJSON(this.getTromboneUrl(), {
-        				tool: 'notebook.NotebookManager',
-        				notebook: notebook 
-        			}).done(function(data) {
-        				me.loadBlocks(data);
-        			}).fail(function(response, textStatus, error) {
-        				if (textStatus=="parsererror") { // might still be valid
-        					me.loadBlocksFromString(response.responseText);
-        				}
-        				else {
-        					Ext.create("Voyant.util.ResponseError", {
-        						msg: me.localize('failedNotebookLoad'),
-        						response: response
-        					}).showMsg();
-        					me.loadDefaultBlocks();
-        				}
-        			}).always(function() {
-        				me.unmask()
-        				if (queryParams && (queryParams.run)) {me.runAllCode()}
-        			})
-        		}
-        		else {
-					this.loadDefaultBlocks();
-                	if (queryParams.run) {this.runAllCode()}
-        		}
-        	}
+    		this.init();
     	},
     	
     	notebookWrapperMoveUp: function(wrapper) {
@@ -246,7 +295,8 @@ Ext.define('Voyant.notebook.Notebook', {
     	}
     	position = (typeof position === 'undefined') ? this.items.getCount() : position;
     	return this.insert(position, Ext.apply(block, {
-    		xtype: xtype
+    		xtype: xtype,
+    		docs: xtype == 'notebookcodeeditorwrapper' ? this.docs: undefined
     	}))
     },
     
