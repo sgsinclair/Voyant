@@ -23,6 +23,10 @@ a {
 	color: #ffffff;
 }
 
+.x-title-text .subtitle {
+    font-style: italic;
+    font-size: smaller;
+}
 .voyant-footer {
     text-align: center;
     font-size: 10px;

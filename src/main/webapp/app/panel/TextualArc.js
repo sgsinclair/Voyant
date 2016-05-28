@@ -327,6 +327,7 @@ Ext.define('Voyant.panel.TextualArc', {
     	this.termsMap = {};
     	this.draw();
     	var doc =  this.getCorpus().getDocument(parseInt(this.getApiParam('docIndex')));
+    	this.setTitle(this.localize('title') + " <span class='subtitle'>"+doc.getFullLabel()+"</span>");
     	this.lastToken = parseInt(doc.get('lastTokenStartOffset-lexical'));
     	this.documentTerms = doc.getDocumentTerms({
     		proxy: {

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri May 27 21:59:12 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri May 27 22:25:11 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5744,7 +5744,8 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getFullLabel: function() {
-    	return this.getTitle(); // TODO: complete full label
+    	var author = this.getAuthor();
+    	return this.getTitle() + (author ? "("+author+")" : ''); // TODO: complete full label
     },
     
     getTitle: function() {
@@ -8250,6 +8251,7 @@ Ext.define('Voyant.panel.Bubbles', {
     
     loadDocument: function() {
     	var me = this, doc = this.getCorpus().getDocument(parseInt(this.getApiParam('docIndex')));
+    	this.setTitle(this.localize('title') + " <span class='subtitle'>"+doc.getFullLabel()+"</span>");
     	doc.loadDocumentTerms(Ext.apply(this.getApiParams(["stopList"]), {
     		limit: 100
     	})).then(function(documentTerms) {
@@ -12936,8 +12938,7 @@ Ext.define('Voyant.panel.Documents', {
     		success: function(response) {
     			view.unmask();
     			var obj = Ext.decode(response.responseText);
-    			debugger
-				app.openUrl(app.getBaseUrl()+"/?corpus="+obj.corpus.id);
+				app.openUrl(app.getBaseUrl()+"?corpus="+obj.corpus.id);
 //    			view.mask("Loading new corpus…")
 //    			new Voyant.data.model.Corpus({corpus: obj.corpus.id}).then(function(corpus) {
 //    				view.unmask();
@@ -17152,6 +17153,7 @@ Ext.define('Voyant.panel.TextualArc', {
     	this.termsMap = {};
     	this.draw();
     	var doc =  this.getCorpus().getDocument(parseInt(this.getApiParam('docIndex')));
+    	this.setTitle(this.localize('title') + " <span class='subtitle'>"+doc.getFullLabel()+"</span>");
     	this.lastToken = parseInt(doc.get('lastTokenStartOffset-lexical'));
     	this.documentTerms = doc.getDocumentTerms({
     		proxy: {

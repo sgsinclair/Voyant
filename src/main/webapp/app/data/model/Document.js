@@ -131,7 +131,8 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getFullLabel: function() {
-    	return this.getTitle(); // TODO: complete full label
+    	var author = this.getAuthor();
+    	return this.getTitle() + (author ? "("+author+")" : ''); // TODO: complete full label
     },
     
     getTitle: function() {
