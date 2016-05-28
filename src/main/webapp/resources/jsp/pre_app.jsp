@@ -52,7 +52,7 @@
 	<% } 
 } %>
 
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v4<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=4&lang=<%
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=5<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=5&lang=<%
 if (request.getParameter("lang")!=null) { %><%= request.getParameter("lang") %><% } 
 else if (request.getAttribute("lang")!=null) {%><%= request.getAttribute("lang") %><% } else { %>en<% } %>"></script>
