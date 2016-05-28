@@ -375,14 +375,16 @@ Ext.define('Voyant.panel.Documents', {
     		success: function(response) {
     			view.unmask();
     			var obj = Ext.decode(response.responseText);
-    			view.mask("Loading new corpus…")
-    			new Voyant.data.model.Corpus({corpus: obj.corpus.id}).then(function(corpus) {
-    				view.unmask();
-    				app.dispatchEvent('loadedCorpus', app, corpus);
-    			}).fail(function(message, response) {
-    				view.unmask();
-    				app.showErrorResponse({message: message}, response);
-    			});
+				app.openUrl(app.getBaseUrl()+"?corpus="+obj.corpus.id);
+//    			view.mask("Loading new corpus…")
+//    			new Voyant.data.model.Corpus({corpus: obj.corpus.id}).then(function(corpus) {
+//    				view.unmask();
+//    				app.openUrl(app.getBaseUrl()+"/?corpus="+obj.corpus.id)
+//    				app.dispatchEvent('loadedCorpus', app, corpus);
+//    			}).fail(function(message, response) {
+//    				view.unmask();
+//    				app.showErrorResponse({message: message}, response);
+//    			});
     		}
     	});
     	
