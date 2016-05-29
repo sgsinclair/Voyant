@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri May 27 22:25:11 EDT 2016 */
+/* This file created by JSCacher. Last modified: Sat May 28 22:28:00 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5099,7 +5099,10 @@ Ext.define('Voyant.util.Toolable', {
 	getExportUrl: function() {
 		var api = this.isXType('voyantheader') ? this.getApplication().getModifiedApiParams() : this.getModifiedApiParams();
 		if (!this.isXType('voyantheader')) {api.view=Ext.getClassName(this).split(".").pop()}
-		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(api);
+		if (!api.corpus) {
+			api.corpus = this.getApplication().getCorpus().getAliasOrId();
+		}
+		return this.getApplication().getBaseUrl()+'?'+Ext.Object.toQueryString(api);
 	},
 	helpToolClick: function(panel) {
 		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
@@ -5126,7 +5129,7 @@ Ext.define('Voyant.util.Toolable', {
 			
 			var queryParams = Ext.Object.fromQueryString(document.location.search);
 			var url = this.getApplication().getBaseUrl();
-			url += '?corpus='+corpus.getId();
+			url += '?corpus='+corpus.getAliasOrId();
 			url += '&view='+xtype;
 			for (var key in queryParams) {
 				if (key !== 'corpus' && key !== 'view') {
@@ -5134,7 +5137,7 @@ Ext.define('Voyant.util.Toolable', {
 				}
 			}
 			window.history.pushState({
-				corpus: corpus.getId(),
+				corpus: corpus.getAliasOrId(),
 				view: xtype
 			}, '', url);
 		}
@@ -6886,6 +6889,11 @@ Ext.define('Voyant.data.model.Corpus', {
 	},
 	
 	
+	getAliasOrId: function() {
+		// overrides the getId() function from the model to handle promises
+    	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : (this.get('alias') || this.get('id'));		
+	},
+	
 	/**
      * Create a promise for {@link Voyant.data.store.CorpusTerms Corpus Terms}.
      * 
@@ -7109,13 +7117,16 @@ Ext.define('Voyant.widget.CorpusSelector', {
     config: {
         labelWidth: 150,
         labelAlign: 'right',
-        fieldLabel:'Choose a corpus:',
+//        fieldLabel:'Choose a corpus:',
         name:'corpus',
         queryMode:'local',
         store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]]
     },
     initComponent: function(config) {
     	var me = this;
+    	Ext.applyIf(this, {
+    		fieldLabel: this.localize('chooseCorpus')
+    	})
         me.callParent(arguments);
     }
 })
@@ -10886,13 +10897,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	    	buttonAlign: 'right',
 //    	    	defaultButtonUI : 'default',
 	    		items: [{
-	    			text: 'Open',
+	    			text: me.localize('Open'),
                     glyph: 'xf115@FontAwesome', // not visible
-	    			tooltip: 'Select an exsting corpus',
+	    			tooltip: me.localize('SelectExisting'),
 	    			hidden: this.getCorpus()!=undefined,
 	    			handler: function() {
 	    				Ext.create('Ext.window.Window', {
-	    				    title: 'Open an Existing Corpus',
+	    				    title: me.localize('Open'),
 	    				    layout: 'fit',
 	    				    modal: true,
 	    				    items: {  // Let's put an empty grid in just to illustrate fit layout
@@ -10911,7 +10922,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				        },
 	    				        buttons: [
 	    				        	{
-	    				        		text: 'Open',
+	    				        		text: me.localize('Open'),
 	    			                    glyph: 'xf00c@FontAwesome',
 	    				        		handler: function(btn) {
 	    				        			var form = btn.up('form').getForm();
@@ -10922,8 +10933,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				        			}
 	    				        			else {
 	    				    	        		Ext.Msg.show({
-	    				    	        		    title:'Select a Corpus',
-	    				    	        		    message: 'Please be sure to select a corpus.',
+	    				    	        		    title: me.localize('SelectExisting'),
+	    				    	        		    message: me.localize('PleaseSelectExisting'),
 	    				    	        		    buttons: Ext.Msg.OK,
 	    				    	        		    icon: Ext.Msg.ERROR
 	    				    	        		});
@@ -10931,7 +10942,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				        		},
 	    				        		flex: 1
 	    				            },{
-	    				        		text: 'Cancel',
+	    				        		text: me.localize('cancel'),
 	    			                    glyph: 'xf00d@FontAwesome',
 	    				        		flex: 1,
 	    				        		handler: function(btn) {
@@ -10949,13 +10960,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
         	    	buttonOnly: true,
         	    	hideLabel: true,
 		            ui: 'default-toolbar',
-        	    	buttonText: 'Upload',
+        	    	buttonText: me.localize('Upload'),
         	    	listeners: {
         	    		render: function(filefield) {
         	    			filefield.fileInputEl.dom.setAttribute('multiple', true);
         		        	Ext.tip.QuickTipManager.register({
        		                 target: filefield.getEl(),
-       		                 text: 'Upload one or more documents from your computer'
+       		                 text: me.localize('UploadLocal')
        		             	});
         	            },
         	            change: function(filefield, value) {
@@ -11043,8 +11054,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	        	}
 	    	        	else {
 	    	        		Ext.Msg.show({
-	    	        		    title:'No Text Provided',
-	    	        		    message: 'Please provide text in the text box (or choose open or upload).',
+	    	        		    title: me.localize('noTextProvided'),
+	    	        		    message: me.localize('pleaseProvideText'),
 	    	        		    buttons: Ext.Msg.OK,
 	    	        		    icon: Ext.Msg.ERROR
 	    	        		});
@@ -20138,7 +20149,7 @@ Ext.define('Voyant.panel.VoyantFooter', {
 				"<a href='"+container.getBaseUrl()+"docs/' target='voyantdocs'>"+container.localize('voyantTools')+"</a> ",
 				", <a href='http://stefansinclair.name/'>St&eacute;fan Sinclair</a> &amp; <a href='http://geoffreyrockwell.com'>Geoffrey Rockwell</a>",
 				" (<a href='http://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> "+ new Date().getFullYear() +")",
-				" <a href='http://docs.voyant-tools.org/privacy/' target='top' data-qtip='"+container.localize('privacyMsg')+"'>"+container.localize('privacy')+"</a>",
+				" <a class='privacy' href='"+this.getBaseUrl()+"docs/#!/guide/about-section-privacy-statement' target='top'>"+container.localize('privacy')+"</a>",
 				" v. "+Voyant.application.getVersion() + (Voyant.application.getBuild() ? " ("+Voyant.application.getBuild()+")" : "")
 			];
 			var footer = '';
@@ -20146,13 +20157,18 @@ Ext.define('Voyant.panel.VoyantFooter', {
 			var partWidth;
 			var el = container.getEl();
 			for (var i=0;i<parts.length;i++) {
-				partWidth = el.getTextWidth(parts[i].replace(/<.+?>/g, ""));
+				partWidth = el.getTextWidth(parts[i].replace(/data-qtip.+?-->/,">").replace(/<.+?>/g, ""));
+				console.warn(parts[i])
 				if (footerWidth+partWidth < width) {
 					footer += parts[i];
 					footerWidth += partWidth;
 				}
 			}
 			container.update(footer);
+        	Ext.tip.QuickTipManager.register({
+                target: container.getTargetEl().dom.querySelector(".privacy"),
+                text: this.localize('privacyMsg')
+            });
 		}
 	}
 });
@@ -21739,7 +21755,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
     		var corpusId = this.getCorpusId && this.getCorpusId() ? this.getCorpusId() : undefined;
     		if (window.history.pushState && !corpusId) {
     			// add the corpusId to the url
-    			var corpusId = corpus.getId();
+    			var corpusId = corpus.getAliasOrId();
         		var queryParams = Ext.Object.fromQueryString(document.location.search);
         		
     			var url = this.getBaseUrl()+'?corpus='+corpusId;
@@ -21804,7 +21820,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 						xtype: 'corpuscreator'
 					},{
 						xtype: 'container',
-						html: this.localize('voyantIs')
+						html: "<div style='font-style: italic; text-align: center; margin-top: 10px;'><div>"+this.localize('voyantIs')+"</div>" + (this.localize('translatedBy').indexOf("English") == -1 ? "<div>"+this.localize('translatedBy')+"</div>" : "")
 					}]	
 				},{
 					layout: 'fit',

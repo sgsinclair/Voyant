@@ -8,6 +8,7 @@ Ext.apply(Voyant.panel.Cirrus.i18n, {
 "maxTerms":"Max terms",
 "visible":"Show",
 "options":"Options",
+"scale":"Scale",
 "title":"Cirrus",
 "helpTip":"</p><p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document –&nbsp;this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>",
 "visibleTerms":"Terms"});
@@ -206,6 +207,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPassword":"other access",
 "xpathGroupBy":"Group by",
 "reveal":"Reveal",
+"OpenExisting":"Open an Existing Corpus",
 "tableNoHeadersRow":"No Headers Row",
 "accessOptionsText":"If desired, specify one or more access passwords (separated by commas).",
 "tableDocumentsRows":"from cells in each row",
@@ -216,14 +218,17 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "xpathContent":"Content",
 "numbersNeedCommas":"Please use a comma to separate multiple numbers.",
 "tableDocumentsTable":"from entire table",
+"UploadLocal":"Upload one or more documents from your computer",
 "helpTip":"This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from you computer (you can select multiple files by using the Ctrl and/or Shift keys)</li>",
 "xmlOptionsText":"Define XPath Expressions for any of the following:",
 "tableTitle":"Title",
+"noTextProvided":"No Text Provided",
 "tableContent":"Content",
 "xpathDocuments":"Documents",
 "tokenizationAuto":"Automatic (highly recommended)",
 "numbersCommasOnly":"Comma-separated numbers only.",
 "tableOptionsText":"Specify how documents should be extracted (currently only supported for MS Excel: .xls, xlsx). For more information see the documentation on creating a corpus with <a href=\"{0}\" target=\"voyantdocs\">tabular data</a>.",
+"PleaseSelectExisting":"Please be sure to select a corpus.",
 "inputFormat":"Input Format",
 "tableDocumentsColumns":"from entire columns",
 "accessModeWithoutPasswordText":"If you specify an <i>access password</i> you can also specify what access is granted to users without the password.",
@@ -238,11 +243,14 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableDocuments":"Documents",
 "fileTypesMessage":"You have one or more files with incompatible or unrecognized file extensions that may cause problems.",
 "errorNotXmlContinue":"You've selected an XML input format but the input doesn't appear to be XML. Are you sure you wish to continue?",
+"SelectExisting":"Select an existing corpus",
 "tableOptions":"Tables",
 "xmlOptions":"XML",
+"Upload":"Upload",
 "title":"Add Texts",
 "error":"Error",
 "sureContinue":"Are you sure you wish to continue?",
+"Open":"Open",
 "badFiles":"incompatible (likely error): ",
 "emptyInput":"Type in one or more URLs on separate lines or paste in a full text.",
 "ok":"OK",
@@ -252,6 +260,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableMetadataText":"These options are only used when documents are extracted from cells in each row (see the first option in this section). Same syntax as the Content option above: column numbers separated by commas or combined with a plus sign.",
 "xpathAuthor":"Author",
 "xpathTitle":"Title",
+"pleaseProvideText":"Please provide text in the text box (or choose open or upload).",
 "invalidForm":"Invalid values have been used, please hover over fields with red boxes for explanations.",
 "tableAuthor":"Author",
 "gearWinTitle":"Options",
@@ -304,13 +313,15 @@ Ext.apply(Voyant.panel.Mandala.i18n, {
 "clearTip":"Clear all magnets (search term).",
 "EditMagnet":"Edit Magnet",
 "clear":"Clear",
-"labelsTip":"Toggle visibiity of labels",
+"labelsTip":"Toggle visibility of labels",
 "update":"update",
 "title":"Mandala",
 "addTip":"Add a magnet (search term).",
 "helpTip":"Mandala is a conceptual visualization that shows the relationships between terms and documents. Each search term (or magnet) pulls documents toward it based on the term's relative frequency in the corpus.",
 "remove":"remove",
 "labels":"labels"});
+Ext.apply(Voyant.widget.CorpusSelector.i18n, {
+"chooseCorpus":"Choose a corpus"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "matchingTerms":"Matching terms: {count}",
 "tfidfTip":"The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.",
@@ -329,6 +340,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "daysAgo":"about {count} days ago",
 "monthsAgo":"about {count} months ago",
 "thisCorpus":"This corpus",
+"created":"Created",
 "isEmpty":"is empty",
 "widthNwordsAndNTypes":"with {words} <span class=\"info-tip\" data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted\">total words</span> and {types} <span class=\"info-tip\" data-qtip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">unique word forms</span>",
 "hoursAgo":"about {count} hours ago",
@@ -391,7 +403,7 @@ Ext.apply(Voyant.util.Toolable.i18n, {
 "reset":"Reset",
 "exportViewBiblio":"a bibliographic reference for this view",
 "exportViewEmbedTitle":"Embed HTML Snippet",
-"exportNoFunction":"An export function has been defined by is not availble.",
+"exportNoFunction":"An export function has been defined by is not available.",
 "exportGridCurrentJson":"export current data as JSON",
 "exportSvg":"export the SVG of this visualization",
 "saveTip":"Export a URL, an embeddable tool, data or a bibliographic reference."});
@@ -440,18 +452,19 @@ Ext.apply(Voyant.panel.Phrases.i18n, {
 "term":"Term",
 "helpTip":"<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->"});
 Ext.apply(Voyant.panel.Trends.i18n, {
-"freqsMode":"Frequencies",
-"freqsModeTip":"Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).",
 "relativeFrequencies":"Relative Frequencies",
 "documents":"Documents",
-"options":"Options",
 "raw":"Raw",
 "segmentsSlider":"Segments",
+"scale":"Scale",
 "title":"Trends",
+"segments":"Document Segments",
+"freqsMode":"Frequencies",
+"freqsModeTip":"Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).",
+"options":"Options",
 "rawFrequencies":"Raw Frequencies",
 "helpTip":"<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
-"relative":"Relative",
-"segments":"Document Segments"});
+"relative":"Relative"});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"Cancel",
 "de":"German",
@@ -598,7 +611,7 @@ Ext.apply(Voyant.panel.Contexts.i18n, {
 "positionTip":"The position of the keyword within the document.",
 "helpTip":"The Keywords in Context tool shows each occurrence of a keyword with a bit of surounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:<p></p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"});
 Ext.apply(Voyant.VoyantDefaultApp.i18n, {
-"voyantIs":"<p style=\"text-align: center; font-style: italic;\">Voyant Tools is a web-based reading and analysis environment for digital texts – please visit <a href=\"http://hermeneuti.ca/\" target=\"_blank\">Hermeneuti.ca</a> for more information..</p>",
+"voyantIs":"<a href=\"./docs/#!/guide/about\">Voyant Tools is a web-based reading and analysis environment for digital texts</a>.",
 "noViewKnownErrorTpl":"The selected view ({view}) has not been migrated from the previous version of Voyant (and probably won't be). {additional} The default view will be used instead.",
 "convertSkinMsg":"The convert skin was used for document exporting and that functionality is now available from the Documents tool.",
 "noViewErrorTitle":"View Error",
@@ -649,9 +662,9 @@ Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"Voyant Tools",
 "privacy":"Privacy",
 "voyantLink":"<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools</a>",
-"privacyMsg":"The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see &lt;a href=\"http://www.google.ca/intl/en/policies/privacy/\" target=\"_blank\"&gt;Google's Privacy Policy&lt;/a&gt; and the &lt;em&gt;Log Information&lt;/em&gt; section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact &lt;a href=\"http://stefansinclair.name/contact/\"&gt;Stéfan Sinclair&lt;/a&gt;."});
+"privacyMsg":"The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see Google's Privacy Policy and the <em>Log Information</em> section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact Stéfan Sinclair. Click on this link for more information."});
 Ext.apply(Voyant.widget.QuerySearchField.i18n, {
-"querySearchTip":"<div>Search syntax (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as a phrase</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,\"coat mittens\"~5</b>: combine syntaxes</li></ul>",
+"querySearchTip":"<div>Search syntax (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>*oat</b>: match terms that end with <i>oad</i> as one term</li><li><b>^*oat</b>: match terms that end with <i>oad</i> as multiple terms</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as a phrase</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,\"coat mittens\"~5</b>: combine syntaxes</li></ul>",
 "querySearchDocsModeTip":"<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as a phrase</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+\"winter coat\" +mitten*</b>: combine syntaxes</li></ul>",
 "querySearch":"Search",
 "aggregateInDocumentsCount":"This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms)."});

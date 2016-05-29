@@ -60,13 +60,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	    	buttonAlign: 'right',
 //    	    	defaultButtonUI : 'default',
 	    		items: [{
-	    			text: 'Open',
+	    			text: me.localize('Open'),
                     glyph: 'xf115@FontAwesome', // not visible
-	    			tooltip: 'Select an exsting corpus',
+	    			tooltip: me.localize('SelectExisting'),
 	    			hidden: this.getCorpus()!=undefined,
 	    			handler: function() {
 	    				Ext.create('Ext.window.Window', {
-	    				    title: 'Open an Existing Corpus',
+	    				    title: me.localize('Open'),
 	    				    layout: 'fit',
 	    				    modal: true,
 	    				    items: {  // Let's put an empty grid in just to illustrate fit layout
@@ -85,7 +85,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				        },
 	    				        buttons: [
 	    				        	{
-	    				        		text: 'Open',
+	    				        		text: me.localize('Open'),
 	    			                    glyph: 'xf00c@FontAwesome',
 	    				        		handler: function(btn) {
 	    				        			var form = btn.up('form').getForm();
@@ -96,8 +96,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				        			}
 	    				        			else {
 	    				    	        		Ext.Msg.show({
-	    				    	        		    title:'Select a Corpus',
-	    				    	        		    message: 'Please be sure to select a corpus.',
+	    				    	        		    title: me.localize('SelectExisting'),
+	    				    	        		    message: me.localize('PleaseSelectExisting'),
 	    				    	        		    buttons: Ext.Msg.OK,
 	    				    	        		    icon: Ext.Msg.ERROR
 	    				    	        		});
@@ -105,7 +105,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    				        		},
 	    				        		flex: 1
 	    				            },{
-	    				        		text: 'Cancel',
+	    				        		text: me.localize('cancel'),
 	    			                    glyph: 'xf00d@FontAwesome',
 	    				        		flex: 1,
 	    				        		handler: function(btn) {
@@ -123,13 +123,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
         	    	buttonOnly: true,
         	    	hideLabel: true,
 		            ui: 'default-toolbar',
-        	    	buttonText: 'Upload',
+        	    	buttonText: me.localize('Upload'),
         	    	listeners: {
         	    		render: function(filefield) {
         	    			filefield.fileInputEl.dom.setAttribute('multiple', true);
         		        	Ext.tip.QuickTipManager.register({
        		                 target: filefield.getEl(),
-       		                 text: 'Upload one or more documents from your computer'
+       		                 text: me.localize('UploadLocal')
        		             	});
         	            },
         	            change: function(filefield, value) {
@@ -217,8 +217,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	        	}
 	    	        	else {
 	    	        		Ext.Msg.show({
-	    	        		    title:'No Text Provided',
-	    	        		    message: 'Please provide text in the text box (or choose open or upload).',
+	    	        		    title: me.localize('noTextProvided'),
+	    	        		    message: me.localize('pleaseProvideText'),
 	    	        		    buttons: Ext.Msg.OK,
 	    	        		    icon: Ext.Msg.ERROR
 	    	        		});

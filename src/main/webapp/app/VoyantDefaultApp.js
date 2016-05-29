@@ -24,7 +24,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
     		var corpusId = this.getCorpusId && this.getCorpusId() ? this.getCorpusId() : undefined;
     		if (window.history.pushState && !corpusId) {
     			// add the corpusId to the url
-    			var corpusId = corpus.getId();
+    			var corpusId = corpus.getAliasOrId();
         		var queryParams = Ext.Object.fromQueryString(document.location.search);
         		
     			var url = this.getBaseUrl()+'?corpus='+corpusId;
@@ -89,7 +89,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 						xtype: 'corpuscreator'
 					},{
 						xtype: 'container',
-						html: this.localize('voyantIs')
+						html: "<div style='font-style: italic; text-align: center; margin-top: 10px;'><div>"+this.localize('voyantIs')+"</div>" + (this.localize('translatedBy').indexOf("English") == -1 ? "<div>"+this.localize('translatedBy')+"</div>" : "")
 					}]	
 				},{
 					layout: 'fit',

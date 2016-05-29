@@ -161,6 +161,11 @@ Ext.define('Voyant.data.model.Corpus', {
 	},
 	
 	
+	getAliasOrId: function() {
+		// overrides the getId() function from the model to handle promises
+    	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : (this.get('alias') || this.get('id'));		
+	},
+	
 	/**
      * Create a promise for {@link Voyant.data.store.CorpusTerms Corpus Terms}.
      * 

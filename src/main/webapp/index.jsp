@@ -52,7 +52,7 @@ Ext.onReady(function(){
 		   	var me = this;
 			this.callParent(arguments);
 
-			if (true || window.location.hostname==='beta.voyant-tools.org') {
+			if (window.location.hostname==='beta.voyant-tools.org') {
 				var viewport = this.getViewport();
 				viewport.mask();
 				Ext.create('Ext.window.Window', {

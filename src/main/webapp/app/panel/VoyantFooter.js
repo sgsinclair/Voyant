@@ -14,7 +14,7 @@ Ext.define('Voyant.panel.VoyantFooter', {
 				"<a href='"+container.getBaseUrl()+"docs/' target='voyantdocs'>"+container.localize('voyantTools')+"</a> ",
 				", <a href='http://stefansinclair.name/'>St&eacute;fan Sinclair</a> &amp; <a href='http://geoffreyrockwell.com'>Geoffrey Rockwell</a>",
 				" (<a href='http://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> "+ new Date().getFullYear() +")",
-				" <a href='http://docs.voyant-tools.org/privacy/' target='top' data-qtip='"+container.localize('privacyMsg')+"'>"+container.localize('privacy')+"</a>",
+				" <a class='privacy' href='"+this.getBaseUrl()+"docs/#!/guide/about-section-privacy-statement' target='top'>"+container.localize('privacy')+"</a>",
 				" v. "+Voyant.application.getVersion() + (Voyant.application.getBuild() ? " ("+Voyant.application.getBuild()+")" : "")
 			];
 			var footer = '';
@@ -22,13 +22,18 @@ Ext.define('Voyant.panel.VoyantFooter', {
 			var partWidth;
 			var el = container.getEl();
 			for (var i=0;i<parts.length;i++) {
-				partWidth = el.getTextWidth(parts[i].replace(/<.+?>/g, ""));
+				partWidth = el.getTextWidth(parts[i].replace(/data-qtip.+?-->/,">").replace(/<.+?>/g, ""));
+				console.warn(parts[i])
 				if (footerWidth+partWidth < width) {
 					footer += parts[i];
 					footerWidth += partWidth;
 				}
 			}
 			container.update(footer);
+        	Ext.tip.QuickTipManager.register({
+                target: container.getTargetEl().dom.querySelector(".privacy"),
+                text: this.localize('privacyMsg')
+            });
 		}
 	}
 });

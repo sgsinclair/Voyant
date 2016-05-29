@@ -572,7 +572,10 @@ Ext.define('Voyant.util.Toolable', {
 	getExportUrl: function() {
 		var api = this.isXType('voyantheader') ? this.getApplication().getModifiedApiParams() : this.getModifiedApiParams();
 		if (!this.isXType('voyantheader')) {api.view=Ext.getClassName(this).split(".").pop()}
-		return this.getApplication().getBaseUrl()+'?corpus='+this.getApplication().getCorpus().getId()+"&"+Ext.Object.toQueryString(api);
+		if (!api.corpus) {
+			api.corpus = this.getApplication().getCorpus().getAliasOrId();
+		}
+		return this.getApplication().getBaseUrl()+'?'+Ext.Object.toQueryString(api);
 	},
 	helpToolClick: function(panel) {
 		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
@@ -599,7 +602,7 @@ Ext.define('Voyant.util.Toolable', {
 			
 			var queryParams = Ext.Object.fromQueryString(document.location.search);
 			var url = this.getApplication().getBaseUrl();
-			url += '?corpus='+corpus.getId();
+			url += '?corpus='+corpus.getAliasOrId();
 			url += '&view='+xtype;
 			for (var key in queryParams) {
 				if (key !== 'corpus' && key !== 'view') {
@@ -607,7 +610,7 @@ Ext.define('Voyant.util.Toolable', {
 				}
 			}
 			window.history.pushState({
-				corpus: corpus.getId(),
+				corpus: corpus.getAliasOrId(),
 				view: xtype
 			}, '', url);
 		}
