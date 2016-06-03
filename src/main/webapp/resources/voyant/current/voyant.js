@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat May 28 22:28:00 EDT 2016 */
+/* This file created by JSCacher. Last modified: Sat May 28 22:30:46 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8996,7 +8996,7 @@ Ext.define('Voyant.panel.Catalogue', {
     	    	    url: this.getTromboneUrl(),
     	    	    params: {
     	        		tool: 'resource.StoredResource',
-    	        		verifyResourceId: 'customhtml-'+corpus.getId()
+    	        		verifyResourceId: 'customhtml-'+corpus.getAliasOrId()
     	    	    },
     	    	    success: function(response, req) {
     	    	    	var json = Ext.util.JSON.decode(response.responseText);
@@ -9005,7 +9005,7 @@ Ext.define('Voyant.panel.Catalogue', {
     	        	    	    url: this.getTromboneUrl(),
     	        	    	    params: {
     	        	        		tool: 'resource.StoredResource',
-    	        	        		retrieveResourceId: 'customhtml-'+corpus.getId()
+    	        	        		retrieveResourceId: 'customhtml-'+corpus.getAliasOrId()
     	        	    	    },
     	        	    	    success: function(response, req) {
     	        	    	    	var json = Ext.util.JSON.decode(response.responseText);

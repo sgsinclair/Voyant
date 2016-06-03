@@ -162,7 +162,7 @@ Ext.define('Voyant.panel.Catalogue', {
     	    	    url: this.getTromboneUrl(),
     	    	    params: {
     	        		tool: 'resource.StoredResource',
-    	        		verifyResourceId: 'customhtml-'+corpus.getId()
+    	        		verifyResourceId: 'customhtml-'+corpus.getAliasOrId()
     	    	    },
     	    	    success: function(response, req) {
     	    	    	var json = Ext.util.JSON.decode(response.responseText);
@@ -171,7 +171,7 @@ Ext.define('Voyant.panel.Catalogue', {
     	        	    	    url: this.getTromboneUrl(),
     	        	    	    params: {
     	        	        		tool: 'resource.StoredResource',
-    	        	        		retrieveResourceId: 'customhtml-'+corpus.getId()
+    	        	        		retrieveResourceId: 'customhtml-'+corpus.getAliasOrId()
     	        	    	    },
     	        	    	    success: function(response, req) {
     	        	    	    	var json = Ext.util.JSON.decode(response.responseText);
