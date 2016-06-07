@@ -1,0 +1,40 @@
+{
+    "metadata": {
+        "created": 1464978017646,
+        "modified": 1464978111736,
+        "version": 2
+    },
+    "blocks": [
+        {
+            "type": "text",
+            "input": [
+                "<h1 style=\"text-align: center;\">Getting Started with&nbsp;Voyant Notebooks</h1>\n",
+                "\n<p>This notebook will walk through some very preliminary steps of getting start",
+                "ed with Jupyter (iPython Nobooks). It's part of the&nbsp;<a href=\"https://render",
+                ".githubusercontent.com/view/ArtOfLiteraryTextAnalysis.ipynb\" data-tabindex-value",
+                "=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">The Art of Literary Text Analysi",
+                "s</a>. In this notebook we'll look in particular at:</p>\n\n<ul>\n\t<li>creating a n",
+                "ew notebook</li>\n\t<li>&nbsp;</li>\n\t<li>editing modes\n\t<ul>\n\t\t<li>markdown cells<",
+                "/li>\n\t\t<li>code cells</li>\n\t</ul>\n\t</li>\n\t<li>Printing a String</li>\n\t<li>Printi",
+                "ng Dynamic Content</li>\n</ul>\n\n<p>This is a Voyant Notebook, a dynamic document ",
+                "that combines writing, code and data in service of reading, analyzing and interp",
+                "reting digital texts.</p>\n\n<p>Voyant Notebooks are composed of text blocks (like",
+                " this one) and code blocks (like the one below). You can <span class=\"marker\">cl",
+                "ick on the blocks to edit</span> them and add new blocks by clicking add icon th",
+                "at appears in the left column when hovering over a block.</p>\n"
+            ]
+        },
+        {
+            "type": "code",
+            "input": "new Corpus(\"Hello Voyant!\").show();",
+            "output": [
+                " <div class=\"info\">This corpus has 1 document with 2 <span class=\"info-tip\" data",
+                "-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&qu",
+                "ot;) is counted\">total words</span> and 2 <span class=\"info-tip\" data-qtip=\"mult",
+                "iple occurrences of words (like &quot;the&quot;) are counted once\">unique word f",
+                "orms</span>. Created <span class=\"info-tip\" data-qtip=\"2016-05-07, 15:51:18\">abo",
+                "ut 26 days ago</span>.</div>"
+            ]
+        }
+    ]
+}

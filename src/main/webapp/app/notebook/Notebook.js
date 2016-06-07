@@ -16,7 +16,14 @@ Ext.define('Voyant.notebook.Notebook', {
 			originalJson: "Original JSON string",
 			exportJson: "Voyant Notebooks data format (JSON)",
 			exportHtml: "HTML (suitable for saving or printing)"
+    	},
+    	api: {
+    		input: undefined
     	}
+    },
+    config: {
+    	metadata: {},
+    	version: 2.0
     },
     
     docs: {
@@ -160,7 +167,7 @@ Ext.define('Voyant.notebook.Notebook', {
     				tool: 'notebook.NotebookManager',
     				notebook: notebook 
     			}).done(function(data) {
-    				me.loadBlocks(data);
+    				me.loadData(data);
     			}).fail(function(response, textStatus, error) {
     				if (textStatus=="parsererror") { // might still be valid
     					me.loadBlocksFromString(response.responseText);
@@ -170,7 +177,7 @@ Ext.define('Voyant.notebook.Notebook', {
     						msg: me.localize('failedNotebookLoad'),
     						response: response
     					}).showMsg();
-    					me.loadDefaultBlocks();
+    					me.loadData();
     				}
     			}).always(function() {
     				me.unmask()
@@ -178,7 +185,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			})
     		}
     		else {
-				this.loadDefaultBlocks();
+				this.loadData();
             	if (queryParams.run) {this.runAllCode()}
     		}
     	}
@@ -236,6 +243,50 @@ Ext.define('Voyant.notebook.Notebook', {
 
     },
     
+    loadData: function(data) {
+    	if (!data) {
+    		data = {
+    			blocks: [{
+    				type: 'text',
+    				input: "<h1 style='text-align: center;'>Voyant Notebook Template (title)</h1><p>This is a Voyant Notebook, a dynamic document that combines writing, code and data in service of reading, analyzing and interpreting digital texts.</p><p>Voyant Notebooks are composed of text blocks (like this one) and code blocks (like the one below). You can <span class='marker'>click on the blocks to edit</span> them and add new blocks by clicking add icon that appears in the left column when hovering over a block.</p>"
+    			},{
+    				input: 'new Corpus("Hello Voyant!").show();',
+    		        output: [
+    		                   " <div class=\"info\">This corpus has 1 document with 2 <span class=\"info-tip\" data",
+    		                   "-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&qu",
+    		                   "ot;) is counted\">total words</span> and 2 <span class=\"info-tip\" data-qtip=\"mult",
+    		                   "iple occurrences of words (like &quot;the&quot;) are counted once\">unique word f",
+    		                   "orms</span>. Created <span class=\"info-tip\" data-qtip=\"2016-05-07, 15:51:18\">abo",
+    		                   "ut 26 days ago</span>.</div>"
+    		        ]
+    			}]
+    		}
+    	}
+    	if (Ext.isString(data) || Ext.isArray(data)) {
+    		data = {blocks: data}
+    	}
+    	if (Ext.isObject(data)) {
+    		if (!("metadata" in data)) {
+    			data.metadata = {
+    					created: new Date().getTime() // others will be set later as needed
+    			}
+    		}
+			this.setMetadata(data.metadata);
+        	Ext.Array.from(data.blocks).forEach(function(block) {
+        		if (block) {
+            		if (Ext.isString(block) && block!='') {this.addCode({input: block});}
+            		else if (block.input) {
+                		if (block.type=='text') {this.addText(block);}
+                		else {this.addCode(block);}
+            		}
+        		}
+        	}, this)
+    	} else {
+    		this.showError("Unable to load Notebooks data.");
+    		console.warn(data);
+    	}
+    },
+    
     loadBlocksFromString: function(string) {
     	if (/^\s*[\[\{]/m.test(string)) {
     		var json = undefined;
@@ -249,36 +300,11 @@ Ext.define('Voyant.notebook.Notebook', {
 					details: e.stack+"\n\n"+this.localize("originalJson")+": "+string
 				}).showMsg()
     		}
-    		if (json) {
-				this.loadBlocks(Ext.isArray(json) ? json : [json])
-    		}
+    		this.loadData(json)
     	}
     	else {
-    		this.loadBlocks([string]) // treat as single content block
+    		this.loadData(string) // treat as single content block
     	}
-    },
-    
-    loadDefaultBlocks: function() {
-    	this.loadBlocks([
-		    {
-		    	type: 'text',
-		    	content: "<h1 style='text-align: center;'>Voyant Notebook Template (title)</h1><p>This is a Voyant Notebook, a dynamic document that combines writing, code and data in service of reading, analyzing and interpreting digital texts.</p><p>Voyant Notebooks are composed of text blocks (like this one) and code blocks (like the one below). You can <span class='marker'>click on the blocks to edit</span> them and add new blocks by clicking add icon that appears in the left column when hovering over a block.</p>"
-		    },{
-		    	content: "loadCorpus('hello world!').loadCorpusTerms().then(function(corpusTerms) { var lengths = {}, len; corpusTerms.eachRow(function(row) { len = row.term.length; console.warn(row, len) for (var i=0; i<row.rawFreq;i++) { lengths[len] = lengths[len] ? lengths[len]+1 : 1 } }, true) console.warn(lengths) })"
-		    }
-		])
-    },
-    
-    loadBlocks: function(blocks) {
-    	blocks.forEach(function(block) {
-    		if (block) {
-        		if (Ext.isString(block) && block!='') {this.addCode({input: block});}
-        		else if (block.input) {
-            		if (block.type=='text') {this.addText(block);}
-            		else {this.addCode(block);}
-        		}
-    		}
-    	}, this)
     },
     
     addText: function(block, position) {
@@ -345,8 +371,20 @@ Ext.define('Voyant.notebook.Notebook', {
     	if (blocks.length==1 && blocks[0].type=='code') {
     		blocks = blocks[0].input
     	}
+    	
+    	var metadata = this.getMetadata();
+    	Ext.applyIf(metadata, {
+    		created: new Date().getTime(),
+    		modified: new Date().getTime(),
+    		version: this.getVersion()
+    	})
+    	
+    	var data = {
+    		metadata: metadata,
+    		blocks: blocks
+    	}
 
-    	Ext.Msg.prompt("Export Notebook", "Currently only copying and pasting the notebook is available. You can select all the contents of the box below and copy to the clipboard.", undefined, undefined, true, JSON && JSON.stringify ? JSON.stringify(blocks, undefined, 4) : Ext.encode(blocks))
+    	Ext.Msg.prompt("Export Notebook", "Currently only copying and pasting the notebook is available. You can select all the contents of the box below and copy to the clipboard.", undefined, undefined, true, JSON && JSON.stringify ? JSON.stringify(data, undefined, 4) : Ext.encode(data))
     	
 //    	var url = "./?input=" + encodeURIComponent(Ext.encode(blocks));
 //    	var openurl = "window.open().document.write(unescape('"+escape(Ext.encode(blocks))+"')); return false";

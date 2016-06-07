@@ -23,7 +23,6 @@ Ext.define('Voyant.panel.VoyantFooter', {
 			var el = container.getEl();
 			for (var i=0;i<parts.length;i++) {
 				partWidth = el.getTextWidth(parts[i].replace(/data-qtip.+?-->/,">").replace(/<.+?>/g, ""));
-				console.warn(parts[i])
 				if (footerWidth+partWidth < width) {
 					footer += parts[i];
 					footerWidth += partWidth;
