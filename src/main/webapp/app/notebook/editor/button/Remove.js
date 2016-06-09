@@ -15,7 +15,7 @@ Ext.define("Voyant.notebook.editor.button.Remove", {
     	})
         this.callParent(arguments);
 	},
-	glyph: 'xf057@FontAwesome',
+	glyph: 'xf014@FontAwesome',
 	textAlign: 'left',
 	listeners: {
 		click: function() {

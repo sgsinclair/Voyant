@@ -320,7 +320,7 @@ Ext.define('Voyant.data.model.Corpus', {
 	 * 
 	 * 	new Corpus("Hello World!").then(function(corpus) {corpus.show(true);});
 	 * 
-	 * @params {boolean} [withID] Includes the corpus ID in parentheses at the end, if true.
+	 * @param {boolean} [withID] Includes the corpus ID in parentheses at the end, if true.
 	 */
 	show: function(config) {
 		if (this.then) {
@@ -329,6 +329,25 @@ Ext.define('Voyant.data.model.Corpus', {
 			show(this.getString(config))
 		}
 	},
+	
+	/**
+	 * @method embed
+	 * Embed the current corpus in the specified tool.
+	 * 
+	 * Because embed knows about promises, you don't need to handle promises when calling embed on a corpus.
+	 * 
+	 * 	new Corpus("Hello Voyant!").embed(); // use summary as a default
+	 * 	new Corpus("Hello Voyant!").embed("corpusterms"); // specify corpus terms tool
+	 * 	new Corpus("Hello Voyant!").embed("cirrus", {width: "300px"}); // with config
+	 *  
+	 * @param {String} [tool] Specify which tool to use for embedding this corpus.
+	 * The following are recognized tool values: {@link Voyant.panel.Summary summary} (default), {@link Voyant.panel.Cirrus cirrus}, {@link Voyant.panel.Documents documents}, {@link Voyant.panel.CorpusTerms corpusterms}.
+	 * @param {Object} [config] Additional configuration options to pass to the tool.
+	 * In addition to the configuration options available from each tool listed in the tool param (see above), options include:
+	 * 
+	 * - **width**: a CSS width value for the embedded tool (e.g. "500px", "80em", "50%")
+	 * - **height**: a CSS height value for the embedded tool (e.g. "300px", "10em", "30%")
+	 */
 
     getString: function(config) {
 		var size = this.getDocumentsCount();

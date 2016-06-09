@@ -9,5 +9,5 @@ Ext.define("Voyant.notebook.editor.button.Run", {
 			}
 		}
 	},
-	glyph: 'xf144@FontAwesome'
+	glyph: 'xf04b@FontAwesome'
 })

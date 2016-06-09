@@ -1,3 +1,6 @@
+/**
+ * A Summary of a corpus.
+ */
 Ext.define('Voyant.panel.Summary', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel', 'Voyant.util.SparkLine'],

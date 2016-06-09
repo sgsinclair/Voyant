@@ -207,7 +207,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPassword":"jiný typ přístupu",
 "xpathGroupBy":"Seskupit podle",
 "reveal":"Odhalit",
-"OpenExisting":"Open an Existing Corpus",
+"OpenExisting":"Otevřít existující korpus",
 "tableNoHeadersRow":"Bez řádku záhlaví",
 "accessOptionsText":"Přejete-li si, můžete zadat jedno, nebo více přístupových hesel (oddělených čárkou).",
 "tableDocumentsRows":"z buněk každé řádky",
@@ -218,17 +218,17 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "xpathContent":"Obsah",
 "numbersNeedCommas":"Prosím použijte čárku k oddělení více čísel.",
 "tableDocumentsTable":"z celé tabulky",
-"UploadLocal":"Upload one or more documents from your computer",
+"UploadLocal":"Nahrát jeden nebo více dokumentů z vašeho počítače.",
 "helpTip":"Tento nástroj umožňuje vytvořit korpus jedním ze tří způsobů:<ol><li>napsáním nebo vložením textu do textového pole a kliknutím na <i>Odhalit</i>; pokud je každý řádek v textovém poli adresou URL, text se načte z těchto URL odkazů, v ostatních případech je obsah považován za jeden dokument </li><li>klikněte na tlačítko <i>Otevřít</i> pro otevření existujícího korpusu</li><li>klikněte na tlačítko <i>Nahrát</i> pro nahrání jednoho nebo více souborů ze svého počítače (více souborů můžete vybrat při stisknutí klávesy Ctrl a/nebo Shift)</li>",
 "xmlOptionsText":"Definovat XPath výrazy pro následující:",
 "tableTitle":"Název",
-"noTextProvided":"No Text Provided",
+"noTextProvided":"Nebyl vložen žádný text.",
 "tableContent":"Obsah",
 "xpathDocuments":"Dokumenty",
 "tokenizationAuto":"Automatická (velmi doporučováno)",
 "numbersCommasOnly":"Pouze čísla oddělená čárkou.",
 "tableOptionsText":"Specifikujte, jak by měly být dokumenty extrahovány (v současnosti podporováno pro MS Excel: .xls, xlsx). Pro více informací konzultujte dokumentaci o vytváření korpusu s <a href=\"{0}\" target=\"voyantdocs\">tabulkovými daty</a>.",
-"PleaseSelectExisting":"Please be sure to select a corpus.",
+"PleaseSelectExisting":"Prosím ujistěte se, že jste vybrali korpus.",
 "inputFormat":"Formát vstupu",
 "tableDocumentsColumns":"z celých sloupců",
 "accessModeWithoutPasswordText":"Pokud zadáte <i>přístupové heslo</i> můžete také specifikovat, jaký typ přístupu bude poskytnut uživatelům bez hesla.",
@@ -243,14 +243,14 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableDocuments":"Dokumenty",
 "fileTypesMessage":"Máte jeden nebo více souborů s nekompatibilní nebo nerozpoznanou příponou souboru, což může způsobit problémy.",
 "errorNotXmlContinue":"Zvolili jste XML formát vstupu, ale vstup se nezdá být v tomto formátu. Jste si jisti, že chcete pokračovat?",
-"SelectExisting":"Select an existing corpus",
+"SelectExisting":"Vybrat existující korpus",
 "tableOptions":"Tabulky",
 "xmlOptions":"XML",
-"Upload":"Upload",
+"Upload":"Nahrát",
 "title":"Přidat texty",
 "error":"Chyba",
 "sureContinue":"Jste si jisti, že chcete pokračovat?",
-"Open":"Open",
+"Open":"Otevřít",
 "badFiles":"nekompatibilní (pravděpodobná chyba):",
 "emptyInput":"Zadejte jednu nebo více URL adres na zvláštní řádky, nebo vložte plný text.",
 "ok":"OK",
@@ -260,7 +260,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableMetadataText":"Tyto možnosti nastavení se použijí pouze pokud jsou dokumenty extrahovány z buňek na každém řádku (viz první možnost v této sekci). Syntax je stejná jako u výše uvedených možností nastavení Obsahu: čísla sloupců oddělenná čárkami nebo sloučenná znaménkem plus.",
 "xpathAuthor":"Autor",
 "xpathTitle":"Název",
-"pleaseProvideText":"Please provide text in the text box (or choose open or upload).",
+"pleaseProvideText":"Prosím vložte text do textového pole (případně zvolte Otevřít nebo Nahrát)",
 "invalidForm":"Byly použity neplatné hodnoty, prosím najeďte kurzorem na červeně označená pole pro vysvětlení.",
 "tableAuthor":"Autor",
 "gearWinTitle":"Nastavení",
@@ -311,7 +311,7 @@ Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"Přidat",
 "cancel":"zrušit",
 "clearTip":"Smazání všech magnetů (vyhledávacích termínů).",
-"EditMagnet":"Editovat magnet",
+"EditMagnet":"Upravit magnet",
 "clear":"Smazat",
 "labelsTip":"Přepíná zobrazování štítků",
 "update":"aktualizovat",
@@ -321,10 +321,10 @@ Ext.apply(Voyant.panel.Mandala.i18n, {
 "remove":"odstranit",
 "labels":"štítky"});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
-"chooseCorpus":"Choose a corpus"});
+"chooseCorpus":"Zvolte korpus"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "matchingTerms":"Termíny odpovídající kritériím vyhledávání: {count}",
-"tfidfTip":"Významnost se zde měří pomocí hodnoty TF-IDF, což je běžný způsob vyjádření důležitosti termínu v dokumentu v poměru ke zbytku korpusu.",
+"tfidfTip":"Významnost se zde měří pomocí hodnoty TF-IDF (vypočítává se ze dvou složek: četnost slova v dokumentu a převrácená četnost slova ve všech dokumentech), což je běžný způsob vyjádření důležitosti termínu v dokumentu v poměru ke zbytku korpusu.",
 "rawFreqTip":"Počet (prostá frekvence) tohoto termínu v tomto dokumentu.",
 "emptyText":"Vyhledávacím kritériím neodpovídají žádné výsledky.",
 "relativeFreqTip":"Relativní frekvence (na milión) tohoto termínu v každém dokumentu.",
@@ -333,7 +333,7 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "trendTip":"Toto je řádkový minigraf (sparkline), který reprezentuje rozdělení termínu uvnitř lineárních segmentů dokumentu (ve výchozím nastavení 10 segmentů stejné velikosti).",
 "tfidf":"Významnost",
 "title":"Dokumentové termíny",
-"helpTip":"</p><p>Nástroj Dokumentové termíny poskytuje tabulkové zobrazení termínů, které se objevují v každém dokumentu. Funkce zahrnují: </p><ul><li>změna uspořádání pomocí <i>termínů</i> a <i>počet</i> (prostá frekvence), a <i>relativní</i> frekvence (klikněte na záhlaví sloupců)</li><li>řádkový minigraf (sparkline) trendů frekvence termínu napříč dokumenty</li><li>zpřístupnění dodatečných sloupců (<i>Významnost</i> nebo TF-IDF, tj. frekvence slova v dokumentu - inverzní frekvence slova ve všech dokumentech) pomocí kliknutí na šipku, která se objeví po najetí kurzoru na záhlaví</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud potřebujete nápovědu pro syntax</li></ul>",
+"helpTip":"</p><p>Nástroj Dokumentové termíny poskytuje tabulkové zobrazení termínů, které se objevují v každém dokumentu. Funkce zahrnují: </p><ul><li>změna uspořádání pomocí <i>termínů</i> a <i>počet</i> (prostá frekvence), a <i>relativní</i> frekvence (klikněte na záhlaví sloupců)</li><li>řádkový minigraf (sparkline) trendů frekvence termínu napříč dokumenty</li><li>zpřístupnění dodatečných sloupců (<i>Významnost</i> neboli TF-IDF, tj. četnost slova v dokumentu - převrácená četnost slova ve všech dokumentech) pomocí kliknutí na šipku, která se objeví po najetí kurzoru na záhlaví</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud potřebujete nápovědu pro syntax</li></ul>",
 "zscoreTip":"Z-skóre nebo standardizované skóre představuje normalizovanou hodnotu prosté (absolutní) frekvence termínu ve srovnání s frekvencemi dalších termínů ve stejném dokumentu.<table><tbody><tr><td style=\"text-align: center; font-size: smaller; font-family: mono;\">frekvence termínu - průměrná hodnota frekvence termínů<hr>směrodatná odchylka frekvence termínů</td></tr></tbody></table>."});
 Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hasNdocuments":"obsahuje {count} dokumentů",
@@ -357,7 +357,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "secondsAgo":"asi před {count} vteřinami",
 "dayAgo":"asi před jedním dnem"});
 Ext.apply(Voyant.panel.WordTree.i18n, {
-"emptyText":"No matching results.",
+"emptyText":"Vyhledávacímu výrazu neodpovídají žádné výsledky.",
 "title":"Slovní strom"});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "original":"originál",
@@ -377,7 +377,7 @@ Ext.apply(Voyant.util.Toolable.i18n, {
 "exportViewFieldset":"Exportovat zobrazení (Nástroje a data)",
 "exportSvgMessage":"<p>Toto je náhled SVG obrázku. Pro uložení origináu v plné velikosti na pevný disk klikněte na obrázek pravým tlačítkem myši nebo na něj klikněte při současném stisknutí klávesy ctrl .</p><p>Můžete také zkopírovat níže uvedený SVG kód.</p>",
 "exportDataJsonMessage":"Zkopírovat níže uvedená data, lze je použít v jiných webových aplikacích.",
-"plusTip":"Klikněte zde pro volbu jiného nástroje v tomto umístění panelu (aktuální nástroj bude nahrazen)",
+"plusTip":"Klikněte zde pro volbu jiného nástroje v tomto umístění panelu (aktuální nástroj bude nahrazen).",
 "gearTip":"Definovat možnosti pro tento nástroj.",
 "cancelTitle":"Zrušit",
 "exportViewHtmlEmbed":"fragment HTML kódu pro vložení tohoto zobrazení do jiné webové stránky",
@@ -412,9 +412,9 @@ Ext.apply(Voyant.panel.TextualArc.i18n, {
 "search":"filtr",
 "minRawFreq":"minimální frekvence",
 "adaptation":"Inspirováno aplikací <a href=\"http://textarc.org\" target=\"_blank\">TextArc</a>, kterou vytvořil W. Bradford Paley.",
-"title":"Textový oblouk",
+"title":"Textová klenba",
 "speedTip":"Ovládá rychlost vizualizace.",
-"helpTip":"Textový oblouk (TextualArc), je vizualizací termínů v dokumentu, která zahrnuje vážený centroid (definiční bod) termínů a oblouk sledující termíny v dokumentovém řazení.",
+"helpTip":"Textová klenba (TextualArc), je vizualizací termínů v dokumentu, která zahrnuje vážený centroid (definiční bod) termínů a oblouk sledující termíny v dokumentovém řazení.",
 "speed":"rychlost"});
 Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "freqsMode":"Frekvence",
@@ -510,8 +510,8 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "nl":"holandština",
 "tr":"turečtina"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
-"cancel":"Cancel",
-"select":"Select",
+"cancel":"Zrušit",
+"select":"Zvolit",
 "exportInProgress":"Příprava vašeho korpusu pro exportt…",
 "facet.titleTitle":"Názvy",
 "title":"Katalog",
@@ -520,9 +520,9 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "rawFreqs":"celkový výskyt (absolutní frekvence)",
 "facet.languageTitle":"Jazyky",
 "noMatches":"Nebyla nalezena žádná shoda (z {0} dokumentů).",
-"selectValidFacet":"Please select a valid facet.",
-"plusFacetTip":"Add a new facet.",
-"facet.collectionTitle":"Collections",
+"selectValidFacet":"Prosím zvolte platnou fasetu.",
+"plusFacetTip":"Přidat novou fasetu",
+"facet.collectionTitle":"Sbírky",
 "matchingDocuments":"počet dokumentů odpovídajících vyhledávacím kritériím",
 "helpTip":"<p>Nástroj <i>Katalog</i> poskytuje rozhraní pro prozkoumání obsahu větších korpusů složených z více dokumentů. Rovněž umožňuje vytvářet podmnožiny (nebo pracovní sady) podle vyhledávacích kritérií. Funguje podobně jako knihovnická databáze nebo eshop v tom smyslu, že umožňuje filtrovat dokumenty.",
 "export":"Exportovat",
@@ -531,8 +531,8 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "facet.keywordTitle":"Klíčová slova",
 "exportTip":"Vytvořit nový Voyant korpus z vybraných dokumentů.",
 "facet.authorTitle":"Autoři",
-"closeFacetTip":"Remove this facet.",
-"selectFacet":"Select Facet",
+"closeFacetTip":"Odstranit tuto fasetu",
+"selectFacet":"Zvolit fasetu",
 "loadingSnippets":"nahrávání textových fragmentů",
 "facet.pubDateTitle":"Data vydání",
 "facet.publisherTitle":"Vydavatelé"});
@@ -590,7 +590,7 @@ Ext.apply(Voyant.widget.DocumentSelector.i18n, {
 "all":"vše",
 "selectAll":"Vše",
 "documents":"Dokumenty",
-"ok":"Ok",
+"ok":"Potvrdit",
 "selectNone":"Žádný"});
 Ext.apply(Voyant.panel.Contexts.i18n, {
 "emptyText":"Vyhledávacím kritériím neodpovídají žádné výsledky.",
@@ -639,7 +639,7 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "dimension":"Rozměr",
 "helpTip":"<p>Bodový graf ukazuje souvztažnost (korespondenci) užití slov v korpusu. Tato vizualizace se odvíjí od statistické analýzy, která vezme souvztažnost  daných slov za každý dokument (kde každý dokument reprezentuje jeden rozměr) a redukuje ji do trojrozměrného prostoru, aby přístupným způsobem vizualizovala data pomocí bodového grafu.</p>",
 "ca":"Analýza souvztažnosti (korespondence)",
-"clusters":"Klastry",
+"clusters":"Shluky",
 "pcTitle":"Procentuální podíl celkové variace vysvětlený každým komponentem",
 "relativeFrequencies":"Relativní frekvence",
 "addTerm":"Přidej termín",
@@ -650,7 +650,7 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "fill":"Vyplnit",
 "loading":"Nahrávání",
 "labels":"Popisky",
-"freqsModeTip":"Frekvence",
+"freqsModeTip":"Určuje, zda jsou frekvence vyjádřeny jako relativní četnosti, prosté četnosti, nebo jako TF-IDF (vypočítává se ze dvou složek: četnost slova v dokumentu a převrácená četnost slova ve všech dokumentech).",
 "yAxis":"Osa Y",
 "pc":"PC",
 "nearbyTerm":"V blízkosti <b>{0}</b>",
@@ -662,9 +662,9 @@ Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"Voyant Tools",
 "privacy":"Ochrana soukromí",
 "voyantLink":"<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools</a>",
-"privacyMsg":"Vývojáři Voyant Tools sbírají ze stránky data o tom, jaké nástroje jsou používány a s jakými parametry (také IP adresy jsou protokolovány, aby bylo možné identifikovat vícenásobné požadavky během jedné relace). Kromě toho Voyant Tools používají Google Analytics (viz Google's Privacy Policy především sekce <em>Log Information</em>). Lokálně protokolovaná data a data z Google Analytics budou vývojářským týmem použita k odstranění chyb a vylepšení nástrojů a také k lepšímu porozumění tomu, jak je badatelé využívají. Tato data mohou být také v anonymizované a agregované formě využita pro výzkumné účely. Upozorňujeme, že texty odeslané do Voyant Tools jsou ukládány, aby byl umožněn soustavný přístup během pracovní relace a mezi nimi. Pokud máte dotazy ohledně sbíraných dat a jejich použití nebo chcete-li požádat o odstranění korpusu, kontaktujte prosím Stéfan Sinclair."});
+"privacyMsg":"Vývojáři Voyant Tools sbírají ze stránky data o tom, jaké nástroje jsou používány a s jakými parametry (IP adresy jsou také protokolovány, aby bylo možné identifikovat vícenásobné požadavky během jedné relace). Kromě toho Voyant Tools používají Google Analytics (viz Google's Privacy Policy především sekce <em>Log Information</em>). Lokálně protokolovaná data a data z Google Analytics budou vývojářským týmem použita k odstranění chyb a vylepšení nástrojů a také k lepšímu porozumění tomu, jak je badatelé využívají. Tato data mohou být v anonymizované a agregované formě rovněž využita pro výzkumné účely. Upozorňujeme, že texty odeslané do Voyant Tools jsou ukládány, aby k nim byl umožněn soustavný přístup během pracovní relace a mezi více relacemi. Pokud máte dotazy ohledně sbíraných dat a jejich použití nebo chcete-li požádat o odstranění korpusu, kontaktujte prosím Stéfana Sinclaira. Pro více informací klikněte na tento odkaz."});
 Ext.apply(Voyant.widget.QuerySearchField.i18n, {
-"querySearchTip":"<div>Syntax vyhledávání (stisknutím klávesy enter/return zahájíte vyhledávání):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>^kabát*</b>: vyhledat termíny začínající na <i>kabát</i> jako samostatné termíny (kabát, kabáty, atd.)</li><li><b>kabát,bunda</b>: vyhledat termíny oddělené čárkami jako samostatné termíny</li><li><b>kabát|bunda</b>: vyhledat termíny oddělené svislou čárou jako jeden termín</li><li><b>\"zimní kabát\"</b>: <i>zimní kabát</i>jako slovní spojení</li><li><b>\"kabát rukavice\"~5</b>: <i>kabát</i> v blízkosti <i>rukavice</i> (v okolí 5 slov)</li><li><b>^kabát*,bunda|parka,\"kabát rukavice\"~5</b>: kombinovaná syntax</li></ul>",
+"querySearchTip":"<div>Syntax vyhledávání (stisknutím klávesy enter/return zahájíte vyhledávání):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>^kabát*</b>: vyhledat termíny začínající na <i>kabát</i> jako samostatné termíny (kabát, kabáty, atd.)</li><li><b>kabát,bunda</b>: vyhledat termíny oddělené čárkami jako samostatné termíny</li><li><b>kabát|bunda</b>: vyhledat termíny oddělené svislou čárou jako jeden termín</li><li><b>\"zimní kabát\"</b>: <i>zimní kabát</i> jako slovní spojení</li><li><b>\"kabát rukavice\"~5</b>: <i>kabát</i> v blízkosti <i>rukavice</i> (v okolí 5 slov)</li><li><b>^kabát*,bunda|parka,\"kabát rukavice\"~5</b>: kombinovaná syntax</li></ul>",
 "querySearchDocsModeTip":"<div>Syntax pro vyhledávání v dokumentech  (stisknutím klávesy enter/return zahájíte vyhledávání):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>kabát</b>: vyhledat přesné znění<i>kabát</i></li><li><b>kabát*</b>: vyhledat termíny začínající na <i>kabát</i></li><li><b>kabát,bunda</b>: vyhledat termíny oddělené čárkami jako samostatné termíny</li><li><b>\"zimní kabát\"</b>: <i>zimní kabát</i> jako slovní spojení</li><li><b>\"kabát rukavice\"~5</b>: <i>kabát</i> v blízkosti <i>rukavice</i> (v okolí 5 slov)</li><li><b>+zimní +kabát</b>: vyhledat každý termín, kterému předchází plus (+)</li><li><b>+\"zimní kabát\" +rukavice*</b>: kombinovaná syntax</li></ul>",
 "querySearch":"Vyhledávání",
 "aggregateInDocumentsCount":"Toto je počet dokumentů vyhovujících kritériím vyhledávání (každý započtený dokument obsahuje aspoň jeden vyhledávaný termín)."});

@@ -15,7 +15,7 @@ Ext.define("Voyant.notebook.editor.button.Add", {
     	})
         this.callParent(arguments);
 	},
-	glyph: 'xf055@FontAwesome',
+	glyph: 'xf067@FontAwesome',
 	textAlign: 'left',
 	listeners: {
 		click: function(btn, e) {

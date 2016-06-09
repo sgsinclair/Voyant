@@ -30,7 +30,8 @@ Ext.define('Voyant.notebook.Notebook', {
     	"!name": "Voyant"
     },
     
-    constructor: function() {
+    constructor: function(config) {
+    	config = config || {};
     	var me = this;
     	var libs = ["Corpus"];
     	this.docsLoading = libs.length;
@@ -64,9 +65,20 @@ Ext.define('Voyant.notebook.Notebook', {
     	}, this)
     	
     	
-    	Ext.apply(this, {
+    	Ext.apply(config, {
     		title: this.localize('title'),
-    		includeTools: ['help']
+    		includeTools: {
+    			'help': true,
+    			'save': true,
+    			'new': {
+    				tooltip: this.localize("newTip"),
+    				callback: function() {
+    					debugger
+    				},
+    				xtype: 'toolmenu',
+    				glyph: 'xf067@FontAwesome'
+    			}
+			 }
     	})
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -280,7 +292,18 @@ Ext.define('Voyant.notebook.Notebook', {
                 		else {this.addCode(block);}
             		}
         		}
-        	}, this)
+        	}, this);
+        	if (document.location.hash) { // try to handle anchors in URL
+        		setTimeout(function() {
+            		var el = document.body.querySelector(location.hash);
+            		if (el) {
+            			el.scrollIntoView();
+            			setTimeout(function() {
+                			Ext.get(el.parentElement).frame().frame();
+            			}, 200);
+            		}
+        		}, 200)
+        	}
     	} else {
     		this.showError("Unable to load Notebooks data.");
     		console.warn(data);
@@ -326,11 +349,16 @@ Ext.define('Voyant.notebook.Notebook', {
     	}))
     },
     
-    runAllCode: function() {
+    runAllCode: function(startCmp) {
     	var containers = [];
     	this.items.each(function(item) {
     		if (item.isXType('notebookcodeeditorwrapper')) {
-    			containers.push(item);
+    			if (startCmp && startCmp.id==item.id) {
+    				startCmp=undefined;
+    			}
+    			if (!startCmp) {
+        			containers.push(item);
+    			}
     		}
     	})
     	this._runCodeContainers(containers);

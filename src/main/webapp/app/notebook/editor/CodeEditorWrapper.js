@@ -1,6 +1,6 @@
 Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	extend: "Voyant.notebook.editor.EditorWrapper",
-	requires: ["Voyant.notebook.editor.CodeEditor","Voyant.notebook.editor.button.Run"],
+	requires: ["Voyant.notebook.editor.CodeEditor","Voyant.notebook.editor.button.Run",,"Voyant.notebook.editor.button.RunAll"],
 	alias: "widget.notebookcodeeditorwrapper",
 	cls: 'notebook-code-wrapper',
 	layout: {
@@ -34,6 +34,16 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 						listeners: {
 							click: {
 								fn: this.run,
+								scope: this
+							}
+						}
+					},{
+						xtype: 'notebookwrapperrunall',
+						listeners: {
+							click: {
+								fn: function() {
+									this.up('notebook').runAllCode(this)
+								},
 								scope: this
 							}
 						}

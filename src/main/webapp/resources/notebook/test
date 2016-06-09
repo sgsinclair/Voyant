@@ -1,3 +1,0 @@
-var corpus = new Corpus("Hello world");
-var documentTerms = corpus.getDocumentTerms();
-documentTerms.embed();

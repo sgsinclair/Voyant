@@ -10,13 +10,14 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 		ckeditorConfig : {
 			toolbar:  [
 				    	{ name: 'basicstyles', items: [ 'Bold', 'Italic', '-', 'RemoveFormat' ] },
-				    	{ name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', 'Blockquote', 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ] },
+				    	{ name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Justify', 'Outdent', 'Indent', 'Blockquote', 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ] },
 				    	{ name: 'colors', items: [ 'TextColor', 'BGColor' ] },
 				    	{ name: 'styles', items: [ 'Styles', 'Format' ] },
-				    	{ name: 'links', items: [ 'Link', 'Unlink'] },
-				    	{ name: 'insert', items: [ 'Image', 'Table' ] },
-				    	{ name: 'document', items: [ 'Source' ] }
+				    	{ name: 'links', items: [ 'Link', 'Unlink', 'Anchor'] },
+				    	{ name: 'insert', items: [ 'Image', 'Table', 'Iframe' ] },
+				    	{ name: 'document', items: [ 'Sourcedialog' ] }
 		    ],
+		    extraPlugins: 'sourcedialog,iframe,justify,colorbutton',
 			allowedContent: true,
 			toolbarCanCollapse: true,
 			startupFocus: true

@@ -13,7 +13,7 @@ Ext.define("Voyant.notebook.editor.button.MoveUp", {
     	})
         this.callParent(arguments);
 	},
-	glyph: 'xf0aa@FontAwesome',
+	glyph: 'xf062@FontAwesome',
 	textAlign: 'left',
 	listeners: {
 		click: function() {
