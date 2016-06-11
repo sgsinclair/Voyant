@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jun 08 17:08:49 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Jun 10 11:40:36 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7977,7 +7977,7 @@ Ext.define('Voyant.panel.Panel', {
 	},
 	
 	showError: function(config) {
-		this.getApplication().showError.apply(this, arguments)
+		this.getApplication().showError(config)
 	},
 	
 	toastError: function(config) {
@@ -21394,6 +21394,9 @@ Ext.define('Voyant.VoyantApp', {
 	},
 	
 	showError: function(config) {
+		if (config.statusText && config.responseText) {
+			return this.showResponseError({}, config);
+		}
 		if (config instanceof Voyant.util.ResponseError) {
 			var response = config.getResponse();
 			Ext.apply(config, {

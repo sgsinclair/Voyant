@@ -70,13 +70,33 @@ Ext.define('Voyant.notebook.Notebook', {
     		includeTools: {
     			'help': true,
     			'save': true,
+    			'open': {
+    				tooltip: this.localize("openTip"),
+    				callback: function() {
+    					Ext.Msg.prompt(this.localize("openTitle"),this.localize("openMsg"),function(btn, text) {
+    						text = text.trim();
+    						if (btn=="ok") {
+    							this.removeAll();
+    							if (text.indexOf("http")==0) {
+    								this.loadFromUrl(text);
+    							} else {
+    								this.loadBlocksFromString(text);
+    							}
+    						}
+    					}, this, true);
+    				},
+    				xtype: 'toolmenu',
+    				glyph: 'xf115@FontAwesome',
+    				scope: this
+    			},
     			'new': {
     				tooltip: this.localize("newTip"),
     				callback: function() {
-    					debugger
+    					this.openUrl(this.getBaseUrl()+"notebook/")
     				},
     				xtype: 'toolmenu',
-    				glyph: 'xf067@FontAwesome'
+    				glyph: 'xf067@FontAwesome',
+    				scope: this
     			}
 			 }
     	})
@@ -165,40 +185,25 @@ Ext.define('Voyant.notebook.Notebook', {
     		}, 100);
     	}
     	var queryParams = Ext.Object.fromQueryString(document.location.search, true);
+    	var isRun = Ext.isDefined(queryParams.run);
     	if (queryParams.input) {
-    		this.loadBlocksFromString(queryParams.input);
-        	if (queryParams.run) {this.runAllCode()}
+    		if (queryParams.input.indexOf("http")===0) {
+    			this.loadFromUrl(queryParams.input, isRun);
+    		} else {
+        		this.loadBlocksFromString(queryParams.input, isRun);
+    		}
     	}
     	else {
-    		var url = location.href.replace(location.hash,"").replace(location.search,'');
-    		var notebook = url.substring(url.lastIndexOf("/",url.length-2)+1, url.length-1);
-    		if (notebook && notebook!='new') {
-        		var me = this;
-        		this.mask(this.localize("fetchingNotebook"));
-    			$.getJSON(this.getTromboneUrl(), {
-    				tool: 'notebook.NotebookManager',
-    				notebook: notebook 
-    			}).done(function(data) {
-    				me.loadData(data);
-    			}).fail(function(response, textStatus, error) {
-    				if (textStatus=="parsererror") { // might still be valid
-    					me.loadBlocksFromString(response.responseText);
-    				}
-    				else {
-    					Ext.create("Voyant.util.ResponseError", {
-    						msg: me.localize('failedNotebookLoad'),
-    						response: response
-    					}).showMsg();
-    					me.loadData();
-    				}
-    			}).always(function() {
-    				me.unmask()
-    				if (queryParams && (queryParams.run)) {me.runAllCode()}
-    			})
-    		}
-    		else {
-				this.loadData();
-            	if (queryParams.run) {this.runAllCode()}
+    		var url = location.href.replace(location.hash,"").replace(location.search,''),
+    			url = url.substring(url.indexOf("/notebook/")+10), // grab after notebook
+    			urlParts = url.split("/"), notebook = urlParts.shift();
+    		if (notebook && urlParts[urlParts.length-1].length==0) {urlParts.pop();} // remove trailing
+    		if (!notebook || notebook=="new") {
+    			this.loadData(undefined, isRun);
+    		} else if (notebook=="gist") {
+				return this.loadFromUrl(url, isRun);
+    		} else {
+    			this.loadFromUrl(notebook, isRun);
     		}
     	}
     },
@@ -255,7 +260,52 @@ Ext.define('Voyant.notebook.Notebook', {
 
     },
     
-    loadData: function(data) {
+    loadFromUrl: function(url, isRun) {
+    	var me = this;
+		if (url.indexOf("https://gist.github.com/")==0 || url.indexOf("https://gist.githubusercontent.com/")==0) {
+			url = "gist"+url.substring(url.indexOf(".com")+4, url.length - (url.charAt(url.length-1) == "/" ? 1 : 0));
+		}
+		if (url.indexOf("gist/")==0) {
+			var gistParts = url.substring(5).split("/");
+			if (gistParts.length<2) {
+				return this.showError(this.localize("invalidGistUrl"));
+			}
+			if (gistParts[2] && gistParts[2]=="raw") {
+				gistParts.splice(2,1); // remove raw
+			}
+			
+			var gistUrl = "gist/"+gistParts.slice(0,3).join("/");
+			window.history.pushState({
+				url: url
+			}, "Voyant Notebook: "+gistUrl, this.getBaseUrl()+"notebook/"+gistUrl);
+			url = "https://gist.githubusercontent.com/"+gistParts.slice(0,2).join("/")+"/raw/"+(gistParts[2] ? gistParts[2] : "");
+		} else if (url.indexOf("http")==0) {
+			window.history.pushState({
+				url: url
+			}, "Voyant Notebook: "+url, this.getBaseUrl()+"notebook/?input="+url);
+		}
+		
+    	me.mask(this.localize("fetchingNotebook"))
+    	 Ext.Ajax.request({
+    	     url: this.getTromboneUrl(),
+    	     params: {
+    	    	 tool: 'notebook.NotebookManager',
+    	    	 notebook: url
+    	     },
+    	     scope: this
+    	 }).then(function(response, opts) {
+    		 me.unmask();
+    	     var data = Ext.decode(response.responseText);
+    		 me.loadBlocksFromString(data.notebook.jsonData, isRun);
+    	 },
+    	 function(response, opts) {
+    		 me.showError(response);
+    		 me.unmask();
+    		 me.loadData()
+    	 });
+    },
+    
+    loadData: function(data, isRun) {
     	if (!data) {
     		data = {
     			blocks: [{
@@ -308,9 +358,12 @@ Ext.define('Voyant.notebook.Notebook', {
     		this.showError("Unable to load Notebooks data.");
     		console.warn(data);
     	}
+    	if (isRun) {
+    		this.runAllCode();
+    	}
     },
     
-    loadBlocksFromString: function(string) {
+    loadBlocksFromString: function(string, isRun) {
     	if (/^\s*[\[\{]/m.test(string)) {
     		var json = undefined;
     		try {
@@ -323,10 +376,10 @@ Ext.define('Voyant.notebook.Notebook', {
 					details: e.stack+"\n\n"+this.localize("originalJson")+": "+string
 				}).showMsg()
     		}
-    		this.loadData(json)
+    		this.loadData(json, isRun)
     	}
     	else {
-    		this.loadData(string) // treat as single content block
+    		this.loadData(string, isRun); // treat as single content block
     	}
     },
     

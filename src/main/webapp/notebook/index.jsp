@@ -1,6 +1,7 @@
 <%@ include file="../../resources/jsp/pre_app.jsp" %>
-<script src="../../resources/ckeditor/current/ckeditor.js"></script>
-<script src="../../resources/ace/tern-src-noconflict/ace.js"></script>
+
+<script src="<%= base %>/resources/ckeditor/current/ckeditor.js"></script>
+<script src="<%= base %>/resources/ace/tern-src-noconflict/ace.js"></script>
 <style id="voyant-notebooks-styles">
 	body.exported-notebook {
 		font-family: helvetica, arial, verdana, sans-serif;
@@ -45,8 +46,8 @@
 	Ext.Loader.setConfig({
 		enabled : true,
 		paths : {
-			'Voyant' : '../../app',
-			'resources': '../../resources'
+			'Voyant' : '<%= base %>/app',
+			'resources': '<%= base %>/resources'
 		}
 	});
 
@@ -54,7 +55,7 @@
 		extend : 'Voyant.VoyantNotebookApp',
 		name: 'VoyantNotebookApp',
 		config: {
-			baseUrl: '../../',
+			baseUrl: '<%= base %>/',
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>'			
 		}

@@ -267,8 +267,7 @@ public class Trombone extends HttpServlet {
 			File file = new File(getServletContext().getRealPath("/resources/notebook"), parameters.getParameterValue("notebook") +".json");
 			if (file.exists()) {
 				String string = FileUtils.readFileToString(file);
-				writer.write(string);
-				return;
+				parameters.setParameter("jsonData", string);
 			}
 		}
 		final Controller controller = new Controller(storage, parameters, writer);

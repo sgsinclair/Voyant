@@ -52,7 +52,7 @@ Ext.define('Voyant.panel.Panel', {
 	},
 	
 	showError: function(config) {
-		this.getApplication().showError.apply(this, arguments)
+		this.getApplication().showError(config)
 	},
 	
 	toastError: function(config) {

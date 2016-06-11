@@ -101,6 +101,9 @@ Ext.define('Voyant.VoyantApp', {
 	},
 	
 	showError: function(config) {
+		if (config.statusText && config.responseText) {
+			return this.showResponseError({}, config);
+		}
 		if (config instanceof Voyant.util.ResponseError) {
 			var response = config.getResponse();
 			Ext.apply(config, {
