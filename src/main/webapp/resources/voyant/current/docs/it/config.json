@@ -1,0 +1,10 @@
+{
+    "--title": "Voyant Tools Help",
+    "--css": "#guide-body p img {max-width: 100%; height: auto; border: thin solid #efefef; thumb-list dd .thumb img {border: none;};",
+    "--warnings": ["-link"],
+    "--guides": "guides.json",
+    "--output": "docs",
+    "--template": "template-min",
+    "--welcome": "welcome.html",
+    "--footer": "<a href='http://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> St&eacute;fan Sinclair & Geoffrey Rockwell"
+}

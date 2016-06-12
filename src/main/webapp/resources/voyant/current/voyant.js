@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Jun 10 11:40:36 EDT 2016 */
+/* This file created by JSCacher. Last modified: Sat Jun 11 16:36:35 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -21848,6 +21848,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 						xtype: 'corpuscreator'
 					},{
 						xtype: 'container',
+						width: 800,
 						html: "<div style='font-style: italic; text-align: center; margin-top: 10px;'><div>"+this.localize('voyantIs')+"</div>" + (this.localize('translatedBy').indexOf("English") == -1 ? "<div>"+this.localize('translatedBy')+"</div>" : "")
 					}]	
 				},{

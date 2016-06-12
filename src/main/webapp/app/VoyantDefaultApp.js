@@ -89,6 +89,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 						xtype: 'corpuscreator'
 					},{
 						xtype: 'container',
+						width: 800,
 						html: "<div style='font-style: italic; text-align: center; margin-top: 10px;'><div>"+this.localize('voyantIs')+"</div>" + (this.localize('translatedBy').indexOf("English") == -1 ? "<div>"+this.localize('translatedBy')+"</div>" : "")
 					}]	
 				},{

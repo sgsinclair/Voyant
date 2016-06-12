@@ -120,7 +120,7 @@ Ext.apply(Voyant.panel.Panel.i18n, {
 "error":"Error",
 "info":"Information"});
 Ext.apply(Voyant.panel.Bubbles.i18n, {
-"soundTip":"Togges the sound.",
+"soundTip":"Toggles the sound.",
 "sound":"sound",
 "adaptation":"Adaptation of <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\"><i>Letter Pairs</i> by Martin Ignacio Bereciartua</a>",
 "title":"Bubbles",

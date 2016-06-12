@@ -1,0 +1,190 @@
+[
+    {
+        "title": "Voyant Tools Help",
+        "items": [
+            {
+                "title": "Guides",
+                "items": [
+                    {
+                        "name": "start",
+                        "url": "guides/ui/start",
+                        "title": "Getting Started",
+                        "description": "This introduction helps you get started with Voyant Tools."
+                    },
+                    {
+                        "name": "corpuscreator",
+                        "url": "guides/ui/corpuscreator",
+                        "title": "Creating a Corpus"
+                    },
+                    {
+                        "name": "modifyingcorpus",
+                        "url": "guides/ui/modifyingcorpus",
+                        "title": "Modifying a Corpus"
+                    },
+                    {
+                        "name": "embedding",
+                        "url": "guides/ui/embedding",
+                        "title": "Embedding Voyant"
+                    },
+                    {
+                        "name": "skins",
+                        "url": "guides/ui/skins",
+                        "title": "Skins"
+                    },
+                    {
+                        "name": "stopwords",
+                        "url": "guides/ui/stopwords",
+                        "title": "Stopwords"
+                    },
+                    {
+                        "name": "search",
+                        "url": "guides/ui/search",
+                        "title": "Search"
+                    },
+                    {
+                        "name": "grids",
+                        "url": "guides/ui/grids",
+                        "title": "Grids"
+                    },
+                    {
+                        "name": "new",
+                        "url": "guides/ui/new",
+                        "title": "What's New"
+                    }
+                ]
+            },
+            {
+                "title": "Tools",
+                "items": [
+                    {
+                        "name": "tools",
+                        "url": "guides/tools",
+                        "title": "List of Tools",
+                        "description": "An overview of the tools available."
+                    },
+                    {
+                        "name": "bubblelines",
+                        "url": "guides/tools/bubblelines",
+                        "title": "Bubblelines"
+                    },
+                    {
+                        "name": "bubbles",
+                        "url": "guides/tools/bubbles",
+                        "title": "Bubbles"
+                    },
+                    {
+                        "name": "catalogue",
+                        "url": "guides/tools/catalogue",
+                        "title": "Catalogue"
+                    },
+                    {
+                        "name": "cirrus",
+                        "url": "guides/tools/cirrus",
+                        "title": "Cirrus"
+                    },
+                    {
+                        "name": "corpuscollocates",
+                        "url": "guides/tools/corpuscollocates",
+                        "title": "Corpus Collocates"
+                    },
+                    {
+                        "name": "collocatesgraph",
+                        "url": "guides/tools/collocatesgraph",
+                        "title": "Collocates Graph"
+                    },
+                    {
+                        "name": "contexts",
+                        "url": "guides/tools/contexts",
+                        "title": "Contexts"
+                    },
+                    {
+                        "name": "corpusterms",
+                        "url": "guides/tools/corpusterms",
+                        "title": "Corpus Terms"
+                    },
+                    {
+                        "name": "documents",
+                        "url": "guides/tools/documents",
+                        "title": "Documents"
+                    },
+                    {
+                        "name": "documentterms",
+                        "url": "guides/tools/documentterms",
+                        "title": "Document Terms"
+                    },
+                    {
+                        "name": "knots",
+                        "url": "guides/tools/knots",
+                        "title": "Knots"
+                    },
+                    {
+                        "name": "mandala",
+                        "url": "guides/tools/mandala",
+                        "title": "Mandala"
+                    },
+                    {
+                        "name": "microsearch",
+                        "url": "guides/tools/microsearch",
+                        "title": "MicroSearch"
+                    },
+                    {
+                        "name": "phrases",
+                        "url": "guides/tools/phrases",
+                        "title": "Phrases"
+                    },
+                    {
+                        "name": "reader",
+                        "url": "guides/tools/reader",
+                        "title": "Reader"
+                    },
+                    {
+                        "name": "scatterplot",
+                        "url": "guides/tools/scatterplot",
+                        "title": "Scatter Plot"
+                    },
+                    {
+                        "name": "streamgraph",
+                        "url": "guides/tools/streamgraph",
+                        "title": "StreamGraph"
+                    },
+                    {
+                        "name": "summary",
+                        "url": "guides/tools/summary",
+                        "title": "Summary"
+                    },
+                    {
+                        "name": "termsradio",
+                        "url": "guides/tools/termsradio",
+                        "title": "Terms Radio"
+                    },
+                    {
+                        "name": "textualarc",
+                        "url": "guides/tools/textualarc",
+                        "title": "TextualArc"
+                    },
+                    {
+                        "name": "trends",
+                        "url": "guides/tools/trends",
+                        "title": "Trends"
+                    },
+                    {
+                        "name": "wordtree",
+                        "url": "guides/tools/wordtree",
+                        "title": "Word Tree"
+                    }
+                ]
+            },
+            {
+                "title": "About",
+                "items": [
+                    {
+                        "name": "about",
+                        "url": "guides/about",
+                        "title": "About",
+                        "description": "General information about Voyant Tools."
+                    }
+                 ]
+            }
+        ]
+    }
+]
