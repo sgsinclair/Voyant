@@ -145,19 +145,19 @@ Ext.define('Voyant.panel.CustomSet', {
 	initTableLayout: function() {
     	Ext.suspendLayouts();
     	
-    	var tableLayout = this.getApiParam('tableLayout');
+    	var tableLayout = decodeURI(this.getApiParam('tableLayout'));
     	if (tableLayout && tableLayout.charAt(0)!="{" && tableLayout.charAt(0)!="[") {
     		var cells = [];
     		tableLayout.split(/,\s*/).forEach(function(cell) {
     			cells.push(/^"'/.test(cell) ? cell : '"'+cell+'"');
-    		})
+    		});
     		tableLayout = "["+cells.join(",")+"]"; // treat as simple comma-separated string
     	}
     	var layout = Ext.decode(tableLayout);
     	if (Ext.isArray(layout)) {
     		layout = {
         		cells: layout
-        	}
+        	};
     	}
     	if (!layout.numCols && layout.cells && Ext.isArray(layout.cells)) {
     		if (layout.cells.length < 3) {
@@ -173,6 +173,9 @@ Ext.define('Voyant.panel.CustomSet', {
         	for (var i = 0; i < layout.cells.length; i++) {
         		var cell = layout.cells[i];
         		if (Ext.isObject(cell)) {
+        			// TODO handle width & height
+        			delete cell.width;
+        			delete cell.height;
             		items.push(cell);
         		} else if (Ext.isArray(cell)) {
         			var colspan = 1, rowspan = 1; xtype = undefined;
