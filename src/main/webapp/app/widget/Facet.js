@@ -42,7 +42,7 @@ Ext.define('Voyant.widget.Facet', {
     			me.showError(Ext.create("Voyant.util.ResponseError", {response: request}));
     		})
     	}
-
+    	
         Ext.applyIf(this, {
         	emptyText: this.localize("emptyText"),
         	hideHeaders: true,

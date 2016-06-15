@@ -3,6 +3,7 @@
  */
 Ext.define('Voyant.data.model.CorpusTerm', {
     extend: 'Ext.data.Model',
+    idProperty: 'term', // should be unique
     fields: [
              {name: 'id'},
              {name: 'rawFreq', type: 'int'},

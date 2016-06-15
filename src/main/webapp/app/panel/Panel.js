@@ -27,7 +27,44 @@ Ext.define('Voyant.panel.Panel', {
 			if (this.getApiParam('subtitle') && this.getTitle()) {
 				this.setTitle(this.getTitle()+" <i style='font-size: smaller;'>"+this.getApiParam('subtitle')+"</i>")
 			}
-		}, this)
+			if (this.isXType("grid")) {
+				this.getSelectionModel().on("selectionchange", function(store, records) {
+//					console.warn(records, this.selectedRecordsToRemember)
+//					this.selectedRecordsToRemember = records;
+				}, this);
+				this.getStore().on("beforeload", function() {
+					this.selectedRecordsToRemember = this.getSelection();
+				}, this)
+				this.getStore().on("load", function(store, records) {
+					if (Ext.Array.from(this.selectedRecordsToRemember).length>0) {
+						// combine contents of store with contents of remembered items, filtering out duplicates
+						var seen = {}
+						var mergedRecords = Ext.Array.merge(this.selectedRecordsToRemember, records).filter(function(item) {
+							if (!(item.getId() in seen)) {
+								seen[item.getId()]=true;
+								return true
+							} else {
+								return false;
+							}
+						});
+						if (store.isBufferedStore) {
+							if (store.currentPage==1) {
+								store.data.addAll(mergedRecords);
+								store.totalCount = mergedRecords.length;
+								store.fireEvent('refresh', store);
+							}
+						} else {
+							store.loadRecords(mergedRecords);
+							this.getSelectionModel().select(this.selectedRecordsToRemember);
+							store.fireEvent('refresh', store);
+							this.selectedRecordsToRemember = [];
+						}
+					}
+				}, this);
+			}
+		}, this);
+		
+
 	},
 	
 	getApplication: function() {
@@ -89,6 +126,5 @@ Ext.define('Voyant.panel.Panel', {
 		})
 		Ext.toast(config);
 	}
-	
 	
 });

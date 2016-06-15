@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Jun 11 16:36:35 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue Jun 14 21:35:25 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5518,6 +5518,7 @@ Ext.define('Voyant.data.model.Context', {
 });
 Ext.define('Voyant.data.model.CorpusFacet', {
     extend: 'Ext.data.Model',
+    idProperty: 'label',
     fields: [
              {name: 'facet'},
              {name: 'label'},
@@ -5554,6 +5555,7 @@ Ext.define('Voyant.data.model.CorpusCollocate', {
  */
 Ext.define('Voyant.data.model.CorpusTerm', {
     extend: 'Ext.data.Model',
+    idProperty: 'term', // should be unique
     fields: [
              {name: 'id'},
              {name: 'rawFreq', type: 'int'},
@@ -6031,13 +6033,24 @@ Ext.define('Voyant.data.store.VoyantStore', {
 							var params = parent.getApiParams();
 							operation = operation ? (operation===1 ? {} : operation) : {};
 							operation.params = operation.params || {};
+							
+							// unset any previously set extra params (only applies with proxy and buffered store)
+							if (proxy && this.isBufferedStore) {
+								Ext.Array.from(this.previouslySetExtraParams).forEach(function(key) {
+									proxy.setExtraParam(key, undefined);
+								});
+								this.previouslySetExtraParams = [];
+							}
+							
 							for (var key in params) {
-								if (proxy) { // also set proxy for automatic buffering calls
+								if (proxy && this.isBufferedStore) { // also set proxy for automatic buffering calls
+									this.previouslySetExtraParams.push(key);
 									proxy.setExtraParam(key, params[key]);
 								}
 								operation.params[key] = params[key];
 							}
 						}
+						console.warn(operation.params)
 					},
 					scope: this
 					
@@ -7334,6 +7347,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    createNewOnEnter: true,
     	    createNewOnBlur: false,
     	    autoSelect: false,
+//    	    emptyText: this.localize('querySearch'),
     	    tpl: Ext.create('Ext.XTemplate',
     	    	'<ul class="x-list-plain"><tpl for=".">',
     	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">'+itemTpl+'</li>',
@@ -7952,7 +7966,44 @@ Ext.define('Voyant.panel.Panel', {
 			if (this.getApiParam('subtitle') && this.getTitle()) {
 				this.setTitle(this.getTitle()+" <i style='font-size: smaller;'>"+this.getApiParam('subtitle')+"</i>")
 			}
-		}, this)
+			if (this.isXType("grid")) {
+				this.getSelectionModel().on("selectionchange", function(store, records) {
+//					console.warn(records, this.selectedRecordsToRemember)
+//					this.selectedRecordsToRemember = records;
+				}, this);
+				this.getStore().on("beforeload", function() {
+					this.selectedRecordsToRemember = this.getSelection();
+				}, this)
+				this.getStore().on("load", function(store, records) {
+					if (Ext.Array.from(this.selectedRecordsToRemember).length>0) {
+						// combine contents of store with contents of remembered items, filtering out duplicates
+						var seen = {}
+						var mergedRecords = Ext.Array.merge(this.selectedRecordsToRemember, records).filter(function(item) {
+							if (!(item.getId() in seen)) {
+								seen[item.getId()]=true;
+								return true
+							} else {
+								return false;
+							}
+						});
+						if (store.isBufferedStore) {
+							if (store.currentPage==1) {
+								store.data.addAll(mergedRecords);
+								store.totalCount = mergedRecords.length;
+								store.fireEvent('refresh', store);
+							}
+						} else {
+							store.loadRecords(mergedRecords);
+							this.getSelectionModel().select(this.selectedRecordsToRemember);
+							store.fireEvent('refresh', store);
+							this.selectedRecordsToRemember = [];
+						}
+					}
+				}, this);
+			}
+		}, this);
+		
+
 	},
 	
 	getApplication: function() {
@@ -8014,7 +8065,6 @@ Ext.define('Voyant.panel.Panel', {
 		})
 		Ext.toast(config);
 	}
-	
 	
 });
 
@@ -8098,7 +8148,7 @@ Ext.define('Voyant.widget.Facet', {
     			me.showError(Ext.create("Voyant.util.ResponseError", {response: request}));
     		})
     	}
-
+    	
         Ext.applyIf(this, {
         	emptyText: this.localize("emptyText"),
         	hideHeaders: true,

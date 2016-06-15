@@ -1,5 +1,6 @@
 Ext.define('Voyant.data.model.CorpusFacet', {
     extend: 'Ext.data.Model',
+    idProperty: 'label',
     fields: [
              {name: 'facet'},
              {name: 'label'},

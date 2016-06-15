@@ -70,8 +70,18 @@ Ext.define('Voyant.data.store.VoyantStore', {
 							var params = parent.getApiParams();
 							operation = operation ? (operation===1 ? {} : operation) : {};
 							operation.params = operation.params || {};
+							
+							// unset any previously set extra params (only applies with proxy and buffered store)
+							if (proxy && this.isBufferedStore) {
+								Ext.Array.from(this.previouslySetExtraParams).forEach(function(key) {
+									proxy.setExtraParam(key, undefined);
+								});
+								this.previouslySetExtraParams = [];
+							}
+							
 							for (var key in params) {
-								if (proxy) { // also set proxy for automatic buffering calls
+								if (proxy && this.isBufferedStore) { // also set proxy for automatic buffering calls
+									this.previouslySetExtraParams.push(key);
 									proxy.setExtraParam(key, params[key]);
 								}
 								operation.params[key] = params[key];

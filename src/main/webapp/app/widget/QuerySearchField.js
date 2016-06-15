@@ -29,6 +29,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    createNewOnEnter: true,
     	    createNewOnBlur: false,
     	    autoSelect: false,
+//    	    emptyText: this.localize('querySearch'),
     	    tpl: Ext.create('Ext.XTemplate',
     	    	'<ul class="x-list-plain"><tpl for=".">',
     	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">'+itemTpl+'</li>',
