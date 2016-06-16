@@ -25,7 +25,8 @@ Ext.define('Voyant.panel.VoyantHeader', {
 			titleAlign: 'center'
     	});
         this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {
+        
+        Ext.applyIf(config, {
     		moreTools: ['corpusset','scatterplot','termsradio'],
 			includeTools: {
 				save: true,
@@ -46,7 +47,9 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	        		}
 				}
 			}
-    	}));
+        })
+        
+    	this.mixins['Voyant.panel.Panel'].constructor.call(this, config);
     },
     
     onCollapse: function(panel) {

@@ -13,17 +13,17 @@
 	   else if (skin.equals("bubblelines")) {view="bubblelinesset";}
 	   else if (skin.equals("custom")) {view="customset";}
 	   else if (skin.equals("table")) {view="tableset";}
-	   else if (skin.equals("simple")==false){view="noskin";}
+	   else if (skin.equals("simple")==false && skin.equals("dtoc")==false) {view="noskin";}
        query = query.replaceAll("skin="+skin, "");
        if (query.length()>0 && query.endsWith("&")==false) {query+="&";}
        if (view.equals("noskin")) {
     	   query+="noskin="+skin;
        }
-       else if (view.equals("corpusset")==false) {
+       else if (view.equals("corpusset")==false && skin.equals("dtoc")==false) {
     	   query+="view="+view;
        }
        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-	   response.setHeader("Location", "./?"+query);
+	   response.setHeader("Location", "./" + (skin.equals("dtoc") ? "dtoc/" : "") + (query.length()>0 ? "?"+query : ""));
        return;
    }
    

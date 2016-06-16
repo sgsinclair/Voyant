@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Jun 14 21:35:25 EDT 2016 */
+/* This file created by JSCacher. Last modified: Wed Jun 15 21:37:34 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6050,7 +6050,6 @@ Ext.define('Voyant.data.store.VoyantStore', {
 								operation.params[key] = params[key];
 							}
 						}
-						console.warn(operation.params)
 					},
 					scope: this
 					
@@ -11204,7 +11203,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     			items: [{
     				xtype: 'form',
     				defaultType: 'textfield',
-        			maxHeight: panel.up('viewport').getHeight()-300,
+        			maxHeight: me.getApplication().getViewport().getHeight()-300,
         			scrollable: true,
     				fieldDefaults: {
     					labelAlign: 'right',
@@ -20274,7 +20273,8 @@ Ext.define('Voyant.panel.VoyantHeader', {
 			titleAlign: 'center'
     	});
         this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.call(this, Ext.apply(config, {
+        
+        Ext.applyIf(config, {
     		moreTools: ['corpusset','scatterplot','termsradio'],
 			includeTools: {
 				save: true,
@@ -20295,7 +20295,9 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	        		}
 				}
 			}
-    	}));
+        })
+        
+    	this.mixins['Voyant.panel.Panel'].constructor.call(this, config);
     },
     
     onCollapse: function(panel) {

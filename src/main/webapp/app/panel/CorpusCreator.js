@@ -294,7 +294,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     			items: [{
     				xtype: 'form',
     				defaultType: 'textfield',
-        			maxHeight: panel.up('viewport').getHeight()-300,
+        			maxHeight: me.getApplication().getViewport().getHeight()-300,
         			scrollable: true,
     				fieldDefaults: {
     					labelAlign: 'right',

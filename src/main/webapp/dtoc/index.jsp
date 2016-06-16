@@ -31,6 +31,24 @@
             });
             this.callParent(arguments);
             
+            if (!this.hasQueryToLoad()) {
+				Ext.create('Ext.window.Window', {
+					modal: true,
+					header: false,
+					
+					items: [{
+						xtype: 'voyantheader',
+						width: '100%',
+						title: "Dynamic Table of Contexts",
+						moreTools: [],
+						includeTools: [],
+						collapsed: true
+					}, {
+						xtype: 'corpuscreator'}
+					]
+				}).show()
+            }
+            
             this.on('loadedCorpus', function(src, corpus) {
             	// check for existence of index
             	Ext.Ajax.request({
