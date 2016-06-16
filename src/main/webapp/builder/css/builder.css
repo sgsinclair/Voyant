@@ -1,6 +1,7 @@
 #toolsList .listTool {
 	padding: 10px 5px;
 	cursor: pointer;
+	user-select:none;-o-user-select:none;-ms-user-select:none;-moz-user-select:-moz-none;-webkit-user-select:none;
 }
 
 #toolsList .listTool.over {
@@ -27,4 +28,27 @@ table.builder, .builder tbody {
 .builder.x-dd-drag-current {
 	padding: 10px 5px;
 	background-color: rgba(246,240,177,1);
+}
+
+.resizer {
+	background-color: rgba(128,128,128,0);
+	position: absolute;
+}
+
+.resizer:hover {
+    background-color: rgba(128,128,128,1);
+}
+
+.column.resizer {
+	width: 10px;
+	cursor: e-resize;
+}
+
+.row.resizer {
+	height: 10px;
+	cursor: n-resize;
+}
+
+.resizer.x-dd-drag-current {
+	background-color: rgba(128,128,128,1);
 }
