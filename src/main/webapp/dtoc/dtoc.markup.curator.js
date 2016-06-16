@@ -53,6 +53,7 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 			queryMode: 'local',
 			editable: true,
 			allowBlank: false,
+			autoSelect: false,
 			store: new Ext.data.ArrayStore({
 			    idIndex: 0,
 				fields: ['tag', 'disabled']
@@ -70,12 +71,6 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 			listeners: {
 				beforeselect: function(combo, record, index) {
 					return !record.get('disabled');
-				},
-				change: function(field, newVal, oldVal) {
-				    var r = field.store.findRecord('tag', newVal);
-				    if (r !== null) r.set('disabled', true);
-				    r = field.store.findRecord('tag', oldVal);
-				    if (r !== null) r.set('disabled', false);
 				},
 				scope: this
 			}
@@ -99,7 +94,7 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 						freq: 0,
 						type: 't'
 					}], true);
-					var numRecords = this.store.getTotalCount();
+					var numRecords = this.store.getCount();
 					this.getPlugin('cellEditor').startEditByPosition({row: numRecords-1, column: 0});
 				},
 				scope: this
@@ -151,7 +146,7 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 				}
 			}],
 			listeners: {
-				afteredit: function(e) {
+				edit: function(editor, e) {
 					if (e.field == 'tagName') {
 						if (e.value == 'title') {
 							e.record.set('tagName', 'xmlTitle');
@@ -162,6 +157,12 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 						var type = e.value.match(/^\w+$/) == null ? 'x' : 't';
 						e.record.set('type', type);
 					}
+					
+					var comboStore = this.tagCombo.getStore();
+					var r = comboStore.findRecord('tag', e.value);
+				    if (r !== null) r.set('disabled', true);
+				    r = comboStore.findRecord('tag', e.originalValue);
+				    if (r !== null) r.set('disabled', false);
 				},
 				scope: this
 			}
