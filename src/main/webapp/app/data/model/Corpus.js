@@ -362,7 +362,7 @@ Ext.define('Voyant.data.model.Corpus', {
 				message+=this.localize('has1document');
 			}
 			message+=' '+new Ext.XTemplate(this.localize('widthNwordsAndNTypes')).apply({words: Ext.util.Format.number(this.getWordTokensCount(),"0,000"), types: Ext.util.Format.number(this.getWordTypesCount(),"0,000")})+'.'
-			message+=" Created "
+			message+=" "+this.localize('created')+" ";
 			var createdDate = this.get('createdDate');
 			var now = new Date();
 			if (Ext.Array.each([

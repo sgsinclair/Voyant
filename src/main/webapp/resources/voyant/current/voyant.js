@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jun 16 21:58:51 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Jun 17 09:36:57 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7106,7 +7106,7 @@ Ext.define('Voyant.data.model.Corpus', {
 				message+=this.localize('has1document');
 			}
 			message+=' '+new Ext.XTemplate(this.localize('widthNwordsAndNTypes')).apply({words: Ext.util.Format.number(this.getWordTokensCount(),"0,000"), types: Ext.util.Format.number(this.getWordTypesCount(),"0,000")})+'.'
-			message+=" Created "
+			message+=" "+this.localize('createdd')+" ";
 			var createdDate = this.get('createdDate');
 			var now = new Date();
 			if (Ext.Array.each([
