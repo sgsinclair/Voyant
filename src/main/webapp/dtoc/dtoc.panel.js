@@ -21,7 +21,7 @@ Ext.define('Voyant.panel.DToC', {
     
     showFreqInReader: false,
     
-    loadInkeTags: true,
+    loadInkeTags: false,
     
     settingsWin: null,
     helpWin: null,
@@ -41,6 +41,9 @@ Ext.define('Voyant.panel.DToC', {
 		}
     	
     	this.queryParameters = Ext.urlDecode(window.location.search.substring(1));
+    	if (this.queryParameters.inkeTags !== undefined) {
+    		this.loadInkeTags = this.queryParameters.inkeTags == 'true';
+    	}
     },
     
     initComponent: function() {
