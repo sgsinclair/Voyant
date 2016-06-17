@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jun 16 14:25:42 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Jun 16 21:58:51 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -21052,7 +21052,8 @@ Ext.define('Voyant.panel.CustomSet', {
         	for (var i = 0; i < layout.cells.length; i++) {
         		var cell = layout.cells[i];
         		if (Ext.isObject(cell)) {
-        			// TODO handle width & height
+        			cell.cellWidth = parseFloat(cell.width) || undefined;
+        			cell.cellHeight = parseFloat(cell.height) || undefined;
         			delete cell.width;
         			delete cell.height;
             		items.push(cell);
@@ -21121,6 +21122,8 @@ Ext.define('Voyant.panel.CustomSet', {
     	var sizeMap = {};
     	
     	var table = this.getTargetEl().down(".x-table-layout");
+    	var tableSize = table.getSize(false);
+    	
     	var rows = table.dom.rows;
     	for (var i=0; i<rows.length; i++) {
     		var cells = rows[i].cells;
@@ -21137,7 +21140,22 @@ Ext.define('Voyant.panel.CustomSet', {
             		size.height = size.height * heightRatio;
             		// FIXME multiple resize calls gradually reduce size
     			} else {
-    				size = cellEl.getSize(false);
+    				var sizeObj = cellEl.getSize(false);
+    				
+    				var cmp = Ext.getCmp(cmpId);
+    				var widthPercent = cmp.initialConfig.cellWidth;
+    				var heightPercent = cmp.initialConfig.cellHeight;
+    				
+    				if (widthPercent !== undefined) {
+    					sizeObj.width = tableSize.width * (widthPercent/100);
+    					cellEl.setWidth(sizeObj.width);
+    				}
+    				if (heightPercent !== undefined) {
+    					sizeObj.height = tableSize.height * (heightPercent/100);
+    					cellEl.setHeight(sizeObj.height);
+    				}
+    				
+    				size = sizeObj; 
     			}
     			
     			sizeMap[cmpId] = size;
