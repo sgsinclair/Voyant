@@ -8,6 +8,9 @@ Ext.define('Voyant.VoyantCorpusApp', {
     
     statics: {
     	i18n: {
+    	},
+    	api: {
+    		toolFlow: undefined
     	}
     },
     
@@ -226,6 +229,15 @@ Ext.define('Voyant.VoyantCorpusApp', {
 				else {
 					if (console) {console.warn("Unhandled event: "+eventName, data)}
 					return;
+				}
+				if (api.toolFlow) {
+					var toolFlow = Ext.Array.from(api.toolFlow.split(","));
+					api.view = toolFlow.shift();
+					if (toolFlow.length>0) {
+						api.toolFlow = toolFlow.join(",");
+					} else {
+						delete api.toolFlow
+					}
 				}
 				url += "&"+Ext.Object.toQueryString(api)
 				this.openUrl(url)
