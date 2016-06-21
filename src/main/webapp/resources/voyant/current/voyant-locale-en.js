@@ -219,7 +219,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "numbersNeedCommas":"Please use a comma to separate multiple numbers.",
 "tableDocumentsTable":"from entire table",
 "UploadLocal":"Upload one or more documents from your computer",
-"helpTip":"This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from you computer (you can select multiple files by using the Ctrl and/or Shift keys)</li></ol>",
+"helpTip":"This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from your computer (you can select multiple files by using the Ctrl and/or Shift keys)</li></ol>",
 "xmlOptionsText":"Define XPath Expressions for any of the following:",
 "tableTitle":"Title",
 "noTextProvided":"No Text Provided",
@@ -290,6 +290,8 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
 "title":"Corpus View",
 "helpTip":"This is the default, general-purpose corpus view."});
+Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
+"label":"Font family"});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"Publishers",
 "sendToVoyantButton":"New Voyant Corpus",
@@ -430,6 +432,16 @@ Ext.apply(Voyant.panel.StreamGraph.i18n, {
 Ext.apply(Voyant.notebook.util.Embed.i18n, {
 "tryWidget":"Try one of the following widgets: ",
 "widgetNotRecognized":"Unable to embed (invalid or no embed tool specified)."});
+Ext.apply(Voyant.widget.ListEditor.i18n, {
+"cancel":"Cancel",
+"editList":"Edit List",
+"new":"New User-Defined List",
+"editListMessage":"This is the list, one term per line.",
+"editListTitle":"Edit List",
+"label":"List:",
+"none":"None",
+"ok":"Save",
+"whiteListLabel":"White List:"});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"Download Options"});
 Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
@@ -656,7 +668,7 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "nearbyTerm":"Nearby <b>{0}</b>",
 "docsLabel":"Documents",
 "rawFreq":"Raw",
-"caTitle":"Percentage of Total Assocation Explained by Each Dimension",
+"caTitle":"Percentage of Total Association Explained by Each Dimension",
 "dimensions":"Dimensions"});
 Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"Voyant Tools",

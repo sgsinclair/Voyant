@@ -138,16 +138,21 @@ Ext.define('Voyant.util.Toolable', {
 					        				// trigger a reloading of the app
 					        				if (corpus) {
 					        					app.dispatchEvent("loadedCorpus", this, corpus);
-					        					
 						        				// events aren't sent to owning panels, so fire locally too
 					        					this.fireEvent("loadedCorpus", this, corpus);
+					        				} else {
+					        					app.dispatchEvent("apiParamsUpdated", this, values);
+					        					this.fireEvent("apiParamsUpdated", this, values);
 					        				}
 					        				
 					        				
+					        			} else {
+					        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+					        				else {this.fireEvent("apiParamsUpdated", this, values);}
 					        			}
 					        			
 					        			// fire this even if we have global stopwords since the app dispatch won't reach this tool
-				        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+//				        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
 
 					        			btn.up('window').close();
 					        		},
@@ -364,7 +369,7 @@ Ext.define('Voyant.util.Toolable', {
 				.node().parentNode.innerHTML
 			Ext.Msg.show({
 			    title: this.localize('exportSvgTitle'),
-			    message: '<img src="'+'data:image/svg+xml;base64,'+ btoa(html)+'" style="float: right; max-width: 200px; max-height: 200px; border: thin dotted #ccc;"/>'+this.localize('exportSvgMessage'),
+			    message: '<img src="'+'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)))+'" style="float: right; max-width: 200px; max-height: 200px; border: thin dotted #ccc;"/>'+this.localize('exportSvgMessage'),
 			    buttons: Ext.Msg.OK,
 			    icon: Ext.Msg.INFO,
 			    prompt: true,
@@ -409,7 +414,7 @@ Ext.define('Voyant.util.Toolable', {
 				.attr("version", 1.1)
 				.attr("xmlns", "http://www.w3.org/2000/svg")
 				.node().parentNode.innerHTML;
-			  img = 'data:image/svg+xml;base64,'+ btoa(html);
+			  img = 'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)));
 			  
 			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: svg.offsetWidth,height:svg.offsetHeight}),
 			  context = canvas.getContext("2d"), me=this;

@@ -66,6 +66,7 @@ app/data/model/Corpus.js
 
 # WIDGETS
 app/widget/CorpusSelector.js
+app/widget/ListEditor.js
 app/widget/StopListOption.js
 app/widget/QuerySearchField.js
 app/widget/TotalPropertyStatus.js
@@ -74,6 +75,7 @@ app/widget/CorpusDocumentSelector.js
 app/widget/DownloadFilenameBuilder.js
 app/widget/DownloadFileFormat.js
 app/widget/DownloadOptions.js
+app/widget/FontFamilyOption.js
 app/widget/VoyantChart.js
 
 # PANELS

@@ -34,7 +34,6 @@
 <!-- FontAwesome -->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/fontawesome/current/css/font-awesome.min.css" />
 
-
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/css/styles.css" />
 
 <%

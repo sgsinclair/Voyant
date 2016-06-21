@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Jun 17 09:36:57 EDT 2016 */
+/* This file created by JSCacher. Last modified: Tue Jun 21 13:56:02 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4665,16 +4665,21 @@ Ext.define('Voyant.util.Toolable', {
 					        				// trigger a reloading of the app
 					        				if (corpus) {
 					        					app.dispatchEvent("loadedCorpus", this, corpus);
-					        					
 						        				// events aren't sent to owning panels, so fire locally too
 					        					this.fireEvent("loadedCorpus", this, corpus);
+					        				} else {
+					        					app.dispatchEvent("apiParamsUpdated", this, values);
+					        					this.fireEvent("apiParamsUpdated", this, values);
 					        				}
 					        				
 					        				
+					        			} else {
+					        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+					        				else {this.fireEvent("apiParamsUpdated", this, values);}
 					        			}
 					        			
 					        			// fire this even if we have global stopwords since the app dispatch won't reach this tool
-				        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+//				        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
 
 					        			btn.up('window').close();
 					        		},
@@ -4891,7 +4896,7 @@ Ext.define('Voyant.util.Toolable', {
 				.node().parentNode.innerHTML
 			Ext.Msg.show({
 			    title: this.localize('exportSvgTitle'),
-			    message: '<img src="'+'data:image/svg+xml;base64,'+ btoa(html)+'" style="float: right; max-width: 200px; max-height: 200px; border: thin dotted #ccc;"/>'+this.localize('exportSvgMessage'),
+			    message: '<img src="'+'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)))+'" style="float: right; max-width: 200px; max-height: 200px; border: thin dotted #ccc;"/>'+this.localize('exportSvgMessage'),
 			    buttons: Ext.Msg.OK,
 			    icon: Ext.Msg.INFO,
 			    prompt: true,
@@ -4936,7 +4941,7 @@ Ext.define('Voyant.util.Toolable', {
 				.attr("version", 1.1)
 				.attr("xmlns", "http://www.w3.org/2000/svg")
 				.node().parentNode.innerHTML;
-			  img = 'data:image/svg+xml;base64,'+ btoa(html);
+			  img = 'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)));
 			  
 			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: svg.offsetWidth,height:svg.offsetHeight}),
 			  context = canvas.getContext("2d"), me=this;
@@ -7106,7 +7111,7 @@ Ext.define('Voyant.data.model.Corpus', {
 				message+=this.localize('has1document');
 			}
 			message+=' '+new Ext.XTemplate(this.localize('widthNwordsAndNTypes')).apply({words: Ext.util.Format.number(this.getWordTokensCount(),"0,000"), types: Ext.util.Format.number(this.getWordTypesCount(),"0,000")})+'.'
-			message+=" "+this.localize('createdd')+" ";
+			message+=" "+this.localize('created')+" ";
 			var createdDate = this.get('createdDate');
 			var now = new Date();
 			if (Ext.Array.each([
@@ -7163,6 +7168,108 @@ Ext.define('Voyant.widget.CorpusSelector', {
     		fieldLabel: this.localize('chooseCorpus')
     	})
         me.callParent(arguments);
+    }
+})
+Ext.define('Voyant.widget.ListEditor', {
+    extend: 'Ext.container.Container',
+    mixins: ['Voyant.util.Localization'],
+    alias: 'widget.listeditor',
+    layout: 'hbox',
+    statics: {
+    	i18n: {
+    	}
+    },
+    initComponent: function(config) {
+    	var me = this;
+    	var value = this.up('window').panel.getApiParam(this.name);
+    	var data = value ? [{name: value, value: value}] : [];
+    	
+    	data.splice(0, 0, {name : this.localize('none'),   value: ''},  {name : this.localize('new'),   value: 'new'})
+    	Ext.apply(me, {
+	    		items: [{
+	    	        xtype: 'combo',
+	    	        queryMode: 'local',
+	    	        value: value,
+	    	        triggerAction: 'all',
+	    	        editable: true,
+	    	        fieldLabel: this.localize(this.name+'Label'),
+	    	        labelAlign: 'right',
+	    	        name: this.name,
+	    	        displayField: 'name',
+	    	        valueField: 'value',
+	    	        store: {
+	    	            fields: ['name', 'value'],
+	    	            data: data
+	    	        }
+	    		}, {width: 10}, {xtype: 'tbspacer'}, {
+	    			xtype: 'button',
+	    			text: this.localize('editList'),
+		            ui: 'default-toolbar',
+	    			handler: this.editList,
+	    			scope: this
+	    		}]
+    	})
+        me.callParent(arguments);
+    },
+    
+    editList: function() {
+    	var win = this.up('window');
+    	var panel = win.panel;
+    	var value = this.down('combo').getValue();
+    	Ext.Ajax.request({
+    	    url: panel.getTromboneUrl(),
+    	    params: {
+        		tool: 'resource.KeywordsManager',
+        		list: value
+    	    },
+    	    success: function(response){
+    	    	var json = Ext.util.JSON.decode(response.responseText);
+    	    	var keywords = json.keywords.keywords.sort().join("\n");
+    			Ext.Msg.show({
+	    		    title: this.localize('editListTitle'),
+	    		    message: this.localize('editListMessage'),
+	    		    buttons: Ext.Msg.OKCANCEL,
+	    		    buttonText: {
+	    		        ok: this.localize('ok'),
+	    		        cancel: this.localize('cancel')
+	    		    },
+	    		    icon: Ext.Msg.INFO,
+	    		    prompt: true,
+	    	        multiline: true,
+	    	        value: keywords,
+	    	        original: keywords,
+	    	        fn: function(btn,value,list) {
+	    	        	if (btn=='ok' && list.original!=value) {
+	    	        		var combo = this.down('combo')
+	    	        		if (Ext.String.trim(value).length==0) {
+	    	        			combo.setValue('empty');
+	    	        		}
+	    	        		else {
+	    	        	    	Ext.Ajax.request({
+	    	        	    	    url: panel.getTromboneUrl(),
+	    	        	    	    params: {
+	    	        	        		tool: 'resource.StoredResource',
+	    	        	    			storeResource: value
+	    	        	    	    },
+	    	        	    	    combo: combo,
+	    	        	    	    success: function(response, req) {
+	    	        	    	    	var json = Ext.util.JSON.decode(response.responseText);
+	    	        	    	    	var store = req.combo.getStore();
+	    	        	    	    	var value = 'keywords-'+json.storedResource.id;
+	    	        	    	    	store.add({name: value, value: value});
+	    	        	    	    	req.combo.setValue(value)
+	    	        	    	    	req.combo.updateLayout()
+	    	        	    	    },
+	    	        	    	    scope: this
+	    	        	    	})
+	    	        		}
+	    	        	}
+	    	        },
+	    	        scope: this
+    			})
+    	    },
+    	    scope: this
+    	});
     }
 })
 Ext.define('Voyant.widget.StopListOption', {
@@ -7289,30 +7396,6 @@ Ext.define('Voyant.widget.StopListOption', {
     	    },
     	    scope: this
     	});
-    	
-//    	$.getJSON( this.up('window').panel.getTromboneUrl(), {
-//    		tool: 'resource.KeywordsManager',
-//			stopList: this.down('combo').getValue()
-//    	}).done(function(data) {
-//    		deb
-//    		this.unmask();
-//    	}).fail(function() {
-//    		debugger
-//    	})
-//		Ext.Msg.show({
-//		    title: this.localize('exportDataTitle'),
-//		    message: this.localize('exportDataHtmlMessage'),
-//		    buttons: Ext.Msg.OK,
-//		    icon: Ext.Msg.INFO,
-//		    prompt: true,
-//	        multiline: true,
-//	        value: '',
-//	        listeners: {
-//	        	render: function() {
-//	        		debugger
-//	        	}
-//	        }
-//		});
     }
 })
 Ext.define('Voyant.widget.QuerySearchField', {
@@ -7910,6 +7993,56 @@ Ext.define('Voyant.widget.DownloadOptions', {
     }
 });
 
+Ext.define('Voyant.widget.FontFamilyOption', {
+    extend: 'Ext.form.field.ComboBox',
+    mixins: ['Voyant.util.Localization'],
+    alias: 'widget.fontfamilyoption',
+    statics: {
+    	i18n: {
+    	}
+    },
+    name: 'fontFamily',
+    initComponent: function(config) {
+    	config = config || {};
+    	var me = this;
+    	var value = this.up('window').panel.getApiParam('fontFamily');
+    	var data = [{name: "Georgia", value: 'Georgia, serif'},
+    	            {name: "Palatino", value: '"Palatino Linotype", "Book Antiqua", Palatino, serif'},
+    	            {name: "Times New Roman", value: '"Times New Roman", Times, serif'},
+    	            {name: "Arial", value: 'Arial, Helvetica, sans-serif'},
+    	            {name: "Arial Black", value: '"Arial Black", Gadget, sans-serif'},
+    	            {name: "Comic Sans MS", value: '"Comic Sans MS", cursive, sans-serif'},
+    	            {name: "Impact", value: 'Impact, Charcoal, sans-serif'},
+    	            {name: "Lato", value: 'LatoWeb'},
+    	            {name: "Lucida", value: '"Lucida Sans Unicode", "Lucida Grande", sans-serif'},
+    	            {name: "Tahoma/Geneva", value: 'Tahoma, Geneva, sans-serif'},
+    	            {name: "Trebuchet MS/Helvetica", value: '"Trebuchet MS", Helvetica, sans-serif'},
+    	            {name: "Verdana/Geneva", value: 'Verdana, Geneva, sans-serif'},
+    	            {name: "Courrier New", value: '"Courier New", Courier, monospace'},
+    	            {name: "Lucida/Monaco", value: '"Lucida Console", Monaco, monospace'}];
+
+    	if (!Ext.Array.contains(data.map(function(item) {return item.value}), value)) {
+        	data.splice(0, 0, {name : value, value: value});
+    	}
+    	
+    	Ext.apply(me, {
+	        queryMode: 'local',
+	        value: value,
+	        triggerAction: 'all',
+	        editable: true,
+	        fieldLabel: this.localize('label'),
+	        labelAlign: 'right',
+	        displayField: 'name',
+	        valueField: 'value',
+	        store: {
+	            fields: ['name', 'value'],
+	            data: data
+	        },
+	        width: 400
+    	})
+        me.callParent(arguments);
+    }
+})
 Ext.define('Voyant.widget.VoyantChart', {
     extend: 'Ext.chart.CartesianChart',
     mixins: ['Voyant.util.Localization','Voyant.util.Api'],
@@ -9433,12 +9566,14 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	api: {
     		stopList: 'auto',
+    		whiteList: undefined, // specify a list of words to use
     		limit: 500,
     		visible: 50,
     		terms: undefined,
     		docId: undefined,
     		docIndex: undefined,
-    		
+
+    		fontFamily: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
     		cirrusForceFlash: false,
     		background: '0xffffff',
     		fade: true,
@@ -9453,6 +9588,9 @@ Ext.define('Voyant.panel.Cirrus', {
     	options: [
     		{xtype: 'stoplistoption'},
     		{
+	    		xtype: 'listeditor',
+	    		name: 'whiteList'
+    	    },{
     	        xtype: 'numberfield',
     	        name: 'label',
     	        fieldLabel: 'Max words',
@@ -9466,7 +9604,9 @@ Ext.define('Voyant.panel.Cirrus', {
         	        	if (win && win.panel) {field.setFieldLabel(win.panel.localize("maxTerms"))}
         	        }
     	        }
-    	    }
+    	    },
+    	    {xtype: 'fontfamilyoption'}
+
     	],
     	corpus: undefined,
     	records: undefined,
@@ -9543,6 +9683,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
+    		this.initVisLayout(true); // force in case we've changed fontFamily from options
     		this.loadFromCorpus(corpus);
     	},
     	
@@ -9613,8 +9754,8 @@ Ext.define('Voyant.panel.Cirrus', {
     	this.buildFromTerms();
     },
     
-    initVisLayout: function() {
-    	if (this.getVisLayout() == undefined) {
+    initVisLayout: function(forceLayout) {
+    	if (forceLayout || this.getVisLayout() == undefined) {
     		var cirrusForceFlash = this.getApiParam('cirrusForceFlash');
     		if (cirrusForceFlash == 'true') {
     			this.setApiParam('cirrusForceFlash', true);
@@ -9677,6 +9818,7 @@ Ext.define('Voyant.panel.Cirrus', {
     			}, this);
     		} else {
     			var el = this.getLayout().getRenderTarget();
+    			el.update(""); // make sure to clear existing contents (especially for re-layout)
     	    	var width = el.getWidth();
     			var height = el.getHeight();
     			
@@ -9686,7 +9828,7 @@ Ext.define('Voyant.panel.Cirrus', {
 						.padding(1)
 						.rotate(function() { return ~~(Math.random() * 2) * 90; })
 						.spiral('archimedean')
-						.font('Impact')
+						.font(this.getApiParam('fontFamily'))
 						.fontSize(function(d) {
 							return d.fontSize;
 						}.bind(this))
@@ -16884,12 +17026,14 @@ Ext.define('Voyant.panel.Summary', {
     						});
     						var len;
     						docIndex.forEach(function(index) {
-    							var doc = this.getCorpus().getDocument(index);
-    							len = docs[index].length; // declare for template
-    		    				Ext.dom.Helper.append(list, {tag: 'li', 'voyant:index': String(index), html: 
-    		    					'<a href="#" onclick="return false" class="document-id document-id-distinctive" voyant:val="'+doc.get('id')+'">'+doc.getShortTitle()+'</a>'+
-    		    					this.localize('colon')+ new Ext.XTemplate(this.localize('documentType')).apply({types: docs[index]})+'.'
-    		    				});
+    							if (docs[index]) {
+        							var doc = this.getCorpus().getDocument(index);
+        							len = docs[index].length; // declare for template
+        		    				Ext.dom.Helper.append(list, {tag: 'li', 'voyant:index': String(index), html: 
+        		    					'<a href="#" onclick="return false" class="document-id document-id-distinctive" voyant:val="'+doc.get('id')+'">'+doc.getShortTitle()+'</a>'+
+        		    					this.localize('colon')+ new Ext.XTemplate(this.localize('documentType')).apply({types: docs[index]})+'.'
+        		    				});
+    							}
     						}, this);
     						distinctiveWordsContainer.updateLayout()
     						len = numberOfDocumentsForDistinctiveWords;
@@ -21604,6 +21748,9 @@ Ext.define('Voyant.VoyantCorpusApp', {
     
     statics: {
     	i18n: {
+    	},
+    	api: {
+    		toolFlow: undefined
     	}
     },
     
@@ -21822,6 +21969,15 @@ Ext.define('Voyant.VoyantCorpusApp', {
 				else {
 					if (console) {console.warn("Unhandled event: "+eventName, data)}
 					return;
+				}
+				if (api.toolFlow) {
+					var toolFlow = Ext.Array.from(api.toolFlow.split(","));
+					api.view = toolFlow.shift();
+					if (toolFlow.length>0) {
+						api.toolFlow = toolFlow.join(",");
+					} else {
+						delete api.toolFlow
+					}
 				}
 				url += "&"+Ext.Object.toQueryString(api)
 				this.openUrl(url)

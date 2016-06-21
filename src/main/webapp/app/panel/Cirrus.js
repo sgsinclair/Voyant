@@ -9,12 +9,14 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	api: {
     		stopList: 'auto',
+    		whiteList: undefined, // specify a list of words to use
     		limit: 500,
     		visible: 50,
     		terms: undefined,
     		docId: undefined,
     		docIndex: undefined,
-    		
+
+    		fontFamily: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
     		cirrusForceFlash: false,
     		background: '0xffffff',
     		fade: true,
@@ -29,6 +31,9 @@ Ext.define('Voyant.panel.Cirrus', {
     	options: [
     		{xtype: 'stoplistoption'},
     		{
+	    		xtype: 'listeditor',
+	    		name: 'whiteList'
+    	    },{
     	        xtype: 'numberfield',
     	        name: 'label',
     	        fieldLabel: 'Max words',
@@ -42,7 +47,9 @@ Ext.define('Voyant.panel.Cirrus', {
         	        	if (win && win.panel) {field.setFieldLabel(win.panel.localize("maxTerms"))}
         	        }
     	        }
-    	    }
+    	    },
+    	    {xtype: 'fontfamilyoption'}
+
     	],
     	corpus: undefined,
     	records: undefined,
@@ -119,6 +126,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
+    		this.initVisLayout(true); // force in case we've changed fontFamily from options
     		this.loadFromCorpus(corpus);
     	},
     	
@@ -189,8 +197,8 @@ Ext.define('Voyant.panel.Cirrus', {
     	this.buildFromTerms();
     },
     
-    initVisLayout: function() {
-    	if (this.getVisLayout() == undefined) {
+    initVisLayout: function(forceLayout) {
+    	if (forceLayout || this.getVisLayout() == undefined) {
     		var cirrusForceFlash = this.getApiParam('cirrusForceFlash');
     		if (cirrusForceFlash == 'true') {
     			this.setApiParam('cirrusForceFlash', true);
@@ -253,6 +261,7 @@ Ext.define('Voyant.panel.Cirrus', {
     			}, this);
     		} else {
     			var el = this.getLayout().getRenderTarget();
+    			el.update(""); // make sure to clear existing contents (especially for re-layout)
     	    	var width = el.getWidth();
     			var height = el.getHeight();
     			
@@ -262,7 +271,7 @@ Ext.define('Voyant.panel.Cirrus', {
 						.padding(1)
 						.rotate(function() { return ~~(Math.random() * 2) * 90; })
 						.spiral('archimedean')
-						.font('Impact')
+						.font(this.getApiParam('fontFamily'))
 						.fontSize(function(d) {
 							return d.fontSize;
 						}.bind(this))

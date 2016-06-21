@@ -1,9 +1,9 @@
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
-"homeConfirm":"Are you sure you want to start over (and leave the current corpus)?",
+"homeConfirm":"（現在のコーパスを離れて）本当にやり直しますか？",
 "title":"Voyantツール",
 "helpTip":"Voyantツールは、デジタルテキストの読解と分析のためのウェブ上の環境です。",
-"homeTip":"Click to start over from the corpus creation screen.",
-"home":"Start Over"});
+"homeTip":"コーパス・クリエーション・スクリーンからやり直すためにクリックする。",
+"home":"やり直す"});
 Ext.apply(Voyant.panel.Cirrus.i18n, {
 "maxTerms":"Max terms",
 "visible":"Show",
@@ -122,7 +122,7 @@ Ext.apply(Voyant.panel.Panel.i18n, {
 Ext.apply(Voyant.panel.Bubbles.i18n, {
 "soundTip":"サウンドを切り替える",
 "sound":"サウンド",
-"adaptation":"Adaptation of <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\"><i>Letter Pairs</i> by Martin Ignacio Bereciartua</a>",
+"adaptation":" <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\">Martin Ignacio Bereciartuaの<i>レター・ペア</i></a>を適用する。",
 "title":"バブルズ",
 "speedTip":"可視化の速度を調整する",
 "helpTip":"バブルズは文書中の頻出単語を楽しく可視化します。",
@@ -136,23 +136,23 @@ Ext.apply(Voyant.panel.Reader.i18n, {
 "title":"Reader",
 "helpTip":"<p>The Reader tool provides a view of text from the corpus. Features include:</p><ul><li>frequency information appears when hovering over a word</li><li>distribution information appears in a graph at the bottom when clicking on a word</li><li>a bar graph at the bottom indicates the relative size of each document in the corpus</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"});
 Ext.apply(Voyant.VoyantCorpusApp.i18n, {
-"fetchingCorpus":"Fetching your corpus",
+"fetchingCorpus":"コーパスを持ってきてください",
 "moreToolsTypeViz":"可視化ツール",
-"noPasswordGiven":"Please provide an access code.",
-"passwordValidationError":"Sorry, an unexpected error occurred while trying to validate your access code.",
-"passwordRequiredMessage":"This corpus requires an access code.",
-"passwordRequiredTitle":"Access Code Required",
+"noPasswordGiven":"アクセスコードを入力してください。",
+"passwordValidationError":"申し訳ありません、あなたのアクセスコードを認証している途中で予期しないエラーが起きました。",
+"passwordRequiredMessage":"このコーパスはアクセスコードをリクエストしています。",
+"passwordRequiredTitle":"リクエストされたアクセスコード",
 "password":"アクセスコード",
 "moreToolsScaleDocument":"文書ツール",
 "moreToolsTypeGrid":"グリッドツール",
-"moreToolsType":"Tools by Type",
+"moreToolsType":"タイプによるツール",
 "moreToolsTypeOther":"その他のツール",
-"nonConsumptiveButton":"Limited Access",
+"nonConsumptiveButton":"制限付きアクセス",
 "moreToolsScaleCorpus":"コーパスツール",
-"nonConsumptiveMessage":"Alternatively, you can click on the <i>Limited Access</i> button to continue with limited functionality (generally speaking, this non-consumptive access allows you to explore derivative data from the corpus without allowing you to read text from the corpus).",
-"passwordValidateButton":"Validate",
-"moreToolsScale":"Tools by Scale",
-"badPassword":"Sorry, that doesn't seem to be a valid access code."});
+"nonConsumptiveMessage":"代わりに、制限付きの機能で続けるために、<i>制限付きアクセス</i>ボタンをクリックすることができます（一般的に、この非消費的なアクセスは、コーパスからテキストを読めるようにはせずに、あなたにコーパスからの二次的なデータを検討するようにできます）。",
+"passwordValidateButton":"認証する",
+"moreToolsScale":"スケールによるツール",
+"badPassword":"申し訳ありません、それは認証されたアクセスコードではないようです。"});
 Ext.apply(Voyant.panel.Bubblelines.i18n, {
 "findTerm":"Find Term",
 "showTerm":"Show Term",
@@ -189,12 +189,12 @@ Ext.apply(Voyant.panel.NoTool.i18n, {
 "currentButton":"現在のバージョンを使う",
 "oldButton":"古いバージョンを使う",
 "noToolSpecified":"No tool has been specified. You will be redirected to the main page of Voyant Tools.",
-"title":"No Such Tool",
+"title":"そのようなツールは存在しません",
 "error":"エラー"});
 Ext.apply(Voyant.panel.CustomSet.i18n, {
-"noSuchTool":"The specified tool ({0}) does not exist.",
-"title":"Custom View",
-"helpTip":"This is a custom view."});
+"noSuchTool":"指定されたツール ({0}) は存在しません。",
+"title":"カスタム・ビュー",
+"helpTip":"これはカスタム・ビューです。"});
 Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 "cleaning":"Cleaning",
 "releaseToRemove":"Release to remove this term",
@@ -204,7 +204,7 @@ Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 "helpTip":"<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:</p><ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"});
 Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "cancel":"キャンセル",
-"accessModeWithoutPassword":"other access",
+"accessModeWithoutPassword":"その他のコード",
 "xpathGroupBy":"Group by",
 "reveal":"結果を表示する",
 "OpenExisting":"既存のコーパスを開く",
@@ -219,7 +219,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "numbersNeedCommas":"Please use a comma to separate multiple numbers.",
 "tableDocumentsTable":"テーブル全体から",
 "UploadLocal":"ファイルを選択してアップロードする（複数選択可）",
-"helpTip":"This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from you computer (you can select multiple files by using the Ctrl and/or Shift keys)</li></ol>",
+"helpTip":"This tool allows you to create a corpus in one of three ways:<ol><li>by typing or pasting text into the text box and clicking <i>Reveal</i>; if each line in the text box is a URL, text is fetched from those URLs, otherwise the contents are treated as a single document</li><li>click the <i>Open</i> button to open an existing corpus</li><li>click the <i>Upload</i> button to upload one or more files from your computer (you can select multiple files by using the Ctrl and/or Shift keys)</li></ol>",
 "xmlOptionsText":"Define XPath Expressions for any of the following:",
 "tableTitle":"タイトル",
 "noTextProvided":"No Text Provided",
@@ -235,13 +235,13 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableContentText":"Specify which column numbers contain content (or leave blank to use all columns). The left-most columnn is column 1. Define multiple documents by separating columns with a comma or combine columns by using the plus sign. For example \"1+2,3\" (without quotes) would combine columns 1 and 2 into one document and use column 3 for  a second document.",
 "numberZero":"0 is invalid, the first column is 1",
 "inputFormatAuto":"Auto-Detect (recommended)",
-"unknownFiles":"unrecognized (possible error): ",
-"fileTypesWarning":"File Types Warning",
-"accessModeNone":"none",
+"unknownFiles":"認識されない（エラーの可能性）",
+"fileTypesWarning":"ファイルのタイプについての警告",
+"accessModeNone":"なし",
 "tokenizationOptions":"Tokenization",
 "advancedOptionsText":"For more information on the advanced options below, see the documentation on <a href=\"{0}\" target=\"voyantdocs\">creating a corpus</a>.",
 "tableDocuments":"ドキュメント",
-"fileTypesMessage":"You have one or more files with incompatible or unrecognized file extensions that may cause problems.",
+"fileTypesMessage":"あなたは、互換性がないか、問題を起こしかねないような認識されない拡張ファイルを持った１つかそれ以上のファイルを持っています。",
 "errorNotXmlContinue":"選択された入力フォーマットはXML形式ではないようです。操作を続けますか？",
 "SelectExisting":"既存のコーパスを選択する",
 "tableOptions":"テーブル",
@@ -251,12 +251,12 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "error":"エラー",
 "sureContinue":"操作を続けますか？",
 "Open":"開く",
-"badFiles":"incompatible (likely error): ",
+"badFiles":"非互換性（ありえるエラー）",
 "emptyInput":"Type in one or more URLs on separate lines or paste in a full text.",
 "ok":"OK",
 "accessPassword":"アクセスコード",
-"adminPassword":"admin code",
-"accessModeNonConsumptive":"limited (non-consumptive)",
+"adminPassword":"管理コード",
+"accessModeNonConsumptive":"制限付き（非消費的）",
 "tableMetadataText":"These options are only used when documents are extracted from cells in each row (see the first option in this section). Same syntax as the Content option above: column numbers separated by commas or combined with a plus sign.",
 "xpathAuthor":"著者",
 "xpathTitle":"タイトル",
@@ -264,7 +264,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "invalidForm":"Invalid values have been used, please hover over fields with red boxes for explanations.",
 "tableAuthor":"著者",
 "gearWinTitle":"オプション",
-"uploadingCorpus":"Uploading corpus…",
+"uploadingCorpus":"コーパスをアップロードしています",
 "accessOptions":"Access Management",
 "tableNoHeadersRowText":"Determines whether or not to skip the first row (if there's a header row). When there is a header row, it can be used to define the document title automatically when documents are extracted from entire columns (in this case leave the title field blank)."});
 Ext.apply(Voyant.util.DetailedError.i18n, {
@@ -289,17 +289,19 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "shortest":"Shortest: "});
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
 "title":"コーパス・ビュー",
-"helpTip":"This is the default, general-purpose corpus view."});
+"helpTip":"これはデフォルトで、多目的のコーパスビューです。"});
+Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
+"label":"Font family"});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"出版社",
-"sendToVoyantButton":"New Voyant Corpus",
-"downloadButton":"Download ZIP Archive",
-"sendToVoyantNoQuery":"There's currently no query specified, but you can <a href=\"{0}\" target=\"_blank\">open the current corpus in a new window</a>.",
+"sendToVoyantButton":"新しいVoyantコーパス",
+"downloadButton":"ZIPアーカイブをダウンロード",
+"sendToVoyantNoQuery":"設定されたクエリは今のところありませんが、あなたは<a href=\"{0}\" target=\"_blank\">新しいウィンドウで現在のコーパスを開くことができます。</a>.",
 "lexicalLabel":"フルテキスト",
-"noMatches":"The current query criteria don't match any documents, please modifying the search first.",
+"noMatches":"現在のクエリのクライテリアはどの文書にも一致しません。検索をまず修正してください。",
 "titleLabel":"タイトル",
 "authorLabel":"著者",
-"title":"Workset Builder"});
+"title":"ワークセット・ビルダー"});
 Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 "titleLabel":"タイトル",
 "authorLabel":"著者",
@@ -313,15 +315,15 @@ Ext.apply(Voyant.panel.Mandala.i18n, {
 "clearTip":"すべてのマグネット（検索語）をクリアする",
 "EditMagnet":"マグネットの編集",
 "clear":"クリア",
-"labelsTip":"Toggle visibility of labels",
+"labelsTip":"ラベルの可視状態を切り替える",
 "update":"アップデート",
 "title":"マンダラ",
 "addTip":"マグネット（検索語）を追加する",
 "helpTip":"「マンダラ」は単語とドキュメントの関係を示すための可視化です。各検索語（またはマグネット）は、関連度数に基づいてドキュメントに紐づけられます。",
-"remove":"remove",
-"labels":"labels"});
+"remove":"取り除く",
+"labels":"ラベル"});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
-"chooseCorpus":"Choose a corpus"});
+"chooseCorpus":"コーパスの選択"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "matchingTerms":"Matching terms: {count}",
 "tfidfTip":"The significance is measured here using an TF-IDF score, a common way of expressing how important a term is in a document relative to the rest of the corpus.",
@@ -368,8 +370,8 @@ Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "SOURCETip":"This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided.",
 "TXTTip":"This will produce a plain text version of each document."});
 Ext.apply(Voyant.panel.ScatterSet.i18n, {
-"title":"Scatter",
-"helpTip":"This is a specialized view for working with scatterplots."});
+"title":"スキャッター",
+"helpTip":"これは散布図で作業するために専門化されたビュワーです。"});
 Ext.apply(Voyant.util.Toolable.i18n, {
 "exportTitle":"エクスポート",
 "exportError":"エクスポートエラー",
@@ -429,7 +431,17 @@ Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "segments":"Segments"});
 Ext.apply(Voyant.notebook.util.Embed.i18n, {
 "tryWidget":"以下のウィジェットの一つを試してください；",
-"widgetNotRecognized":"Unable to embed (invalid or no embed tool specified)."});
+"widgetNotRecognized":"このファイルを埋め込むことはできません（無効か、指定されたツールで埋め込まれていません）。"});
+Ext.apply(Voyant.widget.ListEditor.i18n, {
+"cancel":"Cancel",
+"editList":"Edit List",
+"new":"New User-Defined List",
+"editListMessage":"This is the list, one term per line.",
+"editListTitle":"Edit List",
+"label":"List:",
+"none":"None",
+"ok":"Save",
+"whiteListLabel":"White List:"});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"ダウンロードオプション"});
 Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
@@ -453,18 +465,18 @@ Ext.apply(Voyant.panel.Phrases.i18n, {
 "helpTip":"<p>Corpus Phrases is a table view of repeating phrases in the entire corpus.<!-- Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>-->"});
 Ext.apply(Voyant.panel.Trends.i18n, {
 "relativeFrequencies":"相対度数",
-"documents":"Documents",
-"raw":"Raw",
-"segmentsSlider":"Segments",
-"scale":"Scale",
+"documents":"文書",
+"raw":"生データ",
+"segmentsSlider":"文節",
+"scale":"スケール",
 "title":"Trends",
-"segments":"Document Segments",
+"segments":"文書の文節",
 "freqsMode":"度数",
 "freqsModeTip":"Determines if frequencies are expressed as raw counts or as relative counts (per document or segment).",
 "options":"オプション",
 "rawFrequencies":"度数",
 "helpTip":"<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
-"relative":"Relative"});
+"relative":"相関"});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"キャンセル",
 "de":"ドイツ語",
@@ -537,19 +549,19 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "facet.pubDateTitle":"Publication Dates",
 "facet.publisherTitle":"出版社"});
 Ext.apply(Voyant.panel.CollocatesSet.i18n, {
-"title":"Scatter",
-"helpTip":"This is a specialized view for working with scatterplots."});
+"title":"スキャッター",
+"helpTip":"これは散布図で作業するために専門化されたビュワーです。"});
 Ext.apply(Voyant.panel.MicroSearch.i18n, {
-"title":"MicroSearch",
-"loading":"Loading terms…",
-"helpTip":"This tool shows an overview of the entire corpus and allows you to visualize the distribution of search terms."});
+"title":"マイクロサーチ",
+"loading":"単語を読み込む",
+"helpTip":"このツールはコーパスの全体の概観を提示し、検索単語の分布を可視化することができます。"});
 Ext.apply(Voyant.panel.TopicContexts.i18n, {
 "reset":"リセットする",
 "title":"Topic Contexts",
 "helpTip":"Topic Contexts"});
 Ext.apply(Voyant.panel.BubblelinesSet.i18n, {
-"title":"Bubblelines Skin",
-"helpTip":"This is a specialized view for working with Bubblelines."});
+"title":"バブルラインスキン",
+"helpTip":"これはバブルラインで作業するために専門化されたビュワーです。"});
 Ext.apply(Voyant.panel.Knots.i18n, {
 "findTerm":"Find Term",
 "settings":"設定",
@@ -568,7 +580,7 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 "options":"オプション",
 "context":"Context"});
 Ext.apply(Voyant.VoyantApp.i18n, {
-"serverResponseError":"The server error reponse:",
+"serverResponseError":"サーバーがエラーを返しています：",
 "error":"エラー",
 "translatedBy":"English translation by your names here."});
 Ext.apply(Voyant.panel.RezoViz.i18n, {
@@ -612,11 +624,11 @@ Ext.apply(Voyant.panel.Contexts.i18n, {
 "helpTip":"The Keywords in Context tool shows each occurrence of a keyword with a bit of surrounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:<p></p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"});
 Ext.apply(Voyant.VoyantDefaultApp.i18n, {
 "voyantIs":"<a href=\"./docs/#!/guide/about\">Voyantツールは、デジタルテキストの読解と分析のためのウェブ上の環境です。</a>",
-"noViewKnownErrorTpl":"The selected view ({view}) has not been migrated from the previous version of Voyant (and probably won't be). {additional} The default view will be used instead.",
-"convertSkinMsg":"The convert skin was used for document exporting and that functionality is now available from the Documents tool.",
-"noViewErrorTitle":"No View Specified",
+"noViewKnownErrorTpl":"選択されたビュー({view}) はVoyantの前のバージョンから移行してきたのではありません（し、これからもそうはならないでしょう）。 {additional} デフォルトのビューが代わりに使われています。",
+"convertSkinMsg":"コンバート・スキンは文書のエクスポートに使います。これは文書ツールから機能的に用いることができます。",
+"noViewErrorTitle":"指定されたビューはありません。",
 "helpTip":"Voyantツールは、デジタルテキストの読解と分析のためのウェブ上の環境です。<p></p>",
-"noViewErrorTpl":"No view was found with the name \"<i>{view}</i>\". The default view will be used instead."});
+"noViewErrorTpl":" \"<i>{view}</i>\"という名前のビューはありません. デフォルトのビューが代わりに使われています。."});
 Ext.apply(Voyant.widget.Facet.i18n, {
 "emptyText":"No values found."});
 Ext.apply(Voyant.panel.ScatterPlot.i18n, {
@@ -656,13 +668,13 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "nearbyTerm":"Nearby <b>{0}</b>",
 "docsLabel":"Documents",
 "rawFreq":"Raw",
-"caTitle":"Percentage of Total Assocation Explained by Each Dimension",
+"caTitle":"Percentage of Total Association Explained by Each Dimension",
 "dimensions":"Dimensions"});
 Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"Voyantツール",
 "privacy":"プライバシー",
 "voyantLink":"<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyantツール</a>",
-"privacyMsg":"The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see Google's Privacy Policy and the <em>Log Information</em> section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact Stéfan Sinclair. Click on this link for more information."});
+"privacyMsg":"Voyantツールの開発は、ツールが呼びされたことについて、そしてともにパラメータが呼び出されたサイトからデータを集めました（同一セッションの間に複数のリクエストを同定することができるようにIPアドレスも記録されています）。さらに、Voyantツールはグーグルアナリシスを用いています（グーグルのプラバシー・ポリシーの、とりわけ<em>ログ情報</em> を見てください）。ローカルに記録されたデータとグーグルアナリティクスのデータは、研究者がどのようにツールを使っているか理解するのと同様に、ツールのデバッグと向上のためにに開発チームによって使用されます。また、このデータは匿名で集約されたフォームにおいて研究のために用いられます。Voyantツールに提示されたテキストは、ワークセッションの最中とその間の継続的なアクセスを可能にするために保存される点にご注意ください。データが収集されていることについてや、どのようにそれが用いられているかに質問が場合、またはコーパスを削除するようにリクエストする場合は、Stéfan Sinclairに連絡してください。もっと情報が知りたい方はこのリンクをクリックしてください。"});
 Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchTip":"<div>Search syntax (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>*oat</b>: match terms that end with <i>oat</i> as one term</li><li><b>^*oat</b>: match terms that end with <i>oad</i> as multiple terms</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separated by pipe as a single term</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as a phrase</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,\"coat mittens\"~5</b>: combine syntaxes</li></ul>",
 "querySearchDocsModeTip":"<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as a phrase</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+\"winter coat\" +mitten*</b>: combine syntaxes</li></ul>",

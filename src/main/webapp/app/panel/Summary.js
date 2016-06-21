@@ -311,12 +311,14 @@ Ext.define('Voyant.panel.Summary', {
     						});
     						var len;
     						docIndex.forEach(function(index) {
-    							var doc = this.getCorpus().getDocument(index);
-    							len = docs[index].length; // declare for template
-    		    				Ext.dom.Helper.append(list, {tag: 'li', 'voyant:index': String(index), html: 
-    		    					'<a href="#" onclick="return false" class="document-id document-id-distinctive" voyant:val="'+doc.get('id')+'">'+doc.getShortTitle()+'</a>'+
-    		    					this.localize('colon')+ new Ext.XTemplate(this.localize('documentType')).apply({types: docs[index]})+'.'
-    		    				});
+    							if (docs[index]) {
+        							var doc = this.getCorpus().getDocument(index);
+        							len = docs[index].length; // declare for template
+        		    				Ext.dom.Helper.append(list, {tag: 'li', 'voyant:index': String(index), html: 
+        		    					'<a href="#" onclick="return false" class="document-id document-id-distinctive" voyant:val="'+doc.get('id')+'">'+doc.getShortTitle()+'</a>'+
+        		    					this.localize('colon')+ new Ext.XTemplate(this.localize('documentType')).apply({types: docs[index]})+'.'
+        		    				});
+    							}
     						}, this);
     						distinctiveWordsContainer.updateLayout()
     						len = numberOfDocumentsForDistinctiveWords;

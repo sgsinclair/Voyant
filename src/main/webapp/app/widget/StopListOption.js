@@ -122,29 +122,5 @@ Ext.define('Voyant.widget.StopListOption', {
     	    },
     	    scope: this
     	});
-    	
-//    	$.getJSON( this.up('window').panel.getTromboneUrl(), {
-//    		tool: 'resource.KeywordsManager',
-//			stopList: this.down('combo').getValue()
-//    	}).done(function(data) {
-//    		deb
-//    		this.unmask();
-//    	}).fail(function() {
-//    		debugger
-//    	})
-//		Ext.Msg.show({
-//		    title: this.localize('exportDataTitle'),
-//		    message: this.localize('exportDataHtmlMessage'),
-//		    buttons: Ext.Msg.OK,
-//		    icon: Ext.Msg.INFO,
-//		    prompt: true,
-//	        multiline: true,
-//	        value: '',
-//	        listeners: {
-//	        	render: function() {
-//	        		debugger
-//	        	}
-//	        }
-//		});
     }
 })
