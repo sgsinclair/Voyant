@@ -2,7 +2,48 @@
 	if (org.voyanttools.voyant.Voyant.preProcess(request, response)) {return;}
 %><%@ page contentType="text/html;charset=UTF-8" %><% 
 	String base = request.getContextPath();
-	String rtl = request.getParameter("rtl")==null || request.getParameter("rtl").isEmpty() ? "" : "-rtl";
+
+	//default to en
+	String lang = "en";
+	
+	//hard-coded for now
+	String[] langs = new String[]{"en","ar","bs","cz","fr","he","hr","it","ja","sr"};
+	
+	//try first with parameter
+	if (request.getParameter("lang")!=null) {
+		String p = request.getParameter("lang").toLowerCase();
+		for (String l : langs) {
+			if (p.equals(l)) {
+				lang = p;
+				break;
+			}
+		}
+	} else {
+		java.util.Enumeration locales = request.getLocales();
+	 while (locales.hasMoreElements()) {
+	     java.util.Locale locale = (java.util.Locale) locales.nextElement();
+	     boolean hasLang = false;
+	     for (String l : langs) {
+	     	if (locale.getLanguage().equals(new java.util.Locale(l).getLanguage())) {
+	     		hasLang = true;
+	     		lang = l;
+	     		break;
+	     	}
+	     	if (hasLang) {break;}
+	     }
+	 }
+	}
+	
+	// default to no rtl
+	String rtl = "";
+	if (request.getParameter("rtl")!=null) {
+		String r = request.getParameter("rtl").toLowerCase();
+		if (r.isEmpty()==false && r.equals("false")==false || r.equals("0")==false) {
+			rtl = "-rtl";
+		}
+	} else if (lang.equals("he") || lang.equals("ar")) {
+		rtl = "-rtl";
+	}
 %><!DOCTYPE html>
 <html>
 <head>
@@ -52,6 +93,4 @@
 } %>
 
 <script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=6<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=6&lang=<%
-if (request.getParameter("lang")!=null) { %><%= request.getParameter("lang") %><% } 
-else if (request.getAttribute("lang")!=null) {%><%= request.getAttribute("lang") %><% } else { %>en<% } %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=6&lang=<%= lang %>"></script>

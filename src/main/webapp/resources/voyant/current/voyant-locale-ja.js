@@ -1,3 +1,4 @@
+Voyant.util.Localization.LANGUAGE='ja'
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"（現在のコーパスを離れて）本当にやり直しますか？",
 "title":"Voyantツール",

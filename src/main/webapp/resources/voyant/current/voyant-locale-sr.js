@@ -1,3 +1,4 @@
+Voyant.util.Localization.LANGUAGE='sr'
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"Are you sure you want to start over (and leave the current corpus)?",
 "title":"Voyant Tools",
@@ -120,9 +121,9 @@ Ext.apply(Voyant.panel.Panel.i18n, {
 "error":"Грешка",
 "info":"Информација"});
 Ext.apply(Voyant.panel.Bubbles.i18n, {
-"soundTip":"Togges the sound.",
+"soundTip":"Toggles the sound.",
 "sound":"sound",
-"adaptation":"Adaptation of <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\"><i>Letter Pairs</i> by Martin Ignacio Bereciartua</a>",
+"adaptation":"Adapted from <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\"><i>Letter Pairs</i></a> by Martin Ignacio Bereciartua",
 "title":"Bubbles",
 "speedTip":"Controls the speed of the visualization.",
 "helpTip":"Bubbles is a playful visualization of frequent terms in a document. ",
@@ -149,7 +150,7 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "moreToolsTypeOther":"Other Tools",
 "nonConsumptiveButton":"Limited Access",
 "moreToolsScaleCorpus":"Corpus Tools",
-"nonConsumptiveMessage":"Alternatively, you can click on the <i>Limited Access</i> button to continue with limited functionality (generally speaking, this non-consumpive access allows you to explore derivative data from the corpus without allowing you to read text from the corpus).",
+"nonConsumptiveMessage":"Alternatively, you can click on the <i>Limited Access</i> button to continue with limited functionality (generally speaking, this non-consumptive access allows you to explore derivative data from the corpus without allowing you to read text from the corpus).",
 "passwordValidateButton":"Validate",
 "moreToolsScale":"Tools by Scale",
 "badPassword":"Sorry, that doesn't seem to be a valid access code."});
@@ -283,17 +284,19 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "highest":"Highest: ",
 "distinctiveWords":"<b>Distinctive words</b> (compared to the rest of the corpus): ",
 "docsDensity":"Vocabulary Density: ",
-"helpTip":"<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>",
+"helpTip":"<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one document<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>",
 "moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Next {0} of {1} remaining</a>",
 "items":"items",
 "shortest":"Shortest: "});
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
 "title":"Corpus View",
 "helpTip":"This is the default, general-purpose corpus view."});
+Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
+"label":"Font family"});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"Publishers",
 "sendToVoyantButton":"New Voyant Corpus",
-"downloadButton":"Download Zip Archive",
+"downloadButton":"Download ZIP Archive",
 "sendToVoyantNoQuery":"There's currently no query specified, but you can <a href=\"{0}\" target=\"_blank\">open the current corpus in a new window</a>.",
 "lexicalLabel":"Full-text",
 "noMatches":"The current query criteria don't match any documents, please modifying the search first.",
@@ -310,7 +313,7 @@ Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"Add",
 "cancel":"cancel",
-"clearTip":"Clear all magnets (search term).",
+"clearTip":"Clear all magnets (search term)",
 "EditMagnet":"Edit Magnet",
 "clear":"Clear",
 "labelsTip":"Toggle visibility of labels",
@@ -430,6 +433,16 @@ Ext.apply(Voyant.panel.StreamGraph.i18n, {
 Ext.apply(Voyant.notebook.util.Embed.i18n, {
 "tryWidget":"Try one of the following widgets: ",
 "widgetNotRecognized":"Unable to embed (invalid or no embed tool specified)."});
+Ext.apply(Voyant.widget.ListEditor.i18n, {
+"cancel":"Cancel",
+"editList":"Edit List",
+"new":"New User-Defined List",
+"editListMessage":"This is the list, one term per line.",
+"editListTitle":"Edit List",
+"label":"List:",
+"none":"None",
+"ok":"Save",
+"whiteListLabel":"White List:"});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"опције за преузимање"});
 Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
@@ -510,6 +523,7 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "nl":"холандски",
 "tr":"турски"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
+"sendToVoyantButton":"New Voyant Corpus",
 "cancel":"Cancel",
 "select":"Select",
 "exportInProgress":"Припрема вашег корпуса за експорт",
@@ -526,6 +540,7 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "matchingDocuments":"број резултата",
 "helpTip":"Алатка <i>Каталог</i> нуди приступ за истраживање корпуса са већим бројем докумената, као и стварање подсета (радног сета) који је базиран на критеријумима претраге. Отприлике функционише као база података, допуштајући вам да филтрирате документе.",
 "export":"Експорт",
+"downloadButton":"Преузимање",
 "facet.pubPlaceTitle":"Места издања",
 "queryMatches":"{0} резултата (од {1}).",
 "facet.keywordTitle":"Кључне речи",
@@ -614,7 +629,7 @@ Ext.apply(Voyant.VoyantDefaultApp.i18n, {
 "voyantIs":"<a href=\"./docs/#!/guide/about\">Voyant Tools is a web-based reading and analysis environment for digital texts</a>.",
 "noViewKnownErrorTpl":"The selected view ({view}) has not been migrated from the previous version of Voyant (and probably won't be). {additional} The default view will be used instead.",
 "convertSkinMsg":"The convert skin was used for document exporting and that functionality is now available from the Documents tool.",
-"noViewErrorTitle":"View Error",
+"noViewErrorTitle":"No View Specified",
 "helpTip":"Voyant Tools is a web-based reading and analysis environment for digital texts.<p></p>",
 "noViewErrorTpl":"No view was found with the name \"<i>{view}</i>\". The default view will be used instead."});
 Ext.apply(Voyant.widget.Facet.i18n, {
@@ -637,7 +652,7 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "docFreqTip":"<b>{0}</b><br><b>Word Count</b><br>{1}",
 "rawFrequencies":"Raw Frequencies",
 "dimension":"Dimension",
-"helpTip":"<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>",
+"helpTip":"<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three-dimensional space to easily visualize the data through a scatterplot.</p>",
 "ca":"Correspondence Analysis",
 "clusters":"Clusters",
 "pcTitle":"Percentage of Total Variation Explained by Each Component",
@@ -656,7 +671,7 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "nearbyTerm":"Nearby <b>{0}</b>",
 "docsLabel":"Documents",
 "rawFreq":"Raw",
-"caTitle":"Percentage of Total Assocation Explained by Each Dimension",
+"caTitle":"Percentage of Total Association Explained by Each Dimension",
 "dimensions":"Dimensions"});
 Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"Voyant Tools",
@@ -664,7 +679,7 @@ Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantLink":"<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools</a>",
 "privacyMsg":"The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see Google's Privacy Policy and the <em>Log Information</em> section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact Stéfan Sinclair. Click on this link for more information."});
 Ext.apply(Voyant.widget.QuerySearchField.i18n, {
-"querySearchTip":"<div>Search syntax (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>*oat</b>: match terms that end with <i>oad</i> as one term</li><li><b>^*oat</b>: match terms that end with <i>oad</i> as multiple terms</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separate by pipe as a single term</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as a phrase</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,\"coat mittens\"~5</b>: combine syntaxes</li></ul>",
+"querySearchTip":"<div>Search syntax (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i> as one term</li><li><b>^coat*</b>: match terms that start with <i>coat</i> as separate terms (coat, coats, etc.)</li><li><b>*oat</b>: match terms that end with <i>oat</i> as one term</li><li><b>^*oat</b>: match terms that end with <i>oad</i> as multiple terms</li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>coat|jacket</b>: match terms separated by pipe as a single term</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as a phrase</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>^coat*,jacket|parka,\"coat mittens\"~5</b>: combine syntaxes</li></ul>",
 "querySearchDocsModeTip":"<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as a phrase</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+\"winter coat\" +mitten*</b>: combine syntaxes</li></ul>",
 "querySearch":"Претрага",
 "aggregateInDocumentsCount":"Број документата који задовољавају критеријуме претраге (убројени документи садрже барем један тражени термин)."});

@@ -66,7 +66,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		var SPLIT_SIZE = 5;
 		this.viewport = Ext.create('Ext.container.Viewport', {
 		    layout: 'border',
-		    rtl: this.getApiParam('rtl')!==undefined,
+		    rtl: (this.getApiParam('rtl')!==undefined || Voyant.util.Localization.LANGUAGE=="ar" || Voyant.util.Localization.LANGUAGE=="he"),
 		    items: [{
 		    	xtype: 'voyantheader',
 		    	region: 'north'
@@ -101,6 +101,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 				}]
 		    }]
 		});
+		console.warn(this.viewport.rtl);
 		this.callParent(arguments);
 	}
 });

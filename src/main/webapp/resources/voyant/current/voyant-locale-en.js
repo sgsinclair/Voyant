@@ -1,3 +1,4 @@
+Voyant.util.Localization.LANGUAGE='en'
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"Are you sure you want to start over (and leave the current corpus)?",
 "title":"Voyant Tools",

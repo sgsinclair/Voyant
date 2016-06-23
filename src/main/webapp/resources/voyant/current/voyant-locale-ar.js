@@ -1,3 +1,4 @@
+Voyant.util.Localization.LANGUAGE='ar'
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"هل  تريد البدء من جديد (والخروج من المكنزة الحالية)؟",
 "title":"فواينت تولز",
@@ -283,7 +284,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "highest":"اعلى:",
 "distinctiveWords":"<b>Distinctive words</b> (compared to the rest of the corpus): ",
 "docsDensity":"كثافة المفردات:",
-"helpTip":"<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>",
+"helpTip":"<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one document<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>",
 "moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Next {0} of {1} remaining</a>",
 "items":"عناصر",
 "shortest":"اقصر:"});
@@ -522,6 +523,7 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "nl":"هولندي",
 "tr":"تركي"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
+"sendToVoyantButton":"مكنز فويانت جديد",
 "cancel":"إلغاء",
 "select":"إختيار",
 "exportInProgress":"إعداد المكنز للتصدير",
@@ -538,6 +540,7 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "matchingDocuments":"عدد المستندات المطابقة",
 "helpTip":"توفر أداة الفهرس واجهة لاكتشاف محتويات مكنز كبير الحجم  أومتعدد المستندات بالاضافة الى إنشاء مكنز ثانوي بحسب معايير البحث. يقوم بعمل قاعدة البيانات أو متجر على الانترنت ليتيح لك امكانية ترشيح المستندات",
 "export":"تصدير ",
+"downloadButton":"تحميل",
 "facet.pubPlaceTitle":"مكان النشر",
 "queryMatches":"عدد من المستندات مطابقة {0} من {1}",
 "facet.keywordTitle":"كلمات مفتاحية",
@@ -649,7 +652,7 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "docFreqTip":"<b>{0}</b><br><b> عدد الكلمات </b><br>{1}",
 "rawFrequencies":"التواتر الأساسي",
 "dimension":"بُعد",
-"helpTip":"<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>",
+"helpTip":"<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three-dimensional space to easily visualize the data through a scatterplot.</p>",
 "ca":"Correspondence Analysis",
 "clusters":"مقاطع تخزين",
 "pcTitle":"النسبة المؤية لكل اختلاف مشروحة في كل  ",

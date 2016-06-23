@@ -1,3 +1,4 @@
+Voyant.util.Localization.LANGUAGE='cz'
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"Opravdu chcete začít znovu (a opustit stávající korpus)?",
 "title":"Voyant Tools",
@@ -219,7 +220,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "numbersNeedCommas":"Prosím použijte čárku k oddělení více čísel.",
 "tableDocumentsTable":"z celé tabulky",
 "UploadLocal":"Nahrát jeden nebo více dokumentů z vašeho počítače.",
-"helpTip":"Tento nástroj umožňuje vytvořit korpus jedním ze tří způsobů:<ol><li>napsáním nebo vložením textu do textového pole a kliknutím na <i>Odhalit</i>; pokud je každý řádek v textovém poli adresou URL, text se načte z těchto URL odkazů, v ostatních případech je obsah považován za jeden dokument </li><li>klikněte na tlačítko <i>Otevřít</i> pro otevření existujícího korpusu</li><li>klikněte na tlačítko <i>Nahrát</i> pro nahrání jednoho nebo více souborů ze svého počítače (více souborů můžete vybrat při stisknutí klávesy Ctrl a/nebo Shift)</li>",
+"helpTip":"Tento nástroj umožňuje vytvořit korpus jedním ze tří způsobů:<ol><li>napsáním nebo vložením textu do textového pole a kliknutím na <i>Odhalit</i>; pokud je každý řádek v textovém poli adresou URL, text se načte z těchto URL odkazů, v ostatních případech je obsah považován za jeden dokument </li><li>klikněte na tlačítko <i>Otevřít</i> pro otevření existujícího korpusu</li><li>klikněte na tlačítko <i>Nahrát</i> pro nahrání jednoho nebo více souborů ze svého počítače (více souborů můžete vybrat při stisknutí klávesy Ctrl a/nebo Shift)</li></ol>",
 "xmlOptionsText":"Definovat XPath výrazy pro následující:",
 "tableTitle":"Název",
 "noTextProvided":"Nebyl vložen žádný text.",
@@ -290,6 +291,8 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
 "title":"Zobrazení korpusu",
 "helpTip":"Toto je výchozí zobrazení korpusu pro obecné účely."});
+Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
+"label":"Font family"});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"Vydavatelé",
 "sendToVoyantButton":"Nový Voyant korpus",
@@ -430,6 +433,16 @@ Ext.apply(Voyant.panel.StreamGraph.i18n, {
 Ext.apply(Voyant.notebook.util.Embed.i18n, {
 "tryWidget":"Zkuste jednu z následujících pomůcek (widgetů):",
 "widgetNotRecognized":"Vložení se nezdařilo (nebyl zvolen žádný nástroj pro vložení nebo je neplatný)."});
+Ext.apply(Voyant.widget.ListEditor.i18n, {
+"cancel":"Cancel",
+"editList":"Edit List",
+"new":"New User-Defined List",
+"editListMessage":"This is the list, one term per line.",
+"editListTitle":"Edit List",
+"label":"List:",
+"none":"None",
+"ok":"Save",
+"whiteListLabel":"White List:"});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"Možnosti stažení"});
 Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
@@ -510,6 +523,7 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "nl":"holandština",
 "tr":"turečtina"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
+"sendToVoyantButton":"Nový Voyant korpus",
 "cancel":"Zrušit",
 "select":"Zvolit",
 "exportInProgress":"Příprava vašeho korpusu pro exportt…",
@@ -526,6 +540,7 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "matchingDocuments":"počet dokumentů odpovídajících vyhledávacím kritériím",
 "helpTip":"<p>Nástroj <i>Katalog</i> poskytuje rozhraní pro prozkoumání obsahu větších korpusů složených z více dokumentů. Rovněž umožňuje vytvářet podmnožiny (nebo pracovní sady) podle vyhledávacích kritérií. Funguje podobně jako knihovnická databáze nebo eshop v tom smyslu, že umožňuje filtrovat dokumenty.",
 "export":"Exportovat",
+"downloadButton":"Stáhnout",
 "facet.pubPlaceTitle":"Místa vydání",
 "queryMatches":"Hledanému výrazu odpovídá celkem {0} dokumentů (z {1}).",
 "facet.keywordTitle":"Klíčová slova",

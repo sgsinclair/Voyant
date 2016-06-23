@@ -52,7 +52,7 @@ public class Localizer {
 			}
 			locationsMap.get(location).put(cells[2], cells.length>column && cells[column].isEmpty()==false ? cells[column] : cells[english]);
 		}
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("Voyant.util.Localization.LANGUAGE='").append(lang).append("'\n");
 		for (Map.Entry<String, Map<String, String>> locationEntry : locationsMap.entrySet()) {
 			sb.append("Ext.apply(").append(locationEntry.getKey()).append(".i18n, {\n");
 			for (Map.Entry<String, String> classEntry : locationEntry.getValue().entrySet()) {
