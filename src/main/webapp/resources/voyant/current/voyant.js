@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Jun 21 13:56:02 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Jun 23 10:45:53 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4190,6 +4190,12 @@ Ext.define('Voyant.util.Api', {
     			this.setApiParam(key, queryParams[key]);
     		}
     	}
+    	
+    	// handle "type"  parameter specially for backwards compatibility
+    	if (queryParams["type"] && ("query" in this.api) && !this.getApiParam('query')) {
+    		this.setApiParam("query", queryParams['type']);
+    	}
+    	
 	},
 	addParentApi: function(apis, clz) {
 		if (clz.api) {apis.splice(0,0, clz.api)} // add to front
@@ -8529,6 +8535,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     		 * @private
         	 */
     		query: null,
+    		
     		/**
     		 * @property stopList The stop list to use to filter results.
     		 * Choose from a pre-defined list, or enter a comma separated list of words, or enter an URL to a list of stop words in plain text (one per line).
@@ -8909,6 +8916,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
+    	debugger
     	if (this.bubblelines) { // get rid of existing terms
     		this.bubblelines.removeAllTerms();
     		this.termStore.removeAll(true);
@@ -8924,8 +8932,9 @@ Ext.define('Voyant.panel.Bubblelines', {
 		    },
 		    scope: this,
 		    params: {
-		    	limit: 5,
-		    	stopList: this.getApiParams('stopList')
+		    	limit: this.getApiParam("query") ? undefined : 5,
+		    	stopList: this.getApiParams('stopList'),
+		    	query: this.getApiParam("query")
 		    }
     	});
     },
@@ -16878,14 +16887,14 @@ Ext.define('Voyant.panel.Summary', {
 		    			width: sparkWidth
 		    		}]
 		    	},{
-	    			html: '<ul><li>'+this.localize('longest')+docsLengthTpl.apply(docs.slice(0, docs.length>limit ? limit : parseInt(docs.length/2)).map(function(doc) {return {
+	    			html: '<ul><li>'+this.localize('longest')+" "+docsLengthTpl.apply(docs.slice(0, docs.length>limit ? limit : parseInt(docs.length/2)).map(function(doc) {return {
 						id: doc.getId(),
 						shortTitle: doc.getShortTitle(),
 						title: doc.getTitle(),
 						val: doc.getLexicalTokensCount(),
 						valTip: numberOfTerms
 					}}))+'</li>'+
-	    				'<li>'+this.localize('shortest')+docsLengthTpl.apply(docs.slice(-(docs.length>limit ? limit : parseInt(docs.length/2))).reverse().map(function(doc) {return {
+	    				'<li>'+this.localize('shortest')+" "+docsLengthTpl.apply(docs.slice(-(docs.length>limit ? limit : parseInt(docs.length/2))).reverse().map(function(doc) {return {
 	    					id: doc.getId(),
 	    					shortTitle: doc.getShortTitle(),
 	    					title: doc.getTitle(),
@@ -16971,7 +16980,7 @@ Ext.define('Voyant.panel.Summary', {
     	
     	if (docs.length>1) {
         	main.add({
-        		html: this.localize("mostFrequentWords")+"<ol></ol>",
+        		html: this.localize("distinctiveWords")+"<ol></ol>",
         		cls: 'section',
         		itemId: 'distinctiveWords',
         		listeners: {
@@ -17031,7 +17040,7 @@ Ext.define('Voyant.panel.Summary', {
         							len = docs[index].length; // declare for template
         		    				Ext.dom.Helper.append(list, {tag: 'li', 'voyant:index': String(index), html: 
         		    					'<a href="#" onclick="return false" class="document-id document-id-distinctive" voyant:val="'+doc.get('id')+'">'+doc.getShortTitle()+'</a>'+
-        		    					this.localize('colon')+ new Ext.XTemplate(this.localize('documentType')).apply({types: docs[index]})+'.'
+        		    					this.localize('colon')+ " "+new Ext.XTemplate(this.localize('documentType')).apply({types: docs[index]})+'.'
         		    				});
     							}
     						}, this);
@@ -19993,7 +20002,7 @@ Ext.define('Voyant.panel.TermsRadio', {
             }]
         });
         me.callParent(arguments);
-    	 
+    	
     },
     
     loadFromDocuments: function(documents) {

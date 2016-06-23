@@ -122,7 +122,7 @@ Ext.apply(Voyant.panel.Panel.i18n, {
 Ext.apply(Voyant.panel.Bubbles.i18n, {
 "soundTip":"Toggles the sound.",
 "sound":"sound",
-"adaptation":"Adaptation of <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\"><i>Letter Pairs</i> by Martin Ignacio Bereciartua</a>",
+"adaptation":"Adapted from <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\"><i>Letter Pairs</i></a> by Martin Ignacio Bereciartua",
 "title":"Bubbles",
 "speedTip":"Controls the speed of the visualization.",
 "helpTip":"Bubbles is a playful visualization of frequent terms in a document. ",

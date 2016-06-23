@@ -19,6 +19,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     		 * @private
         	 */
     		query: null,
+    		
     		/**
     		 * @property stopList The stop list to use to filter results.
     		 * Choose from a pre-defined list, or enter a comma separated list of words, or enter an URL to a list of stop words in plain text (one per line).
@@ -414,8 +415,9 @@ Ext.define('Voyant.panel.Bubblelines', {
 		    },
 		    scope: this,
 		    params: {
-		    	limit: 5,
-		    	stopList: this.getApiParams('stopList')
+		    	limit: this.getApiParam("query") ? undefined : 5,
+		    	stopList: this.getApiParams('stopList'),
+		    	query: this.getApiParam("query")
 		    }
     	});
     },

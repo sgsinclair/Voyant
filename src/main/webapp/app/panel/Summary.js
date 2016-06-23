@@ -163,14 +163,14 @@ Ext.define('Voyant.panel.Summary', {
 		    			width: sparkWidth
 		    		}]
 		    	},{
-	    			html: '<ul><li>'+this.localize('longest')+docsLengthTpl.apply(docs.slice(0, docs.length>limit ? limit : parseInt(docs.length/2)).map(function(doc) {return {
+	    			html: '<ul><li>'+this.localize('longest')+" "+docsLengthTpl.apply(docs.slice(0, docs.length>limit ? limit : parseInt(docs.length/2)).map(function(doc) {return {
 						id: doc.getId(),
 						shortTitle: doc.getShortTitle(),
 						title: doc.getTitle(),
 						val: doc.getLexicalTokensCount(),
 						valTip: numberOfTerms
 					}}))+'</li>'+
-	    				'<li>'+this.localize('shortest')+docsLengthTpl.apply(docs.slice(-(docs.length>limit ? limit : parseInt(docs.length/2))).reverse().map(function(doc) {return {
+	    				'<li>'+this.localize('shortest')+" "+docsLengthTpl.apply(docs.slice(-(docs.length>limit ? limit : parseInt(docs.length/2))).reverse().map(function(doc) {return {
 	    					id: doc.getId(),
 	    					shortTitle: doc.getShortTitle(),
 	    					title: doc.getTitle(),
@@ -256,7 +256,7 @@ Ext.define('Voyant.panel.Summary', {
     	
     	if (docs.length>1) {
         	main.add({
-        		html: this.localize("mostFrequentWords")+"<ol></ol>",
+        		html: this.localize("distinctiveWords")+"<ol></ol>",
         		cls: 'section',
         		itemId: 'distinctiveWords',
         		listeners: {
@@ -316,7 +316,7 @@ Ext.define('Voyant.panel.Summary', {
         							len = docs[index].length; // declare for template
         		    				Ext.dom.Helper.append(list, {tag: 'li', 'voyant:index': String(index), html: 
         		    					'<a href="#" onclick="return false" class="document-id document-id-distinctive" voyant:val="'+doc.get('id')+'">'+doc.getShortTitle()+'</a>'+
-        		    					this.localize('colon')+ new Ext.XTemplate(this.localize('documentType')).apply({types: docs[index]})+'.'
+        		    					this.localize('colon')+ " "+new Ext.XTemplate(this.localize('documentType')).apply({types: docs[index]})+'.'
         		    				});
     							}
     						}, this);

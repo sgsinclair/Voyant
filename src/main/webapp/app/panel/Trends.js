@@ -230,7 +230,7 @@
             }]
         });
         me.callParent(arguments);
-    	 
+    	
     },
     
     loadFromDocuments: function(documents) {

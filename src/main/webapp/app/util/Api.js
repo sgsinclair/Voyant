@@ -34,6 +34,12 @@ Ext.define('Voyant.util.Api', {
     			this.setApiParam(key, queryParams[key]);
     		}
     	}
+    	
+    	// handle "type"  parameter specially for backwards compatibility
+    	if (queryParams["type"] && ("query" in this.api) && !this.getApiParam('query')) {
+    		this.setApiParam("query", queryParams['type']);
+    	}
+    	
 	},
 	addParentApi: function(apis, clz) {
 		if (clz.api) {apis.splice(0,0, clz.api)} // add to front
