@@ -1,6 +1,6 @@
 Ext.define('Voyant.panel.Documents', {
 	extend: 'Ext.grid.Panel',
-	mixins: ['Voyant.panel.Panel'/*,'Voyant.util.Localization'*/],
+	mixins: ['Voyant.panel.Panel','Voyant.util.Downloadable'],
 	alias: 'widget.documents',
 	isConsumptive: true,
     statics: {
@@ -31,6 +31,8 @@ Ext.define('Voyant.panel.Documents', {
         }, {
             xtype: 'totalpropertystatus'
         }]
+    	
+    	var me = this;
     	
     	if (!config || config.mode!=this.MODE_EDITING) {
     		dockedItemsItems.push({
@@ -127,6 +129,12 @@ Ext.define('Voyant.panel.Documents', {
             		}).show();
 
             	}
+    		}, {
+    			text: this.localize('downloadButton'),
+		    	glyph: 'xf019@FontAwesome',
+    			handler: function() {
+    				me.downloadFromCorpusId(me.getStore().getCorpus().getId())
+    			}
     		})
     	}
     	

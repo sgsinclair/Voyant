@@ -44,7 +44,7 @@ Ext.define('Voyant.panel.Subset', {
 	        		tokenType: 'author'
         		},{
 	        		xtype: 'querysearchfield',
-	        		fieldLabel: this.localize('termsLabel')
+	        		fieldLabel: this.localize('lexicalLabel')
         	}],
         	fieldColumns: 2
         });

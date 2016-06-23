@@ -283,7 +283,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "highest":"Highest: ",
 "distinctiveWords":"<b>Distinctive words</b> (compared to the rest of the corpus): ",
 "docsDensity":"Vocabulary Density: ",
-"helpTip":"<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>",
+"helpTip":"<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one document<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>",
 "moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Next {0} of {1} remaining</a>",
 "items":"items",
 "shortest":"Shortest: "});
@@ -484,7 +484,7 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "no":"Norwegian",
 "auto":"Auto-detect",
 "bg":"Bulgarian",
-"noEditAutoMessage":"The auto-detected stoplist cannot be edited, please select a specifc stoplist such as the \"New User-Defined List\".",
+"noEditAutoMessage":"The auto-detected stoplist cannot be edited, please select a specific stoplist such as the \"New User-Defined List\".",
 "lt":"Latvian",
 "lv":"Lithuanian",
 "none":"None",
@@ -522,6 +522,7 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "nl":"Dutch",
 "tr":"Turkish"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
+"sendToVoyantButton":"New Voyant Corpus",
 "cancel":"Cancel",
 "select":"Select",
 "exportInProgress":"Preparing your corpus for export…",
@@ -538,6 +539,7 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "matchingDocuments":"number of matching documents",
 "helpTip":"The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.",
 "export":"Export",
+"downloadButton":"Download",
 "facet.pubPlaceTitle":"Publication Locations",
 "queryMatches":"{0} matching documents (out of {1}).",
 "facet.keywordTitle":"Keywords",
@@ -649,7 +651,7 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "docFreqTip":"<b>{0}</b><br><b>Word Count</b><br>{1}",
 "rawFrequencies":"Raw Frequencies",
 "dimension":"Dimension",
-"helpTip":"<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>",
+"helpTip":"<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three-dimensional space to easily visualize the data through a scatterplot.</p>",
 "ca":"Correspondence Analysis",
 "clusters":"Clusters",
 "pcTitle":"Percentage of Total Variation Explained by Each Component",

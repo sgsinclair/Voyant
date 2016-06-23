@@ -219,7 +219,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "numbersNeedCommas":"Usare la virgola per separare i diversi numeri.",
 "tableDocumentsTable":"Da tutta la tabella",
 "UploadLocal":"Carica uno o più documenti dal tuo computer",
-"helpTip":"Questo strumento permette di creare un corpus in tre diverse modalità:<ol><li>digitando o incollando un testo nella caselle fa cliccando <i>Rivela</i>; se ogni riga nella casella è un URL, il testo verrà recuperato, altrimenti i contenti verranno considerati come un singolo documento</li><li>clicca il pulsante <i>Apri</i> per aprire un corpus esistente</li><li>clicca il pulsante <i>Carica</i> per caricare uno o più file dal tuo computer (è possibile selezionare più file utilizzando i tasti Ctrl e/o Shift)</li>",
+"helpTip":"Questo strumento permette di creare un corpus in tre diverse modalità:<ol><li>digitando o incollando un testo nella caselle fa cliccando <i>Rivela</i>; se ogni riga nella casella è un URL, il testo verrà recuperato, altrimenti i contenti verranno considerati come un singolo documento</li><li>clicca il pulsante <i>Apri</i> per aprire un corpus esistente</li><li>clicca il pulsante <i>Carica</i> per caricare uno o più file dal tuo computer (è possibile selezionare più file utilizzando i tasti Ctrl e/o Shift)</li></ol>",
 "xmlOptionsText":"Definisci le espressioni XPath per i seguenti: ",
 "tableTitle":"Titolo",
 "noTextProvided":"Nessun testo inserito",
@@ -290,10 +290,12 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
 "title":"Vista corpus",
 "helpTip":"Questo è per la vista di default generica del corpus."});
+Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
+"label":"Font family"});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"Editori",
 "sendToVoyantButton":"Nuovo corpus di Voyant",
-"downloadButton":"Scarica il file Zip",
+"downloadButton":"Scarica il file ZIP",
 "sendToVoyantNoQuery":"Non c'è attualmente una query specificata, ma puoi <a href=\"{0}\" target=\"_blank\">aprire il corpus corrente in una nuova finestra</a>.",
 "lexicalLabel":"Testo intero ",
 "noMatches":"I criteri della query corrente non individuano alcun documento, prima modifica la ricerca.",
@@ -309,7 +311,7 @@ Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 "pubDateLabel":"data"});
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"Aggiungi",
-"cancel":"cacella",
+"cancel":"cancella",
 "clearTip":"Rimuovi tutti i magneti (termini ricercati)",
 "EditMagnet":"Modifica il magnete",
 "clear":"Rimuovi",
@@ -430,6 +432,16 @@ Ext.apply(Voyant.panel.StreamGraph.i18n, {
 Ext.apply(Voyant.notebook.util.Embed.i18n, {
 "tryWidget":"Prova uno dei seguenti widget:",
 "widgetNotRecognized":"Impossibile incorporare"});
+Ext.apply(Voyant.widget.ListEditor.i18n, {
+"cancel":"Cancel",
+"editList":"Edit List",
+"new":"New User-Defined List",
+"editListMessage":"This is the list, one term per line.",
+"editListTitle":"Edit List",
+"label":"List:",
+"none":"None",
+"ok":"Save",
+"whiteListLabel":"White List:"});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"Opzioni per il download"});
 Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
@@ -510,6 +522,7 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "nl":"Olandese",
 "tr":"Turco"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
+"sendToVoyantButton":"Nuovo corpus di Voyant",
 "cancel":"Cancella",
 "select":"Seleziona",
 "exportInProgress":"Preparazione del corpus per l'esportazione",
@@ -526,6 +539,7 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "matchingDocuments":"numero di documenti corrispondenti",
 "helpTip":"Lo strumento <i>Catalogo</i> è una interfaccia per esplorare il contenuto di un corpus più grande, composto da molteplici documenti, così come per la creazione di sottoinsiemi di testi che corrispondono a deterrminati criteri di ricerca. Il catalogo funziona in modo simile a una base di dati bibliografica o a un negozio online, poiché consente di selezionare i documenti.",
 "export":"Esportare",
+"downloadButton":"Download",
 "facet.pubPlaceTitle":"Luoghi di pubblicazione",
 "queryMatches":"{0} documenti corrispondenti (su {1}).",
 "facet.keywordTitle":"Parole chiave",
@@ -548,7 +562,7 @@ Ext.apply(Voyant.panel.TopicContexts.i18n, {
 "title":"Contesti tematici",
 "helpTip":"Contesti tematici"});
 Ext.apply(Voyant.panel.BubblelinesSet.i18n, {
-"title":"Bubblelines Skin.",
+"title":"Bubblelines Skin",
 "helpTip":"Questa visualizzazione è per lavorare con Bubblelines."});
 Ext.apply(Voyant.panel.Knots.i18n, {
 "findTerm":"Trova termine",
@@ -614,7 +628,7 @@ Ext.apply(Voyant.VoyantDefaultApp.i18n, {
 "voyantIs":"<a href=\"./docs/#!/guide/about\">Voyant Tools è un ambiente web per la lettura e l'analisi di testi digitali</a>",
 "noViewKnownErrorTpl":"La vista selezionata ({view}) non è stata migrata dalla versione precedente di Voyant (e probabilmente non lo sarà). {additional} Sarà usata la vista di  default.",
 "convertSkinMsg":"La skin di conversione era utilizzata per l'esportazione del documenti e quella funionalità è ora disponibile nello strumento Documento.",
-"noViewErrorTitle":"Visualizza errore",
+"noViewErrorTitle":"Nessuna vista è stata specificata",
 "helpTip":"Voyant Tools è un ambiente web per la lettura e l'analisi di testi digitali.<p></p>",
 "noViewErrorTpl":"Nessuna vista denominata \"<i>{view}</i>\" è stata trovata. Sarà usata la vista di  default."});
 Ext.apply(Voyant.widget.Facet.i18n, {

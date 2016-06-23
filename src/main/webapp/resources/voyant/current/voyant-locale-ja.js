@@ -5,10 +5,10 @@ Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeTip":"コーパス・クリエーション・スクリーンからやり直すためにクリックする。",
 "home":"やり直す"});
 Ext.apply(Voyant.panel.Cirrus.i18n, {
-"maxTerms":"Max terms",
+"maxTerms":"最頻単語",
 "visible":"Show",
 "options":"オプション",
-"scale":"Scale",
+"scale":"スケール",
 "title":"シーラス",
 "helpTip":"</p><p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document –&nbsp;this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>",
 "visibleTerms":"単語"});
@@ -41,7 +41,7 @@ Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "log":"Logarithmic",
 "displayPanel":"Display Panel",
 "completingTransition":"Completing transition.",
-"removeTerm":"Remove <b>{0}</b>",
+"removeTerm":"<b>{0}</b>を消去",
 "yScale":"Y-axis Scale",
 "title":"TermsRadio",
 "type":"Visualization",
@@ -63,19 +63,19 @@ Ext.apply(Voyant.util.Downloadable.i18n, {
 "downloadButton":"ダウンロード",
 "cancelButton":"キャンセル"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
-"contextTermRawFreq":"Count (context)",
+"contextTermRawFreq":"カウント（文脈）",
 "matchingTerms":"{count}",
-"contextTerm":"Collocate",
+"contextTerm":"共起",
 "emptyText":"一致する情報が見つかりませんでした。",
 "termTip":"This is the keyword term around which collocate (context) terms are counted.",
 "termRawFreqTip":"The number of times the keyword term occurs in the corpus.",
-"title":"Collocates",
+"title":"共起",
 "termRawFreq":"カウント（キーワード）",
-"context":"context",
+"context":"文脈",
 "term":"単語",
 "helpTip":"<p>Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus. Features include:</p><ul><li>reordering by keyword, collocate word, collocate word count</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
-"contextTermRawFreqTip":"The number of times this collocate occurs near the keyword term in the corpus.",
-"contextTermTip":"This is the collocate (context) term that occurs near the keyword term."});
+"contextTermRawFreqTip":"コーパス内において、キーワードの近くで共起する単語",
+"contextTermTip":"キーワードの近くで共起する（文脈）単語"});
 Ext.apply(Voyant.panel.Documents.i18n, {
 "keepTip":"Click here to create a new corpus that only includes selected or filtered (search query) documents.",
 "reorderFilteredError":"You cannot reorder a filtered (after search query) corpus. Please create a new corpus first (with the <i>Remove</i> or <i>Keep</i> button) and then reorder the new corpus.",
@@ -129,7 +129,7 @@ Ext.apply(Voyant.panel.Bubbles.i18n, {
 "speed":"速度"});
 Ext.apply(Voyant.widget.CorpusDocumentSelector.i18n, {
 "corpus":"コーパス",
-"scale":"Scale"});
+"scale":"スケール"});
 Ext.apply(Voyant.panel.Reader.i18n, {
 "documentFrequency":"document frequency:",
 "limitedAccess":"This is a limited access corpus and this tool's functionality is restricted.",
@@ -154,18 +154,18 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "moreToolsScale":"スケールによるツール",
 "badPassword":"申し訳ありません、それは認証されたアクセスコードではないようです。"});
 Ext.apply(Voyant.panel.Bubblelines.i18n, {
-"findTerm":"Find Term",
-"showTerm":"Show Term",
-"corpusTooSmall":"The provided corpus is too small for this tool.",
+"findTerm":"単語を探す",
+"showTerm":"単語を表示する",
+"corpusTooSmall":"このツールで使うにはコーパスが少なすぎます。",
 "clearTerms":"クリア",
-"removeTerm":"Remove Term",
-"hideTerm":"Hide Term",
+"removeTerm":"単語を消去",
+"hideTerm":"単語を隠す",
 "title":"タイトル",
 "type":"可視化",
-"separateLines":"Separate Lines for Terms",
+"separateLines":"単語ごとにバブルラインを分割する",
 "help":"Bubblelines visualizes the frequency and repetition of  a term's use in a corpus. Each document in the corpus is represented as a horizontal line and divided into segments of equal lengths. Each term is represented as a bubble, the size of the bubble indicates its frequency in the corresponding segment of text. The larger the bubble's radius the more frequently the term occurs.",
-"total":"Total",
-"granularity":"Granularity",
+"total":"合計",
+"granularity":"粒度",
 "options":"オプション"});
 Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "corpusComparisonDifference":"Comparison",
@@ -196,7 +196,7 @@ Ext.apply(Voyant.panel.CustomSet.i18n, {
 "title":"カスタム・ビュー",
 "helpTip":"これはカスタム・ビューです。"});
 Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
-"cleaning":"Cleaning",
+"cleaning":"クリーニング",
 "releaseToRemove":"Release to remove this term",
 "context":"コンテクスト",
 "clearTerms":"クリア",
@@ -205,12 +205,12 @@ Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "cancel":"キャンセル",
 "accessModeWithoutPassword":"その他のコード",
-"xpathGroupBy":"Group by",
+"xpathGroupBy":"グループ化",
 "reveal":"結果を表示する",
 "OpenExisting":"既存のコーパスを開く",
 "tableNoHeadersRow":"No Headers Row",
 "accessOptionsText":"If desired, specify one or more access passwords (separated by commas).",
-"tableDocumentsRows":"from cells in each row",
+"tableDocumentsRows":"各行のセルから",
 "gearTip":"オプション",
 "tokenizationWordBoundaries":"Simple Word Boundaries",
 "numberEmpty":"At least one column number is currently empty.",
@@ -226,7 +226,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableContent":"内容",
 "xpathDocuments":"文書",
 "tokenizationAuto":"Automatic (highly recommended)",
-"numbersCommasOnly":"Comma-separated numbers only.",
+"numbersCommasOnly":"コンマ区切り数値のみ",
 "tableOptionsText":"Specify how documents should be extracted (currently only supported for MS Excel: .XLS, XLSX). For more information see the documentation on creating a corpus with <a href=\"{0}\" target=\"voyantdocs\">tabular data</a>.",
 "PleaseSelectExisting":"コーパスが選択されていることを確認してください",
 "inputFormat":"入力フォーマット",
@@ -234,7 +234,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPasswordText":"If you specify an <i>access password</i> you can also specify what access is granted to users without the password.",
 "tableContentText":"Specify which column numbers contain content (or leave blank to use all columns). The left-most columnn is column 1. Define multiple documents by separating columns with a comma or combine columns by using the plus sign. For example \"1+2,3\" (without quotes) would combine columns 1 and 2 into one document and use column 3 for  a second document.",
 "numberZero":"0 is invalid, the first column is 1",
-"inputFormatAuto":"Auto-Detect (recommended)",
+"inputFormatAuto":"自動判別（推奨）",
 "unknownFiles":"認識されない（エラーの可能性）",
 "fileTypesWarning":"ファイルのタイプについての警告",
 "accessModeNone":"なし",
@@ -256,7 +256,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "ok":"OK",
 "accessPassword":"アクセスコード",
 "adminPassword":"管理コード",
-"accessModeNonConsumptive":"制限付き（非消費的）",
+"accessModeNonConsumptive":"制限付き（非商用）",
 "tableMetadataText":"These options are only used when documents are extracted from cells in each row (see the first option in this section). Same syntax as the Content option above: column numbers separated by commas or combined with a plus sign.",
 "xpathAuthor":"著者",
 "xpathTitle":"タイトル",
@@ -283,7 +283,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "highest":"Highest: ",
 "distinctiveWords":"<b>Distinctive words</b> (compared to the rest of the corpus): ",
 "docsDensity":"Vocabulary Density: ",
-"helpTip":"<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one documen<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>",
+"helpTip":"<p>The <i>Summary</i> tool provides general information about the corpus. Many elements in the tool are links that trigger other views. Features include:</p><ul><li>total words (tokens) and word forms (types) and age of the corpus</li><li>most frequent terms in the corpus</li><li>for corpora with more than one document<ul><li>documents ordered by length and vocabulary density</li><li>distinctive words for each document (by TF-IDF score)</li></ul></li></ul>",
 "moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Next {0} of {1} remaining</a>",
 "items":"項目",
 "shortest":"Shortest: "});
@@ -320,7 +320,7 @@ Ext.apply(Voyant.panel.Mandala.i18n, {
 "title":"マンダラ",
 "addTip":"マグネット（検索語）を追加する",
 "helpTip":"「マンダラ」は単語とドキュメントの関係を示すための可視化です。各検索語（またはマグネット）は、関連度数に基づいてドキュメントに紐づけられます。",
-"remove":"取り除く",
+"remove":"消去",
 "labels":"ラベル"});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"コーパスの選択"});
@@ -362,13 +362,13 @@ Ext.apply(Voyant.panel.WordTree.i18n, {
 "emptyText":"一致する情報が見つかりませんでした。",
 "title":"ワードツリー"});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
-"original":"original",
+"original":"オリジナル",
 "VOYANTTip":"This is a normalized version of the content: when the source documents are in XML, this will be mostly the original content, and for most other source document formats this will be simple HTML content.",
 "fieldLabel":"ファイル形式",
 "voyantXml":"Voyant XML",
 "plainText":"プレーンテキスト",
 "SOURCETip":"This will attempt to provide the source documents in their original formats. In some cases this means that a single archive (such as a ZIP file) might be provided.",
-"TXTTip":"This will produce a plain text version of each document."});
+"TXTTip":"これは各ドキュメントのプレーンテキストです。"});
 Ext.apply(Voyant.panel.ScatterSet.i18n, {
 "title":"スキャッター",
 "helpTip":"これは散布図で作業するために専門化されたビュワーです。"});
@@ -382,7 +382,7 @@ Ext.apply(Voyant.util.Toolable.i18n, {
 "plusTip":"このパネルの場所に別のツールを割り当て",
 "gearTip":"このツールに関するオプションの設定",
 "cancelTitle":"キャンセル",
-"exportViewHtmlEmbed":"an HTML snippet for embedding this view in another web page",
+"exportViewHtmlEmbed":"別のWebページにこの画面を埋め込むためのHTMLスニペット",
 "exportGridCurrent":"現在のデータをエクスポート",
 "exportSvgTitle":"SVGのエクスポート",
 "maximizeTip":"新しいウインドウでこのツールを開く",
@@ -400,15 +400,15 @@ Ext.apply(Voyant.util.Toolable.i18n, {
 "exportPngTitle":"PNGのエクスポート",
 "exportPngMessage":"<p>これはPNG形式画像のサブネイルです。右クリックまたはCTRLを押しながらクリックすると、フルサイズの画像を保存できます。</p><p>または、下記HTMLコードをコピーしてください</p>",
 "exportGridCurrentHtml":"現在のデータをHTML形式でエクスポート",
-"exportViewEmbedMessage":"You can copy and paste the HTML snippet from the box below into another web page. Note that some content management systems (like WordPress) may need a special plugin to handle &lt;iframe&gt; tags.",
+"exportViewEmbedMessage":"下のボックスに表示されるHTMLスニペットをコピー＆ペーストすることで別のWebページに埋め込むことができます。（例えばWordpressのような）CMSによっては、&lt;iframe&gt; タグを扱うためのプラグインが必要になります。",
 "exportPng":"この可視化をPNG形式でエクスポート",
 "reset":"リセット",
-"exportViewBiblio":"a bibliographic reference for this view",
-"exportViewEmbedTitle":"Embed HTML Snippet",
-"exportNoFunction":"An export function has been defined by is not available.",
+"exportViewBiblio":"この画面",
+"exportViewEmbedTitle":"埋め込み用HTMLスニペット",
+"exportNoFunction":"選択されたエクスポート機能は利用できません",
 "exportGridCurrentJson":"現在のデータをJSON形式でエクスポート",
 "exportSvg":"この可視化をSVG形式でエクスポート",
-"saveTip":"Export a URL, an embeddable tool, data or a bibliographic reference."});
+"saveTip":"URL、埋め込み可能なツール、データ、書誌情報のエクスポート"});
 Ext.apply(Voyant.panel.TextualArc.i18n, {
 "minRawFreqTip":"The minimum number of occurrences for terms. By default this is set to 2 (repeating words) to improve performance, setting it to 1 may slow things down considerably.",
 "search":"フィルター",
@@ -522,31 +522,33 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "nl":"オランダ語",
 "tr":"トルコ語"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
+"sendToVoyantButton":"新しいVoyantコーパス",
 "cancel":"キャンセル",
 "select":"選択する",
 "exportInProgress":"エクスポートするコーパスを準備してください…",
 "facet.titleTitle":"タイトル",
 "title":"カタログ",
 "lexicalTitle":"単語",
-"clickToOpenCorpus":"Please <a href=\"{0}\" target=\"_blank\" class=\"link\">click here</a> to access your new corpus (since popup windows are blocked).",
-"rawFreqs":"total occurrences (raw frequency)",
+"clickToOpenCorpus":"ポップアップウィンドウがブロックされている場合は、新しいコーパスにアクセスするために、 <a href=\"{0}\" target=\"_blank\" class=\"link\">ここ</a>をクリックしてください。",
+"rawFreqs":"頻度",
 "facet.languageTitle":"言語",
 "noMatches":"該当なし({0}のドキュメント中）",
 "selectValidFacet":"絞り込み項目を選択してください。",
 "plusFacetTip":"絞り込み項目を追加する",
-"facet.collectionTitle":"Collections",
+"facet.collectionTitle":"コレクション",
 "matchingDocuments":"一致したドキュメントの数",
 "helpTip":"The <i>Catalogue</i> tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.",
 "export":"エクスポート",
+"downloadButton":"ダウンロード",
 "facet.pubPlaceTitle":"出版地",
 "queryMatches":"{0}のドキュメントが該当（{1}のドキュメント中）",
 "facet.keywordTitle":"キーワード",
-"exportTip":"Create a new Voyant corpus with the selected documents.",
+"exportTip":"選択したドキュメントから新しいVoyantコーパスを作る。",
 "facet.authorTitle":"著者",
 "closeFacetTip":"この絞り込み項目を消去する",
 "selectFacet":"絞り込み項目を選択する",
-"loadingSnippets":"loading text snippets…",
-"facet.pubDateTitle":"Publication Dates",
+"loadingSnippets":"textスニペットを読み込み中…",
+"facet.pubDateTitle":"出版データ",
 "facet.publisherTitle":"出版社"});
 Ext.apply(Voyant.panel.CollocatesSet.i18n, {
 "title":"スキャッター",
@@ -563,15 +565,15 @@ Ext.apply(Voyant.panel.BubblelinesSet.i18n, {
 "title":"バブルラインスキン",
 "helpTip":"これはバブルラインで作業するために専門化されたビュワーです。"});
 Ext.apply(Voyant.panel.Knots.i18n, {
-"findTerm":"Find Term",
+"findTerm":"単語を探す",
 "settings":"設定",
 "startAngle":"スタート",
 "tangles":"Turn",
-"showTerm":"Show Term",
+"showTerm":"単語を表示",
 "sound":"sound",
-"clearTerms":"Clear",
-"removeTerm":"Remove Term",
-"hideTerm":"Hide Term",
+"clearTerms":"クリア",
+"removeTerm":"単語を消去",
+"hideTerm":"単語を隠す",
 "title":"Knots",
 "type":"可視化",
 "noTermsFound":"No terms found in this document.",
@@ -600,27 +602,27 @@ Ext.apply(Voyant.panel.RezoViz.i18n, {
 Ext.apply(Voyant.widget.DocumentSelector.i18n, {
 "cancel":"キャンセル",
 "all":"すべて",
-"selectAll":"All",
+"selectAll":"すべて選択",
 "documents":"ドキュメント",
 "ok":"OK",
-"selectNone":"None"});
+"selectNone":"すべて解除"});
 Ext.apply(Voyant.panel.Contexts.i18n, {
 "emptyText":"一致する情報が見つかりませんでした。",
 "document":"ドキュメント",
 "corpus":"コーパス",
 "limitedAccess":"This is a limited access corpus and this tool's functionality is restricted.",
-"termTip":"The keyword for the context.",
+"termTip":"文脈内のキーワード",
 "right":"右",
 "title":"コンテクスト",
 "expand":"拡張する",
 "documentTip":"The document of the occurrence.",
 "left":"左",
 "corpusTip":"Reset to corpus mode (contexts from all documents).",
-"rightTip":"Context to the right of the keyword.",
-"context":"コンテクスト",
-"leftTip":"Context to the left of the keyword.",
-"position":"Position",
-"positionTip":"The position of the keyword within the document.",
+"rightTip":"キーワード右側の文脈",
+"context":"文脈",
+"leftTip":"キーワード左側の文脈",
+"position":"位置",
+"positionTip":"ドキュメント内のキーワードの位置",
 "helpTip":"The Keywords in Context tool shows each occurrence of a keyword with a bit of surrounding text (the context). It can be useful for studying more closely how terms are used in different contexts. Features include:<p></p><ul><li>reordering document, by keyword or by left or right context</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"});
 Ext.apply(Voyant.VoyantDefaultApp.i18n, {
 "voyantIs":"<a href=\"./docs/#!/guide/about\">Voyantツールは、デジタルテキストの読解と分析のためのウェブ上の環境です。</a>",
@@ -630,7 +632,7 @@ Ext.apply(Voyant.VoyantDefaultApp.i18n, {
 "helpTip":"Voyantツールは、デジタルテキストの読解と分析のためのウェブ上の環境です。<p></p>",
 "noViewErrorTpl":" \"<i>{view}</i>\"という名前のビューはありません. デフォルトのビューが代わりに使われています。."});
 Ext.apply(Voyant.widget.Facet.i18n, {
-"emptyText":"No values found."});
+"emptyText":"該当なし"});
 Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "relFreq":"Relative",
 "xAxis":"X軸",
@@ -638,7 +640,7 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "summaryLabel":"Summary",
 "title":"ScatterPlot",
 "nearby":"Nearby",
-"remove":"Remove",
+"remove":"消去",
 "pca":"主成分分析",
 "docSim":"文書類似性",
 "noTermSelected":"単語が選択されていません。",
@@ -649,19 +651,19 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "docFreqTip":"<b>{0}</b><br><b>Word Count</b><br>{1}",
 "rawFrequencies":"Raw Frequencies",
 "dimension":"Dimension",
-"helpTip":"<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three dimensional space to easily visualize the data through a scatterplot.</p>",
+"helpTip":"<p>ScatterPlot displays the correspondance of word use in a corpus. This visualization relies on a statistical analysis that takes the word’s correspondance from each document (where each document represents a dimension) and reduces it to a three-dimensional space to easily visualize the data through a scatterplot.</p>",
 "ca":"対応分析",
 "clusters":"クラスタ",
 "pcTitle":"Percentage of Total Variation Explained by Each Component",
 "relativeFrequencies":"相対度数",
-"addTerm":"単語を選択する",
+"addTerm":"単語を追加",
 "numTerms":"Terms",
-"removeTerm":"Remove <b>{0}</b>",
+"removeTerm":"<b>{0}</b>を消去",
 "tfidf":"TF-IDF",
 "analysis":"分析",
 "fill":"Fill",
 "loading":"Loading",
-"labels":"Labels",
+"labels":"ラベル",
 "freqsModeTip":"Determines if frequencies are expressed as relative counts, raw counts, or as TF-IDF.",
 "yAxis":"Y軸",
 "pc":"PC",

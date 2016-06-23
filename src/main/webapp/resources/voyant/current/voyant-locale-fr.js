@@ -522,6 +522,7 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "nl":"Néerlandais",
 "tr":"Turc"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
+"sendToVoyantButton":"Nouveau corpus de Voyant",
 "cancel":"Annuler",
 "select":"Sélectionner",
 "exportInProgress":"Préparation de votre corpus pour l’exportation…",
@@ -538,6 +539,7 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "matchingDocuments":"nombre de documents correspondants",
 "helpTip":"L’outil <i>Catalogue</i> est une interface permettant d’explorer le contenu d’un corpus plus vaste comprenant plusieurs documents, ainsi que de créer des sous-corpus (ou corpus de travail) fondés sur certains critères de recherche. <i>Catalogue</i> fonctionne à peu près comme la base de données d’une bibliothèque ou comme une boutique en ligne, en ce qu’elle vous donne la possibilité de filtrer les documents.",
 "export":"Exporter",
+"downloadButton":"Télécharger",
 "facet.pubPlaceTitle":"Lieux de publication",
 "queryMatches":"{0} documents correspondants (sur {1})",
 "facet.keywordTitle":"Mots-clés",

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jun 23 10:45:53 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Jun 23 11:55:50 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8916,7 +8916,6 @@ Ext.define('Voyant.panel.Bubblelines', {
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
-    	debugger
     	if (this.bubblelines) { // get rid of existing terms
     		this.bubblelines.removeAllTerms();
     		this.termStore.removeAll(true);
@@ -9049,7 +9048,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 Ext.define('Voyant.panel.Catalogue', {
 	extend: 'Ext.panel.Panel',
 	requires: ['Voyant.widget.Facet'],
-	mixins: ['Voyant.panel.Panel'],
+	mixins: ['Voyant.panel.Panel','Voyant.util.Downloadable'],
 	
 	alias: 'widget.catalogue',
     statics: {
@@ -9129,9 +9128,8 @@ Ext.define('Voyant.panel.Catalogue', {
     		        		}
     		        	},
     		        	bbar: [{
-    		        		itemId: 'export',
-    		        		text: this.localize('export'),
-    		        		tooltip: this.localize('exportTip'),
+    		        		itemId: 'sendToVoyant',
+    		        		text: this.localize('sendToVoyantButton'),
     		        		disabled: true,
     		        		handler: function() {
     		        			this.mask(this.localize("exportInProgress"));
@@ -9148,31 +9146,35 @@ Ext.define('Voyant.panel.Catalogue', {
     		            		    	catalogue.unmask();
     		            		    	var json = Ext.JSON.decode(response.responseText);
 	                    				var url = catalogue.getBaseUrl()+"?corpus="+json.corpus.id;
-	                    				var win = window.open(url);
-	                    				if (!win) { // popup blocked
-	                    					var msg = Ext.create('Ext.window.MessageBox', {
-	                    						makeButton: function(btnIdx) {
-	                    					        return new Ext.button.Button({
-	                    					            handler: this.btnCallback,
-//	                    					            itemId: btnId,
-	                    					            scope: this,
-	                    					            text: catalogue.localize('cancel'),
-	                    					            ui: 'default-toolbar',
-	                    					            minWidth: 75
-	                    					        });
-	                    						}
-	                    					}).show({
-	                    						title: catalogue.localize('export'),
-	                    						buttons: Ext.MessageBox.CANCEL,
-	                    						icon: Ext.MessageBox.INFO,
-	                    						message: new Ext.XTemplate(catalogue.localize('clickToOpenCorpus')).apply([url])
-	                    					});
-	                    					var link = msg.getTargetEl().dom.querySelector("a");
-	                    					link.addEventListener("click", function() {
-	                    						msg.close()
-	                    					})
-	                    					Ext.get(link).frame().frame();
-	                    				}
+	                    				catalogue.openUrl(url);
+    		            		    },
+    		            		    failure: function(response, opts) {
+    		            		    	catalogue.unmask();
+    		            		    	me.showError(response);
+    		            		    }
+    		            		})
+
+    		        		},
+    		        		scope: this
+    		        	},{
+    		        		itemId: 'export',
+    		        		text: this.localize('downloadButton'),
+    		        		disabled: true,
+    		        		handler: function() {
+    		        			this.mask(this.localize("exportInProgress"));
+    		        			var catalogue = this;
+    		            		Ext.Ajax.request({
+    		            			url: this.getApplication().getTromboneUrl(),
+    		            			params: {
+    		            				corpus: this.getCorpus().getId(),
+    		            				tool: 'corpus.CorpusManager',
+    		            				keepDocuments: true,
+    		            				docId: this.getMatchingDocIds()
+    		            			},
+    		            		    success: function(response, opts) {
+    		            		    	catalogue.unmask();
+    		            		    	var json = Ext.JSON.decode(response.responseText);
+    		            		    	catalogue.downloadFromCorpusId(json.corpus.id);
     		            		    },
     		            		    failure: function(response, opts) {
     		            		    	catalogue.unmask();
@@ -9366,6 +9368,7 @@ Ext.define('Voyant.panel.Catalogue', {
 		var catalogue = this;
 		results.update(this.getCustomResultsHtml() ? this.getCustomResultsHtml() : new Ext.XTemplate(this.localize('noMatches')).apply([this.getCorpus().getDocumentsCount()]));
 		this.queryById('status').update(new Ext.XTemplate(this.localize('noMatches')).apply([this.getCorpus().getDocumentsCount()]))
+		this.queryById('sendToVoyant').setDisabled(true);
 		this.queryById('export').setDisabled(true);
     	if (queries && queries.length>0) {
     		this.mask(this.localize("loading"));
@@ -9430,6 +9433,7 @@ Ext.define('Voyant.panel.Catalogue', {
     					this.setMatchingDocIds(Ext.Array.clone(matchingDocIds));
     					if (matchingDocIds.length>0) {
     						this.queryById('export').setDisabled(false);
+    						this.queryById('sendToVoyant').setDisabled(false);
     					}
     					
     					// now try to load some snippets, if need be
@@ -12797,7 +12801,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
 
 Ext.define('Voyant.panel.Documents', {
 	extend: 'Ext.grid.Panel',
-	mixins: ['Voyant.panel.Panel'/*,'Voyant.util.Localization'*/],
+	mixins: ['Voyant.panel.Panel','Voyant.util.Downloadable'],
 	alias: 'widget.documents',
 	isConsumptive: true,
     statics: {
@@ -12828,6 +12832,8 @@ Ext.define('Voyant.panel.Documents', {
         }, {
             xtype: 'totalpropertystatus'
         }]
+    	
+    	var me = this;
     	
     	if (!config || config.mode!=this.MODE_EDITING) {
     		dockedItemsItems.push({
@@ -12924,6 +12930,12 @@ Ext.define('Voyant.panel.Documents', {
             		}).show();
 
             	}
+    		}, {
+    			text: this.localize('downloadButton'),
+		    	glyph: 'xf019@FontAwesome',
+    			handler: function() {
+    				me.downloadFromCorpusId(me.getStore().getCorpus().getId())
+    			}
     		})
     	}
     	
@@ -20707,7 +20719,7 @@ Ext.define('Voyant.panel.Subset', {
 	        		tokenType: 'author'
         		},{
 	        		xtype: 'querysearchfield',
-	        		fieldLabel: this.localize('termsLabel')
+	        		fieldLabel: this.localize('lexicalLabel')
         	}],
         	fieldColumns: 2
         });
