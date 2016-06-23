@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jun 23 11:55:50 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Jun 23 13:21:52 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8000,7 +8000,7 @@ Ext.define('Voyant.widget.DownloadOptions', {
 });
 
 Ext.define('Voyant.widget.FontFamilyOption', {
-    extend: 'Ext.form.field.ComboBox',
+    extend: 'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.fontfamilyoption',
     statics: {
@@ -8028,23 +8028,26 @@ Ext.define('Voyant.widget.FontFamilyOption', {
     	            {name: "Lucida/Monaco", value: '"Lucida Console", Monaco, monospace'}];
 
     	if (!Ext.Array.contains(data.map(function(item) {return item.value}), value)) {
-        	data.splice(0, 0, {name : value, value: value});
+        	data.splice(0, 0, {name : value, value: value});//
     	}
     	
     	Ext.apply(me, {
-	        queryMode: 'local',
-	        value: value,
-	        triggerAction: 'all',
-	        editable: true,
-	        fieldLabel: this.localize('label'),
-	        labelAlign: 'right',
-	        displayField: 'name',
-	        valueField: 'value',
-	        store: {
-	            fields: ['name', 'value'],
-	            data: data
-	        },
-	        width: 400
+    		items: {
+    			xtype: 'combo',
+    	        queryMode: 'local',
+    	        value: value,
+    	        triggerAction: 'all',
+    	        editable: true,
+    	        fieldLabel: this.localize('label'),
+    	        labelAlign: 'right',
+    	        displayField: 'name',
+    	        valueField: 'value',
+    	        store: {
+    	            fields: ['name', 'value'],
+    	            data: data
+    	        },
+    	        width: 400
+    		}
     	})
         me.callParent(arguments);
     }

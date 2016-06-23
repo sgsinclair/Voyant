@@ -1,5 +1,5 @@
 Ext.define('Voyant.widget.FontFamilyOption', {
-    extend: 'Ext.form.field.ComboBox',
+    extend: 'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.fontfamilyoption',
     statics: {
@@ -27,23 +27,26 @@ Ext.define('Voyant.widget.FontFamilyOption', {
     	            {name: "Lucida/Monaco", value: '"Lucida Console", Monaco, monospace'}];
 
     	if (!Ext.Array.contains(data.map(function(item) {return item.value}), value)) {
-        	data.splice(0, 0, {name : value, value: value});
+        	data.splice(0, 0, {name : value, value: value});//
     	}
     	
     	Ext.apply(me, {
-	        queryMode: 'local',
-	        value: value,
-	        triggerAction: 'all',
-	        editable: true,
-	        fieldLabel: this.localize('label'),
-	        labelAlign: 'right',
-	        displayField: 'name',
-	        valueField: 'value',
-	        store: {
-	            fields: ['name', 'value'],
-	            data: data
-	        },
-	        width: 400
+    		items: {
+    			xtype: 'combo',
+    	        queryMode: 'local',
+    	        value: value,
+    	        triggerAction: 'all',
+    	        editable: true,
+    	        fieldLabel: this.localize('label'),
+    	        labelAlign: 'right',
+    	        displayField: 'name',
+    	        valueField: 'value',
+    	        store: {
+    	            fields: ['name', 'value'],
+    	            data: data
+    	        },
+    	        width: 400
+    		}
     	})
         me.callParent(arguments);
     }
