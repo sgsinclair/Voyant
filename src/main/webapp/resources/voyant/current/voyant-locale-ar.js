@@ -101,6 +101,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentTitle":"عنوان",
 "helpTip":"<p>Documents is a table view of the documents in the corpus. Features include:</p><ul><li>reordering by <i>Title</i>, <i>Words</i> count (tokens), word forms count (<i>Types</i>), and <i>Ratio</i> (Types/Tokens Ratio) (click on the column headers)</li><li>a search box for queries (by default in the full-text, title and author fields —&nbsp;hover over the magnifying icon for help with the syntax)</li></ul>",
 "add":"إضافة",
+"downloadButton":"تحميل",
 "newCorpus":"مكنزجديد",
 "allSelectedError":"You have selected all documents, you must select a subset of documents to remove or keep.",
 "reorderTip":"إضغط هنا لإنشاء مكنز جديد بناء على أعادة التنظيم للمستندات (بواسطة سحب والقاء السطور لاعادة التنظيم)",
@@ -683,3 +684,20 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>طريقة البحث عن المستندات (مفتاح الدخول يبدأ البحث) :</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b> تطابق حرفي للكلمة  <i>معطف </i></li><li><b>معطف *</b>: تطابق الكلمات التي تبدأ ب <i>معطف </i></li><li><b>معطف ,جاكيت</b> طابق الكلمات المحددة بفاصلة ككلمات منفصلة</li><li><b>\" معطف شتوي\"</b>: <i>معطف شتوي</i> كعبارة </li><li><b>\"معطف,قفاز\"~5</b>:<i>معطف</i> بالقرب من <i>قفاز </i>ما بين خمسة كلمات</li><li><b>+معطف+شتوي</li></ul>طابق كل كلمة مسبوقة ب (+) +معطف+ قفاز*</b>: جمع طرق البحث</li></ul>",
 "querySearch":"بحث",
 "aggregateInDocumentsCount":"عدد المستندات التي تعادل معاير البحث (كل مستند ظاهر يحتوي على الاقل كلمة بحث واحدة)"});
+Ext.apply(Voyant.util.Localization.i18n, {
+"de":"الماني",
+"thisLanguage":"عربي",
+"autoRecommended":" كشف تلقائي (يوصى به)",
+"en":"انكليزي",
+"hr":"Croatian",
+"it":"ايطالي",
+"languageTitle":"Language Interface Options",
+"fr":"فرنسي",
+"ar":"عربي",
+"bs":"Bosnian",
+"chooseLanguage":"Interface Language",
+"cz":"تشيكي",
+"ja":"ياباني",
+"he":"Hebrew",
+"ro":"روماني",
+"sr":"Serbian"});

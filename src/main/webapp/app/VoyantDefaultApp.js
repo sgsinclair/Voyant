@@ -101,7 +101,6 @@ Ext.define('Voyant.VoyantDefaultApp', {
 				}]
 		    }]
 		});
-		console.warn(this.viewport.rtl);
 		this.callParent(arguments);
 	}
 });

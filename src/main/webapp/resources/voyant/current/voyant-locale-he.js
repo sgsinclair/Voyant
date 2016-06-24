@@ -101,6 +101,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentTitle":"Title",
 "helpTip":"<p>Documents is a table view of the documents in the corpus. Features include:</p><ul><li>reordering by <i>Title</i>, <i>Words</i> count (tokens), word forms count (<i>Types</i>), and <i>Ratio</i> (Types/Tokens Ratio) (click on the column headers)</li><li>a search box for queries (by default in the full-text, title and author fields —&nbsp;hover over the magnifying icon for help with the syntax)</li></ul>",
 "add":"Add",
+"downloadButton":"הורדה",
 "newCorpus":"New Corpus",
 "allSelectedError":"You have selected all documents, you must select a subset of documents to remove or keep.",
 "reorderTip":"Click here to create a new corpus based on a reordering of documents (drag and drop rows to reorder).",
@@ -683,3 +684,20 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as a phrase</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+\"winter coat\" +mitten*</b>: combine syntaxes</li></ul>",
 "querySearch":"חיפוש",
 "aggregateInDocumentsCount":"This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms)."});
+Ext.apply(Voyant.util.Localization.i18n, {
+"de":"גרמנית",
+"thisLanguage":"Hebrew",
+"autoRecommended":"Auto-Detect (recommended)",
+"en":"אנגלית",
+"hr":"Croatian",
+"it":"איטלקית",
+"languageTitle":"Language Interface Options",
+"fr":"צרפתית",
+"ar":"ערבית",
+"bs":"Bosnian",
+"chooseLanguage":"Interface Language",
+"cz":"צ'כית",
+"ja":"יפנית",
+"he":"Hebrew",
+"ro":"רומנית",
+"sr":"Serbian"});

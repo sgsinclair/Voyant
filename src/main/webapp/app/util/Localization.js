@@ -1,7 +1,10 @@
 Ext.define('Voyant.util.Localization', {
 	statics: {
 		DEFAULT_LANGUAGE: 'en',
-		LANGUAGE: 'en'
+		LANGUAGE: 'en',
+		i18n: {
+		}
+		
 	},
 	
     languageStore: Ext.create('Ext.data.ArrayStore', {
@@ -63,6 +66,112 @@ Ext.define('Voyant.util.Localization', {
 			return config && config['default']!=undefined ? config['default'] : '['+key+']'; // no language key found, so just return the key
 		}
 		return false
+	},
+	
+	getLanguageToolMenu: function() {
+		var me = this;
+		return {
+			type: 'language',
+			tooltip: this.localize("languageTitle"),
+			xtype: 'toolmenu',
+	        glyph: 'xf1ab@FontAwesome',
+			handler: me.showLanguageOptions,
+			scope: me
+		} 
+	},
+
+	
+	showLanguageOptions: function() {
+		var me = this;
+		var langs = ["ar","bs","cz","en","fr","he","hr","it","ja","sr"].map(function(lang) {
+			return {text: this.localize(lang), value: lang}
+		}, this);
+		langs.sort(function(a,b) {
+			return a.text.localeCompare(b.text);
+		});
+		langs.splice(0,0,{text: this.localize('autoRecommended'), value: ''})
+		
+		new Ext.window.Window({
+			title: this.localize("languageTitle"),
+			modal: true,
+			items: {
+				xtype: 'form',
+				items: [{
+					xtype: 'combo',
+					name: 'lang',
+					value: this.getApiParam("lang") || "",
+	    	        queryMode: 'local',
+	    	        editable: false,
+	    	        fieldLabel: this.localize('chooseLanguage'),
+	    	        width: 450,
+	    	        labelAlign: 'right',
+	    	        labelWidth: 150,
+	    	        displayField: 'text',
+	    	        valueField: 'value',
+					store: {
+						fields: ['text', 'value'],
+						data: langs
+					}
+				}/*,{
+					xtype: 'combo',
+					name: 'rtl',
+					value: '',
+	    	        queryMode: 'local',
+	    	        editable: false,
+	    	        fieldLabel: this.localize('rtlLabel'),
+	    	        labelAlign: 'right',
+	    	        displayField: 'text',
+	    	        valueField: 'value',
+					store: {
+						fields: ['text', 'value'],
+						data: [{
+							text: this.localize('auto'),
+							value: ''
+						},{
+							text: this.localize('yes'),
+							value: 'true'
+						},{
+							text: this.localize('no'),
+							value: 'false'
+						}]
+					}
+				}*/],
+				buttons: [{
+	            	text: this.localize("cancelTitle"),
+		            ui: 'default-toolbar',
+	                glyph: 'xf00d@FontAwesome',
+	        		flex: 1,
+	        		handler: function(btn) {
+	        			btn.up('window').close();
+	        		}
+				},{
+	            	text: this.localize("confirmTitle"),
+					glyph: 'xf00c@FontAwesome',
+	            	flex: 1,
+	        		handler: function(btn) {
+	        			var form = btn.up('form');
+	        			if (form.isDirty()) {
+	        				var app = me.getApplication();
+	        				var params = app.getModifiedApiParams();
+	        				if (app.getCorpus()) {
+	        					params.corpus = app.getCorpus().getAliasOrId();
+	        				} else {
+	        					delete params.panels; // we probably don't need this
+	        				}
+	        				delete params.lang;
+//	        				delete params.rtl;
+	        				var values = form.getValues();
+	        				if (values.lang) {params.lang = values.lang;}
+//	        				if (values.rtl) {params.rtl = values.lang;}
+	        				location.assign("./?"+Ext.Object.toQueryString(params))
+	        			}
+	        			btn.up('window').close();
+	        		},
+	        		scope: me
+	            }]
+			},
+			bodyPadding: 5
+		}).show()
 	}
 	
 });

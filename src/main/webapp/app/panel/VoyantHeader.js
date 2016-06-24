@@ -32,6 +32,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
 				save: true,
 				plus: true,
 				help: true,
+				language: this.getLanguageToolMenu(),
 				home: {
 					type: 'home',
 					tooltip: this.localize("homeTip"),

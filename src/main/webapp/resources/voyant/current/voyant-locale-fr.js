@@ -101,6 +101,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentTitle":"Titre",
 "helpTip":"<p>L’outil <i>Documents</i> montre sous la forme d’un tableau les documents qui composent le corpus. À noter&nbsp;:</p><ul><li>il est possible de réarranger le tableau en prenant pour critère de tri le <i>titre</i>, le nombre de <i>mots</i> (tokens), le nombre de formes verbales (<i>types</i>) et le <i>rapport</i> des mots et des formes verbales (types/tokens ratio) (cliquez sur les en-têtes des colonnes)</li><li>une case de recherche est disponible (par défaut dans les champs « texte entier », « titre » et « auteur » –&nbsp;l’aide de la syntaxe des requêtes apparaît au survol de l’icône représentant une loupe)</li></ul>",
 "add":"Ajouter",
+"downloadButton":"Télécharger",
 "newCorpus":"Nouveau corpus",
 "allSelectedError":"Vous avez sélectionné tous les documents&nbsp;: vous devez sélectionner un sous-ensemble de documents à supprimer ou à conserver.",
 "reorderTip":"Créer un nouveau corpus en réarrangeant les documents (glissez et déposez les lignes pour les réarranger)",
@@ -683,3 +684,20 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>Recherche syntaxique de documents (appuyer sur la touche Entrée/Retour pour lancer une recherche)&nbsp;:</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>&nbsp;: trouver le terme exact <i>coat</i></li><li><b>coat*</b>&nbsp;: trouver les termes qui commencent par le terme exact <i>coat</i></li><li><b>coat,jacket</b>&nbsp;: trouver tous les mots délimités par des virgules, comme des termes séparés</li><li><b>\"winter coat\"</b>&nbsp;: trouver le syntagme exact <i>winter coat</i></li><li><b>\"coat mittens\"~5</b>&nbsp;: trouver le terme exact <i>coat</i> à proximité du terme exact <i>mittens</i> (dans une chaîne de 5 mots)</li><li><b>+winter +coat</b>&nbsp;: trouver tous les termes précédés d’un signe \"plus\" (+)</li><li><b>+\"winter coat\" +mitten*</b>&nbsp;: combiner les syntaxes</li></ul>",
 "querySearch":"Recherche",
 "aggregateInDocumentsCount":"Nombre de documents qui correspondent aux critères de la recherche (chaque document pris en compte contient au moins l’un des termes de la requête)."});
+Ext.apply(Voyant.util.Localization.i18n, {
+"de":"Allemand",
+"thisLanguage":"français",
+"autoRecommended":"Détection automatique (recommandée)",
+"en":"Anglais",
+"hr":"Croate",
+"it":"Italien",
+"languageTitle":"Paramètres de langue de l'interface",
+"fr":"Français",
+"ar":"Arabe",
+"bs":"Bosnien",
+"chooseLanguage":"Langue de l'interface",
+"cz":"Tchèque",
+"ja":"Japonais",
+"he":"Hébreu",
+"ro":"Roumain",
+"sr":"Serbe"});
