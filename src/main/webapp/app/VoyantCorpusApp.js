@@ -200,7 +200,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
     		this.on("unhandledEvent", function(src, eventName, data) {
-				var url = this.getBaseUrl() + '?corpus='+corpus.getId();
+				var url = this.getBaseUrl() + '?corpus='+corpus.getAliasOrId();
 				var api = this.getModifiedApiParams() || {}; // use application, not tool
 				delete api.view; // make sure we show default view
 				if (eventName=='termsClicked') {
