@@ -27,14 +27,28 @@ We appreciate you citing Voyant Tools, it helps to demonstrate the value of the 
 
 Sinclair, St&eacute;fan and Geoffrey Rockwell, 2016. _Voyant Tools_. Web. <http://voyant-tools.org/>.
 
-### Contributors
+## Contributors
 
 * Andrew MacDonald (2008-present) a programmer who's worked on several tools including Bubblelines, Cirrus, Knots, ScatterPlot and skins including Dynamic Table of Contents
 * Cyril Briquet (2010-2011) a postdoctoral fellow who worked primarily on improving Trombone 2 (the back-end system in Java)
 * Lisa Goddard (2011-2012) a research assistant at UAlberta working on tool reviews and bug identification
 * Mark Turcato (2012-2013) a research assistant at McGill working on documentation
 
-### Software Libraries
+## Translations
+
+In addition to the [English](../?lang=en) interface, the following translations are available (in various stages of completion):
+
+* [Arabic](../?lang=ar): D. J. Wrisley
+* [Bosnian](../?lang=bs): Téa Rokolj
+* [Czech](../?lang=cz): Radim Hladík
+* [Croatian](../?lang=hr): Téa Rokolj
+* [French](../?lang=fr): Aurélien Berra
+* [Hebrew](../?lang=he): Sinai Rusinek
+* [Italian](../?lang=it): Fabio Ciotti and the AIUCD team: Alessandra Baldelli, Cristiana Bettella, Eleonora Durban, Federico Caria, Federico Meschini, Greta Franzini, Giorgio Guzzetta, Roberto Rosselli del Turco, Elena Spadini, Tiziana Mancinelli
+* [Japanese](../?lang=ja): 小風尚樹 (Naoki Kokaze), 佐藤正尚 (Masanao Sato), 杉浦清人 (Kiyoto Sugiura), 鈴木親彦 (Chikahiko Suzuki), 王一凡 (Yifan Wang), and 永崎研宣 (Kiyonori Nagasaki)
+* [Serbian](../?lang=sr): Téa Rokolj
+
+## Software Libraries
 
 Voyant Tools is made possible by several open source libraries (many of these libraries use additional libraries not listed here):
 

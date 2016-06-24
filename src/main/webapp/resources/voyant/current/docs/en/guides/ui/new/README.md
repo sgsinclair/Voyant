@@ -1,5 +1,16 @@
 # What's New
 
+## Voyant 2.1
+
+This provides hundreds of bug fixes and refinements, most notably:
+
+* [multiple interface languages](#!/guide/languages)
+* additional tools including [Bubbles](#!/guide/bubbles), [MicroSearch](#!/guide/microsearch), [TextualArc](#!/guide/textualarc)
+* improvements for larger corpora
+* improved compatibility of the standalone [VoyantServer](https://github.com/sgsinclair/VoyantServer) in various environments
+
+## Voyant 2.0
+
 Voyant 2.0 is a complete rewrite of both the user interface and the server-end components. The following is an overview of some of the more significant changes:
 
 * a cleaner, crisper appearance

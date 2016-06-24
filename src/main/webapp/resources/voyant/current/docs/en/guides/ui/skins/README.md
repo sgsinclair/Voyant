@@ -24,6 +24,8 @@ Beyond the tools visible in the tabs, it's possible to access most of the other 
 
 For more information about the available tools, consult the [List of Tools](#!/guide/toolslist)
 
-* [stopwords](#!/guide/stopwords)
+## Next Steps
+
+* [languages](#!/guide/languages)
 * [explore the tools](#!/guide/tools)
 * read [about Voyant Tools](#!/guide/about)

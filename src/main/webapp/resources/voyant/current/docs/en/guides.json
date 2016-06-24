@@ -32,6 +32,11 @@
                         "title": "Skins"
                     },
                     {
+                        "name": "languages",
+                        "url": "guides/ui/languages",
+                        "title": "Languages"
+                    },
+                    {
                         "name": "stopwords",
                         "url": "guides/ui/stopwords",
                         "title": "Stopwords"
