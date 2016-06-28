@@ -127,8 +127,9 @@ body {
     width: 0px;
 }
 
-.dtc-tree .x-grid-tree-node-expanded .x-tree-icon-parent {
+.dtc-tree .x-tree-icon-parent-expanded {
 	background-image: none !important;
+	width: 0px;
 }
 
 .dtc-tree.x-tree-arrows .x-tree-expander {
