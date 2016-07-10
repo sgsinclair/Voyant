@@ -24,6 +24,10 @@ There are many ways of contributing to the development of Voyant Tools:
 * if you find a bug, identify an issue or have requests, submit a [GitHub ticket](https://github.com/sgsinclair/Voyant/issues) (or [tweet](http://twitter.com/VoyantTools))
 * if you're a developer, see instructions for setting up a development environment and consider submitting a patch or pull request
 
+# License
+
+Voyant Tools is an open-source project and the code is available through [GitHub](http://github.com/sgsinclair/Voyant). The code is under a [GPL3 license](http://www.gnu.org/licenses/gpl-3.0.en.html) and the content of the web application is under a [Creative Commons By Attribution license](https://creativecommons.org/licenses/by/4.0/).
+
 # Voyant Tools 2.0
 The currently available version of [Voyant Tools](http://voyant-tools.org/) is 1.0 but version 2.0 is in active development and is expected to replace 1.0 in the first half of 2015. Voyant Tools 2.0 is a complete rewrite that is focused on better performance and scalability, as well as improved functionality (such as more powerful search).
 
