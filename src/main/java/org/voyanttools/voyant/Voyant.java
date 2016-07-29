@@ -57,6 +57,20 @@ public class Voyant {
 		
 	}
 	
+	public static String getBaseUrlString(HttpServletRequest request) {
+		StringBuilder sb = new StringBuilder("//").append(request.getServerName());
+		int serverPort = request.getServerPort();
+		if (serverPort!=80 && serverPort!=443) {
+			sb.append(":").append(serverPort);
+		}
+		String contextPath = request.getContextPath();
+		if (contextPath.isEmpty()==false) {
+			sb.append(contextPath);
+		}
+		sb.append("/");
+		return sb.toString();
+	}
+	
 		
 
 	/**

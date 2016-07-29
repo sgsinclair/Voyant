@@ -13,7 +13,7 @@
         extend : 'Voyant.VoyantCorpusApp',
         name: 'VoyantSkinBuilderApp',
         config: {
-            baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/',
+			baseUrl: '<%= org.voyanttools.voyant.Voyant.getBaseUrlString(request) %>',
             version: '<%= application.getInitParameter("version") %>',
             build: '<%= application.getInitParameter("build") %>'
         },

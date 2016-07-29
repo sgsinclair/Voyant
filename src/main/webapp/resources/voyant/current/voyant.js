@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Jun 24 11:11:14 EDT 2016 */
+/* This file created by JSCacher. Last modified: Fri Jul 29 13:28:50 PDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -16855,7 +16855,8 @@ Ext.define('Voyant.panel.StreamGraph', {
 
 
 /**
- * A Summary of a corpus.
+ * The Summary panel provides an overview of a corpus, and the content will
+ * depend on whether the corpus includes one document or many.
  */
 Ext.define('Voyant.panel.Summary', {
 	extend: 'Ext.panel.Panel',
@@ -16865,10 +16866,31 @@ Ext.define('Voyant.panel.Summary', {
     	i18n: {
     	},
     	api: {
+    		
+    		/**
+    		 * @cfg {String} stopList A list of words to exclude.
+    		 * 
+    		 * Stopword lists can take one of several forms and they can be combined with commas:
+    		 * 
+    		 * * *auto*: automatically detect the language (this is recommended and the default so it doesn't need to be specified)
+    		 * * specially named stopword lists including stop.ar.arabic-lucene.txt, stop.bg.bulgarian-lucene.txt, stop.br.breton-lucene.txt, stop.ca.catalan-lucene.txt, stop.ckb.kurdish-lucene.txt, stop.cn.chinese-lawrence.txt, stop.cz.czech-lucene.txt, stop.de.citelab.txt, stop.de.german.txt, stop.el.greek-lucene.txt, stop.en.glasgow.txt, stop.en.smart.txt, stop.en.taporware.txt, stop.es.spanish.txt, stop.eu.basque-luence.txt, stop.fa.farsi-lucene.txt, stop.fr.steffens.txt, stop.fr.veronis.txt, stop.ga.ga-irish.txt, stop.gl.galician-lucene.txt, stop.hi.hindi-lucene.txt, stop.hu.hungarian.txt, stop.hy.armenian-lucene.txt, stop.id.indonesian-lucene.txt, stop.it.italian.txt, stop.ja.japanese.txt, stop.lt.lithuanian-lucene.txt, stop.lv.latvian-lucene.txt, stop.mu.multi.txt, stop.nl.dutch.txt, stop.no.norwegian.txt, stop.ro.romanian-lucene.txt, stop.se.swedish-long.txt, stop.se.swedish-short.txt, stop.th.thai-lucene.txt, stop.tr.turkish-lucene.txt
+    		 * * individual words to be excluded
+    		 * * URLs that point to plain text UTF-8 files with one stopword per line (lines with leading hash symbols (#) are skipped)
+    		 */
     		stopList: 'auto',
+    		
+    		
     		start: 0,
+    		
+    		
+    		/**
+    		 * @cfg {Number} limit The number of items to include in most lists (document length, vocabulary density, most frequent terms).
+    		 */
     		limit: 5,
-    		// The maximum number of documents to show distinctive words for.
+    		
+    		/**
+    		 * @cfg {Number} numberOfDocumentsForDistinctiveWords The number of items to include in the list of distinctive words (similar to the limit parameter but specific to distinctive words).
+    		 */
     		numberOfDocumentsForDistinctiveWords: 10
     	},
 		glyph: 'xf1ea@FontAwesome'
@@ -22375,7 +22397,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
     		this.on("unhandledEvent", function(src, eventName, data) {
-				var url = this.getBaseUrl() + '?corpus='+corpus.getId();
+				var url = this.getBaseUrl() + '?corpus='+corpus.getAliasOrId();
 				var api = this.getModifiedApiParams() || {}; // use application, not tool
 				delete api.view; // make sure we show default view
 				if (eventName=='termsClicked') {

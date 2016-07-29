@@ -25,7 +25,7 @@ String corpus = parts[1];
 		requires: ['Voyant.panel.VoyantHeader','Voyant.panel.Catalogue','Voyant.panel.VoyantFooter'],
 		name : 'VoyantToolApp',
 		config: {
-			baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/',
+			baseUrl: '<%= org.voyanttools.voyant.Voyant.getBaseUrlString(request) %>',
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>',
 			corpusId: '<%= corpus %>'

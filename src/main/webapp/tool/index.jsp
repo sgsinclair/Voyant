@@ -63,7 +63,7 @@ if (isNotRealTool || (new java.io.File(new java.io.File(request.getServletContex
 //		requires: ['Voyant.panel.VoyantHeader','Voyant.panel.<%= tool %>','Voyant.panel.VoyantFooter'],
 		name : 'VoyantToolApp',
 		config: {
-			baseUrl: '<%= new java.net.URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()) %>/',
+			baseUrl: '<%= org.voyanttools.voyant.Voyant.getBaseUrlString(request) %>',
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>',
 			tool: '<%= tool.toLowerCase() %>'

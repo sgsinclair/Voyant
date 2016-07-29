@@ -7,12 +7,12 @@
 
 	<context-param>
 		<param-name>version</param-name>
-		<param-value>2.1</param-value>
+		<param-value>2.2</param-value>
 	</context-param>
 	
 	<context-param>
 		<param-name>build</param-name>
-		<param-value>M5</param-value>
+		<param-value>M1</param-value>
 	</context-param>
 	
 	<servlet>
