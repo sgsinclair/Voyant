@@ -20,17 +20,17 @@
 		}
 	} else {
 		java.util.Enumeration locales = request.getLocales();
-	 while (locales.hasMoreElements()) {
+		boolean hasLang = false;
+	 while (locales.hasMoreElements() && hasLang==false) {
 	     java.util.Locale locale = (java.util.Locale) locales.nextElement();
-	     boolean hasLang = false;
 	     for (String l : langs) {
 	     	if (locale.getLanguage().equals(new java.util.Locale(l).getLanguage())) {
-	     		hasLang = true;
 	     		lang = l;
+	     		hasLang = true;
 	     		break;
 	     	}
-	     	if (hasLang) {break;}
 	     }
+     	 if (hasLang) {break;}
 	 }
 	}
 	
