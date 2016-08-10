@@ -46,7 +46,8 @@ Ext.onReady(function(){
 		config: {
 			baseUrl: '<%= org.voyanttools.voyant.Voyant.getBaseUrlString(request) %>',
 			version: '<%= application.getInitParameter("version") %>',
-			build: '<%= application.getInitParameter("build") %>'			
+			build: '<%= application.getInitParameter("build") %>',
+			openMenu: '<%= System.getProperty("org.voyanttools.voyant.openmenu")==null ? "" : System.getProperty("org.voyanttools.voyant.openmenu") %>'
 		},
 		launch: function() {
 		   	var me = this;

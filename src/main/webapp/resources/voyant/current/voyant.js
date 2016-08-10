@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Jul 29 13:28:50 PDT 2016 */
+/* This file created by JSCacher. Last modified: Wed Aug 10 10:29:48 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7262,10 +7262,13 @@ Ext.define('Voyant.data.model.Corpus', {
 });
 Ext.define('Voyant.widget.CorpusSelector', {
     extend: 'Ext.form.field.ComboBox',
-    mixins: ['Voyant.util.Localization'],
+    mixins: ['Voyant.util.Localization', 'Voyant.util.Api'],
     alias: 'widget.corpusselector',
     statics: {
     	i18n: {
+    	},
+    	api: {
+    		openMenu: undefined
     	}
     },
     
@@ -7279,10 +7282,30 @@ Ext.define('Voyant.widget.CorpusSelector', {
     },
     initComponent: function(config) {
     	var me = this;
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
     	Ext.applyIf(this, {
     		fieldLabel: this.localize('chooseCorpus')
-    	})
+    	});
+    	
+    	// check API and server option for open menu values
+    	if (this.getApiParam("openMenu")) {
+			this.replaceStoreItemsFromDefinition(this.getApiParam("openMenu"));
+		} else if (Voyant.application && Voyant.application.getOpenMenu && Voyant.application.getOpenMenu()) {
+			this.replaceStoreItemsFromDefinition(Voyant.application.getOpenMenu());
+    	}
+
         me.callParent(arguments);
+    },
+    
+    replaceStoreItemsFromDefinition: function(definition) {
+    	var data = [], items = definition.split(";");
+    	for (var i=0; i<items.length; i++) {
+    		var nameValue = items[i].split(":");
+    		if (nameValue[0]) {
+        		data.push([nameValue[0],nameValue[1] ? nameValue[1] : nameValue[0]]);
+    		}
+    	}
+    	this.setStore(data);
     }
 })
 Ext.define('Voyant.widget.ListEditor', {
