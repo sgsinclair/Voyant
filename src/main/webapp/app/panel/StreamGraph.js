@@ -285,7 +285,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     	var max = d3.max(processedLayers, function(layer) {
     		return d3.max(layer.values, function(d) { return d.y0 + d.y; });
     	});
-    	var height = this.body.down('svg').getHeight() - this.graphMargin.top - this.graphMargin.bottom;
+
+    	var height = this.body.down('svg').dom.clientHeight - this.graphMargin.top - this.graphMargin.bottom;
     	var y = d3.scale.linear().domain([0, max]).range([height, 0]);
     	
     	var area = d3.svg.area()
