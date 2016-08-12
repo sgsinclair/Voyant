@@ -15,6 +15,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		terms: undefined,
     		docId: undefined,
     		docIndex: undefined,
+    		
 
     		fontFamily: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
     		cirrusForceFlash: false,
@@ -107,9 +108,27 @@ Ext.define('Voyant.panel.Cirrus', {
     	});
 
     	this.callParent(arguments);
+    	
+    	
     },
     
     listeners: {
+    	afterrender: function() {
+    		var dataString = this.getApiParam('inlineData');
+        	if (dataString !== undefined) {
+        		var jsonData = Ext.decode(dataString, true);
+        		if (jsonData !== null) {        			
+        			this.setApiParam('inlineData', jsonData);
+
+        			var corpus;
+        			new Corpus().then(function(data) {
+        				corpus = data;
+        				var app = this.getApplication();
+        				app.dispatchEvent('loadedCorpus', app, corpus);
+        			}, null, null, this);
+        		}
+        	}
+    	},
     	resize: function(panel, width, height) {
     		if (this.getVisLayout() && this.getCorpus()) {
     			this.setAdjustedSizes();
@@ -155,10 +174,25 @@ Ext.define('Voyant.panel.Cirrus', {
     	
     },
     
-    loadFromCorpus: function(corpus) {    	
-		this.setCorpus(corpus);
-		this.setApiParams({docId: undefined, docIndex: undefined});
-		this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
+    loadFromCorpus: function(corpus) {
+    	var jsonData = this.getApiParam('inlineData');
+			this.setCorpus(corpus);
+			this.setApiParams({docId: undefined, docIndex: undefined});
+			this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
+    	} else {
+//    		var jsonData = this.getApiParam('inlineData');
+    		if (jsonData !== undefined) {
+    			var records = [];
+    			for (var i = 0; i < jsonData.length; i++) {
+    				var wordData = jsonData[i];
+    				var record = Ext.create('Voyant.data.model.CorpusTerm', wordData);
+    				records.push(record);
+    			}
+    			this.setRecords(records);
+    			this.setMode(this.MODE_CORPUS);
+    			this.loadFromTermsRecords();
+    		}
+    	}
     },
     
     loadFromDocumentTerms: function(documentTerms) {
@@ -227,6 +261,7 @@ Ext.define('Voyant.panel.Cirrus', {
 				'cirrusTool.cirrusPNGHandler(base64String);'+
 				'}'+
 				'</script>';
+    			
     			this.update(swfscript+cirrusLinks, true, function() {
     				function loadFlash(component) {
     					if (typeof swfobject !== 'undefined') {
@@ -330,7 +365,7 @@ Ext.define('Voyant.panel.Cirrus', {
 	    		// set the relative sizes for each word (0.0 to 1.0), then adjust based on available area
 	    		this.setRelativeSizes();
 	    		this.setAdjustedSizes();
-	    		
+
 	//    		var fontSizer = d3.scale.pow().range([10, 100]).domain([minSize, maxSize]);
 	    		
 	    		this.getVisLayout().words(terms).start();
@@ -404,6 +439,7 @@ Ext.define('Voyant.panel.Cirrus', {
 	            var wordArea = this.calculateWordArea(word);
 	            totalWordsSize += wordArea;
 	        }
+
 	        this.setSizeAdjustment(stageArea / totalWordsSize);
         }
     },
