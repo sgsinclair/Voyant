@@ -16,6 +16,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		docId: undefined,
     		docIndex: undefined,
     		
+    		inlineData: undefined, // format should match CorpusTerm model, only term and rawFreq required
 
     		fontFamily: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
     		cirrusForceFlash: false,
@@ -176,6 +177,7 @@ Ext.define('Voyant.panel.Cirrus', {
     
     loadFromCorpus: function(corpus) {
     	var jsonData = this.getApiParam('inlineData');
+    	if (jsonData === undefined) {
 			this.setCorpus(corpus);
 			this.setApiParams({docId: undefined, docIndex: undefined});
 			this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
