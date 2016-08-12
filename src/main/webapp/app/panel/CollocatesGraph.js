@@ -145,6 +145,18 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				}
 			},{
 				xtype: 'button',
+				text: 'Fetch Collocates',
+				style: 'margin: 5px;',
+				handler: function(b, e) {
+					var n = this.getNetwork().getSelectedNodes();
+		    		if (n[0] != null) {
+		    			var data = this.getNodeDataSet().get(n[0]);
+		    			this.itemdblclick(data);
+		    		}
+				},
+				scope: this
+			},{
+				xtype: 'button',
 				text: 'Remove',
 				style: 'margin: 5px;',
 				handler: function(b, e) {
