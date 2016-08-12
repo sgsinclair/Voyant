@@ -65,6 +65,25 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			}
 		}
 	},
+	physicsOptions: {
+		defaultPhysics: {
+			barnesHut: {
+				"gravitationalConstant": -1500,
+				"centralGravity": 6,
+				"damping": 0.5,
+				"avoidOverlap": 0.5
+			}
+		},
+		centralizedPhysics: {
+			barnesHut: {
+				"gravitationalConstant": -1500,
+				"centralGravity": 1,
+				"damping": 0.5,
+				"avoidOverlap": 0.5
+			}
+		}
+	},
+	
 	keywordColor: 'green',
 	contextColor: 'maroon',
     
@@ -93,10 +112,16 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 	handler: function() {
                 		this.getNodeDataSet().clear();
                 		this.getEdgeDataSet().clear();
+                		
+                		this.queryById('contextSlider').enable();
+                		this.getNetwork().setOptions({
+                			physics: this.physicsOptions.defaultPhysics
+                		});
                 	},
                 	scope: me
                 },this.localize('context'),{
                 	xtype: 'slider',
+                	itemId: 'contextSlider',
                 	minValue: 3,
                 	value: 5,
                 	maxValue: 30,
@@ -152,6 +177,34 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		    		if (n[0] != null) {
 		    			var data = this.getNodeDataSet().get(n[0]);
 		    			this.itemdblclick(data);
+		    		}
+				},
+				scope: this
+			},{
+				xtype: 'button',
+				text: 'Centralize',
+				style: 'margin: 5px;',
+				handler: function(b, e) {
+					var n = this.getNetwork().getSelectedNodes();
+		    		if (n[0] != null) {
+		    			this.queryById('contextSlider').disable();
+		    			
+		    			var data = this.getNodeDataSet().get(n[0]);
+		    			data.fixed = true;
+		    			this.getNodeDataSet().clear();
+                		this.getEdgeDataSet().clear();
+                		this.getNodeDataSet().add(data);
+                		
+                		this.getNetwork().setOptions({
+                			physics: this.physicsOptions.centralizedPhysics
+                		});
+                		
+                		var limit = this.getApiParam('limit');
+                		this.setApiParam('limit', 100);
+                		this.itemdblclick(data);
+                		this.setApiParam('limit', limit);
+                		
+                		this.getContextMenu().hide();
 		    		}
 				},
 				scope: this
@@ -353,14 +406,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			hoverConnectedEdges: true,
 	    			multiselect: false
 	    		},
-	    		physics: {
-					barnesHut: {
-						"gravitationalConstant": -1500,
-						"centralGravity": 6,
-						"damping": 0.5,
-						"avoidOverlap": 0.5
-					}
-	    		},
+	    		physics: this.physicsOptions.defaultPhysics,
 	    		nodes: this.nodeOptions,
 	    		edges: this.edgeOptions
 	    	};
