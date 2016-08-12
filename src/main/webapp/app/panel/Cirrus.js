@@ -200,7 +200,7 @@ Ext.define('Voyant.panel.Cirrus', {
     initVisLayout: function(forceLayout) {
     	if (forceLayout || this.getVisLayout() == undefined) {
     		var cirrusForceFlash = this.getApiParam('cirrusForceFlash');
-    		if (cirrusForceFlash == 'true') {
+    		if (cirrusForceFlash == 'true' || cirrusForceFlash === true) {
     			this.setApiParam('cirrusForceFlash', true);
     			var id = this.id.replace(/-/g,'_')+'_cirrus';
     			var appVars = {
@@ -256,7 +256,7 @@ Ext.define('Voyant.panel.Cirrus', {
     						setTimeout(loadFlash, 50, component);
     					}
         			}
-    				loadFlash(this.component);
+    				loadFlash(this);
     				
     			}, this);
     		} else {
