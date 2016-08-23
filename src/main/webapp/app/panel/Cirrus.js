@@ -57,14 +57,16 @@ Ext.define('Voyant.panel.Cirrus', {
     	corpus: undefined,
     	records: undefined,
     	terms: undefined,
+    	cirrusId: undefined,
     	visLayout: undefined, // cloud layout algorithm
     	vis: undefined, // actual vis
+    	tip: undefined,
     	sizeAdjustment: 100, // amount to multiply a word's relative size by
     	minFontSize: 12,
     	largestWordSize: 0,
     	smallestWordSize: 1000000
     },
-
+    
     MODE_CORPUS: 'corpus',
     MODE_DOCUMENT: 'mode_document',
     
@@ -73,6 +75,8 @@ Ext.define('Voyant.panel.Cirrus', {
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
+    	this.setCirrusId(Ext.id(null, 'cirrus_'));
     },
     
     initComponent: function (config) {
@@ -239,7 +243,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		var cirrusForceFlash = this.getApiParam('cirrusForceFlash');
     		if (cirrusForceFlash == 'true' || cirrusForceFlash === true) {
     			this.setApiParam('cirrusForceFlash', true);
-    			var id = this.id.replace(/-/g,'_')+'_cirrus';
+    			var id = this.getCirrusId();
     			var appVars = {
     				id: id
     			};
@@ -319,21 +323,12 @@ Ext.define('Voyant.panel.Cirrus', {
 						.on('end', this.draw.bind(this))
 				);
 				
-				var svg = d3.select(el.dom).append('svg').attr('id','cirrusGraph').attr('width', width).attr('height', height);
+				var svg = d3.select(el.dom).append('svg').attr('id',this.getCirrusId()).attr('class', 'cirrusGraph').attr('width', width).attr('height', height);
 				this.setVis(svg.append('g').attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')'));
 				
-				var tip = Ext.create('Ext.tip.ToolTip', {
-					target: svg.node(),
-					delegate: 'text',
-					trackMouse: true,
-					listeners: {
-						beforeshow: function(tip) {
-							var el = tip.triggerElement;
-							var freq = el.getAttribute('data-freq');
-							tip.update(freq);
-						}
-					}
-				});
+				if (this.getTip() === undefined) {
+					this.setTip(Ext.create('Ext.tip.Tip', {}));
+				}
     		}
     	}
     },
@@ -415,7 +410,21 @@ Ext.define('Voyant.panel.Cirrus', {
 			.style('font-family', function(d) { return d.font; })
 			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
 			.text(function(d) { return d.text; })
-			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);});
+			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);})
+			.on('mouseover', function(obj) {
+				this.getTip().show();
+			}.bind(this))
+			.on('mousemove', function(obj) {
+				var tip = this.getTip();
+				tip.update(obj.text+': '+obj.rawFreq);
+				var container = Ext.get(this.getCirrusId()).dom;
+				var coords = d3.mouse(container);
+				coords[1] += 30;
+				tip.setPosition(coords);
+			}.bind(this))
+			.on('mouseout', function(obj) {
+				this.getTip().hide();
+			}.bind(this));
 		
 		wordNodes.exit().remove();
 		
