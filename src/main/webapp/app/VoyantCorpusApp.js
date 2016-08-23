@@ -52,7 +52,11 @@ Ext.define('Voyant.VoyantCorpusApp', {
         	if (!queryParams.corpus && this.getCorpusId && this.getCorpusId()) {
         		queryParams.corpus = this.getCorpusId();
         	}
-        	this.loadCorpusFromParams(queryParams)
+        	this.loadCorpusFromParams(queryParams);
+        	
+        	if (queryParams.palette) {
+        		this.loadColorPaletteForCorpus(queryParams.corpus, queryParams.palette);
+        	}
     	}
     },
     
@@ -196,9 +200,32 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	return params.corpus || params.input || (this.getCorpusId && this.getCorpusId()); // TODO: should this include "archive" from V1?
     },
     
+    loadColorPaletteForCorpus: function(corpusId, paletteId) {
+		Ext.Ajax.request({
+    	    url: this.getTromboneUrl(),
+    	    params: {
+        		tool: 'resource.StoredResource',
+        		retrieveResourceId: paletteId,
+    			corpus: corpusId
+    	    },
+    	    success: function(response, req) {
+    	    	var json = Ext.util.JSON.decode(response.responseText);
+    	    	var value = json.storedResource.resource;
+    	    	var palette = Ext.decode(value);
+    	    	this.addColorPalette(paletteId, palette);
+    	    },
+    	    failure: function(response) {
+    	    	this.setApiParam('palette', undefined);
+    	    },
+    	    scope: this
+    	});
+    },
+    
     listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
+    		this.colorTermAssociations.clear();
+    		
     		this.on("unhandledEvent", function(src, eventName, data) {
 				var url = this.getBaseUrl() + '?corpus='+corpus.getAliasOrId();
 				var api = this.getModifiedApiParams() || {}; // use application, not tool

@@ -35,7 +35,7 @@ Ext.define('Voyant.panel.Knots', {
 		corpus: undefined,
 		docTermStore: undefined,
 		tokensStore: undefined,
-    	options: {xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
     	refreshInterval: 100,
     	startAngle: 315,
     	angleIncrement: 15,

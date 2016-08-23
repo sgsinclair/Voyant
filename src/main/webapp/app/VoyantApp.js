@@ -8,6 +8,9 @@ Ext.define('Voyant.VoyantApp', {
     
     statics: {
     	i18n: {
+    	},
+    	api: {
+    		palette: 'default'
     	}
     },
     
@@ -137,30 +140,62 @@ Ext.define('Voyant.VoyantApp', {
 	},
 	
 	/**
-	 * A universal palette of colors for use with terms and documents.
+	 * Palettes for use with terms and documents.
 	 * @private
 	 */
-	colors: [[0, 0, 255], [51, 197, 51], [255, 0, 255], [121, 51, 255], [28, 255, 255], [255, 174, 0], [30, 177, 255], [182, 242, 58], [255, 0, 164], [51, 102, 153], [34, 111, 52], [155, 20, 104], [109, 43, 157], [128, 130, 33], [111, 76, 10], [119, 115, 165], [61, 177, 169], [202, 135, 115], [194, 169, 204], [181, 212, 228], [182, 197, 174], [255, 197, 197], [228, 200, 124], [197, 179, 159]],
+	palettes: {
+		'default': [[0, 0, 255], [51, 197, 51], [255, 0, 255], [121, 51, 255], [28, 255, 255], [255, 174, 0], [30, 177, 255], [182, 242, 58], [255, 0, 164], [51, 102, 153], [34, 111, 52], [155, 20, 104], [109, 43, 157], [128, 130, 33], [111, 76, 10], [119, 115, 165], [61, 177, 169], [202, 135, 115], [194, 169, 204], [181, 212, 228], [182, 197, 174], [255, 197, 197], [228, 200, 124], [197, 179, 159]]
+	},
 	
 	rgbToHex: function(a) {
 		return "#" + ((1 << 24) + (a[0] << 16) + (a[1] << 8) + a[2]).toString(16).slice(1);
 	},
 	
+	hexToRgb: function(hex) {
+	    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+	    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+	    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+	        return r + r + g + g + b + b;
+	    });
+
+	    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	    return result ? {
+	        r: parseInt(result[1], 16),
+	        g: parseInt(result[2], 16),
+	        b: parseInt(result[3], 16)
+	    } : null;
+	},
+	
+	/**
+	 * Adds a new palette to the list.
+	 * @param key {String} The palette name.
+	 * @param values {Array} The array of colors. Format: [[,g,b],[r,g,b],....]
+	 */
+	addColorPalette: function(key, values) {
+		this.palettes[key] = values;
+	},
+	
 	/**
 	 * Gets the whole color palette.
+	 * @param {String} [key] The key of the palette to return, defaults to the "palette" api param value.
 	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of each color (optional, defaults to rgb values).
 	 * @return {Array} The color palette.
 	 * @private
 	 */
-	getColorPalette: function(returnHex) {
+	getColorPalette: function(key, returnHex) {
+		var paletteKey = key || this.getApiParam('palette') || 'default';
+		var palette = this.palettes[paletteKey];
+		if (palette === undefined) {
+			palette = [];
+		}
 		if (returnHex) {
 			var colors = [];
-			for (var i = 0; i < this.colors.length; i++) {
-				colors.push(this.rgbToHex(this.colors[i]));
+			for (var i = 0; i < palette.length; i++) {
+				colors.push(this.rgbToHex(palette[i]));
 			}
 			return colors;
 		} else {
-			return this.colors;
+			return palette;
 		}
 	},
 	
@@ -172,10 +207,12 @@ Ext.define('Voyant.VoyantApp', {
 	 * @private
 	 */
 	getColor: function(index, returnHex) {
+		var paletteKey = this.getApiParam('palette') || 'default';
+		var palette = this.palettes[paletteKey];
 		if (returnHex) {
-			return this.rgbToHex(this.colors[index]);
+			return this.rgbToHex(palette[index]);
 		} else {
-			return this.colors[index];
+			return palette[index];
 		}
 	},
 	
@@ -198,8 +235,11 @@ Ext.define('Voyant.VoyantApp', {
 		}
 		var color = this.colorTermAssociations.get(term);
 		if (color == null) {
-			var index = this.colorTermAssociations.getCount() % this.colors.length;
-			color = this.colors[index];
+			var paletteKey = this.getApiParam('palette') || 'default';
+			var palette = this.palettes[paletteKey];
+			
+			var index = this.colorTermAssociations.getCount() % palette.length;
+			color = palette[index];
 			this.colorTermAssociations.add(term, color);
 		}
 		if (returnHex) {

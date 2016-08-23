@@ -52,7 +52,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		corpus: undefined,
 		docTermStore: undefined,
 		docStore: undefined,
-    	options: {xtype: 'stoplistoption'}
+    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
 	},
 	
 	selectedDocs: undefined,

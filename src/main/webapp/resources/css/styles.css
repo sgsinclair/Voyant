@@ -266,3 +266,19 @@ svg#collocatesGraph line {
     font-weight: normal;
     text-rendering: optimizeLegibility;
 }
+
+.color {
+	float: left;
+	padding: 10px;
+	margin: 1px;
+	border: 2px solid #ffffff;
+}
+.color.selected {
+	border: 2px solid #000000;
+}
+.sp-container {
+	border-color: #cfcfcf !important;
+}
+.sp-input {
+	background: #ffffff !important;
+}

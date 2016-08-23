@@ -50,7 +50,8 @@ Ext.define('Voyant.panel.Cirrus', {
         	        }
     	        }
     	    },
-    	    {xtype: 'fontfamilyoption'}
+    	    {xtype: 'fontfamilyoption'},
+    	    {xtype: 'colorpaletteoption'}
 
     	],
     	corpus: undefined,

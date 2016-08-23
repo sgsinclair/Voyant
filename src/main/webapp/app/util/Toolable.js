@@ -111,6 +111,22 @@ Ext.define('Voyant.util.Toolable', {
 					            	flex: 1,
 					            	panel: panel,
 					        		handler: function(btn) {
+					        			function doGlobalUpdate(key, value) {
+					        				// set the api value for the app
+					        				if (app.setApiParam) {
+					        					app.setApiParam(key, value);
+					        				}
+					        				
+					        				// tell the panels, including this one
+					        				var panels = app.getViewport().query("panel,chart");
+					        				for (var i=0; i<panels.length; i++) {
+					        					if (panels[i].setApiParam) {
+					        						panels[i].setApiParam(key, value);
+					        					}
+					        				}
+					        				globalUpdate = true;
+					        			}
+					        			
 					        			var values = btn.up('form').getValues();
 					        			
 					        			// set api values (all of them, not just global ones)
@@ -119,40 +135,25 @@ Ext.define('Voyant.util.Toolable', {
 					        			var app = this.getApplication();
 					        			var corpus = app.getCorpus();
 					        			
-					        			// treat stopwords differently since they can be set globally
+					        			var globalUpdate = false;
 					        			if (values['stopList'] != undefined && values['stopListGlobal'] != undefined && values.stopListGlobal) {
-					        				
-					        				// set the api value for the app
-					        				if (app.setApiParams) {
-					        					app.setApiParams({stopList: values.stopList})
-					        				}
-					        				
-					        				// tell the panels, including this one
-					        				var panels = app.getViewport().query("panel,chart");
-					        				for (var i=0; i<panels.length; i++) {
-					        					if (panels[i].setApiParams) {
-					        						panels[i].setApiParams({stopList: values.stopList});
-					        					}
-					        				}
-					        				
+					        				doGlobalUpdate('stopList', values['stopList']);
+					        			}
+					        			if (values['palette'] != undefined) {
+					        				doGlobalUpdate('palette', values['palette']);
+					        			}
+					        			
+					        			if (globalUpdate) {
 					        				// trigger a reloading of the app
 					        				if (corpus) {
 					        					app.dispatchEvent("loadedCorpus", this, corpus);
-						        				// events aren't sent to owning panels, so fire locally too
-					        					this.fireEvent("loadedCorpus", this, corpus);
 					        				} else {
 					        					app.dispatchEvent("apiParamsUpdated", this, values);
-					        					this.fireEvent("apiParamsUpdated", this, values);
 					        				}
-					        				
-					        				
-					        			} else {
-					        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
-					        				else {this.fireEvent("apiParamsUpdated", this, values);}
 					        			}
-					        			
-					        			// fire this even if we have global stopwords since the app dispatch won't reach this tool
-//				        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+					        			// fire this even if we have global params since the app dispatch won't reach this tool
+					        			if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+				        				else {this.fireEvent("apiParamsUpdated", this, values);}
 
 					        			btn.up('window').close();
 					        		},
