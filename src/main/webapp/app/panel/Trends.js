@@ -5,7 +5,7 @@
 
 	alias: 'widget.trends',
 	config: {
-    	options: {xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
 		corpus: undefined
 	},
     statics: {
@@ -334,6 +334,7 @@
     			title: term,
     			xField: 'index',
     			yField: '_'+index,
+    			colors: [this.getApplication().getColorForTerm(term, true)],
                 style: {
                     lineWidth: 2
                 },
