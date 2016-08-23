@@ -34,7 +34,7 @@ Ext.define('Voyant.VoyantApp', {
 		// call the parent constructor
         this.callParent(arguments);
         
-        // d3 palettes
+        // palettes
         var cat10 = d3.scale.category10().range().map(function(val) { return this.hexToRgb(val); }, this);
         var cat20a = d3.scale.category20().range().map(function(val) { return this.hexToRgb(val); }, this);
         var cat20b = d3.scale.category20b().range().map(function(val) { return this.hexToRgb(val); }, this);
@@ -43,6 +43,9 @@ Ext.define('Voyant.VoyantApp', {
         this.addColorPalette('d3_cat20a', cat20a);
         this.addColorPalette('d3_cat20b', cat20b);
         this.addColorPalette('d3_cat20c', cat20c);
+        
+        var extjs = Ext.create('Ext.chart.theme.Base').getColors().map(function(val) { return this.hexToRgb(val); }, this);
+        this.addColorPalette('extjs', extjs);
     },
     
     getTools: function() {
