@@ -34,6 +34,15 @@ Ext.define('Voyant.VoyantApp', {
 		// call the parent constructor
         this.callParent(arguments);
         
+        // d3 palettes
+        var cat10 = d3.scale.category10().range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20a = d3.scale.category20().range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20b = d3.scale.category20b().range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20c = d3.scale.category20c().range().map(function(val) { return this.hexToRgb(val); }, this);
+        this.addColorPalette('d3_cat10', cat10);
+        this.addColorPalette('d3_cat20a', cat20a);
+        this.addColorPalette('d3_cat20b', cat20b);
+        this.addColorPalette('d3_cat20c', cat20c);
     },
     
     getTools: function() {
@@ -159,11 +168,11 @@ Ext.define('Voyant.VoyantApp', {
 	    });
 
 	    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	    return result ? {
-	        r: parseInt(result[1], 16),
-	        g: parseInt(result[2], 16),
-	        b: parseInt(result[3], 16)
-	    } : null;
+	    return result ? [
+	        parseInt(result[1], 16),
+	        parseInt(result[2], 16),
+	        parseInt(result[3], 16)
+	    ] : null;
 	},
 	
 	/**
