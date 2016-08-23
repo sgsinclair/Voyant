@@ -403,21 +403,22 @@ Ext.define('Voyant.util.Toolable', {
 			return this.exportPngData(this.down('chart').getImage().data);
 		}
 
-		var canvas = this.getTargetEl().dom.querySelector("canvas"); // next try finding a canvas
+		var targetEl = this.getTargetEl().dom;
+		
+		var canvas = targetEl.querySelector("canvas"); // next try finding a canvas
 		if (canvas) {
 			return this.exportPngData(canvas.toDataURL("image/png"));
 		}
 		
-		
-		var svg = this.getTargetEl().dom.querySelector("svg"); // finally try finding an SVG
+		var svg = targetEl.querySelector("svg"); // finally try finding an SVG
 		if (svg) {
 			var html = d3.select(svg)
 				.attr("version", 1.1)
 				.attr("xmlns", "http://www.w3.org/2000/svg")
 				.node().parentNode.innerHTML;
 			  img = 'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)));
-			  
-			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: svg.offsetWidth,height:svg.offsetHeight}),
+
+			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: targetEl.offsetWidth,height:targetEl.offsetHeight}),
 			  context = canvas.getContext("2d"), me=this;
 			  
 			  var image = new Image;
