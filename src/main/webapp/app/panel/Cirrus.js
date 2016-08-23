@@ -254,18 +254,17 @@ Ext.define('Voyant.panel.Cirrus', {
     			
     			var swfscript = '<script type="text/javascript" src="'+this.getApplication().getBaseUrl()+'resources/swfobject/swfobject.js'+'"></script>';
     			var cirrusLinks = '<script type="text/javascript">'+
-				'function cirrusClickHandler'+id+'(word, value) {'+
-				'if (window.console && console.info) console.info(word, value);'+
-				'var cirrusTool = Ext.getCmp("'+this.id+'");'+
-				'cirrusTool.cirrusClickHandler(word, value);'+
-				'}'+
-				'function cirrusLoaded'+id+'() {'+
-				'if (window.console && console.info) console.info("cirrus flash loaded");'+
-				//'Ext.getCmp("'+this.id+'").loadInitialData();'+
-				'}'+
-				'function cirrusPNGHandler'+id+'(base64String) {'+
-				'var cirrusTool = Ext.getCmp("'+this.id+'");'+
-				'cirrusTool.cirrusPNGHandler(base64String);'+
+				'cirrusClickHandler'+id+' = function(word, value) {\n'+
+				'\tif (window.console && console.info) console.info(word, value);\n'+
+				'\tvar cirrusTool = Ext.getCmp("'+this.id+'");\n'+
+				'\tcirrusTool.dispatchEvent("termsClicked", cirrusTool, [word]);\n'+
+				'}\n'+
+				'cirrusLoaded'+id+' = function() {\n'+
+				'\tif (window.console && console.info) console.info("cirrus flash loaded");\n'+
+				'}\n'+
+				'cirrusPNGHandler'+id+' = function(base64String) {\n'+
+				'\tvar cirrusTool = Ext.getCmp("'+this.id+'");\n'+
+				'\tcirrusTool.cirrusPNGHandler(base64String);\n'+
 				'}'+
 				'</script>';
     			
