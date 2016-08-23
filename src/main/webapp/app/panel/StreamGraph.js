@@ -250,7 +250,10 @@ Ext.define('Voyant.panel.StreamGraph', {
     },
     
     loadFromRecords: function(records) {
-    	var color = d3.scale.category10();
+    	var app = this.getApplication();
+    	var color = function(name) {
+    		return app.getColorForTerm(name, true);
+    	};
     	
     	var legendStore = this.down('[xtype=legend]').getStore();
     	var legendData = [];
@@ -262,7 +265,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     			termLayer.push({x: i, y: r});
     		}, this);
     		layers.push({name: key, values: termLayer});
-    		legendData.push({id: key, name: key, mark: color(index), active: true});
+    		legendData.push({id: key, name: key, mark: color(key), active: true});
     	}, this);
     	
     	legendStore.loadData(legendData);
@@ -310,12 +313,12 @@ Ext.define('Voyant.panel.StreamGraph', {
     	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d.name; });
     	
     	// update
-    	paths.attr('d', function(d) { return area(d.values); }).style('fill', function(d, i) { return color(i); });
+    	paths.attr('d', function(d) { return area(d.values); }).style('fill', function(d, i) { return color(d.name); });
     	
     	// enter
     	paths.enter().append('path')
 		.attr('d', function(d) { return area(d.values); })
-		.style('fill', function(d, i) { return color(i); })
+		.style('fill', function(d, i) { return color(d.name); })
 		.append('title').text(function (d) { return d.name; });
     	
     	// exit
