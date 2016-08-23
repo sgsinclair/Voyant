@@ -75,6 +75,10 @@
 <!-- FontAwesome -->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/fontawesome/current/css/font-awesome.min.css" />
 
+<!-- spectrum -->
+<script type="text/javascript" src="<%=base %>/resources/spectrum/spectrum.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/spectrum/spectrum.css" />
+
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/css/styles.css" />
 
 <%

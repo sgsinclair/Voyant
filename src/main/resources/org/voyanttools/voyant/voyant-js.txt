@@ -76,6 +76,7 @@ app/widget/DownloadFilenameBuilder.js
 app/widget/DownloadFileFormat.js
 app/widget/DownloadOptions.js
 app/widget/FontFamilyOption.js
+app/widget/ColorPaletteOption.js
 app/widget/VoyantChart.js
 
 # PANELS
