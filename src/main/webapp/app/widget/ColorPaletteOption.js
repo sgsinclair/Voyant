@@ -158,24 +158,25 @@ Ext.define('Voyant.widget.ColorPaletteOption', {
 				text: this.localize('saveNewPalette'),
 				handler: function(btn) {
 					this.savePalette();
-					if (this.spectrum) {
-						this.spectrum.spectrum('destroy');
-						this.spectrum = null;
-					}
 					btn.up('window').close();
 				},
 				scope: this
 			},{
 				text: this.localize('cancel'),
 				handler: function(btn) {
+					btn.up('window').close();
+				},
+				scope: this
+			}],
+			listeners: {
+				close: function(panel) {
 					if (this.spectrum) {
 						this.spectrum.spectrum('destroy');
 						this.spectrum = null;
 					}
-					btn.up('window').close();
 				},
 				scope: this
-			}]
+			}
     	}).show();
     	
     	this.initSpectrum();
