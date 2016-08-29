@@ -97,11 +97,9 @@ Ext.define('Voyant.widget.ColorPaletteOption', {
 						text: this.localize('add'),
 						margin: '0 5 0 0',
 						handler: function(btn) {
+							var color = this.spectrum.spectrum('get').toRgb();
 							var dv = this.editPaletteWin.down('dataview');
-							var r = 200;
-							var g = 200;
-							var b = 200;
-							this.paletteStore.add([ [Ext.id(), [r,g,b]] ]);
+							this.paletteStore.add([ [Ext.id(), [color.r, color.g, color.b]] ]);
 							dv.refresh();
 						},
 						scope: this
