@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Aug 10 10:29:48 EDT 2016 */
+/* This file created by JSCacher. Last modified: Wed Sep 21 13:54:03 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4753,6 +4753,22 @@ Ext.define('Voyant.util.Toolable', {
 					            	flex: 1,
 					            	panel: panel,
 					        		handler: function(btn) {
+					        			function doGlobalUpdate(key, value) {
+					        				// set the api value for the app
+					        				if (app.setApiParam) {
+					        					app.setApiParam(key, value);
+					        				}
+					        				
+					        				// tell the panels, including this one
+					        				var panels = app.getViewport().query("panel,chart");
+					        				for (var i=0; i<panels.length; i++) {
+					        					if (panels[i].setApiParam) {
+					        						panels[i].setApiParam(key, value);
+					        					}
+					        				}
+					        				globalUpdate = true;
+					        			}
+					        			
 					        			var values = btn.up('form').getValues();
 					        			
 					        			// set api values (all of them, not just global ones)
@@ -4761,40 +4777,25 @@ Ext.define('Voyant.util.Toolable', {
 					        			var app = this.getApplication();
 					        			var corpus = app.getCorpus();
 					        			
-					        			// treat stopwords differently since they can be set globally
+					        			var globalUpdate = false;
 					        			if (values['stopList'] != undefined && values['stopListGlobal'] != undefined && values.stopListGlobal) {
-					        				
-					        				// set the api value for the app
-					        				if (app.setApiParams) {
-					        					app.setApiParams({stopList: values.stopList})
-					        				}
-					        				
-					        				// tell the panels, including this one
-					        				var panels = app.getViewport().query("panel,chart");
-					        				for (var i=0; i<panels.length; i++) {
-					        					if (panels[i].setApiParams) {
-					        						panels[i].setApiParams({stopList: values.stopList});
-					        					}
-					        				}
-					        				
+					        				doGlobalUpdate('stopList', values['stopList']);
+					        			}
+					        			if (values['palette'] != undefined) {
+					        				doGlobalUpdate('palette', values['palette']);
+					        			}
+					        			
+					        			if (globalUpdate) {
 					        				// trigger a reloading of the app
 					        				if (corpus) {
 					        					app.dispatchEvent("loadedCorpus", this, corpus);
-						        				// events aren't sent to owning panels, so fire locally too
-					        					this.fireEvent("loadedCorpus", this, corpus);
 					        				} else {
 					        					app.dispatchEvent("apiParamsUpdated", this, values);
-					        					this.fireEvent("apiParamsUpdated", this, values);
 					        				}
-					        				
-					        				
-					        			} else {
-					        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
-					        				else {this.fireEvent("apiParamsUpdated", this, values);}
 					        			}
-					        			
-					        			// fire this even if we have global stopwords since the app dispatch won't reach this tool
-//				        				if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+					        			// fire this even if we have global params since the app dispatch won't reach this tool
+					        			if (corpus) {this.fireEvent("loadedCorpus", this, corpus);}
+				        				else {this.fireEvent("apiParamsUpdated", this, values);}
 
 					        			btn.up('window').close();
 					        		},
@@ -5044,21 +5045,22 @@ Ext.define('Voyant.util.Toolable', {
 			return this.exportPngData(this.down('chart').getImage().data);
 		}
 
-		var canvas = this.getTargetEl().dom.querySelector("canvas"); // next try finding a canvas
+		var targetEl = this.getTargetEl().dom;
+		
+		var canvas = targetEl.querySelector("canvas"); // next try finding a canvas
 		if (canvas) {
 			return this.exportPngData(canvas.toDataURL("image/png"));
 		}
 		
-		
-		var svg = this.getTargetEl().dom.querySelector("svg"); // finally try finding an SVG
+		var svg = targetEl.querySelector("svg"); // finally try finding an SVG
 		if (svg) {
 			var html = d3.select(svg)
 				.attr("version", 1.1)
 				.attr("xmlns", "http://www.w3.org/2000/svg")
 				.node().parentNode.innerHTML;
 			  img = 'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)));
-			  
-			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: svg.offsetWidth,height:svg.offsetHeight}),
+
+			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: targetEl.offsetWidth,height:targetEl.offsetHeight}),
 			  context = canvas.getContext("2d"), me=this;
 			  
 			  var image = new Image;
@@ -6127,7 +6129,7 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			listeners: {
 				exception: function(proxy, request, operation) {
 					if (me.parentPanel && me.parentPanel.showError) {
-						me.parentPanel.showError(new Voyant.util.ResponseError({response: request}))
+						me.parentPanel.showError(operation)
 					}
 				}
 			}
@@ -8184,6 +8186,258 @@ Ext.define('Voyant.widget.FontFamilyOption', {
         me.callParent(arguments);
     }
 })
+Ext.define('Voyant.widget.ColorPaletteOption', {
+    extend: 'Ext.container.Container',
+    mixins: ['Voyant.util.Localization'],
+    alias: 'widget.colorpaletteoption',
+    layout: 'hbox',
+    statics: {
+    	i18n: {
+    	}
+    },
+    
+    paletteTpl: new Ext.XTemplate(
+		'<tpl for=".">',
+			'<div class="color" style="background-color: rgb({color});"></div>',
+		'</tpl>'
+	),
+	paletteStore: new Ext.data.ArrayStore({
+        fields: ['id', 'color'],
+        listeners: {
+        	update: function(store, record, op, mod, details) {
+        	},
+        	scope: this
+        } 
+    }),
+    
+    editPaletteWin: null,
+    spectrum: null,
+    
+    initComponent: function(config) {
+    	var me = this;
+
+    	var app = this.up('window').panel.getApplication();
+    	var data = [];
+    	for (var key in app.palettes) {
+    		data.push({name: key, value: key});
+    	}
+    	var value = app.getApiParam('palette');
+    	
+    	Ext.apply(me, {
+	    		items: [{
+	    	        xtype: 'combo',
+	    	        queryMode: 'local',
+	    	        value: value,
+	    	        triggerAction: 'all',
+	    	        editable: true,
+	    	        fieldLabel: 'Palette',
+	    	        labelAlign: 'right',
+	    	        name: 'palette',
+	    	        displayField: 'name',
+	    	        valueField: 'value',
+	    	        store: {
+	    	            fields: ['name', 'value'],
+	    	            data: data
+	    	        }
+	    		}, {width: 10}, {xtype: 'tbspacer'}, {
+	    			xtype: 'button',
+	    			text: this.localize('editList'),
+		            ui: 'default-toolbar',
+	    			handler: this.editPalette,
+	    			scope: this
+	    		}
+//	    		, {width: 10}, {
+//	    			xtype: 'checkbox',
+//	    			name: 'paletteGlobal',
+//	    			checked: true,
+//	    			boxLabel: this.localize('applyGlobally')
+//	    		}
+	    		]
+    	});
+        me.callParent(arguments);
+    },
+    
+    editPalette: function() {
+    	var value = this.down('combo').getValue();
+    	this.loadPalette(value);
+    	
+    	this.editPaletteWin = Ext.create('Ext.window.Window', {
+			title: this.localize('paletteEditor'),
+			modal: true,
+			height: 300,
+			width: 425,
+			padding: 5,
+			layout: {
+				type: 'hbox',
+				align: 'stretch'
+			},
+			items:[{
+				flex: 1,
+				layout: {
+					type: 'vbox',
+					align: 'stretch'
+				},
+				items: [{
+					height: 24,
+					margin: '0 0 5 0',
+					items: [{
+						xtype: 'button',
+						text: this.localize('add'),
+						margin: '0 5 0 0',
+						handler: function(btn) {
+							var color = this.spectrum.spectrum('get').toRgb();
+							var dv = this.editPaletteWin.down('dataview');
+							this.paletteStore.add([ [Ext.id(), [color.r, color.g, color.b]] ]);
+							dv.refresh();
+						},
+						scope: this
+					},{
+						xtype: 'button',
+						text: this.localize('remove'),
+						margin: '0 5 0 0',
+						handler: function(btn) {
+							var dv = this.editPaletteWin.down('dataview');
+							var sel = dv.getSelectionModel().getSelection()[0];
+							if (sel != null) {
+								this.paletteStore.remove(sel);
+							}
+							dv.refresh();
+						},
+						scope: this
+					},{
+						xtype: 'button',
+						text: this.localize('clear'),
+						handler: function(btn) {
+							this.paletteStore.removeAll();
+						},
+						scope: this
+					}]
+				},{
+					xtype: 'dataview',
+					flex: 1,
+					scrollable: 'y',
+		        	store: this.paletteStore,
+		        	tpl: this.paletteTpl,
+		        	itemSelector: 'div.color',
+		        	overItemCls: 'over',
+		        	selectedItemCls: 'selected',
+		        	selectionModel: {
+		        		mode: 'SINGLE'
+		        	},
+		        	listeners: {
+		        		selectionchange: function(viewmodel, selected, opts) {
+		        			if (selected[0] != null) {
+								var color = selected[0].get('color');
+								var parentPanel = this.up('window').panel;
+								var hex = parentPanel.getApplication().rgbToHex(color);
+								this.spectrum.spectrum('set', hex);
+							}
+		        		},
+		        		scope: this
+		        	}
+				}]
+			},{
+				itemId: 'colorEditor',
+				width: 200,
+				margin: '0 0 0 5',
+				html: '<input type="text" style="display: none;" />'
+			}],
+			buttons: [{
+				text: this.localize('saveNewPalette'),
+				handler: function(btn) {
+					this.savePalette();
+					btn.up('window').close();
+				},
+				scope: this
+			},{
+				text: this.localize('cancel'),
+				handler: function(btn) {
+					btn.up('window').close();
+				},
+				scope: this
+			}],
+			listeners: {
+				close: function(panel) {
+					if (this.spectrum) {
+						this.spectrum.spectrum('destroy');
+						this.spectrum = null;
+					}
+				},
+				scope: this
+			}
+    	}).show();
+    	
+    	this.initSpectrum();
+    },
+    
+    setColorForSelected: function(color) {
+    	if (this.spectrum !== null) { // need check due to https://github.com/bgrins/spectrum/issues/387
+			var rgb = color.toRgb();
+			var rgbA = [rgb.r, rgb.g, rgb.b];
+			var dv = this.editPaletteWin.down('dataview');
+			var sel = dv.getSelectionModel().getSelection()[0];
+			if (sel != null) {
+				sel.set('color', rgbA);
+			}
+    	}
+	},
+    
+	initSpectrum: function() {
+		if (this.spectrum === null) {
+			var editor = this.editPaletteWin.down('#colorEditor');
+			var input = editor.el.down('input');
+			this.spectrum = $(input.dom).spectrum({
+				flat: true,
+				showInput: true,
+				showButtons: false,
+				preferredFormat: 'hex',
+				change: this.setColorForSelected.bind(this),
+				move: this.setColorForSelected.bind(this)
+			});
+		}
+	},
+	
+    loadPalette: function(paletteId) {
+    	var parentPanel = this.up('window').panel;
+    	
+    	var palette = parentPanel.getApplication().getColorPalette(paletteId);
+    	var paletteData = [];
+    	palette.forEach(function(c) {
+    		paletteData.push([Ext.id(), c]);
+    	}, this);
+    	this.paletteStore.loadData(paletteData);
+    },
+    
+    savePalette: function() {
+    	var value = [];
+    	this.paletteStore.each(function(c) {
+    		value.push(c.get('color'));
+    	});
+    	var valueString = Ext.encode(value);
+    	var parentPanel = this.up('window').panel;
+    	var corpusId = parentPanel.getCorpus().getId();
+    	Ext.Ajax.request({
+    	    url: parentPanel.getTromboneUrl(),
+    	    params: {
+        		tool: 'resource.StoredResource',
+    			storeResource: valueString,
+    			corpus: corpusId
+    	    },
+    	    success: function(response, req) {
+    	    	var json = Ext.util.JSON.decode(response.responseText);
+    	    	var id = json.storedResource.id;
+    	    	var combo = this.down('combo');
+    	    	var store = combo.getStore();
+    	    	store.add({name: id, value: id});
+    	    	combo.setValue(id);
+    	    	combo.updateLayout();
+    	    	
+    	    	parentPanel.getApplication().addColorPalette(id, value);
+    	    },
+    	    scope: this
+    	});
+    }
+});
 Ext.define('Voyant.widget.VoyantChart', {
     extend: 'Ext.chart.CartesianChart',
     mixins: ['Voyant.util.Localization','Voyant.util.Api'],
@@ -8300,8 +8554,11 @@ Ext.define('Voyant.panel.Panel', {
 		application.dispatchEvent.apply(application, arguments);
 	},
 	
-	showError: function(config) {
-		this.getApplication().showError(config)
+	showError: function(config, response) {
+		Ext.applyIf(config, {
+			title: this.localize("error")+" ("+this.localize("title")+")"
+		})
+		this.getApplication().showError(config, response)
 	},
 	
 	toastError: function(config) {
@@ -8703,7 +8960,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		corpus: undefined,
 		docTermStore: undefined,
 		docStore: undefined,
-    	options: {xtype: 'stoplistoption'}
+    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
 	},
 	
 	selectedDocs: undefined,
@@ -9720,6 +9977,8 @@ Ext.define('Voyant.panel.Cirrus', {
     		terms: undefined,
     		docId: undefined,
     		docIndex: undefined,
+    		
+    		inlineData: undefined, // format should match CorpusTerm model, only term and rawFreq required
 
     		fontFamily: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
     		cirrusForceFlash: false,
@@ -9753,20 +10012,23 @@ Ext.define('Voyant.panel.Cirrus', {
         	        }
     	        }
     	    },
-    	    {xtype: 'fontfamilyoption'}
+    	    {xtype: 'fontfamilyoption'},
+    	    {xtype: 'colorpaletteoption'}
 
     	],
     	corpus: undefined,
     	records: undefined,
     	terms: undefined,
+    	cirrusId: undefined,
     	visLayout: undefined, // cloud layout algorithm
     	vis: undefined, // actual vis
+    	tip: undefined,
     	sizeAdjustment: 100, // amount to multiply a word's relative size by
     	minFontSize: 12,
     	largestWordSize: 0,
     	smallestWordSize: 1000000
     },
-
+    
     MODE_CORPUS: 'corpus',
     MODE_DOCUMENT: 'mode_document',
     
@@ -9775,6 +10037,8 @@ Ext.define('Voyant.panel.Cirrus', {
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
+    	this.setCirrusId(Ext.id(null, 'cirrus_'));
     },
     
     initComponent: function (config) {
@@ -9812,9 +10076,27 @@ Ext.define('Voyant.panel.Cirrus', {
     	});
 
     	this.callParent(arguments);
+    	
+    	
     },
     
     listeners: {
+    	afterrender: function() {
+    		var dataString = this.getApiParam('inlineData');
+        	if (dataString !== undefined) {
+        		var jsonData = Ext.decode(dataString, true);
+        		if (jsonData !== null) {        			
+        			this.setApiParam('inlineData', jsonData);
+
+        			var corpus;
+        			new Corpus().then(function(data) {
+        				corpus = data;
+        				var app = this.getApplication();
+        				app.dispatchEvent('loadedCorpus', app, corpus);
+        			}, null, null, this);
+        		}
+        	}
+    	},
     	resize: function(panel, width, height) {
     		if (this.getVisLayout() && this.getCorpus()) {
     			this.setAdjustedSizes();
@@ -9860,10 +10142,26 @@ Ext.define('Voyant.panel.Cirrus', {
     	
     },
     
-    loadFromCorpus: function(corpus) {    	
-		this.setCorpus(corpus);
-		this.setApiParams({docId: undefined, docIndex: undefined});
-		this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
+    loadFromCorpus: function(corpus) {
+    	var jsonData = this.getApiParam('inlineData');
+    	if (jsonData === undefined) {
+			this.setCorpus(corpus);
+			this.setApiParams({docId: undefined, docIndex: undefined});
+			this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
+    	} else {
+//    		var jsonData = this.getApiParam('inlineData');
+    		if (jsonData !== undefined) {
+    			var records = [];
+    			for (var i = 0; i < jsonData.length; i++) {
+    				var wordData = jsonData[i];
+    				var record = Ext.create('Voyant.data.model.CorpusTerm', wordData);
+    				records.push(record);
+    			}
+    			this.setRecords(records);
+    			this.setMode(this.MODE_CORPUS);
+    			this.loadFromTermsRecords();
+    		}
+    	}
     },
     
     loadFromDocumentTerms: function(documentTerms) {
@@ -9905,9 +10203,9 @@ Ext.define('Voyant.panel.Cirrus', {
     initVisLayout: function(forceLayout) {
     	if (forceLayout || this.getVisLayout() == undefined) {
     		var cirrusForceFlash = this.getApiParam('cirrusForceFlash');
-    		if (cirrusForceFlash == 'true') {
+    		if (cirrusForceFlash == 'true' || cirrusForceFlash === true) {
     			this.setApiParam('cirrusForceFlash', true);
-    			var id = this.id.replace(/-/g,'_')+'_cirrus';
+    			var id = this.getCirrusId();
     			var appVars = {
     				id: id
     			};
@@ -9918,20 +10216,20 @@ Ext.define('Voyant.panel.Cirrus', {
     			
     			var swfscript = '<script type="text/javascript" src="'+this.getApplication().getBaseUrl()+'resources/swfobject/swfobject.js'+'"></script>';
     			var cirrusLinks = '<script type="text/javascript">'+
-				'function cirrusClickHandler'+id+'(word, value) {'+
-				'if (window.console && console.info) console.info(word, value);'+
-				'var cirrusTool = Ext.getCmp("'+this.id+'");'+
-				'cirrusTool.cirrusClickHandler(word, value);'+
-				'}'+
-				'function cirrusLoaded'+id+'() {'+
-				'if (window.console && console.info) console.info("cirrus flash loaded");'+
-				//'Ext.getCmp("'+this.id+'").loadInitialData();'+
-				'}'+
-				'function cirrusPNGHandler'+id+'(base64String) {'+
-				'var cirrusTool = Ext.getCmp("'+this.id+'");'+
-				'cirrusTool.cirrusPNGHandler(base64String);'+
+				'cirrusClickHandler'+id+' = function(word, value) {\n'+
+				'\tif (window.console && console.info) console.info(word, value);\n'+
+				'\tvar cirrusTool = Ext.getCmp("'+this.id+'");\n'+
+				'\tcirrusTool.dispatchEvent("termsClicked", cirrusTool, [word]);\n'+
+				'}\n'+
+				'cirrusLoaded'+id+' = function() {\n'+
+				'\tif (window.console && console.info) console.info("cirrus flash loaded");\n'+
+				'}\n'+
+				'cirrusPNGHandler'+id+' = function(base64String) {\n'+
+				'\tvar cirrusTool = Ext.getCmp("'+this.id+'");\n'+
+				'\tcirrusTool.cirrusPNGHandler(base64String);\n'+
 				'}'+
 				'</script>';
+    			
     			this.update(swfscript+cirrusLinks, true, function() {
     				function loadFlash(component) {
     					if (typeof swfobject !== 'undefined') {
@@ -9961,7 +10259,7 @@ Ext.define('Voyant.panel.Cirrus', {
     						setTimeout(loadFlash, 50, component);
     					}
         			}
-    				loadFlash(this.component);
+    				loadFlash(this);
     				
     			}, this);
     		} else {
@@ -9986,21 +10284,12 @@ Ext.define('Voyant.panel.Cirrus', {
 						.on('end', this.draw.bind(this))
 				);
 				
-				var svg = d3.select(el.dom).append('svg').attr('id','cirrusGraph').attr('width', width).attr('height', height);
+				var svg = d3.select(el.dom).append('svg').attr('id',this.getCirrusId()).attr('class', 'cirrusGraph').attr('width', width).attr('height', height);
 				this.setVis(svg.append('g').attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')'));
 				
-				var tip = Ext.create('Ext.tip.ToolTip', {
-					target: svg.node(),
-					delegate: 'text',
-					trackMouse: true,
-					listeners: {
-						beforeshow: function(tip) {
-							var el = tip.triggerElement;
-							var freq = el.getAttribute('data-freq');
-							tip.update(freq);
-						}
-					}
-				});
+				if (this.getTip() === undefined) {
+					this.setTip(Ext.create('Ext.tip.Tip', {}));
+				}
     		}
     	}
     },
@@ -10035,7 +10324,7 @@ Ext.define('Voyant.panel.Cirrus', {
 	    		// set the relative sizes for each word (0.0 to 1.0), then adjust based on available area
 	    		this.setRelativeSizes();
 	    		this.setAdjustedSizes();
-	    		
+
 	//    		var fontSizer = d3.scale.pow().range([10, 100]).domain([minSize, maxSize]);
 	    		
 	    		this.getVisLayout().words(terms).start();
@@ -10082,7 +10371,21 @@ Ext.define('Voyant.panel.Cirrus', {
 			.style('font-family', function(d) { return d.font; })
 			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
 			.text(function(d) { return d.text; })
-			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);});
+			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);})
+			.on('mouseover', function(obj) {
+				this.getTip().show();
+			}.bind(this))
+			.on('mousemove', function(obj) {
+				var tip = this.getTip();
+				tip.update(obj.text+': '+obj.rawFreq);
+				var container = Ext.get(this.getCirrusId()).dom;
+				var coords = d3.mouse(container);
+				coords[1] += 30;
+				tip.setPosition(coords);
+			}.bind(this))
+			.on('mouseout', function(obj) {
+				this.getTip().hide();
+			}.bind(this));
 		
 		wordNodes.exit().remove();
 		
@@ -10109,6 +10412,7 @@ Ext.define('Voyant.panel.Cirrus', {
 	            var wordArea = this.calculateWordArea(word);
 	            totalWordsSize += wordArea;
 	        }
+
 	        this.setSizeAdjustment(stageArea / totalWordsSize);
         }
     },
@@ -10224,6 +10528,25 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			}
 		}
 	},
+	physicsOptions: {
+		defaultPhysics: {
+			barnesHut: {
+				"gravitationalConstant": -1500,
+				"centralGravity": 6,
+				"damping": 0.5,
+				"avoidOverlap": 0.5
+			}
+		},
+		centralizedPhysics: {
+			barnesHut: {
+				"gravitationalConstant": -1500,
+				"centralGravity": 1,
+				"damping": 0.5,
+				"avoidOverlap": 0.5
+			}
+		}
+	},
+	
 	keywordColor: 'green',
 	contextColor: 'maroon',
     
@@ -10252,10 +10575,16 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 	handler: function() {
                 		this.getNodeDataSet().clear();
                 		this.getEdgeDataSet().clear();
+                		
+                		this.queryById('contextSlider').enable();
+                		this.getNetwork().setOptions({
+                			physics: this.physicsOptions.defaultPhysics
+                		});
                 	},
                 	scope: me
                 },this.localize('context'),{
                 	xtype: 'slider',
+                	itemId: 'contextSlider',
                 	minValue: 3,
                 	value: 5,
                 	maxValue: 30,
@@ -10302,6 +10631,46 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 					},
 					scope: this
 				}
+			},{
+				xtype: 'button',
+				text: 'Fetch Collocates',
+				style: 'margin: 5px;',
+				handler: function(b, e) {
+					var n = this.getNetwork().getSelectedNodes();
+		    		if (n[0] != null) {
+		    			var data = this.getNodeDataSet().get(n[0]);
+		    			this.itemdblclick(data);
+		    		}
+				},
+				scope: this
+			},{
+				xtype: 'button',
+				text: 'Centralize',
+				style: 'margin: 5px;',
+				handler: function(b, e) {
+					var n = this.getNetwork().getSelectedNodes();
+		    		if (n[0] != null) {
+		    			this.queryById('contextSlider').disable();
+		    			
+		    			var data = this.getNodeDataSet().get(n[0]);
+		    			data.fixed = true;
+		    			this.getNodeDataSet().clear();
+                		this.getEdgeDataSet().clear();
+                		this.getNodeDataSet().add(data);
+                		
+                		this.getNetwork().setOptions({
+                			physics: this.physicsOptions.centralizedPhysics
+                		});
+                		
+                		var limit = this.getApiParam('limit');
+                		this.setApiParam('limit', 100);
+                		this.itemdblclick(data);
+                		this.setApiParam('limit', limit);
+                		
+                		this.getContextMenu().hide();
+		    		}
+				},
+				scope: this
 			},{
 				xtype: 'button',
 				text: 'Remove',
@@ -10500,14 +10869,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			hoverConnectedEdges: true,
 	    			multiselect: false
 	    		},
-	    		physics: {
-					barnesHut: {
-						"gravitationalConstant": -1500,
-						"centralGravity": 6,
-						"damping": 0.5,
-						"avoidOverlap": 0.5
-					}
-	    		},
+	    		physics: this.physicsOptions.defaultPhysics,
 	    		nodes: this.nodeOptions,
 	    		edges: this.edgeOptions
 	    	};
@@ -11737,7 +12099,7 @@ Ext.define('Voyant.panel.Knots', {
 		corpus: undefined,
 		docTermStore: undefined,
 		tokensStore: undefined,
-    	options: {xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
     	refreshInterval: 100,
     	startAngle: 315,
     	angleIncrement: 15,
@@ -16728,7 +17090,10 @@ Ext.define('Voyant.panel.StreamGraph', {
     },
     
     loadFromRecords: function(records) {
-    	var color = d3.scale.category10();
+    	var app = this.getApplication();
+    	var color = function(name) {
+    		return app.getColorForTerm(name, true);
+    	};
     	
     	var legendStore = this.down('[xtype=legend]').getStore();
     	var legendData = [];
@@ -16740,7 +17105,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     			termLayer.push({x: i, y: r});
     		}, this);
     		layers.push({name: key, values: termLayer});
-    		legendData.push({id: key, name: key, mark: color(index), active: true});
+    		legendData.push({id: key, name: key, mark: color(key), active: true});
     	}, this);
     	
     	legendStore.loadData(legendData);
@@ -16763,7 +17128,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     	var max = d3.max(processedLayers, function(layer) {
     		return d3.max(layer.values, function(d) { return d.y0 + d.y; });
     	});
-    	var height = this.body.down('svg').getHeight() - this.graphMargin.top - this.graphMargin.bottom;
+
+    	var height = this.body.down('svg').dom.clientHeight - this.graphMargin.top - this.graphMargin.bottom;
     	var y = d3.scale.linear().domain([0, max]).range([height, 0]);
     	
     	var area = d3.svg.area()
@@ -16787,12 +17153,12 @@ Ext.define('Voyant.panel.StreamGraph', {
     	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d.name; });
     	
     	// update
-    	paths.attr('d', function(d) { return area(d.values); }).style('fill', function(d, i) { return color(i); });
+    	paths.attr('d', function(d) { return area(d.values); }).style('fill', function(d, i) { return color(d.name); });
     	
     	// enter
     	paths.enter().append('path')
 		.attr('d', function(d) { return area(d.values); })
-		.style('fill', function(d, i) { return color(i); })
+		.style('fill', function(d, i) { return color(d.name); })
 		.append('title').text(function (d) { return d.name; });
     	
     	// exit
@@ -19954,7 +20320,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 
 	alias: 'widget.trends',
 	config: {
-    	options: {xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
 		corpus: undefined
 	},
     statics: {
@@ -20204,9 +20570,13 @@ Ext.define('Voyant.panel.TermsRadio', {
     	    			this.setMode(this.MODE_DOCUMENT);
     		    		this.loadFromRecords(records);
     		    	}
-    		    	else {
-    					Voyant.application.showResponseError(this.localize('failedGetDocumentTerms'), operation);
-    		    	}
+    		    	// errors should be shown by data store proxy listener
+//    		    	else {
+//    		    		this.showError({
+//    		    			message: this.localize('failedGetDocumentTerms')
+//    		    		}, operation);
+////    					Voyant.application.showResponseError(this.localize('failedGetDocumentTerms'), operation);
+//    		    	}
     		    },
     		    scope: this,
     		    params: this.getApiParams(['stopList','query','docIndex','withDistributions','bins'])
@@ -20283,6 +20653,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     			title: term,
     			xField: 'index',
     			yField: '_'+index,
+    			colors: [this.getApplication().getColorForTerm(term, true)],
                 style: {
                     lineWidth: 2
                 },
@@ -21998,6 +22369,9 @@ Ext.define('Voyant.VoyantApp', {
     
     statics: {
     	i18n: {
+    	},
+    	api: {
+    		palette: 'default'
     	}
     },
     
@@ -22021,6 +22395,18 @@ Ext.define('Voyant.VoyantApp', {
 		// call the parent constructor
         this.callParent(arguments);
         
+        // palettes
+        var cat10 = d3.scale.category10().range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20a = d3.scale.category20().range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20b = d3.scale.category20b().range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20c = d3.scale.category20c().range().map(function(val) { return this.hexToRgb(val); }, this);
+        this.addColorPalette('d3_cat10', cat10);
+        this.addColorPalette('d3_cat20a', cat20a);
+        this.addColorPalette('d3_cat20b', cat20b);
+        this.addColorPalette('d3_cat20c', cat20c);
+        
+        var extjs = Ext.create('Ext.chart.theme.Base').getColors().map(function(val) { return this.hexToRgb(val); }, this);
+        this.addColorPalette('extjs', extjs);
     },
     
     getTools: function() {
@@ -22090,21 +22476,45 @@ Ext.define('Voyant.VoyantApp', {
 		this.showError(Ext.create("Voyant.util.ResponseError", {msg: (Ext.isString(config) ? config : config.msg), response: response}))
 	},
 	
-	showError: function(config) {
-		if (config.statusText && config.responseText) {
-			return this.showResponseError({}, config);
-		}
-		if (config instanceof Voyant.util.ResponseError) {
-			var response = config.getResponse();
-			Ext.apply(config, {
-				message: config.getMsg()+" "+this.localize('serverResponseError')+
-					"<pre class='error'>\n"+response.responseText.substring(0,response.responseText.indexOf("\n\t"))+"… "+
-					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.responseText)+"</pre>')); return false;\">more</a></pre>"
-			})
-		}
+	showError: function(config, response) {
 		if (Ext.isString(config)) {
 			config = {message: config}
 		}
+		debugger
+		if (!response && (config.error || config.responseText || config instanceof Voyant.util.ResponseError)) {
+			response = config;
+		}
+		if (response) {
+			config = config || {};
+			config.message = (config.message || "");
+			if (response.error) {
+				var lines = response.error.split(/(\r\n|\r|\n)/);
+				if (lines.length>0) {
+					config.message=this.localize('serverResponseError');
+					config.message += "<pre class='error'>\n"+lines[0]+"</p>";
+					if (lines.length>1) {
+						config.message+="…  <a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.error)+"</pre>')); return false;\">more</a></pre>";
+					}
+					config.message+="</pre>";
+				}
+			}
+			if (response.responseText) {
+				config.message +=
+					"<pre class='error'>\n"+response.responseText.substring(0,response.responseText.indexOf("\n\t"))+"… "+
+					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.responseText)+"</pre>')); return false;\">more</a></pre>"
+			}
+		}
+//		if (config.statusText && config.responseText) {
+//			return this.showResponseError({}, config);
+//		}
+//		if (config instanceof Voyant.util.ResponseError) {
+//			var response = config.getResponse();
+//			Ext.apply(config, {
+//				message: config.getMsg()+" "+this.localize('serverResponseError')+
+//					"<pre class='error'>\n"+response.responseText.substring(0,response.responseText.indexOf("\n\t"))+"… "+
+//					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.responseText)+"</pre>')); return false;\">more</a></pre>"
+//			})
+//		}
 		Ext.applyIf(config, {
 			title: this.localize("error"),
 		    buttons: Ext.Msg.OK,
@@ -22127,30 +22537,62 @@ Ext.define('Voyant.VoyantApp', {
 	},
 	
 	/**
-	 * A universal palette of colors for use with terms and documents.
+	 * Palettes for use with terms and documents.
 	 * @private
 	 */
-	colors: [[0, 0, 255], [51, 197, 51], [255, 0, 255], [121, 51, 255], [28, 255, 255], [255, 174, 0], [30, 177, 255], [182, 242, 58], [255, 0, 164], [51, 102, 153], [34, 111, 52], [155, 20, 104], [109, 43, 157], [128, 130, 33], [111, 76, 10], [119, 115, 165], [61, 177, 169], [202, 135, 115], [194, 169, 204], [181, 212, 228], [182, 197, 174], [255, 197, 197], [228, 200, 124], [197, 179, 159]],
+	palettes: {
+		'default': [[0, 0, 255], [51, 197, 51], [255, 0, 255], [121, 51, 255], [28, 255, 255], [255, 174, 0], [30, 177, 255], [182, 242, 58], [255, 0, 164], [51, 102, 153], [34, 111, 52], [155, 20, 104], [109, 43, 157], [128, 130, 33], [111, 76, 10], [119, 115, 165], [61, 177, 169], [202, 135, 115], [194, 169, 204], [181, 212, 228], [182, 197, 174], [255, 197, 197], [228, 200, 124], [197, 179, 159]]
+	},
 	
 	rgbToHex: function(a) {
 		return "#" + ((1 << 24) + (a[0] << 16) + (a[1] << 8) + a[2]).toString(16).slice(1);
 	},
 	
+	hexToRgb: function(hex) {
+	    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+	    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+	    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+	        return r + r + g + g + b + b;
+	    });
+
+	    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	    return result ? [
+	        parseInt(result[1], 16),
+	        parseInt(result[2], 16),
+	        parseInt(result[3], 16)
+	    ] : null;
+	},
+	
+	/**
+	 * Adds a new palette to the list.
+	 * @param key {String} The palette name.
+	 * @param values {Array} The array of colors. Format: [[,g,b],[r,g,b],....]
+	 */
+	addColorPalette: function(key, values) {
+		this.palettes[key] = values;
+	},
+	
 	/**
 	 * Gets the whole color palette.
+	 * @param {String} [key] The key of the palette to return, defaults to the "palette" api param value.
 	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of each color (optional, defaults to rgb values).
 	 * @return {Array} The color palette.
 	 * @private
 	 */
-	getColorPalette: function(returnHex) {
+	getColorPalette: function(key, returnHex) {
+		var paletteKey = key || this.getApiParam('palette') || 'default';
+		var palette = this.palettes[paletteKey];
+		if (palette === undefined) {
+			palette = [];
+		}
 		if (returnHex) {
 			var colors = [];
-			for (var i = 0; i < this.colors.length; i++) {
-				colors.push(this.rgbToHex(this.colors[i]));
+			for (var i = 0; i < palette.length; i++) {
+				colors.push(this.rgbToHex(palette[i]));
 			}
 			return colors;
 		} else {
-			return this.colors;
+			return palette;
 		}
 	},
 	
@@ -22162,10 +22604,12 @@ Ext.define('Voyant.VoyantApp', {
 	 * @private
 	 */
 	getColor: function(index, returnHex) {
+		var paletteKey = this.getApiParam('palette') || 'default';
+		var palette = this.palettes[paletteKey];
 		if (returnHex) {
-			return this.rgbToHex(this.colors[index]);
+			return this.rgbToHex(palette[index]);
 		} else {
-			return this.colors[index];
+			return palette[index];
 		}
 	},
 	
@@ -22188,8 +22632,11 @@ Ext.define('Voyant.VoyantApp', {
 		}
 		var color = this.colorTermAssociations.get(term);
 		if (color == null) {
-			var index = this.colorTermAssociations.getCount() % this.colors.length;
-			color = this.colors[index];
+			var paletteKey = this.getApiParam('palette') || 'default';
+			var palette = this.palettes[paletteKey];
+			
+			var index = this.colorTermAssociations.getCount() % palette.length;
+			color = palette[index];
 			this.colorTermAssociations.add(term, color);
 		}
 		if (returnHex) {
@@ -22272,7 +22719,11 @@ Ext.define('Voyant.VoyantCorpusApp', {
         	if (!queryParams.corpus && this.getCorpusId && this.getCorpusId()) {
         		queryParams.corpus = this.getCorpusId();
         	}
-        	this.loadCorpusFromParams(queryParams)
+        	this.loadCorpusFromParams(queryParams);
+        	
+        	if (queryParams.palette) {
+        		this.loadColorPaletteForCorpus(queryParams.corpus, queryParams.palette);
+        	}
     	}
     },
     
@@ -22416,9 +22867,32 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	return params.corpus || params.input || (this.getCorpusId && this.getCorpusId()); // TODO: should this include "archive" from V1?
     },
     
+    loadColorPaletteForCorpus: function(corpusId, paletteId) {
+		Ext.Ajax.request({
+    	    url: this.getTromboneUrl(),
+    	    params: {
+        		tool: 'resource.StoredResource',
+        		retrieveResourceId: paletteId,
+    			corpus: corpusId
+    	    },
+    	    success: function(response, req) {
+    	    	var json = Ext.util.JSON.decode(response.responseText);
+    	    	var value = json.storedResource.resource;
+    	    	var palette = Ext.decode(value);
+    	    	this.addColorPalette(paletteId, palette);
+    	    },
+    	    failure: function(response) {
+    	    	this.setApiParam('palette', undefined);
+    	    },
+    	    scope: this
+    	});
+    },
+    
     listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
+    		this.colorTermAssociations.clear();
+    		
     		this.on("unhandledEvent", function(src, eventName, data) {
 				var url = this.getBaseUrl() + '?corpus='+corpus.getAliasOrId();
 				var api = this.getModifiedApiParams() || {}; // use application, not tool

@@ -88,8 +88,11 @@ Ext.define('Voyant.panel.Panel', {
 		application.dispatchEvent.apply(application, arguments);
 	},
 	
-	showError: function(config) {
-		this.getApplication().showError(config)
+	showError: function(config, response) {
+		Ext.applyIf(config, {
+			title: this.localize("error")+" ("+this.localize("title")+")"
+		})
+		this.getApplication().showError(config, response)
 	},
 	
 	toastError: function(config) {

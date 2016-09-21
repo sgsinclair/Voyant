@@ -115,21 +115,44 @@ Ext.define('Voyant.VoyantApp', {
 		this.showError(Ext.create("Voyant.util.ResponseError", {msg: (Ext.isString(config) ? config : config.msg), response: response}))
 	},
 	
-	showError: function(config) {
-		if (config.statusText && config.responseText) {
-			return this.showResponseError({}, config);
-		}
-		if (config instanceof Voyant.util.ResponseError) {
-			var response = config.getResponse();
-			Ext.apply(config, {
-				message: config.getMsg()+" "+this.localize('serverResponseError')+
-					"<pre class='error'>\n"+response.responseText.substring(0,response.responseText.indexOf("\n\t"))+"… "+
-					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.responseText)+"</pre>')); return false;\">more</a></pre>"
-			})
-		}
+	showError: function(config, response) {
 		if (Ext.isString(config)) {
 			config = {message: config}
 		}
+		if (!response && (config.error || config.responseText || config instanceof Voyant.util.ResponseError)) {
+			response = config;
+		}
+		if (response) {
+			config = config || {};
+			config.message = (config.message || "");
+			if (response.error) {
+				var lines = response.error.split(/(\r\n|\r|\n)/);
+				if (lines.length>0) {
+					config.message=this.localize('serverResponseError'); // assuming this is a server error
+					config.message += "<pre class='error'>\n"+lines[0]+"</p>";
+					if (lines.length>1) {
+						config.message+="…  <a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.error)+"</pre>')); return false;\">more</a></pre>";
+					}
+					config.message+="</pre>";
+				}
+			}
+			if (response.responseText) {
+				config.message +=
+					"<pre class='error'>\n"+response.responseText.substring(0,response.responseText.indexOf("\n\t"))+"… "+
+					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.responseText)+"</pre>')); return false;\">more</a></pre>"
+			}
+		}
+//		if (config.statusText && config.responseText) {
+//			return this.showResponseError({}, config);
+//		}
+//		if (config instanceof Voyant.util.ResponseError) {
+//			var response = config.getResponse();
+//			Ext.apply(config, {
+//				message: config.getMsg()+" "+this.localize('serverResponseError')+
+//					"<pre class='error'>\n"+response.responseText.substring(0,response.responseText.indexOf("\n\t"))+"… "+
+//					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.responseText)+"</pre>')); return false;\">more</a></pre>"
+//			})
+//		}
 		Ext.applyIf(config, {
 			title: this.localize("error"),
 		    buttons: Ext.Msg.OK,

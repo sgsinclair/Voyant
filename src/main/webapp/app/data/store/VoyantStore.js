@@ -44,7 +44,7 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			listeners: {
 				exception: function(proxy, request, operation) {
 					if (me.parentPanel && me.parentPanel.showError) {
-						me.parentPanel.showError(new Voyant.util.ResponseError({response: request}))
+						me.parentPanel.showError(operation)
 					}
 				}
 			}

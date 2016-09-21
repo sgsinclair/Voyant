@@ -255,9 +255,13 @@
     	    			this.setMode(this.MODE_DOCUMENT);
     		    		this.loadFromRecords(records);
     		    	}
-    		    	else {
-    					Voyant.application.showResponseError(this.localize('failedGetDocumentTerms'), operation);
-    		    	}
+    		    	// errors should be shown by data store proxy listener
+//    		    	else {
+//    		    		this.showError({
+//    		    			message: this.localize('failedGetDocumentTerms')
+//    		    		}, operation);
+////    					Voyant.application.showResponseError(this.localize('failedGetDocumentTerms'), operation);
+//    		    	}
     		    },
     		    scope: this,
     		    params: this.getApiParams(['stopList','query','docIndex','withDistributions','bins'])
