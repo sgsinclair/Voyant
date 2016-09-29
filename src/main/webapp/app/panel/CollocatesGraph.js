@@ -29,29 +29,63 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	force: undefined,
     	graphHeight: undefined,
     	graphWidth: undefined,
-    	corpusColours: d3.scale.category10()
+    	corpusColours: d3.scale.category10(),
+    	
+    	graphMode: this.DEFAULT_MODE
     },
 
+    DEFAULT_MODE: 0,
+    CENTRALIZED_MODE: 1,
+    
     nodeOptions: {
-		shape: 'box',
-		color: {
-			border: 'rgba(0,0,0,0.1)',
-			background: 'rgba(255,255,255,1)'
-		},
-		scaling: {
-			label: {
-				min: 10, 
-				max: 30
+    	defaultNode: {
+			shape: 'box',
+			color: {
+				border: 'rgba(0,0,0,0.1)',
+				background: 'rgba(255,255,255,1)'
+			},
+			scaling: {
+				label: {
+					min: 10,
+					max: 30,
+					maxVisible: 50,
+					drawThreshold: 6
+				}
 			}
-		}
+    	},
+    	centralizedNode: {
+    		shape: 'text',
+    		scaling: {
+				label: {
+					min: 6,
+					max: 30,
+					maxVisible: 50,
+					drawThreshold: 1
+				}
+			}
+    	}
 	},
 	edgeOptions: {
-		color: {
-			color: 'rgba(0,0,0,0.1)',
-			highlight: 'black',
-			hover: 'red'
+		defaultEdge: {
+			color: {
+				color: 'rgba(0,0,0,0.1)',
+				highlight: 'black',
+				hover: 'red'
+			},
+			labelHighlightBold: false,
+			scaling: {
+				min: 1,
+				max: 15
+			},
+			length: undefined
 		},
-		labelHighlightBold: false
+		centralizedEdge: {
+			scaling: {
+				min: 1,
+				max: 1
+			},
+			length: 150
+		}
 	},
 	highlightOptions: {
 		font: {
@@ -68,21 +102,26 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	physicsOptions: {
 		defaultPhysics: {
 			barnesHut: {
-				"gravitationalConstant": -1500,
-				"centralGravity": 6,
-				"damping": 0.5,
-				"avoidOverlap": 0.5
+				gravitationalConstant: -1500,
+				centralGravity: 6,
+				damping: 0.5,
+				avoidOverlap: 0.5,
+				springConstant: 0.04
 			}
 		},
 		centralizedPhysics: {
 			barnesHut: {
-				"gravitationalConstant": -1500,
-				"centralGravity": 1,
-				"damping": 0.5,
-				"avoidOverlap": 0.5
+				gravitationalConstant: -1500,
+				centralGravity: 1,
+				damping: 1,
+				avoidOverlap: 0.01,
+				springConstant: 0.2
 			}
 		}
 	},
+	
+	stablizationMaxTime: 5000, // milliseconds that stabilization should run for
+	stabilizationTask: undefined, // stop simulation if it's run for too long
 	
 	keywordColor: 'green',
 	contextColor: 'maroon',
@@ -92,6 +131,16 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 
+    	this.stabilizationTask = Ext.TaskManager.newTask({
+    		run: function() {
+    			this.getNetwork().stopSimulation();
+    		},
+    		scope: this,
+    		interval: this.stablizationMaxTime,
+    		repeat: 1,
+    		fireOnStart: false
+    	});
+    	
     },
     
     initComponent: function() {
@@ -113,10 +162,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 		this.getNodeDataSet().clear();
                 		this.getEdgeDataSet().clear();
                 		
-                		this.queryById('contextSlider').enable();
-                		this.getNetwork().setOptions({
-                			physics: this.physicsOptions.defaultPhysics
-                		});
+                		this.setGraphMode(this.DEFAULT_MODE);
                 	},
                 	scope: me
                 },this.localize('context'),{
@@ -134,11 +180,13 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 		changecomplete: {
                 			fn: function(slider, newValue) {
                     			this.setApiParam("context", slider.getValue());
-                    			var terms = this.getNodeDataSet().map(function(node) { return node.label; });
-                				if (terms.length > 0) {
-                					this.getNodeDataSet().clear();
-                					this.loadFromQuery(terms);
-                				}
+                    			if (this.getGraphMode() === this.DEFAULT_MODE) {
+	                    			var terms = this.getNodeDataSet().map(function(node) { return node.label; });
+	                				if (terms.length > 0) {
+	                					this.getNodeDataSet().clear();
+	                					this.loadFromQuery(terms);
+	                				}
+                    			}
                     		},
                     		scope: me
                 		}
@@ -187,23 +235,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				handler: function(b, e) {
 					var n = this.getNetwork().getSelectedNodes();
 		    		if (n[0] != null) {
-		    			this.queryById('contextSlider').disable();
-		    			
-		    			var data = this.getNodeDataSet().get(n[0]);
-		    			data.fixed = true;
-		    			this.getNodeDataSet().clear();
-                		this.getEdgeDataSet().clear();
-                		this.getNodeDataSet().add(data);
-                		
-                		this.getNetwork().setOptions({
-                			physics: this.physicsOptions.centralizedPhysics
-                		});
-                		
-                		var limit = this.getApiParam('limit');
-                		this.setApiParam('limit', 100);
-                		this.itemdblclick(data);
-                		this.setApiParam('limit', limit);
-                		
+		    			this.doCentralize(n[0]);
                 		this.getContextMenu().hide();
 		    		}
 				},
@@ -232,10 +264,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         }, this);
         
         this.on('activate', function() { // load after tab activate (if we're in a tab panel)
-    					if (this.getCorpus()) {
-    						Ext.Function.defer(this.initLoad, 100, this);
-    					}
-    		    	}, this);
+			if (this.getCorpus()) {
+				Ext.Function.defer(this.initLoad, 100, this);
+			}
+    	}, this);
         
         this.on("query", function(src, query) {this.loadFromQuery(query);}, this);
         
@@ -254,10 +286,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         	el.setWidth(el.getWidth());
         	this.setGraphHeight(el.getHeight());
         	this.setGraphWidth(el.getWidth());
-        	
-        	if (this.getNetwork() !== undefined) {
-        		this.getNetwork().fit();
-        	}
 		}, this);
         
         me.callParent(arguments);
@@ -301,7 +329,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         		},
         		scope: this
         	});
-    	}, this)
+    	}, this);
     },
     
     loadFromCorpusTermRecords: function(corpusTerms) {
@@ -332,10 +360,23 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     			var termFreq = corpusCollocate.getKeywordRawFreq();
     			var contextFreq = corpusCollocate.getContextTermRawFreq();
     			
+    			var termValue = termFreq;
+    			var contextValue = contextFreq;
+    			if (this.getGraphMode() === this.CENTRALIZED_MODE) {
+    				termValue = 0;
+    				contextValue = Math.log(contextFreq);
+    			}
+    			
     			if (index == 0) { // only process keyword once
     				if (keywordId === undefined) keywordId = term;
 	    			if (existingKeys[keywordId] !== undefined) {
-	    				nodeDS.update({id: keywordId, value: termFreq, title: term+' ('+termFreq+')', type: 'keyword', font: {color: this.keywordColor}});
+	    				nodeDS.update({
+	    					id: keywordId,
+	    					value: termValue,
+	    					title: term+' ('+termFreq+')',
+	    					type: 'keyword',
+	    					font: {color: this.keywordColor}
+	    				});
 	    			} else {
 	    				existingKeys[keywordId] = true;
 	    				newNodes.push({
@@ -343,7 +384,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    					label: term,
 	    					title: term+' ('+termFreq+')',
 	    					type: 'keyword',
-	    					value: termFreq,
+	    					value: termValue,
 	    					start: start,
 	    					font: {color: this.keywordColor}
 						});
@@ -360,7 +401,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         					label: contextTerm,
         					title: contextTerm+' ('+contextFreq+')',
         					type: 'context',
-        					value: contextFreq,
+        					value: contextValue,
         					start: 0,
         					font: {color: this.contextColor}
     					});
@@ -391,6 +432,55 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	}
     },
     
+    doCentralize: function(node) {
+    	var centralizeLimit = 150;
+		var centerNodeSize = 75;
+		
+		var data = this.getNodeDataSet().get(node);
+		data.fixed = true;
+		data.shape = 'circle';
+		data.scaling = {
+			min: centerNodeSize,
+			max: centerNodeSize
+			,label: {
+				min: centerNodeSize,
+				max: centerNodeSize
+			}
+		};
+		
+		
+		this.getNodeDataSet().clear();
+		this.getEdgeDataSet().clear();
+		this.getNodeDataSet().add(data);
+		
+		this.setGraphMode(this.CENTRALIZED_MODE);
+		
+		var limit = this.getApiParam('limit');
+		this.setApiParam('limit', centralizeLimit);
+		this.itemdblclick(data);
+		this.setApiParam('limit', limit);
+    },
+    
+    setGraphMode: function(mode) {
+    	this.graphMode = mode === undefined ? this.DEFAULT_MODE : mode;
+    	var network = this.getNetwork();
+    	if (network !== undefined) {
+	    	if (this.graphMode === this.DEFAULT_MODE) {
+	    		network.setOptions({
+	    			physics: this.physicsOptions.defaultPhysics,
+	    			nodes: this.nodeOptions.defaultNode,
+	    			edges: this.edgeOptions.defaultEdge
+	    		});
+	    	} else if (this.graphMode === this.CENTRALIZED_MODE) {
+	    		network.setOptions({
+	    			physics: this.physicsOptions.centralizedPhysics,
+	    			nodes: this.nodeOptions.centralizedNode,
+	    			edges: this.edgeOptions.centralizedEdge
+	    		});
+	    	}
+    	}
+    },
+    
     initGraph: function() {
     	var el = this.getLayout().getRenderTarget();
     	el.setWidth(el.getWidth());
@@ -405,20 +495,16 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			hover: true,
 	    			hoverConnectedEdges: true,
 	    			multiselect: false
-	    		},
-	    		physics: this.physicsOptions.defaultPhysics,
-	    		nodes: this.nodeOptions,
-	    		edges: this.edgeOptions
+	    		}
 	    	};
-	    	
 	    	
 	    	var network = new vis.Network(el.dom, {
 	    		nodes: this.getNodeDataSet(),
 	    		edges: this.getEdgeDataSet()
 	    	}, options);
-	
-	    	
 	    	this.setNetwork(network);
+	    	
+	    	this.setGraphMode();
 	    	
 	    	this.getNodeDataSet().on('remove', function(e, props, sender) {
 	    		var key = props.items[0];
@@ -511,6 +597,29 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			menu.showAt(params.event.pageX, params.event.pageY);
 	    		}
 	    	}.bind(this));
+	    	
+	    	network.on('startStabilizing', function() {
+	    		this.stabilizationTask.restart();
+	    	}.bind(this));
+	    	
+	    	network.on('stabilized', function() {
+	    		this.stabilizationTask.stop();
+	    		this.getNetwork().fit({
+	    			animation: {
+	    				duration: 500,
+	    				easing: 'linear'
+	    			}
+	    		});
+	    	}.bind(this));
+	    	
+	    	network.on('resize', function(params) {
+	    		this.getNetwork().fit({
+	    			animation: {
+	    				duration: 500,
+	    				easing: 'linear'
+	    			}
+	    		});
+	    	}.bind(this));
     	}
     },
     
@@ -521,8 +630,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		});
 		this.getNodeDataSet().update(ids);
 		ids = this.getEdgeDataSet().map(function(edge) {
-			return {id: edge.id}
-		})
+			return {id: edge.id};
+		});
 		this.getEdgeDataSet().update(ids);
     },
     
