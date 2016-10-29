@@ -478,7 +478,8 @@ Ext.apply(Voyant.panel.Trends.i18n, {
 "options":"オプション",
 "rawFrequencies":"粗頻度",
 "helpTip":"<p><i>トレンド</i>は一つまたは複数のコーパス（ドキュメント）を横断して、相対頻度をグラフ化します。含まれる機能</p><ul><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul></li></ul>",
-"relative":"相関"});
+"relative":"相関",
+"failedGetDocumentTerms":"Failed to get document terms for Trends."});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"キャンセル",
 "de":"ドイツ語",

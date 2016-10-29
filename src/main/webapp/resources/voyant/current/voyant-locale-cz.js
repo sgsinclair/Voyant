@@ -478,7 +478,8 @@ Ext.apply(Voyant.panel.Trends.i18n, {
 "options":"Nastavení",
 "rawFrequencies":"Prosté frekvence",
 "helpTip":"<p><i>Trendy</i> ukazují čárový graf relativních četností napříč korpusem (pro více dokumentů), nebo uvnitř dokumentu. Funkce zahrnují </p><ul><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud chcete získat nápovědu k syntaxi)</li></ul>",
-"relative":"Relativní"});
+"relative":"Relativní",
+"failedGetDocumentTerms":"Failed to get document terms for Trends."});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"Zrušit",
 "de":"němčina",

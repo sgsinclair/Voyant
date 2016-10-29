@@ -478,7 +478,8 @@ Ext.apply(Voyant.panel.Trends.i18n, {
 "options":"Options",
 "rawFrequencies":"Raw Frequencies",
 "helpTip":"<p><i>Trends</i> shows a line graph of the relative frequencies across the corpus (for multiple documents) or within a document. Features include</p><ul><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
-"relative":"Relative"});
+"relative":"Relative",
+"failedGetDocumentTerms":"Failed to get document terms for Trends."});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"Cancel",
 "de":"German",

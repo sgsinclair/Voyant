@@ -478,7 +478,8 @@ Ext.apply(Voyant.panel.Trends.i18n, {
 "options":"فواينت تولز",
 "rawFrequencies":"التواترالاساسية",
 "helpTip":"<p><i>ترندز</i> يظهر خط الرسم البياني للتواترات النسبية عبر المكنز (في حالة وجود مستندات متعددة) او داخل المستند. الوظائف المتاحة:</p><ul><li>مربع البحث للإستفسارات (التحويم على أيقونة التكبير للمساعدة في طريقة البحث)",
-"relative":"نسبي"});
+"relative":"نسبي",
+"failedGetDocumentTerms":"Failed to get document terms for Trends."});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"الغاء",
 "de":"الماني",

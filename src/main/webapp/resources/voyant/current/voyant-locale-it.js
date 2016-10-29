@@ -478,7 +478,8 @@ Ext.apply(Voyant.panel.Trends.i18n, {
 "options":"Opzioni",
 "rawFrequencies":"Frequenze assolute",
 "helpTip":"<p><i>Andamenti</i> mostra un grafico lineare delle frequenze relative all'interno del corpus (per più di un documento) o in un documento. Le funzionalità includono</p><ul><li>un campo per la ricerca (passare sopra l'icona lente di ingrandimento per ottenere aiuto con la sintassi)</li></ul>",
-"relative":"Relative"});
+"relative":"Relative",
+"failedGetDocumentTerms":"Failed to get document terms for Trends."});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"Elimina",
 "de":"Tedesco",
