@@ -55,7 +55,12 @@ Ext.define('Voyant.VoyantCorpusApp', {
         	this.loadCorpusFromParams(queryParams);
         	
         	if (queryParams.palette) {
-        		this.loadColorPaletteForCorpus(queryParams.corpus, queryParams.palette);
+        		if (queryParams.palette.indexOf(",")>-1) { // treat as inline
+        	    	var palette = Ext.decode(queryParams.palette);
+        	    	this.addColorPalette(queryParams.palette, palette);
+        		} else {
+            		this.loadColorPaletteForCorpus(queryParams.corpus, queryParams.palette);
+        		}
         	}
     	}
     },

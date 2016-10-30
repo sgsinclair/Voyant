@@ -21,6 +21,7 @@ Clicking on the [Options](#!/guide/options) icon also allows produces a dialog b
 - **White List**: you can define a set of allowed words (the opposite of a stopwords list), only terms in this list will be shown in Cirrus (note that the stopwords list is still active, so you may want to choose "None" from the stopwords menu to deactivate it)
 - **Max Terms**: you can specify the maximum number of terms to be fetched as data from the server (though the **Terms** slider described above determines how many of these terms are visible at once); note that setting this too high may slow things down considerably
 - **Font Family**: you can determine which font is used by Cirrus, a set of web safe fonts is provided, as well as [Lato](http://www.latofonts.com/); you can also specify a font installed on your computer, but of course it may not be available on other computers (in which case a default font is used)
+- **Palette**: you can [edit the colour palette](#!/guide/palette)
 
 ## Flexible Scale
 
@@ -38,5 +39,6 @@ Word clouds can be effective at very quickly drawing attention to high frequency
 
 - [Getting Started](#!/guide/start)
 - [Stopwords](#!/guide/stopwords)
+- [Palette](#!/guide/palette)
 - [Default Skin](#!/guide/skins-section-default-skin)
 - [List of Tools](#!/guide/tools)

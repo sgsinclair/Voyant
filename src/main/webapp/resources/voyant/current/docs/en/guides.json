@@ -47,6 +47,11 @@
                         "title": "Search"
                     },
                     {
+                        "name": "palette",
+                        "url": "guides/ui/palette",
+                        "title": "Palette"
+                    },
+                    {
                         "name": "grids",
                         "url": "guides/ui/grids",
                         "title": "Grids"

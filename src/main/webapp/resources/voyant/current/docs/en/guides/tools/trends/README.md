@@ -22,11 +22,12 @@ You can choose to display either raw or relative frequencies.
 * **relative frequencies** (default): term frequency in document or document segment per normalized count of 1 million terms
 * **raw frequencies**: the absolute count for each document or document segment
 
-Clicking on the [Options](#!/guide/options) icon allows you to define a set of stopwords to exclude – see the [stopwords guide](#!/guide/stopwords) for more information.
+Clicking on the [Options](#!/guide/options) icon allows you to define a set of stopwords to exclude – see the [stopwords guide](#!/guide/stopwords) for more information.  The options also allow you to [edit the colour palette](#!/guide/palette).
 
 ## See Also
 
 - [Getting Started](#!/guide/start)
 - [Stopwords](#!/guide/stopwords)
+- [Palette](#!/guide/palette)
 - [Default Skin](#!/guide/skins-section-default-skin)
 - [List of Tools](#!/guide/tools)

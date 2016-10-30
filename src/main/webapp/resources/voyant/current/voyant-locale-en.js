@@ -36,6 +36,15 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"publisher",
 "pubDateField":"publication date",
 "exportNewCorpusTip":"Create a new corpus from matching documents (button will be disabled if there are no matches)."});
+Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
+"paletteEditor":"Palette Editor",
+"add":"Add",
+"cancel":"Cancel",
+"editList":"Edit List",
+"saveNewPalette":"Save New Palette",
+"clear":"Clear",
+"palette":"Palette",
+"remove":"Remove"});
 Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"Panel to control settings for word display.",
 "linear":"Linear",

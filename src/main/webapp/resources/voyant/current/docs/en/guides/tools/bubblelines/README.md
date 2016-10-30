@@ -26,7 +26,7 @@ The "Segments" slider allows you to adjust how many segments are used for each d
 
 You also have the choice of viewing all the terms from a document on one line, or separating each term on its own line.
 
-Clicking on the [Options](#!/guide/options) icon allows you to define a set of stopwords to exclude – see the [stopwords guide](#!/guide/stopwords) for more information.
+Clicking on the [Options](#!/guide/options) icon allows you to define a set of stopwords to exclude – see the [stopwords guide](#!/guide/stopwords) for more information. The options also allow you to [edit the colour palette](#!/guide/palette).
 
 ## Additional Information
 
@@ -39,5 +39,6 @@ Bubblelines was initially designed by Carlos Fiorentino as a student of Stan Rue
 - [Getting Started](#!/guide/start)
 - [Stopwords](#!/guide/stopwords)
 - [Term Searches](#!/guide/search)
+- [Palette](#!/guide/palette)
 - [Default Skin](#!/guide/skins-section-default-skin)
 - [List of Tools](#!/guide/tools)

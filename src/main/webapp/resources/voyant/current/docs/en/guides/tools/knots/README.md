@@ -27,11 +27,12 @@ There are three sliders that help fine-tune the visualization. The sliders remai
 * **start angle**: each line will originate from this angle (0&deg; is to the right, 90&deg; toward the bottom, etc. up to 360&deg;)
 * **turn angle**: the angle to turn for each occurrence encountered, from 0&deg; to 90&deg;
 
-You can also select the [stopwords](#!/guide/stopwords) (words to ignore) from the top options menu.
+You can also select the [stopwords](#!/guide/stopwords) (words to ignore) from the top options menu, as well as [edit the colour palette](#!/guide/palette).
 
 ## See Also
 
 - [Getting Started](#!/guide/start)
 - [Stopwords](#!/guide/stopwords)
+- [Palette](#!/guide/palette)
 - [Default Skin](#!/guide/skins-section-default-skin)
 - [List of Tools](#!/guide/tools)

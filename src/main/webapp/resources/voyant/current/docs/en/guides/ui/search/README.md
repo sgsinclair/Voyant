@@ -30,6 +30,6 @@ Note that Voyant doesn't currently support regular expressions.
 
 ## Next Steps
 
-* [grids](#!/guide/grids)
+- [palette](#!/guide/palette)
 * [explore the tools](#!/guide/tools)
 * read [about Voyant Tools](#!/guide/about)

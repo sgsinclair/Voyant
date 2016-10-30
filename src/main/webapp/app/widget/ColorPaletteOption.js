@@ -42,7 +42,7 @@ Ext.define('Voyant.widget.ColorPaletteOption', {
 	    	        value: value,
 	    	        triggerAction: 'all',
 	    	        editable: true,
-	    	        fieldLabel: 'Palette',
+	    	        fieldLabel: me.localize('palette'),
 	    	        labelAlign: 'right',
 	    	        name: 'palette',
 	    	        displayField: 'name',

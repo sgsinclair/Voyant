@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Oct 28 16:36:34 EDT 2016 */
+/* This file created by JSCacher. Last modified: Sat Oct 29 17:01:14 EDT 2016 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8230,7 +8230,7 @@ Ext.define('Voyant.widget.ColorPaletteOption', {
 	    	        value: value,
 	    	        triggerAction: 'all',
 	    	        editable: true,
-	    	        fieldLabel: 'Palette',
+	    	        fieldLabel: me.localize('palette'),
 	    	        labelAlign: 'right',
 	    	        name: 'palette',
 	    	        displayField: 'name',
@@ -22830,7 +22830,12 @@ Ext.define('Voyant.VoyantCorpusApp', {
         	this.loadCorpusFromParams(queryParams);
         	
         	if (queryParams.palette) {
-        		this.loadColorPaletteForCorpus(queryParams.corpus, queryParams.palette);
+        		if (queryParams.palette.indexOf(",")>-1) { // treat as inline
+        	    	var palette = Ext.decode(queryParams.palette);
+        	    	this.addColorPalette(queryParams.palette, palette);
+        		} else {
+            		this.loadColorPaletteForCorpus(queryParams.corpus, queryParams.palette);
+        		}
         	}
     	}
     },
