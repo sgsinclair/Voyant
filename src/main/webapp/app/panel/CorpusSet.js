@@ -98,23 +98,25 @@ Ext.define('Voyant.panel.CorpusSet', {
     	boxready: function() {
     		var panelsString = this.getApiParam("panels");
     		if (panelsString) {
-    			var panels = panelsString.toLowerCase().split(",");
-    			var tabpanels = this.query("voyanttabpanel");
-    			for (var i=0, len=panels.length; i<len; i++) {
-    				var panel = panels[i];
-    				if (panel && Ext.ClassManager.getByAlias('widget.'+panel) && tabpanels[i]) {
-    					var tabpanel = tabpanels[i];
-    					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already selected
-    					tabpanel.items.each(function(item, index) {
-    						if (item.isXType(panel)) {
-    							this.setActiveTab(index)
-    							return false
-    						}
-    					}, tabpanel)
-    					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already switched
-    					tabpanel.getActiveTab().replacePanel(panel); // switch to specified panel
-    				}
-    			}
+    			Ext.defer(function() { // we need to defer otherwise corpus loaded doesn't always trigger
+        			var panels = panelsString.toLowerCase().split(",");
+        			var tabpanels = this.query("voyanttabpanel");
+        			for (var i=0, len=panels.length; i<len; i++) {
+        				var panel = panels[i];
+        				if (panel && Ext.ClassManager.getByAlias('widget.'+panel) && tabpanels[i]) {
+        					var tabpanel = tabpanels[i];
+        					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already selected
+        					tabpanel.items.each(function(item, index) {
+        						if (item.isXType(panel)) {
+        							this.setActiveTab(index)
+        							return false
+        						}
+        					}, tabpanel)
+        					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already switched
+        					tabpanel.getActiveTab().replacePanel(panel); // switch to specified panel
+        				}
+        			}
+    			}, 10, this)
     		}
     		// add an easter egg
     		var cirrus = this.down('cirrus');
