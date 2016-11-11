@@ -442,9 +442,12 @@ Ext.define('Voyant.util.Toolable', {
 		    icon: Ext.Msg.INFO,
 		    prompt: true,
 	        multiline: true,
-	        value: "<!--	Exported from Voyant Tools: http://voyant-tools.org/.\n"+
-	        	"Please note that this is an early version and the API may change.\n"+
-	        	"Feel free to change the height and width values below: -->\n"+
+	        value: "<!--	Exported from Voyant Tools (voyant-tools.org).\n"+
+	        	"The iframe src attribute below uses a relative protocol to better function with both\n"+
+	        	"http and https sites, but if you're embedding this into a local web page (file protocol)\n"+
+	        	"you should add an explicit protocol (https if you're using voyant-tools.org, otherwise\n"+
+	        	"it depends on this server.\n"+
+	        	"Feel free to change the height and width values or other styling below: -->\n"+
 	        	"<iframe style='width: 100%; height: 800px' src='"+this.getExportUrl()+"'></iframe>"
 		});
 	},
