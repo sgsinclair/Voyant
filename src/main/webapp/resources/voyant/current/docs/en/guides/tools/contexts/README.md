@@ -7,7 +7,7 @@ The Contexts (or Keywords in Context) tool shows each occurrence of a keyword wi
 The table view shows the following three columns by default:
 
 - *Document*: this is document in which keyword and contexts occur
-- *Left*: contextual words to the left of the keyword
+- *Left*: contextual words to the left of the keyword (note that sorting by this column treats words in reverse order, right to left from the keyword)
 - *Term*: the keyword matching the default or user-provided term query
 - *Right*: contextual words to the right of the keyword
 
