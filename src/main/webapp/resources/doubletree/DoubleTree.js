@@ -7,6 +7,7 @@
  * - branch length based on text length on per node basis
  * - click handler
  * - zoom fixes
+ * - redraw checks for tries before re-running setup
  */
 
 /*
@@ -155,7 +156,9 @@ doubletree.DoubleTree = function() {
 	 * redraw the visualization
 	 */
 	mine.redraw = function() {
-		mine.setupFromTries(leftTrie, rtTrie);
+		if (leftTrie !== undefined && rtTrie !== undefined) {
+			mine.setupFromTries(leftTrie, rtTrie);
+		}
 
 		return mine;
 	}

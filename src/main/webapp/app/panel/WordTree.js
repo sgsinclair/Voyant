@@ -40,6 +40,42 @@ Ext.define('Voyant.panel.WordTree', {
                 enableOverflow: true,
                 items: [{
                 	xtype: 'querysearchfield'
+                }, this.localize('branches'), {
+                	xtype: 'slider',
+                	itemId: 'branchesSlider',
+                	minValue: 2,
+                	value: 5,
+                	maxValue: 15,
+                	increment: 1,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(this.getApiParam('limit'));
+                		},
+                		changecomplete: function(slider, newValue) {
+                			this.setApiParam('limit', slider.getValue());
+                			this.reload();
+                		},
+                		scope: this
+                	}
+                }, this.localize('context'), {
+                	xtype: 'slider',
+                	itemId: 'contextSlider',
+                	minValue: 3,
+                	value: 10,
+                	maxValue: 20,
+                	increment: 2,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(this.getApiParam('context'));
+                		},
+                		changecomplete: function(slider, newValue) {
+                			this.setApiParam('context', slider.getValue());
+                			this.reload();
+                		},
+                		scope: this
+                	}
                 }]
     		}]
         });
@@ -54,21 +90,26 @@ Ext.define('Voyant.panel.WordTree', {
         	listeners: {
         		load: function(store, records, success, operation) {
         			if (success) {
-        				var prefix = [], hit = [], suffix = [], id = [];
+        				var prefixes = [], hits = [], suffixes = [], ids = [];
         				for (var i = 0; i < records.length; i++) {
         					var r = records[i];
-        					//prefix.push([r.getLeft().trim().replace(/\s+/g, ' ')]);
-        					prefix.push(r.getLeft().trim().split(/\s+/));
-        					hit.push(r.getMiddle());
-        					//suffix.push([r.getRight().trim().replace(/\s+/g, ' ')]);
-        					suffix.push(r.getRight().trim().split(/\s+/));
-        					id.push(i);
+        					var prefix = r.getLeft().trim().split(/\s+/);
+        					prefixes.push(prefix);
+        					var hit = r.getMiddle();
+        					if (hits.length == 0) {
+        						hits.push(hit);
+        					} else {
+        						hits.push(hits[0]);
+        					}
+        					var suffix = r.getRight().trim().split(/\s+/);
+        					suffixes.push(suffix);
+        					ids.push(i);
         				}
         				var caseSensitive = false;
         				var fieldNames = ["token", "POS"];
         				var fieldDelim = "/";
         				var distinguishingFieldsArray = ["token", "POS"];
-        				this.getTree().setupFromArrays(prefix, hit, suffix, id, caseSensitive, fieldNames, fieldDelim, distinguishingFieldsArray);
+        				this.getTree().setupFromArrays(prefixes, hits, suffixes, ids, caseSensitive, fieldNames, fieldDelim, distinguishingFieldsArray);
         				
         				if (!this.getTree().succeeded()) {
         					this.toastInfo({
@@ -126,7 +167,12 @@ Ext.define('Voyant.panel.WordTree', {
     	}, this);
         
         this.on('resize', function(panel, width, height) {
-
+        	var tree = this.getTree();
+        	if (tree !== undefined) {
+        		tree.visWidth(width).visHeight(height);
+        		// TODO preserve expanded branches
+        		tree.redraw();
+        	}
 		}, this);
         
         this.on('boxready', this.initGraph, this);
@@ -176,6 +222,13 @@ Ext.define('Voyant.panel.WordTree', {
     setRoot: function(query) {
     	this.setApiParam('query', this.stripPunctuation(query));
 		this.getKwicStore().load({params: this.getApiParams()});
+    },
+    
+    reload: function() {
+    	var query = this.getApiParam('query');
+    	if (query !== undefined) {
+    		this.setRoot(query);
+    	}
     },
     
     stripPunctuation: function(value) {
