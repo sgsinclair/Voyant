@@ -11,7 +11,7 @@ Ext.define('Voyant.panel.WordTree', {
     		docIndex: undefined,
     		stopList: 'auto',
     		context: 10,
-    		limit: 5
+    		limit: 100
     	},
 		glyph: 'xf0e8@FontAwesome'
     },
@@ -20,7 +20,8 @@ Ext.define('Voyant.panel.WordTree', {
     	corpus: undefined,
     	tree: undefined,
     	kwicStore: undefined,
-    	options: {xtype: 'stoplistoption'}
+    	options: {xtype: 'stoplistoption'},
+    	numBranches: 5
     },
     
     doubleClickDelay: 300,
@@ -40,6 +41,24 @@ Ext.define('Voyant.panel.WordTree', {
                 enableOverflow: true,
                 items: [{
                 	xtype: 'querysearchfield'
+                }, this.localize('pool'), {
+                	xtype: 'slider',
+                	itemId: 'poolSlider',
+                	minValue: 10,
+                	value: 100,
+                	maxValue: 1000,
+                	increment: 5,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(this.getApiParam('limit'));
+                		},
+                		changecomplete: function(slider, newValue) {
+                			this.setApiParam('limit', slider.getValue());
+                			this.reload();
+                		},
+                		scope: this
+                	}
                 }, this.localize('branches'), {
                 	xtype: 'slider',
                 	itemId: 'branchesSlider',
@@ -50,10 +69,10 @@ Ext.define('Voyant.panel.WordTree', {
                 	width: 50,
                 	listeners: {
                 		render: function(slider) {
-                			slider.setValue(this.getApiParam('limit'));
+                			slider.setValue(this.getNumBranches());
                 		},
                 		changecomplete: function(slider, newValue) {
-                			this.setApiParam('limit', slider.getValue());
+                			this.setNumBranches(slider.getValue());
                 			this.reload();
                 		},
                 		scope: this
@@ -90,33 +109,7 @@ Ext.define('Voyant.panel.WordTree', {
         	listeners: {
         		load: function(store, records, success, operation) {
         			if (success) {
-        				var prefixes = [], hits = [], suffixes = [], ids = [];
-        				for (var i = 0; i < records.length; i++) {
-        					var r = records[i];
-        					var prefix = r.getLeft().trim().split(/\s+/);
-        					prefixes.push(prefix);
-        					var hit = r.getMiddle();
-        					if (hits.length == 0) {
-        						hits.push(hit);
-        					} else {
-        						hits.push(hits[0]);
-        					}
-        					var suffix = r.getRight().trim().split(/\s+/);
-        					suffixes.push(suffix);
-        					ids.push(i);
-        				}
-        				var caseSensitive = false;
-        				var fieldNames = ["token", "POS"];
-        				var fieldDelim = "/";
-        				var distinguishingFieldsArray = ["token", "POS"];
-        				this.getTree().setupFromArrays(prefixes, hits, suffixes, ids, caseSensitive, fieldNames, fieldDelim, distinguishingFieldsArray);
-        				
-        				if (!this.getTree().succeeded()) {
-        					this.toastInfo({
-       		    				html: this.localize("emptyText"),
-       		    				align: 'bl'
-       		    			});
-        				}
+        				this.parseRecords(records);
         			}
         		},
         		scope: this
@@ -179,7 +172,110 @@ Ext.define('Voyant.panel.WordTree', {
         
         this.callParent(arguments);
     },
-        
+    
+    parseRecords: function(records) {
+    	var parsedRecords = [];
+		for (var i = 0; i < records.length; i++) {
+			var r = records[i];
+			var pr = {
+				id: i,
+				prefix: r.getLeft().trim().split(/\s+/),
+				hit: r.getMiddle(),
+				suffix: r.getRight().trim().split(/\s+/)
+			};
+			parsedRecords.push(pr);
+		}
+		
+		// find top tokens and sort records by them
+		var prefixTokenCounts = {};
+		var suffixTokenCounts = {};
+		for (var i = 0; i < parsedRecords.length; i++) {
+			var pr = parsedRecords[i];
+			var prefixToken = pr.prefix[pr.prefix.length-1];
+			var suffixToken = pr.suffix[0];
+			if (prefixTokenCounts[prefixToken]) {
+				prefixTokenCounts[prefixToken]++;
+			} else {
+				prefixTokenCounts[prefixToken] = 1;
+			}
+			if (suffixTokenCounts[suffixToken]) {
+				suffixTokenCounts[suffixToken]++;
+			} else {
+				suffixTokenCounts[suffixToken] = 1;
+			}
+		}
+		
+		var sortableTokens = [];
+		for (var i = 0; i < parsedRecords.length; i++) {
+			var pr = parsedRecords[i];
+			var prefixToken = pr.prefix[pr.prefix.length-1];
+			var suffixToken = pr.suffix[0];
+			
+			sortableTokens.push({
+				suffix: suffixToken, suffixCount: suffixTokenCounts[suffixToken],
+				prefix: prefixToken, prefixCount: prefixTokenCounts[prefixToken]
+			});
+			
+		}
+		
+		var prioritizeSuffix = false;
+		// multi-sort
+		sortableTokens.sort(function(a, b) {
+			var s1 = a.suffixCount;
+			var s2 = b.suffixCount;
+			
+			var p1 = a.prefixCount;
+			var p2 = b.prefixCount;
+			
+			if (prioritizeSuffix) {
+				if (s1 > s2) return -1;
+				if (s1 < s2) return 1;
+				if (p1 > p2) return -1;
+				if (p1 < p2) return 1;
+			} else {
+				if (p1 > p2) return -1;
+				if (p1 < p2) return 1;
+				if (s1 > s2) return -1;
+				if (s1 < s2) return 1;
+			}
+			
+			return 0;
+		});
+		
+		var len = Math.min(this.getNumBranches(), sortableTokens.length);
+		var topSuffixTokens = [];
+		var topPrefixTokens = [];
+		for (var i = 0; i < len; i++) {
+			topSuffixTokens.push(sortableTokens[i].suffix);
+			topPrefixTokens.push(sortableTokens[i].prefix);
+		}
+		
+		// use top tokens to limit results
+		var prefixes = [], hits = [], suffixes = [], ids = [];
+		for (var i = 0; i < parsedRecords.length; i++) {
+			var parsedRecord = parsedRecords[i];
+			if (topSuffixTokens.indexOf(parsedRecord.suffix[0]) != -1 || topPrefixTokens.indexOf(parsedRecord.suffix[0]) != -1) {
+				prefixes.push(parsedRecord.prefix);
+				hits.push(parsedRecord.hit);
+				suffixes.push(parsedRecord.suffix);
+				ids.push(parsedRecord.id);
+			}
+		}
+		
+		var caseSensitive = false;
+		var fieldNames = ["token", "POS"];
+		var fieldDelim = "/";
+		var distinguishingFieldsArray = ["token", "POS"];
+		this.getTree().setupFromArrays(prefixes, hits, suffixes, ids, caseSensitive, fieldNames, fieldDelim, distinguishingFieldsArray);
+		
+		if (!this.getTree().succeeded()) {
+			this.toastInfo({
+   				html: this.localize("emptyText"),
+   				align: 'bl'
+   			});
+		}
+    },
+    
     initGraph: function() {
     	var el = this.getLayout().getRenderTarget();
     	var w = el.getWidth();
