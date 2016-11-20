@@ -110,7 +110,7 @@ a {
 
 /* Reader */
 
-.voyant-reader .x-panel-body .keyword, .keyword {
+.voyant-reader .x-panel-body .keyword, .voyant-reader .x-panel-body .word:hover, .keyword {
 	background-color: yellow;
 }
 
