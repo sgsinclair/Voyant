@@ -7,6 +7,8 @@
  * - branch length based on text length on per node basis
  * - click handler
  * - zoom fixes
+ * - redraw checks for tries before re-running setup
+ * - prevent negative height error
  */
 
 /*
@@ -155,7 +157,9 @@ doubletree.DoubleTree = function() {
 	 * redraw the visualization
 	 */
 	mine.redraw = function() {
-		mine.setupFromTries(leftTrie, rtTrie);
+		if (leftTrie !== undefined && rtTrie !== undefined) {
+			mine.setupFromTries(leftTrie, rtTrie);
+		}
 
 		return mine;
 	}
@@ -844,16 +848,20 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 		// compensate
 		dx = root.x - height / 2;
 
+		var baseBranchSegmentWidth = 50;
 		// Normalize for fixed-depth.
 		nodes.forEach(function(d) {
-			var textSize = 0;
-			var parent = d.parent;
-			while (parent != null) {
-				textSize += Ext.draw.TextMeasurer.measureText(parent.name, 'arial').width;
-				parent = parent.parent;
+			var textSize = d.textSize;
+			if (textSize == undefined) {
+				textSize = 0;
+				var parent = d.parent;
+				while (parent != null) {
+					textSize += parent.textSize || Ext.draw.TextMeasurer.measureText(parent.name, 'arial').width;
+					parent = parent.parent;
+				}
+				d.textSize = textSize; // cache the size so we don't recalculate each time
 			}
-			
-			d.y = d.depth * 25 + textSize;
+			d.y = d.depth * baseBranchSegmentWidth + textSize;
 		});
 
 		// Update the nodes…
@@ -933,7 +941,12 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 					.insert("rect", "text")
 					.attr("class", "nodeRect")
 					.attr("height", function() {
-						return this.parentElement.getBBox().height - 6;
+						var height = this.parentElement.getBBox().height;
+						if (height < 6) {
+							// end of branch, need to prevent negative height
+							height = 6.1;
+						}
+						return height - 6;
 					})
 					.attr("y", function(d) {
 						if (!d.parent) {
