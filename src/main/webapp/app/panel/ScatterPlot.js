@@ -110,8 +110,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
         								} else {
         									this.setApiParam('analysis', 'ca');
         									if (this.getCorpus().getDocumentsCount() == 3) {
-        	//									this.setApiParam('dimensions', 2);
-        	//									this.dimsButton.menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
+        										this.setApiParam('dimensions', 2);
+        										this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
         									}
         								}
         								this.loadFromApis(true);
@@ -200,7 +200,15 @@ Ext.define('Voyant.panel.ScatterPlot', {
         					listeners: {
         						click: function(menu, item) {
         							if (item !== undefined) {
-        								this.setApiParam('dimensions', parseInt(item.text));
+        								var dims = parseInt(item.text);
+        								
+        								if (dims == 3 && this.getApiParam('analysis') == 'ca' && this.getCorpus().getDocumentsCount() == 3) {
+        									dims = 2;
+        									// TODO add info message 'Because of the nature of Correspondence Analysis, you can only use 2 dimensions with 3 documents.'
+        									return false;
+        								}
+        								
+        								this.setApiParam('dimensions', dims);
         								this.loadFromApis(true);
         							}
         						},
@@ -348,10 +356,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
     			},{
     				text: this.localize('rawFreq'),
     				dataIndex: 'rawFreq',
+    				flex: 0.75,
+    				minWidth: 70,
                     sortable: true
     			},{
     				text: this.localize('relFreq'),
     				dataIndex: 'relativeFreq',
+    				flex: 0.75,
+    				minWidth: 70,
                     sortable: true,
                     hidden: true
     			}],
@@ -390,13 +402,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	this.on('loadedCorpus', function(src, corpus) {
     		function setCheckItemFromApi(apiParamName) {
     			var value = this.getApiParam(apiParamName);
-    			var menu = this.queryById('chartParent').getDockedItems('toolbar')[0].down('#'+apiParamName);
+    			var menu = this.queryById(apiParamName);
     			menu.down('#'+apiParamName+'_'+value).setChecked(true);
     		}
     		var setCheckBound = setCheckItemFromApi.bind(this);
     		setCheckBound('analysis');
 //    		setCheckBound('limit');
     		setCheckBound('clusters');
+    		
+    		if (corpus.getDocumentsCount() == 3) {
+    			this.setApiParam('dimensions', 2);
+    		}
     		setCheckBound('dimensions');
     		
     		this.setCorpus(corpus);
@@ -546,7 +562,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	axes: [{
         		type: 'numeric',
         		position: 'bottom',
-        		fields: ['x']
+        		fields: ['x'],
+        		label: {
+                    rotate:{degrees:-30}
+            	}
         	},{
         		type: 'numeric',
         		position: 'left',
