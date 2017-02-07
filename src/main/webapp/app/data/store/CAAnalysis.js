@@ -17,8 +17,7 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 				url: Voyant.application.getTromboneUrl(),
 				extraParams: {
 					tool: 'corpus.CA',
-					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
-					withDistributions: true
+					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
 		         },
 		         reader: {
 		             type: 'json',
