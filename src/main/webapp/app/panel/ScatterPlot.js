@@ -584,6 +584,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xField: 'x',
         		yField: 'y',
         		store: termSeriesStore,
+        		label: {
+        			font: '14px Helvetica',
+        			field: 'term',
+        			display: 'over'
+        		},
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
@@ -629,6 +634,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xField: 'x',
         		yField: 'y',
         		store: docSeriesStore,
+        		label: {
+        			font: 'bold 14px Helvetica',
+        			field: 'term',
+        			display: 'over'
+        		},
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
@@ -719,15 +729,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		scope: this
         	}
         };
-    	
-		config.series[0].label = {
-			field: 'term',
-			display: 'over'
-		};
-		config.series[1].label = {
-			field: 'term',
-			display: 'over'
-		};
     	
     	var chart = Ext.create('Ext.chart.CartesianChart', config);
     	this.queryById('chartParent').insert(0, chart);
