@@ -198,7 +198,7 @@ Ext.define('Voyant.util.Toolable', {
 		})
 		this.on("afterrender", function() {
 			var header = this.getHeader();
-			if (header && Ext.os.deviceType=="Desktop") {
+			if (header && Ext.os.deviceType=="Desktop" && !this.isXType("corpuscreator")) {
 				var el = header.getEl();
 				el.on("mouseover", function() {
 					this.getHeader().getTools().forEach(function(tool) {
