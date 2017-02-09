@@ -36,6 +36,15 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"الناشر",
 "pubDateField":"تاريخ النشر",
 "exportNewCorpusTip":"انشاء مكنز جديد من المستندات المطابقة (الزرسيكون معطل في حال عدم وجود مستندات مطابقة) "});
+Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
+"paletteEditor":"Palette Editor",
+"add":"إضافة",
+"cancel":"إلغاء",
+"editList":"تحرير القائمة ",
+"saveNewPalette":"Save New Palette",
+"clear":"إزالة",
+"palette":"Palette",
+"remove":"إزالة"});
 Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"إطارالتحكم بإعدادات كشف الكلمات",
 "linear":"خطي",
@@ -143,8 +152,10 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "noPasswordGiven":"يرجى ادخال رمز الوصول",
 "passwordValidationError":"عذرا  وقع خطأ غير متوقع عند التحقق من رمز الوصول",
 "passwordRequiredMessage":"رمزالوصول مطلوب لهذا المكنز",
+"didYouKnow":"Did you know?",
 "passwordRequiredTitle":"رمزالوصول مطلوب",
 "password":"رمز الوصول",
+"didYouKnowText":"Help and options are available!",
 "moreToolsScaleDocument":"أدوات المستند",
 "moreToolsTypeGrid":"أدوات جدولية",
 "moreToolsType":"أدوات بحسب النوع",
@@ -338,7 +349,7 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "tfidf":"الدلالة",
 "title":"دوكيومنت تيرمز(كلمات المستند)",
 "helpTip":"دوكيومنت تيرمز هو عرض جدولي للكلمات التي تظهر في كل مستندز المميزات المتاحة:</p><ul><li>اعادة الترتيب بحسب <i>الكلمة</i>, <i>عدد </i>(التواتر الاساسي), و التواتر <i>النسبي</i>(النقر على ترويسة العواميد)</li><li>مخطط مؤشر لتوزيع التواترات لكلمة عبر المستندات</li><li>عواميد اضافية متاحة (<i>مستوى الدلالة</i>اوTF-IDF) النقر على السهم الذي يظهرعند التحليق فوق الترويسة </li><li>مربع البحث (يرجى التحليق فوق ايقونة المكبرة للمساعدة في تركيب الجمل)</li></ul>",
-"zscoreTip":"معيار او المعيار المعتمد هو قيمة موحدة للتواتر الاساسي لكلمة بالمقارنة مع التواترات الاخرى لكلمات في نفس المستند. .<table><tbody><tr><td style=\"text-align: center; font-size: smaller; font-family: mono;\">تواتر الكلمة - معدل التواترات للكلمة<hr>الانحراف المعياري لتواترات الكلمة</td></tr></tbody></table>."});
+"zscoreTip":"معيار او المعيار المعتمد هو قيمة موحدة للتواتر الاساسي لكلمة بالمقارنة مع التواترات الاخرى لكلمات في نفس المستند. ."});
 Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hasNdocuments":"يحتوي على عدد من مستندات : {count}",
 "daysAgo":"منذ  حوالي عدد من الأيام : {count}",

@@ -36,6 +36,15 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"出版社",
 "pubDateField":"発行日",
 "exportNewCorpusTip":"一致するドキュメントから新しいコーパスを作成する(一致するものがないときはボタンは見えなくなります)"});
+Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
+"paletteEditor":"Palette Editor",
+"add":"追加する",
+"cancel":"キャンセル",
+"editList":"リストの編集",
+"saveNewPalette":"Save New Palette",
+"clear":"クリア",
+"palette":"Palette",
+"remove":"消去する"});
 Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"ワードディスプレイの設定を行うパネル",
 "linear":"線形",
@@ -143,8 +152,10 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "noPasswordGiven":"アクセスコードを入力してください。",
 "passwordValidationError":"申し訳ありません、あなたのアクセスコードを認証している途中で予期しないエラーが起きました。",
 "passwordRequiredMessage":"このコーパスにはアクセスコードが必要です",
+"didYouKnow":"Did you know?",
 "passwordRequiredTitle":"アクセスコードが必要",
 "password":"アクセスコード",
+"didYouKnowText":"Help and options are available!",
 "moreToolsScaleDocument":"ドキュメントツール",
 "moreToolsTypeGrid":"グリッドツール",
 "moreToolsType":"タイプ別",
@@ -338,7 +349,7 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "tfidf":"有意",
 "title":"ドキュメントの語",
 "helpTip":"<p>「ドキュメントの語」は各ドキュメント内に出現する単語をリスト化したものです。含まれる機能:</p><ul><li>ヘッダーをクリックすることで単語、語数（粗頻度）、相対頻度による並び替え。</li><li>ドキュメント間で単語頻度の傾向を示すスパークライン</li><li>ヘッダー上にマウスを合わせると表示される矢印をクリックすることで行の追加が可能</li><li><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul>",
-"zscoreTip":"Zスコア（標準得点）は語の粗頻度を同じドキュメントの中の他の語の頻度と比較するために一般化した値です。<table><tbody><tr><td style=\"text-align: center; font-size: smaller; font-family: mono;\">語の頻度 - 語の頻度の平均<hr>語の頻度の標準偏差</td></tr></tbody></table>"});
+"zscoreTip":"Zスコア（標準得点）は語の粗頻度を同じドキュメントの中の他の語の頻度と比較するために一般化した値です。"});
 Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hasNdocuments":"は{count}個のドキュメントを含みます。",
 "daysAgo":"およそ {count}  日前",

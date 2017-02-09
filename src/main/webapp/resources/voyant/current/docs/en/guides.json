@@ -148,6 +148,11 @@
                         "title": "Reader"
                     },
                     {
+                        "name": "rezoviz",
+                        "url": "guides/tools/rezoviz",
+                        "title": "RezoViz"
+                    },
+                    {
                         "name": "scatterplot",
                         "url": "guides/tools/scatterplot",
                         "title": "Scatter Plot"
@@ -185,13 +190,19 @@
                 ]
             },
             {
-                "title": "About",
+                "title": "Information",
                 "items": [
                     {
                         "name": "about",
-                        "url": "guides/about",
+                        "url": "guides/info/about",
                         "title": "About",
                         "description": "General information about Voyant Tools."
+                    },
+                    {
+                        "name": "mirrors",
+                        "url": "guides/info/mirrors",
+                        "title": "Mirrors",
+                        "description": "Known Mirrors of Voyant Tools."
                     }
                  ]
             }

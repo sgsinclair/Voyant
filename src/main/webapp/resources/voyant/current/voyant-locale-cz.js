@@ -36,6 +36,15 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"vydavatel",
 "pubDateField":"datum vydání",
 "exportNewCorpusTip":"Vytvořit nový korpus z dokumentů odpovídajících hledanému výrazu (tlačítko bude neaktivní, pokud nejsou nalezeny žádné shody)."});
+Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
+"paletteEditor":"Editor palety",
+"add":"Přidat",
+"cancel":"Zrušit",
+"editList":"Editace seznamu",
+"saveNewPalette":"Uložit novou paletu",
+"clear":"Smazat",
+"palette":"Paleta",
+"remove":"Odstranit"});
 Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"Panel kontroly nastavení pro slovní zobrazení",
 "linear":"Lineární",
@@ -143,8 +152,10 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "noPasswordGiven":"Prosím vložte přístupové heslo.",
 "passwordValidationError":"Promiňte, během ověřování platnosti vašeho přístupového hesla se vyskytla nečekaná chyba.",
 "passwordRequiredMessage":"Tento korpus vyžaduje přístupové heslo.",
+"didYouKnow":"Did you know?",
 "passwordRequiredTitle":"Je vyžadováno heslo",
 "password":"přístupové heslo",
+"didYouKnowText":"Help and options are available!",
 "moreToolsScaleDocument":"Dokumentové nástroje",
 "moreToolsTypeGrid":"Maticové nástroje",
 "moreToolsType":"Nástroje podle typu",
@@ -293,7 +304,7 @@ Ext.apply(Voyant.panel.CorpusSet.i18n, {
 "title":"Zobrazení korpusu",
 "helpTip":"Toto je výchozí zobrazení korpusu pro obecné účely."});
 Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
-"label":"Font family"});
+"label":"Rodina písma"});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"Vydavatelé",
 "sendToVoyantButton":"Nový Voyant korpus",
@@ -338,7 +349,7 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "tfidf":"Významnost",
 "title":"Dokumentové termíny",
 "helpTip":"</p><p>Nástroj Dokumentové termíny poskytuje tabulkové zobrazení termínů, které se objevují v každém dokumentu. Funkce zahrnují: </p><ul><li>změna uspořádání pomocí <i>termínů</i> a <i>počet</i> (prostá frekvence), a <i>relativní</i> frekvence (klikněte na záhlaví sloupců)</li><li>řádkový minigraf (sparkline) trendů frekvence termínu napříč dokumenty</li><li>zpřístupnění dodatečných sloupců (<i>Významnost</i> neboli TF-IDF, tj. četnost slova v dokumentu - převrácená četnost slova ve všech dokumentech) pomocí kliknutí na šipku, která se objeví po najetí kurzoru na záhlaví</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud potřebujete nápovědu pro syntax</li></ul>",
-"zscoreTip":"Z-skóre nebo standardizované skóre představuje normalizovanou hodnotu prosté (absolutní) frekvence termínu ve srovnání s frekvencemi dalších termínů ve stejném dokumentu.<table><tbody><tr><td style=\"text-align: center; font-size: smaller; font-family: mono;\">frekvence termínu - průměrná hodnota frekvence termínů<hr>směrodatná odchylka frekvence termínů</td></tr></tbody></table>."});
+"zscoreTip":"Z-skóre nebo standardizované skóre představuje normalizovanou hodnotu prosté (absolutní) frekvence termínu ve srovnání s frekvencemi dalších termínů ve stejném dokumentu."});
 Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hasNdocuments":"obsahuje {count} dokumentů",
 "daysAgo":"asi před {count} dny",
@@ -435,15 +446,15 @@ Ext.apply(Voyant.notebook.util.Embed.i18n, {
 "tryWidget":"Zkuste jednu z následujících pomůcek (widgetů):",
 "widgetNotRecognized":"Vložení se nezdařilo (nebyl zvolen žádný nástroj pro vložení nebo je neplatný)."});
 Ext.apply(Voyant.widget.ListEditor.i18n, {
-"cancel":"Cancel",
-"editList":"Edit List",
-"new":"New User-Defined List",
-"editListMessage":"This is the list, one term per line.",
-"editListTitle":"Edit List",
-"label":"List:",
-"none":"None",
-"ok":"Save",
-"whiteListLabel":"White List:"});
+"cancel":"Zrušit",
+"editList":"Editovat seznam",
+"new":"Nový uživatelský seznam",
+"editListMessage":"Toto je seznam, každá řádka odpovídá jednomu termínu.",
+"editListTitle":"Editovat seznam",
+"label":"Seznam:",
+"none":"Žádný",
+"ok":"Uložit",
+"whiteListLabel":"Bílá listina:"});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"Možnosti stažení"});
 Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
@@ -690,15 +701,15 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "thisLanguage":"čeština",
 "autoRecommended":"Automatická detekce (doporučeno)",
 "en":"angličtina",
-"hr":"Croatian",
+"hr":"chorvatština",
 "it":"italština",
-"languageTitle":"Language Interface Options",
+"languageTitle":"Možnosti jazykového rozhraní",
 "fr":"francouzština",
 "ar":"arabština",
-"bs":"Bosnian",
-"chooseLanguage":"Interface Language",
+"bs":"bosenština",
+"chooseLanguage":"Jazyk rozhraní",
 "cz":"čeština",
 "ja":"japonština",
-"he":"Hebrew",
+"he":"hebrejština",
 "ro":"rumunština",
-"sr":"Serbian"});
+"sr":"srbština"});

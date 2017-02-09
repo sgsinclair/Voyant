@@ -36,6 +36,15 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"editore",
 "pubDateField":"data di pubblicazione",
 "exportNewCorpusTip":"Crea un nuovo corpus con i documenti corrispondenti (il tasto è disabilitato se non ci sono corrispondenze/se la ricerca non ha dato risultati)"});
+Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
+"paletteEditor":"Palette Editor",
+"add":"Aggiungi",
+"cancel":"Elimina",
+"editList":"Modifica la lista",
+"saveNewPalette":"Save New Palette",
+"clear":"Rimuovi",
+"palette":"Palette",
+"remove":"Rimuovi"});
 Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"Pannello per controllare le impostazioni della visualizzazione della parola",
 "linear":"Lineare",
@@ -143,8 +152,10 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "noPasswordGiven":"Per favore fornisci un codice di accesso",
 "passwordValidationError":"Spiacente, è avvenuto un errore durante la validazione del tuo codice di accesso.",
 "passwordRequiredMessage":"Questo corpus richiede un codice di accesso",
+"didYouKnow":"Did you know?",
 "passwordRequiredTitle":"Richiesto un codice di accesso",
 "password":"codice di accesso",
+"didYouKnowText":"Help and options are available!",
 "moreToolsScaleDocument":"Strumenti per documenti",
 "moreToolsTypeGrid":"Strumenti a tabelle",
 "moreToolsType":"Strumenti per tipologia",
@@ -338,7 +349,7 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "tfidf":"Significance",
 "title":"Parole del Documento",
 "helpTip":"</p><p>Parole del Documento è una vista tabellare delle parole che compaiono in ciascun documento. Funzionalità:</p><ul><li>ordinamento per <i>Parola</i> per <i>Frequenza</i> (assoluta) e <Relativa</i> (fai click sulle intestazioni di colonna)</li><li>un grafico sparkline dell'andamento della frequenza del termine nel corpus nel documento</li><li>ulteriori colonne disponibili (<i>Significanza</i> o TF-IDF) facendo click sulla freccia che appare se si posiziona il puntatore sopra una intestazione</li><li>casella di ricerca (posizionare il mouse sopra l'icona lente di ingrandimento per un aiuto sulla sintassi)</li></ul>",
-"zscoreTip":"The Z-Score, or standard score, is a normalized value for the term's raw frequency compared to other term frequencies in the same document.<table><tbody><tr><td style=\"text-align: center; font-size: smaller; font-family: mono;\">frequency of term - mean of term frequencies<hr>standard deviation of term frequencies</td></tr></tbody></table>."});
+"zscoreTip":"The Z-Score, or <a href=\"https://en.wikipedia.org/wiki/Standard_score\" target=\"_blank\">standard score</a>, is a normalized value for the term's raw frequency compared to other term frequencies in the same document. It is calculated by taking the frequency of a term in a document, subtracting the mean frequency of all terms, and dividing the difference by the standard deviation of all term frequencies."});
 Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hasNdocuments":"contiene {count} documenti",
 "daysAgo":"circa {count} giorni fa",

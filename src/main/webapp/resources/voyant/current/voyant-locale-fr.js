@@ -36,6 +36,15 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"maison d’édition",
 "pubDateField":"date de publication",
 "exportNewCorpusTip":"Créer un nouveau corpus à partir des documents correspondants (le bouton sera inactif s’il n’y a pas de résultat)."});
+Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
+"paletteEditor":"Palette Editor",
+"add":"Ajouter",
+"cancel":"Annuler",
+"editList":"Modifier la liste",
+"saveNewPalette":"Save New Palette",
+"clear":"Effacer",
+"palette":"Palette",
+"remove":"Supprimer"});
 Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"Panneau des réglages pour l’affichage des mots.",
 "linear":"Linéaire",
@@ -143,8 +152,10 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "noPasswordGiven":"Veuillez fournir un code d’accès.",
 "passwordValidationError":"Désolé, une erreur est survenue à l’improviste alors que nous essayions de valider votre code d’accès.",
 "passwordRequiredMessage":"Il faut un code pour accéder à ce corpus.",
+"didYouKnow":"Le saviez-vous ?",
 "passwordRequiredTitle":"Un code d’accès est exigé.",
 "password":"code d’accès",
+"didYouKnowText":"De l'aide et des paramètres sont disponibles !",
 "moreToolsScaleDocument":"Outils de documents",
 "moreToolsTypeGrid":"Outils de tableaux",
 "moreToolsType":"Outil par type",
@@ -338,7 +349,7 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "tfidf":"Signification",
 "title":"Termes du document",
 "helpTip":"<p>L’outil <i>Termes du document</i> montre sous la forme d’un tableau les mots qui apparaissent dans chaque document. À noter&nbsp;:</p><ul><li>il est possible de réarranger le tableau en prenant pour critère de tri le <i>terme</i>, le <i>total</i> des occurrences (fréquence absolue) et la fréquence <i>relative</i> (cliquez sur les en-têtes des colonnes)</li><li>un graphique <i>sparkline</i> de la distribution des fréquences dans l’ensemble des documents</li><li>il est possible d’ajouter des colonnes (<i>signification</i> ou TF-IDF) en cliquant sur la flèche qui apparaît au survol d’un en-tête</li><li>une case de recherche est disponible (l’aide de la syntaxe des requêtes apparaît au survol de l’icône représentant une loupe)</li></ul>",
-"zscoreTip":"La variable centrée réduite, également nommée <i>Z-score</i> ou <i>standard score</i>, est une valeur normalisée correspondant à la fréquence absolue d’un terme par rapport à aux fréquences d’autres termes dans le même document. <table><tbody><tr><td style=\"text-align: center; font-size: smaller; font-family: mono;\">fréquence du terme - moyenne des fréquences des termes<hr>écart type des fréquences des termes</td></tr></tbody></table>."});
+"zscoreTip":"La variable centrée réduite, également nommée <i>Z-score</i> ou <i>standard score</i>, est une valeur normalisée correspondant à la fréquence absolue d’un terme par rapport à aux fréquences d’autres termes dans le même document."});
 Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hasNdocuments":"contient {count} documents,",
 "daysAgo":"il y a environ {count} jours",
