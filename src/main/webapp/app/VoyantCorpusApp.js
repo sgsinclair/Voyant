@@ -62,6 +62,31 @@ Ext.define('Voyant.VoyantCorpusApp', {
             		this.loadColorPaletteForCorpus(queryParams.corpus, queryParams.palette);
         		}
         	}
+    	} else {
+    		var viewport = this.getViewport();
+    		if (viewport) {
+    			var corpuscreator = viewport.down("corpuscreator")
+    			if (corpuscreator) {
+    				var toast = corpuscreator.toastInfo({
+    					html: this.localize('didYouKnowText'),
+    					title: this.localize('didYouKnow'),
+    					anchor: corpuscreator.down("textareafield"),
+    					align: 'tr',
+    					listeners: {
+    						beforeclose: {
+    							fn: function() {
+    								this.getHeader().getTools().forEach(function(tool) {
+    									if (tool.type=="gear" || tool.type=='help') {
+    										tool.getEl().frame("#ff0000", 1, { duration: 3000 })
+    									}
+    								});
+    							},
+    							scope: corpuscreator
+    						}
+    					}
+    				});
+    			}
+    		}
     	}
     },
     

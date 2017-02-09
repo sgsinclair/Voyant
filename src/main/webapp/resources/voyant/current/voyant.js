@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Oct 29 17:01:14 EDT 2016 */
+/* This file created by JSCacher. Last modified: Thu Feb 09 16:05:51 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -2361,6 +2361,8 @@ Function.prototype.createDelegate = function(obj, args, appendArgs){
  * - branch length based on text length on per node basis
  * - click handler
  * - zoom fixes
+ * - redraw checks for tries before re-running setup
+ * - prevent negative height error
  */
 
 /*
@@ -2509,7 +2511,9 @@ doubletree.DoubleTree = function() {
 	 * redraw the visualization
 	 */
 	mine.redraw = function() {
-		mine.setupFromTries(leftTrie, rtTrie);
+		if (leftTrie !== undefined && rtTrie !== undefined) {
+			mine.setupFromTries(leftTrie, rtTrie);
+		}
 
 		return mine;
 	}
@@ -3198,16 +3202,20 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 		// compensate
 		dx = root.x - height / 2;
 
+		var baseBranchSegmentWidth = 50;
 		// Normalize for fixed-depth.
 		nodes.forEach(function(d) {
-			var textSize = 0;
-			var parent = d.parent;
-			while (parent != null) {
-				textSize += Ext.draw.TextMeasurer.measureText(parent.name, 'arial').width;
-				parent = parent.parent;
+			var textSize = d.textSize;
+			if (textSize == undefined) {
+				textSize = 0;
+				var parent = d.parent;
+				while (parent != null) {
+					textSize += parent.textSize || Ext.draw.TextMeasurer.measureText(parent.name, 'arial').width;
+					parent = parent.parent;
+				}
+				d.textSize = textSize; // cache the size so we don't recalculate each time
 			}
-			
-			d.y = d.depth * 25 + textSize;
+			d.y = d.depth * baseBranchSegmentWidth + textSize;
 		});
 
 		// Update the nodes…
@@ -3287,7 +3295,12 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 					.insert("rect", "text")
 					.attr("class", "nodeRect")
 					.attr("height", function() {
-						return this.parentElement.getBBox().height - 6;
+						var height = this.parentElement.getBBox().height;
+						if (height < 6) {
+							// end of branch, need to prevent negative height
+							height = 6.1;
+						}
+						return height - 6;
 					})
 					.attr("y", function(d) {
 						if (!d.parent) {
@@ -4840,7 +4853,7 @@ Ext.define('Voyant.util.Toolable', {
 		})
 		this.on("afterrender", function() {
 			var header = this.getHeader();
-			if (header && Ext.os.deviceType=="Desktop") {
+			if (header && Ext.os.deviceType=="Desktop" && !this.isXType("corpuscreator")) {
 				var el = header.getEl();
 				el.on("mouseover", function() {
 					this.getHeader().getTools().forEach(function(tool) {
@@ -5084,9 +5097,12 @@ Ext.define('Voyant.util.Toolable', {
 		    icon: Ext.Msg.INFO,
 		    prompt: true,
 	        multiline: true,
-	        value: "<!--	Exported from Voyant Tools: http://voyant-tools.org/.\n"+
-	        	"Please note that this is an early version and the API may change.\n"+
-	        	"Feel free to change the height and width values below: -->\n"+
+	        value: "<!--	Exported from Voyant Tools (voyant-tools.org).\n"+
+	        	"The iframe src attribute below uses a relative protocol to better function with both\n"+
+	        	"http and https sites, but if you're embedding this into a local web page (file protocol)\n"+
+	        	"you should add an explicit protocol (https if you're using voyant-tools.org, otherwise\n"+
+	        	"it depends on this server.\n"+
+	        	"Feel free to change the height and width values or other styling below: -->\n"+
 	        	"<iframe style='width: 100%; height: 800px' src='"+this.getExportUrl()+"'></iframe>"
 		});
 	},
@@ -6206,8 +6222,7 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 				url: Voyant.application.getTromboneUrl(),
 				extraParams: {
 					tool: 'corpus.CA',
-					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined,
-					withDistributions: true
+					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
 		         },
 		         reader: {
 		             type: 'json',
@@ -10271,6 +10286,7 @@ Ext.define('Voyant.panel.Cirrus', {
 				this.setVisLayout(
 					d3.layout.cloud()
 						.size([width, height])
+						.overflow(true)
 						.padding(1)
 						.rotate(function() { return ~~(Math.random() * 2) * 90; })
 						.spiral('archimedean')
@@ -16145,8 +16161,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
         								} else {
         									this.setApiParam('analysis', 'ca');
         									if (this.getCorpus().getDocumentsCount() == 3) {
-        	//									this.setApiParam('dimensions', 2);
-        	//									this.dimsButton.menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
+        										this.setApiParam('dimensions', 2);
+        										this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
         									}
         								}
         								this.loadFromApis(true);
@@ -16235,7 +16251,15 @@ Ext.define('Voyant.panel.ScatterPlot', {
         					listeners: {
         						click: function(menu, item) {
         							if (item !== undefined) {
-        								this.setApiParam('dimensions', parseInt(item.text));
+        								var dims = parseInt(item.text);
+        								
+        								if (dims == 3 && this.getApiParam('analysis') == 'ca' && this.getCorpus().getDocumentsCount() == 3) {
+        									dims = 2;
+        									// TODO add info message 'Because of the nature of Correspondence Analysis, you can only use 2 dimensions with 3 documents.'
+        									return false;
+        								}
+        								
+        								this.setApiParam('dimensions', dims);
         								this.loadFromApis(true);
         							}
         						},
@@ -16383,10 +16407,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
     			},{
     				text: this.localize('rawFreq'),
     				dataIndex: 'rawFreq',
+    				flex: 0.75,
+    				minWidth: 70,
                     sortable: true
     			},{
     				text: this.localize('relFreq'),
     				dataIndex: 'relativeFreq',
+    				flex: 0.75,
+    				minWidth: 70,
                     sortable: true,
                     hidden: true
     			}],
@@ -16425,13 +16453,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	this.on('loadedCorpus', function(src, corpus) {
     		function setCheckItemFromApi(apiParamName) {
     			var value = this.getApiParam(apiParamName);
-    			var menu = this.queryById('chartParent').getDockedItems('toolbar')[0].down('#'+apiParamName);
+    			var menu = this.queryById(apiParamName);
     			menu.down('#'+apiParamName+'_'+value).setChecked(true);
     		}
     		var setCheckBound = setCheckItemFromApi.bind(this);
     		setCheckBound('analysis');
 //    		setCheckBound('limit');
     		setCheckBound('clusters');
+    		
+    		if (corpus.getDocumentsCount() == 3) {
+    			this.setApiParam('dimensions', 2);
+    		}
     		setCheckBound('dimensions');
     		
     		this.setCorpus(corpus);
@@ -16581,7 +16613,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	axes: [{
         		type: 'numeric',
         		position: 'bottom',
-        		fields: ['x']
+        		fields: ['x'],
+        		label: {
+                    rotate:{degrees:-30}
+            	}
         	},{
         		type: 'numeric',
         		position: 'left',
@@ -16600,6 +16635,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xField: 'x',
         		yField: 'y',
         		store: termSeriesStore,
+        		label: {
+        			font: '14px Helvetica',
+        			field: 'term',
+        			display: 'over'
+        		},
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
@@ -16645,6 +16685,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		xField: 'x',
         		yField: 'y',
         		store: docSeriesStore,
+        		label: {
+        			font: '14px Helvetica',
+        			field: 'term',
+        			display: 'over',
+        			color: this.getDefaultDocColor(true)
+        		},
         		tooltip: {
         			trackMouse: true,
         			style: 'background: #fff',
@@ -16666,19 +16712,20 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				var clusterIndex = item.get('cluster');
 	    				var scatterplot = that;
 	    				
+	    				var color;
 	    				if (clusterIndex === -1 || scatterplot.getApiParam('analysis') !== 'docSim') {
-	    					// no clusters were specified in initial call
-	    					clusterIndex = 6; // default doc color
+	    					color = scatterplot.getDefaultDocColor();
+	    				} else {
+	    					color = scatterplot.getApplication().getColor(clusterIndex);	
 	    				}
 	    				
 	    				var a = 0.65;
 	    				if (numDims === 3) {
 	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
 	    				}
-	    				var color = scatterplot.getApplication().getColor(clusterIndex);
+	    				
 	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
 	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
-
 	    				config.radius = 5;
     				}
     			},
@@ -16736,15 +16783,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	}
         };
     	
-		config.series[0].label = {
-			field: 'term',
-			display: 'over'
-		};
-		config.series[1].label = {
-			field: 'term',
-			display: 'over'
-		};
-    	
     	var chart = Ext.create('Ext.chart.CartesianChart', config);
     	this.queryById('chartParent').insert(0, chart);
     	this.doLabels();
@@ -16753,6 +16791,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	this.selectTerm(this.newTerm);
         	this.newTerm = null;
         }
+    },
+    
+    getDefaultDocColor: function(returnHex) {
+    	var color = this.getApplication().getColor(6, returnHex);
+    	return color;
     },
     
     doLabels: function() {
@@ -21510,23 +21553,25 @@ Ext.define('Voyant.panel.CorpusSet', {
     	boxready: function() {
     		var panelsString = this.getApiParam("panels");
     		if (panelsString) {
-    			var panels = panelsString.toLowerCase().split(",");
-    			var tabpanels = this.query("voyanttabpanel");
-    			for (var i=0, len=panels.length; i<len; i++) {
-    				var panel = panels[i];
-    				if (panel && Ext.ClassManager.getByAlias('widget.'+panel) && tabpanels[i]) {
-    					var tabpanel = tabpanels[i];
-    					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already selected
-    					tabpanel.items.each(function(item, index) {
-    						if (item.isXType(panel)) {
-    							this.setActiveTab(index)
-    							return false
-    						}
-    					}, tabpanel)
-    					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already switched
-    					tabpanel.getActiveTab().replacePanel(panel); // switch to specified panel
-    				}
-    			}
+    			Ext.defer(function() { // we need to defer otherwise corpus loaded doesn't always trigger
+        			var panels = panelsString.toLowerCase().split(",");
+        			var tabpanels = this.query("voyanttabpanel");
+        			for (var i=0, len=panels.length; i<len; i++) {
+        				var panel = panels[i];
+        				if (panel && Ext.ClassManager.getByAlias('widget.'+panel) && tabpanels[i]) {
+        					var tabpanel = tabpanels[i];
+        					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already selected
+        					tabpanel.items.each(function(item, index) {
+        						if (item.isXType(panel)) {
+        							this.setActiveTab(index)
+        							return false
+        						}
+        					}, tabpanel)
+        					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already switched
+        					tabpanel.getActiveTab().replacePanel(panel); // switch to specified panel
+        				}
+        			}
+    			}, 10, this)
     		}
     		// add an easter egg
     		var cirrus = this.down('cirrus');
@@ -22287,7 +22332,7 @@ Ext.define('Voyant.panel.WordTree', {
     		docIndex: undefined,
     		stopList: 'auto',
     		context: 10,
-    		limit: 5
+    		limit: 100
     	},
 		glyph: 'xf0e8@FontAwesome'
     },
@@ -22296,7 +22341,8 @@ Ext.define('Voyant.panel.WordTree', {
     	corpus: undefined,
     	tree: undefined,
     	kwicStore: undefined,
-    	options: {xtype: 'stoplistoption'}
+    	options: {xtype: 'stoplistoption'},
+    	numBranches: 5
     },
     
     doubleClickDelay: 300,
@@ -22316,6 +22362,60 @@ Ext.define('Voyant.panel.WordTree', {
                 enableOverflow: true,
                 items: [{
                 	xtype: 'querysearchfield'
+                }, this.localize('pool'), {
+                	xtype: 'slider',
+                	itemId: 'poolSlider',
+                	minValue: 10,
+                	value: 100,
+                	maxValue: 1000,
+                	increment: 5,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(this.getApiParam('limit'));
+                		},
+                		changecomplete: function(slider, newValue) {
+                			this.setApiParam('limit', slider.getValue());
+                			this.reload();
+                		},
+                		scope: this
+                	}
+                }, this.localize('branches'), {
+                	xtype: 'slider',
+                	itemId: 'branchesSlider',
+                	minValue: 2,
+                	value: 5,
+                	maxValue: 15,
+                	increment: 1,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(this.getNumBranches());
+                		},
+                		changecomplete: function(slider, newValue) {
+                			this.setNumBranches(slider.getValue());
+                			this.reload();
+                		},
+                		scope: this
+                	}
+                }, this.localize('context'), {
+                	xtype: 'slider',
+                	itemId: 'contextSlider',
+                	minValue: 3,
+                	value: 10,
+                	maxValue: 20,
+                	increment: 2,
+                	width: 50,
+                	listeners: {
+                		render: function(slider) {
+                			slider.setValue(this.getApiParam('context'));
+                		},
+                		changecomplete: function(slider, newValue) {
+                			this.setApiParam('context', slider.getValue());
+                			this.reload();
+                		},
+                		scope: this
+                	}
                 }]
     		}]
         });
@@ -22330,28 +22430,7 @@ Ext.define('Voyant.panel.WordTree', {
         	listeners: {
         		load: function(store, records, success, operation) {
         			if (success) {
-        				var prefix = [], hit = [], suffix = [], id = [];
-        				for (var i = 0; i < records.length; i++) {
-        					var r = records[i];
-        					//prefix.push([r.getLeft().trim().replace(/\s+/g, ' ')]);
-        					prefix.push(r.getLeft().trim().split(/\s+/));
-        					hit.push(r.getMiddle());
-        					//suffix.push([r.getRight().trim().replace(/\s+/g, ' ')]);
-        					suffix.push(r.getRight().trim().split(/\s+/));
-        					id.push(i);
-        				}
-        				var caseSensitive = false;
-        				var fieldNames = ["token", "POS"];
-        				var fieldDelim = "/";
-        				var distinguishingFieldsArray = ["token", "POS"];
-        				this.getTree().setupFromArrays(prefix, hit, suffix, id, caseSensitive, fieldNames, fieldDelim, distinguishingFieldsArray);
-        				
-        				if (!this.getTree().succeeded()) {
-        					this.toastInfo({
-       		    				html: this.localize("emptyText"),
-       		    				align: 'bl'
-       		    			});
-        				}
+        				this.parseRecords(records);
         			}
         		},
         		scope: this
@@ -22402,14 +22481,122 @@ Ext.define('Voyant.panel.WordTree', {
     	}, this);
         
         this.on('resize', function(panel, width, height) {
-
+        	var tree = this.getTree();
+        	if (tree !== undefined) {
+        		tree.visWidth(width).visHeight(height);
+        		// TODO preserve expanded branches
+        		tree.redraw();
+        	}
 		}, this);
         
         this.on('boxready', this.initGraph, this);
         
         this.callParent(arguments);
     },
-        
+    
+    parseRecords: function(records) {
+    	var parsedRecords = [];
+		for (var i = 0; i < records.length; i++) {
+			var r = records[i];
+			var pr = {
+				id: i,
+				prefix: r.getLeft().trim().split(/\s+/),
+				hit: r.getMiddle(),
+				suffix: r.getRight().trim().split(/\s+/)
+			};
+			parsedRecords.push(pr);
+		}
+		
+		// find top tokens and sort records by them
+		var prefixTokenCounts = {};
+		var suffixTokenCounts = {};
+		for (var i = 0; i < parsedRecords.length; i++) {
+			var pr = parsedRecords[i];
+			var prefixToken = pr.prefix[pr.prefix.length-1];
+			var suffixToken = pr.suffix[0];
+			if (prefixTokenCounts[prefixToken]) {
+				prefixTokenCounts[prefixToken]++;
+			} else {
+				prefixTokenCounts[prefixToken] = 1;
+			}
+			if (suffixTokenCounts[suffixToken]) {
+				suffixTokenCounts[suffixToken]++;
+			} else {
+				suffixTokenCounts[suffixToken] = 1;
+			}
+		}
+		
+		var sortableTokens = [];
+		for (var i = 0; i < parsedRecords.length; i++) {
+			var pr = parsedRecords[i];
+			var prefixToken = pr.prefix[pr.prefix.length-1];
+			var suffixToken = pr.suffix[0];
+			
+			sortableTokens.push({
+				suffix: suffixToken, suffixCount: suffixTokenCounts[suffixToken],
+				prefix: prefixToken, prefixCount: prefixTokenCounts[prefixToken]
+			});
+			
+		}
+		
+		var prioritizeSuffix = false;
+		// multi-sort
+		sortableTokens.sort(function(a, b) {
+			var s1 = a.suffixCount;
+			var s2 = b.suffixCount;
+			
+			var p1 = a.prefixCount;
+			var p2 = b.prefixCount;
+			
+			if (prioritizeSuffix) {
+				if (s1 > s2) return -1;
+				if (s1 < s2) return 1;
+				if (p1 > p2) return -1;
+				if (p1 < p2) return 1;
+			} else {
+				if (p1 > p2) return -1;
+				if (p1 < p2) return 1;
+				if (s1 > s2) return -1;
+				if (s1 < s2) return 1;
+			}
+			
+			return 0;
+		});
+		
+		var len = Math.min(this.getNumBranches(), sortableTokens.length);
+		var topSuffixTokens = [];
+		var topPrefixTokens = [];
+		for (var i = 0; i < len; i++) {
+			topSuffixTokens.push(sortableTokens[i].suffix);
+			topPrefixTokens.push(sortableTokens[i].prefix);
+		}
+		
+		// use top tokens to limit results
+		var prefixes = [], hits = [], suffixes = [], ids = [];
+		for (var i = 0; i < parsedRecords.length; i++) {
+			var parsedRecord = parsedRecords[i];
+			if (topSuffixTokens.indexOf(parsedRecord.suffix[0]) != -1 || topPrefixTokens.indexOf(parsedRecord.suffix[0]) != -1) {
+				prefixes.push(parsedRecord.prefix);
+				hits.push(parsedRecord.hit);
+				suffixes.push(parsedRecord.suffix);
+				ids.push(parsedRecord.id);
+			}
+		}
+		
+		var caseSensitive = false;
+		var fieldNames = ["token", "POS"];
+		var fieldDelim = "/";
+		var distinguishingFieldsArray = ["token", "POS"];
+		this.getTree().setupFromArrays(prefixes, hits, suffixes, ids, caseSensitive, fieldNames, fieldDelim, distinguishingFieldsArray);
+		
+		if (!this.getTree().succeeded()) {
+			this.toastInfo({
+   				html: this.localize("emptyText"),
+   				align: 'bl'
+   			});
+		}
+    },
+    
     initGraph: function() {
     	var el = this.getLayout().getRenderTarget();
     	var w = el.getWidth();
@@ -22452,6 +22639,13 @@ Ext.define('Voyant.panel.WordTree', {
     setRoot: function(query) {
     	this.setApiParam('query', this.stripPunctuation(query));
 		this.getKwicStore().load({params: this.getApiParams()});
+    },
+    
+    reload: function() {
+    	var query = this.getApiParam('query');
+    	if (query !== undefined) {
+    		this.setRoot(query);
+    	}
     },
     
     stripPunctuation: function(value) {
@@ -22837,6 +23031,31 @@ Ext.define('Voyant.VoyantCorpusApp', {
             		this.loadColorPaletteForCorpus(queryParams.corpus, queryParams.palette);
         		}
         	}
+    	} else {
+    		var viewport = this.getViewport();
+    		if (viewport) {
+    			var corpuscreator = viewport.down("corpuscreator")
+    			if (corpuscreator) {
+    				var toast = corpuscreator.toastInfo({
+    					html: this.localize('didYouKnowText'),
+    					title: this.localize('didYouKnow'),
+    					anchor: corpuscreator.down("textareafield"),
+    					align: 'tr',
+    					listeners: {
+    						beforeclose: {
+    							fn: function() {
+    								this.getHeader().getTools().forEach(function(tool) {
+    									if (tool.type=="gear" || tool.type=='help') {
+    										tool.getEl().frame("#ff0000", 1, { duration: 3000 })
+    									}
+    								});
+    							},
+    							scope: corpuscreator
+    						}
+    					}
+    				});
+    			}
+    		}
     	}
     },
     
