@@ -635,9 +635,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		yField: 'y',
         		store: docSeriesStore,
         		label: {
-        			font: 'bold 14px Helvetica',
+        			font: '14px Helvetica',
         			field: 'term',
-        			display: 'over'
+        			display: 'over',
+        			color: this.getDefaultDocColor(true)
         		},
         		tooltip: {
         			trackMouse: true,
@@ -660,19 +661,20 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				var clusterIndex = item.get('cluster');
 	    				var scatterplot = that;
 	    				
+	    				var color;
 	    				if (clusterIndex === -1 || scatterplot.getApiParam('analysis') !== 'docSim') {
-	    					// no clusters were specified in initial call
-	    					clusterIndex = 6; // default doc color
+	    					color = scatterplot.getDefaultDocColor();
+	    				} else {
+	    					color = scatterplot.getApplication().getColor(clusterIndex);	
 	    				}
 	    				
 	    				var a = 0.65;
 	    				if (numDims === 3) {
 	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
 	    				}
-	    				var color = scatterplot.getApplication().getColor(clusterIndex);
+	    				
 	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
 	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
-
 	    				config.radius = 5;
     				}
     			},
@@ -738,6 +740,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	this.selectTerm(this.newTerm);
         	this.newTerm = null;
         }
+    },
+    
+    getDefaultDocColor: function(returnHex) {
+    	var color = this.getApplication().getColor(6, returnHex);
+    	return color;
     },
     
     doLabels: function() {
