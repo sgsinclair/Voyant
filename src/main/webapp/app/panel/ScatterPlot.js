@@ -39,9 +39,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			{name: 'term'},
 			{name: 'rawFreq', type: 'int'},
 			{name: 'relativeFreq', type: 'number'},
-			{name: 'coordinates', mapping : 'vector'}
+			{name: 'coordinates', mapping : 'vector'},
+			{name: 'category'}
 		],
-		sorters: [{property: 'rawFreq', direction: 'DESC'}]
+		sorters: [{property: 'rawFreq', direction: 'DESC'}],
+		groupField: 'category'
 	}),
 	newTerm: null,
 	termsTimeout: null,
@@ -86,6 +88,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		tbar: {
         			enableOverflow: true,
         			items: [{
+        				xtype: 'querysearchfield',
+        				itemId: 'filterTerms',
+        				width: 150
+        			},{
     	            	xtype: 'documentselectorbutton',
     	            	flex: 1
     	            },{
@@ -251,9 +257,18 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		}
                 	}]
         			
+        		},
+        		listeners: {
+        			query: function(component, value) {
+        				if (value !== undefined) {
+	        				this.termStore.filter([{property: 'term', value: value, anyMatch: true}]);
+	        				this.filterChart(value);
+        				}
+        			},
+        			scope: this
         		}
         	},{
-        		itemId: 'terms',
+        		itemId: 'termsGrid',
         		xtype: 'grid',
  //       		title: 'Terms',
         		region: 'east',
@@ -262,9 +277,15 @@ Ext.define('Voyant.panel.ScatterPlot', {
 //        		collapsible: true,
 //        		border: true,
         		forceFit: true,
+        		features: [{
+        			ftype: 'grouping',
+        			hideGroupedHeader: true,
+                    enableGroupingMenu: false
+        		}],
         		bbar: {
             		enableOverflow: true,
         			items: [{
+        				itemId: 'nearbyButton',
                         xtype: 'button',
                         text: this.localize('nearby'),
                         glyph: 'xf0b2@FontAwesome',
@@ -284,6 +305,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         },
                         scope: this
                     },{
+                    	itemId: 'removeButton',
                         xtype: 'button',
                         text: this.localize('remove'),
                         glyph: 'xf068@FontAwesome',
@@ -344,6 +366,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     					}
                 	},{
                     	xtype: 'querysearchfield',
+                    	itemId: 'addTerms',
 //                    	emptyText: this.localize('addTerm'),
                     	flex: 1
                     }]
@@ -375,7 +398,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         		var sel = selections[0];
                         		if (sel !== undefined) {
 	                        		var term = sel.get('term');
-	                        		this.selectTerm(term);
+	                        		var isDoc = sel.get('category') === 'doc';
+	                        		this.selectTerm(term, isDoc);
+	                        		
+	                        		if (isDoc) {
+	                        			this.queryById('nearbyButton').disable();
+	                        			this.queryById('removeButton').disable();
+	                        		} else {
+	                        			this.queryById('nearbyButton').enable();
+	                        			this.queryById('removeButton').enable();
+	                        		}
                         		}
                         	},
                         	scope: this
@@ -386,7 +418,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		store: this.termStore,
         		listeners: {
         			query: function(component, value) {
-    					if (value !== undefined && this.termStore.findExact('term', value) === -1) {
+        				if (value !== undefined && this.termStore.findExact('term', value) === -1) {
 	                		this.newTerm = value;
 	                		this.loadFromApis();
     					} else {
@@ -426,7 +458,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		this.setApiParam('docId', docIds);
     		this.loadFromApis();
     	}, this);
-        
+    	
         this.caStore.on('load', function(store, records) {
         	this.buildChart(store);
         }, this);
@@ -507,10 +539,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	if (isTerm) {
 	        	if (freq > maxFreq) maxFreq = freq;
 	        	if (freq < minFreq) minFreq = freq;
-	        	
-	        	if (this.termStore.findExact('term', token.get('term') === -1)) {
-	        		this.termStore.addSorted(token);
-	        	}
+        	}
+        	if (this.termStore.findExact('term', token.get('term') === -1)) {
+        		this.termStore.addSorted(token);
         	}
         	if (numDims === 3) {
 				var z = token.get('vector')[2];
@@ -519,7 +550,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			}
         	var tokenData = {
         		x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2],
-    			term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), category: category
+    			term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), category: category,
+    			disabled: false
         	};
         	if (!isTerm) {
         		if (token.get('category') === 'bin') {
@@ -544,11 +576,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         
         
     	var termSeriesStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'category', 'docIndex'],
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'category', 'docIndex', 'disabled'],
     		data: termData
     	});
     	var docSeriesStore = Ext.create('Ext.data.JsonStore', {
-    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'category', 'docIndex'],
+    		fields: ['term', 'x', 'y', 'z', 'rawFreq', 'relativeFreq', 'cluster', 'category', 'docIndex', 'disabled'],
     		data: docData
     	});
     	
@@ -615,13 +647,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    					clusterIndex = 0;
 	    				}
 	    				
-	    				var a = 0.65;
-	    				if (numDims === 3) {
-	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
+	    				var fillAlpha = 0.65;
+	    				var strokeAlpha = 1;
+	    				if (item.get('disabled') === true) {
+	    					fillAlpha = 0.1;
+	    					strokeAlpha = 0.1;
+	    				} else if (numDims === 3) {
+	    					fillAlpha = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
 	    				}
 	    				var color = scatterplot.getApplication().getColor(clusterIndex);
-	    				config.fillStyle = 'rgba('+color.join(',')+','+a+')';
-	    				config.strokeStyle = 'rgba('+color.join(',')+',1)';
+	    				config.fillStyle = 'rgba('+color.join(',')+','+fillAlpha+')';
+	    				config.strokeStyle = 'rgba('+color.join(',')+','+strokeAlpha+')';
 	    				
 	    				var freq = item.get('rawFreq');
 	    				var radius = scatterplot.interpolate(freq, minFreq, maxFreq, 2, 20);
@@ -760,10 +796,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	else {series[1].getLabel().hide();}
     },
     
-    selectTerm: function(term) {
+    selectTerm: function(term, isDoc) {
     	var chart = this.down('#chart');
-    	var series = chart.getSeries()[0];
-    	var index = series.getStore().findExact('term', term);
+    	var series, index;
+    	if (isDoc === true) {
+    		series = chart.getSeries()[1];
+	    	index = series.getStore().findExact('title', term);
+    	} else {
+	    	series = chart.getSeries()[0];
+	    	index = series.getStore().findExact('term', term);
+    	}
     	if (index !== -1) {
     		var record = series.getStore().getAt(index);
     		var sprite = series.getSprites()[0];
@@ -777,6 +819,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 sprite: sprite
     		};
     		series.setHighlightItem(item);
+    		if (isDoc) {
+    			chart.getSeries()[0].setHighlightItem(null);
+    		} else {
+    			chart.getSeries()[1].setHighlightItem(null);
+    		}
     		
     		var point = this.getPointFromIndex(series, index);
     		this.highlightData = {x: point[0], y: point[1], r: 50};
@@ -838,6 +885,35 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			}
 			chart.redraw();
     	}
+    },
+    
+    filterChart: function(query) {
+    	if (Ext.isString(query)) query = [query];
+    	var reQueries = [];
+    	for (var i = 0; i < query.length; i++) {
+    		var re = new RegExp(query[i]);
+    		reQueries.push(re);
+    	}
+    	
+    	// filter terms
+    	var chart = this.queryById('chart');
+    	var series0 = chart.getSeries()[0];
+    	var label0 = series0.getLabel();
+    	series0.getStore().each(function(item) {
+    		var match = false;
+    		if (reQueries.length == 0) match = true;
+    		else {
+	    		for (var i = 0; i < reQueries.length; i++) {
+	    			match = match || reQueries[i].test(item.get('term'));
+	    			if (match) break;
+	    		}
+    		}
+    		item.set('disabled', !match);
+    		var index = item.store.indexOf(item);
+    		label0.setAttributesFor(index, {hidden: !match});
+    	}, this);
+
+		chart.redraw();
     },
     
     getCurrentTerms: function() {
