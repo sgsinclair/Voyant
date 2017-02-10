@@ -36,6 +36,15 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"publisher",
 "pubDateField":"publication date",
 "exportNewCorpusTip":"Create a new corpus from matching documents (button will be disabled if there are no matches)."});
+Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
+"paletteEditor":"Palette Editor",
+"add":"Add",
+"cancel":"ביטול",
+"editList":"עריכת רשימה",
+"saveNewPalette":"Save New Palette",
+"clear":"Clear",
+"palette":"Palette",
+"remove":"Remove"});
 Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"Panel to control settings for word display.",
 "linear":"Linear",
@@ -143,8 +152,10 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "noPasswordGiven":"Please provide an access code.",
 "passwordValidationError":"Sorry, an unexpected error occurred while trying to validate your access code.",
 "passwordRequiredMessage":"This corpus requires an access code.",
+"didYouKnow":"Did you know?",
 "passwordRequiredTitle":"Access Code Required",
 "password":"access code",
+"didYouKnowText":"Help and options are available!",
 "moreToolsScaleDocument":"Document Tools",
 "moreToolsTypeGrid":"Grid Tools",
 "moreToolsType":"Tools by Type",
@@ -338,7 +349,7 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "tfidf":"Significance",
 "title":"Document Terms",
 "helpTip":"<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
-"zscoreTip":"The Z-Score, or standard score, is a normalized value for the term's raw frequency compared to other term frequencies in the same document.<table><tbody><tr><td style=\"text-align: center; font-size: smaller; font-family: mono;\">frequency of term - mean of term frequencies<hr>standard deviation of term frequencies</td></tr></tbody></table>."});
+"zscoreTip":"The Z-Score, or <a href=\"https://en.wikipedia.org/wiki/Standard_score\" target=\"_blank\">standard score</a>, is a normalized value for the term's raw frequency compared to other term frequencies in the same document. It is calculated by taking the frequency of a term in a document, subtracting the mean frequency of all terms, and dividing the difference by the standard deviation of all term frequencies."});
 Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hasNdocuments":"כולל {} מסמכים",
 "daysAgo":"לפני כ-{} ימים",
