@@ -41,7 +41,8 @@ Ext.define('Voyant.panel.Contexts', {
 //                    direction: 'ASC'
 //            	}
             }),
-    		selModel: Ext.create('Ext.selection.RowModel', {
+    		selModel: {
+    			type: 'rowmodel',
                 listeners: {
                     selectionchange: {
                     	fn: function(sm, selections) {
@@ -50,7 +51,7 @@ Ext.define('Voyant.panel.Contexts', {
                     	scope: this
                     }
                 }
-            }),
+            },
             plugins: [{ // the expander slider assumes there's only one plugin, needs to be updated if changed
                 ptype: 'rowexpander',
                 rowBodyTpl : new Ext.XTemplate('')

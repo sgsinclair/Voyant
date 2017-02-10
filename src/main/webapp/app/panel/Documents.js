@@ -186,7 +186,8 @@ Ext.define('Voyant.panel.Documents', {
 	    	
 	        store: store,
 	    	
-	    	selModel: Ext.create('Ext.selection.RowModel', {
+	    	selModel: {
+	    		type: 'rowmodel',
 	    		mode: 'MULTI',
                 listeners: {
                     selectionchange: {
@@ -196,7 +197,7 @@ Ext.define('Voyant.panel.Documents', {
                     	scope: this
                     }
                 }
-            }),
+            },
             
             dockedItems: [{
                 dock: 'bottom',
