@@ -109,18 +109,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
         					listeners: {
         						click: function(menu, item) {
         							if (item !== undefined) {
-        								if (item.text === this.localize('pca')) {
-        									this.setApiParam('analysis', 'pca');
-        								} else if (item.text === this.localize('docSim')) {
-        									this.setApiParam('analysis', 'docSim');
-        								} else {
-        									this.setApiParam('analysis', 'ca');
-        									if (this.getCorpus().getDocumentsCount() == 3) {
-        										this.setApiParam('dimensions', 2);
-        										this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
+        								var analysis = item.getItemId().split('_')[1];
+        								if (analysis !== this.getApiParam('analysis')) {
+        									this.setApiParam('analysis', analysis);
+        									if (analysis === 'ca') {
+        										if (this.getCorpus().getDocumentsCount() == 3) {
+            										this.setApiParam('dimensions', 2);
+            										this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
+            									}
         									}
+        									this.loadFromApis(true);
         								}
-        								this.loadFromApis(true);
         							}
         						},
         						scope: this
@@ -128,47 +127,28 @@ Ext.define('Voyant.panel.ScatterPlot', {
             			}
     	            },{
     	            	text: this.localize('freqsMode'),
+    	            	itemId: 'comparisonType',
     					glyph: 'xf201@FontAwesome',
     				    tooltip: this.localize('freqsModeTip'),
     	            	flex: 1,
     				    menu: {
-    				    	items: [{
-				               text: this.localize("rawFrequencies"),
-				               checked: false,
-				               itemId: 'raw',
-				               group: 'freqsMode',
-				               checkHandler: function(item, checked) {
-				            	   if (checked) {
-				                	   this.setApiParam('comparisonType', 'raw');
-				                	   this.loadFromApis();
-				            	   }
-				               },
-				               scope: this
-				           },{
-				               text: this.localize("relativeFrequencies"),
-				               checked: true,
-				               itemId: 'relative',
-				               group: 'freqsMode',
-				               checkHandler: function(item, checked) {
-				            	   if (checked) {
-				                	   this.setApiParam('comparisonType', 'relative');
-				                	   this.loadFromApis();
-				            	   }
-				               },
-				               scope: this
-				           },{
-				               text: this.localize("tfidf"),
-				               checked: false,
-				               itemId: 'tfidf',
-				               group: 'freqsMode',
-				               checkHandler: function(item, checked) {
-				            	   if (checked) {
-				                	   this.setApiParam('comparisonType', 'tfidf');
-				                	   this.loadFromApis();
-				            	   }
-				               },
-				               scope: this
-				           }]
+    				    	items: [
+				               {text: this.localize("rawFrequencies"), itemId: 'comparisonType_raw', group: 'freqsMode', xtype: 'menucheckitem'},
+				               {text: this.localize("relativeFrequencies"), itemId: 'comparisonType_relative', group: 'freqsMode', xtype: 'menucheckitem'},
+				               {text: this.localize("tfidf"), itemId: 'comparisonType_tfidf', group: 'freqsMode', xtype: 'menucheckitem'}
+				            ],
+	       					listeners: {
+	    						click: function(menu, item) {
+	    							if (item !== undefined) {
+	    								var type = item.getItemId().split('_')[1];
+	    								if (type !== this.getApiParam('comparisonType')) {
+		    								this.setApiParam('comparisonType', type);
+		    								this.loadFromApis(true);
+	    								}
+	    							}
+	    						},
+	    						scope: this
+	    				    }
     				    }
                 	},{
                 		text: this.localize('clusters'),
@@ -186,8 +166,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
         					listeners: {
         						click: function(menu, item) {
         							if (item !== undefined) {
-        								this.setApiParam('clusters', parseInt(item.text));
-        								this.loadFromApis(true);
+        								var clusters = parseInt(item.getItemId().split('_')[1]);
+        								if (clusters !== this.getApiParam('clusters')) {
+	        								this.setApiParam('clusters', clusters);
+	        								this.loadFromApis(true);
+        								}
         							}
         						},
         						scope: this
@@ -206,16 +189,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
         					listeners: {
         						click: function(menu, item) {
         							if (item !== undefined) {
-        								var dims = parseInt(item.text);
-        								
-        								if (dims == 3 && this.getApiParam('analysis') == 'ca' && this.getCorpus().getDocumentsCount() == 3) {
-        									dims = 2;
-        									// TODO add info message 'Because of the nature of Correspondence Analysis, you can only use 2 dimensions with 3 documents.'
-        									return false;
+        								var dims = parseInt(item.getItemId().split('_')[1]);
+        								if (dims !== this.getApiParam('dimensions')) {
+	        								if (dims == 3 && this.getApiParam('analysis') == 'ca' && this.getCorpus().getDocumentsCount() == 3) {
+	        									dims = 2;
+	        									// TODO add info message 'Because of the nature of Correspondence Analysis, you can only use 2 dimensions with 3 documents.'
+	        									return false;
+	        								}
+	        								
+	        								this.setApiParam('dimensions', dims);
+	        								this.loadFromApis(true);
         								}
-        								
-        								this.setApiParam('dimensions', dims);
-        								this.loadFromApis(true);
         							}
         						},
         						scope: this
@@ -440,10 +424,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		function setCheckItemFromApi(apiParamName) {
     			var value = this.getApiParam(apiParamName);
     			var menu = this.queryById(apiParamName);
-    			menu.down('#'+apiParamName+'_'+value).setChecked(true);
+    			var item = menu.down('#'+apiParamName+'_'+value);
+    			item.setChecked(true);
     		}
     		var setCheckBound = setCheckItemFromApi.bind(this);
     		setCheckBound('analysis');
+    		setCheckBound('comparisonType');
 //    		setCheckBound('limit');
     		setCheckBound('clusters');
     		
