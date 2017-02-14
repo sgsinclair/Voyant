@@ -18,7 +18,7 @@ Ext.define('Voyant.data.model.StatisticalAnalysis', {
 	,getDimensions: function() {
 		var dimensions = [];
 		this.data.dimensions.forEach(function(dim) {
-			dimensions.push(Ext.create('Voyant.data.model.Dimension', dim));
+			dimensions.push(Ext.create('Voyant.data.model.Dimension', {percentage: dim}));
 		});
 		return dimensions;
 	}

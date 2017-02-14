@@ -486,15 +486,18 @@ Ext.define('Voyant.panel.ScatterPlot', {
 				var pc = pcs[i];
 				eigenTotal += parseFloat(pc.get('eigenValue'));
 			}
-			summary = this.localize('pcTitle')+'\n';
-			var pcMapping = ['xAxis', 'yAxis', 'fill'];
-			for (var i = 0; i < pcs.length; i++) {
-				if (i >= numDims) break;
-				
-				var pc = pcs[i];
-				var eigenValue = parseFloat(pc.get('eigenValue'));
-				var percentage = eigenValue / eigenTotal * 100;
-				summary += this.localize('pc')+' '+(i+1)+' ('+this.localize(pcMapping[i])+'): '+Math.round(percentage*100)/100+'%\n';
+			if (eigenTotal == 0) {
+				// do nothing
+			} else {
+				summary = this.localize('pcTitle')+'\n';
+				var pcMapping = ['xAxis', 'yAxis', 'fill'];
+				for (var i = 0; i < pcs.length; i++) {
+					if (i >= numDims) break;
+					
+					var eigenValue = pcs[i].get('eigenValue');
+					var percentage = eigenValue / eigenTotal * 100;
+					summary += this.localize('pc')+' '+(i+1)+' ('+this.localize(pcMapping[i])+'): '+Math.round(percentage*100)/100+'%\n';
+				}
 			}
     	} else {
     		summary = this.localize('caTitle')+'\n';
@@ -504,7 +507,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		for (var i = 0; i < dimensions.length; i++) {
     			if (i >= numDims) break;
     			
-    			var percentage = parseFloat(dimensions[i]['data']);
+    			var percentage = dimensions[i].get('percentage');
     			summary += this.localize('dimension')+' '+(i+1)+' ('+this.localize(pcMapping[i])+'): '+Math.round(percentage*100)/100+'%\n';
     		}
     	}
