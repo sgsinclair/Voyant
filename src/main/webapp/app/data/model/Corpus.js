@@ -73,7 +73,9 @@ Ext.define('Voyant.data.model.Corpus', {
          {name: 'lexicalTokensCount', type: 'int'},
          {name: 'lexicalTypesCount', type: 'int'},
          {name: 'createdTime', type: 'int'},
-         {name: 'createdDate', type: 'date', dateFormat: 'c'}
+         {name: 'createdDate', type: 'date', dateFormat: 'c'},
+         {name: 'title', type: 'string'},
+         {name: 'subTitle', type: 'string'}
     ],
     
 	/**
@@ -129,7 +131,47 @@ Ext.define('Voyant.data.model.Corpus', {
 				params: config
 			}).then(function(response) {
 				me.set(Ext.JSON.decode(response.responseText).corpus.metadata);
-				return me
+				
+				if (config.corpusTitle || config.corpusSubTitle) {
+					// store title and subTitle until they become part of metadata
+					me.set('title', config.corpusTitle);
+					me.set('subTitle', config.corpusSubTitle);
+					Ext.Ajax.request({
+			    	    url: Voyant.application.getTromboneUrl(),
+			    	    params: {
+			        		tool: 'resource.StoredResource',
+			    			storeResource: Ext.encode({title: config.corpusTitle, subTitle: config.corpusSubTitle}),
+			    			resourceId: 'titles-'+me.getId()
+			    	    }
+			    	});
+				} else {
+					// try to load stored title and subTitle
+					Ext.Ajax.request({
+			    	    url: Voyant.application.getTromboneUrl(),
+			    	    params: {
+			        		tool: 'resource.StoredResource',
+			        		verifyResourceId: 'titles-'+me.getId()
+			    	    }
+			    	}).then(function(response) {
+			    		var json = Ext.util.JSON.decode(response.responseText);
+			    		if (json && json.storedResource && json.storedResource.id) {
+				    		Ext.Ajax.request({
+					    	    url: Voyant.application.getTromboneUrl(),
+					    	    params: {
+					        		tool: 'resource.StoredResource',
+					        		retrieveResourceId: 'titles-'+me.getId()
+					    	    }
+					    	}).then(function(response) {
+					    		var json = Ext.util.JSON.decode(response.responseText);
+				    	    	var value = json.storedResource.resource;
+				    	    	var titles = Ext.decode(value);
+				    	    	me.set(titles);
+				    	    });
+				    	}
+			    	});
+				}
+				
+				return me;
 			}).otherwise(function(response){
 				Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
 			}).then(function(corpus) {
@@ -313,6 +355,14 @@ Ext.define('Voyant.data.model.Corpus', {
 	getNoPasswordAccess: function() {
 		// overrides the getId() function from the model to handle promises
     	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('noPasswordAccess');		
+	},
+	
+	getTitle: function() {
+		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('title');		
+	},
+	
+	getSubTitle: function() {
+		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('subTitle');		
 	},
 	
 	/**

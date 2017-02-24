@@ -21,7 +21,9 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tableDocuments: undefined,
     		tableContent: undefined,
     		tableTitle: undefined,
-    		tableAuthor: undefined
+    		tableAuthor: undefined,
+    		corpusTitle: undefined,
+    		corpusSubTitle: undefined
     	}
     },
     config: {
@@ -322,6 +324,25 @@ Ext.define('Voyant.panel.CorpusCreator', {
 							xtype: 'container',
 							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-xml'])+'</i></p>',
 							width: 375
+						},{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/' target='voyantdocs'>"+me.localize('corpus')+"</a>",
+	                        collapsible: true,
+	                        collapsed: true,
+	                        defaultType: 'textfield',
+	                        items: [
+	                            {
+	    							xtype: 'container',
+	    							html: '<p><i>'+'</i></p>',
+	    							width: 375
+	                            },{
+									fieldLabel: me.localize('corpusTitle'),
+									name: 'corpusTitle'
+								},{
+									fieldLabel: me.localize('corpusSubTitle'),
+									name: 'corpusSubTitle'
+								}
+							]
 						},{
 	        				xtype: 'fieldset',
 	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-xml' target='voyantdocs'>"+me.localize('xmlOptions')+"</a>",
