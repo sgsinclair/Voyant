@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Feb 15 16:07:33 EST 2017 */
+/* This file created by JSCacher. Last modified: Sat Feb 25 16:44:17 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6954,7 +6954,9 @@ Ext.define('Voyant.data.model.Corpus', {
          {name: 'lexicalTokensCount', type: 'int'},
          {name: 'lexicalTypesCount', type: 'int'},
          {name: 'createdTime', type: 'int'},
-         {name: 'createdDate', type: 'date', dateFormat: 'c'}
+         {name: 'createdDate', type: 'date', dateFormat: 'c'},
+         {name: 'title', type: 'string'},
+         {name: 'subTitle', type: 'string'}
     ],
     
 	/**
@@ -7010,7 +7012,47 @@ Ext.define('Voyant.data.model.Corpus', {
 				params: config
 			}).then(function(response) {
 				me.set(Ext.JSON.decode(response.responseText).corpus.metadata);
-				return me
+				
+				if (config.corpusTitle || config.corpusSubTitle) {
+					// store title and subTitle until they become part of metadata
+					me.set('title', config.corpusTitle);
+					me.set('subTitle', config.corpusSubTitle);
+					Ext.Ajax.request({
+			    	    url: Voyant.application.getTromboneUrl(),
+			    	    params: {
+			        		tool: 'resource.StoredResource',
+			    			storeResource: Ext.encode({title: config.corpusTitle, subTitle: config.corpusSubTitle}),
+			    			resourceId: 'titles-'+me.getId()
+			    	    }
+			    	});
+				} else {
+					// try to load stored title and subTitle
+					Ext.Ajax.request({
+			    	    url: Voyant.application.getTromboneUrl(),
+			    	    params: {
+			        		tool: 'resource.StoredResource',
+			        		verifyResourceId: 'titles-'+me.getId()
+			    	    }
+			    	}).then(function(response) {
+			    		var json = Ext.util.JSON.decode(response.responseText);
+			    		if (json && json.storedResource && json.storedResource.id) {
+				    		Ext.Ajax.request({
+					    	    url: Voyant.application.getTromboneUrl(),
+					    	    params: {
+					        		tool: 'resource.StoredResource',
+					        		retrieveResourceId: 'titles-'+me.getId()
+					    	    }
+					    	}).then(function(response) {
+					    		var json = Ext.util.JSON.decode(response.responseText);
+				    	    	var value = json.storedResource.resource;
+				    	    	var titles = Ext.decode(value);
+				    	    	me.set(titles);
+				    	    });
+				    	}
+			    	});
+				}
+				
+				return me;
 			}).otherwise(function(response){
 				Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
 			}).then(function(corpus) {
@@ -7194,6 +7236,14 @@ Ext.define('Voyant.data.model.Corpus', {
 	getNoPasswordAccess: function() {
 		// overrides the getId() function from the model to handle promises
     	return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('noPasswordAccess');		
+	},
+	
+	getTitle: function() {
+		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('title');		
+	},
+	
+	getSubTitle: function() {
+		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('subTitle');		
 	},
 	
 	/**
@@ -11708,7 +11758,9 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tableDocuments: undefined,
     		tableContent: undefined,
     		tableTitle: undefined,
-    		tableAuthor: undefined
+    		tableAuthor: undefined,
+    		corpusTitle: undefined,
+    		corpusSubTitle: undefined
     	}
     },
     config: {
@@ -12009,6 +12061,25 @@ Ext.define('Voyant.panel.CorpusCreator', {
 							xtype: 'container',
 							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-xml'])+'</i></p>',
 							width: 375
+						},{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/' target='voyantdocs'>"+me.localize('corpus')+"</a>",
+	                        collapsible: true,
+	                        collapsed: true,
+	                        defaultType: 'textfield',
+	                        items: [
+	                            {
+	    							xtype: 'container',
+	    							html: '<p><i>'+'</i></p>',
+	    							width: 375
+	                            },{
+									fieldLabel: me.localize('corpusTitle'),
+									name: 'corpusTitle'
+								},{
+									fieldLabel: me.localize('corpusSubTitle'),
+									name: 'corpusSubTitle'
+								}
+							]
 						},{
 	        				xtype: 'fieldset',
 	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-xml' target='voyantdocs'>"+me.localize('xmlOptions')+"</a>",
@@ -22396,6 +22467,127 @@ Ext.define('Voyant.panel.CustomSet', {
     	this.updateLayout();
 	}
 })
+Ext.define('Voyant.panel.Veliza', {
+	extend: 'Ext.panel.Panel',
+	mixins: ['Voyant.panel.Panel'],
+    xtype: 'veliza',
+	autoScroll: true,
+    statics: {
+    	i18n: {
+    		title: "Veliza",
+    		typeAndEnter: "Type text and hit enter.",
+    		send: "send",
+    		fromCorpus: "from text"
+    	},
+    	api: {
+    	},
+		glyph: 'xf0e6@FontAwesome'
+    },
+    config: {
+		corpus: undefined,
+    	previous: []
+    },
+    
+    initComponent: function(config) {
+        var me = this;
+        
+        Ext.apply(this, {
+    		title: this.localize('title'),
+    		glyph: 'xf0e6@FontAwesome',
+    		html: "<form class='chat'></form>",
+    		dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+        		enableOverflow: true,
+                items: [{
+        			xtype: 'textfield',
+        			emptyText: this.localize("typeAndEnter"),
+        			flex: 1,
+        			listeners: {
+                        specialkey: function(field, e){
+                            if (e.getKey() == e.ENTER) {
+                            	me.handleUserSentence(field.getValue())
+                            }
+                        }
+                    }
+                },{
+        			xtype: 'button',
+        			text: this.localize('send'),
+        			handler: function() {
+        				me.handleUserSentence(this.up("toolbar").down('textfield').getValue(), false)
+        			}
+        		},{
+        			xtype: 'button',
+        			text: this.localize('fromCorpus'),
+        			handler: function() {
+        				me.handleUserSentence("", true)
+        			}
+        		}]
+    		}]
+        })
+             
+        this.callParent();
+        
+    	this.on('boxready', function(cmp) {
+    		cmp.addSentence("fromThem", "Hello, I'm Veliza, and I'm here to talk to you about your texts (you may know my sister <a href='https://en.wikipedia.org/wiki/ELIZA' target='_blank'>Eliza</a> she's a famous psychotherapist). I'm just learning to talk about text documents, but please, let me know about any anxieties you're feeling about your texts. Type a message in the box below and hit enter. Or, if you're feeling playful, hit the <i>from text</i> bottom in the lower right-hand corner to fetch a sentence from the corpus.")
+    	})
+
+    }, 
+    
+    listeners: {
+    	loadedCorpus: function(src, corpus) {
+    		this.setCorpus(corpus);
+    	}
+    },
+    
+    handleUserSentence: function(sentence, fromCorpus) {
+    	sentence = sentence.trim();
+    	if (sentence || fromCorpus) {
+    		if (sentence) {
+    	    	this.addSentence("myMessage", sentence);
+    		}
+	    	this.down('textfield').setValue("");
+	    	this.mask();
+    		var me = this;
+    		Ext.Ajax.request({
+    			url: this.getApplication().getTromboneUrl(),
+    			params: {
+    				corpus: me.getCorpus().getId(),
+    				tool: 'corpus.Veliza',
+    				sentence: sentence,
+    				previous: this.getPrevious(),
+    				fromCorpus: fromCorpus ? true : false,
+    				noCache: Ext.id()
+    			},
+    		    success: function(response, opts) {
+    		    	me.unmask();
+    		    	var response = Ext.decode(response.responseText);
+    		    	var veliza = response.veliza.response;
+    		    	var sentence = response.veliza.sentence;
+    		    	me.setPrevious(response.veliza.previous);
+    		    	if (fromCorpus) {
+    			    	me.addSentence("myMessage", sentence);
+    			    	Ext.Function.defer(function() {
+            		    	this.addSentence("fromThem", veliza);
+            		    	this.body.scroll('b', Infinity)
+    			    	}, 500, me);
+    		    	} else {
+        		    	me.addSentence("fromThem", veliza);
+        		    	me.body.scroll('b', Infinity)
+    		    	}
+    		    },
+    		    failure: function(response, opts) {
+    		    	me.showError(response);
+    		    }
+    		})
+    	}
+    },
+
+    addSentence: function(speaker, sentence) {
+    	var el = this.body.down("form").insertHtml('beforeEnd', '<div class="message"><div class="'+speaker+'"><p>'+sentence+'</p></div></div>', true);
+    	this.body.scroll('b', Infinity);
+    }
+});
 Ext.define('Voyant.panel.WordTree', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
