@@ -175,18 +175,19 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getShortLabel: function() {
-    	return (parseInt(this.getIndex())+1) + ') ' + this.getShortTitle();
+    	var author = this.getAuthor(25);
+    	return (parseInt(this.getIndex())+1) + ') <i>' + this.getShortTitle() + (author ? "</i> ("+author+")" : '')
     },
     
     getTinyLabel: function() {
     	return (parseInt(this.getIndex())+1) + ') ' + this.getTinyTitle();
     },
     
-    getAuthor: function() {
+    getAuthor: function(max) {
     	var author = this.get('author') || "";
     	author = Ext.isArray(author) ? author.join("; ") : author;
     	author = author.trim().replace(/\s+/g, ' ');
-    	return author;
+    	return max ? this.getTruncated(author, max) : author;
     },
     
     getCorpusId: function() {

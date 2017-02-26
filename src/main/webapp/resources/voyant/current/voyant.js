@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Feb 25 16:44:17 EST 2017 */
+/* This file created by JSCacher. Last modified: Sat Feb 25 22:24:14 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5935,18 +5935,19 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getShortLabel: function() {
-    	return (parseInt(this.getIndex())+1) + ') ' + this.getShortTitle();
+    	var author = this.getAuthor(25);
+    	return (parseInt(this.getIndex())+1) + ') <i>' + this.getShortTitle() + (author ? "</i> ("+author+")" : '')
     },
     
     getTinyLabel: function() {
     	return (parseInt(this.getIndex())+1) + ') ' + this.getTinyTitle();
     },
     
-    getAuthor: function() {
+    getAuthor: function(max) {
     	var author = this.get('author') || "";
     	author = Ext.isArray(author) ? author.join("; ") : author;
     	author = author.trim().replace(/\s+/g, ' ');
-    	return author;
+    	return max ? this.getTruncated(author, max) : author;
     },
     
     getCorpusId: function() {
@@ -22566,7 +22567,8 @@ Ext.define('Voyant.panel.Veliza', {
     		    	var sentence = response.veliza.sentence;
     		    	me.setPrevious(response.veliza.previous);
     		    	if (fromCorpus) {
-    			    	me.addSentence("myMessage", sentence);
+    		    		meta = response.veliza.docIndex > -1 ? me.getCorpus().getDocument(response.veliza.docIndex).getShortLabel() : undefined;
+    		    		me.addSentence("myMessage", sentence, meta);
     			    	Ext.Function.defer(function() {
             		    	this.addSentence("fromThem", veliza);
             		    	this.body.scroll('b', Infinity)
@@ -22583,8 +22585,8 @@ Ext.define('Voyant.panel.Veliza', {
     	}
     },
 
-    addSentence: function(speaker, sentence) {
-    	var el = this.body.down("form").insertHtml('beforeEnd', '<div class="message"><div class="'+speaker+'"><p>'+sentence+'</p></div></div>', true);
+    addSentence: function(speaker, sentence, meta) {
+    	var el = this.body.down("form").insertHtml('beforeEnd', '<div class="message"><div class="'+speaker+'"><p>'+sentence+'</p>'+(meta ? "<date>"+meta+"</date>" : "")+'</div></div>', true);
     	this.body.scroll('b', Infinity);
     }
 });

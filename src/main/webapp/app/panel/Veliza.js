@@ -97,7 +97,8 @@ Ext.define('Voyant.panel.Veliza', {
     		    	var sentence = response.veliza.sentence;
     		    	me.setPrevious(response.veliza.previous);
     		    	if (fromCorpus) {
-    			    	me.addSentence("myMessage", sentence);
+    		    		meta = response.veliza.docIndex > -1 ? me.getCorpus().getDocument(response.veliza.docIndex).getShortLabel() : undefined;
+    		    		me.addSentence("myMessage", sentence, meta);
     			    	Ext.Function.defer(function() {
             		    	this.addSentence("fromThem", veliza);
             		    	this.body.scroll('b', Infinity)
@@ -114,8 +115,8 @@ Ext.define('Voyant.panel.Veliza', {
     	}
     },
 
-    addSentence: function(speaker, sentence) {
-    	var el = this.body.down("form").insertHtml('beforeEnd', '<div class="message"><div class="'+speaker+'"><p>'+sentence+'</p></div></div>', true);
+    addSentence: function(speaker, sentence, meta) {
+    	var el = this.body.down("form").insertHtml('beforeEnd', '<div class="message"><div class="'+speaker+'"><p>'+sentence+'</p>'+(meta ? "<date>"+meta+"</date>" : "")+'</div></div>', true);
     	this.body.scroll('b', Infinity);
     }
 });
