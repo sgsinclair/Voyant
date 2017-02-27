@@ -119,6 +119,7 @@ app/panel/Subset.js
 app/panel/CollocatesSet.js
 app/panel/BubblelinesSet.js
 app/panel/CustomSet.js
+app/panel/Veliza.js
 app/panel/WordTree.js
 
 # APPS
