@@ -94,7 +94,7 @@ Ext.define('Voyant.panel.DToC', {
         		},{
         			columnWidth: 1,
         			padding: '0 0 0 5px',
-        			html: '<div id="headerBookName" class="headerRow">Regenerations: Canadian Women&rsquo;s Writing/&Eacute;criture des femmes au Canada.</div><div id="headerAuthor" class="headerRow">Ed. Marie Carri&egrave;re and Patricia Demers.</div>'
+        			html: '<div id="headerBookName" class="headerRow"></div><div id="headerAuthor" class="headerRow"></div>'
         		},{
         			width: 285,
         			style: {
@@ -367,6 +367,11 @@ Ext.define('Voyant.panel.DToC', {
 		if (isCurator) {
 			Ext.getCmp('dtcTools').setActiveTab('dtcMarkup');
 		}
+    },
+    
+    setHeader: function() {
+		Ext.get('headerBookName').setHtml(this.getCorpus().getTitle());
+		Ext.get('headerAuthor').setHtml(this.getCorpus().getSubTitle());
     },
     
     showSettings: function(panel) {
@@ -655,6 +660,7 @@ Ext.define('Voyant.panel.DToC', {
 		},
 		loadedCorpus: function(src, corpus) {
 			this.setCorpus(corpus);
+			this.setHeader();
 			
 			if (this.queryParameters.curatorId) {
 				var curatorId = this.queryParameters.curatorId;
