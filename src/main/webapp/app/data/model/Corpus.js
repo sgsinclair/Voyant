@@ -125,13 +125,12 @@ Ext.define('Voyant.data.model.Corpus', {
 
 			var dfd = Voyant.application.getDeferred(this);
 			var me = this;
-			
 			var promise = Ext.Ajax.request({
 				url: Voyant.application.getTromboneUrl(),
 				params: config
 			}).then(function(response) {
 				me.set(Ext.JSON.decode(response.responseText).corpus.metadata);
-				
+				var rId = 'titles-'+me.getId();
 				if (config.corpusTitle || config.corpusSubTitle) {
 					// store title and subTitle until they become part of metadata
 					me.set('title', config.corpusTitle);
@@ -141,7 +140,7 @@ Ext.define('Voyant.data.model.Corpus', {
 			    	    params: {
 			        		tool: 'resource.StoredResource',
 			    			storeResource: Ext.encode({title: config.corpusTitle, subTitle: config.corpusSubTitle}),
-			    			resourceId: 'titles-'+me.getId()
+			    			resourceId: rId
 			    	    }
 			    	});
 				} else {
@@ -150,16 +149,16 @@ Ext.define('Voyant.data.model.Corpus', {
 			    	    url: Voyant.application.getTromboneUrl(),
 			    	    params: {
 			        		tool: 'resource.StoredResource',
-			        		verifyResourceId: 'titles-'+me.getId()
+			        		verifyResourceId: rId
 			    	    }
 			    	}).then(function(response) {
 			    		var json = Ext.util.JSON.decode(response.responseText);
-			    		if (json && json.storedResource && json.storedResource.id) {
+			    		if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
 				    		Ext.Ajax.request({
 					    	    url: Voyant.application.getTromboneUrl(),
 					    	    params: {
 					        		tool: 'resource.StoredResource',
-					        		retrieveResourceId: 'titles-'+me.getId()
+					        		retrieveResourceId: rId
 					    	    }
 					    	}).then(function(response) {
 					    		var json = Ext.util.JSON.decode(response.responseText);

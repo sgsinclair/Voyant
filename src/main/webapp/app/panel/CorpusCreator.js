@@ -268,8 +268,11 @@ Ext.define('Voyant.panel.CorpusCreator', {
 			failure: function(form, action) { // we always fail because of content-type
             	view.unmask();
 				if (action.result) {
+					var corpusParams = {corpus: action.result.corpus ? action.result.corpus.metadata.id : action.result.stepEnabledCorpusCreator.storedId};
+					Ext.apply(corpusParams, apiParams); // adding corpusTitle & corpusSubTitle here
+					
 					this.setCorpus(undefined)
-					this.loadCorpus({corpus: action.result.corpus ? action.result.corpus.metadata.id : action.result.stepEnabledCorpusCreator.storedId});
+					this.loadCorpus(corpusParams);
 				}
 			},
 			scope: this
