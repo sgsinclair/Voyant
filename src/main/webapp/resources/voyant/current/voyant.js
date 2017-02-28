@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Feb 25 22:24:14 EST 2017 */
+/* This file created by JSCacher. Last modified: Mon Feb 27 11:59:07 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5346,8 +5346,10 @@ Ext.define('Voyant.util.ToolMenu', {
 	            glyphParts = glyph.split('@');
 	            glyph = glyphParts[0];
 	            glyphFontFamily = glyphParts[1];
-	        } else {
-	            glyphFontFamily = 'FontAwesome';
+	        } else if (typeof glyph === 'object' && glyph.glyphConfig) {
+	            glyphParts = glyph.glyphConfig.split('@');
+	            glyph = glyphParts[0];
+	            glyphFontFamily = glyphParts[1];
 	        }
 	
 	

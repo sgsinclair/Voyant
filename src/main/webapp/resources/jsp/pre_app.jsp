@@ -51,12 +51,12 @@
 
 <link rel="shortcut icon" type="image/ico" href="<%= base %>/resources/voyant/favicon.ico" />
 
-<script type="text/javascript" src="<%= base %>/resources/ext/6.0.1/ext-all<%= rtl %>.js"></script>
-<script type="text/javascript" src="<%= base %>/resources/ext/6.0.1/charts.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.1/charts-all<%= rtl %>.css" />
-<script type="text/javascript" src="<%= base %>/resources/ext/6.0.1/theme-crisp/theme-crisp.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.1/theme-crisp/resources/theme-crisp-all<%= rtl %>_1.css" />
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.0.1/theme-crisp/resources/theme-crisp-all<%= rtl %>_2.css" />
+<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/ext-all<%= rtl %>.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/charts.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/charts-all<%= rtl %>.css" />
+<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/theme-crisp/theme-crisp.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/theme-crisp-all<%= rtl %>_1.css" />
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/theme-crisp-all<%= rtl %>_2.css" />
 
 <!-- jQuery -->
 <script type="text/javascript" src="<%= base %>/resources/jquery/current/jquery.min.js"></script>

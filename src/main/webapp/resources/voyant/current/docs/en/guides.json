@@ -183,6 +183,11 @@
                         "title": "Trends"
                     },
                     {
+                        "name": "veliza",
+                        "url": "guides/tools/veliza",
+                        "title": "Veliza"
+                    },
+                    {
                         "name": "wordtree",
                         "url": "guides/tools/wordtree",
                         "title": "Word Tree"

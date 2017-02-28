@@ -691,8 +691,10 @@ Ext.define('Voyant.util.ToolMenu', {
 	            glyphParts = glyph.split('@');
 	            glyph = glyphParts[0];
 	            glyphFontFamily = glyphParts[1];
-	        } else {
-	            glyphFontFamily = 'FontAwesome';
+	        } else if (typeof glyph === 'object' && glyph.glyphConfig) {
+	            glyphParts = glyph.glyphConfig.split('@');
+	            glyph = glyphParts[0];
+	            glyphFontFamily = glyphParts[1];
 	        }
 	
 	

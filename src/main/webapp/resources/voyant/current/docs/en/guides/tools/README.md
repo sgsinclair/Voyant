@@ -245,6 +245,18 @@
 </div>
 
 <div class="thumb-list">
+	<a href="#!/guide/veliza"><dd>
+		<div class="thumb">
+			<img src="guides/veliza/icon.png" />
+		</div>
+		<div>
+			<h4>Veliza</h4>
+			<p>Veliza is an experimental tool for having a (limited) natural language exchange (in English) based on your corpus.</p>
+		</div>
+	</dd></a>
+</div>
+
+<div class="thumb-list">
 	<a href="#!/guide/wordtree"><dd>
 		<div class="thumb">
 			<img src="guides/wordtree/icon.png" />
