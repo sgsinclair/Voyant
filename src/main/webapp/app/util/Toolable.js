@@ -207,11 +207,11 @@ Ext.define('Voyant.util.Toolable', {
 				}, this);
 				el.on("mouseout", function() {
 					this.getHeader().getTools().forEach(function(tool) {
-						if (tool.type!='help' && tool.type.indexOf('collapse')==-1) {tool.hide();}
+						if (tool.config.type!='help' && tool.config.type.indexOf('collapse')==-1) {tool.hide();}
 					})
 				}, this);
 				header.getTools().forEach(function(tool,i) {
-					if (tool.type!='help') {tool.hide();}
+					if (tool.config.type!='help') {tool.hide();}
 				});
 			}
 		}, this)

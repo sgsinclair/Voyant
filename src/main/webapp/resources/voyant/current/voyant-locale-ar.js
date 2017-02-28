@@ -228,6 +228,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationWordBoundaries":"حدود بسيطة  للكلمة",
 "numberEmpty":"يوجد على الاقل عمود واحد فارغ حاليا",
 "tokenization":"تفصيل الكلمات",
+"tokenizationWhitespace":"Whitespace Only",
 "xpathContent":"محتويات",
 "numbersNeedCommas":"الرجاء إستعمال الفاصلة للفصل بين الأرقام المتعددة",
 "tableDocumentsTable":"من الجدول الكامل",

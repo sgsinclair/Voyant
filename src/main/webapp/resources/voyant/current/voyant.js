@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Feb 27 11:59:07 EST 2017 */
+/* This file created by JSCacher. Last modified: Tue Feb 28 15:21:23 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4862,11 +4862,11 @@ Ext.define('Voyant.util.Toolable', {
 				}, this);
 				el.on("mouseout", function() {
 					this.getHeader().getTools().forEach(function(tool) {
-						if (tool.type!='help' && tool.type.indexOf('collapse')==-1) {tool.hide();}
+						if (tool.config.type!='help' && tool.config.type.indexOf('collapse')==-1) {tool.hide();}
 					})
 				}, this);
 				header.getTools().forEach(function(tool,i) {
-					if (tool.type!='help') {tool.hide();}
+					if (tool.config.type!='help') {tool.hide();}
 				});
 			}
 		}, this)
@@ -7009,13 +7009,12 @@ Ext.define('Voyant.data.model.Corpus', {
 
 			var dfd = Voyant.application.getDeferred(this);
 			var me = this;
-			
 			var promise = Ext.Ajax.request({
 				url: Voyant.application.getTromboneUrl(),
 				params: config
 			}).then(function(response) {
 				me.set(Ext.JSON.decode(response.responseText).corpus.metadata);
-				
+				var rId = 'titles-'+me.getId();
 				if (config.corpusTitle || config.corpusSubTitle) {
 					// store title and subTitle until they become part of metadata
 					me.set('title', config.corpusTitle);
@@ -7025,7 +7024,7 @@ Ext.define('Voyant.data.model.Corpus', {
 			    	    params: {
 			        		tool: 'resource.StoredResource',
 			    			storeResource: Ext.encode({title: config.corpusTitle, subTitle: config.corpusSubTitle}),
-			    			resourceId: 'titles-'+me.getId()
+			    			resourceId: rId
 			    	    }
 			    	});
 				} else {
@@ -7034,16 +7033,16 @@ Ext.define('Voyant.data.model.Corpus', {
 			    	    url: Voyant.application.getTromboneUrl(),
 			    	    params: {
 			        		tool: 'resource.StoredResource',
-			        		verifyResourceId: 'titles-'+me.getId()
+			        		verifyResourceId: rId
 			    	    }
 			    	}).then(function(response) {
 			    		var json = Ext.util.JSON.decode(response.responseText);
-			    		if (json && json.storedResource && json.storedResource.id) {
+			    		if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
 				    		Ext.Ajax.request({
 					    	    url: Voyant.application.getTromboneUrl(),
 					    	    params: {
 					        		tool: 'resource.StoredResource',
-					        		retrieveResourceId: 'titles-'+me.getId()
+					        		retrieveResourceId: rId
 					    	    }
 					    	}).then(function(response) {
 					    		var json = Ext.util.JSON.decode(response.responseText);
@@ -12008,8 +12007,11 @@ Ext.define('Voyant.panel.CorpusCreator', {
 			failure: function(form, action) { // we always fail because of content-type
             	view.unmask();
 				if (action.result) {
+					var corpusParams = {corpus: action.result.corpus ? action.result.corpus.metadata.id : action.result.stepEnabledCorpusCreator.storedId};
+					Ext.apply(corpusParams, apiParams); // adding corpusTitle & corpusSubTitle here
+					
 					this.setCorpus(undefined)
-					this.loadCorpus({corpus: action.result.corpus ? action.result.corpus.metadata.id : action.result.stepEnabledCorpusCreator.storedId});
+					this.loadCorpus(corpusParams);
 				}
 			},
 			scope: this
@@ -12170,8 +12172,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								    xtype:'combo',
 								    fieldLabel: me.localize('tokenization'),
 								    name: 'tokenization',
-								    queryMode:'local',
-								    store:[['',me.localize('tokenizationAuto')],['wordBoundaries',me.localize("tokenizationWordBoundaries")]],
+								    queryMode:'local', //?
+								    store:[['',me.localize('tokenizationAuto')],['wordBoundaries',me.localize("tokenizationWordBoundaries")],['whitespace',me.localize("tokenizationWhitespace")]],
 								    forceSelection:true,
 								    value: ''
 								}
@@ -14238,97 +14240,18 @@ Ext.define('Voyant.panel.Dummy', {
         var columns = 3;
         
         Ext.apply(this, {
-        	layout: {
-        		type: 'table',
-        		columns: columns,
-        		tableAttrs: {
-        			style: {
-        				width: '100%',
-        				height: '100%'
-        			}
-        		},
-        		tdAttrs: {
-        			style: {
-        				padding: '0px',
-        				verticalAlign: 'top'
-        			}
-        		}
-        	},
-        	defaults: { // place holder values to ensure that the children are rendered
-        		width: 10,
-        		height: 10,
-        		border: true
-        	},
-        	items:  [{
-        		colspan: 2,
-        		xtype: 'summary'
-        	},{
-        		xtype: 'reader',
-        		rowspan: 2
-        	},{
-        		xtype: 'documentterms'
-        	},{
-        		xtype: 'corpusterms'
-        	}]
-        })
-        
-        this.on("boxready", function() {
-        	this.body.setStyle('overflow', 'hidden');
-        	
-        	var sizeMap = {};
-        	
-        	var table = this.getTargetEl().down(".x-table-layout");
-        	var rows = table.dom.rows;
-        	for (var i=0; i<rows.length; i++) {
-        		var cells = rows[i].cells;
-        		for (var j=0; j<cells.length; j++) {
-        			var cell = cells[j];
-        			var cellEl = Ext.get(cell);
-        			var size = cellEl.getSize(false);
-        			var cmpId = cellEl.down('.x-panel').id;
-        			sizeMap[cmpId] = size;
-        		}
-        	}
-        	
-        	for (var id in sizeMap) {
-        		var size = sizeMap[id];
-        		Ext.getCmp(id).setSize(size);
-        	}
-
-        	this.updateLayout();
-        })
-        
-        this.on('resize', function(panel, newwidth, newheight, oldwidth, oldheight) {
-        	if (oldwidth !== undefined && oldheight !== undefined) {
-	        	var widthRatio = newwidth/oldwidth;
-	        	var heightRatio = newheight/oldheight;
-
-	        	var sizeMap = {};
-	        	
-	        	var table = this.getTargetEl().down(".x-table-layout");
-	        	var rows = table.dom.rows;
-	        	for (var i=0; i<rows.length; i++) {
-	        		var cells = rows[i].cells;
-	        		for (var j=0; j<cells.length; j++) {
-	        			var cell = cells[j];
-	        			var cellEl = Ext.get(cell);
-	        			var panelEl = cellEl.down('.x-panel');
-	        			var size = panelEl.getSize(false); // get panel size this time since table cell size will be inaccurate
-	        			var w = Math.floor(size.width * widthRatio);
-		        		var h = Math.floor(size.height * heightRatio);
-	        			var cmpId = panelEl.id;
-	        			sizeMap[cmpId] = {width: w, height: h};
-	        		}
-	        	}
-	        	
-	        	for (var id in sizeMap) {
-	        		var size = sizeMap[id];
-	        		Ext.getCmp(id).setSize(size);
-	        	}
-	
-	        	this.updateLayout();
-        	}
-        	
+    		xtype: 'tabpanel',
+    		items: [{
+                title: 'Tab 1',
+                icon: null,
+                glyph: 42,
+                html: "one"
+            }, {
+                title: 'Tab 2',
+                icon: null,
+                glyph: 70,
+                html: "two"
+            }]
         })
         
         this.callParent();

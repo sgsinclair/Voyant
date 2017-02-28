@@ -433,8 +433,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								    xtype:'combo',
 								    fieldLabel: me.localize('tokenization'),
 								    name: 'tokenization',
-								    queryMode:'local',
-								    store:[['',me.localize('tokenizationAuto')],['wordBoundaries',me.localize("tokenizationWordBoundaries")]],
+								    queryMode:'local', //?
+								    store:[['',me.localize('tokenizationAuto')],['wordBoundaries',me.localize("tokenizationWordBoundaries")],['whitespace',me.localize("tokenizationWhitespace")]],
 								    forceSelection:true,
 								    value: ''
 								}

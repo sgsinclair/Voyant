@@ -228,6 +228,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationWordBoundaries":"単純な語境界",
 "numberEmpty":"少なくとも1つの列の数字が現在空白です。",
 "tokenization":"トークン化",
+"tokenizationWhitespace":"Whitespace Only",
 "xpathContent":"コンテンツ",
 "numbersNeedCommas":"複数の数字を分けるにはコンマを使用してください",
 "tableDocumentsTable":"テーブル全体から",

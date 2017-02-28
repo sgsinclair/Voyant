@@ -228,6 +228,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationWordBoundaries":"Simple Word Boundaries",
 "numberEmpty":"At least one column number is currently empty.",
 "tokenization":"Tokenization",
+"tokenizationWhitespace":"Whitespace Only",
 "xpathContent":"Content",
 "numbersNeedCommas":"Please use a comma to separate multiple numbers.",
 "tableDocumentsTable":"from entire table",

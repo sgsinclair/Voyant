@@ -1,10 +1,10 @@
 Voyant.util.Localization.LANGUAGE='bs'
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
-"homeConfirm":"Are you sure you want to start over (and leave the current corpus)?",
+"homeConfirm":"Jeste li sigurni da želite krenuti od početka (i napustiti trenutni korpus)?",
 "title":"Voyant Tools",
-"helpTip":"Voyant Tools is a web-based reading and analysis environment for digital texts.",
-"homeTip":"Click to start over from the corpus creation screen.",
-"home":"Start Over"});
+"helpTip":"Voyant Tools je mrežno okruženje za čitanje i analizu digitalnih tekstova.",
+"homeTip":"Kliknite kako biste krenuli od početka sa ekrana za izgradnju korpusa.",
+"home":"Krenite od početka"});
 Ext.apply(Voyant.panel.Cirrus.i18n, {
 "maxTerms":"Maksimum termina",
 "visible":"Prikaz",
@@ -147,24 +147,24 @@ Ext.apply(Voyant.panel.Reader.i18n, {
 "title":"Čitač",
 "helpTip":"<p> Alatka Čitač nudi pregled tekstova unutar korpusa. Uključuje funkcije, kao što su: </p><ul><li>podaci o učestalosti prilikom pozicioniranja kursora na riječ </li><li>grafički prikaz distribucije u dnu prilikom klika na riječ </li><li> stupčasti grafikon u dnu koji pokazuje relativnu veličinu svakog dokumenta u korpusu </li><li> okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita)</li></ul>"});
 Ext.apply(Voyant.VoyantCorpusApp.i18n, {
-"fetchingCorpus":"Fetching your corpus",
-"moreToolsTypeViz":"Visualization Tools",
+"fetchingCorpus":"Vaš korpus se učitava",
+"moreToolsTypeViz":"atke za vizualizaciju",
 "noPasswordGiven":"Please provide an access code.",
 "passwordValidationError":"Sorry, an unexpected error occurred while trying to validate your access code.",
-"passwordRequiredMessage":"This corpus requires an access code.",
+"passwordRequiredMessage":"Ovaj korpus zahtijeva pristupnu šifru.",
 "didYouKnow":"Did you know?",
-"passwordRequiredTitle":"Access Code Required",
+"passwordRequiredTitle":"Potrebna je pristupna šifra",
 "password":"access code",
 "didYouKnowText":"Help and options are available!",
-"moreToolsScaleDocument":"Document Tools",
-"moreToolsTypeGrid":"Grid Tools",
-"moreToolsType":"Tools by Type",
-"moreToolsTypeOther":"Other Tools",
+"moreToolsScaleDocument":"Alatke za dokumente",
+"moreToolsTypeGrid":"Alatke za tabele",
+"moreToolsType":"Alatke po vrsti",
+"moreToolsTypeOther":"Ostale alatke",
 "nonConsumptiveButton":"Limited Access",
-"moreToolsScaleCorpus":"Corpus Tools",
+"moreToolsScaleCorpus":"Alatke za korpus",
 "nonConsumptiveMessage":"Alternatively, you can click on the <i>Limited Access</i> button to continue with limited functionality (generally speaking, this non-consumptive access allows you to explore derivative data from the corpus without allowing you to read text from the corpus).",
 "passwordValidateButton":"Validate",
-"moreToolsScale":"Tools by Scale",
+"moreToolsScale":"Alatke po razmjeru",
 "badPassword":"Sorry, that doesn't seem to be a valid access code."});
 Ext.apply(Voyant.panel.Bubblelines.i18n, {
 "findTerm":"Pronaći termin",
@@ -205,9 +205,9 @@ Ext.apply(Voyant.panel.NoTool.i18n, {
 "title":"Nepostojeća alatka",
 "error":"Greška"});
 Ext.apply(Voyant.panel.CustomSet.i18n, {
-"noSuchTool":"The specified tool ({0}) does not exist.",
-"title":"Custom View",
-"helpTip":"This is a custom view."});
+"noSuchTool":"Navedena alatka ({0}) ne postoji.",
+"title":"Personalizovani prikaz",
+"helpTip":"Ovo je personalizovani prikaz."});
 Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 "cleaning":"Čišćenje",
 "releaseToRemove":"Otpustiti za uklanjanje ovog termina",
@@ -228,6 +228,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationWordBoundaries":"Jednostavne granice riječi",
 "numberEmpty":"Najmanje jedan broj kolone je trenutno prazan",
 "tokenization":"Tokenizacija",
+"tokenizationWhitespace":"Whitespace Only",
 "xpathContent":"Sadržaj",
 "numbersNeedCommas":"Zarezom razdvojite više brojeva",
 "tableDocumentsTable":"iz cijele tabele",
@@ -301,20 +302,20 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "items":"elementi",
 "shortest":"najkraće:"});
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
-"title":"Corpus View",
-"helpTip":"This is the default, general-purpose corpus view."});
+"title":"Prikaz korpusa",
+"helpTip":"Ovo je predefinisani, opšte namjenski prikaz korpusa."});
 Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
 "label":"Familija fontova"});
 Ext.apply(Voyant.panel.Subset.i18n, {
-"publisherLabel":"Publishers",
-"sendToVoyantButton":"New Voyant Corpus",
-"downloadButton":"Download ZIP Archive",
-"sendToVoyantNoQuery":"There's currently no query specified, but you can <a href=\"{0}\" target=\"_blank\">open the current corpus in a new window</a>.",
-"lexicalLabel":"Full-text",
-"noMatches":"The current query criteria don't match any documents, please modifying the search first.",
-"titleLabel":"Titles",
-"authorLabel":"Authors",
-"title":"Workset Builder"});
+"publisherLabel":"Izdavači",
+"sendToVoyantButton":"Novi Voyant korpus",
+"downloadButton":"Preuzmite ZIP arhivu",
+"sendToVoyantNoQuery":"Trenutno nema specifičnog upita, ali možete <a href=\"{0}\" target=\"_blank\"> otvoriti trenutni korpus unutar novog prozora.",
+"lexicalLabel":"Cijeli tekst",
+"noMatches":"Trenutni kriteriji pretrage ne poklapaju se ni sa jednim dokumentom, najprije izmijenite upit.",
+"titleLabel":"Naslovi",
+"authorLabel":"Autori",
+"title":"Izgrađivač radnog seta"});
 Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 "titleLabel":"naslov",
 "authorLabel":"autor",
@@ -372,8 +373,8 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "secondsAgo":"prije {} sekund-e/i",
 "dayAgo":"otprilike prije jednog dana"});
 Ext.apply(Voyant.panel.WordTree.i18n, {
-"emptyText":"No matching results.",
-"title":"WordTree"});
+"emptyText":"Nema odgovarajućih rezultata.",
+"title":"Stablo riječi"});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "original":"original",
 "VOYANTTip":"Ovo je normalizovana verzija sadržaja. Kad su izvorni dokumenti u XML-u, biti će to uglavnom originalni sadržaj, a za većinu ostalih formata, jednostavni HTML sadržaj.",
@@ -383,8 +384,8 @@ Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "SOURCETip":"Ovo je pokušaj da se izvorni dokumenti pokažu u svom originalnom formatu. U nekim slučajevima to može biti   pojedina arhiva, npr. ZIP datoteka.",
 "TXTTip":"Ovo će proizvesti svaki dokument u obliku običnog teksta."});
 Ext.apply(Voyant.panel.ScatterSet.i18n, {
-"title":"Scatter",
-"helpTip":"This is a specialized view for working with scatterplots."});
+"title":"Disperzija",
+"helpTip":"Ovo je specijalizovani prikaz za rad sa dijagramima disperzije."});
 Ext.apply(Voyant.util.Toolable.i18n, {
 "exportTitle":"Eksport",
 "exportError":"Greška pri eksportu",
@@ -565,8 +566,8 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "facet.pubDateTitle":"Datumi objavljivanja",
 "facet.publisherTitle":"Izdavači"});
 Ext.apply(Voyant.panel.CollocatesSet.i18n, {
-"title":"Scatter",
-"helpTip":"This is a specialized view for working with scatterplots."});
+"title":"Kolokati",
+"helpTip":"Ovo je specijalizovani prikaz za rad sa kolokatima."});
 Ext.apply(Voyant.panel.MicroSearch.i18n, {
 "title":"MicroSearch",
 "loading":"Loading terms…",
@@ -577,7 +578,7 @@ Ext.apply(Voyant.panel.TopicContexts.i18n, {
 "helpTip":"Tematski konteksti"});
 Ext.apply(Voyant.panel.BubblelinesSet.i18n, {
 "title":"Bubblelines Skin",
-"helpTip":"This is a specialized view for working with Bubblelines."});
+"helpTip":"Ovo je specijalizovani prikaz za rad sa Bubblelines."});
 Ext.apply(Voyant.panel.Knots.i18n, {
 "findTerm":"Pronaći termin",
 "settings":"Podešavanje",
@@ -596,8 +597,8 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 "options":"Opcije",
 "context":"Kontekst"});
 Ext.apply(Voyant.VoyantApp.i18n, {
-"serverResponseError":"The server error reponse:",
-"error":"Error",
+"serverResponseError":"Poruka o grešci na serveru",
+"error":"Greška",
 "translatedBy":"Téa Rokolj"});
 Ext.apply(Voyant.panel.RezoViz.i18n, {
 "noEntitiesForEdgeCount":"Nije pronađen nijedan entitet. Želite li umanjiti minimalni broj rubova za bolje rezultate?",
@@ -690,7 +691,7 @@ Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"Voyant tools",
 "privacy":"Privatnost",
 "voyantLink":"<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools</a>",
-"privacyMsg":"The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see Google's Privacy Policy and the <em>Log Information</em> section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact Stéfan Sinclair. Click on this link for more information."});
+"privacyMsg":"Programeri Voyant Tools prikupljaju podatke o paramentrima upotrebe alatki (registriraju se IP adrese kako bi se utvrdili višestruki upiti unutar iste sesije). Dodatno, Voyant Tools koristi Google Analytics (pogledajte Google's Privacy Policy, a posebno sekciju <em>Log Information</em>). Lokalno registrirani podaci i Google Analytics koristit će razvojnom timu za ispravljanje grešaka i usavršavanje alatki, kao i uvid u kako ih istraživači koriste. Ovi podaci se također mogu koristiti u istraživačke svrhe, u anonimnom i agregatnom obliku. Imajte u vidu da se tekstovi dodati u Voyant pohranjuju kako bi se omogućio neometan pristup tokom jedne ili između više sesija. Ako imate pitanja kako se sakupljaju i koriste podaci ili želite povući određeni korpus, slobodno se obratite Stéfanu Sinclairu. Kliknite na ovaj link za dodatne informacije."});
 Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchTip":"<div>Sintaksa pretraživanja (pritisnite enter/return za početak pretraživanja):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>kaput</b>: pronađite tačan termin <i>kaput</i></li><li><b>kaput*</b>: pronađite termine koji počinju sa <i>kaput</i> kao jedinstven termin</li><li><b>^kaput*</b>: pronađite termine koji počinju sa <i>kaput</i> kao razdvojene (kaput, kaputi itd.)</li><li><b>*aput</b>: pronađite termine koji se završavaju na <i>aput</i> kao jedinstven termin</li><li><b>^*aput</b>: pronađite termine koji se završavaju na <i>aput</i>kao višestruke termine</li><li><b>kaput,jakna</b>: pronađite svaki termin razdvojen zarezima kao jedinstven termin</li><li><b>kaput|jakna</b>: pronađite termine razdvojene prečkom kao jedinstven termin</li><li><b>\"zimski kaput\"</b>: <i>zimski kaput</i>kao fraza</li><li><b>\"kaput rukavice\"~5</b>: <i>kaput</i> blizu termina <i>rukavice</i> (u razmaku do 5 riječi)</li><li><b>^kaput*,jakna|bunda,\"kaput rukavice\"~5</b>: kombiniranje sintaksi</li></ul>",
 "querySearchDocsModeTip":"<div>Sintaksa pretraživanja dokumenata (pritisnite enter/return za početak pretraživanja):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>kaput</b>: pronađite tačan termin <i>kaput</i></li><li><b>kaput*</b>: pronađite termine koji počinju sa <i>kaput</i></li><li><b>kaput,jakna</b>:pronađite svaki termin razdvojen zarezima kao jedinstven termin</li><li><b>\"zimski kaput\"</b>: <i>zimski kaput</i> kao fraza</li><li><b>\"kaput rukavice\"~5</b>: <i>kaput</i> blizu termina <i>rukavice</i> (u razmaku do 5 riječi)</li><li><b>+zimski +kaput</b>: pronađite svaki termin koji slijedi iza plus znaka (+)</li><li><b>+\"zimski kaput\" +rukavica*</b>: kombiniranje sintaksi</li></ul>",

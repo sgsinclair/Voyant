@@ -228,6 +228,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationWordBoundaries":"Limites de mots (début et fin) simples",
 "numberEmpty":"Un numéro de colonne au moins est actuellement vide.",
 "tokenization":"Segmentation",
+"tokenizationWhitespace":"Espaces blancs",
 "xpathContent":"Contenu",
 "numbersNeedCommas":"Veuillez utiliser la virgule pour délimiter les nombres.",
 "tableDocumentsTable":"à partir du tableau entier",

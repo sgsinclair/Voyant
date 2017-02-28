@@ -97,10 +97,44 @@ When documents are extracted _from entire columns_, the title metadata is extrac
 
 ## Tokenization
 
-Tokenization (in this context) is the process of identifying words, or sequences of Unicode letter characters that should be considered as a unit. In most cases Voyant will do a decent job of tokenization, even with some languages where there's not always an indication of word boundaries (like Chinese). There are two choices:
+Tokenization (in this context) is the process of identifying words, or sequences of Unicode letter characters that should be considered as a unit. In most cases Voyant will do a decent job of tokenization, even with some languages where there's not always an indication of word boundaries (like Chinese). There are three choices:
 
 * **Automatic (highly recommended)**: this works adequately for most languages
-* **Simple Word Boundaries**: use this if you have segmented the text yourself (by adding spaces between words)
+* **Simple Word Boundaries**: use this if you have segmented the text yourself (by adding spaces between words), all non-letter characters (like punctuation) will be discarded from word tokens
+* **Whitespace Only**: use this if you want tokens to be created based solely on separation of whitespace (note that this may help for things like Twitter where you want @users and #hashes and urls.com, but it also means that all punctuation will remain attached to tokens)
+
+The following table summarizes tokenization for the string <span class="keyword">What's voyant-tools.org?</span>:
+
+<table class="grid rows">
+<thead>
+<tr>
+<th> Tokenization </th>
+<th> Count </th>
+<th> Tokens </th>
+<th> Notes </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> Automatic </td>
+<td style="text-align: center"> 3 </td>
+<td> <span class="keyword">what's</span>, <span class="keyword">voyant</span>, <span class="keyword">tools.org</span> </td>
+<td> the hyphen is split but the tools.org is considered a URL token; tokens are lowercase </td>
+</tr>
+<tr>
+<td> Word Boundaries </td>
+<td style="text-align: center"> 5 </td>
+<td> <span class="keyword">what</span>, <span class="keyword">s</span>, <span class="keyword">voyant</span>, <span class="keyword">tools</span>, <span class="keyword">org</span> </td>
+<td> any non-word character is a delimiter, tokens are lowercase </td>
+</tr>
+<tr>
+<td> Whitespace Only </td>
+<td style="text-align: center"> 2 </td>
+<td> <span class="keyword">What's</span>, <span class="keyword">voyant-tools.org?</span> </td>
+<td> punctuation is kept in tokens and case is unchanged </td>
+</tr>
+</tbody>
+</table>
 
 ## Access Management
 

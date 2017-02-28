@@ -228,6 +228,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationWordBoundaries":"Jednoduché hranice slov",
 "numberEmpty":"Nejméně jedno číslo sloupce je aktuálně prázdné.",
 "tokenization":"Tokenizace",
+"tokenizationWhitespace":"Whitespace Only",
 "xpathContent":"Obsah",
 "numbersNeedCommas":"Prosím použijte čárku k oddělení více čísel.",
 "tableDocumentsTable":"z celé tabulky",
