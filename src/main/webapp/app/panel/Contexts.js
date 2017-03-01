@@ -77,7 +77,7 @@ Ext.define('Voyant.panel.Contexts', {
                 		},
                 		changecomplete: function(slider, newValue) {
                 			me.setApiParam("context", slider.getValue());
-           		        	me.getStore().loadPage(1, {params: me.getApiParams()});
+           		        	me.getStore().clearAndLoad({params: me.getApiParams()});
                 		}
                 	}
                 }, this.localize('expand'), {
@@ -153,7 +153,7 @@ Ext.define('Voyant.panel.Contexts', {
 				corpusSelected: function() {
 					if (this.getStore().getCorpus()) {
 						this.setApiParams({docId: undefined, docIndex: undefined})
-						this.getStore().loadPage(1)
+						this.getStore().clearAndLoad()
 					}
 				},
 				
@@ -164,7 +164,7 @@ Ext.define('Voyant.panel.Contexts', {
 						docIds.push(corpus.getDocument(doc).getId())
 					}, this);
 					this.setApiParams({docId: docIds, docIndex: undefined})
-					this.getStore().loadPage(1)
+					this.getStore().clearAndLoad()
 				},
 
             	documentSegmentTermClicked: {
@@ -180,7 +180,7 @@ Ext.define('Voyant.panel.Contexts', {
 	           			 }
 	           			 this.setApiParams(params);
 	       	        	if (this.isVisible()) {
-	       		        	this.getStore().loadPage(1);
+	       		        	this.getStore().clearAndLoad()
 	       	        	}
 	           		 },
 	           		 scope: this
@@ -208,7 +208,7 @@ Ext.define('Voyant.panel.Contexts', {
 	       	        		query: queries
 	       	        	});
 	       	        	if (this.isVisible()) {
-	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
+	       		        	this.getStore().clearAndLoad({params: this.getApiParams()});
 	       	        	}
 	           		 },
 	           		 scope: this
@@ -231,11 +231,11 @@ Ext.define('Voyant.panel.Contexts', {
                 	            	},
                 	                callback: function(records, operation, success) {
                 	                	if (success && records.length==1) {
-                	                		data = records[0].getData()
-                	                		operation.expandRow.firstElementChild.firstElementChild.innerHTML = data.left + " <span class='word keyword'>" + data.middle + "</span> " + data.right
+                	                		data = records[0].getData();
+                	                		Ext.fly(operation.expandRow).down('.x-grid-rowbody').setHtml(data.left + " <span class='word keyword'>" + data.middle + "</span> " + data.right);
                 	                	}
                 	                },
-                	                expandRow : expandRow
+                	                expandRow: expandRow
                 	            });
                 	            
                 		 }
@@ -254,8 +254,8 @@ Ext.define('Voyant.panel.Contexts', {
         		corpusTerms.load({
         		    callback: function(records, operation, success) {
         		    	if (success && records.length>0) {
-        		    		this.setApiParam("query", records[0].getTerm());
-        		    		this.getStore().load({params: this.getApiParams()});
+        		    		this.setApiParam("query", [records[0].getTerm()]);
+        		    		this.getStore().clearAndLoad({params: this.getApiParams()});
         		    	}
         		    },
         		    scope: me,
@@ -270,7 +270,7 @@ Ext.define('Voyant.panel.Contexts', {
         
         me.on("query", function(src, query) {
         	this.setApiParam('query', query);
-        	this.getStore().loadPage(1, {params: this.getApiParams()});
+        	this.getStore().clearAndLoad({params: this.getApiParams()});
         }, me);
         
         me.on("documentTermsClicked", function(src, documentTerms) {

@@ -249,7 +249,7 @@ Ext.define('Voyant.panel.Phrases', {
                     			});
                         		if (this.isVisible()) {
                             		if (this.isVisible()) {
-                                		this.getStore().loadPage(1, {params: this.getApiParams()});
+                                		this.getStore().clearAndLoad({params: this.getApiParams()});
                             		}
                         		}
                     		}

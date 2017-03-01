@@ -55,7 +55,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
         			docIndex: undefined
         		});
         		if (this.isVisible()) {
-            		this.getStore().loadPage(1, {params: this.getApiParams()});
+            		this.getStore().clearAndLoad({params: this.getApiParams()});
         		}
     		}
     	});
@@ -69,7 +69,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     			query: undefined
     		})
     		if (this.isVisible()) {
-        		this.getStore().loadPage(1, {params: this.getApiParams()});
+        		this.getStore().clearAndLoad({params: this.getApiParams()});
     		}
     	});
     	
@@ -87,7 +87,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     loadFromApis: function() {
     	if (this.getStore().getCorpus()) {
     		if (this.getApiParam('query')) {
-    			this.getStore().loadPage(1, {params: this.getApiParams()});
+    			this.getStore().clearAndLoad({params: this.getApiParams()});
     		}
     		else {
 				var corpusTerms = this.getStore().getCorpus().getCorpusTerms({
@@ -162,7 +162,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 		},
                 		changecomplete: function(slider, newValue) {
                 			me.setApiParam("context", slider.getValue());
-           		        	me.getStore().loadPage(1, {params: me.getApiParams()});
+           		        	me.getStore().clearAndLoad({params: me.getApiParams()});
                 		}
                 	}
                 }]
@@ -221,7 +221,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                     			});
                         		if (this.isVisible()) {
                             		if (this.isVisible()) {
-                                		this.getStore().loadPage(1, {params: this.getApiParams()});
+                                		this.getStore().clearAndLoad({params: this.getApiParams()});
                             		}
                         		}
                     		}
