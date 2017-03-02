@@ -121,7 +121,8 @@
     	this.on("documentTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
     			this.setMode(this.MODE_DOCUMENT);
-    			if (terms[0] && terms[0].get('distributions') !== undefined) {
+    			if (terms[0] && terms[0].get('distributions') !== undefined &&
+					this.getDistributionsType(terms[0].get('distributions')) === this.getApiParam('withDistributions')) {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
@@ -131,7 +132,8 @@
     	});
     	this.on("corpusTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
-    			if (terms[0] && terms[0].get('distributions') !== undefined && this.getCorpus().getDocumentsCount()>1) {
+    			if (terms[0] && terms[0].get('distributions') !== undefined && 
+					this.getDistributionsType(terms[0].get('distributions')) === this.getApiParam('withDistributions') && this.getCorpus().getDocumentsCount()>1) {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
@@ -505,7 +507,15 @@
     	var mode = this.getApiParam("mode");    	
 //    	var menu = this.queryById("segmentsSlider");
 //    	menu.setHidden(mode==this.MODE_CORPUS)
-    }        
+    },
+    
+    getDistributionsType: function(distributions) {
+    	if (distributions[0] === Math.round(distributions[0])) {
+    		return 'raw';
+    	} else {
+    		return 'relative';
+    	}
+    }
 });
  
 /* We override this entirely beastly function to allow for all x axis labels to be shown (this may impact other charts in other tools) */
