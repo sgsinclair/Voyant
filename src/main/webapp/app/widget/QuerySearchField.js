@@ -127,7 +127,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	})
     	
     	// we need to make sure the panel is a voyantpanel
-    	// so that we get loadedCorpus event after a call to Voyant.util.Toolable.replacePanel 
+    	// so that we get loadedCorpus event after a call to Voyant.util.Toolable.replacePanel
     	me.up('panel:mixin(Voyant.panel.Panel)').on("loadedCorpus", function(src, corpus) {
     		me.setCorpus(corpus);
     		var stopList = me.getStopList();
@@ -169,6 +169,14 @@ Ext.define('Voyant.widget.QuerySearchField', {
 			  }
     	}, me)
     	
+    	me.on("beforedestroy", function(c) {
+    		if (c.triggers && c.triggers.help) {
+    			Ext.tip.QuickTipManager.unregister(c.triggers.help.getEl());
+    		}
+    		if (c.triggers && c.triggers.count) {
+    			Ext.tip.QuickTipManager.unregister(c.triggers.count.getEl());
+    		}
+    	}, me)
     	
     	me.callParent(arguments);
     }
