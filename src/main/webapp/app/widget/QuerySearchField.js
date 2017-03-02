@@ -30,11 +30,11 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    createNewOnBlur: false,
     	    autoSelect: false,
 //    	    emptyText: this.localize('querySearch'),
-    	    tpl: Ext.create('Ext.XTemplate',
+    	    tpl: [
     	    	'<ul class="x-list-plain"><tpl for=".">',
     	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">'+itemTpl+'</li>',
     	    	'</tpl></ul>'
-    	    ),
+    	    ],
     	    triggers: {
     	        help: {
     	            weight: 2,
@@ -126,7 +126,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
     		}
     	})
     	
-    	me.up("panel").on("loadedCorpus", function(src, corpus) {
+    	// we need to make sure the panel is a voyantpanel
+    	// so that we get loadedCorpus event after a call to Voyant.util.Toolable.replacePanel 
+    	me.up('panel:mixin(Voyant.panel.Panel)').on("loadedCorpus", function(src, corpus) {
     		me.setCorpus(corpus);
     		var stopList = me.getStopList();
     		if (stopList==undefined) {
@@ -166,7 +168,26 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		             });
 			  }
     	}, me)
+    	
+    	
     	me.callParent(arguments);
     }
     
 });
+
+// query components by mixin class name
+Ext.ComponentQuery.pseudos.mixin = function(components, selector) {
+	var i = 0, l = components.length, c, result = [];
+	for (; i < l; i++) {
+        c = components[i];
+        if (c.mixins) {
+        	for (var className in c.mixins) {
+        		if (className == selector) {
+        			result.push(c);
+        			break;
+        		}
+        	}
+        }
+	}
+	return result;
+};
