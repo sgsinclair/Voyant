@@ -474,6 +474,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		this.queryById('chartParent').remove(oldChart);
     	}
     	
+    	this.queryById('termsGrid').getSelectionModel().deselectAll();
+    	
     	var rec = store.getAt(0);
         var numDims = this.getApiParam('dimensions');
         
@@ -792,49 +794,51 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     selectTerm: function(term, isDoc) {
     	var chart = this.down('#chart');
-    	if (term === undefined) {
-			chart.getSeries()[0].setHighlightItem(null);
-			chart.getSeries()[1].setHighlightItem(null);
-    	} else {
-	    	var series, index;
-	    	if (isDoc === true) {
-	    		series = chart.getSeries()[1];
-		    	index = series.getStore().findExact('title', term);
+    	if (chart !== null) {
+	    	if (term === undefined) {
+				chart.getSeries()[0].setHighlightItem(null);
+				chart.getSeries()[1].setHighlightItem(null);
 	    	} else {
-		    	series = chart.getSeries()[0];
-		    	index = series.getStore().findExact('term', term);
-	    	}
-	    	if (index !== -1) {
-	    		var record = series.getStore().getAt(index);
-	    		var sprite = series.getSprites()[0];
-	    		// constructing series item, like in the chart series source
-	    		var item = {
-					series: series,
-	                category: series.getItemInstancing() ? 'items' : 'markers',
-	                index: index,
-	                record: record,
-	                field: series.getYField(),
-	                sprite: sprite
-	    		};
-	    		series.setHighlightItem(item);
-	    		if (isDoc) {
-	    			chart.getSeries()[0].setHighlightItem(null);
-	    		} else {
-	    			chart.getSeries()[1].setHighlightItem(null);
-	    		}
-	    		
-	    		var point = this.getPointFromIndex(series, index);
-	    		this.highlightData = {x: point[0], y: point[1], r: 50};
-	    		
-	    		if (this.highlightTask == null) {
-	    			this.highlightTask = Ext.TaskManager.newTask({
-	        			run: this.doHighlight,
-	        			scope: this,
-	        			interval: 25,
-	        			repeat: this.highlightData.r
-	        		});
-	    		}
-	    		this.highlightTask.restart();
+		    	var series, index;
+		    	if (isDoc === true) {
+		    		series = chart.getSeries()[1];
+			    	index = series.getStore().findExact('title', term);
+		    	} else {
+			    	series = chart.getSeries()[0];
+			    	index = series.getStore().findExact('term', term);
+		    	}
+		    	if (index !== -1) {
+		    		var record = series.getStore().getAt(index);
+		    		var sprite = series.getSprites()[0];
+		    		// constructing series item, like in the chart series source
+		    		var item = {
+						series: series,
+		                category: series.getItemInstancing() ? 'items' : 'markers',
+		                index: index,
+		                record: record,
+		                field: series.getYField(),
+		                sprite: sprite
+		    		};
+		    		series.setHighlightItem(item);
+		    		if (isDoc) {
+		    			chart.getSeries()[0].setHighlightItem(null);
+		    		} else {
+		    			chart.getSeries()[1].setHighlightItem(null);
+		    		}
+		    		
+		    		var point = this.getPointFromIndex(series, index);
+		    		this.highlightData = {x: point[0], y: point[1], r: 50};
+		    		
+		    		if (this.highlightTask == null) {
+		    			this.highlightTask = Ext.TaskManager.newTask({
+		        			run: this.doHighlight,
+		        			scope: this,
+		        			interval: 25,
+		        			repeat: this.highlightData.r
+		        		});
+		    		}
+		    		this.highlightTask.restart();
+		    	}
 	    	}
     	}
     },
