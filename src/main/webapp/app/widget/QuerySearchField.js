@@ -130,7 +130,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
 
     	// we need to make sure the panel is a voyantpanel
     	// so that we get loadedCorpus event after a call to Voyant.util.Toolable.replacePanel
-    	var parentPanel = me.up('panel:mixin(Voyant.panel.Panel)');
+    	var parentPanel = me.findParentBy(function(clz) {
+    		return clz.mixins["Voyant.panel.Panel"];
+		});
     	if (parentPanel != null) {
 	    	parentPanel.on("loadedCorpus", function(src, corpus) {
 	    		me.doSetCorpus(corpus);
@@ -140,7 +142,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	
     	me.on("afterrender", function(c) {
     		if (me.hasCorpusLoadedListener === false) {
-	    		parentPanel = me.up('panel:mixin(Voyant.panel.Panel)');
+	    		parentPanel = me.findParentBy(function(clz) {
+	    			return clz.mixins["Voyant.panel.Panel"];
+    			});
 	    		var corpus = parentPanel.getApplication().getCorpus();
 				if (corpus !== undefined) {
 					me.doSetCorpus(corpus);
@@ -207,20 +211,3 @@ Ext.define('Voyant.widget.QuerySearchField', {
     }
     
 });
-
-// query components by mixin class name
-Ext.ComponentQuery.pseudos.mixin = function(components, selector) {
-	var i = 0, l = components.length, c, result = [];
-	for (; i < l; i++) {
-        c = components[i];
-        if (c.mixins) {
-        	for (var className in c.mixins) {
-        		if (className == selector) {
-        			result.push(c);
-        			break;
-        		}
-        	}
-        }
-	}
-	return result;
-};
