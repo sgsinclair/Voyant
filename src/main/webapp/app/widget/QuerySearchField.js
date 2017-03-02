@@ -14,6 +14,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		stopList: undefined,
 		showAggregateInDocumentsCount: false
 	},
+	hasCorpusLoadedListener: false, 
     
     constructor: function(config) {
     	config = config || {};
@@ -63,6 +64,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     },
     initComponent: function(config) {
     	var me = this;
+
     	me.on("beforequery", function(queryPlan) {
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
@@ -98,7 +100,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1 ? ","+"^"+queryPlan.query+"*" : "")
 	            }
     		}
-    	}, me);
+    	});
     	
     	me.on("change", function(tags, queries) {
     		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
@@ -125,60 +127,83 @@ Ext.define('Voyant.widget.QuerySearchField', {
     			}
     		}
     	})
-    	
+
     	// we need to make sure the panel is a voyantpanel
     	// so that we get loadedCorpus event after a call to Voyant.util.Toolable.replacePanel
-    	me.up('panel:mixin(Voyant.panel.Panel)').on("loadedCorpus", function(src, corpus) {
-    		me.setCorpus(corpus);
-    		var stopList = me.getStopList();
-    		if (stopList==undefined) {
-        		if (this.getApiParam) {me.setStopList(this.getApiParam("stopList"))}
-        		else {
-        			var parent = this.up("panel");
-        			if (parent && parent.getApiParam) {
-        				me.setStopList(parent.getApiParam("stopList"))
-        			}
-        		}
+    	var parentPanel = me.up('panel:mixin(Voyant.panel.Panel)');
+    	if (parentPanel != null) {
+	    	parentPanel.on("loadedCorpus", function(src, corpus) {
+	    		me.doSetCorpus(corpus);
+	    	}, me);
+	    	me.hasCorpusLoadedListener = true;
+    	}
+    	
+    	me.on("afterrender", function(c) {
+    		if (me.hasCorpusLoadedListener === false) {
+	    		parentPanel = me.up('panel:mixin(Voyant.panel.Panel)');
+	    		var corpus = parentPanel.getApplication().getCorpus();
+				if (corpus !== undefined) {
+					me.doSetCorpus(corpus);
+				} else {
+					parentPanel.on("loadedCorpus", function(src, corpus) {
+						me.doSetCorpus(corpus);
+			    	}, me);
+					me.hasCorpusLoadedListener = true;
+				}
     		}
-
-			me.setStore(corpus.getCorpusTerms({
+			
+    		if (me.triggers && me.triggers.help) {
+    			Ext.tip.QuickTipManager.register({
+    				target: me.triggers.help.getEl(),
+    				text: me.getIsDocsMode() ? me.localize('querySearchDocsModeTip') : me.localize('querySearchTip')
+				});
+			}
+    		if (me.triggers && me.triggers.count) {
+    			Ext.tip.QuickTipManager.register({
+    				target: me.triggers.count.getEl(),
+    				text: me.localize('aggregateInDocumentsCount')
+				});
+			}
+    	});
+    	
+    	me.on("beforedestroy", function(c) {
+    		if (me.triggers && me.triggers.help) {
+    			Ext.tip.QuickTipManager.unregister(me.triggers.help.getEl());
+    		}
+    		if (me.triggers && me.triggers.count) {
+    			Ext.tip.QuickTipManager.unregister(me.triggers.count.getEl());
+    		}
+    	});
+    	
+    	me.callParent(arguments);
+    },
+    
+    doSetCorpus: function(corpus) {
+    	if (corpus != null) {
+	    	this.setCorpus(corpus);
+			var stopList = this.getStopList();
+			if (stopList==undefined) {
+	    		if (this.getApiParam) {this.setStopList(this.getApiParam("stopList"))}
+	    		else {
+	    			var parent = this.up("panel");
+	    			if (parent && parent.getApiParam) {
+	    				this.setStopList(parent.getApiParam("stopList"))
+	    			}
+	    		}
+			}
+	
+			this.setStore(corpus.getCorpusTerms({
 				corpus: corpus,
 				proxy: {
 					extraParams: {
 		    			limit: 10,
-		    			tokenType: me.tokenType,
-		    			stopList: me.getStopList(),
-		    			inDocumentsCountOnly: me.getInDocumentsCountOnly()
+		    			tokenType: this.tokenType,
+		    			stopList: this.getStopList(),
+		    			inDocumentsCountOnly: this.getInDocumentsCountOnly()
 					}
 				}
-    		}));
-    	})
-    	
-    	me.on("afterrender", function(c) {
-			  if (c.triggers && c.triggers.help) {
-		        	Ext.tip.QuickTipManager.register({
-		                 target: c.triggers.help.getEl(),
-		                 text: c.getIsDocsMode() ? c.localize('querySearchDocsModeTip') : c.localize('querySearchTip')
-		             });
-			  }
-			  if (c.triggers && c.triggers.count) {
-		        	Ext.tip.QuickTipManager.register({
-		                 target: c.triggers.count.getEl(),
-		                 text: c.localize('aggregateInDocumentsCount')
-		             });
-			  }
-    	}, me)
-    	
-    	me.on("beforedestroy", function(c) {
-    		if (c.triggers && c.triggers.help) {
-    			Ext.tip.QuickTipManager.unregister(c.triggers.help.getEl());
-    		}
-    		if (c.triggers && c.triggers.count) {
-    			Ext.tip.QuickTipManager.unregister(c.triggers.count.getEl());
-    		}
-    	}, me)
-    	
-    	me.callParent(arguments);
+			}));
+    	}
     }
     
 });
