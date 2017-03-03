@@ -153,9 +153,6 @@ Ext.define('Voyant.panel.Catalogue', {
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		this.queryById('status').update(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]))
-    		this.query("facet").forEach(function(facet) {
-    			facet.setCorpus(corpus);
-    		});
     		if (!this.getCustomResultsHtml()) {
     			this.setCustomResultsHtml(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]));
     			this.updateResults();

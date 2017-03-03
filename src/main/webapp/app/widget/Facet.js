@@ -51,8 +51,12 @@ Ext.define('Voyant.widget.Facet', {
         this.callParent();
         
         if (this.corpus) {
-        	this.setCorpus(this.corpus)
+        	this.setStoreCorpus(this.corpus);
         }
+        
+        this.on('loadedCorpus', function(src, corpus) {
+        	this.setStoreCorpus(corpus);
+        }, this);
         
         this.on("query", function(src, query) {
         	this.setApiParam("query", query);
@@ -60,12 +64,11 @@ Ext.define('Voyant.widget.Facet', {
         	this.store.load({
         		params: this.getApiParams()
         	})
-        	
         })
     },
     
-    setCorpus: function(corpus) {
-    	this.callParent(arguments)
+    setStoreCorpus: function(corpus) {
+//    	this.callParent(arguments)
     	if (this.getStore()) {
         	this.getStore().setCorpus(corpus);
         	this.getStore().load();
