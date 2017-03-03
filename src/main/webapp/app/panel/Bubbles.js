@@ -28,7 +28,6 @@ Ext.define('Voyant.panel.Bubbles', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
-		corpus: undefined,
     	options: {xtype: 'stoplistoption'},
     	audio: false
 	},
@@ -103,7 +102,6 @@ Ext.define('Voyant.panel.Bubbles', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
     		var canvas = this.getTargetEl().dom.querySelector("canvas");
     		var me = this;
     		Ext.Ajax.request({

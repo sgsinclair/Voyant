@@ -16,7 +16,6 @@ Ext.define('Voyant.panel.Reader', {
     	glyph: 'xf0f6@FontAwesome'
 	},
     config: {
-    	corpus: undefined,
     	tokensStore: undefined,
     	documentsStore: undefined,
     	documentTermsStore: undefined,
@@ -247,7 +246,6 @@ Ext.define('Voyant.panel.Reader', {
     		}],
     		listeners: {
     			loadedCorpus: function(src, corpus) {
-    				this.setCorpus(corpus);
     	    		this.getTokensStore().setCorpus(corpus);
     	    		this.getDocumentTermsStore().getProxy().setExtraParam('corpus', corpus.getId());
     	    		

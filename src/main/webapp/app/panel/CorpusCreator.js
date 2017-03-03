@@ -26,9 +26,6 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		corpusSubTitle: undefined
     	}
     },
-    config: {
-    	corpus: undefined
-    },
     
     constructor: function(config) {
         this.callParent(arguments);

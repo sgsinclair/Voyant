@@ -17,7 +17,6 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     config: {
-    	corpus: undefined,
     	tree: undefined,
     	kwicStore: undefined,
     	options: {xtype: 'stoplistoption'},
@@ -117,7 +116,6 @@ Ext.define('Voyant.panel.WordTree', {
         }));
         
         this.on('loadedCorpus', function(src, corpus) {
-        	this.setCorpus(corpus);
         	var corpusTerms = corpus.getCorpusTerms({autoLoad: false});
     		corpusTerms.load({
     		    callback: function(records, operation, success) {

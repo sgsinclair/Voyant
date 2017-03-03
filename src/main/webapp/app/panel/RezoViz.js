@@ -16,7 +16,6 @@ Ext.define('Voyant.panel.RezoViz', {
     },
     
     config: {
-    	corpus: undefined,
     	network: undefined, // the vis network graph
     	nodesStore: undefined, // used by combo
     	nodesDataSet: undefined, // used by vis
@@ -216,7 +215,6 @@ Ext.define('Voyant.panel.RezoViz', {
         });
         
         this.on('loadedCorpus', function(src, corpus) {
-        	this.setCorpus(corpus);
         	if (corpus.getDocumentsCount()==1) {
         		this.setApiParam("minEdgeCount", 1);
         	}

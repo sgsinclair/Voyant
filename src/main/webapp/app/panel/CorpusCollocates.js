@@ -2,9 +2,6 @@ Ext.define('Voyant.panel.CorpusCollocates', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.corpuscollocates',
-	config: {
-		corpus: undefined
-	},
     statics: {
     	i18n: {
     	},

@@ -54,7 +54,6 @@ Ext.define('Voyant.panel.Cirrus', {
     	    {xtype: 'colorpaletteoption'}
 
     	],
-    	corpus: undefined,
     	records: undefined,
     	terms: undefined,
     	cirrusId: undefined,
@@ -183,7 +182,6 @@ Ext.define('Voyant.panel.Cirrus', {
     loadFromCorpus: function(corpus) {
     	var jsonData = this.getApiParam('inlineData');
     	if (jsonData === undefined) {
-			this.setCorpus(corpus);
 			this.setApiParams({docId: undefined, docIndex: undefined});
 			this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
     	} else {

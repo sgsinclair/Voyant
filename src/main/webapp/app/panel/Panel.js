@@ -15,6 +15,9 @@ Ext.define('Voyant.panel.Panel', {
 			subtitle: undefined
 		}
 	},
+	config: {
+		corpus: undefined
+	},
 	constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 //		this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
@@ -64,7 +67,15 @@ Ext.define('Voyant.panel.Panel', {
 			}
 		}, this);
 		
-
+		this.on({
+			loadedCorpus: {
+				fn: function(src, corpus) {
+					this.setCorpus(corpus);
+				},
+				priority: 999, // very high priority
+				scope: this
+			}
+		});
 	},
 	
 	getApplication: function() {

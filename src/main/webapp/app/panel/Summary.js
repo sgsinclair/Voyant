@@ -40,7 +40,6 @@ Ext.define('Voyant.panel.Summary', {
 		glyph: 'xf1ea@FontAwesome'
     },
     config: {
-    	corpus: undefined,
     	options: {xtype: 'stoplistoption'}
     },
     autoScroll: true,
@@ -106,9 +105,6 @@ Ext.define('Voyant.panel.Summary', {
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		
-    		this.setCorpus(corpus);
-    		
     		if (this.rendered) {
     			this.loadSummary();
     		}

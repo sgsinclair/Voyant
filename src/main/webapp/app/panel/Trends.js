@@ -5,8 +5,7 @@
 
 	alias: 'widget.trends',
 	config: {
-    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
-		corpus: undefined
+    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
 	},
     statics: {
     	i18n: {
@@ -45,7 +44,6 @@
     	}
     	
     	this.on("loadedCorpus", function(src, corpus) {
-    		this.setCorpus(corpus);
     		if (corpus.getDocumentsCount()==1 && this.getApiParam("mode")!=this.MODE_DOCUMENT) {
     			this.setMode(this.MODE_DOCUMENT);
     			this.setApiParams({withDistributions: 'raw'});

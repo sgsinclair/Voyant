@@ -15,7 +15,6 @@ Ext.define('Voyant.panel.Veliza', {
 		glyph: 'xf0e6@FontAwesome'
     },
     config: {
-		corpus: undefined,
     	previous: []
     },
     
@@ -66,9 +65,6 @@ Ext.define('Voyant.panel.Veliza', {
     }, 
     
     listeners: {
-    	loadedCorpus: function(src, corpus) {
-    		this.setCorpus(corpus);
-    	}
     },
     
     handleUserSentence: function(sentence, fromCorpus) {

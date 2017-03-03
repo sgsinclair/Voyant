@@ -32,7 +32,6 @@ Ext.define('Voyant.panel.Knots', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
-		corpus: undefined,
 		docTermStore: undefined,
 		tokensStore: undefined,
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
@@ -63,8 +62,6 @@ Ext.define('Voyant.panel.Knots', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
-    		
     		var firstDoc = corpus.getDocument(0);
     		var pDoc = this.processDocument(firstDoc);
     		this.knots.setCurrentDoc(pDoc);

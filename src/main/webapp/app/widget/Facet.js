@@ -11,9 +11,6 @@ Ext.define('Voyant.widget.Facet', {
 		}
 	},
 	
-	config: {
-		corpus: undefined
-	},
 	constructor: function(config) {
         this.callParent(arguments);
         Ext.applyIf(config || {}, {

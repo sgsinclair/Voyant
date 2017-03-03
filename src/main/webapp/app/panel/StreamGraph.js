@@ -18,7 +18,6 @@ Ext.define('Voyant.panel.StreamGraph', {
     },
     
     config: {
-    	corpus: undefined,
     	visLayout: undefined,
     	vis: undefined,
     	mode: 'corpus'
@@ -129,7 +128,6 @@ Ext.define('Voyant.panel.StreamGraph', {
         });
         
         this.on('loadedCorpus', function(src, corpus) {
-        	this.setCorpus(corpus);
         	if (this.getCorpus().getDocumentsCount() == 1 && this.getMode() != this.MODE_DOCUMENT) {
 				this.setMode(this.MODE_DOCUMENT);
 			}

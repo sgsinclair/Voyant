@@ -4,7 +4,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	requires: ['Ext.chart.CartesianChart'],
 	alias: 'widget.scatterplot',
 	config: {
-		corpus: undefined,
 		options: {
     		xtype: 'stoplistoption'
     	}
@@ -438,7 +437,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		}
     		setCheckBound('dimensions');
     		
-    		this.setCorpus(corpus);
     		this.caStore.setCorpus(corpus);
     		this.pcaStore.setCorpus(corpus);
     		this.docSimStore.setCorpus(corpus);

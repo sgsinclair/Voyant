@@ -7,10 +7,6 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     	i18n: {
     	}
     },
-    
-    config: {
-    	corpus: undefined
-    },
 
     constructor: function(config) {
     	
@@ -168,7 +164,6 @@ Ext.define('Voyant.panel.DocumentsFinder', {
   
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
     		var docs = corpus.getDocuments();
     		if (docs && docs.getCount()>0) {
     			var doc = docs.getDocument(0);

@@ -9,7 +9,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.termsradio',
 	config: {
-		corpus: undefined,
 		options: [{
 			xtype: 'stoplistoption'
 		}],
@@ -462,7 +461,6 @@ Ext.define('Voyant.panel.TermsRadio', {
     	});
 		
 		this.on("loadedCorpus", function(src, corpus) {
-    		this.setCorpus(corpus);
     		this.documentStore.setCorpus(corpus);
     		this.corpusStore.setCorpus(corpus);
     		

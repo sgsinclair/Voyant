@@ -27,7 +27,6 @@ Ext.define('Voyant.panel.Mandala', {
 	textFont: '12px sans-serif',
 	
 	config: {
-		corpus: undefined,
     	options: [{xtype: 'stoplistoption'}]
 	},
 	
@@ -116,7 +115,6 @@ Ext.define('Voyant.panel.Mandala', {
     	})
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
     		this.documents = [];
     		var canvas = this.getTargetEl().dom.querySelector("canvas"), ctx = canvas.getContext("2d"), radius = canvas.width/2;
     		ctx.font = this.textFont;

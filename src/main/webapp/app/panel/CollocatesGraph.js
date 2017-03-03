@@ -17,7 +17,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     config: {
-    	corpus: undefined,
     	node: undefined,
     	link: undefined,
     	
@@ -257,7 +256,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		}));
         
         this.on("loadedCorpus", function(src, corpus) {
-			this.setCorpus(corpus);
 			if (this.isVisible()) {
 				this.initLoad();
 			}

@@ -49,7 +49,6 @@ Ext.define('Voyant.panel.Bubblelines', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
-		corpus: undefined,
 		docTermStore: undefined,
 		docStore: undefined,
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
@@ -87,7 +86,6 @@ Ext.define('Voyant.panel.Bubblelines', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
     		this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
     		if (this.isVisible()) {
         		this.getDocStore().load();

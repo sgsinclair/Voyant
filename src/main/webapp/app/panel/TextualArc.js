@@ -24,7 +24,6 @@ Ext.define('Voyant.panel.TextualArc', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
-		corpus: undefined,
     	options: [{xtype: 'stoplistoption'},{
     		xtype: 'container',
     		items: {
@@ -157,7 +156,6 @@ Ext.define('Voyant.panel.TextualArc', {
     	})
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
 			this.loadDocument();
     	}, this);
     	
