@@ -98,7 +98,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     	boxready: function() {
     		var panelsString = this.getApiParam("panels");
     		if (panelsString) {
-    			Ext.defer(function() { // we need to defer otherwise corpus loaded doesn't always trigger
+//    			Ext.defer(function() { // we need to defer otherwise corpus loaded doesn't always trigger
         			var panels = panelsString.toLowerCase().split(",");
         			var tabpanels = this.query("voyanttabpanel");
         			for (var i=0, len=panels.length; i<len; i++) {
@@ -116,7 +116,7 @@ Ext.define('Voyant.panel.CorpusSet', {
         					tabpanel.getActiveTab().replacePanel(panel); // switch to specified panel
         				}
         			}
-    			}, 10, this)
+//    			}, 10, this)
     		}
     		// add an easter egg
     		var cirrus = this.down('cirrus');
