@@ -289,7 +289,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"Il più lungo/a:",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
 "more":"Più ..",
-"averageWordsPerSentence":"Average Words Per Sentence",
+"averageWordsPerSentence":"Average Words Per Sentence:",
 "mostFrequentWords":"<b>Parole più frequenti</b> nel corpus",
 "title":"Sommario",
 "numberOfTerms":"numero delle parole in questo documento",

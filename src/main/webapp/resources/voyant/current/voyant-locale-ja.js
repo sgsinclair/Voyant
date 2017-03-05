@@ -289,7 +289,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"最長:",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
 "more":"さらに表示",
-"averageWordsPerSentence":"Average Words Per Sentence",
+"averageWordsPerSentence":"Average Words Per Sentence:",
 "mostFrequentWords":"コーパスの中で<b>最も頻度の高い語</b>は：",
 "title":" コーパスの概要",
 "numberOfTerms":"ドキュメント中の語数",

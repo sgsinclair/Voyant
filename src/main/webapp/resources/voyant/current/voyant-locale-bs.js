@@ -289,7 +289,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"najduže:",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
 "more":"Više…",
-"averageWordsPerSentence":"Average Words Per Sentence",
+"averageWordsPerSentence":"Average Words Per Sentence:",
 "mostFrequentWords":"<b>Najučestalije riječi</b> u korpusu:",
 "title":"Sažetak",
 "numberOfTerms":"broj riječi u ovom dokumentu",

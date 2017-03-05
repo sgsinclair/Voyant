@@ -278,6 +278,18 @@ Ext.define('Voyant.panel.Summary', {
 	    				}}))+'</li>'
 	        	}]
         	})        	
+    	} else { // single document, we can still show word density and average words per sentence
+    		var doc = docs[0];
+    		if (doc) {
+            	main.add({
+            		cls: 'section',
+            		html:"<b>"+this.localize("docsDensity")+"</b> "+Ext.util.Format.number(doc.getLexicalTypeTokenRatio(),'0.000')
+            	});    		
+            	main.add({
+            		cls: 'section',
+            		html: "<b>"+this.localize("averageWordsPerSentence")+"</b> "+Ext.util.Format.number(doc.getAverageWordsPerSentence(),'0.0')
+            	});    		
+    		}
     	}
     	
     	main.add({

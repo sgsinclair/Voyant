@@ -289,7 +289,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"Longest: ",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
 "more":"More…",
-"averageWordsPerSentence":"Average Words Per Sentence",
+"averageWordsPerSentence":"Average Words Per Sentence:",
 "mostFrequentWords":"Most <b>frequent words</b> in the corpus: ",
 "title":"Summary",
 "numberOfTerms":"number of words in this document",

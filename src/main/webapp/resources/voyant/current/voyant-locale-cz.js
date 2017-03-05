@@ -289,7 +289,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"Nejdelší:",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
 "more":"Více...",
-"averageWordsPerSentence":"Average Words Per Sentence",
+"averageWordsPerSentence":"Average Words Per Sentence:",
 "mostFrequentWords":"Nejvíce <b>frekventovaná slova</b> v korpusu: ",
 "title":"Shrnutí",
 "numberOfTerms":"počet slov v dokumentu",

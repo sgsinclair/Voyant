@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Mar 04 20:29:56 EST 2017 */
+/* This file created by JSCacher. Last modified: Sat Mar 04 21:12:04 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -17777,6 +17777,18 @@ Ext.define('Voyant.panel.Summary', {
 	    				}}))+'</li>'
 	        	}]
         	})        	
+    	} else { // single document, we can still show word density and average words per sentence
+    		var doc = docs[0];
+    		if (doc) {
+            	main.add({
+            		cls: 'section',
+            		html:"<b>"+this.localize("docsDensity")+"</b> "+Ext.util.Format.number(doc.getLexicalTypeTokenRatio(),'0.000')
+            	});    		
+            	main.add({
+            		cls: 'section',
+            		html: "<b>"+this.localize("averageWordsPerSentence")+"</b> "+Ext.util.Format.number(doc.getAverageWordsPerSentence(),'0.0')
+            	});    		
+    		}
     	}
     	
     	main.add({

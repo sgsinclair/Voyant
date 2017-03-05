@@ -289,7 +289,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"Décroissante&nbsp;:",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
 "more":"En voir davantage…",
-"averageWordsPerSentence":"Moyenne des mots par phrase",
+"averageWordsPerSentence":"Moyenne des mots par phrase&nbsp;:",
 "mostFrequentWords":"<b>Mots les plus fréquents&nbsp;: </b>",
 "title":"Résumé",
 "numberOfTerms":"Nombre de mots du document",
