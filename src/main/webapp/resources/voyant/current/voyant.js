@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Feb 28 15:21:23 EST 2017 */
+/* This file created by JSCacher. Last modified: Sat Mar 04 20:29:56 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4862,7 +4862,8 @@ Ext.define('Voyant.util.Toolable', {
 				}, this);
 				el.on("mouseout", function() {
 					this.getHeader().getTools().forEach(function(tool) {
-						if (tool.config.type!='help' && tool.config.type.indexOf('collapse')==-1) {tool.hide();}
+						var type = tool.config.type || tool.type; // auto-added tools don't have config.type, e.g. collapse
+						if (type && type!='help' && type.indexOf('collapse')==-1) {tool.hide();}
 					})
 				}, this);
 				header.getTools().forEach(function(tool,i) {
@@ -5774,7 +5775,10 @@ Ext.define('Voyant.data.model.Document', {
              }},
              {name: 'lastTokenStartOffset-lexical', type: 'int'},
              {name: 'title'},
-             {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data;}}
+             {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data;}},
+             {name: 'averageWordsPerSentence', type: 'float', calculate:  function(data) {
+        	 	return data['sentencesCount'] ? data['tokensCount-lexical'] / data['sentencesCount'] : 0;
+             }}
     ],
     
     getLexicalTokensCount: function() {
@@ -5961,6 +5965,10 @@ Ext.define('Voyant.data.model.Document', {
     		return true
     	}
     	return false;
+    },
+    
+    getAverageWordsPerSentence: function() {
+    	return this.get("averageWordsPerSentence");
     },
     
     show: function() {
@@ -7621,6 +7629,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		stopList: undefined,
 		showAggregateInDocumentsCount: false
 	},
+	hasCorpusLoadedListener: false, 
     
     constructor: function(config) {
     	config = config || {};
@@ -7637,11 +7646,11 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    createNewOnBlur: false,
     	    autoSelect: false,
 //    	    emptyText: this.localize('querySearch'),
-    	    tpl: Ext.create('Ext.XTemplate',
+    	    tpl: [
     	    	'<ul class="x-list-plain"><tpl for=".">',
     	    	'<li role="option" class="x-boundlist-item" style="white-space: nowrap;">'+itemTpl+'</li>',
     	    	'</tpl></ul>'
-    	    ),
+    	    ],
     	    triggers: {
     	        help: {
     	            weight: 2,
@@ -7670,6 +7679,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     },
     initComponent: function(config) {
     	var me = this;
+
     	me.on("beforequery", function(queryPlan) {
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
@@ -7705,7 +7715,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1 ? ","+"^"+queryPlan.query+"*" : "")
 	            }
     		}
-    	}, me);
+    	});
     	
     	me.on("change", function(tags, queries) {
     		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
@@ -7732,51 +7742,91 @@ Ext.define('Voyant.widget.QuerySearchField', {
     			}
     		}
     	})
-    	
-    	me.up("panel").on("loadedCorpus", function(src, corpus) {
-    		me.setCorpus(corpus);
-    		var stopList = me.getStopList();
-    		if (stopList==undefined) {
-        		if (this.getApiParam) {me.setStopList(this.getApiParam("stopList"))}
-        		else {
-        			var parent = this.up("panel");
-        			if (parent && parent.getApiParam) {
-        				me.setStopList(parent.getApiParam("stopList"))
-        			}
-        		}
-    		}
 
-			me.setStore(corpus.getCorpusTerms({
+    	// we need to make sure the panel is a voyantpanel
+    	// so that we get loadedCorpus event after a call to Voyant.util.Toolable.replacePanel
+    	var parentPanel = me.findParentBy(function(clz) {
+    		return clz.mixins["Voyant.panel.Panel"];
+		});
+    	if (parentPanel != null) {
+	    	parentPanel.on("loadedCorpus", function(src, corpus) {
+	    		me.doSetCorpus(corpus);
+	    	}, me);
+	    	me.hasCorpusLoadedListener = true;
+    	}
+    	
+    	me.on("afterrender", function(c) {
+    		if (me.hasCorpusLoadedListener === false) {
+	    		parentPanel = me.findParentBy(function(clz) {
+	    			return clz.mixins["Voyant.panel.Panel"];
+    			});
+	    		var corpus = parentPanel.getApplication().getCorpus();
+				if (corpus !== undefined) {
+					me.doSetCorpus(corpus);
+				} else {
+					parentPanel.on("loadedCorpus", function(src, corpus) {
+						me.doSetCorpus(corpus);
+			    	}, me);
+					me.hasCorpusLoadedListener = true;
+				}
+    		}
+			
+    		if (me.triggers && me.triggers.help) {
+    			Ext.tip.QuickTipManager.register({
+    				target: me.triggers.help.getEl(),
+    				text: me.getIsDocsMode() ? me.localize('querySearchDocsModeTip') : me.localize('querySearchTip')
+				});
+			}
+    		if (me.triggers && me.triggers.count) {
+    			Ext.tip.QuickTipManager.register({
+    				target: me.triggers.count.getEl(),
+    				text: me.localize('aggregateInDocumentsCount')
+				});
+			}
+    	});
+    	
+    	me.on("beforedestroy", function(c) {
+    		if (me.triggers && me.triggers.help) {
+    			Ext.tip.QuickTipManager.unregister(me.triggers.help.getEl());
+    		}
+    		if (me.triggers && me.triggers.count) {
+    			Ext.tip.QuickTipManager.unregister(me.triggers.count.getEl());
+    		}
+    	});
+    	
+    	me.callParent(arguments);
+    },
+    
+    doSetCorpus: function(corpus) {
+    	if (corpus != null) {
+	    	this.setCorpus(corpus);
+			var stopList = this.getStopList();
+			if (stopList==undefined) {
+	    		if (this.getApiParam) {this.setStopList(this.getApiParam("stopList"))}
+	    		else {
+	    			var parent = this.up("panel");
+	    			if (parent && parent.getApiParam) {
+	    				this.setStopList(parent.getApiParam("stopList"))
+	    			}
+	    		}
+			}
+	
+			this.setStore(corpus.getCorpusTerms({
 				corpus: corpus,
 				proxy: {
 					extraParams: {
 		    			limit: 10,
-		    			tokenType: me.tokenType,
-		    			stopList: me.getStopList(),
-		    			inDocumentsCountOnly: me.getInDocumentsCountOnly()
+		    			tokenType: this.tokenType,
+		    			stopList: this.getStopList(),
+		    			inDocumentsCountOnly: this.getInDocumentsCountOnly()
 					}
 				}
-    		}));
-    	})
-    	
-    	me.on("afterrender", function(c) {
-			  if (c.triggers && c.triggers.help) {
-		        	Ext.tip.QuickTipManager.register({
-		                 target: c.triggers.help.getEl(),
-		                 text: c.getIsDocsMode() ? c.localize('querySearchDocsModeTip') : c.localize('querySearchTip')
-		             });
-			  }
-			  if (c.triggers && c.triggers.count) {
-		        	Ext.tip.QuickTipManager.register({
-		                 target: c.triggers.count.getEl(),
-		                 text: c.localize('aggregateInDocumentsCount')
-		             });
-			  }
-    	}, me)
-    	me.callParent(arguments);
+			}));
+    	}
     }
     
 });
+
 Ext.define('Voyant.widget.TotalPropertyStatus', {
     extend: 'Ext.Component',
     mixins: ['Voyant.util.Localization'],
@@ -8548,6 +8598,9 @@ Ext.define('Voyant.panel.Panel', {
 			subtitle: undefined
 		}
 	},
+	config: {
+		corpus: undefined
+	},
 	constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 //		this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
@@ -8597,7 +8650,15 @@ Ext.define('Voyant.panel.Panel', {
 			}
 		}, this);
 		
-
+		this.on({
+			loadedCorpus: {
+				fn: function(src, corpus) {
+					this.setCorpus(corpus);
+				},
+				priority: 999, // very high priority
+				scope: this
+			}
+		});
 	},
 	
 	getApplication: function() {
@@ -8714,9 +8775,6 @@ Ext.define('Voyant.widget.Facet', {
 		}
 	},
 	
-	config: {
-		corpus: undefined
-	},
 	constructor: function(config) {
         this.callParent(arguments);
         Ext.applyIf(config || {}, {
@@ -8757,8 +8815,12 @@ Ext.define('Voyant.widget.Facet', {
         this.callParent();
         
         if (this.corpus) {
-        	this.setCorpus(this.corpus)
+        	this.setStoreCorpus(this.corpus);
         }
+        
+        this.on('loadedCorpus', function(src, corpus) {
+        	this.setStoreCorpus(corpus);
+        }, this);
         
         this.on("query", function(src, query) {
         	this.setApiParam("query", query);
@@ -8766,12 +8828,11 @@ Ext.define('Voyant.widget.Facet', {
         	this.store.load({
         		params: this.getApiParams()
         	})
-        	
         })
     },
     
-    setCorpus: function(corpus) {
-    	this.callParent(arguments)
+    setStoreCorpus: function(corpus) {
+//    	this.callParent(arguments)
     	if (this.getStore()) {
         	this.getStore().setCorpus(corpus);
         	this.getStore().load();
@@ -8809,7 +8870,6 @@ Ext.define('Voyant.panel.Bubbles', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
-		corpus: undefined,
     	options: {xtype: 'stoplistoption'},
     	audio: false
 	},
@@ -8884,7 +8944,6 @@ Ext.define('Voyant.panel.Bubbles', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
     		var canvas = this.getTargetEl().dom.querySelector("canvas");
     		var me = this;
     		Ext.Ajax.request({
@@ -9024,7 +9083,6 @@ Ext.define('Voyant.panel.Bubblelines', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
-		corpus: undefined,
 		docTermStore: undefined,
 		docStore: undefined,
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
@@ -9062,7 +9120,6 @@ Ext.define('Voyant.panel.Bubblelines', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
     		this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
     		if (this.isVisible()) {
         		this.getDocStore().load();
@@ -9521,7 +9578,6 @@ Ext.define('Voyant.panel.Catalogue', {
 		glyph: 'xf1ea@FontAwesome'
     },
     config: {
-    	corpus: undefined,
     	facets: {},
     	matchingDocIds: [],
     	customResultsHtml: undefined
@@ -9659,11 +9715,7 @@ Ext.define('Voyant.panel.Catalogue', {
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
     		this.queryById('status').update(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]))
-    		this.query("facet").forEach(function(facet) {
-    			facet.setCorpus(corpus);
-    		});
     		if (!this.getCustomResultsHtml()) {
     			this.setCustomResultsHtml(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]));
     			this.updateResults();
@@ -10083,7 +10135,6 @@ Ext.define('Voyant.panel.Cirrus', {
     	    {xtype: 'colorpaletteoption'}
 
     	],
-    	corpus: undefined,
     	records: undefined,
     	terms: undefined,
     	cirrusId: undefined,
@@ -10212,7 +10263,6 @@ Ext.define('Voyant.panel.Cirrus', {
     loadFromCorpus: function(corpus) {
     	var jsonData = this.getApiParam('inlineData');
     	if (jsonData === undefined) {
-			this.setCorpus(corpus);
 			this.setApiParams({docId: undefined, docIndex: undefined});
 			this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
     	} else {
@@ -10548,7 +10598,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     config: {
-    	corpus: undefined,
     	node: undefined,
     	link: undefined,
     	
@@ -10788,7 +10837,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		}));
         
         this.on("loadedCorpus", function(src, corpus) {
-			this.setCorpus(corpus);
 			if (this.isVisible()) {
 				this.initLoad();
 			}
@@ -11268,7 +11316,7 @@ Ext.define('Voyant.panel.Contexts', {
                 		},
                 		changecomplete: function(slider, newValue) {
                 			me.setApiParam("context", slider.getValue());
-           		        	me.getStore().loadPage(1, {params: me.getApiParams()});
+           		        	me.getStore().clearAndLoad({params: me.getApiParams()});
                 		}
                 	}
                 }, this.localize('expand'), {
@@ -11344,7 +11392,7 @@ Ext.define('Voyant.panel.Contexts', {
 				corpusSelected: function() {
 					if (this.getStore().getCorpus()) {
 						this.setApiParams({docId: undefined, docIndex: undefined})
-						this.getStore().loadPage(1)
+						this.getStore().clearAndLoad()
 					}
 				},
 				
@@ -11355,7 +11403,7 @@ Ext.define('Voyant.panel.Contexts', {
 						docIds.push(corpus.getDocument(doc).getId())
 					}, this);
 					this.setApiParams({docId: docIds, docIndex: undefined})
-					this.getStore().loadPage(1)
+					this.getStore().clearAndLoad()
 				},
 
             	documentSegmentTermClicked: {
@@ -11371,7 +11419,7 @@ Ext.define('Voyant.panel.Contexts', {
 	           			 }
 	           			 this.setApiParams(params);
 	       	        	if (this.isVisible()) {
-	       		        	this.getStore().loadPage(1);
+	       		        	this.getStore().clearAndLoad()
 	       	        	}
 	           		 },
 	           		 scope: this
@@ -11399,7 +11447,7 @@ Ext.define('Voyant.panel.Contexts', {
 	       	        		query: queries
 	       	        	});
 	       	        	if (this.isVisible()) {
-	       		        	this.getStore().loadPage(1, {params: this.getApiParams()});
+	       		        	this.getStore().clearAndLoad({params: this.getApiParams()});
 	       	        	}
 	           		 },
 	           		 scope: this
@@ -11422,11 +11470,11 @@ Ext.define('Voyant.panel.Contexts', {
                 	            	},
                 	                callback: function(records, operation, success) {
                 	                	if (success && records.length==1) {
-                	                		data = records[0].getData()
-                	                		operation.expandRow.firstElementChild.firstElementChild.innerHTML = data.left + " <span class='word keyword'>" + data.middle + "</span> " + data.right
+                	                		data = records[0].getData();
+                	                		Ext.fly(operation.expandRow).down('.x-grid-rowbody').setHtml(data.left + " <span class='word keyword'>" + data.middle + "</span> " + data.right);
                 	                	}
                 	                },
-                	                expandRow : expandRow
+                	                expandRow: expandRow
                 	            });
                 	            
                 		 }
@@ -11445,8 +11493,8 @@ Ext.define('Voyant.panel.Contexts', {
         		corpusTerms.load({
         		    callback: function(records, operation, success) {
         		    	if (success && records.length>0) {
-        		    		this.setApiParam("query", records[0].getTerm());
-        		    		this.getStore().load({params: this.getApiParams()});
+        		    		this.setApiParam("query", [records[0].getTerm()]);
+        		    		this.getStore().clearAndLoad({params: this.getApiParams()});
         		    	}
         		    },
         		    scope: me,
@@ -11461,7 +11509,7 @@ Ext.define('Voyant.panel.Contexts', {
         
         me.on("query", function(src, query) {
         	this.setApiParam('query', query);
-        	this.getStore().loadPage(1, {params: this.getApiParams()});
+        	this.getStore().clearAndLoad({params: this.getApiParams()});
         }, me);
         
         me.on("documentTermsClicked", function(src, documentTerms) {
@@ -11500,9 +11548,6 @@ Ext.define('Voyant.panel.CorpusCollocates', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.corpuscollocates',
-	config: {
-		corpus: undefined
-	},
     statics: {
     	i18n: {
     	},
@@ -11553,7 +11598,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
         			docIndex: undefined
         		});
         		if (this.isVisible()) {
-            		this.getStore().loadPage(1, {params: this.getApiParams()});
+            		this.getStore().clearAndLoad({params: this.getApiParams()});
         		}
     		}
     	});
@@ -11567,7 +11612,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     			query: undefined
     		})
     		if (this.isVisible()) {
-        		this.getStore().loadPage(1, {params: this.getApiParams()});
+        		this.getStore().clearAndLoad({params: this.getApiParams()});
     		}
     	});
     	
@@ -11585,7 +11630,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     loadFromApis: function() {
     	if (this.getStore().getCorpus()) {
     		if (this.getApiParam('query')) {
-    			this.getStore().loadPage(1, {params: this.getApiParams()});
+    			this.getStore().clearAndLoad({params: this.getApiParams()});
     		}
     		else {
 				var corpusTerms = this.getStore().getCorpus().getCorpusTerms({
@@ -11660,7 +11705,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 		},
                 		changecomplete: function(slider, newValue) {
                 			me.setApiParam("context", slider.getValue());
-           		        	me.getStore().loadPage(1, {params: me.getApiParams()});
+           		        	me.getStore().clearAndLoad({params: me.getApiParams()});
                 		}
                 	}
                 }]
@@ -11719,7 +11764,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                     			});
                         		if (this.isVisible()) {
                             		if (this.isVisible()) {
-                                		this.getStore().loadPage(1, {params: this.getApiParams()});
+                                		this.getStore().clearAndLoad({params: this.getApiParams()});
                             		}
                         		}
                     		}
@@ -11764,9 +11809,6 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		corpusTitle: undefined,
     		corpusSubTitle: undefined
     	}
-    },
-    config: {
-    	corpus: undefined
     },
     
     constructor: function(config) {
@@ -12298,7 +12340,6 @@ Ext.define('Voyant.panel.Knots', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
-		corpus: undefined,
 		docTermStore: undefined,
 		tokensStore: undefined,
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
@@ -12329,8 +12370,6 @@ Ext.define('Voyant.panel.Knots', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
-    		
     		var firstDoc = corpus.getDocument(0);
     		var pDoc = this.processDocument(firstDoc);
     		this.knots.setCurrentDoc(pDoc);
@@ -13112,7 +13151,7 @@ Ext.define('Voyant.panel.Phrases', {
                     			});
                         		if (this.isVisible()) {
                             		if (this.isVisible()) {
-                                		this.getStore().loadPage(1, {params: this.getApiParams()});
+                                		this.getStore().clearAndLoad({params: this.getApiParams()});
                             		}
                         		}
                     		}
@@ -13304,7 +13343,6 @@ Ext.define('Voyant.panel.DocumentTerms', {
 	requires: ['Voyant.data.store.DocumentTerms'],
 	alias: 'widget.documentterms',
 	config: {
-		corpus: undefined,
 		options: {
     		xtype: 'stoplistoption'
     	}
@@ -13684,6 +13722,12 @@ Ext.define('Voyant.panel.Documents', {
 	    	        renderer: function(val) {return Ext.util.Format.percent(val)},
 	    	        width: 'autoSize'
 	    	    },{
+	    	        text: this.localize('averageWordsPerSentence'),
+	    	        dataIndex: 'averageWordsPerSentence',
+	    	        renderer: Ext.util.Format.numberRenderer('0,000.0'),
+	            	tooltip: this.localize("averageWordsPerSentenceTip"),
+	    	        width: 'autoSize'
+	    	    },{
 	    	        text: this.localize('language'),
 	    	        dataIndex: 'language',
 	    	        hidden: true,
@@ -13919,10 +13963,6 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     	i18n: {
     	}
     },
-    
-    config: {
-    	corpus: undefined
-    },
 
     constructor: function(config) {
     	
@@ -14080,7 +14120,6 @@ Ext.define('Voyant.panel.DocumentsFinder', {
   
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
     		var docs = corpus.getDocuments();
     		if (docs && docs.getCount()>0) {
     			var doc = docs.getDocument(0);
@@ -14275,7 +14314,6 @@ Ext.define('Voyant.panel.RezoViz', {
     },
     
     config: {
-    	corpus: undefined,
     	network: undefined, // the vis network graph
     	nodesStore: undefined, // used by combo
     	nodesDataSet: undefined, // used by vis
@@ -14475,7 +14513,6 @@ Ext.define('Voyant.panel.RezoViz', {
         });
         
         this.on('loadedCorpus', function(src, corpus) {
-        	this.setCorpus(corpus);
         	if (corpus.getDocumentsCount()==1) {
         		this.setApiParam("minEdgeCount", 1);
         	}
@@ -14681,8 +14718,6 @@ Ext.define('Voyant.panel.MicroSearch', {
 		glyph: 'xf1ea@FontAwesome'
     },
     config: {
-    	corpus: undefined,
-    	
     	/**
     	 * @private
     	 */
@@ -14727,9 +14762,6 @@ Ext.define('Voyant.panel.MicroSearch', {
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		
-    		this.setCorpus(corpus);
-    		
     		if (this.rendered) {
     			this.initialize();
     		}
@@ -14901,7 +14933,6 @@ Ext.define('Voyant.panel.Mandala', {
 	textFont: '12px sans-serif',
 	
 	config: {
-		corpus: undefined,
     	options: [{xtype: 'stoplistoption'}]
 	},
 	
@@ -14990,7 +15021,6 @@ Ext.define('Voyant.panel.Mandala', {
     	})
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
     		this.documents = [];
     		var canvas = this.getTargetEl().dom.querySelector("canvas"), ctx = canvas.getContext("2d"), radius = canvas.width/2;
     		ctx.font = this.textFont;
@@ -15353,7 +15383,6 @@ Ext.define('Voyant.panel.Reader', {
     	glyph: 'xf0f6@FontAwesome'
 	},
     config: {
-    	corpus: undefined,
     	tokensStore: undefined,
     	documentsStore: undefined,
     	documentTermsStore: undefined,
@@ -15584,7 +15613,6 @@ Ext.define('Voyant.panel.Reader', {
     		}],
     		listeners: {
     			loadedCorpus: function(src, corpus) {
-    				this.setCorpus(corpus);
     	    		this.getTokensStore().setCorpus(corpus);
     	    		this.getDocumentTermsStore().getProxy().setExtraParam('corpus', corpus.getId());
     	    		
@@ -16054,7 +16082,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	requires: ['Ext.chart.CartesianChart'],
 	alias: 'widget.scatterplot',
 	config: {
-		corpus: undefined,
 		options: {
     		xtype: 'stoplistoption'
     	}
@@ -16488,7 +16515,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		}
     		setCheckBound('dimensions');
     		
-    		this.setCorpus(corpus);
     		this.caStore.setCorpus(corpus);
     		this.pcaStore.setCorpus(corpus);
     		this.docSimStore.setCorpus(corpus);
@@ -16523,6 +16549,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	if (oldChart !== null) {
     		this.queryById('chartParent').remove(oldChart);
     	}
+    	
+    	this.queryById('termsGrid').getSelectionModel().deselectAll();
     	
     	var rec = store.getAt(0);
         var numDims = this.getApiParam('dimensions');
@@ -16842,49 +16870,51 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     selectTerm: function(term, isDoc) {
     	var chart = this.down('#chart');
-    	if (term === undefined) {
-			chart.getSeries()[0].setHighlightItem(null);
-			chart.getSeries()[1].setHighlightItem(null);
-    	} else {
-	    	var series, index;
-	    	if (isDoc === true) {
-	    		series = chart.getSeries()[1];
-		    	index = series.getStore().findExact('title', term);
+    	if (chart !== null) {
+	    	if (term === undefined) {
+				chart.getSeries()[0].setHighlightItem(null);
+				chart.getSeries()[1].setHighlightItem(null);
 	    	} else {
-		    	series = chart.getSeries()[0];
-		    	index = series.getStore().findExact('term', term);
-	    	}
-	    	if (index !== -1) {
-	    		var record = series.getStore().getAt(index);
-	    		var sprite = series.getSprites()[0];
-	    		// constructing series item, like in the chart series source
-	    		var item = {
-					series: series,
-	                category: series.getItemInstancing() ? 'items' : 'markers',
-	                index: index,
-	                record: record,
-	                field: series.getYField(),
-	                sprite: sprite
-	    		};
-	    		series.setHighlightItem(item);
-	    		if (isDoc) {
-	    			chart.getSeries()[0].setHighlightItem(null);
-	    		} else {
-	    			chart.getSeries()[1].setHighlightItem(null);
-	    		}
-	    		
-	    		var point = this.getPointFromIndex(series, index);
-	    		this.highlightData = {x: point[0], y: point[1], r: 50};
-	    		
-	    		if (this.highlightTask == null) {
-	    			this.highlightTask = Ext.TaskManager.newTask({
-	        			run: this.doHighlight,
-	        			scope: this,
-	        			interval: 25,
-	        			repeat: this.highlightData.r
-	        		});
-	    		}
-	    		this.highlightTask.restart();
+		    	var series, index;
+		    	if (isDoc === true) {
+		    		series = chart.getSeries()[1];
+			    	index = series.getStore().findExact('title', term);
+		    	} else {
+			    	series = chart.getSeries()[0];
+			    	index = series.getStore().findExact('term', term);
+		    	}
+		    	if (index !== -1) {
+		    		var record = series.getStore().getAt(index);
+		    		var sprite = series.getSprites()[0];
+		    		// constructing series item, like in the chart series source
+		    		var item = {
+						series: series,
+		                category: series.getItemInstancing() ? 'items' : 'markers',
+		                index: index,
+		                record: record,
+		                field: series.getYField(),
+		                sprite: sprite
+		    		};
+		    		series.setHighlightItem(item);
+		    		if (isDoc) {
+		    			chart.getSeries()[0].setHighlightItem(null);
+		    		} else {
+		    			chart.getSeries()[1].setHighlightItem(null);
+		    		}
+		    		
+		    		var point = this.getPointFromIndex(series, index);
+		    		this.highlightData = {x: point[0], y: point[1], r: 50};
+		    		
+		    		if (this.highlightTask == null) {
+		    			this.highlightTask = Ext.TaskManager.newTask({
+		        			run: this.doHighlight,
+		        			scope: this,
+		        			interval: 25,
+		        			repeat: this.highlightData.r
+		        		});
+		    		}
+		    		this.highlightTask.restart();
+		    	}
 	    	}
     	}
     },
@@ -17084,7 +17114,6 @@ Ext.define('Voyant.panel.StreamGraph', {
     },
     
     config: {
-    	corpus: undefined,
     	visLayout: undefined,
     	vis: undefined,
     	mode: 'corpus'
@@ -17195,7 +17224,6 @@ Ext.define('Voyant.panel.StreamGraph', {
         });
         
         this.on('loadedCorpus', function(src, corpus) {
-        	this.setCorpus(corpus);
         	if (this.getCorpus().getDocumentsCount() == 1 && this.getMode() != this.MODE_DOCUMENT) {
 				this.setMode(this.MODE_DOCUMENT);
 			}
@@ -17511,7 +17539,6 @@ Ext.define('Voyant.panel.Summary', {
 		glyph: 'xf1ea@FontAwesome'
     },
     config: {
-    	corpus: undefined,
     	options: {xtype: 'stoplistoption'}
     },
     autoScroll: true,
@@ -17577,9 +17604,6 @@ Ext.define('Voyant.panel.Summary', {
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		
-    		this.setCorpus(corpus);
-    		
     		if (this.rendered) {
     			this.loadSummary();
     		}
@@ -17712,6 +17736,47 @@ Ext.define('Voyant.panel.Summary', {
 	    				}}))+'</li>'
 	        	}]
         	})
+ 
+        	// words per sentence
+    		docs.sort(function(d1, d2) {return d2.getAverageWordsPerSentence()-d1.getAverageWordsPerSentence()});
+        	main.add({
+        		cls: 'section',
+        		items: [{
+		    		layout: 'hbox',
+		    		align: 'bottom',
+		    		cls: 'section',
+		    		items: [{
+		    			html: this.localize("averageWordsPerSentence"),
+		    			cls: 'header'
+		    		}, {
+		    			xtype: 'sparklineline',
+		    			values: this.getCorpus().getDocuments().getRange().map(function(doc) {return Ext.util.Format.number(doc.getAverageWordsPerSentence(),'0.0')}),
+		                tipTpl: new Ext.XTemplate('{[this.getDocumentTitle(values.x,values.y)]}', {
+		                	getDocumentTitle: function(docIndex, len) {
+		                		return '('+len+') '+this.panel.getCorpus().getDocument(docIndex).getTitle()
+		                	},
+		                	panel: me 
+		                }),
+		    			height: 16,
+		    			width: sparkWidth
+		    		}]
+		    	},{
+	    			html: '<ul><li>'+this.localize('highest')+docsLengthTpl.apply(docs.slice(0, docs.length>limit ? limit : parseInt(docs.length/2)).map(function(doc) {return {
+						id: doc.getId(),
+						shortTitle: doc.getShortTitle(),
+						title: doc.getTitle(),
+						val: Ext.util.Format.number(doc.getAverageWordsPerSentence(),'0.0'),
+						valTip: numberOfTerms
+					}}))+'</li>'+
+	    				'<li>'+this.localize('lowest')+docsLengthTpl.apply(docs.slice(-(docs.length>limit ? limit : parseInt(docs.length/2))).reverse().map(function(doc) {return {
+	    					id: doc.getId(),
+	    					shortTitle: doc.getShortTitle(),
+	    					title: doc.getTitle(),
+	    					val: Ext.util.Format.number(doc.getAverageWordsPerSentence(),'0.0'),
+	    					valTip: numberOfTerms
+	    				}}))+'</li>'
+	        	}]
+        	})        	
     	}
     	
     	main.add({
@@ -17858,7 +17923,6 @@ Ext.define('Voyant.panel.TextualArc', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
-		corpus: undefined,
     	options: [{xtype: 'stoplistoption'},{
     		xtype: 'container',
     		items: {
@@ -17991,7 +18055,6 @@ Ext.define('Voyant.panel.TextualArc', {
     	})
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.setCorpus(corpus);
 			this.loadDocument();
     	}, this);
     	
@@ -18468,7 +18531,6 @@ Ext.define('Voyant.panel.TermsRadio', {
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.termsradio',
 	config: {
-		corpus: undefined,
 		options: [{
 			xtype: 'stoplistoption'
 		}],
@@ -18921,7 +18983,6 @@ Ext.define('Voyant.panel.TermsRadio', {
     	});
 		
 		this.on("loadedCorpus", function(src, corpus) {
-    		this.setCorpus(corpus);
     		this.documentStore.setCorpus(corpus);
     		this.corpusStore.setCorpus(corpus);
     		
@@ -20546,8 +20607,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 
 	alias: 'widget.trends',
 	config: {
-    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
-		corpus: undefined
+    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
 	},
     statics: {
     	i18n: {
@@ -20586,7 +20646,6 @@ Ext.define('Voyant.panel.TermsRadio', {
     	}
     	
     	this.on("loadedCorpus", function(src, corpus) {
-    		this.setCorpus(corpus);
     		if (corpus.getDocumentsCount()==1 && this.getApiParam("mode")!=this.MODE_DOCUMENT) {
     			this.setMode(this.MODE_DOCUMENT);
     			this.setApiParams({withDistributions: 'raw'});
@@ -20662,7 +20721,8 @@ Ext.define('Voyant.panel.TermsRadio', {
     	this.on("documentTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
     			this.setMode(this.MODE_DOCUMENT);
-    			if (terms[0] && terms[0].get('distributions') !== undefined) {
+    			if (terms[0] && terms[0].get('distributions') !== undefined &&
+					this.getDistributionsType(terms[0].get('distributions')) === this.getApiParam('withDistributions')) {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
@@ -20672,7 +20732,8 @@ Ext.define('Voyant.panel.TermsRadio', {
     	});
     	this.on("corpusTermsClicked", function(src, terms) {
     		if (this.getCorpus()) { // make sure we have a corpus
-    			if (terms[0] && terms[0].get('distributions') !== undefined && this.getCorpus().getDocumentsCount()>1) {
+    			if (terms[0] && terms[0].get('distributions') !== undefined && 
+					this.getDistributionsType(terms[0].get('distributions')) === this.getApiParam('withDistributions') && this.getCorpus().getDocumentsCount()>1) {
     				this.loadFromRecords(terms); // load anyway, even if not visible - no server request required
     			}
     			else {
@@ -21046,7 +21107,15 @@ Ext.define('Voyant.panel.TermsRadio', {
     	var mode = this.getApiParam("mode");    	
 //    	var menu = this.queryById("segmentsSlider");
 //    	menu.setHidden(mode==this.MODE_CORPUS)
-    }        
+    },
+    
+    getDistributionsType: function(distributions) {
+    	if (distributions[0] === Math.round(distributions[0])) {
+    		return 'raw';
+    	} else {
+    		return 'relative';
+    	}
+    }
 });
  
 /* We override this entirely beastly function to allow for all x axis labels to be shown (this may impact other charts in other tools) */
@@ -21627,7 +21696,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     	boxready: function() {
     		var panelsString = this.getApiParam("panels");
     		if (panelsString) {
-    			Ext.defer(function() { // we need to defer otherwise corpus loaded doesn't always trigger
+//    			Ext.defer(function() { // we need to defer otherwise corpus loaded doesn't always trigger
         			var panels = panelsString.toLowerCase().split(",");
         			var tabpanels = this.query("voyanttabpanel");
         			for (var i=0, len=panels.length; i<len; i++) {
@@ -21645,7 +21714,7 @@ Ext.define('Voyant.panel.CorpusSet', {
         					tabpanel.getActiveTab().replacePanel(panel); // switch to specified panel
         				}
         			}
-    			}, 10, this)
+//    			}, 10, this)
     		}
     		// add an easter egg
     		var cirrus = this.down('cirrus');
@@ -22410,7 +22479,6 @@ Ext.define('Voyant.panel.Veliza', {
 		glyph: 'xf0e6@FontAwesome'
     },
     config: {
-		corpus: undefined,
     	previous: []
     },
     
@@ -22461,9 +22529,6 @@ Ext.define('Voyant.panel.Veliza', {
     }, 
     
     listeners: {
-    	loadedCorpus: function(src, corpus) {
-    		this.setCorpus(corpus);
-    	}
     },
     
     handleUserSentence: function(sentence, fromCorpus) {
@@ -22534,7 +22599,6 @@ Ext.define('Voyant.panel.WordTree', {
     },
     
     config: {
-    	corpus: undefined,
     	tree: undefined,
     	kwicStore: undefined,
     	options: {xtype: 'stoplistoption'},
@@ -22634,7 +22698,6 @@ Ext.define('Voyant.panel.WordTree', {
         }));
         
         this.on('loadedCorpus', function(src, corpus) {
-        	this.setCorpus(corpus);
         	var corpusTerms = corpus.getCorpusTerms({autoLoad: false});
     		corpusTerms.load({
     		    callback: function(records, operation, success) {
@@ -23189,7 +23252,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','wordtree']
+			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','veliza','wordtree']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
@@ -23205,7 +23268,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		},{
 			i18n: 'moreToolsTypeOther',
 			glyph: 'xf035@FontAwesome',
-			items: ['reader','summary']
+			items: ['reader','summary','veliza']
     	}]
     },
     

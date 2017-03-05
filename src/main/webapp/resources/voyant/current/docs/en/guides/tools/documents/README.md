@@ -10,6 +10,7 @@ The table view shows the following columns by default:
 - *Words*: the number of individual words (tokens) found in the document (e.g. each occurrence of "the" is counted)
 - *Types*: the number of word forms found in the document (e.g. all occurrences of "the" are counted as one word form)
 - *Ratio*: the ratio of types to tokens (types/tokens), expressed as a percentage – higher numbers generally mean greater vocabulary diversity
+- *Words/Sentence*: an approximation of the average number of words per sentence (words tokens / sentences count); the way that sentences are calculated should be considered very approximate, especially because of complications with abbreviations and other uses of punctuation (parsing of sentences is performed by [Java's BreakIterator](https://docs.oracle.com/javase/tutorial/i18n/text/about.html) class, and also depends on accurate language detection)
 
 Additional columns can be shown:
 

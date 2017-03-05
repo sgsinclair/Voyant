@@ -176,6 +176,12 @@ Ext.define('Voyant.panel.Documents', {
 	    	        renderer: function(val) {return Ext.util.Format.percent(val)},
 	    	        width: 'autoSize'
 	    	    },{
+	    	        text: this.localize('averageWordsPerSentence'),
+	    	        dataIndex: 'averageWordsPerSentence',
+	    	        renderer: Ext.util.Format.numberRenderer('0,000.0'),
+	            	tooltip: this.localize("averageWordsPerSentenceTip"),
+	    	        width: 'autoSize'
+	    	    },{
 	    	        text: this.localize('language'),
 	    	        dataIndex: 'language',
 	    	        hidden: true,

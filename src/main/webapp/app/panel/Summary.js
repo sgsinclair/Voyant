@@ -237,6 +237,47 @@ Ext.define('Voyant.panel.Summary', {
 	    				}}))+'</li>'
 	        	}]
         	})
+ 
+        	// words per sentence
+    		docs.sort(function(d1, d2) {return d2.getAverageWordsPerSentence()-d1.getAverageWordsPerSentence()});
+        	main.add({
+        		cls: 'section',
+        		items: [{
+		    		layout: 'hbox',
+		    		align: 'bottom',
+		    		cls: 'section',
+		    		items: [{
+		    			html: this.localize("averageWordsPerSentence"),
+		    			cls: 'header'
+		    		}, {
+		    			xtype: 'sparklineline',
+		    			values: this.getCorpus().getDocuments().getRange().map(function(doc) {return Ext.util.Format.number(doc.getAverageWordsPerSentence(),'0.0')}),
+		                tipTpl: new Ext.XTemplate('{[this.getDocumentTitle(values.x,values.y)]}', {
+		                	getDocumentTitle: function(docIndex, len) {
+		                		return '('+len+') '+this.panel.getCorpus().getDocument(docIndex).getTitle()
+		                	},
+		                	panel: me 
+		                }),
+		    			height: 16,
+		    			width: sparkWidth
+		    		}]
+		    	},{
+	    			html: '<ul><li>'+this.localize('highest')+docsLengthTpl.apply(docs.slice(0, docs.length>limit ? limit : parseInt(docs.length/2)).map(function(doc) {return {
+						id: doc.getId(),
+						shortTitle: doc.getShortTitle(),
+						title: doc.getTitle(),
+						val: Ext.util.Format.number(doc.getAverageWordsPerSentence(),'0.0'),
+						valTip: numberOfTerms
+					}}))+'</li>'+
+	    				'<li>'+this.localize('lowest')+docsLengthTpl.apply(docs.slice(-(docs.length>limit ? limit : parseInt(docs.length/2))).reverse().map(function(doc) {return {
+	    					id: doc.getId(),
+	    					shortTitle: doc.getShortTitle(),
+	    					title: doc.getTitle(),
+	    					val: Ext.util.Format.number(doc.getAverageWordsPerSentence(),'0.0'),
+	    					valTip: numberOfTerms
+	    				}}))+'</li>'
+	        	}]
+        	})        	
     	}
     	
     	main.add({

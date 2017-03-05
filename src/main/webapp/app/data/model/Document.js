@@ -12,7 +12,10 @@ Ext.define('Voyant.data.model.Document', {
              }},
              {name: 'lastTokenStartOffset-lexical', type: 'int'},
              {name: 'title'},
-             {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data;}}
+             {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data;}},
+             {name: 'averageWordsPerSentence', type: 'float', calculate:  function(data) {
+        	 	return data['sentencesCount'] ? data['tokensCount-lexical'] / data['sentencesCount'] : 0;
+             }}
     ],
     
     getLexicalTokensCount: function() {
@@ -199,6 +202,10 @@ Ext.define('Voyant.data.model.Document', {
     		return true
     	}
     	return false;
+    },
+    
+    getAverageWordsPerSentence: function() {
+    	return this.get("averageWordsPerSentence");
     },
     
     show: function() {

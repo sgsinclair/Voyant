@@ -230,7 +230,14 @@
 						        	scope: this
 					        }]
 			        	}]
-		        	}]
+		        	}, {
+			        		xtype: 'checkboxfield',
+			        		fieldLabel: '&nbsp;',
+		                    boxLabel  : 'use orthographic variants in full-text search',
+		                    name      : 'variants',
+		                    inputValue: 'true',
+		                    checked   : true
+			        	}]
 			    }]
 			});
 
