@@ -67,6 +67,9 @@ Ext.define('Voyant.panel.Bubbles', {
 	    		        	});
 	                		
 	                	},
+	                	beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+	                	},
 	                    changecomplete: function(cmp, val) {
 	                    	this.setApiParam('speed', val);
 	                		if (this.bubbles) {this.bubbles.frameRate(val)}
@@ -85,6 +88,9 @@ Ext.define('Voyant.panel.Bubbles', {
 	   		                 	text: this.localize('soundTip')
 	    		        	});
 	                		
+	                	},
+	                	beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
 	                	},
 	                    change: function(cmp, val) {
 	                    	this.setApiParam('audio', val);

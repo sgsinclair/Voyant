@@ -68,6 +68,9 @@ Ext.define('Voyant.panel.Mandala', {
 	    		        	});
 	                		
 	                	},
+	                	beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+	                	},
 	                    change: function(cmp, val) {
 	                    	this.setApiParam('labels', val);
 	                    	this.draw();

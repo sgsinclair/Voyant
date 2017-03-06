@@ -139,6 +139,9 @@ Ext.define('Voyant.panel.CorpusCreator', {
        		                 text: me.localize('UploadLocal')
        		             	});
         	            },
+        	            beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+	                	},
         	            change: function(filefield, value) {
         	            	if (value) {
             	            	var form = filefield.up('form').getForm();

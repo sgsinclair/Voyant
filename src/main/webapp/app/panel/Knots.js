@@ -311,6 +311,9 @@ Ext.define('Voyant.panel.Knots', {
 	    		        	});
 	                		
 	                	},
+	                	beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+	                	},
 	                    change: function(cmp, val) {
 	                    	if (this.knots) {
 		                    	this.knots.setAudio(val);

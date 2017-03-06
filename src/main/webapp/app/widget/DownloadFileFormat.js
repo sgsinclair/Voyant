@@ -34,6 +34,12 @@ Ext.define('Voyant.widget.DownloadFileFormat', {
         		}
         	}, this)
         }, this)
+        me.on('beforedestroy', function() {
+        	this.query('checkbox').forEach(function(cmp) {
+        		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+        	}, this);
+        }, this);
+
         me.callParent(arguments);
     }
 });

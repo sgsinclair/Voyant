@@ -42,7 +42,10 @@ Ext.define('Voyant.panel.TextualArc', {
 			                 target: cmp.getEl(),
 			                 text: panel.localize('minRawFreqTip')
 			             });
-	    			})
+	    			});
+	    			this.on('beforedestroy', function(cmp) {
+                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+                	});
 	    			this.callParent(arguments);
 	    		},
 	    		fieldLabel: 'minRawFreq'
@@ -94,6 +97,9 @@ Ext.define('Voyant.panel.TextualArc', {
 	   		                 	text: this.localize('speedTip')
 	    		        	});
 	                		
+	                	},
+	                	beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
 	                	},
 	                    changecomplete: function(cmp, val) {
 	                    	this.setApiParam('speed', val);

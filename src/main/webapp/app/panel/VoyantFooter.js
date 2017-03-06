@@ -33,6 +33,9 @@ Ext.define('Voyant.panel.VoyantFooter', {
                 target: container.getTargetEl().dom.querySelector(".privacy"),
                 text: this.localize('privacyMsg')
             });
-		}
+		},
+		beforedestroy: function(container) {
+    		Ext.tip.QuickTipManager.unregister(container.getTargetEl().dom.querySelector(".privacy"));
+    	},
 	}
 });
