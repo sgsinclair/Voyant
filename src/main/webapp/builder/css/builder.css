@@ -28,6 +28,7 @@ table.builder, .builder tbody {
 .builder.x-dd-drag-current {
 	padding: 10px 5px;
 	background-color: rgba(246,240,177,1);
+	width: 300px;
 }
 
 .resizer {

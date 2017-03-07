@@ -198,61 +198,34 @@ Ext.define('Voyant.panel.Builder', {
     				    	toolsList.getStore().loadData(toolConfigs);
     				    	toolsList.getStore().sort('title', 'ASC');
     				    	
-    				    	// DD
-    				    	var overrides = {
-				    			b4StartDrag: function(x, y) {
-				    		        this.showFrame(x, y);
-				    		        var lel = this.getEl(),
-				    	            	del = this.getDragEl();
-				    		        
-				    		        Ext.fly(del).addCls('builder');
-				    		        del.textContent = lel.textContent;
-				    		    },
-				    		    onDragEnter: function(evt, id) {
-				    		    	Ext.fly(id).addCls('selected');
-				    		    },
-				    		    onDragOut: function(evt, id) {
-				    		    	Ext.fly(id).removeCls('selected');
-				    		    },
-				    	        onInvalidDrop: function() {
-				    	            this.invalidDrop = true;
-				    	        },
-				    	        endDrag: function(evt) {
-				    	        	var lel = this.getEl(),
-					    	            del = this.getDragEl();
-
-					    	        del.style.visibility = "";
-	
-					    	        this.beforeMove();
-					    	        lel.style.visibility = "hidden";
-					    	        
-					    	        if (this.invalidDrop) {
-					    	        	
-					    	        } else {
-					    	        	var targetEl = Ext.get(evt.target);
-					    	        	var tl = Ext.getCmp('toolsList');
-					    	        	var toolRec = tl.getRecord(lel);
-					    	        	if (toolRec != null) {
-					    	        		tl.findParentByType('builder').getTableEditor().addTool(toolRec);
-					    	        	}
-					    	        }
-					    	        
-					    	        del.style.visibility = "hidden";
-					    	        lel.style.visibility = "";
-	
-					    	        this.afterDrag();
-					    	        
-					    	        delete this.invalidDrop;
-				    	        }
-    				    			
-    				    	};
-    				    	
     				    	var toolEls = this.body.select('.listTool');
     				    	Ext.each(toolEls.elements, function(el) {
-    				    		var dd = Ext.create('Ext.dd.DDProxy', el, 'toolsDDGroup', {
-    				    			isTarget: false
+    				    		var dd = Ext.create('Ext.drag.Source', {
+    				    			element: el,
+    				    			groups: 'toolsDDGroup',
+    				    			proxy: {
+    				    				type: 'placeholder',
+    				    				getElement: function(info) {
+    				    					var el = this.element;
+    				    					if (!el) {
+    				    						this.element = el = Ext.getBody().createChild({
+    				    							cls: 'builder x-dd-drag-current',
+    				    							html: info.eventTarget.textContent
+    				    						});
+    				    					}
+    				    					el.show();
+    				    					return el;
+    				    				}
+    				    			},
+    				    			listeners: {
+    				    				beforedragstart: function(src, info, evt) {
+    				    					var tl = Ext.getCmp('toolsList');
+    				    					var rec = tl.getRecord(src.getElement());
+    				    					if (rec == null) return false;
+    				    					info.setData('toolRecord', rec);
+    				    				}
+    				    			}
     				    		});
-    				    		Ext.apply(dd, overrides);
     				    	});
     				    	
     				    	this.setupDropTargets();
@@ -445,7 +418,24 @@ Ext.define('Voyant.panel.Builder', {
     	var tdEls = Ext.get('tableParent').select('td');
     	Ext.each(tdEls.elements, function(el) {
     		if (dropTargets[el.id] === undefined) {
-	    		var toolsDDTarget = Ext.create('Ext.dd.DDTarget', el, 'toolsDDGroup');
+	    		var toolsDDTarget = Ext.create('Ext.drag.Target', {
+	    			element: el,
+	    			groups: 'toolsDDGroup',
+	    			listeners: {
+	    				dragenter: function(target, info) {
+	    					target.getElement().addCls('selected');
+	    				},
+	    				dragleave: function(target, info) {
+	    					target.getElement().removeCls('selected');
+	    				},
+	    				drop: function(target, info) {
+	    					info.getData('toolRecord').then(function(data) {
+	    						var tl = Ext.getCmp('toolsList');
+	    						tl.findParentByType('builder').getTableEditor().addTool(data);
+	    					});
+	    				}
+	    			}
+	    		});
 	    		dropTargets[el.id] = toolsDDTarget;
     		}
     	}, this);
