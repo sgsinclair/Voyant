@@ -34,6 +34,7 @@ Ext.define('Voyant.widget.FontFamilyOption', {
     		items: {
     			xtype: 'combo',
     	        queryMode: 'local',
+    	        name: 'fontFamily',
     	        value: value,
     	        triggerAction: 'all',
     	        editable: true,
