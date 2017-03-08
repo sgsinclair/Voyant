@@ -49,39 +49,22 @@ Ext.define('Voyant.panel.Bubblelines', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
+		bubblelines: undefined,
+		termStore: undefined,
 		docTermStore: undefined,
 		docStore: undefined,
+		selectedDocs: undefined,
+		processedDocs: undefined,
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
 	},
-	
-	selectedDocs: undefined,
-	processedDocs: new Ext.util.MixedCollection(),
-	
-	bubblelines: null, // the viz itself
 	
 	termTpl: new Ext.XTemplate(
 		'<tpl for=".">',
 			'<div class="term" style="color: rgb({color});float: left;padding: 3px;margin: 2px;">{term}</div>',
 		'</tpl>'
 	),
-	termStore: new Ext.data.ArrayStore({
-        fields: ['term', 'color'],
-        listeners: {
-        	load: function(store, records, successful, options) {
-        		var termsView = this.down('#termsView');
-        		for (var i = 0; i < records.length; i++) {
-        			var r = records[i];
-        			termsView.select(r, true);
-        		}
-        	},
-        	scope: this
-        } 
-    }),
     
     constructor: function() {
-    	Ext.apply(this, {
-    		title: this.localize('title')
-    	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
@@ -107,10 +90,10 @@ Ext.define('Voyant.panel.Bubblelines', {
         
         this.on('documentsSelected', function(src, docIds) {
         	this.setApiParam('docId', docIds);
-        	this.bubblelines.cache.each(function(d) {
+        	this.getBubblelines().cache.each(function(d) {
         		d.hidden = docIds.indexOf(d.id) === -1;
         	});
-        	this.bubblelines.drawGraph();
+        	this.getBubblelines().drawGraph();
         }, this);
     	
     	this.on('termsClicked', function(src, terms) {
@@ -137,7 +120,21 @@ Ext.define('Voyant.panel.Bubblelines', {
     },
     
     initComponent: function() {
-    	var docStore = Ext.create("Ext.data.Store", {
+    	this.setTermStore(Ext.create('Ext.data.ArrayStore', {
+            fields: ['term', 'color'],
+            listeners: {
+            	load: function(store, records, successful, options) {
+            		var termsView = this.down('#termsView');
+            		for (var i = 0; i < records.length; i++) {
+            			var r = records[i];
+            			termsView.select(r, true);
+            		}
+            	},
+            	scope: this
+            }
+        }));
+    	
+    	this.setDocStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.Document",
     		autoLoad: false,
     		remoteSort: false,
@@ -157,18 +154,17 @@ Ext.define('Voyant.panel.Bubblelines', {
    		     listeners: {
    		    	load: function(store, records, successful, options) {
    					this.processDocuments(records);
-   					this.processedDocs.each(function(doc) {
-   						this.bubblelines.addDocToCache(doc);
+   					this.getProcessedDocs().each(function(doc) {
+   						this.getBubblelines().addDocToCache(doc);
    					}, this);
    					// get the top 5 corpus terms
    					this.loadFromCorpusTerms(this.getCorpus().getCorpusTerms({autoload: false}));
    				},
    				scope: this
    		     }
-    	});
-    	this.setDocStore(docStore);
+    	}));
     	
-    	var docTermStore = Ext.create("Ext.data.Store", {
+    	this.setDocTermStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.DocumentTerm",
 			asynchronousLoad: false,
     		autoLoad: false,
@@ -196,9 +192,9 @@ Ext.define('Voyant.panel.Bubblelines', {
    		    			var term = record.get('term');
    		    			var termObj = {};
    		    			termObj[term] = termData;
-   		    			this.bubblelines.addTermsToDoc(termObj, docId);
+   		    			this.getBubblelines().addTermsToDoc(termObj, docId);
    		    		}, this);
-   		    		this.bubblelines.doBubblelinesLayout();
+   		    		this.getBubblelines().doBubblelinesLayout();
 
 //   					this.processDocuments();
 //   					if (this.maxFreqChanged) {
@@ -206,15 +202,17 @@ Ext.define('Voyant.panel.Bubblelines', {
 //   					} else {
 //   						this.calculateBubbleRadii(options.params.type);
 //   					}
-//   					this.bubblelines.setCanvasHeight();
-//   					this.bubblelines.drawGraph();
+//   					this.getBubblelines().setCanvasHeight();
+//   					this.getBubblelines().drawGraph();
    				},
    				scope: this
    		     }
-    	});
-    	this.setDocTermStore(docTermStore);
+    	}));
+    	
+    	this.setProcessedDocs(new Ext.util.MixedCollection());
     	
     	Ext.apply(this, {
+    		title: this.localize('title'),
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
@@ -226,10 +224,10 @@ Ext.define('Voyant.panel.Bubblelines', {
 					glyph: 'xf014@FontAwesome',
 	            	handler: function() {
 	            		this.down('#termsView').getSelectionModel().deselectAll(true);
-	            		this.termStore.removeAll();
+	            		this.getTermStore().removeAll();
 	            		this.setApiParams({query: null});
-	            		this.bubblelines.removeAllTerms();
-	            		this.bubblelines.drawGraph();
+	            		this.getBubblelines().removeAllTerms();
+	            		this.getBubblelines().drawGraph();
 	            	},
 	            	scope: this                			
         		},{
@@ -247,7 +245,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	listeners: {
 	            		changecomplete: function(slider, newvalue) {
 	            			this.setApiParams({bins: newvalue});
-	            			this.bubblelines.bubbleSpacing = newvalue;
+	            			this.getBubblelines().bubbleSpacing = newvalue;
 	            			this.reloadTermsData();
 	            		},
 	            		scope: this
@@ -258,10 +256,10 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	boxLabelAlign: 'before',
 	            	checked: false,
 	            	handler: function(checkbox, checked) {
-	            		this.bubblelines.SEPARATE_LINES_FOR_TERMS = checked;
-	            		this.bubblelines.lastClickedBubbles = {};
-	            		this.bubblelines.setCanvasHeight();
-	    				this.bubblelines.drawGraph();
+	            		this.getBubblelines().SEPARATE_LINES_FOR_TERMS = checked;
+	            		this.getBubblelines().lastClickedBubbles = {};
+	            		this.getBubblelines().setCanvasHeight();
+	    				this.getBubblelines().drawGraph();
 	            	},
 	            	scope: this
 	            	
@@ -279,7 +277,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	height: 30,
 	            	itemId: 'termsView',
 	            	xtype: 'dataview',
-	            	store: this.termStore,
+	            	store: this.getTermStore(),
 	            	tpl: this.termTpl,
 	            	itemSelector: 'div.term',
 	            	overItemCls: 'over',
@@ -315,18 +313,18 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            				}
 	            			});
 	            			
-	            			for (var index in this.bubblelines.lastClickedBubbles) {
-	            				var lcTerms = this.bubblelines.lastClickedBubbles[index];
+	            			for (var index in this.getBubblelines().lastClickedBubbles) {
+	            				var lcTerms = this.getBubblelines().lastClickedBubbles[index];
 	            				for (var term in lcTerms) {
 	            					if (terms.indexOf(term) == -1) {
-	            						delete this.bubblelines.lastClickedBubbles[index][term];
+	            						delete this.getBubblelines().lastClickedBubbles[index][term];
 	            					}
 	            				}
 	            				
 	            			}
-	            			this.bubblelines.termsFilter = terms;
-	            			this.bubblelines.setCanvasHeight();
-	            			this.bubblelines.drawGraph();
+	            			this.getBubblelines().termsFilter = terms;
+	            			this.getBubblelines().setCanvasHeight();
+	            			this.getBubblelines().drawGraph();
 	            		},
 	            		itemcontextmenu: function(dv, record, el, index, event) {
 	            			event.preventDefault();
@@ -348,13 +346,13 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            					text: this.localize('removeTerm'),
 	            					handler: function() {
 	            						dv.deselect(index);
-	            						var term = this.termStore.getAt(index).get('term');
-	            						this.termStore.removeAt(index);
+	            						var term = this.getTermStore().getAt(index).get('term');
+	            						this.getTermStore().removeAt(index);
 	            						dv.refresh();
 	            						
-	            						this.bubblelines.removeTerm(term);
-	            						this.bubblelines.setCanvasHeight();
-	            						this.bubblelines.drawGraph();
+	            						this.getBubblelines().removeTerm(term);
+	            						this.getBubblelines().setCanvasHeight();
+	            						this.getBubblelines().drawGraph();
 	            					},
 	            					scope: this
 	            				}]
@@ -375,19 +373,19 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            listeners: {
 	            	render: function(component) {
 	            		var canvasParent = this.down('#canvasParent');
-	                	this.bubblelines = new Bubblelines({
+	                	this.setBubblelines(new Bubblelines({
 	                		container: canvasParent,
 	                		clickHandler: this.bubbleClickHandler.bind(this)
-	                	});
-	                	this.bubblelines.bubbleSpacing = parseInt(this.getApiParam('bins'));
+	                	}));
+	                	this.getBubblelines().bubbleSpacing = parseInt(this.getApiParam('bins'));
 	            	},
             		afterlayout: function(container) {
-            			if (this.bubblelines.initialized === false) {
-            				this.bubblelines.initializeCanvas();
+            			if (this.getBubblelines().initialized === false) {
+            				this.getBubblelines().initializeCanvas();
             			}
             		},
 	        		resize: function(cnt, width, height) {
-	        			this.bubblelines.doBubblelinesLayout();
+	        			this.getBubblelines().doBubblelinesLayout();
 	        		},
             		scope: this
             	}
@@ -398,9 +396,9 @@ Ext.define('Voyant.panel.Bubblelines', {
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
-    	if (this.bubblelines) { // get rid of existing terms
-    		this.bubblelines.removeAllTerms();
-    		this.termStore.removeAll(true);
+    	if (this.getBubblelines()) { // get rid of existing terms
+    		this.getBubblelines().removeAllTerms();
+    		this.getTermStore().removeAll(true);
     	}
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
@@ -442,7 +440,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     
 	reloadTermsData: function() {
 		var terms = [];
-		for (var term in this.bubblelines.currentTerms) {
+		for (var term in this.getBubblelines().currentTerms) {
 			terms.push(term);
 		}
 		this.getDocTermsFromQuery(terms);
@@ -460,22 +458,22 @@ Ext.define('Voyant.panel.Bubblelines', {
 		if (typeof docIds == 'string') docIds = [docIds];
 		
 		if (docIds == null) {
-			this.selectedDocs = this.getCorpus().getDocuments().clone();
-			var count = this.selectedDocs.getCount();
+			this.setSelectedDocs(this.getCorpus().getDocuments().clone());
+			var count = this.getSelectedDocs().getCount();
 			if (count > 10) {
 				for (var i = 10; i < count; i++) {
-					this.selectedDocs.removeAt(10);
+					this.getSelectedDocs().removeAt(10);
 				}
 			}
 			docIds = [];
-			this.selectedDocs.eachKey(function(docId, doc) {
+			this.getSelectedDocs().eachKey(function(docId, doc) {
 				docIds.push(docId);
 			}, this);
 			this.setApiParams({docId: docIds});
 		} else {
-			this.selectedDocs = this.getCorpus().getDocuments().filterBy(function(doc, docId) {
+			this.setSelectedDocs(this.getCorpus().getDocuments().filterBy(function(doc, docId) {
 				return docIds.indexOf(docId) != -1;
-			}, this);
+			}, this));
 		}
 	},
 	
@@ -486,13 +484,13 @@ Ext.define('Voyant.panel.Bubblelines', {
 	// produce format that bubblelines can use
 	processDocument: function(doc) {
 		var docId = doc.getId();
-		if (!this.processedDocs.containsKey(docId)) {
+		if (!this.getProcessedDocs().containsKey(docId)) {
 			var title = doc.getShortTitle();
 			title = title.replace('&hellip;', '...');
 			var index = doc.get('index');
 			var totalTokens = doc.get('tokensCount-lexical');
 		
-			this.processedDocs.add(docId, {
+			this.getProcessedDocs().add(docId, {
 				id: docId,
 				index: index,
 				title: title,
@@ -509,9 +507,9 @@ Ext.define('Voyant.panel.Bubblelines', {
 		var positions = termRecord.get('positions');
 		if (rawFreq > 0) {
 			var color = this.getApplication().getColorForTerm(term);
-			if (this.termStore.find('term', term) === -1) {
-				this.termStore.loadData([[term, color]], true);
-				var index = this.termStore.find('term', term);
+			if (this.getTermStore().find('term', term) === -1) {
+				this.getTermStore().loadData([[term, color]], true);
+				var index = this.getTermStore().find('term', term);
 				this.down('#termsView').select(index, true); // manually select since the store's load listener isn't triggered
 			}
 			var distributions = termRecord.get('distributions');
