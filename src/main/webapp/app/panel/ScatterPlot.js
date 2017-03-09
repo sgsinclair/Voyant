@@ -3,11 +3,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	mixins: ['Voyant.panel.Panel'],
 	requires: ['Ext.chart.CartesianChart'],
 	alias: 'widget.scatterplot',
-	config: {
-		options: {
-    		xtype: 'stoplistoption'
-    	}
-	},
     statics: {
     	i18n: {
     	},
@@ -27,30 +22,23 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	},
 		glyph: 'xf06e@FontAwesome'
     },
+	config: {
+		options: {
+    		xtype: 'stoplistoption'
+    	},
+    	caStore: null,
+    	pcaStore: null,
+    	docSimStore: null,
+    	termStore: null,
+    	chartMenu: null,
+    	newTerm: null,
+    	termsTimeout: null,
+    	highlightData: {x: 0, y: 0, r: 0},
+        highlightTask: null
+	},
     
     tokenFreqTipTemplate: null,
     docFreqTipTemplate: null,
-    caStore: null,
-    pcaStore: null,
-    docSimStore: null,
-    termStore: Ext.create('Ext.data.JsonStore', {
-		fields: [
-			{name: 'term'},
-			{name: 'rawFreq', type: 'int'},
-			{name: 'relativeFreq', type: 'number'},
-			{name: 'coordinates', mapping : 'vector'},
-			{name: 'category'}
-		],
-		sorters: [{property: 'rawFreq', direction: 'DESC'}],
-		groupField: 'category'
-	}),
-	newTerm: null,
-	termsTimeout: null,
-    chartMenu: null,
-    labelsMode: 0, // 0 all labels, 1 doc labels, 2 word labels, 3 no labels
-    
-    highlightData: {x: 0, y: 0, r: 0},
-    highlightTask: null,
     
     constructor: function(config) {
         this.callParent(arguments);
@@ -58,26 +46,47 @@ Ext.define('Voyant.panel.ScatterPlot', {
     },
     
     initComponent: function() {
+    	this.setCaStore(Ext.create('Voyant.data.store.CAAnalysis', {
+    		listeners: {load: this.buildChart, scope: this}
+    	}));
+    	this.setPcaStore(Ext.create('Voyant.data.store.PCAAnalysis', {
+    		listeners: {load: this.buildChart, scope: this}
+    	}));
+    	this.setDocSimStore(Ext.create('Voyant.data.store.DocSimAnalysis', {
+    		listeners: {load: this.buildChart, scope: this}
+    	}));
+    	this.setTermStore(Ext.create('Ext.data.JsonStore', {
+			fields: [
+				{name: 'term'},
+				{name: 'rawFreq', type: 'int'},
+				{name: 'relativeFreq', type: 'number'},
+				{name: 'coordinates', mapping : 'vector'},
+				{name: 'category'}
+			],
+			sorters: [{property: 'rawFreq', direction: 'DESC'}],
+			groupField: 'category'
+		}));
+    	
+    	this.setChartMenu(Ext.create('Ext.menu.Menu', {
+    		items: [
+    			{text: this.localize('remove'), itemId: 'remove', glyph: 'xf068@FontAwesome'},
+    			{text: this.localize('nearby'), itemId: 'nearby', glyph: 'xf0b2@FontAwesome'}
+    		],
+    		listeners: {
+    			hide: function() {
+    				var series = this.down('#chart').getSeries();
+    				series[0].enableToolTips();
+    				series[1].enableToolTips();
+    			},
+    			scope: this
+    		}
+    	}));
+    	
+    	this.tokenFreqTipTemplate = new Ext.Template(this.localize('tokenFreqTip'));
+    	this.docFreqTipTemplate = new Ext.Template(this.localize('docFreqTip'));
+    	
         Ext.apply(this, {
         	title: this.localize('title'),
-        	caStore: Ext.create('Voyant.data.store.CAAnalysis'),
-        	pcaStore: Ext.create('Voyant.data.store.PCAAnalysis'),
-        	docSimStore: Ext.create('Voyant.data.store.DocSimAnalysis'),
-        	termStore: this.termStore,
-        	chartMenu: Ext.create('Ext.menu.Menu', {
-        		items: [
-        			{text: this.localize('remove'), itemId: 'remove', glyph: 'xf068@FontAwesome'},
-        			{text: this.localize('nearby'), itemId: 'nearby', glyph: 'xf0b2@FontAwesome'}
-        		],
-        		listeners: {
-        			hide: function() {
-        				var series = this.down('#chart').getSeries();
-        				series[0].enableToolTips();
-        				series[1].enableToolTips();
-        			},
-        			scope: this
-        		}
-        	}),
         	layout: 'border',
         	autoDestroy: true,
         	items: [{
@@ -244,7 +253,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		listeners: {
         			query: function(component, value) {
         				if (value !== undefined) {
-	        				this.termStore.filter([{property: 'term', value: value, anyMatch: true}]);
+	        				this.getTermStore().filter([{property: 'term', value: value, anyMatch: true}]);
 	        				this.filterChart(value);
         				}
         			},
@@ -339,10 +348,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
 									this.loadFromApis();
     							}
     							if (combo.isValid() && oldVal !== null) {
-    								if (this.termsTimeout !== null) {
-    									clearTimeout(this.termsTimeout);
+    								if (this.getTermsTimeout() !== null) {
+    									clearTimeout(this.getTermsTimeout());
     								}
-    								this.termsTimeout = setTimeout(doLoad.bind(this), 500);
+    								this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
     							}
     						},
     						scope: this
@@ -403,14 +412,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         }
                     }
                 },
-        		store: this.termStore,
+        		store: this.getTermStore(),
         		listeners: {
         			query: function(component, value) {
-        				if (value !== undefined && this.termStore.findExact('term', value) === -1) {
-	                		this.newTerm = value;
+        				if (value !== undefined && this.getTermStore().findExact('term', value) === -1) {
+	                		this.setNewTerm(value);
 	                		this.loadFromApis();
     					} else {
-    						this.newTerm = null;
+    						this.setNewTerm(null);
     					}
         			},
         			scope: this
@@ -437,9 +446,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		}
     		setCheckBound('dimensions');
     		
-    		this.caStore.setCorpus(corpus);
-    		this.pcaStore.setCorpus(corpus);
-    		this.docSimStore.setCorpus(corpus);
+    		this.getCaStore().setCorpus(corpus);
+    		this.getPcaStore().setCorpus(corpus);
+    		this.getDocSimStore().setCorpus(corpus);
     		this.loadFromApis();
     	}, this);
     	
@@ -447,19 +456,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		this.setApiParam('docId', docIds);
     		this.loadFromApis();
     	}, this);
-    	
-        this.caStore.on('load', function(store, records) {
-        	this.buildChart(store);
-        }, this);
-        this.pcaStore.on('load', function(store, records) {
-        	this.buildChart(store);
-        }, this);
-        this.docSimStore.on('load', function(store, records) {
-        	this.buildChart(store);
-        }, this);
-        
-    	this.tokenFreqTipTemplate = new Ext.Template(this.localize('tokenFreqTip'));
-    	this.docFreqTipTemplate = new Ext.Template(this.localize('docFreqTip'));
         
     	this.callParent(arguments);
     },
@@ -519,7 +515,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         
         
         if (this.getApiParam('analysis') !== 'docSim') { // docSim doesn't return terms so keep the current ones
-	        this.termStore.removeAll();
+	        this.getTermStore().removeAll();
         }
 	        
         var tokens = rec.getTokens();
@@ -534,8 +530,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	        	if (freq > maxFreq) maxFreq = freq;
 	        	if (freq < minFreq) minFreq = freq;
         	}
-        	if (this.termStore.findExact('term', token.get('term') === -1)) {
-        		this.termStore.addSorted(token);
+        	if (this.getTermStore().findExact('term', token.get('term') === -1)) {
+        		this.getTermStore().addSorted(token);
         	}
         	if (numDims === 3) {
 				var z = token.get('vector')[2];
@@ -564,7 +560,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	}
         }, this);
         
-        var newCount = this.termStore.getCount();
+        var newCount = this.getTermStore().getCount();
         this.queryById('limit').setRawValue(newCount);
         this.setApiParam('limit', newCount);
         
@@ -600,7 +596,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	sprites: [{
         		type: 'text',
         		text: summary,
-        		hidden: this.labelsMode > 0,
         		x: 70,
         		y: 70
         	}],
@@ -740,11 +735,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		            		var term = chartItem.record.get('term');
 		            		
 		            		var text = (new Ext.Template(this.localize('removeTerm'))).apply([term]);
-		            		this.chartMenu.queryById('remove').setText(text);
+		            		this.getChartMenu().queryById('remove').setText(text);
 		            		text = (new Ext.Template(this.localize('nearbyTerm'))).apply([term]);
-		            		this.chartMenu.queryById('nearby').setText(text);
+		            		this.getChartMenu().queryById('nearby').setText(text);
 		            		
-		            		this.chartMenu.on('click', function(menu, item) {
+		            		this.getChartMenu().on('click', function(menu, item) {
 		            			if (item !== undefined) {
 		            				var term = chartItem.record.get('term');
 			            			if (item.text === this.localize('remove')) {
@@ -754,7 +749,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			            			}
 		            			}
 		            		}, this, {single: true});
-		            		this.chartMenu.showAt(xy);
+		            		this.getChartMenu().showAt(xy);
 		            	}
 		            }, this);
         		},
@@ -766,9 +761,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	this.queryById('chartParent').insert(0, chart);
     	this.doLabels();
     	
-    	if (this.newTerm !== null) {
-        	this.selectTerm(this.newTerm);
-        	this.newTerm = null;
+    	if (this.getNewTerm() !== null) {
+        	this.selectTerm(this.getNewTerm());
+        	this.setNewTerm(null);
         }
     },
     
@@ -825,17 +820,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		    		}
 		    		
 		    		var point = this.getPointFromIndex(series, index);
-		    		this.highlightData = {x: point[0], y: point[1], r: 50};
+		    		this.setHighlightData({x: point[0], y: point[1], r: 50});
 		    		
-		    		if (this.highlightTask == null) {
-		    			this.highlightTask = Ext.TaskManager.newTask({
+		    		if (this.getHighlightTask() == null) {
+		    			this.setHighlightTask(Ext.TaskManager.newTask({
 		        			run: this.doHighlight,
 		        			scope: this,
 		        			interval: 25,
-		        			repeat: this.highlightData.r
-		        		});
+		        			repeat: this.getHighlightData().r
+		        		}));
 		    		}
-		    		this.highlightTask.restart();
+		    		this.getHighlightTask().restart();
 		    	}
 	    	}
     	}
@@ -851,7 +846,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     doHighlight: function() {
     	var chart = this.down('#chart');
-    	if (this.highlightData.r > 0) {
+    	if (this.getHighlightData().r > 0) {
 	    	var surf = chart.getSurface();
 			var highlight = null;
 			var items = surf.getItems();
@@ -868,19 +863,19 @@ Ext.define('Voyant.panel.ScatterPlot', {
 					type: 'circle',
 					strokeStyle: 'red',
 					fillStyle: 'none',
-					radius: this.highlightData.r,
-					x: this.highlightData.x,
-					y: this.highlightData.y
+					radius: this.getHighlightData().r,
+					x: this.getHighlightData().x,
+					y: this.getHighlightData().y
 				});
 			} else {
 				highlight.setAttributes({
-					x: this.highlightData.x,
-					y: this.highlightData.y,
-					radius: this.highlightData.r
+					x: this.getHighlightData().x,
+					y: this.getHighlightData().y,
+					radius: this.getHighlightData().r
 				});
-				this.highlightData.r -= 1.5;
-				if (this.highlightData.r <= 0) {
-					this.highlightData.r = 0;
+				this.getHighlightData().r -= 1.5;
+				if (this.getHighlightData().r <= 0) {
+					this.getHighlightData().r = 0;
 					surf.remove(highlight, true);
 				}
 			}
@@ -919,7 +914,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     getCurrentTerms: function() {
     	var terms = [];
-    	this.termStore.each(function(r) {
+    	this.getTermStore().each(function(r) {
     		if (r.get('category') === 'term') {
     			terms.push(r.get('term'));
     		}
@@ -939,10 +934,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	var index = series.getStore().findExact('term', term);
     	series.getStore().removeAt(index);
     	
-    	index = this.termStore.findExact('term', term);
-    	this.termStore.removeAt(index);
+    	index = this.getTermStore().findExact('term', term);
+    	this.getTermStore().removeAt(index);
     	
-    	var newCount = this.termStore.getCount();
+    	var newCount = this.getTermStore().getCount();
         this.queryById('limit').setRawValue(newCount);
     },
     
@@ -953,12 +948,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	}
     	var params = {};
     	var terms = this.getCurrentTerms();
-    	if (this.newTerm !== null) {
-    		terms.push(this.newTerm);
+    	if (this.getNewTerm() !== null) {
+    		terms.push(this.getNewTerm());
     		this.setApiParam('limit', terms.length);
     	}
     	if (terms.length > 0) {
-    		if (this.newTerm !== null || keepCurrentTerms) {
+    		if (this.getNewTerm() !== null || keepCurrentTerms) {
     			params.query = terms.join(',');
     		}
 //    		params.term = terms;
@@ -969,15 +964,15 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	}
 
     	if (params.analysis === 'pca') {
-    		this.pcaStore.load({
+    		this.getPcaStore().load({
 	    		params: params
 	    	});
     	} else if (params.analysis === 'docSim'){
-    		this.docSimStore.load({
+    		this.getDocSimStore().load({
 	    		params: params
 	    	});
     	} else {
-    		this.caStore.load({
+    		this.getCaStore().load({
 	    		params: params
 	    	});
     	}

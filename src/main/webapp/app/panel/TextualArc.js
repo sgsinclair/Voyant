@@ -50,7 +50,9 @@ Ext.define('Voyant.panel.TextualArc', {
 	    		},
 	    		fieldLabel: 'minRawFreq'
     		}
-    	}]
+    	}],
+    	perim: [],
+    	diam: undefined
 	},
 	
 	tokensFetch: 500,
@@ -118,24 +120,7 @@ Ext.define('Voyant.panel.TextualArc', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('boxready', function(cmp) {
-    		var gutter = 20,
-			availableWidth = this.getTargetEl().getWidth() - gutter - gutter,
-			availableHeight = this.getTargetEl().getHeight() - gutter - gutter,
-			diam = Math.max(availableWidth, availableHeight), rad = diam /2,
-			ratio = Math.min(availableWidth, availableHeight) / diam,
-			canvas = this.getTargetEl().dom.querySelector("canvas"), ctx = canvas.getContext("2d");
-			canvas.width = this.getTargetEl().getWidth();
-			canvas.height = this.getTargetEl().getHeight();
-			this.diam = diam;
-			this.perim = [];
-			var i = parseInt(diam*.75)
-			while (this.perim.length<diam) {
-	    		this.perim.push({
-	    			x:  gutter+(availableWidth/2)+(rad * (availableWidth>availableHeight ? 1 : ratio) * Math.cos(2 * Math.PI * i / diam)),
-	    			y:  gutter+(availableHeight/2)+(rad * (availableHeight>availableWidth ? 1 : ratio) * Math.sin(2 * Math.PI * i / diam))
-	    		})
-	    		if (i++==diam) {i=0;}
-			}
+			var canvas = this.getTargetEl().dom.querySelector("canvas");
 	    	this.draw(canvas);
 
     		canvas.addEventListener('mousemove', function(evt) {
@@ -171,6 +156,27 @@ Ext.define('Voyant.panel.TextualArc', {
     	});
     	
     	this.on("resize", function() {
+    		var gutter = 20,
+			availableWidth = this.getTargetEl().getWidth() - gutter - gutter,
+			availableHeight = this.getTargetEl().getHeight() - gutter - gutter,
+			diam = Math.max(availableWidth, availableHeight), rad = diam /2,
+			ratio = Math.min(availableWidth, availableHeight) / diam,
+			canvas = this.getTargetEl().dom.querySelector("canvas");
+    		
+			canvas.width = this.getTargetEl().getWidth();
+			canvas.height = this.getTargetEl().getHeight();
+			this.setDiam(diam);
+			this.setPerim([]);
+			var i = parseInt(diam*.75)
+			while (this.getPerim().length<diam) {
+	    		this.getPerim().push({
+	    			x:  gutter+(availableWidth/2)+(rad * (availableWidth>availableHeight ? 1 : ratio) * Math.cos(2 * Math.PI * i / diam)),
+	    			y:  gutter+(availableHeight/2)+(rad * (availableHeight>availableWidth ? 1 : ratio) * Math.sin(2 * Math.PI * i / diam))
+	    		})
+	    		if (i++==diam) {i=0;}
+			}
+			
+			// TODO clear previous/current drawing
     	})
     },
     
@@ -179,7 +185,7 @@ Ext.define('Voyant.panel.TextualArc', {
     	ctx = ctx || canvas.getContext("2d");
     	ctx.clearRect(0,0,canvas.width,canvas.height);
 		ctx.fillStyle = "rgba(0,0,0,.1)";
-    	this.perim.forEach(function(p,i) {
+    	this.getPerim().forEach(function(p,i) {
     		if (i%3==0) {
         		ctx.fillRect(p.x-5,p.y,10,1)
     		}
@@ -200,9 +206,9 @@ Ext.define('Voyant.panel.TextualArc', {
     	ctx = ctx || this.getTargetEl().dom.querySelector("canvas").getContext("2d");
     	var delay = 2000-(parseInt(this.getApiParam('speed'))*1999/100);
     	if (this.isReading && this.documentTerms) {
-    		var current = parseInt(this.readingIndex * this.perim.length / this.lastToken);
+    		var current = parseInt(this.readingIndex * this.getPerim().length / this.lastToken);
     		ctx.fillStyle = "purple";
-    		ctx.fillRect(this.perim[current].x,this.perim[current].y, 5, 5)
+    		ctx.fillRect(this.getPerim()[current].x,this.getPerim()[current].y, 5, 5)
 			var first = this.readingStartTime == undefined;
 			this.readingStartTime = this.readingStartTime || new Date().getTime();
 			var delta = this.readingStartTime+delay-new Date().getTime();
@@ -265,7 +271,7 @@ Ext.define('Voyant.panel.TextualArc', {
     	canvas = canvas || this.getTargetEl().dom.querySelector("canvas");
     	ctx = ctx || canvas.getContext("2d");
     	ctx.textAlign = "center";
-    	if (this.documentTerms && this.perim) {
+    	if (this.documentTerms && this.getPerim().length > 0) {
     		this.documentTerms.each(function(documentTerm) {
     			var me = this, freq = documentTerm.getRawFreq(), term = documentTerm.getTerm(),
     				x = documentTerm.get('x'), y = documentTerm.get('y');
@@ -282,10 +288,10 @@ Ext.define('Voyant.panel.TextualArc', {
     	    	if (isCurrentTerm || isReadingTerm) {
     	    		ctx.strokeStyle = isCurrentTerm ? "rgba(255,0,0,.2)" : "rgba(0,255,0,.4)";
     	    		documentTerm.getDistributions().forEach(function(d, i) {
-    	    			if (d>0 && this.perim[i]) {
+    	    			if (d>0 && this.getPerim()[i]) {
     	    				ctx.beginPath();
     	    				ctx.moveTo(x, y);
-    	    				ctx.lineTo(this.perim[i].x,this.perim[i].y);
+    	    				ctx.lineTo(this.getPerim()[i].x,this.getPerim()[i].y);
     	    				ctx.stroke();
     	    			}
     	    		}, this)
@@ -337,7 +343,7 @@ Ext.define('Voyant.panel.TextualArc', {
     		proxy: {
     			extraParams: {
     				stopList: this.getApiParam('stopList'),
-    				bins: this.diam,
+    				bins: this.getDiam(),
     				withDistributions: 'raw',
     				minRawFreq: parseInt(this.getApiParam('minRawFreq'))
     			}
@@ -362,8 +368,8 @@ Ext.define('Voyant.panel.TextualArc', {
             		records.forEach(function(documentTerm) {
             			var x = y = 0;
             			documentTerm.get('distributions').forEach(function(d, i) {
-            				x += (this.perim[i].x*d);
-            				y += (this.perim[i].y*d);
+            				x += (this.getPerim()[i].x*d);
+            				y += (this.getPerim()[i].y*d);
             			}, this)
             			documentTerm.set('x', x/documentTerm.getRawFreq());
             			documentTerm.set('y', y/documentTerm.getRawFreq());
@@ -415,8 +421,11 @@ Ext.define('Voyant.panel.TextualArc', {
     				})
         			if (first) {
         				this.previousBeziers = [];
-        				this.isReading = true;
-        				this.read(0);
+        				// TODO
+//        				if (this.getApiParam('speed') > 0) {
+	        				this.isReading = true;
+	        				this.read(0);
+//        				}
         			}
     			} else {
     				this.noMoreTokens = true;

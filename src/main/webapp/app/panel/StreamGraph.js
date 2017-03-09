@@ -20,7 +20,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     config: {
     	visLayout: undefined,
     	vis: undefined,
-    	mode: 'corpus'
+    	mode: 'corpus',
+    	graphId: undefined
     },
     
     graphMargin: {top: 20, right: 60, bottom: 110, left: 80},
@@ -31,6 +32,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
+    	this.setGraphId(Ext.id(null, 'streamgraph_'));
     },
     
     initComponent: function() {
@@ -169,9 +172,7 @@ Ext.define('Voyant.panel.StreamGraph', {
         	}
         }, this);
 		
-        this.on('resize', function(panel, width, height) {
-
-		}, this);
+        this.on('resize', this.resizeGraph, this);
         
         this.on('boxready', this.initGraph, this);
         
@@ -381,10 +382,6 @@ Ext.define('Voyant.panel.StreamGraph', {
     initGraph: function() {
     	if (this.getVisLayout() === undefined) {
 	    	var el = this.getLayout().getRenderTarget();
-	    	var paddingH = this.graphMargin.left + this.graphMargin.right;
-	    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
-	    	var width = el.getWidth()-paddingH;
-			var height = el.getHeight()-paddingV;
 	    	this.setVisLayout(
 				d3.layout.stack()
 					.offset('silhouette')
@@ -393,10 +390,22 @@ Ext.define('Voyant.panel.StreamGraph', {
 					})
 			);
 			
-			this.setVis(d3.select(el.dom).append('svg').attr('id','streamGraph')
-					.attr('width', width+paddingH).attr('height', height+paddingV).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')')
-			);
+			this.setVis(d3.select(el.dom).append('svg').attr('id',this.getGraphId()).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')'));
+			
+			this.resizeGraph();
     	}
+    },
+    
+    resizeGraph: function() {
+    	var el = this.getLayout().getRenderTarget();
+    	var paddingH = this.graphMargin.left + this.graphMargin.right;
+    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
+    	var width = el.getWidth()-paddingH;
+		var height = el.getHeight()-paddingV;
+
+		d3.select(el.dom).select('svg').attr('width', width+paddingH).attr('height', height+paddingV);
+		
+		// TODO recalculate streams
     }
 });
 

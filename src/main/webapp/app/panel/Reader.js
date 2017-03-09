@@ -16,6 +16,7 @@ Ext.define('Voyant.panel.Reader', {
     	glyph: 'xf0f6@FontAwesome'
 	},
     config: {
+    	innerContainer: undefined,
     	tokensStore: undefined,
     	documentsStore: undefined,
     	documentTermsStore: undefined,
@@ -29,38 +30,7 @@ Ext.define('Voyant.panel.Reader', {
     
     INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling
     
-    innerContainer: null, // set after render
-    
-    cls: 'voyant-reader',
-    
-    layout: 'fit',
-    
-    items: {
-    	layout: 'border',
-    	items: [{
-	    	bodyPadding: 10,
-	    	region: 'center',
-	    	border: false,
-	    	autoScroll: true,
-	    	html: '<div class="readerContainer"></div>'
-	    },{
-	    	region: 'south',
-	    	height: 40,
-	    	split: {
-	    		size: 2
-	    	},
-	    	splitterResize: true,
-	    	border: false,
-	    	layout: {
-	    		type: 'hbox'
-	    	}
-	    }]
-    },
-    
     constructor: function() {
-    	Ext.apply(this, {
-    		title: this.localize('title')
-    	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
@@ -176,11 +146,11 @@ Ext.define('Voyant.panel.Reader', {
     	
     	this.on("afterrender", function() {
     		var centerPanel = this.down('panel[region="center"]');
-    		this.innerContainer = centerPanel.getLayout().getRenderTarget();
+    		this.setInnerContainer(centerPanel.getLayout().getRenderTarget());
     		
     		// scroll listener
     		centerPanel.body.on("scroll", function(event, target) {
-    			var readerContainer = this.innerContainer.first();
+    			var readerContainer = this.getInnerContainer().first();
     			var downwardsScroll = this.getLastScrollTop() < target.scrollTop;
     			
     			// scroll up
@@ -223,6 +193,30 @@ Ext.define('Voyant.panel.Reader', {
     	}, this);
     	
     	Ext.apply(this, {
+    		title: this.localize('title'),
+    		cls: 'voyant-reader',
+    	    layout: 'fit',
+    	    items: {
+    	    	layout: 'border',
+    	    	items: [{
+    		    	bodyPadding: 10,
+    		    	region: 'center',
+    		    	border: false,
+    		    	autoScroll: true,
+    		    	html: '<div class="readerContainer"></div>'
+    		    },{
+    		    	region: 'south',
+    		    	height: 40,
+    		    	split: {
+    		    		size: 2
+    		    	},
+    		    	splitterResize: true,
+    		    	border: false,
+    		    	layout: {
+    		    		type: 'hbox'
+    		    	}
+    		    }]
+    	    },
     		// TODO clearing search loads default document terms into chart but probably shouldn't
     		dockedItems: [{
                 dock: 'bottom',
@@ -558,11 +552,11 @@ Ext.define('Voyant.panel.Reader', {
     highlightKeywords: function(query, doScroll) {
 		if (!Ext.isArray(query)) query = [query];
 		
-		this.innerContainer.first().select('span[class*=keyword]').removeCls('keyword');
+		this.getInnerContainer().first().select('span[class*=keyword]').removeCls('keyword');
 		
 		var spans = [];
 		var caseInsensitiveQuery = new RegExp('^'+query[0]+'$', 'i');
-		var nodes = this.innerContainer.first().select('span.word');
+		var nodes = this.getInnerContainer().first().select('span.word');
 		nodes.each(function(el, compEl, index) {
 			if (el.dom.firstChild && el.dom.firstChild.nodeValue.match(caseInsensitiveQuery)) {
 				el.addCls('keyword');
@@ -576,7 +570,7 @@ Ext.define('Voyant.panel.Reader', {
 	},
     
 	fetchPrevious: function(scroll) {
-		var readerContainer = this.innerContainer.first();
+		var readerContainer = this.getInnerContainer().first();
 		var first = readerContainer.first('.word');
 		if (first != null && first.hasCls("loading")===false) {
 			while(first) {
@@ -628,7 +622,7 @@ Ext.define('Voyant.panel.Reader', {
 	},
 	
 	fetchNext: function(scroll) {
-		var readerContainer = this.innerContainer.first();
+		var readerContainer = this.getInnerContainer().first();
 		var last = readerContainer.last();
 		if (last.hasCls("loading")===false) {
 			// store any text that occurs after last word
@@ -677,9 +671,9 @@ Ext.define('Voyant.panel.Reader', {
 	
     load: function(doClear, config) {
     	if (doClear) {
-    		this.innerContainer.first().destroy(); // clear everything
-    		this.innerContainer.setHtml('<div class="readerContainer"><div class="loading">'+this.localize('loading')+'</div></div>');
-			this.innerContainer.first().first().mask();
+    		this.getInnerContainer().first().destroy(); // clear everything
+    		this.getInnerContainer().setHtml('<div class="readerContainer"><div class="loading">'+this.localize('loading')+'</div></div>');
+			this.getInnerContainer().first().first().mask();
     	}
     	this.getTokensStore().load(Ext.apply(config || {}, {
     		params: Ext.apply(this.getApiParams(), {
@@ -689,9 +683,9 @@ Ext.define('Voyant.panel.Reader', {
     },
     
     updateText: function(contents) {
-    	var loadingMask = this.innerContainer.down('.loading');
+    	var loadingMask = this.getInnerContainer().down('.loading');
     	if (loadingMask) loadingMask.destroy();
-    	var inserted = this.innerContainer.first().insertHtml(this.getInsertWhere(), contents, true); // return Element, not dom
+    	var inserted = this.getInnerContainer().first().insertHtml(this.getInsertWhere(), contents, true); // return Element, not dom
     	if (inserted && this.getScrollIntoView()) {
     		inserted.dom.scrollIntoView(); // use dom
     		// we can't rely on the returned element because it can be a transient fly element, but the id is right in a deferred call

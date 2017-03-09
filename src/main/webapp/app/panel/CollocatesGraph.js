@@ -20,17 +20,19 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	node: undefined,
     	link: undefined,
     	
-    	nodeDataSet: new vis.DataSet(),
-    	edgeDataSet: new vis.DataSet(),
+    	nodeDataSet: undefined,
+    	edgeDataSet: undefined,
     	network: undefined,
     	contextMenu: undefined,
     	
     	force: undefined,
     	graphHeight: undefined,
     	graphWidth: undefined,
-    	corpusColours: d3.scale.category10(),
+    	corpusColours: d3.scale.category10(), // TODO unused
     	
-    	graphMode: this.DEFAULT_MODE
+    	graphMode: undefined,
+    	
+    	stabilizationTask: undefined // stop simulation if it's run for too long
     },
 
     DEFAULT_MODE: 0,
@@ -120,7 +122,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	},
 	
 	stablizationMaxTime: 5000, // milliseconds that stabilization should run for
-	stabilizationTask: undefined, // stop simulation if it's run for too long
 	
 	keywordColor: 'green',
 	contextColor: 'maroon',
@@ -130,7 +131,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 
-    	this.stabilizationTask = Ext.TaskManager.newTask({
+    	this.setNodeDataSet(new vis.DataSet());
+    	this.setEdgeDataSet(new vis.DataSet());
+    	
+    	this.setGraphMode(this.DEFAULT_MODE);
+    	
+    	this.setStabilizationTask(Ext.TaskManager.newTask({
     		run: function() {
     			this.getNetwork().stopSimulation();
     		},
@@ -138,7 +144,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		interval: this.stablizationMaxTime,
     		repeat: 1,
     		fireOnStart: false
-    	});
+    	}));
     	
     },
     
@@ -459,17 +465,17 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		this.setApiParam('limit', limit);
     },
     
-    setGraphMode: function(mode) {
-    	this.graphMode = mode === undefined ? this.DEFAULT_MODE : mode;
+    applyGraphMode: function(mode) {
+    	mode = mode === undefined ? this.DEFAULT_MODE : mode;
     	var network = this.getNetwork();
     	if (network !== undefined) {
-	    	if (this.graphMode === this.DEFAULT_MODE) {
+	    	if (mode === this.DEFAULT_MODE) {
 	    		network.setOptions({
 	    			physics: this.physicsOptions.defaultPhysics,
 	    			nodes: this.nodeOptions.defaultNode,
 	    			edges: this.edgeOptions.defaultEdge
 	    		});
-	    	} else if (this.graphMode === this.CENTRALIZED_MODE) {
+	    	} else if (mode === this.CENTRALIZED_MODE) {
 	    		network.setOptions({
 	    			physics: this.physicsOptions.centralizedPhysics,
 	    			nodes: this.nodeOptions.centralizedNode,
@@ -477,6 +483,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    		});
 	    	}
     	}
+    	
+    	return mode;
     },
     
     initGraph: function() {
@@ -597,11 +605,11 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    	}.bind(this));
 	    	
 	    	network.on('startStabilizing', function() {
-	    		this.stabilizationTask.restart();
+	    		this.getStabilizationTask().restart();
 	    	}.bind(this));
 	    	
 	    	network.on('stabilized', function() {
-	    		this.stabilizationTask.stop();
+	    		this.getStabilizationTask().stop();
 	    		this.getNetwork().fit({
 	    			animation: {
 	    				duration: 500,

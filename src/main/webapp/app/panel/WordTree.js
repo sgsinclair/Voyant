@@ -20,11 +20,11 @@ Ext.define('Voyant.panel.WordTree', {
     	tree: undefined,
     	kwicStore: undefined,
     	options: {xtype: 'stoplistoption'},
-    	numBranches: 5
+    	numBranches: 5,
+    	lastClick: 1
     },
     
     doubleClickDelay: 300,
-    lastClick: 1,
     
     constructor: function(config) {
         this.callParent(arguments);
@@ -295,8 +295,8 @@ Ext.define('Voyant.panel.WordTree', {
     
     clickHandler: function(node) {
     	var now = new Date().getTime();
-    	if (this.lastClick && now-this.lastClick<this.doubleClickDelay) {
-    		this.lastClick=1;
+    	if (this.getLastClick() && now-this.getLastClick()<this.doubleClickDelay) {
+    		this.setLastClick(1);
     		var terms = [], parent = node;
         	while (parent != null) {
         		terms.push(parent.name);
@@ -304,7 +304,7 @@ Ext.define('Voyant.panel.WordTree', {
         	}
         	this.getApplication().dispatchEvent('termsClicked', this, [terms.reverse().join(" ")]);
     	} else {
-    		this.lastClick = now;
+    		this.setLastClick(now);
     	}
     },
     

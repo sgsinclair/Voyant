@@ -32,6 +32,8 @@ Ext.define('Voyant.panel.Knots', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
+		knots: undefined,
+		termStore: undefined,
 		docTermStore: undefined,
 		tokensStore: undefined,
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
@@ -41,30 +43,25 @@ Ext.define('Voyant.panel.Knots', {
     	currentTerm: undefined
 	},
 	
-    knots: null,
-	
 	termTpl: new Ext.XTemplate(
 		'<tpl for=".">',
 			'<div class="term" style="color: rgb({color});float: left;padding: 3px;margin: 2px;">{term}</div>',
 		'</tpl>'
 	),
-	termStore: new Ext.data.ArrayStore({
-        fields: ['term', 'color']
-    }),
 	
     constructor: function() {
-    	var rurl = this.getBaseUrl()+"resources/knots/";
-    	Ext.apply(this, {
-    		title: this.localize('title'),
-    		html: "<audio src='"+rurl+"bone-crack.m4a' preload='auto'></audio>"
-    	});
+//    	var rurl = this.getBaseUrl()+"resources/knots/";
+//    	Ext.apply(this, {
+//    		html: "<audio src='"+rurl+"bone-crack.m4a' preload='auto'></audio>"
+//    	});
+    	
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('loadedCorpus', function(src, corpus) {
     		var firstDoc = corpus.getDocument(0);
     		var pDoc = this.processDocument(firstDoc);
-    		this.knots.setCurrentDoc(pDoc);
+    		this.getKnots().setCurrentDoc(pDoc);
     		
     		this.setApiParams({docId: firstDoc.getId()});
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
@@ -97,13 +94,13 @@ Ext.define('Voyant.panel.Knots', {
         	var document = this.getCorpus().getDocument(doc)
         	this.setApiParam('docId', document.getId());
         	
-        	var terms = this.knots.currentDoc.terms;
+        	var terms = this.getKnots().currentDoc.terms;
         	var termsToKeep = [];
         	for (var t in terms) {
         		termsToKeep.push(t);
         	}
         	
-//        	this.termStore.removeAll();
+//        	this.getTermStore().removeAll();
     		this.setApiParams({query: termsToKeep});
     		
     		var limit = termsToKeep.length;
@@ -111,7 +108,7 @@ Ext.define('Voyant.panel.Knots', {
     			limit = 5;
     		}
         	
-        	this.knots.setCurrentDoc(this.processDocument(document));
+        	this.getKnots().setCurrentDoc(this.processDocument(document));
         	
         	this.getDocTermStore().load({params: {
 		    	query: termsToKeep,
@@ -150,6 +147,10 @@ Ext.define('Voyant.panel.Knots', {
     },
     
     initComponent: function() {
+    	this.setTermStore(Ext.create('Ext.data.ArrayStore', {
+	        fields: ['term', 'color']
+	    }));
+    	
     	this.setDocTermStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.DocumentTerm",
     		autoLoad: false,
@@ -182,8 +183,8 @@ Ext.define('Voyant.panel.Knots', {
    	   		    			var term = record.get('term');
    	   		    			termObj[term] = termData;
    	   		    		}, this);
-   	   		    		this.knots.addTerms(termObj);
-   	   		    		this.knots.buildGraph();
+   	   		    		this.getKnots().addTerms(termObj);
+   	   		    		this.getKnots().buildGraph();
    		    		}
    		    		else {
    		    			this.toastInfo({
@@ -225,6 +226,7 @@ Ext.define('Voyant.panel.Knots', {
         }));
     	
     	Ext.apply(this, {
+    		title: this.localize('title'),
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
@@ -236,10 +238,10 @@ Ext.define('Voyant.panel.Knots', {
 	            	glyph: 'xf00d@FontAwesome',
 	            	handler: function() {
 	            		this.down('#termsView').getSelectionModel().deselectAll(true);
-	            		this.termStore.removeAll();
+	            		this.getTermStore().removeAll();
 	            		this.setApiParams({query: null});
-	            		this.knots.removeAllTerms();
-	            		this.knots.drawGraph();
+	            		this.getKnots().removeAllTerms();
+	            		this.getKnots().drawGraph();
 	            	},
 	            	scope: this
 	            },{
@@ -259,7 +261,7 @@ Ext.define('Voyant.panel.Knots', {
 					listeners: {
 						changecomplete: function(slider, newvalue) {
 							this.setRefreshInterval(500-newvalue);
-							if (this.knots) {this.knots.buildGraph();}
+							if (this.getKnots()) {this.getKnots().buildGraph();}
 						},
 						scope: this
 					}
@@ -277,7 +279,7 @@ Ext.define('Voyant.panel.Knots', {
 					listeners: {
 						changecomplete: function(slider, newvalue) {
 							this.setStartAngle(newvalue);
-							if (this.knots) {this.knots.buildGraph();}
+							if (this.getKnots()) {this.getKnots().buildGraph();}
 						},
 						scope: this
 					}
@@ -295,7 +297,7 @@ Ext.define('Voyant.panel.Knots', {
 					listeners: {
 						changecomplete: function(slider, newvalue) {
 							this.setAngleIncrement(newvalue);
-							if (this.knots) {this.knots.buildGraph();}
+							if (this.getKnots()) {this.getKnots().buildGraph();}
 						},
 						scope: this
 					}
@@ -315,8 +317,8 @@ Ext.define('Voyant.panel.Knots', {
 	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
 	                	},
 	                    change: function(cmp, val) {
-	                    	if (this.knots) {
-		                    	this.knots.setAudio(val);
+	                    	if (this.getKnots()) {
+		                    	this.getKnots().setAudio(val);
 	                    	}
 	                    },
 	                    scope: this
@@ -335,7 +337,7 @@ Ext.define('Voyant.panel.Knots', {
 	            	height: 30,
 	            	itemId: 'termsView',
 	            	xtype: 'dataview',
-	            	store: this.termStore,
+	            	store: this.getTermStore(),
 	            	tpl: this.termTpl,
 	            	itemSelector: 'div.term',
 	            	overItemCls: 'over',
@@ -371,8 +373,8 @@ Ext.define('Voyant.panel.Knots', {
 	            				}
 	            			});
 	            			
-	            			this.knots.termsFilter = terms;
-	            			this.knots.drawGraph();
+	            			this.getKnots().termsFilter = terms;
+	            			this.getKnots().drawGraph();
 	            		},
 	            		itemcontextmenu: function(dv, record, el, index, event) {
 	            			event.preventDefault();
@@ -394,12 +396,12 @@ Ext.define('Voyant.panel.Knots', {
 	            					text: this.localize('removeTerm'),
 	            					handler: function() {
 	            						dv.deselect(index);
-	            						var term = this.termStore.getAt(index).get('term');
-	            						this.termStore.removeAt(index);
+	            						var term = this.getTermStore().getAt(index).get('term');
+	            						this.getTermStore().removeAt(index);
 	            						dv.refresh();
 	            						
-	            						this.knots.removeTerm(term);
-	            						this.knots.drawGraph();
+	            						this.getKnots().removeTerm(term);
+	            						this.getKnots().drawGraph();
 	            					},
 	            					scope: this
 	            				}]
@@ -420,19 +422,19 @@ Ext.define('Voyant.panel.Knots', {
 	            listeners: {
 	            	render: function(component) {
 	            		var canvasParent = this.down('#canvasParent');
-	                	this.knots = new Knots({
+	                	this.setKnots(new Knots({
 	                		container: canvasParent,
 	                		clickHandler: this.knotClickHandler.bind(this),
 	                		audio: this.getApiParam("audio")===true ||  this.getApiParam("audio")=="true"
-	                	});
+	                	}));
 	            	},
             		afterlayout: function(container) {
-            			if (this.knots.initialized === false) {
-            				this.knots.initializeCanvas();
+            			if (this.getKnots().initialized === false) {
+            				this.getKnots().initializeCanvas();
             			}
             		},
 	        		resize: function(cnt, width, height) {
-	        			this.knots.doLayout();
+	        			this.getKnots().doLayout();
 	        		},
             		scope: this
             	}
@@ -443,38 +445,38 @@ Ext.define('Voyant.panel.Knots', {
     },
     
     updateRefreshInterval: function(value) {
-    	if (this.knots) {
+    	if (this.getKnots()) {
     		if (value < 50) {
     			value = 50;
-    			this.knots.progressiveDraw = false;
+    			this.getKnots().progressiveDraw = false;
     		} else {
-    			this.knots.progressiveDraw = true;
+    			this.getKnots().progressiveDraw = true;
     		}
-    		this.knots.refreshInterval = value;
-			this.knots.buildGraph(this.knots.drawStep);
+    		this.getKnots().refreshInterval = value;
+			this.getKnots().buildGraph(this.getKnots().drawStep);
     	}
     },
     
     updateStartAngle: function(value) {
-    	if (this.knots) {
-			this.knots.startAngle = value;
-			this.knots.recache();
-			this.knots.buildGraph();
+    	if (this.getKnots()) {
+			this.getKnots().startAngle = value;
+			this.getKnots().recache();
+			this.getKnots().buildGraph();
     	}
     },
     
     updateAngleIncrement: function(value) {
-    	if (this.knots) {
-	    	this.knots.angleIncrement = value;
-			this.knots.recache();
-			this.knots.buildGraph();
+    	if (this.getKnots()) {
+	    	this.getKnots().angleIncrement = value;
+			this.getKnots().recache();
+			this.getKnots().buildGraph();
     	}
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
-    	if (this.knots) { // get rid of existing terms
-    		this.knots.removeAllTerms();
-    		this.termStore.removeAll(true);
+    	if (this.getKnots()) { // get rid of existing terms
+    		this.getKnots().removeAllTerms();
+    		this.getTermStore().removeAll(true);
     	}
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
@@ -568,9 +570,9 @@ Ext.define('Voyant.panel.Knots', {
 		var positions = termRecord.get('positions');
 		if (rawFreq > 0) {
 			var color = this.getApplication().getColorForTerm(term);
-			if (this.termStore.find('term', term) === -1) {
-				this.termStore.loadData([[term, color]], true);
-				var index = this.termStore.find('term', term);
+			if (this.getTermStore().find('term', term) === -1) {
+				this.getTermStore().loadData([[term, color]], true);
+				var index = this.getTermStore().find('term', term);
 				this.down('#termsView').select(index, true); // manually select since the store's load listener isn't triggered
 			}
 			var distributions = termRecord.get('distributions');
