@@ -50,11 +50,6 @@ Ext.define('Voyant.panel.Knots', {
 	),
 	
     constructor: function() {
-//    	var rurl = this.getBaseUrl()+"resources/knots/";
-//    	Ext.apply(this, {
-//    		html: "<audio src='"+rurl+"bone-crack.m4a' preload='auto'></audio>"
-//    	});
-    	
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
