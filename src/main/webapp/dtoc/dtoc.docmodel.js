@@ -151,7 +151,9 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 					text: 'Clear',
 					handler: function() {
 						Ext.getCmp('dtcMarkup').clearSelections();
-						Ext.getCmp('dtcIndex').clearSelections();
+						if (this.getApplication().useIndex) {
+							Ext.getCmp('dtcIndex').clearSelections();
+						}
 						Ext.getCmp('dtcReader').clearHighlights();
 						Ext.getCmp('dtcStats').clearSelections();
 						var tree = Ext.getCmp('dtcToc');

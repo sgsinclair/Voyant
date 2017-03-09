@@ -62,7 +62,8 @@
                         	var json = JSON.parse(response.responseText);
                             var indexText = json['org.voyanttools.trombone.tool.corpus.DtocIndex'].index;
                             
-                            if (indexText.length > 0) {
+                            // FIXME server returns some xml even if there's no index
+                            if (indexText.length > 0 && /target/.test(indexText)) {
 	                            this.useIndex = true;
 	                            
 	                            // remove the index from the count

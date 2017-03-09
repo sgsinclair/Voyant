@@ -101,9 +101,11 @@ Ext.define('Voyant.panel.DToC', {
         				textAlign: 'right'
         			},
         			html: '<div class="headerRow">'+
+        			// TODO if we're using an index, assume it's Regenerations (for now)
+        			(this.getApplication().useIndex ?
         			'<a href="http://inke.ca/" target="_blank"><img src="images/inke_logo_small.png" title="INKE Logo" /></a>'+
         			'<a href="http://cwrc.ca/" target="_blank"><img src="images/cwrc_logo_small.png" title="CWRC Logo" style="margin-left: 8px;" /></a>'+
-        			'<a href="http://www.uap.ualberta.ca/" target="_blank"><img src="images/uap_logo_small.png" title="UAP Logo" style="margin-left: 8px;" /></a>'+
+        			'<a href="http://www.uap.ualberta.ca/" target="_blank"><img src="images/uap_logo_small.png" title="UAP Logo" style="margin-left: 8px;" /></a>':'')+
         			'<a href="http://voyant-tools.org/" target="_blank"><img src="images/voyant_small.png" title="Voyant Logo" style="margin-left: 8px;" /></a>'+
         			'</div>'
         		}]

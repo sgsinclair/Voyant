@@ -207,6 +207,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 			
 			this.body.unmask();
 			
+			// save index
+			this._storeValues('indexids', this.indexIds);
+			
 			// re-select previously selected nodes (why?)
 //			var sm = this.getSelectionModel();
 //			var selNodes = sm.getSelection();
@@ -221,7 +224,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 	loadIndex: function() {
 	    this._maskEl = this.body.mask('Processing Index: 0%', 'loadMask');
 	    
-		this._getIndexXml();
+	    var me = this;
+		var indexId = 'indexids-'+me.getCorpus().getId();
+		this._getStoredValues(indexId);
 	},
 
 	clearSelections: function() {
@@ -347,6 +352,8 @@ Ext.define('Voyant.panel.DToC.Index', {
 					
 //					console.log(JSON.stringify(rootConfig, null, '\t'));
 					this.getRootNode().appendChild(rootConfig.children);
+					
+					this._storeValues('indextree', rootConfig.children);
 					
 					this.getApplication().dispatchEvent('indexProcessed', this);
 				}
@@ -512,6 +519,69 @@ Ext.define('Voyant.panel.DToC.Index', {
 				}
 			}
 		}
+	},
+	
+	_storeValues: function(prefix, values) {
+		var me = this;
+		var storageId = prefix+'-'+me.getCorpus().getId();
+		Ext.Ajax.request({
+    	    url: me.getApplication().getTromboneUrl(),
+    	    params: {
+        		tool: 'resource.StoredResource',
+        		verifyResourceId: storageId
+    	    }
+    	}).then(function(response) {
+    		var json = Ext.util.JSON.decode(response.responseText);
+    		if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
+    			// already exists, do nothing
+    		} else {
+    			var resource = Ext.encode(values);
+    			Ext.Ajax.request({
+    	    	    url: me.getApplication().getTromboneUrl(),
+    	    	    params: {
+    	        		tool: 'resource.StoredResource',
+    	    			storeResource: resource,
+    	    			resourceId: storageId
+    	    	    }
+    	    	}).then(function(response) {
+//    	    		console.log(prefix, 'success');
+    	    	}).otherwise(function(response) {
+//    	    		console.log(prefix, 'failure');
+    	    	});
+    		}
+    	});
+	},
+	
+	_getStoredValues: function(id) {
+		var me = this;
+		return Ext.Ajax.request({
+    	    url: me.getApplication().getTromboneUrl(),
+    	    params: {
+        		tool: 'resource.StoredResource',
+        		verifyResourceId: id
+    	    }
+    	}).then(function(response) {
+    		var json = Ext.util.JSON.decode(response.responseText);
+    		if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
+//    			console.log('getting stored', id);
+	    		Ext.Ajax.request({
+		    	    url: me.getApplication().getTromboneUrl(),
+		    	    params: {
+		        		tool: 'resource.StoredResource',
+		        		retrieveResourceId: id
+		    	    }
+		    	}).then(function(response) {
+		    		var json = Ext.util.JSON.decode(response.responseText);
+	    	    	var value = json.storedResource.resource;
+					me.indexIds = Ext.decode(value);
+					
+					me.getApplication().dispatchEvent('indexProcessed', me);
+		    	});
+    		} else {
+//    			console.log('getting index xml');
+    			me._getIndexXml();
+    		}
+    	});
 	},
 	
 	editNodeLabel: function(node) {

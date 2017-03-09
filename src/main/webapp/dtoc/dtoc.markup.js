@@ -34,11 +34,43 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	},
 	
 	_doLoadTags: function(docId, callback) {
-		this._getDocumentXml(docId, function(xml) {
-			var tagData = this._parseTags(xml, docId, this.curatedTags);
-			this.saveTags(tagData, docId);
-			if (callback) callback();
-		}.bind(this));
+		var me = this;
+		
+		var tagsId = 'tags-'+me.getCorpus().getId()+'-'+docId;
+		
+		Ext.Ajax.request({
+    	    url: me.getApplication().getTromboneUrl(),
+    	    params: {
+        		tool: 'resource.StoredResource',
+        		verifyResourceId: tagsId
+    	    }
+    	}).then(function(response) {
+    		var json = Ext.util.JSON.decode(response.responseText);
+    		if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
+//    			console.log('getting stored', docId);
+	    		Ext.Ajax.request({
+		    	    url: me.getApplication().getTromboneUrl(),
+		    	    params: {
+		        		tool: 'resource.StoredResource',
+		        		retrieveResourceId: tagsId
+		    	    }
+		    	}).then(function(response) {
+		    		var json = Ext.util.JSON.decode(response.responseText);
+	    	    	var value = json.storedResource.resource;
+	    	    	var tags = Ext.decode(value);
+	    	    	me._saveTags(tags, docId);
+	    	    	if (callback) callback();
+	    	    });
+	    	} else {
+//	    		console.log('getting', docId);
+	    		me._getDocumentXml(docId, function(xml) {
+	    			var tagData = me._parseTags(xml, docId, me.curatedTags);
+	    			me._saveTags(tagData, docId);
+	    			me._storeTags(tagData, docId);
+	    			if (callback) callback();
+	    		});
+	    	}
+    	});
 	},
 	
 	updateTagTotals: function(updateSelections) {
@@ -103,7 +135,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		return jsonData;
 	},
 	
-	saveTags: function(data, docId) {
+	_saveTags: function(data, docId) {
 		this.savedTags[docId] = data;
 
 		// add tag freqs to totals
@@ -120,7 +152,39 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 					this.tagTotals[tagName].freq += tagData.length;
 				}
 			}
+		};
+		
+		if (this.getApplication().useIndex) {
+			this._updateProgress(docId);
 		}
+	},
+	
+	_storeTags: function(tags, docId) {
+		
+		var rId = 'tags-'+this.getCorpus().getId()+'-'+docId;
+		
+		var resource = Ext.encode(tags);
+//		console.log('storing', docId, 'length', resource.length);
+		Ext.Ajax.request({
+    	    url: this.getApplication().getTromboneUrl(),
+    	    params: {
+        		tool: 'resource.StoredResource',
+    			storeResource: resource,
+    			resourceId: rId
+    	    }
+    	}).then(function(response) {
+//    		console.log('success', docId);
+    	}).otherwise(function(response) {
+//    		console.log('failure', docId);
+    	});
+	},
+	
+	_updateProgress: function(docId) {
+		var dtcIndex = Ext.getCmp('dtcIndex');
+	    var totalDocs = this.getCorpus().getDocumentsCount();
+	    var docIndex = this.getCorpus().getDocument(docId).getIndex();
+	    var progress = docIndex / totalDocs;
+	    dtcIndex.updateIndexProgress(progress);
 	},
 	
 	showHitsForTags: Ext.emptyFn, // need to override this
@@ -328,6 +392,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			var head = docBody.querySelectorAll('xmlHead').item(0);
 			if (head) {
 			    // special handling for TEI docs
+				// TODO save in stored resource
 				var authors = head.querySelectorAll('author');
 				if (authors.length > 0) {
 	    			var authorsArray = [];
@@ -363,13 +428,6 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			}
 			
 			if (this.getApplication().useIndex) {
-				var dtcIndex = Ext.getCmp('dtcIndex');
-			    
-			    var totalDocs = this.getCorpus().getDocumentsCount();
-			    var docIndex = this.getCorpus().getDocument(docId).getIndex();
-			    var progress = docIndex / totalDocs;
-			    dtcIndex.updateIndexProgress(progress);
-				
 				// find index items
 				var dtcIndex = Ext.getCmp('dtcIndex');
 				var indexIds = dtcIndex.indexIds;
