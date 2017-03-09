@@ -216,7 +216,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         		]
         	}),
 			tbar: new Ext.Toolbar({
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
 				items: {
 					xtype: 'legend',
 					store: new Ext.data.JsonStore({
@@ -251,7 +251,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 				}
 			}),
 			bbar: {
-	            enableOverflow: true,
+                overflowHandler: 'scroller',
 	            items: [{
 	            	xtype: 'querysearchfield'
 	            },{

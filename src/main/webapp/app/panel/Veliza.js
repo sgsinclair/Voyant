@@ -28,7 +28,7 @@ Ext.define('Voyant.panel.Veliza', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
         			xtype: 'textfield',
         			emptyText: this.localize("typeAndEnter"),

@@ -42,7 +42,7 @@ Ext.define('Voyant.panel.StreamGraph', {
         Ext.apply(me, {
     		title: this.localize('title'),
     		tbar: new Ext.Toolbar({
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
 				items: ['->',{
 					xtype: 'legend',
 					store: new Ext.data.JsonStore({
@@ -61,7 +61,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 				},'->']
 			}),
 			bbar: {
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
 				items: [{
                 	xtype: 'querysearchfield'
                 },{

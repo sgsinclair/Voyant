@@ -208,7 +208,7 @@ Ext.define('Voyant.panel.Documents', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: dockedItemsItems
             }]
     	});

@@ -67,7 +67,7 @@ Ext.define('Voyant.panel.TextualArc', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'combo',
                 	itemId: 'search',

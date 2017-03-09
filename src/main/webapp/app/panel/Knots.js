@@ -230,7 +230,7 @@ Ext.define('Voyant.panel.Knots', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'querysearchfield'
                 },{

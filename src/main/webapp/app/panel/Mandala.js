@@ -39,7 +39,7 @@ Ext.define('Voyant.panel.Mandala', {
 			dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	text: this.localize('add'),
         			glyph: 'xf067@FontAwesome',

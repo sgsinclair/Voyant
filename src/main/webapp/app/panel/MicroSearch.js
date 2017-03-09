@@ -44,7 +44,7 @@ Ext.define('Voyant.panel.MicroSearch', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-                enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'querysearchfield'
                 }]

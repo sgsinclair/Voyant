@@ -37,7 +37,7 @@ Ext.define('Voyant.panel.WordTree', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-                enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'querysearchfield'
                 }, this.localize('pool'), {

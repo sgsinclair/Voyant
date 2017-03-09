@@ -57,7 +57,7 @@ Ext.define('Voyant.panel.Summary', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
         			fieldLabel: this.localize('items'),
         			labelWidth: 40,

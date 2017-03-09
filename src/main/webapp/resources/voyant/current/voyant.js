@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Mar 04 21:12:04 EST 2017 */
+/* This file created by JSCacher. Last modified: Thu Mar 09 10:24:49 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8224,6 +8224,12 @@ Ext.define('Voyant.widget.DownloadFileFormat', {
         		}
         	}, this)
         }, this)
+        me.on('beforedestroy', function() {
+        	this.query('checkbox').forEach(function(cmp) {
+        		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+        	}, this);
+        }, this);
+
         me.callParent(arguments);
     }
 });
@@ -8286,6 +8292,7 @@ Ext.define('Voyant.widget.FontFamilyOption', {
     		items: {
     			xtype: 'combo',
     	        queryMode: 'local',
+    	        name: 'fontFamily',
     	        value: value,
     	        triggerAction: 'all',
     	        editable: true,
@@ -8884,7 +8891,7 @@ Ext.define('Voyant.panel.Bubbles', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
 	            	xtype: 'documentselectorbutton',
 	            	singleSelect: true
@@ -8909,6 +8916,9 @@ Ext.define('Voyant.panel.Bubbles', {
 	    		        	});
 	                		
 	                	},
+	                	beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+	                	},
 	                    changecomplete: function(cmp, val) {
 	                    	this.setApiParam('speed', val);
 	                		if (this.bubbles) {this.bubbles.frameRate(val)}
@@ -8927,6 +8937,9 @@ Ext.define('Voyant.panel.Bubbles', {
 	   		                 	text: this.localize('soundTip')
 	    		        	});
 	                		
+	                	},
+	                	beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
 	                	},
 	                    change: function(cmp, val) {
 	                    	this.setApiParam('audio', val);
@@ -9083,39 +9096,22 @@ Ext.define('Voyant.panel.Bubblelines', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
+		bubblelines: undefined,
+		termStore: undefined,
 		docTermStore: undefined,
 		docStore: undefined,
+		selectedDocs: undefined,
+		processedDocs: undefined,
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
 	},
-	
-	selectedDocs: undefined,
-	processedDocs: new Ext.util.MixedCollection(),
-	
-	bubblelines: null, // the viz itself
 	
 	termTpl: new Ext.XTemplate(
 		'<tpl for=".">',
 			'<div class="term" style="color: rgb({color});float: left;padding: 3px;margin: 2px;">{term}</div>',
 		'</tpl>'
 	),
-	termStore: new Ext.data.ArrayStore({
-        fields: ['term', 'color'],
-        listeners: {
-        	load: function(store, records, successful, options) {
-        		var termsView = this.down('#termsView');
-        		for (var i = 0; i < records.length; i++) {
-        			var r = records[i];
-        			termsView.select(r, true);
-        		}
-        	},
-        	scope: this
-        } 
-    }),
     
     constructor: function() {
-    	Ext.apply(this, {
-    		title: this.localize('title')
-    	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
@@ -9141,10 +9137,10 @@ Ext.define('Voyant.panel.Bubblelines', {
         
         this.on('documentsSelected', function(src, docIds) {
         	this.setApiParam('docId', docIds);
-        	this.bubblelines.cache.each(function(d) {
+        	this.getBubblelines().cache.each(function(d) {
         		d.hidden = docIds.indexOf(d.id) === -1;
         	});
-        	this.bubblelines.drawGraph();
+        	this.getBubblelines().drawGraph();
         }, this);
     	
     	this.on('termsClicked', function(src, terms) {
@@ -9171,7 +9167,21 @@ Ext.define('Voyant.panel.Bubblelines', {
     },
     
     initComponent: function() {
-    	var docStore = Ext.create("Ext.data.Store", {
+    	this.setTermStore(Ext.create('Ext.data.ArrayStore', {
+            fields: ['term', 'color'],
+            listeners: {
+            	load: function(store, records, successful, options) {
+            		var termsView = this.down('#termsView');
+            		for (var i = 0; i < records.length; i++) {
+            			var r = records[i];
+            			termsView.select(r, true);
+            		}
+            	},
+            	scope: this
+            }
+        }));
+    	
+    	this.setDocStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.Document",
     		autoLoad: false,
     		remoteSort: false,
@@ -9191,18 +9201,17 @@ Ext.define('Voyant.panel.Bubblelines', {
    		     listeners: {
    		    	load: function(store, records, successful, options) {
    					this.processDocuments(records);
-   					this.processedDocs.each(function(doc) {
-   						this.bubblelines.addDocToCache(doc);
+   					this.getProcessedDocs().each(function(doc) {
+   						this.getBubblelines().addDocToCache(doc);
    					}, this);
    					// get the top 5 corpus terms
    					this.loadFromCorpusTerms(this.getCorpus().getCorpusTerms({autoload: false}));
    				},
    				scope: this
    		     }
-    	});
-    	this.setDocStore(docStore);
+    	}));
     	
-    	var docTermStore = Ext.create("Ext.data.Store", {
+    	this.setDocTermStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.DocumentTerm",
 			asynchronousLoad: false,
     		autoLoad: false,
@@ -9230,9 +9239,9 @@ Ext.define('Voyant.panel.Bubblelines', {
    		    			var term = record.get('term');
    		    			var termObj = {};
    		    			termObj[term] = termData;
-   		    			this.bubblelines.addTermsToDoc(termObj, docId);
+   		    			this.getBubblelines().addTermsToDoc(termObj, docId);
    		    		}, this);
-   		    		this.bubblelines.doBubblelinesLayout();
+   		    		this.getBubblelines().doBubblelinesLayout();
 
 //   					this.processDocuments();
 //   					if (this.maxFreqChanged) {
@@ -9240,19 +9249,21 @@ Ext.define('Voyant.panel.Bubblelines', {
 //   					} else {
 //   						this.calculateBubbleRadii(options.params.type);
 //   					}
-//   					this.bubblelines.setCanvasHeight();
-//   					this.bubblelines.drawGraph();
+//   					this.getBubblelines().setCanvasHeight();
+//   					this.getBubblelines().drawGraph();
    				},
    				scope: this
    		     }
-    	});
-    	this.setDocTermStore(docTermStore);
+    	}));
+    	
+    	this.setProcessedDocs(new Ext.util.MixedCollection());
     	
     	Ext.apply(this, {
+    		title: this.localize('title'),
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-                enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'querysearchfield'
                 },{
@@ -9260,10 +9271,10 @@ Ext.define('Voyant.panel.Bubblelines', {
 					glyph: 'xf014@FontAwesome',
 	            	handler: function() {
 	            		this.down('#termsView').getSelectionModel().deselectAll(true);
-	            		this.termStore.removeAll();
+	            		this.getTermStore().removeAll();
 	            		this.setApiParams({query: null});
-	            		this.bubblelines.removeAllTerms();
-	            		this.bubblelines.drawGraph();
+	            		this.getBubblelines().removeAllTerms();
+	            		this.getBubblelines().drawGraph();
 	            	},
 	            	scope: this                			
         		},{
@@ -9281,7 +9292,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	listeners: {
 	            		changecomplete: function(slider, newvalue) {
 	            			this.setApiParams({bins: newvalue});
-	            			this.bubblelines.bubbleSpacing = newvalue;
+	            			this.getBubblelines().bubbleSpacing = newvalue;
 	            			this.reloadTermsData();
 	            		},
 	            		scope: this
@@ -9292,10 +9303,10 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	boxLabelAlign: 'before',
 	            	checked: false,
 	            	handler: function(checkbox, checked) {
-	            		this.bubblelines.SEPARATE_LINES_FOR_TERMS = checked;
-	            		this.bubblelines.lastClickedBubbles = {};
-	            		this.bubblelines.setCanvasHeight();
-	    				this.bubblelines.drawGraph();
+	            		this.getBubblelines().SEPARATE_LINES_FOR_TERMS = checked;
+	            		this.getBubblelines().lastClickedBubbles = {};
+	            		this.getBubblelines().setCanvasHeight();
+	    				this.getBubblelines().drawGraph();
 	            	},
 	            	scope: this
 	            	
@@ -9313,7 +9324,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            	height: 30,
 	            	itemId: 'termsView',
 	            	xtype: 'dataview',
-	            	store: this.termStore,
+	            	store: this.getTermStore(),
 	            	tpl: this.termTpl,
 	            	itemSelector: 'div.term',
 	            	overItemCls: 'over',
@@ -9349,18 +9360,18 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            				}
 	            			});
 	            			
-	            			for (var index in this.bubblelines.lastClickedBubbles) {
-	            				var lcTerms = this.bubblelines.lastClickedBubbles[index];
+	            			for (var index in this.getBubblelines().lastClickedBubbles) {
+	            				var lcTerms = this.getBubblelines().lastClickedBubbles[index];
 	            				for (var term in lcTerms) {
 	            					if (terms.indexOf(term) == -1) {
-	            						delete this.bubblelines.lastClickedBubbles[index][term];
+	            						delete this.getBubblelines().lastClickedBubbles[index][term];
 	            					}
 	            				}
 	            				
 	            			}
-	            			this.bubblelines.termsFilter = terms;
-	            			this.bubblelines.setCanvasHeight();
-	            			this.bubblelines.drawGraph();
+	            			this.getBubblelines().termsFilter = terms;
+	            			this.getBubblelines().setCanvasHeight();
+	            			this.getBubblelines().drawGraph();
 	            		},
 	            		itemcontextmenu: function(dv, record, el, index, event) {
 	            			event.preventDefault();
@@ -9382,13 +9393,13 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            					text: this.localize('removeTerm'),
 	            					handler: function() {
 	            						dv.deselect(index);
-	            						var term = this.termStore.getAt(index).get('term');
-	            						this.termStore.removeAt(index);
+	            						var term = this.getTermStore().getAt(index).get('term');
+	            						this.getTermStore().removeAt(index);
 	            						dv.refresh();
 	            						
-	            						this.bubblelines.removeTerm(term);
-	            						this.bubblelines.setCanvasHeight();
-	            						this.bubblelines.drawGraph();
+	            						this.getBubblelines().removeTerm(term);
+	            						this.getBubblelines().setCanvasHeight();
+	            						this.getBubblelines().drawGraph();
 	            					},
 	            					scope: this
 	            				}]
@@ -9409,19 +9420,19 @@ Ext.define('Voyant.panel.Bubblelines', {
 	            listeners: {
 	            	render: function(component) {
 	            		var canvasParent = this.down('#canvasParent');
-	                	this.bubblelines = new Bubblelines({
+	                	this.setBubblelines(new Bubblelines({
 	                		container: canvasParent,
 	                		clickHandler: this.bubbleClickHandler.bind(this)
-	                	});
-	                	this.bubblelines.bubbleSpacing = parseInt(this.getApiParam('bins'));
+	                	}));
+	                	this.getBubblelines().bubbleSpacing = parseInt(this.getApiParam('bins'));
 	            	},
             		afterlayout: function(container) {
-            			if (this.bubblelines.initialized === false) {
-            				this.bubblelines.initializeCanvas();
+            			if (this.getBubblelines().initialized === false) {
+            				this.getBubblelines().initializeCanvas();
             			}
             		},
 	        		resize: function(cnt, width, height) {
-	        			this.bubblelines.doBubblelinesLayout();
+	        			this.getBubblelines().doBubblelinesLayout();
 	        		},
             		scope: this
             	}
@@ -9432,9 +9443,9 @@ Ext.define('Voyant.panel.Bubblelines', {
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
-    	if (this.bubblelines) { // get rid of existing terms
-    		this.bubblelines.removeAllTerms();
-    		this.termStore.removeAll(true);
+    	if (this.getBubblelines()) { // get rid of existing terms
+    		this.getBubblelines().removeAllTerms();
+    		this.getTermStore().removeAll(true);
     	}
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
@@ -9476,7 +9487,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     
 	reloadTermsData: function() {
 		var terms = [];
-		for (var term in this.bubblelines.currentTerms) {
+		for (var term in this.getBubblelines().currentTerms) {
 			terms.push(term);
 		}
 		this.getDocTermsFromQuery(terms);
@@ -9494,22 +9505,22 @@ Ext.define('Voyant.panel.Bubblelines', {
 		if (typeof docIds == 'string') docIds = [docIds];
 		
 		if (docIds == null) {
-			this.selectedDocs = this.getCorpus().getDocuments().clone();
-			var count = this.selectedDocs.getCount();
+			this.setSelectedDocs(this.getCorpus().getDocuments().clone());
+			var count = this.getSelectedDocs().getCount();
 			if (count > 10) {
 				for (var i = 10; i < count; i++) {
-					this.selectedDocs.removeAt(10);
+					this.getSelectedDocs().removeAt(10);
 				}
 			}
 			docIds = [];
-			this.selectedDocs.eachKey(function(docId, doc) {
+			this.getSelectedDocs().eachKey(function(docId, doc) {
 				docIds.push(docId);
 			}, this);
 			this.setApiParams({docId: docIds});
 		} else {
-			this.selectedDocs = this.getCorpus().getDocuments().filterBy(function(doc, docId) {
+			this.setSelectedDocs(this.getCorpus().getDocuments().filterBy(function(doc, docId) {
 				return docIds.indexOf(docId) != -1;
-			}, this);
+			}, this));
 		}
 	},
 	
@@ -9520,13 +9531,13 @@ Ext.define('Voyant.panel.Bubblelines', {
 	// produce format that bubblelines can use
 	processDocument: function(doc) {
 		var docId = doc.getId();
-		if (!this.processedDocs.containsKey(docId)) {
+		if (!this.getProcessedDocs().containsKey(docId)) {
 			var title = doc.getShortTitle();
 			title = title.replace('&hellip;', '...');
 			var index = doc.get('index');
 			var totalTokens = doc.get('tokensCount-lexical');
 		
-			this.processedDocs.add(docId, {
+			this.getProcessedDocs().add(docId, {
 				id: docId,
 				index: index,
 				title: title,
@@ -9543,9 +9554,9 @@ Ext.define('Voyant.panel.Bubblelines', {
 		var positions = termRecord.get('positions');
 		if (rawFreq > 0) {
 			var color = this.getApplication().getColorForTerm(term);
-			if (this.termStore.find('term', term) === -1) {
-				this.termStore.loadData([[term, color]], true);
-				var index = this.termStore.find('term', term);
+			if (this.getTermStore().find('term', term) === -1) {
+				this.getTermStore().loadData([[term, color]], true);
+				var index = this.getTermStore().find('term', term);
 				this.down('#termsView').select(index, true); // manually select since the store's load listener isn't triggered
 			}
 			var distributions = termRecord.get('distributions');
@@ -10165,7 +10176,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
         			xtype: 'corpusdocumentselector',
         			singleSelect: true
@@ -10601,17 +10612,19 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	node: undefined,
     	link: undefined,
     	
-    	nodeDataSet: new vis.DataSet(),
-    	edgeDataSet: new vis.DataSet(),
+    	nodeDataSet: undefined,
+    	edgeDataSet: undefined,
     	network: undefined,
     	contextMenu: undefined,
     	
     	force: undefined,
     	graphHeight: undefined,
     	graphWidth: undefined,
-    	corpusColours: d3.scale.category10(),
+    	corpusColours: d3.scale.category10(), // TODO unused
     	
-    	graphMode: this.DEFAULT_MODE
+    	graphMode: undefined,
+    	
+    	stabilizationTask: undefined // stop simulation if it's run for too long
     },
 
     DEFAULT_MODE: 0,
@@ -10701,7 +10714,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	},
 	
 	stablizationMaxTime: 5000, // milliseconds that stabilization should run for
-	stabilizationTask: undefined, // stop simulation if it's run for too long
 	
 	keywordColor: 'green',
 	contextColor: 'maroon',
@@ -10711,7 +10723,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 
-    	this.stabilizationTask = Ext.TaskManager.newTask({
+    	this.setNodeDataSet(new vis.DataSet());
+    	this.setEdgeDataSet(new vis.DataSet());
+    	
+    	this.setGraphMode(this.DEFAULT_MODE);
+    	
+    	this.setStabilizationTask(Ext.TaskManager.newTask({
     		run: function() {
     			this.getNetwork().stopSimulation();
     		},
@@ -10719,7 +10736,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		interval: this.stablizationMaxTime,
     		repeat: 1,
     		fireOnStart: false
-    	});
+    	}));
     	
     },
     
@@ -10732,7 +10749,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                    xtype: 'querysearchfield'
                 },{
@@ -11040,17 +11057,17 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		this.setApiParam('limit', limit);
     },
     
-    setGraphMode: function(mode) {
-    	this.graphMode = mode === undefined ? this.DEFAULT_MODE : mode;
+    applyGraphMode: function(mode) {
+    	mode = mode === undefined ? this.DEFAULT_MODE : mode;
     	var network = this.getNetwork();
     	if (network !== undefined) {
-	    	if (this.graphMode === this.DEFAULT_MODE) {
+	    	if (mode === this.DEFAULT_MODE) {
 	    		network.setOptions({
 	    			physics: this.physicsOptions.defaultPhysics,
 	    			nodes: this.nodeOptions.defaultNode,
 	    			edges: this.edgeOptions.defaultEdge
 	    		});
-	    	} else if (this.graphMode === this.CENTRALIZED_MODE) {
+	    	} else if (mode === this.CENTRALIZED_MODE) {
 	    		network.setOptions({
 	    			physics: this.physicsOptions.centralizedPhysics,
 	    			nodes: this.nodeOptions.centralizedNode,
@@ -11058,6 +11075,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    		});
 	    	}
     	}
+    	
+    	return mode;
     },
     
     initGraph: function() {
@@ -11178,11 +11197,11 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    	}.bind(this));
 	    	
 	    	network.on('startStabilizing', function() {
-	    		this.stabilizationTask.restart();
+	    		this.getStabilizationTask().restart();
 	    	}.bind(this));
 	    	
 	    	network.on('stabilized', function() {
-	    		this.stabilizationTask.stop();
+	    		this.getStabilizationTask().stop();
 	    		this.getNetwork().fit({
 	    			animation: {
 	    				duration: 500,
@@ -11298,7 +11317,7 @@ Ext.define('Voyant.panel.Contexts', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
@@ -11687,7 +11706,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
@@ -11846,7 +11865,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		},
 	    	dockedItems: [{
 	    		xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 dock: 'bottom',
     	    	buttonAlign: 'right',
 //    	    	defaultButtonUI : 'default',
@@ -11923,6 +11942,9 @@ Ext.define('Voyant.panel.CorpusCreator', {
        		                 text: me.localize('UploadLocal')
        		             	});
         	            },
+        	            beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+	                	},
         	            change: function(filefield, value) {
         	            	if (value) {
             	            	var form = filefield.up('form').getForm();
@@ -12340,6 +12362,8 @@ Ext.define('Voyant.panel.Knots', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
+		knots: undefined,
+		termStore: undefined,
 		docTermStore: undefined,
 		tokensStore: undefined,
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
@@ -12349,30 +12373,25 @@ Ext.define('Voyant.panel.Knots', {
     	currentTerm: undefined
 	},
 	
-    knots: null,
-	
 	termTpl: new Ext.XTemplate(
 		'<tpl for=".">',
 			'<div class="term" style="color: rgb({color});float: left;padding: 3px;margin: 2px;">{term}</div>',
 		'</tpl>'
 	),
-	termStore: new Ext.data.ArrayStore({
-        fields: ['term', 'color']
-    }),
 	
     constructor: function() {
-    	var rurl = this.getBaseUrl()+"resources/knots/";
-    	Ext.apply(this, {
-    		title: this.localize('title'),
-    		html: "<audio src='"+rurl+"bone-crack.m4a' preload='auto'></audio>"
-    	});
+//    	var rurl = this.getBaseUrl()+"resources/knots/";
+//    	Ext.apply(this, {
+//    		html: "<audio src='"+rurl+"bone-crack.m4a' preload='auto'></audio>"
+//    	});
+    	
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('loadedCorpus', function(src, corpus) {
     		var firstDoc = corpus.getDocument(0);
     		var pDoc = this.processDocument(firstDoc);
-    		this.knots.setCurrentDoc(pDoc);
+    		this.getKnots().setCurrentDoc(pDoc);
     		
     		this.setApiParams({docId: firstDoc.getId()});
     		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
@@ -12405,13 +12424,13 @@ Ext.define('Voyant.panel.Knots', {
         	var document = this.getCorpus().getDocument(doc)
         	this.setApiParam('docId', document.getId());
         	
-        	var terms = this.knots.currentDoc.terms;
+        	var terms = this.getKnots().currentDoc.terms;
         	var termsToKeep = [];
         	for (var t in terms) {
         		termsToKeep.push(t);
         	}
         	
-//        	this.termStore.removeAll();
+//        	this.getTermStore().removeAll();
     		this.setApiParams({query: termsToKeep});
     		
     		var limit = termsToKeep.length;
@@ -12419,7 +12438,7 @@ Ext.define('Voyant.panel.Knots', {
     			limit = 5;
     		}
         	
-        	this.knots.setCurrentDoc(this.processDocument(document));
+        	this.getKnots().setCurrentDoc(this.processDocument(document));
         	
         	this.getDocTermStore().load({params: {
 		    	query: termsToKeep,
@@ -12458,6 +12477,10 @@ Ext.define('Voyant.panel.Knots', {
     },
     
     initComponent: function() {
+    	this.setTermStore(Ext.create('Ext.data.ArrayStore', {
+	        fields: ['term', 'color']
+	    }));
+    	
     	this.setDocTermStore(Ext.create("Ext.data.Store", {
 			model: "Voyant.data.model.DocumentTerm",
     		autoLoad: false,
@@ -12490,8 +12513,8 @@ Ext.define('Voyant.panel.Knots', {
    	   		    			var term = record.get('term');
    	   		    			termObj[term] = termData;
    	   		    		}, this);
-   	   		    		this.knots.addTerms(termObj);
-   	   		    		this.knots.buildGraph();
+   	   		    		this.getKnots().addTerms(termObj);
+   	   		    		this.getKnots().buildGraph();
    		    		}
    		    		else {
    		    			this.toastInfo({
@@ -12533,10 +12556,11 @@ Ext.define('Voyant.panel.Knots', {
         }));
     	
     	Ext.apply(this, {
+    		title: this.localize('title'),
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'querysearchfield'
                 },{
@@ -12544,10 +12568,10 @@ Ext.define('Voyant.panel.Knots', {
 	            	glyph: 'xf00d@FontAwesome',
 	            	handler: function() {
 	            		this.down('#termsView').getSelectionModel().deselectAll(true);
-	            		this.termStore.removeAll();
+	            		this.getTermStore().removeAll();
 	            		this.setApiParams({query: null});
-	            		this.knots.removeAllTerms();
-	            		this.knots.drawGraph();
+	            		this.getKnots().removeAllTerms();
+	            		this.getKnots().drawGraph();
 	            	},
 	            	scope: this
 	            },{
@@ -12567,7 +12591,7 @@ Ext.define('Voyant.panel.Knots', {
 					listeners: {
 						changecomplete: function(slider, newvalue) {
 							this.setRefreshInterval(500-newvalue);
-							if (this.knots) {this.knots.buildGraph();}
+							if (this.getKnots()) {this.getKnots().buildGraph();}
 						},
 						scope: this
 					}
@@ -12585,7 +12609,7 @@ Ext.define('Voyant.panel.Knots', {
 					listeners: {
 						changecomplete: function(slider, newvalue) {
 							this.setStartAngle(newvalue);
-							if (this.knots) {this.knots.buildGraph();}
+							if (this.getKnots()) {this.getKnots().buildGraph();}
 						},
 						scope: this
 					}
@@ -12603,7 +12627,7 @@ Ext.define('Voyant.panel.Knots', {
 					listeners: {
 						changecomplete: function(slider, newvalue) {
 							this.setAngleIncrement(newvalue);
-							if (this.knots) {this.knots.buildGraph();}
+							if (this.getKnots()) {this.getKnots().buildGraph();}
 						},
 						scope: this
 					}
@@ -12619,9 +12643,12 @@ Ext.define('Voyant.panel.Knots', {
 	    		        	});
 	                		
 	                	},
+	                	beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+	                	},
 	                    change: function(cmp, val) {
-	                    	if (this.knots) {
-		                    	this.knots.setAudio(val);
+	                    	if (this.getKnots()) {
+		                    	this.getKnots().setAudio(val);
 	                    	}
 	                    },
 	                    scope: this
@@ -12640,7 +12667,7 @@ Ext.define('Voyant.panel.Knots', {
 	            	height: 30,
 	            	itemId: 'termsView',
 	            	xtype: 'dataview',
-	            	store: this.termStore,
+	            	store: this.getTermStore(),
 	            	tpl: this.termTpl,
 	            	itemSelector: 'div.term',
 	            	overItemCls: 'over',
@@ -12676,8 +12703,8 @@ Ext.define('Voyant.panel.Knots', {
 	            				}
 	            			});
 	            			
-	            			this.knots.termsFilter = terms;
-	            			this.knots.drawGraph();
+	            			this.getKnots().termsFilter = terms;
+	            			this.getKnots().drawGraph();
 	            		},
 	            		itemcontextmenu: function(dv, record, el, index, event) {
 	            			event.preventDefault();
@@ -12699,12 +12726,12 @@ Ext.define('Voyant.panel.Knots', {
 	            					text: this.localize('removeTerm'),
 	            					handler: function() {
 	            						dv.deselect(index);
-	            						var term = this.termStore.getAt(index).get('term');
-	            						this.termStore.removeAt(index);
+	            						var term = this.getTermStore().getAt(index).get('term');
+	            						this.getTermStore().removeAt(index);
 	            						dv.refresh();
 	            						
-	            						this.knots.removeTerm(term);
-	            						this.knots.drawGraph();
+	            						this.getKnots().removeTerm(term);
+	            						this.getKnots().drawGraph();
 	            					},
 	            					scope: this
 	            				}]
@@ -12725,19 +12752,19 @@ Ext.define('Voyant.panel.Knots', {
 	            listeners: {
 	            	render: function(component) {
 	            		var canvasParent = this.down('#canvasParent');
-	                	this.knots = new Knots({
+	                	this.setKnots(new Knots({
 	                		container: canvasParent,
 	                		clickHandler: this.knotClickHandler.bind(this),
 	                		audio: this.getApiParam("audio")===true ||  this.getApiParam("audio")=="true"
-	                	});
+	                	}));
 	            	},
             		afterlayout: function(container) {
-            			if (this.knots.initialized === false) {
-            				this.knots.initializeCanvas();
+            			if (this.getKnots().initialized === false) {
+            				this.getKnots().initializeCanvas();
             			}
             		},
 	        		resize: function(cnt, width, height) {
-	        			this.knots.doLayout();
+	        			this.getKnots().doLayout();
 	        		},
             		scope: this
             	}
@@ -12748,38 +12775,38 @@ Ext.define('Voyant.panel.Knots', {
     },
     
     updateRefreshInterval: function(value) {
-    	if (this.knots) {
+    	if (this.getKnots()) {
     		if (value < 50) {
     			value = 50;
-    			this.knots.progressiveDraw = false;
+    			this.getKnots().progressiveDraw = false;
     		} else {
-    			this.knots.progressiveDraw = true;
+    			this.getKnots().progressiveDraw = true;
     		}
-    		this.knots.refreshInterval = value;
-			this.knots.buildGraph(this.knots.drawStep);
+    		this.getKnots().refreshInterval = value;
+			this.getKnots().buildGraph(this.getKnots().drawStep);
     	}
     },
     
     updateStartAngle: function(value) {
-    	if (this.knots) {
-			this.knots.startAngle = value;
-			this.knots.recache();
-			this.knots.buildGraph();
+    	if (this.getKnots()) {
+			this.getKnots().startAngle = value;
+			this.getKnots().recache();
+			this.getKnots().buildGraph();
     	}
     },
     
     updateAngleIncrement: function(value) {
-    	if (this.knots) {
-	    	this.knots.angleIncrement = value;
-			this.knots.recache();
-			this.knots.buildGraph();
+    	if (this.getKnots()) {
+	    	this.getKnots().angleIncrement = value;
+			this.getKnots().recache();
+			this.getKnots().buildGraph();
     	}
     },
     
     loadFromCorpusTerms: function(corpusTerms) {
-    	if (this.knots) { // get rid of existing terms
-    		this.knots.removeAllTerms();
-    		this.termStore.removeAll(true);
+    	if (this.getKnots()) { // get rid of existing terms
+    		this.getKnots().removeAllTerms();
+    		this.getTermStore().removeAll(true);
     	}
 		corpusTerms.load({
 		    callback: function(records, operation, success) {
@@ -12873,9 +12900,9 @@ Ext.define('Voyant.panel.Knots', {
 		var positions = termRecord.get('positions');
 		if (rawFreq > 0) {
 			var color = this.getApplication().getColorForTerm(term);
-			if (this.termStore.find('term', term) === -1) {
-				this.termStore.loadData([[term, color]], true);
-				var index = this.termStore.find('term', term);
+			if (this.getTermStore().find('term', term) === -1) {
+				this.getTermStore().loadData([[term, color]], true);
+				var index = this.getTermStore().find('term', term);
 				this.down('#termsView').select(index, true); // manually select since the store's load listener isn't triggered
 			}
 			var distributions = termRecord.get('distributions');
@@ -13013,7 +13040,7 @@ Ext.define('Voyant.panel.Phrases', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
@@ -13232,7 +13259,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
@@ -13448,7 +13475,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                     xtype: 'querysearchfield'
                 }, {
@@ -13754,7 +13781,7 @@ Ext.define('Voyant.panel.Documents', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: dockedItemsItems
             }]
     	});
@@ -14391,7 +14418,7 @@ Ext.define('Voyant.panel.RezoViz', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                     xtype: 'combo',
                     queryMode: 'local',
@@ -14750,7 +14777,7 @@ Ext.define('Voyant.panel.MicroSearch', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-                enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'querysearchfield'
                 }]
@@ -14945,7 +14972,7 @@ Ext.define('Voyant.panel.Mandala', {
 			dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	text: this.localize('add'),
         			glyph: 'xf067@FontAwesome',
@@ -14973,6 +15000,9 @@ Ext.define('Voyant.panel.Mandala', {
 	   		                 	text: this.localize('labelsTip')
 	    		        	});
 	                		
+	                	},
+	                	beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
 	                	},
 	                    change: function(cmp, val) {
 	                    	this.setApiParam('labels', val);
@@ -15383,6 +15413,7 @@ Ext.define('Voyant.panel.Reader', {
     	glyph: 'xf0f6@FontAwesome'
 	},
     config: {
+    	innerContainer: undefined,
     	tokensStore: undefined,
     	documentsStore: undefined,
     	documentTermsStore: undefined,
@@ -15396,38 +15427,7 @@ Ext.define('Voyant.panel.Reader', {
     
     INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling
     
-    innerContainer: null, // set after render
-    
-    cls: 'voyant-reader',
-    
-    layout: 'fit',
-    
-    items: {
-    	layout: 'border',
-    	items: [{
-	    	bodyPadding: 10,
-	    	region: 'center',
-	    	border: false,
-	    	autoScroll: true,
-	    	html: '<div class="readerContainer"></div>'
-	    },{
-	    	region: 'south',
-	    	height: 40,
-	    	split: {
-	    		size: 2
-	    	},
-	    	splitterResize: true,
-	    	border: false,
-	    	layout: {
-	    		type: 'hbox'
-	    	}
-	    }]
-    },
-    
     constructor: function() {
-    	Ext.apply(this, {
-    		title: this.localize('title')
-    	});
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
@@ -15543,11 +15543,11 @@ Ext.define('Voyant.panel.Reader', {
     	
     	this.on("afterrender", function() {
     		var centerPanel = this.down('panel[region="center"]');
-    		this.innerContainer = centerPanel.getLayout().getRenderTarget();
+    		this.setInnerContainer(centerPanel.getLayout().getRenderTarget());
     		
     		// scroll listener
     		centerPanel.body.on("scroll", function(event, target) {
-    			var readerContainer = this.innerContainer.first();
+    			var readerContainer = this.getInnerContainer().first();
     			var downwardsScroll = this.getLastScrollTop() < target.scrollTop;
     			
     			// scroll up
@@ -15590,11 +15590,35 @@ Ext.define('Voyant.panel.Reader', {
     	}, this);
     	
     	Ext.apply(this, {
+    		title: this.localize('title'),
+    		cls: 'voyant-reader',
+    	    layout: 'fit',
+    	    items: {
+    	    	layout: 'border',
+    	    	items: [{
+    		    	bodyPadding: 10,
+    		    	region: 'center',
+    		    	border: false,
+    		    	autoScroll: true,
+    		    	html: '<div class="readerContainer"></div>'
+    		    },{
+    		    	region: 'south',
+    		    	height: 40,
+    		    	split: {
+    		    		size: 2
+    		    	},
+    		    	splitterResize: true,
+    		    	border: false,
+    		    	layout: {
+    		    		type: 'hbox'
+    		    	}
+    		    }]
+    	    },
     		// TODO clearing search loads default document terms into chart but probably shouldn't
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	glyph: 'xf060@FontAwesome',
             		handler: function() {
@@ -15925,11 +15949,11 @@ Ext.define('Voyant.panel.Reader', {
     highlightKeywords: function(query, doScroll) {
 		if (!Ext.isArray(query)) query = [query];
 		
-		this.innerContainer.first().select('span[class*=keyword]').removeCls('keyword');
+		this.getInnerContainer().first().select('span[class*=keyword]').removeCls('keyword');
 		
 		var spans = [];
 		var caseInsensitiveQuery = new RegExp('^'+query[0]+'$', 'i');
-		var nodes = this.innerContainer.first().select('span.word');
+		var nodes = this.getInnerContainer().first().select('span.word');
 		nodes.each(function(el, compEl, index) {
 			if (el.dom.firstChild && el.dom.firstChild.nodeValue.match(caseInsensitiveQuery)) {
 				el.addCls('keyword');
@@ -15943,7 +15967,7 @@ Ext.define('Voyant.panel.Reader', {
 	},
     
 	fetchPrevious: function(scroll) {
-		var readerContainer = this.innerContainer.first();
+		var readerContainer = this.getInnerContainer().first();
 		var first = readerContainer.first('.word');
 		if (first != null && first.hasCls("loading")===false) {
 			while(first) {
@@ -15995,7 +16019,7 @@ Ext.define('Voyant.panel.Reader', {
 	},
 	
 	fetchNext: function(scroll) {
-		var readerContainer = this.innerContainer.first();
+		var readerContainer = this.getInnerContainer().first();
 		var last = readerContainer.last();
 		if (last.hasCls("loading")===false) {
 			// store any text that occurs after last word
@@ -16044,9 +16068,9 @@ Ext.define('Voyant.panel.Reader', {
 	
     load: function(doClear, config) {
     	if (doClear) {
-    		this.innerContainer.first().destroy(); // clear everything
-    		this.innerContainer.setHtml('<div class="readerContainer"><div class="loading">'+this.localize('loading')+'</div></div>');
-			this.innerContainer.first().first().mask();
+    		this.getInnerContainer().first().destroy(); // clear everything
+    		this.getInnerContainer().setHtml('<div class="readerContainer"><div class="loading">'+this.localize('loading')+'</div></div>');
+			this.getInnerContainer().first().first().mask();
     	}
     	this.getTokensStore().load(Ext.apply(config || {}, {
     		params: Ext.apply(this.getApiParams(), {
@@ -16056,9 +16080,9 @@ Ext.define('Voyant.panel.Reader', {
     },
     
     updateText: function(contents) {
-    	var loadingMask = this.innerContainer.down('.loading');
+    	var loadingMask = this.getInnerContainer().down('.loading');
     	if (loadingMask) loadingMask.destroy();
-    	var inserted = this.innerContainer.first().insertHtml(this.getInsertWhere(), contents, true); // return Element, not dom
+    	var inserted = this.getInnerContainer().first().insertHtml(this.getInsertWhere(), contents, true); // return Element, not dom
     	if (inserted && this.getScrollIntoView()) {
     		inserted.dom.scrollIntoView(); // use dom
     		// we can't rely on the returned element because it can be a transient fly element, but the id is right in a deferred call
@@ -16081,11 +16105,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	mixins: ['Voyant.panel.Panel'],
 	requires: ['Ext.chart.CartesianChart'],
 	alias: 'widget.scatterplot',
-	config: {
-		options: {
-    		xtype: 'stoplistoption'
-    	}
-	},
     statics: {
     	i18n: {
     	},
@@ -16105,30 +16124,23 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	},
 		glyph: 'xf06e@FontAwesome'
     },
+	config: {
+		options: {
+    		xtype: 'stoplistoption'
+    	},
+    	caStore: null,
+    	pcaStore: null,
+    	docSimStore: null,
+    	termStore: null,
+    	chartMenu: null,
+    	newTerm: null,
+    	termsTimeout: null,
+    	highlightData: {x: 0, y: 0, r: 0},
+        highlightTask: null
+	},
     
     tokenFreqTipTemplate: null,
     docFreqTipTemplate: null,
-    caStore: null,
-    pcaStore: null,
-    docSimStore: null,
-    termStore: Ext.create('Ext.data.JsonStore', {
-		fields: [
-			{name: 'term'},
-			{name: 'rawFreq', type: 'int'},
-			{name: 'relativeFreq', type: 'number'},
-			{name: 'coordinates', mapping : 'vector'},
-			{name: 'category'}
-		],
-		sorters: [{property: 'rawFreq', direction: 'DESC'}],
-		groupField: 'category'
-	}),
-	newTerm: null,
-	termsTimeout: null,
-    chartMenu: null,
-    labelsMode: 0, // 0 all labels, 1 doc labels, 2 word labels, 3 no labels
-    
-    highlightData: {x: 0, y: 0, r: 0},
-    highlightTask: null,
     
     constructor: function(config) {
         this.callParent(arguments);
@@ -16136,26 +16148,47 @@ Ext.define('Voyant.panel.ScatterPlot', {
     },
     
     initComponent: function() {
+    	this.setCaStore(Ext.create('Voyant.data.store.CAAnalysis', {
+    		listeners: {load: this.buildChart, scope: this}
+    	}));
+    	this.setPcaStore(Ext.create('Voyant.data.store.PCAAnalysis', {
+    		listeners: {load: this.buildChart, scope: this}
+    	}));
+    	this.setDocSimStore(Ext.create('Voyant.data.store.DocSimAnalysis', {
+    		listeners: {load: this.buildChart, scope: this}
+    	}));
+    	this.setTermStore(Ext.create('Ext.data.JsonStore', {
+			fields: [
+				{name: 'term'},
+				{name: 'rawFreq', type: 'int'},
+				{name: 'relativeFreq', type: 'number'},
+				{name: 'coordinates', mapping : 'vector'},
+				{name: 'category'}
+			],
+			sorters: [{property: 'rawFreq', direction: 'DESC'}],
+			groupField: 'category'
+		}));
+    	
+    	this.setChartMenu(Ext.create('Ext.menu.Menu', {
+    		items: [
+    			{text: this.localize('remove'), itemId: 'remove', glyph: 'xf068@FontAwesome'},
+    			{text: this.localize('nearby'), itemId: 'nearby', glyph: 'xf0b2@FontAwesome'}
+    		],
+    		listeners: {
+    			hide: function() {
+    				var series = this.down('#chart').getSeries();
+    				series[0].enableToolTips();
+    				series[1].enableToolTips();
+    			},
+    			scope: this
+    		}
+    	}));
+    	
+    	this.tokenFreqTipTemplate = new Ext.Template(this.localize('tokenFreqTip'));
+    	this.docFreqTipTemplate = new Ext.Template(this.localize('docFreqTip'));
+    	
         Ext.apply(this, {
         	title: this.localize('title'),
-        	caStore: Ext.create('Voyant.data.store.CAAnalysis'),
-        	pcaStore: Ext.create('Voyant.data.store.PCAAnalysis'),
-        	docSimStore: Ext.create('Voyant.data.store.DocSimAnalysis'),
-        	termStore: this.termStore,
-        	chartMenu: Ext.create('Ext.menu.Menu', {
-        		items: [
-        			{text: this.localize('remove'), itemId: 'remove', glyph: 'xf068@FontAwesome'},
-        			{text: this.localize('nearby'), itemId: 'nearby', glyph: 'xf0b2@FontAwesome'}
-        		],
-        		listeners: {
-        			hide: function() {
-        				var series = this.down('#chart').getSeries();
-        				series[0].enableToolTips();
-        				series[1].enableToolTips();
-        			},
-        			scope: this
-        		}
-        	}),
         	layout: 'border',
         	autoDestroy: true,
         	items: [{
@@ -16163,7 +16196,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		region: 'center',
         		layout: 'fit',
         		tbar: {
-        			enableOverflow: true,
+                    overflowHandler: 'scroller',
         			items: [{
         				xtype: 'querysearchfield',
         				itemId: 'filterTerms',
@@ -16175,7 +16208,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('analysis'),
                 		itemId: 'analysis',
                 		glyph: 'xf1ec@FontAwesome',
-                		enableOverflow: true,
+                        overflowHandler: 'scroller',
     	            	flex: 1,
             			menu: {
         					items: [
@@ -16322,7 +16355,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		listeners: {
         			query: function(component, value) {
         				if (value !== undefined) {
-	        				this.termStore.filter([{property: 'term', value: value, anyMatch: true}]);
+	        				this.getTermStore().filter([{property: 'term', value: value, anyMatch: true}]);
 	        				this.filterChart(value);
         				}
         			},
@@ -16344,7 +16377,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                     enableGroupingMenu: false
         		}],
         		bbar: {
-            		enableOverflow: true,
+                    overflowHandler: 'scroller',
         			items: [{
         				itemId: 'nearbyButton',
                         xtype: 'button',
@@ -16389,7 +16422,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         			
         		},
         		tbar: {
-            		enableOverflow: true,
+                    overflowHandler: 'scroller',
                     items: [{
                 		fieldLabel: this.localize('numTerms'),
                 		labelAlign: 'right',
@@ -16417,10 +16450,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
 									this.loadFromApis();
     							}
     							if (combo.isValid() && oldVal !== null) {
-    								if (this.termsTimeout !== null) {
-    									clearTimeout(this.termsTimeout);
+    								if (this.getTermsTimeout() !== null) {
+    									clearTimeout(this.getTermsTimeout());
     								}
-    								this.termsTimeout = setTimeout(doLoad.bind(this), 500);
+    								this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
     							}
     						},
     						scope: this
@@ -16481,14 +16514,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         }
                     }
                 },
-        		store: this.termStore,
+        		store: this.getTermStore(),
         		listeners: {
         			query: function(component, value) {
-        				if (value !== undefined && this.termStore.findExact('term', value) === -1) {
-	                		this.newTerm = value;
+        				if (value !== undefined && this.getTermStore().findExact('term', value) === -1) {
+	                		this.setNewTerm(value);
 	                		this.loadFromApis();
     					} else {
-    						this.newTerm = null;
+    						this.setNewTerm(null);
     					}
         			},
         			scope: this
@@ -16515,9 +16548,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		}
     		setCheckBound('dimensions');
     		
-    		this.caStore.setCorpus(corpus);
-    		this.pcaStore.setCorpus(corpus);
-    		this.docSimStore.setCorpus(corpus);
+    		this.getCaStore().setCorpus(corpus);
+    		this.getPcaStore().setCorpus(corpus);
+    		this.getDocSimStore().setCorpus(corpus);
     		this.loadFromApis();
     	}, this);
     	
@@ -16525,19 +16558,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		this.setApiParam('docId', docIds);
     		this.loadFromApis();
     	}, this);
-    	
-        this.caStore.on('load', function(store, records) {
-        	this.buildChart(store);
-        }, this);
-        this.pcaStore.on('load', function(store, records) {
-        	this.buildChart(store);
-        }, this);
-        this.docSimStore.on('load', function(store, records) {
-        	this.buildChart(store);
-        }, this);
-        
-    	this.tokenFreqTipTemplate = new Ext.Template(this.localize('tokenFreqTip'));
-    	this.docFreqTipTemplate = new Ext.Template(this.localize('docFreqTip'));
         
     	this.callParent(arguments);
     },
@@ -16597,7 +16617,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         
         
         if (this.getApiParam('analysis') !== 'docSim') { // docSim doesn't return terms so keep the current ones
-	        this.termStore.removeAll();
+	        this.getTermStore().removeAll();
         }
 	        
         var tokens = rec.getTokens();
@@ -16612,8 +16632,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	        	if (freq > maxFreq) maxFreq = freq;
 	        	if (freq < minFreq) minFreq = freq;
         	}
-        	if (this.termStore.findExact('term', token.get('term') === -1)) {
-        		this.termStore.addSorted(token);
+        	if (this.getTermStore().findExact('term', token.get('term') === -1)) {
+        		this.getTermStore().addSorted(token);
         	}
         	if (numDims === 3) {
 				var z = token.get('vector')[2];
@@ -16642,7 +16662,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	}
         }, this);
         
-        var newCount = this.termStore.getCount();
+        var newCount = this.getTermStore().getCount();
         this.queryById('limit').setRawValue(newCount);
         this.setApiParam('limit', newCount);
         
@@ -16678,7 +16698,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	sprites: [{
         		type: 'text',
         		text: summary,
-        		hidden: this.labelsMode > 0,
         		x: 70,
         		y: 70
         	}],
@@ -16818,11 +16837,11 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		            		var term = chartItem.record.get('term');
 		            		
 		            		var text = (new Ext.Template(this.localize('removeTerm'))).apply([term]);
-		            		this.chartMenu.queryById('remove').setText(text);
+		            		this.getChartMenu().queryById('remove').setText(text);
 		            		text = (new Ext.Template(this.localize('nearbyTerm'))).apply([term]);
-		            		this.chartMenu.queryById('nearby').setText(text);
+		            		this.getChartMenu().queryById('nearby').setText(text);
 		            		
-		            		this.chartMenu.on('click', function(menu, item) {
+		            		this.getChartMenu().on('click', function(menu, item) {
 		            			if (item !== undefined) {
 		            				var term = chartItem.record.get('term');
 			            			if (item.text === this.localize('remove')) {
@@ -16832,7 +16851,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 			            			}
 		            			}
 		            		}, this, {single: true});
-		            		this.chartMenu.showAt(xy);
+		            		this.getChartMenu().showAt(xy);
 		            	}
 		            }, this);
         		},
@@ -16844,9 +16863,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	this.queryById('chartParent').insert(0, chart);
     	this.doLabels();
     	
-    	if (this.newTerm !== null) {
-        	this.selectTerm(this.newTerm);
-        	this.newTerm = null;
+    	if (this.getNewTerm() !== null) {
+        	this.selectTerm(this.getNewTerm());
+        	this.setNewTerm(null);
         }
     },
     
@@ -16903,17 +16922,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		    		}
 		    		
 		    		var point = this.getPointFromIndex(series, index);
-		    		this.highlightData = {x: point[0], y: point[1], r: 50};
+		    		this.setHighlightData({x: point[0], y: point[1], r: 50});
 		    		
-		    		if (this.highlightTask == null) {
-		    			this.highlightTask = Ext.TaskManager.newTask({
+		    		if (this.getHighlightTask() == null) {
+		    			this.setHighlightTask(Ext.TaskManager.newTask({
 		        			run: this.doHighlight,
 		        			scope: this,
 		        			interval: 25,
-		        			repeat: this.highlightData.r
-		        		});
+		        			repeat: this.getHighlightData().r
+		        		}));
 		    		}
-		    		this.highlightTask.restart();
+		    		this.getHighlightTask().restart();
 		    	}
 	    	}
     	}
@@ -16929,7 +16948,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     doHighlight: function() {
     	var chart = this.down('#chart');
-    	if (this.highlightData.r > 0) {
+    	if (this.getHighlightData().r > 0) {
 	    	var surf = chart.getSurface();
 			var highlight = null;
 			var items = surf.getItems();
@@ -16946,19 +16965,19 @@ Ext.define('Voyant.panel.ScatterPlot', {
 					type: 'circle',
 					strokeStyle: 'red',
 					fillStyle: 'none',
-					radius: this.highlightData.r,
-					x: this.highlightData.x,
-					y: this.highlightData.y
+					radius: this.getHighlightData().r,
+					x: this.getHighlightData().x,
+					y: this.getHighlightData().y
 				});
 			} else {
 				highlight.setAttributes({
-					x: this.highlightData.x,
-					y: this.highlightData.y,
-					radius: this.highlightData.r
+					x: this.getHighlightData().x,
+					y: this.getHighlightData().y,
+					radius: this.getHighlightData().r
 				});
-				this.highlightData.r -= 1.5;
-				if (this.highlightData.r <= 0) {
-					this.highlightData.r = 0;
+				this.getHighlightData().r -= 1.5;
+				if (this.getHighlightData().r <= 0) {
+					this.getHighlightData().r = 0;
 					surf.remove(highlight, true);
 				}
 			}
@@ -16997,7 +17016,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     getCurrentTerms: function() {
     	var terms = [];
-    	this.termStore.each(function(r) {
+    	this.getTermStore().each(function(r) {
     		if (r.get('category') === 'term') {
     			terms.push(r.get('term'));
     		}
@@ -17017,10 +17036,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	var index = series.getStore().findExact('term', term);
     	series.getStore().removeAt(index);
     	
-    	index = this.termStore.findExact('term', term);
-    	this.termStore.removeAt(index);
+    	index = this.getTermStore().findExact('term', term);
+    	this.getTermStore().removeAt(index);
     	
-    	var newCount = this.termStore.getCount();
+    	var newCount = this.getTermStore().getCount();
         this.queryById('limit').setRawValue(newCount);
     },
     
@@ -17031,12 +17050,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	}
     	var params = {};
     	var terms = this.getCurrentTerms();
-    	if (this.newTerm !== null) {
-    		terms.push(this.newTerm);
+    	if (this.getNewTerm() !== null) {
+    		terms.push(this.getNewTerm());
     		this.setApiParam('limit', terms.length);
     	}
     	if (terms.length > 0) {
-    		if (this.newTerm !== null || keepCurrentTerms) {
+    		if (this.getNewTerm() !== null || keepCurrentTerms) {
     			params.query = terms.join(',');
     		}
 //    		params.term = terms;
@@ -17047,15 +17066,15 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	}
 
     	if (params.analysis === 'pca') {
-    		this.pcaStore.load({
+    		this.getPcaStore().load({
 	    		params: params
 	    	});
     	} else if (params.analysis === 'docSim'){
-    		this.docSimStore.load({
+    		this.getDocSimStore().load({
 	    		params: params
 	    	});
     	} else {
-    		this.caStore.load({
+    		this.getCaStore().load({
 	    		params: params
 	    	});
     	}
@@ -17116,7 +17135,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     config: {
     	visLayout: undefined,
     	vis: undefined,
-    	mode: 'corpus'
+    	mode: 'corpus',
+    	graphId: undefined
     },
     
     graphMargin: {top: 20, right: 60, bottom: 110, left: 80},
@@ -17127,6 +17147,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
+    	this.setGraphId(Ext.id(null, 'streamgraph_'));
     },
     
     initComponent: function() {
@@ -17135,7 +17157,7 @@ Ext.define('Voyant.panel.StreamGraph', {
         Ext.apply(me, {
     		title: this.localize('title'),
     		tbar: new Ext.Toolbar({
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
 				items: ['->',{
 					xtype: 'legend',
 					store: new Ext.data.JsonStore({
@@ -17154,7 +17176,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 				},'->']
 			}),
 			bbar: {
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
 				items: [{
                 	xtype: 'querysearchfield'
                 },{
@@ -17265,9 +17287,7 @@ Ext.define('Voyant.panel.StreamGraph', {
         	}
         }, this);
 		
-        this.on('resize', function(panel, width, height) {
-
-		}, this);
+        this.on('resize', this.resizeGraph, this);
         
         this.on('boxready', this.initGraph, this);
         
@@ -17477,10 +17497,6 @@ Ext.define('Voyant.panel.StreamGraph', {
     initGraph: function() {
     	if (this.getVisLayout() === undefined) {
 	    	var el = this.getLayout().getRenderTarget();
-	    	var paddingH = this.graphMargin.left + this.graphMargin.right;
-	    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
-	    	var width = el.getWidth()-paddingH;
-			var height = el.getHeight()-paddingV;
 	    	this.setVisLayout(
 				d3.layout.stack()
 					.offset('silhouette')
@@ -17489,10 +17505,22 @@ Ext.define('Voyant.panel.StreamGraph', {
 					})
 			);
 			
-			this.setVis(d3.select(el.dom).append('svg').attr('id','streamGraph')
-					.attr('width', width+paddingH).attr('height', height+paddingV).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')')
-			);
+			this.setVis(d3.select(el.dom).append('svg').attr('id',this.getGraphId()).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')'));
+			
+			this.resizeGraph();
     	}
+    },
+    
+    resizeGraph: function() {
+    	var el = this.getLayout().getRenderTarget();
+    	var paddingH = this.graphMargin.left + this.graphMargin.right;
+    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
+    	var width = el.getWidth()-paddingH;
+		var height = el.getHeight()-paddingV;
+
+		d3.select(el.dom).select('svg').attr('width', width+paddingH).attr('height', height+paddingV);
+		
+		// TODO recalculate streams
     }
 });
 
@@ -17556,7 +17584,7 @@ Ext.define('Voyant.panel.Summary', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
         			fieldLabel: this.localize('items'),
         			labelWidth: 40,
@@ -17953,12 +17981,17 @@ Ext.define('Voyant.panel.TextualArc', {
 			                 target: cmp.getEl(),
 			                 text: panel.localize('minRawFreqTip')
 			             });
-	    			})
+	    			});
+	    			this.on('beforedestroy', function(cmp) {
+                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+                	});
 	    			this.callParent(arguments);
 	    		},
 	    		fieldLabel: 'minRawFreq'
     		}
-    	}]
+    	}],
+    	perim: [],
+    	diam: undefined
 	},
 	
 	tokensFetch: 500,
@@ -17973,7 +18006,7 @@ Ext.define('Voyant.panel.TextualArc', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'combo',
                 	itemId: 'search',
@@ -18006,6 +18039,9 @@ Ext.define('Voyant.panel.TextualArc', {
 	    		        	});
 	                		
 	                	},
+	                	beforedestroy: function(cmp) {
+	                		Ext.tip.QuickTipManager.unregister(cmp.getEl());
+	                	},
 	                    changecomplete: function(cmp, val) {
 	                    	this.setApiParam('speed', val);
                     		this.isReading = val!==0
@@ -18023,24 +18059,7 @@ Ext.define('Voyant.panel.TextualArc', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('boxready', function(cmp) {
-    		var gutter = 20,
-			availableWidth = this.getTargetEl().getWidth() - gutter - gutter,
-			availableHeight = this.getTargetEl().getHeight() - gutter - gutter,
-			diam = Math.max(availableWidth, availableHeight), rad = diam /2,
-			ratio = Math.min(availableWidth, availableHeight) / diam,
-			canvas = this.getTargetEl().dom.querySelector("canvas"), ctx = canvas.getContext("2d");
-			canvas.width = this.getTargetEl().getWidth();
-			canvas.height = this.getTargetEl().getHeight();
-			this.diam = diam;
-			this.perim = [];
-			var i = parseInt(diam*.75)
-			while (this.perim.length<diam) {
-	    		this.perim.push({
-	    			x:  gutter+(availableWidth/2)+(rad * (availableWidth>availableHeight ? 1 : ratio) * Math.cos(2 * Math.PI * i / diam)),
-	    			y:  gutter+(availableHeight/2)+(rad * (availableHeight>availableWidth ? 1 : ratio) * Math.sin(2 * Math.PI * i / diam))
-	    		})
-	    		if (i++==diam) {i=0;}
-			}
+			var canvas = this.getTargetEl().dom.querySelector("canvas");
 	    	this.draw(canvas);
 
     		canvas.addEventListener('mousemove', function(evt) {
@@ -18076,6 +18095,27 @@ Ext.define('Voyant.panel.TextualArc', {
     	});
     	
     	this.on("resize", function() {
+    		var gutter = 20,
+			availableWidth = this.getTargetEl().getWidth() - gutter - gutter,
+			availableHeight = this.getTargetEl().getHeight() - gutter - gutter,
+			diam = Math.max(availableWidth, availableHeight), rad = diam /2,
+			ratio = Math.min(availableWidth, availableHeight) / diam,
+			canvas = this.getTargetEl().dom.querySelector("canvas");
+    		
+			canvas.width = this.getTargetEl().getWidth();
+			canvas.height = this.getTargetEl().getHeight();
+			this.setDiam(diam);
+			this.setPerim([]);
+			var i = parseInt(diam*.75)
+			while (this.getPerim().length<diam) {
+	    		this.getPerim().push({
+	    			x:  gutter+(availableWidth/2)+(rad * (availableWidth>availableHeight ? 1 : ratio) * Math.cos(2 * Math.PI * i / diam)),
+	    			y:  gutter+(availableHeight/2)+(rad * (availableHeight>availableWidth ? 1 : ratio) * Math.sin(2 * Math.PI * i / diam))
+	    		})
+	    		if (i++==diam) {i=0;}
+			}
+			
+			// TODO clear previous/current drawing
     	})
     },
     
@@ -18084,7 +18124,7 @@ Ext.define('Voyant.panel.TextualArc', {
     	ctx = ctx || canvas.getContext("2d");
     	ctx.clearRect(0,0,canvas.width,canvas.height);
 		ctx.fillStyle = "rgba(0,0,0,.1)";
-    	this.perim.forEach(function(p,i) {
+    	this.getPerim().forEach(function(p,i) {
     		if (i%3==0) {
         		ctx.fillRect(p.x-5,p.y,10,1)
     		}
@@ -18105,9 +18145,9 @@ Ext.define('Voyant.panel.TextualArc', {
     	ctx = ctx || this.getTargetEl().dom.querySelector("canvas").getContext("2d");
     	var delay = 2000-(parseInt(this.getApiParam('speed'))*1999/100);
     	if (this.isReading && this.documentTerms) {
-    		var current = parseInt(this.readingIndex * this.perim.length / this.lastToken);
+    		var current = parseInt(this.readingIndex * this.getPerim().length / this.lastToken);
     		ctx.fillStyle = "purple";
-    		ctx.fillRect(this.perim[current].x,this.perim[current].y, 5, 5)
+    		ctx.fillRect(this.getPerim()[current].x,this.getPerim()[current].y, 5, 5)
 			var first = this.readingStartTime == undefined;
 			this.readingStartTime = this.readingStartTime || new Date().getTime();
 			var delta = this.readingStartTime+delay-new Date().getTime();
@@ -18170,7 +18210,7 @@ Ext.define('Voyant.panel.TextualArc', {
     	canvas = canvas || this.getTargetEl().dom.querySelector("canvas");
     	ctx = ctx || canvas.getContext("2d");
     	ctx.textAlign = "center";
-    	if (this.documentTerms && this.perim) {
+    	if (this.documentTerms && this.getPerim().length > 0) {
     		this.documentTerms.each(function(documentTerm) {
     			var me = this, freq = documentTerm.getRawFreq(), term = documentTerm.getTerm(),
     				x = documentTerm.get('x'), y = documentTerm.get('y');
@@ -18187,10 +18227,10 @@ Ext.define('Voyant.panel.TextualArc', {
     	    	if (isCurrentTerm || isReadingTerm) {
     	    		ctx.strokeStyle = isCurrentTerm ? "rgba(255,0,0,.2)" : "rgba(0,255,0,.4)";
     	    		documentTerm.getDistributions().forEach(function(d, i) {
-    	    			if (d>0 && this.perim[i]) {
+    	    			if (d>0 && this.getPerim()[i]) {
     	    				ctx.beginPath();
     	    				ctx.moveTo(x, y);
-    	    				ctx.lineTo(this.perim[i].x,this.perim[i].y);
+    	    				ctx.lineTo(this.getPerim()[i].x,this.getPerim()[i].y);
     	    				ctx.stroke();
     	    			}
     	    		}, this)
@@ -18242,7 +18282,7 @@ Ext.define('Voyant.panel.TextualArc', {
     		proxy: {
     			extraParams: {
     				stopList: this.getApiParam('stopList'),
-    				bins: this.diam,
+    				bins: this.getDiam(),
     				withDistributions: 'raw',
     				minRawFreq: parseInt(this.getApiParam('minRawFreq'))
     			}
@@ -18267,8 +18307,8 @@ Ext.define('Voyant.panel.TextualArc', {
             		records.forEach(function(documentTerm) {
             			var x = y = 0;
             			documentTerm.get('distributions').forEach(function(d, i) {
-            				x += (this.perim[i].x*d);
-            				y += (this.perim[i].y*d);
+            				x += (this.getPerim()[i].x*d);
+            				y += (this.getPerim()[i].y*d);
             			}, this)
             			documentTerm.set('x', x/documentTerm.getRawFreq());
             			documentTerm.set('y', y/documentTerm.getRawFreq());
@@ -18320,8 +18360,11 @@ Ext.define('Voyant.panel.TextualArc', {
     				})
         			if (first) {
         				this.previousBeziers = [];
-        				this.isReading = true;
-        				this.read(0);
+        				// TODO
+//        				if (this.getApiParam('speed') > 0) {
+	        				this.isReading = true;
+	        				this.read(0);
+//        				}
         			}
     			} else {
     				this.noMoreTokens = true;
@@ -18750,7 +18793,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         		]
         	}),
 			tbar: new Ext.Toolbar({
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
 				items: {
 					xtype: 'legend',
 					store: new Ext.data.JsonStore({
@@ -18785,7 +18828,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 				}
 			}),
 			bbar: {
-	            enableOverflow: true,
+                overflowHandler: 'scroller',
 	            items: [{
 	            	xtype: 'querysearchfield'
 	            },{
@@ -20777,7 +20820,7 @@ Ext.define('Voyant.panel.TermsRadio', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                     	xtype: 'querysearchfield'
                 	},{
@@ -21544,7 +21587,10 @@ Ext.define('Voyant.panel.VoyantFooter', {
                 target: container.getTargetEl().dom.querySelector(".privacy"),
                 text: this.localize('privacyMsg')
             });
-		}
+		},
+		beforedestroy: function(container) {
+    		Ext.tip.QuickTipManager.unregister(container.getTargetEl().dom.querySelector(".privacy"));
+    	}
 	}
 });
 Ext.define('Voyant.panel.VoyantHeader', {
@@ -22504,7 +22550,7 @@ Ext.define('Voyant.panel.Veliza', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
         			xtype: 'textfield',
         			emptyText: this.localize("typeAndEnter"),
@@ -22614,11 +22660,11 @@ Ext.define('Voyant.panel.WordTree', {
     	tree: undefined,
     	kwicStore: undefined,
     	options: {xtype: 'stoplistoption'},
-    	numBranches: 5
+    	numBranches: 5,
+    	lastClick: 1
     },
     
     doubleClickDelay: 300,
-    lastClick: 1,
     
     constructor: function(config) {
         this.callParent(arguments);
@@ -22631,7 +22677,7 @@ Ext.define('Voyant.panel.WordTree', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-                enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'querysearchfield'
                 }, this.localize('pool'), {
@@ -22889,8 +22935,8 @@ Ext.define('Voyant.panel.WordTree', {
     
     clickHandler: function(node) {
     	var now = new Date().getTime();
-    	if (this.lastClick && now-this.lastClick<this.doubleClickDelay) {
-    		this.lastClick=1;
+    	if (this.getLastClick() && now-this.getLastClick()<this.doubleClickDelay) {
+    		this.setLastClick(1);
     		var terms = [], parent = node;
         	while (parent != null) {
         		terms.push(parent.name);
@@ -22898,7 +22944,7 @@ Ext.define('Voyant.panel.WordTree', {
         	}
         	this.getApplication().dispatchEvent('termsClicked', this, [terms.reverse().join(" ")]);
     	} else {
-    		this.lastClick = now;
+    		this.setLastClick(now);
     	}
     },
     

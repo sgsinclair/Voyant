@@ -94,7 +94,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		region: 'center',
         		layout: 'fit',
         		tbar: {
-        			enableOverflow: true,
+                    overflowHandler: 'scroller',
         			items: [{
         				xtype: 'querysearchfield',
         				itemId: 'filterTerms',
@@ -106,7 +106,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('analysis'),
                 		itemId: 'analysis',
                 		glyph: 'xf1ec@FontAwesome',
-                		enableOverflow: true,
+                        overflowHandler: 'scroller',
     	            	flex: 1,
             			menu: {
         					items: [
@@ -275,7 +275,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                     enableGroupingMenu: false
         		}],
         		bbar: {
-            		enableOverflow: true,
+                    overflowHandler: 'scroller',
         			items: [{
         				itemId: 'nearbyButton',
                         xtype: 'button',
@@ -320,7 +320,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         			
         		},
         		tbar: {
-            		enableOverflow: true,
+                    overflowHandler: 'scroller',
                     items: [{
                 		fieldLabel: this.localize('numTerms'),
                 		labelAlign: 'right',

@@ -84,7 +84,7 @@ Ext.define('Voyant.panel.Cirrus', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
         			xtype: 'corpusdocumentselector',
         			singleSelect: true

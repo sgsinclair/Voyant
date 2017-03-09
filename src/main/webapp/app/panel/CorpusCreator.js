@@ -62,7 +62,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		},
 	    	dockedItems: [{
 	    		xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 dock: 'bottom',
     	    	buttonAlign: 'right',
 //    	    	defaultButtonUI : 'default',

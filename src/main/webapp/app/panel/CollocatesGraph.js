@@ -157,7 +157,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                    xtype: 'querysearchfield'
                 },{

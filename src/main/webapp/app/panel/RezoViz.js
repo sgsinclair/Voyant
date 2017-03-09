@@ -93,7 +93,7 @@ Ext.define('Voyant.panel.RezoViz', {
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
                     xtype: 'combo',
                     queryMode: 'local',

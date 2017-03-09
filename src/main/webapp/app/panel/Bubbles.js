@@ -42,7 +42,7 @@ Ext.define('Voyant.panel.Bubbles', {
     		dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
-        		enableOverflow: true,
+                overflowHandler: 'scroller',
                 items: [{
 	            	xtype: 'documentselectorbutton',
 	            	singleSelect: true
