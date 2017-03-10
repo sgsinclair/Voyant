@@ -35,42 +35,17 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	
 	_doLoadTags: function(docId, callback) {
 		var me = this;
-		
-		var tagsId = 'tags-'+me.getCorpus().getId()+'-'+docId;
-		
-		Ext.Ajax.request({
-    	    url: me.getApplication().getTromboneUrl(),
-    	    params: {
-        		tool: 'resource.StoredResource',
-        		verifyResourceId: tagsId
-    	    }
-    	}).then(function(response) {
-    		var json = Ext.util.JSON.decode(response.responseText);
-    		if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
-//    			console.log('getting stored', docId);
-	    		Ext.Ajax.request({
-		    	    url: me.getApplication().getTromboneUrl(),
-		    	    params: {
-		        		tool: 'resource.StoredResource',
-		        		retrieveResourceId: tagsId
-		    	    }
-		    	}).then(function(response) {
-		    		var json = Ext.util.JSON.decode(response.responseText);
-	    	    	var value = json.storedResource.resource;
-	    	    	var tags = Ext.decode(value);
-	    	    	me._saveTags(tags, docId);
-	    	    	if (callback) callback();
-	    	    });
-	    	} else {
-//	    		console.log('getting', docId);
-	    		me._getDocumentXml(docId, function(xml) {
-	    			var tagData = me._parseTags(xml, docId, me.curatedTags);
-	    			me._saveTags(tagData, docId);
-	    			me._storeTags(tagData, docId);
-	    			if (callback) callback();
-	    		});
-	    	}
-    	});
+		this.getApplication().getStoredResource('tags-'+me.getCorpus().getId()+'-'+docId).then(function(value) {
+	    	me._saveTags(value, docId);
+	    	if (callback) callback();
+		}, function() {
+    		me._getDocumentXml(docId, function(xml) {
+    			var tagData = me._parseTags(xml, docId, me.curatedTags);
+    			me._saveTags(tagData, docId);
+    			me._storeTags(tagData, docId);
+    			if (callback) callback();
+    		});
+		});
 	},
 	
 	updateTagTotals: function(updateSelections) {
@@ -160,23 +135,8 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	},
 	
 	_storeTags: function(tags, docId) {
-		
 		var rId = 'tags-'+this.getCorpus().getId()+'-'+docId;
-		
-		var resource = Ext.encode(tags);
-//		console.log('storing', docId, 'length', resource.length);
-		Ext.Ajax.request({
-    	    url: this.getApplication().getTromboneUrl(),
-    	    params: {
-        		tool: 'resource.StoredResource',
-    			storeResource: resource,
-    			resourceId: rId
-    	    }
-    	}).then(function(response) {
-//    		console.log('success', docId);
-    	}).otherwise(function(response) {
-//    		console.log('failure', docId);
-    	});
+		this.getApplication().storeResource(rId, tags);
 	},
 	
 	_updateProgress: function(docId) {
@@ -517,6 +477,7 @@ Ext.define('Voyant.panel.DToC.Markup', {
     initComponent: function() {
         var me = this;
         
+        // TODO what is this used for?
         me.setTokensStore(Ext.create("Voyant.data.store.Tokens", {
         	stripTags: 'NONE',
         	listeners: {

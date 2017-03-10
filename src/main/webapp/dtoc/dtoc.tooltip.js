@@ -12,45 +12,28 @@ Ext.define('Ext.ux.DToCToolTip', {
 	
 	// overwritten
 	setTarget: function(target) {
-        var me = this,
-            t = Ext.get(target),
-            tg;
+		var me = this, listeners;
 
-        if (me.target) {
-            tg = Ext.get(me.target);
-            if (Ext.supports.Touch) {
-                me.mun(tg, 'tap', me.onTargetOver, me);
-            } else {
-                me.mun(tg, {
-                    mouseover: me.onTargetOver,
-                    mouseout: me.onTargetOut,
-                    mousemove: me.onMouseMove,
-                    click: me.onClick,
-                    scope: me
-                });
-            }
-        }
-
-        me.target = t;
-        if (t) {
-            if (Ext.supports.Touch) {
-                me.mon(t, {
-                    tap: me.onTargetOver,
-                    scope: me
-                });
-            } else {
-                me.mon(t, {
-                    mouseover: me.onTargetOver,
-                    mouseout: me.onTargetOut,
-                    mousemove: me.onMouseMove,
-                    click: me.onClick,
-                    scope: me
-                });
-            }
-        }
-        if (me.anchor) {
-            me.anchorTarget = me.target;
-        }
+	    if (me.targetListeners) {
+	        me.targetListeners.destroy();
+	    }
+	
+	    if (target) {
+	        me.target = target = Ext.get(target.el || target);
+	        listeners = {
+	            mouseover: 'onTargetOver',
+	            mouseout: 'onTargetOut',
+	            mousemove: 'onMouseMove',
+	            tap: 'onTargetTap',
+	            click: 'onClick',
+	            scope: me,
+	            destroyable: true
+	        };
+	
+	        me.targetListeners = target.on(listeners);
+	    } else {
+	        me.target = null;
+	    }
     },
     
     getTool: function(type) {
@@ -73,70 +56,80 @@ Ext.define('Ext.ux.DToCToolTip', {
     
     onMouseMove: function(e) {
         var me = this,
-            t,
-            xy;
-
-        // If the event target is no longer in this tip's target (possibly due to rapidly churning content in target), ignore it.
-        if (!me.target || me.target.contains(e.target)) {
-            t = me.delegate ? e.getTarget(me.delegate) : me.triggerElement = true;
-            if (t) {
-                me.targetXY = e.getXY();
-                if (t === me.triggerElement) {
-                    if (!me.hidden && me.trackMouse) {
-                        xy = me.getTargetXY();
-                        if (me.constrainPosition) {
-                            xy = me.el.adjustForConstraints(xy, me.el.parent());
-                        }
-                        me.setPagePosition(xy);
-                    }
-                } else if (me.targetClicked !== true) {
-                    me.hide();
-                    me.lastActive = new Date(0);
-                    me.onTargetOver(e);
-                }
-            } else if (me.targetClicked !== true && (!me.closable && me.isVisible()) && me.autoHide !== false) {
-                me.delayHide();
+            dismissDelay = me.dismissDelay;
+ 
+        // Always update pointerEvent, so that if there's a delayed show 
+        // scheduled, it gets the latest pointer to align to. 
+        me.pointerEvent = e;
+        if (me.isVisible() && me.currentTarget.contains(e.target)) {
+            // If they move the mouse, restart the dismiss delay 
+            if (me.targetClicked !== true && dismissDelay && me.autoHide !== false) {
+                me.clearTimer('dismiss');
+                me.dismissTimer = Ext.defer(me.hide, dismissDelay, me);
+            }
+ 
+            if (me.trackMouse)  {
+               me.doAlignment(me.getAlignRegion());
             }
         }
     },
-
+    
     onTargetOver: function(e) {
         var me = this,
             delegate = me.delegate,
-            t;
-
-        if (me.disabled || e.within(me.target.dom, true)) {
+            currentTarget = me.currentTarget,
+            fromElement = e.relatedTarget || e.fromElement,
+            newTarget,
+            myListeners = me.hasListeners;
+ 
+        if (me.disabled) {
             return;
         }
-        t = delegate ? e.getTarget(delegate) : true;
-        if (t && me.hidden) {
-        	me.targetClicked = false;
-            me.triggerElement = t;
-            me.triggerEvent = e;
-            me.clearTimer('hide');
-            me.targetXY = e.getXY();
-            me.delayShow();
+ 
+        if (delegate) {
+            // Moving inside a delegate 
+            if (currentTarget.contains(e.target)) {
+                return;
+            }
+            newTarget = e.getTarget(delegate);
+            // Move inside a delegate with no currentTarget 
+            if (newTarget && Ext.fly(newTarget).contains(e.fromElement)) {
+                return;
+            }
+        }
+        // Moved from outside the target 
+        else if (!me.target.contains(fromElement)) {
+            newTarget = me.target.dom;
+        }
+        // Moving inside the target 
+        else {
+            return;
+        }
+ 
+        // If pointer entered the target or a delegate child, then show. 
+        if (newTarget) {
+            // If users need to see show events on target change, we must hide. 
+            if ((myListeners.beforeshow || myListeners.show) && me.isVisible()) {
+                me.hide();
+            }
+ 
+            me.targetClicked = false;
+            me.triggerElement = newTarget;
+            me.pointerEvent = e;
+            currentTarget.attach(newTarget);
+            me.handleTargetOver(newTarget, e);
+        }
+        // If over a non-delegate child, behave as in target out 
+        else if (currentTarget.dom) {
+            me.handleTargetOut();
         }
     },
     
     onTargetOut: function(e) {
-        var me = this,
-            triggerEl = me.triggerElement,
-            // If we don't have a delegate, then the target is set
-            // to true, so set it to the main target.
-            target = triggerEl === true ? me.target : triggerEl;
-
-        // If disabled, moving within the current target, ignore the mouseout
-        // e.within is the only correct way to determine this.
-        if (me.disabled || !triggerEl || e.within(target, true)) {
-            return;
-        }
-        if (me.showTimer) {
-            me.clearTimer('show');
-            me.triggerElement = null;
-        }
-        if (me.targetClicked !== true) {
-            me.delayHide();
+    	// TODO doesn't hide ever
+        // We have exited the current target 
+        if (this.targetClicked !== true && this.currentTarget.dom && !this.currentTarget.contains(e.relatedTarget)) {
+            this.handleTargetOut();
         }
     },
     

@@ -91,7 +91,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 										data.label = (node.parentNode.getData().textNoCount ? node.parentNode.getData().textNoCount : '') + ' ' + node.getData().textNoCount;
 										indexes.push(data);
 									} else {
-										if (console) {
+										if (window.console) {
 											console.log('no targets:',node.data.textNoCount+', id:'+id);
 										}
 									}
@@ -206,9 +206,9 @@ Ext.define('Voyant.panel.DToC.Index', {
 			this.filterIndex();
 			
 			this.body.unmask();
-			
+
 			// save index
-			this._storeValues('indexids', this.indexIds);
+			this.getApplication().storeResource('indexids-'+this.getCorpus().getId(), this.indexIds);
 			
 			// re-select previously selected nodes (why?)
 //			var sm = this.getSelectionModel();
@@ -225,8 +225,25 @@ Ext.define('Voyant.panel.DToC.Index', {
 	    this._maskEl = this.body.mask('Processing Index: 0%', 'loadMask');
 	    
 	    var me = this;
-		var indexId = 'indexids-'+me.getCorpus().getId();
-		this._getStoredValues(indexId);
+		this.getApplication().getStoredResource('indexids-'+me.getCorpus().getId()).then(function(value) {
+			me.indexIds = value;
+			me.getApplication().getStoredResource('indextree-'+me.getCorpus().getId()).then(function(value) {
+				me.getRootNode().appendChild(value);
+				var idsToKeep = [];
+				for (var key in me.indexIds) {
+					idsToKeep.push(key);
+				}
+				me.filterIndex(idsToKeep);
+				me.getApplication().dispatchEvent('indexProcessed', me);
+			}, function() {
+				if (window.console) {
+					console.log('failed getting index tree');
+				}
+			});
+		}, function() {
+			me._getIndexXml();
+		});
+	
 	},
 
 	clearSelections: function() {
@@ -350,10 +367,11 @@ Ext.define('Voyant.panel.DToC.Index', {
 					this._processIndex(items, rootConfig);
 //					this._resolveCrossRefs(rootConfig, rootConfig);
 					
+					this.getApplication().storeResource('indextree-'+this.getCorpus().getId(), rootConfig.children);
+					
 //					console.log(JSON.stringify(rootConfig, null, '\t'));
 					this.getRootNode().appendChild(rootConfig.children);
 					
-					this._storeValues('indextree', rootConfig.children);
 					
 					this.getApplication().dispatchEvent('indexProcessed', this);
 				}
@@ -519,69 +537,6 @@ Ext.define('Voyant.panel.DToC.Index', {
 				}
 			}
 		}
-	},
-	
-	_storeValues: function(prefix, values) {
-		var me = this;
-		var storageId = prefix+'-'+me.getCorpus().getId();
-		Ext.Ajax.request({
-    	    url: me.getApplication().getTromboneUrl(),
-    	    params: {
-        		tool: 'resource.StoredResource',
-        		verifyResourceId: storageId
-    	    }
-    	}).then(function(response) {
-    		var json = Ext.util.JSON.decode(response.responseText);
-    		if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
-    			// already exists, do nothing
-    		} else {
-    			var resource = Ext.encode(values);
-    			Ext.Ajax.request({
-    	    	    url: me.getApplication().getTromboneUrl(),
-    	    	    params: {
-    	        		tool: 'resource.StoredResource',
-    	    			storeResource: resource,
-    	    			resourceId: storageId
-    	    	    }
-    	    	}).then(function(response) {
-//    	    		console.log(prefix, 'success');
-    	    	}).otherwise(function(response) {
-//    	    		console.log(prefix, 'failure');
-    	    	});
-    		}
-    	});
-	},
-	
-	_getStoredValues: function(id) {
-		var me = this;
-		return Ext.Ajax.request({
-    	    url: me.getApplication().getTromboneUrl(),
-    	    params: {
-        		tool: 'resource.StoredResource',
-        		verifyResourceId: id
-    	    }
-    	}).then(function(response) {
-    		var json = Ext.util.JSON.decode(response.responseText);
-    		if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
-//    			console.log('getting stored', id);
-	    		Ext.Ajax.request({
-		    	    url: me.getApplication().getTromboneUrl(),
-		    	    params: {
-		        		tool: 'resource.StoredResource',
-		        		retrieveResourceId: id
-		    	    }
-		    	}).then(function(response) {
-		    		var json = Ext.util.JSON.decode(response.responseText);
-	    	    	var value = json.storedResource.resource;
-					me.indexIds = Ext.decode(value);
-					
-					me.getApplication().dispatchEvent('indexProcessed', me);
-		    	});
-    		} else {
-//    			console.log('getting index xml');
-    			me._getIndexXml();
-    		}
-    	});
 	},
 	
 	editNodeLabel: function(node) {
