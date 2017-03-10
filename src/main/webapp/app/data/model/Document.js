@@ -13,6 +13,7 @@ Ext.define('Voyant.data.model.Document', {
              {name: 'lastTokenStartOffset-lexical', type: 'int'},
              {name: 'title'},
              {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data;}},
+             {name: 'sentencesCount', type: 'int'},
              {name: 'averageWordsPerSentence', type: 'float', calculate:  function(data) {
         	 	return data['sentencesCount'] ? data['tokensCount-lexical'] / data['sentencesCount'] : 0;
              }}
