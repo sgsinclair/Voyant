@@ -57,6 +57,7 @@ Ext.define('Voyant.panel.Veliza', {
         })
              
         this.callParent();
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
         
     	this.on('boxready', function(cmp) {
     		cmp.addSentence("fromThem", "Hello, I'm Veliza, and I'm here to talk to you about your texts (you may know my sister <a href='https://en.wikipedia.org/wiki/ELIZA' target='_blank'>Eliza</a> she's a famous psychotherapist). I'm just learning to talk about text documents, but please, let me know about any anxieties you're feeling about your texts. Type a message in the box below and hit enter. Or, if you're feeling playful, hit the <i>from text</i> bottom in the lower right-hand corner to fetch a sentence from the corpus.")
