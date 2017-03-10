@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Mar 09 10:24:49 EST 2017 */
+/* This file created by JSCacher. Last modified: Fri Mar 10 12:31:14 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -930,7 +930,10 @@ function Knots(config) {
 	
 	this.canvas = null;
 	this.ctx = null;
-	this.currentDoc = null;
+	this.currentDoc = {
+		terms: {},
+		lineLength: undefined
+	};
 	this.maxDocLength = 0;
 	
 	this.offset = {x: 0, y: 0};
@@ -940,7 +943,7 @@ function Knots(config) {
 	this.initialized = false;
 	
 	this.audio = config.audio;
-	
+	this.audioCtx = null;
 }
 
 
@@ -1099,30 +1102,34 @@ Knots.prototype = {
 		for (var t in terms) {
 			if (this.termsFilter.indexOf(t) != -1) {
 				var info = terms[t];
-				var prevXY = [[0,0],[0,0]];
-				if (this.progressiveDraw) {
-					var length = this.drawStep + 1;
-					if (info.pos.length <= this.drawStep) {
-						info.done = true;
-						length = info.pos.length;
-						if (terms[t].audio) {terms[t].audio.gainNode.gain.value=0};
+				if (info && info.pos) {
+					var prevXY = [[0,0],[0,0]];
+					if (this.progressiveDraw) {
+						var length = this.drawStep + 1;
+						if (info.pos.length <= this.drawStep) {
+							info.done = true;
+							length = info.pos.length;
+							if (info.audio) {info.audio.gainNode.gain.value=0};
+						} else {
+							if (this.audio && info.audio) {
+								info.audio.gainNode.gain.value=.1;
+								setTimeout(function() {
+									info.audio.gainNode.gain.value=0;
+								}, this.refreshInterval*.75)
+							}
+							info.done = false;
+						}
+						for (var i = 0; i < length; i++) {
+							var xy = info.pos[i];
+							this.drawPolygon(xy, prevXY, info.color);
+							prevXY = [[xy.polygon[0][3], xy.polygon[1][3]], [xy.polygon[0][2], xy.polygon[1][2]]];
+						}
 					} else {
-						if (this.audio && terms[t].audio) {terms[t].audio.gainNode.gain.value=.1;}
-						setTimeout(function() {
-							if (terms[t]) {terms[t].audio.gainNode.gain.value=0;}
-						}, this.refreshInterval*.75)
-						info.done = false;
-					}
-					for (var i = 0; i < length; i++) {
-						var xy = info.pos[i];
-						this.drawPolygon(xy, prevXY, info.color);
-						prevXY = [[xy.polygon[0][3], xy.polygon[1][3]], [xy.polygon[0][2], xy.polygon[1][2]]];
-					}
-				} else {
-					for (var i = 0; i < info.pos.length; i++) {
-						var xy = info.pos[i];
-						this.drawPolygon(xy, prevXY, info.color);
-						prevXY = [[xy.polygon[0][3], xy.polygon[1][3]], [xy.polygon[0][2], xy.polygon[1][2]]];
+						for (var i = 0; i < info.pos.length; i++) {
+							var xy = info.pos[i];
+							this.drawPolygon(xy, prevXY, info.color);
+							prevXY = [[xy.polygon[0][3], xy.polygon[1][3]], [xy.polygon[0][2], xy.polygon[1][2]]];
+						}
 					}
 				}
 			}
@@ -1173,7 +1180,7 @@ Knots.prototype = {
 	
 	setCurrentDoc: function(doc) {
 		this.currentDoc = doc;
-		this.cacheDocument(doc);
+		this.cacheCurrentDocument();
 	},
 	
 	addTerms: function(termsObj) {
@@ -1199,23 +1206,28 @@ Knots.prototype = {
 	
 	recache: function() {
 		this.MAX_LINE_LENGTH = Math.sqrt((this.canvas.width * this.canvas.width) + (this.canvas.height * this.canvas.height));
-		this.cacheDocument(this.currentDoc);
+		this.cacheCurrentDocument();
 		this.determineGraphSizeAndPosition();
 	},
 	
-	cacheDocument: function(doc) {
+	cacheCurrentDocument: function() {
 		var lineLength = this.MAX_LINE_LENGTH;
 		
 		this.currentDoc.lineLength = lineLength;
 		
-		var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+		if (this.audio && this.audioCtx == null) {
+			try {
+				this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+			} catch(e) {
+			}
+		}
 		
 		for (var term in this.currentDoc.terms) {
-			if (audioCtx && !this.currentDoc.terms[term].audio) {
-				var oscillator = audioCtx.createOscillator();
-				var gainNode = audioCtx.createGain();
+			if (this.audio && this.audioCtx && !this.currentDoc.terms[term].audio) {
+				var oscillator = this.audioCtx.createOscillator();
+				var gainNode = this.audioCtx.createGain();
 				oscillator.connect(gainNode);
-				gainNode.connect(audioCtx.destination);
+				gainNode.connect(this.audioCtx.destination);
 				oscillator.frequency.value = (Math.random()*500)+150; // value in hertz
 				oscillator.start();
 				gainNode.gain.value = 0;
@@ -1298,7 +1310,8 @@ Knots.prototype = {
 		this.offset.y = Math.abs(bb.minY * ratio - (this.canvas.height / 2 - height / 2));
 		
 		this.MAX_LINE_LENGTH = Math.sqrt((this.canvas.width * this.canvas.width) + (this.canvas.height * this.canvas.height)) * ratio;
-		this.cacheDocument(this.currentDoc);
+		
+		this.cacheCurrentDocument();
 	},
 	
 	findBoundingBoxForGraph: function() {
@@ -12380,11 +12393,6 @@ Ext.define('Voyant.panel.Knots', {
 	),
 	
     constructor: function() {
-//    	var rurl = this.getBaseUrl()+"resources/knots/";
-//    	Ext.apply(this, {
-//    		html: "<audio src='"+rurl+"bone-crack.m4a' preload='auto'></audio>"
-//    	});
-    	
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
