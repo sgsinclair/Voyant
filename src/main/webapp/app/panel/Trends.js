@@ -446,6 +446,7 @@
     			fontSize: 12
     		});
     	});
+
     	Ext.applyIf(config, {
     	    plugins: {
     	        ptype: 'chartitemevents',
@@ -474,6 +475,15 @@
         	var mode = this.getApiParam("mode");
         	if (mode===this.MODE_DOCUMENT) {
         		var docId = this.getApiParam("docId");
+        		if (!docId) { // may not yet be set, let's check if we have a corpus and doc
+        			var corpus = this.getCorpus();
+        			if (corpus) {
+        				docId = corpus.getDocument(0).getId();
+        				if (docId) {
+            				this.setApiParam('docId', docId);
+        				}
+        			}
+        		}
         		if (docId) {
         			var doc = this.getCorpus().getDocument(docId);
         			var tokens = doc.get('tokensCount-lexical');

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Mar 10 16:30:30 EST 2017 */
+/* This file created by JSCacher. Last modified: Fri Mar 10 17:40:17 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -21119,6 +21119,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     			fontSize: 12
     		});
     	});
+
     	Ext.applyIf(config, {
     	    plugins: {
     	        ptype: 'chartitemevents',
@@ -21147,6 +21148,16 @@ Ext.define('Voyant.panel.TermsRadio', {
         	var mode = this.getApiParam("mode");
         	if (mode===this.MODE_DOCUMENT) {
         		var docId = this.getApiParam("docId");
+        		debugger
+        		if (!docId) {
+        			var corpus = this.getCorpus();
+        			if (corpus) {
+        				docId = corpus.getDocument(0).getId();
+        				if (docId) {
+            				this.setApiParam('docId', docId);
+        				}
+        			}
+        		}
         		if (docId) {
         			var doc = this.getCorpus().getDocument(docId);
         			var tokens = doc.get('tokensCount-lexical');
