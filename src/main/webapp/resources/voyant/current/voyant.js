@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Mar 10 12:31:14 EST 2017 */
+/* This file created by JSCacher. Last modified: Fri Mar 10 16:26:17 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5789,6 +5789,7 @@ Ext.define('Voyant.data.model.Document', {
              {name: 'lastTokenStartOffset-lexical', type: 'int'},
              {name: 'title'},
              {name: 'language', convert: function(data) {return Ext.isEmpty(data) ? '' : data;}},
+             {name: 'sentencesCount', type: 'int'},
              {name: 'averageWordsPerSentence', type: 'float', calculate:  function(data) {
         	 	return data['sentencesCount'] ? data['tokensCount-lexical'] / data['sentencesCount'] : 0;
              }}
@@ -9017,7 +9018,11 @@ Ext.define('Voyant.panel.Bubbles', {
     
     loadDocument: function() {
     	var me = this, doc = this.getCorpus().getDocument(parseInt(this.getApiParam('docIndex')));
-    	this.setTitle(this.localize('title') + " <span class='subtitle'>"+doc.getFullLabel()+"</span>");
+    	// if we're not in a tab panel, set the document title as part of the header
+    	if (!this.up("tabpanel")) {
+        	this.setTitle(this.localize('title') + " <span class='subtitle'>"+doc.getFullLabel()+"</span>");
+    	}
+
     	doc.loadDocumentTerms(Ext.apply(this.getApiParams(["stopList"]), {
     		limit: 100
     	})).then(function(documentTerms) {
@@ -18284,7 +18289,10 @@ Ext.define('Voyant.panel.TextualArc', {
     	this.termsMap = {};
     	this.draw();
     	var doc =  this.getCorpus().getDocument(parseInt(this.getApiParam('docIndex')));
-    	this.setTitle(this.localize('title') + " <span class='subtitle'>"+doc.getFullLabel()+"</span>");
+    	// if we're not in a tab panel, set the document title as part of the header
+    	if (!this.up("tabpanel")) {
+        	this.setTitle(this.localize('title') + " <span class='subtitle'>"+doc.getFullLabel()+"</span>");
+    	}
     	this.lastToken = parseInt(doc.get('lastTokenStartOffset-lexical'));
     	this.documentTerms = doc.getDocumentTerms({
     		proxy: {

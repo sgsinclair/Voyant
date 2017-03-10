@@ -155,7 +155,11 @@ Ext.define('Voyant.panel.Bubbles', {
     
     loadDocument: function() {
     	var me = this, doc = this.getCorpus().getDocument(parseInt(this.getApiParam('docIndex')));
-    	this.setTitle(this.localize('title') + " <span class='subtitle'>"+doc.getFullLabel()+"</span>");
+    	// if we're not in a tab panel, set the document title as part of the header
+    	if (!this.up("tabpanel")) {
+        	this.setTitle(this.localize('title') + " <span class='subtitle'>"+doc.getFullLabel()+"</span>");
+    	}
+
     	doc.loadDocumentTerms(Ext.apply(this.getApiParams(["stopList"]), {
     		limit: 100
     	})).then(function(documentTerms) {
