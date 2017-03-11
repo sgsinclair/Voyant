@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Mar 10 17:40:17 EST 2017 */
+/* This file created by JSCacher. Last modified: Fri Mar 10 22:09:32 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7363,6 +7363,7 @@ Ext.define('Voyant.widget.CorpusSelector', {
     	}
     },
     
+    /*
     config: {
         labelWidth: 150,
         labelAlign: 'right',
@@ -7370,12 +7371,19 @@ Ext.define('Voyant.widget.CorpusSelector', {
         name:'corpus',
         queryMode:'local',
         store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]]
-    },
+    },*/
     initComponent: function(config) {
+    	debugger
     	var me = this;
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
     	Ext.applyIf(this, {
-    		fieldLabel: this.localize('chooseCorpus')
+    		fieldLabel: this.localize('chooseCorpus'),
+            labelWidth: 150,
+            labelAlign: 'right',
+//            fieldLabel:'Choose a corpus:',
+            name:'corpus',
+            queryMode:'local',
+            store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]]
     	});
     	
     	// check API and server option for open menu values
@@ -7390,6 +7398,7 @@ Ext.define('Voyant.widget.CorpusSelector', {
     
     replaceStoreItemsFromDefinition: function(definition) {
     	var data = [], items = definition.split(";");
+    	debugger
     	for (var i=0; i<items.length; i++) {
     		var nameValue = items[i].split(":");
     		if (nameValue[0]) {
@@ -21148,8 +21157,7 @@ Ext.define('Voyant.panel.TermsRadio', {
         	var mode = this.getApiParam("mode");
         	if (mode===this.MODE_DOCUMENT) {
         		var docId = this.getApiParam("docId");
-        		debugger
-        		if (!docId) {
+        		if (!docId) { // may not yet be set, let's check if we have a corpus and doc
         			var corpus = this.getCorpus();
         			if (corpus) {
         				docId = corpus.getDocument(0).getId();
