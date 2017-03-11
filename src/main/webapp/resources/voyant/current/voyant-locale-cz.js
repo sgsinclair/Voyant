@@ -249,6 +249,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableDocumentsColumns":"z celých sloupců",
 "accessModeWithoutPasswordText":"Pokud zadáte <i>přístupové heslo</i> můžete také specifikovat, jaký typ přístupu bude poskytnut uživatelům bez hesla.",
 "tableContentText":"Specifikujte, která čísla sloupců mají obsah (nebo nevyplňujte, pokud chcete použít všechny sloupce). Sloupec nejvíce vlevo má číslo 1. Definujte více dokumentů pomocí oddělení sloupců čárkou, nebo sloupce slučte použitím znaménka plus. Například 1+2,3 sloučí sloupce 1 a 2 do jednoho dokumentu a použije sloupec 3 pro druhý dokument.",
+"corpusSubTitle":"Corpus Subititle",
 "numberZero":"0 je neplatné označení, první sloupec musí mít číslo 1",
 "inputFormatAuto":"Automatická detekce (doporučeno)",
 "unknownFiles":"nerozpoznané (pravděpodobná chyba):",
@@ -275,12 +276,14 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeNonConsumptive":"omezený (bez uživatelských oprávnění)",
 "tableMetadataText":"Tyto možnosti nastavení se použijí pouze pokud jsou dokumenty extrahovány z buňek na každém řádku (viz první možnost v této sekci). Syntax je stejná jako u výše uvedených možností nastavení Obsahu: čísla sloupců oddělenná čárkami nebo sloučenná znaménkem plus.",
 "xpathAuthor":"Autor",
+"corpusOptions":"Corpus",
 "xpathTitle":"Název",
 "pleaseProvideText":"Prosím vložte text do textového pole (případně zvolte Otevřít nebo Nahrát)",
 "invalidForm":"Byly použity neplatné hodnoty, prosím najeďte kurzorem na červeně označená pole pro vysvětlení.",
 "tableAuthor":"Autor",
 "gearWinTitle":"Nastavení",
 "uploadingCorpus":"Nahrávání korpusu…",
+"corpusTitle":"Corpus Title",
 "accessOptions":"Správa přístupu",
 "tableNoHeadersRowText":"Určuje, zda má být přeskočen první řádek (pokud obsahuje záhlaví tabulky). Pokud tabulka obsahuje záhlaví, lze toto použít k automatickému přiřazení názvu dokumentu, když jsou dokumenty extrahovány z celých sloupců (v tomto případě ponechte pole názvu nevyplněné)."});
 Ext.apply(Voyant.util.DetailedError.i18n, {

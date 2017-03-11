@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Mar 11 12:00:20 EST 2017 */
+/* This file created by JSCacher. Last modified: Sat Mar 11 12:21:40 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -12184,7 +12184,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 							width: 375
 						},{
 	        				xtype: 'fieldset',
-	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/' target='voyantdocs'>"+me.localize('corpus')+"</a>",
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-titles' target='voyantdocs'>"+me.localize('corpusOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        defaultType: 'textfield',
@@ -12335,7 +12335,6 @@ Ext.define('Voyant.panel.CorpusCreator', {
     					var win = button.findParentByType('window');
     					var form = win.down('form');
     					if (form.isValid()) {
-    						debugger
         					var params = form.getValues();
         					me.setApiParams(params);
         					win.hide();

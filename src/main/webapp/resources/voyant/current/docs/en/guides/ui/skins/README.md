@@ -24,6 +24,24 @@ Beyond the tools visible in the tabs, it's possible to access most of the other 
 
 For more information about the available tools, consult the [List of Tools](#!/guide/toolslist)
 
+## Special Skins
+
+In addition to the default skin (that can be used with [Austen](../?corpus=austen) or [your own corpus](../)) there are several pre-defined skins that combine a subset of tools, including:
+
+* *Bubblelines Skin*: the [bubblelines](#!/guide/bubblelines) tool combined with the [contexts](#!/guide/contexts) and [reader](#!/guide/reader) tools (use with [Austen](../?corpus=austen&view=bubblelinesset) or [your own corpus](../?view=bubblelinesset))
+* *Collocates Skin*: [corpus terms](#!/guide/corpusterms), [document terms](#!/guide/documentterms), [corpus collocates](#!/guide/corpuscollocates), [contexts](#!/guide/contexts), and [collocates graph](#!/guide/collocatesgraph) (use with [Austen](../?corpus=austen&view=collocatesset) or [your own corpus](../?view=collocatesset))
+* *Scatter Skin*: [scatterplot (PCA and CA)](#!/guide/scatterplot) with [documents](#!/guide/documents), [trends](#!/guide/trends) and [contexts](#!/guide/contexts) (use with [Austen](../?corpus=austen&view=scatterset) or [your own corpus](../?view=scatterset))
+* *Subset Skin*: a specialized interface to select a subset of documents from your corpus (for download or for use in Voyant), based on full-text and metadata search (use with [Austen](../?corpus=austen&view=subset) or [your own corpus](../?view=subset))
+
+
+## Dynamic Table of Contexts Skin
+
+The Dynamic Table of Contexts Browser is an online reading environment for digitally encoded texts that allows for complex searches combining the table of contents with semantic tagging, index items, and free-text searching.
+
+The Dynamic Table of Contexts developed from the question of how best to leverage the kind of tagging or semantic markup used in the digital humanities to publish born digital scholarship involving long-form argumentation of the kind found in scholarly books. The browser, which resembles an e-book interface of the kind encountered at websites such as archive.org, combines tagging of the structure of the text with the tagging of named entities (people, places, organizations, titles) and with search functionality. Together, these provide users with a unique environment for browsing and navigating through the digital book, one that combines the Table of Contents with the Index. The result is a dynamic browsing environment in which the user can see where the materials that interest her are located within the structure of the volume.
+
+More information is available at the [CWRC website](http://www.cwrc.ca/cwrc_news/dtoc/).
+
 ## Next Steps
 
 * [languages](#!/guide/languages)

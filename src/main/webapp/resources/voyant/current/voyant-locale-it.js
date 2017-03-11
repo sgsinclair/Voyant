@@ -249,6 +249,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableDocumentsColumns":"Da tutte le colonne",
 "accessModeWithoutPasswordText":"Se specifichi una <i>password di accesso</i> puoi anche specificare il tipo di accesso da garantire ad utenti senza password.",
 "tableContentText":"Inserire i numeri delle colonne contenenti del testo (o lasciare vuoto per usare tutte le colonne). La prima colonna a sinistra ha il numero 1. Per distinguere i documenti separare le colonne con una virgola mentre per combinarle usare il segno più. Ad esempio 1+2,3 unirà le colonne 1 e 2 in un singolo documento e userà la colonna 3 per un secondo documento.",
+"corpusSubTitle":"Corpus Subititle",
 "numberZero":"0 non è valido, la prima colonna è 1",
 "inputFormatAuto":"Rilevamento Automatico (raccomandato)",
 "unknownFiles":"Non riconosciuto (possibile errore):",
@@ -275,12 +276,14 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeNonConsumptive":"Limitato (non di consumo)",
 "tableMetadataText":"Queste opzioni sono utilizzate quando i documenti sono estratti dalle celle in ogni riga (vedi la prima opzione di questa sezione). La sintassi è la stessa dell'opzione precedente: numeri di colonna separati da virgole o combinati con il segno più.",
 "xpathAuthor":"Autore",
+"corpusOptions":"Corpus",
 "xpathTitle":"Titolo",
 "pleaseProvideText":"Per favore, inserisci un testo nella casella testo (o scegli apri o carica)",
 "invalidForm":"Hai usato valori non validi, porta il cursore sopra i campi con zone rosse per ulteriori spiegazioni.",
 "tableAuthor":"Autore",
 "gearWinTitle":"Opzioni",
 "uploadingCorpus":"Caricamento corpus...",
+"corpusTitle":"Corpus Title",
 "accessOptions":"Opzioni accesso",
 "tableNoHeadersRowText":"Determina se saltare o no la prima riga (se è presente un'intestazione). Quando la prima riga fa da intestazione, può essere utilizzata per definire automaticamente il titolo del documento quando vengono estratti da una colonna intera (in questa evenienza con compilare il campo del titolo)."});
 Ext.apply(Voyant.util.DetailedError.i18n, {

@@ -249,6 +249,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableDocumentsColumns":"すべてのカラムから",
 "accessModeWithoutPasswordText":"あなたが<i>アクセスパスワード</i>を指定すれば、パスワードのないユーザーにどのようなアクセスが可能かを指定することもできます。",
 "tableContentText":"どのカラム番号がコンテンツを含むか（または、すべてのカラムを使うために空欄を残すか）を指定してください。一番左のカラムはカラム１です。コンマを使ってカラムを区切ったり、＋を用いることでカラムを連結して、複数のドキュメントを決定してください。例えば、”1+2,3”（実際には、引用符で囲む必要はありません）と指定すると、カラム１と２を１つのドキュメントに連結して、２つ目のドキュメントとしてカラム３を使うことになります。",
+"corpusSubTitle":"Corpus Subititle",
 "numberZero":"0は無効です。最初の列は1です",
 "inputFormatAuto":"自動判別（推奨）",
 "unknownFiles":"不明な形式（エラーの可能性）",
@@ -275,12 +276,14 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeNonConsumptive":"制限付き（非消費的）",
 "tableMetadataText":"このオプションは、各行のセルからドキュメントを抽出する時だけ用いてください（このセクションの最初のオプションを見てください）。記法は前述のコンテンツオプションと同じで、コンマを用いてカラムを区切ったり、＋を用いて連結できます。",
 "xpathAuthor":"著者",
+"corpusOptions":"Corpus",
 "xpathTitle":"タイトル",
 "pleaseProvideText":"テキストをテキストボックスに入力してください（または開くかアップロードするを選択してください）",
 "invalidForm":"不正な値が使用されています。赤色で囲まれているフィールド上にマウスカーソルを移動し確認していください",
 "tableAuthor":"著者",
 "gearWinTitle":"オプション",
 "uploadingCorpus":"コーパスをアップロードしています…",
+"corpusTitle":"Corpus Title",
 "accessOptions":"アクセスマネジメント",
 "tableNoHeadersRowText":"（ヘッダー行がある場合は）最初の行をスキップするかしないかを決定してください。ヘッダー行がある場合は、ドキュメントがカラム全体から抽出される時に（この場合は、タイトルフィールドが空欄になります）、それがドキュメントのタイトルを自動的に決定するために用いられます。"});
 Ext.apply(Voyant.util.DetailedError.i18n, {

@@ -249,6 +249,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableDocumentsColumns":"iz cijelih kolona",
 "accessModeWithoutPasswordText":"Ako navedete <i>pristupnu šifru</i>, možete odrediti i oblik pristupa za korisnike koji nemaju lozinku.",
 "tableContentText":"Odredite koji brojevi kolone imaju sadržaj (ili ostavite prazno kako biste koristili sve kolone). Najlijevija kolona je kolona 1. Definišite višestruke dokumente tako što ćete kolone razdvojiti zarezom ili ih kombinovati uz pomoć znaka plus. Naprimjer, 1+2, 3 bi kombinovalo kolone 1 i 2 u jedan dokument, a kolonu 3 u drugi dokument.",
+"corpusSubTitle":"Corpus Subititle",
 "numberZero":"0 ne važi, prva kolona je 1",
 "inputFormatAuto":"automatsko prepoznavanje (preporučljivo)",
 "unknownFiles":"nije prepoznato (moguća greška):",
@@ -275,12 +276,14 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeNonConsumptive":"ograničeno (neiskoristivo",
 "tableMetadataText":"Ove opcije se koriste samo kada su dokumenti ekstraktirani iz ćelija u svakom redu (pogledajte prvu opciju u ovoj sekciji). Ista sintaksa kao opcija za sadržaj iznad: brojevi kolona se razdvajaju zarezom ili kombinuju uz pomoć znaka plus.",
 "xpathAuthor":"Autor",
+"corpusOptions":"Corpus",
 "xpathTitle":"Naslov",
 "pleaseProvideText":"Dodajte tekst u okvir (ili odaberite Otvoriti ili Otpremiti)",
 "invalidForm":"Korištene su neispravne vrijednosti; pozicionirajte kursor na polja sa crvenim okvirima za pojašnjenje",
 "tableAuthor":"Autor",
 "gearWinTitle":"Opcije",
 "uploadingCorpus":"Otprema korpusa…",
+"corpusTitle":"Corpus Title",
 "accessOptions":"Upravljanje pristupa",
 "tableNoHeadersRowText":"Određuje da li će se preskočiti prvi red (ako sadrži zaglavlje). Ukoliko postoji, zaglavlje se može koristiti za automatsko definiranje naslova dokumenata kad kada su dokumenti ekstraktirani iz cijelih kolona (u ovom slučaju polje za naslov ostavite praznim)."});
 Ext.apply(Voyant.util.DetailedError.i18n, {

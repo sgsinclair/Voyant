@@ -249,6 +249,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableDocumentsColumns":"from entire columns",
 "accessModeWithoutPasswordText":"If you specify an <i>access password</i> you can also specify what access is granted to users without the password.",
 "tableContentText":"Specify which column numbers contain content (or leave blank to use all columns). The left-most columnn is column 1. Define multiple documents by separating columns with a comma or combine columns by using the plus sign. For example \"1+2,3\" (without quotes) would combine columns 1 and 2 into one document and use column 3 for  a second document.",
+"corpusSubTitle":"Corpus Subititle",
 "numberZero":"0 is invalid, the first column is 1",
 "inputFormatAuto":"Auto-Detect (recommended)",
 "unknownFiles":"unrecognized (possible error): ",
@@ -275,12 +276,14 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeNonConsumptive":"limited (non-consumptive)",
 "tableMetadataText":"These options are only used when documents are extracted from cells in each row (see the first option in this section). Same syntax as the Content option above: column numbers separated by commas or combined with a plus sign.",
 "xpathAuthor":"Author",
+"corpusOptions":"Corpus",
 "xpathTitle":"Title",
 "pleaseProvideText":"Please provide text in the text box (or choose open or upload).",
 "invalidForm":"Invalid values have been used, please hover over fields with red boxes for explanations.",
 "tableAuthor":"Author",
 "gearWinTitle":"Options",
 "uploadingCorpus":"Uploading corpus…",
+"corpusTitle":"Corpus Title",
 "accessOptions":"Access Management",
 "tableNoHeadersRowText":"Determines whether or not to skip the first row (if there's a header row). When there is a header row, it can be used to define the document title automatically when documents are extracted from entire columns (in this case leave the title field blank)."});
 Ext.apply(Voyant.util.DetailedError.i18n, {
