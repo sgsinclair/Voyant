@@ -17,7 +17,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tokenization: undefined,
     		adminPassword: undefined,
     		accessPassword: undefined,
-    		accessModeWithoutPassword: undefined,
+    		noPasswordAccess: undefined,
     		tableDocuments: undefined,
     		tableContent: undefined,
     		tableTitle: undefined,
@@ -463,7 +463,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	                            },{
 								    xtype:'combo',
 									fieldLabel: me.localize('accessModeWithoutPassword'),
-								    name: 'noPassordAccess',
+								    name: 'noPasswordAccess',
 								    queryMode:'local',
 								    store:[['',me.localize('accessModeNonConsumptive')],['none',me.localize("accessModeNone")]],
 								    forceSelection:true,

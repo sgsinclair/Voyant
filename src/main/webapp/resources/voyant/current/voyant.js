@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Mar 10 22:09:32 EST 2017 */
+/* This file created by JSCacher. Last modified: Sat Mar 11 12:00:20 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8752,6 +8752,32 @@ Ext.define('Voyant.panel.Panel', {
 			 anchor: this.getTargetEl()			
 		})
 		Ext.toast(config);
+	},
+
+	/**
+	 * Checks to see if we have access to this corpus, first by checking the application's
+	 * access setting for the corpus, then by checking the corpus setting.
+	 * 
+	 * Assumes we're only calling this from a non-consumptive tool.
+	 */
+	hasCorpusAccess: function(corpus) {
+		var app = this.getApplication();
+		if (app) {
+			var corpusAccess = app.getCorpusAccess();
+			if (corpusAccess=='ADMIN' || corpusAccess=='ACCESS') {return true;}
+		}
+		if (!corpus) {
+			if (this.getCorpus) {
+				corpus = this.getCorpus();
+			}
+			if (!corpus && app.getCorpus) {
+				corpus = app.getCorpus();
+			}
+		}
+		if (corpus) {
+			return corpus.getNoPasswordAccess()!='NONCONSUMPTIVE' && corpus.getNoPasswordAccess()!='NONE';
+		}
+		return false; // don't know if we ever get here
 	}
 	
 });
@@ -11531,7 +11557,7 @@ Ext.define('Voyant.panel.Contexts', {
         });
         
         me.on("loadedCorpus", function(src, corpus) {
-        	if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+        	if (this.hasCorpusAccess(corpus)==false) {
         		this.mask(this.localize('limitedAccess'), 'mask-no-spinner');
         	}
         	else {
@@ -11585,8 +11611,7 @@ Ext.define('Voyant.panel.Contexts', {
         	}
         });
 
-        me.callParent(arguments);
-        
+    	me.callParent(arguments);
      }
      
 });
@@ -11847,7 +11872,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tokenization: undefined,
     		adminPassword: undefined,
     		accessPassword: undefined,
-    		accessModeWithoutPassword: undefined,
+    		noPasswordAccess: undefined,
     		tableDocuments: undefined,
     		tableContent: undefined,
     		tableTitle: undefined,
@@ -12293,7 +12318,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	                            },{
 								    xtype:'combo',
 									fieldLabel: me.localize('accessModeWithoutPassword'),
-								    name: 'noPassordAccess',
+								    name: 'noPasswordAccess',
 								    queryMode:'local',
 								    store:[['',me.localize('accessModeNonConsumptive')],['none',me.localize("accessModeNone")]],
 								    forceSelection:true,
@@ -12310,6 +12335,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     					var win = button.findParentByType('window');
     					var form = win.down('form');
     					if (form.isValid()) {
+    						debugger
         					var params = form.getValues();
         					me.setApiParams(params);
         					win.hide();
@@ -12953,6 +12979,7 @@ Ext.define('Voyant.panel.Phrases', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.phrases',
+	isConsumptive: true,
     statics: {
     	i18n: {
     	},
@@ -12977,7 +13004,11 @@ Ext.define('Voyant.panel.Phrases', {
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		if (this.isVisible()) {
-    			this.loadFromApis();
+            	if (this.hasCorpusAccess(corpus)==false) {
+            		this.mask(this.localize('limitedAccess'), 'mask-no-spinner');
+            	} else {
+        			this.loadFromApis();
+            	}
     		}
     		
     	});
@@ -13031,6 +13062,10 @@ Ext.define('Voyant.panel.Phrases', {
 
         var store = Ext.create("Voyant.data.store.CorpusNgramsBuffered", {
         	parentPanel: me
+        });
+        
+        store.on("beforeload", function(store) {
+    		return me.hasCorpusAccess(store.getCorpus());
         });
         me.on("sortchange", function( ct, column, direction, eOpts ) {
         	this.setApiParam('sort', column.dataIndex);
@@ -13815,7 +13850,7 @@ Ext.define('Voyant.panel.Documents', {
     	this.on('loadedCorpus', function(src, corpus) {
     		this.store.setCorpus(corpus);
     		this.store.load({params: this.getApiParams()});
-    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+    		if (this.hasCorpusAccess(corpus)==false) {
     			this.queryById('modifyButton').hide();
     		}
     		/*
@@ -15456,8 +15491,9 @@ Ext.define('Voyant.panel.Reader', {
     
     initComponent: function() {
     	var tokensStore = Ext.create("Voyant.data.store.Tokens");
+    	var me = this;
     	tokensStore.on("beforeload", function(store) {
-    		return store.getCorpus().getNoPasswordAccess()!='NONCONSUMPTIVE';
+    		return me.hasCorpusAccess(store.getCorpus());
     	})
     	tokensStore.on("load", function(s, records, success) {
     		if (success) {
@@ -15672,7 +15708,7 @@ Ext.define('Voyant.panel.Reader', {
     	    		
     	    		if (this.rendered) {
     	    			this.load();
-        	    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+        	    		if (this.hasCorpusAccess(corpus)==false) {
         	    			this.mask(this.localize("limitedAccess"), 'mask-no-spinner')
         	    		}
         	    		var query = this.getApiParam('query');
@@ -19096,9 +19132,11 @@ Ext.define('Voyant.panel.TermsRadio', {
 			store.on('load', function(store, records) {
 				for (var i = 0; i < 3; i++) {
 					var r = records[i];
-					var info = {wordString : r.get('term'), docId : r.get('docId')};
-	    			var paramsBundle = this.buildParamsBundle(info);
-	    			this.manageOverlaySticky(paramsBundle);
+					if (r) {
+						var info = {wordString : r.get('term'), docId : r.get('docId')};
+		    			var paramsBundle = this.buildParamsBundle(info);
+		    			this.manageOverlaySticky(paramsBundle);
+					}
 				}
 			}, this, {single: true});
 			store.load({params: params});
@@ -21829,7 +21867,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     		
     	},
     	loadedCorpus: function(src, corpus) {
-    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE' && !this.getApiParam('panels')) {
+    		if (this.hasCorpusAccess(corpus)==false && !this.getApiParam('panels')) {
     			var tabpanels = this.query("voyanttabpanel");
     			tabpanels[1].add({xtype: 'termsradio'}); // reader
     			tabpanels[1].setActiveTab(1); // reader
@@ -23143,12 +23181,18 @@ Ext.define('Voyant.VoyantApp', {
 			config = config || {};
 			config.message = (config.message || "");
 			if (response.error) {
-				var lines = response.error.split(/(\r\n|\r|\n)/);
+				var err = "";
+				if (typeof response.error == 'string') { // not sure when this is the actual error
+					err = response.error; 
+				} else if (response.error.response.responseText && typeof response.error.response.responseText == 'string') {
+					err = response.error.response.responseText;
+				}
+				var lines = err.split(/(\r\n|\r|\n)/);
 				if (lines.length>0) {
 					config.message=this.localize('serverResponseError'); // assuming this is a server error
 					config.message += "<pre class='error'>\n"+lines[0]+"</p>";
 					if (lines.length>1) {
-						config.message+="…  <a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.error)+"</pre>')); return false;\">more</a></pre>";
+						config.message+="…  <a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(err)+"</pre>')); return false;\">more</a></pre>";
 					}
 					config.message+="</pre>";
 				}
@@ -23343,6 +23387,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 	
     config: {
     	corpus: undefined,
+    	corpusAccess: undefined,
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
@@ -23447,12 +23492,6 @@ Ext.define('Voyant.VoyantCorpusApp', {
 			return !panel.isConsumptive
 		})) {
 			var noPasswordAccess = corpus.getNoPasswordAccess();
-			var buttons = [
-			       { text: 'Validate' }
-			]
-			if (noPasswordAccess=='NONCONSUMPTIVE') {
-				buttons.push({text: 'Limited'})
-			}
 			var passWin = Ext.create('Ext.window.Window', {
 	            title: me.localize('passwordRequiredTitle'),
 			    layout: 'fit',
@@ -23500,6 +23539,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 	                    				  if (access=="ADMIN" || access=="ACCESS") {
 			                    			    passWin.close();
 			                    			    view.unmask();
+			                    			    me.setCorpusAccess(access);
 					            				me.dispatchEvent('loadedCorpus', this, corpus);
 	                    				  }
 	                    				  else {
@@ -23518,6 +23558,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 	                    	}
 	                    },{
 	                    	text: me.localize('nonConsumptiveButton'),
+	                    	hidden: corpus.getNoPasswordAccess()=='NONE',
 	                    	handler: function() {
 	                    		passWin.mask();
 	                    		Ext.Ajax.request({

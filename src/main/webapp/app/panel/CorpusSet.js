@@ -138,7 +138,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     		
     	},
     	loadedCorpus: function(src, corpus) {
-    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE' && !this.getApiParam('panels')) {
+    		if (this.hasCorpusAccess(corpus)==false && !this.getApiParam('panels')) {
     			var tabpanels = this.query("voyanttabpanel");
     			tabpanels[1].add({xtype: 'termsradio'}); // reader
     			tabpanels[1].setActiveTab(1); // reader

@@ -139,6 +139,32 @@ Ext.define('Voyant.panel.Panel', {
 			 anchor: this.getTargetEl()			
 		})
 		Ext.toast(config);
+	},
+
+	/**
+	 * Checks to see if we have access to this corpus, first by checking the application's
+	 * access setting for the corpus, then by checking the corpus setting.
+	 * 
+	 * Assumes we're only calling this from a non-consumptive tool.
+	 */
+	hasCorpusAccess: function(corpus) {
+		var app = this.getApplication();
+		if (app) {
+			var corpusAccess = app.getCorpusAccess();
+			if (corpusAccess=='ADMIN' || corpusAccess=='ACCESS') {return true;}
+		}
+		if (!corpus) {
+			if (this.getCorpus) {
+				corpus = this.getCorpus();
+			}
+			if (!corpus && app.getCorpus) {
+				corpus = app.getCorpus();
+			}
+		}
+		if (corpus) {
+			return corpus.getNoPasswordAccess()!='NONCONSUMPTIVE' && corpus.getNoPasswordAccess()!='NONE';
+		}
+		return false; // don't know if we ever get here
 	}
 	
 });

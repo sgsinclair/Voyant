@@ -2,6 +2,7 @@ Ext.define('Voyant.panel.Phrases', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.phrases',
+	isConsumptive: true,
     statics: {
     	i18n: {
     	},
@@ -26,7 +27,11 @@ Ext.define('Voyant.panel.Phrases', {
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		if (this.isVisible()) {
-    			this.loadFromApis();
+            	if (this.hasCorpusAccess(corpus)==false) {
+            		this.mask(this.localize('limitedAccess'), 'mask-no-spinner');
+            	} else {
+        			this.loadFromApis();
+            	}
     		}
     		
     	});
@@ -80,6 +85,10 @@ Ext.define('Voyant.panel.Phrases', {
 
         var store = Ext.create("Voyant.data.store.CorpusNgramsBuffered", {
         	parentPanel: me
+        });
+        
+        store.on("beforeload", function(store) {
+    		return me.hasCorpusAccess(store.getCorpus());
         });
         me.on("sortchange", function( ct, column, direction, eOpts ) {
         	this.setApiParam('sort', column.dataIndex);

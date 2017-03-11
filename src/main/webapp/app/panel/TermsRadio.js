@@ -494,9 +494,11 @@ Ext.define('Voyant.panel.TermsRadio', {
 			store.on('load', function(store, records) {
 				for (var i = 0; i < 3; i++) {
 					var r = records[i];
-					var info = {wordString : r.get('term'), docId : r.get('docId')};
-	    			var paramsBundle = this.buildParamsBundle(info);
-	    			this.manageOverlaySticky(paramsBundle);
+					if (r) {
+						var info = {wordString : r.get('term'), docId : r.get('docId')};
+		    			var paramsBundle = this.buildParamsBundle(info);
+		    			this.manageOverlaySticky(paramsBundle);
+					}
 				}
 			}, this, {single: true});
 			store.load({params: params});
