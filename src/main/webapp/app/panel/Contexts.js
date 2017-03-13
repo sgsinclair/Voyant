@@ -246,7 +246,7 @@ Ext.define('Voyant.panel.Contexts', {
         });
         
         me.on("loadedCorpus", function(src, corpus) {
-        	if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+        	if (this.hasCorpusAccess(corpus)==false) {
         		this.mask(this.localize('limitedAccess'), 'mask-no-spinner');
         	}
         	else {
@@ -300,8 +300,7 @@ Ext.define('Voyant.panel.Contexts', {
         	}
         });
 
-        me.callParent(arguments);
-        
+    	me.callParent(arguments);
      }
      
 });

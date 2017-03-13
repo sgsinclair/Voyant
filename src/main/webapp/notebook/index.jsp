@@ -57,7 +57,8 @@
 		config: {
 			baseUrl: '<%= base %>/',
 			version: '<%= application.getInitParameter("version") %>',
-			build: '<%= application.getInitParameter("build") %>'			
+			build: '<%= application.getInitParameter("build") %>',
+			allowInput: '<%= System.getProperty("org.voyanttools.server.allowinput")==null ? "" : System.getProperty("org.voyanttools.server.allowinput") %>'			
 		}
 	});
 </script>

@@ -10,6 +10,7 @@ Ext.define('Voyant.widget.CorpusSelector', {
     	}
     },
     
+    /*
     config: {
         labelWidth: 150,
         labelAlign: 'right',
@@ -17,12 +18,19 @@ Ext.define('Voyant.widget.CorpusSelector', {
         name:'corpus',
         queryMode:'local',
         store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]]
-    },
+    },*/
     initComponent: function(config) {
+    	debugger
     	var me = this;
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
     	Ext.applyIf(this, {
-    		fieldLabel: this.localize('chooseCorpus')
+    		fieldLabel: this.localize('chooseCorpus'),
+            labelWidth: 150,
+            labelAlign: 'right',
+//            fieldLabel:'Choose a corpus:',
+            name:'corpus',
+            queryMode:'local',
+            store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]]
     	});
     	
     	// check API and server option for open menu values
@@ -37,6 +45,7 @@ Ext.define('Voyant.widget.CorpusSelector', {
     
     replaceStoreItemsFromDefinition: function(definition) {
     	var data = [], items = definition.split(";");
+    	debugger
     	for (var i=0; i<items.length; i++) {
     		var nameValue = items[i].split(":");
     		if (nameValue[0]) {

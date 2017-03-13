@@ -17,7 +17,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tokenization: undefined,
     		adminPassword: undefined,
     		accessPassword: undefined,
-    		accessModeWithoutPassword: undefined,
+    		noPasswordAccess: undefined,
     		tableDocuments: undefined,
     		tableContent: undefined,
     		tableTitle: undefined,
@@ -245,7 +245,24 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	}    
         });
         
+        me.on("boxready", function(panel) {
+        	var app = this.getApplication()
+        	if (app.getAllowInput && app.getAllowInput()=="false") {
+        		panel.hide();
+        		Ext.create('Ext.window.Window', {
+        		    layout: 'fit',
+        		    header: false,
+        		    modal: true,
+        		    bodyPadding: 10,
+        		    items: {  // Let's put an empty grid in just to illustrate fit layout
+        		        html: "<p style='color: red;'>"+panel.localize('noAllowInputMessage')+"</p>"
+        		    }
+        		}).show();
+        	}
+        })
+
         me.callParent(arguments);
+        
     },
     
     loadForm: function(form) {
@@ -329,7 +346,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 							width: 375
 						},{
 	        				xtype: 'fieldset',
-	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/' target='voyantdocs'>"+me.localize('corpus')+"</a>",
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-titles' target='voyantdocs'>"+me.localize('corpusOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        defaultType: 'textfield',
@@ -463,7 +480,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	                            },{
 								    xtype:'combo',
 									fieldLabel: me.localize('accessModeWithoutPassword'),
-								    name: 'noPassordAccess',
+								    name: 'noPasswordAccess',
 								    queryMode:'local',
 								    store:[['',me.localize('accessModeNonConsumptive')],['none',me.localize("accessModeNone")]],
 								    forceSelection:true,

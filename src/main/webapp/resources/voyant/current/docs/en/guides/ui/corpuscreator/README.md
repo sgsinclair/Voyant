@@ -36,6 +36,11 @@ Most document formats are fairly easy to detect automatically, Voyant does a dec
 * **Text Encoding Initiative ([TEI](http://www.tei-c.org/))**: An XML-based format (essentially uses `//text` for content and `//teiHeader//title` and `//teiHeader//author` for metadata)
 * **TEI Corpus**: As above, except that produces multiple documents from `//TEI` tags
 
+## Titles
+
+It's possible to provide a title and subtitle for your corpus. These values aren't typically used in the
+[default skin](#!/guide/skins-section-default-skin) but are useful elsewhere, such as in the [Dynamic Table of Contexts skin](#!/guide/skins-section-dynamic-table-of-contexts-skin).
+
 ## XML
 
 Voyant provides powerful functionality for creating a corpus from XML documents, in particular by using [XPath](https://en.m.wikipedia.org/wiki/XPath) expressions to define documents, content, and metadata like title and author.

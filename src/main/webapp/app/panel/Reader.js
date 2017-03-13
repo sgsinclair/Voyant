@@ -37,8 +37,9 @@ Ext.define('Voyant.panel.Reader', {
     
     initComponent: function() {
     	var tokensStore = Ext.create("Voyant.data.store.Tokens");
+    	var me = this;
     	tokensStore.on("beforeload", function(store) {
-    		return store.getCorpus().getNoPasswordAccess()!='NONCONSUMPTIVE';
+    		return me.hasCorpusAccess(store.getCorpus());
     	})
     	tokensStore.on("load", function(s, records, success) {
     		if (success) {
@@ -253,7 +254,7 @@ Ext.define('Voyant.panel.Reader', {
     	    		
     	    		if (this.rendered) {
     	    			this.load();
-        	    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+        	    		if (this.hasCorpusAccess(corpus)==false) {
         	    			this.mask(this.localize("limitedAccess"), 'mask-no-spinner')
         	    		}
         	    		var query = this.getApiParam('query');

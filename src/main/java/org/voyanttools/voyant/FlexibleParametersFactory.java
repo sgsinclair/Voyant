@@ -18,6 +18,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.NameValuePair;
+import org.voyanttools.trombone.input.source.InputSourcesBuilder;
 import org.voyanttools.trombone.util.FlexibleParameters;
 
 import sun.security.action.GetPropertyAction;
@@ -99,6 +100,11 @@ public class FlexibleParametersFactory {
 					parametersDecoder.decodeParameters(param.getKey(), param.getValue(), allowLocalFileSystemAccess || (request instanceof Voyant.PostedInputRequestWrapper && param.getKey().equals("upload")));
 				}		
 			}
+		}
+		
+		// check to see if this instance allows new input
+		if (System.getProperty("org.voyanttools.server.allowinput", "true").equals("false") && InputSourcesBuilder.hasParameterSources(parameters)) {
+			throw new IllegalArgumentException("This server has been configured to refuse new input.");
 		}
 		
 		return parameters;

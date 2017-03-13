@@ -66,7 +66,8 @@ if (isNotRealTool || (new java.io.File(new java.io.File(request.getServletContex
 			baseUrl: '<%= org.voyanttools.voyant.Voyant.getBaseUrlString(request) %>',
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>',
-			tool: '<%= tool.toLowerCase() %>'
+			tool: '<%= tool.toLowerCase() %>',
+			allowInput: '<%= System.getProperty("org.voyanttools.server.allowinput")==null ? "" : System.getProperty("org.voyanttools.server.allowinput") %>'
 		},
 		launch: function() {
 			if (document.location.search.length==0) {

@@ -126,12 +126,18 @@ Ext.define('Voyant.VoyantApp', {
 			config = config || {};
 			config.message = (config.message || "");
 			if (response.error) {
-				var lines = response.error.split(/(\r\n|\r|\n)/);
+				var err = "";
+				if (typeof response.error == 'string') { // not sure when this is the actual error
+					err = response.error; 
+				} else if (response.error.response.responseText && typeof response.error.response.responseText == 'string') {
+					err = response.error.response.responseText;
+				}
+				var lines = err.split(/(\r\n|\r|\n)/);
 				if (lines.length>0) {
 					config.message=this.localize('serverResponseError'); // assuming this is a server error
 					config.message += "<pre class='error'>\n"+lines[0]+"</p>";
 					if (lines.length>1) {
-						config.message+="…  <a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.error)+"</pre>')); return false;\">more</a></pre>";
+						config.message+="…  <a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(err)+"</pre>')); return false;\">more</a></pre>";
 					}
 					config.message+="</pre>";
 				}

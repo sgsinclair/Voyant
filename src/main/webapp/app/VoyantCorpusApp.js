@@ -21,6 +21,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 	
     config: {
     	corpus: undefined,
+    	corpusAccess: undefined,
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
@@ -125,12 +126,6 @@ Ext.define('Voyant.VoyantCorpusApp', {
 			return !panel.isConsumptive
 		})) {
 			var noPasswordAccess = corpus.getNoPasswordAccess();
-			var buttons = [
-			       { text: 'Validate' }
-			]
-			if (noPasswordAccess=='NONCONSUMPTIVE') {
-				buttons.push({text: 'Limited'})
-			}
 			var passWin = Ext.create('Ext.window.Window', {
 	            title: me.localize('passwordRequiredTitle'),
 			    layout: 'fit',
@@ -178,6 +173,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 	                    				  if (access=="ADMIN" || access=="ACCESS") {
 			                    			    passWin.close();
 			                    			    view.unmask();
+			                    			    me.setCorpusAccess(access);
 					            				me.dispatchEvent('loadedCorpus', this, corpus);
 	                    				  }
 	                    				  else {
@@ -196,6 +192,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 	                    	}
 	                    },{
 	                    	text: me.localize('nonConsumptiveButton'),
+	                    	hidden: corpus.getNoPasswordAccess()=='NONE',
 	                    	handler: function() {
 	                    		passWin.mask();
 	                    		Ext.Ajax.request({

@@ -220,7 +220,7 @@ Ext.define('Voyant.panel.Documents', {
     	this.on('loadedCorpus', function(src, corpus) {
     		this.store.setCorpus(corpus);
     		this.store.load({params: this.getApiParams()});
-    		if (corpus.getNoPasswordAccess()=='NONCONSUMPTIVE') {
+    		if (this.hasCorpusAccess(corpus)==false) {
     			this.queryById('modifyButton').hide();
     		}
     		/*
