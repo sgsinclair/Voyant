@@ -5,8 +5,13 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	curatedTags: null, // curated tags list
 	tagTotals: {}, // tracks tag freq counts for entire corpus
 	
-	loadAllTags: function() {
+	_maskEl: null,
+	
+	loadAllTags: function(useMask) {
 		if (this.getCorpus() !== undefined) {
+			if (useMask) {
+				this._maskEl = this.body.mask('Processing Tags: 0%', 'loadMask');
+			}
 			var currDocIndex = 0;
 			
 			var me = this;
@@ -21,6 +26,9 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 				} else {
 					me.updateTagTotals(true);
 					me.getApplication().dispatchEvent('allTagsLoaded', me);
+					if (useMask) {
+						me.body.unmask();
+					}
 				}
 			}
 			
@@ -28,7 +36,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		} else {
 			this.on('loadedCorpus', function(src, corpus) {
 				this.setCorpus(corpus);
-				this.loadAllTags();
+				this.loadAllTags(useMask);
 			}, this, {single: true});
 		}
 	},
@@ -129,9 +137,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			}
 		};
 		
-		if (this.getApplication().useIndex) {
-			this._updateProgress(docId);
-		}
+		this._updateProgress(docId);
 	},
 	
 	_storeTags: function(tags, docId) {
@@ -140,11 +146,17 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	},
 	
 	_updateProgress: function(docId) {
-		var dtcIndex = Ext.getCmp('dtcIndex');
 	    var totalDocs = this.getCorpus().getDocumentsCount();
 	    var docIndex = this.getCorpus().getDocument(docId).getIndex();
 	    var progress = docIndex / totalDocs;
-	    dtcIndex.updateIndexProgress(progress);
+	    
+	    if (this.getApplication().useIndex) {
+	    	Ext.getCmp('dtcIndex').updateIndexProgress(progress);
+	    } else {
+		    if (this._maskEl != null) {
+		    	this._maskEl.down('.x-mask-msg-text').dom.firstChild.data = 'Processing Tags: '+Math.floor(progress*100)+'%';
+		    }
+	    }
 	},
 	
 	showHitsForTags: Ext.emptyFn, // need to override this
@@ -671,11 +683,11 @@ Ext.define('Voyant.panel.DToC.Markup', {
 			this.updateChapterFilter();
 			
 			if (this.getApplication().useIndex != true) {
-				this.loadAllTags();
+				this.loadAllTags(true);
 			}
 		},
 		indexProcessed: function() {
-			this.loadAllTags();
+			this.loadAllTags(false);
 		},
 		chapterFilterSelected: function(src, docId) {
 			this.doChapterFilter(docId, false);
