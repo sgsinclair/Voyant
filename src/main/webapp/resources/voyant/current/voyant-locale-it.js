@@ -258,6 +258,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationOptions":"Tokenizzazione",
 "advancedOptionsText":"Per maggiori informazioni sulle opzioni avanzate disponibili, vedi la documentazione su <a href=\"{0}\" target=\"voyantdocs\">creare un corpus</a>.",
 "tableDocuments":"Documenti",
+"noAllowInputMessage":"This server has been configured to NOT allow new documents to be added. Please contact the server administrator (if you can).",
 "fileTypesMessage":"Uno o più dei tuoi files hanno una estensione incompatibile o non riconosciuta che potrebbe causare problemi.",
 "errorNotXmlContinue":"Hai selezionato un formato input XML ma l'input non risulta essere in XML. Vuoi continuare?",
 "SelectExisting":"Seleziona un corpus esistente",

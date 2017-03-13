@@ -16,7 +16,8 @@
 		config: {
 			baseUrl: '<%= org.voyanttools.voyant.Voyant.getBaseUrlString(request) %>',
 			version: '<%= application.getInitParameter("version") %>',
-			build: '<%= application.getInitParameter("build") %>'			
+			build: '<%= application.getInitParameter("build") %>',
+			allowInput: 'false' // assume that this is always pre-built		
 		},
 		statics: {
 	    	i18n: {

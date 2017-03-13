@@ -258,6 +258,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationOptions":"Tokenizace",
 "advancedOptionsText":"Pro více informací o níže uvedeném pokročilém nastavení konzultujte dokumentaci k<a href=\"{0}\" target=\"voyantdocs\">vytvoření nového korpusu</a>.",
 "tableDocuments":"Dokumenty",
+"noAllowInputMessage":"This server has been configured to NOT allow new documents to be added. Please contact the server administrator (if you can).",
 "fileTypesMessage":"Máte jeden nebo více souborů s nekompatibilní nebo nerozpoznanou příponou souboru, což může způsobit problémy.",
 "errorNotXmlContinue":"Zvolili jste XML formát vstupu, ale vstup se nezdá být v tomto formátu. Jste si jisti, že chcete pokračovat?",
 "SelectExisting":"Vybrat existující korpus",

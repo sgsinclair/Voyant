@@ -47,7 +47,8 @@ Ext.onReady(function(){
 			baseUrl: '<%= org.voyanttools.voyant.Voyant.getBaseUrlString(request) %>',
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>',
-			openMenu: '<%= System.getProperty("org.voyanttools.voyant.openmenu")==null ? "" : System.getProperty("org.voyanttools.voyant.openmenu") %>'
+			openMenu: '<%= System.getProperty("org.voyanttools.voyant.openmenu")==null ? "" : System.getProperty("org.voyanttools.voyant.openmenu") %>',
+			allowInput: '<%= System.getProperty("org.voyanttools.server.allowinput")==null ? "" : System.getProperty("org.voyanttools.server.allowinput") %>'
 		},
 		launch: function() {
 		   	var me = this;

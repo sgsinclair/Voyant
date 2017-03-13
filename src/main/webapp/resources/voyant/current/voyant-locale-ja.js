@@ -258,6 +258,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationOptions":"トークン化",
 "advancedOptionsText":"下記の詳細なオプションに関するさらなる情報は、<a href=\"{0}\" target=\"voyantdocs\">コーパスを作成する</a>マニュアルを参照してください。",
 "tableDocuments":"ドキュメント",
+"noAllowInputMessage":"This server has been configured to NOT allow new documents to be added. Please contact the server administrator (if you can).",
 "fileTypesMessage":"互換性がないか、問題を起こしかねないような認識されない拡張子を持った１つかそれ以上のファイルがあります。",
 "errorNotXmlContinue":"入力されたデータはXML形式ではないようです。操作を続けますか？",
 "SelectExisting":"既存のコーパスを選択する",

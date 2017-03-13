@@ -40,7 +40,7 @@ public class HttpParametersDecoder {
 		decodeParameters(key, new String[] { value }, allowLocalFileSystemAccess);
 	
 	}
-
+	
 	public synchronized void decodeParameters(String key, String[] values, boolean allowLocalFileSystemAccess) {
 
 		if (key == null) {
@@ -49,7 +49,7 @@ public class HttpParametersDecoder {
 		if (values == null) {
 			throw new NullPointerException("illegal values");
 		}
-
+				
 		// let's strip the brackets that indicate an array
 		if (key.endsWith("[]") && key.length()>2) {key = key.substring(0, key.length()-2);}
 

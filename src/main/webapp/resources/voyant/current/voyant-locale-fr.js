@@ -258,6 +258,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationOptions":"Segmentation",
 "advancedOptionsText":"Pour plus d’informations sur les options avancées proposées ci-dessous, voir la documentation sur la <a href=\"{0}\" target=\"voyantdocs\">création d’un corpus</a>.",
 "tableDocuments":"Documents",
+"noAllowInputMessage":"Ce serveur est configuré pour refuser l'ajout de nouveaux documents (veuillez contacter l'administrateur du serveur si possible).",
 "fileTypesMessage":"Les extensions d’un ou de plusieurs fichiers sont incompatibles ou ne sont pas reconnues. Cela risque d’entraîner des problèmes.",
 "errorNotXmlContinue":"Vous avez sélectionné un import en XML, mais le contenu importé ne semble pas être du XML. Voulez-vous vraiment continuer ?",
 "SelectExisting":"Sélectionner un corpus déjà créé",

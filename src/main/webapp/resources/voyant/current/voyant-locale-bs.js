@@ -258,6 +258,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationOptions":"Tokenizacija",
 "advancedOptionsText":"Za više informacija o naprednim opcijama ispod, pogledajte dokumentaciju o <a href=\"{0}\" target=\"voyantdocs\">stvaranju korpusa</a>.",
 "tableDocuments":"Dokumenti",
+"noAllowInputMessage":"This server has been configured to NOT allow new documents to be added. Please contact the server administrator (if you can).",
 "fileTypesMessage":"Jedna ili više vaših datoteka sadrži nekompatibilne ili nepoznate ekstenzije, što može izazvati problem.",
 "errorNotXmlContinue":"Odabrali ste XML format za unos podataka, ali unos nije u XML-u. Jeste li sigurni da želite nastaviti?",
 "SelectExisting":"Odabrati postojeći korpus",

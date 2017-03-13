@@ -28,7 +28,8 @@ String corpus = parts[1];
 			baseUrl: '<%= org.voyanttools.voyant.Voyant.getBaseUrlString(request) %>',
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>',
-			corpusId: '<%= corpus %>'
+			corpusId: '<%= corpus %>',
+			allowInput: '<%= System.getProperty("org.voyanttools.server.allowinput")==null ? "" : System.getProperty("org.voyanttools.server.allowinput") %>'
 		},
 		launch: function() {
 			this.setApiParam('corpus', this.getCorpusId())

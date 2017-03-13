@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Mar 11 12:21:40 EST 2017 */
+/* This file created by JSCacher. Last modified: Mon Mar 13 12:09:36 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -12100,7 +12100,24 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	}    
         });
         
+        me.on("boxready", function(panel) {
+        	var app = this.getApplication()
+        	if (app.getAllowInput && app.getAllowInput()=="false") {
+        		panel.hide();
+        		Ext.create('Ext.window.Window', {
+        		    layout: 'fit',
+        		    header: false,
+        		    modal: true,
+        		    bodyPadding: 10,
+        		    items: {  // Let's put an empty grid in just to illustrate fit layout
+        		        html: "<p style='color: red;'>"+panel.localize('noAllowInputMessage')+"</p>"
+        		    }
+        		}).show();
+        	}
+        })
+
         me.callParent(arguments);
+        
     },
     
     loadForm: function(form) {

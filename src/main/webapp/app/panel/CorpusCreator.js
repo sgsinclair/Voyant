@@ -245,7 +245,24 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	}    
         });
         
+        me.on("boxready", function(panel) {
+        	var app = this.getApplication()
+        	if (app.getAllowInput && app.getAllowInput()=="false") {
+        		panel.hide();
+        		Ext.create('Ext.window.Window', {
+        		    layout: 'fit',
+        		    header: false,
+        		    modal: true,
+        		    bodyPadding: 10,
+        		    items: {  // Let's put an empty grid in just to illustrate fit layout
+        		        html: "<p style='color: red;'>"+panel.localize('noAllowInputMessage')+"</p>"
+        		    }
+        		}).show();
+        	}
+        })
+
         me.callParent(arguments);
+        
     },
     
     loadForm: function(form) {
