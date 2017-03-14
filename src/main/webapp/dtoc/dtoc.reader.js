@@ -35,7 +35,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
     constructor: function(config) {
     	
     	Ext.applyIf(config, {
-			baseCls: 'x-plain dtc-panel',
+    		cls: 'dtc-panel',
 			height: '100%',
 			html: '<div id="dtcReaderContainer"><div id="dtcReaderDivWrapper"></div><div id="dtcReaderButtons"></div></div>'
 		});
@@ -51,6 +51,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			this.prevButton = new Ext.Button({
 				text: 'Previous Chapter',
 				scale: 'medium',
+				cls: 'dtc-button',
 				style: 'display: inline-block; margin-right: 5px;',
 				renderTo: buttonContainer,
 				handler: this.fetchPreviousDocument,
@@ -61,6 +62,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			this.nextButton = new Ext.Button({
 				text: 'Next Chapter',
 				scale: 'medium',
+				cls: 'dtc-button',
 				style: 'display: inline-block; margin-left: 5px;',
 				renderTo: buttonContainer,
 				handler: this.fetchNextDocument,

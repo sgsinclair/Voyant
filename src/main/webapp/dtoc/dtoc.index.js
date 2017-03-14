@@ -33,17 +33,14 @@ Ext.define('Voyant.panel.DToC.Index', {
 		var treeConfig = {
 			itemId: 'dtcTree',
 			xtype: 'treepanel',
-			baseCls: 'x-plain dtc-tree',
-			cls: 'x-tree-noicon',
+			bodyCls: 'dtc-tree',
 			useArrows: true,
 			lines: false,
 			rootVisible: false,
-			overflowX: 'hidden',
-			overflowY: 'auto',
+			scrollable: 'y',
 			hideHeaders: true,
 			viewConfig: {
-				overflowX: 'hidden',
-				overflowY: 'auto'
+				scrollable: 'y'
 			},
 			columns: {
 				items: [{

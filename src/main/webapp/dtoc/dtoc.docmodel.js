@@ -133,38 +133,34 @@ Ext.define('Voyant.panel.DToC.DocModel', {
         
         Ext.apply(me, {
 			tools: null,
-			baseCls: 'x-plain dtc-panel',
+			cls: 'dtc-panel',
 			height: '100%',
 			layout: {
 				type: 'vbox',
 				align: 'center'
 			},
 			defaults: {
-				layout: 'fit',
-				baseCls: 'x-plain'
-			},
-			tbar: {
-				padding: '0',
-				items: [{
-					xtype: 'button',
-					padding: '0',
-					text: 'Clear',
-					handler: function() {
-						Ext.getCmp('dtcMarkup').clearSelections();
-						if (this.getApplication().useIndex) {
-							Ext.getCmp('dtcIndex').clearSelections();
-						}
-						Ext.getCmp('dtcReader').clearHighlights();
-						Ext.getCmp('dtcStats').clearSelections();
-						var tree = Ext.getCmp('dtcToc');
-						tree.clearTree();
-			    		tree.updateDocModelOutline();
-			    		this.clearHits();
-					},
-					scope: this
-				}]
+				layout: 'fit'
 			},
 			items: [{
+				xtype: 'button',
+				cls: 'dtc-button',
+				padding: '0',
+				text: 'Clear',
+				handler: function() {
+					Ext.getCmp('dtcMarkup').clearSelections();
+					if (this.getApplication().useIndex) {
+						Ext.getCmp('dtcIndex').clearSelections();
+					}
+					Ext.getCmp('dtcReader').clearHighlights();
+					Ext.getCmp('dtcStats').clearSelections();
+					var tree = Ext.getCmp('dtcToc');
+					tree.clearTree();
+		    		tree.updateDocModelOutline();
+		    		this.clearHits();
+				},
+				scope: this
+			},{
 				html: '<div id="docModelSegmentContainer" style="height: 100%; width: '+(me.width-10)+'px;"></div>',
 				margin: '10 0 0 0',
 				flex: 1

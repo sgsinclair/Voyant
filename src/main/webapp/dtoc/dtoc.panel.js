@@ -130,8 +130,7 @@ Ext.define('Voyant.panel.DToC', {
 //        				headerText: 'Index & Tags',
 //                        showCollapseTool: false
 //                    }),
-        			baseCls: 'x-plain dtc-panel',
-        			bodyCls: 'borderRadiusBottom',
+        			cls: 'dtc-panel',
         			deferredRender: false,
         			activeTab: 0,
         			items: dtcToolsConfig,
@@ -155,7 +154,7 @@ Ext.define('Voyant.panel.DToC', {
         			title: 'Table of Contents',
         			id: 'dtcToc',
         			xtype: 'dtocToc',
-        			bodyCls: 'borderRadiusBottom',
+//        			bodyCls: 'borderRadiusBottom',
 //        			plugins: new Ext.ux.plugins.PanelCollapseHorizontal({
 //                        showCollapseTool: false
 //                    }),
@@ -186,9 +185,6 @@ Ext.define('Voyant.panel.DToC', {
         				align: 'stretch'
         			},
         			collapsible: false,
-        			defaults: {
-//        				baseCls: 'x-plain dtc-panel'
-        			},
         			items: [{
         				id: 'dtcDocModel',
         				xtype: 'dtocDocModel',
@@ -607,48 +603,36 @@ Ext.define('Voyant.panel.DToC', {
 			exportObj.toc.push(obj);
 		}
 
-		var exportString = Ext.encode(exportObj);
-		
 		var curatorId = new Date().getTime() + '.' + (Math.floor(Math.random() * (9999 - 1001)) + 1000);
 		
-		Ext.Ajax.request({
-           url: this.getTromboneUrl(),
-           params: {
-        	   tool: 'resource.StoredResource',
-        	   resourceId: curatorId,
-        	   storeResource: exportString
-           },
-           success: function(response, options) {
-				// TODO add original query params if necessary
-				var params = {
-					corpus: this.getCorpus().getId(),
-					curatorId: curatorId
-				};
+		var me = this;
+		this.getApplication().storeResource(curatorId, exportObj).then(function() {
+			// TODO add original query params if necessary
+			var params = {
+				corpus: me.getCorpus().getId(),
+				curatorId: curatorId
+			};
 
-				var url = this.getBaseUrl()+'dtoc/?'+Ext.urlEncode(params);
-				
-				var msg = '<p>'+ new Ext.Template(this.localize('clickUrl')).apply([url])+'</p>';
-				
-				var msgBox = Ext.Msg.show({
-					title: 'Export',
-					message: msg,
-					buttons: Ext.MessageBox.OK,
-					value: url,
-					multiline: true,
-					width: Ext.getBody().getWidth()-50,
-					icon: Ext.MessageBox.INFO
-				});
-			},
-			failure: function() {
-				Ext.Msg.show({
-					title: 'Error',
-					message: 'There was an error generating the export link.',
-					buttons: Ext.MessageBox.OK,
-					icon: Ext.MessageBox.ERROR
-				});
-			},
-			scope: this
-	  });
+			var url = me.getBaseUrl()+'dtoc/?'+Ext.urlEncode(params);
+			var msg = '<p>'+ new Ext.Template(me.localize('clickUrl')).apply([url])+'</p>';
+			
+			Ext.Msg.show({
+				title: 'Export',
+				message: msg,
+				buttons: Ext.MessageBox.OK,
+				value: url,
+				multiline: true,
+				width: Ext.getBody().getWidth()-50,
+				icon: Ext.MessageBox.INFO
+			});
+		}, function() {
+			Ext.Msg.show({
+				title: 'Error',
+				message: 'There was an error generating the export link.',
+				buttons: Ext.MessageBox.OK,
+				icon: Ext.MessageBox.ERROR
+			});
+		});
 	},
     
 	onSplitterClick: function(splitter, event, el) {
@@ -665,21 +649,9 @@ Ext.define('Voyant.panel.DToC', {
 			this.setHeader();
 			
 			if (this.queryParameters.curatorId) {
-				var curatorId = this.queryParameters.curatorId;
-				Ext.Ajax.request({
-		           url: this.getTromboneUrl(),
-		           params: {
-		        	   tool: 'resource.StoredResource',
-		        	   retrieveResourceId: curatorId
-		           },
-		           success: function(response, options) {
-		        	   var json = Ext.decode(response.responseText);
-		        	   var curatorString = json.storedResource.resource;
-		        	   this.getDataFromString(curatorString);
-		           },
-		           failure: function() {
-		           },
-		           scope: this
+				var me = this;
+				this.getApplication().getStoredResource(this.queryParameters.curatorId).then(function(curatorString) {
+					me.getDataFromString(curatorString);
 				});
 			} else {
 				this.getDataFromString();

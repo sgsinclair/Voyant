@@ -48,17 +48,15 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		var treeConfig = {
 			itemId: 'dtcTree',
 			xtype: 'treepanel',
-			baseCls: 'x-plain dtc-tree dtc-panel',
-			cls: 'x-tree-noicon',
+			cls: 'dtc-panel',
+			bodyCls: 'dtc-tree',
 			useArrows: true,
 			lines: false,
 			rootVisible: false,
 			hideHeaders: true,
-			overflowX: 'hidden',
-			overflowY: 'auto',
+			scrollable: 'y',
 			viewConfig: {
-				overflowX: 'hidden',
-				overflowY: 'auto',
+				scrollable: 'y',
 				listeners: {
 					select: function(view, record, index, opts) {
 						var data = record.getData();
