@@ -28,6 +28,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 	model: new Ext.util.MixedCollection(), // model for tracking all selections
 	
 	currentPosition: [0, 0], // [docIndex, amount]
+	arrowDragSource: null,
 	isArrowDragging: false,
 	dragStartTime: null,
     
@@ -200,6 +201,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			this.chapterButtonContainer = Ext.get('docModelChapterButton');
 			this.chapterButton = new Ext.Button({
 				text: 'Chapter',
+				cls: 'dtc-button',
 				renderTo: this.chapterButtonContainer,
 				handler: function(b, e) {
 					if (b.getText().indexOf('Next') != -1) {
@@ -222,52 +224,57 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 				scope: this
 			});
 			
-			// using jquery for dragging because it's much more simple
-			$('#docModelCurrentSegment').draggable({
-				axis: 'y',
-				drag: function(event, ui) {
-					var docIndex = this.currentPosition[0];
-					var arrowY = ui.position.top + this.ARROW_HALF_HEIGHT;
-					var docDiv = this.segmentContainer.down('div:nth-child('+(docIndex+1)+')');
-					var amount = (arrowY - docDiv.getY()) / docDiv.getHeight();
-					var docId = this.documents.get(docIndex).document.getId();
-					
-					this.getApplication().dispatchEvent('dtcDocModelScroll', this, {
-						docIndex: docIndex,
-						docId: docId,
-						amount: amount
-					});
-					
-					var container = $('#docModelCurrentSegment').draggable('option', 'containment');
-					if ((event.pageY >= container[3] && docIndex < this.getCorpus().getDocumentsCount()) ||
-						(event.pageY <= container[1] && docIndex > 0)) {
-						if (this.dragStartTime == null) {
-							this.dragStartTime = new Date();
-						} else {
-							var now = new Date();
-							if (now.getTime() >= this.dragStartTime.getTime() + this.CHAPTER_BUTTONS_DELAY) {
-								this.chapterButtonContainer.setY(arrowY - this.chapterButtonContainer.getHeight()/2);
-								if (event.pageY >= container[3]) {
-									this.chapterButton.setText('Next Chapter');
-									Ext.getCmp('dtcReader').setReaderScroll('bottom');
-								} else {
-									this.chapterButton.setText('Previous Chapter');
-									Ext.getCmp('dtcReader').setReaderScroll('top');
+			this.arrowDragSource = new Ext.drag.Source({
+				element: 'docModelCurrentSegment',
+				constrain: {
+					vertical: true
+				},
+				listeners: {
+					dragmove: function(d, info, event) {
+						var docIndex = this.currentPosition[0];
+						var arrowY = info.element.current.y + this.ARROW_HALF_HEIGHT;
+						var docDiv = this.segmentContainer.down('div:nth-child('+(docIndex+1)+')');
+						var amount = (arrowY - docDiv.getY()) / docDiv.getHeight();
+						var docId = this.documents.get(docIndex).document.getId();
+						
+						this.getApplication().dispatchEvent('dtcDocModelScroll', this, {
+							docIndex: docIndex,
+							docId: docId,
+							amount: amount
+						});
+						
+						var container = d.getConstrain().getRegion();
+						if ((event.pageY >= container.bottom && docIndex < this.getCorpus().getDocumentsCount()) ||
+							(event.pageY <= container.top && docIndex > 0)) {
+							if (this.dragStartTime == null) {
+								this.dragStartTime = new Date();
+							} else {
+								var now = new Date();
+								if (now.getTime() >= this.dragStartTime.getTime() + this.CHAPTER_BUTTONS_DELAY) {
+									this.chapterButtonContainer.setY(arrowY - this.chapterButtonContainer.getHeight()/2);
+									if (event.pageY >= container.bottom) {
+										this.chapterButton.setText('Next Chapter');
+										Ext.getCmp('dtcReader').setReaderScroll('bottom');
+									} else {
+										this.chapterButton.setText('Previous Chapter');
+										Ext.getCmp('dtcReader').setReaderScroll('top');
+									}
+									this.chapterButtonContainer.show();
 								}
-								this.chapterButtonContainer.show();
 							}
 						}
-					}
-				}.bind(this),
-				start: function(event, ui) {
-					this.isArrowDragging = true;
-					this.dragStartTime = null;
-					this.chapterButtonContainer.hide();
-				}.bind(this),
-				stop: function(event, ui) {
-					this.isArrowDragging = false;
-					this.dragStartTime = null;
-				}.bind(this)
+					},
+					dragstart: function() {
+						this.isArrowDragging = true;
+						this.dragStartTime = null;
+						this.chapterButtonContainer.hide();
+					},
+					dragend: function() {
+						this.isArrowDragging = false;
+						this.dragStartTime = null;
+					},
+					scope: this
+				}
 			});
 			
 			panel.body.addListener('click', function(e) {
@@ -309,6 +316,8 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 	_afterLayoutHandler: function() {
 		// have to set segmentContainer here because it isn't yet available in afterrender
 		this.segmentContainer = Ext.get('docModelSegmentContainer');
+		this.segmentContainer.unselectable();
+		
 		this.setLocation();
 	},
 	
@@ -434,7 +443,10 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			}
 			
 			var box = docContainer.getBox();
-			$('#docModelCurrentSegment').draggable('option', 'containment', [box.x, box.y-this.ARROW_HALF_HEIGHT, box.x, box.height+box.y-this.ARROW_HALF_HEIGHT]);
+			this.arrowDragSource.setConstrain({
+				vertical: true,
+				region: new Ext.util.Region(box.y-this.ARROW_HALF_HEIGHT, box.x, box.y+box.height+this.ARROW_HALF_HEIGHT, box.x)
+			});
 			
 			this.currentPosition = [docIndex, amount];
 		}
