@@ -224,6 +224,8 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 				scope: this
 			});
 			
+			Ext.get('docModelCurrentSegment').unselectable();
+			
 			this.arrowDragSource = new Ext.drag.Source({
 				element: 'docModelCurrentSegment',
 				constrain: {
@@ -262,6 +264,8 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 									this.chapterButtonContainer.show();
 								}
 							}
+						} else {
+							this.chapterButtonContainer.hide();
 						}
 					},
 					dragstart: function() {
