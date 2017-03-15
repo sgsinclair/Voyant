@@ -122,11 +122,13 @@
 
 <link href='http://fonts.googleapis.com/css?family=Nunito:300,400' rel='stylesheet' type='text/css' />
 
+<!-- 
 <link href="annotator/annotator.min.css" rel="stylesheet" type="text/css" />
 <link href="annotator/dtoc.annotator.css" rel="stylesheet" type="text/css" />
 <script src="annotator/annotator-full.min.js"></script>
 <script src="annotator/dtoc.annotator.auth.js"></script>
 <script src="annotator/dtoc.annotator.js"></script>
+ -->
 
 <link href="css/dtc.css" rel="stylesheet" type="text/css" />
 <title>Dynamic Table of Contexts</title>

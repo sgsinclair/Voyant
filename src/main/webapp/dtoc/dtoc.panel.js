@@ -63,11 +63,13 @@ Ext.define('Voyant.panel.DToC', {
 			title: 'Stats',
 			id: 'dtcStats',
 			xtype: 'dtocStats'
-		},{
-			title: 'Annotations',
-			id: 'dtcAnnotator',
-			xtype: 'dtocAnnotator'
-		}];
+		}
+//		,{
+//			title: 'Annotations',
+//			id: 'dtcAnnotator',
+//			xtype: 'dtocAnnotator'
+//		}
+		];
         
         if (this.getApplication().useIndex != true) {
         	dtcToolsConfig.splice(0,1); // remove index
@@ -448,36 +450,38 @@ Ext.define('Voyant.panel.DToC', {
 				        	},
 				        	scope: this
 				        }
-					},{
-						xtype: 'container',
-						html: '<hr style="border: none; border-top: 1px solid #ccc; width: 90%;" />'
-					},{
-						xtype: 'container',
-						layout: {
-							type: 'hbox',
-							pack: 'center'
-						},
-						items: [{
-							xtype: 'button',
-							id: 'annotatorLoginButton',
-							text: 'Annotator Login',
-							tooltip: 'This will take you to the login page. You must reload DToC after logging in.',
-							tooltipType: 'title',
-							hidden: true,
-							margins: '0 10 0 0',
-							handler: function() {
-								window.open('http://annotateit.org/user/login');
-							},
-							scope: this
-						},{
-							xtype: 'button',
-							text: 'Export',
-							handler: function() {
-								this.doExport();
-							},
-							scope: this
-						}]
-					}],
+					}
+//					,{
+//						xtype: 'container',
+//						html: '<hr style="border: none; border-top: 1px solid #ccc; width: 90%;" />'
+//					},{
+//						xtype: 'container',
+//						layout: {
+//							type: 'hbox',
+//							pack: 'center'
+//						},
+//						items: [{
+//							xtype: 'button',
+//							id: 'annotatorLoginButton',
+//							text: 'Annotator Login',
+//							tooltip: 'This will take you to the login page. You must reload DToC after logging in.',
+//							tooltipType: 'title',
+//							hidden: true,
+//							margins: '0 10 0 0',
+//							handler: function() {
+//								window.open('http://annotateit.org/user/login');
+//							},
+//							scope: this
+//						},{
+//							xtype: 'button',
+//							text: 'Export',
+//							handler: function() {
+//								this.doExport();
+//							},
+//							scope: this
+//						}]
+//					}
+					],
 					buttons: [{
 		            	text: 'Ok',
 						glyph: 'xf00c@FontAwesome',
@@ -520,11 +524,11 @@ Ext.define('Voyant.panel.DToC', {
     	this.settingsWin.show();
     	var form = this.settingsWin.down('form');
     	
-    	if (!Ext.getCmp('dtcAnnotator').annotator.isAuthenticated()) {
-    		form.down('#annotatorLoginButton').show();
-    	} else {
-    		form.down('#annotatorLoginButton').hide();
-    	}
+//    	if (!Ext.getCmp('dtcAnnotator').annotator.isAuthenticated()) {
+//    		form.down('#annotatorLoginButton').show();
+//    	} else {
+//    		form.down('#annotatorLoginButton').hide();
+//    	}
 
     	var titlesMode = Ext.getCmp('dtcToc').getTitlesMode();
     	form.getComponent('titles').setValue(titlesMode);
@@ -642,7 +646,7 @@ Ext.define('Voyant.panel.DToC', {
 	
 	listeners: {
 		afterrender: function(container) {
-				
+			
 		},
 		loadedCorpus: function(src, corpus) {
 			this.setCorpus(corpus);
