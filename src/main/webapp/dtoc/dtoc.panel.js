@@ -646,7 +646,7 @@ Ext.define('Voyant.panel.DToC', {
 	
 	listeners: {
 		afterrender: function(container) {
-			
+			Ext.get('header').unselectable();
 		},
 		loadedCorpus: function(src, corpus) {
 			this.setCorpus(corpus);

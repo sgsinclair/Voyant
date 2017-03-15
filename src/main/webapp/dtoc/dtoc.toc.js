@@ -364,7 +364,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			text: title,
 			expandable: true,
 			draggable: this.isCurator,
-			allowChildren: !this.isCurator,
+			leaf: true,
 			docId: doc.getId(),
 			docIndex: doc.getIndex(),
 			isDoc: true,
@@ -424,6 +424,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	},
 	
 	showDocument: function(docId) {
+		// TODO respond to corpusDocumentSelected?
 		this.getApplication().dispatchEvent('corpusDocumentSelected', this, {docId:docId});
 	},
 
@@ -733,9 +734,9 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	clearTree: function() {
 		var root = this.getRootNode();
 		root.eachChild(function(node) {
-//			node.ui.removeClass('hasChildren');
 			node.removeAll();
 			node.collapse();
+			node.set('leaf', true);
 		});
 		
 		this.down('#search').setValue('');
