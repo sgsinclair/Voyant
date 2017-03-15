@@ -13,6 +13,7 @@
 	
 	Ext.application({
 		extend : 'Voyant.VoyantCorpusApp',
+		mixins: ['Voyant.util.Storage'],
 		name: 'VoyantDTOCApp',
 		config: {
 			baseUrl: '<%= org.voyanttools.voyant.Voyant.getBaseUrlString(request) %>',
@@ -106,59 +107,6 @@
                     scope: this
                 });
             }, this, {single: true});
-		},
-		
-		storeResource: function(id, data) {
-			var dfd = new Ext.Deferred();
-			Ext.Ajax.request({
-	            url: this.getTromboneUrl(),
-	            params: {
-	                tool: 'resource.StoredResource',
-	                storeResource: Ext.encode(data),
-	                resourceId: id
-	            }
-	        }).then(function(response) {
-	            dfd.resolve();
-	        }, function(response) {
-	            dfd.reject();
-	        });
-			
-			return dfd.promise;
-		},
-		
-		getStoredResource: function(id) {
-			var me = this;
-			var dfd = new Ext.Deferred();
-			Ext.Ajax.request({
-	            url: me.getTromboneUrl(),
-	            params: {
-	                tool: 'resource.StoredResource',
-	                verifyResourceId: id
-	            }
-	        }).then(function(response) {
-                var json = Ext.util.JSON.decode(response.responseText);
-                if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
-                    Ext.Ajax.request({
-                        url: me.getTromboneUrl(),
-                        params: {
-                            tool: 'resource.StoredResource',
-                            retrieveResourceId: id
-                        }
-                    }).then(function(response) {
-                    	var json = Ext.util.JSON.decode(response.responseText);
-                        var value = Ext.decode(json.storedResource.resource);
-                        dfd.resolve(value);
-                    }, function() {
-                    	dfd.reject();
-                    });
-                } else {
-                	dfd.reject();
-                }
-            }, function() {
-            	dfd.reject();
-            });
-			
-			return dfd.promise;
 		}
 	});
 </script>
