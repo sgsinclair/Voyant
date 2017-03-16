@@ -1,0 +1,23 @@
+{
+    "lastUpdate": "2017-03-14",
+    "servers": [{
+        "name": "Main Server",
+        "url": "https://voyant-tools.org/",
+        "check_url": "http://voyant-tools.org/",
+        "location": "Montreal, Canada",
+        "latlong": "45.5576136,-73.8533637",
+        "contact": "<a href='http://stefansinclair.name/'>Stéfan Sinclair</a> &amp; <a href='http://geoffreyrockwell.com'>Geoffrey Rockwell</a>"
+    },{
+        "name": "Beta (Auxiliary) Server",
+        "url": "https://beta.voyant-tools.org/",
+        "location": "Montreal, Canada",
+        "latlong": "45.5576136,-73.8533637",
+        "contact": "<a href='http://stefansinclair.name/'>Stéfan Sinclair</a> &amp; <a href='http://geoffreyrockwell.com'>Geoffrey Rockwell</a>"
+    },{
+        "name": "Huma-Num",
+        "url": "http://voyant.tools.huma-num.fr/",
+        "location": "Lyon, France",
+        "latlong": "45.7718126,4.854807",
+        "contact": "<a href='http://www.huma-num.fr/informations-pratiques'>Huma-Num</a>"
+    }]
+}

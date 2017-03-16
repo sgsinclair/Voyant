@@ -1,0 +1,80 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="../../../fontawesome/current/css/font-awesome.min.css" />
+<script src="../../../jquery/current/jquery.min.js"></script>
+<style>
+    .health .fa-smile-o {color: green;}
+    .health .fa-meh-o {color: yellow;}
+    .health .fa-frown-o {color: red;}
+</style>
+<script>
+
+var Voyant = Voyant || {};
+Voyant.Mirrors = {
+	local:  '../servers.json',
+	remote: 'https://raw.githubusercontent.com/sgsinclair/Voyant/master/src/main/webapp/resources/voyant/current/servers.json',
+	buildMirrorsList: function(url) {
+		$.getJSON(url)
+	    .done(function( data ) {
+	    	Voyant.Mirrors.generateMirrorsList(data)
+	      })
+	      .fail(function(data) {
+	    	  if (url!=Voyant.Mirrors.local) {
+	    		  Voyant.Mirrors.buildMirrorsList(Voyant.Mirrors.local);
+	    	  }
+	      })
+	},
+	generateMirrorsList: function(data, el) {
+		var list = "<ul>";
+		for (var i=0, len=data.servers.length; i<len; i++) {
+			var server = data.servers[i];
+			list+="<li class='health' id='health"+i+"'>"+
+				"<a href='"+server.url+"' target='_blank'>"+server.name+"</a> "+
+				" ("+server.location+") "+
+				" "+server.contact+
+				"</li>";
+			Voyant.Mirrors.checkHealth("health"+i, server.check_url ? server.check_url : server.url, server.check_corpus ? server.check_corpus  : "austen")
+		}
+		list+="</ul>";
+		document.body.innerHTML = list;
+	},
+	checkHealth: function(id, url, corpus) {
+		// we query something that tests the general health because it needs to consider all terms, assumes Austen is on all servers, which may not be the case
+		$.getJSON("../../../../trombone", {
+			fetchJSON: url+"trombone?corpus="+corpus+"&tool=corpus.CorpusTerms&limit=1&withDistributions=true&noCache=1"
+		})
+	    .done(function( data ) {
+	    	var version;
+	    	if (data.voyantVersion) {
+	    		version = "(version "+data.voyantVersion;
+	    		if (data.voyantBuild) {
+	    			version += " "+data.voyantBuild
+	    		}
+	    		version+=")";
+	    	}
+	    	var health = "frown";
+	    	if (data && data.duration) {
+	    		if (data.duration<1000) {
+	    			health = "smile"
+	    		} else if (data.duration<2000) {
+	    			health = "meh"
+	    		}
+	    	}
+	    	Voyant.Mirrors.setHealth(id, health, version);
+	      })
+	      .fail(function() {
+		    	Voyant.Mirrors.setHealth(id, "frown");
+	      })
+	},
+	setHealth: function(id, health, version) {
+    	$("#"+id).prepend('<i class="fa fa-'+health+'-o" aria-hidden="true"></i> '+(version ? version+' ' : ''))
+	}
+}
+$(function() {
+	Voyant.Mirrors.buildMirrorsList(Voyant.Mirrors.remote);
+});
+</script>
+</head>
+<body></body>
+</html>
+

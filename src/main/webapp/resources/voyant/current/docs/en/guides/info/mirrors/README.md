@@ -6,33 +6,6 @@ Having said that, there are good reasons to use one of the mirrors, particularly
 
 ## Known Mirrors
 
-<table id="mirrors" data-timestamp="2016-11-06-12:10">
-	<thead>
-		<tr>
-			<th>Host</th>
-			<th>URL</th>
-			<th>Location</th>
-			<th>Status</th>
-			<th>Version</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>Huma-Num</td>
-			<td class="url">[voyant-tools.org](https://voyant-tools.org)</td>
-			<td>Eastern Canada</td>
-			<td>?</td>
-			<td>?</td>
-		</tr>
-		<tr>
-			<td>Huma-Num</td>
-			<td class="url">[voyant.tools.huma-num.fr](http://voyant.tools.huma-num.fr)</td>
-			<td>France</td>
-			<td>?</td>
-			<td>?</td>
-		</tr>
-	</tbody>
-</table>
+<iframe src="../resources/voyant/current/docs/mirrors.html" style="width: 90%; height: 200px;"></iframe>
 
-
-If you're interested in mirroring Voyant, please let us know by submitting a ticket on the [VoyantServr Github](http://github.com/sgsinclair/VoyantServer)!
+If you're interested in mirroring Voyant, please let us know by submitting a ticket on the [VoyantServer Github](http://github.com/sgsinclair/VoyantServer)!
