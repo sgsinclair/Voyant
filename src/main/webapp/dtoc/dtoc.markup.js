@@ -52,14 +52,20 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
     		});
 		}
 		
-		var me = this;
-		if (me.curatedTags != null) {
-			getXml.bind(me)();
-		} else {
-			this.getApplication().getStoredResource('tags-'+me.getCorpus().getId()+'-'+docId).then(function(value) {
-		    	me._saveTags(value, docId);
+		if (this.curatedTags != null) {
+			this.getApplication().getStoredResource('curatedtags-'+this.getCorpus().getId()+'-'+docId).then(function(value) {
+				this._saveTags(value, docId);
 		    	if (callback) callback();
-			}, getXml.bind(me));
+			}, function() {
+				getXml.call(this);
+			}, null, this);
+		} else {
+			this.getApplication().getStoredResource('tags-'+this.getCorpus().getId()+'-'+docId).then(function(value) {
+		    	this._saveTags(value, docId);
+		    	if (callback) callback();
+			}, function() {
+				getXml.call(this);
+			}, null, this);
 		}
 	},
 	
@@ -148,7 +154,12 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	},
 	
 	_storeTags: function(tags, docId) {
-		var rId = 'tags-'+this.getCorpus().getId()+'-'+docId;
+		var rId = this.getCorpus().getId()+'-'+docId;
+		if (this.curatedTags != null) {
+			rId = 'curatedtags-'+rId;
+		} else {
+			rId = 'tags-'+rId;
+		}
 		this.getApplication().storeResource(rId, tags);
 	},
 	
@@ -690,6 +701,7 @@ Ext.define('Voyant.panel.DToC.Markup', {
 			this.updateChapterFilter();
 			
 			if (this.getApplication().useIndex != true) {
+				// TODO confirm that curated tags (if using) get added before this
 				this.loadAllTags(true);
 			}
 		},
