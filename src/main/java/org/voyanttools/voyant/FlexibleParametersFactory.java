@@ -10,14 +10,15 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.voyanttools.trombone.input.source.InputSourcesBuilder;
 import org.voyanttools.trombone.util.FlexibleParameters;
 
@@ -28,6 +29,14 @@ import sun.security.action.GetPropertyAction;
  * @author Stéfan Sinclair, Cyril Briquet
  */
 public class FlexibleParametersFactory {
+	
+	private String build;
+	private String version;
+
+	public FlexibleParametersFactory(ServletContext servlet) {
+		this.build = servlet.getInitParameter("build");
+		this.version = servlet.getInitParameter("version");
+	}
 
 	/**
 	 * Get an instance of {@link FlexibleParameters} from the {@link HttpServletRequest}.
@@ -59,6 +68,8 @@ public class FlexibleParametersFactory {
 		}
 		
 		final FlexibleParameters parameters = new FlexibleParameters();
+		parameters.setParameter("VOYANT_VERSION", version!=null ? version : "");
+		parameters.setParameter("VOYANT_BUILD", build!=null ? build : "");
 
 		final HttpParametersDecoder parametersDecoder = new HttpParametersDecoder(parameters);
 		

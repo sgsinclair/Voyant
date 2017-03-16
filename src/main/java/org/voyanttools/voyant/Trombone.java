@@ -50,13 +50,12 @@ public class Trombone extends HttpServlet {
 	private FlexibleParametersFactory flexibleParametersFactory;
 	
 	public Trombone() {
-		
-		this.flexibleParametersFactory = new FlexibleParametersFactory();
 		this.storage = new FileStorage();
 	}
 	
 	@Override
 	public void init() {
+		this.flexibleParametersFactory = new FlexibleParametersFactory(this.getServletContext());
 	}
 	
 	@Override
@@ -187,6 +186,7 @@ public class Trombone extends HttpServlet {
 			URLConnection c;
 			try {
 				url = new URL(parameters.getParameterValue("fetchJSON").replaceAll(" ", "+"));
+				System.out.println(url);
 				c = url.openConnection();
 			}
 			catch (MalformedURLException e) {

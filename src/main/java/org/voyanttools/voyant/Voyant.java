@@ -40,7 +40,7 @@ public class Voyant {
 		final String method = request.getMethod();
 		if (method==null) {return false;}
 
-		final FlexibleParametersFactory flexibleParametersFactory = new FlexibleParametersFactory();
+		final FlexibleParametersFactory flexibleParametersFactory = new FlexibleParametersFactory(request.getSession().getServletContext());
 		final FlexibleParameters params = flexibleParametersFactory.getInstance(request);
 
 		// if we have a POST request, we need to create the corpus before redirecting
