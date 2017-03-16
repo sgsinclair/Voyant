@@ -599,11 +599,12 @@ Ext.define('Voyant.panel.DToC.Reader', {
     		var tip = this.tokenToolTipsMap[tokenId];
     		if (tip) {
     		    tip.target.scrollIntoView(readerEl);
+    		    tag = tip.target; // FIXME showing tip programatically is broken
     		} else {
     		    tag.scrollIntoView(readerEl);
     		}
     		
-    		if (tip) {
+    		if (false) { // FIXME showing tip programatically is broken
     			setTimeout(function() {
     				tip.show();//At([tip.target.getX(), tip.target.getY()+tip.target.getHeight()]);
     				tip.stayOpen();
