@@ -233,20 +233,8 @@ Ext.define('Voyant.panel.DToC', {
         me.callParent(arguments);
     },
     
-    getDataFromString: function(dataString) {    	
-    	var data = null;
-    	if (dataString == null && this.getApplication().useIndex && this.loadInkeTags == true) {
-    		data = {markup:[{"tagName":"bibl","label":"bibliography","type":"t"},{"tagName":"date","label":"date","type":"t"},{"tagName":"event","label":"event","type":"t"},{"tagName":"note","label":"note","type":"t"},{"tagName":"orgName","label":"organization name","type":"t"},{"tagName":"persName","label":"person name","type":"t"},{"tagName":"placeName","label":"place name","type":"t"},{"tagName":"q","label":"quote","type":"t"},{"tagName":"ref[@target*='class_issue']","label":"class issue","type":"x"},{"tagName":"ref[@target*='nationality_issue']","label":"nationality issue","type":"x"},{"tagName":"ref[@target*='race_and_ethnicity']","label":"race and ethnicity","type":"x"},{"tagName":"ref[@target*='sexuality']","label":"sexuality","type":"x"},{"tagName":"ref[@target*='education']","label":"education","type":"x"},{"tagName":"ref[@target*='health_issue']","label":"health issue","type":"x"},{"tagName":"ref[@target*='history']","label":"history","type":"x"},{"tagName":"ref[@target*='politics']","label":"politics","type":"x"},{"tagName":"ref[@target*='violence']","label":"violence","type":"x"},{"tagName":"ref[@target*='gender_issue']","label":"gender issue","type":"x"},{"tagName":"ref[@target*='religion']","label":"religion","type":"x"},{"tagName":"ref[@target*='authorship']","label":"authorship","type":"x"},{"tagName":"ref[@target*='literary_schools']","label":"literary schools","type":"x"},{"tagName":"ref[@target*='writing_climate']","label":"writing climate","type":"x"},{"tagName":"ref[@target*='attitudes_to_women_writing']","label":"attitudes to women writing","type":"x"},{"tagName":"ref[@target*='place_of_publication']","label":"place of publication","type":"x"},{"tagName":"ref[@target*='editions']","label":"editions","type":"x"},{"tagName":"ref[@target*='anthologization']","label":"anthologization","type":"x"},{"tagName":"ref[@target*='manuscript_history']","label":"manuscript history","type":"x"},{"tagName":"ref[@target*='non-survival_of_text']","label":"non-survival of text","type":"x"},{"tagName":"ref[@target*='archive']","label":"archive","type":"x"},{"tagName":"ref[@target*='archival_location']","label":"archival location","type":"x"},{"tagName":"ref[@target*='non-book_media']","label":"non-book media","type":"x"},{"tagName":"ref[@target*='genre_drama']","label":"genre drama","type":"x"},{"tagName":"ref[@target*='genre_fiction']","label":"genre fiction","type":"x"},{"tagName":"ref[@target*='genre_journalism']","label":"genre journalism","type":"x"},{"tagName":"ref[@target*='genre_lifeWriting']","label":"genre life writing","type":"x"},{"tagName":"ref[@target*='genre_music']","label":"genre music","type":"x"},{"tagName":"ref[@target*='genre_novel']","label":"genre novel","type":"x"},{"tagName":"ref[@target*='genre_non-fiction']","label":"genre non-fiction","type":"x"},{"tagName":"ref[@target*='genre_poetry']","label":"genre poetry","type":"x"},{"tagName":"ref[@target*='genre_performance']","label":"genre performance","type":"x"},{"tagName":"ref[@target*='genre_short_story']","label":"genre short story","type":"x"},{"tagName":"ref[@target*='genre_scholarlyWriting']","label":"genre scholarly writing","type":"x"},{"tagName":"ref[@target*='genre_issue']","label":"genre issue","type":"x"},{"tagName":"ref[@target*='voice_or_narration']","label":"voice or narration","type":"x"},{"tagName":"ref[@target*='textual_strategies']","label":"textual strategies","type":"x"},{"tagName":"ref[@target*='characterization']","label":"characterization","type":"x"},{"tagName":"ref[@target*='intertextuality']","label":"intertextuality","type":"x"},{"tagName":"ref[@target*='theme_or_topic']","label":"theme or thopic","type":"x"},{"tagName":"ref[@target*='motif']","label":"motif","type":"x"},{"tagName":"ref[@target*='response_recent']","label":"response recent","type":"x"},{"tagName":"ref[@target*='response_re-evaluation']","label":"response re-evaluation","type":"x"},{"tagName":"ref[@target*='response_formal']","label":"response formal","type":"x"},{"tagName":"ref[@target*='response_informal']","label":"response informal","type":"x"},{"tagName":"ref[@target*='response_gendered']","label":"response gendered","type":"x"},{"tagName":"ref[@target*='recognitions']","label":"recognitions","type":"x"},{"tagName":"ref[@target*='censorship']","label":"censorship","type":"x"},{"tagName":"ref[@target*='authority']","label":"authority","type":"x"},{"tagName":"ref[@target*='economics']","label":"economics","type":"x"},{"tagName":"ref[@target*='men_writing']","label":"men writing","type":"x"},{"tagName":"ref[@target*='women_writing']","label":"women writing","type":"x"},{"tagName":"ref[@target*='textual_agency']","label":"textual agency","type":"x"},{"tagName":"ref[@target*='canon_formation']","label":"canon formation","type":"x"},{"tagName":"ref[@target*='critique_of_canon']","label":"critique of canon","type":"x"},{"tagName":"ref[@target*='intellectual_history']","label":"intellectual history","type":"x"},{"tagName":"ref[@target*='social_movement']","label":"social movement","type":"x"},{"tagName":"ref[@target*='close_reading']","label":"close reading","type":"x"},{"tagName":"ref[@target*='methodology']","label":"methodology","type":"x"},{"tagName":"ref[@target*='representation_of_women']","label":"representation of women","type":"x"},{"tagName":"ref[@target*='representation_of_men']","label":"representation of men","type":"x"},{"tagName":"ref[@target*='historical_oppression']","label":"historical oppression","type":"x"},{"tagName":"ref[@target*='technology']","label":"technology","type":"x"},{"tagName":"ref[@target*='collaboration']","label":"collaboration","type":"x"},{"tagName":"ref[@target*='theory']","label":"theory","type":"x"}],
-    			        toc:[]};
-    	} else if (dataString != null) {
-	    	try {
-				data = Ext.decode(dataString);
-			} catch (e) {
-				if (window.console) console.log(e);
-			}
-    	}
-		
-		if (data != null) {
+    loadCuration: function(data) {
+		if (data && data.markup) {
 			var dtcMarkup = Ext.getCmp('dtcMarkup');
 			dtcMarkup.curatedTags = {};
 			dtcMarkup.tagTotals = {};
@@ -443,17 +431,16 @@ Ext.define('Voyant.panel.DToC', {
 				        	},
 				        	scope: this
 				        }
-					}
-//					,{
-//						xtype: 'container',
-//						html: '<hr style="border: none; border-top: 1px solid #ccc; width: 90%;" />'
-//					},{
-//						xtype: 'container',
-//						layout: {
-//							type: 'hbox',
-//							pack: 'center'
-//						},
-//						items: [{
+					},{
+						xtype: 'container',
+						html: '<hr style="border: none; border-top: 1px solid #ccc; width: 90%;" />'
+					},{
+						xtype: 'container',
+						layout: {
+							type: 'hbox',
+							pack: 'center'
+						},
+						items: [{
 //							xtype: 'button',
 //							id: 'annotatorLoginButton',
 //							text: 'Annotator Login',
@@ -465,15 +452,16 @@ Ext.define('Voyant.panel.DToC', {
 //								window.open('http://annotateit.org/user/login');
 //							},
 //							scope: this
-//						},{
-//							xtype: 'button',
-//							text: 'Export',
-//							handler: function() {
-//								this.doExport();
-//							},
-//							scope: this
-//						}]
-//					}
+//						}
+//						,{
+							xtype: 'button',
+							text: 'Export',
+							handler: function() {
+								this.doExport();
+							},
+							scope: this
+						}]
+					}
 					],
 					buttons: [{
 		            	text: 'Ok',
@@ -603,7 +591,7 @@ Ext.define('Voyant.panel.DToC', {
 		var curatorId = new Date().getTime() + '.' + (Math.floor(Math.random() * (9999 - 1001)) + 1000);
 		
 		var me = this;
-		this.getApplication().storeResource(curatorId, exportObj).then(function() {
+		this.getApplication().storeResource('curation-'+curatorId, exportObj).then(function() {
 			// TODO add original query params if necessary
 			var params = {
 				corpus: me.getCorpus().getId(),
@@ -647,11 +635,16 @@ Ext.define('Voyant.panel.DToC', {
 			
 			if (this.queryParameters.curatorId) {
 				var me = this;
-				this.getApplication().getStoredResource(this.queryParameters.curatorId).then(function(curatorString) {
-					me.getDataFromString(curatorString);
+				var cId = 'curation-'+this.queryParameters.curatorId;
+				this.getApplication().getStoredResource(cId).then(function(curation) {
+					me.loadCuration(curation);
 				});
 			} else {
-				this.getDataFromString();
+				if (this.getApplication().useIndex && this.loadInkeTags == true) {
+		    		var data = {markup:[{"tagName":"bibl","label":"bibliography","type":"t"},{"tagName":"date","label":"date","type":"t"},{"tagName":"event","label":"event","type":"t"},{"tagName":"note","label":"note","type":"t"},{"tagName":"orgName","label":"organization name","type":"t"},{"tagName":"persName","label":"person name","type":"t"},{"tagName":"placeName","label":"place name","type":"t"},{"tagName":"q","label":"quote","type":"t"},{"tagName":"ref[@target*='class_issue']","label":"class issue","type":"x"},{"tagName":"ref[@target*='nationality_issue']","label":"nationality issue","type":"x"},{"tagName":"ref[@target*='race_and_ethnicity']","label":"race and ethnicity","type":"x"},{"tagName":"ref[@target*='sexuality']","label":"sexuality","type":"x"},{"tagName":"ref[@target*='education']","label":"education","type":"x"},{"tagName":"ref[@target*='health_issue']","label":"health issue","type":"x"},{"tagName":"ref[@target*='history']","label":"history","type":"x"},{"tagName":"ref[@target*='politics']","label":"politics","type":"x"},{"tagName":"ref[@target*='violence']","label":"violence","type":"x"},{"tagName":"ref[@target*='gender_issue']","label":"gender issue","type":"x"},{"tagName":"ref[@target*='religion']","label":"religion","type":"x"},{"tagName":"ref[@target*='authorship']","label":"authorship","type":"x"},{"tagName":"ref[@target*='literary_schools']","label":"literary schools","type":"x"},{"tagName":"ref[@target*='writing_climate']","label":"writing climate","type":"x"},{"tagName":"ref[@target*='attitudes_to_women_writing']","label":"attitudes to women writing","type":"x"},{"tagName":"ref[@target*='place_of_publication']","label":"place of publication","type":"x"},{"tagName":"ref[@target*='editions']","label":"editions","type":"x"},{"tagName":"ref[@target*='anthologization']","label":"anthologization","type":"x"},{"tagName":"ref[@target*='manuscript_history']","label":"manuscript history","type":"x"},{"tagName":"ref[@target*='non-survival_of_text']","label":"non-survival of text","type":"x"},{"tagName":"ref[@target*='archive']","label":"archive","type":"x"},{"tagName":"ref[@target*='archival_location']","label":"archival location","type":"x"},{"tagName":"ref[@target*='non-book_media']","label":"non-book media","type":"x"},{"tagName":"ref[@target*='genre_drama']","label":"genre drama","type":"x"},{"tagName":"ref[@target*='genre_fiction']","label":"genre fiction","type":"x"},{"tagName":"ref[@target*='genre_journalism']","label":"genre journalism","type":"x"},{"tagName":"ref[@target*='genre_lifeWriting']","label":"genre life writing","type":"x"},{"tagName":"ref[@target*='genre_music']","label":"genre music","type":"x"},{"tagName":"ref[@target*='genre_novel']","label":"genre novel","type":"x"},{"tagName":"ref[@target*='genre_non-fiction']","label":"genre non-fiction","type":"x"},{"tagName":"ref[@target*='genre_poetry']","label":"genre poetry","type":"x"},{"tagName":"ref[@target*='genre_performance']","label":"genre performance","type":"x"},{"tagName":"ref[@target*='genre_short_story']","label":"genre short story","type":"x"},{"tagName":"ref[@target*='genre_scholarlyWriting']","label":"genre scholarly writing","type":"x"},{"tagName":"ref[@target*='genre_issue']","label":"genre issue","type":"x"},{"tagName":"ref[@target*='voice_or_narration']","label":"voice or narration","type":"x"},{"tagName":"ref[@target*='textual_strategies']","label":"textual strategies","type":"x"},{"tagName":"ref[@target*='characterization']","label":"characterization","type":"x"},{"tagName":"ref[@target*='intertextuality']","label":"intertextuality","type":"x"},{"tagName":"ref[@target*='theme_or_topic']","label":"theme or thopic","type":"x"},{"tagName":"ref[@target*='motif']","label":"motif","type":"x"},{"tagName":"ref[@target*='response_recent']","label":"response recent","type":"x"},{"tagName":"ref[@target*='response_re-evaluation']","label":"response re-evaluation","type":"x"},{"tagName":"ref[@target*='response_formal']","label":"response formal","type":"x"},{"tagName":"ref[@target*='response_informal']","label":"response informal","type":"x"},{"tagName":"ref[@target*='response_gendered']","label":"response gendered","type":"x"},{"tagName":"ref[@target*='recognitions']","label":"recognitions","type":"x"},{"tagName":"ref[@target*='censorship']","label":"censorship","type":"x"},{"tagName":"ref[@target*='authority']","label":"authority","type":"x"},{"tagName":"ref[@target*='economics']","label":"economics","type":"x"},{"tagName":"ref[@target*='men_writing']","label":"men writing","type":"x"},{"tagName":"ref[@target*='women_writing']","label":"women writing","type":"x"},{"tagName":"ref[@target*='textual_agency']","label":"textual agency","type":"x"},{"tagName":"ref[@target*='canon_formation']","label":"canon formation","type":"x"},{"tagName":"ref[@target*='critique_of_canon']","label":"critique of canon","type":"x"},{"tagName":"ref[@target*='intellectual_history']","label":"intellectual history","type":"x"},{"tagName":"ref[@target*='social_movement']","label":"social movement","type":"x"},{"tagName":"ref[@target*='close_reading']","label":"close reading","type":"x"},{"tagName":"ref[@target*='methodology']","label":"methodology","type":"x"},{"tagName":"ref[@target*='representation_of_women']","label":"representation of women","type":"x"},{"tagName":"ref[@target*='representation_of_men']","label":"representation of men","type":"x"},{"tagName":"ref[@target*='historical_oppression']","label":"historical oppression","type":"x"},{"tagName":"ref[@target*='technology']","label":"technology","type":"x"},{"tagName":"ref[@target*='collaboration']","label":"collaboration","type":"x"},{"tagName":"ref[@target*='theory']","label":"theory","type":"x"}],
+		    			        toc:[]};
+		    		this.loadCuration(data);
+				}
 			}
 		}
 	}

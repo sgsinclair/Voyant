@@ -42,18 +42,25 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	},
 	
 	_doLoadTags: function(docId, callback) {
-		var me = this;
-		this.getApplication().getStoredResource('tags-'+me.getCorpus().getId()+'-'+docId).then(function(value) {
-	    	me._saveTags(value, docId);
-	    	if (callback) callback();
-		}, function() {
-    		me._getDocumentXml(docId, function(xml) {
+		function getXml() {
+			var me = this;
+    		this._getDocumentXml(docId, function(xml) {
     			var tagData = me._parseTags(xml, docId, me.curatedTags);
     			me._saveTags(tagData, docId);
     			me._storeTags(tagData, docId);
     			if (callback) callback();
     		});
-		});
+		}
+		
+		var me = this;
+		if (me.curatedTags != null) {
+			getXml.bind(me)();
+		} else {
+			this.getApplication().getStoredResource('tags-'+me.getCorpus().getId()+'-'+docId).then(function(value) {
+		    	me._saveTags(value, docId);
+		    	if (callback) callback();
+			}, getXml.bind(me));
+		}
 	},
 	
 	updateTagTotals: function(updateSelections) {
