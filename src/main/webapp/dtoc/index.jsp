@@ -24,6 +24,21 @@
 		
 		useIndex: false, // whether display the index
 		
+		colors: {
+			index: {
+				dark: '#F47922',
+				light: '#FBD7B2'
+			},
+			tag: {
+				dark: '#249EF5',
+				light: '#B1D6FB'
+			},
+			kwic: {
+				dark: '#E324F5',
+				light: '#FBB1FB'
+			}
+		},
+		
 		launch: function() {
 			Ext.create('Ext.container.Viewport', {
                 layout: 'border',

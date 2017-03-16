@@ -162,7 +162,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 				if (range) {
 					var result = document.evaluate('/'+range.start, this.readerContainer.dom.firstChild, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 					if (result !== null) {
-						Ext.get(result).scrollIntoView(this.readerContainer).frame('#F47922', 1, { duration: 1000 });
+						Ext.get(result).scrollIntoView(this.readerContainer).frame(this.getApplication().colors.index.dark, 1, { duration: 1000 });
 					}
 				}
 			}
@@ -534,7 +534,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			for (var i=0; i<nodes.length;i++) {
 				Ext.get(nodes[i]).addCls('keyword');
 			}
-			if (doScroll) Ext.get(nodes[0]).scrollIntoView(this.readerContainer).frame("#F47922", 1, { duration: 1000 });
+			if (doScroll) Ext.get(nodes[0]).scrollIntoView(this.readerContainer).frame(this.getApplication().color.index.dark, 1, { duration: 1000 });
 		}
 	},
 	
@@ -623,11 +623,11 @@ Ext.define('Voyant.panel.DToC.Reader', {
     				}
     			}.bind(this), 500);
     		} else {
-    			var color = '#F47922';
+    			var color = this.getApplication().colors.index.dark;
     			if (tag.hasCls('tag')) {
-    				color = '#249EF5';
+    				color = this.getApplication().colors.tag.dark;
     			} else if (tag.hasCls('kwic')) {
-    				color = '#E324F5';
+    				color = this.getApplication().colors.kwic.dark;
     			}
     			tag.frame(color, 1, {duration: 1000});
     		}
