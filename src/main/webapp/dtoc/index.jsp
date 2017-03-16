@@ -67,35 +67,6 @@
                             // FIXME server returns some xml even if there's no index
                             if (indexText.length > 0 && /target/.test(indexText)) {
 	                            this.useIndex = true;
-	                            
-	                            // remove the index from the count
-	                            Voyant.data.model.Corpus.override({
-	                                getDocumentsCount: function() {
-	                                    var count = this.callParent(arguments)-1;
-	                                    return count;
-	                                }
-	                            });
-	                            
-	                            Voyant.data.store.Documents.override({
-	                                getDocument: function(config) {
-	                                    if (this.getCorpus().getDocumentsCount()!=this.getTotalCount()-1) {
-	                                        var dfd = Voyant.application.getDeferred();
-	                                        var me = this;
-	                                        this.load({
-	                                            scope: this,
-	                                            callback: function(records, operation, success) {
-	                                                if (success) {dfd.resolve(this.getDocument(config));}
-	                                                else {
-	                                                    Voyant.application.showResponseError(this.localize('failedGetDocuments'), response);
-	                                                    dfd.reject(); // don't send error since we've already shown it
-	                                                }
-	                                            }
-	                                        });
-	                                        return dfd.promise();
-	                                    }
-	                                    return Ext.isNumber(config) ? this.getAt(config) : this.getById(config);
-	                                }
-	                            });
 	                        }
                         }
                         

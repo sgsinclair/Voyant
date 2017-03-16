@@ -606,42 +606,19 @@ body {
 	margin: 1px 0 0 3px !important;
 }
 
-.dtcReaderNote .x-window-header, .dtcReaderNote .x-title-text {
+.dtcReaderNote .x-title-text {
 	color: #231f20;
 	font-size: 14px;
 	font-weight: 400;
 	font-family: 'Nunito', Arial, sans-serif;
 }
 
-.dtcReaderNote .x-window-mc, .dtcReaderNote .x-tip-body {
+.dtcReaderNote .x-tip-body {
 	color: #000;
 	font-family: 'Nunito', Arial, sans-serif;
 	font-weight: 300;
     font-size: 14px;
 	border: none;
-	max-height: 400px;
-	overflow: auto;
-}
-
-.dtcReaderNote .x-window-tl,
-.dtcReaderNote .x-window-tr,
-.dtcReaderNote .x-window-tc,
-.dtcReaderNote .x-window-bl,
-.dtcReaderNote .x-window-br,
-.dtcReaderNote .x-window-bc,
-.dtcReaderNote .x-window-ml,
-.dtcReaderNote .x-window-mr,
-.dtcReaderNote .x-window-mc,
-.dtcReaderNote .x-tip-tl,
-.dtcReaderNote .x-tip-tr,
-.dtcReaderNote .x-tip-tc,
-.dtcReaderNote .x-tip-bl,
-.dtcReaderNote .x-tip-br,
-.dtcReaderNote .x-tip-bc,
-.dtcReaderNote .x-tip-ml,
-.dtcReaderNote .x-tip-mr,
-.dtcReaderNote .x-tip-mc {
-	background: none;
 }
 
 #dtcReaderContainer titlepage {

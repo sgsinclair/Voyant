@@ -246,7 +246,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 						});
 						
 						var container = d.getConstrain().getRegion();
-						if ((event.pageY >= container.bottom && docIndex < this.getCorpus().getDocumentsCount()) ||
+						if ((event.pageY >= container.bottom && docIndex < this.getCorpus().getDocumentsCount()-1) ||
 							(event.pageY <= container.top && docIndex > 0)) {
 							if (this.dragStartTime == null) {
 								this.dragStartTime = new Date();
@@ -327,15 +327,16 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 	
 	buildProspect: function() {
 		var docs = this.getCorpus().getDocuments();
+		var docsCount = this.getCorpus().getDocumentsCount();
 		
 		var totalTokens = 0;
-		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
+		for (var i = 0; i < docsCount; i++) {
     		var doc = docs.getAt(i);
 			totalTokens += doc.get('tokensCount-lexical');
 		};
 		
 		var containerHeight = this.segmentContainer.getHeight();
-		var separationHeight = (this.getCorpus().getDocumentsCount() - 1) * this.LINE_HEIGHT;
+		var separationHeight = (docsCount-1) * this.LINE_HEIGHT;
 		containerHeight -= separationHeight;
 		var availableLines = parseInt(containerHeight / this.LINE_HEIGHT);
 		if (this.LINE_HEIGHT * availableLines > containerHeight) {
@@ -352,7 +353,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 		var label;
 		this.documents = new Ext.util.MixedCollection();
 		
-		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
+		for (var i = 0; i < docsCount; i++) {
     		var doc = docs.getAt(i);
 			label = doc.getShortTitle();
 			docIndex = doc.getIndex();

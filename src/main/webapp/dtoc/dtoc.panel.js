@@ -125,13 +125,9 @@ Ext.define('Voyant.panel.DToC', {
         				hidden: true
         			},
         			id: 'dtcTools',
-        			width: 300,
-        			minWidth: 24, // needed for hboxfitsplit layout
+        			width: 310,
+        			minWidth: 200,
         			xtype: 'tabpanel',
-//        			plugins: new Ext.ux.plugins.PanelCollapseHorizontal({
-//        				headerText: 'Index & Tags',
-//                        showCollapseTool: false
-//                    }),
         			cls: 'dtc-panel',
         			deferredRender: false,
         			activeTab: 0,
@@ -160,8 +156,8 @@ Ext.define('Voyant.panel.DToC', {
 //        			plugins: new Ext.ux.plugins.PanelCollapseHorizontal({
 //                        showCollapseTool: false
 //                    }),
-        			width: 250,
-        			minWidth: 24, // needed for hboxfitsplit layout
+        			width: 275,
+        			minWidth: 175,
         			animCollapse: false,
         			collapseDirection: 'left',
         			listeners: {
@@ -321,11 +317,8 @@ Ext.define('Voyant.panel.DToC', {
 			isCurator: isCurator,
 			doInit: true,
 			initData: treeData,
-//			plugins: new Ext.ux.plugins.PanelCollapseHorizontal({
-//                showCollapseTool: false
-//            }),
-			width: 250,
-			minWidth: 24 
+			width: 275,
+			minWidth: 175
 		});
 		
 		Ext.getCmp('dtcDocModel').buildProspect();
@@ -360,7 +353,7 @@ Ext.define('Voyant.panel.DToC', {
 		if (isCurator) {
 			dtcTools.setWidth(500);
 		} else {
-			dtcTools.setWidth(250);
+			dtcTools.setWidth(275);
 		}
 		this.getApplication().getViewport().updateLayout();
 		

@@ -15,12 +15,15 @@ Ext.define('Voyant.panel.DToC.Reader', {
     toolTipConfig: {
 		cls: 'dtcReaderNote',
 		showDelay: 50,
+		hideDelay: 200,
 		draggable: true,
 		constrainPosition: true,
 		border: false,
 		shadow: false,
 		padding: 5,
-		maxWidth: 400
+		maxWidth: 400,
+		maxHeight: 420,
+		scrollable: 'y'
 	},
     
     MINIMUM_LIMIT: 1000,
@@ -310,7 +313,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 				if (index > 0) {
 					this.prevButton.show();
 				}
-				if (index < this.getCorpus().getDocumentsCount()) {
+				if (index < this.getCorpus().getDocumentsCount()-1) {
 					this.nextButton.show();
 				}
 				
@@ -464,6 +467,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 				    scope: this
 				}
 			}, this.toolTipConfig));
+			
 			var tokenId = note.getAttribute('tokenid');
 			this.tokenToolTipsMap[tokenId] = tip;
 		}
@@ -600,11 +604,10 @@ Ext.define('Voyant.panel.DToC.Reader', {
     		}
     		
     		if (tip) {
-    			var xy = tip.target.getXY();
-    			tip.targetXY = xy;
     			setTimeout(function() {
-    				tip.show();
-    				tip.showCloseButton();
+    				tip.show();//At([tip.target.getX(), tip.target.getY()+tip.target.getHeight()]);
+    				tip.stayOpen();
+    				
     				var tokenid = tag.getAttribute('tokenid');
     				var type = 'index';
     				if (tag.hasCls('tag')) {
@@ -612,8 +615,11 @@ Ext.define('Voyant.panel.DToC.Reader', {
     				} else if (tag.hasCls('kwic')) {
     					type = 'kwic';
     				}
+    				// TODO always seems to be null
     				var noteTag = tip.el.down('*[tokenid="'+tokenid+'"]');
-    				this._doHighlight(noteTag, type);
+    				if (noteTag != null) {
+    					this._doHighlight(noteTag, type);
+    				}
     			}.bind(this), 500);
     		} else {
     			var color = '#F47922';

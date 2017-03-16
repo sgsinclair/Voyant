@@ -4,7 +4,7 @@
 Ext.define('Ext.ux.DToCToolTip', {
 	extend: 'Ext.ToolTip',
 	
-	dismissDelay: 0,
+	dismissDelay: 1500,
 	autoHide: true,
 	closable: true,
 	
@@ -46,11 +46,14 @@ Ext.define('Ext.ux.DToCToolTip', {
     },
     
     onClick: function(e) {
-    	this.showCloseButton();
+    	this.stayOpen();
     },
     
-    showCloseButton: function() {
+    stayOpen: function() {
     	this.getTool('close').show();
+    	this.dismissDelay = 0;
+    	this.autoHide = false;
+    	this.clearTimer('dismiss');
     	this.targetClicked = true;
     },
     
@@ -126,7 +129,6 @@ Ext.define('Ext.ux.DToCToolTip', {
     },
     
     onTargetOut: function(e) {
-    	// TODO doesn't hide ever
         // We have exited the current target 
         if (this.targetClicked !== true && this.currentTarget.dom && !this.currentTarget.contains(e.relatedTarget)) {
             this.handleTargetOut();
@@ -135,6 +137,8 @@ Ext.define('Ext.ux.DToCToolTip', {
     
     onShow: function() {
         var me = this;
+        me.dismissDelay = 1500;
+        me.autoHide = true;
         me.callParent();
         me.mon(Ext.getDoc(), 'mousedown', me.onDocMouseDown, me);
         me.getTool('close').hide();
