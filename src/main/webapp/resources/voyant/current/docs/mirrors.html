@@ -14,7 +14,10 @@ Voyant.Mirrors = {
 	local:  '../servers.json',
 	remote: 'https://raw.githubusercontent.com/sgsinclair/Voyant/master/src/main/webapp/resources/voyant/current/servers.json',
 	buildMirrorsList: function(url) {
-		$.getJSON(url)
+		// for remote URL we use Trombone to fetch JSON to avoid any cross-domain issues
+		$.getJSON(url==Voyant.Mirrors.local ? url : "../../../../trombone", {
+			fetchJSON: url
+		})
 	    .done(function( data ) {
 	    	Voyant.Mirrors.generateMirrorsList(data)
 	      })
