@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Mar 16 10:33:00 EDT 2017 */
+/* This file created by JSCacher. Last modified: Fri Mar 17 14:01:56 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5249,8 +5249,14 @@ Ext.define('Voyant.util.Toolable', {
 		});
 	},
 	getExportUrl: function() {
-		var api = this.isXType('voyantheader') ? this.getApplication().getModifiedApiParams() : this.getModifiedApiParams();
-		if (!this.isXType('voyantheader')) {api.view=Ext.getClassName(this).split(".").pop()}
+		// start with the application api
+		var api = this.getApplication().getModifiedApiParams();
+		if (this.isXType('voyantheader')==false) {
+			delete api.panels; // not needed for individual tools
+			// add (and overwrite if need be) this tool's api
+			Ext.apply(api, this.getModifiedApiParams());
+			api.view=Ext.getClassName(this).split(".").pop()
+		}
 		if (!api.corpus) {
 			api.corpus = this.getApplication().getCorpus().getAliasOrId();
 		}
@@ -23242,7 +23248,9 @@ Ext.define('Voyant.VoyantApp', {
     	i18n: {
     	},
     	api: {
-    		palette: 'default'
+    		palette: 'default',
+    		lang: undefined,
+    		debug: undefined
     	}
     },
     

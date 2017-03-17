@@ -581,8 +581,14 @@ Ext.define('Voyant.util.Toolable', {
 		});
 	},
 	getExportUrl: function() {
-		var api = this.isXType('voyantheader') ? this.getApplication().getModifiedApiParams() : this.getModifiedApiParams();
-		if (!this.isXType('voyantheader')) {api.view=Ext.getClassName(this).split(".").pop()}
+		// start with the application api
+		var api = this.getApplication().getModifiedApiParams();
+		if (this.isXType('voyantheader')==false) {
+			delete api.panels; // not needed for individual tools
+			// add (and overwrite if need be) this tool's api
+			Ext.apply(api, this.getModifiedApiParams());
+			api.view=Ext.getClassName(this).split(".").pop()
+		}
 		if (!api.corpus) {
 			api.corpus = this.getApplication().getCorpus().getAliasOrId();
 		}
