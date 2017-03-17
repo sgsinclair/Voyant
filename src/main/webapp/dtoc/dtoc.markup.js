@@ -5,6 +5,8 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	curatedTags: null, // curated tags list
 	tagTotals: {}, // tracks tag freq counts for entire corpus
 	
+	ignoreSpans: true, // ignoring spans drastically reduces the size of the tag data
+	
 	_maskEl: null,
 	
 	loadAllTags: function(useMask) {
@@ -28,6 +30,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 					me.getApplication().dispatchEvent('allTagsLoaded', me);
 					if (useMask) {
 						me.body.unmask();
+						me._maskEl = null;
 					}
 				}
 			}
@@ -53,12 +56,18 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		}
 		
 		if (this.curatedTags != null) {
-			this.getApplication().getStoredResource('curatedtags-'+this.getCorpus().getId()+'-'+docId).then(function(value) {
-				this._saveTags(value, docId);
-		    	if (callback) callback();
-			}, function() {
+			var curId = this.getApplication().getCuratorId();
+			if (curId != null) {
+				this.getApplication().getStoredResource('curatedtags-'+curId+'-'+this.getCorpus().getId()+'-'+docId).then(function(value) {
+					this._saveTags(value, docId);
+			    	if (callback) callback();
+				}, function() {
+					getXml.call(this);
+				}, null, this);
+			} else {
+				// it's a new curation
 				getXml.call(this);
-			}, null, this);
+			}
 		} else {
 			this.getApplication().getStoredResource('tags-'+this.getCorpus().getId()+'-'+docId).then(function(value) {
 		    	this._saveTags(value, docId);
@@ -156,7 +165,9 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	_storeTags: function(tags, docId) {
 		var rId = this.getCorpus().getId()+'-'+docId;
 		if (this.curatedTags != null) {
-			rId = 'curatedtags-'+rId;
+			var cId = this.getApplication().getCuratorId();
+			if (cId === undefined) return;
+			rId = 'curatedtags-'+cId+'-'+rId;
 		} else {
 			rId = 'tags-'+rId;
 		}
@@ -168,12 +179,10 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	    var docIndex = this.getCorpus().getDocument(docId).getIndex();
 	    var progress = docIndex / totalDocs;
 	    
-	    if (this.getApplication().useIndex) {
+	    if (this._maskEl != null) {
+	    	this._maskEl.down('.x-mask-msg-text').dom.firstChild.data = 'Processing Tags: '+Math.floor(progress*100)+'%';
+	    } else if (this.getApplication().useIndex) {
 	    	Ext.getCmp('dtcIndex').updateIndexProgress(progress);
-	    } else {
-		    if (this._maskEl != null) {
-		    	this._maskEl.down('.x-mask-msg-text').dom.firstChild.data = 'Processing Tags: '+Math.floor(progress*100)+'%';
-		    }
 	    }
 	},
 	
@@ -285,6 +294,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			for (var i = 0; i < tags.length; i++) {
 				tag = tags[i];
 				nodeName = tag.nodeName;
+				if (this.ignoreSpans && nodeName.toLowerCase() === 'span') continue;
 				tokenId = tag.getAttribute('tokenid');
 				if (tokenId == null) {
 					// empty tags lack tokenid attribute
@@ -334,7 +344,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 			if (customTagSet == null) {
 				// no curation so parse all tags
 				var tags = Ext.DomQuery.jsSelect('*', docBody);
-				returnData = produceTagData(tags);
+				returnData = produceTagData.call(this, tags);
 			} else {
 				// find hits for curated tags only
 				for (var tag in customTagSet) {
@@ -373,7 +383,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 						Ext.apply(returnData, data);
 					} else {
 						var results = Ext.DomQuery.jsSelect(cTag.tagName, docBody);
-						Ext.apply(returnData, produceTagData(results, cTag.label));
+						Ext.apply(returnData, produceTagData.call(this, results, cTag.label));
 					}
 				}
 			}
@@ -615,6 +625,7 @@ Ext.define('Voyant.panel.DToC.Markup', {
 	},
     
 	updateChapterFilter: function() {
+		// TODO take possible curation into account
 	    var menu = this.down('#markupChapterFilter').getMenu();
 	    menu.removeAll();
 	    
@@ -690,20 +701,9 @@ Ext.define('Voyant.panel.DToC.Markup', {
 	},
 	
 	listeners: {
-		afterrender: function(container) {
-				
-		},
 		loadedCorpus: function(src, corpus) {
 			this.setCorpus(corpus);
-//			this.getTokensStore().setCorpus(corpus);
-//			this.getTokensStore().load();
-			
 			this.updateChapterFilter();
-			
-			if (this.getApplication().useIndex != true) {
-				// TODO confirm that curated tags (if using) get added before this
-				this.loadAllTags(true);
-			}
 		},
 		indexProcessed: function() {
 			this.loadAllTags(false);

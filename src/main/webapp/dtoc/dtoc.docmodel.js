@@ -44,8 +44,6 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 				'<div id="docModelChapterButton"></div>'
 		);
     	
-    	this.addListener('afterlayout', this._afterLayoutHandler, this);
-    	
     	this.addListener('corpusDocumentSelected', function(src, data) {
 			if (src != this) {
 				var docIndex = data.docIndex == null ? this.getCorpus().getDocument(data.docId).getIndex() : data.docIndex;
@@ -177,22 +175,33 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			
 			if (this.rendered) {
 				this.buildProspect();
+			}
 				
-				var corpus = this.getCorpus();
-				var docs = corpus.getDocuments();
-				for (var i = 0, len = corpus.getDocumentsCount(); i < len; i++) {
-		    		var doc = docs.getAt(i);
-					this.model.add(doc.getId(), {
-						index: {},
-						tag: {},
-						kwic: {}
-					});
-				}
-				
-				Ext.defer(this._afterLayoutHandler, 50, this);
+			var corpus = this.getCorpus();
+			var docs = corpus.getDocuments();
+			for (var i = 0, len = corpus.getDocumentsCount(); i < len; i++) {
+	    		var doc = docs.getAt(i);
+				this.model.add(doc.getId(), {
+					index: {},
+					tag: {},
+					kwic: {}
+				});
 			}
 		},
+		boxready: function() {
+			this.setOutlineDimensions();
+		},
+		resize: function() {
+			this.buildProspect();
+		},
+		afterlayout: function() {
+			this.setOutlineDimensions();
+			this.setCurrentPosition();
+		},
 		afterrender: function(panel) {
+			this.segmentContainer = Ext.get('docModelSegmentContainer');
+			this.segmentContainer.unselectable();
+			
 			this.outlineTop = Ext.get('docModelOutlineTop');
 			this.outlineLeft = Ext.get('docModelOutlineLeft');
 			this.outlineRight = Ext.get('docModelOutlineRight');
@@ -262,6 +271,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 										Ext.getCmp('dtcReader').setReaderScroll('top');
 									}
 									this.chapterButtonContainer.show();
+									// TODO add dismiss timer for chapter button
 								}
 							}
 						} else {
@@ -317,71 +327,60 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 		}
 	},
 	
-	_afterLayoutHandler: function() {
-		// have to set segmentContainer here because it isn't yet available in afterrender
-		this.segmentContainer = Ext.get('docModelSegmentContainer');
-		this.segmentContainer.unselectable();
-		
-		this.setLocation();
-	},
-	
 	buildProspect: function() {
-		var docs = this.getCorpus().getDocuments();
-		var docsCount = this.getCorpus().getDocumentsCount();
-		
-		var totalTokens = 0;
-		for (var i = 0; i < docsCount; i++) {
-    		var doc = docs.getAt(i);
-			totalTokens += doc.get('tokensCount-lexical');
-		};
-		
-		var containerHeight = this.segmentContainer.getHeight();
-		var separationHeight = (docsCount-1) * this.LINE_HEIGHT;
-		containerHeight -= separationHeight;
-		var availableLines = parseInt(containerHeight / this.LINE_HEIGHT);
-		if (this.LINE_HEIGHT * availableLines > containerHeight) {
-			availableLines--; // make sure there's no scrollbar for prospect
-		}
-		
-		
-		var tokensPerLine = Math.floor(totalTokens / availableLines);
-		if (tokensPerLine < this.MINIMUM_LIMIT) {tokensPerLine = this.MINIMUM_LIMIT;}
-		this.setApiParams({limit: tokensPerLine});
-		
-		var docTotalTokens, linesPerDocument;
-		var imagesSnippet = "";
-		var label;
-		this.documents = new Ext.util.MixedCollection();
-		
-		for (var i = 0; i < docsCount; i++) {
-    		var doc = docs.getAt(i);
-			label = doc.getShortTitle();
-			docIndex = doc.getIndex();
-			imagesSnippet += "<div>";
-			docTotalTokens = doc.get('tokensCount-lexical');
-			var percentageOfWhole = docTotalTokens / totalTokens;
-			//linesPerDocument = Math.floor(docTotalTokens / tokensPerLine);
-			linesPerDocument = Math.floor(availableLines * percentageOfWhole);
-//			console.log('linesPerDocument',linesPerDocument,'percentageOfWhole',percentageOfWhole);
-			if (linesPerDocument < 1) {linesPerDocument = 1;}
+		if (this.getCorpus()) {
+			var docs = this.getCorpus().getDocuments();
+			var docsCount = this.getCorpus().getDocumentsCount();
 			
-			// TODO change ID system to reflect new token IDs
-			for (var j = 0; j < linesPerDocument; j++) {
-				imagesSnippet += "<img src='"+Ext.BLANK_IMAGE_URL+"' class='docModelLine' "+
-//						"'ext:qtip='"+label+"' "+
-						"id='prospect_"+docIndex+'_'+j+"' />";
+			var totalTokens = 0;
+			for (var i = 0; i < docsCount; i++) {
+	    		var doc = docs.getAt(i);
+				totalTokens += doc.get('tokensCount-lexical');
+			};
+			
+			var containerHeight = this.segmentContainer.getHeight();
+			var separationHeight = (docsCount-1) * this.LINE_HEIGHT;
+			containerHeight -= separationHeight;
+			var availableLines = parseInt(containerHeight / this.LINE_HEIGHT);
+			if (this.LINE_HEIGHT * availableLines > containerHeight) {
+				availableLines--; // make sure there's no scrollbar for prospect
 			}
-			this.documents.add(doc.getIndex(), {
-				document: doc, lines: linesPerDocument
-			});
-			imagesSnippet += '</div>';
+			
+			
+			var tokensPerLine = Math.floor(totalTokens / availableLines);
+			if (tokensPerLine < this.MINIMUM_LIMIT) {tokensPerLine = this.MINIMUM_LIMIT;}
+			this.setApiParams({limit: tokensPerLine});
+			
+			var docTotalTokens, linesPerDocument;
+			var imagesSnippet = "";
+			var label;
+			this.documents = new Ext.util.MixedCollection();
+			
+			for (var i = 0; i < docsCount; i++) {
+	    		var doc = docs.getAt(i);
+				label = doc.getShortTitle();
+				docIndex = doc.getIndex();
+				imagesSnippet += "<div>";
+				docTotalTokens = doc.get('tokensCount-lexical');
+				var percentageOfWhole = docTotalTokens / totalTokens;
+				//linesPerDocument = Math.floor(docTotalTokens / tokensPerLine);
+				linesPerDocument = Math.floor(availableLines * percentageOfWhole);
+	//			console.log('linesPerDocument',linesPerDocument,'percentageOfWhole',percentageOfWhole);
+				if (linesPerDocument < 1) {linesPerDocument = 1;}
+				
+				// TODO change ID system to reflect new token IDs
+				for (var j = 0; j < linesPerDocument; j++) {
+					imagesSnippet += "<img src='"+Ext.BLANK_IMAGE_URL+"' class='docModelLine' "+
+	//						"'ext:qtip='"+label+"' "+
+							"id='prospect_"+docIndex+'_'+j+"' />";
+				}
+				this.documents.add(doc.getIndex(), {
+					document: doc, lines: linesPerDocument
+				});
+				imagesSnippet += '</div>';
+			}
+			this.segmentContainer.setHtml(imagesSnippet);
 		}
-		this.segmentContainer.setHtml(imagesSnippet);
-		
-		this.addListener('afterlayout', function(p, l) {
-			var buildAndPosition = Ext.Function.createSequence(this.buildProspect, this.setCurrentPosition, this);
-			Ext.defer(buildAndPosition, 250, this);
-		}, this, {single: true});
 	},
 	
 	showTokenHit: function(docId, tokenId, type) {
@@ -437,14 +436,18 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 		docIndex = docIndex == null ? this.currentPosition[0] : docIndex;
 		amount = amount == null ? this.currentPosition[1] : amount;
 		animate = animate == null ? false : animate;
+		
 		var docContainer = this.segmentContainer.down('div:nth-child('+(docIndex+1)+')');
 		if (docContainer) {
 			var height = docContainer.getHeight();
 			var y = docContainer.getY() + Math.round(height * amount) - this.ARROW_HALF_HEIGHT;
+			
+			var currSeg = Ext.get('docModelCurrentSegment');
+			if (!currSeg.isVisible()) currSeg.show();
 			if (animate) {
-				Ext.get('docModelCurrentSegment').setY(y, animate);
+				currSeg.setY(y, animate);
 			} else {
-				Ext.get('docModelCurrentSegment').setStyle({top: y+'px'});
+				currSeg.setStyle({top: y+'px'});
 			}
 			
 			var box = docContainer.getBox();
@@ -466,22 +469,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 	getSelectionsForDoc: function(docId) {
 		return this.model.get(docId);
 	},
-	
-	setLocation: function() {
-		this.setCurrentSegmentX();
-		this.setOutlineDimensions();
-	},
-	
-	setCurrentSegmentX: function() {
-		var x = this.segmentContainer.getX() + this.segmentContainer.getWidth();
-		var currSeg = Ext.get('docModelCurrentSegment');
-		currSeg.setX(x);
-		if (!currSeg.isVisible()) currSeg.show();
-		
-		this.chapterButtonContainer.hide();
-		this.chapterButtonContainer.setX(this.segmentContainer.getX() + this.segmentContainer.getWidth() + 10);
-	},
-	
+
 	setOutlineDimensions: function(minMaxObj) {
 		var outlineThickness = 1;
 		var min = 0;
@@ -523,6 +511,13 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			this.outlineBottom.setStyle('border-radius', null);
 		}
 		
+		var currSeg = Ext.get('docModelCurrentSegment');
+		var viz = currSeg.isVisible();
+		if (!viz) currSeg.show();
+		currSeg.setX(box.x+box.width-5);
+		if (!viz) currSeg.hide();
 		
+		this.chapterButtonContainer.hide();
+		this.chapterButtonContainer.setX(box.x+box.width+7);
 	}
 });

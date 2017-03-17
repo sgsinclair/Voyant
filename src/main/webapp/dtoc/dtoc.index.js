@@ -185,18 +185,12 @@ Ext.define('Voyant.panel.DToC.Index', {
     	
     },
     initComponent: function() {
-        var me = this;
-        
-        me.callParent(arguments);
+        this.callParent(arguments);
     },
     
 	listeners: {
-		afterrender: function(container) {
-				
-		},
 		loadedCorpus: function(src, corpus) {
 			this.setCorpus(corpus);
-			this.loadIndex();
 			this.updateChapterFilter();
 		},
 		allTagsLoaded: function(src) {
