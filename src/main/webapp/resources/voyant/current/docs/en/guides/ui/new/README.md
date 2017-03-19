@@ -1,5 +1,13 @@
 # What's New
 
+## Voyant 2.2
+
+Again, hundreds of bug fixes and refinements, most notably:
+
+* [addition of new Veliza tool](#!/guide/veliza)
+* [improved handling of Tibetan](https://github.com/sgsinclair/Voyant/issues/342)
+* [improved ScatterPlot tool](#!/guide/scatterplot) for correspondence analysis and principle component analysis
+
 ## Voyant 2.1
 
 This provides hundreds of bug fixes and refinements, most notably:
