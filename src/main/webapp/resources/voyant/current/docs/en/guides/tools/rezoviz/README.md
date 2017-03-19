@@ -1,6 +1,8 @@
 # RezoViz
 
 RezoViz represents connections between people, places and organizations that co-occur in multiple documents.
+
+Please note: this tool is one of the least reliable ones in Voyant (especially with larger corpora), in part because the processing of entities requires more time and computation than most other operations. In some cases you can try refreshing the page (i.e. not reloading the corpus, but reloading the page with the same corpus) in case processing of entities has completed in the interim.
 	
 ## Overview
 
@@ -33,6 +35,8 @@ RezoViz is a network graph representation where automatically identified people,
 
 Shown as a network graph this might look something like the following:
 
+{@img rezoviz-cities.png RezoViz with Cities}
+
 This shows that Montreal is central as it appears in all three documents. The placement of the other cities tries to optimize available space by showing more closely linked items in proximity and with the fewest number of crossing lines (as the data become more complex this becomes more difficult as competing priorities are at work). This type of graph is called a force-directed network graph.
 
 Because RezoViz creates links between pairs of terms in a document, it works best with several documents (all terms in a single document will be linked). Depending on the genre of the documents, it may work better with shorter documents (like news articles, where there tends to be a high density of people, locations and organizations) or longer documents (like novels where there tend to be fewer unique people, locations and organizations).
@@ -47,12 +51,15 @@ How does Voyant know what are people, locations and organizations? It performs a
 
 You can add keywords by typing a query into the search box and hitting enter (see [Term Searches](#!/guide/search) for more advanced searching capabilities).
 
-You can use the _Clear_ button to clear all keywords in the graph (to start from scratch and add your own).
+You can determine which categories of entities (people, locations, organizations) to display (keeping in mind that the automatic identification of organizations is at best approximate).
 
-The _Context_ slider determines how many terms to include when looking for collocates. The value specifies the number of words to consider on _each_ side of the keyword (so the total window of words is double). By default the context is set to 5 words per side, and the slider can have a maximum of 30.
+You can determine a minimum number of edges for displayed items. In other words, how many other entities must be connected in order for an item to be shown? The default is two (any item needs to be linked to at least two others).
 
-Clicking on the [Options](#!/guide/options) icon also allows you to define a set of stopwords to exclude – see the [stopwords guide](#!/guide/stopwords) for more information.
+The following options relate to the physics engine of the force-directed graph, they determine how items are arranged in the available space. The optimal settings will depend on a lot of factors, including the number of items shown, their interconnectedness, etc.
 
+* *repulsion*: how strongly to the labels (nodes) push away from each other (the stronger the repulsion the easier it might be to see the labels, but too much repulsion may not work in smaller spaces with more items)
+* *stiffness*: this refers to the strength of the edges during layout, it determines how springy they behave, that is, how resistent they are to resizing in length (while the other forces are being applied)
+* *friction*: the force-directed graph continues to move until it has achieved an optimal placement of items, the friction setting determines how much to slow down the movement after each iteration (a high value will allow things to keep moving for longer)
 
 ## See Also
 

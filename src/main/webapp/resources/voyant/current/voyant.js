@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Mar 17 14:01:56 EDT 2017 */
+/* This file created by JSCacher. Last modified: Sat Mar 18 09:43:36 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -22010,25 +22010,23 @@ Ext.define('Voyant.panel.CorpusSet', {
     	boxready: function() {
     		var panelsString = this.getApiParam("panels");
     		if (panelsString) {
-//    			Ext.defer(function() { // we need to defer otherwise corpus loaded doesn't always trigger
-        			var panels = panelsString.toLowerCase().split(",");
-        			var tabpanels = this.query("voyanttabpanel");
-        			for (var i=0, len=panels.length; i<len; i++) {
-        				var panel = panels[i];
-        				if (panel && Ext.ClassManager.getByAlias('widget.'+panel) && tabpanels[i]) {
-        					var tabpanel = tabpanels[i];
-        					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already selected
-        					tabpanel.items.each(function(item, index) {
-        						if (item.isXType(panel)) {
-        							this.setActiveTab(index)
-        							return false
-        						}
-        					}, tabpanel)
-        					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already switched
-        					tabpanel.getActiveTab().replacePanel(panel); // switch to specified panel
-        				}
-        			}
-//    			}, 10, this)
+    			var panels = panelsString.toLowerCase().split(",");
+    			var tabpanels = this.query("voyanttabpanel");
+    			for (var i=0, len=panels.length; i<len; i++) {
+    				var panel = panels[i];
+    				if (panel && Ext.ClassManager.getByAlias('widget.'+panel) && tabpanels[i]) {
+    					var tabpanel = tabpanels[i];
+    					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already selected
+    					tabpanel.items.each(function(item, index) {
+    						if (item.isXType(panel)) {
+    							this.setActiveTab(index)
+    							return false
+    						}
+    					}, tabpanel)
+    					if (tabpanel.getActiveTab().isXType(panel)) {continue;} // already switched
+    					tabpanel.getActiveTab().replacePanel(panel); // switch to specified panel
+    				}
+    			}
     		}
     		// add an easter egg
     		var cirrus = this.down('cirrus');
@@ -22036,16 +22034,23 @@ Ext.define('Voyant.panel.CorpusSet', {
     		if (cirrus) {
     			var toolbar = cirrus.down('toolbar');
     			toolbar.add({xtype: 'tbfill'})
-    			var b = toolbar.add({
+    			toolbar.add({
     				text: ' ',
-    				handler: function() {
-    					me.add({
-    						region: 'north',
-    						width: '100%',
-							html: '<div align="center"><table><tr><td><img src="http://stefansinclair.name/wordpress/wp-content/uploads/2011/07/Sinclair_Stefan_small.jpg" style="height: 60px"></td><td style="text-align: center; padding-left: 2em; padding-right: 2em;">By Athena, you found us hidden<br>up here between the panels!</td><td><img src="http://geoffreyrockwell.com/images/home_09.jpg" style="height: 60px"></td></tr></table></div>'
-    					})
+    				listeners: {
+    					click: {
+    						fn: function() {
+	        					me.add({
+	        						region: 'north',
+	        						width: '100%',
+	    							html: '<div align="center"><table><tr><td><img src="http://stefansinclair.name/wordpress/wp-content/uploads/2011/07/Sinclair_Stefan_small.jpg" style="height: 60px"></td><td style="text-align: center; padding-left: 2em; padding-right: 2em;">By Athena, you found us hidden<br>up here between the panels!</td><td><img src="http://geoffreyrockwell.com/images/home_09.jpg" style="height: 60px"></td></tr></table></div>'
+	        					})
+	        				}, single: true
+    					},
+    					render: function(b) {
+    						b.getTargetEl().dom.className=''
+    					}
     				}
-    			}).getTargetEl().dom.className=''
+    			});
     		}
     		
     	},
