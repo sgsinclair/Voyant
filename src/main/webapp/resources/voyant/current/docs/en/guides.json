@@ -204,6 +204,12 @@
                         "description": "General information about Voyant Tools."
                     },
                     {
+                        "name": "gallery",
+                        "url": "guides/info/gallery",
+                        "title": "Gallery",
+                        "description": "Gallery of examples."
+                    },
+                    {
                         "name": "mirrors",
                         "url": "guides/info/mirrors",
                         "title": "Mirrors",
