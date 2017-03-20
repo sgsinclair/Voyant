@@ -16,6 +16,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
     initialized: false,
 	xpathWin: null,
 	isCurator: false,
+	internalSelection: false,
 	titlesMode: null,
 	FULL_TITLES: 0,
 	MIN_TITLES: 1,
@@ -59,43 +60,44 @@ Ext.define('Voyant.panel.DToC.ToC', {
 				scrollable: 'y',
 				listeners: {
 					select: function(view, record, index, opts) {
-						var data = record.getData();
-
-						// document
-						if (data.isDoc) {
-			    			this.showDocument(data.docId);
-			    		} else {
-						
-							switch(data.dtcType) {
-							case 'tag':
-								var tag = data.tagData;
-								var edata = {
-									tag: tag.tagName,
-									tokenId: tag.tokenId,
-									docId: data.docId,
-									type: 'tag'
-								};
-								this.getApplication().dispatchEvent('tagSelected', this, edata);
-								break;
-							case 'index':
-								var index = data.indexData;
-								var edata = {
-									tag: index.tag,
-									tokenId: index.tokenId,
-									docId: data.docId,
-									type: 'index'
-								};
-								this.getApplication().dispatchEvent('tagSelected', this, edata);
-								break;
-							case 'kwic':
-								var data = {
-									tokenId: data.tokenId,
-									docId: data.docId,
-									docIdType: data.docId+':'+data.kwicData
-								};
-								this.getApplication().dispatchEvent('tokenSelected', this, data);
-							}
-			    		}
+						if (!this.internalSelection) {
+							var data = record.getData();
+							// document
+							if (data.isDoc) {
+				    			this.showDocument(data.docId);
+				    		} else {
+							
+								switch(data.dtcType) {
+								case 'tag':
+									var tag = data.tagData;
+									var edata = {
+										tag: tag.tagName,
+										tokenId: tag.tokenId,
+										docId: data.docId,
+										type: 'tag'
+									};
+									this.getApplication().dispatchEvent('tagSelected', this, edata);
+									break;
+								case 'index':
+									var index = data.indexData;
+									var edata = {
+										tag: index.tag,
+										tokenId: index.tokenId,
+										docId: data.docId,
+										type: 'index'
+									};
+									this.getApplication().dispatchEvent('tagSelected', this, edata);
+									break;
+								case 'kwic':
+									var data = {
+										tokenId: data.tokenId,
+										docId: data.docId,
+										docIdType: data.docId+':'+data.kwicData
+									};
+									this.getApplication().dispatchEvent('tokenSelected', this, data);
+								}
+				    		}
+						}
 					},
 					scope: this
 				}
@@ -121,6 +123,9 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			treeConfig.listeners.afterrender = {
 	    		fn: function() {
 	    			this.setCorpus(this.getApplication().getCorpus());
+	    			if (this.isCurator) {
+	    				this.getApplication().addOrigIndexField();
+	    			}
 	    			this.initToc(config.initData);
 	    		},
 	    		scope: this,
@@ -129,9 +134,14 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		}
 		
 		if (this.isCurator) {
-			treeConfig.plugins = ['cellediting'];
+			treeConfig.plugins = {
+		        ptype: 'cellediting',
+		        clicksToEdit: 2
+		    },
 			treeConfig.viewConfig.plugins = {
 				ptype: 'treeviewdragdrop',
+				enableDrag: true,
+				enableDrop: true,
 				containerScroll: true
 			};
 			treeConfig.columns = {
@@ -145,16 +155,18 @@ Ext.define('Voyant.panel.DToC.ToC', {
 					}
 				}
 			};
+			treeConfig.listeners.beforeedit = function(ed, context) {
+				return context.record.get('editable');
+			};
 			treeConfig.listeners.edit = {
 				fn: function(ed, context) {
-					var docId = context.record.getData().docId;
+					var docId = context.record.get('docId');
 					var record = this.getCorpus().getDocument(docId);
 					record.set('title', context.value);
-					var shortTitle = record.fieldsMap.shortTitle.mapping({title: context.value});
-					record.set('shortTitle', shortTitle);
 				},
 				scope: this
 			};
+			
 			treeConfig.viewConfig.listeners.beforedrop = function(targetNode, dragData, overModel, dropPosition, dropHandlers, event) {
 				if ((dragData.records[0].getData().isDoc && dropPosition === 'append') || !overModel.getData().isDoc) return false;
 			};
@@ -166,31 +178,24 @@ Ext.define('Voyant.panel.DToC.ToC', {
 						var child = children[i];
 						child.getData().docIndex = i;
 						var doc = corpus.getDocument(child.getData().docId);
-						// store the original index
-						if (doc.get('origIndex') === undefined) {
-							// hack to add a new field
-							Voyant.data.model.Document.prototype.fields.push(new Ext.data.Field({
-								name: 'origIndex', type: 'int'
-							}));
-							doc.set('origIndex', doc.get('index'));
-						}
+						doc.set('origIndex', doc.get('index'));
 						doc.set('index', i);
 					}
+					
+					corpus.getDocuments().setRemoteSort(false);
 					corpus.getDocuments().sort('index', 'ASC');
+					corpus.getDocuments().setRemoteSort(true);
+					
 					Ext.getCmp('dtcDocModel').buildProspect();
 				},
 				scope: this
 			};
-			treeConfig.listeners.beforeitemdblclick = {
-				fn: function(node, evt) {
-					return false; // cancel node expand/contract, edit will still happen however
-				},
-				scope: this
-			};
-			treeConfig.listeners.itemdblclick = {
-				fn: this.editNodeLabel,
-				scope: this
-			};
+//			treeConfig.listeners.beforeitemdblclick = {
+//				fn: function(node, evt) {
+//					return false; // cancel node expand/contract, edit will still happen however
+//				},
+//				scope: this
+//			};
 		}
 		
 		Ext.apply(config, treeConfig);
@@ -206,12 +211,20 @@ Ext.define('Voyant.panel.DToC.ToC', {
     },
     
 	listeners: {
-		afterrender: function(container) {
-				
-		},
 		loadedCorpus: function(src, corpus) {
 			this.setCorpus(corpus);
 			this.initToc();
+		},
+		corpusDocumentSelected: function(src, data) {
+			if (src != this) {
+				var docId = data.docId == null ? this.getCorpus().getDocument(data.docIndex).getId() : data.docId;
+				var match = this.getStore().query('docId', docId).first();
+				if (match) {
+					this.internalSelection = true;
+					this.setSelection(match);
+					this.internalSelection = false;
+				}
+			}
 		},
 		tagsSelected: function(src, tags) {
 			var noSubType = [];
@@ -363,7 +376,7 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		var data = {
 			text: title,
 			expandable: true,
-			draggable: this.isCurator,
+			editable: true,
 			leaf: true,
 			docId: doc.getId(),
 			docIndex: doc.getIndex(),
@@ -424,7 +437,6 @@ Ext.define('Voyant.panel.DToC.ToC', {
 	},
 	
 	showDocument: function(docId) {
-		// TODO respond to corpusDocumentSelected?
 		this.getApplication().dispatchEvent('corpusDocumentSelected', this, {docId:docId});
 	},
 
@@ -756,18 +768,12 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		store.each(doTest);
 		
 		if (nodesToRemove.length > 0) {
-			this.unbindStore();
+			this.unbindStore(); // don't refresh while removing
 			for (var i = 0; i < nodesToRemove.length; i++) {
 				var node = nodesToRemove[i];
 				node.erase();
 			}
 			this.bindStore(store);
-		}
-	},
-	
-	editNodeLabel: function(node) {
-		if (node.getData().editable != false) {
-			this.treeEditor.startEdit(node.ui.textNode);
 		}
 	},
 	

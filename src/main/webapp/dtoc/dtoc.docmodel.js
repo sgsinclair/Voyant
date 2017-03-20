@@ -353,15 +353,16 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			
 			var docTotalTokens, linesPerDocument;
 			var imagesSnippet = "";
-			var label;
+			var tiplabel, docIndex;
 			this.documents = new Ext.util.MixedCollection();
 			
 			for (var i = 0; i < docsCount; i++) {
 	    		var doc = docs.getAt(i);
-				label = doc.getShortTitle();
+	    		tiplabel = doc.getShortTitle();
 				docIndex = doc.getIndex();
 				imagesSnippet += "<div>";
 				docTotalTokens = doc.get('tokensCount-lexical');
+				
 				var percentageOfWhole = docTotalTokens / totalTokens;
 				//linesPerDocument = Math.floor(docTotalTokens / tokensPerLine);
 				linesPerDocument = Math.floor(availableLines * percentageOfWhole);
@@ -371,7 +372,7 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 				// TODO change ID system to reflect new token IDs
 				for (var j = 0; j < linesPerDocument; j++) {
 					imagesSnippet += "<img src='"+Ext.BLANK_IMAGE_URL+"' class='docModelLine' "+
-	//						"'ext:qtip='"+label+"' "+
+	//						"'ext:qtip='"+tiplabel+"' "+
 							"id='prospect_"+docIndex+'_'+j+"' />";
 				}
 				this.documents.add(doc.getIndex(), {

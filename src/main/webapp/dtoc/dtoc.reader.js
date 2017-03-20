@@ -56,6 +56,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 				scale: 'medium',
 				cls: 'dtc-button',
 				style: 'display: inline-block; margin-right: 5px;',
+				hidden: true,
 				renderTo: buttonContainer,
 				handler: this.fetchPreviousDocument,
 				scope: this
@@ -67,6 +68,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 				scale: 'medium',
 				cls: 'dtc-button',
 				style: 'display: inline-block; margin-left: 5px;',
+				hidden: true,
 				renderTo: buttonContainer,
 				handler: this.fetchNextDocument,
 				scope: this
@@ -246,12 +248,13 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		},
 		loadedCorpus: function(src, corpus) {
 			this.setCorpus(corpus);
-			
-			var docId = this.getApiParams().docId;
-			if (docId == null) docId = this.getCorpus().getDocument(0).getId();
-			var data = {docId: docId};
-			this.getApplication().dispatchEvent('corpusDocumentSelected', this, data);
-			this.fetchDocument(data);
+			if (this.getApplication().getCuratorId() == undefined) {
+				var docId = this.getApiParams().docId;
+				if (docId == null) docId = this.getCorpus().getDocument(0).getId();
+				var data = {docId: docId};
+				this.getApplication().dispatchEvent('corpusDocumentSelected', this, data);
+				this.fetchDocument(data);
+			}
 		}
 	},
 	

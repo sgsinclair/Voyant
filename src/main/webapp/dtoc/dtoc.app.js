@@ -286,12 +286,10 @@ Ext.define('VoyantDTOCApp', {
 				var tag = data.markup[i];
 				dtcMarkup.curatedTags[tag.tagName] = tag;
 			}
-			// TODO what happens if tag loading has already started
-//			dtcMarkup.store.loadData(data.markup, false);
-//			dtcMarkup.loadAllTags();
 			
 			if (data.toc && data.toc.length > 0) {
 				var treeNodes = [];
+				this.addOrigIndexField();
 				for (var i = 0; i < data.toc.length; i++) {
 					var node = data.toc[i];
 					var doc = this.getCorpus().getDocument(node.d);
@@ -300,14 +298,7 @@ Ext.define('VoyantDTOCApp', {
 					// check if docIndex matches doc order
 					// if it doesn't, set the appropriate fields
 					if (node.d != i) {
-						
-						if (doc.get('origIndex') === undefined) {
-							// hack to add a new field
-							Voyant.data.model.Document.prototype.fields.push(new Ext.data.Field({
-								name: 'origIndex', type: 'int'
-							}));
-							doc.set('origIndex', node.d);
-						}
+						doc.set('origIndex', node.d);
 						doc.set('title', node.t);
 						doc.set('index', i);
 					}
@@ -318,11 +309,14 @@ Ext.define('VoyantDTOCApp', {
 					});
 				}
 				
-				// TODO sorting messes things up
-//				this.getCorpus().getDocuments().sort('index', 'ASC');
+				this.getCorpus().getDocuments().setRemoteSort(false);
+				this.getCorpus().getDocuments().sort('index', 'ASC');
+				this.getCorpus().getDocuments().setRemoteSort(true);
 				
-	//			console.debug(treeNodes);
 				Ext.getCmp('dtcToc').initToc(treeNodes, true);
+				Ext.getCmp('dtcDocModel').buildProspect();
+				
+				this.dispatchEvent('corpusDocumentSelected', this, {docId: this.getCorpus().getDocument(0).getId()});
 			}
 		}
     },
@@ -639,5 +633,15 @@ Ext.define('VoyantDTOCApp', {
 	onSplitterClick: function(splitter, event, el) {
 		var panel = splitter.prev();
 		panel.toggleCollapse();
+	},
+	
+	addOrigIndexField: function() {
+		if (this.getCorpus().getDocument(0).get('origIndex') === undefined) {
+			Voyant.data.model.Document.addFields([{name: 'origIndex', type: 'int'}]);
+			this.getCorpus().getDocuments().setModel(Voyant.data.model.Document);
+			this.getCorpus().getDocuments().each(function(doc) {
+				doc.set('origIndex', doc.get('index'));
+			});
+		}
 	}
 });
