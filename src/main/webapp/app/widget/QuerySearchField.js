@@ -142,18 +142,20 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	
     	me.on("afterrender", function(c) {
     		if (me.hasCorpusLoadedListener === false) {
-	    		parentPanel = me.findParentBy(function(clz) {
-	    			return clz.mixins["Voyant.panel.Panel"];
-    			});
-	    		var corpus = parentPanel.getApplication().getCorpus();
-				if (corpus !== undefined) {
-					me.doSetCorpus(corpus);
-				} else {
-					parentPanel.on("loadedCorpus", function(src, corpus) {
-						me.doSetCorpus(corpus);
-			    	}, me);
-					me.hasCorpusLoadedListener = true;
-				}
+    			if (!me.getCorpus()) {
+    	    		parentPanel = me.findParentBy(function(clz) {
+    	    			return clz.mixins["Voyant.panel.Panel"];
+        			});
+    	    		var corpus = parentPanel.getApplication().getCorpus();
+    				if (corpus !== undefined) {
+    					me.doSetCorpus(corpus);
+    				} else {
+    					parentPanel.on("loadedCorpus", function(src, corpus) {
+    						me.doSetCorpus(corpus);
+    			    	}, me);
+    					me.hasCorpusLoadedListener = true;
+    				}
+    			}
     		}
 			
     		if (me.triggers && me.triggers.help) {

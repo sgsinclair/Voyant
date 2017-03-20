@@ -150,14 +150,14 @@ Ext.define('Voyant.panel.Mandala', {
     },
     
     editMagnet: function(term) {
-    	var me = this;
+    	var me = this, currentTerms = Ext.Array.from(me.getApiParam('query'));
 		Ext.create('Ext.window.Window', {
 			title: this.localize("EditMagnet"),
 			modal: true,
 			items: {
 				xtype: 'form',
 				width: 300,
-				items: {
+				items: [{
 					xtype: 'querysearchfield',
 					corpus: this.getCorpus(),
 					store: this.getCorpus().getCorpusTerms({
@@ -167,8 +167,28 @@ Ext.define('Voyant.panel.Mandala', {
 							}
 						}
 					}),
-					stopList: this.getApiParam('stopList')
-				},
+					stopList: this.getApiParam('stopList'),
+					listeners: {
+						afterrender: function(field) {
+							if (term) {
+								var termObj = new Ext.create("Voyant.data.model.CorpusTerm", {
+									term: term
+								});
+								field.getStore().loadData(termObj, true)
+								field.setValue(termObj);
+							}
+						}
+					}
+				},{
+					xtype: "numberfield",
+				    fieldLabel: 'rotate clockwise',
+				    minValue: 0,
+				    maxValue: currentTerms.length-1,
+				    value: 0,
+				    stepValue: 1,
+				    width: 200,
+				    name: "rotate"
+				}],
 				buttons: [{
 	            	text: this.localize("remove"),
 					glyph: 'xf0e2@FontAwesome',
@@ -196,15 +216,35 @@ Ext.define('Voyant.panel.Mandala', {
 					glyph: 'xf00c@FontAwesome',
 	            	flex: 1,
 	        		handler: function(btn) {
-	        			var queries = Ext.Array.filter(Ext.Array.from(me.getApiParam('query')), function(query) {
-	        				return query!=term
-	        			});
-	        			var val = btn.up('window').down('querysearchfield').getValue();
-	        			if (val.length>0) {
-	        				queries.push(val.join("|"));
+	        			var val = btn.up('window').down('querysearchfield').getValue().join("|")
+	        			if (val) {
+
+	        				// start by updating the term in place
+		        			var position = -1;
+		        			for (var i=0; i<currentTerms.length; i++) {
+		        				if (term==currentTerms[i]) {
+		        					position=i;
+		        					currentTerms[i]=val;
+		        					
+				        			// see if we need to shift
+				        			var rotate = btn.up('window').down('numberfield').getValue();
+				        			if (rotate) {
+				        				currentTerms.splice(i, 1);
+				        				var newpos = i+rotate;
+				        				if (newpos>currentTerms.length) {newpos-=currentTerms.length+1;}
+				        				currentTerms.splice(newpos, 0, val);
+				        			}
+				        			break
+				        			
+		        				}
+		        			}
+		        			if (position==-1) { // not sure why it couldn't be found
+		        				currentTerms.push(val);
+		        			}		        			
 	        			}
-	        			me.setApiParam('query', queries);
-	        			me.updateFromQueries(queries.length==0);
+	        			
+	        			me.setApiParam('query', currentTerms);
+	        			me.updateFromQueries(currentTerms.length==0);
 	        			btn.up('window').close();
 	        		},
 	        		scope: this
@@ -230,7 +270,7 @@ Ext.define('Voyant.panel.Mandala', {
         		    	var canvas = this.getTargetEl().dom.querySelector("canvas"), ctx = canvas.getContext("2d");
         		    		diam = canvas.width, rad = diam /2;
         		    	ctx.font = this.textFont;
-        		    	this.magnets = {};
+        		    	var magnets = {};
         		    	for (var i=0, len=records.length; i<len; i++) {
         		    		var term = records[i].getTerm();
         		    		records[i].getDistributions().forEach(function(val, i) {
@@ -238,13 +278,29 @@ Ext.define('Voyant.panel.Mandala', {
         		    				this.documents[i].matches.push(term)
         		    			}
         		    		}, this);
-        		    		this.magnets[term] = {
+        		    		magnets[term] = {
         		    			record: records[i],
         		    			colour: this.getApplication().getColor(i),
         		    			width: ctx.measureText(term).width,
         		    			isHovering: false
         		    		}
         		    	}
+
+        		    	this.magnets = {};
+        		    	
+        		    	// try ordering by queries
+        		    	queries.forEach(function(query) {
+        		    		if (magnets[query]) {
+            		    		this.magnets[query] = magnets[query]
+            		    		delete magnets[query]
+        		    		}
+        		    	}, this);
+        		    	
+        		    	// now for any leftovers
+        		    	for (term in magnets) {
+        		    		this.magnets[term] = magnets[term]
+        		    	}
+        		    	
         		    	this.setApiParam('query', Object.keys(this.magnets))
         		    	this.updateMagnets();
         		    	this.updateDocs();
