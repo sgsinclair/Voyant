@@ -355,9 +355,9 @@ Ext.define('Voyant.panel.Reader', {
 			amount = (target.scrollTop + target.clientHeight * 0.5) / target.scrollHeight;
 		}
 		
-		var readerWords = $(target).find('.readerContainer').find('.word'); //.filter(function(index, el) { return $(el).position().top > 0; }); // filter by position too slow
-		var firstWord = readerWords.first()[0];
-		var lastWord = readerWords.last()[0];
+		var readerWords = Ext.DomQuery.select('.word', Ext.fly(target).down('.readerContainer', true));
+		var firstWord = readerWords[0];
+		var lastWord = readerWords[readerWords.length-1];
 		if (firstWord !== undefined && lastWord !== undefined) {
 			var corpus = this.getCorpus();
 			var partialFirstDoc = false;
@@ -403,8 +403,10 @@ Ext.define('Voyant.panel.Reader', {
 				
 			var fraction = tokenPosInDoc / corpus.getDocument(docIndex).get('tokensCount-lexical');
 			var graph = this.query('cartesian')[docIndex];
-			var locX = graph.getX() + graph.getWidth()*fraction;
-			Ext.get(this.getLocationMarker()).setX(locX);
+			if (graph) {
+				var locX = graph.getX() + graph.getWidth()*fraction;
+				Ext.get(this.getLocationMarker()).setX(locX);
+			}
 		}
 		this.setLastLocationUpdate(new Date());
     },
@@ -626,10 +628,6 @@ Ext.define('Voyant.panel.Reader', {
 		var readerContainer = this.getInnerContainer().first();
 		var last = readerContainer.last();
 		if (last.hasCls("loading")===false) {
-			// store any text that occurs after last word
-			var lastText = $(readerContainer.dom).contents().filter(function() {
-				return this.nodeType === 3;
-			}).last();
 			while(last) {
 				if (last.hasCls("word")) {
 					var info = Voyant.data.model.Token.getInfoFromElement(last);
@@ -651,8 +649,11 @@ Ext.define('Voyant.panel.Reader', {
 					}
 					
 					// remove any text after the last word
-					if (last.el.dom.nextSibling === lastText[0]) {
-						lastText.remove();
+					var nextSib = last.dom.nextSibling;
+					while(nextSib) {
+						var oldNext = nextSib;
+						nextSib = nextSib.nextSibling;
+						oldNext.parentNode.removeChild(oldNext);
 					}
 					
 					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
