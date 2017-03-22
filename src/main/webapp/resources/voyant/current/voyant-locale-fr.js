@@ -333,16 +333,17 @@ Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"Ajouter",
 "cancel":"Annuler",
-"clearTip":"Effacer tous les aimants",
-"EditMagnet":"Modifier l’aimant",
 "clear":"Effacer",
 "labelsTip":"Afficher ou masquer les étiquettes",
 "update":"Mettre à jour",
 "title":"Mandala",
 "addTip":"Ajouter un aimant (terme de requête)",
-"helpTip":"L’outil <i>Mandala</i> est une visualisation conceptuelle qui montre les relations entre des termes et des documents. Chaque terme de requête, ou « aimant », attire à lui les documents en fonction de la fréquence relative du terme dans le corpus en question.",
 "remove":"Supprimer",
-"labels":"étiquettes"});
+"labels":"étiquettes",
+"clearTip":"Effacer tous les aimants",
+"EditMagnet":"Modifier l’aimant",
+"rotateClockwise":"rotation (horaire)",
+"helpTip":"L’outil <i>Mandala</i> est une visualisation conceptuelle qui montre les relations entre des termes et des documents. Chaque terme de requête, ou « aimant », attire à lui les documents en fonction de la fréquence relative du terme dans le corpus en question."});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"Choisir un corpus"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {

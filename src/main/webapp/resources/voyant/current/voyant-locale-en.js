@@ -333,16 +333,17 @@ Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"Add",
 "cancel":"cancel",
-"clearTip":"Clear all magnets (search term)",
-"EditMagnet":"Edit Magnet",
 "clear":"Clear",
 "labelsTip":"Toggle visibility of labels",
 "update":"update",
 "title":"Mandala",
 "addTip":"Add a magnet (search term).",
-"helpTip":"Mandala is a conceptual visualization that shows the relationships between terms and documents. Each search term (or magnet) pulls documents toward it based on the term's relative frequency in the corpus.",
 "remove":"remove",
-"labels":"labels"});
+"labels":"labels",
+"clearTip":"Clear all magnets (search term)",
+"EditMagnet":"Edit Magnet",
+"rotateClockwise":"rotate clockwise",
+"helpTip":"Mandala is a conceptual visualization that shows the relationships between terms and documents. Each search term (or magnet) pulls documents toward it based on the term's relative frequency in the corpus."});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"Choose a corpus"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {

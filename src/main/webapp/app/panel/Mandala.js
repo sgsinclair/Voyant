@@ -181,7 +181,7 @@ Ext.define('Voyant.panel.Mandala', {
 					}
 				},{
 					xtype: "numberfield",
-				    fieldLabel: 'rotate clockwise',
+				    fieldLabel: me.localize('rotateClockwise'),
 				    minValue: 0,
 				    maxValue: currentTerms.length-1,
 				    value: 0,

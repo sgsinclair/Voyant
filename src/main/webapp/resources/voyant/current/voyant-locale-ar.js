@@ -333,16 +333,17 @@ Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"إضافة",
 "cancel":"الغاء",
-"clearTip":"إزالة جميع المغناطيسات (كلمة البحث)",
-"EditMagnet":"حرر المغناطيس",
 "clear":"إزالة",
 "labelsTip":"تبديل مظهر السمات",
 "update":"تحديث",
 "title":"مندالا",
 "addTip":"إضافة مغناطيس (كلمة البحث)",
-"helpTip":"مندالا هو عرض مرئي مفهومي يبين العلاقات بين الكلمات والمستندات. تجر كل كلمة بحث (أي مغناطيس) المستندات باتجاها حسب التواتر النسبي للكلمات في المكنز.",
 "remove":"حذف",
-"labels":"سمات"});
+"labels":"سمات",
+"clearTip":"إزالة جميع المغناطيسات (كلمة البحث)",
+"EditMagnet":"حرر المغناطيس",
+"rotateClockwise":"rotate clockwise",
+"helpTip":"مندالا هو عرض مرئي مفهومي يبين العلاقات بين الكلمات والمستندات. تجر كل كلمة بحث (أي مغناطيس) المستندات باتجاها حسب التواتر النسبي للكلمات في المكنز."});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"إختيار مكنز"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {

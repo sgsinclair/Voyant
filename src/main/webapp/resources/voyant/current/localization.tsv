@@ -1,4 +1,4 @@
-Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Spanish (es)	Russian (ru)	German (de)	Romanian (ro)	Croatian (hr)	Serbian (sr)	Bosnian (bs)	Japanese (ja)	Hebrew (he)	Czech (cz)	བོད་ཡིག (ar)	Tibetan (bo)
+Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Spanish (es)	Russian (ru)	German (de)	Romanian (ro)	Croatian (hr)	Serbian (sr)	Bosnian (bs)	Japanese (ja)	Hebrew (he)	Czech (cz)	Arabic (ar)	Tibetan (bo)
 2016-04-25	Voyant.VoyantApp	translatedBy	English translation by your names here.	Traduction française d’Aurélien Berra	Traduzione italiana a cura di Fabio Ciotti (AIUCD team: Alessandra Baldelli, Cristiana Bettella, Eleonora Durban, Federico Caria, Federico Meschini, Greta Franzini, Giorgio Guzzetta, Roberto Rosselli del Turco, Elena Spadini, Tiziana Mancinelli)					Téa Rokolj	Téa Rokolj	Téa Rokolj	小風尚樹(Naoki Kokaze), 佐藤正尚(Masanao Sato), 杉浦清人(Kiyoto Sugiura), 鈴木親彦(Chikahiko Suzuki), 王一凡(Yifan Wang), and 永崎研宣(Kiyonori Nagasaki)	התרגום לעברית ע"י סיני רוסינק	Do češtiny přeložil Radim Hladík	 الترجمة العربية بقلم <"a href="http://djwrisley.com>ديفيد جوزيف رزلي</a> و نجلاء جركس	
 2016-04-25	Voyant.util.DetailedError	error	Error	Erreur	Errore					Greška	Грешка	Greška	エラー	טעות	Chyba	وقع خطأ	
 2016-04-25	Voyant.util.Toolable	maximizeTip	Open this tool in a new window	Ouvrir cet outil dans une nouvelle fenêtre.	Aprire questo strumento in una nuova finestra					Otvorite ovu alatku u novom prozoru	Oтворитe ову алатку у новом прозору	Otvorite ovu alatku u novom prozoru	新しいウインドウでこのツールを開く	פתיחה בחלון נפרד	Otevřít tento nástroj v novém okně	فتح الاداة في نافذة جديدة	
@@ -629,6 +629,7 @@ September 21	Voyant.panel.Trends	failedGetDocumentTerms	Failed to get document t
 2016-05-18	Voyant.panel.Mandala	cancel	cancel	Annuler	cancella					poništiti	поништити	poništiti	キャンセル		zrušit	الغاء	
 2016-05-18	Voyant.panel.Mandala	update	update	Mettre à jour	aggiorna					ažurirati	ажурирати	ažurirati	アップデート		aktualizovat	تحديث	
 2016-05-18	Voyant.panel.Mandala	EditMagnet	Edit Magnet	Modifier l’aimant	Modifica il magnete					Revizija magneta	Ревизија магнета	Revizija magneta	マグネットの編集		Upravit magnet	حرر المغناطيس	
+2017-03-21	Voyant.panel.Mandala	rotateClockwise	rotate clockwise	rotation (horaire)													
 2016-05-28	Voyant.widget.CorpusSelector	chooseCorpus	Choose a corpus	Choisir un corpus	Scegli un corpus					Odaberite korpus	Одаберите корпус	Odaberite korpus	コーパスの選択		Zvolte korpus	إختيار مكنز	
 															Sloupce	عواميد	
 			Sort Ascending	Trier par ordre croissant						Sortirati uzlazno	Сортирати узлазно	Sortirati uzlazno			Seřadit vzestupně	ترتيب تصاعدي	
