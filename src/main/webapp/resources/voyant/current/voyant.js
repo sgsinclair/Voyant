@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Mar 20 14:16:42 EDT 2017 */
+/* This file created by JSCacher. Last modified: Tue Mar 21 12:03:36 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -15356,7 +15356,7 @@ Ext.define('Voyant.panel.Mandala', {
 					}
 				},{
 					xtype: "numberfield",
-				    fieldLabel: 'rotate clockwise',
+				    fieldLabel: me.localize('rotateClockwise'),
 				    minValue: 0,
 				    maxValue: currentTerms.length-1,
 				    value: 0,

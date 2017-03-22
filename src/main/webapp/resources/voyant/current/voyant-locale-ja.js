@@ -333,16 +333,17 @@ Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"追加する",
 "cancel":"キャンセル",
-"clearTip":"すべてのマグネット（検索語）をクリアする",
-"EditMagnet":"マグネットの編集",
 "clear":"クリア",
 "labelsTip":"ラベルの可視状態を切り替える",
 "update":"アップデート",
 "title":"マンダラ",
 "addTip":"マグネット（検索語）を追加する",
-"helpTip":"「マンダラ」は単語とドキュメントの関係を示すための視覚化です。各検索語（またはマグネット）は、相対頻度に基づいてドキュメントに紐づけられます。",
 "remove":"消去",
-"labels":"ラベル"});
+"labels":"ラベル",
+"clearTip":"すべてのマグネット（検索語）をクリアする",
+"EditMagnet":"マグネットの編集",
+"rotateClockwise":"rotate clockwise",
+"helpTip":"「マンダラ」は単語とドキュメントの関係を示すための視覚化です。各検索語（またはマグネット）は、相対頻度に基づいてドキュメントに紐づけられます。"});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"コーパスの選択"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {

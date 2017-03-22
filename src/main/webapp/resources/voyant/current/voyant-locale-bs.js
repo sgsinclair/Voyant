@@ -333,16 +333,17 @@ Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"Dodati",
 "cancel":"poništiti",
-"clearTip":"Obrisati sve magnete (tražene termine).",
-"EditMagnet":"Revizija magneta",
 "clear":"Obrisati",
 "labelsTip":"Podesiti vidljivost oznaka",
 "update":"ažurirati",
 "title":"Mandala",
 "addTip":"Dodati magnet (traženi termin).",
-"helpTip":"Mandala je konceptualna vizualizacija koja pokazuje odnose između termina i dokumenata. Svaki traženi termin (ili magnet) privlači sebi dokumente na osnovu relativne učestalosti termina unutar korpusa.",
 "remove":"ukloniti",
-"labels":"oznake"});
+"labels":"oznake",
+"clearTip":"Obrisati sve magnete (tražene termine).",
+"EditMagnet":"Revizija magneta",
+"rotateClockwise":"rotate clockwise",
+"helpTip":"Mandala je konceptualna vizualizacija koja pokazuje odnose između termina i dokumenata. Svaki traženi termin (ili magnet) privlači sebi dokumente na osnovu relativne učestalosti termina unutar korpusa."});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"Odaberite korpus"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {

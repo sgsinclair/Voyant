@@ -333,16 +333,17 @@ Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"Aggiungi",
 "cancel":"cancella",
-"clearTip":"Rimuovi tutti i magneti (termini ricercati)",
-"EditMagnet":"Modifica il magnete",
 "clear":"Rimuovi",
 "labelsTip":"Visualizza/nascondi etichette",
 "update":"aggiorna",
 "title":"Mandala",
 "addTip":"Aggiungi un magnete (termine cercato)",
-"helpTip":"Mandala è una visualizzazione concettuale che mostra le relazioni tra parole e documenti. Ogni termine riceratgo (o magnete) attire verso di se i documenti sulla base della sua frequenza relativa nel corpus.",
 "remove":"rimuovi",
-"labels":"etichette"});
+"labels":"etichette",
+"clearTip":"Rimuovi tutti i magneti (termini ricercati)",
+"EditMagnet":"Modifica il magnete",
+"rotateClockwise":"rotate clockwise",
+"helpTip":"Mandala è una visualizzazione concettuale che mostra le relazioni tra parole e documenti. Ogni termine riceratgo (o magnete) attire verso di se i documenti sulla base della sua frequenza relativa nel corpus."});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"Scegli un corpus"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {
