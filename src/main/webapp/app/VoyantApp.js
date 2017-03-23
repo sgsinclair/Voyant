@@ -252,6 +252,9 @@ Ext.define('Voyant.VoyantApp', {
 	getColor: function(index, returnHex) {
 		var paletteKey = this.getApiParam('palette') || 'default';
 		var palette = this.palettes[paletteKey];
+		if (index >= palette.length) {
+			index = index % palette.length;
+		}
 		if (returnHex) {
 			return this.rgbToHex(palette[index]);
 		} else {
