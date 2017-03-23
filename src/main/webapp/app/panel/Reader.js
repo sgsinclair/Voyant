@@ -25,8 +25,11 @@ Ext.define('Voyant.panel.Reader', {
     	scrollIntoView: false,
     	insertWhere: 'beforeEnd',
     	locationMarker: undefined,
-    	lastLocationUpdate: new Date()
+    	lastLocationUpdate: new Date(),
+    	isDetailedGraph: true
     },
+    
+    DETAILED_GRAPH_DOC_LIMIT: 25, // upper limit on document count for showing detailed graphs 
     
     INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling
     
@@ -129,16 +132,18 @@ Ext.define('Voyant.panel.Reader', {
    		    		 this.highlightKeywords(term);
 //   		    		 this.down('querysearchfield').setValue(term);
    		    		 
-   		    		 var graphs = this.query('cartesian');
-   		    		 for (var i = 0; i < graphs.length; i++) {
-   		    			 var graph = graphs[i];
-   		    			 var data = graphDatas[i];
-   		    			 if (data !== undefined) {
-   		    				 graph.getAxes()[0].setMaximum(maxValue);
- 		    				 graph.getStore().loadData(data);
-   		    			 } else {
-   		    				 graph.getStore().removeAll();
-   		    			 }
+   		    		 if (this.getIsDetailedGraph()) {
+	   		    		 var graphs = this.query('cartesian');
+	   		    		 for (var i = 0; i < graphs.length; i++) {
+	   		    			 var graph = graphs[i];
+	   		    			 var data = graphDatas[i];
+	   		    			 if (data !== undefined) {
+	   		    				 graph.getAxes()[0].setMaximum(maxValue);
+	 		    				 graph.getStore().loadData(data);
+	   		    			 } else {
+	   		    				 graph.getStore().removeAll();
+	   		    			 }
+	   		    		 }
    		    		 }
    		    	 },
    		    	 scope: this
@@ -246,9 +251,14 @@ Ext.define('Voyant.panel.Reader', {
     	    		
     	    		var docs = corpus.getDocuments();
     	    		this.setDocumentsStore(docs);
+    	    		
+    	    		this.setIsDetailedGraph(docs.getTotalCount() < this.DETAILED_GRAPH_DOC_LIMIT);
+    	    		
     	    		var container = this.down('panel[region="south"]');
     	    		
-    	    		this.setLocationMarker(Ext.DomHelper.append(container.el, {tag: 'div', style: 'background-color: #157fcc; height: 100%; width: 2px; position: absolute; top: 0; left: 0;'}));
+    	    		if (this.getLocationMarker() == undefined) {
+    	    			this.setLocationMarker(Ext.DomHelper.append(container.el, {tag: 'div', style: 'background-color: #157fcc; height: 100%; width: 2px; position: absolute; top: 0; left: 0;'}));
+    	    		}
     	    		
     	    		this.generateChart(corpus, container);
     	    		
@@ -402,9 +412,16 @@ Ext.define('Voyant.panel.Reader', {
 			}
 				
 			var fraction = tokenPosInDoc / corpus.getDocument(docIndex).get('tokensCount-lexical');
-			var graph = this.query('cartesian')[docIndex];
-			if (graph) {
-				var locX = graph.getX() + graph.getWidth()*fraction;
+			if (this.getIsDetailedGraph()) {
+				var graph = this.query('cartesian')[docIndex];
+				if (graph) {
+					var locX = graph.getX() + graph.getWidth()*fraction;
+					Ext.get(this.getLocationMarker()).setX(locX);
+				}
+			} else {
+				var graph = this.down('cartesian');
+				var docWidth = graph.getWidth() / this.getCorpus().getDocuments().getCount();
+				var locX = graph.getX() + docWidth*docIndex + docWidth*fraction;
 				Ext.get(this.getLocationMarker()).setX(locX);
 			}
 		}
@@ -413,8 +430,7 @@ Ext.define('Voyant.panel.Reader', {
     
     generateChart: function(corpus, container) {
     	function getColor(index, alpha) {
-    		var colors = [[116,116,181], [139,163,83], [189,157,60], [171,75,75], [174,61,155]];
-    		var c = colors[index % colors.length];
+    		var c = this.getApplication().getColor(index);
     		return 'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha+')';
     	}
     	
@@ -422,12 +438,12 @@ Ext.define('Voyant.panel.Reader', {
 			return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 		}
     	
-    	function addChart(docInfo, reader) {
+    	function addChart(docInfo) {
     		var index = docInfo.index;
     		var fraction = docInfo.fraction;
     		var height = docInfo.relativeHeight;
-    		var bColor = getColor(index, 0.3);
-    		var sColor = getColor(index, 1.0);
+    		var bColor = getColor.call(this, index, 0.3);
+    		var sColor = getColor.call(this, index, 1.0);
     		var chart = container.add({
     			xtype: 'cartesian',
     			plugins: {
@@ -494,7 +510,7 @@ Ext.define('Voyant.panel.Reader', {
             			var doc = this.getDocumentsStore().getAt(data.docIndex);
             			this.getApplication().dispatchEvent('documentsClicked', this, [doc]);
             		},
-            		scope: reader
+            		scope: this
             	}
     		});
     		
@@ -515,41 +531,98 @@ Ext.define('Voyant.panel.Reader', {
 				
 				this.setApiParams({'skipToDocId': doc.getId(), start: bufferPosition < 0 ? 0 : bufferPosition});
 				this.load(true);
-    		}, reader);
+    		}, this);
     	}
     	
     	container.removeAll();
     	
     	var docs = corpus.getDocuments();
-    	var docsCount = docs.getTotalCount();
-    	if (docsCount<50) {
-    		
-    	
-	    	var tokensTotal = corpus.getWordTokensCount();
-	    	var docInfos = [];
-	    	var docMinSize = Number.MAX_VALUE;
-	    	var docMaxSize = -1;
-	//		for (var i = 0; i < docs.getTotalCount(); i++) {
-			for (var i = 0; i < docs.getCount(); i++) {
-				var d = docs.getAt(i);
-				var docIndex = d.get('index');
-				var count = d.get('tokensCount-lexical');
-				if (count < docMinSize) docMinSize = count;
-				if (count > docMaxSize) docMaxSize = count;
-				var fraction = count / tokensTotal;
-				docInfos.push({
-					index: docIndex,
-					count: count,
-					fraction: fraction
-				});
-			}
-			
+    	var tokensTotal = corpus.getWordTokensCount();
+    	var docInfos = [];
+    	var docMinSize = Number.MAX_VALUE;
+    	var docMaxSize = -1;
+//		for (var i = 0; i < docs.getTotalCount(); i++) {
+		for (var i = 0; i < docs.getCount(); i++) {
+			var d = docs.getAt(i);
+			var docIndex = d.get('index');
+			var count = d.get('tokensCount-lexical');
+			if (count < docMinSize) docMinSize = count;
+			if (count > docMaxSize) docMaxSize = count;
+			var fraction = count / tokensTotal;
+			docInfos.push({
+				index: docIndex,
+				count: count,
+				fraction: fraction
+			});
+		}
+		
+		if (this.getIsDetailedGraph()) {
 			for (var i = 0; i < docInfos.length; i++) {
 				var d = docInfos[i];
 				d.relativeHeight = d.count==docMaxSize ? 1 : map(d.count, docMinSize, docMaxSize, 0.25, 1);
-				addChart(d, this);
+				addChart.call(this, d);
 			}
-    	}
+		} else {
+			var chart = container.add({
+    			xtype: 'cartesian',
+    			plugins: {
+                    ptype: 'chartitemevents'
+                },
+    	    	flex: 1,
+    	    	height: '100%',
+    	    	insetPadding: 0,
+    	    	axes: [{
+    	    		type: 'numeric',
+    	    		position: 'left',
+    	    		fields: 'count',
+    	    		hidden: true
+    	    	},{
+    				type: 'category',
+    				position: 'bottom',
+    				fields: 'index',
+    				hidden: true
+        		}],
+        		series: [{
+        			type: 'bar',
+        			xField: 'index',
+        			yField: 'count',
+        			style: {
+        				minGapWidth: 0,
+        				strokeStyle: 'none'
+        			},
+        			renderer: function (sprite, config, rendererData, index) {
+        				var reader = this.getChart().findParentByType('reader');
+        				return {fillStyle: getColor.call(reader, index, 0.3)};
+        			}
+        		}],
+    	    	store: Ext.create('Ext.data.JsonStore', {
+            		fields: [{name: 'index', type: 'int'}, {name: 'count', type: 'int'}, {name: 'fraction', type: 'float'}],
+            		data: docInfos
+            	}),
+            	listeners: {
+            		itemclick: function(chart, item, event) {
+            			var el = Ext.get(event.getTarget());
+            			var x = event.getX();
+            			var box = el.getBox();
+            			var docWidth = box.width / this.getCorpus().getDocuments().getCount();
+            			var docX = (x - box.x) % docWidth;
+            			var fraction = docX / docWidth;
+
+            			var data = item.record.data;
+            			var doc = this.getDocumentsStore().getAt(data.index);
+            			
+            			var totalTokens = doc.get('tokensCount-lexical');
+            			var position = Math.floor(totalTokens * fraction);
+        				var bufferPosition = position - (this.getApiParam('limit')/2);
+        				
+        				this.setApiParams({'skipToDocId': doc.getId(), start: bufferPosition < 0 ? 0 : bufferPosition});
+        				this.load(true);
+            		},
+            		scope: this
+            	}
+    		});
+		}
+
     },
     
     highlightKeywords: function(query, doScroll) {
