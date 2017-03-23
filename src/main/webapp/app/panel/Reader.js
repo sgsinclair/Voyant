@@ -588,6 +588,8 @@ Ext.define('Voyant.panel.Reader', {
         			yField: 'count',
         			style: {
         				minGapWidth: 0,
+        				minBarWidth: 1,
+        				lineWidth: 0,
         				strokeStyle: 'none'
         			},
         			renderer: function (sprite, config, rendererData, index) {
