@@ -29,6 +29,12 @@ Ext.define('Voyant.panel.Reader', {
     	isDetailedGraph: true
     },
     
+    SCROLL_UP: -1,
+    SCROLL_EQ: 0,
+    SCROLL_DOWN: 1,
+    
+    LOCATION_UPDATE_FREQ: 100,
+    
     DETAILED_GRAPH_DOC_LIMIT: 25, // upper limit on document count for showing detailed graphs 
     
     INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling
@@ -73,7 +79,7 @@ Ext.define('Voyant.panel.Reader', {
 	    				}
 	    			}
 	    		}, this);
-	    		this.updateText(contents, true);
+	    		this.updateText(contents);
 	    		
 	    		var keyword = this.down('querysearchfield').getValue();
 	    		if (keyword != '') {
@@ -156,19 +162,29 @@ Ext.define('Voyant.panel.Reader', {
     		
     		// scroll listener
     		centerPanel.body.on("scroll", function(event, target) {
-    			var readerContainer = this.getInnerContainer().first();
-    			var downwardsScroll = this.getLastScrollTop() < target.scrollTop;
+    			var scrollDir = this.getLastScrollTop() < target.scrollTop ? this.SCROLL_DOWN
+    								: this.getLastScrollTop() > target.scrollTop ? this.SCROLL_UP
+									: this.SCROLL_EQ;
     			
     			// scroll up
-    			if (!downwardsScroll && target.scrollTop < 1) {
+    			if (scrollDir == this.SCROLL_UP && target.scrollTop < 1) {
     				this.fetchPrevious(true);
     			// scroll down
-    			} else if (downwardsScroll && target.scrollHeight - target.scrollTop < target.offsetHeight*1.5) {//target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
+    			} else if (scrollDir == this.SCROLL_DOWN && target.scrollHeight - target.scrollTop < target.offsetHeight*1.5) {//target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
     				this.fetchNext(false);
     			} else {
+    				var amount;
+    				if (target.scrollTop == 0) {
+    					amount = 0;
+    				} else if (target.scrollHeight - target.scrollTop == target.clientHeight) {
+    					amount = 1;
+    				} else {
+    					amount = (target.scrollTop + target.clientHeight * 0.5) / target.scrollHeight;
+    				}
+    				
     				var now = new Date();
-        			if (now - this.getLastLocationUpdate() > 250) {
-        				this.updateLocationMarker(target);
+        			if (now - this.getLastLocationUpdate() > this.LOCATION_UPDATE_FREQ || amount == 0 || amount == 1) {
+        				this.updateLocationMarker(amount, scrollDir);
         			}
     			}
     			this.setLastScrollTop(target.scrollTop);
@@ -355,17 +371,8 @@ Ext.define('Voyant.panel.Reader', {
 		}
     },
     
-    updateLocationMarker: function(target) {
-    	var amount;
-		if (target.scrollTop == 0) {
-			amount = 0;
-		} else if (target.scrollHeight - target.scrollTop == target.clientHeight) {
-			amount = 1;
-		} else {
-			amount = (target.scrollTop + target.clientHeight * 0.5) / target.scrollHeight;
-		}
-		
-		var readerWords = Ext.DomQuery.select('.word', Ext.fly(target).down('.readerContainer', true));
+    updateLocationMarker: function(amount, scrollDir) {
+		var readerWords = Ext.DomQuery.select('.word', this.getInnerContainer().down('.readerContainer', true));
 		var firstWord = readerWords[0];
 		var lastWord = readerWords[readerWords.length-1];
 		if (firstWord !== undefined && lastWord !== undefined) {
@@ -412,18 +419,24 @@ Ext.define('Voyant.panel.Reader', {
 			}
 				
 			var fraction = tokenPosInDoc / corpus.getDocument(docIndex).get('tokensCount-lexical');
+			var locMarkEl = Ext.get(this.getLocationMarker());
+			var locX = locMarkEl.getX();
 			if (this.getIsDetailedGraph()) {
 				var graph = this.query('cartesian')[docIndex];
 				if (graph) {
-					var locX = graph.getX() + graph.getWidth()*fraction;
-					Ext.get(this.getLocationMarker()).setX(locX);
+					locX = graph.getX() + graph.getWidth()*fraction;
 				}
 			} else {
 				var graph = this.down('cartesian');
 				var docWidth = graph.getWidth() / this.getCorpus().getDocuments().getCount();
-				var locX = graph.getX() + docWidth*docIndex + docWidth*fraction;
-				Ext.get(this.getLocationMarker()).setX(locX);
+				locX = graph.getX() + docWidth*docIndex + docWidth*fraction;
 			}
+			if (scrollDir != null) {
+				var currX = locMarkEl.getX();
+				// prevent location being set in opposite direction of scroll
+				if ((scrollDir == this.SCROLL_DOWN && currX > locX) || (scrollDir == this.SCROLL_UP && currX < locX)) locX = currX;
+			}
+			locMarkEl.setX(locX);
 		}
 		this.setLastLocationUpdate(new Date());
     },
@@ -660,8 +673,12 @@ Ext.define('Voyant.panel.Reader', {
 					var limit = this.getApiParam('limit');
 					var getPrevDoc = false;
 					if (docIndex === 0 && start === 0) {
-						first.dom.scrollIntoView()
-						first.frame("red")
+						var scrollContainer = this.down('panel[region="center"]').body;
+						var scrollNeeded = first.getScrollIntoViewXY(scrollContainer, scrollContainer.dom.scrollTop, scrollContainer.dom.scrollLeft);
+						if (scrollNeeded.y != 0) {
+							first.dom.scrollIntoView();
+						}
+						first.frame("red");
 						break;
 					}
 					if (docIndex > 0 && start === 0) {
@@ -772,7 +789,15 @@ Ext.define('Voyant.panel.Reader', {
     		}, 100);
     	}
     	var target = this.down('panel[region="center"]').body.dom;
-    	this.updateLocationMarker(target);
+    	var amount;
+		if (target.scrollTop == 0) {
+			amount = 0;
+		} else if (target.scrollHeight - target.scrollTop == target.clientHeight) {
+			amount = 1;
+		} else {
+			amount = (target.scrollTop + target.clientHeight * 0.5) / target.scrollHeight;
+		}
+    	this.updateLocationMarker(amount);
     },
     
     updateChart: function() {
