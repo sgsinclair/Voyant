@@ -178,6 +178,11 @@
                         "title": "TextualArc"
                     },
                     {
+                        "name": "topics",
+                        "url": "guides/tools/topics",
+                        "title": "Topics"
+                    },
+                    {
                         "name": "trends",
                         "url": "guides/tools/trends",
                         "title": "Trends"

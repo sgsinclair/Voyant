@@ -5,6 +5,28 @@ Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "helpTip":"Voyantツールは、ウェブ上でデジタルテキストを読解・分析するための環境です。",
 "homeTip":"クリックしてコーパス作成画面に戻る。",
 "home":"やり直す"});
+Ext.apply(Voyant.panel.Topics.i18n, {
+"scores":"Scores",
+"adaptation":"adapted from David Mimno's <a href=\"https://github.com/mimno/jsLDA\" target=\"_blank\">jsLDA</a>",
+"scoresTip":"This represents the score of each document (in corpus order) for the row's topic.",
+"titleTip":"This tool performs topic modelling (<a href=\"https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation\" target=\"_blank\">LDA</a>) on the current corpus. Initially words are randomly assigned to each topic and with each iteration the topics become more refined. Please note that because of the initial random assignment, results will be different each time this tool is run.",
+"numTopics":"Topics",
+"title":"Topics",
+"searchTip":"Highlight the topics that contain the search (even partial words), don't forget that each topic is limited to the top 10 terms.",
+"loadingStopWords":"Loading stopwords…",
+"runningIterations":"Performing topic modelling.",
+"search":"Search",
+"runningIterationsCount":"Running {0} iterations.",
+"perDocLimitTip":"The maximum number of terms to include from the start of a document (set this to a very high number or to zero to have no limit, but beware that high values can cause problems on the server or in your browser).",
+"perDocLimit":"Terms/Doc",
+"numTopicsTip":"Determine the number of topics (or term clusters) to produce. Note that changing this value will regenerate topics (and that results will be different even with the same number of topics).",
+"run50iterationsTip":"This runs 50 iterations on the current topics (in other words, the topics aren't replaced, they're refined).",
+"topic":"Topic",
+"parsingDocuments":"Parsing documents…",
+"topicTip":"This provides an ordered list of the ten most signifiant terms in the topic cluster. ",
+"run50iterations":"run 50 iterations",
+"loadingDocuments":"Loading documents…",
+"perDocLimitHigh":"This value seems high. Please note that problems may occur on the server or in your browser if you include too many terms (default is 1,000)."});
 Ext.apply(Voyant.panel.Cirrus.i18n, {
 "maxTerms":"最も頻度の高い語",
 "visible":"表示する",

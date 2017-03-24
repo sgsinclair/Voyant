@@ -79,6 +79,7 @@ app/widget/DownloadOptions.js
 app/widget/FontFamilyOption.js
 app/widget/ColorPaletteOption.js
 app/widget/VoyantChart.js
+app/widget/LiveSearchGrid.js
 
 # PANELS
 app/panel/Panel.js
@@ -122,6 +123,7 @@ app/panel/BubblelinesSet.js
 app/panel/CustomSet.js
 app/panel/Veliza.js
 app/panel/WordTree.js
+app/panel/Topics.js
 
 # APPS
 app/VoyantApp.js

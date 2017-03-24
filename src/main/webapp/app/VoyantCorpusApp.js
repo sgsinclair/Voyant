@@ -25,11 +25,11 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','veliza','wordtree']
+			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','topics','veliza','wordtree']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
-			items: ['bubbles','cirrus','contexts','documentterms','reader','textualarc','trends','knots']
+			items: ['bubbles','cirrus','contexts','documentterms','reader','textualarc','trends','knots','topics']
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
@@ -37,7 +37,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',
-			items: ['corpusterms','corpuscollocates','phrases','contexts','documentterms','documents']
+			items: ['corpusterms','corpuscollocates','phrases','contexts','documentterms','documents','topics']
 		},{
 			i18n: 'moreToolsTypeOther',
 			glyph: 'xf035@FontAwesome',

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Mar 21 12:03:36 EDT 2017 */
+/* This file created by JSCacher. Last modified: Fri Mar 24 15:57:58 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8780,6 +8780,147 @@ Ext.define('Voyant.widget.VoyantChart', {
     }
 
 })
+/**
+ * A GridPanel class with live search support.
+ */
+Ext.define('Voyant.widget.LiveSearchGrid', {
+    extend: 'Ext.grid.Panel',
+    
+    /**
+     * @private
+     * search value initialization
+     */
+    searchValue: null,
+    
+    /**
+     * @private
+     * The matched positions from the most recent search
+     */
+    matches: [],
+    
+    /**
+     * @private
+     * The current index matched.
+     */
+    currentIndex: null,
+    
+    /**
+     * @private
+     * The generated regular expression used for searching.
+     */
+    searchRegExp: null,
+    
+    /**
+     * @private
+     * Case sensitive mode.
+     */
+    caseSensitive: false,
+    
+    /**
+     * @private
+     * Regular expression mode.
+     */
+    regExpMode: false,
+    
+    /**
+     * @cfg {String} matchCls
+     * The matched string css classe.
+     */
+    matchCls: 'keyword',
+    
+    // Component initialization override: adds the top and bottom toolbars and setup headers renderer.
+    initComponent: function() {
+        var me = this;
+        me.callParent(arguments);
+    },
+    
+    // detects html tag
+    tagsRe: /<[^>]*>/gm,
+    
+    // DEL ASCII code
+    tagsProtect: '\x0f',
+    
+    /**
+     * Finds all strings that matches the searched value in each grid cells.
+     * @private
+     */
+     onTextFieldChange: function(field, val) {
+         var me = this,
+             count = 0,
+             view = me.view,
+             cellSelector = view.cellSelector,
+             innerSelector = view.innerSelector,
+             columns = me.visibleColumnManager.getColumns();
+
+         view.refresh();
+
+         me.searchValue = val;
+         me.matches = [];
+         me.currentIndex = null;
+
+         if (me.searchValue !== null) {
+             me.searchRegExp = new RegExp(val, 'g' + (me.caseSensitive ? '' : 'i'));
+
+             me.store.each(function(record, idx) {
+                var node = view.getNode(record);
+
+                if (node) {
+                    Ext.Array.forEach(columns, function(column) {
+                    	
+                        var cell = Ext.fly(node).down(column.getCellInnerSelector(), true),
+                            matches, cellHTML,
+                            seen;
+
+                        if (cell && column.isXType('widgetcolumn')==false) {
+                            matches = cell.innerHTML.match(me.tagsRe);
+                            cellHTML = cell.innerHTML.replace(me.tagsRe, me.tagsProtect);
+
+                            // populate indexes array, set currentIndex, and replace wrap matched string in a span
+                            cellHTML = cellHTML.replace(me.searchRegExp, function(m) {
+                                ++count;
+                                if (!seen) {
+                                    me.matches.push({
+                                        record: record,
+                                        column: column
+                                    });
+                                    seen = true;
+                                }
+                                return '<span class="' + me.matchCls + '">' + m + '</span>';
+                            }, me);
+                            // restore protected tags
+                            Ext.each(matches, function(match) {
+                                cellHTML = cellHTML.replace(me.tagsProtect, match);
+                            });
+                            // update cell html
+                            cell.innerHTML = cellHTML;
+                        }
+                    });
+                }
+             }, me);
+
+             // results found
+             if (count) {
+                me.currentIndex = 0;
+                me.gotoCurrent();
+             }
+         }
+
+         // no results found
+         if (me.currentIndex === null) {
+             me.getSelectionModel().deselectAll();
+         }
+         field.focus();
+     },
+
+    privates: {
+        gotoCurrent: function() {
+            var pos = this.matches[this.currentIndex];
+            this.getNavigationModel().setPosition(pos.record, pos.column);
+            this.getSelectionModel().select(pos.record);
+        }
+    }
+});
+
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable','Voyant.util.DetailedError'],
 	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.TotalPropertyStatus'],
@@ -15720,8 +15861,17 @@ Ext.define('Voyant.panel.Reader', {
     	scrollIntoView: false,
     	insertWhere: 'beforeEnd',
     	locationMarker: undefined,
-    	lastLocationUpdate: new Date()
+    	lastLocationUpdate: new Date(),
+    	isDetailedGraph: true
     },
+    
+    SCROLL_UP: -1,
+    SCROLL_EQ: 0,
+    SCROLL_DOWN: 1,
+    
+    LOCATION_UPDATE_FREQ: 100,
+    
+    DETAILED_GRAPH_DOC_LIMIT: 25, // upper limit on document count for showing detailed graphs 
     
     INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling
     
@@ -15765,7 +15915,7 @@ Ext.define('Voyant.panel.Reader', {
 	    				}
 	    			}
 	    		}, this);
-	    		this.updateText(contents, true);
+	    		this.updateText(contents);
 	    		
 	    		var keyword = this.down('querysearchfield').getValue();
 	    		if (keyword != '') {
@@ -15824,16 +15974,18 @@ Ext.define('Voyant.panel.Reader', {
    		    		 this.highlightKeywords(term);
 //   		    		 this.down('querysearchfield').setValue(term);
    		    		 
-   		    		 var graphs = this.query('cartesian');
-   		    		 for (var i = 0; i < graphs.length; i++) {
-   		    			 var graph = graphs[i];
-   		    			 var data = graphDatas[i];
-   		    			 if (data !== undefined) {
-   		    				 graph.getAxes()[0].setMaximum(maxValue);
- 		    				 graph.getStore().loadData(data);
-   		    			 } else {
-   		    				 graph.getStore().removeAll();
-   		    			 }
+   		    		 if (this.getIsDetailedGraph()) {
+	   		    		 var graphs = this.query('cartesian');
+	   		    		 for (var i = 0; i < graphs.length; i++) {
+	   		    			 var graph = graphs[i];
+	   		    			 var data = graphDatas[i];
+	   		    			 if (data !== undefined) {
+	   		    				 graph.getAxes()[0].setMaximum(maxValue);
+	 		    				 graph.getStore().loadData(data);
+	   		    			 } else {
+	   		    				 graph.getStore().removeAll();
+	   		    			 }
+	   		    		 }
    		    		 }
    		    	 },
    		    	 scope: this
@@ -15846,19 +15998,29 @@ Ext.define('Voyant.panel.Reader', {
     		
     		// scroll listener
     		centerPanel.body.on("scroll", function(event, target) {
-    			var readerContainer = this.getInnerContainer().first();
-    			var downwardsScroll = this.getLastScrollTop() < target.scrollTop;
+    			var scrollDir = this.getLastScrollTop() < target.scrollTop ? this.SCROLL_DOWN
+    								: this.getLastScrollTop() > target.scrollTop ? this.SCROLL_UP
+									: this.SCROLL_EQ;
     			
     			// scroll up
-    			if (!downwardsScroll && target.scrollTop < 1) {
+    			if (scrollDir == this.SCROLL_UP && target.scrollTop < 1) {
     				this.fetchPrevious(true);
     			// scroll down
-    			} else if (downwardsScroll && target.scrollHeight - target.scrollTop < target.offsetHeight*1.5) {//target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
+    			} else if (scrollDir == this.SCROLL_DOWN && target.scrollHeight - target.scrollTop < target.offsetHeight*1.5) {//target.scrollTop+target.offsetHeight>target.scrollHeight/2) { // more than half-way down
     				this.fetchNext(false);
     			} else {
+    				var amount;
+    				if (target.scrollTop == 0) {
+    					amount = 0;
+    				} else if (target.scrollHeight - target.scrollTop == target.clientHeight) {
+    					amount = 1;
+    				} else {
+    					amount = (target.scrollTop + target.clientHeight * 0.5) / target.scrollHeight;
+    				}
+    				
     				var now = new Date();
-        			if (now - this.getLastLocationUpdate() > 250) {
-        				this.updateLocationMarker(target);
+        			if (now - this.getLastLocationUpdate() > this.LOCATION_UPDATE_FREQ || amount == 0 || amount == 1) {
+        				this.updateLocationMarker(amount, scrollDir);
         			}
     			}
     			this.setLastScrollTop(target.scrollTop);
@@ -15941,9 +16103,14 @@ Ext.define('Voyant.panel.Reader', {
     	    		
     	    		var docs = corpus.getDocuments();
     	    		this.setDocumentsStore(docs);
+    	    		
+    	    		this.setIsDetailedGraph(docs.getTotalCount() < this.DETAILED_GRAPH_DOC_LIMIT);
+    	    		
     	    		var container = this.down('panel[region="south"]');
     	    		
-    	    		this.setLocationMarker(Ext.DomHelper.append(container.el, {tag: 'div', style: 'background-color: #157fcc; height: 100%; width: 2px; position: absolute; top: 0; left: 0;'}));
+    	    		if (this.getLocationMarker() == undefined) {
+    	    			this.setLocationMarker(Ext.DomHelper.append(container.el, {tag: 'div', style: 'background-color: #157fcc; height: 100%; width: 2px; position: absolute; top: 0; left: 0;'}));
+    	    		}
     	    		
     	    		this.generateChart(corpus, container);
     	    		
@@ -16040,19 +16207,10 @@ Ext.define('Voyant.panel.Reader', {
 		}
     },
     
-    updateLocationMarker: function(target) {
-    	var amount;
-		if (target.scrollTop == 0) {
-			amount = 0;
-		} else if (target.scrollHeight - target.scrollTop == target.clientHeight) {
-			amount = 1;
-		} else {
-			amount = (target.scrollTop + target.clientHeight * 0.5) / target.scrollHeight;
-		}
-		
-		var readerWords = $(target).find('.readerContainer').find('.word'); //.filter(function(index, el) { return $(el).position().top > 0; }); // filter by position too slow
-		var firstWord = readerWords.first()[0];
-		var lastWord = readerWords.last()[0];
+    updateLocationMarker: function(amount, scrollDir) {
+		var readerWords = Ext.DomQuery.select('.word', this.getInnerContainer().down('.readerContainer', true));
+		var firstWord = readerWords[0];
+		var lastWord = readerWords[readerWords.length-1];
 		if (firstWord !== undefined && lastWord !== undefined) {
 			var corpus = this.getCorpus();
 			var partialFirstDoc = false;
@@ -16097,17 +16255,31 @@ Ext.define('Voyant.panel.Reader', {
 			}
 				
 			var fraction = tokenPosInDoc / corpus.getDocument(docIndex).get('tokensCount-lexical');
-			var graph = this.query('cartesian')[docIndex];
-			var locX = graph.getX() + graph.getWidth()*fraction;
-			Ext.get(this.getLocationMarker()).setX(locX);
+			var locMarkEl = Ext.get(this.getLocationMarker());
+			var locX = locMarkEl.getX();
+			if (this.getIsDetailedGraph()) {
+				var graph = this.query('cartesian')[docIndex];
+				if (graph) {
+					locX = graph.getX() + graph.getWidth()*fraction;
+				}
+			} else {
+				var graph = this.down('cartesian');
+				var docWidth = graph.getWidth() / this.getCorpus().getDocuments().getCount();
+				locX = graph.getX() + docWidth*docIndex + docWidth*fraction;
+			}
+			if (scrollDir != null) {
+				var currX = locMarkEl.getX();
+				// prevent location being set in opposite direction of scroll
+				if ((scrollDir == this.SCROLL_DOWN && currX > locX) || (scrollDir == this.SCROLL_UP && currX < locX)) locX = currX;
+			}
+			locMarkEl.setX(locX);
 		}
 		this.setLastLocationUpdate(new Date());
     },
     
     generateChart: function(corpus, container) {
     	function getColor(index, alpha) {
-    		var colors = [[116,116,181], [139,163,83], [189,157,60], [171,75,75], [174,61,155]];
-    		var c = colors[index % colors.length];
+    		var c = this.getApplication().getColor(index);
     		return 'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha+')';
     	}
     	
@@ -16115,12 +16287,12 @@ Ext.define('Voyant.panel.Reader', {
 			return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 		}
     	
-    	function addChart(docInfo, reader) {
+    	function addChart(docInfo) {
     		var index = docInfo.index;
     		var fraction = docInfo.fraction;
     		var height = docInfo.relativeHeight;
-    		var bColor = getColor(index, 0.3);
-    		var sColor = getColor(index, 1.0);
+    		var bColor = getColor.call(this, index, 0.3);
+    		var sColor = getColor.call(this, index, 1.0);
     		var chart = container.add({
     			xtype: 'cartesian',
     			plugins: {
@@ -16187,7 +16359,7 @@ Ext.define('Voyant.panel.Reader', {
             			var doc = this.getDocumentsStore().getAt(data.docIndex);
             			this.getApplication().dispatchEvent('documentsClicked', this, [doc]);
             		},
-            		scope: reader
+            		scope: this
             	}
     		});
     		
@@ -16208,41 +16380,100 @@ Ext.define('Voyant.panel.Reader', {
 				
 				this.setApiParams({'skipToDocId': doc.getId(), start: bufferPosition < 0 ? 0 : bufferPosition});
 				this.load(true);
-    		}, reader);
+    		}, this);
     	}
     	
     	container.removeAll();
     	
     	var docs = corpus.getDocuments();
-    	var docsCount = docs.getTotalCount();
-    	if (docsCount<50) {
-    		
-    	
-	    	var tokensTotal = corpus.getWordTokensCount();
-	    	var docInfos = [];
-	    	var docMinSize = Number.MAX_VALUE;
-	    	var docMaxSize = -1;
-	//		for (var i = 0; i < docs.getTotalCount(); i++) {
-			for (var i = 0; i < docs.getCount(); i++) {
-				var d = docs.getAt(i);
-				var docIndex = d.get('index');
-				var count = d.get('tokensCount-lexical');
-				if (count < docMinSize) docMinSize = count;
-				if (count > docMaxSize) docMaxSize = count;
-				var fraction = count / tokensTotal;
-				docInfos.push({
-					index: docIndex,
-					count: count,
-					fraction: fraction
-				});
-			}
-			
+    	var tokensTotal = corpus.getWordTokensCount();
+    	var docInfos = [];
+    	var docMinSize = Number.MAX_VALUE;
+    	var docMaxSize = -1;
+//		for (var i = 0; i < docs.getTotalCount(); i++) {
+		for (var i = 0; i < docs.getCount(); i++) {
+			var d = docs.getAt(i);
+			var docIndex = d.get('index');
+			var count = d.get('tokensCount-lexical');
+			if (count < docMinSize) docMinSize = count;
+			if (count > docMaxSize) docMaxSize = count;
+			var fraction = count / tokensTotal;
+			docInfos.push({
+				index: docIndex,
+				count: count,
+				fraction: fraction
+			});
+		}
+		
+		if (this.getIsDetailedGraph()) {
 			for (var i = 0; i < docInfos.length; i++) {
 				var d = docInfos[i];
 				d.relativeHeight = d.count==docMaxSize ? 1 : map(d.count, docMinSize, docMaxSize, 0.25, 1);
-				addChart(d, this);
+				addChart.call(this, d);
 			}
-    	}
+		} else {
+			var chart = container.add({
+    			xtype: 'cartesian',
+    			plugins: {
+                    ptype: 'chartitemevents'
+                },
+    	    	flex: 1,
+    	    	height: '100%',
+    	    	insetPadding: 0,
+    	    	axes: [{
+    	    		type: 'numeric',
+    	    		position: 'left',
+    	    		fields: 'count',
+    	    		hidden: true
+    	    	},{
+    				type: 'category',
+    				position: 'bottom',
+    				fields: 'index',
+    				hidden: true
+        		}],
+        		series: [{
+        			type: 'bar',
+        			xField: 'index',
+        			yField: 'count',
+        			style: {
+        				minGapWidth: 0,
+        				minBarWidth: 1,
+        				lineWidth: 0,
+        				strokeStyle: 'none'
+        			},
+        			renderer: function (sprite, config, rendererData, index) {
+        				var reader = this.getChart().findParentByType('reader');
+        				return {fillStyle: getColor.call(reader, index, 0.3)};
+        			}
+        		}],
+    	    	store: Ext.create('Ext.data.JsonStore', {
+            		fields: [{name: 'index', type: 'int'}, {name: 'count', type: 'int'}, {name: 'fraction', type: 'float'}],
+            		data: docInfos
+            	}),
+            	listeners: {
+            		itemclick: function(chart, item, event) {
+            			var el = Ext.get(event.getTarget());
+            			var x = event.getX();
+            			var box = el.getBox();
+            			var docWidth = box.width / this.getCorpus().getDocuments().getCount();
+            			var docX = (x - box.x) % docWidth;
+            			var fraction = docX / docWidth;
+
+            			var data = item.record.data;
+            			var doc = this.getDocumentsStore().getAt(data.index);
+            			
+            			var totalTokens = doc.get('tokensCount-lexical');
+            			var position = Math.floor(totalTokens * fraction);
+        				var bufferPosition = position - (this.getApiParam('limit')/2);
+        				
+        				this.setApiParams({'skipToDocId': doc.getId(), start: bufferPosition < 0 ? 0 : bufferPosition});
+        				this.load(true);
+            		},
+            		scope: this
+            	}
+    		});
+		}
+
     },
     
     highlightKeywords: function(query, doScroll) {
@@ -16278,8 +16509,12 @@ Ext.define('Voyant.panel.Reader', {
 					var limit = this.getApiParam('limit');
 					var getPrevDoc = false;
 					if (docIndex === 0 && start === 0) {
-						first.dom.scrollIntoView()
-						first.frame("red")
+						var scrollContainer = this.down('panel[region="center"]').body;
+						var scrollNeeded = first.getScrollIntoViewXY(scrollContainer, scrollContainer.dom.scrollTop, scrollContainer.dom.scrollLeft);
+						if (scrollNeeded.y != 0) {
+							first.dom.scrollIntoView();
+						}
+						first.frame("red");
 						break;
 					}
 					if (docIndex > 0 && start === 0) {
@@ -16321,10 +16556,6 @@ Ext.define('Voyant.panel.Reader', {
 		var readerContainer = this.getInnerContainer().first();
 		var last = readerContainer.last();
 		if (last.hasCls("loading")===false) {
-			// store any text that occurs after last word
-			var lastText = $(readerContainer.dom).contents().filter(function() {
-				return this.nodeType === 3;
-			}).last();
 			while(last) {
 				if (last.hasCls("word")) {
 					var info = Voyant.data.model.Token.getInfoFromElement(last);
@@ -16346,8 +16577,11 @@ Ext.define('Voyant.panel.Reader', {
 					}
 					
 					// remove any text after the last word
-					if (last.el.dom.nextSibling === lastText[0]) {
-						lastText.remove();
+					var nextSib = last.dom.nextSibling;
+					while(nextSib) {
+						var oldNext = nextSib;
+						nextSib = nextSib.nextSibling;
+						oldNext.parentNode.removeChild(oldNext);
 					}
 					
 					var mask = last.insertSibling("<div class='loading'>"+this.localize('loading')+"</div>", 'after', false).mask();
@@ -16391,7 +16625,15 @@ Ext.define('Voyant.panel.Reader', {
     		}, 100);
     	}
     	var target = this.down('panel[region="center"]').body.dom;
-    	this.updateLocationMarker(target);
+    	var amount;
+		if (target.scrollTop == 0) {
+			amount = 0;
+		} else if (target.scrollHeight - target.scrollTop == target.clientHeight) {
+			amount = 1;
+		} else {
+			amount = (target.scrollTop + target.clientHeight * 0.5) / target.scrollHeight;
+		}
+    	this.updateLocationMarker(amount);
     },
     
     updateChart: function() {
@@ -23299,6 +23541,568 @@ Ext.define('Voyant.panel.WordTree', {
 });
 
 
+Ext.define('Voyant.panel.Topics', {
+	extend: 'Ext.grid.Panel',
+	mixins: ['Voyant.panel.Panel','Voyant.widget.LiveSearchGrid'],
+	alias: 'widget.topics',
+    statics: {
+    	i18n: {
+    		runningIterationsCount: "Running {0} iterations."
+    	},
+    	api: {
+    		stopList: 'auto',
+    		numTopics: 25,
+    		iterations: 50,
+    		perDocLimit: 1000,
+    		query: undefined
+    	},
+		glyph: 'xf1ea@FontAwesome'
+    },
+    config: {
+    	/**
+    	 * @private
+    	 */
+    	options: [{xtype: 'stoplistoption'},{
+	        xtype: 'numberfield',
+	        name: 'perDocLimit',
+	        fieldLabel: 'maximum words per document',
+	        labelAlign: 'right',
+	        value: 1000,
+	        minValue: 0,
+	        step: 100,
+	        listeners: {
+    	        afterrender: function(field) {
+    	        	var win = field.up("window");
+    	        	if (win && win.panel) {
+        	        	field.setValue(parseInt(win.panel.getApiParam('perDocLimit')))
+    	        		field.setFieldLabel(win.panel.localize("perDocLimit"))
+    	        	}
+    	        },
+		        change: function(field, val) {
+		        	var win = field.up("window");
+		        	if (val>5000 && win && win.panel) {
+		        		win.panel.toastInfo({
+		        			html: win.panel.localize("perDocLimitHigh"),
+		        			anchor: win.getTargetEl(),
+		        			align: 'tr',
+		        			maxWidth: 400
+		        		})
+		        	}
+		        }
+	        }
+	    }],
+    	
+    	corpus: undefined,
+    	
+    	documentTopicSmoothing : 0.1,
+    	topicWordSmoothing : 0.01,
+    	vocabularySize : 0,
+    	 vocabularyCounts : {},
+    	 stopwords : {},
+    	 docSortSmoothing : 10.0,
+    	 sumDocSortSmoothing : 10.0 * 25, // update?
+    	 requestedSweeps : 0,
+    	 wordTopicCounts : {},
+    	 topicWordCounts : [],
+    	 tokensPerTopic : [],
+    	 topicWeights : Array(25),
+    	 documents: [],
+    	 progress: undefined
+    	
+    },
+    
+    zeros: function(count, val) {
+    	val = val || 0;
+    	var ret = Array(count)
+    	for (var i=0; i<count; i++) {ret[i]=val;}
+    	return ret;
+    },
+    
+    constructor: function(config ) {
+    	var me = this;
+    	Ext.apply(this, {
+    		title: this.localize('title'),
+    		layout: {
+    	        type: 'hbox',
+    	        pack: 'start',
+    	        align: 'stretch'
+    	    },
+	        store: {
+	            fields: ['topic', 'scores'],
+	            data: []
+	        },
+    		columns: [{
+    			text: this.localize("topic"),
+    			tooltip: this.localize("topicTip"),
+    			flex: 3,
+        		dataIndex: 'topic',
+                sortable: false
+            },{
+                xtype: 'widgetcolumn',
+                text: this.localize("scores"),
+                tooltip: this.localize("scoresTip"),
+                flex: 1,
+                dataIndex: 'scores',
+                widget: {
+                    xtype: 'sparklineline',
+                    tipTpl: new Ext.XTemplate('{[this.getDocumentTitle(values.x,values.y)]}', {
+                    	getDocumentTitle: function(docIndex, score) {
+                    		return this.panel.getCorpus().getDocument(docIndex).getTitle()+"<br>coverage: "+Ext.util.Format.number(score*100, "0,000.0")+"%"
+                    	},
+                    	panel: me 
+                    })
+               }
+            }],
+            dockedItems: {
+                dock: 'bottom',
+                xtype: 'toolbar',
+                overflowHandler: 'scroller',
+                items:[
+                       '<span class="info-tip" data-qtip="'+this.localize('searchTip')+'">'+this.localize('search')+'</span>'
+                    ,{
+                    xtype: 'textfield',
+                    name: 'searchField',
+                    hideLabel: true,
+                    width: 100,
+                    listeners: {
+                        change: {
+                            fn: me.onTextFieldChange,
+                            scope: me,
+                            buffer: 500
+                        }
+                    }
+                },
+                	'<span class="info-tip" data-qtip="'+this.localize('numTopicsTip')+'">'+this.localize('numTopics')+'</span>'
+                ,{ 
+	    			width: 100,
+                    hideLabel: true,
+	    			xtype: 'slider',
+	            	increment: 1,
+	            	minValue: 1,
+	            	maxValue: 200,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(parseInt(this.getApiParam("numTopics")))
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({numTopics: newvalue});
+	            			this.loadFromExistingDocuments();
+	            		},
+	            		scope: this
+	            	}
+                },{
+            		text: this.localize('run50iterations'),
+					glyph: 'xf04b@FontAwesome',
+            		tooltip: this.localize('run50iterationsTip'),
+            		handler: this.runIterations,
+            		scope: this
+            	},{xtype: 'tbfill'}, {
+	    			xtype: 'tbtext',
+	    			html: this.localize('adaptation')
+	    		}]
+            }
+    	});
+
+        this.callParent(arguments);
+        
+
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
+    	this.resetData();
+        // set calculated values
+        var numTopics = parseInt(this.getApiParam('numTopics'));
+        this.setTokensPerTopic(this.zeros(numTopics));
+        this.setTopicWeights(this.zeros(numTopics))
+        
+        // create a listener for corpus loading (defined here, in case we need to load it next)
+    	this.on('loadedCorpus', function(src, corpus) {
+    		this.setCorpus(corpus);
+    		if (this.rendered) {
+    			this.initialize();
+    		}
+    		else {
+    			this.on("afterrender", function() {
+    				this.initialize();
+    			}, this)
+    		}
+
+    	});
+    	
+    	this.on('query', function(src, query) {
+    		this.setApiParam('query', query);
+    		this.updateSearchResults();
+    	})
+    	
+    },
+    
+    loadStopwords: function() {
+    	this.mask(this.localize("loadingStopWords"));
+    	Ext.Ajax.request({
+    	    url: this.getTromboneUrl(),
+    	    params: {
+        		tool: 'resource.KeywordsManager',
+    			stopList: this.getApiParam('stopList'),
+    			corpus: this.getCorpus() ? this.getCorpus().getAliasOrId() : undefined
+    	    },
+    	    success: function(response, req) {
+    	    	this.unmask();
+    	    	var json = Ext.util.JSON.decode(response.responseText);
+    	    	var stopwords = {};
+    	    	json.keywords.keywords.forEach(function(stop) {
+    	    		stopwords[stop]=1;
+    	    	})
+    	    	this.setStopwords(stopwords);
+    	    	this.loadDocuments();
+    	    },
+    	    scope: this
+    	})
+    },
+    
+    loadDocuments: function() {
+    	this.mask(this.localize("loadingDocuments"));
+    	var corpus = this.getCorpus();
+    	if (corpus) {
+        	Ext.Ajax.request({
+        	    url: this.getTromboneUrl(),
+        	    params: {
+            		tool: 'corpus.DocumentTokens',
+        			corpus: corpus.getAliasOrId(),
+        			outputFormat: "text",
+        			template: "docTokens2text",
+        			limit: 0,
+        			noOthers: true,
+        			perDocLimit: corpus.getDocumentsCount()==1 ? undefined : parseInt(this.getApiParam('perDocLimit'))
+        		},
+        	    success: function(response, req) {
+        	    	this.unmask();
+        	    	this.mask(this.localize("parsingDocuments"));
+        	    	var lines = response.responseText.trim().split(/(\r\n|\r|\n)/);
+        	    	if (lines.length==1) { // one document, so segment
+        	    		var parts = lines[0].split(': ');
+        	    		if (parts.length>1) {
+            	    		var doc = corpus.getDocument(parts[0]);
+            	    		var allwords = parts[1].split(' ');
+            	    		var totalWords = doc.getLexicalTokensCount();
+            	    		if (totalWords<10) {
+            	    			bins = totalWords
+            	    		} else if (totalWords<1000) {
+            	    			bins = 10
+            	    		} else {
+            	    			bins = 100
+            	    		}
+            	    		var bins = 10;
+            	    		var wordsPerBin = Math.floor(allwords.length/bins);
+            	    		for (var i=0; i<bins; i++) {
+            	    			var text = allwords.slice(i*wordsPerBin,(i*wordsPerBin)+wordsPerBin).join(" ");
+                	    		this.parseLine(parts[0]+"-"+i+"\t"+parts[0]+"-"+i+"\t"+text);
+            	    		}
+        	    		}
+        	    	} else {
+            	    	lines.forEach(function(line) {
+            	    		var parts = line.split(': ');
+            	    		if (parts.length>1) {
+                	    		var doc = corpus.getDocument(parts[0]);
+                	    		this.parseLine(parts[0]+"\t"+doc.getTinyLabel()+"\t"+parts[1]);
+            	    		}
+            	    	}, this);
+        	    	}
+        	    	this.unmask();
+        	    	this.runIterations();
+        	    },
+        	    scope: this
+        	})
+    	}
+    },
+    
+    resetData: function() {
+    	var numTopics = parseInt(this.getApiParam('numTopics'));
+	 	this.setVocabularyCounts({});
+		this.setSumDocSortSmoothing(this.getDocSortSmoothing()*numTopics);
+		this.setRequestedSweeps(0);
+		this.setWordTopicCounts({});
+		this.setTopicWordCounts([]);
+		this.setTokensPerTopic([]);
+		this.setTopicWeights(Array(numTopics));
+		this.setDocuments([]);
+    },
+    
+    loadFromExistingDocuments: function() {
+
+    	// not quite efficient, but at least we don't have to reload from server
+    	var data = this.getDocuments().map(function(doc) {return doc.id+"\t"+doc.date+"\t"+doc.originalText});
+    	
+    	this.resetData(); // reset all data before starting over
+    	
+    	data.forEach(function(doc) {
+    		this.parseLine(doc);
+    	}, this);
+    	
+    	this.runIterations();
+    },
+    
+    runIterations: function() {
+    	var sweeps = this.getRequestedSweeps();
+    	sweeps+=parseInt(this.getApiParam('iterations'));
+    	this.setRequestedSweeps(sweeps)
+    	if (!this.getProgress()) {
+    		var progress = Ext.MessageBox.show({
+    			title: this.localize("runningIterations"),
+    			message: new Ext.Template(this.localize('runningIterationsCount')).apply([sweeps]),
+    			progress: true,
+    			progressText: '',
+    			target: sweeps,
+    			customUpdateProgress: function(val) {
+     			   this.updateProgress((this.config.target-val)*this.config.target, " iterations");
+     		   	}
+    		});
+    		this.setProgress(progress);
+    		this.updateProgress(sweeps);
+    	}
+    	this.sweep();
+    },
+    
+    updateProgress: function(sweeps) {
+    	var progress = this.getProgress(), sweeps = this.getRequestedSweeps();
+    	if (progress) {
+    		var target = progress.cfg.target;
+        	var val = (target-sweeps)/target;
+        	progress.updateProgress(val, (parseInt(val)*100) +"% done");
+    	}
+    },
+    
+    sweep: function() {
+
+    	var startTime = Date.now(), numTopics = parseInt(this.getApiParam('numTopics')),
+    		vocabularySize = this.getVocabularySize(), topicWordSmoothing = this.getTopicWordSmoothing(),
+    		tokensPerTopic = this.getTokensPerTopic(), documents = this.getDocuments(),
+    		wordTopicCounts = this.getWordTopicCounts(), topicWeights = this.getTopicWeights(), 
+    		documentTopicSmoothing = this.getDocumentTopicSmoothing()
+    		
+    		
+    	var topicNormalizers = this.zeros(numTopics);
+    	for (var topic = 0; topic < numTopics; topic++) {
+    		topicNormalizers[topic] = 1.0 / (vocabularySize * topicWordSmoothing + tokensPerTopic[topic]);
+    	}
+
+    	for (var doc = 0; doc < documents.length; doc++) {
+    		var currentDoc = documents[doc];
+    		var docTopicCounts = currentDoc.topicCounts;
+    		
+    		for (var position = 0; position < currentDoc.tokens.length; position++) {
+    			var token = currentDoc.tokens[position];
+    			if (token.isStopword) { continue; }
+
+    			tokensPerTopic[ token.topic ]--;
+    			var currentWordTopicCounts = wordTopicCounts[ token.word ];
+    			currentWordTopicCounts[ token.topic ]--;
+    			if (currentWordTopicCounts[ token.topic ] == 0) {
+    			  //delete(currentWordTopicCounts[ token.topic ]);
+    			}
+    			docTopicCounts[ token.topic ]--;
+    			topicNormalizers[ token.topic ] = 1.0 / (vocabularySize * topicWordSmoothing + tokensPerTopic[ token.topic ]);
+
+    			var sum = 0.0;
+    			for (var topic = 0; topic < numTopics; topic++) {
+    				if (currentWordTopicCounts[ topic ]) {
+    				  topicWeights[topic] =
+    				    (documentTopicSmoothing + docTopicCounts[topic]) *
+    				    (topicWordSmoothing + currentWordTopicCounts[ topic ]) *
+    					topicNormalizers[topic];
+    				}
+    				else {
+    				  topicWeights[topic] =
+    				    (documentTopicSmoothing + docTopicCounts[topic]) *
+    					topicWordSmoothing *
+    					topicNormalizers[topic];
+    				}
+    				sum += topicWeights[topic];
+    			}
+    		    
+    			// Sample from an unnormalized discrete distribution
+    			var sample = sum * Math.random();
+    		    var i = 0;
+    		    sample -= topicWeights[i];
+    		    while (sample > 0.0) {
+    		      i++;
+    		      sample -= topicWeights[i];
+    		 	}
+    			token.topic = i;
+    			
+    			tokensPerTopic[ token.topic ]++;
+    			if (! currentWordTopicCounts[ token.topic ]) {
+    				currentWordTopicCounts[ token.topic ] = 1;
+    			}
+    			else {
+    				currentWordTopicCounts[ token.topic ] += 1;
+    			}
+    			docTopicCounts[ token.topic ]++;
+    			
+    			topicNormalizers[ token.topic ] = 1.0 / (vocabularySize * topicWordSmoothing + tokensPerTopic[ token.topic ]);
+    		}
+    	}
+    	
+    	var sweeps = this.getRequestedSweeps()-1;
+    	this.setRequestedSweeps(sweeps);
+    	var progress = this.getProgress();
+    	if (sweeps>0) {
+    		this.updateProgress(sweeps);
+    		Ext.defer(this.sweep, 0, this);
+    	} else {
+    		progress.close();
+    		this.setProgress(undefined);
+    		this.postSweep();
+    	}
+    	
+    },
+    
+    postSweep: function(){
+    	this.sortTopicWords();
+    	var store = this.getStore();
+    	
+		var numTopics = parseInt(this.getApiParam('numTopics')),
+			topicWordCounts = this.getTopicWordCounts(),
+			data = [], documents = this.getDocuments(),
+			docSortSmoothing = this.getDocSortSmoothing(),
+			sumDocSortSmoothing = this.getSumDocSortSmoothing();
+			
+		
+		for (var topic = 0; topic < numTopics; topic++) {
+			var scores = documents.map(function (doc, i) {
+				  return (doc.topicCounts[topic] + docSortSmoothing) / (doc.tokens.length + sumDocSortSmoothing);
+			});
+			
+			data.push({
+				topic: this.topNWords(topicWordCounts[topic], 10),
+				scores: scores
+			})
+		}
+    	store.loadData(data)
+    },
+    
+    topNWords: function(wordCounts, n) { return wordCounts.slice(0,n).map( function(d) { return d.word; }).join(" "); },
+
+    
+    displayTopicWords: function() {
+    	
+    	var numTopics = parseInt(this.getApiParam('numTopics')),
+    		topicWordCounts = this.getTopicWordCounts();
+
+    	  var topicTopWords = [];
+
+    	  for (var topic = 0; topic < numTopics; topic++) {
+    	    topicTopWords.push(this.topNWords(topicWordCounts[topic], 10));
+    	  }
+
+    	  var topicLines = d3.select("#"+this.body.getId()+" div#topics").selectAll("div.topicwords")
+    	    .data(topicTopWords);
+
+    	  var me = this;
+    	  topicLines
+    	    .enter().append("div")
+    	    .attr("class", "topicwords")
+    	    .on("click", function(d, i) { me.toggleTopicDocuments(i); });
+
+    	  topicLines.transition().text(function(d, i) { return "[" + i + "] " + d; });
+
+    	  return topicWordCounts;
+    	  
+    },
+    
+    sortTopicWords: function() {
+    	var topicWordCounts = this.getTopicWordCounts(), numTopics = parseInt(this.getApiParam('numTopics')),
+    		wordTopicCounts = this.getWordTopicCounts();
+
+    	  topicWordCounts = [];
+    	  for (var topic = 0; topic < numTopics; topic++) {
+    	    topicWordCounts[topic] = [];
+    	  }
+
+    	  for (var word in wordTopicCounts) {
+    	    for (var topic in wordTopicCounts[word]) {
+    	      topicWordCounts[topic].push({"word":word, "count":wordTopicCounts[word][topic]});
+    	    }
+    	  }
+
+    	  for (var topic = 0; topic < numTopics; topic++) {
+    	    topicWordCounts[topic].sort(this.byCountDescending);
+    	  }
+
+    	  this.setTopicWordCounts(topicWordCounts);
+    },
+    
+    byCountDescending: function(a,b) {return b.count - a.count; },
+    
+    initialize: function() {
+    	this.loadStopwords();
+    },
+    
+    parseLine: function ( line ) {
+    	
+    	// for simplicity, create locally scoped variables of these
+    	var stopwords = this.getStopwords(), vocabularyCounts = this.getVocabularyCounts(),
+	    	tokensPerTopic = this.getTokensPerTopic(), vocabularySize=this.getVocabularySize(),
+	    	vocabularyCounts = this.getVocabularyCounts(), documents = this.getDocuments(),
+	    	numTopics = parseInt(this.getApiParam('numTopics')), documents = this.getDocuments(),
+	    	wordTopicCounts = this.getWordTopicCounts();
+    	
+    	  if (line == "") { return; }
+    	  var docID = documents.length;
+    	  var docDate = "";
+    	  var fields = line.split("\t");
+    	  var text = fields[0];  // Assume there's just one field, the text
+    	  if (fields.length == 3) {  // If it's in [ID]\t[TAG]\t[TEXT] format...
+    	    docID = fields[0];
+    	    docDate = fields[1]; // do not interpret date as anything but a string
+    	    text = fields[2];
+    	  }
+
+    	  var tokens = [];
+    	  var rawTokens = text.toLowerCase().split(' '); // xsl should only use space between tokens
+    	  if (rawTokens == null) { return; }
+    	  var topicCounts = this.zeros(numTopics);
+
+    	  rawTokens.forEach(function (word) {
+    	    if (word !== "") {
+    	      var topic = Math.floor(Math.random() * numTopics);
+    		  
+    		  if (word.length <= 2) { stopwords[word] = 1; }
+    		  
+    		  var isStopword = stopwords[word];
+    		  if (isStopword) {
+    			  // Record counts for stopwords, but nothing else
+    			  if (! vocabularyCounts[word]) {
+    				  vocabularyCounts[word] = 1;
+    			  }
+    			  else {
+    			  	vocabularyCounts[word] += 1;
+    			  }
+    		  }
+    		  else {
+    		      tokensPerTopic[topic]++;
+    		      if (! wordTopicCounts[word]) {
+    		        wordTopicCounts[word] = {};
+    		        vocabularySize++;
+    		        vocabularyCounts[word] = 0;
+    		      }
+    		      if (! wordTopicCounts[word][topic]) {
+    		        wordTopicCounts[word][topic] = 0;
+    		      }
+    		      wordTopicCounts[word][topic] += 1;
+    		      vocabularyCounts[word] += 1;
+    		      topicCounts[topic] += 1;
+    	      }
+    	      tokens.push({"word":word, "topic":topic, "isStopword":isStopword });
+    	    }
+    	  });
+    	  this.setVocabularySize(vocabularySize); // set this scalar
+    	  
+    	  documents.push({ "originalOrder" : documents.length, "id" : docID, "date" : docDate, "originalText" : text, "tokens" : tokens, "topicCounts" : topicCounts});
+//    	  d3.select("div#docs-page").append("div")
+//    	     .attr("class", "document")
+//    	     .text("[" + docID + "] " + truncate(text));
+    	}
+    
+});
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
@@ -23553,6 +24357,9 @@ Ext.define('Voyant.VoyantApp', {
 	getColor: function(index, returnHex) {
 		var paletteKey = this.getApiParam('palette') || 'default';
 		var palette = this.palettes[paletteKey];
+		if (index >= palette.length) {
+			index = index % palette.length;
+		}
 		if (returnHex) {
 			return this.rgbToHex(palette[index]);
 		} else {
@@ -23639,11 +24446,11 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','veliza','wordtree']
+			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','topics','veliza','wordtree']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
-			items: ['bubbles','cirrus','contexts','documentterms','reader','textualarc','trends','knots']
+			items: ['bubbles','cirrus','contexts','documentterms','reader','textualarc','trends','knots','topics']
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
@@ -23651,7 +24458,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',
-			items: ['corpusterms','corpuscollocates','phrases','contexts','documentterms','documents']
+			items: ['corpusterms','corpuscollocates','phrases','contexts','documentterms','documents','topics']
 		},{
 			i18n: 'moreToolsTypeOther',
 			glyph: 'xf035@FontAwesome',

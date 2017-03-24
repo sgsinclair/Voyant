@@ -668,3 +668,24 @@ September 21	Voyant.panel.Trends	failedGetDocumentTerms	Failed to get document t
 2016-10-29	Voyant.widget.ColorPaletteOption	saveNewPalette	Save New Palette							Snimiti novu paletu	Снимити нову палету	Snimiti novu paletu			Uložit novou paletu		
 2016-10-29	Voyant.widget.ColorPaletteOption	cancel	Cancel	Annuler	Elimina					Poništiti	Поништити	Poništiti	キャンセル	ביטול	Zrušit	إلغاء	
 2016-10-29	Voyant.widget.ColorPaletteOption	palette	Palette							Paleta	Палета	Paleta			Paleta		
+2017-03-24	Voyant.panel.Topics	title	Topics	Thématiques													
+2017-03-24	Voyant.panel.Topics	helpTip	This tool performs topic modelling (<a href="https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation" target="_blank">LDA</a>) on the current corpus. Initially words are randomly assigned to each topic and with each iteration the topics become more refined. Please note that because of the initial random assignment, results will be different each time this tool is run.														
+2017-03-24	Voyant.panel.Topics	adaptation	adapted from David Mimno's <a href="https://github.com/mimno/jsLDA" target="_blank">jsLDA</a>	adapté de <a href="https://github.com/mimno/jsLDA" target="_blank">jsLDA</a> de David Mimno													
+2017-03-24	Voyant.panel.Topics	topic	Topic	Thématique													
+2017-03-24	Voyant.panel.Topics	topicTip	This provides an ordered list of the ten most signifiant terms in the topic cluster. 	Cette colonne affiche une liste ordonnée des dix mots les plus importants pour chaque thématique.													
+2017-03-24	Voyant.panel.Topics	scores	Scores	Scores													
+2017-03-24	Voyant.panel.Topics	scoresTip	This represents the score of each document (in corpus order) for the row's topic.	Cette colonne représente le score pour chaque document (dans l'ordre du corpus) pour la thématique de la rangée.													
+2017-03-24	Voyant.panel.Topics	search	Search	Recheche													
+2017-03-24	Voyant.panel.Topics	searchTip	Highlight the topics that contain the search (even partial words), don't forget that each topic is limited to the top 10 terms.	Cette fonction met en surbrillance les thématiques qui contiennent le mot (ou la partie de mot), parmi les dix mots affichés de chaque thématique.													
+2017-03-24	Voyant.panel.Topics	numTopics	Topics	Thématiques													
+2017-03-24	Voyant.panel.Topics	numTopicsTip	Determine the number of topics (or term clusters) to produce. Note that changing this value will regenerate topics (and that results will be different even with the same number of topics).	Détermine le nombre de thématiques (ensemble de mots) à générer. Veuillez noter qu'un changement à cette valeur lancera de nouveau l'analyse des thématiques.													
+2017-03-24	Voyant.panel.Topics	run50iterations	run 50 iterations	lancer 50 itérations													
+2017-03-24	Voyant.panel.Topics	run50iterationsTip	This runs 50 iterations on the current topics (in other words, the topics aren't replaced, they're refined).	Lance 50 itérations sur les thématiques actuelles (autrement dit, les thématiques ne sont pas remplacées, elles sont raffinées.													
+2017-03-24	Voyant.panel.Topics	loadingStopWords	Loading stopwords…	Récupérations des mots vides (stopwords)…													
+2017-03-24	Voyant.panel.Topics	loadingDocuments	Loading documents…	Récupérations des documents…													
+2017-03-24	Voyant.panel.Topics	parsingDocuments	Parsing documents…	Traitement des textes…													
+2017-03-24	Voyant.panel.Topics	runningIterations	Performing topic modelling.	Analyse des thématiques.													
+2017-03-24	Voyant.panel.Topics	runningIterationsCount	Running {0} iterations.	{0} iterations													
+2017-03-24	Voyant.panel.Topics	perDocLimit	Terms/Doc														
+2017-03-24	Voyant.panel.Topics	perDocLimitTip	The maximum number of terms to include from the start of a document (set this to a very high number or to zero to have no limit, but beware that high values can cause problems on the server or in your browser).														
+2017-03-24	Voyant.panel.Topics	perDocLimitHigh	This value seems high. Please note that problems may occur on the server or in your browser if you include too many terms (default is 1,000).														

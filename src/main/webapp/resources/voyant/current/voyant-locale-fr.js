@@ -5,6 +5,28 @@ Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "helpTip":"Voyant Tools est un environnement en ligne de lecture et d’analyse de textes numériques.",
 "homeTip":"Revenir à l’écran de création du corpus",
 "home":"Reprendre du début"});
+Ext.apply(Voyant.panel.Topics.i18n, {
+"scores":"Scores",
+"adaptation":"adapté de <a href=\"https://github.com/mimno/jsLDA\" target=\"_blank\">jsLDA</a> de David Mimno",
+"scoresTip":"Cette colonne représente le score pour chaque document (dans l'ordre du corpus) pour la thématique de la rangée.",
+"titleTip":"This tool performs topic modelling (<a href=\"https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation\" target=\"_blank\">LDA</a>) on the current corpus. Initially words are randomly assigned to each topic and with each iteration the topics become more refined. Please note that because of the initial random assignment, results will be different each time this tool is run.",
+"numTopics":"Thématiques",
+"title":"Thématiques",
+"searchTip":"Cette fonction met en surbrillance les thématiques qui contiennent le mot (ou la partie de mot), parmi les dix mots affichés de chaque thématique.",
+"loadingStopWords":"Récupérations des mots vides (stopwords)…",
+"runningIterations":"Analyse des thématiques.",
+"search":"Recheche",
+"runningIterationsCount":"{0} iterations",
+"perDocLimitTip":"The maximum number of terms to include from the start of a document (set this to a very high number or to zero to have no limit, but beware that high values can cause problems on the server or in your browser).",
+"perDocLimit":"Terms/Doc",
+"numTopicsTip":"Détermine le nombre de thématiques (ensemble de mots) à générer. Veuillez noter qu'un changement à cette valeur lancera de nouveau l'analyse des thématiques.",
+"run50iterationsTip":"Lance 50 itérations sur les thématiques actuelles (autrement dit, les thématiques ne sont pas remplacées, elles sont raffinées.",
+"topic":"Thématique",
+"parsingDocuments":"Traitement des textes…",
+"topicTip":"Cette colonne affiche une liste ordonnée des dix mots les plus importants pour chaque thématique.",
+"run50iterations":"lancer 50 itérations",
+"loadingDocuments":"Récupérations des documents…",
+"perDocLimitHigh":"This value seems high. Please note that problems may occur on the server or in your browser if you include too many terms (default is 1,000)."});
 Ext.apply(Voyant.panel.Cirrus.i18n, {
 "maxTerms":"Nombre maximal de termes",
 "visible":"Afficher",
