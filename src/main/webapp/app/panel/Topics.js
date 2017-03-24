@@ -1,3 +1,5 @@
+// heavy lifting for the LDA from https://github.com/mimno/jsLDA with tweaks to fit into a Voyant object scope
+
 Ext.define('Voyant.panel.Topics', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel','Voyant.widget.LiveSearchGrid'],
