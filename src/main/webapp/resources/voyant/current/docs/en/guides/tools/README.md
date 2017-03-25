@@ -219,7 +219,6 @@
 	</dd></a>
 </div>
 
-
 <div class="thumb-list">
 	<a href="#!/guide/textualarc"><dd>
 		<div class="thumb">
@@ -228,6 +227,18 @@
 		<div>
 			<h4>TextualArc</h4>
 			<p>TextualArc is a visualization of the terms in a document that includes a weighted centroid of terms and an arc that follows the terms in document order.</p>
+		</div>
+	</dd></a>
+</div>
+
+<div class="thumb-list">
+	<a href="#!/guide/topics"><dd>
+		<div class="thumb">
+			<img src="guides/topics/icon.png" />
+		</div>
+		<div>
+			<h4>Topics</h4>
+			<p>he Topics tool provides a rudimentary way of generating term clusters from a document or corpus and then seeing how each topic (term cluster) is distributed across the document or corpus.</p>
 		</div>
 	</dd></a>
 </div>
