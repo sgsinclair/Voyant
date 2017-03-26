@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Mar 24 15:57:58 EDT 2017 */
+/* This file created by JSCacher. Last modified: Fri Mar 24 21:41:26 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -23540,6 +23540,8 @@ Ext.define('Voyant.panel.WordTree', {
     }
 });
 
+
+// heavy lifting for the LDA from https://github.com/mimno/jsLDA with tweaks to fit into a Voyant object scope
 
 Ext.define('Voyant.panel.Topics', {
 	extend: 'Ext.grid.Panel',
