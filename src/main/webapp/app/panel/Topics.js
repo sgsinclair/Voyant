@@ -26,7 +26,7 @@ Ext.define('Voyant.panel.Topics', {
 	        fieldLabel: 'maximum words per document',
 	        labelAlign: 'right',
 	        value: 1000,
-	        minValue: 0,
+	        minValue: 1,
 	        step: 100,
 	        listeners: {
     	        afterrender: function(field) {
@@ -47,6 +47,24 @@ Ext.define('Voyant.panel.Topics', {
 		        		})
 		        	}
 		        }
+	        }
+	    },{
+	        xtype: 'numberfield',
+	        name: 'iterations',
+	        fieldLabel: 'iterations per run',
+	        labelAlign: 'right',
+	        value: 100,
+	        minValue: 1,
+	        maxValue: 10000,
+	        step: 50,
+	        listeners: {
+    	        afterrender: function(field) {
+    	        	var win = field.up("window");
+    	        	if (win && win.panel) {
+        	        	field.setValue(parseInt(win.panel.getApiParam('iterations')))
+    	        		field.setFieldLabel(win.panel.localize("iterations"))
+    	        	}
+    	        }
 	        }
 	    }],
     	
@@ -151,6 +169,7 @@ Ext.define('Voyant.panel.Topics', {
 	            	}
                 },{
             		text: new Ext.Template(this.localize('runIterations')).apply([100]),
+            		itemId: 'iterations',
 					glyph: 'xf04b@FontAwesome',
             		tooltip: this.localize('runIterationsTip'),
             		handler: this.runIterations,
@@ -423,7 +442,7 @@ Ext.define('Voyant.panel.Topics', {
     postSweep: function(){
     	this.sortTopicWords();
     	var store = this.getStore();
-    	var done = new Ext.Template(this.localize('totalDone')).apply([this.getTotalIterations()]);
+    	var done = new Ext.Template(this.localize('totalDone')).apply([Ext.util.Format.number(parseInt(this.getTotalIterations()), "0,000")]);
     	this.down('#done').setHtml(done);
     	
 		var numTopics = parseInt(this.getApiParam('numTopics')),
@@ -447,33 +466,6 @@ Ext.define('Voyant.panel.Topics', {
     },
     
     topNWords: function(wordCounts, n) { return wordCounts.slice(0,n).map( function(d) { return d.word; }).join(" "); },
-
-    
-    displayTopicWords: function() {
-    	
-    	var numTopics = parseInt(this.getApiParam('numTopics')),
-    		topicWordCounts = this.getTopicWordCounts();
-
-    	  var topicTopWords = [];
-
-    	  for (var topic = 0; topic < numTopics; topic++) {
-    	    topicTopWords.push(this.topNWords(topicWordCounts[topic], 10));
-    	  }
-
-    	  var topicLines = d3.select("#"+this.body.getId()+" div#topics").selectAll("div.topicwords")
-    	    .data(topicTopWords);
-
-    	  var me = this;
-    	  topicLines
-    	    .enter().append("div")
-    	    .attr("class", "topicwords")
-    	    .on("click", function(d, i) { me.toggleTopicDocuments(i); });
-
-    	  topicLines.transition().text(function(d, i) { return "[" + i + "] " + d; });
-
-    	  return topicWordCounts;
-    	  
-    },
     
     sortTopicWords: function() {
     	var topicWordCounts = this.getTopicWordCounts(), numTopics = parseInt(this.getApiParam('numTopics')),
@@ -500,6 +492,9 @@ Ext.define('Voyant.panel.Topics', {
     byCountDescending: function(a,b) {return b.count - a.count; },
     
     initialize: function() {
+    	// make sure we have the right number of iterations in our label (especially after an options change)
+    	var val = new Ext.Template(this.localize('runIterations')).apply([Ext.util.Format.number(parseInt(this.getApiParam('iterations')), "0,000")]);
+    	var iterations = this.down('#iterations').setText(val)
     	this.loadStopwords();
     },
     
@@ -564,9 +559,6 @@ Ext.define('Voyant.panel.Topics', {
     	  this.setVocabularySize(vocabularySize); // set this scalar
     	  
     	  documents.push({ "originalOrder" : documents.length, "id" : docID, "date" : docDate, "originalText" : text, "tokens" : tokens, "topicCounts" : topicCounts});
-//    	  d3.select("div#docs-page").append("div")
-//    	     .attr("class", "document")
-//    	     .text("[" + docID + "] " + truncate(text));
     	}
     
 });
