@@ -6,12 +6,11 @@ Ext.define('Voyant.panel.Topics', {
 	alias: 'widget.topics',
     statics: {
     	i18n: {
-    		runningIterationsCount: "Running {0} iterations."
     	},
     	api: {
     		stopList: 'auto',
     		numTopics: 25,
-    		iterations: 50,
+    		iterations: 100,
     		perDocLimit: 1000,
     		query: undefined
     	},
@@ -66,7 +65,8 @@ Ext.define('Voyant.panel.Topics', {
     	 tokensPerTopic : [],
     	 topicWeights : Array(25),
     	 documents: [],
-    	 progress: undefined
+    	 progress: undefined,
+    	 totalIterations: 0
     	
     },
     
@@ -150,12 +150,15 @@ Ext.define('Voyant.panel.Topics', {
 	            		scope: this
 	            	}
                 },{
-            		text: this.localize('run50iterations'),
+            		text: new Ext.Template(this.localize('runIterations')).apply([100]),
 					glyph: 'xf04b@FontAwesome',
-            		tooltip: this.localize('run50iterationsTip'),
+            		tooltip: this.localize('runIterationsTip'),
             		handler: this.runIterations,
             		scope: this
-            	},{xtype: 'tbfill'}, {
+            	},{
+                	xtype: 'tbtext',
+                	itemId: 'done'
+                },{xtype: 'tbfill'}, {
 	    			xtype: 'tbtext',
 	    			html: this.localize('adaptation')
 	    		}]
@@ -283,6 +286,7 @@ Ext.define('Voyant.panel.Topics', {
 		this.setTokensPerTopic([]);
 		this.setTopicWeights(Array(numTopics));
 		this.setDocuments([]);
+		this.setTotalIterations(0);
     },
     
     loadFromExistingDocuments: function() {
@@ -301,7 +305,9 @@ Ext.define('Voyant.panel.Topics', {
     
     runIterations: function() {
     	var sweeps = this.getRequestedSweeps();
-    	sweeps+=parseInt(this.getApiParam('iterations'));
+    	var iterations = parseInt(this.getApiParam('iterations'));
+    	sweeps+=parseInt(iterations);
+    	this.setTotalIterations(this.getTotalIterations()+iterations);
     	this.setRequestedSweeps(sweeps)
     	if (!this.getProgress()) {
     		var progress = Ext.MessageBox.show({
@@ -417,6 +423,8 @@ Ext.define('Voyant.panel.Topics', {
     postSweep: function(){
     	this.sortTopicWords();
     	var store = this.getStore();
+    	var done = new Ext.Template(this.localize('totalDone')).apply([this.getTotalIterations()]);
+    	this.down('#done').setHtml(done);
     	
 		var numTopics = parseInt(this.getApiParam('numTopics')),
 			topicWordCounts = this.getTopicWordCounts(),
