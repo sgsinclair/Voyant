@@ -248,13 +248,6 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		},
 		loadedCorpus: function(src, corpus) {
 			this.setCorpus(corpus);
-			if (this.getApplication().getCuratorId() == undefined) {
-				var docId = this.getApiParams().docId;
-				if (docId == null) docId = this.getCorpus().getDocument(0).getId();
-				var data = {docId: docId};
-				this.getApplication().dispatchEvent('corpusDocumentSelected', this, data);
-				this.fetchDocument(data);
-			}
 		}
 	},
 	

@@ -60,8 +60,10 @@ Ext.define('VoyantDTOCApp', {
                     	Ext.getCmp('dtcTools').remove(Ext.getCmp('dtcIndex'), true);
                     	Ext.getCmp('dtcMarkup').loadAllTags(true);
                     }
+                    this.dispatchEvent('corpusDocumentSelected', this, {docId: this.getCorpus().getDocument(0).getId()});
                 }, function() {
                 	Ext.getCmp('dtcMarkup').loadAllTags(true);
+                	this.dispatchEvent('corpusDocumentSelected', this, {docId: this.getCorpus().getDocument(0).getId()});
                 }, null, this);
     		}
     		
@@ -315,8 +317,6 @@ Ext.define('VoyantDTOCApp', {
 				
 				Ext.getCmp('dtcToc').initToc(treeNodes, true);
 				Ext.getCmp('dtcDocModel').buildProspect();
-				
-				this.dispatchEvent('corpusDocumentSelected', this, {docId: this.getCorpus().getDocument(0).getId()});
 			}
 		}
     },
