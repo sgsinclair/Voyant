@@ -213,7 +213,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 	},
 	
 	loadIndex: function() {
-	    this._maskEl = this.body.mask('Processing Index: 0%', 'loadMask');
+	    this._maskEl = this.body.mask('Processing Index', 'loadMask');
 	    
 	    var me = this;
 		this.getApplication().getStoredResource('indexids-'+me.getCorpus().getId()).then(function(value) {

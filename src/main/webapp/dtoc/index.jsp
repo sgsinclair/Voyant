@@ -4,6 +4,7 @@
 
 <script src="dtoc.app.js"></script>
 <script src="dtoc.tooltip.js"></script>
+<script src="dtoc.markup.loader.js"></script>
 <script src="dtoc.markup.js"></script>
 <script src="dtoc.markup.curator.js"></script>
 <script src="dtoc.index.js"></script>
