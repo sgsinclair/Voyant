@@ -279,16 +279,17 @@ Ext.define('VoyantDTOCApp', {
 	},
 	
 	loadCuration: function(data) {
-		if (data && data.markup) {
-			var dtcMarkup = Ext.getCmp('dtcMarkup');
-			dtcMarkup.curatedTags = {};
-			dtcMarkup.tagTotals = {};
-			dtcMarkup.savedTags = {};
-			for (var i = 0; i < data.markup.length; i++) {
-				var tag = data.markup[i];
-				dtcMarkup.curatedTags[tag.tagName] = tag;
+		if (data) {
+			if (data.markup) {
+				var dtcMarkup = Ext.getCmp('dtcMarkup');
+				dtcMarkup.curatedTags = {};
+				dtcMarkup.tagTotals = {};
+				dtcMarkup.savedTags = {};
+				for (var i = 0; i < data.markup.length; i++) {
+					var tag = data.markup[i];
+					dtcMarkup.curatedTags[tag.tagName] = tag;
+				}
 			}
-			
 			if (data.toc && data.toc.length > 0) {
 				var treeNodes = [];
 				this.addOrigIndexField();

@@ -1,41 +1,37 @@
 Ext.define('Voyant.panel.DToC.MarkupBase', {
-	TAG_SNIPPET_WORD_LENGTH: 10,
+	
+	mixins: ['Voyant.panel.DToC.MarkupLoader'],
+	constructor: function(config) {
+		this.mixins['Voyant.panel.DToC.MarkupLoader'].constructor.apply(this, arguments);
+	},
 	
 	savedTags: {}, // saved metadata for tags, organized by document 
 	curatedTags: null, // curated tags list
 	tagTotals: {}, // tracks tag freq counts for entire corpus
 	
-	ignoreSpans: true, // ignoring spans drastically reduces the size of the tag data
-	
 	_maskEl: null,
 	
 	loadAllTags: function(useMask) {
+		var me = this;
 		if (this.getCorpus() !== undefined) {
 			if (useMask) {
-				this._maskEl = this.body.mask('Processing Tags: 0%', 'loadMask');
+				this._maskEl = this.body.mask('Processing Tags', 'loadMask');
 			}
-			var currDocIndex = 0;
-			
-			var me = this;
-			function doLoad(index) {
-				if (index < me.getCorpus().getDocumentsCount()) {
-					currDocIndex++;
-					var id = me.getCorpus().getDocument(index).getId();
-					me._doLoadTags(id, function() {
-						me.updateTagTotals();
-						doLoad(currDocIndex);
-					});
-				} else {
-					me.updateTagTotals(true);
-					me.getApplication().dispatchEvent('allTagsLoaded', me);
-					if (useMask) {
-						me.body.unmask();
-						me._maskEl = null;
-					}
+			this.doLoadAllTags().then(function() {
+				me._updateTagTotals();
+				me.getApplication().dispatchEvent('allTagsLoaded', me);
+			}, function() {
+				if (window.console) console.warn('loading tags failed!');
+			}, function(docId) {
+			    var docIndex = me.getCorpus().getDocument(docId).getIndex();
+			    var progress = docIndex / me.getCorpus().getDocumentsCount();
+			    me._updateProgress(progress);
+			}).always(function() {
+				if (useMask) {
+					me.body.unmask();
+					me._maskEl = null;
 				}
-			}
-			
-			doLoad(currDocIndex);
+			});
 		} else {
 			this.on('loadedCorpus', function(src, corpus) {
 				this.setCorpus(corpus);
@@ -44,43 +40,26 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		}
 	},
 	
-	_doLoadTags: function(docId, callback) {
-		function getXml() {
-			var me = this;
-    		this._getDocumentXml(docId, function(xml) {
-    			var tagData = me._parseTags(xml, docId, me.curatedTags);
-    			me._saveTags(tagData, docId);
-    			me._storeTags(tagData, docId);
-    			if (callback) callback();
-    		});
+	_updateTagTotals: function() {
+		// add tag freqs to totals
+		for (var docId in this.savedTags) {
+			var docData = this.savedTags[docId];
+			for (var tagName in docData) {
+				var tagData = docData[tagName];
+				if (tagData != null) {
+					if (this.tagTotals[tagName] == null) {
+						this.tagTotals[tagName] = {
+						    freq: tagData.length,
+						    label: tagData[0].label,
+						    type: tagData[0].type
+						};
+					} else {
+						this.tagTotals[tagName].freq += tagData.length;
+					}
+				}
+			};
 		}
 		
-		if (this.curatedTags != null) {
-			var curId = this.getApplication().getCuratorId();
-			if (curId != null) {
-				this.getApplication().getStoredResource('curatedtags-'+curId+'-'+this.getCorpus().getId()+'-'+docId).then(function(value) {
-					this._saveTags(value, docId);
-			    	if (callback) callback();
-				}, function() {
-					getXml.call(this);
-				}, null, this);
-			} else {
-				// it's a new curation
-				getXml.call(this);
-			}
-		} else {
-			this.getApplication().getStoredResource('tags-'+this.getCorpus().getId()+'-'+docId).then(function(value) {
-		    	this._saveTags(value, docId);
-		    	if (callback) callback();
-			}, function() {
-				getXml.call(this);
-			}, null, this);
-		}
-	},
-	
-	updateTagTotals: function(updateSelections) {
-//		var sm = this.getComponent('tags').getSelectionModel();
-		var selectedTagRecords = [];
 		var data = [];
 		for (var tag in this.tagTotals) {
 //			var index = this.store.findExact('tagName', tag);
@@ -111,14 +90,10 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 				} catch (e) {
 //					console.log(record, e);
 				}
-//				if (updateSelections && sm.isSelected(record)) {
-//					selectedTagRecords.push(record);
-//				}
 			}
 		}
 		this.store.loadData(data, true);
 		this.store.sort('label', 'ASC');
-//		if (updateSelections && sm.grid) sm.selectRecords(selectedTagRecords);
 	},
 	
 	/**
@@ -140,45 +115,7 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 		return jsonData;
 	},
 	
-	_saveTags: function(data, docId) {
-		this.savedTags[docId] = data;
-
-		// add tag freqs to totals
-		for (var tagName in data) {
-			var tagData = data[tagName];
-			if (tagData != null) {
-				if (this.tagTotals[tagName] == null) {
-					this.tagTotals[tagName] = {
-					    freq: tagData.length,
-					    label: tagData[0].label,
-					    type: tagData[0].type
-					};
-				} else {
-					this.tagTotals[tagName].freq += tagData.length;
-				}
-			}
-		};
-		
-		this._updateProgress(docId);
-	},
-	
-	_storeTags: function(tags, docId) {
-		var rId = this.getCorpus().getId()+'-'+docId;
-		if (this.curatedTags != null) {
-			var cId = this.getApplication().getCuratorId();
-			if (cId === undefined) return;
-			rId = 'curatedtags-'+cId+'-'+rId;
-		} else {
-			rId = 'tags-'+rId;
-		}
-		this.getApplication().storeResource(rId, tags);
-	},
-	
-	_updateProgress: function(docId) {
-	    var totalDocs = this.getCorpus().getDocumentsCount();
-	    var docIndex = this.getCorpus().getDocument(docId).getIndex();
-	    var progress = docIndex / totalDocs;
-	    
+	_updateProgress: function(progress) {
 	    if (this._maskEl != null) {
 	    	this._maskEl.down('.x-mask-msg-text').dom.firstChild.data = 'Processing Tags: '+Math.floor(progress*100)+'%';
 	    } else if (this.getApplication().useIndex) {
@@ -190,302 +127,6 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
 	
 	clearSelections: function() {
 		this.getSelectionModel().deselectAll(true);
-	},
-	
-	_getDocumentXml: function(docId, callback) {
-		var params = {
-			tool: 'corpus.DocumentTokens',
-			corpus: this.getCorpus().getId(),
-			docId: docId,
-			template: 'docTokensPlusStructure2html',
-			outputFormat: 'xml',
-			limit: 0
-		};
-		Ext.Ajax.request({
-           url: this.getTromboneUrl(),
-           params: params,
-           success: function(response, options) {
-				if (callback) callback(response.responseXML);
-           },
-           scope: this
-        });
-	},
-	
-	/**
-	 * Parses the tags in an xml document and gathers metadata.
-	 * @param {Document} xml The xml document.
-	 * @param {String} docId The id for the document.
-	 * @param {Object} [customTagSet] An object containing a set of tags to look for, in the same format as curatedTags
-	 * @returns The tag metadata.
-	 */
-	_parseTags: function(xml, docId, customTagSet) {
-		var docBody = Ext.DomQuery.jsSelect('div[class="document"]', xml)[0];
-		
-		var shortRe = new RegExp('(([^\\s]+\\s\\s*){'+this.TAG_SNIPPET_WORD_LENGTH+'})(.*)'); // get first X words
-		var prevRe = new RegExp('(.*)(\\s([^\\s]+\\s\\s*){'+Math.floor(this.TAG_SNIPPET_WORD_LENGTH/2)+'})'); // get last X words
-		var nextRe = new RegExp('(([^\\s]+\\s\\s*){'+Math.floor(this.TAG_SNIPPET_WORD_LENGTH/2)+'})(.*)');
-		
-		function getText(tag) {
-			var text = tag.textContent;
-			text = text.replace(/\s+/g, ' '); // consolidate whitespace
-			var shortText = text.replace(shortRe, "$1");
-			return {content: shortText, shortened: shortText.length < text.length};
-		}
-		
-		function getSurroundingText(tag) {
-			function doGet(currTag, dir, currText) {
-				var walker = currTag.ownerDocument.createTreeWalker(currTag.ownerDocument, NodeFilter.SHOW_TEXT, null, false);
-				walker.currentNode = currTag;
-				if (dir === 'prev') {
-					walker.previousNode();
-				} else {
-					walker.nextNode();
-				}
-				var node = walker.currentNode;
-				if (node != null) {
-					var text = node.textContent;
-					if (dir === 'prev') {
-						currText = text + currText;
-					} else {
-						currText += text;
-					}
-					if (currText.length > 30) return currText;
-					else return doGet(node, dir, currText);
-				} else {
-					return currText;
-				}
-			}
-			
-			var prevText = doGet(tag, 'prev', '');
-			var match = prevText.match(prevRe);
-			if (match != null) {
-				prevText = match[2];
-			}
-			var walker = tag.ownerDocument.createTreeWalker(tag.ownerDocument, NodeFilter.SHOW_ALL, null, false);
-			walker.currentNode = tag;
-			walker.nextSibling();
-			tag = walker.currentNode;
-			var currText = '';
-			if (tag.nodeType === Node.TEXT_NODE) {
-				currText = tag.textContent;
-			}
-			var nextText = doGet(tag, 'next', currText);
-			match = nextText.match(nextRe);
-			if (match != null) {
-				nextText = match[1];
-			}
-			
-			return [prevText, nextText];
-		}
-		
-		function getXPathResults(xpath) {
-			try {
-//				var result = xml.evaluate(xpath, docBody, null, XPathResult.ANY_TYPE, null);
-				var result = Ext.DomQuery.jsSelect(xpath, xml);
-				return result;
-			} catch(e) {
-				return [];
-			}
-		}
-		
-		function produceTagData(tags, label) {
-			var data = {};
-			var tag, nodeName, tokenId, dataObj, text, surrText;
-			for (var i = 0; i < tags.length; i++) {
-				tag = tags[i];
-				nodeName = tag.nodeName;
-				if (this.ignoreSpans && nodeName.toLowerCase() === 'span') continue;
-				tokenId = tag.getAttribute('tokenid');
-				if (tokenId == null) {
-					// empty tags lack tokenid attribute
-				} else {
-					dataObj = {
-						docId: docId,
-						tagName: nodeName,
-						label: label || nodeName,
-						tokenId: tokenId,
-						subtype: tag.getAttribute('subtype'),
-						type: 't'
-					};
-					
-					text = getText(tag);
-					dataObj.text = text.content;
-					
-					if (text.shortened == false) {
-						surrText = getSurroundingText(tag);
-						dataObj.prevText = surrText[0];
-						dataObj.nextText = surrText[1];
-					} else {
-						dataObj.text += '&hellip;';
-					}
-					
-					// FIXME temp fix, title not allowed outside of head in html
-					// see similar fix in docTokensPlusStructure2html.xsl
-					if (nodeName == 'title') {
-						dataObj.tagName = 'xmlTitle';
-					} else if (nodeName == 'head') {
-	                    dataObj.tagName = 'xmlHead';
-	                }
-					
-					if (data[nodeName] == null) {
-						data[nodeName] = [dataObj];
-					} else {
-						data[nodeName].push(dataObj);
-					}
-				}
-			}
-
-			return data;
-		}
-		
-		if (docBody != null) {
-		
-			var returnData = {};
-			if (customTagSet == null) {
-				// no curation so parse all tags
-				var tags = Ext.DomQuery.jsSelect('*', docBody);
-				returnData = produceTagData.call(this, tags);
-			} else {
-				// find hits for curated tags only
-				for (var tag in customTagSet) {
-					var cTag = customTagSet[tag];
-					if (cTag.type == 'x') {
-						var data = {};
-						var xpath = cTag.tagName;
-						var results = getXPathResults(xpath);
-						if (results.length > 0) {
-							data[xpath] = [];
-							var el, dataObj, text, surrText;
-							for (var i = 0; i < results.length; i++) {
-								var el = results[i];
-								dataObj = {
-									docId: docId,
-									tagName: xpath,
-									label: cTag.label,
-									tokenId: el.getAttribute('tokenid'),
-									subtype: el.getAttribute('subtype'),
-									type: 'x'
-								};
-								
-								text = getText(el);
-								dataObj.text = text.content;
-								
-								if (text.shortened == false) {
-									surrText = getSurroundingText(el);
-									dataObj.prevText = surrText[0];
-									dataObj.nextText = surrText[1];
-								} else {
-									dataObj.text += '&hellip;';
-								}
-								data[xpath].push(dataObj);
-							}
-						}
-						Ext.apply(returnData, data);
-					} else {
-						var results = Ext.DomQuery.jsSelect(cTag.tagName, docBody);
-						Ext.apply(returnData, produceTagData.call(this, results, cTag.label));
-					}
-				}
-			}
-			
-			// process header
-			var head = docBody.querySelectorAll('xmlHead').item(0);
-			if (head) {
-			    // special handling for TEI docs
-				// TODO save in stored resource
-				var authors = head.querySelectorAll('author');
-				if (authors.length > 0) {
-	    			var authorsArray = [];
-	    			for (var i = 0; i < authors.length; i++) {
-	    				var author = authors.item(i);
-	    				var authorObj = {};
-	    				var updateAuthor = false;
-	    				
-	    				var forename = author.getElementsByTagName('forename').item(0);
-	    				var surname = author.getElementsByTagName('surname').item(0);
-	    				if (forename !== null) {
-	    				    authorObj.forename = forename.textContent;
-	    				    updateAuthor = true;
-	    				}
-	    				if (surname !== null) {
-	    				    authorObj.surname = surname.textContent;
-	    				    updateAuthor = true;
-	    				}
-	    				
-	    				if (updateAuthor) {
-	    				    authorsArray.push(authorObj);
-	    				}
-	    			}
-	    			if (authorsArray.length > 0) {
-	    			    this.getCorpus().getDocument(docId).record.set('author', authorsArray);
-	    			}
-				}
-				
-				var reader = Ext.getCmp('dtcReader');
-				if (reader.currentDocId == docId) {
-					reader.setReaderTitle();
-				}
-			}
-			
-			if (this.getApplication().useIndex) {
-				// find index items
-				var dtcIndex = Ext.getCmp('dtcIndex');
-				var indexIds = dtcIndex.indexIds;
-				var idsToKeep = [];
-				for (var id in indexIds) {
-				    var hit;
-				    if (id.indexOf('ie') == 0) {
-				    	// cross reference
-				    }
-				    try {
-				    	if (Ext.isIE) {
-				            var result = document.evaluate('//*["'+id+'"=@*[local-name()="id"]]', docBody,
-			                    function(prefix){
-			                        return {
-			                            xml: "http://www.w3.org/XML/1998/namespace"
-			                        }[prefix] || null;
-			                    },
-			                    XPathResult.FIRST_ORDERED_NODE_TYPE
-			                );
-				            hit = result.singleNodeValue;
-				        } else {
-				            hit = docBody.querySelectorAll('*[*|id="'+id+'"]').item(0);
-				        }
-				    } catch (e) {
-				        if (window.console) {
-				            console.log('bad ID', id);
-				        }
-				    }
-					if (hit) {
-						idsToKeep.push(id);
-						indexIds[id] = {
-							tokenId: hit.getAttribute('tokenid'),
-							tag: hit.nodeName,
-							docId: docId
-						};
-						
-						var text = getText(hit);
-						indexIds[id].text = text.content;
-						
-						if (text.shortened == false) {
-							surrText = getSurroundingText(hit);
-							indexIds[id].prevText = surrText[0];
-							indexIds[id].nextText = surrText[1];
-						} else {
-							indexIds[id].text += '&hellip;';
-						}
-					}
-				}
-				dtcIndex.filterIndex(idsToKeep);
-			}
-			
-			return returnData;
-		} else {
-			if (window.console) {
-				console.log('parse error');
-			}
-			return {};
-		}
 	}
 });
 
