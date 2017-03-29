@@ -49,7 +49,7 @@ public class Trombone extends HttpServlet {
 
 	private FlexibleParametersFactory flexibleParametersFactory;
 	
-	public Trombone() {
+	public Trombone() throws IOException {
 		this.storage = new FileStorage();
 	}
 	
@@ -265,6 +265,9 @@ public class Trombone extends HttpServlet {
 		// intercept to see if we have a notebook in resources
 		if (parameters.getParameterValue("tool", "").equals("notebook.NotebookManager") && parameters.containsKey("notebook")) {
 			File file = new File(getServletContext().getRealPath("/resources/notebook"), parameters.getParameterValue("notebook") +".json");
+			if (!file.exists()) {
+				file = new File(getServletContext().getRealPath("/resources/notebook"), parameters.getParameterValue("notebook") +"/index.json");
+			}
 			if (file.exists()) {
 				String string = FileUtils.readFileToString(file);
 				parameters.setParameter("jsonData", string);

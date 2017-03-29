@@ -14,6 +14,9 @@
         <xsl:apply-templates select="results/documentTokens/tokens/token"/>
     </xsl:template>
     <xsl:template match="token">
-        <xsl:value-of select="term"/>
+        <xsl:if test="tokenType='lexical'">
+            <xsl:value-of select="term"/>
+            <xsl:text> </xsl:text>
+        </xsl:if>
     </xsl:template>
 </xsl:stylesheet>

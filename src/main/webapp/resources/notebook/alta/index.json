@@ -8,9 +8,9 @@
         {
             "type": "text",
             "input": [
-                "<h1 style=\"text-align: center\">The Art of Literary Text Analysis with Voyant Not",
+                "<h1 style=\"text-align: center\">The Art of Literary Text Analysis with Spiral Not",
                 "ebooks</h1>\n\n<p style=\"text-align: center\">by Stéfan Sinclair &amp; Geoffrey Roc",
-                "kwell</p>\n\n<p><em>The Art of Literary Text Analysis with Voyant Notebooks</em> h",
+                "kwell</p>\n\n<p><em>The Art of Literary Text Analysis with Spiral Notebooks</em> h",
                 "as two objectives. First, it is designed as a guide to provide a gentle introduc",
                 "tion to concepts and methodologies for literary text analysis with computers – i",
                 "t is meant to be very welcoming to newcomers to digital tools for the study of t",
@@ -19,22 +19,22 @@
                 "d demonstrate everything, it at least has the ambition of suggesting the breadth",
                 " of possibilities and providing a helpful foundation for further exploration and",
                 " experimentation.</p>\n\n<p>This instance of The Art of Literary Text Analysis is ",
-                "created in Voyant Notebooks (there's also companion version in <a data-tabindex-",
-                "counter=\"1\" data-tabindex-value=\"none\" href=\"https://github.com/sgsinclair/alta/",
+                "created in Spiral Notebooks (there's also companion version in <a data-tabindex-",
+                "counter=\"2\" data-tabindex-value=\"none\" href=\"https://github.com/sgsinclair/alta/",
                 "blob/master/ipynb/ArtOfLiteraryTextAnalysis.ipynb\" tabindex=\"-1\">iPython Noteboo",
                 "ks</a>).&nbsp;Other choices are available, and many conceptual aspects of the gu",
-                "ide are relevant regardless of the implementation. Voyant Notebooks was chosen f",
-                "or four main reasons:</p>\n\n<ol>\n\t<li>Voyant Notebooks requires no setup or insta",
-                "llation to get started, you just visit a web page;</li>\n\t<li>Voyant Notebooks le",
+                "ide are relevant regardless of the implementation. Spiral Notebooks was chosen f",
+                "or four main reasons:</p>\n\n<ol>\n\t<li>Spiral Notebooks requires no setup or insta",
+                "llation to get started, you just visit a web page;</li>\n\t<li>Spiral Notebooks le",
                 "verages the analytic and visualization capabilities of <a data-tabindex-counter=",
-                "\"1\" data-tabindex-value=\"none\" href=\"http://voyant-tools.org\" tabindex=\"-1\">Voya",
-                "nt Tools</a>;</li>\n\t<li>code in Voyant Notebooks&nbsp;is essentially written in ",
+                "\"2\" data-tabindex-value=\"none\" href=\"http://voyant-tools.org\" tabindex=\"-1\">Voya",
+                "nt Tools</a>;</li>\n\t<li>code in Spiral Notebooks&nbsp;is essentially written in ",
                 "Javascript, a relatively friendly language to learn and one that's widely used;<",
-                "/li>\n\t<li>Voyant Notebooks offers a&nbsp;<em>literate programming</em>&nbsp;mode",
+                "/li>\n\t<li>Spiral Notebooks offers a&nbsp;<em>literate programming</em>&nbsp;mode",
                 "l of writing where blocks of prose text (like this one) can be interspersed with",
                 " bits of code and output (like below).&nbsp;<em>The Art of Literary Text Analysi",
-                "s</em>&nbsp;focuses on process, and the documentation-rich format offered by Voy",
-                "ant&nbsp;Notebooks is well-suited to the nature of this guide.</li>\n</ol>\n"
+                "s</em>&nbsp;focuses on process, and the documentation-rich format offered by Spi",
+                "ral Notebooks is well-suited to the nature of this guide.</li>\n</ol>\n"
             ]
         },
         {
@@ -46,16 +46,16 @@
             "output": [
                 " <div class=\"info\"><iframe style=\"width: 90%; height: 400px\" src=\"../../tool/Cir",
                 "rus/?minimal=true&amp;corpus=2821fe410914bbb369b50af75a5099da&amp;debug=true\" da",
-                "ta-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div>"
+                "ta-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"2\"></iframe></div>"
             ]
         },
         {
             "type": "text",
             "input": [
-                "<h2>Table of Contents</h2>\n\n<ul>\n\t<li>First Encounters:\n\t<ul>\n\t\t<li><a href=\"../a",
-                "lta-GetingStarted/\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-count",
-                "er=\"1\">Getting Started</a> (introducing core concepts of Voyant Notebooks)</li>\n",
-                "\t</ul>\n\t</li>\n</ul>\n"
+                "<h2>Table of Contents</h2>\n\n<ul>\n\t<li>First Encounters:\n\t<ul>\n\t\t<li><a data-tabi",
+                "ndex-counter=\"2\" data-tabindex-value=\"none\" href=\"./GettingStarted\" tabin",
+                "dex=\"-1\">Getting Started</a> (introducing core concepts of Spiral Notebooks)</li",
+                ">\n\t</ul>\n\t</li>\n</ul>\n"
             ]
         }
     ]

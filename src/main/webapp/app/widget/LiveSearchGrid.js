@@ -1,6 +1,3 @@
-/**
- * A GridPanel class with live search support.
- */
 Ext.define('Voyant.widget.LiveSearchGrid', {
     extend: 'Ext.grid.Panel',
     
