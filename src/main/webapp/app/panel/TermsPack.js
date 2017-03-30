@@ -7,7 +7,7 @@ Ext.define('Voyant.panel.TermsPack', {
     	},
     	api: {
     		stopList: 'auto',
-    		limit: 50,
+    		context: 3,
     		query: undefined,
     		docIndex: undefined,
     		docId: undefined
@@ -19,12 +19,10 @@ Ext.define('Voyant.panel.TermsPack', {
     	
     	mode: undefined,
     	
-    	initialTerms: undefined,
+    	numInitialTerms: 50,
+    	collocatesLimit: 1000000, // a very large number so we get all of them
     	
     	maxCollocateValue: -1,
-    	
-    	queryQueue: undefined,
-    	queryQueueDelay: 10,
     	
     	visLayout: undefined,
     	vis: undefined,
@@ -98,104 +96,45 @@ Ext.define('Voyant.panel.TermsPack', {
     	var corpusTerms = corpus.getCorpusTerms();
     	corpusTerms.load({
     		params: {
- 				limit: 5,
+ 				limit: this.getNumInitialTerms(),
  				stopList: this.getApiParam("stopList")
  			},
 		    callback: function(records, operation, success) {
 		    	if (success) {
-		    		var terms = {};
-		    		records.forEach(function(r) {
-		    			terms[r.getTerm()] = null;
-		    		});
-		    		this.setInitialTerms(terms);
-		    		this.loadFromRecords(records, true);
+		    		this.loadFromRecords(records);
 		    	}
 		    },
 		    scope: this
     	});
     },
     
-    loadFromRecords: function(records, isInitial) {
+    loadFromRecords: function(records) {
     	if (Ext.isArray(records) && records.length>0) {
     		var terms = [];
     		records.forEach(function(r) {
     			terms.push(r.getTerm());
     		});
-    		
-    		if (isInitial) {
-				terms.forEach(function(t) {
-					this.loadFromQuery(t, true);
-				}, this);
-    		} else {
-	    		this.setQueryQueue(terms);
-	    		this.processQueryQueue();
-    		}
+    		this.loadFromQuery(terms);
     	}
     },
     
-    processQueryQueue: function() {
-    	var queue = this.getQueryQueue();
-    	if (queue !== undefined && queue.length > 0) {
-    		var query = queue.shift();
-    		this.loadFromQuery(query);
-    		this.getVisLabel().text(queue.length);
-    	} else {
-    		this.getVisLabel().text('');
-    	}
-    },
-    
-    loadFromQuery: function(query, isInitial) {
+    loadFromQuery: function(query) {
     	this.setApiParams({
     		mode: 'corpus'
     	});
     	var params = this.getApiParams();
     	this.getCorpus().getCorpusCollocates().load({
-    		params: Ext.apply(Ext.clone(params), {query: query}),
+    		params: Ext.apply(Ext.clone(params), {query: query, collocatesWhitelist: query, limit: this.getCollocatesLimit()}),
     		callback: function(records, op, success) {
     			if (success) {
-	    			if (isInitial) {
-	    				var term = records[0].getTerm();
-	    				this.getInitialTerms()[term] = records;
-	    				
-	    				var done = true;
-	    				for (var t in this.getInitialTerms()) {
-	    					if (this.getInitialTerms()[t] === null) {
-	    						done = false;
-	    						break;
-	    					}
-	    				}
-	    				
-	    				if (done) {
-	    					var combinedRecords = [];
-	    					for (var key in this.getInitialTerms()) {
-	    						combinedRecords = combinedRecords.concat(this.getInitialTerms()[key]);
-	    					}
-	    					this.addRecordsToVis(combinedRecords, isInitial);
-	    					
-	    					var queue = [];
-	    					for (var i = 0; i < combinedRecords.length; i++) {
-	    						var cterm = combinedRecords[i].getContextTerm();
-	    						queue.push(cterm);
-	    					}
-	    					var qq = this.getQueryQueue();
-	    					if (qq != undefined) {
-	    						queue = qq.concat(queue);
-	    					}
-	    					this.setQueryQueue(queue);
-	    					this.processQueryQueue();
-	    					
-	    				}
-	    			} else {
-	    				this.addRecordsToVis(records);
-						Ext.defer(this.processQueryQueue, this.getQueryQueueDelay(), this);
-	    			}
+    				this.addRecordsToVis(records);
     			}
     		},
     		scope: this
     	});
     },
     
-    addRecordsToVis: function(records, isInitial) {
+    addRecordsToVis: function(records) {
     	function getRootValue(val) {
     		return Math.pow(val, 1/2);
     	}
@@ -218,37 +157,27 @@ Ext.define('Voyant.panel.TermsPack', {
 				max = contextFreq;
 			}
 			
-			if (isInitial) {
-	//    		if (i == 0) {
-	    			if (currentTerms[term] === undefined) {
-	    				currentTerms[term] = {
-	    	    			term: term,
-	    	    			freq: termFreq,
-	    	    			value: getRootValue(termFreq),
-	    	    			collocates: []
-	    				};
-	    			}
-	//    		}
-	    		if (term != contextTerm) {
-	    			if (currentTerms[contextTerm] === undefined) {
-	    				currentTerms[contextTerm] = {
-	    	    			term: contextTerm,
-	    	    			freq: contextFreq,
-	    	    			value: getRootValue(contextFreq),
-	    	    			collocates: []
-	    				};
-	    			}
-	    			currentTerms[term].collocates.push({
-	    				term: contextTerm, value: contextFreq
-	    			});
-	    		}
-			} else {
-				if (term != contextTerm && currentTerms[term] && currentTerms[contextTerm]) {
-					currentTerms[term].collocates.push({
-	    				term: contextTerm, value: contextFreq
-	    			});
-				}
+			if (currentTerms[term] === undefined) {
+				currentTerms[term] = {
+	    			term: term,
+	    			freq: termFreq,
+	    			value: getRootValue(termFreq),
+	    			collocates: []
+				};
 			}
+    		if (term != contextTerm) {
+//    			if (currentTerms[contextTerm] === undefined) {
+//    				currentTerms[contextTerm] = {
+//    	    			term: contextTerm,
+//    	    			freq: contextFreq,
+//    	    			value: getRootValue(contextFreq),
+//    	    			collocates: []
+//    				};
+//    			}
+    			currentTerms[term].collocates.push({
+    				term: contextTerm, value: contextFreq
+    			});
+    		}
     	}
     	
     	this.setMaxCollocateValue(max);
@@ -281,7 +210,7 @@ Ext.define('Voyant.panel.TermsPack', {
     			d3.select(this).select('circle').style('fill', '#89e1c2');
     			
 				var tip = me.getTip();
-				tip.update(d.term+': '+d.collocates.length);
+				tip.update('<b>'+d.term+'</b><br\>frequency: '+d.freq+'<br\>collocates: '+d.collocates.length);
 				tip.show();
 				
 				var fill = d3.scale
@@ -297,7 +226,7 @@ Ext.define('Voyant.panel.TermsPack', {
 			.on('mousemove', function() {
 				var container = Ext.get(me.getVisId()).dom;
 				var coords = d3.mouse(container);
-				coords[1] += 40;
+//				coords[1] += 40;
 				me.getTip().setPosition(coords);
 			})
 			.on('mouseout', function() {
@@ -334,6 +263,7 @@ Ext.define('Voyant.panel.TermsPack', {
 		
 		this.setVisLayout(
 			d3.layout.pack()
+				.sort(function(a, b) { return a.freq < b.freq ? 1 : a.freq > b.freq ? -1 : 0; })
 				.size([width, height])
 				.padding(1.5)
 		);
