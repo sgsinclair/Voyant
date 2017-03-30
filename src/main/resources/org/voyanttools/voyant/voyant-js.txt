@@ -3,7 +3,7 @@ resources/bubblelines/Bubblelines.js
 
 # KNOTS
 resources/knots/Knots.js
-		
+
 # CIRRUS
 resources/cirrus/html5/Cirrus.js
 resources/cirrus/html5/Word.js
@@ -124,6 +124,7 @@ app/panel/CustomSet.js
 app/panel/Veliza.js
 app/panel/WordTree.js
 app/panel/Topics.js
+app/panel/TermsPack.js
 
 # APPS
 app/VoyantApp.js
