@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Mar 27 10:27:38 EDT 2017 */
+/* This file created by JSCacher. Last modified: Tue Mar 28 19:41:31 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6154,6 +6154,37 @@ Ext.define('Voyant.data.model.Document', {
     
     show: function() {
     	show(this.getFullLabel())
+    },
+    
+    
+    getText: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+	    	config = config || {};
+	    	Ext.apply(config, {
+        		tool: 'corpus.DocumentTokens',
+        		corpus: this.getCorpusId()
+	    	});
+	    	return dfd.promise
+		}
+    },
+    
+    getPlainText: function(config) {
+    	debugger
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+	    	config = config || {};
+	    	Ext.apply(config, {
+    			outputFormat: "text",
+    			template: "docTokens2text",
+    			noOthers: true
+	    	});
+			return this.getText(config);
+		}
+    	
     }
     
 });
@@ -7098,9 +7129,9 @@ Ext.define('Voyant.data.table.CorpusTerms', {
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization'],
-    transferable: ['loadCorpusTerms','loadTokens'],
+    transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
-    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms'],
+    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
@@ -7436,6 +7467,143 @@ Ext.define('Voyant.data.model.Corpus', {
 	getSubTitle: function() {
 		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('subTitle');		
 	},
+	
+	/**
+     * Create a promise for a text representation of all the document bodies in the corpus.
+     * 
+     * This does NOT necessarily return the full original document, but rather the body or main
+     * content, as extracted by Voyant. You can also request a {@link #plainText} version with
+     * the tags stripped.
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the text as an argument.
+     * 
+     * 	new Corpus("http://hermeneuti.ca").getText().then(function(text) {
+     * 		show(text.replace(/</g, "&lt;")); // show the markup 
+     * 	});
+     * 
+     * @param {Number/Object} config
+     * 
+     * - when this is a number, it's the maximum number of words to fetch (though there may be any number of other tokens, like punctuation and space (but no tags).
+     * - otherwise this is a regular config object that can contain the following:
+     * 	 - `limit`: a limit on the total number of words (by default there's no limit)
+     * 	 - `perDocLimit`: a limit on the number of words to fetch for each document (by default there's no limit)
+     * 	 - `start`: start at this word index for each document
+     * 	 - `stopList`: the ID of an existing stopList resource or an array of words to skip
+     * 	 - `whitelist`: the ID of an existing whitelist resource or an array of words to keep
+     * 
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return text but a promise to return text when it's finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * text as an argument, as per the example above).
+	 */
+	getText: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+	    	config = config || {};
+	    	if (Ext.isNumber(config)) {
+	    		config = {limit: config}
+	    	} else if (Ext.isString(config)) {
+	    		config = {limit: parseInt(config)}
+	    	};
+	    	Ext.applyIf(config, {
+        		limit: 0,
+    			outputFormat: "text",
+    			template: "docTokens2text"
+	    	});
+	    	Ext.apply(config, {
+        		tool: 'corpus.DocumentTokens',
+        		corpus: this.getAliasOrId()
+	    	});
+        	Ext.Ajax.request({
+        	    url: Voyant.application.getTromboneUrl(),
+        	    params: config,
+        	    success: function(response, opts) {
+        	    	dfd.resolve(response.responseText);
+        	    },
+        	    failure: function(response, opts) {
+        	    	dfd.reject(response);
+        	    },
+        	    scope: this
+        	})
+	    	return dfd.promise
+		}
+    },
+    
+	/**
+     * Create a promise for a plain text representation of all the text in the corpus.
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the text as an argument.
+     * 
+     * 	new Corpus("http://hermeneuti.ca").getPlainText().then(function(text) {
+     * 		show(text.trim().replace(/\s+/g, " ").substr(-150)); // show the end 
+     * 	});
+     * 
+     * @param {Number/Object} config
+     * 
+     * - when this is a number, it's the maximum number of words to fetch (though there may be any number of other tokens, like punctuation and space (but no tags).
+     * - otherwise this is a regular config object – see {@link #getText} for more details.
+     * 
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return text but a promise to return text when it's finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * text as an argument, as per the example above).
+	 */
+    getPlainText: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+	    	config = config || {};
+	    	if (Ext.isNumber(config)) {
+	    		config = {limit: config}
+	    	} else if (Ext.isString(config)) {
+	    		config = {limit: parseInt(config)}
+	    	}
+	    	Ext.apply(config, {
+    			template: "docTokens2plainText"
+	    	});
+			return this.getText(config);
+		}
+    	
+    },
+
+	/**
+     * Create a promise for a string containing just the words from the corpus.
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the text as an argument.
+     * 
+     * 	new Corpus("http://hermeneuti.ca").getWords().then(function(words) {
+     * 		show(words); // show the words 
+     * 	});
+     * 
+     * @param {Number/Object} config
+     * 
+     * - when this is a number, it's the maximum number of words to fetch (though there may be any number of other tokens, like punctuation and space (but no tags).
+     * - otherwise this is a regular config object – see {@link #getText} for more details.
+     * 
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return the words but a promise to return words when it's finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * words as a string argument, as per the example above).
+	 */
+    getWords: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+	    	config = config || {};
+	    	if (Ext.isNumber(config)) {
+	    		config = {limit: config}
+	    	} else if (Ext.isString(config)) {
+	    		config = {limit: parseInt(config)}
+	    	};
+	    	Ext.apply(config, {
+    			template: "docTokens2words"
+	    	});
+			return this.getText(config);
+		}
+    	
+    },
 	
 	/**
 	 * Shows a one-line summary of this corpus.
@@ -8780,9 +8948,6 @@ Ext.define('Voyant.widget.VoyantChart', {
     }
 
 })
-/**
- * A GridPanel class with live search support.
- */
 Ext.define('Voyant.widget.LiveSearchGrid', {
     extend: 'Ext.grid.Panel',
     
@@ -23792,7 +23957,7 @@ Ext.define('Voyant.panel.Topics', {
             		tool: 'corpus.DocumentTokens',
         			corpus: corpus.getAliasOrId(),
         			outputFormat: "text",
-        			template: "docTokens2text",
+        			template: "docTokens2idsAndText",
         			limit: 0,
         			noOthers: true,
         			perDocLimit: corpus.getDocumentsCount()==1 ? undefined : parseInt(this.getApiParam('perDocLimit'))

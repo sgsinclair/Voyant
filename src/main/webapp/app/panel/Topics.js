@@ -249,7 +249,7 @@ Ext.define('Voyant.panel.Topics', {
             		tool: 'corpus.DocumentTokens',
         			corpus: corpus.getAliasOrId(),
         			outputFormat: "text",
-        			template: "docTokens2text",
+        			template: "docTokens2idsAndText",
         			limit: 0,
         			noOthers: true,
         			perDocLimit: corpus.getDocumentsCount()==1 ? undefined : parseInt(this.getApiParam('perDocLimit'))

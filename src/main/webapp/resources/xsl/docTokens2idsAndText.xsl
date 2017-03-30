@@ -11,9 +11,17 @@
         </xd:desc>
     </xd:doc>
     <xsl:template match="/">
-        <xsl:apply-templates select="results/documentTokens/tokens/token"/>
+        <xsl:for-each-group select="results/documentTokens/tokens/token" group-by="docIndex">
+            <xsl:value-of select="docId"/>
+            <text>: </text>
+            <xsl:apply-templates select="current-group()"/><xsl:text>
+</xsl:text><!-- formatting is important here, it should be a new line -->
+        </xsl:for-each-group>
     </xsl:template>
     <xsl:template match="token">
-        <xsl:value-of select="term"/>
+        <xsl:if test="tokenType='lexical'">
+            <xsl:value-of select="term"/>
+            <xsl:text> </xsl:text>
+        </xsl:if>
     </xsl:template>
 </xsl:stylesheet>

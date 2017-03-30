@@ -211,6 +211,37 @@ Ext.define('Voyant.data.model.Document', {
     
     show: function() {
     	show(this.getFullLabel())
+    },
+    
+    
+    getText: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+	    	config = config || {};
+	    	Ext.apply(config, {
+        		tool: 'corpus.DocumentTokens',
+        		corpus: this.getCorpusId()
+	    	});
+	    	return dfd.promise
+		}
+    },
+    
+    getPlainText: function(config) {
+    	debugger
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+	    	config = config || {};
+	    	Ext.apply(config, {
+    			outputFormat: "text",
+    			template: "docTokens2text",
+    			noOthers: true
+	    	});
+			return this.getText(config);
+		}
+    	
     }
     
 });
