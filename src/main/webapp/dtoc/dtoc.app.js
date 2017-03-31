@@ -41,6 +41,15 @@ Ext.define('VoyantDTOCApp', {
     		Ext.get('headerBookName').setHtml(this.getCorpus().getTitle());
     		Ext.get('headerAuthor').setHtml(this.getCorpus().getSubTitle());
     		
+    		if (corpus.getAliasOrId() === 'regenerations') {
+    			Ext.getCmp('header').getComponent('icons').setHtml('<div class="headerRow">'+
+					'<a href="http://inke.ca/" target="_blank"><img src="images/inke_logo_small.png" title="INKE Logo" /></a>'+
+        			'<a href="http://cwrc.ca/" target="_blank"><img src="images/cwrc_logo_small.png" title="CWRC Logo" style="margin-left: 8px;" /></a>'+
+        			'<a href="http://www.uap.ualberta.ca/" target="_blank"><img src="images/uap_logo_small.png" title="UAP Logo" style="margin-left: 8px;" /></a>'+
+        			'<a href="http://voyant-tools.org/" target="_blank"><img src="images/voyant_small.png" title="Voyant Logo" style="margin: 1px 0 1px 8px;" /></a>'+
+    			'</div>');
+    		}
+    		
     		function doIndexCheck() {
     			Ext.Ajax.request({
                     url: this.getTromboneUrl(),
@@ -142,17 +151,13 @@ Ext.define('VoyantDTOCApp', {
         			padding: '0 0 0 5px',
         			html: '<div id="headerBookName" class="headerRow"></div><div id="headerAuthor" class="headerRow"></div>'
         		},{
+        			itemId: 'icons',
         			width: 285,
         			style: {
         				textAlign: 'right'
         			},
         			html: '<div class="headerRow">'+
-        			// TODO if we're using an index, assume it's Regenerations (for now)
-        			(this.useIndex ?
-        			'<a href="http://inke.ca/" target="_blank"><img src="images/inke_logo_small.png" title="INKE Logo" /></a>'+
-        			'<a href="http://cwrc.ca/" target="_blank"><img src="images/cwrc_logo_small.png" title="CWRC Logo" style="margin-left: 8px;" /></a>'+
-        			'<a href="http://www.uap.ualberta.ca/" target="_blank"><img src="images/uap_logo_small.png" title="UAP Logo" style="margin-left: 8px;" /></a>':'')+
-        			'<a href="http://voyant-tools.org/" target="_blank"><img src="images/voyant_small.png" title="Voyant Logo" style="margin-left: 8px;" /></a>'+
+        			'<a href="http://voyant-tools.org/" target="_blank"><img src="images/voyant_small.png" title="Voyant Logo" style="margin: 1px 0 1px 8px;" /></a>'+
         			'</div>'
         		}],
         		listeners: {
