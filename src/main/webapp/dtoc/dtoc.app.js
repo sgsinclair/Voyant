@@ -433,7 +433,7 @@ Ext.define('VoyantDTOCApp', {
 			};
 
 			var url = me.getBaseUrl()+'dtoc/?'+Ext.urlEncode(params);
-			var msg = '<p>'+ new Ext.Template(me.localize('clickUrl')).apply([url])+'</p>';
+			var msg = '<p>'+ new Ext.Template("Copy and paste the URL below (you may need to add http or https depending on the current server) or simply <a href='{0}' target='_blank'>click on this link.</a>").apply([url])+'</p>';
 			
 			Ext.Msg.show({
 				title: 'Export',
