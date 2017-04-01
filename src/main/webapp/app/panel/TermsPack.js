@@ -21,12 +21,17 @@ Ext.define('Voyant.panel.TermsPack', {
     	
     	numInitialTerms: 50,
     	collocatesLimit: 1000000, // a very large number so we get all of them
+    	scalingFactor: 3,
     	
+    	minRawFreq: 1000000,
+    	maxRawFreq: -1,
     	maxCollocateValue: -1,
+    	
+    	currentData: undefined,
     	
     	visLayout: undefined,
     	vis: undefined,
-    	visLabel: undefined,
+    	visInfo: undefined,
     	visId: undefined,
     	
     	tip: undefined
@@ -34,6 +39,12 @@ Ext.define('Voyant.panel.TermsPack', {
     
 	MODE_CORPUS: 'corpus',
     MODE_DOCUMENT: 'document',
+    
+    MIN_TERMS: 5,
+    MAX_TERMS: 500,
+    
+    MIN_SCALING: 1,
+    MAX_SCALING: 5,
 	
     layout: 'fit',
     
@@ -46,61 +57,102 @@ Ext.define('Voyant.panel.TermsPack', {
     
     initComponent: function() {
     	Ext.apply(this, {
-    		title: this.localize('title')
-//    		,dockedItems: [{
-//                dock: 'bottom',
-//                xtype: 'toolbar',
-//                overflowHandler: 'scroller',
-//                items: [{
-//        			xtype: 'corpusdocumentselector',
-//        			singleSelect: true
-//        		}]
-//    		}]
+    		title: this.localize('title'),
+    		dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                overflowHandler: 'scroller',
+                items: [
+//                {xtype: 'corpusdocumentselector', singleSelect: true},
+                {
+	                fieldLabel: this.localize('numTerms'),
+	    			labelWidth: 50,
+	    			width: 120,
+	    			xtype: 'slider',
+	            	increment: 1,
+	            	minValue: this.MIN_TERMS,
+	            	maxValue: this.MAX_TERMS,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(this.getNumInitialTerms());
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.resetVis();
+	            			this.setNumInitialTerms(newvalue);
+	            			this.loadFromCorpus(this.getCorpus());
+	            		},
+	            		scope: this
+	            	}
+                },{
+	                fieldLabel: this.localize('scaling'),
+	    			labelWidth: 50,
+	    			width: 120,
+	    			xtype: 'slider',
+	            	increment: 1,
+	            	minValue: this.MIN_SCALING,
+	            	maxValue: this.MAX_SCALING,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(this.getScalingFactor());
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			// use the inverse of the value since it'll make more sense to the user
+	            			var value = Math.abs(newvalue-(this.MAX_SCALING+1));
+	            			
+	            			this.setScalingFactor(value);
+	            			
+	            			this.getVisLayout().value(function(d) { return Math.pow(d.rawFreq, 1/value); });
+	            			
+	            			var data = this.processRecordsForVis([]);
+	            			this.resetVis();
+	            			this.buildVisFromData(data);
+	            		},
+	            		scope: this
+	            	}
+                }
+                ]
+    		}]
     	});
     	
     	this.callParent(arguments);
     },
     
     listeners: {
-    	afterrender: function() {
-    		
-    	},
-    	
     	boxready: function() {
 			this.initVisLayout();
     	},
     	
     	resize: function(panel, width, height) {
     		if (this.getVisLayout() && this.getCorpus()) {
-
     			var el = this.getLayout().getRenderTarget();
     	    	width = el.getWidth();
     			height = el.getHeight();
     			
     			el.down('svg').set({width: width, height: height});
-//    			if (this.getTerms()) {
-//        			this.getVisLayout().size([width, height]).stop().words(this.getTerms()).start();
-//    			}
+    			
+    			this.getVisLayout().size([width, height]);
+    			
+    			var data = this.processRecordsForVis([]);
+    			this.resetVis();
+    			this.buildVisFromData(data);
     		}
     	},
     	
     	loadedCorpus: function(src, corpus) {
-    		this.initVisLayout();
-
     		this.loadFromCorpus(corpus);
     	}
     },
     
     loadFromCorpus: function(corpus) {
     	this.setApiParams({docId: undefined, docIndex: undefined});
-    	var corpusTerms = corpus.getCorpusTerms();
-    	corpusTerms.load({
+    	corpus.getCorpusTerms().load({
     		params: {
  				limit: this.getNumInitialTerms(),
- 				stopList: this.getApiParam("stopList")
+ 				stopList: this.getApiParam('stopList')
  			},
 		    callback: function(records, operation, success) {
 		    	if (success) {
+		    		this.setCurrentData({});
 		    		this.loadFromRecords(records);
 		    	}
 		    },
@@ -110,10 +162,30 @@ Ext.define('Voyant.panel.TermsPack', {
     
     loadFromRecords: function(records) {
     	if (Ext.isArray(records) && records.length>0) {
+    		var maxFreq = this.getMaxRawFreq();
+    		var minFreq = this.getMinRawFreq();
     		var terms = [];
     		records.forEach(function(r) {
-    			terms.push(r.getTerm());
-    		});
+    			var term = r.getTerm();
+    			var rawFreq = r.getRawFreq();
+    			
+    			if (rawFreq > maxFreq) maxFreq = rawFreq;
+    			if (rawFreq < minFreq) minFreq = rawFreq;
+    			
+    			this.getCurrentData()[term] = {
+    				term: term,
+    				rawFreq: rawFreq,
+    				relativeFreq: r.get('relativeFreq'),//r.getRelativeFreq(),
+    				inDocumentsCount: r.getInDocumentsCount(),
+    				collocates: []
+    			};
+    			
+    			terms.push(term);
+    		}, this);
+    		
+    		this.setMaxRawFreq(maxFreq);
+    		this.setMinRawFreq(minFreq);
+    		
     		this.loadFromQuery(terms);
     	}
     },
@@ -127,132 +199,149 @@ Ext.define('Voyant.panel.TermsPack', {
     		params: Ext.apply(Ext.clone(params), {query: query, collocatesWhitelist: query, limit: this.getCollocatesLimit()}),
     		callback: function(records, op, success) {
     			if (success) {
-    				this.addRecordsToVis(records);
+    				this.buildVisFromData(this.processRecordsForVis(records));
     			}
     		},
     		scope: this
     	});
     },
     
-    addRecordsToVis: function(records) {
-    	function getRootValue(val) {
-    		return Math.pow(val, 1/2);
-    	}
-    	
-    	var currentTerms = {};
-    	this.getVis().selectAll('.node').data().forEach(function(d, i) {
-    		if (d.term) currentTerms[d.term] = d;
-    	});
-    	
-    	var max = this.getMaxCollocateValue();
+    processRecordsForVis: function(records) {
+    	var currentTerms = this.getCurrentData();
+
+    	var maxCol = this.getMaxCollocateValue();
     	
     	for (var i=0; i<records.length; i++) {
     		var r = records[i];
     		var term = r.getTerm();
 			var contextTerm = r.getContextTerm();
-			var termFreq = r.getKeywordRawFreq();
 			var contextFreq = r.getContextTermRawFreq();
 			
-			if (contextFreq > max) {
-				max = contextFreq;
+			if (contextFreq > maxCol) {
+				maxCol = contextFreq;
 			}
 			
 			if (currentTerms[term] === undefined) {
-				currentTerms[term] = {
-	    			term: term,
-	    			freq: termFreq,
-	    			value: getRootValue(termFreq),
-	    			collocates: []
-				};
+				// should not be here
+			} else {
+	    		if (term != contextTerm) {
+	    			currentTerms[term].collocates.push({
+	    				term: contextTerm, value: contextFreq
+	    			});
+	    		}
 			}
-    		if (term != contextTerm) {
-//    			if (currentTerms[contextTerm] === undefined) {
-//    				currentTerms[contextTerm] = {
-//    	    			term: contextTerm,
-//    	    			freq: contextFreq,
-//    	    			value: getRootValue(contextFreq),
-//    	    			collocates: []
-//    				};
-//    			}
-    			currentTerms[term].collocates.push({
-    				term: contextTerm, value: contextFreq
-    			});
-    		}
     	}
     	
-    	this.setMaxCollocateValue(max);
+    	this.setMaxCollocateValue(maxCol);
     	
     	var data = [];
     	for (var term in currentTerms) {
     		data.push(currentTerms[term]);
     	}
-    	
+    	return data;
+    },
+    
+    buildVisFromData: function(data) {
     	// compute node xy
-    	var processedData = this.getVisLayout().nodes({children: data, collocates:[], term: null});
+    	var processedData = this.getVisLayout().nodes({children: data, collocates:[], term: null, rawFreq: 0});
     	// join nodes with data
     	var nodes = this.getVis().selectAll('.node').data(processedData, function(d) { return d.term; } ); // use term as key
     	
     	// update
-    	nodes//.transition().duration(transDuration)
-			.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+    	nodes.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+    	nodes.selectAll('circle').attr('r', function(d) { return d.r; });
     	
     	var me = this;
     	
+    	var collocateFill = d3.scale.pow().exponent(1/3)
+			.domain([0,this.getMaxCollocateValue()]).range(['#ffffff', '#bd3163']);
+    	
+    	var inDocsFill = d3.scale.linear()
+			.domain([2,this.getCorpus().getDocumentsCount()]).range(['#fff', '#ddd']);
+    	
+    	var count = nodes[0].length-1;
+    	
+    	var minFontSize = d3.scale.pow().exponent(1/2)
+    		.domain([this.MIN_TERMS,this.MAX_TERMS]).range([16, 8])(count);
+    	var maxFontSize = d3.scale.pow().exponent(1/2)
+    		.domain([this.MIN_TERMS,this.MAX_TERMS]).range([20, 12])(count);
+    	var textSizer = d3.scale.pow().exponent(1/2)
+    		.domain([this.getMinRawFreq(),this.getMaxRawFreq()]).range([minFontSize, maxFontSize]);
+    	
     	// enter
-    	var g = nodes.enter().append('g')
+    	var node = nodes.enter().append('g')
     		.attr('class', 'node')
     		.style('visibility', function(d) { return d.depth > 0 ? 'visible' : 'hidden'; }) // hide root
-    		.attr('opacity', 1e-6)
     		.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
     		.on('mouseover', function(d, i) {
-    			me.resetCircles();
+    			me.getVis().selectAll('circle').style('stroke-width', 1).style('stroke', '#111')
+        			.style('fill', function(d) { return inDocsFill(d.inDocumentsCount); });
     			
     			d3.select(this).select('circle').style('fill', '#89e1c2');
     			
+    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')';
 				var tip = me.getTip();
-				tip.update('<b>'+d.term+'</b><br\>frequency: '+d.freq+'<br\>collocates: '+d.collocates.length);
+				tip.update(info);
 				tip.show();
 				
-				var fill = d3.scale
-					.pow().exponent(1/3)
-					.domain([0,me.getMaxCollocateValue()]).range(['#ffffff', '#bd3163']);
 				for (var i = 0; i < d.collocates.length; i++) {
 					var collocate = d.collocates[i];
-					me.getVis().selectAll('.node').filter(function(d) { return d.term === collocate.term; }).select('circle')
-						.style('fill', function(d) { return fill(collocate.value); })
-						.style('stroke-width', 2);
+					var match = me.getVis().selectAll('.node').filter(function(d) { return d.term === collocate.term; })
+					match.select('circle')
+						.style('fill', function(d) { return collocateFill(collocate.value); })
+						.style('stroke', '#314b8b')
+						.style('stroke-width', 3);
+					match.select('tspan.value').text(function(d) { return collocate.value; });
 				}
 			})
 			.on('mousemove', function() {
 				var container = Ext.get(me.getVisId()).dom;
 				var coords = d3.mouse(container);
-//				coords[1] += 40;
+				coords[1] += 20;
 				me.getTip().setPosition(coords);
 			})
 			.on('mouseout', function() {
-				me.resetCircles();
+				me.getVis().selectAll('circle').style('stroke-width', 1).style('stroke', '#111')
+	    			.style('fill', function(d) { return inDocsFill(d.inDocumentsCount); });
+				me.getVis().selectAll('tspan.value').text('');
 				me.getTip().hide();
+//				me.getVisInfo().text('');
 			});
-		g.append('circle')
+    	
+    	node.append('circle')
+    		.attr('id', function(d) { return d.term; })
 			.attr('r', function(d) { return d.r; })
-			.style('fill', '#ffffff')
-			.style('stroke', '#314b8b')
+			.style('fill', function(d) { return inDocsFill(d.inDocumentsCount); })
+			.style('stroke', '#111')
+			.style('stroke-opacity', 0.3)
 			.style('stroke-width', 1);
-		g.append('text')
-			.style('text-anchor', 'middle')
-			.text(function(d) { return d.term; });
+    	
+    	node.append('clipPath').attr('id', function(d) { return 'clip-' + d.term; })
+    		.append('use').attr('xlink:href', function(d) { return '#' + d.term; });
 		
-		g//.transition().duration(transDuration)
-		.attr('opacity', 1);
+    	var text = node.append('text')
+    		.attr('clip-path', function(d) { return 'url(#clip-' + d.term + ')'; })
+			.style('text-anchor', 'middle')
+			.style('cursor', 'default');
+		text.append('tspan')
+			.attr('class', 'term')
+			.style('font-size', function(d) { return textSizer(d.rawFreq); })
+			.attr('x', 0)
+			.attr('y', 0)
+			.text(function(d) { return d.term; });
+		text.append('tspan')
+			.attr('class', 'value')
+			.style('font-size', function(d) { return textSizer(d.rawFreq)-2; })
+			.attr('x', 0)
+			.attr('y', function(d) { return textSizer(d.rawFreq)+1; });
 		
 		// exit
-    	nodes.exit()//.transition().duration(transDuration)
-    	.style('opacity', 1e-6).remove();
+    	nodes.exit().remove();
 		
     },
     
-    resetCircles: function() {
-    	this.getVis().selectAll('circle').style('fill', '#ffffff').style('stroke-width', 1);
+    resetVis: function() {
+    	this.getVis().selectAll('.node').remove();
     },
     
     initVisLayout: function() {
@@ -261,16 +350,19 @@ Ext.define('Voyant.panel.TermsPack', {
     	var width = el.getWidth();
 		var height = el.getHeight();
 		
+		var me = this;
 		this.setVisLayout(
 			d3.layout.pack()
-				.sort(function(a, b) { return a.freq < b.freq ? 1 : a.freq > b.freq ? -1 : 0; })
+				.sort(function(a, b) { return a.rawFreq < b.rawFreq ? 1 : a.rawFreq > b.rawFreq ? -1 : 0; })
+				.value(function(d) { return Math.pow(d.rawFreq, 1/me.getScalingFactor()); })
 				.size([width, height])
 				.padding(1.5)
 		);
 		
 		var svg = d3.select(el.dom).append('svg').attr('id',this.getVisId()).attr('width', width).attr('height', height);
 		this.setVis(svg.append('g'));
-		this.setVisLabel(svg.append('text').attr('transform', 'translate(25, 25)'));
+		
+		this.setVisInfo(svg.append('text').attr('x', 10).attr('y', 10));
 		
 		if (this.getTip() === undefined) {
 			this.setTip(Ext.create('Ext.tip.Tip', {}));
