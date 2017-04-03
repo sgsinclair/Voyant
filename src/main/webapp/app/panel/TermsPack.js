@@ -7,7 +7,7 @@ Ext.define('Voyant.panel.TermsPack', {
     	},
     	api: {
     		stopList: 'auto',
-    		context: 3,
+    		context: 5,
     		query: undefined,
     		docIndex: undefined,
     		docId: undefined
@@ -115,6 +115,24 @@ Ext.define('Voyant.panel.TermsPack', {
 	            		scope: this
 	            	}
                 },{
+	                fieldLabel: this.localize('context'),
+	    			labelWidth: 50,
+	    			width: 120,
+	    			xtype: 'slider',
+	            	increment: 1,
+	            	minValue: 1,
+	            	maxValue: 30,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(this.getApiParam('context'));
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({context: newvalue});
+	            			this.doLoad();
+	            		},
+	            		scope: this
+	            	}
+                },{
 	                fieldLabel: this.localize('scaling'),
 	    			labelWidth: 50,
 	    			width: 120,
@@ -214,41 +232,21 @@ Ext.define('Voyant.panel.TermsPack', {
     },
     
     loadFromDocuments: function() {
-    	var limit = Math.round(this.getNumInitialTerms() / this.getCorpus().getDocumentsCount());
-    	
-    	var docRecords = {};
-    	this.getCorpus().getDocuments().each(function(item, index) {
-	    	this.getCorpus().getDocumentTerms().load({
-				addRecords: true,
-				params: {
-					docIndex: index,
-					limit: limit,
-					stopList: this.getApiParam('stopList'),
-					sort: 'TFIDF',
-					dir: 'DESC'
-				},
-				callback: function(records, operation, success) {
-					if (success) {
-						docRecords[index] = records;
-						var done = true;
-						for (var j = 0; j < this.getCorpus().getDocumentsCount(); j++) {
-							if (docRecords[j] === undefined) {
-								done = false;
-								break;
-							}
-						}
-						if (done) {
-							var doneRecords = [];
-							for (var key in docRecords) {
-								doneRecords = doneRecords.concat(docRecords[key]);
-							}
-							this.loadFromRecords(doneRecords);
-						}
-					}
-				},
-				scope: this
-	    	});
-    	}, this);
+    	this.getCorpus().getDocumentTerms().load({
+			addRecords: true,
+			params: {
+				limit: this.getNumInitialTerms(),
+				stopList: this.getApiParam('stopList'),
+				sort: 'TFIDF',
+				dir: 'DESC'
+			},
+			callback: function(records, operation, success) {
+				if (success) {
+					this.loadFromRecords(records);
+				}
+			},
+			scope: this
+    	});
     },
     
     loadFromRecords: function(records) {
@@ -357,8 +355,14 @@ Ext.define('Voyant.panel.TermsPack', {
     	var collocateFill = d3.scale.pow().exponent(1/3)
 			.domain([0,this.getMaxCollocateValue()]).range(['#ffffff', '#bd3163']);
     	
-    	var defaultFill = d3.scale.pow().exponent(1/3)
-    		.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#ddd']);
+    	var defaultFill;
+    	if (this.getMode() === this.MODE_DOCUMENT) {
+    		defaultFill = d3.scale.pow().exponent(1/3)
+    			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#ddd']);
+    	} else {
+    		defaultFill = d3.scale.linear()
+				.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#ddd']);
+    	}
     	
     	var count = nodes[0].length-1;
     	
@@ -378,7 +382,7 @@ Ext.define('Voyant.panel.TermsPack', {
     			me.getVis().selectAll('circle').style('stroke-width', 1).style('stroke', '#111')
         			.style('fill', function(d) { return defaultFill(d.inDocumentsCount); });
     			
-    			d3.select(this).select('circle').style('fill', '#89e1c2');
+    			d3.select(this).select('circle').style('fill', '#89e1c2').style('stroke', '#26926c').style('stroke-opacity', 1);
     			
     			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')';
 				var tip = me.getTip();
@@ -390,8 +394,8 @@ Ext.define('Voyant.panel.TermsPack', {
 					var match = me.getVis().selectAll('.node').filter(function(d) { return d.term === collocate.term; })
 					match.select('circle')
 						.style('fill', function(d) { return collocateFill(collocate.value); })
-						.style('stroke', '#314b8b')
-						.style('stroke-width', 3);
+						.style('stroke', '#bd3163')
+						.style('stroke-opacity', 1);
 					match.select('tspan.value').text(function(d) { return collocate.value; });
 				}
 			})
@@ -402,7 +406,7 @@ Ext.define('Voyant.panel.TermsPack', {
 				me.getTip().setPosition(coords);
 			})
 			.on('mouseout', function() {
-				me.getVis().selectAll('circle').style('stroke-width', 1).style('stroke', '#111')
+				me.getVis().selectAll('circle').style('stroke-opacity', 0.3).style('stroke', '#111')
 	    			.style('fill', function(d) { return defaultFill(d.fillValue); });
 				me.getVis().selectAll('tspan.value').text('');
 				me.getTip().hide();
