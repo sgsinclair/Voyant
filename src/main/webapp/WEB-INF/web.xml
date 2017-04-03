@@ -12,7 +12,7 @@
 	
 	<context-param>
 		<param-name>build</param-name>
-		<param-value>M1pr1</param-value>
+		<param-value>M1pr2</param-value>
 	</context-param>
 	
 	<servlet>
@@ -36,13 +36,13 @@
 	</servlet-mapping>
 	
 	<servlet-mapping>
-		<servlet-name>notebook</servlet-name>
-		<url-pattern>/notebook/*</url-pattern>
+		<servlet-name>spiral</servlet-name>
+		<url-pattern>/spiral/*</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
-		<servlet-name>notebook</servlet-name>
-		<jsp-file>/notebook/index.jsp</jsp-file>
+		<servlet-name>spiral</servlet-name>
+		<jsp-file>/spiral/index.jsp</jsp-file>
 	</servlet>
 	
 	<!-- this is to handle a bad URL in Hermeneutica the book -->

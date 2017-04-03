@@ -96,5 +96,5 @@
 	<% } 
 } %>
 
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=6<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=6&lang=<%= lang %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=9<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=9&lang=<%= lang %>"></script>
