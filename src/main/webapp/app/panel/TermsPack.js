@@ -23,9 +23,11 @@ Ext.define('Voyant.panel.TermsPack', {
     	collocatesLimit: 1000000, // a very large number so we get all of them
     	scalingFactor: 3,
     	
-    	minRawFreq: 1000000,
-    	maxRawFreq: -1,
-    	maxCollocateValue: -1,
+    	minRawFreq: undefined,
+    	maxRawFreq: undefined,
+    	maxCollocateValue: undefined,
+    	minFillValue: undefined,
+    	maxFillValue: undefined,
     	
     	currentData: undefined,
     	
@@ -49,6 +51,8 @@ Ext.define('Voyant.panel.TermsPack', {
     layout: 'fit',
     
     constructor: function(config) {
+    	this.setMode(this.MODE_CORPUS);
+    	
     	this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
@@ -62,9 +66,37 @@ Ext.define('Voyant.panel.TermsPack', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 overflowHandler: 'scroller',
-                items: [
-//                {xtype: 'corpusdocumentselector', singleSelect: true},
-                {
+                items: [{
+                	xtype: 'button',
+                	text: this.localize('strategy'),
+                	menu: {
+	                	items: [{
+	                		xtype: 'menucheckitem',
+	                		group: 'strategy',
+	                		checked: this.getMode() === this.MODE_CORPUS,
+	                		text: this.localize('topTerms'),
+	                		checkHandler: function(item, checked) {
+	                			if (checked) {
+	                				this.setMode(this.MODE_CORPUS);
+	                				this.doLoad();
+	                			}
+	                		},
+	                		scope: this
+	                	},{
+	                		xtype: 'menucheckitem',
+	                		group: 'strategy',
+	                		checked: this.getMode() === this.MODE_DOCUMENT,
+	                		text: this.localize('distinctTerms'),
+	                		checkHandler: function(item, checked) {
+	                			if (checked) {
+	                				this.setMode(this.MODE_DOCUMENT);
+	                				this.doLoad();
+	                			}
+	                		},
+	                		scope: this
+	                	}]
+                	}
+                },{
 	                fieldLabel: this.localize('numTerms'),
 	    			labelWidth: 50,
 	    			width: 120,
@@ -77,9 +109,8 @@ Ext.define('Voyant.panel.TermsPack', {
 	            			slider.setValue(this.getNumInitialTerms());
 	            		},
 	            		changecomplete: function(slider, newvalue) {
-	            			this.resetVis();
 	            			this.setNumInitialTerms(newvalue);
-	            			this.loadFromCorpus(this.getCorpus());
+	            			this.doLoad();
 	            		},
 	            		scope: this
 	            	}
@@ -139,20 +170,42 @@ Ext.define('Voyant.panel.TermsPack', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
-    		this.loadFromCorpus(corpus);
+    		this.doLoad();
     	}
     },
     
-    loadFromCorpus: function(corpus) {
+    doLoad: function() {
+		this.resetVis();
+		this.resetMinMax();
+		this.setCurrentData({});
+    	if (this.getMode() === this.MODE_DOCUMENT) {
+    		this.loadFromDocuments();
+    	} else {
+    		this.loadFromCorpus();
+    	}
+    },
+    
+    resetMinMax: function() {
+    	this.setMinRawFreq(undefined);
+    	this.setMaxRawFreq(undefined);
+    	this.setMaxCollocateValue(undefined);
+    	this.setMinFillValue(undefined);
+    	this.setMaxFillValue(undefined);
+    },
+    
+    resetVis: function() {
+    	this.getVis().selectAll('.node').remove();
+    },
+    
+    loadFromCorpus: function() {
     	this.setApiParams({docId: undefined, docIndex: undefined});
-    	corpus.getCorpusTerms().load({
+    	this.getCorpus().getCorpusTerms().load({
     		params: {
  				limit: this.getNumInitialTerms(),
  				stopList: this.getApiParam('stopList')
  			},
 		    callback: function(records, operation, success) {
 		    	if (success) {
-		    		this.setCurrentData({});
 		    		this.loadFromRecords(records);
 		    	}
 		    },
@@ -160,23 +213,67 @@ Ext.define('Voyant.panel.TermsPack', {
     	});
     },
     
+    loadFromDocuments: function() {
+    	var limit = Math.round(this.getNumInitialTerms() / this.getCorpus().getDocumentsCount());
+    	
+    	var docRecords = {};
+    	this.getCorpus().getDocuments().each(function(item, index) {
+	    	this.getCorpus().getDocumentTerms().load({
+				addRecords: true,
+				params: {
+					docIndex: index,
+					limit: limit,
+					stopList: this.getApiParam('stopList'),
+					sort: 'TFIDF',
+					dir: 'DESC'
+				},
+				callback: function(records, operation, success) {
+					if (success) {
+						docRecords[index] = records;
+						var done = true;
+						for (var j = 0; j < this.getCorpus().getDocumentsCount(); j++) {
+							if (docRecords[j] === undefined) {
+								done = false;
+								break;
+							}
+						}
+						if (done) {
+							var doneRecords = [];
+							for (var key in docRecords) {
+								doneRecords = doneRecords.concat(docRecords[key]);
+							}
+							this.loadFromRecords(doneRecords);
+						}
+					}
+				},
+				scope: this
+	    	});
+    	}, this);
+    },
+    
     loadFromRecords: function(records) {
     	if (Ext.isArray(records) && records.length>0) {
     		var maxFreq = this.getMaxRawFreq();
     		var minFreq = this.getMinRawFreq();
+    		var minFillVal = this.getMinFillValue();
+    		var maxFillVal = this.getMaxFillValue();
     		var terms = [];
     		records.forEach(function(r) {
     			var term = r.getTerm();
     			var rawFreq = r.getRawFreq();
+    			var fillVal = this.getMode() === this.MODE_DOCUMENT ? r.get('tfidf') : r.getInDocumentsCount();
     			
-    			if (rawFreq > maxFreq) maxFreq = rawFreq;
-    			if (rawFreq < minFreq) minFreq = rawFreq;
+    			if (maxFreq === undefined || rawFreq > maxFreq) maxFreq = rawFreq;
+    			if (minFreq === undefined || rawFreq < minFreq) minFreq = rawFreq;
+    			
+    			if (maxFillVal === undefined || fillVal > maxFillVal) maxFillVal = fillVal;
+    			if (minFillVal === undefined || fillVal < minFillVal) minFillVal = fillVal;
     			
     			this.getCurrentData()[term] = {
     				term: term,
     				rawFreq: rawFreq,
     				relativeFreq: r.get('relativeFreq'),//r.getRelativeFreq(),
-    				inDocumentsCount: r.getInDocumentsCount(),
+    				fillValue: fillVal,
     				collocates: []
     			};
     			
@@ -185,6 +282,8 @@ Ext.define('Voyant.panel.TermsPack', {
     		
     		this.setMaxRawFreq(maxFreq);
     		this.setMinRawFreq(minFreq);
+    		this.setMinFillValue(minFillVal);
+    		this.setMaxFillValue(maxFillVal);
     		
     		this.loadFromQuery(terms);
     	}
@@ -217,7 +316,7 @@ Ext.define('Voyant.panel.TermsPack', {
 			var contextTerm = r.getContextTerm();
 			var contextFreq = r.getContextTermRawFreq();
 			
-			if (contextFreq > maxCol) {
+			if (maxCol === undefined || contextFreq > maxCol) {
 				maxCol = contextFreq;
 			}
 			
@@ -236,14 +335,16 @@ Ext.define('Voyant.panel.TermsPack', {
     	
     	var data = [];
     	for (var term in currentTerms) {
-    		data.push(currentTerms[term]);
+    		if (currentTerms[term].collocates.length > 0) {
+    			data.push(currentTerms[term]);
+    		}
     	}
     	return data;
     },
     
     buildVisFromData: function(data) {
     	// compute node xy
-    	var processedData = this.getVisLayout().nodes({children: data, collocates:[], term: null, rawFreq: 0});
+    	var processedData = this.getVisLayout().nodes({children: data, collocates:[], term: '', rawFreq: 1});
     	// join nodes with data
     	var nodes = this.getVis().selectAll('.node').data(processedData, function(d) { return d.term; } ); // use term as key
     	
@@ -256,8 +357,8 @@ Ext.define('Voyant.panel.TermsPack', {
     	var collocateFill = d3.scale.pow().exponent(1/3)
 			.domain([0,this.getMaxCollocateValue()]).range(['#ffffff', '#bd3163']);
     	
-    	var inDocsFill = d3.scale.linear()
-			.domain([2,this.getCorpus().getDocumentsCount()]).range(['#fff', '#ddd']);
+    	var defaultFill = d3.scale.pow().exponent(1/3)
+    		.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#ddd']);
     	
     	var count = nodes[0].length-1;
     	
@@ -275,7 +376,7 @@ Ext.define('Voyant.panel.TermsPack', {
     		.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
     		.on('mouseover', function(d, i) {
     			me.getVis().selectAll('circle').style('stroke-width', 1).style('stroke', '#111')
-        			.style('fill', function(d) { return inDocsFill(d.inDocumentsCount); });
+        			.style('fill', function(d) { return defaultFill(d.inDocumentsCount); });
     			
     			d3.select(this).select('circle').style('fill', '#89e1c2');
     			
@@ -302,7 +403,7 @@ Ext.define('Voyant.panel.TermsPack', {
 			})
 			.on('mouseout', function() {
 				me.getVis().selectAll('circle').style('stroke-width', 1).style('stroke', '#111')
-	    			.style('fill', function(d) { return inDocsFill(d.inDocumentsCount); });
+	    			.style('fill', function(d) { return defaultFill(d.fillValue); });
 				me.getVis().selectAll('tspan.value').text('');
 				me.getTip().hide();
 //				me.getVisInfo().text('');
@@ -311,7 +412,7 @@ Ext.define('Voyant.panel.TermsPack', {
     	node.append('circle')
     		.attr('id', function(d) { return d.term; })
 			.attr('r', function(d) { return d.r; })
-			.style('fill', function(d) { return inDocsFill(d.inDocumentsCount); })
+			.style('fill', function(d) { return defaultFill(d.fillValue); })
 			.style('stroke', '#111')
 			.style('stroke-opacity', 0.3)
 			.style('stroke-width', 1);
@@ -338,10 +439,6 @@ Ext.define('Voyant.panel.TermsPack', {
 		// exit
     	nodes.exit().remove();
 		
-    },
-    
-    resetVis: function() {
-    	this.getVis().selectAll('.node').remove();
     },
     
     initVisLayout: function() {
