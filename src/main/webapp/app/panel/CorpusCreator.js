@@ -22,8 +22,12 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		tableContent: undefined,
     		tableTitle: undefined,
     		tableAuthor: undefined,
-    		corpusTitle: undefined,
-    		corpusSubTitle: undefined
+    		title: undefined,
+    		subTitle: undefined,
+    		inputRemoveFrom: undefined,
+    		inputRemoveFromAfter: undefined,
+    		inputRemoveUntil: undefined,
+    		inputRemoveUntilAfter: undefined
     	}
     },
     
@@ -286,7 +290,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
             	view.unmask();
 				if (action.result) {
 					var corpusParams = {corpus: action.result.corpus ? action.result.corpus.metadata.id : action.result.stepEnabledCorpusCreator.storedId};
-					Ext.apply(corpusParams, apiParams); // adding corpusTitle & corpusSubTitle here
+					Ext.apply(corpusParams, apiParams); // adding title & subTitle here
 					
 					this.setCorpus(undefined)
 					this.loadCorpus(corpusParams);
@@ -357,10 +361,35 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    							width: 375
 	                            },{
 									fieldLabel: me.localize('corpusTitle'),
-									name: 'corpusTitle'
+									name: 'title'
 								},{
 									fieldLabel: me.localize('corpusSubTitle'),
-									name: 'corpusSubTitle'
+									name: 'subTitle'
+								}
+							]
+						},{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-text' target='voyantdocs'>"+me.localize('textOptions')+"</a>",
+	                        collapsible: true,
+	                        collapsed: true,
+	                        defaultType: 'textfield',
+	                        items: [
+	                            {
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("textOptionsText")+'</i></p>',
+	    							width: 375
+	                            },{
+									fieldLabel: me.localize('inputRemoveUntil'),
+									name: 'inputRemoveUntil'
+								},{
+									fieldLabel: me.localize('inputRemoveUntilAfter'),
+									name: 'inputRemoveUntilAfter'
+								},{
+									fieldLabel: me.localize('inputRemoveFrom'),
+									name: 'inputRemoveFrom'
+								},{
+									fieldLabel: me.localize('inputRemoveFromAfter'),
+									name: 'inputRemoveFromAfter'
 								}
 							]
 						},{
