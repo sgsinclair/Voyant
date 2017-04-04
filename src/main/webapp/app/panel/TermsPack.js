@@ -29,7 +29,7 @@ Ext.define('Voyant.panel.TermsPack', {
     	minFillValue: undefined,
     	maxFillValue: undefined,
     	
-    	currentData: undefined,
+    	currentData: {},
     	
     	visLayout: undefined,
     	vis: undefined,
@@ -39,19 +39,22 @@ Ext.define('Voyant.panel.TermsPack', {
     	tip: undefined
 	},
     
-	MODE_CORPUS: 'corpus',
-    MODE_DOCUMENT: 'document',
+	MODE_TOP: 'top',
+    MODE_DISTINCT: 'distinct',
     
     MIN_TERMS: 5,
     MAX_TERMS: 500,
     
     MIN_SCALING: 1,
     MAX_SCALING: 5,
+    
+    MIN_STROKE_OPACITY: 0.1,
+	MAX_STROKE_OPACITY: 0.3,
 	
     layout: 'fit',
     
     constructor: function(config) {
-    	this.setMode(this.MODE_CORPUS);
+    	this.setMode(this.MODE_TOP);
     	
     	this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -73,11 +76,11 @@ Ext.define('Voyant.panel.TermsPack', {
 	                	items: [{
 	                		xtype: 'menucheckitem',
 	                		group: 'strategy',
-	                		checked: this.getMode() === this.MODE_CORPUS,
+	                		checked: this.getMode() === this.MODE_TOP,
 	                		text: this.localize('topTerms'),
 	                		checkHandler: function(item, checked) {
 	                			if (checked) {
-	                				this.setMode(this.MODE_CORPUS);
+	                				this.setMode(this.MODE_TOP);
 	                				this.doLoad();
 	                			}
 	                		},
@@ -85,11 +88,11 @@ Ext.define('Voyant.panel.TermsPack', {
 	                	},{
 	                		xtype: 'menucheckitem',
 	                		group: 'strategy',
-	                		checked: this.getMode() === this.MODE_DOCUMENT,
+	                		checked: this.getMode() === this.MODE_DISTINCT,
 	                		text: this.localize('distinctTerms'),
 	                		checkHandler: function(item, checked) {
 	                			if (checked) {
-	                				this.setMode(this.MODE_DOCUMENT);
+	                				this.setMode(this.MODE_DISTINCT);
 	                				this.doLoad();
 	                			}
 	                		},
@@ -182,8 +185,10 @@ Ext.define('Voyant.panel.TermsPack', {
     			this.getVisLayout().size([width, height]);
     			
     			var data = this.processRecordsForVis([]);
-    			this.resetVis();
-    			this.buildVisFromData(data);
+    			if (data.length > 0) {
+	    			this.resetVis();
+	    			this.buildVisFromData(data);
+    			}
     		}
     	},
     	
@@ -196,10 +201,10 @@ Ext.define('Voyant.panel.TermsPack', {
 		this.resetVis();
 		this.resetMinMax();
 		this.setCurrentData({});
-    	if (this.getMode() === this.MODE_DOCUMENT) {
-    		this.loadFromDocuments();
+    	if (this.getMode() === this.MODE_DISTINCT) {
+    		this.getDistinctTerms();
     	} else {
-    		this.loadFromCorpus();
+    		this.getTopTerms();
     	}
     },
     
@@ -215,7 +220,7 @@ Ext.define('Voyant.panel.TermsPack', {
     	this.getVis().selectAll('.node').remove();
     },
     
-    loadFromCorpus: function() {
+    getTopTerms: function() {
     	this.setApiParams({docId: undefined, docIndex: undefined});
     	this.getCorpus().getCorpusTerms().load({
     		params: {
@@ -231,11 +236,13 @@ Ext.define('Voyant.panel.TermsPack', {
     	});
     },
     
-    loadFromDocuments: function() {
+    getDistinctTerms: function() {
+    	var perDocLimit = Math.ceil(this.getNumInitialTerms() / this.getCorpus().getDocumentsCount()); // ceil ensures there's at least 1 per doc
     	this.getCorpus().getDocumentTerms().load({
 			addRecords: true,
 			params: {
 				limit: this.getNumInitialTerms(),
+				perDocLimit: perDocLimit,
 				stopList: this.getApiParam('stopList'),
 				sort: 'TFIDF',
 				dir: 'DESC'
@@ -259,7 +266,7 @@ Ext.define('Voyant.panel.TermsPack', {
     		records.forEach(function(r) {
     			var term = r.getTerm();
     			var rawFreq = r.getRawFreq();
-    			var fillVal = this.getMode() === this.MODE_DOCUMENT ? r.get('tfidf') : r.getInDocumentsCount();
+    			var fillVal = this.getMode() === this.MODE_DISTINCT ? r.get('tfidf') : r.getInDocumentsCount();
     			
     			if (maxFreq === undefined || rawFreq > maxFreq) maxFreq = rawFreq;
     			if (minFreq === undefined || rawFreq < minFreq) minFreq = rawFreq;
@@ -352,25 +359,35 @@ Ext.define('Voyant.panel.TermsPack', {
     	
     	var me = this;
     	
+    	var idGet = function(term) {
+    		return term.replace(/\W/g, '_'); // remove non-word characters to create valid DOM ids
+    	};
+    	
     	var collocateFill = d3.scale.pow().exponent(1/3)
-			.domain([0,this.getMaxCollocateValue()]).range(['#ffffff', '#bd3163']);
+			.domain([0,this.getMaxCollocateValue()]).range(['#fff', '#bd3163']);
     	
     	var defaultFill;
-    	if (this.getMode() === this.MODE_DOCUMENT) {
+    	if (this.getMode() === this.MODE_DISTINCT) {
     		defaultFill = d3.scale.pow().exponent(1/3)
-    			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#ddd']);
+    			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#eee']);
     	} else {
     		defaultFill = d3.scale.linear()
-				.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#ddd']);
+				.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#eee']);
     	}
     	
-    	var count = nodes[0].length-1;
-    	
-    	var minFontSize = d3.scale.pow().exponent(1/2)
-    		.domain([this.MIN_TERMS,this.MAX_TERMS]).range([16, 8])(count);
-    	var maxFontSize = d3.scale.pow().exponent(1/2)
-    		.domain([this.MIN_TERMS,this.MAX_TERMS]).range([20, 12])(count);
-    	var textSizer = d3.scale.pow().exponent(1/2)
+    	// roughly calculate font size based on available area and number of terms
+    	var size = this.getVisLayout().size();
+    	var layoutRadius = Math.min(size[0], size[1]) / 2;
+    	var layoutArea = Math.PI*(layoutRadius*layoutRadius);
+    	var totalTerms = nodes[0].length-1;
+    	var termArea = layoutArea / totalTerms;
+    	var termRadius = Math.sqrt(termArea / Math.PI);
+    	var minFontSize = termRadius / 3;
+    	var scalingInverse = Math.abs(this.getScalingFactor()-(this.MAX_SCALING+1));
+    	scalingInverse = Math.max(1, scalingInverse-1); // substract one to avoid too large fonts
+    	var maxFontSize = minFontSize * scalingInverse;
+
+    	var textSizer = d3.scale.linear()//pow().exponent(1/2)
     		.domain([this.getMinRawFreq(),this.getMaxRawFreq()]).range([minFontSize, maxFontSize]);
     	
     	// enter
@@ -378,13 +395,21 @@ Ext.define('Voyant.panel.TermsPack', {
     		.attr('class', 'node')
     		.style('visibility', function(d) { return d.depth > 0 ? 'visible' : 'hidden'; }) // hide root
     		.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
+    		.on('click', function(d) {
+    			me.dispatchEvent('termsClicked', me, [d.term]);
+    		})
     		.on('mouseover', function(d, i) {
-    			me.getVis().selectAll('circle').style('stroke-width', 1).style('stroke', '#111')
+    			me.getVis().selectAll('circle')
+    				.style('stroke-width', 1)
+    				.style('stroke', '#111')
         			.style('fill', function(d) { return defaultFill(d.inDocumentsCount); });
     			
-    			d3.select(this).select('circle').style('fill', '#89e1c2').style('stroke', '#26926c').style('stroke-opacity', 1);
+    			d3.select(this).select('circle')
+    				.style('fill', '#89e1c2')
+    				.style('stroke', '#26926c')
+    				.style('stroke-opacity', me.MAX_STROKE_OPACITY);
     			
-    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')';
+    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')<br/>'+d.fillValue;
 				var tip = me.getTip();
 				tip.update(info);
 				tip.show();
@@ -395,7 +420,7 @@ Ext.define('Voyant.panel.TermsPack', {
 					match.select('circle')
 						.style('fill', function(d) { return collocateFill(collocate.value); })
 						.style('stroke', '#bd3163')
-						.style('stroke-opacity', 1);
+						.style('stroke-opacity', me.MAX_STROKE_OPACITY);
 					match.select('tspan.value').text(function(d) { return collocate.value; });
 				}
 			})
@@ -406,7 +431,7 @@ Ext.define('Voyant.panel.TermsPack', {
 				me.getTip().setPosition(coords);
 			})
 			.on('mouseout', function() {
-				me.getVis().selectAll('circle').style('stroke-opacity', 0.3).style('stroke', '#111')
+				me.getVis().selectAll('circle').style('stroke-opacity', me.MIN_STROKE_OPACITY).style('stroke', '#111')
 	    			.style('fill', function(d) { return defaultFill(d.fillValue); });
 				me.getVis().selectAll('tspan.value').text('');
 				me.getTip().hide();
@@ -414,29 +439,29 @@ Ext.define('Voyant.panel.TermsPack', {
 			});
     	
     	node.append('circle')
-    		.attr('id', function(d) { return d.term; })
+    		.attr('id', function(d) { return idGet(d.term); })
 			.attr('r', function(d) { return d.r; })
 			.style('fill', function(d) { return defaultFill(d.fillValue); })
 			.style('stroke', '#111')
-			.style('stroke-opacity', 0.3)
+			.style('stroke-opacity', me.MIN_STROKE_OPACITY)
 			.style('stroke-width', 1);
     	
-    	node.append('clipPath').attr('id', function(d) { return 'clip-' + d.term; })
-    		.append('use').attr('xlink:href', function(d) { return '#' + d.term; });
+    	node.append('clipPath').attr('id', function(d) { return 'clip-' + idGet(d.term); })
+    		.append('use').attr('xlink:href', function(d) { return '#' + idGet(d.term); });
 		
     	var text = node.append('text')
-    		.attr('clip-path', function(d) { return 'url(#clip-' + d.term + ')'; })
+    		.attr('clip-path', function(d) { return 'url(#clip-' + idGet(d.term) + ')'; })
 			.style('text-anchor', 'middle')
 			.style('cursor', 'default');
 		text.append('tspan')
 			.attr('class', 'term')
 			.style('font-size', function(d) { return textSizer(d.rawFreq); })
 			.attr('x', 0)
-			.attr('y', 0)
+			.attr('y', function(d) { return textSizer(d.rawFreq)/4; })
 			.text(function(d) { return d.term; });
 		text.append('tspan')
 			.attr('class', 'value')
-			.style('font-size', function(d) { return textSizer(d.rawFreq)-2; })
+			.style('font-size', function(d) { return textSizer(d.rawFreq)*0.75; })
 			.attr('x', 0)
 			.attr('y', function(d) { return textSizer(d.rawFreq)+1; });
 		
