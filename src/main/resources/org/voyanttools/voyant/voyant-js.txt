@@ -110,6 +110,7 @@ app/panel/StreamGraph.js
 app/panel/Summary.js
 app/panel/TextualArc.js
 app/panel/TopicContexts.js
+app/panel/TermsBerry.js
 app/panel/TermsRadio.js
 app/panel/Trends.js
 app/panel/NoTool.js
@@ -124,7 +125,6 @@ app/panel/CustomSet.js
 app/panel/Veliza.js
 app/panel/WordTree.js
 app/panel/Topics.js
-app/panel/TermsPack.js
 
 # APPS
 app/VoyantApp.js

@@ -1,7 +1,7 @@
-Ext.define('Voyant.panel.TermsPack', {
+Ext.define('Voyant.panel.TermsBerry', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
-	alias: 'widget.termspack',
+	alias: 'widget.termsberry',
     statics: {
     	i18n: {
     	},
