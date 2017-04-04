@@ -392,6 +392,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "created":"Byl vytvořen",
 "isEmpty":"je prázdný",
 "widthNwordsAndNTypes":"a skládá se celkem z {words} <span class=\"info-tip\" data-qtip=\"počítá se každý výskyt každého slova (jako např. vícenásobné výskyty slova &quot;tento&quot;)\">slov (tokenů)</span> a {types} <span class=\"info-tip\" data-qtip=\"vícenásobné výskyty slov (jako např. &quot;tento&quot;) jsou počítány jen jednou\">unikátních slovních forem (typů)</span>",
+"noCorpusOrInput":"No corpus ID or input specified.",
 "hoursAgo":"asi před {count} hodinami",
 "minutesAgo":"asi před {count} minutami",
 "minuteAgo":"asi před minutou",
@@ -402,6 +403,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "yearsAgo":"asi před {count} lety",
 "secondAgo":"asi před vteřinou",
 "now":"nyní",
+"badDataTypeCorpus":"Unable to recognize a valid data type for this corpus: ",
 "yearAgo":"asi před rokem",
 "secondsAgo":"asi před {count} vteřinami",
 "dayAgo":"asi před jedním dnem"});

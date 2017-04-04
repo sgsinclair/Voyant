@@ -392,6 +392,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "created":"إنشاء",
 "isEmpty":"فارغ",
 "widthNwordsAndNTypes":"عند {words} <span class=\"info-tip\" data-qtip= \"يتم عد كل ظهور لكلمة ما مرة واحدة\" >total words</span> and {types} <span class=\"info-tip\" data-qtip= كما تعد الكلمات المتكررة (like &quot;the&quot;) مرة واحدة \">unique word forms</span>",
+"noCorpusOrInput":"No corpus ID or input specified.",
 "hoursAgo":"منذ  حوالي عدد من الساعات : {count}",
 "minutesAgo":"منذ  حوالي عدد من الدقائق : {count}",
 "minuteAgo":"منذ حوالي دقيقة",
@@ -402,6 +403,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "yearsAgo":"منذ  حوالي عدد من السنوات : {count}",
 "secondAgo":"منذ حوالي ثانية",
 "now":"الآن",
+"badDataTypeCorpus":"Unable to recognize a valid data type for this corpus: ",
 "yearAgo":"منذ حوالي سنة",
 "secondsAgo":"منذ  حوالي عدد من الثوان : {count}",
 "dayAgo":"منذ حوالي يوم"});

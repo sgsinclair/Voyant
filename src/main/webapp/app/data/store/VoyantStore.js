@@ -44,6 +44,7 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			listeners: {
 				exception: function(proxy, request, operation) {
 					if (me.parentPanel && me.parentPanel.showError) {
+						// FIXME: this should probably send the request, not the operation
 						me.parentPanel.showError(operation)
 					}
 				}

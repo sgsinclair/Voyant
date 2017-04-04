@@ -106,7 +106,7 @@ Ext.define('Voyant.panel.Veliza', {
     		    	}
     		    },
     		    failure: function(response, opts) {
-    		    	me.showError(response);
+    		    	me.showResponseError("Unable to get response from Veliza.", response);
     		    }
     		})
     	}

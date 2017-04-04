@@ -102,7 +102,7 @@ Ext.define('Voyant.panel.Catalogue', {
     		            		    },
     		            		    failure: function(response, opts) {
     		            		    	catalogue.unmask();
-    		            		    	me.showError(response);
+    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
     		            		    }
     		            		})
 
@@ -130,7 +130,7 @@ Ext.define('Voyant.panel.Catalogue', {
     		            		    },
     		            		    failure: function(response, opts) {
     		            		    	catalogue.unmask();
-    		            		    	me.showError(response);
+    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
     		            		    }
     		            		})
 

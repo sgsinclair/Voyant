@@ -40,6 +40,8 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Spanish (es)	Rus
 2016-04-25	Voyant.util.Downloadable	exportTitle	Export	Exporter	Esporta					Eksport	Експорт	Eksport	エクスポート	ייצוא	Exportovat	تصدير 	
 2016-04-25	Voyant.util.Downloadable	downloadButton	Download	Télécharger	Download					Preuzimanje	Преузимање	Preuzimanje	ダウンロード	הורדה	Stáhnout	تحميل	
 2016-04-25	Voyant.util.Downloadable	cancelButton	Cancel	Annuler	Elimina					Poništite izbor	Поништите избор	Poništite izbor	キャンセル	ביטול	Zrušit	إلغاء	
+2017-04-03	Voyant.data.model.Corpus	badDataTypeCorpus	Unable to recognize a valid data type for this corpus: 	Le type de données de ce corpus n'est pas reconnu : 													
+2017-04-03	Voyant.data.model.Corpus	noCorpusOrInput	No corpus ID or input specified.	Il faut fournir un identifiant de corpus ou une source de documents.													
 2016-04-25	Voyant.data.model.Corpus	failedCreateCorpus	Failed attempt to create a Corpus.	La création du corpus a échoué.	Tentativo fallito di creare un Corpus.					Neuspjeli pokušaj stvaranja korpusa	Неуспешан покушај стварања корпуса	Neuspješan pokušaj stvaranja korpusa	コーパスの生成に失敗しました	נסיון כושל ליצירת קורפוס	Pokus vytvořit korpus se nezdařil.	محاولة فاشلة لإنشاء مكنز	
 2016-04-25	Voyant.data.model.Corpus	thisCorpus	This corpus	Ce corpus	Questo corpus					Ovaj korpus	Овај корпус	Ovaj korpus	このコーパス	קורפוס זה	Tento korpus	المكنز الحالي	
 2016-04-25	Voyant.data.model.Corpus	isEmpty	is empty	est vide	è vuoto					je prazan	је празан	je prazan	は空です。	ריק	je prázdný	فارغ	

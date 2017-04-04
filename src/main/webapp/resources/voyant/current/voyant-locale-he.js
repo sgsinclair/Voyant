@@ -392,6 +392,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "created":"Created",
 "isEmpty":"ריק",
 "widthNwordsAndNTypes":"with {words} <span class=\"info-tip\" data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted\">total words</span> and {types} <span class=\"info-tip\" data-qtip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">unique word forms</span>",
+"noCorpusOrInput":"No corpus ID or input specified.",
 "hoursAgo":"לפני כ-{} ימים",
 "minutesAgo":"לפני כ-{} דקות",
 "minuteAgo":"לפני כדקה",
@@ -402,6 +403,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "yearsAgo":"לפני כ-{} שנים",
 "secondAgo":"לפני כשנייה",
 "now":"כעת",
+"badDataTypeCorpus":"Unable to recognize a valid data type for this corpus: ",
 "yearAgo":"לפני כשנה",
 "secondsAgo":"לפני כ-{} שניות",
 "dayAgo":"לפני כיום"});

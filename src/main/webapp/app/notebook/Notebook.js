@@ -300,7 +300,7 @@ Ext.define('Voyant.notebook.Notebook', {
     		 me.loadBlocksFromString(data.notebook.jsonData, isRun);
     	 },
     	 function(response, opts) {
-    		 me.showError(response);
+    		 me.showResponseError("Unable to load specified notebook: "+url, response);
     		 me.unmask();
     		 me.loadData()
     	 });

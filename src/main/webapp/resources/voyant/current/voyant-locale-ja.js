@@ -392,6 +392,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "created":"生成されたのは",
 "isEmpty":"は空です。",
 "widthNwordsAndNTypes":"のべ語数 {words} <span class=\"info-tip\" data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted\">語</span>、異なり語数 {types} <span class=\"info-tip\" data-qtip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">語</span>",
+"noCorpusOrInput":"No corpus ID or input specified.",
 "hoursAgo":"およそ {count}  時間前",
 "minutesAgo":"およそ {count}  分前",
 "minuteAgo":"およそ1分前",
@@ -402,6 +403,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "yearsAgo":"およそ {count} 年前",
 "secondAgo":"およそ1秒前",
 "now":"現在",
+"badDataTypeCorpus":"Unable to recognize a valid data type for this corpus: ",
 "yearAgo":"およそ1年前",
 "secondsAgo":" {count}  秒前",
 "dayAgo":"およそ1日前"});

@@ -392,6 +392,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "created":"Kreirano",
 "isEmpty":"je prazan",
 "widthNwordsAndNTypes":"sa {words} <span class=\"info-tip\" data-qtip=\"svako pojavljivanje svake riječi (kao naprimjer višestruka pojavljivanja &quot;the&quot;) se broji\"> ukupno riječi </span> i {types} <span class=\"info-tip\" data-qtip=\"višestruka pojavljivanja riječi (kao &quot;the&quot;) se broje jednom\">jedinstveni oblici riječi </span>",
+"noCorpusOrInput":"No corpus ID or input specified.",
 "hoursAgo":"otprilike prije {} sat-a/i",
 "minutesAgo":"otprilike prije {} minut-e/i",
 "minuteAgo":"otprilike prije jedne minute",
@@ -402,6 +403,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "yearsAgo":"otprilike prije {} godin-e/a/u",
 "secondAgo":"otprilike prije jedne sekunde",
 "now":"sada",
+"badDataTypeCorpus":"Unable to recognize a valid data type for this corpus: ",
 "yearAgo":"otprilike prije godinu dana",
 "secondsAgo":"prije {} sekund-e/i",
 "dayAgo":"otprilike prije jednog dana"});

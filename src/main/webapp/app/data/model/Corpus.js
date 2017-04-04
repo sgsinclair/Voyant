@@ -106,24 +106,52 @@ Ext.define('Voyant.data.model.Corpus', {
 	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
 	 * Corpus as an argument, as per the example above).
 	 */
-	constructor : function(config) {
+	constructor : function(source, config) {
 		
+		source = source || {};
 		config = config || {};
 				
 		this.callParent([]); // only send config, not source
-		if (config) {
-			
-			if (Ext.isString(config) || Ext.isArray(config)) {
-				if (Ext.isString(config) && /\s/.test(config)==false && config.indexOf(":")==-1) {
-					config = {corpus: config};
-				} else {
-					config = {input: config};
-				}
+		
+		var dfd = Voyant.application.getDeferred(this);
+		
+		if (Ext.isString(source)) { // a string could be a corpus ID or an input string (text or URL)
+			if (/\s/.test(source)==false && source.indexOf(":")==-1) { // looks like a corpus ID
+				Ext.apply(config, {
+					corpus: source
+				});
+				config = {corpus: config};
+			} else { // looks like input (text or URL)
+				Ext.apply(config, {
+					input: source
+				});
 			}
-
+		} else if (Ext.isArray(source)) { // assume we have an array of texts or URLs
+			Ext.apply(config, {
+				input: source
+			});
+		} else if (Ext.isObject(source)) { // copy the source to the config
+			Ext.apply(config, source);
+		} else {
+			Voyant.application.showError(this.localize("badDataTypeCorpus")+": ("+ (typeof source)+") "+source);
+			Ext.defer(function() {
+				dfd.reject(this.localize("badDataTypeCorpus")+": ("+ (typeof source)+") "+source)
+			}, 50, this);
+			return dfd.promise;
+		}
+		
+		if (Ext.isObject(config)) {
+			
+			if (!config.corpus && !config.input) {
+				Voyant.application.showError(this.localize("noCorpusOrInput")+": "+config);
+				Ext.defer(function() {
+					dfd.reject(this.localize("noCorpusOrInput")+": "+config)
+				}, 50, this);
+				return dfd.promise;
+			}
+			
 			Ext.apply(config, {tool: 'corpus.CorpusMetadata'})
 
-			var dfd = Voyant.application.getDeferred(this);
 			var me = this;
 			var promise = Ext.Ajax.request({
 				url: Voyant.application.getTromboneUrl(),
@@ -193,6 +221,12 @@ Ext.define('Voyant.data.model.Corpus', {
 				}
 			})
 			return dfd.promise
+		} else {
+			Voyant.application.showError(this.localize("badDataTypeCorpus")+": ("+ (typeof config)+") "+config);
+			Ext.defer(function() {
+				dfd.reject(this.localize("badDataTypeCorpus")+": ("+ (typeof config)+") "+config)
+			}, 50, this);
+			return dfd.promise;
 		}
 	},
 	

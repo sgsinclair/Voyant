@@ -36,7 +36,7 @@ Ext.define('Voyant.widget.Facet', {
     			parentPanel: this
     		})
     		this.store.getProxy().on("exception", function(proxy, request, operation, eOpts) {
-    			me.showError(Ext.create("Voyant.util.ResponseError", {response: request}));
+		    	me.showResponseError("Unable to fetch facet: "+me.facet, response);
     		})
     	}
     	

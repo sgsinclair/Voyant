@@ -392,6 +392,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "created":"Creato",
 "isEmpty":"è vuoto",
 "widthNwordsAndNTypes":"con {words} <span class=\"info-tip\" data-qtip=\"ogni occorrenza di ogni parola (come le occorrenze multiple di &quot;the&quot;) viene contata\">totale parole</span> e con {types} <span class=\"info-tip\" data-qtip=\"le occorrenze multiple di parole (come &quot;the&quot;) sono contate una volta sola\">forme di parola uniche</span>",
+"noCorpusOrInput":"No corpus ID or input specified.",
 "hoursAgo":"circa {count} ore fa",
 "minutesAgo":"circa {count} minuti fa",
 "minuteAgo":"circa un minuto fa",
@@ -402,6 +403,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "yearsAgo":"circa {count} anni fa",
 "secondAgo":"circa un secondo fa",
 "now":"ora",
+"badDataTypeCorpus":"Unable to recognize a valid data type for this corpus: ",
 "yearAgo":"circa un anno fa",
 "secondsAgo":"{count} secondi fa",
 "dayAgo":"circa un giorno fa"});

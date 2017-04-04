@@ -392,6 +392,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "created":"Il a été créé",
 "isEmpty":"est vide",
 "widthNwordsAndNTypes":"{words} <span class=\"info-tip\" data-qtip=\"Toutes les occurrences de chaque mot (par exemple les diverses occurrences de «&nbsp;la&nbsp;») sont dénombrées.\">mots</span> et {types} <span class=\"info-tip\" data-qtip=\"Les diverses occurrences d’un mot (par exemple celles de «&nbsp;la&nbsp;») ne comptent que pour une seule forme verbale.\">formes verbales uniques</span>",
+"noCorpusOrInput":"Il faut fournir un identifiant de corpus ou une source de documents.",
 "hoursAgo":"il y a environ {count} heures",
 "minutesAgo":"il y a environ {count} minutes",
 "minuteAgo":"il y a environ une minute",
@@ -402,6 +403,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "yearsAgo":"il y a environ {count} années",
 "secondAgo":"il y a environ une seconde",
 "now":"maintenant",
+"badDataTypeCorpus":"Le type de données de ce corpus n'est pas reconnu : ",
 "yearAgo":"il y a environ un an",
 "secondsAgo":"il y a {count} secondes",
 "dayAgo":"il y a environ un jour"});

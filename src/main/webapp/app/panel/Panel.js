@@ -106,6 +106,10 @@ Ext.define('Voyant.panel.Panel', {
 		this.getApplication().showError(config, response)
 	},
 	
+	showResponseError: function(config, response) {
+		this.getApplication().showResponseError(config, response)
+	},
+	
 	toastError: function(config) {
 		if (Ext.isString(config)) {
 			config = {html: config}

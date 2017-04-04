@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Mar 31 22:28:53 EDT 2017 */
+/* This file created by JSCacher. Last modified: Mon Apr 03 22:27:52 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6368,6 +6368,7 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			listeners: {
 				exception: function(proxy, request, operation) {
 					if (me.parentPanel && me.parentPanel.showError) {
+						// FIXME: this should probably send the request, not the operation
 						me.parentPanel.showError(operation)
 					}
 				}
@@ -7210,24 +7211,52 @@ Ext.define('Voyant.data.model.Corpus', {
 	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
 	 * Corpus as an argument, as per the example above).
 	 */
-	constructor : function(config) {
+	constructor : function(source, config) {
 		
+		source = source || {};
 		config = config || {};
 				
 		this.callParent([]); // only send config, not source
-		if (config) {
-			
-			if (Ext.isString(config) || Ext.isArray(config)) {
-				if (Ext.isString(config) && /\s/.test(config)==false && config.indexOf(":")==-1) {
-					config = {corpus: config};
-				} else {
-					config = {input: config};
-				}
+		
+		var dfd = Voyant.application.getDeferred(this);
+		
+		if (Ext.isString(source)) { // a string could be a corpus ID or an input string (text or URL)
+			if (/\s/.test(source)==false && source.indexOf(":")==-1) { // looks like a corpus ID
+				Ext.apply(config, {
+					corpus: source
+				});
+				config = {corpus: config};
+			} else { // looks like input (text or URL)
+				Ext.apply(config, {
+					input: source
+				});
 			}
-
+		} else if (Ext.isArray(source)) { // assume we have an array of texts or URLs
+			Ext.apply(config, {
+				input: source
+			});
+		} else if (Ext.isObject(source)) { // copy the source to the config
+			Ext.apply(config, source);
+		} else {
+			Voyant.application.showError(this.localize("badDataTypeCorpus")+": ("+ (typeof source)+") "+source);
+			Ext.defer(function() {
+				dfd.reject(this.localize("badDataTypeCorpus")+": ("+ (typeof source)+") "+source)
+			}, 50, this);
+			return dfd.promise;
+		}
+		
+		if (Ext.isObject(config)) {
+			
+			if (!config.corpus && !config.input) {
+				Voyant.application.showError(this.localize("noCorpusOrInput")+": "+config);
+				Ext.defer(function() {
+					dfd.reject(this.localize("noCorpusOrInput")+": "+config)
+				}, 50, this);
+				return dfd.promise;
+			}
+			
 			Ext.apply(config, {tool: 'corpus.CorpusMetadata'})
 
-			var dfd = Voyant.application.getDeferred(this);
 			var me = this;
 			var promise = Ext.Ajax.request({
 				url: Voyant.application.getTromboneUrl(),
@@ -7297,6 +7326,12 @@ Ext.define('Voyant.data.model.Corpus', {
 				}
 			})
 			return dfd.promise
+		} else {
+			Voyant.application.showError(this.localize("badDataTypeCorpus")+": ("+ (typeof config)+") "+config);
+			Ext.defer(function() {
+				dfd.reject(this.localize("badDataTypeCorpus")+": ("+ (typeof config)+") "+config)
+			}, 50, this);
+			return dfd.promise;
 		}
 	},
 	
@@ -9236,6 +9271,10 @@ Ext.define('Voyant.panel.Panel', {
 		this.getApplication().showError(config, response)
 	},
 	
+	showResponseError: function(config, response) {
+		this.getApplication().showResponseError(config, response)
+	},
+	
 	toastError: function(config) {
 		if (Ext.isString(config)) {
 			config = {html: config}
@@ -10246,7 +10285,7 @@ Ext.define('Voyant.panel.Catalogue', {
     		            		    },
     		            		    failure: function(response, opts) {
     		            		    	catalogue.unmask();
-    		            		    	me.showError(response);
+    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
     		            		    }
     		            		})
 
@@ -24337,9 +24376,11 @@ Ext.define('Voyant.panel.TermsPack', {
     	collocatesLimit: 1000000, // a very large number so we get all of them
     	scalingFactor: 3,
     	
-    	minRawFreq: 1000000,
-    	maxRawFreq: -1,
-    	maxCollocateValue: -1,
+    	minRawFreq: undefined,
+    	maxRawFreq: undefined,
+    	maxCollocateValue: undefined,
+    	minFillValue: undefined,
+    	maxFillValue: undefined,
     	
     	currentData: undefined,
     	
@@ -24363,6 +24404,8 @@ Ext.define('Voyant.panel.TermsPack', {
     layout: 'fit',
     
     constructor: function(config) {
+    	this.setMode(this.MODE_CORPUS);
+    	
     	this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
@@ -24376,9 +24419,37 @@ Ext.define('Voyant.panel.TermsPack', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 overflowHandler: 'scroller',
-                items: [
-//                {xtype: 'corpusdocumentselector', singleSelect: true},
-                {
+                items: [{
+                	xtype: 'button',
+                	text: this.localize('strategy'),
+                	menu: {
+	                	items: [{
+	                		xtype: 'menucheckitem',
+	                		group: 'strategy',
+	                		checked: this.getMode() === this.MODE_CORPUS,
+	                		text: this.localize('topTerms'),
+	                		checkHandler: function(item, checked) {
+	                			if (checked) {
+	                				this.setMode(this.MODE_CORPUS);
+	                				this.doLoad();
+	                			}
+	                		},
+	                		scope: this
+	                	},{
+	                		xtype: 'menucheckitem',
+	                		group: 'strategy',
+	                		checked: this.getMode() === this.MODE_DOCUMENT,
+	                		text: this.localize('distinctTerms'),
+	                		checkHandler: function(item, checked) {
+	                			if (checked) {
+	                				this.setMode(this.MODE_DOCUMENT);
+	                				this.doLoad();
+	                			}
+	                		},
+	                		scope: this
+	                	}]
+                	}
+                },{
 	                fieldLabel: this.localize('numTerms'),
 	    			labelWidth: 50,
 	    			width: 120,
@@ -24391,9 +24462,8 @@ Ext.define('Voyant.panel.TermsPack', {
 	            			slider.setValue(this.getNumInitialTerms());
 	            		},
 	            		changecomplete: function(slider, newvalue) {
-	            			this.resetVis();
 	            			this.setNumInitialTerms(newvalue);
-	            			this.loadFromCorpus(this.getCorpus());
+	            			this.doLoad();
 	            		},
 	            		scope: this
 	            	}
@@ -24453,20 +24523,42 @@ Ext.define('Voyant.panel.TermsPack', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
-    		this.loadFromCorpus(corpus);
+    		this.doLoad();
     	}
     },
     
-    loadFromCorpus: function(corpus) {
+    doLoad: function() {
+		this.resetVis();
+		this.resetMinMax();
+		this.setCurrentData({});
+    	if (this.getMode() === this.MODE_DOCUMENT) {
+    		this.loadFromDocuments();
+    	} else {
+    		this.loadFromCorpus();
+    	}
+    },
+    
+    resetMinMax: function() {
+    	this.setMinRawFreq(undefined);
+    	this.setMaxRawFreq(undefined);
+    	this.setMaxCollocateValue(undefined);
+    	this.setMinFillValue(undefined);
+    	this.setMaxFillValue(undefined);
+    },
+    
+    resetVis: function() {
+    	this.getVis().selectAll('.node').remove();
+    },
+    
+    loadFromCorpus: function() {
     	this.setApiParams({docId: undefined, docIndex: undefined});
-    	corpus.getCorpusTerms().load({
+    	this.getCorpus().getCorpusTerms().load({
     		params: {
  				limit: this.getNumInitialTerms(),
  				stopList: this.getApiParam('stopList')
  			},
 		    callback: function(records, operation, success) {
 		    	if (success) {
-		    		this.setCurrentData({});
 		    		this.loadFromRecords(records);
 		    	}
 		    },
@@ -24474,23 +24566,67 @@ Ext.define('Voyant.panel.TermsPack', {
     	});
     },
     
+    loadFromDocuments: function() {
+    	var limit = Math.round(this.getNumInitialTerms() / this.getCorpus().getDocumentsCount());
+    	
+    	var docRecords = {};
+    	this.getCorpus().getDocuments().each(function(item, index) {
+	    	this.getCorpus().getDocumentTerms().load({
+				addRecords: true,
+				params: {
+					docIndex: index,
+					limit: limit,
+					stopList: this.getApiParam('stopList'),
+					sort: 'TFIDF',
+					dir: 'DESC'
+				},
+				callback: function(records, operation, success) {
+					if (success) {
+						docRecords[index] = records;
+						var done = true;
+						for (var j = 0; j < this.getCorpus().getDocumentsCount(); j++) {
+							if (docRecords[j] === undefined) {
+								done = false;
+								break;
+							}
+						}
+						if (done) {
+							var doneRecords = [];
+							for (var key in docRecords) {
+								doneRecords = doneRecords.concat(docRecords[key]);
+							}
+							this.loadFromRecords(doneRecords);
+						}
+					}
+				},
+				scope: this
+	    	});
+    	}, this);
+    },
+    
     loadFromRecords: function(records) {
     	if (Ext.isArray(records) && records.length>0) {
     		var maxFreq = this.getMaxRawFreq();
     		var minFreq = this.getMinRawFreq();
+    		var minFillVal = this.getMinFillValue();
+    		var maxFillVal = this.getMaxFillValue();
     		var terms = [];
     		records.forEach(function(r) {
     			var term = r.getTerm();
     			var rawFreq = r.getRawFreq();
+    			var fillVal = this.getMode() === this.MODE_DOCUMENT ? r.get('tfidf') : r.getInDocumentsCount();
     			
-    			if (rawFreq > maxFreq) maxFreq = rawFreq;
-    			if (rawFreq < minFreq) minFreq = rawFreq;
+    			if (maxFreq === undefined || rawFreq > maxFreq) maxFreq = rawFreq;
+    			if (minFreq === undefined || rawFreq < minFreq) minFreq = rawFreq;
+    			
+    			if (maxFillVal === undefined || fillVal > maxFillVal) maxFillVal = fillVal;
+    			if (minFillVal === undefined || fillVal < minFillVal) minFillVal = fillVal;
     			
     			this.getCurrentData()[term] = {
     				term: term,
     				rawFreq: rawFreq,
     				relativeFreq: r.get('relativeFreq'),//r.getRelativeFreq(),
-    				inDocumentsCount: r.getInDocumentsCount(),
+    				fillValue: fillVal,
     				collocates: []
     			};
     			
@@ -24499,6 +24635,8 @@ Ext.define('Voyant.panel.TermsPack', {
     		
     		this.setMaxRawFreq(maxFreq);
     		this.setMinRawFreq(minFreq);
+    		this.setMinFillValue(minFillVal);
+    		this.setMaxFillValue(maxFillVal);
     		
     		this.loadFromQuery(terms);
     	}
@@ -24531,7 +24669,7 @@ Ext.define('Voyant.panel.TermsPack', {
 			var contextTerm = r.getContextTerm();
 			var contextFreq = r.getContextTermRawFreq();
 			
-			if (contextFreq > maxCol) {
+			if (maxCol === undefined || contextFreq > maxCol) {
 				maxCol = contextFreq;
 			}
 			
@@ -24550,14 +24688,16 @@ Ext.define('Voyant.panel.TermsPack', {
     	
     	var data = [];
     	for (var term in currentTerms) {
-    		data.push(currentTerms[term]);
+    		if (currentTerms[term].collocates.length > 0) {
+    			data.push(currentTerms[term]);
+    		}
     	}
     	return data;
     },
     
     buildVisFromData: function(data) {
     	// compute node xy
-    	var processedData = this.getVisLayout().nodes({children: data, collocates:[], term: null, rawFreq: 0});
+    	var processedData = this.getVisLayout().nodes({children: data, collocates:[], term: '', rawFreq: 1});
     	// join nodes with data
     	var nodes = this.getVis().selectAll('.node').data(processedData, function(d) { return d.term; } ); // use term as key
     	
@@ -24570,8 +24710,8 @@ Ext.define('Voyant.panel.TermsPack', {
     	var collocateFill = d3.scale.pow().exponent(1/3)
 			.domain([0,this.getMaxCollocateValue()]).range(['#ffffff', '#bd3163']);
     	
-    	var inDocsFill = d3.scale.linear()
-			.domain([2,this.getCorpus().getDocumentsCount()]).range(['#fff', '#ddd']);
+    	var defaultFill = d3.scale.pow().exponent(1/3)
+    		.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#ddd']);
     	
     	var count = nodes[0].length-1;
     	
@@ -24589,7 +24729,7 @@ Ext.define('Voyant.panel.TermsPack', {
     		.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
     		.on('mouseover', function(d, i) {
     			me.getVis().selectAll('circle').style('stroke-width', 1).style('stroke', '#111')
-        			.style('fill', function(d) { return inDocsFill(d.inDocumentsCount); });
+        			.style('fill', function(d) { return defaultFill(d.inDocumentsCount); });
     			
     			d3.select(this).select('circle').style('fill', '#89e1c2');
     			
@@ -24616,7 +24756,7 @@ Ext.define('Voyant.panel.TermsPack', {
 			})
 			.on('mouseout', function() {
 				me.getVis().selectAll('circle').style('stroke-width', 1).style('stroke', '#111')
-	    			.style('fill', function(d) { return inDocsFill(d.inDocumentsCount); });
+	    			.style('fill', function(d) { return defaultFill(d.fillValue); });
 				me.getVis().selectAll('tspan.value').text('');
 				me.getTip().hide();
 //				me.getVisInfo().text('');
@@ -24625,7 +24765,7 @@ Ext.define('Voyant.panel.TermsPack', {
     	node.append('circle')
     		.attr('id', function(d) { return d.term; })
 			.attr('r', function(d) { return d.r; })
-			.style('fill', function(d) { return inDocsFill(d.inDocumentsCount); })
+			.style('fill', function(d) { return defaultFill(d.fillValue); })
 			.style('stroke', '#111')
 			.style('stroke-opacity', 0.3)
 			.style('stroke-width', 1);
@@ -24652,10 +24792,6 @@ Ext.define('Voyant.panel.TermsPack', {
 		// exit
     	nodes.exit().remove();
 		
-    },
-    
-    resetVis: function() {
-    	this.getVis().selectAll('.node').remove();
     },
     
     initVisLayout: function() {
@@ -24803,49 +24939,26 @@ Ext.define('Voyant.VoyantApp', {
 	},
 	
 	showError: function(config, response) {
-		if (Ext.isString(config)) {
-			config = {message: config}
-		}
-		if (!response && (config.error || config.responseText || config instanceof Voyant.util.ResponseError)) {
-			response = config;
-		}
-		if (response) {
-			config = config || {};
-			config.message = (config.message || "");
-			if (response.error) {
-				var err = "";
-				if (typeof response.error == 'string') { // not sure when this is the actual error
-					err = response.error; 
-				} else if (response.error.response.responseText && typeof response.error.response.responseText == 'string') {
-					err = response.error.response.responseText;
-				}
-				var lines = err.split(/(\r\n|\r|\n)/);
-				if (lines.length>0) {
-					config.message=this.localize('serverResponseError'); // assuming this is a server error
-					config.message += "<pre class='error'>\n"+lines[0]+"</p>";
-					if (lines.length>1) {
-						config.message+="…  <a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(err)+"</pre>')); return false;\">more</a></pre>";
-					}
-					config.message+="</pre>";
+		debugger
+		if (config instanceof Voyant.util.ResponseError) {
+			config = {
+				message: config.getMsg()+"<p class='error'>\n"+config.getError()+" … "+
+					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(config.getDetails())+"</pre>')); return false;\">more</a></p>"
+			}
+		} else {
+			if (Ext.isString(config)) {
+				config = {message: config}
+			} else if (Ext.isObject(config)) {
+				debugger
+				if (config.responseText) {
+					// rebundle as error (without nice message)
+					return this.showResponseError(config.statusText, config);
 				}
 			}
-			if (response.responseText) {
-				config.message +=
-					"<pre class='error'>\n"+response.responseText.substring(0,response.responseText.indexOf("\n\t"))+"… "+
-					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.responseText)+"</pre>')); return false;\">more</a></pre>"
-			}
+			// maybe handle other forms
 		}
-//		if (config.statusText && config.responseText) {
-//			return this.showResponseError({}, config);
-//		}
-//		if (config instanceof Voyant.util.ResponseError) {
-//			var response = config.getResponse();
-//			Ext.apply(config, {
-//				message: config.getMsg()+" "+this.localize('serverResponseError')+
-//					"<pre class='error'>\n"+response.responseText.substring(0,response.responseText.indexOf("\n\t"))+"… "+
-//					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(response.responseText)+"</pre>')); return false;\">more</a></pre>"
-//			})
-//		}
+		
+
 		Ext.applyIf(config, {
 			title: this.localize("error"),
 		    buttons: Ext.Msg.OK,
