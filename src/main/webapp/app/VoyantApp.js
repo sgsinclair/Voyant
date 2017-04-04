@@ -118,7 +118,6 @@ Ext.define('Voyant.VoyantApp', {
 	},
 	
 	showError: function(config, response) {
-		debugger
 		if (config instanceof Voyant.util.ResponseError) {
 			config = {
 				message: config.getMsg()+"<p class='error'>\n"+config.getError()+" … "+
@@ -128,7 +127,6 @@ Ext.define('Voyant.VoyantApp', {
 			if (Ext.isString(config)) {
 				config = {message: config}
 			} else if (Ext.isObject(config)) {
-				debugger
 				if (config.responseText) {
 					// rebundle as error (without nice message)
 					return this.showResponseError(config.statusText, config);
