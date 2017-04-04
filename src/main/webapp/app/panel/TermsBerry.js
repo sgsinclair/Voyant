@@ -4,6 +4,13 @@ Ext.define('Voyant.panel.TermsBerry', {
 	alias: 'widget.termsberry',
     statics: {
     	i18n: {
+    		title: 'TermsBerry',
+    		strategy: 'Strategy',
+    		topTerms: 'Top Terms',
+    		distinctTerms: 'Distinct Terms',
+    		numTerms: 'Terms',
+    		context: 'Context',
+    		scaling: 'Scaling'
     	},
     	api: {
     		stopList: 'auto',
@@ -102,6 +109,7 @@ Ext.define('Voyant.panel.TermsBerry', {
                 },{
 	                fieldLabel: this.localize('numTerms'),
 	    			labelWidth: 50,
+	    			labelAlign: 'right',
 	    			width: 120,
 	    			xtype: 'slider',
 	            	increment: 1,
@@ -120,6 +128,7 @@ Ext.define('Voyant.panel.TermsBerry', {
                 },{
 	                fieldLabel: this.localize('context'),
 	    			labelWidth: 50,
+	    			labelAlign: 'right',
 	    			width: 120,
 	    			xtype: 'slider',
 	            	increment: 1,
@@ -138,6 +147,7 @@ Ext.define('Voyant.panel.TermsBerry', {
                 },{
 	                fieldLabel: this.localize('scaling'),
 	    			labelWidth: 50,
+	    			labelAlign: 'right',
 	    			width: 120,
 	    			xtype: 'slider',
 	            	increment: 1,
