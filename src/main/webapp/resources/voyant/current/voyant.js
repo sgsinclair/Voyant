@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Apr 04 14:58:27 EDT 2017 */
+/* This file created by JSCacher. Last modified: Tue Apr 04 15:42:47 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7133,10 +7133,8 @@ Ext.define('Voyant.data.table.CorpusTerms', {
  * - **formats**:
  * 	- **Text**: {@link #inputRemoveFrom}, {@link #inputRemoveFromAfter}, {@link #inputRemoveUntil}, {@link #inputRemoveUntilAfter}
  * 	- **XML**: {@link #xmlAuthorXpath}, {@link #xmlCollectionXpath}, {@link #xmlContentXpath}, {@link #xmlExtraMetadataXpath}, {@link #xmlKeywordXpath}, {@link #xmlPubPlaceXpath}, {@link #xmlPublisherXpath}, {@link #xmlTitleXpath}
- * 	- **Tables**: tableAuthor, tableContent, tableDocuments, tableNoHeadersRow, tableTitle
- * - **other**: {@link #inputFormat}, {@link #title}, {@link #subTitle}, {@link #tokenization}
- * 
- * Other parameters: corpus, input
+ * 	- **Tables**: {@link #tableAuthor}, {@link #tableContent}, {@link #tableDocuments}, {@link #tableNoHeadersRow}, {@link #tableTitle}
+ * - **other**: {@link #inputFormat}, {@link #subTitle}, {@link #title}, {@link #tokenization}
  */
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
@@ -7210,6 +7208,98 @@ Ext.define('Voyant.data.model.Corpus', {
     	 * - **XML**: treat the document as XML (sometimes overridding auto-detect of XML vocabularies like RSS and TEI)
     	 * 
     	 * Other formats include **PDF**, **MSWORD**, **XLSX**, **RTF**, **ODT**, and **ZIP** (but again, these rarely need to be specified).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableDocuments Determine what is a document in a table (the entire table, by row, by column); only used for table-based documents.
+    	 * 
+    	 * Possible values are:
+    	 * 
+    	 * - **undefined or blank** (default): the entire table is one document
+    	 * - **rows**: each row of the table is a separate document
+    	 * - **columns**: each column of the table is a separate document
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableContent Determine how to extract body content from the table; only used for table-based documents.
+    	 * 
+    	 * Columns are referred to by numbers, the first is column 1 (not 0).
+    	 * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    	 * 
+    	 * Some examples:
+    	 * 
+    	 * - **1**: use column 1
+    	 * - **1,2**: use columns 1 and 2 separately
+    	 * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableAuthor Determine how to extract the author from each document; only used for table-based documents.
+    	 * 
+    	 * Columns are referred to by numbers, the first is column 1 (not 0).
+    	 * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    	 * 
+    	 * Some examples:
+    	 * 
+    	 * - **1**: use column 1
+    	 * - **1,2**: use columns 1 and 2 separately
+    	 * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableTitle Determine how to extract the title from each document; only used for table-based documents.
+    	 * 
+    	 * Columns are referred to by numbers, the first is column 1 (not 0).
+    	 * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    	 * 
+    	 * Some examples:
+    	 * 
+    	 * - **1**: use column 1
+    	 * - **1,2**: use columns 1 and 2 separately
+    	 * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableContent Determine how to extract body content from the table; only used for table-based documents.
+    	 * 
+    	 * Columns are referred to by numbers, the first is column 1 (not 0).
+    	 * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    	 * 
+    	 * Some examples:
+    	 * 
+    	 * - **1**: use column 1
+    	 * - **1,2**: use columns 1 and 2 separately
+    	 * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableNoHeadersRow Determine if the table has a first row of headers; only used for table-based documents.
+    	 * 
+    	 * Provide a value of "true" if there is no header row, otherwise leave it blank or undefined (default).
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tokenization The tokenization strategy to use
+    	 * 
+    	 * This should usually be undefined, unless specific behaviour is required. These are the valid values:
+    	 * 
+    	 * - **undefined or blank**: use the default tokenization (which uses Unicode rules for word segmentation)
+    	 * - **wordBoundaries**: use any Unicode character word boundaries for tokenization
+    	 * - **whitespace**: tokenize by whitespace only (punctuation and other characters will be kept with words)
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tokenization).
     	 */
     	
     	/**
@@ -12963,6 +13053,31 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								},{
 									fieldLabel: me.localize('corpusSubTitle'),
 									name: 'corpusSubTitle'
+								}
+							]
+						},{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-text' target='voyantdocs'>"+me.localize('textOptions')+"</a>",
+	                        collapsible: true,
+	                        collapsed: true,
+	                        defaultType: 'textfield',
+	                        items: [
+	                            {
+	    							xtype: 'container',
+	    							html: '<p><i>'+me.localize("textOptionsText")+'</i></p>',
+	    							width: 375
+	                            },{
+									fieldLabel: me.localize('inputRemoveUntil'),
+									name: 'inputRemoveUntil'
+								},{
+									fieldLabel: me.localize('inputRemoveUntilAfter'),
+									name: 'inputRemoveUntilAfter'
+								},{
+									fieldLabel: me.localize('inputRemoveFrom'),
+									name: 'inputRemoveFrom'
+								},{
+									fieldLabel: me.localize('inputRemoveFromAfter'),
+									name: 'inputRemoveFromAfter'
 								}
 							]
 						},{

@@ -300,7 +300,7 @@ Ext.define('Voyant.data.model.Corpus', {
     	 */
 
     	/**
-    	 * @cfg {String} inputRemoveUntil Omit text up until the start of the matching text sequence (this is ignored in XML-based documents).
+    	 * @cfg {String} inputRemoveUntil Omit text up until the start of the matching regular expression (this is ignored in XML-based documents).
     	 * 
     	 * 		new Corpus("Hello world! This is Voyant!", {
     	 * 			 inputRemoveUntil: "This"
@@ -308,7 +308,7 @@ Ext.define('Voyant.data.model.Corpus', {
     	 */
     	
     	/**
-    	 * @cfg {String} inputRemoveUntilAfter Omit text up until the end of the matching text sequence (this is ignored in XML-based documents).
+    	 * @cfg {String} inputRemoveUntilAfter Omit text up until the end of the matching regular expression (this is ignored in XML-based documents).
     	 * 
     	 * 		new Corpus("Hello world! This is Voyant!", {
     	 * 			 inputRemoveUntilAfter: "world!"
@@ -316,7 +316,7 @@ Ext.define('Voyant.data.model.Corpus', {
     	 */
     	
     	/**
-    	 * @cfg {String} inputRemoveFrom Omit text from the start of the matching text sequence (this is ignored in XML-based documents).
+    	 * @cfg {String} inputRemoveFrom Omit text from the start of the matching regular expression (this is ignored in XML-based documents).
     	 * 
     	 * 		new Corpus("Hello world! This is Voyant!", {
     	 * 			 inputRemoveFrom: "This"
@@ -324,7 +324,7 @@ Ext.define('Voyant.data.model.Corpus', {
     	 */
     	
     	/**
-    	 * @cfg {String} inputRemoveFromAfter Omit text from the end of the matching text sequence (this is ignored in XML-based documents).
+    	 * @cfg {String} inputRemoveFromAfter Omit text from the end of the matching regular expression (this is ignored in XML-based documents).
     	 * 
     	 * 		new Corpus("Hello world! This is Voyant!", {
     	 * 			 inputRemoveFromAfter: "world!"
@@ -440,15 +440,15 @@ Ext.define('Voyant.data.model.Corpus', {
 			}).then(function(response) {
 				me.set(Ext.JSON.decode(response.responseText).corpus.metadata);
 				var rId = 'titles-'+me.getId();
-				if (config.corpusTitle || config.corpusSubTitle) {
+				if (config.title || config.subTitle) {
 					// store title and subTitle until they become part of metadata
-					me.set('title', config.corpusTitle);
-					me.set('subTitle', config.corpusSubTitle);
+					me.set('title', config.title);
+					me.set('subTitle', config.subTitle);
 					Ext.Ajax.request({
 			    	    url: Voyant.application.getTromboneUrl(),
 			    	    params: {
 			        		tool: 'resource.StoredResource',
-			    			storeResource: Ext.encode({title: config.corpusTitle, subTitle: config.corpusSubTitle}),
+			    			storeResource: Ext.encode({title: config.title, subTitle: config.subTitle}),
 			    			resourceId: rId
 			    	    }
 			    	});
