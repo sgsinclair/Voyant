@@ -21,6 +21,15 @@
  * 	new Corpus("Hello Voyant!").then(function(corpus) {
  * 		corpus.show(); // essentially the same as above (but more work:)
  * 	});
+ * 
+ * There are many parameters that can be specified when creating a corpus:
+ * 
+ * - **sources**: {@link #corpus}, {@link #input}
+ * - **formats**:
+ * 	- **Text**: {@link #inputRemoveFrom}, {@link #inputRemoveFromAfter}, {@link #inputRemoveUntil}, {@link #inputRemoveUntilAfter}
+ * 	- **XML**: {@link #xmlAuthorXpath}, {@link #xmlCollectionXpath}, {@link #xmlContentXpath}, {@link #xmlExtraMetadataXpath}, {@link #xmlKeywordXpath}, {@link #xmlPubPlaceXpath}, {@link #xmlPublisherXpath}, {@link #xmlTitleXpath}
+ * 	- **Tables**: {@link #tableAuthor}, {@link #tableContent}, {@link #tableDocuments}, {@link #tableNoHeadersRow}, {@link #tableTitle}
+ * - **other**: {@link #inputFormat}, {@link #subTitle}, {@link #title}, {@link #tokenization}
  */
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
@@ -36,32 +45,304 @@ Ext.define('Voyant.data.model.Corpus', {
     	 * @cfg {String} corpus The ID of a previously created corpus.
     	 * 
     	 * A corpus ID can be used to try to retrieve a corpus that has been previously created.
+    	 * Typically the corpus ID is used as a first string argument, with an optional second
+    	 * argument for other parameters (especially those to recreate the corpus if needed).
     	 * 
-    	 * This is especially useful if the input sources are long strings, local files, or content
-    	 * that's otherwise difficult or impossible to recreate.
+    	 * 		new Corpus("goldbug");
     	 * 
-    	 * Note that it's possible to also specify input sources as a fall-back if the corpus
-    	 * is no longer available in Voyant.
-    	 * 
-    	 * 		new Corpus({
-    	 * 			corpus: "some.long.corpus.id.generated.by.voyant",
-    	 * 			input: "http://hermeneuti.ca/" // use this as a fallback 
+    	 * 		new Corpus("goldbug", {
+    	 *			// if corpus ID "goldbug" isn't found, use the input
+    	 * 			input: "https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt",
+    	 * 			inputRemoveUntil: 'THE GOLD-BUG',
+    	 * 			inputRemoveFrom: 'FOUR BEASTS IN ONE'
     	 * 		});
     	 */
     	
     	/**
     	 * @cfg {String/String[]} input Input sources for the corpus.
     	 * 
-    	 * The input sources can be either normal text or URLs (starting with `http`):
+    	 * The input sources can be either normal text or URLs (starting with `http`).
     	 * 
-    	 * 		input: "Hello Voyant!" // one document with this string
+    	 * Typically input sources are specified as a string or an array in the first argument, with an optional second argument for other parameters.
     	 * 
-    	 * 		input: ["Hello Voyant!", "How are you?"] // two documents with these strings
+    	 * 		new Corpus("Hello Voyant!"); // one document with this string
     	 * 
-    	 * 		input: "http://hermeneuti.ca/" // one document from URL
+    	 * 		new Corpus(["Hello Voyant!", "How are you?"]); // two documents with these strings
     	 * 
-    	 * 		input: ["Hello Voyant!", "http://hermeneuti.ca/"] // two documents, one from string and one from URL
+    	 * 		new Corpus("http://hermeneuti.ca/"); // one document from URL
+    	 * 
+    	 * 		new Corpus(["http://hermeneuti.ca/", "https://en.wikipedia.org/wiki/Voyant_Tools"]); // two documents from URLs
+    	 * 
+    	 * 		new Corpus("Hello Voyant!", "http://hermeneuti.ca/"]); // two documents, one from string and one from URL
+    	 * 
+    	 * 		new Corpus("https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt", {
+    	 * 			inputRemoveUntil: 'THE GOLD-BUG',
+    	 * 			inputRemoveFrom: 'FOUR BEASTS IN ONE'
+    	 * 		});
+    	 * 
+    	 * 		// use a corpus ID but also specify an input source if the corpus can't be found
+    	 * 		new Corpus("goldbug", {
+    	 * 			input: "https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt",
+    	 * 			inputRemoveUntil: 'THE GOLD-BUG',
+    	 * 			inputRemoveFrom: 'FOUR BEASTS IN ONE'
+    	 * 		});
     	 */
+    	
+    	/**
+    	 * @cfg {String} inputFormat The input format of the corpus (the default is to auto-detect).
+    	 * 
+    	 * The auto-detect format is usually reliable and inputFormat should only be used if the default
+    	 * behaviour isn't desired. Most of the relevant values are used for XML documents:
+    	 * 
+    	 * - **DTOC**: Dynamic Table of Contexts XML format
+    	 * - **HTML**: Hypertext Markup Language
+    	 * - **RSS**: Really Simple Syndication XML format
+    	 * - **TEI**: Text Encoding Initiative XML format
+    	 * - **TEICORPUS**: Text Encoding Initiative Corpus XML format
+    	 * - **TEXT**: plain text
+    	 * - **XML**: treat the document as XML (sometimes overridding auto-detect of XML vocabularies like RSS and TEI)
+    	 * 
+    	 * Other formats include **PDF**, **MSWORD**, **XLSX**, **RTF**, **ODT**, and **ZIP** (but again, these rarely need to be specified).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableDocuments Determine what is a document in a table (the entire table, by row, by column); only used for table-based documents.
+    	 * 
+    	 * Possible values are:
+    	 * 
+    	 * - **undefined or blank** (default): the entire table is one document
+    	 * - **rows**: each row of the table is a separate document
+    	 * - **columns**: each column of the table is a separate document
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableContent Determine how to extract body content from the table; only used for table-based documents.
+    	 * 
+    	 * Columns are referred to by numbers, the first is column 1 (not 0).
+    	 * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    	 * 
+    	 * Some examples:
+    	 * 
+    	 * - **1**: use column 1
+    	 * - **1,2**: use columns 1 and 2 separately
+    	 * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableAuthor Determine how to extract the author from each document; only used for table-based documents.
+    	 * 
+    	 * Columns are referred to by numbers, the first is column 1 (not 0).
+    	 * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    	 * 
+    	 * Some examples:
+    	 * 
+    	 * - **1**: use column 1
+    	 * - **1,2**: use columns 1 and 2 separately
+    	 * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableTitle Determine how to extract the title from each document; only used for table-based documents.
+    	 * 
+    	 * Columns are referred to by numbers, the first is column 1 (not 0).
+    	 * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    	 * 
+    	 * Some examples:
+    	 * 
+    	 * - **1**: use column 1
+    	 * - **1,2**: use columns 1 and 2 separately
+    	 * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableContent Determine how to extract body content from the table; only used for table-based documents.
+    	 * 
+    	 * Columns are referred to by numbers, the first is column 1 (not 0).
+    	 * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    	 * 
+    	 * Some examples:
+    	 * 
+    	 * - **1**: use column 1
+    	 * - **1,2**: use columns 1 and 2 separately
+    	 * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tableNoHeadersRow Determine if the table has a first row of headers; only used for table-based documents.
+    	 * 
+    	 * Provide a value of "true" if there is no header row, otherwise leave it blank or undefined (default).
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} tokenization The tokenization strategy to use
+    	 * 
+    	 * This should usually be undefined, unless specific behaviour is required. These are the valid values:
+    	 * 
+    	 * - **undefined or blank**: use the default tokenization (which uses Unicode rules for word segmentation)
+    	 * - **wordBoundaries**: use any Unicode character word boundaries for tokenization
+    	 * - **whitespace**: tokenize by whitespace only (punctuation and other characters will be kept with words)
+    	 * 
+    	 * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tokenization).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} xmlContentXpath The XPath expression that defines the location of document content (the body); only used for XML-based documents.
+    	 * 
+    	 * 		new Corpus("<doc><head>Hello world!</head><body>This is Voyant!</body></doc>", {
+    	 * 			 xmlContentXpath: "//body"
+    	 * 		}); // document would be: "This is Voyant!"
+    	 * 
+    	 * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} xmlTitleXpath The XPath expression that defines the location of each document's title; only used for XML-based documents.
+    	 * 
+    	 * 		new Corpus("<doc><title>Hello world!</title><body>This is Voyant!</body></doc>", {
+    	 * 			 xmlTitleXpath: "//title"
+    	 * 		}); // title would be: "Hello world!"
+    	 * 
+    	 * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    	 */
+
+    	/**
+    	 * @cfg {String} xmlAuthorXpath The XPath expression that defines the location of each document's author; only used for XML-based documents.
+    	 * 
+    	 * 		new Corpus("<doc><author>Stéfan Sinclair</author><body>This is Voyant!</body></doc>", {
+    	 * 			 xmlAuthorXpath: "//author"
+    	 * 		}); // author would be: "Stéfan Sinclair"
+    	 * 
+    	 * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} xmlPubPlaceXpath The XPath expression that defines the location of each document's publication place; only used for XML-based documents.
+    	 * 
+    	 * 		new Corpus("<doc><pubPlace>Montreal</pubPlace><body>This is Voyant!</body></doc>", {
+    	 * 			 xmlPubPlaceXpath: "//pubPlace"
+    	 * 		}); // publication place would be: "Montreal"
+    	 * 
+    	 * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    	 */
+
+    	/**
+    	 * @cfg {String} xmlPublisherXpath The XPath expression that defines the location of each document's publisher; only used for XML-based documents.
+    	 * 
+    	 * 		new Corpus("<doc><publisher>The Owl</publisher><body>This is Voyant!</body></doc>", {
+    	 * 			 xmlPublisherXpath: "//publisher"
+    	 * 		}); // publisher would be: "The Owl"
+    	 * 
+    	 * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    	 */
+
+    	/**
+    	 * @cfg {String} xmlKeywordXpath The XPath expression that defines the location of each document's keywords; only used for XML-based documents.
+    	 * 
+    	 * 		new Corpus("<doc><keyword>text analysis</keyword><body>This is Voyant!</body></doc>", {
+    	 * 			 xmlKeywordXpath: "//keyword"
+    	 * 		}); // publisher would be: "text analysis"
+    	 * 
+    	 * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} xmlCollectionXpath The XPath expression that defines the location of each document's collection name; only used for XML-based documents.
+    	 * 
+    	 * 		new Corpus("<doc><collection>documentation</collection><body>This is Voyant!</body></doc>", {
+    	 * 			 xmlCollectionXpath: "//collection"
+    	 * 		}); // publisher would be: "documentation"
+    	 * 
+    	 * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} xmlGroupByXpath The XPath expression that defines the location of each document's collection name; only used for XML-based documents.
+    	 * 
+    	 * 		new Corpus("<doc><sp s='Juliet'>Hello!</sp><sp s='Romeo'>Hi!</sp><sp s='Juliet'>Bye!</sp></doc>", {
+    	 * 			 xmlDocumentsXPath: '//sp',
+    	 *           xmlGroupByXpath: "//@s"
+    	 * 		}); // two docs: "Hello! Bye!" (Juliet) and "Hi!" (Romeo)
+    	 * 
+    	 * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} xmlExtraMetadataXpath A value that defines the location of other metadata; only used for XML-based documents.
+    	 * 
+    	 * 		new Corpus("<doc><tool>Voyant</tool><phase>1</phase><body>This is Voyant!</body></doc>", {
+    	 * 			 xmlExtraMetadataXpath: "tool=//tool\nphase=//phase"
+    	 * 		}); // tool would be "Voyant" and phase would be "1"
+    	 * 
+    	 * Note that `xmlExtraMetadataXpath` is a bit different from the other XPath expressions in that it's
+    	 * possible to define multiple values (each on its own line) in the form of name=xpath.
+    	 * 
+    	 * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    	 */
+    	
+    	/**
+    	 * @cfg {String} xmlExtractorTemplate Pass the XML document through the XSL template located at the specified URL before extraction (this is ignored in XML-based documents).
+    	 * 
+    	 * This is an advanced parameter that allows you to define a URL of an XSL template that can
+    	 * be called *before* text extraction (in other words, the other XML-based parameters apply
+    	 * after this template has been processed).
+    	 */
+
+    	/**
+    	 * @cfg {String} inputRemoveUntil Omit text up until the start of the matching text sequence (this is ignored in XML-based documents).
+    	 * 
+    	 * 		new Corpus("Hello world! This is Voyant!", {
+    	 * 			 inputRemoveUntil: "This"
+    	 * 		}); // document would be: "This is Voyant!"
+    	 */
+    	
+    	/**
+    	 * @cfg {String} inputRemoveUntilAfter Omit text up until the end of the matching text sequence (this is ignored in XML-based documents).
+    	 * 
+    	 * 		new Corpus("Hello world! This is Voyant!", {
+    	 * 			 inputRemoveUntilAfter: "world!"
+    	 * 		}); // document would be: "This is Voyant!"
+    	 */
+    	
+    	/**
+    	 * @cfg {String} inputRemoveFrom Omit text from the start of the matching text sequence (this is ignored in XML-based documents).
+    	 * 
+    	 * 		new Corpus("Hello world! This is Voyant!", {
+    	 * 			 inputRemoveFrom: "This"
+    	 * 		}); // document would be: "Hello world!"
+    	 */
+    	
+    	/**
+    	 * @cfg {String} inputRemoveFromAfter Omit text from the end of the matching text sequence (this is ignored in XML-based documents).
+    	 * 
+    	 * 		new Corpus("Hello world! This is Voyant!", {
+    	 * 			 inputRemoveFromAfter: "world!"
+    	 * 		}); // document would be: "Hello world!"
+    	 */
+    	
+    	/**
+    	 * @cfg {String} subTitle A sub-title for the corpus.
+    	 * 
+    	 * This is currently not used, except in the Dynamic Table of Contexts skin. Still, it may be worth specifying a subtitle for later use.
+    	 */
+    	
+    	/**
+    	 * @cfg {String} title A title for the corpus.
+    	 * 
+    	 * This is currently not used, except in the Dynamic Table of Contexts skin. Still, it may be worth specifying a title for later use.
+    	 */
+    	
     	
     	documentsStore: undefined
     },
