@@ -13,6 +13,9 @@ resources/cirrus/html5/WordController.js
 resources/doubletree/DoubleTree.js
 resources/doubletree/Trie.js
 
+# TERMSRADIO
+resources/termsradio/TermsRadio.js
+
 # UTILS
 app/util/Api.js
 app/util/Localization.js
