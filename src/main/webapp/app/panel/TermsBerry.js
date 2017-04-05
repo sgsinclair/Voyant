@@ -4,6 +4,8 @@ Ext.define('Voyant.panel.TermsBerry', {
 	alias: 'widget.termsberry',
     statics: {
     	i18n: {
+    		tfidf: 'tf-idf',
+    		inDocs: 'In Docs'
     	},
     	api: {
     		stopList: 'auto',
@@ -371,11 +373,11 @@ Ext.define('Voyant.panel.TermsBerry', {
     	
     	var defaultFill;
     	if (this.getMode() === this.MODE_DISTINCT) {
-    		defaultFill = d3.scale.pow().exponent(1/3)
-    			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#eee']);
+    		defaultFill = d3.scale.pow().exponent(1/5)
+    			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#dedede']);
     	} else {
     		defaultFill = d3.scale.linear()
-				.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#eee']);
+				.domain([this.getMaxFillValue(), this.getMinFillValue()]).range(['#fff', '#dedede']);
     	}
     	
     	// roughly calculate font size based on available area and number of terms
@@ -412,7 +414,13 @@ Ext.define('Voyant.panel.TermsBerry', {
     				.style('stroke', '#26926c')
     				.style('stroke-opacity', me.MAX_STROKE_OPACITY);
     			
-    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')<br/>'+d.fillValue;
+    			var fillLabel;
+    			if (me.getMode() === me.MODE_DISTINCT) {
+    				fillLabel = me.localize('tfidf');
+    			} else {
+    				fillLabel = me.localize('inDocs');
+    			}
+    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')<br/>'+fillLabel+': '+d.fillValue;
 				var tip = me.getTip();
 				tip.update(info);
 				tip.show();
