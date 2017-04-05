@@ -61,6 +61,14 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"الناشر",
 "pubDateField":"تاريخ النشر",
 "exportNewCorpusTip":"انشاء مكنز جديد من المستندات المطابقة (الزرسيكون معطل في حال عدم وجود مستندات مطابقة) "});
+Ext.apply(Voyant.panel.TermsBerry.i18n, {
+"scaling":"Scaling",
+"distinctTerms":"Distinct Terms",
+"topTerms":"Top Terms",
+"numTerms":"Terms",
+"context":"Context",
+"title":"TermsBerry",
+"strategy":"Strategy"});
 Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
 "paletteEditor":"Palette Editor",
 "add":"إضافة",

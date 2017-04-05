@@ -61,6 +61,14 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"maison d’édition",
 "pubDateField":"date de publication",
 "exportNewCorpusTip":"Créer un nouveau corpus à partir des documents correspondants (le bouton sera inactif s’il n’y a pas de résultat)."});
+Ext.apply(Voyant.panel.TermsBerry.i18n, {
+"scaling":"Scaling",
+"distinctTerms":"Distinct Terms",
+"topTerms":"Top Terms",
+"numTerms":"Terms",
+"context":"Context",
+"title":"TermsBerry",
+"strategy":"Strategy"});
 Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
 "paletteEditor":"Palette Editor",
 "add":"Ajouter",

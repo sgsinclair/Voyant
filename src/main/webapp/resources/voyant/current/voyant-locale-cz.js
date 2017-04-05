@@ -61,6 +61,14 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"vydavatel",
 "pubDateField":"datum vydání",
 "exportNewCorpusTip":"Vytvořit nový korpus z dokumentů odpovídajících hledanému výrazu (tlačítko bude neaktivní, pokud nejsou nalezeny žádné shody)."});
+Ext.apply(Voyant.panel.TermsBerry.i18n, {
+"scaling":"Scaling",
+"distinctTerms":"Distinct Terms",
+"topTerms":"Top Terms",
+"numTerms":"Terms",
+"context":"Context",
+"title":"TermsBerry",
+"strategy":"Strategy"});
 Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
 "paletteEditor":"Editor palety",
 "add":"Přidat",

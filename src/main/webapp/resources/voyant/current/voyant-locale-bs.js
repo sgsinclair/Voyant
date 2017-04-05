@@ -61,6 +61,14 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "publisherField":"izdavač",
 "pubDateField":"datum objavljivanja",
 "exportNewCorpusTip":"Izgraditi novi korpus od odgovarajućih dokumenata (gumb je deaktiviran ako nema rezultata)."});
+Ext.apply(Voyant.panel.TermsBerry.i18n, {
+"scaling":"Scaling",
+"distinctTerms":"Distinct Terms",
+"topTerms":"Top Terms",
+"numTerms":"Terms",
+"context":"Context",
+"title":"TermsBerry",
+"strategy":"Strategy"});
 Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
 "paletteEditor":"Editor za paletu",
 "add":"Dodati",

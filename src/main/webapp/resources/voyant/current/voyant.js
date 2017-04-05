@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Apr 05 13:19:48 EDT 2017 */
+/* This file created by JSCacher. Last modified: Wed Apr 05 13:29:43 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -19738,17 +19738,11 @@ Ext.define('Voyant.panel.TermsBerry', {
 	alias: 'widget.termsberry',
     statics: {
     	i18n: {
-    		title: 'TermsBerry',
-    		strategy: 'Strategy',
-    		topTerms: 'Top Terms',
-    		distinctTerms: 'Distinct Terms',
-    		numTerms: 'Terms',
-    		context: 'Context',
-    		scaling: 'Scaling'
     	},
     	api: {
     		stopList: 'auto',
-    		context: 5,
+    		context: 2,
+        	numInitialTerms: 75,
     		query: undefined,
     		docIndex: undefined,
     		docId: undefined
@@ -19760,7 +19754,6 @@ Ext.define('Voyant.panel.TermsBerry', {
     	
     	mode: undefined,
     	
-    	numInitialTerms: 50,
     	collocatesLimit: 1000000, // a very large number so we get all of them
     	scalingFactor: 3,
     	
@@ -19851,10 +19844,10 @@ Ext.define('Voyant.panel.TermsBerry', {
 	            	maxValue: this.MAX_TERMS,
 	            	listeners: {
 	            		afterrender: function(slider) {
-	            			slider.setValue(this.getNumInitialTerms());
+	            			slider.setValue(parseInt(this.getApiParam('numInitialTerms')));
 	            		},
 	            		changecomplete: function(slider, newvalue) {
-	            			this.setNumInitialTerms(newvalue);
+	            			this.setApiParam("numInitialTerms", newvalue)
 	            			this.doLoad();
 	            		},
 	            		scope: this
@@ -19968,7 +19961,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     	this.setApiParams({docId: undefined, docIndex: undefined});
     	this.getCorpus().getCorpusTerms().load({
     		params: {
- 				limit: this.getNumInitialTerms(),
+ 				limit: parseInt(this.getApiParam('numInitialTerms')),
  				stopList: this.getApiParam('stopList')
  			},
 		    callback: function(records, operation, success) {
@@ -19981,11 +19974,11 @@ Ext.define('Voyant.panel.TermsBerry', {
     },
     
     getDistinctTerms: function() {
-    	var perDocLimit = Math.ceil(this.getNumInitialTerms() / this.getCorpus().getDocumentsCount()); // ceil ensures there's at least 1 per doc
+    	var perDocLimit = Math.ceil(parseInt(this.getApiParam('numInitialTerms')) / this.getCorpus().getDocumentsCount()); // ceil ensures there's at least 1 per doc
     	this.getCorpus().getDocumentTerms().load({
 			addRecords: true,
 			params: {
-				limit: this.getNumInitialTerms(),
+				limit: parseInt(this.getApiParam('numInitialTerms')),
 				perDocLimit: perDocLimit,
 				stopList: this.getApiParam('stopList'),
 				sort: 'TFIDF',
