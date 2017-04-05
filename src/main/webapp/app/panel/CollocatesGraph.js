@@ -11,7 +11,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		limit: 5,
     		stopList: 'auto',
     		terms: undefined,
-    		context: 5
+    		context: 5,
+    		centralize: undefined
     	},
 		glyph: 'xf1e0@FontAwesome'
     },
@@ -297,25 +298,41 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     initLoad: function() {
-    	if (this.getCorpus()) {
-    		this.initGraph();
-    		var corpusTerms = this.getCorpus().getCorpusTerms({
-    			leadingBufferZone: 0,
-    			autoLoad: false
-    		});
-    		corpusTerms.load({
-    		    callback: function(records, operation, success) {
-    		    	if (success) {
-    		    		this.loadFromCorpusTermRecords(records);
-    		    	}
-    		    },
-    		    scope: this,
-    		    params: {
-    				limit: 3,
-    				stopList: this.getApiParam("stopList")
-    			}
-        	});
-    	}
+		this.initGraph();
+		
+		if (this.getApiParam('centralize')) {
+			this.setGraphMode(this.CENTRALIZED_MODE);
+			var term = this.getApiParam('centralize');
+			this.getNodeDataSet().update({
+				id: term,
+				label: term,
+				title: term+' ('+1+')',
+				type: 'keyword',
+				value: 1,
+				start: 0,
+				font: {color: this.keywordColor}
+			});
+			this.doCentralize(term);
+		} else {
+			var limit = 3;
+			var query = this.getApiParam('query');
+			if (query !== undefined) {
+				limit = query.split(',').length;
+			}
+			this.getCorpus().getCorpusTerms({autoLoad: false}).load({
+				params: {
+					limit: limit,
+					query: query,
+					stopList: this.getApiParam("stopList")
+				},
+			    callback: function(records, operation, success) {
+			    	if (success) {
+			    		this.loadFromCorpusTermRecords(records);
+			    	}
+			    },
+			    scope: this
+	    	});
+		}
     },
     
     loadFromQuery: function(query) {
