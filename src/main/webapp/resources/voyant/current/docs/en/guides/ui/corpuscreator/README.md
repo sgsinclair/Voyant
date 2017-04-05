@@ -41,6 +41,32 @@ Most document formats are fairly easy to detect automatically, Voyant does a dec
 It's possible to provide a title and subtitle for your corpus. These values aren't typically used in the
 [default skin](#!/guide/skins-section-default-skin) but are useful elsewhere, such as in the [Dynamic Table of Contexts skin](#!/guide/skins-section-dynamic-table-of-contexts-skin).
 
+## Text
+
+Voyant provides functionality for ignoring parts of documents, for instance to exclude a license statement from the text to be analyzed. The values specified are regular expressions (so care should be taken when using characters other than letters, since they may have special meaning).
+
+- omit until: ignore everything until the start of this regular expression
+- omit until after: ignore everything until the end of this regular expression
+- omit from: ignore everything from the start of this regular expression onwards
+- omit from after: ignore everything from the end of this regular expression onwards
+
+Here's a simple example of a document:
+
+	This is the license preceding the actual document.
+	The Document Title
+	The very interesting document text.
+	The license following the actual document.
+
+In this simple case we can either use one of two combinations of values:
+
+- omit until: `The Document Title`
+- omit from: `The license`
+
+Or:
+
+- omit until after: `the actual document.`
+- omit from after: `document text.`
+
 ## XML
 
 Voyant provides powerful functionality for creating a corpus from XML documents, in particular by using [XPath](https://en.m.wikipedia.org/wiki/XPath) expressions to define documents, content, and metadata like title and author.

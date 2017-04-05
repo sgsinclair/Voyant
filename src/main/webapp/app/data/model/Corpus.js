@@ -36,7 +36,7 @@ Ext.define('Voyant.data.model.Corpus', {
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization'],
     transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
-    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader'],
+    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
@@ -305,6 +305,8 @@ Ext.define('Voyant.data.model.Corpus', {
     	 * 		new Corpus("Hello world! This is Voyant!", {
     	 * 			 inputRemoveUntil: "This"
     	 * 		}); // document would be: "This is Voyant!"
+    	 * 
+    	 * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
     	 */
     	
     	/**
@@ -313,6 +315,8 @@ Ext.define('Voyant.data.model.Corpus', {
     	 * 		new Corpus("Hello world! This is Voyant!", {
     	 * 			 inputRemoveUntilAfter: "world!"
     	 * 		}); // document would be: "This is Voyant!"
+    	 * 
+    	 * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
     	 */
     	
     	/**
@@ -321,6 +325,8 @@ Ext.define('Voyant.data.model.Corpus', {
     	 * 		new Corpus("Hello world! This is Voyant!", {
     	 * 			 inputRemoveFrom: "This"
     	 * 		}); // document would be: "Hello world!"
+    	 * 
+    	 * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
     	 */
     	
     	/**
@@ -329,6 +335,8 @@ Ext.define('Voyant.data.model.Corpus', {
     	 * 		new Corpus("Hello world! This is Voyant!", {
     	 * 			 inputRemoveFromAfter: "world!"
     	 * 		}); // document would be: "Hello world!"
+    	 * 
+    	 * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
     	 */
     	
     	/**

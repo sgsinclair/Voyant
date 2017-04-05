@@ -30,7 +30,7 @@ Ext.define("Voyant.notebook.util.Embed", {
 					cmp = this.embeddable[0];
 				}
 				if (Ext.isString(cmp)) {
-					cmp = Ext.ClassManager.getByAlias('widget.'+cmp) || Ext.ClassManager.get(cmp);
+					cmp = Ext.ClassManager.getByAlias('widget.'+cmp.toLowerCase()) || Ext.ClassManager.get(cmp.toLowerCase());
 				}
 				var isEmbedded = false;
 				if (Ext.isFunction(cmp)) {

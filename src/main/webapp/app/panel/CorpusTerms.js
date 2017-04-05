@@ -1,3 +1,17 @@
+/**
+ * Corpus Terms tool, a grid that shows the terms in the corpus.
+ * 
+ * <iframe src="../?corpus=austen&view=corpusterms" style="max-width: 500px; height: 300px"></iframe>
+ * 
+ * The typical use is not to instantiate this class directly, but to embed the tool from a corpus.
+ * 
+ * 		var austen;
+ * 		new Corpus("austen").then(function(corpus) {
+ * 			austen = corpus;
+ * 			austen.embed('CorpusTerms'); // simply embed
+ * 			austen.embed('CorpusTerms', {query: '^lov*'}); // embed with query
+ * 		});
+ */
 Ext.define('Voyant.panel.CorpusTerms', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -6,14 +20,46 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	i18n: {
     	},
     	api: {
+    		
+    		/**
+    		 * @cfg {String} stopList A comma-separated list of words, a named list or a URL to a plain text list, one word per line.
+    		 * 
+    		 *  By default this is set to 'auto' which auto-detects the document's language and loads an appropriate list (if available for that language). Set this to blank to not use the default stopList.
+    		 *  
+    		 * For more information see the <a href="#!/guide/search">Stopwords documentation</a>.
+    		 */
     		stopList: 'auto',
+    		
+    		/**
+    		 * @cfg {String/String[]} query A query or array of queries (queries can be separated by a comma).
+    		 * 
+    		 * For query syntax, see the <a href="#!/guide/search">search documentation</a>.
+    		 */
     		query: undefined,
+    		
+    		/**
+    		 * @cfg {Number} maxBins The maximum number of bins to use for distributions in Trend.
+    		 * 
+    		 * By default this is set to 100 (in other words, if there are more than 100 documents in the corpus, they will be forced into 100 bins).
+    		 * Higher values are possible but it can cause performance issues and necessitate more data transfer (values for each one of the bins for each one of the terms).
+    		 * @cfg
+    		 */
     		maxBins: 100,
+    		
+    		/**
+    		 * @cfg {String} comparisonCorpus An existing corpus to be used for comparison purposes.
+    		 * 
+    		 * None of the columns visible by default use comparisonCorpus so this is an advanced parameter used when the "Comparison" column is shown.
+    		 * The comparison column shows the relative frequency of the term in the corpus compared to the relative frequency of the same term in a comparison corpus.
+    		 */
     		comparisonCorpus: undefined
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
+    	/**
+    	 * @private
+    	 */
     	options: [{
     		xtype: 'stoplistoption'
     	},{
@@ -22,6 +68,9 @@ Ext.define('Voyant.panel.CorpusTerms', {
     		fieldLabel: 'comparison corpus'
     	}]
     },
+	/**
+	 * @private
+	 */
     constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
         this.callParent(arguments);

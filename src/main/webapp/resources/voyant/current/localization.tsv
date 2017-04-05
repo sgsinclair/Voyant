@@ -295,6 +295,12 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Spanish (es)	Rus
 2016-05-28	Voyant.panel.CorpusCreator	noTextProvided	No Text Provided	Aucun texte n’a été fourni.	Nessun testo inserito					Nije dostavljen nikakav tekst	Није достављен никакав текст	Nije dostavljen nikakav tekst	テキストがありません		Nebyl vložen žádný text.	لا يوجد نص	
 2016-05-28	Voyant.panel.CorpusCreator	pleaseProvideText	Please provide text in the text box (or choose open or upload).	Veuillez fournir un texte dans la zone de dialogue (ou choisir soit Ouvrir soit Charger).	Per favore, inserisci un testo nella casella testo (o scegli apri o carica)					Dodajte tekst u okvir (ili odaberite Otvoriti ili Otpremiti)	Додајте текст у оквир (или одаберите Отворити или Отпремити)	Dodajte tekst u okvir (ili odaberite Otvoriti ili Otpremiti)	テキストをテキストボックスに入力してください（または開くかアップロードするを選択してください）		Prosím vložte text do textového pole (případně zvolte Otevřít nebo Nahrát)	الرجاء إدخال نص في الاطار او اختيار فتح \ تحميل	
 2017-03-13	Voyant.panel.CorpusCreator	noAllowInputMessage	This server has been configured to NOT allow new documents to be added. Please contact the server administrator (if you can).	Ce serveur est configuré pour refuser l'ajout de nouveaux documents (veuillez contacter l'administrateur du serveur si possible).													
+2017-04-04	Voyant.panel.CorpusCreator	textOptions	Text														
+2017-04-04	Voyant.panel.CorpusCreator	textOptionsText	These options allow you to ignore part of a text document by specifying regular expressions.														
+2017-04-04	Voyant.panel.CorpusCreator	inputRemoveUntil	omit until														
+2017-04-04	Voyant.panel.CorpusCreator	inputRemoveUntilAfter	omit unti after														
+2017-04-04	Voyant.panel.CorpusCreator	inputRemoveFrom	omit from														
+2017-04-04	Voyant.panel.CorpusCreator	inputRemoveFromAfter	omit from after														
 2016-04-25	Voyant.panel.Knots	title	Knots	Nœuds	Nodi					Čvorovi	Чворови	Čvorovi	ノット		Uzly	نوتس (عقد)	
 2016-04-25	Voyant.panel.Knots	type	Visualization	Visualisation	Visualizzazione					Vizualizacija	Визуализација	Vizualizacija	視覚化		Vizualizace	عرض مرئي	
 2016-04-25	Voyant.panel.Knots	findTerm	Find Term	Chercher un terme	Trova termine					Pronaći termin	Пронаћи термин	Pronaći termin	単語を探す		Najít termín	البحث عن كلمات	

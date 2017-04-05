@@ -97,6 +97,15 @@ Ext.define('Voyant.notebook.Notebook', {
     				xtype: 'toolmenu',
     				glyph: 'xf067@FontAwesome',
     				scope: this
+    			},
+    			'runall': {
+    				tooltip: this.localize("runallTip"),
+    				callback: function() {
+    					this.runAllCode();
+    				},
+    				xtype: 'toolmenu',
+    				glyph: 'xf04e@FontAwesome',
+    				scope: this
     			}
 			 }
     	})
