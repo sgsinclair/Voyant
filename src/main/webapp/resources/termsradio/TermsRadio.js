@@ -852,7 +852,7 @@ TermsRadio.prototype = {
         	if(!toolObject.isTransitioning) {
         		this.drag = true;
         		
-	        	var w = toolObject.getWidth()
+	        	var w = toolObject.parent.getWidth()
 	        		,displaceX = parseInt(d3.event.dx)
 	        		,checkBefore
 	        		,checkAfter
@@ -1002,8 +1002,8 @@ TermsRadio.prototype = {
 		  	    .attr('y1', this.tPadding + this.navigationHeight)
 		  	    .attr('y2', this.tPadding)
 		  	    .each('end', function () {
-		  	    	if (toolObject.isMasked()) {
-		  	    		toolObject.unmask();
+		  	    	if (toolObject.parent.isMasked()) {
+		  	    		toolObject.parent.unmask();
 		  	    	}
 		  	    	if(toolObject.continueTransition) { 
 		  	    		setTimeout(function () {
@@ -1641,7 +1641,7 @@ TermsRadio.prototype = {
 	},
 	
 	getDuration: function() {
-		return this.numDataPoints*(100-this.getSpeed())
+		return this.numDataPoints*(100-this.parent.getSpeed())
 	}
 	
 };

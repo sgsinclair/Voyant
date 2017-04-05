@@ -191,12 +191,12 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    			handler: function(btn) {
 	    				var playing = btn.glyph=="xf04c@FontAwesome";
 	    				if (playing) {
-	    					this.continueTransition = false;
+	    					this.getTermsRadio().continueTransition = false;
 	    					this.mask(this.localize("completingTransition"))
 	    					btn.setPlaying(false)
 	    				}
 	    				else {
-	    					this.toggleRightCheck();
+	    					this.getTermsRadio().toggleRightCheck();
 	    					btn.setPlaying(true);
 	    				}
 	    			},
@@ -211,10 +211,10 @@ Ext.define('Voyant.panel.TermsRadio', {
 	    			listeners : {
 	    				click : {fn : function() {
 	    					this.queryById("play").setPlaying(false);
-	    							this.shiftCount = 0;
-	    							this.prepareData();
-	    							this.redraw();
-	    					}					
+							this.getTermsRadio().shiftCount = 0;
+							this.getTermsRadio().prepareData();
+							this.getTermsRadio().redraw();
+    					}				
 	    					,scope : this
 	    				}
 	    			}
