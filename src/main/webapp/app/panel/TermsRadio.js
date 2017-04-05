@@ -338,7 +338,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 				}]
 			}),
 			listeners: {
-				render: function(combo) {
+				afterrender: function(combo) {
 					combo.setValue(this.getApiParam('yAxisScale'));
 				},
 				scope: this
