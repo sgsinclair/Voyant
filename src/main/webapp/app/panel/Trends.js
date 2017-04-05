@@ -1,23 +1,89 @@
- Ext.define('Voyant.panel.Trends', {
+/**
+ * Trends tool, a line graph that shows term distributions.
+ * 
+ * <iframe src="../?corpus=austen&view=trends" style="max-width: 500px; height: 300px"></iframe>
+ * 
+ * The typical use is not to instantiate this class directly, but to embed the tool from a corpus.
+ * 
+ * 		var austen;
+ * 		new Corpus("austen").then(function(corpus) {
+ * 			austen = corpus;
+ * 			austen.embed('Trends'); // simply embed
+ * 			austen.embed('Trends', {query: '^lov*'}); // embed with query
+ * 		});
+ */
+Ext.define('Voyant.panel.Trends', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
 	requires: ['Ext.chart.CartesianChart','Voyant.data.store.Documents'],
 
 	alias: 'widget.trends',
 	config: {
+	    /**
+	     * @private
+	     */
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
 	},
     statics: {
     	i18n: {
     	},
     	api: {
+    		
+    		/**
+    		 * @cfg {Number} limit Determine the number of terms to show (larger numbers may make the graph unusable).
+    		 */
     		limit: 5,
+    		
+    		/**
+    		 * @cfg {String} stopList A comma-separated list of words, a named list or a URL to a plain text list, one word per line.
+    		 * 
+    		 *  By default this is set to 'auto' which auto-detects the document's language and loads an appropriate list (if available for that language). Set this to blank to not use the default stopList.
+    		 *  
+    		 * For more information see the <a href="#!/guide/search">Stopwords documentation</a>.
+    		 */
     		stopList: 'auto',
+    		
+    		/**
+    		 * @cfg {String/String[]} query A query or array of queries (queries can be separated by a comma).
+    		 * 
+    		 * For query syntax, see the <a href="#!/guide/search">search documentation</a>.
+    		 */
     		query: undefined,
+    		
+    		/**
+    		 * @cfg {String} withDistributions Determine whether to show "raw" or "relative" frequencies (those are the two valid values).
+    		 * 
+    		 * The default value is "relative" (unless there's only one document in the corpus, in which case raw frequencies are shown).
+    		 */
     		withDistributions: 'relative',
+    		
+    		/**
+    		 * @cfg {Number} bins The number of segments to use.
+    		 * 
+    		 * The default value will depend on the nature of the corpus:
+    		 * 
+    		 * - corpus has one document: the default number of bins is 10
+    		 * - corpus has multiple documents:
+    		 *   - corpus has up to 100 documents: the default number is the size of the corpus
+    		 *   - corpus has more than 1000 documents: the default number is 100
+    		 */
     		bins: 10,
+    		
+    		/**
+    		 * @cfg {Number/Number[]/String} docIndex The index of one or more documents, as a number, or numbers separated by commas or in an array.
+    		 * 
+    		 * The first document's index is 0 and so on.
+    		 */
     		docIndex: undefined,
+    		
+    		/**
+    		 * @cfg {String/String[]} docId The document ID of one or more documents, as a string, or strings separated by commas or in an array.
+    		 */
     		docId: undefined,
+    		
+    		/**
+    		 * @cfg {String} mode Force the mode to be either "corpus" (distribution of terms across documents) or "document" (distribution of terms within a document); usually this is correctly set by default according to whether the corpus has one document ("document") or more than one ("corpus").
+    		 */
     		mode: "corpus"
     	},
 		glyph: 'xf201@FontAwesome'
@@ -28,6 +94,9 @@
     
     layout: 'fit',
     
+    /**
+     * @private
+     */
     constructor: function(config) {
 
     	this.callParent(arguments);

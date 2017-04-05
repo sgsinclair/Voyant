@@ -565,7 +565,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 		if(this.getApiParam('mode') === 'document') {
 			this.numDataPoints = this.records[0].get('distributions').length;
-			if(this.numDataPoints !== this.getApiParam('bins')){
+			if(this.numDataPoints !== parseInt(this.getApiParam('bins'))) {
 				this.numDataPoints = parseInt(this.getApiParam('bins'));
 				this.loadStore();
 			}
