@@ -156,10 +156,10 @@ Ext.define('Voyant.panel.TermsRadio', {
 					listeners: {
 						itemclick: function(view, record, el, index) {
 							var term = record.get('name');
-							if (this.isTermSelected(term)) {
-								this.doTermDeselect(term);
+							if (this.getTermsRadio().isTermSelected(term)) {
+								this.getTermsRadio().doTermDeselect(term);
 							} else {
-								this.doTermSelect(term);
+								this.getTermsRadio().doTermSelect(term);
 							}
 						},
 						itemcontextmenu: function(view, record, el, index, event) {
