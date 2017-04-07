@@ -96,6 +96,13 @@ Ext.define('Voyant.panel.TermsRadio', {
     		,yAxisScale: 'log'
     			
     		,speed: 50
+    		
+    		/**
+    		 * @property slider Whether to show the slider
+    		 * @type Boolean
+    		 * @default true
+    		 */
+    		,slider: undefined
     	},
     	glyph: 'xf201@FontAwesome'
     }
@@ -348,10 +355,13 @@ Ext.define('Voyant.panel.TermsRadio', {
 		this.callParent(arguments);
 		this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 		
-		this.on('render', function(component) {
+		this.on('boxready', function(component) {
+			var sliderParam = this.getApiParam('slider');
+			var showSlider = sliderParam === undefined ? true : sliderParam === 'true';
 			var config = {
 				parent: this,
-				container: this.body
+				container: this.body,
+				showSlider: showSlider
 			};
 			this.setTermsRadio(new TermsRadio(config));
 		}, this);
@@ -439,39 +449,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 				}
 			}, this, {single: true});
 			store.load({params: params});
-    	}, this);
-		
-		/**
-		 * @event resize
-		 * @type listener
-		 * @private
-		 */
-		this.on('resize', function() {
-			//console.log('resize')
-			if(this.chart) {
-				var h = this.body.getHeight(),
-					w = this.body.getWidth();
-				
-				this.chart.attr('height', h)
-					.attr('width', w);
-					
-				this.setTitleLength();
-				
-				if(this.largestH < h && this.largestW < w) {
-					this.chart.select('rect[class=clipping-rectangle]')
-				        .attr("x", 0)
-				        .attr("y", this.navigationHeight + (this.tPadding * 2))
-				        .attr("width", w)
-				        .attr("height", h - this.navigationHeight);
-					this.largestH = h;
-					this.largestW = w;
-				}
-			
-				this.redraw();	
-				this.redrawSliderOverlay();
-			}
-		}, this);
-		
+    	}, this);		
 	}
 	
     ,loadStore: function () {

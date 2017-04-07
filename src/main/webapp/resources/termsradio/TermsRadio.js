@@ -1,6 +1,14 @@
+/**
+ * @param {object} config
+ * @param {Voyant.panel.TermsRadio} config.parent
+ * @param {Ext.dom.Element} config.container
+ * @param {boolean} config.showSlider
+ */
 function TermsRadio(config) {
 	this.parent = config.parent;
 	this.container = config.container;
+	this.showSlider = config.showSlider == undefined ? true : config.showSlider;
+	
 	this.chart = null;
 	
 	this.absMaxFreq = 0;
@@ -15,7 +23,6 @@ function TermsRadio(config) {
 	for (var i = 0; i < this.colorMasterList.length; i++) {
 		this.colorIndex.push(this.colorMasterList[i]);
 	}
-	
 	
 	this.continueTransition = true;
 	this.counterSeries = [];
@@ -44,8 +51,11 @@ function TermsRadio(config) {
 	this.bPadding = 25;
 	this.lPadding = 40;
 	this.rPadding = 20;
-	this.tPadding = 20;
-	this.navigationHeight = 100;
+	this.tPadding = 10;
+	
+	this.sliderHeightRatio = 0.1; // slider/container height ratio
+	this.sliderHeight = 0; // set in init and resize
+	this.sliderBPadding = 10;
 	
 	//tracks largest dimensions, used in resizing
 	this.largestW = 0;
@@ -65,6 +75,7 @@ function TermsRadio(config) {
 	this.xScale = d3.scale.linear();
 	this.xSliderScale = d3.scale.linear();
 	
+	this.container.on('resize', this.doResize, this);
 }
 
 TermsRadio.prototype = {
@@ -85,7 +96,9 @@ TermsRadio.prototype = {
 			this.initializeChart();
 		}
 		
-		this.redrawSliderOverlay();
+		if (this.showSlider) {
+			this.redrawSliderOverlay();
+		}
 	}
 
 	,highlightQuery: function(query, sticky) {
@@ -457,8 +470,10 @@ TermsRadio.prototype = {
 		this.drawXAxis();
 		this.drawYAxis();
 		this.drawChart();
-		this.drawSlider();
-		this.drawVerticalSlider();
+		if (this.showSlider) {
+			this.drawSlider();
+			this.drawVerticalSlider();
+		}
 		this.transitionCall = 'draw';
 	}
 	
@@ -470,34 +485,36 @@ TermsRadio.prototype = {
 		this.redrawXAxis();
 		this.redrawYAxis();
 		this.redrawChart();
-		this.redrawSlider();
-		this.redrawVerticalSlider();
+		if (this.showSlider) {
+			this.redrawSlider();
+			this.redrawVerticalSlider();
+		}
 		this.redrawChartOverlay();
     }
     
 	,initChart: function () {
-//		console.log('fn: initChart')
-		
-		var innerCt = this.container.query('div[class$=innerCt]', false)[0];
-		
-		var h = innerCt.getHeight(),
-			w = innerCt.getWidth();
+		var h = this.container.getHeight(),
+			w = this.container.getWidth();
     
 		//create main SVG Element
-		var chartSVG = innerCt.appendChild(Ext.DomHelper.createDom('<svg class="chart" width="'+w+'" height="'+h+'"></svg>'), true);
+		var chartSVG = Ext.DomHelper.append(this.container.down('div[class$=innerCt]'), '<svg class="chart" width="'+w+'" height="'+h+'"></svg>');
 	    this.chart = d3.select(chartSVG);
 	    
+	    this.setSliderHeight();
+	    
 		this.largestW = w;
-		this.largestH = h - this.navigationHeight;
+		this.largestH = h - this.getSliderHeight();
+		
+		var y = this.tPadding + this.getSliderHeight();
 	    	    
 	    this.chart.append('clipPath')
 	        .attr('id', 'clip1')
 	      .append('rect')
 	      	.attr('class', 'clipping-rectangle')
 	        .attr("x", 0)
-	        .attr("y", this.navigationHeight + (this.tPadding * 2))
+	        .attr("y", y)
 	        .attr("width", w)
-	        .attr("height", h - this.navigationHeight);
+	        .attr("height", this.largestH);
 	    
 	    this.chart.append('g')
 	    	.attr('class','overlay')
@@ -511,24 +528,27 @@ TermsRadio.prototype = {
 		if(this.chart) {
 			var h = this.container.getHeight(),
 				w = this.container.getWidth();
+
+			this.setSliderHeight();
+			
+			this.largestH = h - this.getSliderHeight();
+			this.largestW = w;
 			
 			this.chart.attr('height', h)
 				.attr('width', w);
 				
 			this.setTitleLength();
 			
-			if(this.largestH < h && this.largestW < w) {
-				this.chart.select('rect[class=clipping-rectangle]')
-			        .attr("x", 0)
-			        .attr("y", this.navigationHeight + (this.tPadding * 2))
-			        .attr("width", w)
-			        .attr("height", h - this.navigationHeight);
-				this.largestH = h;
-				this.largestW = w;
-			}
+			this.chart.select('rect[class=clipping-rectangle]')
+		        .attr("x", 0)
+		        .attr("y", this.tPadding + this.getSliderHeight())
+		        .attr("width", w)
+		        .attr("height", this.largestH);
 		
 			this.redraw();	
-			this.redrawSliderOverlay();
+			if (this.showSlider) {
+				this.redrawSliderOverlay();
+			}
 		}
 	}
 	
@@ -621,7 +641,7 @@ TermsRadio.prototype = {
 		
 		this.yAxisScale.scale(toolObject.yScale)
 	    	.orient('left')
-	    	.ticks(yTicksScale(this.container.getHeight()))
+	    	.ticks(yTicksScale(h))
 	    	.tickFormat(logFormat)
 			.tickSize(-w + this.rPadding + this.lPadding);
 		
@@ -734,7 +754,7 @@ TermsRadio.prototype = {
 //    	var h = this.container.getHeight(),
 //			w = this.container.getWidth();
 //    	
-//    	var totalTopOffset = (this.tPadding * 2) + this.navigationHeight
+//    	var totalTopOffset = (this.tPadding * 2) + this.sliderHeight
 //        	,lengthVer = h - (totalTopOffset + this.bPadding);
 //        
 //	    //create vertical minimap rectangle and slider
@@ -787,8 +807,8 @@ TermsRadio.prototype = {
 			.attr('class', 'sliderAxis')
 			.attr('x1', this.lPadding)
 			.attr('x2', this.container.getWidth() - this.rPadding)
-			.attr('y1', this.tPadding + this.navigationHeight)
-			.attr('y2', this.tPadding + this.navigationHeight)
+			.attr('y1', this.tPadding + this.sliderHeight)
+			.attr('y2', this.tPadding + this.sliderHeight)
 			.style('shape-rendering', 'crispEdges')
 			.style('stroke','black')
 	  	    .style('stroke-width','1');
@@ -797,7 +817,7 @@ TermsRadio.prototype = {
 			.attr('class', 'sliderAxis')
 			.attr('x1', this.lPadding)
 			.attr('x2', this.lPadding)
-			.attr('y1', this.tPadding + this.navigationHeight)
+			.attr('y1', this.tPadding + this.sliderHeight)
 			.attr('y2', this.tPadding)
 			.style('shape-rendering', 'crispEdges')
 			.style('stroke','black')
@@ -808,7 +828,7 @@ TermsRadio.prototype = {
 	  	    .attr('id', 'before')
 	  	    .attr('x1', (lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1)) + offsetVisStart)
 	  	    .attr('x2', (lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1)) + offsetVisStart)
-	  	    .attr('y1', this.tPadding + this.navigationHeight)
+	  	    .attr('y1', this.tPadding + this.sliderHeight)
 	  	    .attr('y2', this.tPadding)
 	  	    .style('stroke', 'black')
 	  	    .style('stroke-width', '1');
@@ -818,7 +838,7 @@ TermsRadio.prototype = {
 	  	    .attr('id', 'after')
 	  	    .attr('x1', (lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1)) + offsetVisEnd)
 	  	    .attr('x2', (lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1)) + offsetVisEnd)
-	  	    .attr('y1', this.tPadding + this.navigationHeight)
+	  	    .attr('y1', this.tPadding + this.sliderHeight)
 	  	    .attr('y2', this.tPadding)
 	  	    .style('stroke', 'black')
 	  	    .style('stroke-width', '1');
@@ -828,7 +848,7 @@ TermsRadio.prototype = {
   	    	.attr('id', 'boxBefore')
   	    	.attr('x', this.lPadding)
   	    	.attr('y', this.tPadding)
-  	    	.attr('height', this.navigationHeight)
+  	    	.attr('height', this.sliderHeight)
   	    	.attr('width', lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1))
   	    	.style('fill', 'silver')
   	    	.style('fill-opacity', 0.25)
@@ -839,7 +859,7 @@ TermsRadio.prototype = {
 	    	.attr('id', 'boxAfter')
 	    	.attr('x', (lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1)) + offsetVisEnd)
 	    	.attr('y', this.tPadding)
-	    	.attr('height', this.navigationHeight)
+	    	.attr('height', this.sliderHeight)
 	    	.attr('width', lengthHor * (this.numDataPoints - this.numVisPoints - this.shiftCount + this.callOffset()) / (this.numDataPoints - 1))
 	    	.style('fill', 'silver')
 	    	.style('fill-opacity', 0.25)
@@ -883,7 +903,7 @@ TermsRadio.prototype = {
 	        	
 	        	toolObject.chart.select('#boxAfter')
 	        		.attr('x', function () { return parseInt(this.getAttribute('x')) + displaceX; })
-        			.attr('width', function () { return parseInt(this.getAttribute('width')) - displaceX; });
+        			.attr('width', function () { return Math.max(0, parseInt(this.getAttribute('width')) - displaceX); });
 	        		
 	        	toolObject.chart.selectAll('#before')
 	        		.attr('x1', function () { return parseInt(this.getAttribute('x1')) + displaceX; })
@@ -999,7 +1019,7 @@ TermsRadio.prototype = {
 				.ease('linear')
 			 	.attr('x1', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisStart)
 			 	.attr('x2', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisStart)
-		  	    .attr('y1', this.tPadding + this.navigationHeight)
+		  	    .attr('y1', this.tPadding + this.getSliderHeight())
 		  	    .attr('y2', this.tPadding)
 		  	    .each('end', function () {
 		  	    	if (toolObject.parent.isMasked()) {
@@ -1021,7 +1041,7 @@ TermsRadio.prototype = {
 				.ease('linear')
 			 	.attr('x1', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
 			 	.attr('x2', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
-		  	    .attr('y1', this.tPadding + this.navigationHeight)
+		  	    .attr('y1', this.tPadding + this.getSliderHeight())
 		  	    .attr('y2', this.tPadding);
 		    
 	  	   this.chart.select('#boxBefore').transition()
@@ -1029,7 +1049,7 @@ TermsRadio.prototype = {
 				.ease('linear')
 	  	    	.attr('x', this.lPadding)
 	  	    	.attr('y', this.tPadding)
-	  	    	.attr('height', this.navigationHeight)
+	  	    	.attr('height', this.getSliderHeight())
 	  	    	.attr('width', lengthHor * (this.shiftCount) / (this.numDataPoints - 1));
 	    
 	  	    this.chart.select('#boxAfter').transition()
@@ -1037,7 +1057,7 @@ TermsRadio.prototype = {
 				.ease('linear')
 	  	    	.attr('x', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
 	  	    	.attr('y', this.tPadding)
-	  	    	.attr('height', this.navigationHeight)
+	  	    	.attr('height', this.getSliderHeight())
 	  	    	.attr('width', lengthHor * (this.numDataPoints - this.numVisPoints - this.shiftCount) / (this.numDataPoints - 1));
         }
         
@@ -1116,27 +1136,35 @@ TermsRadio.prototype = {
 				if(this.lastSlippery !== null) {
 					//exceptional case where lastSlippery was not properly removed
 					this.chartOverlayOff(this.lastSlippery);
-					this.sliderOverlayOff(this.lastSlippery);
+					if (this.showSlider) {
+						this.sliderOverlayOff(this.lastSlippery);
+					}
 					this.lastSlippery = null;
 					
 					//select new slippery word
 					//change its colour
 					this.chartOverlayOn(lineObject);
-					this.sliderOverlayOn(lineObject);
+					if (this.showSlider) {
+						this.sliderOverlayOn(lineObject);
+					}
 					this.lastSlippery = selector;
 				}
 				else {
 					//normal case select slippery word
 					//change its colour
 					this.chartOverlayOn(lineObject);
-					this.sliderOverlayOn(lineObject);
+					if (this.showSlider) {
+						this.sliderOverlayOn(lineObject);
+					}
 					this.lastSlippery = selector;
 				}
 			}
 			else{
 				//normal case deselect a slippery word
 				this.chartOverlayOff(selector);
-				this.sliderOverlayOff(this.lastSlippery);
+				if (this.showSlider) {
+					this.sliderOverlayOff(this.lastSlippery);
+				}
 				this.lastSlippery = null;
 			}
 		}
@@ -1219,7 +1247,9 @@ TermsRadio.prototype = {
 		
 		//if this was selected a slippery before click event remove line from navigation bar
 		if(selector === this.lastSlippery){
-			this.sliderOverlayOff(selector);
+			if (this.showSlider) {
+				this.sliderOverlayOff(selector);
+			}
 			this.lastSlippery = null;
 		}
 		
@@ -1228,7 +1258,9 @@ TermsRadio.prototype = {
 
 		this.overlayQueue.push(lineObject);
 		this.chartOverlayOn(lineObject);
-		this.sliderOverlayOn(lineObject);
+		if (this.showSlider) {
+			this.sliderOverlayOn(lineObject);
+		}
 	},
 	
 	doTermDeselect: function(term, legendRemove) {
@@ -1251,7 +1283,9 @@ TermsRadio.prototype = {
 		this.chartOverlayOff(selector);
 		this.colorIndex.push(this.overlayQueue[index].colour);
     	this.overlayQueue.splice(index, 1);
-    	this.sliderOverlayOff(selector);
+    	if (this.showSlider) {
+    		this.sliderOverlayOff(selector);
+    	}
 		this.lastSticky = selector;
 	}
 	
@@ -1525,12 +1559,12 @@ TermsRadio.prototype = {
 		if(this.parent.getApiParam('yAxisScale') == 'log') this.yScale = d3.scale.log();
 		
 		this.yScale.domain([this.minFreq, this.absMaxFreq * this.valFraction * 1.25])
-				.rangeRound([this.container.getHeight() - this.bPadding, (this.tPadding * 2) + this.navigationHeight]);
+				.rangeRound([this.container.getHeight() - this.bPadding, (this.tPadding) + this.getSliderHeight()]);
 	}
 	
 	,manageYSliderScale: function() {
 		var top = this.tPadding
-			,bottom = this.tPadding + this.navigationHeight;
+			,bottom = this.tPadding + this.getSliderHeight();
 		
 		if(this.parent.getApiParam('yAxisScale') == 'linear') this.ySliderScale = d3.scale.linear();
 		if(this.parent.getApiParam('yAxisScale') == 'log') this.ySliderScale = d3.scale.log();
@@ -1571,6 +1605,15 @@ TermsRadio.prototype = {
 	    	.range([this.lPadding, this.container.getWidth() - this.rPadding]);
 	}
 
+	,getSliderHeight: function() {
+		return this.showSlider ? this.sliderHeight+this.sliderBPadding : 0;
+	}
+	
+	,setSliderHeight: function() {
+		this.sliderHeight = Math.max(10, this.container.getHeight()*this.sliderHeightRatio);
+	}
+	
+	
 	//
 	//MISC. FUNCTIONS
 	//
