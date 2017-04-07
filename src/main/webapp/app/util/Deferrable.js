@@ -23,6 +23,11 @@ Ext.define('Voyant.util.Deferrable', {
 		}
 		
 		if (!deferred.promise.show && window.show) {deferred.promise.show=show}
+		
+		// make sure that this object can chain an assignment
+		if (!deferred.promise.assign) {
+			Ext.apply(deferred.promise, {assign: new Voyant.util.Assignable().assign});
+		}
 
 		this.deferredStack.push(deferred);
 		

@@ -33,10 +33,10 @@
  */
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
-    mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization'],
+    mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization','Voyant.util.Assignable'],
     transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
-    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio'],
+    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio','Voyant.panel.DocumentTerms','Voyant.panel.TermsBerry','Voyant.panel.CollocatesGraph','Voyant.panel.Contexts','Voyant.panel.WordTree'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
@@ -370,12 +370,21 @@ Ext.define('Voyant.data.model.Corpus', {
 	/**
      * Create a promise for a new Corpus with relevant data loaded.
      * 
-     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
-     * provide a function that receives the Corpus as an argument.
+     * The typical usage in Spiral is to call {@link #assign} in a first code block:
+     * 
+     * 		new Corpus("Hello Voyant!").assign("corpus");
+     * 
+     * Then use the named variable in a subsequent code block:
+     * 
+     * 	  corpus.show();
+     * 
+     * Alternatively, the returned promise can be chained with {@link Ext.promise.Promise#then then}
+     * and a function argument that receives the Corpus as an argument.
      * 
      * 	var corpus;
      * 	new Corpus("Hello Voyant!").then(function(data) {
      * 		corpus = data;
+     * 		corpus.show();
      * 	});
      * 
      * The following scenarios are possible for the config argument:
@@ -717,7 +726,7 @@ Ext.define('Voyant.data.model.Corpus', {
 	 */
 	getText: function(config) {
 		if (this.then) {
-			return Voyant.application.getDeferredNestedPromise(this, arguments);
+			return Voyant.application.getDeferredNestedPromise(this, arguments, this);
 		} else {
 			var dfd = Voyant.application.getDeferred(this);
 	    	config = config || {};
@@ -739,7 +748,7 @@ Ext.define('Voyant.data.model.Corpus', {
         	    url: Voyant.application.getTromboneUrl(),
         	    params: config,
         	    success: function(response, opts) {
-        	    	dfd.resolve(response.responseText);
+        	    	dfd.resolve(response.responseText.trim());
         	    },
         	    failure: function(response, opts) {
         	    	dfd.reject(response);

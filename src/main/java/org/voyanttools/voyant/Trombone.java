@@ -264,7 +264,7 @@ public class Trombone extends HttpServlet {
 		
 		// intercept to see if we have a notebook in resources
 		if (parameters.getParameterValue("tool", "").equals("notebook.NotebookManager") && parameters.containsKey("notebook")) {
-			File file = new File(getServletContext().getRealPath("/resources/spiral"), parameters.getParameterValue("notebook") +".json");
+			File file = new File(getServletContext().getRealPath("/resources/spiral"), parameters.getParameterValue("notebook").replaceFirst("/$", "") +".json");
 			if (!file.exists()) {
 				file = new File(getServletContext().getRealPath("/resources/spiral"), parameters.getParameterValue("notebook") +"/index.json");
 			}

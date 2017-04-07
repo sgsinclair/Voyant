@@ -537,3 +537,18 @@ form.chat input[type='submit']{
     width: 100%;
   }
 }
+
+table.voyant-table {
+    border: thin solid #ccc;
+}
+
+table.voyant-table th {
+    background-color: rgba(255, 255, 0, .05);
+}
+
+table.voyant-table td, table.voyant-table th {
+    border-right: thin solid #eee; border-bottom: thin solid #eee;
+}
+table.voyant-table td:last-child {
+    border-right: none; border-bottom: none;
+}
