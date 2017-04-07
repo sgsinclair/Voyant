@@ -1,6 +1,18 @@
-/*
+/**
+ * Terms Radio tool, a visualization for term distributions.
+ * 
+ * <iframe src="../?corpus=austen&view=termsradio" style="max-width: 600px; height: 600px"></iframe>
+ * 
+ * The typical use is not to instantiate this class directly, but to embed the tool from a corpus.
+ * 
+ * 		var austen;
+ * 		new Corpus("austen").then(function(corpus) {
+ * 			austen = corpus;
+ * 			austen.embed('TermsRadio'); // simply embed
+ * 			austen.embed('TermsRadio', {visibleBins: 8}); // embed with parameter
+ * 		});
+ * 
  * @class Voyant.panel.TermsRadio
- * @private
  * @author Mark Turcato
  * @author Andrew MacDonald
  */
@@ -9,30 +21,41 @@ Ext.define('Voyant.panel.TermsRadio', {
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.termsradio',
 	config: {
+		/**
+		 * @private
+		 */
 		options: [{
 			xtype: 'stoplistoption'
 		}],
+		/**
+		 * @private
+		 */
 		speed: 50,
+		/**
+		 * @private
+		 */
 		termsRadio: undefined
 	},
     statics: {
     	i18n: {
     	},
     	api: {
-    		withDistributions: true,
     		/**
-    		 * @property bins How many segments, i.e. 'bins', to seperate separate a document into.
-    		 * @type Integer
-    		 * @default 10
-    		 * @private
+    		 * @private (this shouldn't be modified but it needs to be part of the parameters)
+    		 */
+    		withDistributions: true,
+
+    		/**
+    		 * @cfg {Number} bins How many document segments to show if the corpus has a single document (default is 10); otherwise, the number of bins corresponds to the number of documents in the corpus.
+    		 * 
+    		 * Note that this often works in parallel with the {@link #bins} value.
     		 */
     		bins: 5
     	
     		/**
-    		 * @property visibleBins How many visible segments to be displayed at once.
-    		 * @type Integer
-    		 * @default 5
-    		 * @private
+    		 * @cfg {Number} visibleBins How many segments or documents to show at once (default is 5).
+    		 * 
+    		 * Note that this often works in parallel with the {@link #bins} value.
     		 */
     		,visibleBins: 5
     		
@@ -44,6 +67,9 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 */
     		,docIdType: null
     		
+    		/**
+    		 * @cfg {Number} limit Determine the number of terms to show (larger numbers may make the graph unusable).
+    		 */
     		,limit: 50
     	
     		/**
@@ -69,14 +95,13 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 */
     		,selectedWords: []
     		
-    		/**
-    		 * @property stopList The stop list to use to filter results.
-    		 * Choose from a pre-defined list, or enter a comma separated list of words, or enter an URL to a list of stop words in plain text (one per line).
-    		 * @type String
-    		 * @default null
-    		 * @choices stop.en.taporware.txt, stop.fr.veronis.txt
-    		 * @private
-    		 */
+			/**
+			 * @cfg {String} stopList A comma-separated list of words, a named list or a URL to a plain text list, one word per line.
+			 * 
+			 *  By default this is set to 'auto' which auto-detects the document's language and loads an appropriate list (if available for that language). Set this to blank to not use the default stopList.
+			 *  
+			 * For more information see the <a href="#!/guide/search">Stopwords documentation</a>.
+			 */
     		,stopList: 'auto'
     		
     		/**
@@ -107,6 +132,9 @@ Ext.define('Voyant.panel.TermsRadio', {
     	glyph: 'xf201@FontAwesome'
     }
 	
+	/**
+	 * @private
+	 */
 	,constructor: function(config) {
 		
 		var onLoadHandler = function(mode, store, records, success, operation) {

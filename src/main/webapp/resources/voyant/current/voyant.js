@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Apr 05 13:29:43 EDT 2017 */
+/* This file created by JSCacher. Last modified: Fri Apr 07 11:07:34 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4260,6 +4260,46 @@ Ext.define('Voyant.util.Api', {
 		if (this.api && this.api[key]) {this.api[key].value=value;}
 	}
 });
+Ext.define('Voyant.util.Assignable', {
+    transferable: ['assign'],
+    /**
+     * This is a convenience method for assigning a variable name to this promised object once it's ready.
+     * 
+     * This method is chainable, so you can call other promise-aware corpus functions.
+     * 
+     * 		new Corpus("Hello World!").assign("helloworld").show();
+     * 
+     * This is somewhat equivalent to the nastier:
+     * 
+     *  	var helloworld;
+     *  	new Corpus("Hello World!").then(function(corpus) {
+     *  		helloworld = corpus;
+     *  		helloworld.show();
+     *  	})
+     *  
+     * Note that when using `assign` in spiral, any references to the name variable should occur in separate, subsequent code blocks. 
+     * 
+     * 		new Corpus("Hello Voyant!").assign("corpus");
+     * 
+     * Then use the named variable in a subsequent code block:
+     * 
+     * 	  corpus.show();
+     * 
+     *  @param {String} name The variable name to assign to this corpus.
+     */
+    assign: function(name) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			if (Ext.isString(name)) {
+				window[name] = this;
+			} else {
+				Voyant.application.showError("The 'assign' method expects a string argument. ("+typeof name+") "+name)
+			}
+			return this;
+		}
+	}
+})
 Ext.define('Voyant.util.Localization', {
 	statics: {
 		DEFAULT_LANGUAGE: 'en',
@@ -4463,6 +4503,11 @@ Ext.define('Voyant.util.Deferrable', {
 		}
 		
 		if (!deferred.promise.show && window.show) {deferred.promise.show=show}
+		
+		// make sure that this object can chain an assignment
+		if (!deferred.promise.assign) {
+			Ext.apply(deferred.promise, {assign: new Voyant.util.Assignable().assign});
+		}
 
 		this.deferredStack.push(deferred);
 		
@@ -4478,6 +4523,7 @@ Ext.define('Voyant.util.Deferrable', {
 	},
 	
 	getDeferredNestedPromise: function(promise, args, transferable) {
+		console.warn(args, true, transferable, false)
 		var callee = arguments.callee.caller; // TODO: is callee.caller in terms of nested functions?
 		var dfd = Voyant.application.getDeferred(transferable);
 		promise.then(function(promised) {
@@ -5643,23 +5689,24 @@ Ext.define('Voyant.util.Storage', {
 
 Ext.define("Voyant.notebook.util.Show", {
 	transferable: ['show'],
-	show: function() { // this is for instances
-		show.apply(this, arguments);
+	show: function(len) { // this is for instances
+		show.call(this, this.getString ? this.getString() : this.toString(), len);
 	},
 	statics: {
-		show: function(contents) {
+		show: function(contents, len) {
+			var arg = contents;
 			if (this.then) {
 				this.then(function(val) {
-					show.apply(val, arguments);
+					show.call(val, val, arg);
 				})
 			} else {
 				contents = contents.getString ? contents.getString() : contents.toString();
+				if (len) {contents = contents.substring(0,len)}
 				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
 				Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
 			}
 		},
 		showError: function(error, more) {
-			debugger
 			var mode = Voyant.notebook.util.Show.MODE;
 			Voyant.notebook.util.Show.MODE='error';
 			
@@ -6900,7 +6947,7 @@ Ext.define('Voyant.data.store.TokensBuffered', {
  */
 Ext.define('Voyant.data.table.Table', {
 	alternateClassName: ["VoyantTable"],
-	mixins: ['Voyant.notebook.util.Embed'],
+	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
 	embeddable: ['Voyant.widget.VoyantChart'],
 	config: {
 		
@@ -6929,16 +6976,28 @@ Ext.define('Voyant.data.table.Table', {
 	constructor: function(config) {
 
 		config = config || {};
-		
+				
 		// not sure why config isn't working
 		this.rows = Ext.Array.from(Ext.isArray(config) ? config : config.rows);
-		this.headers = Ext.Array.from(config.headers);
+		this.setHeaders(Ext.Array.from(config.headers));
 		this.rowKey = config.rowKey;
+		
+		if (config.count) {
+			// create counts
+			var freqs = {};
+			config.count.forEach(function(item) {freqs[item] = freqs[item] ? freqs[item]+1 : 1;});
+			// sort counts
+			var counts = [];
+			for (var key in freqs) {counts.push([key, freqs[key]])}
+			counts.sort(function(a,b) {return b[1] - a[1]});
+			this.setHeaders(counts.map(function(item) {return item[0]}));
+			this.rows = [counts.map(function(item) {return item[1]})]
+		}
 		
 		if (config.isStore) {
 			this.model = config.getModel();
 			if (config.getCount()>0) {
-				this.headers = Object.keys(config.getAt(0).data);
+				this.setHeaders(Object.keys(config.getAt(0).data));
 			}
 			config.each(function(item) {
 				this.addRow(item.data);
@@ -6948,7 +7007,7 @@ Ext.define('Voyant.data.table.Table', {
 	},
 	addRow: function(row) {
 		if (Ext.isObject(row)) {
-			this.rows.push(this.headers.map(function(key) {return row[key]}))
+			this.rows.push(this.getHeaders().map(function(key) {return row[key]}))
 		} else if (Ext.isArray(row)) {
 			this.rows.push(row);
 		}
@@ -6974,8 +7033,9 @@ Ext.define('Voyant.data.table.Table', {
 	getRow: function(index, asMap) {
 		if (asMap) {
 			var row = {};
+			var headers = this.getHeaders();
 			Ext.Array.from(this.rows[index]).forEach(function(item, i) {
-				row[this.headers[i] || i] = item;
+				row[headers[i] || i] = item;
 			}, this);
 			return row;
 		} else {
@@ -7012,21 +7072,38 @@ Ext.define('Voyant.data.table.Table', {
 		if (this.rows[row][column]===undefined || replace) {this.rows[row][column]=value}
 		else {this.rows[row][column]+=value}
 	},
+	
 	embed: function(cmp, config) {
-		if (Ext.isObject(cmp) && !config) {
+		if ((Ext.isObject(cmp) || !cmp) && !config) {
 			config = cmp;
-			cmp = this.embeddabled[0];
+			// rather than use first embeddable, we'll use a transform grid
+			var id = Ext.id();
+			var localConfig = {id: id};
+			if (Ext.isObject(cmp)) {
+				Ext.apply(localConfig, cmp);
+			}
+			var html = this.getString(localConfig);
+			show(html);
+			var grid = new Ext.ux.grid.TransformGrid(id, {
+				remove: false,
+				width: '100%'
+			});
+			document.getElementById(id).outerHTML="<div id='"+id+"'></div>";
+			grid.render(Ext.get(id));
+			return this;
 		}
 		config = config || {};
 		chart = {};
 
+		debugger
 		var data = this.mapRows(function(row, i) {
 			return this.rowKey===undefined ? Ext.apply(row, {"row-index": i}) : row;
 		}, true, this)
 		
 		// determine columns/headers/fields
-		var fields = Ext.Array.merge(this.rowKey===undefined ? ["row-index"] : [], this.headers);
-		if (this.headers.length==0) {
+		var headers = this.getHeaders();
+		var fields = Ext.Array.merge(this.rowKey===undefined ? ["row-index"] : [], headers);
+		if (headers.length==0) {
 			var max = Ext.Array.max(this.mapRows(function(row) {return row ? row.length : 0}));
 			for (var i=0;i<max;i++) {fields.push(fields.length)}
 		}
@@ -7090,13 +7167,131 @@ Ext.define('Voyant.data.table.Table', {
 		if (config.title) {
 			chart.title = config.title;
 		}
-		console.warn(chart)
 		Ext.apply(config, {
 			chartJson: JSON.stringify(chart)
 		})
-		embed(cmp, config);
+		embed.call(this, cmp, config);
+	},
+	
+	getString: function(config) {
+		config = config || {};
+		var table = "<table class='voyant-table' style='"+(config.width ? ' width: '+config.width : '')+"' id='"+(config.id ? config.id : Ext.id())+"'>";
+		var headers = this.getHeaders();
+		if (headers.length) {
+			table+="<thead><tr>";
+			for (var i=0, len = headers.length; i<len; i++) {
+				table+="<th>"+headers[i]+"</th>";
+			}
+			table+="</tr></thead>";
+		}
+		table+="<tbody>";
+		for (var i=0, len = this.rows.length; i<len; i++) {
+			table+="<tr>";
+			var row = this.getRow(i);
+			row.forEach(function(cell) {
+				table+="<td>"+cell+"</td>";
+			})
+			table+="</tr>";
+		}
+		table+="</tbody></table>";
+		return table;
 	}
 })
+
+/**
+ * A Grid which creates itself from an existing HTML table element.
+ */
+Ext.define('Ext.ux.grid.TransformGrid', {
+    extend: 'Ext.grid.Panel',
+
+    /**
+     * Creates the grid from HTML table element.
+     * @param {String/HTMLElement/Ext.Element} table The table element from which this grid will be created -
+     * The table MUST have some type of size defined for the grid to fill. The container will be
+     * automatically set to position relative if it isn't already.
+     * @param {Object} [config] A config object that sets properties on this grid and has two additional (optional)
+     * properties: fields and columns which allow for customizing data fields and columns for this grid.
+     */
+    constructor: function(table, config) {
+        config = Ext.apply({}, config);
+        table = this.table = Ext.get(table);
+
+        var configFields = config.fields || [],
+            configColumns = config.columns || [],
+            fields = [],
+            cols = [],
+            headers = table.query("thead th"),
+            i = 0,
+            len = headers.length,
+            data = table.dom,
+            width,
+            height,
+            store,
+            col,
+            text,
+            name;
+
+        for (; i < len; ++i) {
+            col = headers[i];
+
+            text = col.innerHTML;
+            name = 'tcol-' + i;
+
+            fields.push(Ext.applyIf(configFields[i] || {}, {
+                name: name,
+                mapping: 'td:nth(' + (i + 1) + ')/@innerHTML'
+            }));
+
+            cols.push(Ext.applyIf(configColumns[i] || {}, {
+                text: text,
+                dataIndex: name,
+                width: col.offsetWidth,
+                tooltip: col.title,
+                sortable: true
+            }));
+        }
+
+        if (config.width) {
+            width = config.width;
+        } else {
+            width = table.getWidth() + 1;
+        }
+
+        if (config.height) {
+            height = config.height;
+        }
+
+        Ext.applyIf(config, {
+            store: {
+                data: data,
+                fields: fields,
+                proxy: {
+                    type: 'memory',
+                    reader: {
+                        record: 'tbody tr',
+                        type: 'xml'
+                    }
+                }
+            },
+            columns: cols,
+            width: width,
+            height: height
+        });
+        this.callParent([config]);
+        
+        if (config.remove !== false) {
+            // Don't use table.remove() as that destroys the row/cell data in the table in
+            // IE6-7 so it cannot be read by the data reader.
+            data.parentNode.removeChild(data);
+        }
+    },
+
+    doDestroy: function() {
+        this.table.remove();
+        this.tabl = null;
+        this.callParent();
+    }
+});
 Ext.define('Voyant.data.table.CorpusTerms', {
 	extend: 'Voyant.data.table.Table',
 	eachCorpusTerm: function() {
@@ -7138,10 +7333,10 @@ Ext.define('Voyant.data.table.CorpusTerms', {
  */
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
-    mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization'],
+    mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization','Voyant.util.Assignable'],
     transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
-    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio'],
+    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio','Voyant.panel.DocumentTerms','Voyant.panel.TermsBerry','Voyant.panel.CollocatesGraph','Voyant.panel.Contexts','Voyant.panel.WordTree'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
@@ -7475,12 +7670,21 @@ Ext.define('Voyant.data.model.Corpus', {
 	/**
      * Create a promise for a new Corpus with relevant data loaded.
      * 
-     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
-     * provide a function that receives the Corpus as an argument.
+     * The typical usage in Spiral is to call {@link #assign} in a first code block:
+     * 
+     * 		new Corpus("Hello Voyant!").assign("corpus");
+     * 
+     * Then use the named variable in a subsequent code block:
+     * 
+     * 	  corpus.show();
+     * 
+     * Alternatively, the returned promise can be chained with {@link Ext.promise.Promise#then then}
+     * and a function argument that receives the Corpus as an argument.
      * 
      * 	var corpus;
      * 	new Corpus("Hello Voyant!").then(function(data) {
      * 		corpus = data;
+     * 		corpus.show();
      * 	});
      * 
      * The following scenarios are possible for the config argument:
@@ -7822,7 +8026,7 @@ Ext.define('Voyant.data.model.Corpus', {
 	 */
 	getText: function(config) {
 		if (this.then) {
-			return Voyant.application.getDeferredNestedPromise(this, arguments);
+			return Voyant.application.getDeferredNestedPromise(this, arguments, this);
 		} else {
 			var dfd = Voyant.application.getDeferred(this);
 	    	config = config || {};
@@ -7844,7 +8048,7 @@ Ext.define('Voyant.data.model.Corpus', {
         	    url: Voyant.application.getTromboneUrl(),
         	    params: config,
         	    success: function(response, opts) {
-        	    	dfd.resolve(response.responseText);
+        	    	dfd.resolve(response.responseText.trim());
         	    },
         	    failure: function(response, opts) {
         	    	dfd.reject(response);
@@ -19741,7 +19945,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     	},
     	api: {
     		stopList: 'auto',
-    		context: 2,
+    		context: 5,
         	numInitialTerms: 75,
     		query: undefined,
     		docIndex: undefined,
@@ -20232,9 +20436,21 @@ Ext.define('Voyant.panel.TermsBerry', {
 		}
     }
 });
-/*
+/**
+ * Terms Radio tool, a visualization for term distributions.
+ * 
+ * <iframe src="../?corpus=austen&view=termsradio" style="max-width: 600px; height: 600px"></iframe>
+ * 
+ * The typical use is not to instantiate this class directly, but to embed the tool from a corpus.
+ * 
+ * 		var austen;
+ * 		new Corpus("austen").then(function(corpus) {
+ * 			austen = corpus;
+ * 			austen.embed('TermsRadio'); // simply embed
+ * 			austen.embed('TermsRadio', {visibleBins: 8}); // embed with parameter
+ * 		});
+ * 
  * @class Voyant.panel.TermsRadio
- * @private
  * @author Mark Turcato
  * @author Andrew MacDonald
  */
@@ -20243,29 +20459,38 @@ Ext.define('Voyant.panel.TermsRadio', {
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.termsradio',
 	config: {
+		/**
+		 * @private
+		 */
 		options: [{
 			xtype: 'stoplistoption'
 		}],
+		/**
+		 * @private
+		 */
 		speed: 50
 	},
     statics: {
     	i18n: {
     	},
     	api: {
-    		withDistributions: true,
+    		
     		/**
-    		 * @property bins How many segments, i.e. 'bins', to seperate separate a document into.
-    		 * @type Integer
-    		 * @default 10
-    		 * @private
+    		 * @private (this shouldn't be modified but it needs to be part of the parameters)
     		 */
-    		bins: 5
+    		withDistributions: true,
+    		
+    		/**
+    		 * @cfg {Number} bins How many document segments to show if the corpus has a single document (default is 10); otherwise, the number of bins corresponds to the number of documents in the corpus.
+    		 * 
+    		 * Note that this often works in parallel with the {@link #bins} value.
+    		 */
+    		bins: 10
     	
     		/**
-    		 * @property visibleBins How many visible segments to be displayed at once.
-    		 * @type Integer
-    		 * @default 5
-    		 * @private
+    		 * @cfg {Number} visibleBins How many segments or documents to show at once (default is 5).
+    		 * 
+    		 * Note that this often works in parallel with the {@link #bins} value.
     		 */
     		,visibleBins: 5
     		
@@ -20277,19 +20502,17 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 */
     		,docIdType: null
     		
+    		/**
+    		 * @cfg {Number} limit Determine the number of terms to show (larger numbers may make the graph unusable).
+    		 */
     		,limit: 50
     	
     		/**
-        	 * @property mode What mode to operate at, either document or corpus.
-        	 * @choices document, corpus
     		 * @private
         	 */
     		,mode: null
     		
     		/**
-        	 * @property position The current shifted position of the visualization.
-        	 * @type Integer
-        	 * @default 0
     		 * @private
         	 */
     		,position: 0
@@ -20302,14 +20525,13 @@ Ext.define('Voyant.panel.TermsRadio', {
     		 */
     		,selectedWords: []
     		
-    		/**
-    		 * @property stopList The stop list to use to filter results.
-    		 * Choose from a pre-defined list, or enter a comma separated list of words, or enter an URL to a list of stop words in plain text (one per line).
-    		 * @type String
-    		 * @default null
-    		 * @choices stop.en.taporware.txt, stop.fr.veronis.txt
-    		 * @private
-    		 */
+			/**
+			 * @cfg {String} stopList A comma-separated list of words, a named list or a URL to a plain text list, one word per line.
+			 * 
+			 *  By default this is set to 'auto' which auto-detects the document's language and loads an appropriate list (if available for that language). Set this to blank to not use the default stopList.
+			 *  
+			 * For more information see the <a href="#!/guide/search">Stopwords documentation</a>.
+			 */
     		,stopList: 'auto'
     		
     		/**
@@ -20374,6 +20596,9 @@ Ext.define('Voyant.panel.TermsRadio', {
 	,largestW: 0
 	,largestH: 0
 	
+	/**
+	 * @private
+	 */
 	,constructor: function(config) {
 		
 		this.colorMasterList = this.theme.getColors();

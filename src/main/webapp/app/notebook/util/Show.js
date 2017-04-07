@@ -1,22 +1,23 @@
 Ext.define("Voyant.notebook.util.Show", {
 	transferable: ['show'],
-	show: function() { // this is for instances
-		show.apply(this, arguments);
+	show: function(len) { // this is for instances
+		show.call(this, this.getString ? this.getString() : this.toString(), len);
 	},
 	statics: {
-		show: function(contents) {
+		show: function(contents, len) {
+			var arg = contents;
 			if (this.then) {
 				this.then(function(val) {
-					show.apply(val, arguments);
+					show.call(val, val, arg);
 				})
 			} else {
 				contents = contents.getString ? contents.getString() : contents.toString();
+				if (len) {contents = contents.substring(0,len)}
 				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
 				Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
 			}
 		},
 		showError: function(error, more) {
-			debugger
 			var mode = Voyant.notebook.util.Show.MODE;
 			Voyant.notebook.util.Show.MODE='error';
 			

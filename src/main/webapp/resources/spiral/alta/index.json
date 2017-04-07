@@ -20,14 +20,14 @@
                 " of possibilities and providing a helpful foundation for further exploration and",
                 " experimentation.</p>\n\n<p>This instance of The Art of Literary Text Analysis is ",
                 "created in Spiral Notebooks (there's also companion version in <a data-tabindex-",
-                "counter=\"2\" data-tabindex-value=\"none\" href=\"https://github.com/sgsinclair/alta/",
+                "counter=\"3\" data-tabindex-value=\"none\" href=\"https://github.com/sgsinclair/alta/",
                 "blob/master/ipynb/ArtOfLiteraryTextAnalysis.ipynb\" tabindex=\"-1\">iPython Noteboo",
                 "ks</a>).&nbsp;Other choices are available, and many conceptual aspects of the gu",
                 "ide are relevant regardless of the implementation. Spiral Notebooks was chosen f",
                 "or four main reasons:</p>\n\n<ol>\n\t<li>Spiral Notebooks requires no setup or insta",
                 "llation to get started, you just visit a web page;</li>\n\t<li>Spiral Notebooks le",
                 "verages the analytic and visualization capabilities of <a data-tabindex-counter=",
-                "\"2\" data-tabindex-value=\"none\" href=\"http://voyant-tools.org\" tabindex=\"-1\">Voya",
+                "\"3\" data-tabindex-value=\"none\" href=\"http://voyant-tools.org\" tabindex=\"-1\">Voya",
                 "nt Tools</a>;</li>\n\t<li>code in Spiral Notebooks&nbsp;is essentially written in ",
                 "Javascript, a relatively friendly language to learn and one that's widely used;<",
                 "/li>\n\t<li>Spiral Notebooks offers a&nbsp;<em>literate programming</em>&nbsp;mode",
@@ -46,16 +46,23 @@
             "output": [
                 " <div class=\"info\"><iframe style=\"width: 90%; height: 400px\" src=\"../../tool/Cir",
                 "rus/?minimal=true&amp;corpus=2821fe410914bbb369b50af75a5099da&amp;debug=true\" da",
-                "ta-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"2\"></iframe></div>"
+                "ta-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"3\"></iframe></div>"
             ]
         },
         {
             "type": "text",
             "input": [
-                "<h2>Table of Contents</h2>\n\n<ul>\n\t<li>First Encounters:\n\t<ul>\n\t\t<li><a data-tabi",
-                "ndex-counter=\"2\" data-tabindex-value=\"none\" href=\"./GettingStarted\" tabin",
-                "dex=\"-1\">Getting Started</a> (introducing core concepts of Spiral Notebooks)</li",
-                ">\n\t</ul>\n\t</li>\n</ul>\n"
+                "<h2>Table of Contents</h2>\n\n<ul>\n\t<li><a data-tabindex-counter=\"3\" data-tabindex",
+                "-value=\"none\" href=\"Start\" tabindex=\"-1\">Getting Started</a> (introducing core c",
+                "oncepts of Spiral Notebooks)</li>\n\t<li><a data-tabindex-counter=\"1\" data-tabinde",
+                "x-value=\"none\" href=\"http://Create\" tabindex=\"-1\">Creating a Corpus</a>&nbsp;(ho",
+                "w to create a corpus with Voyant or programmatically with strings or URLs)</li>\n",
+                "\t<li><a data-tabindex-counter=\"1\" data-tabindex-value=\"none\" href=\"http://Smalle",
+                "rCorpus\" tabindex=\"-1\">Exploring a Smaller Corpus</a>&nbsp;(how to begin explori",
+                "ng a smaller corpus, Edgar Allan Poe's \"The Gold Bug\")</li>\n\t<li><a data-tabinde",
+                "x-counter=\"1\" data-tabindex-value=\"none\" href=\"http://Tables\" tabindex=\"-1\">Intr",
+                "oducing Tables</a>&nbsp;(introducing core concepts of working with custom data a",
+                "nd tables)</li>\n\t<li>Exploring a Larger Corpus</li>\n</ul>\n"
             ]
         }
     ]
