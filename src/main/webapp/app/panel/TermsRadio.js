@@ -319,6 +319,12 @@ Ext.define('Voyant.panel.TermsRadio', {
 	            			this.setApiParams({visibleBins: newvalue});
 							this.numVisPoints = newvalue;
 							this.loadStore();
+							
+							if (this.numVisPoints == this.getCorpus().getDocumentsCount()) {
+								this.getTermsRadio().hideSlider();
+							} else if (this.getApiParam("slider") != 'false'){
+								this.getTermsRadio().showSlider();
+							}
 	            		},
 	            		scope: this
 	            	}

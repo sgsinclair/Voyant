@@ -7,7 +7,7 @@
 function TermsRadio(config) {
 	this.parent = config.parent;
 	this.container = config.container;
-	this.showSlider = config.showSlider == undefined ? true : config.showSlider;
+	this.isSliderVisible = config.showSlider == undefined ? true : config.showSlider;
 	
 	this.chart = null;
 	
@@ -94,10 +94,6 @@ TermsRadio.prototype = {
 			this.redraw();
 		} else {
 			this.initializeChart();
-		}
-		
-		if (this.showSlider) {
-			this.redrawSliderOverlay();
 		}
 	}
 
@@ -470,9 +466,10 @@ TermsRadio.prototype = {
 		this.drawXAxis();
 		this.drawYAxis();
 		this.drawChart();
-		if (this.showSlider) {
+		if (this.isSliderVisible) {
 			this.drawSlider();
 			this.drawVerticalSlider();
+			this.redrawSliderOverlay();
 		}
 		this.transitionCall = 'draw';
 	}
@@ -485,9 +482,10 @@ TermsRadio.prototype = {
 		this.redrawXAxis();
 		this.redrawYAxis();
 		this.redrawChart();
-		if (this.showSlider) {
+		if (this.isSliderVisible) {
 			this.redrawSlider();
 			this.redrawVerticalSlider();
+			this.redrawSliderOverlay();
 		}
 		this.redrawChartOverlay();
     }
@@ -545,10 +543,7 @@ TermsRadio.prototype = {
 		        .attr("width", w)
 		        .attr("height", this.largestH);
 		
-			this.redraw();	
-			if (this.showSlider) {
-				this.redrawSliderOverlay();
-			}
+			this.redraw();
 		}
 	}
 	
@@ -804,7 +799,7 @@ TermsRadio.prototype = {
 			,offsetVisEnd = this.lPadding + (lengthHor * ((this.numVisPoints - 1) / (this.numDataPoints - 1)));
 		
 		var lineX = this.chart.append('line')
-			.attr('class', 'sliderAxis')
+			.attr('class', 'slider axis')
 			.attr('x1', this.lPadding)
 			.attr('x2', this.container.getWidth() - this.rPadding)
 			.attr('y1', this.tPadding + this.sliderHeight)
@@ -814,7 +809,7 @@ TermsRadio.prototype = {
 	  	    .style('stroke-width','1');
 					
 		var lineY = this.chart.append('line')
-			.attr('class', 'sliderAxis')
+			.attr('class', 'slider axis')
 			.attr('x1', this.lPadding)
 			.attr('x2', this.lPadding)
 			.attr('y1', this.tPadding + this.sliderHeight)
@@ -950,16 +945,21 @@ TermsRadio.prototype = {
 	    greyBoxAfter.call(drag);
     }
     
-    ,redrawSlider: function() {
+    ,removeSlider: function(removeTermLines) {
     	this.chart.selectAll('rect[class=slider]')
+    		.remove();
+	
+    	this.chart.selectAll('line[class~=slider]')
 	    	.remove();
-		
-		this.chart.selectAll('line[class=slider]')
-		    .remove();
-		
-		this.chart.selectAll('line[class=sliderAxis]')
-	    	.remove();
-	    	
+    	
+    	if (removeTermLines) {
+    		this.chart.selectAll('g[class=slider]')
+	    		.remove();
+    	}
+    }
+    
+    ,redrawSlider: function() {
+    	this.removeSlider();
     	this.drawSlider();
     }
 	
@@ -1136,7 +1136,7 @@ TermsRadio.prototype = {
 				if(this.lastSlippery !== null) {
 					//exceptional case where lastSlippery was not properly removed
 					this.chartOverlayOff(this.lastSlippery);
-					if (this.showSlider) {
+					if (this.isSliderVisible) {
 						this.sliderOverlayOff(this.lastSlippery);
 					}
 					this.lastSlippery = null;
@@ -1144,7 +1144,7 @@ TermsRadio.prototype = {
 					//select new slippery word
 					//change its colour
 					this.chartOverlayOn(lineObject);
-					if (this.showSlider) {
+					if (this.isSliderVisible) {
 						this.sliderOverlayOn(lineObject);
 					}
 					this.lastSlippery = selector;
@@ -1153,7 +1153,7 @@ TermsRadio.prototype = {
 					//normal case select slippery word
 					//change its colour
 					this.chartOverlayOn(lineObject);
-					if (this.showSlider) {
+					if (this.isSliderVisible) {
 						this.sliderOverlayOn(lineObject);
 					}
 					this.lastSlippery = selector;
@@ -1162,7 +1162,7 @@ TermsRadio.prototype = {
 			else{
 				//normal case deselect a slippery word
 				this.chartOverlayOff(selector);
-				if (this.showSlider) {
+				if (this.isSliderVisible) {
 					this.sliderOverlayOff(this.lastSlippery);
 				}
 				this.lastSlippery = null;
@@ -1247,7 +1247,7 @@ TermsRadio.prototype = {
 		
 		//if this was selected a slippery before click event remove line from navigation bar
 		if(selector === this.lastSlippery){
-			if (this.showSlider) {
+			if (this.isSliderVisible) {
 				this.sliderOverlayOff(selector);
 			}
 			this.lastSlippery = null;
@@ -1258,7 +1258,7 @@ TermsRadio.prototype = {
 
 		this.overlayQueue.push(lineObject);
 		this.chartOverlayOn(lineObject);
-		if (this.showSlider) {
+		if (this.isSliderVisible) {
 			this.sliderOverlayOn(lineObject);
 		}
 	},
@@ -1283,7 +1283,7 @@ TermsRadio.prototype = {
 		this.chartOverlayOff(selector);
 		this.colorIndex.push(this.overlayQueue[index].colour);
     	this.overlayQueue.splice(index, 1);
-    	if (this.showSlider) {
+    	if (this.isSliderVisible) {
     		this.sliderOverlayOff(selector);
     	}
 		this.lastSticky = selector;
@@ -1344,6 +1344,7 @@ TermsRadio.prototype = {
 		
 		//draw path
 		this.chart.append('g')
+			.attr('class', 'slider')
 			.attr('id', 'slider-line-' + objectToSelect.word)
 			.append('path')
 			.attr("d", this.buildSliderPath(objectToSelect.fullPath))
@@ -1606,11 +1607,22 @@ TermsRadio.prototype = {
 	}
 
 	,getSliderHeight: function() {
-		return this.showSlider ? this.sliderHeight+this.sliderBPadding : 0;
+		return this.isSliderVisible ? this.sliderHeight+this.sliderBPadding : 0;
 	}
 	
 	,setSliderHeight: function() {
 		this.sliderHeight = Math.max(10, this.container.getHeight()*this.sliderHeightRatio);
+	}
+	
+	,hideSlider: function() {
+		this.isSliderVisible = false;
+		this.removeSlider(true);
+		this.doResize();
+	}
+	
+	,showSlider: function() {
+		this.isSliderVisible = true;
+		this.doResize();
 	}
 	
 	
