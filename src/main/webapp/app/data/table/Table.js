@@ -15,7 +15,7 @@
 Ext.define('Voyant.data.table.Table', {
 	alternateClassName: ["VoyantTable"],
 	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
-	embeddable: ['Voyant.widget.VoyantChart'],
+	embeddable: ['Voyant.widget.VoyantTableTransform','Voyant.widget.VoyantChart'],
 	config: {
 		
 		/**
@@ -45,9 +45,9 @@ Ext.define('Voyant.data.table.Table', {
 		config = config || {};
 				
 		// not sure why config isn't working
-		this.rows = Ext.Array.from(Ext.isArray(config) ? config : config.rows);
+		this.setRows(Ext.Array.from(Ext.isArray(config) ? config : config.rows));
 		this.setHeaders(Ext.Array.from(config.headers));
-		this.rowKey = config.rowKey;
+		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
 		
 		if (config.count) {
 			// create counts
@@ -57,8 +57,14 @@ Ext.define('Voyant.data.table.Table', {
 			var counts = [];
 			for (var key in freqs) {counts.push([key, freqs[key]])}
 			counts.sort(function(a,b) {return b[1] - a[1]});
-			this.setHeaders(counts.map(function(item) {return item[0]}));
-			this.rows = [counts.map(function(item) {return item[1]})]
+			if (config.orientation && config.orientation=="horizontal") {
+				this.setHeaders(counts.map(function(item) {return item[0]}));
+				this.setRows([counts.map(function(item) {return item[1]})]);
+			} else {
+				this.setHeaders(config.headers ? config.headers : ["Item","Count"]);
+				this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
+				this.setRows(counts);
+			}
 		}
 		
 		if (config.isStore) {
@@ -74,13 +80,13 @@ Ext.define('Voyant.data.table.Table', {
 	},
 	addRow: function(row) {
 		if (Ext.isObject(row)) {
-			this.rows.push(this.getHeaders().map(function(key) {return row[key]}))
+			this.getRows().push(this.getHeaders().map(function(key) {return row[key]}))
 		} else if (Ext.isArray(row)) {
-			this.rows.push(row);
+			this.getRows().push(row);
 		}
 	},
 	eachRecord: function(fn, scope) {
-		var item, i=0, len=this.rows.length;
+		var item, i=0, len=this.getRows().length;
 		for (; i<len; i++) {
             item = this.getRecord(i);
 			if (fn.call(scope || item, item, i, len) === false) {
@@ -89,7 +95,7 @@ Ext.define('Voyant.data.table.Table', {
 		}
 	},
 	eachRow: function(fn, asMap, scope) {
-		var item, i=0, len=this.rows.length;
+		var item, i=0, len=this.getRows().length;
 		for (; i<len; i++) {
             item = this.getRow(i, asMap);
 			if (fn.call(scope || item, item, i, len) === false) {
@@ -101,12 +107,12 @@ Ext.define('Voyant.data.table.Table', {
 		if (asMap) {
 			var row = {};
 			var headers = this.getHeaders();
-			Ext.Array.from(this.rows[index]).forEach(function(item, i) {
+			Ext.Array.from(this.getRows()[index]).forEach(function(item, i) {
 				row[headers[i] || i] = item;
 			}, this);
 			return row;
 		} else {
-			return this.rows[index];
+			return this.getRows()[index];
 		}
 	},
 	getRecord: function(index) {
@@ -135,41 +141,103 @@ Ext.define('Voyant.data.table.Table', {
 	 * the value is added to any current value (which is the default behaviour).
 	 */
 	updateCell: function(row, column, value, replace) {
-		if (this.rows[row]===undefined) {this.rows[row]=[]}
-		if (this.rows[row][column]===undefined || replace) {this.rows[row][column]=value}
-		else {this.rows[row][column]+=value}
+		var rows = this.getRows();
+		if (rows[row]===undefined) {rows[row]=[]}
+		if (rows[row][column]===undefined || replace) {rows[row][column]=value}
+		else {rows[row][column]+=value}
 	},
 	
 	embed: function(cmp, config) {
 		if ((Ext.isObject(cmp) || !cmp) && !config) {
-			config = cmp;
-			// rather than use first embeddable, we'll use a transform grid
-			var id = Ext.id();
-			var localConfig = {id: id};
-			if (Ext.isObject(cmp)) {
-				Ext.apply(localConfig, cmp);
-			}
-			var html = this.getString(localConfig);
-			show(html);
-			var grid = new Ext.ux.grid.TransformGrid(id, {
-				remove: false,
-				width: '100%'
+			config = cmp || {};
+
+			var table = this.getString();
+			Ext.apply(config, {
+				tableHtml: table
 			});
-			document.getElementById(id).outerHTML="<div id='"+id+"'></div>";
-			grid.render(Ext.get(id));
-			return this;
+			return embed.call(this, this.embeddable[0], config);
+
 		}
 		config = config || {};
 		chart = {};
-
-		debugger
+		
+		// build data
+		var rowKey = this.getRowKey();
 		var data = this.mapRows(function(row, i) {
-			return this.rowKey===undefined ? Ext.apply(row, {"row-index": i}) : row;
+			return rowKey===undefined ? Ext.apply(row, {"row-index": i}) : row;
 		}, true, this)
+		
+		// set chart store
+		Ext.apply(chart, {
+			store: {
+		        fields: this.getHeaders(),
+		        data: data
+		    }
+		});
+		
+		// set chart axes
+		if (config.axes) {
+			Ext.apply(chart, {axes: config.axes});
+			var positions = ["left", "bottom"]
+			chart.axes.forEach(function(axis, i) {
+				Ext.applyIf(axis, {
+			        type: i==0 ? 'numeric' : 'category',
+			        position: i==0 ? "left" : "bottom"
+				})
+			})
+			delete config.axes;
+		} else {
+			Ext.apply(chart, {
+				axes:  [{
+			        type: 'numeric',
+			        position: 'left'
+			    }, {
+			        type: 'category', // row numbers (discrete)
+			        position: 'bottom'
+			    }]
+			})
+		}
+		
+		// set chart series
+		var series = [];
+		for (var i=0, len=chart.store.fields.length; i<len;i++) {
+			if (chart.store.fields[i]==rowKey) {continue;}
+			var cfg = {};
+			if (config.series) {
+				if (Ext.isObject(config.series)) {
+					Ext.apply(cfg, config.series);
+				} else if (Ext.isArray(config.series)) {
+					Ext.apply(cfg, config.series[series.length]);
+				}
+			}
+			Ext.applyIf(cfg, {
+		        type: 'line',
+		        xField: rowKey,
+		        yField: chart.store.fields[i],
+		        marker: {
+		        	radius: 2
+		        },
+		        highlightCfg: {
+	                scaling: 2
+	            },
+	            tooltip: {
+	            	trackMouse: true,
+	            	renderer: function (tooltip, record, item) {
+	                    tooltip.setHtml(record.get(item.series.getYField())+": "+record.get(item.series.getYField()));
+	                }
+	            }
+			});
+			series.push(cfg);
+		}
+		Ext.apply(chart, {
+			series: series
+		});
+
+		/*
 		
 		// determine columns/headers/fields
 		var headers = this.getHeaders();
-		var fields = Ext.Array.merge(this.rowKey===undefined ? ["row-index"] : [], headers);
+		var fields = Ext.Array.merge(rowKey===undefined ? ["row-index"] : [], headers);
 		if (headers.length==0) {
 			var max = Ext.Array.max(this.mapRows(function(row) {return row ? row.length : 0}));
 			for (var i=0;i<max;i++) {fields.push(fields.length)}
@@ -206,24 +274,26 @@ Ext.define('Voyant.data.table.Table', {
 		
 		if (config.series) {
 			Ext.apply(chart, {series: config.series});
+			
 			chart.series.forEach(function(axis, i) {
 				Ext.applyIf(axis, {
 					type: 'line',
-					xField: this.rowKey===undefined ? 'row-index' : this.rowKey,
+					xField: rowKey===undefined ? 'row-index' : rowKey,
 					yField: i
 				})
 			})
 			delete config.series;
 		} else {
 			var series = [];
+			debugger
 			for (var i=0, len=fields.length; i<len;i++) {
 				
 				// skip if this is the row key
-				if (i===this.rowKey || (this.rowKey==undefined && i+1==len)) {continue;}
+				if (i===rowKey || (rowKey==undefined && i+1==len)) {continue;}
 				
 				series.push({
 			        type: 'line',
-			        xField: this.rowKey===undefined ? 'row-index' : this.rowKey,
+			        xField: rowKey===undefined ? 'row-index' : rowKey,
 			        yField: i
 				})
 			}
@@ -231,6 +301,7 @@ Ext.define('Voyant.data.table.Table', {
 				series: series
 			});
 		}
+		*/
 		if (config.title) {
 			chart.title = config.title;
 		}
@@ -252,7 +323,7 @@ Ext.define('Voyant.data.table.Table', {
 			table+="</tr></thead>";
 		}
 		table+="<tbody>";
-		for (var i=0, len = this.rows.length; i<len; i++) {
+		for (var i=0, len = this.getRows().length; i<len; i++) {
 			table+="<tr>";
 			var row = this.getRow(i);
 			row.forEach(function(cell) {
@@ -263,99 +334,4 @@ Ext.define('Voyant.data.table.Table', {
 		table+="</tbody></table>";
 		return table;
 	}
-})
-
-/**
- * A Grid which creates itself from an existing HTML table element.
- */
-Ext.define('Ext.ux.grid.TransformGrid', {
-    extend: 'Ext.grid.Panel',
-
-    /**
-     * Creates the grid from HTML table element.
-     * @param {String/HTMLElement/Ext.Element} table The table element from which this grid will be created -
-     * The table MUST have some type of size defined for the grid to fill. The container will be
-     * automatically set to position relative if it isn't already.
-     * @param {Object} [config] A config object that sets properties on this grid and has two additional (optional)
-     * properties: fields and columns which allow for customizing data fields and columns for this grid.
-     */
-    constructor: function(table, config) {
-        config = Ext.apply({}, config);
-        table = this.table = Ext.get(table);
-
-        var configFields = config.fields || [],
-            configColumns = config.columns || [],
-            fields = [],
-            cols = [],
-            headers = table.query("thead th"),
-            i = 0,
-            len = headers.length,
-            data = table.dom,
-            width,
-            height,
-            store,
-            col,
-            text,
-            name;
-
-        for (; i < len; ++i) {
-            col = headers[i];
-
-            text = col.innerHTML;
-            name = 'tcol-' + i;
-
-            fields.push(Ext.applyIf(configFields[i] || {}, {
-                name: name,
-                mapping: 'td:nth(' + (i + 1) + ')/@innerHTML'
-            }));
-
-            cols.push(Ext.applyIf(configColumns[i] || {}, {
-                text: text,
-                dataIndex: name,
-                width: col.offsetWidth,
-                tooltip: col.title,
-                sortable: true
-            }));
-        }
-
-        if (config.width) {
-            width = config.width;
-        } else {
-            width = table.getWidth() + 1;
-        }
-
-        if (config.height) {
-            height = config.height;
-        }
-
-        Ext.applyIf(config, {
-            store: {
-                data: data,
-                fields: fields,
-                proxy: {
-                    type: 'memory',
-                    reader: {
-                        record: 'tbody tr',
-                        type: 'xml'
-                    }
-                }
-            },
-            columns: cols,
-            width: width,
-            height: height
-        });
-        this.callParent([config]);
-        
-        if (config.remove !== false) {
-            // Don't use table.remove() as that destroys the row/cell data in the table in
-            // IE6-7 so it cannot be read by the data reader.
-            data.parentNode.removeChild(data);
-        }
-    },
-
-    doDestroy: function() {
-        this.table.remove();
-        this.tabl = null;
-        this.callParent();
-    }
 });
