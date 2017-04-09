@@ -15,7 +15,7 @@
 Ext.define('Voyant.data.table.Table', {
 	alternateClassName: ["VoyantTable"],
 	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
-	embeddable: ['Voyant.widget.VoyantTableTransform','Voyant.widget.VoyantChart'],
+	embeddable: ['Voyant.panel.VoyantTableTransform','Voyant.widget.VoyantChart'],
 	config: {
 		
 		/**
@@ -151,11 +151,13 @@ Ext.define('Voyant.data.table.Table', {
 		if ((Ext.isObject(cmp) || !cmp) && !config) {
 			config = cmp || {};
 
-			var table = this.getString();
-			Ext.apply(config, {
-				tableHtml: table
-			});
-			return embed.call(this, this.embeddable[0], config);
+			return embed.call(this, this.embeddable[0], Ext.apply(config, {
+				tableJson: JSON.stringify({
+					rowkey: this.getRowKey(),
+					headers: this.getHeaders(),
+					rows: this.getRows()
+				})
+			}));
 
 		}
 		config = config || {};

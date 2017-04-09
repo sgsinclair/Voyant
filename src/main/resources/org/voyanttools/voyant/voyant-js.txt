@@ -84,7 +84,6 @@ app/widget/FontFamilyOption.js
 app/widget/ColorPaletteOption.js
 app/widget/VoyantChart.js
 app/widget/LiveSearchGrid.js
-app/widget/VoyantTableTransform.js
 
 # PANELS
 app/panel/Panel.js
@@ -130,6 +129,7 @@ app/panel/CustomSet.js
 app/panel/Veliza.js
 app/panel/WordTree.js
 app/panel/Topics.js
+app/panel/VoyantTableTransform.js
 
 # APPS
 app/VoyantApp.js
