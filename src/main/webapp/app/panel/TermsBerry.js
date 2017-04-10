@@ -15,7 +15,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     		docIndex: undefined,
     		docId: undefined
     	},
-		glyph: 'xf201@FontAwesome'
+		glyph: 'xf1db@FontAwesome'
     },
     config: {
     	options: [{xtype: 'stoplistoption'}],
@@ -374,10 +374,10 @@ Ext.define('Voyant.panel.TermsBerry', {
     	var defaultFill;
     	if (this.getMode() === this.MODE_DISTINCT) {
     		defaultFill = d3.scale.pow().exponent(1/5)
-    			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#dedede']);
+    			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#dedede', '#fff']);
     	} else {
     		defaultFill = d3.scale.linear()
-				.domain([this.getMaxFillValue(), this.getMinFillValue()]).range(['#fff', '#dedede']);
+				.domain([this.getMaxFillValue(), this.getMinFillValue()]).range(['#dedede', '#fff']);
     	}
     	
     	// roughly calculate font size based on available area and number of terms

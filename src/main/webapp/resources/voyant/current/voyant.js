@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Apr 07 17:31:59 EDT 2017 */
+/* This file created by JSCacher. Last modified: Sun Apr 09 17:08:07 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4180,9 +4180,17 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
 
 })();
 
+/**
+ * @param {object} config
+ * @param {Voyant.panel.TermsRadio} config.parent
+ * @param {Ext.dom.Element} config.container
+ * @param {boolean} config.showSlider
+ */
 function TermsRadio(config) {
 	this.parent = config.parent;
 	this.container = config.container;
+	this.isSliderVisible = config.showSlider == undefined ? true : config.showSlider;
+	
 	this.chart = null;
 	
 	this.absMaxFreq = 0;
@@ -4197,7 +4205,6 @@ function TermsRadio(config) {
 	for (var i = 0; i < this.colorMasterList.length; i++) {
 		this.colorIndex.push(this.colorMasterList[i]);
 	}
-	
 	
 	this.continueTransition = true;
 	this.counterSeries = [];
@@ -4226,8 +4233,11 @@ function TermsRadio(config) {
 	this.bPadding = 25;
 	this.lPadding = 40;
 	this.rPadding = 20;
-	this.tPadding = 20;
-	this.navigationHeight = 100;
+	this.tPadding = 10;
+	
+	this.sliderHeightRatio = 0.1; // slider/container height ratio
+	this.sliderHeight = 0; // set in init and resize
+	this.sliderBPadding = 10;
 	
 	//tracks largest dimensions, used in resizing
 	this.largestW = 0;
@@ -4247,6 +4257,7 @@ function TermsRadio(config) {
 	this.xScale = d3.scale.linear();
 	this.xSliderScale = d3.scale.linear();
 	
+	this.container.on('resize', this.doResize, this);
 }
 
 TermsRadio.prototype = {
@@ -4266,8 +4277,6 @@ TermsRadio.prototype = {
 		} else {
 			this.initializeChart();
 		}
-		
-		this.redrawSliderOverlay();
 	}
 
 	,highlightQuery: function(query, sticky) {
@@ -4639,8 +4648,11 @@ TermsRadio.prototype = {
 		this.drawXAxis();
 		this.drawYAxis();
 		this.drawChart();
-		this.drawSlider();
-		this.drawVerticalSlider();
+		if (this.isSliderVisible) {
+			this.drawSlider();
+			this.drawVerticalSlider();
+			this.redrawSliderOverlay();
+		}
 		this.transitionCall = 'draw';
 	}
 	
@@ -4652,34 +4664,37 @@ TermsRadio.prototype = {
 		this.redrawXAxis();
 		this.redrawYAxis();
 		this.redrawChart();
-		this.redrawSlider();
-		this.redrawVerticalSlider();
+		if (this.isSliderVisible) {
+			this.redrawSlider();
+			this.redrawVerticalSlider();
+			this.redrawSliderOverlay();
+		}
 		this.redrawChartOverlay();
     }
     
 	,initChart: function () {
-//		console.log('fn: initChart')
-		
-		var innerCt = this.container.query('div[class$=innerCt]', false)[0];
-		
-		var h = innerCt.getHeight(),
-			w = innerCt.getWidth();
+		var h = this.container.getHeight(),
+			w = this.container.getWidth();
     
 		//create main SVG Element
-		var chartSVG = innerCt.appendChild(Ext.DomHelper.createDom('<svg class="chart" width="'+w+'" height="'+h+'"></svg>'), true);
+		var chartSVG = Ext.DomHelper.append(this.container.down('div[class$=innerCt]'), '<svg class="chart" width="'+w+'" height="'+h+'"></svg>');
 	    this.chart = d3.select(chartSVG);
 	    
+	    this.setSliderHeight();
+	    
 		this.largestW = w;
-		this.largestH = h - this.navigationHeight;
+		this.largestH = h - this.getSliderHeight();
+		
+		var y = this.tPadding + this.getSliderHeight();
 	    	    
 	    this.chart.append('clipPath')
 	        .attr('id', 'clip1')
 	      .append('rect')
 	      	.attr('class', 'clipping-rectangle')
 	        .attr("x", 0)
-	        .attr("y", this.navigationHeight + (this.tPadding * 2))
+	        .attr("y", y)
 	        .attr("width", w)
-	        .attr("height", h - this.navigationHeight);
+	        .attr("height", this.largestH);
 	    
 	    this.chart.append('g')
 	    	.attr('class','overlay')
@@ -4693,24 +4708,24 @@ TermsRadio.prototype = {
 		if(this.chart) {
 			var h = this.container.getHeight(),
 				w = this.container.getWidth();
+
+			this.setSliderHeight();
+			
+			this.largestH = h - this.getSliderHeight();
+			this.largestW = w;
 			
 			this.chart.attr('height', h)
 				.attr('width', w);
 				
 			this.setTitleLength();
 			
-			if(this.largestH < h && this.largestW < w) {
-				this.chart.select('rect[class=clipping-rectangle]')
-			        .attr("x", 0)
-			        .attr("y", this.navigationHeight + (this.tPadding * 2))
-			        .attr("width", w)
-			        .attr("height", h - this.navigationHeight);
-				this.largestH = h;
-				this.largestW = w;
-			}
+			this.chart.select('rect[class=clipping-rectangle]')
+		        .attr("x", 0)
+		        .attr("y", this.tPadding + this.getSliderHeight())
+		        .attr("width", w)
+		        .attr("height", this.largestH);
 		
-			this.redraw();	
-			this.redrawSliderOverlay();
+			this.redraw();
 		}
 	}
 	
@@ -4803,7 +4818,7 @@ TermsRadio.prototype = {
 		
 		this.yAxisScale.scale(toolObject.yScale)
 	    	.orient('left')
-	    	.ticks(yTicksScale(this.container.getHeight()))
+	    	.ticks(yTicksScale(h))
 	    	.tickFormat(logFormat)
 			.tickSize(-w + this.rPadding + this.lPadding);
 		
@@ -4916,7 +4931,7 @@ TermsRadio.prototype = {
 //    	var h = this.container.getHeight(),
 //			w = this.container.getWidth();
 //    	
-//    	var totalTopOffset = (this.tPadding * 2) + this.navigationHeight
+//    	var totalTopOffset = (this.tPadding * 2) + this.sliderHeight
 //        	,lengthVer = h - (totalTopOffset + this.bPadding);
 //        
 //	    //create vertical minimap rectangle and slider
@@ -4966,20 +4981,20 @@ TermsRadio.prototype = {
 			,offsetVisEnd = this.lPadding + (lengthHor * ((this.numVisPoints - 1) / (this.numDataPoints - 1)));
 		
 		var lineX = this.chart.append('line')
-			.attr('class', 'sliderAxis')
+			.attr('class', 'slider axis')
 			.attr('x1', this.lPadding)
 			.attr('x2', this.container.getWidth() - this.rPadding)
-			.attr('y1', this.tPadding + this.navigationHeight)
-			.attr('y2', this.tPadding + this.navigationHeight)
+			.attr('y1', this.tPadding + this.sliderHeight)
+			.attr('y2', this.tPadding + this.sliderHeight)
 			.style('shape-rendering', 'crispEdges')
 			.style('stroke','black')
 	  	    .style('stroke-width','1');
 					
 		var lineY = this.chart.append('line')
-			.attr('class', 'sliderAxis')
+			.attr('class', 'slider axis')
 			.attr('x1', this.lPadding)
 			.attr('x2', this.lPadding)
-			.attr('y1', this.tPadding + this.navigationHeight)
+			.attr('y1', this.tPadding + this.sliderHeight)
 			.attr('y2', this.tPadding)
 			.style('shape-rendering', 'crispEdges')
 			.style('stroke','black')
@@ -4990,7 +5005,7 @@ TermsRadio.prototype = {
 	  	    .attr('id', 'before')
 	  	    .attr('x1', (lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1)) + offsetVisStart)
 	  	    .attr('x2', (lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1)) + offsetVisStart)
-	  	    .attr('y1', this.tPadding + this.navigationHeight)
+	  	    .attr('y1', this.tPadding + this.sliderHeight)
 	  	    .attr('y2', this.tPadding)
 	  	    .style('stroke', 'black')
 	  	    .style('stroke-width', '1');
@@ -5000,7 +5015,7 @@ TermsRadio.prototype = {
 	  	    .attr('id', 'after')
 	  	    .attr('x1', (lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1)) + offsetVisEnd)
 	  	    .attr('x2', (lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1)) + offsetVisEnd)
-	  	    .attr('y1', this.tPadding + this.navigationHeight)
+	  	    .attr('y1', this.tPadding + this.sliderHeight)
 	  	    .attr('y2', this.tPadding)
 	  	    .style('stroke', 'black')
 	  	    .style('stroke-width', '1');
@@ -5010,7 +5025,7 @@ TermsRadio.prototype = {
   	    	.attr('id', 'boxBefore')
   	    	.attr('x', this.lPadding)
   	    	.attr('y', this.tPadding)
-  	    	.attr('height', this.navigationHeight)
+  	    	.attr('height', this.sliderHeight)
   	    	.attr('width', lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1))
   	    	.style('fill', 'silver')
   	    	.style('fill-opacity', 0.25)
@@ -5021,7 +5036,7 @@ TermsRadio.prototype = {
 	    	.attr('id', 'boxAfter')
 	    	.attr('x', (lengthHor * (this.shiftCount - this.callOffset()) / (this.numDataPoints - 1)) + offsetVisEnd)
 	    	.attr('y', this.tPadding)
-	    	.attr('height', this.navigationHeight)
+	    	.attr('height', this.sliderHeight)
 	    	.attr('width', lengthHor * (this.numDataPoints - this.numVisPoints - this.shiftCount + this.callOffset()) / (this.numDataPoints - 1))
 	    	.style('fill', 'silver')
 	    	.style('fill-opacity', 0.25)
@@ -5065,7 +5080,7 @@ TermsRadio.prototype = {
 	        	
 	        	toolObject.chart.select('#boxAfter')
 	        		.attr('x', function () { return parseInt(this.getAttribute('x')) + displaceX; })
-        			.attr('width', function () { return parseInt(this.getAttribute('width')) - displaceX; });
+        			.attr('width', function () { return Math.max(0, parseInt(this.getAttribute('width')) - displaceX); });
 	        		
 	        	toolObject.chart.selectAll('#before')
 	        		.attr('x1', function () { return parseInt(this.getAttribute('x1')) + displaceX; })
@@ -5112,16 +5127,21 @@ TermsRadio.prototype = {
 	    greyBoxAfter.call(drag);
     }
     
-    ,redrawSlider: function() {
+    ,removeSlider: function(removeTermLines) {
     	this.chart.selectAll('rect[class=slider]')
+    		.remove();
+	
+    	this.chart.selectAll('line[class~=slider]')
 	    	.remove();
-		
-		this.chart.selectAll('line[class=slider]')
-		    .remove();
-		
-		this.chart.selectAll('line[class=sliderAxis]')
-	    	.remove();
-	    	
+    	
+    	if (removeTermLines) {
+    		this.chart.selectAll('g[class=slider]')
+	    		.remove();
+    	}
+    }
+    
+    ,redrawSlider: function() {
+    	this.removeSlider();
     	this.drawSlider();
     }
 	
@@ -5181,7 +5201,7 @@ TermsRadio.prototype = {
 				.ease('linear')
 			 	.attr('x1', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisStart)
 			 	.attr('x2', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisStart)
-		  	    .attr('y1', this.tPadding + this.navigationHeight)
+		  	    .attr('y1', this.tPadding + this.getSliderHeight())
 		  	    .attr('y2', this.tPadding)
 		  	    .each('end', function () {
 		  	    	if (toolObject.parent.isMasked()) {
@@ -5203,7 +5223,7 @@ TermsRadio.prototype = {
 				.ease('linear')
 			 	.attr('x1', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
 			 	.attr('x2', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
-		  	    .attr('y1', this.tPadding + this.navigationHeight)
+		  	    .attr('y1', this.tPadding + this.getSliderHeight())
 		  	    .attr('y2', this.tPadding);
 		    
 	  	   this.chart.select('#boxBefore').transition()
@@ -5211,7 +5231,7 @@ TermsRadio.prototype = {
 				.ease('linear')
 	  	    	.attr('x', this.lPadding)
 	  	    	.attr('y', this.tPadding)
-	  	    	.attr('height', this.navigationHeight)
+	  	    	.attr('height', this.getSliderHeight())
 	  	    	.attr('width', lengthHor * (this.shiftCount) / (this.numDataPoints - 1));
 	    
 	  	    this.chart.select('#boxAfter').transition()
@@ -5219,7 +5239,7 @@ TermsRadio.prototype = {
 				.ease('linear')
 	  	    	.attr('x', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
 	  	    	.attr('y', this.tPadding)
-	  	    	.attr('height', this.navigationHeight)
+	  	    	.attr('height', this.getSliderHeight())
 	  	    	.attr('width', lengthHor * (this.numDataPoints - this.numVisPoints - this.shiftCount) / (this.numDataPoints - 1));
         }
         
@@ -5298,27 +5318,35 @@ TermsRadio.prototype = {
 				if(this.lastSlippery !== null) {
 					//exceptional case where lastSlippery was not properly removed
 					this.chartOverlayOff(this.lastSlippery);
-					this.sliderOverlayOff(this.lastSlippery);
+					if (this.isSliderVisible) {
+						this.sliderOverlayOff(this.lastSlippery);
+					}
 					this.lastSlippery = null;
 					
 					//select new slippery word
 					//change its colour
 					this.chartOverlayOn(lineObject);
-					this.sliderOverlayOn(lineObject);
+					if (this.isSliderVisible) {
+						this.sliderOverlayOn(lineObject);
+					}
 					this.lastSlippery = selector;
 				}
 				else {
 					//normal case select slippery word
 					//change its colour
 					this.chartOverlayOn(lineObject);
-					this.sliderOverlayOn(lineObject);
+					if (this.isSliderVisible) {
+						this.sliderOverlayOn(lineObject);
+					}
 					this.lastSlippery = selector;
 				}
 			}
 			else{
 				//normal case deselect a slippery word
 				this.chartOverlayOff(selector);
-				this.sliderOverlayOff(this.lastSlippery);
+				if (this.isSliderVisible) {
+					this.sliderOverlayOff(this.lastSlippery);
+				}
 				this.lastSlippery = null;
 			}
 		}
@@ -5401,7 +5429,9 @@ TermsRadio.prototype = {
 		
 		//if this was selected a slippery before click event remove line from navigation bar
 		if(selector === this.lastSlippery){
-			this.sliderOverlayOff(selector);
+			if (this.isSliderVisible) {
+				this.sliderOverlayOff(selector);
+			}
 			this.lastSlippery = null;
 		}
 		
@@ -5410,7 +5440,9 @@ TermsRadio.prototype = {
 
 		this.overlayQueue.push(lineObject);
 		this.chartOverlayOn(lineObject);
-		this.sliderOverlayOn(lineObject);
+		if (this.isSliderVisible) {
+			this.sliderOverlayOn(lineObject);
+		}
 	},
 	
 	doTermDeselect: function(term, legendRemove) {
@@ -5433,7 +5465,9 @@ TermsRadio.prototype = {
 		this.chartOverlayOff(selector);
 		this.colorIndex.push(this.overlayQueue[index].colour);
     	this.overlayQueue.splice(index, 1);
-    	this.sliderOverlayOff(selector);
+    	if (this.isSliderVisible) {
+    		this.sliderOverlayOff(selector);
+    	}
 		this.lastSticky = selector;
 	}
 	
@@ -5492,6 +5526,7 @@ TermsRadio.prototype = {
 		
 		//draw path
 		this.chart.append('g')
+			.attr('class', 'slider')
 			.attr('id', 'slider-line-' + objectToSelect.word)
 			.append('path')
 			.attr("d", this.buildSliderPath(objectToSelect.fullPath))
@@ -5707,12 +5742,12 @@ TermsRadio.prototype = {
 		if(this.parent.getApiParam('yAxisScale') == 'log') this.yScale = d3.scale.log();
 		
 		this.yScale.domain([this.minFreq, this.absMaxFreq * this.valFraction * 1.25])
-				.rangeRound([this.container.getHeight() - this.bPadding, (this.tPadding * 2) + this.navigationHeight]);
+				.rangeRound([this.container.getHeight() - this.bPadding, (this.tPadding) + this.getSliderHeight()]);
 	}
 	
 	,manageYSliderScale: function() {
 		var top = this.tPadding
-			,bottom = this.tPadding + this.navigationHeight;
+			,bottom = this.tPadding + this.getSliderHeight();
 		
 		if(this.parent.getApiParam('yAxisScale') == 'linear') this.ySliderScale = d3.scale.linear();
 		if(this.parent.getApiParam('yAxisScale') == 'log') this.ySliderScale = d3.scale.log();
@@ -5753,6 +5788,26 @@ TermsRadio.prototype = {
 	    	.range([this.lPadding, this.container.getWidth() - this.rPadding]);
 	}
 
+	,getSliderHeight: function() {
+		return this.isSliderVisible ? this.sliderHeight+this.sliderBPadding : 0;
+	}
+	
+	,setSliderHeight: function() {
+		this.sliderHeight = Math.max(10, this.container.getHeight()*this.sliderHeightRatio);
+	}
+	
+	,hideSlider: function() {
+		this.isSliderVisible = false;
+		this.removeSlider(true);
+		this.doResize();
+	}
+	
+	,showSlider: function() {
+		this.isSliderVisible = true;
+		this.doResize();
+	}
+	
+	
 	//
 	//MISC. FUNCTIONS
 	//
@@ -8594,7 +8649,7 @@ Ext.define('Voyant.data.store.TokensBuffered', {
 Ext.define('Voyant.data.table.Table', {
 	alternateClassName: ["VoyantTable"],
 	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
-	embeddable: ['Voyant.widget.VoyantTableTransform','Voyant.widget.VoyantChart'],
+	embeddable: ['Voyant.panel.VoyantTableTransform','Voyant.widget.VoyantChart'],
 	config: {
 		
 		/**
@@ -8730,11 +8785,13 @@ Ext.define('Voyant.data.table.Table', {
 		if ((Ext.isObject(cmp) || !cmp) && !config) {
 			config = cmp || {};
 
-			var table = this.getString();
-			Ext.apply(config, {
-				tableHtml: table
-			});
-			return embed.call(this, this.embeddable[0], config);
+			return embed.call(this, this.embeddable[0], Ext.apply(config, {
+				tableJson: JSON.stringify({
+					rowkey: this.getRowKey(),
+					headers: this.getHeaders(),
+					rows: this.getRows()
+				})
+			}));
 
 		}
 		config = config || {};
@@ -11278,122 +11335,6 @@ Ext.define('Voyant.widget.LiveSearchGrid', {
     }
 });
 
-/**
- * A Grid which creates itself from an existing HTML table element.
- */
-Ext.define('Ext.ux.grid.TransformGrid', {
-    extend: 'Ext.grid.Panel',
-
-    /**
-     * Creates the grid from HTML table element.
-     * @param {String/HTMLElement/Ext.Element} table The table element from which this grid will be created -
-     * The table MUST have some type of size defined for the grid to fill. The container will be
-     * automatically set to position relative if it isn't already.
-     * @param {Object} [config] A config object that sets properties on this grid and has two additional (optional)
-     * properties: fields and columns which allow for customizing data fields and columns for this grid.
-     */
-    constructor: function(table, config) {
-        config = Ext.apply({}, config);
-        table = this.table = Ext.get(table);
-
-        var configFields = config.fields || [],
-            configColumns = config.columns || [],
-            fields = [],
-            cols = [],
-            headers = table.query("thead th"),
-            i = 0,
-            len = headers.length,
-            data = table.dom,
-            width,
-            height,
-            store,
-            col,
-            text,
-            name;
-
-        for (; i < len; ++i) {
-            col = headers[i];
-
-            text = col.innerHTML;
-            name = 'tcol-' + i;
-
-            fields.push(Ext.applyIf(configFields[i] || {}, {
-                name: name,
-                mapping: 'td:nth(' + (i + 1) + ')/@innerHTML'
-            }));
-
-            cols.push(Ext.applyIf(configColumns[i] || {}, {
-                text: text,
-                dataIndex: name,
-                width: col.offsetWidth,
-                tooltip: col.title,
-                sortable: true
-            }));
-        }
-debugger
-        if (config.width) {
-            width = config.width;
-        } else {
-            width = table.getWidth() + 1;
-        }
-
-        if (config.height) {
-            height = config.height;
-        }
-
-        Ext.applyIf(config, {
-            store: {
-                data: data,
-                fields: fields,
-                proxy: {
-                    type: 'memory',
-                    reader: {
-                        record: 'tbody tr',
-                        type: 'xml'
-                    }
-                }
-            },
-            columns: cols,
-            width: width,
-            height: height
-        });
-        this.callParent([config]);
-        
-        if (config.remove !== false) {
-            // Don't use table.remove() as that destroys the row/cell data in the table in
-            // IE6-7 so it cannot be read by the data reader.
-            data.parentNode.removeChild(data);
-        }
-    },
-
-    doDestroy: function() {
-        this.table.remove();
-        this.tabl = null;
-        this.callParent();
-    }
-});
-
-Ext.define('Voyant.widget.VoyantTableTransform', {
-	extend: 'Ext.ux.grid.TransformGrid',
-    mixins: ['Voyant.util.Localization','Voyant.util.Api'],
-    statics: {
-		api: {
-			tableHtml: undefined,
-			width: '100%'
-		}
-    },
-	constructor: function(config) {
-		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-		debugger
-		var tableId = config.tableId ? config.tableId : this.getApiParam("tableId");
-		config = config || {};
-		Ext.applyIf(config, this.getApiParams());
-		debugger
-        this.callParent([tableId, config]);
-	},
-	alias: 'widget.voyanttabletransform',
-
-})
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable','Voyant.util.DetailedError'],
 	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.TotalPropertyStatus'],
@@ -21708,7 +21649,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     		docIndex: undefined,
     		docId: undefined
     	},
-		glyph: 'xf201@FontAwesome'
+		glyph: 'xf1db@FontAwesome'
     },
     config: {
     	options: [{xtype: 'stoplistoption'}],
@@ -22067,10 +22008,10 @@ Ext.define('Voyant.panel.TermsBerry', {
     	var defaultFill;
     	if (this.getMode() === this.MODE_DISTINCT) {
     		defaultFill = d3.scale.pow().exponent(1/5)
-    			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#fff', '#dedede']);
+    			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#dedede', '#fff']);
     	} else {
     		defaultFill = d3.scale.linear()
-				.domain([this.getMaxFillValue(), this.getMinFillValue()]).range(['#fff', '#dedede']);
+				.domain([this.getMaxFillValue(), this.getMinFillValue()]).range(['#dedede', '#fff']);
     	}
     	
     	// roughly calculate font size based on available area and number of terms
@@ -22322,6 +22263,13 @@ Ext.define('Voyant.panel.TermsRadio', {
     		,yAxisScale: 'log'
     			
     		,speed: 50
+    		
+    		/**
+    		 * @property slider Whether to show the slider
+    		 * @type Boolean
+    		 * @default true
+    		 */
+    		,slider: undefined
     	},
     	glyph: 'xf201@FontAwesome'
     }
@@ -22513,6 +22461,12 @@ Ext.define('Voyant.panel.TermsRadio', {
 	            			this.setApiParams({visibleBins: newvalue});
 							this.numVisPoints = newvalue;
 							this.loadStore();
+							
+							if (this.numVisPoints == this.getCorpus().getDocumentsCount()) {
+								this.getTermsRadio().hideSlider();
+							} else if (this.getApiParam("slider") != 'false'){
+								this.getTermsRadio().showSlider();
+							}
 	            		},
 	            		scope: this
 	            	}
@@ -22577,10 +22531,13 @@ Ext.define('Voyant.panel.TermsRadio', {
 		this.callParent(arguments);
 		this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 		
-		this.on('render', function(component) {
+		this.on('boxready', function(component) {
+			var sliderParam = this.getApiParam('slider');
+			var showSlider = sliderParam === undefined ? true : sliderParam === 'true';
 			var config = {
 				parent: this,
-				container: this.body
+				container: this.body,
+				showSlider: showSlider
 			};
 			this.setTermsRadio(new TermsRadio(config));
 		}, this);
@@ -22668,39 +22625,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 				}
 			}, this, {single: true});
 			store.load({params: params});
-    	}, this);
-		
-		/**
-		 * @event resize
-		 * @type listener
-		 * @private
-		 */
-		this.on('resize', function() {
-			//console.log('resize')
-			if(this.chart) {
-				var h = this.body.getHeight(),
-					w = this.body.getWidth();
-				
-				this.chart.attr('height', h)
-					.attr('width', w);
-					
-				this.setTitleLength();
-				
-				if(this.largestH < h && this.largestW < w) {
-					this.chart.select('rect[class=clipping-rectangle]')
-				        .attr("x", 0)
-				        .attr("y", this.navigationHeight + (this.tPadding * 2))
-				        .attr("width", w)
-				        .attr("height", h - this.navigationHeight);
-					this.largestH = h;
-					this.largestW = w;
-				}
-			
-				this.redraw();	
-				this.redrawSliderOverlay();
-			}
-		}, this);
-		
+    	}, this);		
 	}
 	
     ,loadStore: function () {
@@ -25690,6 +25615,192 @@ Ext.define('Voyant.panel.Topics', {
     	}
     
 });
+Ext.define('Voyant.panel.VoyantTableTransform', {
+	extend: 'Ext.panel.Panel',
+	mixins: ['Voyant.panel.Panel'],
+	alias: 'widget.voyanttabletransform',
+    statics: {
+		api: {
+			tableHtml: undefined,
+			tableJson: undefined,
+			width: undefined
+		}
+    },
+	constructor: function() {
+        this.callParent(arguments);
+	},
+	initComponent: function() {
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+		var me = this, tableHtml = this.getApiParam('tableHtml'), tableJson = this.getApiParam('tableJson');
+		if (tableHtml) {
+			Ext.apply(me, {
+				html: tableHtml
+			})
+		} else if (tableJson) {
+			var html = "<table><thead><tr>", json = JSON.parse(tableJson);
+			
+			if (json.headers) {
+				json.headers.forEach(function(header) {
+					html+="<th>"+header+"</th>"
+				});
+			} else {
+				json.rows[0].forEach(function(cell, i) {
+					html+="<th>"+(i+1)+"</th>";
+				})
+			}
+			html+="</tr></thead><tbody>";
+			json.rows.forEach(function(row) {
+				html+="<tr>";
+				row.forEach(function(cell) {
+					html+="<td>"+cell+"</td>"
+				})
+				html+="</tr>";
+			})
+			html+="</tbody></table>";
+			Ext.apply(me, {
+				html: html
+			})
+			debugger
+		}
+		
+		me.on('afterrender', function() {
+			var table = this.getTargetEl().down('table');
+			var grid = new Ext.ux.grid.TransformGrid(table, {
+				width: this.getApiParam('width') || '100%',
+				height: this.getApiParam('height') || table.query('tr').length*24 // based on grid heights in crisp
+			});
+			grid.render(this.getTargetEl());
+		}, me);
+		
+    	me.callParent(arguments);
+
+		/*
+		if ()
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+		config = config || {};
+		
+		Ext.applyIf(config, this.getApiParams());
+		if (config.tableHtml) {
+			
+			var table = Ext.getBody().insertHtml('beforeEnd', config.tableHtml);
+			debugger
+	        this.callParent([tableId, config]);
+		} else {
+	        this.callParent([tableId, config]);
+		}
+		var tableEl = Ext.DomHelper.createContextualFragment(table);
+		
+		
+		debugger
+		var tableId = config.tableId ? config.tableId : this.getApiParam("tableId");
+		config = config || {};
+		Ext.applyIf(config, this.getApiParams());
+		debugger
+
+		 */
+		
+	}
+
+})
+
+
+
+/**
+ * A Grid which creates itself from an existing HTML table element.
+ */
+Ext.define('Ext.ux.grid.TransformGrid', {
+    extend: 'Ext.grid.Panel',
+
+    /**
+     * Creates the grid from HTML table element.
+     * @param {String/HTMLElement/Ext.Element} table The table element from which this grid will be created -
+     * The table MUST have some type of size defined for the grid to fill. The container will be
+     * automatically set to position relative if it isn't already.
+     * @param {Object} [config] A config object that sets properties on this grid and has two additional (optional)
+     * properties: fields and columns which allow for customizing data fields and columns for this grid.
+     */
+    constructor: function(table, config) {
+        config = Ext.apply({}, config);
+        this.table = Ext.get(table);
+
+        var configFields = config.fields || [],
+            configColumns = config.columns || [],
+            fields = [],
+            cols = [],
+            headers = table.query("thead th"),
+            i = 0,
+            len = headers.length,
+            data = table.dom,
+            width,
+            height,
+            store,
+            col,
+            text,
+            name;
+
+        for (; i < len; ++i) {
+            col = headers[i];
+
+            text = col.innerHTML;
+            name = 'tcol-' + i;
+
+            fields.push(Ext.applyIf(configFields[i] || {}, {
+                name: name,
+                mapping: 'td:nth(' + (i + 1) + ')/@innerHTML'
+            }));
+
+            cols.push(Ext.applyIf(configColumns[i] || {}, {
+                text: text,
+                dataIndex: name,
+                width: col.offsetWidth,
+                tooltip: col.title,
+                sortable: true
+            }));
+        }
+
+        debugger
+        if (config.width) {
+            width = config.width;
+        } else {
+            width = table.getWidth() + 1;
+        }
+
+        if (config.height) {
+            height = config.height;
+        }
+
+        Ext.applyIf(config, {
+            store: {
+                data: data,
+                fields: fields,
+                proxy: {
+                    type: 'memory',
+                    reader: {
+                        record: 'tbody tr',
+                        type: 'xml'
+                    }
+                }
+            },
+            columns: cols,
+            width: width,
+            height: height
+        });
+        this.callParent([config]);
+        
+        if (config.remove !== false) {
+            // Don't use table.remove() as that destroys the row/cell data in the table in
+            // IE6-7 so it cannot be read by the data reader.
+            data.parentNode.removeChild(data);
+        }
+    },
+
+    doDestroy: function() {
+        this.table.remove();
+        this.tabl = null;
+        this.callParent();
+    }
+});
+
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',

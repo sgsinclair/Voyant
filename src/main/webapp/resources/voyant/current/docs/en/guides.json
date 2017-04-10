@@ -168,6 +168,11 @@
                         "title": "Summary"
                     },
                     {
+                        "name": "termsberry",
+                        "url": "guides/tools/termsberry",
+                        "title": "TermsBerry"
+                    },
+                    {
                         "name": "termsradio",
                         "url": "guides/tools/termsradio",
                         "title": "Terms Radio"
