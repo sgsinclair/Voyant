@@ -124,33 +124,23 @@ Ext.define('Voyant.util.Storage', {
             url: this.getTromboneUrl(),
             params: {
                 tool: 'resource.StoredResource',
-                verifyResourceId: id
+                retrieveResourceId: id,
+                failQuietly: true
             }
         }).then(function(response) {
-            var json = Ext.decode(response.responseText);
-            if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
-                Ext.Ajax.request({
-                    url: this.getTromboneUrl(),
-                    params: {
-                        tool: 'resource.StoredResource',
-                        retrieveResourceId: id
-                    }
-                }).then(function(response) {
-                	var json = Ext.decode(response.responseText);
-                	var id = json.storedResource.id;
-                	var value = json.storedResource.resource;
-                	if (isChunk != true) {
-                		value = Ext.decode(value);
-                		dfd.resolve(value);
-                	} else {
-                		dfd.resolve([id, value]);
-                	}
-                }, function() {
-                	dfd.reject();
-                });
-            } else {
-            	dfd.reject();
-            }
+        	var json = Ext.decode(response.responseText);
+        	var id = json.storedResource.id;
+        	var value = json.storedResource.resource;
+        	if (value.length == 0) {
+        		dfd.reject();
+        	} else {
+	        	if (isChunk != true) {
+	        		value = Ext.decode(value);
+	        		dfd.resolve(value);
+	        	} else {
+	        		dfd.resolve([id, value]);
+	        	}
+        	}
         }, function() {
         	dfd.reject();
         }, null, this);
