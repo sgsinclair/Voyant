@@ -5,6 +5,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	alias: 'widget.scatterplot',
     statics: {
     	i18n: {
+    		tsne: 't-SNE'
     	},
     	api: {
     		docId: undefined,
@@ -28,6 +29,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	},
     	caStore: null,
     	pcaStore: null,
+    	tsneStore: null,
     	docSimStore: null,
     	termStore: null,
     	chartMenu: null,
@@ -50,6 +52,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		listeners: {load: this.buildChart, scope: this}
     	}));
     	this.setPcaStore(Ext.create('Voyant.data.store.PCAAnalysis', {
+    		listeners: {load: this.buildChart, scope: this}
+    	}));
+    	this.setTsneStore(Ext.create('Voyant.data.store.TSNEAnalysis', {
     		listeners: {load: this.buildChart, scope: this}
     	}));
     	this.setDocSimStore(Ext.create('Voyant.data.store.DocSimAnalysis', {
@@ -112,6 +117,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         					items: [
         					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
         					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'},
+        					    {text: this.localize('tsne'), itemId: 'analysis_tsne', group:'analysis', xtype: 'menucheckitem'},
         					    {text: this.localize('docSim'), itemId: 'analysis_docSim', group:'analysis', xtype: 'menucheckitem'}
         					],
         					listeners: {
@@ -120,12 +126,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
         								var analysis = item.getItemId().split('_')[1];
         								if (analysis !== this.getApiParam('analysis')) {
         									this.setApiParam('analysis', analysis);
-        									if (analysis === 'ca') {
+    										this.queryById('nearbyButton').setDisabled(analysis === 'tsne');
+    										if (analysis === 'ca') {
         										if (this.getCorpus().getDocumentsCount() == 3) {
             										this.setApiParam('dimensions', 2);
             										this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
             									}
         									}
+
         									this.loadFromApis(true);
         								}
         							}
@@ -436,7 +444,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
     			item.setChecked(true);
     		}
     		var setCheckBound = setCheckItemFromApi.bind(this);
+    		
     		setCheckBound('analysis');
+    		this.queryById('nearbyButton').setDisabled(this.getApiParam('analysis') === 'tsne');
+    		
     		setCheckBound('comparisonType');
 //    		setCheckBound('limit');
     		setCheckBound('clusters');
@@ -495,6 +506,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
 					summary += this.localize('pc')+' '+(i+1)+' ('+this.localize(pcMapping[i])+'): '+Math.round(percentage*100)/100+'%\n';
 				}
 			}
+    	} else if (this.getApiParam('analysis') === 'tsne') {
+    		
     	} else {
     		summary = this.localize('caTitle')+'\n';
     		var pcMapping = ['xAxis', 'yAxis', 'fill'];
@@ -737,15 +750,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		            		var text = (new Ext.Template(this.localize('removeTerm'))).apply([term]);
 		            		this.getChartMenu().queryById('remove').setText(text);
 		            		text = (new Ext.Template(this.localize('nearbyTerm'))).apply([term]);
-		            		this.getChartMenu().queryById('nearby').setText(text);
+		            		var nearby = this.getChartMenu().queryById('nearby');
+		            		nearby.setText(text);
+		            		nearby.setDisabled(this.getApiParam('analysis') === 'tsne');
 		            		
 		            		this.getChartMenu().on('click', function(menu, item) {
 		            			if (item !== undefined) {
 		            				var term = chartItem.record.get('term');
-			            			if (item.text === this.localize('remove')) {
-			            				this.removeTerm(term);
-			            			} else {
+			            			if (item.getItemId() === 'nearby') {
 			            				this.getNearbyForTerm(term);
+			            			} else {
+			            				this.removeTerm(term);
 			            			}
 		            			}
 		            		}, this, {single: true});
@@ -965,6 +980,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
 
     	if (params.analysis === 'pca') {
     		this.getPcaStore().load({
+	    		params: params
+	    	});
+    	} else if (params.analysis === 'tsne'){
+    		this.getTsneStore().load({
 	    		params: params
 	    	});
     	} else if (params.analysis === 'docSim'){

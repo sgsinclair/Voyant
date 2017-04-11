@@ -58,6 +58,7 @@ app/data/store/DocumentQueryMatches.js
 app/data/store/DocumentTerms.js
 app/data/store/Documents.js
 app/data/store/PCAAnalysis.js
+app/data/store/TSNEAnalysis.js
 app/data/store/DocSimAnalysis.js
 app/data/store/CorpusNgrams.js
 app/data/store/Tokens.js
