@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Apr 09 17:08:07 EDT 2017 */
+/* This file created by JSCacher. Last modified: Wed Apr 12 10:59:28 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7353,33 +7353,23 @@ Ext.define('Voyant.util.Storage', {
             url: this.getTromboneUrl(),
             params: {
                 tool: 'resource.StoredResource',
-                verifyResourceId: id
+                retrieveResourceId: id,
+                failQuietly: true
             }
         }).then(function(response) {
-            var json = Ext.decode(response.responseText);
-            if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
-                Ext.Ajax.request({
-                    url: this.getTromboneUrl(),
-                    params: {
-                        tool: 'resource.StoredResource',
-                        retrieveResourceId: id
-                    }
-                }).then(function(response) {
-                	var json = Ext.decode(response.responseText);
-                	var id = json.storedResource.id;
-                	var value = json.storedResource.resource;
-                	if (isChunk != true) {
-                		value = Ext.decode(value);
-                		dfd.resolve(value);
-                	} else {
-                		dfd.resolve([id, value]);
-                	}
-                }, function() {
-                	dfd.reject();
-                });
-            } else {
-            	dfd.reject();
-            }
+        	var json = Ext.decode(response.responseText);
+        	var id = json.storedResource.id;
+        	var value = json.storedResource.resource;
+        	if (value.length == 0) {
+        		dfd.reject();
+        	} else {
+	        	if (isChunk != true) {
+	        		value = Ext.decode(value);
+	        		dfd.resolve(value);
+	        	} else {
+	        		dfd.resolve([id, value]);
+	        	}
+        	}
         }, function() {
         	dfd.reject();
         }, null, this);
@@ -8339,6 +8329,7 @@ Ext.define('Voyant.data.store.CorpusTermsMixin', {
 Ext.define('Voyant.data.store.CorpusTerms', {
 	extend: 'Ext.data.Store',
 	mixins: ['Voyant.data.store.CorpusTermsMixin'],
+    model: Voyant.data.model.CorpusTerm,
 	
 	/**
 	 * @method each
@@ -8378,6 +8369,7 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 Ext.define('Voyant.data.store.CorpusTermsBuffered', {
 	extend: 'Ext.data.BufferedStore',
 	mixins: ['Voyant.data.store.CorpusTermsMixin'],
+    model: Voyant.data.model.CorpusTerm,
 	constructor : function(config) {
 		config = config || {};
 		this.mixins['Voyant.data.store.CorpusTermsMixin'].constructor.apply(this, [config])
@@ -8649,7 +8641,7 @@ Ext.define('Voyant.data.store.TokensBuffered', {
 Ext.define('Voyant.data.table.Table', {
 	alternateClassName: ["VoyantTable"],
 	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
-	embeddable: ['Voyant.panel.VoyantTableTransform','Voyant.widget.VoyantChart'],
+	embeddable: ['Voyant.widget.VoyantTableTransform','Voyant.widget.VoyantChart'],
 	config: {
 		
 		/**
@@ -8674,7 +8666,7 @@ Ext.define('Voyant.data.table.Table', {
 		model: undefined
 	},
 
-	constructor: function(config) {
+	constructor: function(config, opts) {
 
 		config = config || {};
 				
@@ -8683,7 +8675,7 @@ Ext.define('Voyant.data.table.Table', {
 		this.setHeaders(Ext.Array.from(config.headers));
 		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
 		
-		if (config.count) {
+		if (config.count && Ext.isArray(config.count)) {
 			// create counts
 			var freqs = {};
 			config.count.forEach(function(item) {freqs[item] = freqs[item] ? freqs[item]+1 : 1;});
@@ -8691,6 +8683,9 @@ Ext.define('Voyant.data.table.Table', {
 			var counts = [];
 			for (var key in freqs) {counts.push([key, freqs[key]])}
 			counts.sort(function(a,b) {return b[1] - a[1]});
+			if (config.limit && counts.length>config.limit) {
+				counts.splice(config.limit);
+			}
 			if (config.orientation && config.orientation=="horizontal") {
 				this.setHeaders(counts.map(function(item) {return item[0]}));
 				this.setRows([counts.map(function(item) {return item[1]})]);
@@ -8701,14 +8696,25 @@ Ext.define('Voyant.data.table.Table', {
 			}
 		}
 		
-		if (config.isStore) {
-			this.model = config.getModel();
-			if (config.getCount()>0) {
-				this.setHeaders(Object.keys(config.getAt(0).data));
+		if (config.isStore || config.store) {
+			var store = config.store ? config.store : config;
+			
+			if (opts && opts.headers) {
+				this.setHeaders(opts.headers);
+			} else {
+				// store.getModel() doesn't seem to work (for CorpusTerms at least)
+				// so instead we'll try looking at the first record to get headers
+				var record = store.getAt(0);
+				if (record) { // don't know what to do if this fails?
+					this.setHeaders(record.getFields().map(function(field) {return field.getName()}))
+				}
 			}
-			config.each(function(item) {
-				this.addRow(item.data);
-			}, this)
+			
+			// now we get rows
+			store.each(function(record) {
+				this.addRow(record.getData());
+			}, this);
+			debugger
 		}
 		this.callParent();
 	},
@@ -9727,7 +9733,15 @@ Ext.define('Voyant.data.model.Corpus', {
         	    url: Voyant.application.getTromboneUrl(),
         	    params: config,
         	    success: function(response, opts) {
-        	    	dfd.resolve(response.responseText.trim());
+        	    	var text = response.responseText.trim();
+        	    	if (config.transformCase) {
+        	    		if (config.transformCase.indexOf("lower")>-1) {
+        	    			text = text.toLowerCase();
+        	    		} else if (config.transformCase.indexOf("upper")>-1) {
+        	    			text = text.toUpperCase();
+        	    		}
+        	    	}
+        	    	dfd.resolve(text);
         	    },
         	    failure: function(response, opts) {
         	    	dfd.reject(response);
@@ -9835,18 +9849,8 @@ Ext.define('Voyant.data.model.Corpus', {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
-	    	config = config || {};
-	    	if (Ext.isNumber(config)) {
-	    		config = {limit: config}
-	    	} else if (Ext.isString(config)) {
-	    		config = {limit: parseInt(config)}
-	    	};
-	    	Ext.apply(config, {
-    			template: "docTokens2words"
-	    	});
-	    	var text = this.getWords();
-			var dfd =  Voyant.application.getDeferredNestedPromise(text, arguments);
-			text.then(function(text) {
+			var dfd = Voyant.application.getDeferred(this);
+	    	this.getWords(config).then(function(text) {
 				dfd.resolve(text.split(" "));
 			})
 			return dfd.promise
@@ -11332,6 +11336,167 @@ Ext.define('Voyant.widget.LiveSearchGrid', {
             this.getNavigationModel().setPosition(pos.record, pos.column);
             this.getSelectionModel().select(pos.record);
         }
+    }
+});
+
+Ext.define('Voyant.widget.VoyantTableTransform', {
+	extend: 'Ext.panel.Panel',
+    mixins: ['Voyant.util.Localization','Voyant.util.Api'],
+	alias: 'widget.voyanttabletransform',
+    statics: {
+    	i18n: {},
+		api: {
+			tableHtml: undefined,
+			tableJson: undefined,
+			width: undefined
+		}
+    },
+	constructor: function() {
+        this.callParent(arguments);
+	},
+	initComponent: function(config) {
+    	var me = this, config = config || {};
+    	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+		var me = this, tableHtml = this.getApiParam('tableHtml'), tableJson = this.getApiParam('tableJson');
+		if (tableHtml) {
+			Ext.apply(me, {
+				html: tableHtml
+			})
+		} else if (tableJson) {
+			var html = "<table><thead><tr>", json = JSON.parse(tableJson);
+			
+			if (json.headers) {
+				json.headers.forEach(function(header) {
+					html+="<th>"+header+"</th>"
+				});
+			} else {
+				json.rows[0].forEach(function(cell, i) {
+					html+="<th>"+(i+1)+"</th>";
+				})
+			}
+			html+="</tr></thead><tbody>";
+			json.rows.forEach(function(row) {
+				html+="<tr>";
+				row.forEach(function(cell) {
+					html+="<td>"+cell+"</td>"
+				})
+				html+="</tr>";
+			})
+			html+="</tbody></table>";
+			Ext.apply(me, {
+				html: html
+			})
+		}
+		
+		me.on('afterrender', function() {
+			var table = this.getTargetEl().down('table'), parent = table.parent();
+			var grid = new Ext.ux.grid.TransformGrid(table, {
+				width: this.getApiParam('width') || parent.getWidth(),
+				height: this.getApiParam('height') || 20+(table.query('tr').length*24) // based on grid heights in crisp
+			});
+			grid.render(parent);
+		}, me);
+		
+    	me.callParent(arguments);
+	}
+
+})
+
+
+
+/**
+ * A Grid which creates itself from an existing HTML table element.
+ */
+Ext.define('Ext.ux.grid.TransformGrid', {
+    extend: 'Ext.grid.Panel',
+
+    /**
+     * Creates the grid from HTML table element.
+     * @param {String/HTMLElement/Ext.Element} table The table element from which this grid will be created -
+     * The table MUST have some type of size defined for the grid to fill. The container will be
+     * automatically set to position relative if it isn't already.
+     * @param {Object} [config] A config object that sets properties on this grid and has two additional (optional)
+     * properties: fields and columns which allow for customizing data fields and columns for this grid.
+     */
+    constructor: function(table, config) {
+        config = Ext.apply({}, config);
+        this.table = Ext.get(table);
+
+        var configFields = config.fields || [],
+            configColumns = config.columns || [],
+            fields = [],
+            cols = [],
+            headers = table.query("thead th"),
+            i = 0,
+            len = headers.length,
+            data = table.dom,
+            width,
+            height,
+            store,
+            col,
+            text,
+            name;
+
+        for (; i < len; ++i) {
+            col = headers[i];
+
+            text = col.innerHTML;
+            name = 'tcol-' + i;
+
+            fields.push(Ext.applyIf(configFields[i] || {}, {
+                name: name,
+                mapping: 'td:nth(' + (i + 1) + ')/@innerHTML'
+            }));
+
+            cols.push(Ext.applyIf(configColumns[i] || {}, {
+                text: text,
+                dataIndex: name,
+                //width: col.offsetWidth,
+                flex: 1,
+                tooltip: col.title,
+                sortable: true
+            }));
+        }
+
+        if (config.width) {
+            width = config.width;
+        } else {
+            width = table.getWidth() + 1;
+        }
+
+        if (config.height) {
+            height = config.height;
+        }
+
+        Ext.applyIf(config, {
+            store: {
+                data: data,
+                fields: fields,
+                proxy: {
+                    type: 'memory',
+                    reader: {
+                        record: 'tbody tr',
+                        type: 'xml'
+                    }
+                }
+            },
+            columns: cols,
+            width: width,
+            height: height
+        });
+        this.callParent([config]);
+        
+        if (config.remove !== false) {
+            // Don't use table.remove() as that destroys the row/cell data in the table in
+            // IE6-7 so it cannot be read by the data reader.
+            data.parentNode.removeChild(data);
+        }
+    },
+
+    doDestroy: function() {
+        this.table.remove();
+        this.tabl = null;
+        this.callParent();
     }
 });
 
@@ -19161,6 +19326,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	alias: 'widget.scatterplot',
     statics: {
     	i18n: {
+    		tsne: 't-SNE'
     	},
     	api: {
     		docId: undefined,
@@ -19184,6 +19350,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	},
     	caStore: null,
     	pcaStore: null,
+    	tsneStore: null,
     	docSimStore: null,
     	termStore: null,
     	chartMenu: null,
@@ -19206,6 +19373,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		listeners: {load: this.buildChart, scope: this}
     	}));
     	this.setPcaStore(Ext.create('Voyant.data.store.PCAAnalysis', {
+    		listeners: {load: this.buildChart, scope: this}
+    	}));
+    	this.setTsneStore(Ext.create('Voyant.data.store.TSNEAnalysis', {
     		listeners: {load: this.buildChart, scope: this}
     	}));
     	this.setDocSimStore(Ext.create('Voyant.data.store.DocSimAnalysis', {
@@ -19268,6 +19438,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         					items: [
         					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
         					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'},
+        					    {text: this.localize('tsne'), itemId: 'analysis_tsne', group:'analysis', xtype: 'menucheckitem'},
         					    {text: this.localize('docSim'), itemId: 'analysis_docSim', group:'analysis', xtype: 'menucheckitem'}
         					],
         					listeners: {
@@ -19276,12 +19447,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
         								var analysis = item.getItemId().split('_')[1];
         								if (analysis !== this.getApiParam('analysis')) {
         									this.setApiParam('analysis', analysis);
-        									if (analysis === 'ca') {
+    										this.queryById('nearbyButton').setDisabled(analysis === 'tsne');
+    										if (analysis === 'ca') {
         										if (this.getCorpus().getDocumentsCount() == 3) {
             										this.setApiParam('dimensions', 2);
             										this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
             									}
         									}
+
         									this.loadFromApis(true);
         								}
         							}
@@ -19592,7 +19765,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
     			item.setChecked(true);
     		}
     		var setCheckBound = setCheckItemFromApi.bind(this);
+    		
     		setCheckBound('analysis');
+    		this.queryById('nearbyButton').setDisabled(this.getApiParam('analysis') === 'tsne');
+    		
     		setCheckBound('comparisonType');
 //    		setCheckBound('limit');
     		setCheckBound('clusters');
@@ -19651,6 +19827,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
 					summary += this.localize('pc')+' '+(i+1)+' ('+this.localize(pcMapping[i])+'): '+Math.round(percentage*100)/100+'%\n';
 				}
 			}
+    	} else if (this.getApiParam('analysis') === 'tsne') {
+    		
     	} else {
     		summary = this.localize('caTitle')+'\n';
     		var pcMapping = ['xAxis', 'yAxis', 'fill'];
@@ -19893,15 +20071,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		            		var text = (new Ext.Template(this.localize('removeTerm'))).apply([term]);
 		            		this.getChartMenu().queryById('remove').setText(text);
 		            		text = (new Ext.Template(this.localize('nearbyTerm'))).apply([term]);
-		            		this.getChartMenu().queryById('nearby').setText(text);
+		            		var nearby = this.getChartMenu().queryById('nearby');
+		            		nearby.setText(text);
+		            		nearby.setDisabled(this.getApiParam('analysis') === 'tsne');
 		            		
 		            		this.getChartMenu().on('click', function(menu, item) {
 		            			if (item !== undefined) {
 		            				var term = chartItem.record.get('term');
-			            			if (item.text === this.localize('remove')) {
-			            				this.removeTerm(term);
-			            			} else {
+			            			if (item.getItemId() === 'nearby') {
 			            				this.getNearbyForTerm(term);
+			            			} else {
+			            				this.removeTerm(term);
 			            			}
 		            			}
 		            		}, this, {single: true});
@@ -20121,6 +20301,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
 
     	if (params.analysis === 'pca') {
     		this.getPcaStore().load({
+	    		params: params
+	    	});
+    	} else if (params.analysis === 'tsne'){
+    		this.getTsneStore().load({
 	    		params: params
 	    	});
     	} else if (params.analysis === 'docSim'){
@@ -25615,192 +25799,6 @@ Ext.define('Voyant.panel.Topics', {
     	}
     
 });
-Ext.define('Voyant.panel.VoyantTableTransform', {
-	extend: 'Ext.panel.Panel',
-	mixins: ['Voyant.panel.Panel'],
-	alias: 'widget.voyanttabletransform',
-    statics: {
-		api: {
-			tableHtml: undefined,
-			tableJson: undefined,
-			width: undefined
-		}
-    },
-	constructor: function() {
-        this.callParent(arguments);
-	},
-	initComponent: function() {
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-		var me = this, tableHtml = this.getApiParam('tableHtml'), tableJson = this.getApiParam('tableJson');
-		if (tableHtml) {
-			Ext.apply(me, {
-				html: tableHtml
-			})
-		} else if (tableJson) {
-			var html = "<table><thead><tr>", json = JSON.parse(tableJson);
-			
-			if (json.headers) {
-				json.headers.forEach(function(header) {
-					html+="<th>"+header+"</th>"
-				});
-			} else {
-				json.rows[0].forEach(function(cell, i) {
-					html+="<th>"+(i+1)+"</th>";
-				})
-			}
-			html+="</tr></thead><tbody>";
-			json.rows.forEach(function(row) {
-				html+="<tr>";
-				row.forEach(function(cell) {
-					html+="<td>"+cell+"</td>"
-				})
-				html+="</tr>";
-			})
-			html+="</tbody></table>";
-			Ext.apply(me, {
-				html: html
-			})
-			debugger
-		}
-		
-		me.on('afterrender', function() {
-			var table = this.getTargetEl().down('table');
-			var grid = new Ext.ux.grid.TransformGrid(table, {
-				width: this.getApiParam('width') || '100%',
-				height: this.getApiParam('height') || table.query('tr').length*24 // based on grid heights in crisp
-			});
-			grid.render(this.getTargetEl());
-		}, me);
-		
-    	me.callParent(arguments);
-
-		/*
-		if ()
-		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-		config = config || {};
-		
-		Ext.applyIf(config, this.getApiParams());
-		if (config.tableHtml) {
-			
-			var table = Ext.getBody().insertHtml('beforeEnd', config.tableHtml);
-			debugger
-	        this.callParent([tableId, config]);
-		} else {
-	        this.callParent([tableId, config]);
-		}
-		var tableEl = Ext.DomHelper.createContextualFragment(table);
-		
-		
-		debugger
-		var tableId = config.tableId ? config.tableId : this.getApiParam("tableId");
-		config = config || {};
-		Ext.applyIf(config, this.getApiParams());
-		debugger
-
-		 */
-		
-	}
-
-})
-
-
-
-/**
- * A Grid which creates itself from an existing HTML table element.
- */
-Ext.define('Ext.ux.grid.TransformGrid', {
-    extend: 'Ext.grid.Panel',
-
-    /**
-     * Creates the grid from HTML table element.
-     * @param {String/HTMLElement/Ext.Element} table The table element from which this grid will be created -
-     * The table MUST have some type of size defined for the grid to fill. The container will be
-     * automatically set to position relative if it isn't already.
-     * @param {Object} [config] A config object that sets properties on this grid and has two additional (optional)
-     * properties: fields and columns which allow for customizing data fields and columns for this grid.
-     */
-    constructor: function(table, config) {
-        config = Ext.apply({}, config);
-        this.table = Ext.get(table);
-
-        var configFields = config.fields || [],
-            configColumns = config.columns || [],
-            fields = [],
-            cols = [],
-            headers = table.query("thead th"),
-            i = 0,
-            len = headers.length,
-            data = table.dom,
-            width,
-            height,
-            store,
-            col,
-            text,
-            name;
-
-        for (; i < len; ++i) {
-            col = headers[i];
-
-            text = col.innerHTML;
-            name = 'tcol-' + i;
-
-            fields.push(Ext.applyIf(configFields[i] || {}, {
-                name: name,
-                mapping: 'td:nth(' + (i + 1) + ')/@innerHTML'
-            }));
-
-            cols.push(Ext.applyIf(configColumns[i] || {}, {
-                text: text,
-                dataIndex: name,
-                width: col.offsetWidth,
-                tooltip: col.title,
-                sortable: true
-            }));
-        }
-
-        debugger
-        if (config.width) {
-            width = config.width;
-        } else {
-            width = table.getWidth() + 1;
-        }
-
-        if (config.height) {
-            height = config.height;
-        }
-
-        Ext.applyIf(config, {
-            store: {
-                data: data,
-                fields: fields,
-                proxy: {
-                    type: 'memory',
-                    reader: {
-                        record: 'tbody tr',
-                        type: 'xml'
-                    }
-                }
-            },
-            columns: cols,
-            width: width,
-            height: height
-        });
-        this.callParent([config]);
-        
-        if (config.remove !== false) {
-            // Don't use table.remove() as that destroys the row/cell data in the table in
-            // IE6-7 so it cannot be read by the data reader.
-            data.parentNode.removeChild(data);
-        }
-    },
-
-    doDestroy: function() {
-        this.table.remove();
-        this.tabl = null;
-        this.callParent();
-    }
-});
-
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
