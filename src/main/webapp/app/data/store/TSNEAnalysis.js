@@ -1,4 +1,3 @@
-
 Ext.define('Voyant.data.store.TSNEAnalysisMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.StatisticalAnalysis',
@@ -9,6 +8,7 @@ Ext.define('Voyant.data.store.TSNEAnalysisMixin', {
 			'proxy.reader.totalProperty': 'tsneAnalysis.totalTerms'
 		}])
 		config.proxy.extraParams.withDistributions = true;
+		config.proxy.extraParams.noCache = 1;
 	}
 });
 

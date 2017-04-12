@@ -5,7 +5,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	alias: 'widget.scatterplot',
     statics: {
     	i18n: {
-    		tsne: 't-SNE'
+    		tsne: 't-SNE',
+    		terms: 'Terms',
+    		reload: 'Reload'
     	},
     	api: {
     		docId: undefined,
@@ -99,20 +101,18 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		region: 'center',
         		layout: 'fit',
         		tbar: {
-                    overflowHandler: 'scroller',
+        			overflowHandler: 'scroller',
         			items: [{
         				xtype: 'querysearchfield',
         				itemId: 'filterTerms',
         				width: 150
         			},{
-    	            	xtype: 'documentselectorbutton',
-    	            	flex: 1
+    	            	xtype: 'documentselectorbutton'
     	            },{
                 		text: this.localize('analysis'),
                 		itemId: 'analysis',
                 		glyph: 'xf1ec@FontAwesome',
                         overflowHandler: 'scroller',
-    	            	flex: 1,
             			menu: {
         					items: [
         					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
@@ -127,6 +127,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         								if (analysis !== this.getApiParam('analysis')) {
         									this.setApiParam('analysis', analysis);
     										this.queryById('nearbyButton').setDisabled(analysis === 'tsne');
+    										this.queryById('reloadButton').setVisible(analysis === 'tsne');
     										if (analysis === 'ca') {
         										if (this.getCorpus().getDocumentsCount() == 3) {
             										this.setApiParam('dimensions', 2);
@@ -146,7 +147,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	            	itemId: 'comparisonType',
     					glyph: 'xf201@FontAwesome',
     				    tooltip: this.localize('freqsModeTip'),
-    	            	flex: 1,
     				    menu: {
     				    	items: [
 				               {text: this.localize("rawFrequencies"), itemId: 'comparisonType_raw', group: 'freqsMode', xtype: 'menucheckitem'},
@@ -170,7 +170,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('clusters'),
                 		itemId: 'clusters',
                 		glyph: 'xf192@FontAwesome',
-    	            	flex: 1,
                 		menu: {
                 			items: [
                 			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
@@ -196,7 +195,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('dimensions'),
                 		itemId: 'dimensions',
                 		glyph: 'xf1b2@FontAwesome',
-    	            	flex: 1,
                 		menu: {
                 			items: [
                 			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
@@ -225,7 +223,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 		text: this.localize('labels'),
                 		itemId: 'labels',
                 		glyph: 'xf02b@FontAwesome',
-    	            	flex: 1,
                 		menu: {
                 			items: [
                 			    {text: this.localize("summaryLabel"), itemId: 'summary', xtype: 'menucheckitem'},
@@ -255,27 +252,34 @@ Ext.define('Voyant.panel.ScatterPlot', {
         						scope: this
         					}
                 		}
+                	},{
+                		text: this.localize('reload'),
+                		itemId: 'reloadButton',
+                		glyph: 'xf021@FontAwesome',
+                		hidden: true,
+                		handler: function() {
+                			this.loadFromApis(true);
+                		},
+                		scope: this
                 	}]
         			
         		},
         		listeners: {
         			query: function(component, value) {
-        				if (value !== undefined) {
-	        				this.getTermStore().filter([{property: 'term', value: value, anyMatch: true}]);
-	        				this.filterChart(value);
-        				}
+        				this.getTermStore().filter([{property: 'term', value: value, anyMatch: true}]);
+        				this.filterChart(value);
         			},
         			scope: this
         		}
         	},{
         		itemId: 'termsGrid',
         		xtype: 'grid',
- //       		title: 'Terms',
+        		title: this.localize('terms'),
         		region: 'east',
         		width: 250,
         		split: true,
-//        		collapsible: true,
-//        		border: true,
+        		collapsible: true,
+        		collapseMode: 'header',
         		forceFit: true,
         		features: [{
         			ftype: 'grouping',
@@ -423,7 +427,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		store: this.getTermStore(),
         		listeners: {
         			query: function(component, value) {
-        				if (value !== undefined && this.getTermStore().findExact('term', value) === -1) {
+        				if (value.length > 0 && this.getTermStore().findExact('term', value[0]) === -1) {
 	                		this.setNewTerm(value);
 	                		this.loadFromApis();
     					} else {
@@ -537,7 +541,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         tokens.forEach(function(token) {
         	var freq = token.get('rawFreq');
         	var category = token.get('category');
-        	if (category === undefined) category = 'term'; // PCA doesn't define categories
+        	if (category === undefined) {
+        		category = 'term'; // some analyses don't define categories
+        		token.set('category', 'term');
+        	}
         	var isTerm = category === 'term';
         	if (isTerm) {
 	        	if (freq > maxFreq) maxFreq = freq;
@@ -548,8 +555,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	}
         	if (numDims === 3) {
 				var z = token.get('vector')[2];
-				if (z < minFill) minFill = z;
-				if (z > maxFill) maxFill = z;
+				if (z !== undefined) {
+					if (z < minFill) minFill = z;
+					if (z > maxFill) maxFill = z;
+				}
 			}
         	var tokenData = {
         		x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2],
@@ -654,7 +663,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				if (item.get('disabled') === true) {
 	    					fillAlpha = 0.1;
 	    					strokeAlpha = 0.1;
-	    				} else if (numDims === 3) {
+	    				} else if (numDims === 3 && item.get('z')) {
 	    					fillAlpha = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
 	    				}
 	    				var color = scatterplot.getApplication().getColor(clusterIndex);
@@ -707,7 +716,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				}
 	    				
 	    				var a = 0.65;
-	    				if (numDims === 3) {
+	    				if (numDims === 3 && item.get('z')) {
 	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
 	    				}
 	    				
@@ -777,7 +786,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	this.doLabels();
     	
     	if (this.getNewTerm() !== null) {
-        	this.selectTerm(this.getNewTerm());
+        	this.selectTerm(this.getNewTerm()[0]);
         	this.setNewTerm(null);
         }
     },
@@ -853,10 +862,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     getPointFromIndex: function(series, index) {
 		var sprite = series.getSprites()[0];
-		var matrix = sprite.attr.matrix.clone().prependMatrix(sprite.surfaceMatrix);
-		var dataX = sprite.attr.dataX[index];
-		var dataY = sprite.attr.dataY[index];
-		return matrix.transformPoint([dataX, dataY]);
+		if (sprite.surfaceMatrix !== null) {
+			var matrix = sprite.attr.matrix.clone().prependMatrix(sprite.surfaceMatrix);
+			var dataX = sprite.attr.dataX[index];
+			var dataY = sprite.attr.dataY[index];
+			return matrix.transformPoint([dataX, dataY]);
+		} else {
+			return [0,0];
+		}
     },
     
     doHighlight: function() {
@@ -964,7 +977,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	var params = {};
     	var terms = this.getCurrentTerms();
     	if (this.getNewTerm() !== null) {
-    		terms.push(this.getNewTerm());
+    		terms = terms.concat(this.getNewTerm());
     		this.setApiParam('limit', terms.length);
     	}
     	if (terms.length > 0) {
