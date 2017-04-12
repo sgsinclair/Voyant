@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Apr 12 10:59:28 EDT 2017 */
+/* This file created by JSCacher. Last modified: Wed Apr 12 11:08:03 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8621,6 +8621,39 @@ Ext.define('Voyant.data.store.TokensBuffered', {
 	constructor : function(config) {
 		config = config || {};
 		this.mixins['Voyant.data.store.TokensMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.TSNEAnalysisMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.StatisticalAnalysis',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.TSNE',
+			'proxy.reader.rootProperty': 'tsneAnalysis',
+			'proxy.reader.totalProperty': 'tsneAnalysis.totalTerms'
+		}])
+		config.proxy.extraParams.withDistributions = true;
+	}
+});
+
+Ext.define('Voyant.data.store.TSNEAnalysis', {
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.TSNEAnalysisMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.TSNEAnalysisMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.TSNEAnalysisBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.TSNEAnalysisMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.TSNEAnalysisMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
 	}
 });

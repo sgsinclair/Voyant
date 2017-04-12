@@ -1,3 +1,4 @@
+
 Ext.define('Voyant.data.store.TSNEAnalysisMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.StatisticalAnalysis',
