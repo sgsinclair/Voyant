@@ -748,7 +748,15 @@ Ext.define('Voyant.data.model.Corpus', {
         	    url: Voyant.application.getTromboneUrl(),
         	    params: config,
         	    success: function(response, opts) {
-        	    	dfd.resolve(response.responseText.trim());
+        	    	var text = response.responseText.trim();
+        	    	if (config.transformCase) {
+        	    		if (config.transformCase.indexOf("lower")>-1) {
+        	    			text = text.toLowerCase();
+        	    		} else if (config.transformCase.indexOf("upper")>-1) {
+        	    			text = text.toUpperCase();
+        	    		}
+        	    	}
+        	    	dfd.resolve(text);
         	    },
         	    failure: function(response, opts) {
         	    	dfd.reject(response);
@@ -856,18 +864,8 @@ Ext.define('Voyant.data.model.Corpus', {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
-	    	config = config || {};
-	    	if (Ext.isNumber(config)) {
-	    		config = {limit: config}
-	    	} else if (Ext.isString(config)) {
-	    		config = {limit: parseInt(config)}
-	    	};
-	    	Ext.apply(config, {
-    			template: "docTokens2words"
-	    	});
-	    	var text = this.getWords();
-			var dfd =  Voyant.application.getDeferredNestedPromise(text, arguments);
-			text.then(function(text) {
+			var dfd = Voyant.application.getDeferred(this);
+	    	this.getWords(config).then(function(text) {
 				dfd.resolve(text.split(" "));
 			})
 			return dfd.promise

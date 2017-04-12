@@ -26,6 +26,7 @@ Ext.define('Voyant.data.store.CorpusTermsMixin', {
 Ext.define('Voyant.data.store.CorpusTerms', {
 	extend: 'Ext.data.Store',
 	mixins: ['Voyant.data.store.CorpusTermsMixin'],
+    model: Voyant.data.model.CorpusTerm,
 	
 	/**
 	 * @method each
@@ -65,6 +66,7 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 Ext.define('Voyant.data.store.CorpusTermsBuffered', {
 	extend: 'Ext.data.BufferedStore',
 	mixins: ['Voyant.data.store.CorpusTermsMixin'],
+    model: Voyant.data.model.CorpusTerm,
 	constructor : function(config) {
 		config = config || {};
 		this.mixins['Voyant.data.store.CorpusTermsMixin'].constructor.apply(this, [config])

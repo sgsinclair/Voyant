@@ -1,0 +1,201 @@
+{
+    "metadata": {
+        "created": 1491488686379,
+        "modified": 1491488755429,
+        "version": 2
+    },
+    "blocks": [
+        {
+            "type": "text",
+            "input": [
+                "<h1 style=\"text-align: center;\">Thinking about Corpus Scale</h1>\n\n<p>This notebo",
+                "ok will help you think about corpus scale when working with Spiral Notebooks (it",
+                "'s part of the <a data-tabindex-counter=\"52\" data-tabindex-value=\"none\" href=\"./",
+                "\" tabindex=\"-1\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>). I",
+                "n particular, we'll look at:</p>\n\n<ul>\n\t<li><a data-tabindex-counter=\"5\" data-ta",
+                "bindex-value=\"none\" href=\"#kinds\" tabindex=\"-1\">what kinds of corpora are there?",
+                "</a></li>\n\t<li><a data-tabindex-counter=\"4\" data-tabindex-value=\"none\" href=\"#sm",
+                "aller\" tabindex=\"-1\">word frequencies with a smaller corpus</a></li>\n\t<li><a hre",
+                "f=\"#larger\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">w",
+                "ord frequencies with a larger corpus</a></li>\n\t<li><a data-tabindex-counter=\"52\"",
+                " data-tabindex-value=\"none\" href=\"#next\" tabindex=\"-1\">next steps</a></li>\n</ul>",
+                "\n\n<h2><a id=\"kinds\" name=\"kinds\"></a>What Kinds of Corpora are There?&nbsp;&nbsp",
+                ";</h2>\n\n<p>A corpus, as a body of text, is a very fluid concept. In principle, a",
+                " corpus can be constituted of a single character (let's call that miniscule) or ",
+                "it can be constituted from something like the <a data-tabindex-counter=\"5\" data-",
+                "tabindex-value=\"none\" href=\"https://wiki.htrc.illinois.edu/display/COM/Extracted",
+                "+Features+Dataset\" tabindex=\"-1\">HTRC features dataset</a> that's extracted from",
+                " a corpus of -- at last check -- 13.8 million volumes and over 2 trillion tokens",
+                "/words (let's call that colossal). Probably more relevant to us are corpora in b",
+                "etween, maybe from a single book, or a collection of poems or plays, or the enti",
+                "re works of an author, works from a specific period or genre, works that are the",
+                "matically related, etc. That's a lot of variety and it doesn't even start to scr",
+                "atch the surface of the kinds of corpora people use with Voyant and Spiral, othe",
+                "r examples include legal documents, news articles, collections of tweets, survey",
+                " data.</p>\n\n<p>Also important is to understand that a collection of texts might ",
+                "be arranged and rearranged in many ways to constitute different corpora. For ins",
+                "tance, we may start with a collection of all the news articles from a given week",
+                " of an online media source: we could treat the entire collection as a corpus. Bu",
+                "t we might also (not necessarily instead) want to combine all the articles from ",
+                "a given day into a single document and then have seven documents, one for each d",
+                "ay. We might treat the different documents differently because different tools a",
+                "re better suited to certain corpus sizes. Similarly, we might want to do certain",
+                " operations in Spiral on a single smaller document (because of what we're studyi",
+                "ng or because dealing with the entire corpus at once would be overwhelming for t",
+                "he browser).</p>\n\n<p>A related issue is whether we are operating on data in the ",
+                "browser or data on the server. For example, in the <a data-tabindex-counter=\"5\" ",
+                "data-tabindex-value=\"none\" href=\"Tables\" tabindex=\"-1\" target=\"_blank\">previous ",
+                "notebook</a> we counted all the letters in \"The Gold Bug\" though we started by l",
+                "oading into the browser memory the entire text of the short story. That worked v",
+                "ery well because \"The Gold Bug\" is relatively short (about 13,700 words), but it",
+                " wouldn't work so well for our corpus of Jane Austen novels (about 781,000 words",
+                "). For many operations in Spiral, the total number of words in the corpus may be",
+                " the most useful measure for gauging the relative size of a corpus. You could ha",
+                "ve a corpus of 1,000 documents but if they each had only 100 words it would stil",
+                "l be smaller than our \"Gold Bug\" short story.</p>\n\n<p>In what follows we will co",
+                "mpare doing approximately the same thing with a smaller corpus and with a bigger",
+                " corpus: we will show the highest frequency terms in a chart.</p>\n\n<h2><a id=\"sm",
+                "aller\" name=\"smaller\"></a>Word Frequences with a Smaller Corpus</h2>\n\n<p>For the",
+                " smaller corpus, we will once again use Poe's \"The Gold Bug\" and we can again us",
+                "e the code we saw in an earlier notebook on <a data-tabindex-counter=\"4\" data-ta",
+                "bindex-value=\"none\" href=\"Create#text\" tabindex=\"-1\" target=\"_blank\">Creating a ",
+                "Corpus with Plain Text</a>.</p>\n\n<p>&nbsp;</p>\n"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "new Corpus(\"https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt\", {",
+                "    inputRemoveUntil: 'THE GOLD-BUG',",
+                "    inputRemoveFrom: 'FOUR BEASTS IN ONE'",
+                "}).assign(\"goldbug\").show();"
+            ],
+            "output": [
+                " <div class=\"info\">This corpus has 1 document with 13,731 <span class=\"info-tip\"",
+                " data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;t",
+                "he&quot;) is counted\">total words</span> and 2,756 <span class=\"info-tip\" data-q",
+                "tip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">uniq",
+                "ue word forms</span>. Created <span class=\"info-tip\" data-qtip=\"2017-04-09, 16:0",
+                "2:10\">about a day ago</span>.</div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>Again we see that the corpus is relatively small with some 13,700 words. In t",
+                "he previous notebook on Tables we saw how we could slurp the entire plain text d",
+                "ocument into a string variable. There's a related function which is to <a href=\"",
+                "../../docs/#!/api/Corpus-method-getWordsArray\" target=\"_blank\" data-tabindex-val",
+                "ue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">get all the words</a> in an ar",
+                "ray (an ordered list of strings). Note that this function only provides words, n",
+                "o punctuation, tags, or other contents.</p>\n"
+            ]
+        },
+        {
+            "type": "code",
+            "input": "goldbug.getWordsArray({transformCase: \"lowercase\"}).assign(\"goldbugWords\").show(100); // show first 100 characters from comma-separated words",
+            "output": [
+                " <div class=\"info\">the,gold,bug,what,ho,what,ho,this,fellow,is,dancing,mad,he,ha",
+                "th,been,bitten,by,the,tarantula,all,in,</div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>Now, just as we did with letters in \"The Gold Bug\" we'll create a table of fr",
+                "equencies from our array of words, and immediately chart it.</p>\n"
+            ]
+        },
+        {
+            "type": "code",
+            "input": "new VoyantTable({count: goldbugWords, limit: 20, headers: [\"Words\",\"Counts\"]}).embed(\"VoyantChart\", {width: \"800px\"});",
+            "output": [
+                " <div class=\"info\"><iframe style=\"width: 800px; height: 400px\" src=\"/voyant/tool",
+                "/VoyantChart/?minimal=true&amp;chartJson=%7B%22store%22%3A%7B%22fields%22%3A%5B%",
+                "22Words%22%2C%22Counts%22%5D%2C%22data%22%3A%5B%7B%22Words%22%3A%22the%22%2C%22C",
+                "ounts%22%3A884%7D%2C%7B%22Words%22%3A%22of%22%2C%22Counts%22%3A465%7D%2C%7B%22Wo",
+                "rds%22%3A%22and%22%2C%22Counts%22%3A359%7D%2C%7B%22Words%22%3A%22to%22%2C%22Coun",
+                "ts%22%3A333%7D%2C%7B%22Words%22%3A%22i%22%2C%22Counts%22%3A331%7D%2C%7B%22Words%",
+                "22%3A%22a%22%2C%22Counts%22%3A330%7D%2C%7B%22Words%22%3A%22in%22%2C%22Counts%22%",
+                "3A238%7D%2C%7B%22Words%22%3A%22it%22%2C%22Counts%22%3A210%7D%2C%7B%22Words%22%3A",
+                "%22you%22%2C%22Counts%22%3A162%7D%2C%7B%22Words%22%3A%22was%22%2C%22Counts%22%3A",
+                "135%7D%2C%7B%22Words%22%3A%22that%22%2C%22Counts%22%3A129%7D%2C%7B%22Words%22%3A",
+                "%22with%22%2C%22Counts%22%3A114%7D%2C%7B%22Words%22%3A%22as%22%2C%22Counts%22%3A",
+                "113%7D%2C%7B%22Words%22%3A%22for%22%2C%22Counts%22%3A113%7D%2C%7B%22Words%22%3A%",
+                "22had%22%2C%22Counts%22%3A109%7D%2C%7B%22Words%22%3A%22at%22%2C%22Counts%22%3A10",
+                "8%7D%2C%7B%22Words%22%3A%22he%22%2C%22Counts%22%3A103%7D%2C%7B%22Words%22%3A%22t",
+                "his%22%2C%22Counts%22%3A99%7D%2C%7B%22Words%22%3A%22but%22%2C%22Counts%22%3A99%7",
+                "D%2C%7B%22Words%22%3A%22we%22%2C%22Counts%22%3A98%7D%5D%7D%2C%22axes%22%3A%5B%7B",
+                "%22type%22%3A%22numeric%22%2C%22position%22%3A%22left%22%7D%2C%7B%22type%22%3A%2",
+                "2category%22%2C%22position%22%3A%22bottom%22%7D%5D%2C%22series%22%3A%5B%7B%22typ",
+                "e%22%3A%22line%22%2C%22xField%22%3A%22Words%22%2C%22yField%22%3A%22Counts%22%2C%",
+                "22marker%22%3A%7B%22radius%22%3A2%7D%2C%22highlightCfg%22%3A%7B%22scaling%22%3A2",
+                "%7D%2C%22tooltip%22%3A%7B%22trackMouse%22%3Atrue%7D%7D%5D%7D&amp;debug=true\" dat",
+                "a-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>There we are, the famous Zipf's Law again! With very few lines of code we've ",
+                "been able to create this chart (some steps are put in separate blocks to ensure ",
+                "that they are run separately and sequentially):</p>\n\n<blockquote>\n<pre>new Corpu",
+                "s(\"https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c",
+                "1/raw/goldbug.txt\", {\n&nbsp; &nbsp; inputRemoveUntil: 'THE GOLD-BUG',\n&nbsp; &nb",
+                "sp; inputRemoveFrom: 'FOUR BEASTS IN ONE'\n}).assign(\"goldbug\");\ngoldbug.getWords",
+                "Array({transformCase: \"lowercase\"}).assign(\"goldbugWords\");\nnew VoyantTable({cou",
+                "nt: goldbugWords, limit: 20, headers: [\"Words\",\"Counts\"]}).embed(\"VoyantChart\", ",
+                "{width: \"800px\"});\n</pre>\n</blockquote>\n\n<p>We can do it this way because it's r",
+                "easonable to handle all the words in the browser memory, but sometimes it's not,",
+                " so we have to use a different approach.</p>\n\n<h2><a id=\"larger\" name=\"larger\"><",
+                "/a>Word Frequencies with a Larger Corpus</h2>\n\n<p>So, how can show a graph of hi",
+                "gh frequency terms with a larger corpus? The key is to shift more processing to ",
+                "the server instead of doing it in the browser.</p>\n"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "new Corpus(\"austen\").loadCorpusTerms({limit: 10}).assign(\"austenWords\");",
+                ""
+            ],
+            "output": [
+                " <div role=\"presentation\" class=\"x-mask x-border-box\" id=\"ext-element-72\"><div r",
+                "ole=\"presentation\" class=\"x-mask-msg\" id=\"ext-element-73\" style=\"right: auto; le",
+                "ft: 582px; top: -21px;\"><div role=\"presentation\" class=\"x-mask-msg-inner\"><div r",
+                "ole=\"presentation\" class=\"x-mask-msg-text\">working…</div></div></div></div>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "new VoyantTable(austenWords, {headers: [\"term\",\"rawFreq\"]}).embed(\"VoyantChart\");",
+                ""
+            ],
+            "output": [
+                " <div role=\"presentation\" class=\"x-mask x-border-box\" id=\"ext-element-72\"><div r",
+                "ole=\"presentation\" class=\"x-mask-msg\" id=\"ext-element-73\" style=\"right: auto; le",
+                "ft: 582px; top: -21px;\"><div role=\"presentation\" class=\"x-mask-msg-inner\"><div r",
+                "ole=\"presentation\" class=\"x-mask-msg-text\">working…</div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<h2><a id=\"next\" name=\"next\"></a>Next Steps</h2>\n\n<p>Here are some exercises to ",
+                "try, based on the contents of this notebook:</p>\n\n<ul>\n\t<li>the prominence of th",
+                "e letter \"t\" in \"The Gold Bug\" is certainly unusual, any theories why? Could you",
+                " describe in English (not in code) the steps that might be needed to better unde",
+                "rstand the use and distribution of the letter \"t\"?</li>\n\t<li>create a new corpus",
+                " from a different <a data-tabindex-counter=\"8\" data-tabindex-value=\"none\" href=\"",
+                "https://www.gutenberg.org/wiki/Short_Stories_(Bookshelf)\" tabindex=\"-1\" target=\"",
+                "_blank\">short story</a>&nbsp;and start exploring it in the same way we did here,",
+                " is the order of letters different?</li>\n</ul>\n\n<p>If you're working sequentiall",
+                "y&nbsp;through the <a data-tabindex-counter=\"18\" data-tabindex-value=\"none\" href",
+                "=\"./\" tabindex=\"-1\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>",
+                ", the next notebook&nbsp;is <a data-tabindex-counter=\"6\" data-tabindex-value=\"no",
+                "ne\" href=\"Scale\" tabindex=\"-1\" target=\"_blank\">Thinking about Scale</a>.</p>\n"
+            ]
+        }
+    ]
+}

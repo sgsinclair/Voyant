@@ -15,7 +15,7 @@
 Ext.define('Voyant.data.table.Table', {
 	alternateClassName: ["VoyantTable"],
 	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
-	embeddable: ['Voyant.panel.VoyantTableTransform','Voyant.widget.VoyantChart'],
+	embeddable: ['Voyant.widget.VoyantTableTransform','Voyant.widget.VoyantChart'],
 	config: {
 		
 		/**
@@ -40,7 +40,7 @@ Ext.define('Voyant.data.table.Table', {
 		model: undefined
 	},
 
-	constructor: function(config) {
+	constructor: function(config, opts) {
 
 		config = config || {};
 				
@@ -49,7 +49,7 @@ Ext.define('Voyant.data.table.Table', {
 		this.setHeaders(Ext.Array.from(config.headers));
 		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
 		
-		if (config.count) {
+		if (config.count && Ext.isArray(config.count)) {
 			// create counts
 			var freqs = {};
 			config.count.forEach(function(item) {freqs[item] = freqs[item] ? freqs[item]+1 : 1;});
@@ -57,6 +57,9 @@ Ext.define('Voyant.data.table.Table', {
 			var counts = [];
 			for (var key in freqs) {counts.push([key, freqs[key]])}
 			counts.sort(function(a,b) {return b[1] - a[1]});
+			if (config.limit && counts.length>config.limit) {
+				counts.splice(config.limit);
+			}
 			if (config.orientation && config.orientation=="horizontal") {
 				this.setHeaders(counts.map(function(item) {return item[0]}));
 				this.setRows([counts.map(function(item) {return item[1]})]);
@@ -67,14 +70,25 @@ Ext.define('Voyant.data.table.Table', {
 			}
 		}
 		
-		if (config.isStore) {
-			this.model = config.getModel();
-			if (config.getCount()>0) {
-				this.setHeaders(Object.keys(config.getAt(0).data));
+		if (config.isStore || config.store) {
+			var store = config.store ? config.store : config;
+			
+			if (opts && opts.headers) {
+				this.setHeaders(opts.headers);
+			} else {
+				// store.getModel() doesn't seem to work (for CorpusTerms at least)
+				// so instead we'll try looking at the first record to get headers
+				var record = store.getAt(0);
+				if (record) { // don't know what to do if this fails?
+					this.setHeaders(record.getFields().map(function(field) {return field.getName()}))
+				}
 			}
-			config.each(function(item) {
-				this.addRow(item.data);
-			}, this)
+			
+			// now we get rows
+			store.each(function(record) {
+				this.addRow(record.getData());
+			}, this);
+			debugger
 		}
 		this.callParent();
 	},

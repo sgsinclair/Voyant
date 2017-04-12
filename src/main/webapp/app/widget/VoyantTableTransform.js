@@ -1,8 +1,9 @@
-Ext.define('Voyant.panel.VoyantTableTransform', {
+Ext.define('Voyant.widget.VoyantTableTransform', {
 	extend: 'Ext.panel.Panel',
-	mixins: ['Voyant.panel.Panel'],
+    mixins: ['Voyant.util.Localization','Voyant.util.Api'],
 	alias: 'widget.voyanttabletransform',
     statics: {
+    	i18n: {},
 		api: {
 			tableHtml: undefined,
 			tableJson: undefined,
@@ -12,8 +13,9 @@ Ext.define('Voyant.panel.VoyantTableTransform', {
 	constructor: function() {
         this.callParent(arguments);
 	},
-	initComponent: function() {
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+	initComponent: function(config) {
+    	var me = this, config = config || {};
+    	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 		var me = this, tableHtml = this.getApiParam('tableHtml'), tableJson = this.getApiParam('tableJson');
 		if (tableHtml) {
 			Ext.apply(me, {
@@ -43,45 +45,18 @@ Ext.define('Voyant.panel.VoyantTableTransform', {
 			Ext.apply(me, {
 				html: html
 			})
-			debugger
 		}
 		
 		me.on('afterrender', function() {
-			var table = this.getTargetEl().down('table');
+			var table = this.getTargetEl().down('table'), parent = table.parent();
 			var grid = new Ext.ux.grid.TransformGrid(table, {
-				width: this.getApiParam('width') || '100%',
-				height: this.getApiParam('height') || table.query('tr').length*24 // based on grid heights in crisp
+				width: this.getApiParam('width') || parent.getWidth(),
+				height: this.getApiParam('height') || 20+(table.query('tr').length*24) // based on grid heights in crisp
 			});
-			grid.render(this.getTargetEl());
+			grid.render(parent);
 		}, me);
 		
     	me.callParent(arguments);
-
-		/*
-		if ()
-		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-		config = config || {};
-		
-		Ext.applyIf(config, this.getApiParams());
-		if (config.tableHtml) {
-			
-			var table = Ext.getBody().insertHtml('beforeEnd', config.tableHtml);
-			debugger
-	        this.callParent([tableId, config]);
-		} else {
-	        this.callParent([tableId, config]);
-		}
-		var tableEl = Ext.DomHelper.createContextualFragment(table);
-		
-		
-		debugger
-		var tableId = config.tableId ? config.tableId : this.getApiParam("tableId");
-		config = config || {};
-		Ext.applyIf(config, this.getApiParams());
-		debugger
-
-		 */
-		
 	}
 
 })
@@ -135,13 +110,13 @@ Ext.define('Ext.ux.grid.TransformGrid', {
             cols.push(Ext.applyIf(configColumns[i] || {}, {
                 text: text,
                 dataIndex: name,
-                width: col.offsetWidth,
+                //width: col.offsetWidth,
+                flex: 1,
                 tooltip: col.title,
                 sortable: true
             }));
         }
 
-        debugger
         if (config.width) {
             width = config.width;
         } else {
