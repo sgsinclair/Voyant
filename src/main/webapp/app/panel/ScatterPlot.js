@@ -7,7 +7,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	i18n: {
     		tsne: 't-SNE',
     		terms: 'Terms',
-    		reload: 'Reload'
+    		reload: 'Reload',
+    		options: 'Options',
+    		input: 'Input',
+    		output: 'Output',
+    		perplexity: 'Perplexity',
+    		iterations: 'Iterations',
+    		analyzing: 'Analyzing',
+    		plotting: 'Plotting'
     	},
     	api: {
     		docId: undefined,
@@ -16,6 +23,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		dimensions: 3,
     		bins: 10,
     		clusters: 3,
+    		perplexity: 15,
+    		iterations: 1500,
     		comparisonType: 'relative',
     		stopList: 'auto',
     		target: undefined,
@@ -51,16 +60,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     initComponent: function() {
     	this.setCaStore(Ext.create('Voyant.data.store.CAAnalysis', {
-    		listeners: {load: this.buildChart, scope: this}
+    		listeners: {load: this.maskAndBuildChart, scope: this}
     	}));
     	this.setPcaStore(Ext.create('Voyant.data.store.PCAAnalysis', {
-    		listeners: {load: this.buildChart, scope: this}
+    		listeners: {load: this.maskAndBuildChart, scope: this}
     	}));
     	this.setTsneStore(Ext.create('Voyant.data.store.TSNEAnalysis', {
-    		listeners: {load: this.buildChart, scope: this}
+    		listeners: {load: this.maskAndBuildChart, scope: this}
     	}));
     	this.setDocSimStore(Ext.create('Voyant.data.store.DocSimAnalysis', {
-    		listeners: {load: this.buildChart, scope: this}
+    		listeners: {load: this.maskAndBuildChart, scope: this}
     	}));
     	this.setTermStore(Ext.create('Ext.data.JsonStore', {
 			fields: [
@@ -97,9 +106,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	layout: 'border',
         	autoDestroy: true,
         	items: [{
-        		itemId: 'chartParent',
-        		region: 'center',
-        		layout: 'fit',
+    			itemId: 'chartParent',
+    			region: 'center',
+    			layout: 'fit',
         		tbar: {
         			overflowHandler: 'scroller',
         			items: [{
@@ -107,119 +116,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
         				itemId: 'filterTerms',
         				width: 150
         			},{
-    	            	xtype: 'documentselectorbutton'
-    	            },{
-                		text: this.localize('analysis'),
-                		itemId: 'analysis',
-                		glyph: 'xf1ec@FontAwesome',
-                        overflowHandler: 'scroller',
-            			menu: {
-        					items: [
-        					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
-        					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'},
-        					    {text: this.localize('tsne'), itemId: 'analysis_tsne', group:'analysis', xtype: 'menucheckitem'},
-        					    {text: this.localize('docSim'), itemId: 'analysis_docSim', group:'analysis', xtype: 'menucheckitem'}
-        					],
-        					listeners: {
-        						click: function(menu, item) {
-        							if (item !== undefined) {
-        								var analysis = item.getItemId().split('_')[1];
-        								if (analysis !== this.getApiParam('analysis')) {
-        									this.setApiParam('analysis', analysis);
-    										this.queryById('nearbyButton').setDisabled(analysis === 'tsne');
-    										this.queryById('reloadButton').setVisible(analysis === 'tsne');
-    										if (analysis === 'ca') {
-        										if (this.getCorpus().getDocumentsCount() == 3) {
-            										this.setApiParam('dimensions', 2);
-            										this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
-            									}
-        									}
-
-        									this.loadFromApis(true);
-        								}
-        							}
-        						},
-        						scope: this
-        					}
-            			}
-    	            },{
-    	            	text: this.localize('freqsMode'),
-    	            	itemId: 'comparisonType',
-    					glyph: 'xf201@FontAwesome',
-    				    tooltip: this.localize('freqsModeTip'),
-    				    menu: {
-    				    	items: [
-				               {text: this.localize("rawFrequencies"), itemId: 'comparisonType_raw', group: 'freqsMode', xtype: 'menucheckitem'},
-				               {text: this.localize("relativeFrequencies"), itemId: 'comparisonType_relative', group: 'freqsMode', xtype: 'menucheckitem'},
-				               {text: this.localize("tfidf"), itemId: 'comparisonType_tfidf', group: 'freqsMode', xtype: 'menucheckitem'}
-				            ],
-	       					listeners: {
-	    						click: function(menu, item) {
-	    							if (item !== undefined) {
-	    								var type = item.getItemId().split('_')[1];
-	    								if (type !== this.getApiParam('comparisonType')) {
-		    								this.setApiParam('comparisonType', type);
-		    								this.loadFromApis(true);
-	    								}
-	    							}
-	    						},
-	    						scope: this
-	    				    }
-    				    }
-                	},{
-                		text: this.localize('clusters'),
-                		itemId: 'clusters',
-                		glyph: 'xf192@FontAwesome',
-                		menu: {
-                			items: [
-                			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
-                			    {text: '2', itemId: 'clusters_2', group: 'clusters', xtype: 'menucheckitem'},
-                			    {text: '3', itemId: 'clusters_3', group: 'clusters', xtype: 'menucheckitem'},
-                			    {text: '4', itemId: 'clusters_4', group: 'clusters', xtype: 'menucheckitem'},
-                			    {text: '5', itemId: 'clusters_5', group: 'clusters', xtype: 'menucheckitem'}
-                			],
-        					listeners: {
-        						click: function(menu, item) {
-        							if (item !== undefined) {
-        								var clusters = parseInt(item.getItemId().split('_')[1]);
-        								if (clusters !== this.getApiParam('clusters')) {
-	        								this.setApiParam('clusters', clusters);
-	        								this.loadFromApis(true);
-        								}
-        							}
-        						},
-        						scope: this
-        					}
-                		}
-                	},{
-                		text: this.localize('dimensions'),
-                		itemId: 'dimensions',
-                		glyph: 'xf1b2@FontAwesome',
-                		menu: {
-                			items: [
-                			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
-                			    {text: '3', itemId: 'dimensions_3', group: 'dimensions', xtype: 'menucheckitem'}
-                			],
-        					listeners: {
-        						click: function(menu, item) {
-        							if (item !== undefined) {
-        								var dims = parseInt(item.getItemId().split('_')[1]);
-        								if (dims !== this.getApiParam('dimensions')) {
-	        								if (dims == 3 && this.getApiParam('analysis') == 'ca' && this.getCorpus().getDocumentsCount() == 3) {
-	        									dims = 2;
-	        									// TODO add info message 'Because of the nature of Correspondence Analysis, you can only use 2 dimensions with 3 documents.'
-	        									return false;
-	        								}
-	        								
-	        								this.setApiParam('dimensions', dims);
-	        								this.loadFromApis(true);
-        								}
-        							}
-        						},
-        						scope: this
-        					}
-                		}
-                	},{
                 		text: this.localize('labels'),
                 		itemId: 'labels',
                 		glyph: 'xf02b@FontAwesome',
@@ -252,15 +148,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
         						scope: this
         					}
                 		}
-                	},{
-                		text: this.localize('reload'),
-                		itemId: 'reloadButton',
-                		glyph: 'xf021@FontAwesome',
-                		hidden: true,
-                		handler: function() {
-                			this.loadFromApis(true);
-                		},
-                		scope: this
                 	}]
         			
         		},
@@ -271,6 +158,193 @@ Ext.define('Voyant.panel.ScatterPlot', {
         			},
         			scope: this
         		}
+    		},{
+    			itemId: 'optionsPanel',
+        		title: this.localize('options'),
+        		region: 'west',
+        		split: true,
+        		collapsible: true,
+        		collapseMode: 'header',
+        		width: 135,
+        		scrollable: 'y',
+        		layout: {
+        			type: 'vbox',
+        			align: 'stretch'
+        		},
+        		defaults: {
+        			xtype: 'button',
+        			margin: '5',
+        			labelAlign: 'top'
+        		},
+        		items: [{
+        			xtype: 'label',
+        			text: this.localize('input')
+        		},{
+    				xtype: 'documentselectorbutton'
+    			},{
+	            	text: this.localize('freqsMode'),
+	            	itemId: 'comparisonType',
+					glyph: 'xf201@FontAwesome',
+				    tooltip: this.localize('freqsModeTip'),
+				    menu: {
+				    	items: [
+			               {text: this.localize("rawFrequencies"), itemId: 'comparisonType_raw', group: 'freqsMode', xtype: 'menucheckitem'},
+			               {text: this.localize("relativeFrequencies"), itemId: 'comparisonType_relative', group: 'freqsMode', xtype: 'menucheckitem'},
+			               {text: this.localize("tfidf"), itemId: 'comparisonType_tfidf', group: 'freqsMode', xtype: 'menucheckitem'}
+			            ],
+       					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								var type = item.getItemId().split('_')[1];
+    								if (type !== this.getApiParam('comparisonType')) {
+	    								this.setApiParam('comparisonType', type);
+	    								this.loadFromApis(true);
+    								}
+    							}
+    						},
+    						scope: this
+    				    }
+				    }
+        		},{
+        			fieldLabel: this.localize('numTerms'),
+        			itemId: 'limit',
+        			xtype: 'numberfield',
+        			listeners: {
+        				change: function(numb, newValue, oldValue) {
+        					function doLoad() {
+        						this.setApiParam('limit', newValue);
+            					this.loadFromApis();
+							}
+							if (oldValue !== null) {
+								if (this.getTermsTimeout() !== null) {
+									clearTimeout(this.getTermsTimeout());
+								}
+								this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
+							}
+        				},
+        				scope: this
+        			}
+        		},{
+        			xtype: 'container',
+        			html: '<hr style="border: none; border-top: 1px solid #cfcfcf;"/>'
+        		},{
+        			xtype: 'label',
+        			text: this.localize('output')
+        		},{
+            		text: this.localize('analysis'),
+            		itemId: 'analysis',
+            		glyph: 'xf1ec@FontAwesome',
+                    overflowHandler: 'scroller',
+        			menu: {
+    					items: [
+    					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
+    					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'},
+    					    {text: this.localize('tsne'), itemId: 'analysis_tsne', group:'analysis', xtype: 'menucheckitem'},
+    					    {text: this.localize('docSim'), itemId: 'analysis_docSim', group:'analysis', xtype: 'menucheckitem'}
+    					],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								var analysis = item.getItemId().split('_')[1];
+    								if (analysis !== this.getApiParam('analysis')) {
+    									this.doAnalysisChange(analysis);
+    									this.loadFromApis(true);
+    								}
+    							}
+    						},
+    						scope: this
+    					}
+        			}
+	            },{
+	            	fieldLabel: this.localize('perplexity'),
+	            	itemId: 'perplexity',
+	            	xtype: 'slider',
+	            	minValue: 5,
+	            	maxValue: 100,
+	            	increment: 1,
+	            	listeners: {
+	            		changecomplete: function(slider, newValue) {
+	            			this.setApiParam('perplexity', newValue);
+	            			this.loadFromApis(true);
+	            		},
+	            		scope: this
+	            	}
+	            },{
+	            	fieldLabel: this.localize('iterations'),
+	            	itemId: 'iterations',
+	            	xtype: 'slider',
+	            	minValue: 100,
+	            	maxValue: 5000,
+	            	increment: 100,
+	            	listeners: {
+	            		changecomplete: function(slider, newValue) {
+	            			this.setApiParam('iterations', newValue);
+	            			this.loadFromApis(true);
+	            		},
+	            		scope: this
+	            	}
+	            },{
+            		text: this.localize('clusters'),
+            		itemId: 'clusters',
+            		glyph: 'xf192@FontAwesome',
+            		menu: {
+            			items: [
+            			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '2', itemId: 'clusters_2', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '3', itemId: 'clusters_3', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '4', itemId: 'clusters_4', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '5', itemId: 'clusters_5', group: 'clusters', xtype: 'menucheckitem'}
+            			],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								var clusters = parseInt(item.getItemId().split('_')[1]);
+    								if (clusters !== this.getApiParam('clusters')) {
+        								this.setApiParam('clusters', clusters);
+        								this.loadFromApis(true);
+    								}
+    							}
+    						},
+    						scope: this
+    					}
+            		}
+            	},{
+            		text: this.localize('dimensions'),
+            		itemId: 'dimensions',
+            		glyph: 'xf1b2@FontAwesome',
+            		menu: {
+            			items: [
+            			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
+            			    {text: '3', itemId: 'dimensions_3', group: 'dimensions', xtype: 'menucheckitem'}
+            			],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								var dims = parseInt(item.getItemId().split('_')[1]);
+    								if (dims !== this.getApiParam('dimensions')) {
+        								if (dims == 3 && this.getApiParam('analysis') == 'ca' && this.getCorpus().getDocumentsCount() == 3) {
+        									dims = 2;
+        									// TODO add info message 'Because of the nature of Correspondence Analysis, you can only use 2 dimensions with 3 documents.'
+        									return false;
+        								}
+        								
+        								this.setApiParam('dimensions', dims);
+        								this.loadFromApis(true);
+    								}
+    							}
+    						},
+    						scope: this
+    					}
+            		}
+        		},{
+        			itemId: 'reloadButton',
+        			text: this.localize('reload'),
+        			glyph: 'xf021@FontAwesome',
+        			handler: function() {
+        				this.loadFromApis();
+        			},
+        			scope: this
+        		}]
         	},{
         		itemId: 'termsGrid',
         		xtype: 'grid',
@@ -333,42 +407,44 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		},
         		tbar: {
                     overflowHandler: 'scroller',
-                    items: [{
-                		fieldLabel: this.localize('numTerms'),
-                		labelAlign: 'right',
-                		labelWidth: 40,
-                		itemId: 'limit',
-                		xtype: 'combo',
-                		width: 100,
-                		store: Ext.create('Ext.data.ArrayStore', {
-                			fields: ['count'],
-                			data: [[10],[20],[30],[40],[50],[60],[70],[80],[90],[100]]
-                		}),
-                		displayField: 'count',
-                		valueField: 'count',
-                		queryMode: 'local',
-                		editable: true,
-                		allowBlank: false,
-                		validator: function(val) {
-                			return val.match(/\D/) === null;
-                		},
-                		listeners: {
-    						change: function(combo, newVal, oldVal) {
-    							function doLoad() {
-    								var val = Math.min(parseInt(newVal), 10000);
-    								this.setApiParam('limit', val);
-									this.loadFromApis();
-    							}
-    							if (combo.isValid() && oldVal !== null) {
-    								if (this.getTermsTimeout() !== null) {
-    									clearTimeout(this.getTermsTimeout());
-    								}
-    								this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
-    							}
-    						},
-    						scope: this
-    					}
-                	},{
+                    items: [
+//                    {
+//                		fieldLabel: this.localize('numTerms'),
+//                		labelAlign: 'right',
+//                		labelWidth: 40,
+//                		itemId: 'limit',
+//                		xtype: 'combo',
+//                		width: 100,
+//                		store: Ext.create('Ext.data.ArrayStore', {
+//                			fields: ['count'],
+//                			data: [[10],[20],[30],[40],[50],[60],[70],[80],[90],[100]]
+//                		}),
+//                		displayField: 'count',
+//                		valueField: 'count',
+//                		queryMode: 'local',
+//                		editable: true,
+//                		allowBlank: false,
+//                		validator: function(val) {
+//                			return val.match(/\D/) === null;
+//                		},
+//                		listeners: {
+//    						change: function(combo, newVal, oldVal) {
+//    							function doLoad() {
+//    								var val = Math.min(parseInt(newVal), 10000);
+//    								this.setApiParam('limit', val);
+//									this.loadFromApis();
+//    							}
+//    							if (combo.isValid() && oldVal !== null) {
+//    								if (this.getTermsTimeout() !== null) {
+//    									clearTimeout(this.getTermsTimeout());
+//    								}
+//    								this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
+//    							}
+//    						},
+//    						scope: this
+//    					}
+//                	},
+                	{
                     	xtype: 'querysearchfield',
                     	itemId: 'addTerms',
 //                    	emptyText: this.localize('addTerm'),
@@ -450,17 +526,19 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		var setCheckBound = setCheckItemFromApi.bind(this);
     		
     		setCheckBound('analysis');
-    		this.queryById('nearbyButton').setDisabled(this.getApiParam('analysis') === 'tsne');
+    		this.doAnalysisChange(this.getApiParam('analysis'));
     		
     		setCheckBound('comparisonType');
-//    		setCheckBound('limit');
     		setCheckBound('clusters');
+
+    		this.queryById('perplexity').setValue(this.getApiParam('perplexity'));
+    		this.queryById('iterations').setValue(this.getApiParam('iterations'));
     		
     		if (corpus.getDocumentsCount() == 3) {
     			this.setApiParam('dimensions', 2);
     		}
     		setCheckBound('dimensions');
-    		
+
     		this.getCaStore().setCorpus(corpus);
     		this.getPcaStore().setCorpus(corpus);
     		this.getDocSimStore().setCorpus(corpus);
@@ -473,6 +551,25 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	}, this);
         
     	this.callParent(arguments);
+    },
+    
+    doAnalysisChange: function(analysis) {
+    	this.setApiParam('analysis', analysis);
+		this.queryById('nearbyButton').setDisabled(analysis === 'tsne');
+		this.queryById('reloadButton').setVisible(analysis === 'tsne');
+		this.queryById('perplexity').setVisible(analysis === 'tsne');
+		this.queryById('iterations').setVisible(analysis === 'tsne');
+		if (analysis === 'ca') {
+			if (this.getCorpus().getDocumentsCount() == 3) {
+				this.setApiParam('dimensions', 2);
+				this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
+			}
+		}
+    },
+    
+    maskAndBuildChart: function(store) {
+    	this.queryById('chartParent').mask(this.localize('plotting'));
+    	Ext.defer(this.buildChart, 50, this, [store]);
     },
     
     buildChart: function(store) {
@@ -783,6 +880,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	
     	var chart = Ext.create('Ext.chart.CartesianChart', config);
     	this.queryById('chartParent').insert(0, chart);
+    	
+    	this.queryById('chartParent').unmask();
+    	
     	this.doLabels();
     	
     	if (this.getNewTerm() !== null) {
@@ -970,10 +1070,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
     },
     
     loadFromApis: function(keepCurrentTerms) {
-    	var chart = this.down('#chart');
-    	if (chart !== null) {
-    		chart.mask(this.localize('loading'));
-    	}
+    	this.queryById('chartParent').mask(this.localize('analyzing'));
+    	
+    	var chart = this.queryById('chart');
+    	
     	var params = {};
     	var terms = this.getCurrentTerms();
     	if (this.getNewTerm() !== null) {
