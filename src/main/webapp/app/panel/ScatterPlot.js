@@ -209,6 +209,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         			fieldLabel: this.localize('numTerms'),
         			itemId: 'limit',
         			xtype: 'numberfield',
+        			minValue: 5,
         			listeners: {
         				change: function(numb, newValue, oldValue) {
         					function doLoad() {
@@ -219,7 +220,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
 								if (this.getTermsTimeout() !== null) {
 									clearTimeout(this.getTermsTimeout());
 								}
-								this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
+								if (numb.isValid()) {
+									this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
+								}
 							}
         				},
         				scope: this
@@ -1071,8 +1074,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     loadFromApis: function(keepCurrentTerms) {
     	this.queryById('chartParent').mask(this.localize('analyzing'));
-    	
-    	var chart = this.queryById('chart');
     	
     	var params = {};
     	var terms = this.getCurrentTerms();
