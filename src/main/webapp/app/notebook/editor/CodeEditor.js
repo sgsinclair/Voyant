@@ -18,11 +18,11 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		boxready: function() {
 			var me = this;
 			this.editor = ace.edit(Ext.getDom(this.getEl()));
-			this.$blockScrolling = Infinity;
+//			this.$blockScrolling = Infinity;
 			this.editor.getSession().setUseWorker(true);
 			this.editor.setTheme(this.getTheme());
 			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: 100});
+			this.editor.setOptions({minLines: 6, maxLines: 100, autoScrollEditorIntoView: true, scrollPastEnd: true});
 			this.editor.setHighlightActiveLine(false);
 			this.editor.renderer.setShowPrintMargin(false);
 			this.editor.renderer.setShowGutter(false);
@@ -30,7 +30,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.clearSelection()
 		    this.editor.on("focus", function() {
 		    	me.editor.renderer.setShowGutter(true);
-		    })
+		    }, this)
 		    this.editor.on("blur", function() {
 		    	me.editor.renderer.setShowGutter(false);
 		    });
@@ -97,7 +97,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	                    startedCb: function () {
 	                        //once tern is enabled, it can be accessed via editor.ternServer
 	                        console.log('editor.ternServer:', me.editor.ternServer);
-	                    },
+	                    }
 	                },
 	                /**
 	                 * when using tern, it takes over Ace's built in snippets support.
@@ -110,7 +110,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	                 * This settings affects all modes when using tern, not just javascript.
 	                 * For javascript mode the basic auto completion will be added to completion results if tern fails to find completions or if you double tab the hotkey for get completion (default is ctrl+space, so hit ctrl+space twice rapidly to include basic text completions in the result)
 	                 */
-	                enableBasicAutocompletion: true,
+	                enableBasicAutocompletion: true
 	            });
 	        });
 		}

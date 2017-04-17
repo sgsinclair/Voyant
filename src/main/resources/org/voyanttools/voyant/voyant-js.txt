@@ -132,7 +132,28 @@ app/panel/Veliza.js
 app/panel/WordTree.js
 app/panel/Topics.js
 
+# NOTEBOOKS
+app/notebook/editor/button/Add.js
+app/notebook/editor/button/Edit.js
+app/notebook/editor/button/Counter.js
+app/notebook/editor/button/MoveDown.js
+app/notebook/editor/button/MoveUp.js
+app/notebook/editor/button/Remove.js
+app/notebook/editor/button/Movement.js
+app/notebook/editor/button/Run.js
+app/notebook/editor/button/RunAll.js
+app/notebook/editor/EditorWrapper.js
+app/notebook/editor/CodeEditor.js
+app/notebook/editor/CodeEditorWrapper.js
+app/notebook/editor/TextEditor.js
+app/notebook/editor/TextEditorWrapper.js
+app/notebook/Notebook.js
+
 # APPS
 app/VoyantApp.js
 app/VoyantCorpusApp.js
+app/VoyantCorpusToolsetApp.js
 app/VoyantDefaultApp.js
+app/VoyantDocumentToolsetApp.js
+app/VoyantNotebookApp.js
+app/VoyantToolApp.js

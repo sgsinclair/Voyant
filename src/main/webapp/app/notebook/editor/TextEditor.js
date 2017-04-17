@@ -4,10 +4,7 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 	alias: "widget.notebooktexteditor",
 	cls: 'notebook-text-editor',
 	config: {
-		theme: 'ace/theme/chrome',
-		mode: 'ace/mode/javascript',
-		content: 'test',
-		ckeditorConfig : {
+		ckeditorConfig : { // when upgrading ckeditor, remember to copy stopediting plugin
 			toolbar:  [
 				    	{ name: 'basicstyles', items: [ 'Bold', 'Italic', '-', 'RemoveFormat' ] },
 				    	{ name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Justify', 'Outdent', 'Indent', 'Blockquote', 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ] },
@@ -15,18 +12,21 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 				    	{ name: 'styles', items: [ 'Styles', 'Format' ] },
 				    	{ name: 'links', items: [ 'Link', 'Unlink', 'Anchor'] },
 				    	{ name: 'insert', items: [ 'Image', 'Table', 'Iframe' ] },
-				    	{ name: 'document', items: [ 'Sourcedialog' ] }
+				    	{ name: 'document', items: [ 'Sourcedialog', 'Stopediting'] }
 		    ],
-		    extraPlugins: 'sourcedialog,iframe,justify,colorbutton',
+		    extraPlugins: 'stopediting,sourcedialog,iframe,justify,colorbutton',
 			allowedContent: true,
 			toolbarCanCollapse: true,
 			startupFocus: true
 		},
-		editor: undefined
+		editor: undefined,
+		isEditRegistered: false
 	},
 	statics: {
 		i18n: {
-			emptyText: "(Click here to edit.)"
+			emptyText: "(Click here to edit.)",
+			enableEditingTitle: "Enable Editing?",
+			enableEditing: "By default editing is disable, do you wish to enable editing now?"
 		}
 	},
 	border: false,
@@ -38,21 +38,37 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 	},
 	listeners: {
 		boxready: function(cmp) {
-			this.getTargetEl().on("click", function() {
-				if (!cmp.getEditor()) {
-					var el = this.getTargetEl();
-					el.set({contenteditable: true});
-					var editor = CKEDITOR.inline( el.dom, this.getCkeditorConfig() );
-					this.findParentByType("notebookeditorwrapper").setIsEditing(true);
-					editor.on("blur", function(evt) {
-						cmp.setEditor(undefined);
-						cmp.findParentByType("notebookeditorwrapper").setIsEditing(false).getEl().fireEvent("mouseout");
-						editor.destroy();
-						el.set({contenteditable: false});
-					})
-					this.setEditor(editor);
+			this.getTargetEl().on("click", function(e, t) {
+				if (t.tagName!="A") {
+					this.handleClick(cmp);
 				}
-			}, this)
+			}, this);
+		}
+	},
+	
+	handleClick: function(cmp) {
+		if (!cmp.getEditor() || (cmp.getEditor() && cmp.getEditor().readOnly)) {
+			var el = this.getTargetEl();
+			el.set({contenteditable: true});
+			this.findParentByType("notebookeditorwrapper").setIsEditing(true);
+			if (!cmp.getEditor()) {
+				var editor = CKEDITOR.inline( el.dom, this.getCkeditorConfig() );
+				editor.on("blur", function(evt) {
+//					cmp.setEditor(undefined);
+					cmp.findParentByType("notebookeditorwrapper").setIsEditing(false).getEl().fireEvent("mouseout");
+//					el.set({contenteditable: false});
+					editor.setReadOnly(true);
+				})
+				editor.on("change", function() {
+					if (!this.getIsEditRegistered()) {
+						this.findParentByType("notebook").setIsEdited(true);
+						this.setIsEditRegistered(true);
+					}
+				}, this)
+				this.setEditor(editor);
+			} else {
+				cmp.getEditor().setReadOnly(false);
+			}
 		}
 	},
 	

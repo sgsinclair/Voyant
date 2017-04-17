@@ -10,19 +10,19 @@
             "input": [
                 "<h1 style=\"text-align: center;\">Thinking about Corpus Scale</h1>\n\n<p>This notebo",
                 "ok will help you think about corpus scale when working with Spiral Notebooks (it",
-                "'s part of the <a data-tabindex-counter=\"52\" data-tabindex-value=\"none\" href=\"./",
+                "'s part of the <a data-tabindex-counter=\"54\" data-tabindex-value=\"none\" href=\"./",
                 "\" tabindex=\"-1\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>). I",
-                "n particular, we'll look at:</p>\n\n<ul>\n\t<li><a data-tabindex-counter=\"5\" data-ta",
+                "n particular, we'll look at:</p>\n\n<ul>\n\t<li><a data-tabindex-counter=\"7\" data-ta",
                 "bindex-value=\"none\" href=\"#kinds\" tabindex=\"-1\">what kinds of corpora are there?",
-                "</a></li>\n\t<li><a data-tabindex-counter=\"4\" data-tabindex-value=\"none\" href=\"#sm",
+                "</a></li>\n\t<li><a data-tabindex-counter=\"6\" data-tabindex-value=\"none\" href=\"#sm",
                 "aller\" tabindex=\"-1\">word frequencies with a smaller corpus</a></li>\n\t<li><a hre",
-                "f=\"#larger\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">w",
-                "ord frequencies with a larger corpus</a></li>\n\t<li><a data-tabindex-counter=\"52\"",
+                "f=\"#larger\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"3\">w",
+                "ord frequencies with a larger corpus</a></li>\n\t<li><a data-tabindex-counter=\"54\"",
                 " data-tabindex-value=\"none\" href=\"#next\" tabindex=\"-1\">next steps</a></li>\n</ul>",
                 "\n\n<h2><a id=\"kinds\" name=\"kinds\"></a>What Kinds of Corpora are There?&nbsp;&nbsp",
                 ";</h2>\n\n<p>A corpus, as a body of text, is a very fluid concept. In principle, a",
                 " corpus can be constituted of a single character (let's call that miniscule) or ",
-                "it can be constituted from something like the <a data-tabindex-counter=\"5\" data-",
+                "it can be constituted from something like the <a data-tabindex-counter=\"7\" data-",
                 "tabindex-value=\"none\" href=\"https://wiki.htrc.illinois.edu/display/COM/Extracted",
                 "+Features+Dataset\" tabindex=\"-1\">HTRC features dataset</a> that's extracted from",
                 " a corpus of -- at last check -- 13.8 million volumes and over 2 trillion tokens",
@@ -43,7 +43,7 @@
                 " operations in Spiral on a single smaller document (because of what we're studyi",
                 "ng or because dealing with the entire corpus at once would be overwhelming for t",
                 "he browser).</p>\n\n<p>A related issue is whether we are operating on data in the ",
-                "browser or data on the server. For example, in the <a data-tabindex-counter=\"5\" ",
+                "browser or data on the server. For example, in the <a data-tabindex-counter=\"7\" ",
                 "data-tabindex-value=\"none\" href=\"Tables\" tabindex=\"-1\" target=\"_blank\">previous ",
                 "notebook</a> we counted all the letters in \"The Gold Bug\" though we started by l",
                 "oading into the browser memory the entire text of the short story. That worked v",
@@ -57,7 +57,7 @@
                 " corpus: we will show the highest frequency terms in a chart.</p>\n\n<h2><a id=\"sm",
                 "aller\" name=\"smaller\"></a>Word Frequences with a Smaller Corpus</h2>\n\n<p>For the",
                 " smaller corpus, we will once again use Poe's \"The Gold Bug\" and we can again us",
-                "e the code we saw in an earlier notebook on <a data-tabindex-counter=\"4\" data-ta",
+                "e the code we saw in an earlier notebook on <a data-tabindex-counter=\"6\" data-ta",
                 "bindex-value=\"none\" href=\"Create#text\" tabindex=\"-1\" target=\"_blank\">Creating a ",
                 "Corpus with Plain Text</a>.</p>\n\n<p>&nbsp;</p>\n"
             ]
@@ -75,8 +75,8 @@
                 " data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;t",
                 "he&quot;) is counted\">total words</span> and 2,756 <span class=\"info-tip\" data-q",
                 "tip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">uniq",
-                "ue word forms</span>. Created <span class=\"info-tip\" data-qtip=\"2017-04-09, 16:0",
-                "2:10\">about a day ago</span>.</div>"
+                "ue word forms</span>. Created <span class=\"info-tip\" data-qtip=\"2017-04-04, 18:5",
+                "0:24\">about 7 days ago</span>.</div>"
             ]
         },
         {
@@ -86,7 +86,7 @@
                 "he previous notebook on Tables we saw how we could slurp the entire plain text d",
                 "ocument into a string variable. There's a related function which is to <a href=\"",
                 "../../docs/#!/api/Corpus-method-getWordsArray\" target=\"_blank\" data-tabindex-val",
-                "ue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">get all the words</a> in an ar",
+                "ue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"3\">get all the words</a> in an ar",
                 "ray (an ordered list of strings). Note that this function only provides words, n",
                 "o punctuation, tags, or other contents.</p>\n"
             ]
@@ -110,28 +110,8 @@
             "type": "code",
             "input": "new VoyantTable({count: goldbugWords, limit: 20, headers: [\"Words\",\"Counts\"]}).embed(\"VoyantChart\", {width: \"800px\"});",
             "output": [
-                " <div class=\"info\"><iframe style=\"width: 800px; height: 400px\" src=\"/voyant/tool",
-                "/VoyantChart/?minimal=true&amp;chartJson=%7B%22store%22%3A%7B%22fields%22%3A%5B%",
-                "22Words%22%2C%22Counts%22%5D%2C%22data%22%3A%5B%7B%22Words%22%3A%22the%22%2C%22C",
-                "ounts%22%3A884%7D%2C%7B%22Words%22%3A%22of%22%2C%22Counts%22%3A465%7D%2C%7B%22Wo",
-                "rds%22%3A%22and%22%2C%22Counts%22%3A359%7D%2C%7B%22Words%22%3A%22to%22%2C%22Coun",
-                "ts%22%3A333%7D%2C%7B%22Words%22%3A%22i%22%2C%22Counts%22%3A331%7D%2C%7B%22Words%",
-                "22%3A%22a%22%2C%22Counts%22%3A330%7D%2C%7B%22Words%22%3A%22in%22%2C%22Counts%22%",
-                "3A238%7D%2C%7B%22Words%22%3A%22it%22%2C%22Counts%22%3A210%7D%2C%7B%22Words%22%3A",
-                "%22you%22%2C%22Counts%22%3A162%7D%2C%7B%22Words%22%3A%22was%22%2C%22Counts%22%3A",
-                "135%7D%2C%7B%22Words%22%3A%22that%22%2C%22Counts%22%3A129%7D%2C%7B%22Words%22%3A",
-                "%22with%22%2C%22Counts%22%3A114%7D%2C%7B%22Words%22%3A%22as%22%2C%22Counts%22%3A",
-                "113%7D%2C%7B%22Words%22%3A%22for%22%2C%22Counts%22%3A113%7D%2C%7B%22Words%22%3A%",
-                "22had%22%2C%22Counts%22%3A109%7D%2C%7B%22Words%22%3A%22at%22%2C%22Counts%22%3A10",
-                "8%7D%2C%7B%22Words%22%3A%22he%22%2C%22Counts%22%3A103%7D%2C%7B%22Words%22%3A%22t",
-                "his%22%2C%22Counts%22%3A99%7D%2C%7B%22Words%22%3A%22but%22%2C%22Counts%22%3A99%7",
-                "D%2C%7B%22Words%22%3A%22we%22%2C%22Counts%22%3A98%7D%5D%7D%2C%22axes%22%3A%5B%7B",
-                "%22type%22%3A%22numeric%22%2C%22position%22%3A%22left%22%7D%2C%7B%22type%22%3A%2",
-                "2category%22%2C%22position%22%3A%22bottom%22%7D%5D%2C%22series%22%3A%5B%7B%22typ",
-                "e%22%3A%22line%22%2C%22xField%22%3A%22Words%22%2C%22yField%22%3A%22Counts%22%2C%",
-                "22marker%22%3A%7B%22radius%22%3A2%7D%2C%22highlightCfg%22%3A%7B%22scaling%22%3A2",
-                "%7D%2C%22tooltip%22%3A%7B%22trackMouse%22%3Atrue%7D%7D%5D%7D&amp;debug=true\" dat",
-                "a-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div>"
+                " <div class=\"info\"><iframe style=\"width: 800px; height: 400px\" name=\"ext-185\" da",
+                "ta-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div>"
             ]
         },
         {
@@ -150,33 +130,51 @@
                 " so we have to use a different approach.</p>\n\n<h2><a id=\"larger\" name=\"larger\"><",
                 "/a>Word Frequencies with a Larger Corpus</h2>\n\n<p>So, how can show a graph of hi",
                 "gh frequency terms with a larger corpus? The key is to shift more processing to ",
-                "the server instead of doing it in the browser.</p>\n"
+                "the server instead of doing it in the browser. Above we had to fetch and process",
+                "&nbsp;in the browser an array with&nbsp;<em>all</em>&nbsp;the words from the tex",
+                "t, but that's not practical for larger corpora. Many similar operations&nbsp;<em",
+                ">are</em>&nbsp;possible, however. For instance, we can use <a href=\"../../docs/#",
+                "!/api/Corpus-method-loadCorpusTerms\" target=\"_blank\" data-tabindex-value=\"none\" ",
+                "tabindex=\"-1\" data-tabindex-counter=\"2\">loadCorpusTerms</a> to fetch a specified",
+                " number of terms (from a longer list that by default is sorted by frequency and ",
+                "that include all words).</p>\n"
             ]
         },
         {
             "type": "code",
             "input": [
-                "new Corpus(\"austen\").loadCorpusTerms({limit: 10}).assign(\"austenWords\");",
+                "new Corpus(\"austen\").loadCorpusTerms({limit: 20}).assign(\"austenWords\").show();",
                 ""
             ],
             "output": [
-                " <div role=\"presentation\" class=\"x-mask x-border-box\" id=\"ext-element-72\"><div r",
-                "ole=\"presentation\" class=\"x-mask-msg\" id=\"ext-element-73\" style=\"right: auto; le",
-                "ft: 582px; top: -21px;\"><div role=\"presentation\" class=\"x-mask-msg-inner\"><div r",
-                "ole=\"presentation\" class=\"x-mask-msg-text\">working…</div></div></div></div>"
+                " <div class=\"info\">This store contains 20 items with these fields: id, rawFreq, ",
+                "inDocumentsCount, relativeFreq, relativePeakedness, relativeSkewness, distributi",
+                "ons, typeTokenRatio-lexical, term.</div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>This time we won't use the <code>count</code> parameter when creating a new <",
+                "a data-tabindex-counter=\"2\" data-tabindex-value=\"none\" href=\"../../docs/#!/api/V",
+                "oyantTable\" tabindex=\"-1\" target=\"_blank\">Table</a>, but we can simply provide o",
+                "ur <a data-tabindex-counter=\"2\" data-tabindex-value=\"none\" href=\"../../docs/#!/a",
+                "pi/Voyant.data.store.CorpusTerms\" tabindex=\"-1\" target=\"_blank\">Corpus Terms sto",
+                "re</a> while specifying that we're only interested in two columns, \"term\" and \"r",
+                "awFreq\". Then we simply embed the table as we've done before using the <a data-t",
+                "abindex-counter=\"2\" data-tabindex-value=\"none\" href=\"../../docs/#!/api/Voyant.wi",
+                "dget.VoyantChart\" tabindex=\"-1\" target=\"_blank\">VoyantChart</a> widget.</p>\n"
             ]
         },
         {
             "type": "code",
             "input": [
-                "new VoyantTable(austenWords, {headers: [\"term\",\"rawFreq\"]}).embed(\"VoyantChart\");",
+                "new VoyantTable(austenWords, {headers: [\"term\",\"rawFreq\"]}).embed(\"VoyantChart\", {width: \"800px\"});",
                 ""
             ],
             "output": [
-                " <div role=\"presentation\" class=\"x-mask x-border-box\" id=\"ext-element-72\"><div r",
-                "ole=\"presentation\" class=\"x-mask-msg\" id=\"ext-element-73\" style=\"right: auto; le",
-                "ft: 582px; top: -21px;\"><div role=\"presentation\" class=\"x-mask-msg-inner\"><div r",
-                "ole=\"presentation\" class=\"x-mask-msg-text\">working…</div></div></div></div>"
+                " <div class=\"info\"><iframe style=\"width: 800px; height: 400px\" name=\"ext-190\" da",
+                "ta-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div>"
             ]
         },
         {
@@ -187,14 +185,14 @@
                 "e letter \"t\" in \"The Gold Bug\" is certainly unusual, any theories why? Could you",
                 " describe in English (not in code) the steps that might be needed to better unde",
                 "rstand the use and distribution of the letter \"t\"?</li>\n\t<li>create a new corpus",
-                " from a different <a data-tabindex-counter=\"8\" data-tabindex-value=\"none\" href=\"",
-                "https://www.gutenberg.org/wiki/Short_Stories_(Bookshelf)\" tabindex=\"-1\" target=\"",
-                "_blank\">short story</a>&nbsp;and start exploring it in the same way we did here,",
-                " is the order of letters different?</li>\n</ul>\n\n<p>If you're working sequentiall",
-                "y&nbsp;through the <a data-tabindex-counter=\"18\" data-tabindex-value=\"none\" href",
-                "=\"./\" tabindex=\"-1\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>",
-                ", the next notebook&nbsp;is <a data-tabindex-counter=\"6\" data-tabindex-value=\"no",
-                "ne\" href=\"Scale\" tabindex=\"-1\" target=\"_blank\">Thinking about Scale</a>.</p>\n"
+                " from a different <a data-tabindex-counter=\"10\" data-tabindex-value=\"none\" href=",
+                "\"https://www.gutenberg.org/wiki/Short_Stories_(Bookshelf)\" tabindex=\"-1\" target=",
+                "\"_blank\">short story</a>&nbsp;and start exploring it in the same way we did here",
+                ", is the order of letters different?</li>\n</ul>\n\n<p>If you're working sequential",
+                "ly&nbsp;through the <a data-tabindex-counter=\"20\" data-tabindex-value=\"none\" hre",
+                "f=\"./\" tabindex=\"-1\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a",
+                ">, the next notebook&nbsp;is <a data-tabindex-counter=\"8\" data-tabindex-value=\"n",
+                "one\" href=\"Scale\" tabindex=\"-1\" target=\"_blank\">Thinking about Scale</a>.</p>\n"
             ]
         }
     ]

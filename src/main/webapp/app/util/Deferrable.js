@@ -21,7 +21,7 @@ Ext.define('Voyant.util.Deferrable', {
 		if (transferable && transferable.transfer) {
 			transferable.transfer(transferable, deferred.promise)
 		}
-		
+
 		if (!deferred.promise.show && window.show) {deferred.promise.show=show}
 		
 		// make sure that this object can chain an assignment

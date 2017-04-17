@@ -101,5 +101,10 @@ Ext.define('Voyant.data.store.VoyantStore', {
 			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
 		}
 		this.callParent(arguments);
+	},
+	getString: function(config) {
+		var count = this.getCount();
+		return "This store contains "+this.getCount()+" items"+(count>0 ? " with these fields: "+this.getAt(0).getFields().map(function(field) {return field.getName()}).join(", ") : "")+"."
 	}
+	
 });

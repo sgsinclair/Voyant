@@ -34,7 +34,7 @@
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization','Voyant.util.Assignable'],
-    transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords'],
+    transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords','getString'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
     embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio','Voyant.panel.DocumentTerms','Voyant.panel.TermsBerry','Voyant.panel.CollocatesGraph','Voyant.panel.Contexts','Voyant.panel.WordTree'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
@@ -876,17 +876,11 @@ Ext.define('Voyant.data.model.Corpus', {
     /**
 	 * Shows a one-line summary of this corpus.
 	 * 
-	 * 	new Corpus("Hello World!").then(function(corpus) {corpus.show(true);});
+	 * 	new Corpus("Hello World!").show(true);
 	 * 
+	 * @method show
 	 * @param {boolean} [withID] Includes the corpus ID in parentheses at the end, if true.
 	 */
-	show: function(config) {
-		if (this.then) {
-			return Voyant.application.getDeferredNestedPromise(this, arguments);
-		} else {
-			show(this.getString(config))
-		}
-	},
 	
 	/**
 	 * @method embed

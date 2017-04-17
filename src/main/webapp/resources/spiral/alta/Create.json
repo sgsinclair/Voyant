@@ -10,88 +10,81 @@
             "input": [
                 "<h1 style=\"text-align: center;\">Creating a Corpus in a Spiral Notebook</h1>\n\n<p>",
                 "This notebook will help you create a corpus with Spiral Notebooks (it's part of ",
-                "the <a data-tabindex-counter=\"23\" data-tabindex-value=\"none\" href=\"./\" tabindex=",
+                "the <a data-tabindex-counter=\"24\" data-tabindex-value=\"none\" href=\"./\" tabindex=",
                 "\"-1\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>). In particula",
-                "r, we'll look at:</p>\n\n<ul>\n\t<li><a data-tabindex-counter=\"9\" data-tabindex-valu",
-                "e=\"none\" href=\"#voyant\" tabindex=\"-1\">creating a corpus in Voyant</a></li>\n\t<li>",
-                "<a data-tabindex-counter=\"15\" data-tabindex-value=\"none\" href=\"#strings\" tabinde",
-                "x=\"-1\">creating a corpus from strings</a></li>\n\t<li><a data-tabindex-counter=\"15",
-                "\" data-tabindex-value=\"none\" href=\"#urls\" tabindex=\"-1\">creating a corpus from o",
-                "ne or more URLs</a>\n\t<ul>\n\t\t<li><a href=\"#xml\" data-tabindex-value=\"none\" tabind",
-                "ex=\"-1\" data-tabindex-counter=\"2\">creating an XML Corpus</a></li>\n\t\t<li><a href=",
-                "\"#text\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"2\">creat",
-                "ing a Plain Text Corpus</a></li>\n\t</ul>\n\t</li>\n\t<li><a data-tabindex-counter=\"23",
-                "\" data-tabindex-value=\"none\" href=\"#next\" tabindex=\"-1\">next steps</a></li>\n</ul",
-                ">\n\n<p>In text analysis (both with and without computers) a <em>corpus</em> refer",
-                "s to a collection (or body) of texts. A corpus can be a single poem, a set of pl",
-                "ays, all English novels from the nineteenth century, or even a large collection ",
-                "of tweets. How you define documents within a corpus might change depending on yo",
-                "ur needs. For instance, it might be worth grouping all documents from a decade i",
-                "nto one single document and have ten documents for a corpus that spans across a ",
-                "century.</p>\n\n<p>We will consider three ways of creating a corpus in Spiral, usi",
-                "ng <a data-tabindex-counter=\"4\" data-tabindex-value=\"none\" href=\"#voyant\" tabind",
-                "ex=\"-1\">Voyant</a>,&nbsp;<a data-tabindex-counter=\"15\" data-tabindex-value=\"none",
-                "\" href=\"#strings\" tabindex=\"-1\">strings</a>, and&nbsp;<a data-tabindex-counter=\"",
-                "15\" data-tabindex-value=\"none\" href=\"#urls\" tabindex=\"-1\">URLs</a>. Of these, us",
-                "ing URLs is often preferable since it's the most reliable way for others to acce",
-                "ss the same data (assuming the contents of the URL don't move). But that's not a",
-                "lways possible, and sometimes uploading files is necessary. As we will see, it m",
-                "ay also be possible to use a data service like <a data-tabindex-counter=\"15\" dat",
-                "a-tabindex-value=\"none\" href=\"https://gist.github.com/\" tabindex=\"-1\">Gist</a> o",
-                "r <a data-tabindex-counter=\"15\" data-tabindex-value=\"none\" href=\"https://pastebi",
-                "n.com/\" tabindex=\"-1\">Pastebin</a> to host certain formats of text at a URL.</p>",
-                "\n\n<h2><a id=\"voyant\" name=\"voyant\"></a>Creating a Corpus in Voyant</h2>\n\n<p>Most",
-                " of the techniques below describe ways of using Spiral to create a corpus progra",
-                "mmatically, in other words with a bit of code. But of course it’s also possible ",
-                "to create a corpus using the usual Voyant interface and then to refer to that co",
-                "rpus in a Spiral Notebook (more about that below). Creating a corpus programmati",
-                "cally provides more flexibility (including options that may not be available in ",
-                "the user interface) and it also ensures that your Spiral Notebook is fully self-",
-                "contained (which makes it more portable, it can run on different instances more ",
-                "easily). Then again, using the Voyant interface can be simpler&nbsp;and more fam",
-                "iliar.</p>\n\n<p>You might experiment first with the Voyant interface technique fo",
-                "r creating a corpus and then rewrite parts of your Spiral notebook to use URLs i",
-                "nstead if you're looking to share your notebook with others. If you use Voyant t",
-                "o create your corpus, you can still describe the process in detail in your Spira",
-                "l Notebook so that others may try to reproduce or adapt your work using the same",
-                " options.</p>\n\n<p>When you first open the <a data-tabindex-counter=\"9\" data-tabi",
-                "ndex-value=\"none\" href=\"../../\" tabindex=\"-1\">home page of Voyant</a> (be sure t",
-                "o be on the same server as your instance of Spiral) you can begin by clicking on",
-                " the options icon.</p>\n\n<p style=\"text-align: center\"><img alt=\"\" src=\"../../res",
-                "ources/spiral//alta/voyant_input_options.png\" style=\"max-width:800px;\"></p>\n\n<p>",
-                "There’s a fairly dizzying number of options available (all of which are also ava",
-                "ilable when you create your corpus programmatically) and you’re strongly encoura",
-                "ged to refer to the Voyant documentation on <a data-tabindex-counter=\"7\" data-ta",
-                "bindex-value=\"none\" href=\"../../docs/#!/guide/corpuscreator\" tabindex=\"-1\">creat",
-                "ing a corpus</a>.</p>\n\n<p style=\"text-align: center\"><img alt=\"\" src=\"../../reso",
-                "urces/spiral/alta/voyant_input_options_dialog.png\" style=\"max-width:400px;\"></p>",
-                "\n\n<p>Once you’ve defined the input options you can create the corpus by either f",
-                "illing content in the text box (text or one URLs, one per line) or by clicking t",
-                "he upload button.</p>\n\n<p style=\"text-align: center\"><img alt=\"Inputting Text or",
-                " File Upload\" src=\"../../resources/spiral/alta/voyant_input.png\" style=\"max-widt",
-                "h:800px;\"></p>\n\n<p>Once your corpus is loaded (assuming everything worked proper",
-                "ly) you’ll see the regular Voyant interface, but we’re actually interested in th",
-                "e URL bar where part of the address should now contain a valid corpus ID that we",
-                " can use in Spiral on the same server.</p>\n\n<p style=\"text-align: center\"><img a",
-                "lt=\"Selecting Corpus ID\" src=\"../../resources/spiral/alta/voyant_corpus_id.png\" ",
-                "style=\"max-width:600px;\"></p>\n\n<p>Copy the corpus ID (only) into the clipboard (",
-                "it will be different from the one in the screenshot above but it should have a s",
-                "imilar format). Now we can use that ID in Spiral, try pasting the ID in place be",
-                "low, replacing “<em>austen</em>” (but be sure to leave the quotes in place).</p>",
-                "\n"
+                "r, we'll look at:</p>\n\n<ul>\n\t<li><a data-tabindex-counter=\"10\" data-tabindex-val",
+                "ue=\"none\" href=\"#voyant\" tabindex=\"-1\">creating a corpus in Voyant</a></li>\n\t<li",
+                "><a data-tabindex-counter=\"16\" data-tabindex-value=\"none\" href=\"#strings\" tabind",
+                "ex=\"-1\">creating a corpus from strings</a></li>\n\t<li><a data-tabindex-counter=\"1",
+                "6\" data-tabindex-value=\"none\" href=\"#urls\" tabindex=\"-1\">creating a corpus from ",
+                "one or more URLs</a>\n\t<ul>\n\t\t<li><a href=\"#xml\" data-tabindex-value=\"none\" tabin",
+                "dex=\"-1\" data-tabindex-counter=\"3\">creating an XML Corpus</a></li>\n\t\t<li><a href",
+                "=\"#text\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"3\">crea",
+                "ting a Plain Text Corpus</a></li>\n\t</ul>\n\t</li>\n\t<li><a data-tabindex-counter=\"2",
+                "4\" data-tabindex-value=\"none\" href=\"#next\" tabindex=\"-1\">next steps</a></li>\n</u",
+                "l>\n\n<p>In text analysis (both with and without computers) a <em>corpus</em> refe",
+                "rs to a collection (or body) of texts. A corpus can be a single poem, a set of p",
+                "lays, all English novels from the nineteenth century, or even a large collection",
+                " of tweets. How you define documents within a corpus might change depending on y",
+                "our needs. For instance, it might be worth grouping all documents from a decade ",
+                "into one single document and have ten documents for a corpus that spans across a",
+                " century.</p>\n\n<p>We will consider three ways of creating a corpus in Spiral, us",
+                "ing <a data-tabindex-counter=\"5\" data-tabindex-value=\"none\" href=\"#voyant\" tabin",
+                "dex=\"-1\">Voyant</a>,&nbsp;<a data-tabindex-counter=\"16\" data-tabindex-value=\"non",
+                "e\" href=\"#strings\" tabindex=\"-1\">strings</a>, and&nbsp;<a data-tabindex-counter=",
+                "\"16\" data-tabindex-value=\"none\" href=\"#urls\" tabindex=\"-1\">URLs</a>. Of these, u",
+                "sing URLs is often preferable since it's the most reliable way for others to acc",
+                "ess the same data (assuming the contents of the URL don't move). But that's not ",
+                "always possible, and sometimes uploading files is necessary. As we will see, it ",
+                "may also be possible to use a data service like <a data-tabindex-counter=\"16\" da",
+                "ta-tabindex-value=\"none\" href=\"https://gist.github.com/\" tabindex=\"-1\">Gist</a> ",
+                "or <a data-tabindex-counter=\"16\" data-tabindex-value=\"none\" href=\"https://pasteb",
+                "in.com/\" tabindex=\"-1\">Pastebin</a> to host certain formats of text at a URL.</p",
+                ">\n\n<h2><a id=\"voyant\" name=\"voyant\"></a>Creating a Corpus in Voyant</h2>\n\n<p>Mos",
+                "t of the techniques below describe ways of using Spiral to create a corpus progr",
+                "ammatically, in other words with a bit of code. But of course it’s also possible",
+                " to create a corpus using the usual Voyant interface and then to refer to that c",
+                "orpus in a Spiral Notebook (more about that below). Creating a corpus programmat",
+                "ically provides more flexibility (including options that may not be available in",
+                " the user interface) and it also ensures that your Spiral Notebook is fully self",
+                "-contained (which makes it more portable, it can run on different instances more",
+                " easily). Then again, using the Voyant interface can be simpler&nbsp;and more fa",
+                "miliar.</p>\n\n<p>You might experiment first with the Voyant interface technique f",
+                "or creating a corpus and then rewrite parts of your Spiral notebook to use URLs ",
+                "instead if you're looking to share your notebook with others. If you use Voyant ",
+                "to create your corpus, you can still describe the process in detail in your Spir",
+                "al Notebook so that others may try to reproduce or adapt your work using the sam",
+                "e options.</p>\n\n<p>When you first open the <a data-tabindex-counter=\"10\" data-ta",
+                "bindex-value=\"none\" href=\"../../\" tabindex=\"-1\">home page of Voyant</a> (be sure",
+                " to be on the same server as your instance of Spiral) you can begin by clicking ",
+                "on the options icon.</p>\n\n<p style=\"text-align: center\"><img alt=\"\" src=\"../../r",
+                "esources/spiral//alta/voyant_input_options.png\" style=\"max-width:800px;\"></p>\n\n<",
+                "p>There’s a fairly dizzying number of options available (all of which are also a",
+                "vailable when you create your corpus programmatically) and you’re strongly encou",
+                "raged to refer to the Voyant documentation on <a data-tabindex-counter=\"8\" data-",
+                "tabindex-value=\"none\" href=\"../../docs/#!/guide/corpuscreator\" tabindex=\"-1\">cre",
+                "ating a corpus</a>.</p>\n\n<p style=\"text-align: center\"><img alt=\"\" src=\"../../re",
+                "sources/spiral/alta/voyant_input_options_dialog.png\" style=\"max-width:400px;\"></",
+                "p>\n\n<p>Once you’ve defined the input options you can create the corpus by either",
+                " filling content in the text box (text or one URLs, one per line) or by clicking",
+                " the upload button.</p>\n\n<p style=\"text-align: center\"><img alt=\"Inputting Text ",
+                "or File Upload\" src=\"../../resources/spiral/alta/voyant_input.png\" style=\"max-wi",
+                "dth:800px;\"></p>\n\n<p>Once your corpus is loaded (assuming everything worked prop",
+                "erly) you’ll see the regular Voyant interface, but we’re actually interested in ",
+                "the URL bar where part of the address should now contain a valid corpus ID that ",
+                "we can use in Spiral on the same server.</p>\n\n<p style=\"text-align: center\"><img",
+                " alt=\"Selecting Corpus ID\" src=\"../../resources/spiral/alta/voyant_corpus_id.png",
+                "\" style=\"max-width:600px;\"></p>\n\n<p>Copy the corpus ID (only) into the clipboard",
+                " (it will be different from the one in the screenshot above but it should have a",
+                " similar format). Now we can use that ID in Spiral, try pasting the ID in place ",
+                "below, replacing “<em>austen</em>” (but be sure to leave the quotes in place).</",
+                "p>\n"
             ]
         },
         {
             "type": "code",
             "input": "new Corpus(\"austen\").show();",
-            "output": [
-                " <div class=\"info\">This corpus has 8 documents with 781,763 <span class=\"info-ti",
-                "p\" data-qtip=\"every occurrence of every word (like multiple occurrences of &quot",
-                ";the&quot;) is counted\">total words</span> and 15,368 <span class=\"info-tip\" dat",
-                "a-qtip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">u",
-                "nique word forms</span>. Created <span class=\"info-tip\" data-qtip=\"2017-02-25, 2",
-                "2:42:04\">about a month ago</span>.</div>"
-            ]
+            "output": " <div class=\"info\"></div>"
         },
         {
             "type": "text",
@@ -109,14 +102,7 @@
         {
             "type": "code",
             "input": "new Corpus(\"Hello Spiral!\").show();",
-            "output": [
-                " <div class=\"info\">This corpus has 1 document with 2 <span class=\"info-tip\" data",
-                "-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&qu",
-                "ot;) is counted\">total words</span> and 2 <span class=\"info-tip\" data-qtip=\"mult",
-                "iple occurrences of words (like &quot;the&quot;) are counted once\">unique word f",
-                "orms</span>. Created <span class=\"info-tip\" data-qtip=\"2016-05-07, 15:51:18\">abo",
-                "ut 26 days ago</span>.</div>"
-            ]
+            "output": " <div class=\"info\"></div>"
         },
         {
             "type": "text",
@@ -126,7 +112,7 @@
                 " we assign the string to a variable name – this is a name that we choose (with c",
                 "ertain rules) and that we want to make both short and meaningful. We also use th",
                 "e keyword <em><code>var</code></em> which isn't strictly needed, but it's good p",
-                "rogramming practice and it declares the <a data-tabindex-counter=\"15\" data-tabin",
+                "rogramming practice and it declares the <a data-tabindex-counter=\"16\" data-tabin",
                 "dex-value=\"none\" href=\"https://developer.mozilla.org/en/docs/Web/JavaScript/Refe",
                 "rence/Statements/var\" tabindex=\"-1\">scope</a> (where our variable is recognized)",
                 ".</p>\n\n<p>This is functionally equivalent to the previous code (note the use of ",
@@ -140,13 +126,7 @@
                 "var greeting = \"Hello Spiral!\"; // declare a string into a variable",
                 "new Corpus(greeting).show(); // create a corpus with our variable"
             ],
-            "output": [
-                " <div class=\"info\">This corpus has 1 document with 2 <span class=\"info-tip\" data",
-                "-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&qu",
-                "ot;) is counted\">total words</span> and 2 <span class=\"info-tip\" data-qtip=\"mult",
-                "iple occurrences of words (like &quot;the&quot;) are counted once\">unique word f",
-                "orms</span>. Created now.</div>"
-            ]
+            "output": " <div class=\"info\"></div>"
         },
         {
             "type": "text",
@@ -166,13 +146,7 @@
                 "new Corpus(texts).show(); // same as new Corpus([greeting, reply]).show();",
                 ""
             ],
-            "output": [
-                " <div class=\"info\">This corpus has 2 documents with 5 <span class=\"info-tip\" dat",
-                "a-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&q",
-                "uot;) is counted\">total words</span> and 4 <span class=\"info-tip\" data-qtip=\"mul",
-                "tiple occurrences of words (like &quot;the&quot;) are counted once\">unique word ",
-                "forms</span>. Created now.</div>"
-            ]
+            "output": " <div class=\"info\"></div>"
         },
         {
             "type": "text",
@@ -214,10 +188,9 @@
                 "})"
             ],
             "output": [
-                " <div class=\"info\"><iframe style=\"width: 90%; height: 400px\" src=\"/voyant/tool/R",
-                "eader/?minimal=true&amp;corpus=6482853c23e49fc7eea75578b98b316e&amp;debug=true\" ",
-                "data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"10\"></iframe></d",
-                "iv>"
+                " <div class=\"info\"><iframe style=\"width: 90%; height: 400px\" src=\"/tool/Reader/?",
+                "minimal=true&amp;corpus=6482853c23e49fc7eea75578b98b316e\" data-tabindex-value=\"n",
+                "one\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div>"
             ]
         },
         {
@@ -245,48 +218,30 @@
                 "var urls = [\"http://hermeneuti.ca\", \"https://en.wikipedia.org/wiki/Voyant_Tools\"];",
                 "new Corpus(urls).show(); // "
             ],
-            "output": [
-                " <div class=\"info\">This corpus has 1 document with 259 <span class=\"info-tip\" da",
-                "ta-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the&",
-                "quot;) is counted\">total words</span> and 148 <span class=\"info-tip\" data-qtip=\"",
-                "multiple occurrences of words (like &quot;the&quot;) are counted once\">unique wo",
-                "rd forms</span>. Created <span class=\"info-tip\" data-qtip=\"2017-03-27, 15:19:48\"",
-                ">about 6 days ago</span>.</div><div class=\"info\">This corpus has 2 documents wit",
-                "h 1,084 <span class=\"info-tip\" data-qtip=\"every occurrence of every word (like m",
-                "ultiple occurrences of &quot;the&quot;) is counted\">total words</span> and 540 <",
-                "span class=\"info-tip\" data-qtip=\"multiple occurrences of words (like &quot;the&q",
-                "uot;) are counted once\">unique word forms</span>. Created <span class=\"info-tip\"",
-                " data-qtip=\"2017-04-03, 10:47:18\">33 seconds ago</span>.</div><div class=\"info\">",
-                "This corpus has 2 documents with 1,084 <span class=\"info-tip\" data-qtip=\"every o",
-                "ccurrence of every word (like multiple occurrences of &quot;the&quot;) is counte",
-                "d\">total words</span> and 540 <span class=\"info-tip\" data-qtip=\"multiple occurre",
-                "nces of words (like &quot;the&quot;) are counted once\">unique word forms</span>.",
-                " Created <span class=\"info-tip\" data-qtip=\"2017-04-03, 10:47:18\">33 seconds ago<",
-                "/span>.</div>"
-            ]
+            "output": " <div class=\"info\"></div><div class=\"info\"></div>"
         },
         {
             "type": "text",
             "input": [
                 "<p>In addition to specifying one or more URLs it's also possible to specify para",
                 "meters to be used for preparing the corpus. These parameters are the same as the",
-                " ones used in the <a data-tabindex-counter=\"3\" data-tabindex-value=\"none\" href=\"",
+                " ones used in the <a data-tabindex-counter=\"4\" data-tabindex-value=\"none\" href=\"",
                 "../../docs/#!/guide/corpuscreator-section-options\" tabindex=\"-1\">Voyant options<",
                 "/a> interface (though there are even more options available programmatically in ",
                 "Spiral). Many of the options will depend on the format of the documents in your ",
-                "corpus. For a fuller&nbsp;list of options see the <a data-tabindex-counter=\"3\" d",
+                "corpus. For a fuller&nbsp;list of options see the <a data-tabindex-counter=\"4\" d",
                 "ata-tabindex-value=\"none\" href=\"../../docs/#!/api/Corpus\" tabindex=\"-1\">Corpus</",
                 "a>&nbsp;documentation.</p>\n\n<h3><a id=\"xml\" name=\"xml\"></a>Creating an XML Corpu",
                 "s</h3>\n\n<p>URLs can point to documents in a variety of formats supported by Spir",
                 "al, including HTML, XML, RTF, MS Word, MS Excel, OpenOffice and compressed zip f",
                 "iles containing documents. The XML handling of Spiral is particularly powerful a",
                 "s you can define very precisely how to treat each part of the document. For exam",
-                "ple, if we visit&nbsp;<a data-tabindex-counter=\"3\" data-tabindex-value=\"none\" hr",
+                "ple, if we visit&nbsp;<a data-tabindex-counter=\"4\" data-tabindex-value=\"none\" hr",
                 "ef=\"http://www.cbc.ca/cmlink/rss-topstories\" tabindex=\"-1\" target=\"_blank\">http:",
                 "//www.cbc.ca/cmlink/rss-topstories</a> we find an XML document that is also an <",
-                "a data-tabindex-counter=\"3\" data-tabindex-value=\"none\" href=\"https://en.wikipedi",
+                "a data-tabindex-counter=\"4\" data-tabindex-value=\"none\" href=\"https://en.wikipedi",
                 "a.org/wiki/RSS\" tabindex=\"-1\" target=\"_blank\">RSS</a> feed, that is, a collectio",
-                "n of items. Because the <a data-tabindex-counter=\"3\" data-tabindex-value=\"none\" ",
+                "n of items. Because the <a data-tabindex-counter=\"4\" data-tabindex-value=\"none\" ",
                 "href=\"https://en.wikipedia.org/wiki/Root_element\" tabindex=\"-1\" target=\"_blank\">",
                 "root element</a> of this document is &lt;rss&gt;, Spiral assumes by default that",
                 " you want each item to be its own document.&nbsp;</p>\n"
@@ -295,13 +250,7 @@
         {
             "type": "code",
             "input": "new Corpus(\"http://www.cbc.ca/cmlink/rss-topstories\").show(); // treated as an RSS feed by default",
-            "output": [
-                " <div class=\"info\">This corpus has 20 documents with 2,401 <span class=\"info-tip",
-                "\" data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;",
-                "the&quot;) is counted\">total words</span> and 874 <span class=\"info-tip\" data-qt",
-                "ip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">uniqu",
-                "e word forms</span>. Created now.</div>"
-            ]
+            "output": " <div class=\"info\"></div>"
         },
         {
             "type": "text",
@@ -321,13 +270,7 @@
                 "    xmlContentXpath: '//item/description' // grab item description for content",
                 "}).show();"
             ],
-            "output": [
-                " <div class=\"info\">This corpus has 1 document with 1,698 <span class=\"info-tip\" ",
-                "data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;th",
-                "e&quot;) is counted\">total words</span> and 724 <span class=\"info-tip\" data-qtip",
-                "=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">unique ",
-                "word forms</span>. Created now.</div>"
-            ]
+            "output": " <div class=\"info\"></div>"
         },
         {
             "type": "text",
@@ -347,7 +290,7 @@
                 "bc.ca/cmlink/rss-topstories). The second argument is a data type called an <a hr",
                 "ef=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_ty",
                 "pes#Object_literals\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-coun",
-                "ter=\"2\">object literal</a>. It can be declared with curly brackets&nbsp;that enc",
+                "ter=\"3\">object literal</a>. It can be declared with curly brackets&nbsp;that enc",
                 "lose&nbsp;a set of name: value pairs (note that the name doesn't need to be quot",
                 "ed but the value does need to be quoted). Each pair of arguments is separated by",
                 " a comma (but no comma after the last one). It's easy to make a mistake by forge",
@@ -384,15 +327,15 @@
                 "nt are relevant</li>\n\t<li>create a corpus with parameters that define the releva",
                 "nt document</li>\n</ul>\n\n<p>The \"Gold Bug\" is part of <a href=\"http://www.gutenbe",
                 "rg.org/ebooks/2147\" target=\"_blank\" data-tabindex-value=\"none\" tabindex=\"-1\" dat",
-                "a-tabindex-counter=\"2\">Volume 1 of the Works of Edgar Allan Poe on Project Guten",
+                "a-tabindex-counter=\"3\">Volume 1 of the Works of Edgar Allan Poe on Project Guten",
                 "berg</a>. We have a choice of formats at this location, but for our example we w",
                 "ill choose the&nbsp;<a charset=\"utf-8\" href=\"http://www.gutenberg.org/files/2147",
                 "/2147-0.txt\" target=\"_blank\" title=\"Download\" type=\"text/plain; charset=utf-8\" d",
-                "ata-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"2\">Plain Text UTF",
+                "ata-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"3\">Plain Text UTF",
                 "-8</a>. We have found our document.</p>\n\n<p>Next we will copy the contents of th",
                 "e page (not the URL, the full text) into the clipboard and then paste it into th",
                 "e main (bigger) text box in&nbsp;a <a href=\"https://gist.github.com/\" data-tabin",
-                "dex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"2\">new Gist</a>. Let's als",
+                "dex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"3\">new Gist</a>. Let's als",
                 "o specify a filename, we can use goldbug.txt. Finally, we'll click the \"Create p",
                 "ublic gist\" button. (Again, the Project Gutenberg license allows this kind of co",
                 "pying of content.)</p>\n\n<p style=\"text-align: center\"><img alt=\"\" src=\"../../res",
@@ -405,7 +348,7 @@
                 " use the URL from the \"Gold Bug\" (yes, it's a bit long):</p>\n\n<blockquote>\n<p><a",
                 " href=\"https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc9144",
                 "0e8c1/raw/goldbug.txt\" target=\"_blank\" data-tabindex-value=\"none\" tabindex=\"-1\" ",
-                "data-tabindex-counter=\"2\">https://gist.githubusercontent.com/sgsinclair/84c9da05",
+                "data-tabindex-counter=\"3\">https://gist.githubusercontent.com/sgsinclair/84c9da05",
                 "e9e142af30779cc91440e8c1/raw/goldbug.txt</a></p>\n</blockquote>\n\n<p>We could use ",
                 "the URL right away to create a Spiral corpus, but let's remember that this docum",
                 "ent is a volume contains several works and we only want \"The Gold Bug.\" In order",
@@ -437,9 +380,9 @@
                 "}).embed('reader'); // let's look at the reader to ensure we have the right text"
             ],
             "output": [
-                " <div class=\"info\"><iframe style=\"width: 90%; height: 400px\" src=\"/voyant/tool/R",
-                "eader/?minimal=true&amp;corpus=2d453b0cf4bf2261e1b2578641f3d4e3\" data-tabindex-v",
-                "alue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"2\"></iframe></div>"
+                " <div class=\"info\"><iframe style=\"width: 90%; height: 400px\" src=\"/tool/Reader/?",
+                "minimal=true&amp;corpus=38683ce0ee7dc5f581735ed14938c679\" data-tabindex-value=\"n",
+                "one\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div>"
             ]
         },
         {
@@ -451,9 +394,9 @@
                 "p;MS Excel</li>\n\t<li>create a new corpus with 3 URLs&nbsp;</li>\n\t<li>create a ne",
                 "w corpus from a different text in&nbsp;Project Gutenberg (be sure to create a co",
                 "py and use the URL in Gist)</li>\n</ul>\n\n<p>If you're working sequentially&nbsp;t",
-                "hrough the <a data-tabindex-counter=\"11\" data-tabindex-value=\"none\" href=\"./\" ta",
+                "hrough the <a data-tabindex-counter=\"12\" data-tabindex-value=\"none\" href=\"./\" ta",
                 "bindex=\"-1\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>, the ne",
-                "xt notebook&nbsp;is <a data-tabindex-counter=\"8\" data-tabindex-value=\"none\" href",
+                "xt notebook&nbsp;is <a data-tabindex-counter=\"9\" data-tabindex-value=\"none\" href",
                 "=\"./SmallerCorpus\" tabindex=\"-1\">Exploring a Smaller Corpus</a>.</p>\n"
             ]
         }

@@ -53,6 +53,9 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			    xtype: 'toolbar',
 			    dock: 'right',
 			    items: [{
+			    		xtype: 'notebookwrappercounter',
+			    		order: config.order
+			    	},{
 		        		xtype: 'notebookwrapperremove'
 		        	},{
 			        	xtype: 'notebookwrappermoveup'
@@ -94,7 +97,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	tryToUnmask: function() {
 		if (Voyant.application.getDeferredCount()==0) {
 			for (var key in window) {
-				if (typeof window[key] == 'object' && window[key] && window[key].isFulfilled &&  window[key].isFulfilled()) {
+				if (typeof window[key] == 'object' && window[key] && key!="opener" && window[key].isFulfilled &&  window[key].isFulfilled()) {
 					window[key] = window[key].valueOf();
 				}
 			}

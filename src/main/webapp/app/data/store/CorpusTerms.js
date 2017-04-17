@@ -54,13 +54,8 @@ Ext.define('Voyant.data.store.CorpusTerms', {
 		config = config || {};
 		this.mixins['Voyant.data.store.CorpusTermsMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
-	},
-	
-	getString: function(config) {
-		return new Ext.XTemplate(this.localize("getString")).apply([this.getCount(), this.sum("rawFreq")])
 	}
-
-
+	
 });
 
 Ext.define('Voyant.data.store.CorpusTermsBuffered', {

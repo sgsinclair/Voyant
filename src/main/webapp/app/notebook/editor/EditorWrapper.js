@@ -14,26 +14,17 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 		var me = this;
 		this.on("afterrender", function(){
 			this.getDockedItems().forEach(function(tb) {
-				tb.getEl().setVisibilityMode(Ext.dom.Element.VISIBILITY).setVisible(false);
+				tb.getTargetEl().setVisibilityMode(Ext.dom.Element.VISIBILITY);
 			});
+			this.setActiveMode(false);
 			this.body.on("click", function() {
 				this.removeCls("notebook-editor-wrapper-hover");
 			});
 			this.mon(this.getEl(), "mouseover", function() {
-				this.getDockedItems().forEach(function(tb) {
-					tb.getEl().setVisibility(true);
-				});
-				if (!this.getIsEditing()) {
-					this.body.addCls("notebook-editor-wrapper-hover");
-				}
+				this.setActiveMode(true);
 			}, this);
 			this.mon(this.getEl(), "mouseout", function() {
-				this.getDockedItems().forEach(function(tb) {
-					tb.getEl().setVisibility(false);
-				});
-				if (!this.getIsEditing()) {
-					this.body.removeCls("notebook-editor-wrapper-hover");
-				}
+				this.setActiveMode(false);
 			}, this);
 			
 			// resize as needed (this adds considerable overhead, but it's probably worth it)
@@ -45,5 +36,25 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 			
 		}, this);
 		this.callParent(arguments);
+	},
+	setActiveMode: function(mode) {
+		this.getDockedItems().forEach(function(tb) {
+			if (tb.dock=='right') {
+				tb.items.each(function(item) {
+					if (item.hasCls("notebookwrappercounter")==false) {
+						item.setVisible(mode);
+					}
+				})
+			} else {
+				tb.getTargetEl().setVisibility(mode);
+			}
+		}, this);
+		if (!this.getIsEditing()) {
+			if (mode) {
+				this.body.addCls("notebook-editor-wrapper-hover");
+			} else {
+				this.body.removeCls("notebook-editor-wrapper-hover");
+			}
+		}
 	}
 })

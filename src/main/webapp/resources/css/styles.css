@@ -552,3 +552,10 @@ table.voyant-table td, table.voyant-table th {
 table.voyant-table td:last-child {
     border-right: none; border-bottom: none;
 }
+
+.notebook-is-editable .x-tool-glyph {
+    color: green;
+}
+.notebook-not-editable .x-tool-glyph {
+    color: red;
+}

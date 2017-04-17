@@ -15,7 +15,8 @@ Ext.define('Voyant.notebook.Notebook', {
 			exportAllLinks: "<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
 			originalJson: "Original JSON string",
 			exportJson: "Spiral Notebook data format (JSON)",
-			exportHtml: "HTML (suitable for saving or printing)"
+			exportHtml: "HTML (suitable for saving or printing)",
+			editsAndLeaving: "It looks like you've been editing content and you will lose any content if you follow this link. Continue?"
     	},
     	api: {
     		input: undefined
@@ -23,7 +24,8 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     config: {
     	metadata: {},
-    	version: 2.0
+    	version: 2.0,
+    	isEdited: false
     },
     
     docs: {
@@ -106,6 +108,12 @@ Ext.define('Voyant.notebook.Notebook', {
     				xtype: 'toolmenu',
     				glyph: 'xf04e@FontAwesome',
     				scope: this
+    			},
+    			'edit': {
+    				tooltip: this.localize("editModeTip"),
+    				callback: function() {
+    					this.toggleEditMode();
+    				}
     			}
 			 }
     	})
@@ -216,6 +224,17 @@ Ext.define('Voyant.notebook.Notebook', {
     			this.loadFromUrl(url, isRun);
     		}
     	}
+    	
+    	var me = this;
+	    window.addEventListener("beforeunload", function (e) {
+	        if (me.getIsEdited()) {
+		        var confirmationMessage = me.localize('editsAndLeaving');
+		        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+		        return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+	        } else {
+	        	return undefined
+	        }
+	    });
     },
     listeners: {
     	boxready: function() {
@@ -232,7 +251,10 @@ Ext.define('Voyant.notebook.Notebook', {
     				icon: Ext.MessageBox.WARNING
     			});
     		}
-    		else {this.move(i, i-1);}
+    		else {
+    			this.move(i, i-1);
+        		this.redoOrder();
+    		}
     	},
     	
     	notebookWrapperMoveDown: function(wrapper) {
@@ -245,11 +267,15 @@ Ext.define('Voyant.notebook.Notebook', {
     				icon: Ext.MessageBox.WARNING
     			});
     		}
-    		else {this.move(i, i+1);}
+    		else {
+    			this.move(i, i+1);
+        		this.redoOrder();
+    		}
     	},
     	
     	notebookWrapperRemove: function(wrapper) {
     		this.remove(wrapper);
+    		this.redoOrder();
     	},
     	
     	notebookWrapperRun: function(wrapper) {
@@ -266,8 +292,15 @@ Ext.define('Voyant.notebook.Notebook', {
     			cmp = this.addText('',i+1);
     		}
 			cmp.getTargetEl().scrollIntoView(this.getTargetEl(), null, true, true);
+    		this.redoOrder();
     	}
 
+    },
+    
+    redoOrder: function() {
+    	this.query("notebookwrappercounter").forEach(function(counter, i) {
+    		counter.setOrder(i);
+    	})
     },
     
     loadFromUrl: function(url, isRun) {
@@ -349,7 +382,10 @@ Ext.define('Voyant.notebook.Notebook', {
             		if (Ext.isString(block) && block!='') {this.addCode({input: block});}
             		else if (block.input) {
                 		if (block.type=='text') {this.addText(block);}
-                		else {this.addCode(block);}
+                		else {
+                			if (isRun) {block.output="";}
+                			this.addCode(block);
+                		}
             		}
         		}
         	}, this);
@@ -393,21 +429,22 @@ Ext.define('Voyant.notebook.Notebook', {
     	}
     },
     
-    addText: function(block, position) {
-    	return this._add(block, position, 'notebooktexteditorwrapper');
+    addText: function(block, order) {
+    	return this._add(block, order, 'notebooktexteditorwrapper');
     },
  
-    addCode: function(block, position) {
-    	return this._add(block, position, 'notebookcodeeditorwrapper');
+    addCode: function(block, order) {
+    	return this._add(block, order, 'notebookcodeeditorwrapper');
     },
     
-    _add: function(block, position, xtype) {
+    _add: function(block, order, xtype) {
     	if (Ext.isString(block)) {
     		block = {input: block}
     	}
-    	position = (typeof position === 'undefined') ? this.items.getCount() : position;
-    	return this.insert(position, Ext.apply(block, {
+    	order = (typeof order === 'undefined') ? this.items.getCount() : order;
+    	return this.insert(order, Ext.apply(block, {
     		xtype: xtype,
+    		order: order,
     		docs: xtype == 'notebookcodeeditorwrapper' ? this.docs: undefined
     	}))
     },

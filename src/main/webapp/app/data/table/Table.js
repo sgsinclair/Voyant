@@ -75,12 +75,14 @@ Ext.define('Voyant.data.table.Table', {
 			
 			if (opts && opts.headers) {
 				this.setHeaders(opts.headers);
+				this.setRowKey(opts.rowKey ? opts.rowKey : this.getHeaders()[0]);
 			} else {
 				// store.getModel() doesn't seem to work (for CorpusTerms at least)
 				// so instead we'll try looking at the first record to get headers
 				var record = store.getAt(0);
 				if (record) { // don't know what to do if this fails?
 					this.setHeaders(record.getFields().map(function(field) {return field.getName()}))
+					this.setRowKey(opts.rowKey ? opts.rowKey : this.getHeaders()[0]);
 				}
 			}
 			
@@ -88,7 +90,13 @@ Ext.define('Voyant.data.table.Table', {
 			store.each(function(record) {
 				this.addRow(record.getData());
 			}, this);
-			debugger
+		}
+		
+		if (this.getHeaders().length==0) {
+			var firstRow = this.getRow(0, false);
+			if (firstRow) {
+				this.setHeaders(firstRow.map(function(cell, i) {return String.fromCharCode(65+i)}));
+			}
 		}
 		this.callParent();
 	},
@@ -162,7 +170,8 @@ Ext.define('Voyant.data.table.Table', {
 	},
 	
 	embed: function(cmp, config) {
-		if ((Ext.isObject(cmp) || !cmp) && !config) {
+
+		if (((Ext.isObject(cmp) || !cmp) && !config) || (cmp && Ext.isString(cmp) && cmp.toLowerCase().indexOf("voyanttabletransform")>-1)) {
 			config = cmp || {};
 
 			return embed.call(this, this.embeddable[0], Ext.apply(config, {
@@ -174,31 +183,43 @@ Ext.define('Voyant.data.table.Table', {
 			}));
 
 		}
+		
+		// assume it's a chart, but it could possibly be something else?
 		config = config || {};
 		chart = {};
 		
 		// build data
-		var rowKey = this.getRowKey();
-		var data = this.mapRows(function(row, i) {
-			return rowKey===undefined ? Ext.apply(row, {"row-index": i}) : row;
-		}, true, this)
+		var rowKey = this.getRowKey(), headers = this.getHeaders(), data = [];
+		
+		this.eachRow(function(row, i) {
+			if (row) {
+				var map = {};
+				map[rowKey ? rowKey : "A"] = i;
+				row = row.forEach(function(cell, i) {
+					map[headers[i] ? headers[i] : String.fromCharCode(65+i+(rowKey ? 0 : 1))] = cell
+				})
+				data.push(map);
+			}
+		}, false, this);
 		
 		// set chart store
 		Ext.apply(chart, {
 			store: {
-		        fields: this.getHeaders(),
+		        fields: Object.keys(data[0]),
 		        data: data
 		    }
 		});
 		
 		// set chart axes
 		if (config.axes) {
-			Ext.apply(chart, {axes: config.axes});
-			var positions = ["left", "bottom"]
+			Ext.apply(chart, {axes: Ext.isArray(config.axes) ? config.axes : [{},{}]});
 			chart.axes.forEach(function(axis, i) {
+				if (Ext.isObject(config.axes)) {
+					Ext.applyIf(axis, config.axes);
+				}
 				Ext.applyIf(axis, {
-			        type: i==0 ? 'numeric' : 'category',
-			        position: i==0 ? "left" : "bottom"
+			        type: i==1 ? 'numeric' : 'category',
+			        position: i==1 ? "left" : "bottom"
 				})
 			})
 			delete config.axes;
@@ -217,7 +238,7 @@ Ext.define('Voyant.data.table.Table', {
 		// set chart series
 		var series = [];
 		for (var i=0, len=chart.store.fields.length; i<len;i++) {
-			if (chart.store.fields[i]==rowKey) {continue;}
+			if (chart.store.fields[i]==rowKey || (!rowKey && chart.store.fields[i]=="A")) {continue;} // don't chart the row key, that's the x axis 
 			var cfg = {};
 			if (config.series) {
 				if (Ext.isObject(config.series)) {
@@ -228,7 +249,7 @@ Ext.define('Voyant.data.table.Table', {
 			}
 			Ext.applyIf(cfg, {
 		        type: 'line',
-		        xField: rowKey,
+		        xField: rowKey ? rowKey : "A",
 		        yField: chart.store.fields[i],
 		        marker: {
 		        	radius: 2

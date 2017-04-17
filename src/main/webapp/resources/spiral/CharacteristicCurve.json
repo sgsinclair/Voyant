@@ -1,55 +1,62 @@
 {
     "metadata": {
-        
+        "created": 1492037077579,
+        "modified": 1492037077579,
+        "version": 2
     },
     "blocks": [
         {
             "type": "text",
             "input": [
-                "<h1>Mendenhall&#39;s Characteristic Curve (1887): Early Stylometrics</h1>\n\n<p>In",
-                " 1887 the polymath T. C. Mendenhall published an article in <em>Science</em> tit",
-                "led, &quot;The Characteristic Curves of Composition&quot; which is both one of t",
-                "he earliest examples of quantitative stylistics but also one of the first studie",
-                "s to present text visualizations based on the (manual) count of words. Mendenhal",
-                "l thought that different authors would have distinctive curves of word length fr",
-                "equencies which could help with authorship attribution.</p>\n\n<p>Here you can see",
-                " an example of the characteristic curve of <em>Oliver Twist</em>. Mendenhall too",
-                "k the first 1000 words, counted the length in characters of these 1000 words and",
-                " then graphed the number of words of each length. Thus one can see that there is",
-                " just under 50 words of one letter length in the first one thousand words.</p>\n\n",
-                "<p><img alt=\"Mendhall Characteristic Curve\" src=\"//github.com/sgsinclair/epistem",
-                "ologica/raw/c55822b3d4080c758a168a252eb02ca4e8d1ba07/data/Mendenhall-Characteris",
-                "ticCurve/OliverTwist-CharacteristicCurve.png\" /></p>\n\n<p>Mendenhall thought this",
-                " method of analysis would help with the &quot;identification or discrimination o",
-                "f authorship&quot; or authorship attribution as we call it today. Let&#39;s see ",
-                "if we can recapitulate his technique here.</p>\n\n<h2>Acquiring the Text</h2>\n\n<p>",
-                "We&#39;ll begin by fetching the edition of <a href=\"http://www.gutenberg.org/cac",
-                "he/epub/730/pg730.txt\">Oliver Twist</a> that&#39;s available from the <a href=\"h",
-                "ttp://en.wikipedia.org/wiki/Project_Gutenberg\">Gutenberg Project</a>.&nbsp;The c",
-                "ode block below uses the <a href=\"../../docs/#!/api/Voyant.data.model.Corpus-sta",
-                "tic-method-loadCorpus\">loadCorpus</a> function. The first time it was run withou",
-                "t the corpus option, and then the corpus ID was added for future runs.</p>\n"
+                "<h1>Mendenhall's Characteristic Curve (1887): Early Stylometrics</h1><p>In 1887 ",
+                "the polymath T. C. Mendenhall published an article in <em>Science</em> titled, \"",
+                "The Characteristic Curves of Composition\" which is both one of the earliest exam",
+                "ples of quantitative stylistics but also one of the first studies to present tex",
+                "t visualizations based on the (manual) count of words. Mendenhall thought that d",
+                "ifferent authors would have distinctive curves of word length frequencies which ",
+                "could help with authorship attribution.</p><p>Here you can see an example of the",
+                " characteristic curve of <em>Oliver Twist</em>. Mendenhall took the first 1000 w",
+                "ords, counted the length in characters of these 1000 words and then graphed the ",
+                "number of words of each length. Thus one can see that there is just under 50 wor",
+                "ds of one letter length in the first one thousand words.</p><p><img alt=\"Mendhal",
+                "l Characteristic Curve\" data-cke-saved-src=\"//github.com/sgsinclair/epistemologi",
+                "ca/raw/c55822b3d4080c758a168a252eb02ca4e8d1ba07/data/Mendenhall-CharacteristicCu",
+                "rve/OliverTwist-CharacteristicCurve.png\" src=\"//github.com/sgsinclair/epistemolo",
+                "gica/raw/c55822b3d4080c758a168a252eb02ca4e8d1ba07/data/Mendenhall-Characteristic",
+                "Curve/OliverTwist-CharacteristicCurve.png\"></p><p>Mendenhall thought this method",
+                " of analysis would help with the \"identification or discrimination of authorship",
+                "\" or authorship attribution as we call it today. Let's see if we can recapitulat",
+                "e his technique here.</p><h2>Acquiring the Text</h2><p>We'll begin by fetching t",
+                "he edition of <a data-cke-saved-href=\"http://www.gutenberg.org/cache/epub/730/pg",
+                "730.txt\" href=\"http://www.gutenberg.org/cache/epub/730/pg730.txt\" data-tabindex-",
+                "value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"7\" target=\"_blank\">Oliver Twis",
+                "t</a> that's available from the <a data-cke-saved-href=\"http://en.wikipedia.org/",
+                "wiki/Project_Gutenberg\" href=\"http://en.wikipedia.org/wiki/Project_Gutenberg\" da",
+                "ta-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"7\" target=\"_blank\"",
+                ">Gutenberg Project</a>.&nbsp;The code block &nbsp;below uses the <a data-cke-sav",
+                "ed-href=\"../../docs/#!/api/Voyant.data.model.Corpus-static-method-loadCorpus\" hr",
+                "ef=\"../../docs/#!/api/Voyant.data.model.Corpus-static-method-loadCorpus\" data-ta",
+                "bindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"7\" target=\"_blank\">load",
+                "Corpus</a> function. The first time it was run without the corpus option, and th",
+                "en the corpus ID was added for future runs.</p>"
             ]
         },
         {
             "type": "code",
             "input": [
-                "var corpus;",
                 "new Corpus({",
-                "    corpus: '22e3b1638bf22138e92d0e3126d9726e', // specify corpus ID (copied from output below after first run)",
-                "    input: 'http://www.gutenberg.org/cache/epub/730/pg730.txt' // backup if corpus not available",
-                "}).then(function(data) {",
-                "    corpus = data; // store value for when we leave this function",
-                "    corpus.show(true); // short short summary with corpus ID",
-                "});"
+                "    input: 'https://gist.githubusercontent.com/sgsinclair/f895f2b37cdee761ac08e4ed8cc83d58/raw/CharlesDickens-OliverTwist.txt?1',",
+                "    inputRemoveUntil: \"CHAPTER I\",",
+                "    inputRemoveFromAfter: \"weak and erring.\"",
+                "}).assign(\"corpus\").show();"
             ],
             "output": [
                 " <div class=\"info\">This corpus has 1 document with 159,006 <span class=\"info-tip",
                 "\" data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;",
                 "the&quot;) is counted\">total words</span> and 10,438 <span class=\"info-tip\" data",
                 "-qtip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">un",
-                "ique word forms</span>. Created <span class=\"info-tip\" data-qtip=\"2016-05-10, 15",
-                ":12:53\">about 14 days ago</span>. (22e3b1638bf22138e92d0e3126d9726e)</div>"
+                "ique word forms</span>. Created <span class=\"info-tip\" data-qtip=\"2017-04-12, 18",
+                ":41:55\">about 2 days ago</span>.</div>"
             ]
         },
         {
@@ -58,56 +65,60 @@
                 "<p>The corpus has nearly 160,000 words, but recall that&nbsp;Mendenhall only con",
                 "sidered the first 1,000 words. We can do the same by calling the loadTokens meth",
                 "od on our corpus and specifying arguments that limit the call to 1,000 word toke",
-                "ns while skipping non-word tokens. The code below also uses the VoyantTable clas",
-                "s to conveniently accumulate term lengths with the updateCell. Finally, we can c",
-                "reate a chart by calling the embed method on the table of term lengths.</p>\n"
+                "ns while skipping non-word tokens.</p>\n"
             ]
         },
         {
             "type": "code",
-            "input": [
-                "corpus.loadTokens({limit: 1000, noOthers: true}).then(function(tokens) {",
-                "",
-                "    // build table of word lengths from tokens",
-                "    var lengths = new VoyantTable();",
-                "    tokens.each(function(token) {",
-                "        // in word length row (token.getTerm().length) and column (0), increase by 1",
-                "        lengths.updateCell(token.getTerm().length, 0, 1);",
-                "    });",
-                "",
-                "    // now embed table as chart",
-                "    lengths.embed('voyantchart', {",
-                "        series: [{showMarkers: false}], // don't show item markers (like original)",
-                "        width: 500",
-                "    });",
-                "});"
-            ],
+            "input": "corpus.loadTokens({limit: 1000, noOthers: true}).assign(\"wordsStore\").show();",
             "output": [
-                " <div class=\"info\"><iframe style=\"width: 500px; height: 400px\" src=\"../../tool/V",
-                "oyantChart/?minimal=true&amp;chartJson=%7B%22store%22%3A%7B%22fields%22%3A%5B%22",
-                "row-index%22%2C1%5D%2C%22data%22%3A%5B%7B%22row-index%22%3A0%7D%2C%7B%220%22%3A3",
-                "8%2C%22row-index%22%3A1%7D%2C%7B%220%22%3A165%2C%22row-index%22%3A2%7D%2C%7B%220",
-                "%22%3A230%2C%22row-index%22%3A3%7D%2C%7B%220%22%3A178%2C%22row-index%22%3A4%7D%2",
-                "C%7B%220%22%3A126%2C%22row-index%22%3A5%7D%2C%7B%220%22%3A90%2C%22row-index%22%3",
-                "A6%7D%2C%7B%220%22%3A67%2C%22row-index%22%3A7%7D%2C%7B%220%22%3A37%2C%22row-inde",
-                "x%22%3A8%7D%2C%7B%220%22%3A35%2C%22row-index%22%3A9%7D%2C%7B%220%22%3A13%2C%22ro",
-                "w-index%22%3A10%7D%2C%7B%220%22%3A13%2C%22row-index%22%3A11%7D%2C%7B%220%22%3A7%",
-                "2C%22row-index%22%3A12%7D%2C%7B%220%22%3A1%2C%22row-index%22%3A13%7D%5D%7D%2C%22",
-                "axes%22%3A%5B%7B%22type%22%3A%22numeric%22%2C%22position%22%3A%22left%22%7D%2C%7",
-                "B%22type%22%3A%22category%22%2C%22position%22%3A%22bottom%22%7D%5D%2C%22series%2",
-                "2%3A%5B%7B%22showMarkers%22%3Afalse%2C%22type%22%3A%22line%22%2C%22xField%22%3A%",
-                "22row-index%22%2C%22yField%22%3A0%7D%5D%7D&amp;debug=true\"></iframe></div>"
+                " <div class=\"info\">This store contains 1000 items with these fields: id, docId, ",
+                "docIndex, token, rawFreq, tokenType, position, startOffset, endOffset.</div>"
             ]
         },
         {
             "type": "text",
             "input": [
-                "<p>If we compare to Mendenall&#39;s graph above, that seems pretty close! It&#39",
-                ";s worth noting that Mendenhall doesn&#39;t specify what exactly was counted, su",
-                "ch as chapter titles (which my account for some slight variation).</p>\n\n<p>But M",
-                "endehall was counting terms by hand &ndash; can we do better? Let&#39;s generate",
-                " a similar table but now consider <em>all</em> terms, not just the first 1,000.<",
-                "/p>\n"
+                "<p>We have 1,000 terms but each one has far more fields than we need, we're only",
+                " interested in the word length of the term. So we'll create a table where we inc",
+                "rement the value in first column (zero-based) where the row represent the term l",
+                "ength – this uses the <a data-cke-saved-href=\"../../docs/#!/api/VoyantTable-meth",
+                "od-updateCell\" href=\"../../docs/#!/api/VoyantTable-method-updateCell\" target=\"_b",
+                "lank\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"6\">updateC",
+                "ell</a> function from the <a data-cke-saved-href=\"../../docs/#!/api/VoyantTable\"",
+                " href=\"../../docs/#!/api/VoyantTable\" target=\"_blank\" data-tabindex-value=\"none\"",
+                " tabindex=\"-1\" data-tabindex-counter=\"6\">table</a>. Finally we use the <a data-c",
+                "ke-saved-href=\"../../docs/#!/api/VoyantTable-method-embed\" href=\"../../docs/#!/a",
+                "pi/VoyantTable-method-embed\" target=\"_blank\" data-tabindex-value=\"none\" tabindex",
+                "=\"-1\" data-tabindex-counter=\"6\">embed</a> function to view the table as a <a dat",
+                "a-cke-saved-href=\"../../docs/#!/api/Voyant.widget.VoyantChart\" href=\"../../docs/",
+                "#!/api/Voyant.widget.VoyantChart\" target=\"_blank\" data-tabindex-value=\"none\" tab",
+                "index=\"-1\" data-tabindex-counter=\"6\">VoyantChart</a>.</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "var table = new VoyantTable()",
+                "wordsStore.each(function(word) {",
+                "    table.updateCell(word.getTerm().length, 0, 1);",
+                "});",
+                "table.embed(\"VoyantChart\", {series: {showMarkers: false}, axes: [{grid: true, title: \"Word Length\"}, {grid: true, title: \"Word Count\"}], width: 500})"
+            ],
+            "output": [
+                " <div class=\"info\"><iframe style=\"width: 500px; height: 400px\" id=\"ext-212\" name",
+                "=\"ext-212\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></",
+                "iframe></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>If we compare to Mendenall's graph above, that seems pretty close! It's worth",
+                " noting that Mendenhall doesn't specify what exactly was counted, such as chapte",
+                "r titles (which might account for some slight variation).</p>\n\n<p>But Mendehall ",
+                "was counting terms by hand – can we do better? Let's generate a similar chart bu",
+                "t now consider <em>all</em> terms, not just the first 1,000.</p>\n"
             ]
         },
         {
@@ -119,41 +130,25 @@
                 "    corpusTerms.each(function(corpusTerm) {",
                 "        oliverTwistLengths.updateCell(corpusTerm.getTerm().length, 0, corpusTerm.getRawFreq());",
                 "    });",
-                "    oliverTwistLengths.embed('voyantchart', {",
-                "        series: [{showMarkers: false}],",
-                "        width: 500",
-                "    });",
+                "    oliverTwistLengths.embed('voyantchart', {width: 500});",
                 "});"
             ],
             "output": [
-                " <div class=\"info\"><iframe style=\"width: 500px; height: 400px\" src=\"../../tool/V",
-                "oyantChart/?minimal=true&amp;chartJson=%7B%22store%22%3A%7B%22fields%22%3A%5B%22",
-                "row-index%22%2C1%5D%2C%22data%22%3A%5B%7B%22row-index%22%3A0%7D%2C%7B%220%22%3A5",
-                "445%2C%22row-index%22%3A1%7D%2C%7B%220%22%3A26581%2C%22row-index%22%3A2%7D%2C%7B",
-                "%220%22%3A37999%2C%22row-index%22%3A3%7D%2C%7B%220%22%3A31138%2C%22row-index%22%",
-                "3A4%7D%2C%7B%220%22%3A18352%2C%22row-index%22%3A5%7D%2C%7B%220%22%3A13484%2C%22r",
-                "ow-index%22%3A6%7D%2C%7B%220%22%3A10080%2C%22row-index%22%3A7%7D%2C%7B%220%22%3A",
-                "6802%2C%22row-index%22%3A8%7D%2C%7B%220%22%3A4406%2C%22row-index%22%3A9%7D%2C%7B",
-                "%220%22%3A2406%2C%22row-index%22%3A10%7D%2C%7B%220%22%3A1192%2C%22row-index%22%3",
-                "A11%7D%2C%7B%220%22%3A717%2C%22row-index%22%3A12%7D%2C%7B%220%22%3A294%2C%22row-",
-                "index%22%3A13%7D%2C%7B%220%22%3A70%2C%22row-index%22%3A14%7D%2C%7B%220%22%3A37%2",
-                "C%22row-index%22%3A15%7D%2C%7B%220%22%3A3%2C%22row-index%22%3A16%7D%5D%7D%2C%22a",
-                "xes%22%3A%5B%7B%22type%22%3A%22numeric%22%2C%22position%22%3A%22left%22%7D%2C%7B",
-                "%22type%22%3A%22category%22%2C%22position%22%3A%22bottom%22%7D%5D%2C%22series%22",
-                "%3A%5B%7B%22showMarkers%22%3Afalse%2C%22type%22%3A%22line%22%2C%22xField%22%3A%2",
-                "2row-index%22%2C%22yField%22%3A0%7D%5D%7D&amp;debug=true\"></iframe></div>"
+                " <div class=\"info\"><iframe style=\"width: 500px; height: 400px\" id=\"ext-216\" name",
+                "=\"ext-216\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></",
+                "iframe></div>"
             ]
         },
         {
             "type": "text",
             "input": [
-                "<p>Overall we have an impression that the line gets smoother, which isn&#39;t su",
-                "rprising given that we have more data points. The big question is whether the sm",
-                "oothing actually makes the line less characteristic, which would somewhat contra",
-                "dict Mendhall&#39;s original hypothesis that every other has a characteristic cu",
-                "rve. Let&#39;s compare this with Austen&#39;s <i>Emma</i> which has about the sa",
-                "me number of terms.&nbsp;<em>Emma&nbsp;</em>is the sixth&nbsp;document in the co",
-                "rpus, so we can access it at index 5 (index is zero-based).&nbsp;</p>\n"
+                "<p>Overall we have an impression that the line gets smoother, which isn't surpri",
+                "sing given that we have more data points. The big question is whether the smooth",
+                "ing actually makes the line less characteristic, which would somewhat contradict",
+                " Mendhall's original hypothesis that every other has a characteristic curve. Let",
+                "'s compare this with Austen's <i>Emma</i> which has about the same number of ter",
+                "ms.&nbsp;<em>Emma&nbsp;</em>is the sixth&nbsp;document in the corpus, so we can ",
+                "access it at index 5 (index is zero-based).&nbsp;</p>\n"
             ]
         },
         {
@@ -170,9 +165,9 @@
         {
             "type": "text",
             "input": [
-                "<p>Now we&#39;ll calculate document term lengths for <em>Emma</em>&nbsp;almost i",
-                "dentically to how we calculated corpus term lengths for <em>Oliver Twist</em>. F",
-                "inally, we&#39;ll chart this too.</p>\n"
+                "<p>Now we'll calculate document term lengths for <em>Emma</em>&nbsp;almost ident",
+                "ically to how we calculated corpus term lengths for <em>Oliver Twist</em>. Final",
+                "ly, we'll chart this too.</p>\n"
             ]
         },
         {
@@ -185,64 +180,31 @@
                 "    });",
                 "    ",
                 "    // embed both word length tables",
-                "    embed([oliverTwistLengths,'voyantchart',{",
-                "        series: [{showMarkers: false}],",
+                "    embed([[oliverTwistLengths,'voyantchart',{",
                 "        width: 500,",
                 "        title: \"Word Lengths in <i>Oliver Twist</i>\"",
                 "    }],[emmaLengths,'voyantchart',{",
-                "        series: [{showMarkers: false}],",
                 "        width: 500,",
                 "        title: \"Word Lengths in <i>Emma</i>\"",
-                "    }]);",
+                "    }]]);",
                 "});",
                 ""
             ],
             "output": [
                 " <table><tbody><tr></tr></tbody></table><iframe style=\"width: 500px; height: 400",
-                "px\" src=\"../../tool/VoyantChart/?minimal=true&amp;chartJson=%7B%22store%22%3A%7B",
-                "%22fields%22%3A%5B%22row-index%22%2C1%5D%2C%22data%22%3A%5B%7B%22row-index%22%3A",
-                "0%7D%2C%7B%220%22%3A5445%2C%22row-index%22%3A1%7D%2C%7B%220%22%3A26581%2C%22row-",
-                "index%22%3A2%7D%2C%7B%220%22%3A37999%2C%22row-index%22%3A3%7D%2C%7B%220%22%3A311",
-                "38%2C%22row-index%22%3A4%7D%2C%7B%220%22%3A18352%2C%22row-index%22%3A5%7D%2C%7B%",
-                "220%22%3A13484%2C%22row-index%22%3A6%7D%2C%7B%220%22%3A10080%2C%22row-index%22%3",
-                "A7%7D%2C%7B%220%22%3A6802%2C%22row-index%22%3A8%7D%2C%7B%220%22%3A4406%2C%22row-",
-                "index%22%3A9%7D%2C%7B%220%22%3A2406%2C%22row-index%22%3A10%7D%2C%7B%220%22%3A119",
-                "2%2C%22row-index%22%3A11%7D%2C%7B%220%22%3A717%2C%22row-index%22%3A12%7D%2C%7B%2",
-                "20%22%3A294%2C%22row-index%22%3A13%7D%2C%7B%220%22%3A70%2C%22row-index%22%3A14%7",
-                "D%2C%7B%220%22%3A37%2C%22row-index%22%3A15%7D%2C%7B%220%22%3A3%2C%22row-index%22",
-                "%3A16%7D%5D%7D%2C%22axes%22%3A%5B%7B%22type%22%3A%22numeric%22%2C%22position%22%",
-                "3A%22left%22%7D%2C%7B%22type%22%3A%22category%22%2C%22position%22%3A%22bottom%22",
-                "%7D%5D%2C%22series%22%3A%5B%7B%22showMarkers%22%3Afalse%2C%22type%22%3A%22line%2",
-                "2%2C%22xField%22%3A%22row-index%22%2C%22yField%22%3A0%7D%5D%2C%22title%22%3A%22W",
-                "ord%20Lengths%20in%20%3Ci%3EOliver%20Twist%3C%2Fi%3E%22%7D&amp;debug=true\"></ifr",
-                "ame><iframe style=\"width: 500px; height: 400px\" src=\"../../tool/VoyantChart/?min",
-                "imal=true&amp;chartJson=%7B%22store%22%3A%7B%22fields%22%3A%5B%22row-index%22%2C",
-                "1%5D%2C%22data%22%3A%5B%7B%22row-index%22%3A0%7D%2C%7B%220%22%3A6347%2C%22row-in",
-                "dex%22%3A1%7D%2C%7B%220%22%3A30756%2C%22row-index%22%3A2%7D%2C%7B%220%22%3A37747",
-                "%2C%22row-index%22%3A3%7D%2C%7B%220%22%3A30511%2C%22row-index%22%3A4%7D%2C%7B%22",
-                "0%22%3A16855%2C%22row-index%22%3A5%7D%2C%7B%220%22%3A11691%2C%22row-index%22%3A6",
-                "%7D%2C%7B%220%22%3A9980%2C%22row-index%22%3A7%7D%2C%7B%220%22%3A6011%2C%22row-in",
-                "dex%22%3A8%7D%2C%7B%220%22%3A5464%2C%22row-index%22%3A9%7D%2C%7B%220%22%3A2783%2",
-                "C%22row-index%22%3A10%7D%2C%7B%220%22%3A1477%2C%22row-index%22%3A11%7D%2C%7B%220",
-                "%22%3A807%2C%22row-index%22%3A12%7D%2C%7B%220%22%3A414%2C%22row-index%22%3A13%7D",
-                "%2C%7B%220%22%3A100%2C%22row-index%22%3A14%7D%2C%7B%220%22%3A40%2C%22row-index%2",
-                "2%3A15%7D%2C%7B%220%22%3A6%2C%22row-index%22%3A16%7D%2C%7B%220%22%3A7%2C%22row-i",
-                "ndex%22%3A17%7D%5D%7D%2C%22axes%22%3A%5B%7B%22type%22%3A%22numeric%22%2C%22posit",
-                "ion%22%3A%22left%22%7D%2C%7B%22type%22%3A%22category%22%2C%22position%22%3A%22bo",
-                "ttom%22%7D%5D%2C%22series%22%3A%5B%7B%22showMarkers%22%3Afalse%2C%22type%22%3A%2",
-                "2line%22%2C%22xField%22%3A%22row-index%22%2C%22yField%22%3A0%7D%5D%2C%22title%22",
-                "%3A%22Word%20Lengths%20in%20%3Ci%3EEmma%3C%2Fi%3E%22%7D&amp;debug=true\"></iframe",
-                ">"
+                "px\" id=\"ext-221\" name=\"ext-221\" data-tabindex-value=\"none\" tabindex=\"-1\" data-ta",
+                "bindex-counter=\"1\"></iframe><iframe style=\"width: 500px; height: 400px\" id=\"ext-",
+                "222\" name=\"ext-222\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-count",
+                "er=\"1\"></iframe>"
             ]
         },
         {
             "type": "text",
             "input": [
                 "<p>These do seem different, among other things&nbsp;the peak has different angle",
-                "s and the middle is more jagged in Emma. We can&#39;t help wonder if Mendenhall ",
-                "was seeing larger differences with 1,000 word segments though, which would lead ",
-                "him to over-estimate how distinctive an author&#39;s characteristic curve would ",
-                "be.</p>\n"
+                "s and the middle is more jagged in Emma. We can't help wonder if Mendenhall was ",
+                "seeing larger differences with 1,000 word segments though, which would lead him ",
+                "to over-estimate how distinctive an author's characteristic curve would be.</p>\n"
             ]
         }
     ]

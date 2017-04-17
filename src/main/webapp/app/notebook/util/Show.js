@@ -1,7 +1,19 @@
 Ext.define("Voyant.notebook.util.Show", {
 	transferable: ['show'],
+	
+    /**
+	 * Shows a one-line summary of this object. For example, for a corpus:
+	 * 
+	 * 	new Corpus("Hello World!").show(true);
+	 * 
+	 * @param {boolean} [withID] Includes the corpus ID in parentheses at the end, if true.
+	 */
 	show: function(len) { // this is for instances
-		show.call(this, this.getString ? this.getString() : this.toString(), len);
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			show.call(this, this.getString ? this.getString(len) : this.toString(), Ext.isNumber(len) ? len : undefined);
+		}
 	},
 	statics: {
 		show: function(contents, len) {
