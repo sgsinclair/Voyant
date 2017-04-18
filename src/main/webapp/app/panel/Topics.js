@@ -10,6 +10,7 @@ Ext.define('Voyant.panel.Topics', {
     	api: {
     		stopList: 'auto',
     		numTopics: 25,
+    		limit: 10,
     		iterations: 100,
     		perDocLimit: 1000,
     		query: undefined
@@ -140,7 +141,7 @@ Ext.define('Voyant.panel.Topics', {
                     xtype: 'textfield',
                     name: 'searchField',
                     hideLabel: true,
-                    width: 100,
+                    width: 80,
                     listeners: {
                         change: {
                             fn: me.onTextFieldChange,
@@ -149,9 +150,28 @@ Ext.define('Voyant.panel.Topics', {
                         }
                     }
                 },
+                	'<span class="info-tip" data-qtip="'+this.localize('limitTermsTip')+'">'+this.localize('limitTerms')+'</span>'
+                ,{ 
+	    			width: 80,
+                    hideLabel: true,
+	    			xtype: 'slider',
+	            	increment: 1,
+	            	minValue: 1,
+	            	maxValue: 100,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(parseInt(this.getApiParam("limit")))
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({limit: newvalue});
+	            			this.postSweep();
+	            		},
+	            		scope: this
+	            	}
+                },
                 	'<span class="info-tip" data-qtip="'+this.localize('numTopicsTip')+'">'+this.localize('numTopics')+'</span>'
                 ,{ 
-	    			width: 100,
+	    			width: 80,
                     hideLabel: true,
 	    			xtype: 'slider',
 	            	increment: 1,
@@ -451,14 +471,14 @@ Ext.define('Voyant.panel.Topics', {
 			docSortSmoothing = this.getDocSortSmoothing(),
 			sumDocSortSmoothing = this.getSumDocSortSmoothing();
 			
-		
+		var limit = parseInt(this.getApiParam('limit'));
 		for (var topic = 0; topic < numTopics; topic++) {
 			var scores = documents.map(function (doc, i) {
 				  return (doc.topicCounts[topic] + docSortSmoothing) / (doc.tokens.length + sumDocSortSmoothing);
 			});
 			
 			data.push({
-				topic: this.topNWords(topicWordCounts[topic], 10),
+				topic: this.topNWords(topicWordCounts[topic], limit),
 				scores: scores
 			})
 		}

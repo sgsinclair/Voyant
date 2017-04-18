@@ -18,7 +18,7 @@ The table view shows the following two columns:
 - *Scores*: this shows how prevalent the topic is for each document in the corpus (or segment in the document) – upward spikes show that this topic is more present (you can hover over the line to see which document is represented)
 
 <iframe src="../tool/Topics/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 350px;"></iframe>
-<div style="width: 90%; text-align: center; margin-bottom: 1em;">Topics with the Works of Jane Austen. You can also <a href="../?view=Topics" target="_blank">use Contexts with your own corpus</a>.</div>
+<div style="width: 90%; text-align: center; margin-bottom: 1em;">Topics with the Works of Jane Austen. You can also <a href="../?view=Topics" target="_blank">use Topics with your own corpus</a>.</div>
 
 ## Options
 

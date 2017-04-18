@@ -700,6 +700,8 @@ September 21	Voyant.panel.Trends	failedGetDocumentTerms	Failed to get document t
 2017-03-24	Voyant.panel.Topics	iterations	Iterations	Itérations													
 2017-03-24	Voyant.panel.Topics	iterationsTip	The number of iterations to run each time.	Le nombre d'itérations à faire à chaque fois.													
 2017-03-24	Voyant.panel.Topics	totalDone	({0} iterations done)	({0} itérations terminées)													
+2017-04-17	Voyant.panel.Topics	limitTerms	Terms	Termes													
+2017-04-17	Voyant.panel.Topics	limitTermsTip	Determine the number of terms to show for each topic.	Le nombre de termes à afficher pour chaque thématique.													
 2017-04-05	Voyant.panel.TermsBerry	title	TermsBerry														
 2017-04-05	Voyant.panel.TermsBerry	strategy	Strategy														
 2017-04-05	Voyant.panel.TermsBerry	topTerms	Top Terms														
