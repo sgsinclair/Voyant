@@ -29,16 +29,16 @@
                 "e his technique here.</p><h2>Acquiring the Text</h2><p>We'll begin by fetching t",
                 "he edition of <a data-cke-saved-href=\"http://www.gutenberg.org/cache/epub/730/pg",
                 "730.txt\" href=\"http://www.gutenberg.org/cache/epub/730/pg730.txt\" data-tabindex-",
-                "value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"7\" target=\"_blank\">Oliver Twis",
-                "t</a> that's available from the <a data-cke-saved-href=\"http://en.wikipedia.org/",
-                "wiki/Project_Gutenberg\" href=\"http://en.wikipedia.org/wiki/Project_Gutenberg\" da",
-                "ta-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"7\" target=\"_blank\"",
-                ">Gutenberg Project</a>.&nbsp;The code block &nbsp;below uses the <a data-cke-sav",
-                "ed-href=\"../../docs/#!/api/Voyant.data.model.Corpus-static-method-loadCorpus\" hr",
-                "ef=\"../../docs/#!/api/Voyant.data.model.Corpus-static-method-loadCorpus\" data-ta",
-                "bindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"7\" target=\"_blank\">load",
-                "Corpus</a> function. The first time it was run without the corpus option, and th",
-                "en the corpus ID was added for future runs.</p>"
+                "value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"10\" target=\"_blank\">Oliver Twi",
+                "st</a> that's available from the <a data-cke-saved-href=\"http://en.wikipedia.org",
+                "/wiki/Project_Gutenberg\" href=\"http://en.wikipedia.org/wiki/Project_Gutenberg\" d",
+                "ata-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"10\" target=\"_blan",
+                "k\">Gutenberg Project</a>.&nbsp;The code block &nbsp;below uses the <a data-cke-s",
+                "aved-href=\"../../docs/#!/api/Voyant.data.model.Corpus-static-method-loadCorpus\" ",
+                "href=\"../../docs/#!/api/Voyant.data.model.Corpus-static-method-loadCorpus\" data-",
+                "tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"10\" target=\"_blank\">l",
+                "oadCorpus</a> function. The first time it was run without the corpus option, and",
+                " then the corpus ID was added for future runs.</p>"
             ]
         },
         {
@@ -51,12 +51,12 @@
                 "}).assign(\"corpus\").show();"
             ],
             "output": [
-                " <div class=\"info\">This corpus has 1 document with 159,006 <span class=\"info-tip",
-                "\" data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;",
-                "the&quot;) is counted\">total words</span> and 10,438 <span class=\"info-tip\" data",
-                "-qtip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">un",
-                "ique word forms</span>. Created <span class=\"info-tip\" data-qtip=\"2017-04-12, 18",
-                ":41:55\">about 2 days ago</span>.</div>"
+                "<div style='height: 31px'> <div class=\"info\">This corpus has 1 document with 159",
+                ",006 <span class=\"info-tip\" data-qtip=\"every occurrence of every word (like mult",
+                "iple occurrences of &quot;the&quot;) is counted\">total words</span> and 10,438 <",
+                "span class=\"info-tip\" data-qtip=\"multiple occurrences of words (like &quot;the&q",
+                "uot;) are counted once\">unique word forms</span>. Created <span class=\"info-tip\"",
+                " data-qtip=\"2017-04-17, 21:08:08\">about 14 minutes ago</span>.</div></div>"
             ]
         },
         {
@@ -72,8 +72,9 @@
             "type": "code",
             "input": "corpus.loadTokens({limit: 1000, noOthers: true}).assign(\"wordsStore\").show();",
             "output": [
-                " <div class=\"info\">This store contains 1000 items with these fields: id, docId, ",
-                "docIndex, token, rawFreq, tokenType, position, startOffset, endOffset.</div>"
+                "<div style='height: 31px'> <div class=\"info\">This store contains 1000 items with",
+                " these fields: id, docId, docIndex, token, rawFreq, tokenType, position, startOf",
+                "fset, endOffset.</div></div>"
             ]
         },
         {
@@ -84,16 +85,16 @@
                 "rement the value in first column (zero-based) where the row represent the term l",
                 "ength – this uses the <a data-cke-saved-href=\"../../docs/#!/api/VoyantTable-meth",
                 "od-updateCell\" href=\"../../docs/#!/api/VoyantTable-method-updateCell\" target=\"_b",
-                "lank\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"6\">updateC",
+                "lank\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"9\">updateC",
                 "ell</a> function from the <a data-cke-saved-href=\"../../docs/#!/api/VoyantTable\"",
                 " href=\"../../docs/#!/api/VoyantTable\" target=\"_blank\" data-tabindex-value=\"none\"",
-                " tabindex=\"-1\" data-tabindex-counter=\"6\">table</a>. Finally we use the <a data-c",
+                " tabindex=\"-1\" data-tabindex-counter=\"9\">table</a>. Finally we use the <a data-c",
                 "ke-saved-href=\"../../docs/#!/api/VoyantTable-method-embed\" href=\"../../docs/#!/a",
                 "pi/VoyantTable-method-embed\" target=\"_blank\" data-tabindex-value=\"none\" tabindex",
-                "=\"-1\" data-tabindex-counter=\"6\">embed</a> function to view the table as a <a dat",
+                "=\"-1\" data-tabindex-counter=\"9\">embed</a> function to view the table as a <a dat",
                 "a-cke-saved-href=\"../../docs/#!/api/Voyant.widget.VoyantChart\" href=\"../../docs/",
                 "#!/api/Voyant.widget.VoyantChart\" target=\"_blank\" data-tabindex-value=\"none\" tab",
-                "index=\"-1\" data-tabindex-counter=\"6\">VoyantChart</a>.</p>"
+                "index=\"-1\" data-tabindex-counter=\"9\">VoyantChart</a>.</p>"
             ]
         },
         {
@@ -106,9 +107,23 @@
                 "table.embed(\"VoyantChart\", {series: {showMarkers: false}, axes: [{grid: true, title: \"Word Length\"}, {grid: true, title: \"Word Count\"}], width: 500})"
             ],
             "output": [
-                " <div class=\"info\"><iframe style=\"width: 500px; height: 400px\" id=\"ext-212\" name",
-                "=\"ext-212\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></",
-                "iframe></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe src=\"../../tool/VoyantChar",
+                "t/?chartJson=%7B%22store%22%3A%7B%22fields%22%3A%5B%22A%22%2C%22B%22%5D%2C%22dat",
+                "a%22%3A%5B%7B%22A%22%3A1%2C%22B%22%3A38%7D%2C%7B%22A%22%3A2%2C%22B%22%3A165%7D%2",
+                "C%7B%22A%22%3A3%2C%22B%22%3A230%7D%2C%7B%22A%22%3A4%2C%22B%22%3A178%7D%2C%7B%22A",
+                "%22%3A5%2C%22B%22%3A126%7D%2C%7B%22A%22%3A6%2C%22B%22%3A90%7D%2C%7B%22A%22%3A7%2",
+                "C%22B%22%3A67%7D%2C%7B%22A%22%3A8%2C%22B%22%3A37%7D%2C%7B%22A%22%3A9%2C%22B%22%3",
+                "A35%7D%2C%7B%22A%22%3A10%2C%22B%22%3A13%7D%2C%7B%22A%22%3A11%2C%22B%22%3A13%7D%2",
+                "C%7B%22A%22%3A12%2C%22B%22%3A7%7D%2C%7B%22A%22%3A13%2C%22B%22%3A1%7D%5D%7D%2C%22",
+                "axes%22%3A%5B%7B%22grid%22%3Atrue%2C%22title%22%3A%22Word%20Length%22%2C%22type%",
+                "22%3A%22category%22%2C%22position%22%3A%22bottom%22%7D%2C%7B%22grid%22%3Atrue%2C",
+                "%22title%22%3A%22Word%20Count%22%2C%22type%22%3A%22numeric%22%2C%22position%22%3",
+                "A%22left%22%7D%5D%2C%22series%22%3A%5B%7B%22showMarkers%22%3Afalse%2C%22type%22%",
+                "3A%22line%22%2C%22xField%22%3A%22A%22%2C%22yField%22%3A%22B%22%2C%22marker%22%3A",
+                "%7B%22radius%22%3A2%7D%2C%22highlightCfg%22%3A%7B%22scaling%22%3A2%7D%2C%22toolt",
+                "ip%22%3A%7B%22trackMouse%22%3Atrue%7D%7D%5D%7D&amp;debug=true\" style=\"width: 500",
+                "px; height: 400px\" id=\"ext-230\" name=\"ext-230\" data-tabindex-value=\"none\" tabind",
+                "ex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -134,9 +149,23 @@
                 "});"
             ],
             "output": [
-                " <div class=\"info\"><iframe style=\"width: 500px; height: 400px\" id=\"ext-216\" name",
-                "=\"ext-216\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></",
-                "iframe></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe src=\"../../tool/VoyantChar",
+                "t/?chartJson=%7B%22store%22%3A%7B%22fields%22%3A%5B%22A%22%2C%22B%22%5D%2C%22dat",
+                "a%22%3A%5B%7B%22A%22%3A1%2C%22B%22%3A5445%7D%2C%7B%22A%22%3A2%2C%22B%22%3A26581%",
+                "7D%2C%7B%22A%22%3A3%2C%22B%22%3A38000%7D%2C%7B%22A%22%3A4%2C%22B%22%3A31138%7D%2",
+                "C%7B%22A%22%3A5%2C%22B%22%3A18351%7D%2C%7B%22A%22%3A6%2C%22B%22%3A13483%7D%2C%7B",
+                "%22A%22%3A7%2C%22B%22%3A10080%7D%2C%7B%22A%22%3A8%2C%22B%22%3A6802%7D%2C%7B%22A%",
+                "22%3A9%2C%22B%22%3A4407%7D%2C%7B%22A%22%3A10%2C%22B%22%3A2406%7D%2C%7B%22A%22%3A",
+                "11%2C%22B%22%3A1192%7D%2C%7B%22A%22%3A12%2C%22B%22%3A717%7D%2C%7B%22A%22%3A13%2C",
+                "%22B%22%3A294%7D%2C%7B%22A%22%3A14%2C%22B%22%3A70%7D%2C%7B%22A%22%3A15%2C%22B%22",
+                "%3A37%7D%2C%7B%22A%22%3A16%2C%22B%22%3A3%7D%5D%7D%2C%22axes%22%3A%5B%7B%22type%2",
+                "2%3A%22numeric%22%2C%22position%22%3A%22left%22%7D%2C%7B%22type%22%3A%22category",
+                "%22%2C%22position%22%3A%22bottom%22%7D%5D%2C%22series%22%3A%5B%7B%22type%22%3A%2",
+                "2line%22%2C%22xField%22%3A%22A%22%2C%22yField%22%3A%22B%22%2C%22marker%22%3A%7B%",
+                "22radius%22%3A2%7D%2C%22highlightCfg%22%3A%7B%22scaling%22%3A2%7D%2C%22tooltip%2",
+                "2%3A%7B%22trackMouse%22%3Atrue%7D%7D%5D%7D&amp;debug=true\" style=\"width: 500px; ",
+                "height: 400px\" id=\"ext-232\" name=\"ext-232\" data-tabindex-value=\"none\" tabindex=\"",
+                "-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -160,7 +189,7 @@
                 "    emma.show()",
                 "})"
             ],
-            "output": " <div class=\"info\">1815 Emma</div>"
+            "output": "<div style='height: 31px'> <div class=\"info\">1815 Emma</div></div>"
         },
         {
             "type": "text",
@@ -191,11 +220,41 @@
                 ""
             ],
             "output": [
-                " <table><tbody><tr></tr></tbody></table><iframe style=\"width: 500px; height: 400",
-                "px\" id=\"ext-221\" name=\"ext-221\" data-tabindex-value=\"none\" tabindex=\"-1\" data-ta",
-                "bindex-counter=\"1\"></iframe><iframe style=\"width: 500px; height: 400px\" id=\"ext-",
-                "222\" name=\"ext-222\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-count",
-                "er=\"1\"></iframe>"
+                "<div style='height: 422px'> <table><tbody><tr></tr></tbody></table><iframe src=\"",
+                "../../tool/VoyantChart/?chartJson=%7B%22store%22%3A%7B%22fields%22%3A%5B%22A%22%",
+                "2C%22B%22%5D%2C%22data%22%3A%5B%7B%22A%22%3A1%2C%22B%22%3A5445%7D%2C%7B%22A%22%3",
+                "A2%2C%22B%22%3A26581%7D%2C%7B%22A%22%3A3%2C%22B%22%3A38000%7D%2C%7B%22A%22%3A4%2",
+                "C%22B%22%3A31138%7D%2C%7B%22A%22%3A5%2C%22B%22%3A18351%7D%2C%7B%22A%22%3A6%2C%22",
+                "B%22%3A13483%7D%2C%7B%22A%22%3A7%2C%22B%22%3A10080%7D%2C%7B%22A%22%3A8%2C%22B%22",
+                "%3A6802%7D%2C%7B%22A%22%3A9%2C%22B%22%3A4407%7D%2C%7B%22A%22%3A10%2C%22B%22%3A24",
+                "06%7D%2C%7B%22A%22%3A11%2C%22B%22%3A1192%7D%2C%7B%22A%22%3A12%2C%22B%22%3A717%7D",
+                "%2C%7B%22A%22%3A13%2C%22B%22%3A294%7D%2C%7B%22A%22%3A14%2C%22B%22%3A70%7D%2C%7B%",
+                "22A%22%3A15%2C%22B%22%3A37%7D%2C%7B%22A%22%3A16%2C%22B%22%3A3%7D%5D%7D%2C%22axes",
+                "%22%3A%5B%7B%22type%22%3A%22numeric%22%2C%22position%22%3A%22left%22%7D%2C%7B%22",
+                "type%22%3A%22category%22%2C%22position%22%3A%22bottom%22%7D%5D%2C%22series%22%3A",
+                "%5B%7B%22type%22%3A%22line%22%2C%22xField%22%3A%22A%22%2C%22yField%22%3A%22B%22%",
+                "2C%22marker%22%3A%7B%22radius%22%3A2%7D%2C%22highlightCfg%22%3A%7B%22scaling%22%",
+                "3A2%7D%2C%22tooltip%22%3A%7B%22trackMouse%22%3Atrue%7D%7D%5D%2C%22title%22%3A%22",
+                "Word%20Lengths%20in%20%3Ci%3EOliver%20Twist%3C%2Fi%3E%22%7D&amp;debug=true\" styl",
+                "e=\"width: 500px; height: 400px\" id=\"ext-235\" name=\"ext-235\" data-tabindex-value=",
+                "\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe><iframe src=\"../../tool/",
+                "VoyantChart/?chartJson=%7B%22store%22%3A%7B%22fields%22%3A%5B%22A%22%2C%22B%22%5",
+                "D%2C%22data%22%3A%5B%7B%22A%22%3A1%2C%22B%22%3A6347%7D%2C%7B%22A%22%3A2%2C%22B%2",
+                "2%3A30756%7D%2C%7B%22A%22%3A3%2C%22B%22%3A37747%7D%2C%7B%22A%22%3A4%2C%22B%22%3A",
+                "30511%7D%2C%7B%22A%22%3A5%2C%22B%22%3A16855%7D%2C%7B%22A%22%3A6%2C%22B%22%3A1169",
+                "1%7D%2C%7B%22A%22%3A7%2C%22B%22%3A9980%7D%2C%7B%22A%22%3A8%2C%22B%22%3A6011%7D%2",
+                "C%7B%22A%22%3A9%2C%22B%22%3A5464%7D%2C%7B%22A%22%3A10%2C%22B%22%3A2783%7D%2C%7B%",
+                "22A%22%3A11%2C%22B%22%3A1477%7D%2C%7B%22A%22%3A12%2C%22B%22%3A807%7D%2C%7B%22A%2",
+                "2%3A13%2C%22B%22%3A414%7D%2C%7B%22A%22%3A14%2C%22B%22%3A100%7D%2C%7B%22A%22%3A15",
+                "%2C%22B%22%3A40%7D%2C%7B%22A%22%3A16%2C%22B%22%3A6%7D%2C%7B%22A%22%3A17%2C%22B%2",
+                "2%3A7%7D%5D%7D%2C%22axes%22%3A%5B%7B%22type%22%3A%22numeric%22%2C%22position%22%",
+                "3A%22left%22%7D%2C%7B%22type%22%3A%22category%22%2C%22position%22%3A%22bottom%22",
+                "%7D%5D%2C%22series%22%3A%5B%7B%22type%22%3A%22line%22%2C%22xField%22%3A%22A%22%2",
+                "C%22yField%22%3A%22B%22%2C%22marker%22%3A%7B%22radius%22%3A2%7D%2C%22highlightCf",
+                "g%22%3A%7B%22scaling%22%3A2%7D%2C%22tooltip%22%3A%7B%22trackMouse%22%3Atrue%7D%7",
+                "D%5D%2C%22title%22%3A%22Word%20Lengths%20in%20%3Ci%3EEmma%3C%2Fi%3E%22%7D&amp;de",
+                "bug=true\" style=\"width: 500px; height: 400px\" id=\"ext-236\" name=\"ext-236\" data-t",
+                "abindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div>"
             ]
         },
         {

@@ -25,15 +25,7 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 			}, this);
 			this.mon(this.getEl(), "mouseout", function() {
 				this.setActiveMode(false);
-			}, this);
-			
-			// resize as needed (this adds considerable overhead, but it's probably worth it)
-			this.getTargetEl().on("resize", function(el) {
-				var height = 20;
-				me.items.each(function(item) {height+=item.getHeight();})
-				me.setSize({height: height});
-			})
-			
+			}, this);			
 		}, this);
 		this.callParent(arguments);
 	},

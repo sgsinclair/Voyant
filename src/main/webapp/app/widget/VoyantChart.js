@@ -16,7 +16,11 @@ Ext.define('Voyant.widget.VoyantChart', {
     	if (!config.noEmbed) {
         	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
     	}
-    	this.callParent(arguments)
+    	if (this.getApiParam('chartJson')) {
+    		var json = JSON.parse(this.getApiParam('chartJson'))
+    		Ext.apply(config, json);
+    	}
+    	this.callParent([config])
     	
     	me.on("reconfigure", function() {
         	if (this.getApiParam('chartJson')) {
@@ -32,7 +36,6 @@ Ext.define('Voyant.widget.VoyantChart', {
         		}
         	}
     	})
-
     },
     initComponent: function(config) {
     	this.callParent(arguments)

@@ -50,6 +50,15 @@ Ext.define('Voyant.VoyantApp', {
         this.addColorPalette('extjs', extjs);
     },
     
+    getRelativeUrl: function() {
+    	var url = window.location.pathname.substring(this.getBaseUrl().length);
+    	var relative = "";
+    	for (var i=0, len=url.split("/").length-1; i<len; i++) {
+    		relative+="../"
+    	}
+    	return relative;
+    },
+    
     getTools: function() {
     	return [{type: 'maximize'},{type: 'help'}]
     },

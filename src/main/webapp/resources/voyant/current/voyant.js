@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Apr 17 13:55:12 EDT 2017 */
+/* This file created by JSCacher. Last modified: Mon Apr 17 21:23:52 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7476,10 +7476,12 @@ Ext.define("Voyant.notebook.util.Embed", {
     	    		me.setApiParams(api);
     	    		me.fireEvent("reconfigure");
     	    	}).otherwise(function(response) {
-    	    		if (response.responseText) {
-        	    		showError(response);
-        	    		dfd.reject();
+    	    		if (me.getTargetEl) {
+        				Voyant.notebook.util.Show.TARGET = me.getTargetEl();
+        				showError(response);
     	    		}
+    	    		Voyant.application.showError(response);
+    	    		dfd.reject();
     	    	})
 				
 			}
@@ -7560,37 +7562,36 @@ Ext.define("Voyant.notebook.util.Embed", {
 								delete config.width;
 								delete config.height;
 								
-								var embeddedConfigParam = Ext.Object.toQueryString(embeddedParams);
+		    	    	    	Ext.applyIf(embeddedParams, Voyant.application.getModifiedApiParams());
 								
+								var embeddedConfigParam = Ext.Object.toQueryString(embeddedParams);
 								var iframeId = Ext.id();
-								show('<iframe style="'+config.style+'" id="'+iframeId+'" name="'+iframeId+'"></iframe>');
-								var dfd = Voyant.application.getDeferred(this);
-				    	    	Ext.Ajax.request({
-				    	    	    url: Voyant.application.getTromboneUrl(),
-				    	    	    params: {
-				    	        		tool: 'resource.StoredResource',
-				    	        		storeResource: embeddedConfigParam
-				    	    	    }
-				    	    	}).then(function(response) {
-			    	    	    	var json = Ext.util.JSON.decode(response.responseText);
-			    	    	    	var params = {
-			    	    	    		minimal: true,
-			    	    	    		embeddedConfig: json.storedResource.id
-			    	    	    	}
-			    	    	    	Ext.applyIf(params, Voyant.application.getApiParams());
-			    	    	    	Ext.create(Ext.form.Panel).submit({
-										standardSubmit: true,
-								        params: params,
-								        target: iframeId,
-								        method: 'get',
-								        url: Voyant.application.getBaseUrl()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/'
-								    });
-									dfd.resolve();
-				    	    	}).otherwise(function(response) {
-				    	    		showError(response);
-				    	    		dfd.reject();
-				    	    	})
-
+								var url = Voyant.application.getRelativeUrl()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/?';
+								if (embeddedConfigParam.length>1800) {
+									show('<iframe style="'+config.style+'" id="'+iframeId+'" name="'+iframeId+'"></iframe>');
+									var dfd = Voyant.application.getDeferred(this);
+					    	    	Ext.Ajax.request({
+					    	    	    url: Voyant.application.getTromboneUrl(),
+					    	    	    params: {
+					    	        		tool: 'resource.StoredResource',
+					    	        		storeResource: embeddedConfigParam
+					    	    	    }
+					    	    	}).then(function(response) {
+				    	    	    	var json = Ext.util.JSON.decode(response.responseText);
+				    	    	    	var params = {
+				    	    	    		minimal: true,
+				    	    	    		embeddedConfig: json.storedResource.id
+				    	    	    	}
+				    	    	    	Ext.applyIf(params, Voyant.application.getModifiedApiParams());
+				    	    	    	document.getElementById(iframeId).setAttribute("src",url+Ext.Object.toQueryString(params));
+										dfd.resolve();
+					    	    	}).otherwise(function(response) {
+					    	    		showError(response);
+					    	    		dfd.reject();
+					    	    	})
+								} else {
+									show('<iframe src="'+url+embeddedConfigParam+'" style="'+config.style+'" id="'+iframeId+'" name="'+iframeId+'"></iframe>');
+								}
 								isEmbedded = true;
 								return false;
 							}
@@ -8699,7 +8700,6 @@ Ext.define('Voyant.data.store.TokensBuffered', {
 		this.callParent([config]);
 	}
 });
-
 Ext.define('Voyant.data.store.TSNEAnalysisMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.StatisticalAnalysis',
@@ -8710,6 +8710,7 @@ Ext.define('Voyant.data.store.TSNEAnalysisMixin', {
 			'proxy.reader.totalProperty': 'tsneAnalysis.totalTerms'
 		}])
 		config.proxy.extraParams.withDistributions = true;
+		config.proxy.extraParams.noCache = 1;
 	}
 });
 
@@ -11316,7 +11317,11 @@ Ext.define('Voyant.widget.VoyantChart', {
     	if (!config.noEmbed) {
         	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
     	}
-    	this.callParent(arguments)
+    	if (this.getApiParam('chartJson')) {
+    		var json = JSON.parse(this.getApiParam('chartJson'))
+    		Ext.apply(config, json);
+    	}
+    	this.callParent([config])
     	
     	me.on("reconfigure", function() {
         	if (this.getApiParam('chartJson')) {
@@ -11332,7 +11337,6 @@ Ext.define('Voyant.widget.VoyantChart', {
         		}
         	}
     	})
-
     },
     initComponent: function(config) {
     	this.callParent(arguments)
@@ -11479,7 +11483,7 @@ Ext.define('Voyant.widget.LiveSearchGrid', {
 
 Ext.define('Voyant.widget.VoyantTableTransform', {
 	extend: 'Ext.panel.Panel',
-    mixins: ['Voyant.util.Localization','Voyant.util.Api'],
+    mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.notebook.util.Embed'],
 	alias: 'widget.voyanttabletransform',
     statics: {
     	i18n: {},
@@ -11489,17 +11493,43 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
 			width: undefined
 		}
     },
-	constructor: function() {
-        this.callParent(arguments);
+    html: '',
+	constructor: function(config) {
+    	config = config || {};
+		var me = this;
+    	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	if (!config.noEmbed) {
+        	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
+    	}
+        me.callParent(arguments);
+    	me.on("reconfigure", function() {
+    		this.buildFromParams();
+    		this.fireEvent('afterrender');
+    	}, this);
 	},
 	initComponent: function(config) {
     	var me = this, config = config || {};
-    	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	me.buildFromParams();
+		me.on('afterrender', function() {
+			var table = this.getTargetEl().down('table');
+			if (table) {
+				var parent = table.parent();
+				var grid = new Ext.ux.grid.TransformGrid(table, {
+					width: this.getApiParam('width') || parent.getWidth(),
+					height: this.getApiParam('height') || 20+(table.query('tr').length*24) // based on grid heights in crisp
+				});
+				grid.render(parent);
+			}
+		}, me);
+		
+    	me.callParent(arguments);
+	},
+	
+	buildFromParams: function() {
 		var me = this, tableHtml = this.getApiParam('tableHtml'), tableJson = this.getApiParam('tableJson');
 		if (tableHtml) {
-			Ext.apply(me, {
-				html: tableHtml
-			})
+			this.setHtml(tableHtml);
 		} else if (tableJson) {
 			var html = "<table><thead><tr>", json = JSON.parse(tableJson);
 			
@@ -11521,21 +11551,9 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
 				html+="</tr>";
 			})
 			html+="</tbody></table>";
-			Ext.apply(me, {
-				html: html
-			})
+			this.setHtml(html);
 		}
 		
-		me.on('afterrender', function() {
-			var table = this.getTargetEl().down('table'), parent = table.parent();
-			var grid = new Ext.ux.grid.TransformGrid(table, {
-				width: this.getApiParam('width') || parent.getWidth(),
-				height: this.getApiParam('height') || 20+(table.query('tr').length*24) // based on grid heights in crisp
-			});
-			grid.render(parent);
-		}, me);
-		
-    	me.callParent(arguments);
 	}
 
 })
@@ -19464,7 +19482,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	alias: 'widget.scatterplot',
     statics: {
     	i18n: {
-    		tsne: 't-SNE'
+    		tsne: 't-SNE',
+    		terms: 'Terms',
+    		reload: 'Reload',
+    		options: 'Options',
+    		input: 'Input',
+    		output: 'Output',
+    		perplexity: 'Perplexity',
+    		iterations: 'Iterations',
+    		analyzing: 'Analyzing',
+    		plotting: 'Plotting'
     	},
     	api: {
     		docId: undefined,
@@ -19473,6 +19500,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		dimensions: 3,
     		bins: 10,
     		clusters: 3,
+    		perplexity: 15,
+    		iterations: 1500,
     		comparisonType: 'relative',
     		stopList: 'auto',
     		target: undefined,
@@ -19508,16 +19537,16 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     initComponent: function() {
     	this.setCaStore(Ext.create('Voyant.data.store.CAAnalysis', {
-    		listeners: {load: this.buildChart, scope: this}
+    		listeners: {load: this.maskAndBuildChart, scope: this}
     	}));
     	this.setPcaStore(Ext.create('Voyant.data.store.PCAAnalysis', {
-    		listeners: {load: this.buildChart, scope: this}
+    		listeners: {load: this.maskAndBuildChart, scope: this}
     	}));
     	this.setTsneStore(Ext.create('Voyant.data.store.TSNEAnalysis', {
-    		listeners: {load: this.buildChart, scope: this}
+    		listeners: {load: this.maskAndBuildChart, scope: this}
     	}));
     	this.setDocSimStore(Ext.create('Voyant.data.store.DocSimAnalysis', {
-    		listeners: {load: this.buildChart, scope: this}
+    		listeners: {load: this.maskAndBuildChart, scope: this}
     	}));
     	this.setTermStore(Ext.create('Ext.data.JsonStore', {
 			fields: [
@@ -19554,137 +19583,19 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	layout: 'border',
         	autoDestroy: true,
         	items: [{
-        		itemId: 'chartParent',
-        		region: 'center',
-        		layout: 'fit',
+    			itemId: 'chartParent',
+    			region: 'center',
+    			layout: 'fit',
         		tbar: {
-                    overflowHandler: 'scroller',
+        			overflowHandler: 'scroller',
         			items: [{
         				xtype: 'querysearchfield',
         				itemId: 'filterTerms',
         				width: 150
         			},{
-    	            	xtype: 'documentselectorbutton',
-    	            	flex: 1
-    	            },{
-                		text: this.localize('analysis'),
-                		itemId: 'analysis',
-                		glyph: 'xf1ec@FontAwesome',
-                        overflowHandler: 'scroller',
-    	            	flex: 1,
-            			menu: {
-        					items: [
-        					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
-        					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'},
-        					    {text: this.localize('tsne'), itemId: 'analysis_tsne', group:'analysis', xtype: 'menucheckitem'},
-        					    {text: this.localize('docSim'), itemId: 'analysis_docSim', group:'analysis', xtype: 'menucheckitem'}
-        					],
-        					listeners: {
-        						click: function(menu, item) {
-        							if (item !== undefined) {
-        								var analysis = item.getItemId().split('_')[1];
-        								if (analysis !== this.getApiParam('analysis')) {
-        									this.setApiParam('analysis', analysis);
-    										this.queryById('nearbyButton').setDisabled(analysis === 'tsne');
-    										if (analysis === 'ca') {
-        										if (this.getCorpus().getDocumentsCount() == 3) {
-            										this.setApiParam('dimensions', 2);
-            										this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
-            									}
-        									}
-
-        									this.loadFromApis(true);
-        								}
-        							}
-        						},
-        						scope: this
-        					}
-            			}
-    	            },{
-    	            	text: this.localize('freqsMode'),
-    	            	itemId: 'comparisonType',
-    					glyph: 'xf201@FontAwesome',
-    				    tooltip: this.localize('freqsModeTip'),
-    	            	flex: 1,
-    				    menu: {
-    				    	items: [
-				               {text: this.localize("rawFrequencies"), itemId: 'comparisonType_raw', group: 'freqsMode', xtype: 'menucheckitem'},
-				               {text: this.localize("relativeFrequencies"), itemId: 'comparisonType_relative', group: 'freqsMode', xtype: 'menucheckitem'},
-				               {text: this.localize("tfidf"), itemId: 'comparisonType_tfidf', group: 'freqsMode', xtype: 'menucheckitem'}
-				            ],
-	       					listeners: {
-	    						click: function(menu, item) {
-	    							if (item !== undefined) {
-	    								var type = item.getItemId().split('_')[1];
-	    								if (type !== this.getApiParam('comparisonType')) {
-		    								this.setApiParam('comparisonType', type);
-		    								this.loadFromApis(true);
-	    								}
-	    							}
-	    						},
-	    						scope: this
-	    				    }
-    				    }
-                	},{
-                		text: this.localize('clusters'),
-                		itemId: 'clusters',
-                		glyph: 'xf192@FontAwesome',
-    	            	flex: 1,
-                		menu: {
-                			items: [
-                			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
-                			    {text: '2', itemId: 'clusters_2', group: 'clusters', xtype: 'menucheckitem'},
-                			    {text: '3', itemId: 'clusters_3', group: 'clusters', xtype: 'menucheckitem'},
-                			    {text: '4', itemId: 'clusters_4', group: 'clusters', xtype: 'menucheckitem'},
-                			    {text: '5', itemId: 'clusters_5', group: 'clusters', xtype: 'menucheckitem'}
-                			],
-        					listeners: {
-        						click: function(menu, item) {
-        							if (item !== undefined) {
-        								var clusters = parseInt(item.getItemId().split('_')[1]);
-        								if (clusters !== this.getApiParam('clusters')) {
-	        								this.setApiParam('clusters', clusters);
-	        								this.loadFromApis(true);
-        								}
-        							}
-        						},
-        						scope: this
-        					}
-                		}
-                	},{
-                		text: this.localize('dimensions'),
-                		itemId: 'dimensions',
-                		glyph: 'xf1b2@FontAwesome',
-    	            	flex: 1,
-                		menu: {
-                			items: [
-                			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
-                			    {text: '3', itemId: 'dimensions_3', group: 'dimensions', xtype: 'menucheckitem'}
-                			],
-        					listeners: {
-        						click: function(menu, item) {
-        							if (item !== undefined) {
-        								var dims = parseInt(item.getItemId().split('_')[1]);
-        								if (dims !== this.getApiParam('dimensions')) {
-	        								if (dims == 3 && this.getApiParam('analysis') == 'ca' && this.getCorpus().getDocumentsCount() == 3) {
-	        									dims = 2;
-	        									// TODO add info message 'Because of the nature of Correspondence Analysis, you can only use 2 dimensions with 3 documents.'
-	        									return false;
-	        								}
-	        								
-	        								this.setApiParam('dimensions', dims);
-	        								this.loadFromApis(true);
-        								}
-        							}
-        						},
-        						scope: this
-        					}
-                		}
-                	},{
                 		text: this.localize('labels'),
                 		itemId: 'labels',
                 		glyph: 'xf02b@FontAwesome',
-    	            	flex: 1,
                 		menu: {
                 			items: [
                 			    {text: this.localize("summaryLabel"), itemId: 'summary', xtype: 'menucheckitem'},
@@ -19719,22 +19630,210 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		},
         		listeners: {
         			query: function(component, value) {
-        				if (value !== undefined) {
-	        				this.getTermStore().filter([{property: 'term', value: value, anyMatch: true}]);
-	        				this.filterChart(value);
-        				}
+        				this.getTermStore().filter([{property: 'term', value: value, anyMatch: true}]);
+        				this.filterChart(value);
         			},
         			scope: this
         		}
+    		},{
+    			itemId: 'optionsPanel',
+        		title: this.localize('options'),
+        		region: 'west',
+        		split: true,
+        		collapsible: true,
+        		collapseMode: 'header',
+        		width: 135,
+        		scrollable: 'y',
+        		layout: {
+        			type: 'vbox',
+        			align: 'stretch'
+        		},
+        		defaults: {
+        			xtype: 'button',
+        			margin: '5',
+        			labelAlign: 'top'
+        		},
+        		items: [{
+        			xtype: 'label',
+        			text: this.localize('input')
+        		},{
+    				xtype: 'documentselectorbutton'
+    			},{
+	            	text: this.localize('freqsMode'),
+	            	itemId: 'comparisonType',
+					glyph: 'xf201@FontAwesome',
+				    tooltip: this.localize('freqsModeTip'),
+				    menu: {
+				    	items: [
+			               {text: this.localize("rawFrequencies"), itemId: 'comparisonType_raw', group: 'freqsMode', xtype: 'menucheckitem'},
+			               {text: this.localize("relativeFrequencies"), itemId: 'comparisonType_relative', group: 'freqsMode', xtype: 'menucheckitem'},
+			               {text: this.localize("tfidf"), itemId: 'comparisonType_tfidf', group: 'freqsMode', xtype: 'menucheckitem'}
+			            ],
+       					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								var type = item.getItemId().split('_')[1];
+    								if (type !== this.getApiParam('comparisonType')) {
+	    								this.setApiParam('comparisonType', type);
+	    								this.loadFromApis(true);
+    								}
+    							}
+    						},
+    						scope: this
+    				    }
+				    }
+        		},{
+        			fieldLabel: this.localize('numTerms'),
+        			itemId: 'limit',
+        			xtype: 'numberfield',
+        			minValue: 5,
+        			listeners: {
+        				change: function(numb, newValue, oldValue) {
+        					function doLoad() {
+        						this.setApiParam('limit', newValue);
+            					this.loadFromApis();
+							}
+							if (oldValue !== null) {
+								if (this.getTermsTimeout() !== null) {
+									clearTimeout(this.getTermsTimeout());
+								}
+								if (numb.isValid()) {
+									this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
+								}
+							}
+        				},
+        				scope: this
+        			}
+        		},{
+        			xtype: 'container',
+        			html: '<hr style="border: none; border-top: 1px solid #cfcfcf;"/>'
+        		},{
+        			xtype: 'label',
+        			text: this.localize('output')
+        		},{
+            		text: this.localize('analysis'),
+            		itemId: 'analysis',
+            		glyph: 'xf1ec@FontAwesome',
+                    overflowHandler: 'scroller',
+        			menu: {
+    					items: [
+    					    {text: this.localize('pca'), itemId: 'analysis_pca', group:'analysis', xtype: 'menucheckitem'},
+    					    {text: this.localize('ca'), itemId: 'analysis_ca', group:'analysis', xtype: 'menucheckitem'},
+    					    {text: this.localize('tsne'), itemId: 'analysis_tsne', group:'analysis', xtype: 'menucheckitem'},
+    					    {text: this.localize('docSim'), itemId: 'analysis_docSim', group:'analysis', xtype: 'menucheckitem'}
+    					],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								var analysis = item.getItemId().split('_')[1];
+    								if (analysis !== this.getApiParam('analysis')) {
+    									this.doAnalysisChange(analysis);
+    									this.loadFromApis(true);
+    								}
+    							}
+    						},
+    						scope: this
+    					}
+        			}
+	            },{
+	            	fieldLabel: this.localize('perplexity'),
+	            	itemId: 'perplexity',
+	            	xtype: 'slider',
+	            	minValue: 5,
+	            	maxValue: 100,
+	            	increment: 1,
+	            	listeners: {
+	            		changecomplete: function(slider, newValue) {
+	            			this.setApiParam('perplexity', newValue);
+	            			this.loadFromApis(true);
+	            		},
+	            		scope: this
+	            	}
+	            },{
+	            	fieldLabel: this.localize('iterations'),
+	            	itemId: 'iterations',
+	            	xtype: 'slider',
+	            	minValue: 100,
+	            	maxValue: 5000,
+	            	increment: 100,
+	            	listeners: {
+	            		changecomplete: function(slider, newValue) {
+	            			this.setApiParam('iterations', newValue);
+	            			this.loadFromApis(true);
+	            		},
+	            		scope: this
+	            	}
+	            },{
+            		text: this.localize('clusters'),
+            		itemId: 'clusters',
+            		glyph: 'xf192@FontAwesome',
+            		menu: {
+            			items: [
+            			    {text: '1', itemId: 'clusters_1', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '2', itemId: 'clusters_2', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '3', itemId: 'clusters_3', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '4', itemId: 'clusters_4', group: 'clusters', xtype: 'menucheckitem'},
+            			    {text: '5', itemId: 'clusters_5', group: 'clusters', xtype: 'menucheckitem'}
+            			],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								var clusters = parseInt(item.getItemId().split('_')[1]);
+    								if (clusters !== this.getApiParam('clusters')) {
+        								this.setApiParam('clusters', clusters);
+        								this.loadFromApis(true);
+    								}
+    							}
+    						},
+    						scope: this
+    					}
+            		}
+            	},{
+            		text: this.localize('dimensions'),
+            		itemId: 'dimensions',
+            		glyph: 'xf1b2@FontAwesome',
+            		menu: {
+            			items: [
+            			    {text: '2', itemId: 'dimensions_2', group: 'dimensions', xtype: 'menucheckitem'},
+            			    {text: '3', itemId: 'dimensions_3', group: 'dimensions', xtype: 'menucheckitem'}
+            			],
+    					listeners: {
+    						click: function(menu, item) {
+    							if (item !== undefined) {
+    								var dims = parseInt(item.getItemId().split('_')[1]);
+    								if (dims !== this.getApiParam('dimensions')) {
+        								if (dims == 3 && this.getApiParam('analysis') == 'ca' && this.getCorpus().getDocumentsCount() == 3) {
+        									dims = 2;
+        									// TODO add info message 'Because of the nature of Correspondence Analysis, you can only use 2 dimensions with 3 documents.'
+        									return false;
+        								}
+        								
+        								this.setApiParam('dimensions', dims);
+        								this.loadFromApis(true);
+    								}
+    							}
+    						},
+    						scope: this
+    					}
+            		}
+        		},{
+        			itemId: 'reloadButton',
+        			text: this.localize('reload'),
+        			glyph: 'xf021@FontAwesome',
+        			handler: function() {
+        				this.loadFromApis();
+        			},
+        			scope: this
+        		}]
         	},{
         		itemId: 'termsGrid',
         		xtype: 'grid',
- //       		title: 'Terms',
+        		title: this.localize('terms'),
         		region: 'east',
         		width: 250,
         		split: true,
-//        		collapsible: true,
-//        		border: true,
+        		collapsible: true,
+        		collapseMode: 'header',
         		forceFit: true,
         		features: [{
         			ftype: 'grouping',
@@ -19788,42 +19887,44 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		},
         		tbar: {
                     overflowHandler: 'scroller',
-                    items: [{
-                		fieldLabel: this.localize('numTerms'),
-                		labelAlign: 'right',
-                		labelWidth: 40,
-                		itemId: 'limit',
-                		xtype: 'combo',
-                		width: 100,
-                		store: Ext.create('Ext.data.ArrayStore', {
-                			fields: ['count'],
-                			data: [[10],[20],[30],[40],[50],[60],[70],[80],[90],[100]]
-                		}),
-                		displayField: 'count',
-                		valueField: 'count',
-                		queryMode: 'local',
-                		editable: true,
-                		allowBlank: false,
-                		validator: function(val) {
-                			return val.match(/\D/) === null;
-                		},
-                		listeners: {
-    						change: function(combo, newVal, oldVal) {
-    							function doLoad() {
-    								var val = Math.min(parseInt(newVal), 10000);
-    								this.setApiParam('limit', val);
-									this.loadFromApis();
-    							}
-    							if (combo.isValid() && oldVal !== null) {
-    								if (this.getTermsTimeout() !== null) {
-    									clearTimeout(this.getTermsTimeout());
-    								}
-    								this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
-    							}
-    						},
-    						scope: this
-    					}
-                	},{
+                    items: [
+//                    {
+//                		fieldLabel: this.localize('numTerms'),
+//                		labelAlign: 'right',
+//                		labelWidth: 40,
+//                		itemId: 'limit',
+//                		xtype: 'combo',
+//                		width: 100,
+//                		store: Ext.create('Ext.data.ArrayStore', {
+//                			fields: ['count'],
+//                			data: [[10],[20],[30],[40],[50],[60],[70],[80],[90],[100]]
+//                		}),
+//                		displayField: 'count',
+//                		valueField: 'count',
+//                		queryMode: 'local',
+//                		editable: true,
+//                		allowBlank: false,
+//                		validator: function(val) {
+//                			return val.match(/\D/) === null;
+//                		},
+//                		listeners: {
+//    						change: function(combo, newVal, oldVal) {
+//    							function doLoad() {
+//    								var val = Math.min(parseInt(newVal), 10000);
+//    								this.setApiParam('limit', val);
+//									this.loadFromApis();
+//    							}
+//    							if (combo.isValid() && oldVal !== null) {
+//    								if (this.getTermsTimeout() !== null) {
+//    									clearTimeout(this.getTermsTimeout());
+//    								}
+//    								this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
+//    							}
+//    						},
+//    						scope: this
+//    					}
+//                	},
+                	{
                     	xtype: 'querysearchfield',
                     	itemId: 'addTerms',
 //                    	emptyText: this.localize('addTerm'),
@@ -19882,7 +19983,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		store: this.getTermStore(),
         		listeners: {
         			query: function(component, value) {
-        				if (value !== undefined && this.getTermStore().findExact('term', value) === -1) {
+        				if (value.length > 0 && this.getTermStore().findExact('term', value[0]) === -1) {
 	                		this.setNewTerm(value);
 	                		this.loadFromApis();
     					} else {
@@ -19905,17 +20006,19 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		var setCheckBound = setCheckItemFromApi.bind(this);
     		
     		setCheckBound('analysis');
-    		this.queryById('nearbyButton').setDisabled(this.getApiParam('analysis') === 'tsne');
+    		this.doAnalysisChange(this.getApiParam('analysis'));
     		
     		setCheckBound('comparisonType');
-//    		setCheckBound('limit');
     		setCheckBound('clusters');
+
+    		this.queryById('perplexity').setValue(this.getApiParam('perplexity'));
+    		this.queryById('iterations').setValue(this.getApiParam('iterations'));
     		
     		if (corpus.getDocumentsCount() == 3) {
     			this.setApiParam('dimensions', 2);
     		}
     		setCheckBound('dimensions');
-    		
+
     		this.getCaStore().setCorpus(corpus);
     		this.getPcaStore().setCorpus(corpus);
     		this.getDocSimStore().setCorpus(corpus);
@@ -19928,6 +20031,25 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	}, this);
         
     	this.callParent(arguments);
+    },
+    
+    doAnalysisChange: function(analysis) {
+    	this.setApiParam('analysis', analysis);
+		this.queryById('nearbyButton').setDisabled(analysis === 'tsne');
+		this.queryById('reloadButton').setVisible(analysis === 'tsne');
+		this.queryById('perplexity').setVisible(analysis === 'tsne');
+		this.queryById('iterations').setVisible(analysis === 'tsne');
+		if (analysis === 'ca') {
+			if (this.getCorpus().getDocumentsCount() == 3) {
+				this.setApiParam('dimensions', 2);
+				this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
+			}
+		}
+    },
+    
+    maskAndBuildChart: function(store) {
+    	this.queryById('chartParent').mask(this.localize('plotting'));
+    	Ext.defer(this.buildChart, 50, this, [store]);
     },
     
     buildChart: function(store) {
@@ -19996,7 +20118,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         tokens.forEach(function(token) {
         	var freq = token.get('rawFreq');
         	var category = token.get('category');
-        	if (category === undefined) category = 'term'; // PCA doesn't define categories
+        	if (category === undefined) {
+        		category = 'term'; // some analyses don't define categories
+        		token.set('category', 'term');
+        	}
         	var isTerm = category === 'term';
         	if (isTerm) {
 	        	if (freq > maxFreq) maxFreq = freq;
@@ -20007,8 +20132,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
         	}
         	if (numDims === 3) {
 				var z = token.get('vector')[2];
-				if (z < minFill) minFill = z;
-				if (z > maxFill) maxFill = z;
+				if (z !== undefined) {
+					if (z < minFill) minFill = z;
+					if (z > maxFill) maxFill = z;
+				}
 			}
         	var tokenData = {
         		x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2],
@@ -20113,7 +20240,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				if (item.get('disabled') === true) {
 	    					fillAlpha = 0.1;
 	    					strokeAlpha = 0.1;
-	    				} else if (numDims === 3) {
+	    				} else if (numDims === 3 && item.get('z')) {
 	    					fillAlpha = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
 	    				}
 	    				var color = scatterplot.getApplication().getColor(clusterIndex);
@@ -20166,7 +20293,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	    				}
 	    				
 	    				var a = 0.65;
-	    				if (numDims === 3) {
+	    				if (numDims === 3 && item.get('z')) {
 	    					a = scatterplot.interpolate(item.get('z'), minFill, maxFill, 0, 1);
 	    				}
 	    				
@@ -20233,10 +20360,13 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	
     	var chart = Ext.create('Ext.chart.CartesianChart', config);
     	this.queryById('chartParent').insert(0, chart);
+    	
+    	this.queryById('chartParent').unmask();
+    	
     	this.doLabels();
     	
     	if (this.getNewTerm() !== null) {
-        	this.selectTerm(this.getNewTerm());
+        	this.selectTerm(this.getNewTerm()[0]);
         	this.setNewTerm(null);
         }
     },
@@ -20312,10 +20442,14 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     getPointFromIndex: function(series, index) {
 		var sprite = series.getSprites()[0];
-		var matrix = sprite.attr.matrix.clone().prependMatrix(sprite.surfaceMatrix);
-		var dataX = sprite.attr.dataX[index];
-		var dataY = sprite.attr.dataY[index];
-		return matrix.transformPoint([dataX, dataY]);
+		if (sprite.surfaceMatrix !== null) {
+			var matrix = sprite.attr.matrix.clone().prependMatrix(sprite.surfaceMatrix);
+			var dataX = sprite.attr.dataX[index];
+			var dataY = sprite.attr.dataY[index];
+			return matrix.transformPoint([dataX, dataY]);
+		} else {
+			return [0,0];
+		}
     },
     
     doHighlight: function() {
@@ -20416,14 +20550,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
     },
     
     loadFromApis: function(keepCurrentTerms) {
-    	var chart = this.down('#chart');
-    	if (chart !== null) {
-    		chart.mask(this.localize('loading'));
-    	}
+    	this.queryById('chartParent').mask(this.localize('analyzing'));
+    	
     	var params = {};
     	var terms = this.getCurrentTerms();
     	if (this.getNewTerm() !== null) {
-    		terms.push(this.getNewTerm());
+    		terms = terms.concat(this.getNewTerm());
     		this.setApiParam('limit', terms.length);
     	}
     	if (terms.length > 0) {
@@ -26157,6 +26289,22 @@ Ext.define("Voyant.notebook.editor.button.RunAll", {
 		this.callParent(arguments);
 	}
 })
+Ext.define("Voyant.notebook.editor.button.RunUntil", {
+	extend: "Ext.button.Button",
+	mixins: ["Voyant.util.Localization"],
+	alias: 'widget.notebookwrapperrununtil',
+	statics: {
+		i18n: {
+			tip: "Run all code blocks up to and including this one."
+		}
+	},
+	glyph: 'xf050@FontAwesome',
+	constructor: function(config) {
+		config = config || {};
+		config.tooltip = this.localize('tip');
+		this.callParent(arguments);
+	}
+})
 Ext.define("Voyant.notebook.editor.EditorWrapper", {
 	extend: "Ext.panel.Panel",
 	mixins: ["Voyant.util.Localization"],
@@ -26184,15 +26332,7 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 			}, this);
 			this.mon(this.getEl(), "mouseout", function() {
 				this.setActiveMode(false);
-			}, this);
-			
-			// resize as needed (this adds considerable overhead, but it's probably worth it)
-			this.getTargetEl().on("resize", function(el) {
-				var height = 20;
-				me.items.each(function(item) {height+=item.getHeight();})
-				me.setSize({height: height});
-			})
-			
+			}, this);			
 		}, this);
 		this.callParent(arguments);
 	},
@@ -26226,7 +26366,8 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		theme: 'ace/theme/chrome',
 		mode: 'ace/mode/javascript',
 		content: '',
-		docs: undefined
+		docs: undefined,
+		isChangeRegistered: false
 	},
 	statics: {
 		i18n: {
@@ -26241,7 +26382,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.getSession().setUseWorker(true);
 			this.editor.setTheme(this.getTheme());
 			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: 100, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			this.editor.setOptions({minLines: 6, maxLines: 100/*, autoScrollEditorIntoView: true, scrollPastEnd: true*/});
 			this.editor.setHighlightActiveLine(false);
 			this.editor.renderer.setShowPrintMargin(false);
 			this.editor.renderer.setShowGutter(false);
@@ -26249,6 +26390,12 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.clearSelection()
 		    this.editor.on("focus", function() {
 		    	me.editor.renderer.setShowGutter(true);
+		    }, this)
+		    this.editor.on("change", function() {
+		    	if (me.getIsChangeRegistered()==false) {
+		    		me.setIsChangeRegistered(true);
+			    	me.up('notebookcodeeditorwrapper').setIsRun(false);
+		    	}
 		    }, this)
 		    this.editor.on("blur", function() {
 		    	me.editor.renderer.setShowGutter(false);
@@ -26262,11 +26409,6 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			});
 			
 			ace.config.loadModule('ace/ext/tern', function () {
-				var moi = function(testing) {}
-				var myContext = {
-						   name: 'myContext',
-						   obj: moi
-						}
 	            me.editor.setOptions({
 	                /**
 	                 * Either `true` or `false` or to enable with custom options pass object that
@@ -26275,26 +26417,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	                 */
 	                enableTern: {
 	                    /* http://ternjs.net/doc/manual.html#option_defs */
-	                    defs: [/*'browser', */'ecma5', me.docs/*, {
-	                    	  "!name": "mylibrary",
-	                    	  "!define": {
-	                    	    "point": {
-	                    	      "x": "number",
-	                    	      "y": "number"
-	                    	    }
-	                    	  },
-	                    	  "MyConstructor": {
-	                    	    "!type": "fn(arg: string)",
-	                    	    "staticFunction": "fn() -> bool",
-	                    	    "prototype": {
-	                    	      "property": "[number]",
-	                    	      "clone": "fn() -> +MyConstructor",
-	                    	      "getPoint": "fn(i: number) -> point"
-	                    	    }
-	                    	  },
-	                    	  "someOtherGlobal": "string"
-	                    	}*/], // not sure what browser does here
-	                    /* http://ternjs.net/doc/manual.html#plugins */
+	                    defs: ['ecma5', me.docs],
 	                    plugins: {
 	                        doc_comment: {
 	                            fullDocs: true
@@ -26304,19 +26427,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	                     * (default is true) If web worker is used for tern server.
 	                     * This is recommended as it offers better performance, but prevents this from working in a local html file due to browser security restrictions
 	                     */
-	                    useWorker: true,
-	                    /* if your editor supports switching between different files (such as tabbed interface) then tern can do this when jump to defnition of function in another file is called, but you must tell tern what to execute in order to jump to the specified file */
-	                    switchToDoc: function (name, start) {
-	                        console.log('switchToDoc called but not defined. name=' + name + '; start=', start);
-	                    },
-	                    /**
-	                     * if passed, this function will be called once ternServer is started.
-	                     * This is needed when useWorker=false because the tern source files are loaded asynchronously before the server is started.
-	                     */
-	                    startedCb: function () {
-	                        //once tern is enabled, it can be accessed via editor.ternServer
-	                        console.log('editor.ternServer:', me.editor.ternServer);
-	                    }
+	                    useWorker: true
 	                },
 	                /**
 	                 * when using tern, it takes over Ace's built in snippets support.
@@ -26344,6 +26455,15 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	requires: ["Voyant.notebook.editor.CodeEditor","Voyant.notebook.editor.button.Run",,"Voyant.notebook.editor.button.RunAll"],
 	alias: "widget.notebookcodeeditorwrapper",
 	cls: 'notebook-code-wrapper',
+	statics: {
+		i18n: {
+			previousNotRunTitle: "Previous Code Blocks",
+			previousNotRun: "There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?"
+		}
+	},
+	config: {
+		isRun: false
+	},
 	layout: {
 		type: 'vbox',
 		align: 'stretch'
@@ -26379,11 +26499,22 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 							}
 						}
 					},{
-						xtype: 'notebookwrapperrunall',
+						xtype: 'notebookwrapperrununtil',
 						listeners: {
 							click: {
 								fn: function() {
 									this.up('notebook').runAllCode(this)
+								},
+								scope: this
+							}
+						}
+					},{
+						
+						xtype: 'notebookwrapperrunall',
+						listeners: {
+							click: {
+								fn: function() {
+									this.up('notebook').runAllCode()
 								},
 								scope: this
 							}
@@ -26412,7 +26543,39 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 
 	},
 	
-	run: function() {
+	initComponent: function() {
+		var me = this;
+		me.on("afterrender", function(){
+			this.getTargetEl().on("resize", function(el) {
+				var height = 20;
+				me.items.each(function(item) {height+=item.getHeight();})
+				me.setSize({height: height});
+			})
+		}, this);
+		me.callParent(arguments);
+	},
+	
+	run: function(runningAll) {
+		if (runningAll===true) {
+			this._run();
+		} else {
+			var notebook = this.up('notebook');
+			Ext.Array.each(notebook.query('notebookcodeeditorwrapper'), function(wrapper) {
+				if (wrapper==this) {this._run(); return false;} // break
+				if (wrapper.getIsRun()==false) {
+					Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
+						if (btnId=='yes') {
+							notebook.runAllCode();
+						} else {
+							this._run();
+						}
+					}, this)
+				}
+			}, this);
+		}
+	},
+	
+	_run: function() {
 		this.results.show();
 		this.results.update(' ');
 		this.results.mask('working…');
@@ -26432,7 +26595,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			Voyant.application.releaseAllDeferred();
 			Voyant.notebook.util.Show.showError(e);
 		}
+		this.setIsRun(true);
 		return success;
+	},
+	
+	clearResults: function() {
+		this.results.show();
+		this.results.update(' ');
+		this.getTargetEl().fireEvent('resize');
 	},
 	
 	tryToUnmask: function() {
@@ -26443,6 +26613,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				}
 			}
 			this.results.unmask();
+			this.getTargetEl().fireEvent('resize');
 		}
 		else {
 			Ext.defer(this.tryToUnmask, 20, this);
@@ -26450,10 +26621,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	
 	getContent: function() {
-		var resultEl = this.results.getTargetEl().dom.cloneNode(true);
+		var el = this.results.getTargetEl(), resultEl = el.dom.cloneNode(true);
+		var html = resultEl.innerHTML;
+		if (!resultEl.style.height) {
+			html = "<div style='height: "+el.getHeight()+"px'>"+html+"</div>";
+		}
 		return {
 			input: this.editor.getValue(),
-			output: resultEl.innerHTML
+			output: html
 		}
 	}
 })
@@ -26598,7 +26773,11 @@ Ext.define('Voyant.notebook.Notebook', {
 			originalJson: "Original JSON string",
 			exportJson: "Spiral Notebook data format (JSON)",
 			exportHtml: "HTML (suitable for saving or printing)",
-			editsAndLeaving: "It looks like you've been editing content and you will lose any content if you follow this link. Continue?"
+			editsAndLeaving: "It looks like you've been editing content and you will lose any content if you follow this link. Continue?",
+			fetchingNotebook: "Fetching notebook…",
+			openTip: "Open a Spiral Notebook (by pasting in JSON code).",
+			newTip: "Create a new Spiral Notebook in a new window.",
+			runallTip: "Run all code blocks in this notebook"
     	},
     	api: {
     		input: undefined
@@ -26690,12 +26869,6 @@ Ext.define('Voyant.notebook.Notebook', {
     				xtype: 'toolmenu',
     				glyph: 'xf04e@FontAwesome',
     				scope: this
-    			},
-    			'edit': {
-    				tooltip: this.localize("editModeTip"),
-    				callback: function() {
-    					this.toggleEditMode();
-    				}
     			}
 			 }
     	})
@@ -26802,8 +26975,15 @@ Ext.define('Voyant.notebook.Notebook', {
     		} else if (notebook=="gist") {
 				return this.loadFromUrl(url, isRun);
     		} else {
-    			
-    			this.loadFromUrl(url, isRun);
+    			// special compilation of a notebook series
+    			if (url=='alta/' && queryParams && queryParams.all && queryParams.all=='true') {
+        			this.loadFromUrl('alta/Start', isRun);
+        			this.loadFromUrl('alta/Create', isRun);
+        			this.loadFromUrl('alta/SmallerCorpus', isRun);
+        			this.loadFromUrl('alta/Tables', isRun);
+    			} else {
+        			this.loadFromUrl(url, isRun);
+    			}
     		}
     	}
     	
@@ -26881,7 +27061,6 @@ Ext.define('Voyant.notebook.Notebook', {
     
     redoOrder: function() {
     	this.query("notebookwrappercounter").forEach(function(counter, i) {
-    		console.warn(counter, i)
     		counter.setOrder(i);
     	})
     },
@@ -27032,18 +27211,13 @@ Ext.define('Voyant.notebook.Notebook', {
     	}))
     },
     
-    runAllCode: function(startCmp) {
+    runAllCode: function(upToCmp) {
     	var containers = [];
-    	this.items.each(function(item) {
-    		if (item.isXType('notebookcodeeditorwrapper')) {
-    			if (startCmp && startCmp.id==item.id) {
-    				startCmp=undefined;
-    			}
-    			if (!startCmp) {
-        			containers.push(item);
-    			}
-    		}
-    	})
+    	Ext.Array.each(this.query("notebookcodeeditorwrapper"), function(item) {
+			containers.push(item);
+			item.clearResults();
+    		if (upToCmp && upToCmp==item) {return false;}
+    	}, this);
     	this._runCodeContainers(containers);
     },
     
@@ -27051,7 +27225,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	if (containers.length>0) {
         	if (Voyant.application.getDeferredCount()==0) {
         		var container = containers.shift();
-        		container.run();
+        		container.run(true);
         	}
         	Ext.defer(this._runCodeContainers, 100, this, [containers]);
     	}
@@ -27168,6 +27342,15 @@ Ext.define('Voyant.VoyantApp', {
         
         var extjs = Ext.create('Ext.chart.theme.Base').getColors().map(function(val) { return this.hexToRgb(val); }, this);
         this.addColorPalette('extjs', extjs);
+    },
+    
+    getRelativeUrl: function() {
+    	var url = window.location.pathname.substring(this.getBaseUrl().length);
+    	var relative = "";
+    	for (var i=0, len=url.split("/").length-1; i<len; i++) {
+    		relative+="../"
+    	}
+    	return relative;
     },
     
     getTools: function() {

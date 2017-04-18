@@ -1,6 +1,6 @@
 Ext.define('Voyant.widget.VoyantTableTransform', {
 	extend: 'Ext.panel.Panel',
-    mixins: ['Voyant.util.Localization','Voyant.util.Api'],
+    mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.notebook.util.Embed'],
 	alias: 'widget.voyanttabletransform',
     statics: {
     	i18n: {},
@@ -10,17 +10,43 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
 			width: undefined
 		}
     },
-	constructor: function() {
-        this.callParent(arguments);
+    html: '',
+	constructor: function(config) {
+    	config = config || {};
+		var me = this;
+    	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	if (!config.noEmbed) {
+        	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
+    	}
+        me.callParent(arguments);
+    	me.on("reconfigure", function() {
+    		this.buildFromParams();
+    		this.fireEvent('afterrender');
+    	}, this);
 	},
 	initComponent: function(config) {
     	var me = this, config = config || {};
-    	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	me.buildFromParams();
+		me.on('afterrender', function() {
+			var table = this.getTargetEl().down('table');
+			if (table) {
+				var parent = table.parent();
+				var grid = new Ext.ux.grid.TransformGrid(table, {
+					width: this.getApiParam('width') || parent.getWidth(),
+					height: this.getApiParam('height') || 20+(table.query('tr').length*24) // based on grid heights in crisp
+				});
+				grid.render(parent);
+			}
+		}, me);
+		
+    	me.callParent(arguments);
+	},
+	
+	buildFromParams: function() {
 		var me = this, tableHtml = this.getApiParam('tableHtml'), tableJson = this.getApiParam('tableJson');
 		if (tableHtml) {
-			Ext.apply(me, {
-				html: tableHtml
-			})
+			this.setHtml(tableHtml);
 		} else if (tableJson) {
 			var html = "<table><thead><tr>", json = JSON.parse(tableJson);
 			
@@ -42,21 +68,9 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
 				html+="</tr>";
 			})
 			html+="</tbody></table>";
-			Ext.apply(me, {
-				html: html
-			})
+			this.setHtml(html);
 		}
 		
-		me.on('afterrender', function() {
-			var table = this.getTargetEl().down('table'), parent = table.parent();
-			var grid = new Ext.ux.grid.TransformGrid(table, {
-				width: this.getApiParam('width') || parent.getWidth(),
-				height: this.getApiParam('height') || 20+(table.query('tr').length*24) // based on grid heights in crisp
-			});
-			grid.render(parent);
-		}, me);
-		
-    	me.callParent(arguments);
 	}
 
 })

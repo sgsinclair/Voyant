@@ -7,7 +7,8 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		theme: 'ace/theme/chrome',
 		mode: 'ace/mode/javascript',
 		content: '',
-		docs: undefined
+		docs: undefined,
+		isChangeRegistered: false
 	},
 	statics: {
 		i18n: {
@@ -22,7 +23,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.getSession().setUseWorker(true);
 			this.editor.setTheme(this.getTheme());
 			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: 100, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			this.editor.setOptions({minLines: 6, maxLines: 100/*, autoScrollEditorIntoView: true, scrollPastEnd: true*/});
 			this.editor.setHighlightActiveLine(false);
 			this.editor.renderer.setShowPrintMargin(false);
 			this.editor.renderer.setShowGutter(false);
@@ -30,6 +31,12 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.clearSelection()
 		    this.editor.on("focus", function() {
 		    	me.editor.renderer.setShowGutter(true);
+		    }, this)
+		    this.editor.on("change", function() {
+		    	if (me.getIsChangeRegistered()==false) {
+		    		me.setIsChangeRegistered(true);
+			    	me.up('notebookcodeeditorwrapper').setIsRun(false);
+		    	}
 		    }, this)
 		    this.editor.on("blur", function() {
 		    	me.editor.renderer.setShowGutter(false);
@@ -43,11 +50,6 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			});
 			
 			ace.config.loadModule('ace/ext/tern', function () {
-				var moi = function(testing) {}
-				var myContext = {
-						   name: 'myContext',
-						   obj: moi
-						}
 	            me.editor.setOptions({
 	                /**
 	                 * Either `true` or `false` or to enable with custom options pass object that
@@ -56,26 +58,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	                 */
 	                enableTern: {
 	                    /* http://ternjs.net/doc/manual.html#option_defs */
-	                    defs: [/*'browser', */'ecma5', me.docs/*, {
-	                    	  "!name": "mylibrary",
-	                    	  "!define": {
-	                    	    "point": {
-	                    	      "x": "number",
-	                    	      "y": "number"
-	                    	    }
-	                    	  },
-	                    	  "MyConstructor": {
-	                    	    "!type": "fn(arg: string)",
-	                    	    "staticFunction": "fn() -> bool",
-	                    	    "prototype": {
-	                    	      "property": "[number]",
-	                    	      "clone": "fn() -> +MyConstructor",
-	                    	      "getPoint": "fn(i: number) -> point"
-	                    	    }
-	                    	  },
-	                    	  "someOtherGlobal": "string"
-	                    	}*/], // not sure what browser does here
-	                    /* http://ternjs.net/doc/manual.html#plugins */
+	                    defs: ['ecma5', me.docs],
 	                    plugins: {
 	                        doc_comment: {
 	                            fullDocs: true
@@ -85,19 +68,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	                     * (default is true) If web worker is used for tern server.
 	                     * This is recommended as it offers better performance, but prevents this from working in a local html file due to browser security restrictions
 	                     */
-	                    useWorker: true,
-	                    /* if your editor supports switching between different files (such as tabbed interface) then tern can do this when jump to defnition of function in another file is called, but you must tell tern what to execute in order to jump to the specified file */
-	                    switchToDoc: function (name, start) {
-	                        console.log('switchToDoc called but not defined. name=' + name + '; start=', start);
-	                    },
-	                    /**
-	                     * if passed, this function will be called once ternServer is started.
-	                     * This is needed when useWorker=false because the tern source files are loaded asynchronously before the server is started.
-	                     */
-	                    startedCb: function () {
-	                        //once tern is enabled, it can be accessed via editor.ternServer
-	                        console.log('editor.ternServer:', me.editor.ternServer);
-	                    }
+	                    useWorker: true
 	                },
 	                /**
 	                 * when using tern, it takes over Ace's built in snippets support.

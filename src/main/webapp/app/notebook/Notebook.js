@@ -16,7 +16,11 @@ Ext.define('Voyant.notebook.Notebook', {
 			originalJson: "Original JSON string",
 			exportJson: "Spiral Notebook data format (JSON)",
 			exportHtml: "HTML (suitable for saving or printing)",
-			editsAndLeaving: "It looks like you've been editing content and you will lose any content if you follow this link. Continue?"
+			editsAndLeaving: "It looks like you've been editing content and you will lose any content if you follow this link. Continue?",
+			fetchingNotebook: "Fetching notebook…",
+			openTip: "Open a Spiral Notebook (by pasting in JSON code).",
+			newTip: "Create a new Spiral Notebook in a new window.",
+			runallTip: "Run all code blocks in this notebook"
     	},
     	api: {
     		input: undefined
@@ -108,12 +112,6 @@ Ext.define('Voyant.notebook.Notebook', {
     				xtype: 'toolmenu',
     				glyph: 'xf04e@FontAwesome',
     				scope: this
-    			},
-    			'edit': {
-    				tooltip: this.localize("editModeTip"),
-    				callback: function() {
-    					this.toggleEditMode();
-    				}
     			}
 			 }
     	})
@@ -220,8 +218,15 @@ Ext.define('Voyant.notebook.Notebook', {
     		} else if (notebook=="gist") {
 				return this.loadFromUrl(url, isRun);
     		} else {
-    			
-    			this.loadFromUrl(url, isRun);
+    			// special compilation of a notebook series
+    			if (url=='alta/' && queryParams && queryParams.all && queryParams.all=='true') {
+        			this.loadFromUrl('alta/Start', isRun);
+        			this.loadFromUrl('alta/Create', isRun);
+        			this.loadFromUrl('alta/SmallerCorpus', isRun);
+        			this.loadFromUrl('alta/Tables', isRun);
+    			} else {
+        			this.loadFromUrl(url, isRun);
+    			}
     		}
     	}
     	
@@ -449,18 +454,13 @@ Ext.define('Voyant.notebook.Notebook', {
     	}))
     },
     
-    runAllCode: function(startCmp) {
+    runAllCode: function(upToCmp) {
     	var containers = [];
-    	this.items.each(function(item) {
-    		if (item.isXType('notebookcodeeditorwrapper')) {
-    			if (startCmp && startCmp.id==item.id) {
-    				startCmp=undefined;
-    			}
-    			if (!startCmp) {
-        			containers.push(item);
-    			}
-    		}
-    	})
+    	Ext.Array.each(this.query("notebookcodeeditorwrapper"), function(item) {
+			containers.push(item);
+			item.clearResults();
+    		if (upToCmp && upToCmp==item) {return false;}
+    	}, this);
     	this._runCodeContainers(containers);
     },
     
@@ -468,7 +468,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	if (containers.length>0) {
         	if (Voyant.application.getDeferredCount()==0) {
         		var container = containers.shift();
-        		container.run();
+        		container.run(true);
         	}
         	Ext.defer(this._runCodeContainers, 100, this, [containers]);
     	}

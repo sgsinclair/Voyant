@@ -10,13 +10,13 @@
             "input": [
                 "<h1 style=\"text-align: center;\">Introducing Custom Tables in Spiral Notebook</h1",
                 ">\n\n<p>This notebook will help you work with custom Spiral Tables in your&nbsp;no",
-                "tebooks (it's part of the <a data-tabindex-counter=\"47\" data-tabindex-value=\"non",
+                "tebooks (it's part of the <a data-tabindex-counter=\"49\" data-tabindex-value=\"non",
                 "e\" href=\"./\" tabindex=\"-1\">Art of Literary Text Analysis with Spiral&nbsp;Notebo",
                 "oks</a>). In particular, we'll look at:</p>\n\n<ul>\n\t<li><a data-tabindex-counter=",
-                "\"21\" data-tabindex-value=\"none\" href=\"#create\" tabindex=\"-1\">creating a table</a",
-                "></li>\n\t<li><a data-tabindex-counter=\"13\" data-tabindex-value=\"none\" href=\"#disp",
+                "\"23\" data-tabindex-value=\"none\" href=\"#create\" tabindex=\"-1\">creating a table</a",
+                "></li>\n\t<li><a data-tabindex-counter=\"15\" data-tabindex-value=\"none\" href=\"#disp",
                 "lay\" tabindex=\"-1\">displaying data&nbsp;from a table</a></li>\n\t<li><a data-tabin",
-                "dex-counter=\"47\" data-tabindex-value=\"none\" href=\"#next\" tabindex=\"-1\">next step",
+                "dex-counter=\"49\" data-tabindex-value=\"none\" href=\"#next\" tabindex=\"-1\">next step",
                 "s</a></li>\n</ul>\n\n<p>In the previous notebook we looked at analyzing Edgar Allan",
                 " Poe's \"The Gold Bug\" though we didn't spend much time on one of its key topics:",
                 " cryptography. Indeed, for a literrary short story, there's a fairly good introd",
@@ -36,9 +36,9 @@
                 "\n\t<li>clean the text (so that we are left with letters from a to z)</li>\n\t<li>cr",
                 "eate a table of letters and their frequencies</li>\n\t<li>display output from the ",
                 "table</li>\n</ul>\n\n<h3>Create a Corpus with Text from \"The Gold Bug\"</h3>\n\n<p>Jus",
-                "t as we did in the <a data-tabindex-counter=\"24\" data-tabindex-value=\"none\" href",
+                "t as we did in the <a data-tabindex-counter=\"26\" data-tabindex-value=\"none\" href",
                 "=\"http://SmallerCorpus\" tabindex=\"-1\">previous notebook</a>, we'll start by <a d",
-                "ata-tabindex-counter=\"24\" data-tabindex-value=\"none\" href=\"http://Create#text\" t",
+                "ata-tabindex-counter=\"26\" data-tabindex-value=\"none\" href=\"http://Create#text\" t",
                 "abindex=\"-1\">creating our corpus</a> (in case it doesn't yet exist).</p>\n"
             ]
         },
@@ -51,27 +51,27 @@
                 "}).assign(\"goldbug\").show();"
             ],
             "output": [
-                " <div class=\"info\">This corpus has 1 document with 13,731 <span class=\"info-tip\"",
-                " data-qtip=\"every occurrence of every word (like multiple occurrences of &quot;t",
-                "he&quot;) is counted\">total words</span> and 2,756 <span class=\"info-tip\" data-q",
-                "tip=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">uniq",
-                "ue word forms</span>. Created <span class=\"info-tip\" data-qtip=\"2017-04-09, 16:0",
-                "2:10\">about 17 hours ago</span>.</div>"
+                "<div style='height: 31px'> <div class=\"info\">This corpus has 1 document with 13,",
+                "731 <span class=\"info-tip\" data-qtip=\"every occurrence of every word (like multi",
+                "ple occurrences of &quot;the&quot;) is counted\">total words</span> and 2,756 <sp",
+                "an class=\"info-tip\" data-qtip=\"multiple occurrences of words (like &quot;the&quo",
+                "t;) are counted once\">unique word forms</span>. Created <span class=\"info-tip\" d",
+                "ata-qtip=\"2017-04-17, 21:05:41\">about 19 minutes ago</span>.</div></div>"
             ]
         },
         {
             "type": "text",
             "input": [
                 "<h3>Extract the Actual Text from the Corpus</h3>\n\n<p>You may recall from the&nbs",
-                "p;<a data-tabindex-counter=\"24\" data-tabindex-value=\"none\" href=\"http://smallerc",
+                "p;<a data-tabindex-counter=\"26\" data-tabindex-value=\"none\" href=\"http://smallerc",
                 "orpus/\" tabindex=\"-1\">previous notebook</a> a discussion of <a data-tabindex-cou",
-                "nter=\"24\" data-tabindex-value=\"none\" href=\"http://en.wikipedia.org/wiki/Ajax_(pr",
+                "nter=\"26\" data-tabindex-value=\"none\" href=\"http://en.wikipedia.org/wiki/Ajax_(pr",
                 "ogramming)\" tabindex=\"-1\">asynchronous</a> Javascript which led us to use the as",
                 "sign function (instead of the more complicated <code>promise … then</code> patte",
                 "rn). We can use a similar trick to get our plain text (note that we can assign a",
                 "nd show a subset of the string, but any other processing after assign would need",
                 " to occur in a separate block). We use <a href=\"../../docs/#!/api/Corpus-method-",
-                "getPlainText\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"13",
+                "getPlainText\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"15",
                 "\">getPlainText</a> here because the text isn't too long, we might not want to do",
                 " this with a larger corpus of several books.</p>\n"
             ]
@@ -83,8 +83,8 @@
                 ""
             ],
             "output": [
-                " <div class=\"info\">THE GOLD-BUG\n         \n         What ho! what ho! this fellow",
-                " is dancing mad!\n         \n         He </div>"
+                "<div style='height: 31px'> <div class=\"info\">THE GOLD-BUG\n         \n         Wha",
+                "t ho! what ho! this fellow is dancing mad!\n         \n         He </div></div>"
             ]
         },
         {
@@ -97,9 +97,9 @@
                 "z using a regular expression</li>\n</ol>\n\n<p>The first operation of converting to",
                 " lowercase is trivial, we use the <a href=\"https://developer.mozilla.org/en/docs",
                 "/Web/JavaScript/Reference/Global_Objects/String/toLowerCase\" target=\"_blank\" dat",
-                "a-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"14\">toLowerCase</a>",
+                "a-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"16\">toLowerCase</a>",
                 " function. The second operation is a bit trickier. This isn't the venue to expla",
-                "in <a data-tabindex-counter=\"21\" data-tabindex-value=\"none\" href=\"https://develo",
+                "in <a data-tabindex-counter=\"23\" data-tabindex-value=\"none\" href=\"https://develo",
                 "per.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions\" tabindex=\"-1\">",
                 "regular expressions</a> in detail, but essentially they provide a powerful mecha",
                 "nism for string matching that can use wildcards, character classes and character",
@@ -116,19 +116,22 @@
                 "var clean = text.toLowerCase().replace(/[^a-z]/g, \"\")",
                 "show(clean.substring(0,50))"
             ],
-            "output": " <div class=\"info\">thegoldbugwhathowhathothisfellowisdancingmadhehath</div>"
+            "output": [
+                "<div style='height: 31px'> <div class=\"info\">thegoldbugwhathowhathothisfellowisd",
+                "ancingmadhehath</div></div>"
+            ]
         },
         {
             "type": "text",
             "input": [
                 "<h3>Create a Table of Letter Frequencies</h3>\n\n<p>Creating a&nbsp;<a data-tabind",
-                "ex-counter=\"17\" data-tabindex-value=\"none\" href=\"../../docs/#!/api/Table\" tabind",
+                "ex-counter=\"19\" data-tabindex-value=\"none\" href=\"../../docs/#!/api/Table\" tabind",
                 "ex=\"-1\">Table</a>&nbsp;in Spiral is easy, it can be something as simple as this:",
                 "</p>\n\n<blockquote>\n<pre><code>var table = new VoyantTable();</code></pre>\n</bloc",
                 "kquote>\n\n<p>As we'll see, tables provide convenient methods for updating values ",
                 "and for displaying output. Another benefit of Tables is a convenient way to coun",
                 "t the items in an array. In order to convert our string of letters into an array",
-                " of letters, we'll use the <a data-tabindex-counter=\"21\" data-tabindex-value=\"no",
+                " of letters, we'll use the <a data-tabindex-counter=\"23\" data-tabindex-value=\"no",
                 "ne\" href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Glob",
                 "al_Objects/String/split\" tabindex=\"-1\" target=\"_blank\">split</a> function.</p>\n"
             ]
@@ -141,16 +144,16 @@
                 "table.show();"
             ],
             "output": [
-                " <div class=\"info\"><table class=\"voyant-table\" style=\"\" id=\"ext-260\"><thead><tr>",
-                "<th>e</th><th>t</th><th>a</th><th>o</th><th>i</th><th>n</th><th>s</th><th>h</th>",
-                "<th>r</th><th>d</th><th>l</th><th>u</th><th>c</th><th>m</th><th>f</th><th>w</th>",
-                "<th>p</th><th>y</th><th>g</th><th>b</th><th>v</th><th>k</th><th>x</th><th>j</th>",
-                "<th>q</th><th>z</th></tr></thead><tbody><tr><td>7625</td><td>5485</td><td>4478</",
-                "td><td>4208</td><td>4183</td><td>3912</td><td>3516</td><td>3372</td><td>3278</td",
-                "><td>2533</td><td>2324</td><td>1893</td><td>1523</td><td>1500</td><td>1392</td><",
-                "td>1303</td><td>1170</td><td>1146</td><td>1143</td><td>1031</td><td>525</td><td>",
-                "351</td><td>120</td><td>111</td><td>60</td><td>44</td></tr></tbody></table></div",
-                ">"
+                "<div style='height: 62px'> <div class=\"info\"><table class=\"voyant-table\" style=\"",
+                "\" id=\"ext-285\"><thead><tr><th>e</th><th>t</th><th>a</th><th>o</th><th>i</th><th>",
+                "n</th><th>s</th><th>h</th><th>r</th><th>d</th><th>l</th><th>u</th><th>c</th><th>",
+                "m</th><th>f</th><th>w</th><th>p</th><th>y</th><th>g</th><th>b</th><th>v</th><th>",
+                "k</th><th>x</th><th>j</th><th>q</th><th>z</th></tr></thead><tbody><tr><td>7625</",
+                "td><td>5485</td><td>4478</td><td>4208</td><td>4183</td><td>3912</td><td>3516</td",
+                "><td>3372</td><td>3278</td><td>2533</td><td>2324</td><td>1893</td><td>1523</td><",
+                "td>1500</td><td>1392</td><td>1303</td><td>1170</td><td>1146</td><td>1143</td><td",
+                ">1031</td><td>525</td><td>351</td><td>120</td><td>111</td><td>60</td><td>44</td>",
+                "</tr></tbody></table></div></div>"
             ]
         },
         {
@@ -171,8 +174,9 @@
                 ""
             ],
             "output": [
-                " <div class=\"info\"><pre>e a o i d h n r s t u y c f g l m w b k p q x z\ne t a o ",
-                "i n s h r d l u c m f w p y g b v k x j q z</pre></div>"
+                "<div style='height: 70px'> <div class=\"info\"><pre>e a o i d h n r s t u y c f g ",
+                "l m w b k p q x z\ne t a o i n s h r d l u c m f w p y g b v k x j q z</pre></div",
+                "></div>"
             ]
         },
         {
@@ -193,7 +197,7 @@
                 "de>show()</code> is usually used for the simplest (and static)&nbsp;output possi",
                 "ble while <code>embed()</code> is used for embedding interactive views. We can g",
                 "enerate a default grid from a table by simply calling <a data-tabindex-counter=\"",
-                "13\" data-tabindex-value=\"none\" href=\"../../docs/#!/api/VoyantTable-method-embed\"",
+                "15\" data-tabindex-value=\"none\" href=\"../../docs/#!/api/VoyantTable-method-embed\"",
                 " tabindex=\"-1\" target=\"_blank\">embed</a>&nbsp;(with a parameter to indicate that",
                 " the grid should occupy 100% of the width available).</p>\n"
             ]
@@ -202,22 +206,22 @@
             "type": "code",
             "input": "table.embed({width: \"100%\", height: \"100px\"});",
             "output": [
-                " <div class=\"info\"><iframe style=\"width: 100%; height: 100px\" src=\"/voyant/tool/",
-                "VoyantTableTransform/?minimal=true&amp;tableJson=%7B%22headers%22%3A%5B%22e%22%2",
-                "C%22t%22%2C%22a%22%2C%22o%22%2C%22i%22%2C%22n%22%2C%22s%22%2C%22h%22%2C%22r%22%2",
-                "C%22d%22%2C%22l%22%2C%22u%22%2C%22c%22%2C%22m%22%2C%22f%22%2C%22w%22%2C%22p%22%2",
-                "C%22y%22%2C%22g%22%2C%22b%22%2C%22v%22%2C%22k%22%2C%22x%22%2C%22j%22%2C%22q%22%2",
-                "C%22z%22%5D%2C%22rows%22%3A%5B%5B7625%2C5485%2C4478%2C4208%2C4183%2C3912%2C3516%",
-                "2C3372%2C3278%2C2533%2C2324%2C1893%2C1523%2C1500%2C1392%2C1303%2C1170%2C1146%2C1",
-                "143%2C1031%2C525%2C351%2C120%2C111%2C60%2C44%5D%5D%7D&amp;width=100%25&amp;debug",
-                "=true\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></ifra",
-                "me></div>"
+                "<div style='height: 118px'> <div class=\"info\"><iframe src=\"../../tool/VoyantTabl",
+                "eTransform/?tableJson=%7B%22headers%22%3A%5B%22e%22%2C%22t%22%2C%22a%22%2C%22o%2",
+                "2%2C%22i%22%2C%22n%22%2C%22s%22%2C%22h%22%2C%22r%22%2C%22d%22%2C%22l%22%2C%22u%2",
+                "2%2C%22c%22%2C%22m%22%2C%22f%22%2C%22w%22%2C%22p%22%2C%22y%22%2C%22g%22%2C%22b%2",
+                "2%2C%22v%22%2C%22k%22%2C%22x%22%2C%22j%22%2C%22q%22%2C%22z%22%5D%2C%22rows%22%3A",
+                "%5B%5B7625%2C5485%2C4478%2C4208%2C4183%2C3912%2C3516%2C3372%2C3278%2C2533%2C2324",
+                "%2C1893%2C1523%2C1500%2C1392%2C1303%2C1170%2C1146%2C1143%2C1031%2C525%2C351%2C12",
+                "0%2C111%2C60%2C44%5D%5D%7D&amp;width=100%25&amp;debug=true\" style=\"width: 100%; ",
+                "height: 100px\" id=\"ext-286\" name=\"ext-286\" data-tabindex-value=\"none\" tabindex=\"",
+                "-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
             "type": "text",
             "input": [
-                "<p>Although we can show and hide columns (see <a data-tabindex-counter=\"12\" data",
+                "<p>Although we can show and hide columns (see <a data-tabindex-counter=\"14\" data",
                 "-tabindex-value=\"none\" href=\"../../docs/#!/guide/grids\" tabindex=\"-1\" target=\"_b",
                 "lank\">documentation on grids</a>), in this case the grid isn't all that useful, ",
                 "and arguably harder to read than output from show(). But when tables have severa",
@@ -237,19 +241,19 @@
                 "verticalTable.show();"
             ],
             "output": [
-                " <div class=\"info\"><table class=\"voyant-table\" style=\"\" id=\"ext-261\"><thead><tr>",
-                "<th>Letter</th><th>Count</th></tr></thead><tbody><tr><td>e</td><td>7625</td></tr",
-                "><tr><td>t</td><td>5485</td></tr><tr><td>a</td><td>4478</td></tr><tr><td>o</td><",
-                "td>4208</td></tr><tr><td>i</td><td>4183</td></tr><tr><td>n</td><td>3912</td></tr",
-                "><tr><td>s</td><td>3516</td></tr><tr><td>h</td><td>3372</td></tr><tr><td>r</td><",
-                "td>3278</td></tr><tr><td>d</td><td>2533</td></tr><tr><td>l</td><td>2324</td></tr",
-                "><tr><td>u</td><td>1893</td></tr><tr><td>c</td><td>1523</td></tr><tr><td>m</td><",
-                "td>1500</td></tr><tr><td>f</td><td>1392</td></tr><tr><td>w</td><td>1303</td></tr",
-                "><tr><td>p</td><td>1170</td></tr><tr><td>y</td><td>1146</td></tr><tr><td>g</td><",
-                "td>1143</td></tr><tr><td>b</td><td>1031</td></tr><tr><td>v</td><td>525</td></tr>",
-                "<tr><td>k</td><td>351</td></tr><tr><td>x</td><td>120</td></tr><tr><td>j</td><td>",
-                "111</td></tr><tr><td>q</td><td>60</td></tr><tr><td>z</td><td>44</td></tr></tbody",
-                "></table></div>"
+                "<div style='height: 612px'> <div class=\"info\"><table class=\"voyant-table\" style=",
+                "\"\" id=\"ext-287\"><thead><tr><th>Letter</th><th>Count</th></tr></thead><tbody><tr>",
+                "<td>e</td><td>7625</td></tr><tr><td>t</td><td>5485</td></tr><tr><td>a</td><td>44",
+                "78</td></tr><tr><td>o</td><td>4208</td></tr><tr><td>i</td><td>4183</td></tr><tr>",
+                "<td>n</td><td>3912</td></tr><tr><td>s</td><td>3516</td></tr><tr><td>h</td><td>33",
+                "72</td></tr><tr><td>r</td><td>3278</td></tr><tr><td>d</td><td>2533</td></tr><tr>",
+                "<td>l</td><td>2324</td></tr><tr><td>u</td><td>1893</td></tr><tr><td>c</td><td>15",
+                "23</td></tr><tr><td>m</td><td>1500</td></tr><tr><td>f</td><td>1392</td></tr><tr>",
+                "<td>w</td><td>1303</td></tr><tr><td>p</td><td>1170</td></tr><tr><td>y</td><td>11",
+                "46</td></tr><tr><td>g</td><td>1143</td></tr><tr><td>b</td><td>1031</td></tr><tr>",
+                "<td>v</td><td>525</td></tr><tr><td>k</td><td>351</td></tr><tr><td>x</td><td>120<",
+                "/td></tr><tr><td>j</td><td>111</td></tr><tr><td>q</td><td>60</td></tr><tr><td>z<",
+                "/td><td>44</td></tr></tbody></table></div></div>"
             ]
         },
         {
@@ -264,39 +268,17 @@
             "type": "code",
             "input": "verticalTable.embed('VoyantChart', {width: 500});",
             "output": [
-                " <div class=\"info\"><iframe style=\"width: 500px; height: 400px\" src=\"/voyant/tool",
-                "/VoyantChart/?minimal=true&amp;chartJson=%7B%22store%22%3A%7B%22fields%22%3A%5B%",
-                "22Letter%22%2C%22Count%22%5D%2C%22data%22%3A%5B%7B%22Letter%22%3A%22e%22%2C%22Co",
-                "unt%22%3A7625%7D%2C%7B%22Letter%22%3A%22t%22%2C%22Count%22%3A5485%7D%2C%7B%22Let",
-                "ter%22%3A%22a%22%2C%22Count%22%3A4478%7D%2C%7B%22Letter%22%3A%22o%22%2C%22Count%",
-                "22%3A4208%7D%2C%7B%22Letter%22%3A%22i%22%2C%22Count%22%3A4183%7D%2C%7B%22Letter%",
-                "22%3A%22n%22%2C%22Count%22%3A3912%7D%2C%7B%22Letter%22%3A%22s%22%2C%22Count%22%3",
-                "A3516%7D%2C%7B%22Letter%22%3A%22h%22%2C%22Count%22%3A3372%7D%2C%7B%22Letter%22%3",
-                "A%22r%22%2C%22Count%22%3A3278%7D%2C%7B%22Letter%22%3A%22d%22%2C%22Count%22%3A253",
-                "3%7D%2C%7B%22Letter%22%3A%22l%22%2C%22Count%22%3A2324%7D%2C%7B%22Letter%22%3A%22",
-                "u%22%2C%22Count%22%3A1893%7D%2C%7B%22Letter%22%3A%22c%22%2C%22Count%22%3A1523%7D",
-                "%2C%7B%22Letter%22%3A%22m%22%2C%22Count%22%3A1500%7D%2C%7B%22Letter%22%3A%22f%22",
-                "%2C%22Count%22%3A1392%7D%2C%7B%22Letter%22%3A%22w%22%2C%22Count%22%3A1303%7D%2C%",
-                "7B%22Letter%22%3A%22p%22%2C%22Count%22%3A1170%7D%2C%7B%22Letter%22%3A%22y%22%2C%",
-                "22Count%22%3A1146%7D%2C%7B%22Letter%22%3A%22g%22%2C%22Count%22%3A1143%7D%2C%7B%2",
-                "2Letter%22%3A%22b%22%2C%22Count%22%3A1031%7D%2C%7B%22Letter%22%3A%22v%22%2C%22Co",
-                "unt%22%3A525%7D%2C%7B%22Letter%22%3A%22k%22%2C%22Count%22%3A351%7D%2C%7B%22Lette",
-                "r%22%3A%22x%22%2C%22Count%22%3A120%7D%2C%7B%22Letter%22%3A%22j%22%2C%22Count%22%",
-                "3A111%7D%2C%7B%22Letter%22%3A%22q%22%2C%22Count%22%3A60%7D%2C%7B%22Letter%22%3A%",
-                "22z%22%2C%22Count%22%3A44%7D%5D%7D%2C%22axes%22%3A%5B%7B%22type%22%3A%22numeric%",
-                "22%2C%22position%22%3A%22left%22%7D%2C%7B%22type%22%3A%22category%22%2C%22positi",
-                "on%22%3A%22bottom%22%7D%5D%2C%22series%22%3A%5B%7B%22type%22%3A%22line%22%2C%22x",
-                "Field%22%3A%22Letter%22%2C%22yField%22%3A%22Count%22%2C%22marker%22%3A%7B%22radi",
-                "us%22%3A2%7D%2C%22highlightCfg%22%3A%7B%22scaling%22%3A2%7D%2C%22tooltip%22%3A%7",
-                "B%22trackMouse%22%3Atrue%7D%7D%5D%7D&amp;debug=true\" data-tabindex-value=\"none\" ",
-                "tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 500px; heigh",
+                "t: 400px\" id=\"ext-288\" name=\"ext-288\" src=\"../../tool/VoyantChart/?minimal=true&",
+                "amp;embeddedConfig=376832306917e54f37ef5194043b5421&amp;debug=true\" data-tabinde",
+                "x-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
             "type": "text",
             "input": [
                 "<p>The resulting graph is something close to what's called <a data-tabindex-coun",
-                "ter=\"4\" data-tabindex-value=\"none\" href=\"https://en.wikipedia.org/wiki/Zipf%27s_",
+                "ter=\"6\" data-tabindex-value=\"none\" href=\"https://en.wikipedia.org/wiki/Zipf%27s_",
                 "law\" tabindex=\"-1\" target=\"_blank\">Zipf's Law</a> which states that (for many li",
                 "ngustic phenomena like letter and word counts), frequency is inversely proportio",
                 "nal to rank (or, roughly speaking, each letter is about half as frequent as its ",
@@ -309,13 +291,13 @@
                 " \"t\" in \"The Gold Bug\" is certainly unusual, any theories why? Could you describ",
                 "e in English (not in code) the steps that might be needed to better understand t",
                 "he use and distribution of the letter \"t\"?</li>\n\t<li>create a new corpus from a ",
-                "different <a data-tabindex-counter=\"3\" data-tabindex-value=\"none\" href=\"https://",
+                "different <a data-tabindex-counter=\"5\" data-tabindex-value=\"none\" href=\"https://",
                 "www.gutenberg.org/wiki/Short_Stories_(Bookshelf)\" tabindex=\"-1\" target=\"_blank\">",
                 "short story</a>&nbsp;and start exploring it in the same way we did here, is the ",
                 "order of letters different?</li>\n</ul>\n\n<p>If you're working sequentially&nbsp;t",
-                "hrough the <a data-tabindex-counter=\"13\" data-tabindex-value=\"none\" href=\"./\" ta",
+                "hrough the <a data-tabindex-counter=\"15\" data-tabindex-value=\"none\" href=\"./\" ta",
                 "bindex=\"-1\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>, the ne",
-                "xt notebook&nbsp;is <a data-tabindex-counter=\"1\" data-tabindex-value=\"none\" href",
+                "xt notebook&nbsp;is <a data-tabindex-counter=\"3\" data-tabindex-value=\"none\" href",
                 "=\"Scale\" tabindex=\"-1\" target=\"_blank\">Thinking about Scale</a>.</p>\n"
             ]
         }

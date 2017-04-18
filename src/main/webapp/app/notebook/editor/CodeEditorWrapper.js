@@ -3,6 +3,15 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	requires: ["Voyant.notebook.editor.CodeEditor","Voyant.notebook.editor.button.Run",,"Voyant.notebook.editor.button.RunAll"],
 	alias: "widget.notebookcodeeditorwrapper",
 	cls: 'notebook-code-wrapper',
+	statics: {
+		i18n: {
+			previousNotRunTitle: "Previous Code Blocks",
+			previousNotRun: "There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?"
+		}
+	},
+	config: {
+		isRun: false
+	},
 	layout: {
 		type: 'vbox',
 		align: 'stretch'
@@ -38,11 +47,22 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 							}
 						}
 					},{
-						xtype: 'notebookwrapperrunall',
+						xtype: 'notebookwrapperrununtil',
 						listeners: {
 							click: {
 								fn: function() {
 									this.up('notebook').runAllCode(this)
+								},
+								scope: this
+							}
+						}
+					},{
+						
+						xtype: 'notebookwrapperrunall',
+						listeners: {
+							click: {
+								fn: function() {
+									this.up('notebook').runAllCode()
 								},
 								scope: this
 							}
@@ -71,7 +91,39 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 
 	},
 	
-	run: function() {
+	initComponent: function() {
+		var me = this;
+		me.on("afterrender", function(){
+			this.getTargetEl().on("resize", function(el) {
+				var height = 20;
+				me.items.each(function(item) {height+=item.getHeight();})
+				me.setSize({height: height});
+			})
+		}, this);
+		me.callParent(arguments);
+	},
+	
+	run: function(runningAll) {
+		if (runningAll===true) {
+			this._run();
+		} else {
+			var notebook = this.up('notebook');
+			Ext.Array.each(notebook.query('notebookcodeeditorwrapper'), function(wrapper) {
+				if (wrapper==this) {this._run(); return false;} // break
+				if (wrapper.getIsRun()==false) {
+					Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
+						if (btnId=='yes') {
+							notebook.runAllCode();
+						} else {
+							this._run();
+						}
+					}, this)
+				}
+			}, this);
+		}
+	},
+	
+	_run: function() {
 		this.results.show();
 		this.results.update(' ');
 		this.results.mask('working…');
@@ -91,7 +143,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			Voyant.application.releaseAllDeferred();
 			Voyant.notebook.util.Show.showError(e);
 		}
+		this.setIsRun(true);
 		return success;
+	},
+	
+	clearResults: function() {
+		this.results.show();
+		this.results.update(' ');
+		this.getTargetEl().fireEvent('resize');
 	},
 	
 	tryToUnmask: function() {
@@ -102,6 +161,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				}
 			}
 			this.results.unmask();
+			this.getTargetEl().fireEvent('resize');
 		}
 		else {
 			Ext.defer(this.tryToUnmask, 20, this);
@@ -109,10 +169,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	
 	getContent: function() {
-		var resultEl = this.results.getTargetEl().dom.cloneNode(true);
+		var el = this.results.getTargetEl(), resultEl = el.dom.cloneNode(true);
+		var html = resultEl.innerHTML;
+		if (!resultEl.style.height) {
+			html = "<div style='height: "+el.getHeight()+"px'>"+html+"</div>";
+		}
 		return {
 			input: this.editor.getValue(),
-			output: resultEl.innerHTML
+			output: html
 		}
 	}
 })

@@ -28,10 +28,12 @@ Ext.define("Voyant.notebook.util.Embed", {
     	    		me.setApiParams(api);
     	    		me.fireEvent("reconfigure");
     	    	}).otherwise(function(response) {
-    	    		if (response.responseText) {
-        	    		showError(response);
-        	    		dfd.reject();
+    	    		if (me.getTargetEl) {
+        				Voyant.notebook.util.Show.TARGET = me.getTargetEl();
+        				showError(response);
     	    		}
+    	    		Voyant.application.showError(response);
+    	    		dfd.reject();
     	    	})
 				
 			}
@@ -112,37 +114,36 @@ Ext.define("Voyant.notebook.util.Embed", {
 								delete config.width;
 								delete config.height;
 								
-								var embeddedConfigParam = Ext.Object.toQueryString(embeddedParams);
+		    	    	    	Ext.applyIf(embeddedParams, Voyant.application.getModifiedApiParams());
 								
+								var embeddedConfigParam = Ext.Object.toQueryString(embeddedParams);
 								var iframeId = Ext.id();
-								show('<iframe style="'+config.style+'" id="'+iframeId+'" name="'+iframeId+'"></iframe>');
-								var dfd = Voyant.application.getDeferred(this);
-				    	    	Ext.Ajax.request({
-				    	    	    url: Voyant.application.getTromboneUrl(),
-				    	    	    params: {
-				    	        		tool: 'resource.StoredResource',
-				    	        		storeResource: embeddedConfigParam
-				    	    	    }
-				    	    	}).then(function(response) {
-			    	    	    	var json = Ext.util.JSON.decode(response.responseText);
-			    	    	    	var params = {
-			    	    	    		minimal: true,
-			    	    	    		embeddedConfig: json.storedResource.id
-			    	    	    	}
-			    	    	    	Ext.applyIf(params, Voyant.application.getApiParams());
-			    	    	    	Ext.create(Ext.form.Panel).submit({
-										standardSubmit: true,
-								        params: params,
-								        target: iframeId,
-								        method: 'get',
-								        url: Voyant.application.getBaseUrl()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/'
-								    });
-									dfd.resolve();
-				    	    	}).otherwise(function(response) {
-				    	    		showError(response);
-				    	    		dfd.reject();
-				    	    	})
-
+								var url = Voyant.application.getRelativeUrl()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/?';
+								if (embeddedConfigParam.length>1800) {
+									show('<iframe style="'+config.style+'" id="'+iframeId+'" name="'+iframeId+'"></iframe>');
+									var dfd = Voyant.application.getDeferred(this);
+					    	    	Ext.Ajax.request({
+					    	    	    url: Voyant.application.getTromboneUrl(),
+					    	    	    params: {
+					    	        		tool: 'resource.StoredResource',
+					    	        		storeResource: embeddedConfigParam
+					    	    	    }
+					    	    	}).then(function(response) {
+				    	    	    	var json = Ext.util.JSON.decode(response.responseText);
+				    	    	    	var params = {
+				    	    	    		minimal: true,
+				    	    	    		embeddedConfig: json.storedResource.id
+				    	    	    	}
+				    	    	    	Ext.applyIf(params, Voyant.application.getModifiedApiParams());
+				    	    	    	document.getElementById(iframeId).setAttribute("src",url+Ext.Object.toQueryString(params));
+										dfd.resolve();
+					    	    	}).otherwise(function(response) {
+					    	    		showError(response);
+					    	    		dfd.reject();
+					    	    	})
+								} else {
+									show('<iframe src="'+url+embeddedConfigParam+'" style="'+config.style+'" id="'+iframeId+'" name="'+iframeId+'"></iframe>');
+								}
 								isEmbedded = true;
 								return false;
 							}
