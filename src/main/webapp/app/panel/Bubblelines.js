@@ -52,9 +52,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		bubblelines: undefined,
 		termStore: undefined,
 		docTermStore: undefined,
-		docStore: undefined,
 		selectedDocs: undefined,
-		processedDocs: undefined,
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
 	},
 	
@@ -69,16 +67,37 @@ Ext.define('Voyant.panel.Bubblelines', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
-    		if (this.isVisible()) {
-        		this.getDocStore().load();
+    		this.setDocTermStore(corpus.getDocumentTerms({
+    			proxy: {
+	    			extraParams: {
+						withDistributions: 'raw',
+						withPositions: true
+					}
+    			},
+				listeners: {
+	   		    	 load: function(store, records, successful, options) {
+	   		    		records.forEach(function(record) {
+	   		    			var termData = this.processTerms(record);
+	   		    			var docId = record.get('docId');
+	   		    			var term = record.get('term');
+	   		    			var termObj = {};
+	   		    			termObj[term] = termData;
+	   		    			this.getBubblelines().addTermsToDoc(termObj, docId);
+	   		    		}, this);
+	   		    		this.getBubblelines().doBubblelinesLayout();
+	   				},
+	   				scope: this
+	   		     }
+    		}));
+    		
+    		if (this.isVisible() && this.getBubblelines()) {
+    			this.initLoad();
     		}
-    		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
     	}, this);
     	
         this.on('activate', function() { // load after tab activate (if we're in a tab panel)
-			if (this.getCorpus()) {				
-				Ext.Function.defer(function() {this.getDocStore().load()}, 100, this);
+        	if (this.getCorpus()) {
+				Ext.Function.defer(this.initLoad, 100, this);
 			}
     	}, this);
         
@@ -133,83 +152,6 @@ Ext.define('Voyant.panel.Bubblelines', {
             	scope: this
             }
         }));
-    	
-    	this.setDocStore(Ext.create("Ext.data.Store", {
-			model: "Voyant.data.model.Document",
-    		autoLoad: false,
-    		remoteSort: false,
-    		proxy: {
-				type: 'ajax',
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.DocumentsMetadata'
-				},
-				reader: {
-					type: 'json',
-					rootProperty: 'documentsMetadata.documents',
-					totalProperty: 'documentsMetadata.total'
-				},
-				simpleSortMode: true
-   		     },
-   		     listeners: {
-   		    	load: function(store, records, successful, options) {
-   					this.processDocuments(records);
-   					this.getProcessedDocs().each(function(doc) {
-   						this.getBubblelines().addDocToCache(doc);
-   					}, this);
-   					// get the top 5 corpus terms
-   					this.loadFromCorpusTerms(this.getCorpus().getCorpusTerms({autoload: false}));
-   				},
-   				scope: this
-   		     }
-    	}));
-    	
-    	this.setDocTermStore(Ext.create("Ext.data.Store", {
-			model: "Voyant.data.model.DocumentTerm",
-			asynchronousLoad: false,
-    		autoLoad: false,
-    		remoteSort: false,
-    		proxy: {
-				type: 'ajax',
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.DocumentTerms',
-					withDistributions: 'raw',
-					withPositions: true
-				},
-				reader: {
-					type: 'json',
-		            rootProperty: 'documentTerms.terms',
-		            totalProperty: 'documentTerms.total'
-				},
-				simpleSortMode: true
-   		     },
-   		     listeners: {
-   		    	 load: function(store, records, successful, options) {
-   		    		records.forEach(function(record) {
-   		    			var termData = this.processTerms(record);
-   		    			var docId = record.get('docId');
-   		    			var term = record.get('term');
-   		    			var termObj = {};
-   		    			termObj[term] = termData;
-   		    			this.getBubblelines().addTermsToDoc(termObj, docId);
-   		    		}, this);
-   		    		this.getBubblelines().doBubblelinesLayout();
-
-//   					this.processDocuments();
-//   					if (this.maxFreqChanged) {
-//   						this.calculateBubbleRadii();
-//   					} else {
-//   						this.calculateBubbleRadii(options.params.type);
-//   					}
-//   					this.getBubblelines().setCanvasHeight();
-//   					this.getBubblelines().drawGraph();
-   				},
-   				scope: this
-   		     }
-    	}));
-    	
-    	this.setProcessedDocs(new Ext.util.MixedCollection());
     	
     	Ext.apply(this, {
     		title: this.localize('title'),
@@ -395,15 +337,29 @@ Ext.define('Voyant.panel.Bubblelines', {
     	this.callParent(arguments);
     },
     
-    loadFromCorpusTerms: function(corpusTerms) {
-    	if (this.getBubblelines()) { // get rid of existing terms
-    		this.getBubblelines().removeAllTerms();
-    		this.getTermStore().removeAll(true);
-    	}
-		corpusTerms.load({
-		    callback: function(records, operation, success) {
-		    	var query = []; //this.getApiParam('query') || [];
-				if (typeof query == 'string') query = [query];
+    initLoad: function() {
+    	// get doc info
+    	var docIds = [];
+		this.getCorpus().getDocuments().each(function(doc, index, total) {
+			var inLimit = index < this.getApiParam('maxDocs');
+			this.getBubblelines().addDocToCache({
+				id: doc.getId(),
+				index: doc.getIndex(),
+				title: doc.getShortTitle(),
+				totalTokens: doc.get('tokensCount-lexical'),
+				terms: {},
+				hidden: !inLimit
+			});
+			if (inLimit) {
+				docIds.push(doc.getId());
+			}
+		}, this);
+		this.setApiParam('docId', docIds);
+		
+		// get top terms in corpus
+		this.getCorpus().getCorpusTerms({autoload: false}).load({
+			callback: function(records, operation, success) {
+		    	var query = [];
 		    	records.forEach(function(record, index) {
 					query.push(record.get('term'));
 				}, this);
@@ -411,11 +367,11 @@ Ext.define('Voyant.panel.Bubblelines', {
 		    },
 		    scope: this,
 		    params: {
-		    	limit: this.getApiParam("query") ? undefined : 5,
+		    	limit: this.getApiParam('query') ? undefined : 5,
 		    	stopList: this.getApiParams('stopList'),
-		    	query: this.getApiParam("query")
+		    	query: this.getApiParam('query')
 		    }
-    	});
+		});
     },
     
     /**
@@ -423,18 +379,9 @@ Ext.define('Voyant.panel.Bubblelines', {
      * @param query {String|Array}
      */
     getDocTermsFromQuery: function(query) {
-    	if (query) {this.setApiParam("query", query);} // make sure it's set for subsequent calls
-    	var corpus = this.getCorpus();
-    	if (corpus && this.isVisible()) {
-        	var docs = this.getCorpus().getDocuments();
-        	var len = docs.getCount();
-//        	var maxDocs = parseInt(this.getApiParam('maxDocs'))
-//        	if (len > maxDocs) {len = maxDocs}
-        	for (var i = 0; i < len; i++) {
-        		var doc = docs.getAt(i);
-    	    	this.setApiParams({query: query, docIndex: undefined, docId: doc.getId()});
-    			this.getDocTermStore().load({params: this.getApiParams()});
-        	}
+    	if (query) {this.setApiParam('query', query);} // make sure it's set for subsequent calls
+    	if (this.getCorpus() && this.isVisible()) {
+			this.getDocTermStore().load({params: this.getApiParams()});
     	}
 	},
     
@@ -474,29 +421,6 @@ Ext.define('Voyant.panel.Bubblelines', {
 			this.setSelectedDocs(this.getCorpus().getDocuments().filterBy(function(doc, docId) {
 				return docIds.indexOf(docId) != -1;
 			}, this));
-		}
-	},
-	
-	processDocuments: function(docs) {
-		docs.forEach(this.processDocument, this);
-	},
-	
-	// produce format that bubblelines can use
-	processDocument: function(doc) {
-		var docId = doc.getId();
-		if (!this.getProcessedDocs().containsKey(docId)) {
-			var title = doc.getShortTitle();
-			title = title.replace('&hellip;', '...');
-			var index = doc.get('index');
-			var totalTokens = doc.get('tokensCount-lexical');
-		
-			this.getProcessedDocs().add(docId, {
-				id: docId,
-				index: index,
-				title: title,
-				totalTokens: totalTokens,
-				terms: {}
-			});
 		}
 	},
 	
