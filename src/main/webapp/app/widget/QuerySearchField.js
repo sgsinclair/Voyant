@@ -12,7 +12,8 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		isDocsMode: false,
 		inDocumentsCountOnly: undefined,
 		stopList: undefined,
-		showAggregateInDocumentsCount: false
+		showAggregateInDocumentsCount: false,
+		clearOnQuery: false
 	},
 	hasCorpusLoadedListener: false, 
     
@@ -60,6 +61,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	            hidden: true
     		}
     	}
+    	if (config.clearOnQuery) {
+    		this.setClearOnQuery(config.clearOnQuery);
+    	}
         this.callParent(arguments);
     },
     initComponent: function(config) {
@@ -105,6 +109,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	me.on("change", function(tags, queries) {
     		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
     		me.up('panel').fireEvent("query", me, queries);
+    		if (me.getClearOnQuery()) {
+    			me.removeValue(me.getValueRecords());
+    		}
     		if (me.triggers.count) {
     			me.triggers.count.show();
     			me.triggers.count.getEl().setHtml('0');
