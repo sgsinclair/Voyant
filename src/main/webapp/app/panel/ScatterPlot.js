@@ -410,44 +410,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		},
         		tbar: {
                     overflowHandler: 'scroller',
-                    items: [
-//                    {
-//                		fieldLabel: this.localize('numTerms'),
-//                		labelAlign: 'right',
-//                		labelWidth: 40,
-//                		itemId: 'limit',
-//                		xtype: 'combo',
-//                		width: 100,
-//                		store: Ext.create('Ext.data.ArrayStore', {
-//                			fields: ['count'],
-//                			data: [[10],[20],[30],[40],[50],[60],[70],[80],[90],[100]]
-//                		}),
-//                		displayField: 'count',
-//                		valueField: 'count',
-//                		queryMode: 'local',
-//                		editable: true,
-//                		allowBlank: false,
-//                		validator: function(val) {
-//                			return val.match(/\D/) === null;
-//                		},
-//                		listeners: {
-//    						change: function(combo, newVal, oldVal) {
-//    							function doLoad() {
-//    								var val = Math.min(parseInt(newVal), 10000);
-//    								this.setApiParam('limit', val);
-//									this.loadFromApis();
-//    							}
-//    							if (combo.isValid() && oldVal !== null) {
-//    								if (this.getTermsTimeout() !== null) {
-//    									clearTimeout(this.getTermsTimeout());
-//    								}
-//    								this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
-//    							}
-//    						},
-//    						scope: this
-//    					}
-//                	},
-                	{
+                    items: [{
                     	xtype: 'querysearchfield',
                     	itemId: 'addTerms',
 //                    	emptyText: this.localize('addTerm'),
@@ -505,6 +468,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 },
         		store: this.getTermStore(),
         		listeners: {
+        			expand: function(panel) {
+        				panel.getView().refresh();
+        			},
         			query: function(component, value) {
         				if (value.length > 0 && this.getTermStore().findExact('term', value[0]) === -1) {
 	                		this.setNewTerm(value);
@@ -517,6 +483,13 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		}
         	}]
         });
+        
+        this.on('boxready', function(component, width, height) {
+			if (width < 400) {
+				this.queryById('optionsPanel').collapse();
+				this.queryById('termsGrid').collapse();
+			}
+		}, this);
         
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
