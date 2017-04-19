@@ -5,7 +5,8 @@ Ext.define('Voyant.panel.TermsBerry', {
     statics: {
     	i18n: {
     		tfidf: 'tf-idf',
-    		inDocs: 'In Docs'
+    		inDocs: 'In Docs',
+    		reset: 'Reset'
     	},
     	api: {
     		stopList: 'auto',
@@ -22,7 +23,6 @@ Ext.define('Voyant.panel.TermsBerry', {
     	
     	mode: undefined,
     	
-    	collocatesLimit: 1000000, // a very large number so we get all of them
     	scalingFactor: 3,
     	
     	minRawFreq: undefined,
@@ -32,13 +32,17 @@ Ext.define('Voyant.panel.TermsBerry', {
     	maxFillValue: undefined,
     	
     	currentData: {},
+    	blacklist: {},
     	
     	visLayout: undefined,
     	vis: undefined,
     	visInfo: undefined,
     	visId: undefined,
     	
-    	tip: undefined
+    	currentNode: undefined,
+    	
+    	tip: undefined,
+    	contextMenu: undefined
 	},
     
 	MODE_TOP: 'top',
@@ -46,6 +50,8 @@ Ext.define('Voyant.panel.TermsBerry', {
     
     MIN_TERMS: 5,
     MAX_TERMS: 500,
+    
+    COLLOCATES_LIMIT: 1000000, // a very large number so we get all of them
     
     MIN_SCALING: 1,
     MAX_SCALING: 5,
@@ -72,6 +78,9 @@ Ext.define('Voyant.panel.TermsBerry', {
                 xtype: 'toolbar',
                 overflowHandler: 'scroller',
                 items: [{
+                   xtype: 'querysearchfield',
+                   clearOnQuery: true
+                },{
                 	xtype: 'button',
                 	text: this.localize('strategy'),
                 	menu: {
@@ -160,9 +169,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 	            			
 	            			this.getVisLayout().value(function(d) { return Math.pow(d.rawFreq, 1/value); });
 	            			
-	            			var data = this.processRecordsForVis([]);
-	            			this.resetVis();
-	            			this.buildVisFromData(data);
+	            			this.reload();
 	            		},
 	            		scope: this
 	            	}
@@ -170,6 +177,39 @@ Ext.define('Voyant.panel.TermsBerry', {
                 ]
     		}]
     	});
+    	
+    	this.setContextMenu(Ext.create('Ext.menu.Menu', {
+			renderTo: Ext.getBody(),
+			items: [{
+				xtype: 'box',
+				itemId: 'label',
+				margin: '5px 0px 5px 5px',
+				html: ''
+			},{
+		        xtype: 'menuseparator'
+			},{
+				xtype: 'button',
+				text: 'Remove',
+				style: 'margin: 5px;',
+				handler: function(b, e) {
+					var node = this.getCurrentNode();
+					if (node !== undefined) {
+						delete this.getCurrentData()[node.term];
+						this.getBlacklist()[node.term] = true;
+						this.setCurrentNode(undefined);
+					}
+					this.getContextMenu().hide();
+					this.reload();
+				},
+				scope: this
+			}]
+		}));
+    	
+    	this.on('query', function(src, query) {
+    		if (query.length > 0) {
+    			this.doLoad(query);
+    		}
+		}, this);
     	
     	this.callParent(arguments);
     },
@@ -189,11 +229,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     			
     			this.getVisLayout().size([width, height]);
     			
-    			var data = this.processRecordsForVis([]);
-    			if (data.length > 0) {
-	    			this.resetVis();
-	    			this.buildVisFromData(data);
-    			}
+    			this.reload();
     		}
     	},
     	
@@ -202,15 +238,25 @@ Ext.define('Voyant.panel.TermsBerry', {
     	}
     },
     
-    doLoad: function() {
+    doLoad: function(query) {
 		this.resetVis();
-		this.resetMinMax();
-		this.setCurrentData({});
+		if (query === undefined) {
+			this.resetMinMax();
+			this.setCurrentData({});
+		}
     	if (this.getMode() === this.MODE_DISTINCT) {
-    		this.getDistinctTerms();
+    		this.getDistinctTerms(query);
     	} else {
-    		this.getTopTerms();
+    		this.getTopTerms(query);
     	}
+    },
+    
+    reload: function() {
+    	var data = this.processCollocates([]);
+		if (data.length > 0) {
+			this.resetVis();
+			this.buildVisFromData(data);
+		}
     },
     
     resetMinMax: function() {
@@ -225,12 +271,18 @@ Ext.define('Voyant.panel.TermsBerry', {
     	this.getVis().selectAll('.node').remove();
     },
     
-    getTopTerms: function() {
-    	this.setApiParams({docId: undefined, docIndex: undefined});
+    getTopTerms: function(query) {
+    	var limit = parseInt(this.getApiParam('numInitialTerms'));
+    	var stopList = this.getApiParam('stopList');
+    	if (query !== undefined) {
+    		limit = undefined;
+    		stopList = undefined;
+    	}
     	this.getCorpus().getCorpusTerms().load({
     		params: {
- 				limit: parseInt(this.getApiParam('numInitialTerms')),
- 				stopList: this.getApiParam('stopList')
+    			query: query,
+ 				limit: limit,
+ 				stopList: stopList
  			},
 		    callback: function(records, operation, success) {
 		    	if (success) {
@@ -241,14 +293,20 @@ Ext.define('Voyant.panel.TermsBerry', {
     	});
     },
     
-    getDistinctTerms: function() {
+    getDistinctTerms: function(query) {
+    	var limit = parseInt(this.getApiParam('numInitialTerms'));
+    	var stopList = this.getApiParam('stopList');
+    	if (query !== undefined) {
+    		limit = undefined;
+    		stopList = undefined;
+    	}
     	var perDocLimit = Math.ceil(parseInt(this.getApiParam('numInitialTerms')) / this.getCorpus().getDocumentsCount()); // ceil ensures there's at least 1 per doc
     	this.getCorpus().getDocumentTerms().load({
-			addRecords: true,
 			params: {
-				limit: parseInt(this.getApiParam('numInitialTerms')),
+				query: query,
+				limit: limit,
 				perDocLimit: perDocLimit,
-				stopList: this.getApiParam('stopList'),
+				stopList: stopList,
 				sort: 'TFIDF',
 				dir: 'DESC'
 			},
@@ -261,6 +319,20 @@ Ext.define('Voyant.panel.TermsBerry', {
     	});
     },
     
+    loadFromQuery: function(query) {
+    	this.getCorpus().getCorpusTerms().load({
+    		params: {
+ 				query: query
+ 			},
+		    callback: function(records, operation, success) {
+		    	if (success) {
+		    		this.loadFromRecords(records);
+		    	}
+		    },
+		    scope: this
+    	});
+    },
+    
     loadFromRecords: function(records) {
     	if (Ext.isArray(records) && records.length>0) {
     		var maxFreq = this.getMaxRawFreq();
@@ -270,24 +342,26 @@ Ext.define('Voyant.panel.TermsBerry', {
     		var terms = [];
     		records.forEach(function(r) {
     			var term = r.getTerm();
-    			var rawFreq = r.getRawFreq();
-    			var fillVal = this.getMode() === this.MODE_DISTINCT ? r.get('tfidf') : r.getInDocumentsCount();
-    			
-    			if (maxFreq === undefined || rawFreq > maxFreq) maxFreq = rawFreq;
-    			if (minFreq === undefined || rawFreq < minFreq) minFreq = rawFreq;
-    			
-    			if (maxFillVal === undefined || fillVal > maxFillVal) maxFillVal = fillVal;
-    			if (minFillVal === undefined || fillVal < minFillVal) minFillVal = fillVal;
-    			
-    			this.getCurrentData()[term] = {
-    				term: term,
-    				rawFreq: rawFreq,
-    				relativeFreq: r.get('relativeFreq'),//r.getRelativeFreq(),
-    				fillValue: fillVal,
-    				collocates: []
-    			};
-    			
-    			terms.push(term);
+    			if (!this.getBlacklist()[term]) {
+	    			var rawFreq = r.getRawFreq();
+	    			var fillVal = this.getMode() === this.MODE_DISTINCT ? r.get('tfidf') : r.getInDocumentsCount();
+	    			
+	    			if (maxFreq === undefined || rawFreq > maxFreq) maxFreq = rawFreq;
+	    			if (minFreq === undefined || rawFreq < minFreq) minFreq = rawFreq;
+	    			
+	    			if (maxFillVal === undefined || fillVal > maxFillVal) maxFillVal = fillVal;
+	    			if (minFillVal === undefined || fillVal < minFillVal) minFillVal = fillVal;
+	    			
+	    			this.getCurrentData()[term] = {
+	    				term: term,
+	    				rawFreq: rawFreq,
+	    				relativeFreq: r.get('relativeFreq'),//r.getRelativeFreq(),
+	    				fillValue: fillVal,
+	    				collocates: []
+	    			};
+	    			
+	    			terms.push(term);
+    			}
     		}, this);
     		
     		this.setMaxRawFreq(maxFreq);
@@ -295,27 +369,32 @@ Ext.define('Voyant.panel.TermsBerry', {
     		this.setMinFillValue(minFillVal);
     		this.setMaxFillValue(maxFillVal);
     		
-    		this.loadFromQuery(terms);
+    		this.getCollocatesForQuery(terms);
     	}
     },
     
-    loadFromQuery: function(query) {
+    getCollocatesForQuery: function(query) {
+    	var whitelist = [];
+    	for (var term in this.getCurrentData()) {
+    		whitelist.push(term);
+    	}
+    	 
     	this.setApiParams({
     		mode: 'corpus'
     	});
     	var params = this.getApiParams();
     	this.getCorpus().getCorpusCollocates().load({
-    		params: Ext.apply(Ext.clone(params), {query: query, collocatesWhitelist: query, limit: this.getCollocatesLimit()}),
+    		params: Ext.apply(Ext.clone(params), {query: query, collocatesWhitelist: whitelist, limit: this.COLLOCATES_LIMIT}),
     		callback: function(records, op, success) {
     			if (success) {
-    				this.buildVisFromData(this.processRecordsForVis(records));
+    				this.buildVisFromData(this.processCollocates(records));
     			}
     		},
     		scope: this
     	});
     },
     
-    processRecordsForVis: function(records) {
+    processCollocates: function(records) {
     	var currentTerms = this.getCurrentData();
 
     	var maxCol = this.getMaxCollocateValue();
@@ -345,9 +424,9 @@ Ext.define('Voyant.panel.TermsBerry', {
     	
     	var data = [];
     	for (var term in currentTerms) {
-    		if (currentTerms[term].collocates.length > 0) {
+//    		if (currentTerms[term].collocates.length > 0) {
     			data.push(currentTerms[term]);
-    		}
+//    		}
     	}
     	return data;
     },
@@ -404,6 +483,8 @@ Ext.define('Voyant.panel.TermsBerry', {
     			me.dispatchEvent('termsClicked', me, [d.term]);
     		})
     		.on('mouseover', function(d, i) {
+    			me.setCurrentNode(d);
+    			
     			me.getVis().selectAll('circle')
     				.style('stroke-width', 1)
     				.style('stroke', '#111')
@@ -420,10 +501,13 @@ Ext.define('Voyant.panel.TermsBerry', {
     			} else {
     				fillLabel = me.localize('inDocs');
     			}
-    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')<br/>'+fillLabel+': '+d.fillValue;
-				var tip = me.getTip();
-				tip.update(info);
-				tip.show();
+    			
+    			if (!me.getContextMenu().isVisible()) {
+	    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')<br/>'+fillLabel+': '+d.fillValue;
+					var tip = me.getTip();
+					tip.update(info);
+					tip.show();
+    			}
 				
 				for (var i = 0; i < d.collocates.length; i++) {
 					var collocate = d.collocates[i];
@@ -436,17 +520,25 @@ Ext.define('Voyant.panel.TermsBerry', {
 				}
 			})
 			.on('mousemove', function() {
-				var container = Ext.get(me.getVisId()).dom;
-				var coords = d3.mouse(container);
-				coords[1] += 20;
-				me.getTip().setPosition(coords);
+				me.getTip().setPosition(d3.event.pageX+5, d3.event.pageY-50);
 			})
 			.on('mouseout', function() {
+				if (!me.getContextMenu().isVisible()) {
+					me.setCurrentNode(undefined);
+				}
+				
 				me.getVis().selectAll('circle').style('stroke-opacity', me.MIN_STROKE_OPACITY).style('stroke', '#111')
 	    			.style('fill', function(d) { return defaultFill(d.fillValue); });
 				me.getVis().selectAll('tspan.value').text('');
 				me.getTip().hide();
 //				me.getVisInfo().text('');
+			})
+			.on('contextmenu', function(d, i) {
+				d3.event.preventDefault();
+				me.getTip().hide();
+				var menu = me.getContextMenu();
+				menu.queryById('label').setHtml(d.term);
+				menu.showAt(d3.event.pageX+5, d3.event.pageY-50);
 			});
     	
     	node.append('circle')
