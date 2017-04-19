@@ -204,9 +204,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         this.setContextMenu(Ext.create('Ext.menu.Menu', {
 			renderTo: Ext.getBody(),
 			items: [{
-				text: '',
+				xtype: 'box',
 				itemId: 'label',
-				disabled: true
+				margin: '5px 0px 5px 5px',
+				html: ''
 			},{
 		        xtype: 'menuseparator'
 			},{
@@ -615,7 +616,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			this.getNetwork().selectNodes([n]);
 	    			var data = this.getNodeDataSet().get(n);
 	    			var menu = this.getContextMenu();
-	    			menu.queryById('label').setText(data.label);
+	    			menu.queryById('label').setHtml(data.label);
 	    			menu.queryById('fixed').setChecked(data.fixed);
 	    			menu.showAt(params.event.pageX, params.event.pageY);
 	    		}
