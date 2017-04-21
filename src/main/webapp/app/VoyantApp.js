@@ -1,7 +1,7 @@
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
-	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api'],
+	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api','Voyant.util.CategoriesManager'],
 	requires: ['Voyant.util.ResponseError'],
     
     name: 'VoyantApp',
@@ -18,7 +18,8 @@ Ext.define('Voyant.VoyantApp', {
     
     config: {
     	baseUrl: undefined,
-    	tromboneUrl: undefined
+    	tromboneUrl: undefined,
+    	categoriesManager: undefined
     },
     
     constructor: function(config) {
@@ -28,6 +29,8 @@ Ext.define('Voyant.VoyantApp', {
     	// set the Trombone URL from the baseURL // TODO: maybe allow this to be overridden
 		this.setTromboneUrl(this.config.baseUrl+'trombone');
 
+		this.setCategoriesManager(new Ext.create('Voyant.util.CategoriesManager'));
+		
     	// set the application for the Corpus so that we can use a simple constructor
 		Voyant.application = this;
 		

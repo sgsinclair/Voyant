@@ -29,6 +29,7 @@ app/util/Transferable.js
 app/util/Variants.js
 app/util/Downloadable.js
 app/util/Storage.js
+app/util/CategoriesManager.js
 app/notebook/util/Show.js
 app/notebook/util/Embed.js
 
@@ -86,6 +87,7 @@ app/widget/ColorPaletteOption.js
 app/widget/VoyantChart.js
 app/widget/LiveSearchGrid.js
 app/widget/VoyantTableTransform.js
+app/widget/CategoriesBuilder.js
 
 # PANELS
 app/panel/Panel.js
