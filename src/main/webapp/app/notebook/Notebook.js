@@ -1,4 +1,5 @@
 Ext.define('Voyant.notebook.Notebook', {
+	alternateClassName: ["Notebook"],
 	extend: 'Ext.panel.Panel',
 	requires: ['Voyant.notebook.editor.CodeEditorWrapper','Voyant.notebook.editor.TextEditorWrapper','Voyant.notebook.util.Show','Voyant.panel.Cirrus','Voyant.panel.Summary'],
 	mixins: ['Voyant.panel.Panel'],
@@ -24,7 +25,57 @@ Ext.define('Voyant.notebook.Notebook', {
     	},
     	api: {
     		input: undefined
+    	},
+    	
+    	currentBlock: undefined,
+ 
+    	getDeferred: function() {
+    		return Voyant.application.getDeferred();
+    	},
+    	
+    	getDataFromBlock: function(where) {
+    		if (Voyant.notebook.Notebook.currentBlock) {
+    			var previous = Voyant.notebook.Notebook.currentBlock;
+    			while(previous) {
+    				previous = previous.previousSibling();
+    				if (previous.isXType("notebookcodeeditorwrapper") && previous.editor.getMode()!='ace/mode/javascript') {
+    					return previous.getContent().input;
+    				}
+    			}
+    		}
+    		showError("Unable to find data to load");
+    	},
+    	
+    	loadDataFromUrl: function(url, config) {
+    		var dfd = Voyant.application.getDeferred();
+    		var params = {
+       		     url: Voyant.application.getTromboneUrl(),
+    		     params: {
+    		    	 fetchData: url
+    		     }
+    		}
+    		if (config && config.format) {params.format = config.format}
+    		Ext.Ajax.request(params).then(function(response, opts) {
+    			 if (config && config.format) {
+    				 if (config.format.toLowerCase()=='json') {
+    					 return dfd.resolve(Ext.decode(response.responseText))
+    				 } else if (config.format.toLowerCase()=='xml') {
+    					 parser = new DOMParser();
+    					 xmlDoc = parser.parseFromString(response.responseText,"text/xml");
+    					 return dfd.resolve(xmlDoc)
+    				 }
+    			 }
+    			 dfd.resolve(response.responseText);
+    		 },
+    		 function(response, opts) {
+    			 debugger
+    			 dfd.reject(response.responseText);
+    		     console.log('server-side failure with status code ' + response.status);
+    		 });
+    		
+    		return dfd.promise;
     	}
+    	
     },
     config: {
     	metadata: {},
@@ -163,7 +214,9 @@ Ext.define('Voyant.notebook.Notebook', {
 	        		    		contents += "<div id='vn-section-"+i+"'><a name='vn-section-"+i+"'></a>";
 	        		    		if (type=='code') {
 	        		    			contents += "<div class='notebook-code-editor ace-chrome'>"+item.getTargetEl().query('.ace_text-layer')[0].outerHTML+"</div>";
-	        		    			contents += "<div class='notebook-code-results'>"+content.output+"</div>";
+	        		    			if (content.mode=='javascript') {
+		        		    			contents += "<div class='notebook-code-results'>"+content.output+"</div>";
+	        		    			}
 	        		    		} else {
 	        		    			contents += "<div class='notebook-text-editor'>"+content+"</div>";
 	        		    		}
@@ -484,6 +537,7 @@ Ext.define('Voyant.notebook.Notebook', {
         		block = {
         			type: 'code',
         			input: content.input,
+        			mode: content.mode,
         			output: this.wrap(content.output)
         		}
     		} else {
@@ -521,6 +575,7 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     wrap: function(content) {
+    	content = content || "";
     	var maxLen = 80;
     	if (content && content.length>maxLen) {
 			var contents = [];

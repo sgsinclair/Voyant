@@ -6,7 +6,16 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	statics: {
 		i18n: {
 			previousNotRunTitle: "Previous Code Blocks",
-			previousNotRun: "There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?"
+			previousNotRun: "There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?",
+			modeCode: "Code",
+			modeData: "Data",
+			modeJavascript: "Javascript (default)",
+			modeJson: "JSON",
+			modeText: "Text",
+			modeCsv: "CSV (comma-separated values)",
+			modeTsv: "TSV (tab-separated values)",
+			modeHtml: "HTML",
+			modeXml: "XML"
 		}
 	},
 	config: {
@@ -28,13 +37,17 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		
 		this.editor = Ext.create("Voyant.notebook.editor.CodeEditor", {
 			content: Ext.Array.from(config.input).join("\n"),
-			docs: config.docs
+			docs: config.docs,
+			mode: 'ace/mode/'+(config.mode ? config.mode : 'javascript')
 		});
 		
 		Ext.apply(this, {
 			dockedItems: [{
 			    xtype: 'toolbar',
 			    dock: 'left',
+			    defaults: {
+			    	textAlign: 'left'
+			    },
 			    items: [
 					{
 						xtype: 'notebookwrapperadd'
@@ -57,15 +70,103 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 							}
 						}
 					},{
-						
-						xtype: 'notebookwrapperrunall',
+						xtype: 'button',
+						glyph: 'xf1c9@FontAwesome',
+						tooltip: this.localize('codeModeTip'),
 						listeners: {
-							click: {
-								fn: function() {
-									this.up('notebook').runAllCode()
-								},
-								scope: this
-							}
+							click: function() {
+								var me = this;
+								new Ext.Window({
+								    title: 'Resize Me',
+								    layout: 'fit',
+								    width: 200,
+								    items: [{
+										xtype: 'form',
+										layout: {
+											type: 'vbox',
+											align: 'stretch'
+										},
+										bodyPadding: 10,
+										items: [{
+											xtype: 'fieldset',
+											title: this.localize("modeCode"),
+											items: {
+							                    xtype : 'radiofield',
+							                    boxLabel : this.localize('modeJavascript'),
+							                    name  : 'codeMode',
+							                    inputValue: 'javascript',
+							                    flex  : 1													
+											}
+										},{
+											xtype: 'fieldset',
+											title: this.localize("modeData"),
+											items: [{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeJson'),
+								                    name  : 'codeMode',
+								                    inputValue: 'javascript',
+								                    flex  : 1													
+												}
+											},{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeText'),
+								                    name  : 'codeMode',
+								                    inputValue: 'text',
+								                    flex  : 1													
+												}
+											},/*{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeCsv'),
+								                    name  : 'codeMode',
+								                    inputValue: 'csv',
+								                    flex  : 1													
+												}
+											},{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeTsv'),
+								                    name  : 'codeMode',
+								                    inputValue: 'tsv',
+								                    flex  : 1													
+												}
+											},*/{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeHtml'),
+								                    name  : 'codeMode',
+								                    inputValue: 'html',
+								                    flex  : 1													
+												}
+											},{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeXml'),
+								                    name  : 'codeMode',
+								                    inputValue: 'xml',
+								                    flex  : 1													
+												}
+											}]
+										}]
+								    }],
+								   buttons: [{
+								        text: this.localize('ok'),
+								        handler: function() {
+								        	var win = this.up('window'); values = win.down('form').getForm().getValues();
+								        	me.switchModes(values.codeMode);
+								        	win.close();
+								        }
+								    },{
+								        text:  this.localize('cancel'),
+								        handler: function() {
+								        	this.up('window').close();
+								        }
+								    }]
+								}).show();
+							},
+							scope: this
 						}
 					}
 			    ]
@@ -88,7 +189,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		});
 		
         this.callParent(arguments);
-
+        
 	},
 	
 	initComponent: function() {
@@ -103,23 +204,33 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		me.callParent(arguments);
 	},
 	
+	switchModes: function(mode) {
+		var runnable = mode=='javascript';
+		this.down('notebookwrapperrun').setVisible(runnable);
+		this.down('notebookwrapperrununtil').setVisible(runnable);
+		this.results.setVisible(runnable);
+		this.editor.switchModes(mode);
+	},
+	
 	run: function(runningAll) {
-		if (runningAll===true) {
-			this._run();
-		} else {
-			var notebook = this.up('notebook');
-			Ext.Array.each(notebook.query('notebookcodeeditorwrapper'), function(wrapper) {
-				if (wrapper==this) {this._run(); return false;} // break
-				if (wrapper.getIsRun()==false) {
-					Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
-						if (btnId=='yes') {
-							notebook.runAllCode();
-						} else {
-							this._run();
-						}
-					}, this)
-				}
-			}, this);
+		if (this.editor.getMode()=='ace/mode/javascript') { // only run JS
+			if (runningAll===true) {
+				this._run();
+			} else {
+				var notebook = this.up('notebook');
+				Ext.Array.each(notebook.query('notebookcodeeditorwrapper'), function(wrapper) {
+					if (wrapper==this) {this._run(); return false;} // break
+					if (wrapper.editor && wrapper.editor.getMode() == 'ace/mode/javascript' && wrapper.getIsRun()==false) {
+						Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
+							if (btnId=='yes') {
+								notebook.runAllCode();
+							} else {
+								this._run();
+							}
+						}, this)
+					}
+				}, this);
+			}
 		}
 	},
 	
@@ -130,7 +241,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		var code = this.editor.getValue();
 		var success = false;
 		try {
-			Voyant.notebook.util.Show.TARGET = this.results.getEl();
+			Voyant.notebook.util.Show.TARGET = this.results.getEl(); // this is for output
+			Voyant.notebook.Notebook.currentBlock = this; // this is to tie back in to the block
 			
 			// I'd like to be able to run this in another scope/context, but it
 			// doesn't seem possible for the type of code that's being run
@@ -169,14 +281,17 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	
 	getContent: function() {
-		var el = this.results.getTargetEl(), resultEl = el.dom.cloneNode(true);
-		var html = resultEl.innerHTML;
-		if (!resultEl.style.height) {
-			html = "<div style='height: "+el.getHeight()+"px'>"+html+"</div>";
-		}
-		return {
+		var toReturn = {
 			input: this.editor.getValue(),
-			output: html
+			mode: this.editor.getMode().split("/").pop()
 		}
+		if (toReturn.mode=='javascript') {
+			var el = this.results.getTargetEl(), resultEl = el.dom.cloneNode(true);
+			toReturn.output = resultEl.innerHTML;
+			if (!resultEl.style.height) {
+				toReturn.output = "<div style='height: "+el.getHeight()+"px'>"+toReturn.output+"</div>";
+			}
+		}
+		return toReturn;
 	}
 })

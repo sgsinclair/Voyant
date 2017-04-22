@@ -57,6 +57,8 @@
 <script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/theme-crisp/theme-crisp.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/theme-crisp-all<%= rtl %>_1.css" />
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/theme-crisp-all<%= rtl %>_2.css" />
+<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/ux.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/ux-all<%= rtl %>-debug.css" />
 
 <!-- jQuery -->
 <script type="text/javascript" src="<%= base %>/resources/jquery/current/jquery.min.js"></script>
@@ -71,6 +73,9 @@
 <!-- vis.js -->
 <script type="text/javascript" src="<%= base %>/resources/visjs/vis.min.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/visjs/vis.min.css" />
+
+<!-- ACE Editor (used by Spiral and the widget.codeeditor -->
+<script src="<%= base %>/resources/ace/2017-04-16/src-noconflict/ace.js"></script>
 
 <!-- FontAwesome -->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/fontawesome/current/css/font-awesome.min.css" />

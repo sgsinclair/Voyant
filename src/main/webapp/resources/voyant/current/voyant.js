@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Apr 17 21:58:37 EDT 2017 */
+/* This file created by JSCacher. Last modified: Fri Apr 21 21:28:43 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7378,6 +7378,76 @@ Ext.define('Voyant.util.Storage', {
 	}
 });
 
+Ext.define('Voyant.util.CategoriesManager', {
+	categories: undefined,
+	constructor: function(config) {
+		config = config || {};
+		this.categories = {};
+		if (config.categories !== undefined) {
+			for (var key in config.categories) {
+				var terms = config.categories[key];
+				this.addTerms(key, terms);
+			}
+		}
+	},
+	getCategories: function() {
+		return this.categories;
+	},
+	getCategory: function(name) {
+		return this.categories[name];
+	},
+	addCategory: function(name) {
+		if (this.categories[name] === undefined) {
+			this.categories[name] = [];
+		}
+	},
+	removeCategory: function(name) {
+		delete this.categories[name];
+	},
+	addTerm: function(category, term) {
+		this.addTerms(category, [term]);
+	},
+	addTerms: function(category, terms) {
+		if (!Ext.isArray(terms)) {
+			terms = [terms];
+		}
+		if (this.categories[category] === undefined) {
+			this.addCategory(category);
+		}
+		for (var i = 0; i < terms.length; i++) {
+			var term = terms[i];
+			if (this.categories[category].indexOf(term) === -1) {
+				this.categories[category].push(term);
+			}
+		}
+	},
+	removeTerm: function(category, term) {
+		this.removeTerms(category, [term]);
+	},
+	removeTerms: function(category, terms) {
+		if (!Ext.isArray(terms)) {
+			terms = [terms];
+		}
+		if (this.categories[category] !== undefined) {
+			for (var i = 0; i < terms.length; i++) {
+				var term = terms[i];
+				var index = this.categories[category].indexOf(term);
+				if (index !== -1) {
+					this.categories[category].splice(index, 1);
+				}
+			}
+		}
+	},
+	getCategoryForTerm: function(term) {
+		for (var category in this.categories) {
+			if (this.categories[category].indexOf(term) != -1) {
+				return category;
+			}
+		}
+		return undefined;
+	}
+});
+
 Ext.define("Voyant.notebook.util.Show", {
 	transferable: ['show'],
 	
@@ -7392,7 +7462,7 @@ Ext.define("Voyant.notebook.util.Show", {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
-			show.call(this, this.getString ? this.getString(len) : this.toString(), Ext.isNumber(len) ? len : undefined);
+			show.call(this, this.getString ? this.getString(len) : this.toString(), !this.getString && Ext.isNumber(len) ? len : undefined);
 		}
 	},
 	statics: {
@@ -7403,6 +7473,16 @@ Ext.define("Voyant.notebook.util.Show", {
 					show.call(val, val, arg);
 				})
 			} else {
+				if (Ext.isArray(contents)) {
+					var allContents = "";
+					contents.forEach(function(content) {
+						allContents += content.getString ? content.getString() : content.toString();
+					});
+					contents = allContents;
+				} else if (Ext.isString(this) || this instanceof String) {
+					len = contents;
+					contents = this;
+				}
 				contents = contents.getString ? contents.getString() : contents.toString();
 				if (len) {contents = contents.substring(0,len)}
 				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
@@ -7443,6 +7523,7 @@ Ext.define("Voyant.notebook.util.Show", {
 	}
 });
 
+String.prototype.show = Voyant.notebook.util.Show.show;
 var show = Voyant.notebook.util.Show.show;
 var showError = Voyant.notebook.util.Show.showError;
 
@@ -7543,6 +7624,7 @@ Ext.define("Voyant.notebook.util.Embed", {
 							if (item==name) {
 								config = config || {};
 								var embeddedParams = {};
+								
 								for (key in Ext.ClassManager.get(Ext.getClassName(cmp)).api) {
 									if (key in config) {
 										embeddedParams[key] = config[key]
@@ -7598,8 +7680,14 @@ Ext.define("Voyant.notebook.util.Embed", {
 						}, this)===true) {
 						Voyant.notebook.util.Embed.showWidgetNotRecognized.call(this);
 					}
+					if (!isEmbedded) {
+						var embedded = Ext.create(cmp, config);
+						debugger
+						embedded.embed(config);
+					}
 				}
 				if (!isEmbedded) {
+					
 					Voyant.notebook.util.Embed.showWidgetNotRecognized.call(this);
 				}
 			}
@@ -8750,7 +8838,7 @@ Ext.define('Voyant.data.store.TSNEAnalysisBuffered', {
 Ext.define('Voyant.data.table.Table', {
 	alternateClassName: ["VoyantTable"],
 	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
-	embeddable: ['Voyant.widget.VoyantTableTransform','Voyant.widget.VoyantChart'],
+	embeddable: ['Voyant.widget.VoyantTableTransform','Voyant.widget.VoyantChart','Voyant.widget.CodeEditor'],
 	config: {
 		
 		/**
@@ -8763,6 +8851,11 @@ Ext.define('Voyant.data.table.Table', {
 		 */
 		headers: [],
 
+		/**
+		 * @private
+		 */
+		headersMap: {},
+		
 		/**
 		 * Specifies that a specific header should serve as row key.
 		 * 
@@ -8778,13 +8871,22 @@ Ext.define('Voyant.data.table.Table', {
 	constructor: function(config, opts) {
 
 		config = config || {};
-				
-		// not sure why config isn't working
-		this.setRows(Ext.Array.from(Ext.isArray(config) ? config : config.rows));
-		this.setHeaders(Ext.Array.from(config.headers));
-		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
 		
-		if (config.count && Ext.isArray(config.count)) {
+		if (config.fromBlock) {
+			var data = Voyant.notebook.Notebook.getDataFromBlock(config.fromBlock);
+			if (data) {
+				config.rows = [];
+				data.split(/\n+/).forEach(function(line,i) {
+					var cells = line.split("\t");
+					if (i==0 && !config.noHeaders) {
+						config.headers = cells
+					} else {
+						config.rows.push(cells)
+					}
+				})
+				
+			}
+		} else if (config.count && Ext.isArray(config.count)) {
 			// create counts
 			var freqs = {};
 			config.count.forEach(function(item) {freqs[item] = freqs[item] ? freqs[item]+1 : 1;});
@@ -8796,48 +8898,64 @@ Ext.define('Voyant.data.table.Table', {
 				counts.splice(config.limit);
 			}
 			if (config.orientation && config.orientation=="horizontal") {
-				this.setHeaders(counts.map(function(item) {return item[0]}));
-				this.setRows([counts.map(function(item) {return item[1]})]);
+				config.headers = counts.map(function(item) {return item[0]});
+				config.rows = [counts.map(function(item) {return item[1]})];
 			} else {
-				this.setHeaders(config.headers ? config.headers : ["Item","Count"]);
-				this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
-				this.setRows(counts);
+				config.headers = config.headers ? config.headers : ["Item","Count"];
+				config.rows = counts;
 			}
-		}
-		
-		if (config.isStore || config.store) {
+		} else if (config.isStore || config.store) {
 			var store = config.store ? config.store : config;
-			
 			if (opts && opts.headers) {
-				this.setHeaders(opts.headers);
-				this.setRowKey(opts.rowKey ? opts.rowKey : this.getHeaders()[0]);
+				config.headers = opts.headers;
 			} else {
 				// store.getModel() doesn't seem to work (for CorpusTerms at least)
 				// so instead we'll try looking at the first record to get headers
 				var record = store.getAt(0);
 				if (record) { // don't know what to do if this fails?
-					this.setHeaders(record.getFields().map(function(field) {return field.getName()}))
-					this.setRowKey(opts.rowKey ? opts.rowKey : this.getHeaders()[0]);
+					config.headers = record.getFields().map(function(field) {return field.getName()});
 				}
 			}
 			
 			// now we get rows
+			config.rows = [];
 			store.each(function(record) {
-				this.addRow(record.getData());
+				var cells = [];
+				var data = record.getData();
+				for (key in data) {cells.push(data[key])}
+				config.rows.push(cells);
 			}, this);
 		}
-		
+
+				
+		// not sure why config isn't working
+		this.setRows(Ext.Array.from(Ext.isArray(config) ? config : config.rows));
+		this.setHeaders(Ext.Array.from(config.headers));
+		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
+
 		if (this.getHeaders().length==0) {
 			var firstRow = this.getRow(0, false);
 			if (firstRow) {
 				this.setHeaders(firstRow.map(function(cell, i) {return String.fromCharCode(65+i)}));
 			}
 		}
+		
+		var headersMap = {};
+		this.getHeaders().forEach(function(header, i) {
+			headersMap[header] = i;
+		});
+		this.setHeadersMap(headersMap);
+		
 		this.callParent();
 	},
 	addRow: function(row) {
+		debugger
 		if (Ext.isObject(row)) {
-			this.getRows().push(this.getHeaders().map(function(key) {return row[key]}))
+			var len = this.getRows().length;
+			for (var key in row) {
+				this.updateCell(len, key, row[key])
+			}
+			
 		} else if (Ext.isArray(row)) {
 			this.getRows().push(row);
 		}
@@ -8899,13 +9017,50 @@ Ext.define('Voyant.data.table.Table', {
 	 */
 	updateCell: function(row, column, value, replace) {
 		var rows = this.getRows();
+		var r = Ext.isNumber(row) ? row : this.getRowIndex(row);
+		var c = Ext.isNumber(column) ? column : this.getColumnIndex(column);
 		if (rows[row]===undefined) {rows[row]=[]}
-		if (rows[row][column]===undefined || replace) {rows[row][column]=value}
-		else {rows[row][column]+=value}
+		if (rows[row][c]===undefined || replace) {rows[row][c]=value}
+		else {rows[row][c]+=value}
+	},
+	
+	getRowIndex: function(key) {
+		if (Ext.isString(key)) {
+			console.error("Implement this"); alert("Unimplemented method: VoyantTable.getRowIndex()");
+		}
+	},
+	
+	getColumnIndex: function(column) {
+		if (Ext.isString(column)) {
+			if (!this.getHeadersMap()[column]) {
+				// we don't have this column yet, so create it and expand rows
+				this.getHeaders().push(column);
+				this.getHeadersMap()[column] = this.getHeaders().length-1
+				this.getRows().forEach(function(row) {
+					row.push("")
+				});
+			}
+			return this.getHeadersMap()[column]
+		}
 	},
 	
 	embed: function(cmp, config) {
-
+		if (!config && Ext.isObject(cmp)) {
+			config = cmp;
+			cmp = this.embeddable[0];
+		}
+		config = config || {};
+		
+		Ext.apply(config, {
+			tableJson: JSON.stringify({
+				rowkey: this.getRowKey(),
+				headers: this.getHeaders(),
+				rows: this.getRows()
+			})
+		});
+		
+		return embed.call(this, cmp, config);
+		
 		if (((Ext.isObject(cmp) || !cmp) && !config) || (cmp && Ext.isString(cmp) && cmp.toLowerCase().indexOf("voyanttabletransform")>-1)) {
 			config = cmp || {};
 
@@ -9083,6 +9238,15 @@ Ext.define('Voyant.data.table.Table', {
 		embed.call(this, cmp, config);
 	},
 	
+	toTsv: function(config) {
+		var tsv = this.getHeaders().join("\t");
+		this.getRows().forEach(function(row, i) {
+			if (config && Ext.isNumber(config) && i>config) {return;}
+			tsv += "\n"+row.map(function(cell) {return cell.replace(/(\n|\t)/g, "")}).join("\t");
+		})
+		return tsv;
+	},
+	
 	getString: function(config) {
 		config = config || {};
 		var table = "<table class='voyant-table' style='"+(config.width ? ' width: '+config.width : '')+"' id='"+(config.id ? config.id : Ext.id())+"'>";
@@ -9095,7 +9259,7 @@ Ext.define('Voyant.data.table.Table', {
 			table+="</tr></thead>";
 		}
 		table+="<tbody>";
-		for (var i=0, len = this.getRows().length; i<len; i++) {
+		for (var i=0, len = Ext.isNumber(config) ? config : this.getRows().length; i<len; i++) {
 			table+="<tr>";
 			var row = this.getRow(i);
 			row.forEach(function(cell) {
@@ -10063,6 +10227,56 @@ Ext.define('Voyant.data.model.Corpus', {
     
 
 });
+Ext.define('Voyant.widget.CodeEditor', {
+	extend: 'Ext.panel.Panel',
+    mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.notebook.util.Embed'],
+	alias: 'widget.codeeditor',
+    statics: {
+    	i18n: {},
+		api: {
+			tableJson: undefined,
+			content: '',
+			mode: 'ace/mode/text',
+			width: undefined
+		}
+    },
+	constructor: function(config) {
+    	config = config || {};
+		var me = this;
+    	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	me.buildFromParams();
+    	if (!config.noEmbed) {
+        	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
+    	}
+    	Ext.apply(me, {
+    		items: {
+    			xtype: 'notebookcodeeditor',
+    			content: config.content ? config.content : this.getApiParam('content'),
+    			mode: config.mode ? config.mode : this.getApiParam("mode")
+    		}
+    	})
+        me.callParent(arguments);
+    	me.on("reconfigure", function() {
+    		this.buildFromParams();
+    		this.down('notebookcodeeditor').editor.setValue(this.getApiParam('content'));
+    	}, this);
+	},
+	initComponent: function(config) {
+    	var me = this, config = config || {};
+    	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	me.callParent(arguments);
+	},
+	
+	buildFromParams: function() {
+		var me = this, tableJson = this.getApiParam('tableJson');
+		if (tableJson) {
+			var json = Ext.decode(tableJson);
+			var text = json.headers.join("\t") + "\n"+
+				json.rows.map(function(row) {return row.join("\t")}).join("\n");
+			this.setApiParam('content', text);
+		}
+	}
+})
 Ext.define('Voyant.widget.CorpusSelector', {
     extend: 'Ext.form.field.ComboBox',
     mixins: ['Voyant.util.Localization', 'Voyant.util.Api'],
@@ -10362,7 +10576,8 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		isDocsMode: false,
 		inDocumentsCountOnly: undefined,
 		stopList: undefined,
-		showAggregateInDocumentsCount: false
+		showAggregateInDocumentsCount: false,
+		clearOnQuery: false
 	},
 	hasCorpusLoadedListener: false, 
     
@@ -10410,6 +10625,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	            hidden: true
     		}
     	}
+    	if (config.clearOnQuery) {
+    		this.setClearOnQuery(config.clearOnQuery);
+    	}
         this.callParent(arguments);
     },
     initComponent: function(config) {
@@ -10455,6 +10673,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	me.on("change", function(tags, queries) {
     		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
     		me.up('panel').fireEvent("query", me, queries);
+    		if (me.getClearOnQuery()) {
+    			me.removeValue(me.getValueRecords());
+    		}
     		if (me.triggers.count) {
     			me.triggers.count.show();
     			me.triggers.count.getEl().setHtml('0');
@@ -11656,6 +11877,348 @@ Ext.define('Ext.ux.grid.TransformGrid', {
     }
 });
 
+Ext.define('Voyant.widget.CategoriesBuilder', {
+    extend: 'Ext.container.Container',
+    mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.CategoriesManager'],
+    alias: 'widget.categoriesbuilder',
+    statics: {
+    	i18n: {
+    		title: 'Categories Builder',
+    		terms: 'Terms',
+    		term: 'Term',
+    		rawFreq: 'Count',
+    		relativeFreq: 'Relative',
+    		categories: 'Categories',
+    		addCategory: 'Add Category',
+    		removeCategory: 'Remove Category',
+    		removeTerms: 'Remove Selected Terms',
+    		categoryName: 'Category Name',
+    		add: 'Add',
+    		cancel: 'Cancel',
+    		exists: 'Category already exists',
+    		confirmRemove: 'Are you sure you want to remove the category?'
+    	},
+    	api: {
+    		stopList: 'auto',
+    		query: undefined
+    	}
+    },
+    config: {
+    	corpus: undefined,
+    	categoriesManager: undefined,
+    	categoryWin: undefined
+    },
+
+    constructor: function(config) {
+    	config = config || {};
+    	var categoriesManager = config.categoriesManager ? config.categoriesManager : Ext.create('Voyant.util.CategoriesManager');
+    	this.setCategoriesManager(categoriesManager);
+    	
+    	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	this.callParent(arguments);
+    },
+    
+    initComponent: function() {
+    	Ext.apply(this, {
+    		title: this.localize('title'),
+    		layout: 'border',
+    		items: [{
+    			title: this.localize('terms'),
+    			split: true,
+    			width: 250,
+    			region: 'west',
+    			layout: 'fit',
+    			items: {
+    				itemId: 'terms',
+    				xtype: 'grid',
+    				store: Ext.create('Voyant.data.store.CorpusTermsBuffered', {
+    		        	parentPanel: this
+    		        }),
+    				viewConfig: {
+    					plugins: {
+    						ptype: 'gridviewdragdrop',
+    						ddGroup: 'terms',
+    						copy: true,
+    						enableDrop: false, // can't drop on grid with buffered store
+    						dragZone: {
+    							getDragText: function() {
+    								var text = '';
+    								this.dragData.records.forEach(function(d) {
+    									text += d.get('term')+', ';
+    								});
+    								return text.substr(0, text.length-2);
+    							}
+    						}
+    					}
+    				},
+    				selModel: {
+    	    			mode: 'MULTI'
+    	    		},
+    				columns: [{
+		    			text: this.localize('term'),
+		        		dataIndex: 'term',
+		        		flex: 1,
+		                sortable: true
+		            },{
+		            	text: this.localize('rawFreq'),
+		            	dataIndex: 'rawFreq',
+		                width: 'autoSize',
+		            	sortable: true
+		            },{
+		            	text: this.localize('relativeFreq'),
+		            	dataIndex: 'relativeFreq',
+		            	renderer: function(val) {
+		            		return Ext.util.Format.number(val*1000000, "0,000");
+		            	},
+		                width: 'autoSize',
+		                hidden: true,
+		            	sortable: true
+		            }],
+		            dockedItems: [{
+		                dock: 'bottom',
+		                xtype: 'toolbar',
+		                overflowHandler: 'scroller',
+		                items: [{
+		                    xtype: 'querysearchfield'
+		                }]
+		            }],
+		            listeners: {
+		            	query: function(src, query) {
+		            		this.setApiParam('query', query);
+		            		var store = this.queryById('terms').getStore();
+		            		store.removeAll();
+		            		store.load();
+		            	},
+		            	scope: this
+		            }
+    			}
+    		},{
+    			title: this.localize('categories'),
+    			itemId: 'categories',
+    			region: 'center',
+    			xtype: 'panel',
+    			layout: {
+    				type: 'hbox',
+    				align: 'stretch'
+    			},
+    			scrollable: 'x',
+    			dockedItems: [{
+                    dock: 'bottom',
+                    xtype: 'toolbar',
+                    overflowHandler: 'scroller',
+                    items: [{
+                    	text: this.localize('addCategory'),
+                    	handler: function() {
+                    		this.getCategoryWin().show();
+                    	},
+                    	scope: this
+                    },{
+                    	text: this.localize('removeTerms'),
+                    	handler: function() {
+                    		this.queryById('categories').query('grid').forEach(function(grid) {
+                    			grid.getStore().remove(grid.getSelection());
+                    		}, this);
+                    	},
+                    	scope: this
+                    }]
+    			}],
+    			items: []
+    		}]
+    	});
+    	
+    	this.setCategoryWin(Ext.create('Ext.window.Window', {
+    		title: this.localize('addCategory'),
+    		modal: true,
+    		closeAction: 'hide',
+    		layout: 'fit',
+    		items: {
+    			xtype: 'form',
+    			width: 300,
+    			defaults: {
+    				labelAlign: 'right'
+    			},
+	    		items: [{
+	    			xtype: 'textfield',
+	    			fieldLabel: this.localize('categoryName'),
+	    			name: 'categoryName',
+	    			allowBlank: false,
+	    			validator: function(val) {
+	    				return this.getCategoriesManager().getCategory(val) === undefined ? true : this.localize('exists');
+	    			}.bind(this),
+	    			enableKeyEvents: true,
+	    			listeners: {
+	    				keypress: function(field, evt) {
+	    					if (evt.getKeyName() === Ext.event.Event.ENTER) {
+	    						
+	    					}
+	    				},
+	    				scope: this
+	    			}
+	    		}],
+	    		buttons: [{
+	    			text: this.localize('cancel'),
+	    			handler: function(btn) {
+	    				btn.up('window').close();
+	    			}
+	    		},{
+	    			text: this.localize('add'),
+	    			handler: function(btn) {
+	    				var form = btn.up('form');
+	    				if (form.isValid()) {
+	    					var name = form.getValues()['categoryName'];
+	    					this.addCategory(name);
+	    					btn.up('window').close();
+	    				}
+	    			},
+	    			scope: this
+	    		}]
+    		},
+    		listeners: {
+    			show: function(win) {
+    				var form = win.down('form').getForm();
+    				form.reset();
+					form.clearInvalid();
+    			}
+    		}
+    	}));
+    	
+//    	this.on('afterrender', function(src) {
+//    		console.log(this.queryById('categories').body);
+//    		Ext.create('Ext.dd.DropTarget', this.queryById('categories').body, {
+//    			ddGroup: 'terms',
+//    			notifyEnter: function(source, e, data) {
+//    				console.log(source, e, data);
+//    			},
+//    			notifyOver: function(source, e, data) {
+//    				console.log(source, e, data);
+//    			},
+//    			notifyDrop: function(source, e, data) {
+//    				console.log(source, e, data);
+//    				return true;
+//    			}
+//    		});
+//    	}, this);
+    	
+    	this.on('afterrender', function(builder) {
+    		builder.on('loadedCorpus', function(src, corpus) {
+    			this.setCorpus(corpus);
+	    		var terms = this.queryById('terms');
+	    		terms.getStore().load();
+    		}, builder);
+    		
+    		var panel = builder.findParentBy(function(clz) {
+    			return clz.mixins['Voyant.panel.Panel'];
+    		});
+    		if (panel == null) {
+    			panel = builder.up('window').panel;
+    		}
+    		if (panel) {
+    			panel.on('loadedCorpus', function(src, corpus) {
+    				builder.fireEvent('loadedCorpus', src, corpus);
+    			}, builder);
+    			if (panel.getCorpus && panel.getCorpus()) {builder.fireEvent('loadedCorpus', builder, panel.getCorpus());}
+    			else if (panel.getStore && panel.getStore() && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
+    				builder.fireEvent('loadedCorpus', builder, panel.getStore().getCorpus());
+    			}
+    		}
+    		
+    		this.buildCategories();
+    	}, this);
+    	
+    	this.callParent(arguments);
+    },
+    
+    addCategory: function(name) {
+    	this.getCategoriesManager().addCategory(name);
+    	
+    	var catParent = this.queryById('categories');
+    	return catParent.add({
+    		title: name,
+    		xtype: 'panel',
+    		frame: true,
+    		width: 150,
+    		margin: '10 0 10 10',
+    		layout: 'fit',
+    		tools: [{
+    			type: 'close',
+    			callback: function(panel) {
+    				Ext.Msg.confirm(this.localize('removeCategory'), this.localize('confirmRemove'), function(btn) {
+    					if (btn === 'yes') {
+    						this.queryById('categories').remove(panel);
+    	    				this.getCategoriesManager().removeCategory(name);
+    					}
+    				}, this);
+    			},
+    			scope: this
+    		}],
+    		items: [{
+	    		xtype: 'grid',
+	    		category: name,
+	    		store: Ext.create('Ext.data.JsonStore', {
+	    			data: [],
+	    			fields: ['term']
+	    		}),
+	    		viewConfig: {
+		    		plugins: {
+		    			ptype: 'gridviewdragdrop',
+						ddGroup: 'terms',
+						dragZone: {
+							getDragText: function() {
+								var text = '';
+								this.dragData.records.forEach(function(d) {
+									text += d.get('term')+', ';
+								});
+								return text.substr(0, text.length-2);
+							}
+						}
+		    		}
+	    		},
+	    		selModel: {
+	    			mode: 'MULTI'
+	    		},
+	    		columns: [{
+	        		dataIndex: 'term',
+	        		flex: 1,
+	                sortable: true
+	            }],
+	    		listeners: {
+	    			drop: function(node, data) {
+	    				data.view.getSelectionModel().deselectAll();
+	    				this.getSelectionModel().deselectAll();
+	    				
+	    				var categories = this.up('categoriesbuilder').getCategoriesManager();
+	    				var terms = [];
+	    				for (var i = 0; i < data.records.length; i++) {
+	    					terms.push(data.records[i].get('term'));
+	    				}
+	    				categories.addTerms(name, terms);
+	    				
+	    				var source = data.view.up('grid');
+	    				if (source.category) {
+	    					categories.removeTerms(source.category, terms);
+	    				}
+	    			}
+	    		}
+    		}]
+    	});
+    },
+    
+    buildCategories: function() {
+    	var cats = this.getCategoriesManager().getCategories();
+    	for (var key in cats) {
+    		var data = [];
+    		var terms = cats[key];
+    		for (var i = 0; i < terms.length; i++) {
+    			data.push({term: terms[i]});
+    		}
+    		
+    		var catparent = this.addCategory(key);
+    		var grid = catparent.down('grid');
+    		grid.getStore().loadRawData(data);
+//    		grid.getView().refresh();
+    	}
+    }
+});
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable','Voyant.util.DetailedError'],
 	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.TotalPropertyStatus'],
@@ -12201,9 +12764,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		bubblelines: undefined,
 		termStore: undefined,
 		docTermStore: undefined,
-		docStore: undefined,
 		selectedDocs: undefined,
-		processedDocs: undefined,
     	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
 	},
 	
@@ -12218,16 +12779,37 @@ Ext.define('Voyant.panel.Bubblelines', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.on('loadedCorpus', function(src, corpus) {
-    		this.getDocStore().getProxy().setExtraParam('corpus', corpus.getId());
-    		if (this.isVisible()) {
-        		this.getDocStore().load();
+    		this.setDocTermStore(corpus.getDocumentTerms({
+    			proxy: {
+	    			extraParams: {
+						withDistributions: 'raw',
+						withPositions: true
+					}
+    			},
+				listeners: {
+	   		    	 load: function(store, records, successful, options) {
+	   		    		records.forEach(function(record) {
+	   		    			var termData = this.processTerms(record);
+	   		    			var docId = record.get('docId');
+	   		    			var term = record.get('term');
+	   		    			var termObj = {};
+	   		    			termObj[term] = termData;
+	   		    			this.getBubblelines().addTermsToDoc(termObj, docId);
+	   		    		}, this);
+	   		    		this.getBubblelines().doBubblelinesLayout();
+	   				},
+	   				scope: this
+	   		     }
+    		}));
+    		
+    		if (this.isVisible() && this.getBubblelines()) {
+    			this.initLoad();
     		}
-    		this.getDocTermStore().getProxy().setExtraParam('corpus', corpus.getId());
     	}, this);
     	
         this.on('activate', function() { // load after tab activate (if we're in a tab panel)
-			if (this.getCorpus()) {				
-				Ext.Function.defer(function() {this.getDocStore().load()}, 100, this);
+        	if (this.getCorpus()) {
+				Ext.Function.defer(this.initLoad, 100, this);
 			}
     	}, this);
         
@@ -12282,83 +12864,6 @@ Ext.define('Voyant.panel.Bubblelines', {
             	scope: this
             }
         }));
-    	
-    	this.setDocStore(Ext.create("Ext.data.Store", {
-			model: "Voyant.data.model.Document",
-    		autoLoad: false,
-    		remoteSort: false,
-    		proxy: {
-				type: 'ajax',
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.DocumentsMetadata'
-				},
-				reader: {
-					type: 'json',
-					rootProperty: 'documentsMetadata.documents',
-					totalProperty: 'documentsMetadata.total'
-				},
-				simpleSortMode: true
-   		     },
-   		     listeners: {
-   		    	load: function(store, records, successful, options) {
-   					this.processDocuments(records);
-   					this.getProcessedDocs().each(function(doc) {
-   						this.getBubblelines().addDocToCache(doc);
-   					}, this);
-   					// get the top 5 corpus terms
-   					this.loadFromCorpusTerms(this.getCorpus().getCorpusTerms({autoload: false}));
-   				},
-   				scope: this
-   		     }
-    	}));
-    	
-    	this.setDocTermStore(Ext.create("Ext.data.Store", {
-			model: "Voyant.data.model.DocumentTerm",
-			asynchronousLoad: false,
-    		autoLoad: false,
-    		remoteSort: false,
-    		proxy: {
-				type: 'ajax',
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.DocumentTerms',
-					withDistributions: 'raw',
-					withPositions: true
-				},
-				reader: {
-					type: 'json',
-		            rootProperty: 'documentTerms.terms',
-		            totalProperty: 'documentTerms.total'
-				},
-				simpleSortMode: true
-   		     },
-   		     listeners: {
-   		    	 load: function(store, records, successful, options) {
-   		    		records.forEach(function(record) {
-   		    			var termData = this.processTerms(record);
-   		    			var docId = record.get('docId');
-   		    			var term = record.get('term');
-   		    			var termObj = {};
-   		    			termObj[term] = termData;
-   		    			this.getBubblelines().addTermsToDoc(termObj, docId);
-   		    		}, this);
-   		    		this.getBubblelines().doBubblelinesLayout();
-
-//   					this.processDocuments();
-//   					if (this.maxFreqChanged) {
-//   						this.calculateBubbleRadii();
-//   					} else {
-//   						this.calculateBubbleRadii(options.params.type);
-//   					}
-//   					this.getBubblelines().setCanvasHeight();
-//   					this.getBubblelines().drawGraph();
-   				},
-   				scope: this
-   		     }
-    	}));
-    	
-    	this.setProcessedDocs(new Ext.util.MixedCollection());
     	
     	Ext.apply(this, {
     		title: this.localize('title'),
@@ -12544,15 +13049,29 @@ Ext.define('Voyant.panel.Bubblelines', {
     	this.callParent(arguments);
     },
     
-    loadFromCorpusTerms: function(corpusTerms) {
-    	if (this.getBubblelines()) { // get rid of existing terms
-    		this.getBubblelines().removeAllTerms();
-    		this.getTermStore().removeAll(true);
-    	}
-		corpusTerms.load({
-		    callback: function(records, operation, success) {
-		    	var query = []; //this.getApiParam('query') || [];
-				if (typeof query == 'string') query = [query];
+    initLoad: function() {
+    	// get doc info
+    	var docIds = [];
+		this.getCorpus().getDocuments().each(function(doc, index, total) {
+			var inLimit = index < this.getApiParam('maxDocs');
+			this.getBubblelines().addDocToCache({
+				id: doc.getId(),
+				index: doc.getIndex(),
+				title: doc.getShortTitle(),
+				totalTokens: doc.get('tokensCount-lexical'),
+				terms: {},
+				hidden: !inLimit
+			});
+			if (inLimit) {
+				docIds.push(doc.getId());
+			}
+		}, this);
+		this.setApiParam('docId', docIds);
+		
+		// get top terms in corpus
+		this.getCorpus().getCorpusTerms({autoload: false}).load({
+			callback: function(records, operation, success) {
+		    	var query = [];
 		    	records.forEach(function(record, index) {
 					query.push(record.get('term'));
 				}, this);
@@ -12560,11 +13079,11 @@ Ext.define('Voyant.panel.Bubblelines', {
 		    },
 		    scope: this,
 		    params: {
-		    	limit: this.getApiParam("query") ? undefined : 5,
+		    	limit: this.getApiParam('query') ? undefined : 5,
 		    	stopList: this.getApiParams('stopList'),
-		    	query: this.getApiParam("query")
+		    	query: this.getApiParam('query')
 		    }
-    	});
+		});
     },
     
     /**
@@ -12572,18 +13091,9 @@ Ext.define('Voyant.panel.Bubblelines', {
      * @param query {String|Array}
      */
     getDocTermsFromQuery: function(query) {
-    	if (query) {this.setApiParam("query", query);} // make sure it's set for subsequent calls
-    	var corpus = this.getCorpus();
-    	if (corpus && this.isVisible()) {
-        	var docs = this.getCorpus().getDocuments();
-        	var len = docs.getCount();
-//        	var maxDocs = parseInt(this.getApiParam('maxDocs'))
-//        	if (len > maxDocs) {len = maxDocs}
-        	for (var i = 0; i < len; i++) {
-        		var doc = docs.getAt(i);
-    	    	this.setApiParams({query: query, docIndex: undefined, docId: doc.getId()});
-    			this.getDocTermStore().load({params: this.getApiParams()});
-        	}
+    	if (query) {this.setApiParam('query', query);} // make sure it's set for subsequent calls
+    	if (this.getCorpus() && this.isVisible()) {
+			this.getDocTermStore().load({params: this.getApiParams()});
     	}
 	},
     
@@ -12623,29 +13133,6 @@ Ext.define('Voyant.panel.Bubblelines', {
 			this.setSelectedDocs(this.getCorpus().getDocuments().filterBy(function(doc, docId) {
 				return docIds.indexOf(docId) != -1;
 			}, this));
-		}
-	},
-	
-	processDocuments: function(docs) {
-		docs.forEach(this.processDocument, this);
-	},
-	
-	// produce format that bubblelines can use
-	processDocument: function(doc) {
-		var docId = doc.getId();
-		if (!this.getProcessedDocs().containsKey(docId)) {
-			var title = doc.getShortTitle();
-			title = title.replace('&hellip;', '...');
-			var index = doc.get('index');
-			var totalTokens = doc.get('tokensCount-lexical');
-		
-			this.getProcessedDocs().add(docId, {
-				id: docId,
-				index: index,
-				title: title,
-				totalTokens: totalTokens,
-				terms: {}
-			});
 		}
 	},
 	
@@ -13226,6 +13713,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	mode: undefined,
     	options: [
     		{xtype: 'stoplistoption'},
+    		{xtype: 'colorselector'},
     		{
 	    		xtype: 'listeditor',
 	    		name: 'whiteList'
@@ -13898,9 +14386,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         this.setContextMenu(Ext.create('Ext.menu.Menu', {
 			renderTo: Ext.getBody(),
 			items: [{
-				text: '',
+				xtype: 'box',
 				itemId: 'label',
-				disabled: true
+				margin: '5px 0px 5px 5px',
+				html: ''
 			},{
 		        xtype: 'menuseparator'
 			},{
@@ -14309,7 +14798,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			this.getNetwork().selectNodes([n]);
 	    			var data = this.getNodeDataSet().get(n);
 	    			var menu = this.getContextMenu();
-	    			menu.queryById('label').setText(data.label);
+	    			menu.queryById('label').setHtml(data.label);
 	    			menu.queryById('fixed').setChecked(data.fixed);
 	    			menu.showAt(params.event.pageX, params.event.pageY);
 	    		}
@@ -15073,7 +15562,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
             	            	if (form.isValid()) {
             	            		var files = filefield.fileInputEl.dom.files;
             	            		var badFilesRe = /\.(png|gif|jpe?g|xls|mp[234a]|mpeg|exe|wmv|avi|ppt|mpg|tif|wav|mov|psd|wma|ai|bmp|pps|aif|pub|dwg|indd|swf|asf|mbd|dmg|flv)$/i;
-            	            		var goodFilesRe = /\.(txt|pdf|html?|xml|docx?|rtf|pages|odt|zip|jar|tar|gz|ar|cpio|bzip2|bz2|gzip|xlsx?)$/i;
+            	            		var goodFilesRe = /\.(txt|pdf|html?|xml|docx?|rtf|pages|epub|odt|zip|jar|tar|gz|ar|cpio|bzip2|bz2|gzip|xlsx?)$/i;
             	            		var badFiles = [];
             	            		var unknownFiles = [];
             	            		for (var i = 0, len = files.length; i<len; i++) {
@@ -19887,44 +20376,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		},
         		tbar: {
                     overflowHandler: 'scroller',
-                    items: [
-//                    {
-//                		fieldLabel: this.localize('numTerms'),
-//                		labelAlign: 'right',
-//                		labelWidth: 40,
-//                		itemId: 'limit',
-//                		xtype: 'combo',
-//                		width: 100,
-//                		store: Ext.create('Ext.data.ArrayStore', {
-//                			fields: ['count'],
-//                			data: [[10],[20],[30],[40],[50],[60],[70],[80],[90],[100]]
-//                		}),
-//                		displayField: 'count',
-//                		valueField: 'count',
-//                		queryMode: 'local',
-//                		editable: true,
-//                		allowBlank: false,
-//                		validator: function(val) {
-//                			return val.match(/\D/) === null;
-//                		},
-//                		listeners: {
-//    						change: function(combo, newVal, oldVal) {
-//    							function doLoad() {
-//    								var val = Math.min(parseInt(newVal), 10000);
-//    								this.setApiParam('limit', val);
-//									this.loadFromApis();
-//    							}
-//    							if (combo.isValid() && oldVal !== null) {
-//    								if (this.getTermsTimeout() !== null) {
-//    									clearTimeout(this.getTermsTimeout());
-//    								}
-//    								this.setTermsTimeout(setTimeout(doLoad.bind(this), 500));
-//    							}
-//    						},
-//    						scope: this
-//    					}
-//                	},
-                	{
+                    items: [{
                     	xtype: 'querysearchfield',
                     	itemId: 'addTerms',
 //                    	emptyText: this.localize('addTerm'),
@@ -19982,6 +20434,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
                 },
         		store: this.getTermStore(),
         		listeners: {
+        			expand: function(panel) {
+        				panel.getView().refresh();
+        			},
         			query: function(component, value) {
         				if (value.length > 0 && this.getTermStore().findExact('term', value[0]) === -1) {
 	                		this.setNewTerm(value);
@@ -19994,6 +20449,13 @@ Ext.define('Voyant.panel.ScatterPlot', {
         		}
         	}]
         });
+        
+        this.on('boxready', function(component, width, height) {
+			if (width < 400) {
+				this.queryById('optionsPanel').collapse();
+				this.queryById('termsGrid').collapse();
+			}
+		}, this);
         
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
@@ -22093,7 +22555,8 @@ Ext.define('Voyant.panel.TermsBerry', {
     statics: {
     	i18n: {
     		tfidf: 'tf-idf',
-    		inDocs: 'In Docs'
+    		inDocs: 'In Docs',
+    		reset: 'Reset'
     	},
     	api: {
     		stopList: 'auto',
@@ -22110,7 +22573,6 @@ Ext.define('Voyant.panel.TermsBerry', {
     	
     	mode: undefined,
     	
-    	collocatesLimit: 1000000, // a very large number so we get all of them
     	scalingFactor: 3,
     	
     	minRawFreq: undefined,
@@ -22120,13 +22582,17 @@ Ext.define('Voyant.panel.TermsBerry', {
     	maxFillValue: undefined,
     	
     	currentData: {},
+    	blacklist: {},
     	
     	visLayout: undefined,
     	vis: undefined,
     	visInfo: undefined,
     	visId: undefined,
     	
-    	tip: undefined
+    	currentNode: undefined,
+    	
+    	tip: undefined,
+    	contextMenu: undefined
 	},
     
 	MODE_TOP: 'top',
@@ -22134,6 +22600,8 @@ Ext.define('Voyant.panel.TermsBerry', {
     
     MIN_TERMS: 5,
     MAX_TERMS: 500,
+    
+    COLLOCATES_LIMIT: 1000000, // a very large number so we get all of them
     
     MIN_SCALING: 1,
     MAX_SCALING: 5,
@@ -22160,6 +22628,9 @@ Ext.define('Voyant.panel.TermsBerry', {
                 xtype: 'toolbar',
                 overflowHandler: 'scroller',
                 items: [{
+                   xtype: 'querysearchfield',
+                   clearOnQuery: true
+                },{
                 	xtype: 'button',
                 	text: this.localize('strategy'),
                 	menu: {
@@ -22248,9 +22719,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 	            			
 	            			this.getVisLayout().value(function(d) { return Math.pow(d.rawFreq, 1/value); });
 	            			
-	            			var data = this.processRecordsForVis([]);
-	            			this.resetVis();
-	            			this.buildVisFromData(data);
+	            			this.reload();
 	            		},
 	            		scope: this
 	            	}
@@ -22258,6 +22727,39 @@ Ext.define('Voyant.panel.TermsBerry', {
                 ]
     		}]
     	});
+    	
+    	this.setContextMenu(Ext.create('Ext.menu.Menu', {
+			renderTo: Ext.getBody(),
+			items: [{
+				xtype: 'box',
+				itemId: 'label',
+				margin: '5px 0px 5px 5px',
+				html: ''
+			},{
+		        xtype: 'menuseparator'
+			},{
+				xtype: 'button',
+				text: 'Remove',
+				style: 'margin: 5px;',
+				handler: function(b, e) {
+					var node = this.getCurrentNode();
+					if (node !== undefined) {
+						delete this.getCurrentData()[node.term];
+						this.getBlacklist()[node.term] = true;
+						this.setCurrentNode(undefined);
+					}
+					this.getContextMenu().hide();
+					this.reload();
+				},
+				scope: this
+			}]
+		}));
+    	
+    	this.on('query', function(src, query) {
+    		if (query.length > 0) {
+    			this.doLoad(query);
+    		}
+		}, this);
     	
     	this.callParent(arguments);
     },
@@ -22277,11 +22779,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     			
     			this.getVisLayout().size([width, height]);
     			
-    			var data = this.processRecordsForVis([]);
-    			if (data.length > 0) {
-	    			this.resetVis();
-	    			this.buildVisFromData(data);
-    			}
+    			this.reload();
     		}
     	},
     	
@@ -22290,15 +22788,25 @@ Ext.define('Voyant.panel.TermsBerry', {
     	}
     },
     
-    doLoad: function() {
+    doLoad: function(query) {
 		this.resetVis();
-		this.resetMinMax();
-		this.setCurrentData({});
+		if (query === undefined) {
+			this.resetMinMax();
+			this.setCurrentData({});
+		}
     	if (this.getMode() === this.MODE_DISTINCT) {
-    		this.getDistinctTerms();
+    		this.getDistinctTerms(query);
     	} else {
-    		this.getTopTerms();
+    		this.getTopTerms(query);
     	}
+    },
+    
+    reload: function() {
+    	var data = this.processCollocates([]);
+		if (data.length > 0) {
+			this.resetVis();
+			this.buildVisFromData(data);
+		}
     },
     
     resetMinMax: function() {
@@ -22313,12 +22821,18 @@ Ext.define('Voyant.panel.TermsBerry', {
     	this.getVis().selectAll('.node').remove();
     },
     
-    getTopTerms: function() {
-    	this.setApiParams({docId: undefined, docIndex: undefined});
+    getTopTerms: function(query) {
+    	var limit = parseInt(this.getApiParam('numInitialTerms'));
+    	var stopList = this.getApiParam('stopList');
+    	if (query !== undefined) {
+    		limit = undefined;
+    		stopList = undefined;
+    	}
     	this.getCorpus().getCorpusTerms().load({
     		params: {
- 				limit: parseInt(this.getApiParam('numInitialTerms')),
- 				stopList: this.getApiParam('stopList')
+    			query: query,
+ 				limit: limit,
+ 				stopList: stopList
  			},
 		    callback: function(records, operation, success) {
 		    	if (success) {
@@ -22329,14 +22843,20 @@ Ext.define('Voyant.panel.TermsBerry', {
     	});
     },
     
-    getDistinctTerms: function() {
+    getDistinctTerms: function(query) {
+    	var limit = parseInt(this.getApiParam('numInitialTerms'));
+    	var stopList = this.getApiParam('stopList');
+    	if (query !== undefined) {
+    		limit = undefined;
+    		stopList = undefined;
+    	}
     	var perDocLimit = Math.ceil(parseInt(this.getApiParam('numInitialTerms')) / this.getCorpus().getDocumentsCount()); // ceil ensures there's at least 1 per doc
     	this.getCorpus().getDocumentTerms().load({
-			addRecords: true,
 			params: {
-				limit: parseInt(this.getApiParam('numInitialTerms')),
+				query: query,
+				limit: limit,
 				perDocLimit: perDocLimit,
-				stopList: this.getApiParam('stopList'),
+				stopList: stopList,
 				sort: 'TFIDF',
 				dir: 'DESC'
 			},
@@ -22349,6 +22869,20 @@ Ext.define('Voyant.panel.TermsBerry', {
     	});
     },
     
+    loadFromQuery: function(query) {
+    	this.getCorpus().getCorpusTerms().load({
+    		params: {
+ 				query: query
+ 			},
+		    callback: function(records, operation, success) {
+		    	if (success) {
+		    		this.loadFromRecords(records);
+		    	}
+		    },
+		    scope: this
+    	});
+    },
+    
     loadFromRecords: function(records) {
     	if (Ext.isArray(records) && records.length>0) {
     		var maxFreq = this.getMaxRawFreq();
@@ -22358,24 +22892,26 @@ Ext.define('Voyant.panel.TermsBerry', {
     		var terms = [];
     		records.forEach(function(r) {
     			var term = r.getTerm();
-    			var rawFreq = r.getRawFreq();
-    			var fillVal = this.getMode() === this.MODE_DISTINCT ? r.get('tfidf') : r.getInDocumentsCount();
-    			
-    			if (maxFreq === undefined || rawFreq > maxFreq) maxFreq = rawFreq;
-    			if (minFreq === undefined || rawFreq < minFreq) minFreq = rawFreq;
-    			
-    			if (maxFillVal === undefined || fillVal > maxFillVal) maxFillVal = fillVal;
-    			if (minFillVal === undefined || fillVal < minFillVal) minFillVal = fillVal;
-    			
-    			this.getCurrentData()[term] = {
-    				term: term,
-    				rawFreq: rawFreq,
-    				relativeFreq: r.get('relativeFreq'),//r.getRelativeFreq(),
-    				fillValue: fillVal,
-    				collocates: []
-    			};
-    			
-    			terms.push(term);
+    			if (!this.getBlacklist()[term]) {
+	    			var rawFreq = r.getRawFreq();
+	    			var fillVal = this.getMode() === this.MODE_DISTINCT ? r.get('tfidf') : r.getInDocumentsCount();
+	    			
+	    			if (maxFreq === undefined || rawFreq > maxFreq) maxFreq = rawFreq;
+	    			if (minFreq === undefined || rawFreq < minFreq) minFreq = rawFreq;
+	    			
+	    			if (maxFillVal === undefined || fillVal > maxFillVal) maxFillVal = fillVal;
+	    			if (minFillVal === undefined || fillVal < minFillVal) minFillVal = fillVal;
+	    			
+	    			this.getCurrentData()[term] = {
+	    				term: term,
+	    				rawFreq: rawFreq,
+	    				relativeFreq: r.get('relativeFreq'),//r.getRelativeFreq(),
+	    				fillValue: fillVal,
+	    				collocates: []
+	    			};
+	    			
+	    			terms.push(term);
+    			}
     		}, this);
     		
     		this.setMaxRawFreq(maxFreq);
@@ -22383,27 +22919,32 @@ Ext.define('Voyant.panel.TermsBerry', {
     		this.setMinFillValue(minFillVal);
     		this.setMaxFillValue(maxFillVal);
     		
-    		this.loadFromQuery(terms);
+    		this.getCollocatesForQuery(terms);
     	}
     },
     
-    loadFromQuery: function(query) {
+    getCollocatesForQuery: function(query) {
+    	var whitelist = [];
+    	for (var term in this.getCurrentData()) {
+    		whitelist.push(term);
+    	}
+    	 
     	this.setApiParams({
     		mode: 'corpus'
     	});
     	var params = this.getApiParams();
     	this.getCorpus().getCorpusCollocates().load({
-    		params: Ext.apply(Ext.clone(params), {query: query, collocatesWhitelist: query, limit: this.getCollocatesLimit()}),
+    		params: Ext.apply(Ext.clone(params), {query: query, collocatesWhitelist: whitelist, limit: this.COLLOCATES_LIMIT}),
     		callback: function(records, op, success) {
     			if (success) {
-    				this.buildVisFromData(this.processRecordsForVis(records));
+    				this.buildVisFromData(this.processCollocates(records));
     			}
     		},
     		scope: this
     	});
     },
     
-    processRecordsForVis: function(records) {
+    processCollocates: function(records) {
     	var currentTerms = this.getCurrentData();
 
     	var maxCol = this.getMaxCollocateValue();
@@ -22433,9 +22974,9 @@ Ext.define('Voyant.panel.TermsBerry', {
     	
     	var data = [];
     	for (var term in currentTerms) {
-    		if (currentTerms[term].collocates.length > 0) {
+//    		if (currentTerms[term].collocates.length > 0) {
     			data.push(currentTerms[term]);
-    		}
+//    		}
     	}
     	return data;
     },
@@ -22492,6 +23033,8 @@ Ext.define('Voyant.panel.TermsBerry', {
     			me.dispatchEvent('termsClicked', me, [d.term]);
     		})
     		.on('mouseover', function(d, i) {
+    			me.setCurrentNode(d);
+    			
     			me.getVis().selectAll('circle')
     				.style('stroke-width', 1)
     				.style('stroke', '#111')
@@ -22508,10 +23051,13 @@ Ext.define('Voyant.panel.TermsBerry', {
     			} else {
     				fillLabel = me.localize('inDocs');
     			}
-    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')<br/>'+fillLabel+': '+d.fillValue;
-				var tip = me.getTip();
-				tip.update(info);
-				tip.show();
+    			
+    			if (!me.getContextMenu().isVisible()) {
+	    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')<br/>'+fillLabel+': '+d.fillValue;
+					var tip = me.getTip();
+					tip.update(info);
+					tip.show();
+    			}
 				
 				for (var i = 0; i < d.collocates.length; i++) {
 					var collocate = d.collocates[i];
@@ -22524,17 +23070,25 @@ Ext.define('Voyant.panel.TermsBerry', {
 				}
 			})
 			.on('mousemove', function() {
-				var container = Ext.get(me.getVisId()).dom;
-				var coords = d3.mouse(container);
-				coords[1] += 20;
-				me.getTip().setPosition(coords);
+				me.getTip().setPosition(d3.event.pageX+5, d3.event.pageY-50);
 			})
 			.on('mouseout', function() {
+				if (!me.getContextMenu().isVisible()) {
+					me.setCurrentNode(undefined);
+				}
+				
 				me.getVis().selectAll('circle').style('stroke-opacity', me.MIN_STROKE_OPACITY).style('stroke', '#111')
 	    			.style('fill', function(d) { return defaultFill(d.fillValue); });
 				me.getVis().selectAll('tspan.value').text('');
 				me.getTip().hide();
 //				me.getVisInfo().text('');
+			})
+			.on('contextmenu', function(d, i) {
+				d3.event.preventDefault();
+				me.getTip().hide();
+				var menu = me.getContextMenu();
+				menu.queryById('label').setHtml(d.term);
+				menu.showAt(d3.event.pageX+5, d3.event.pageY-50);
 			});
     	
     	node.append('circle')
@@ -24119,6 +24673,8 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	alias: 'widget.voyantheader',
     statics: {
     	i18n: {
+    		done: 'Done',
+    		categoriesBuilder: 'Categories Builder'
     	}
     },
     constructor: function(config) {
@@ -24161,6 +24717,33 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	        				}
 	        			}, this);
 	        		}
+				},
+				categories: {
+					type: 'categories',
+					tooltip: this.localize('categoriesBuilder'),
+					xtype: 'toolmenu',
+					glyph: 'xf02c@FontAwesome',
+					handler: function(btn) {
+	        			Ext.create('Ext.window.Window', {
+	        				title: this.localize('categoriesBuilder'),
+	        				modal: true,
+	        				layout: 'fit',
+	        				height: this.getApplication().getViewport().getHeight()*0.5,
+	        				width: this.getApplication().getViewport().getWidth()*0.75,
+	        				panel: this,
+	        				items: {
+	        					xtype: 'categoriesbuilder',
+	        					categoriesManager: this.getApplication().getCategoriesManager()
+	        				},
+	        				buttons: [{
+	        					text: this.localize('done'),
+	        					handler: function(btn) {
+	        						btn.up('window').close();
+	        					}
+	        				}]
+	        			}).show();
+	        		},
+	        		scope: this
 				}
 			}
         })
@@ -25981,6 +26564,7 @@ Ext.define('Voyant.panel.Topics', {
 		var limit = parseInt(this.getApiParam('limit'));
 		for (var topic = 0; topic < numTopics; topic++) {
 			var scores = documents.map(function (doc, i) {
+				console.warn(doc, doc.topicCounts[topic], docSortSmoothing, doc.tokens.length, sumDocSortSmoothing);
 				  return (doc.topicCounts[topic] + docSortSmoothing) / (doc.tokens.length + sumDocSortSmoothing);
 			});
 			
@@ -26031,7 +26615,7 @@ Ext.define('Voyant.panel.Topics', {
     	var stopwords = this.getStopwords(), vocabularyCounts = this.getVocabularyCounts(),
 	    	tokensPerTopic = this.getTokensPerTopic(), vocabularySize=this.getVocabularySize(),
 	    	vocabularyCounts = this.getVocabularyCounts(), documents = this.getDocuments(),
-	    	numTopics = parseInt(this.getApiParam('numTopics')), documents = this.getDocuments(),
+	    	numTopics = parseInt(this.getApiParam('numTopics')),
 	    	wordTopicCounts = this.getWordTopicCounts();
     	
     	  if (line == "") { return; }
@@ -26379,8 +26963,8 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 })
 Ext.define("Voyant.notebook.editor.CodeEditor", {
 	extend: "Ext.Component",
-	alias: "widget.notebookcodeeditor",
-	mixins: ["Voyant.util.Localization"],
+	alias: "widget.notebookcodeeditor", 
+	mixins: ["Voyant.util.Localization",'Voyant.notebook.util.Embed'],
 	cls: 'notebook-code-editor',
 	config: {
 		theme: 'ace/theme/chrome',
@@ -26402,7 +26986,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.getSession().setUseWorker(true);
 			this.editor.setTheme(this.getTheme());
 			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: 100/*, autoScrollEditorIntoView: true, scrollPastEnd: true*/});
+			this.editor.setOptions({minLines: 6, maxLines: 35, autoScrollEditorIntoView: true, scrollPastEnd: true});
 			this.editor.setHighlightActiveLine(false);
 			this.editor.renderer.setShowPrintMargin(false);
 			this.editor.renderer.setShowGutter(false);
@@ -26414,7 +26998,10 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		    this.editor.on("change", function() {
 		    	if (me.getIsChangeRegistered()==false) {
 		    		me.setIsChangeRegistered(true);
-			    	me.up('notebookcodeeditorwrapper').setIsRun(false);
+			    	var wrapper = me.up('notebookcodeeditorwrapper');
+			    	if (wrapper) {
+			    		wrapper.setIsRun(false);
+			    	}
 		    	}
 		    }, this)
 		    this.editor.on("blur", function() {
@@ -26424,7 +27011,10 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 				name: 'run',
 			    bindKey: {win: "Shift-Enter", mac: "Shift-Enter"}, // additional bindings like alt/cmd-enter don't seem to work
 			    exec: function(editor) {
-			    	me.up('notebookcodeeditorwrapper').run();
+			    	var wrapper = me.up('notebookcodeeditorwrapper');
+			    	if (wrapper) {
+			    		wrapper.run();
+			    	}
 			    }				
 			});
 			
@@ -26437,7 +27027,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	                 */
 	                enableTern: {
 	                    /* http://ternjs.net/doc/manual.html#option_defs */
-	                    defs: ['ecma5', me.docs],
+	                    defs: me.docs ? ['ecma5', me.docs] : [],
 	                    plugins: {
 	                        doc_comment: {
 	                            fullDocs: true
@@ -26466,6 +27056,11 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		}
 	},
 	
+	switchModes: function(mode) {
+		this.setMode('ace/mode/'+mode);
+		this.editor.getSession().setMode(this.getMode());
+	},
+	
 	getValue: function() {
 		return this.editor.getValue();
 	}
@@ -26478,7 +27073,16 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	statics: {
 		i18n: {
 			previousNotRunTitle: "Previous Code Blocks",
-			previousNotRun: "There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?"
+			previousNotRun: "There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?",
+			modeCode: "Code",
+			modeData: "Data",
+			modeJavascript: "Javascript (default)",
+			modeJson: "JSON",
+			modeText: "Text",
+			modeCsv: "CSV (comma-separated values)",
+			modeTsv: "TSV (tab-separated values)",
+			modeHtml: "HTML",
+			modeXml: "XML"
 		}
 	},
 	config: {
@@ -26500,13 +27104,17 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		
 		this.editor = Ext.create("Voyant.notebook.editor.CodeEditor", {
 			content: Ext.Array.from(config.input).join("\n"),
-			docs: config.docs
+			docs: config.docs,
+			mode: 'ace/mode/'+(config.mode ? config.mode : 'javascript')
 		});
 		
 		Ext.apply(this, {
 			dockedItems: [{
 			    xtype: 'toolbar',
 			    dock: 'left',
+			    defaults: {
+			    	textAlign: 'left'
+			    },
 			    items: [
 					{
 						xtype: 'notebookwrapperadd'
@@ -26529,15 +27137,103 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 							}
 						}
 					},{
-						
-						xtype: 'notebookwrapperrunall',
+						xtype: 'button',
+						glyph: 'xf1c9@FontAwesome',
+						tooltip: this.localize('codeModeTip'),
 						listeners: {
-							click: {
-								fn: function() {
-									this.up('notebook').runAllCode()
-								},
-								scope: this
-							}
+							click: function() {
+								var me = this;
+								new Ext.Window({
+								    title: 'Resize Me',
+								    layout: 'fit',
+								    width: 200,
+								    items: [{
+										xtype: 'form',
+										layout: {
+											type: 'vbox',
+											align: 'stretch'
+										},
+										bodyPadding: 10,
+										items: [{
+											xtype: 'fieldset',
+											title: this.localize("modeCode"),
+											items: {
+							                    xtype : 'radiofield',
+							                    boxLabel : this.localize('modeJavascript'),
+							                    name  : 'codeMode',
+							                    inputValue: 'javascript',
+							                    flex  : 1													
+											}
+										},{
+											xtype: 'fieldset',
+											title: this.localize("modeData"),
+											items: [{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeJson'),
+								                    name  : 'codeMode',
+								                    inputValue: 'javascript',
+								                    flex  : 1													
+												}
+											},{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeText'),
+								                    name  : 'codeMode',
+								                    inputValue: 'text',
+								                    flex  : 1													
+												}
+											},/*{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeCsv'),
+								                    name  : 'codeMode',
+								                    inputValue: 'csv',
+								                    flex  : 1													
+												}
+											},{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeTsv'),
+								                    name  : 'codeMode',
+								                    inputValue: 'tsv',
+								                    flex  : 1													
+												}
+											},*/{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeHtml'),
+								                    name  : 'codeMode',
+								                    inputValue: 'html',
+								                    flex  : 1													
+												}
+											},{
+												items: {
+								                    xtype : 'radiofield',
+								                    boxLabel : this.localize('modeXml'),
+								                    name  : 'codeMode',
+								                    inputValue: 'xml',
+								                    flex  : 1													
+												}
+											}]
+										}]
+								    }],
+								   buttons: [{
+								        text: this.localize('ok'),
+								        handler: function() {
+								        	var win = this.up('window'); values = win.down('form').getForm().getValues();
+								        	me.switchModes(values.codeMode);
+								        	win.close();
+								        }
+								    },{
+								        text:  this.localize('cancel'),
+								        handler: function() {
+								        	this.up('window').close();
+								        }
+								    }]
+								}).show();
+							},
+							scope: this
 						}
 					}
 			    ]
@@ -26560,7 +27256,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		});
 		
         this.callParent(arguments);
-
+        
 	},
 	
 	initComponent: function() {
@@ -26575,23 +27271,33 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		me.callParent(arguments);
 	},
 	
+	switchModes: function(mode) {
+		var runnable = mode=='javascript';
+		this.down('notebookwrapperrun').setVisible(runnable);
+		this.down('notebookwrapperrununtil').setVisible(runnable);
+		this.results.setVisible(runnable);
+		this.editor.switchModes(mode);
+	},
+	
 	run: function(runningAll) {
-		if (runningAll===true) {
-			this._run();
-		} else {
-			var notebook = this.up('notebook');
-			Ext.Array.each(notebook.query('notebookcodeeditorwrapper'), function(wrapper) {
-				if (wrapper==this) {this._run(); return false;} // break
-				if (wrapper.getIsRun()==false) {
-					Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
-						if (btnId=='yes') {
-							notebook.runAllCode();
-						} else {
-							this._run();
-						}
-					}, this)
-				}
-			}, this);
+		if (this.editor.getMode()=='ace/mode/javascript') { // only run JS
+			if (runningAll===true) {
+				this._run();
+			} else {
+				var notebook = this.up('notebook');
+				Ext.Array.each(notebook.query('notebookcodeeditorwrapper'), function(wrapper) {
+					if (wrapper==this) {this._run(); return false;} // break
+					if (wrapper.editor && wrapper.editor.getMode() == 'ace/mode/javascript' && wrapper.getIsRun()==false) {
+						Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
+							if (btnId=='yes') {
+								notebook.runAllCode();
+							} else {
+								this._run();
+							}
+						}, this)
+					}
+				}, this);
+			}
 		}
 	},
 	
@@ -26602,7 +27308,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		var code = this.editor.getValue();
 		var success = false;
 		try {
-			Voyant.notebook.util.Show.TARGET = this.results.getEl();
+			Voyant.notebook.util.Show.TARGET = this.results.getEl(); // this is for output
+			Voyant.notebook.Notebook.currentBlock = this; // this is to tie back in to the block
 			
 			// I'd like to be able to run this in another scope/context, but it
 			// doesn't seem possible for the type of code that's being run
@@ -26641,15 +27348,18 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	
 	getContent: function() {
-		var el = this.results.getTargetEl(), resultEl = el.dom.cloneNode(true);
-		var html = resultEl.innerHTML;
-		if (!resultEl.style.height) {
-			html = "<div style='height: "+el.getHeight()+"px'>"+html+"</div>";
-		}
-		return {
+		var toReturn = {
 			input: this.editor.getValue(),
-			output: html
+			mode: this.editor.getMode().split("/").pop()
 		}
+		if (toReturn.mode=='javascript') {
+			var el = this.results.getTargetEl(), resultEl = el.dom.cloneNode(true);
+			toReturn.output = resultEl.innerHTML;
+			if (!resultEl.style.height) {
+				toReturn.output = "<div style='height: "+el.getHeight()+"px'>"+toReturn.output+"</div>";
+			}
+		}
+		return toReturn;
 	}
 })
 Ext.define("Voyant.notebook.editor.TextEditor", {
@@ -26776,6 +27486,7 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 	}
 })
 Ext.define('Voyant.notebook.Notebook', {
+	alternateClassName: ["Notebook"],
 	extend: 'Ext.panel.Panel',
 	requires: ['Voyant.notebook.editor.CodeEditorWrapper','Voyant.notebook.editor.TextEditorWrapper','Voyant.notebook.util.Show','Voyant.panel.Cirrus','Voyant.panel.Summary'],
 	mixins: ['Voyant.panel.Panel'],
@@ -26801,7 +27512,57 @@ Ext.define('Voyant.notebook.Notebook', {
     	},
     	api: {
     		input: undefined
+    	},
+    	
+    	currentBlock: undefined,
+ 
+    	getDeferred: function() {
+    		return Voyant.application.getDeferred();
+    	},
+    	
+    	getDataFromBlock: function(where) {
+    		if (Voyant.notebook.Notebook.currentBlock) {
+    			var previous = Voyant.notebook.Notebook.currentBlock;
+    			while(previous) {
+    				previous = previous.previousSibling();
+    				if (previous.isXType("notebookcodeeditorwrapper") && previous.editor.getMode()!='ace/mode/javascript') {
+    					return previous.getContent().input;
+    				}
+    			}
+    		}
+    		showError("Unable to find data to load");
+    	},
+    	
+    	loadDataFromUrl: function(url, config) {
+    		var dfd = Voyant.application.getDeferred();
+    		var params = {
+       		     url: Voyant.application.getTromboneUrl(),
+    		     params: {
+    		    	 fetchData: url
+    		     }
+    		}
+    		if (config && config.format) {params.format = config.format}
+    		Ext.Ajax.request(params).then(function(response, opts) {
+    			 if (config && config.format) {
+    				 if (config.format.toLowerCase()=='json') {
+    					 return dfd.resolve(Ext.decode(response.responseText))
+    				 } else if (config.format.toLowerCase()=='xml') {
+    					 parser = new DOMParser();
+    					 xmlDoc = parser.parseFromString(response.responseText,"text/xml");
+    					 return dfd.resolve(xmlDoc)
+    				 }
+    			 }
+    			 dfd.resolve(response.responseText);
+    		 },
+    		 function(response, opts) {
+    			 debugger
+    			 dfd.reject(response.responseText);
+    		     console.log('server-side failure with status code ' + response.status);
+    		 });
+    		
+    		return dfd.promise;
     	}
+    	
     },
     config: {
     	metadata: {},
@@ -26940,7 +27701,9 @@ Ext.define('Voyant.notebook.Notebook', {
 	        		    		contents += "<div id='vn-section-"+i+"'><a name='vn-section-"+i+"'></a>";
 	        		    		if (type=='code') {
 	        		    			contents += "<div class='notebook-code-editor ace-chrome'>"+item.getTargetEl().query('.ace_text-layer')[0].outerHTML+"</div>";
-	        		    			contents += "<div class='notebook-code-results'>"+content.output+"</div>";
+	        		    			if (content.mode=='javascript') {
+		        		    			contents += "<div class='notebook-code-results'>"+content.output+"</div>";
+	        		    			}
 	        		    		} else {
 	        		    			contents += "<div class='notebook-text-editor'>"+content+"</div>";
 	        		    		}
@@ -27261,6 +28024,7 @@ Ext.define('Voyant.notebook.Notebook', {
         		block = {
         			type: 'code',
         			input: content.input,
+        			mode: content.mode,
         			output: this.wrap(content.output)
         		}
     		} else {
@@ -27298,6 +28062,7 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     wrap: function(content) {
+    	content = content || "";
     	var maxLen = 80;
     	if (content && content.length>maxLen) {
 			var contents = [];
@@ -27315,7 +28080,7 @@ Ext.define('Voyant.notebook.Notebook', {
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
-	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api'],
+	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api','Voyant.util.CategoriesManager'],
 	requires: ['Voyant.util.ResponseError'],
     
     name: 'VoyantApp',
@@ -27332,7 +28097,8 @@ Ext.define('Voyant.VoyantApp', {
     
     config: {
     	baseUrl: undefined,
-    	tromboneUrl: undefined
+    	tromboneUrl: undefined,
+    	categoriesManager: undefined
     },
     
     constructor: function(config) {
@@ -27342,6 +28108,8 @@ Ext.define('Voyant.VoyantApp', {
     	// set the Trombone URL from the baseURL // TODO: maybe allow this to be overridden
 		this.setTromboneUrl(this.config.baseUrl+'trombone');
 
+		this.setCategoriesManager(new Ext.create('Voyant.util.CategoriesManager'));
+		
     	// set the application for the Corpus so that we can use a simple constructor
 		Voyant.application = this;
 		

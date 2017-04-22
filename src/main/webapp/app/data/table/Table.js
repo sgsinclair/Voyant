@@ -15,7 +15,7 @@
 Ext.define('Voyant.data.table.Table', {
 	alternateClassName: ["VoyantTable"],
 	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
-	embeddable: ['Voyant.widget.VoyantTableTransform','Voyant.widget.VoyantChart'],
+	embeddable: ['Voyant.widget.VoyantTableTransform','Voyant.widget.VoyantChart','Voyant.widget.CodeEditor'],
 	config: {
 		
 		/**
@@ -28,6 +28,11 @@ Ext.define('Voyant.data.table.Table', {
 		 */
 		headers: [],
 
+		/**
+		 * @private
+		 */
+		headersMap: {},
+		
 		/**
 		 * Specifies that a specific header should serve as row key.
 		 * 
@@ -43,13 +48,22 @@ Ext.define('Voyant.data.table.Table', {
 	constructor: function(config, opts) {
 
 		config = config || {};
-				
-		// not sure why config isn't working
-		this.setRows(Ext.Array.from(Ext.isArray(config) ? config : config.rows));
-		this.setHeaders(Ext.Array.from(config.headers));
-		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
 		
-		if (config.count && Ext.isArray(config.count)) {
+		if (config.fromBlock) {
+			var data = Voyant.notebook.Notebook.getDataFromBlock(config.fromBlock);
+			if (data) {
+				config.rows = [];
+				data.split(/\n+/).forEach(function(line,i) {
+					var cells = line.split("\t");
+					if (i==0 && !config.noHeaders) {
+						config.headers = cells
+					} else {
+						config.rows.push(cells)
+					}
+				})
+				
+			}
+		} else if (config.count && Ext.isArray(config.count)) {
 			// create counts
 			var freqs = {};
 			config.count.forEach(function(item) {freqs[item] = freqs[item] ? freqs[item]+1 : 1;});
@@ -61,48 +75,64 @@ Ext.define('Voyant.data.table.Table', {
 				counts.splice(config.limit);
 			}
 			if (config.orientation && config.orientation=="horizontal") {
-				this.setHeaders(counts.map(function(item) {return item[0]}));
-				this.setRows([counts.map(function(item) {return item[1]})]);
+				config.headers = counts.map(function(item) {return item[0]});
+				config.rows = [counts.map(function(item) {return item[1]})];
 			} else {
-				this.setHeaders(config.headers ? config.headers : ["Item","Count"]);
-				this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
-				this.setRows(counts);
+				config.headers = config.headers ? config.headers : ["Item","Count"];
+				config.rows = counts;
 			}
-		}
-		
-		if (config.isStore || config.store) {
+		} else if (config.isStore || config.store) {
 			var store = config.store ? config.store : config;
-			
 			if (opts && opts.headers) {
-				this.setHeaders(opts.headers);
-				this.setRowKey(opts.rowKey ? opts.rowKey : this.getHeaders()[0]);
+				config.headers = opts.headers;
 			} else {
 				// store.getModel() doesn't seem to work (for CorpusTerms at least)
 				// so instead we'll try looking at the first record to get headers
 				var record = store.getAt(0);
 				if (record) { // don't know what to do if this fails?
-					this.setHeaders(record.getFields().map(function(field) {return field.getName()}))
-					this.setRowKey(opts.rowKey ? opts.rowKey : this.getHeaders()[0]);
+					config.headers = record.getFields().map(function(field) {return field.getName()});
 				}
 			}
 			
 			// now we get rows
+			config.rows = [];
 			store.each(function(record) {
-				this.addRow(record.getData());
+				var cells = [];
+				var data = record.getData();
+				for (key in data) {cells.push(data[key])}
+				config.rows.push(cells);
 			}, this);
 		}
-		
+
+				
+		// not sure why config isn't working
+		this.setRows(Ext.Array.from(Ext.isArray(config) ? config : config.rows));
+		this.setHeaders(Ext.Array.from(config.headers));
+		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
+
 		if (this.getHeaders().length==0) {
 			var firstRow = this.getRow(0, false);
 			if (firstRow) {
 				this.setHeaders(firstRow.map(function(cell, i) {return String.fromCharCode(65+i)}));
 			}
 		}
+		
+		var headersMap = {};
+		this.getHeaders().forEach(function(header, i) {
+			headersMap[header] = i;
+		});
+		this.setHeadersMap(headersMap);
+		
 		this.callParent();
 	},
 	addRow: function(row) {
+		debugger
 		if (Ext.isObject(row)) {
-			this.getRows().push(this.getHeaders().map(function(key) {return row[key]}))
+			var len = this.getRows().length;
+			for (var key in row) {
+				this.updateCell(len, key, row[key])
+			}
+			
 		} else if (Ext.isArray(row)) {
 			this.getRows().push(row);
 		}
@@ -164,13 +194,50 @@ Ext.define('Voyant.data.table.Table', {
 	 */
 	updateCell: function(row, column, value, replace) {
 		var rows = this.getRows();
+		var r = Ext.isNumber(row) ? row : this.getRowIndex(row);
+		var c = Ext.isNumber(column) ? column : this.getColumnIndex(column);
 		if (rows[row]===undefined) {rows[row]=[]}
-		if (rows[row][column]===undefined || replace) {rows[row][column]=value}
-		else {rows[row][column]+=value}
+		if (rows[row][c]===undefined || replace) {rows[row][c]=value}
+		else {rows[row][c]+=value}
+	},
+	
+	getRowIndex: function(key) {
+		if (Ext.isString(key)) {
+			console.error("Implement this"); alert("Unimplemented method: VoyantTable.getRowIndex()");
+		}
+	},
+	
+	getColumnIndex: function(column) {
+		if (Ext.isString(column)) {
+			if (!this.getHeadersMap()[column]) {
+				// we don't have this column yet, so create it and expand rows
+				this.getHeaders().push(column);
+				this.getHeadersMap()[column] = this.getHeaders().length-1
+				this.getRows().forEach(function(row) {
+					row.push("")
+				});
+			}
+			return this.getHeadersMap()[column]
+		}
 	},
 	
 	embed: function(cmp, config) {
-
+		if (!config && Ext.isObject(cmp)) {
+			config = cmp;
+			cmp = this.embeddable[0];
+		}
+		config = config || {};
+		
+		Ext.apply(config, {
+			tableJson: JSON.stringify({
+				rowkey: this.getRowKey(),
+				headers: this.getHeaders(),
+				rows: this.getRows()
+			})
+		});
+		
+		return embed.call(this, cmp, config);
+		
 		if (((Ext.isObject(cmp) || !cmp) && !config) || (cmp && Ext.isString(cmp) && cmp.toLowerCase().indexOf("voyanttabletransform")>-1)) {
 			config = cmp || {};
 
@@ -348,6 +415,15 @@ Ext.define('Voyant.data.table.Table', {
 		embed.call(this, cmp, config);
 	},
 	
+	toTsv: function(config) {
+		var tsv = this.getHeaders().join("\t");
+		this.getRows().forEach(function(row, i) {
+			if (config && Ext.isNumber(config) && i>config) {return;}
+			tsv += "\n"+row.map(function(cell) {return cell.replace(/(\n|\t)/g, "")}).join("\t");
+		})
+		return tsv;
+	},
+	
 	getString: function(config) {
 		config = config || {};
 		var table = "<table class='voyant-table' style='"+(config.width ? ' width: '+config.width : '')+"' id='"+(config.id ? config.id : Ext.id())+"'>";
@@ -360,7 +436,7 @@ Ext.define('Voyant.data.table.Table', {
 			table+="</tr></thead>";
 		}
 		table+="<tbody>";
-		for (var i=0, len = this.getRows().length; i<len; i++) {
+		for (var i=0, len = Ext.isNumber(config) ? config : this.getRows().length; i<len; i++) {
 			table+="<tr>";
 			var row = this.getRow(i);
 			row.forEach(function(cell) {

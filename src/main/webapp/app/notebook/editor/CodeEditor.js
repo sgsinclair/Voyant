@@ -1,7 +1,7 @@
 Ext.define("Voyant.notebook.editor.CodeEditor", {
 	extend: "Ext.Component",
-	alias: "widget.notebookcodeeditor",
-	mixins: ["Voyant.util.Localization"],
+	alias: "widget.notebookcodeeditor", 
+	mixins: ["Voyant.util.Localization",'Voyant.notebook.util.Embed'],
 	cls: 'notebook-code-editor',
 	config: {
 		theme: 'ace/theme/chrome',
@@ -23,7 +23,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.getSession().setUseWorker(true);
 			this.editor.setTheme(this.getTheme());
 			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: 100/*, autoScrollEditorIntoView: true, scrollPastEnd: true*/});
+			this.editor.setOptions({minLines: 6, maxLines: 35, autoScrollEditorIntoView: true, scrollPastEnd: true});
 			this.editor.setHighlightActiveLine(false);
 			this.editor.renderer.setShowPrintMargin(false);
 			this.editor.renderer.setShowGutter(false);
@@ -35,7 +35,10 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		    this.editor.on("change", function() {
 		    	if (me.getIsChangeRegistered()==false) {
 		    		me.setIsChangeRegistered(true);
-			    	me.up('notebookcodeeditorwrapper').setIsRun(false);
+			    	var wrapper = me.up('notebookcodeeditorwrapper');
+			    	if (wrapper) {
+			    		wrapper.setIsRun(false);
+			    	}
 		    	}
 		    }, this)
 		    this.editor.on("blur", function() {
@@ -45,7 +48,10 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 				name: 'run',
 			    bindKey: {win: "Shift-Enter", mac: "Shift-Enter"}, // additional bindings like alt/cmd-enter don't seem to work
 			    exec: function(editor) {
-			    	me.up('notebookcodeeditorwrapper').run();
+			    	var wrapper = me.up('notebookcodeeditorwrapper');
+			    	if (wrapper) {
+			    		wrapper.run();
+			    	}
 			    }				
 			});
 			
@@ -58,7 +64,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	                 */
 	                enableTern: {
 	                    /* http://ternjs.net/doc/manual.html#option_defs */
-	                    defs: ['ecma5', me.docs],
+	                    defs: me.docs ? ['ecma5', me.docs] : [],
 	                    plugins: {
 	                        doc_comment: {
 	                            fullDocs: true
@@ -85,6 +91,11 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	            });
 	        });
 		}
+	},
+	
+	switchModes: function(mode) {
+		this.setMode('ace/mode/'+mode);
+		this.editor.getSession().setMode(this.getMode());
 	},
 	
 	getValue: function() {

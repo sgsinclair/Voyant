@@ -32,6 +32,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	mode: undefined,
     	options: [
     		{xtype: 'stoplistoption'},
+    		{xtype: 'colorselector'},
     		{
 	    		xtype: 'listeditor',
 	    		name: 'whiteList'

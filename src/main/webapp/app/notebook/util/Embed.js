@@ -95,6 +95,7 @@ Ext.define("Voyant.notebook.util.Embed", {
 							if (item==name) {
 								config = config || {};
 								var embeddedParams = {};
+								
 								for (key in Ext.ClassManager.get(Ext.getClassName(cmp)).api) {
 									if (key in config) {
 										embeddedParams[key] = config[key]
@@ -150,8 +151,14 @@ Ext.define("Voyant.notebook.util.Embed", {
 						}, this)===true) {
 						Voyant.notebook.util.Embed.showWidgetNotRecognized.call(this);
 					}
+					if (!isEmbedded) {
+						var embedded = Ext.create(cmp, config);
+						debugger
+						embedded.embed(config);
+					}
 				}
 				if (!isEmbedded) {
+					
 					Voyant.notebook.util.Embed.showWidgetNotRecognized.call(this);
 				}
 			}

@@ -12,7 +12,7 @@ Ext.define("Voyant.notebook.util.Show", {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
-			show.call(this, this.getString ? this.getString(len) : this.toString(), Ext.isNumber(len) ? len : undefined);
+			show.call(this, this.getString ? this.getString(len) : this.toString(), !this.getString && Ext.isNumber(len) ? len : undefined);
 		}
 	},
 	statics: {
@@ -23,6 +23,16 @@ Ext.define("Voyant.notebook.util.Show", {
 					show.call(val, val, arg);
 				})
 			} else {
+				if (Ext.isArray(contents)) {
+					var allContents = "";
+					contents.forEach(function(content) {
+						allContents += content.getString ? content.getString() : content.toString();
+					});
+					contents = allContents;
+				} else if (Ext.isString(this) || this instanceof String) {
+					len = contents;
+					contents = this;
+				}
 				contents = contents.getString ? contents.getString() : contents.toString();
 				if (len) {contents = contents.substring(0,len)}
 				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
@@ -63,5 +73,6 @@ Ext.define("Voyant.notebook.util.Show", {
 	}
 });
 
+String.prototype.show = Voyant.notebook.util.Show.show;
 var show = Voyant.notebook.util.Show.show;
 var showError = Voyant.notebook.util.Show.showError;

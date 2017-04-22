@@ -474,6 +474,7 @@ Ext.define('Voyant.panel.Topics', {
 		var limit = parseInt(this.getApiParam('limit'));
 		for (var topic = 0; topic < numTopics; topic++) {
 			var scores = documents.map(function (doc, i) {
+				console.warn(doc, doc.topicCounts[topic], docSortSmoothing, doc.tokens.length, sumDocSortSmoothing);
 				  return (doc.topicCounts[topic] + docSortSmoothing) / (doc.tokens.length + sumDocSortSmoothing);
 			});
 			
@@ -524,7 +525,7 @@ Ext.define('Voyant.panel.Topics', {
     	var stopwords = this.getStopwords(), vocabularyCounts = this.getVocabularyCounts(),
 	    	tokensPerTopic = this.getTokensPerTopic(), vocabularySize=this.getVocabularySize(),
 	    	vocabularyCounts = this.getVocabularyCounts(), documents = this.getDocuments(),
-	    	numTopics = parseInt(this.getApiParam('numTopics')), documents = this.getDocuments(),
+	    	numTopics = parseInt(this.getApiParam('numTopics')),
 	    	wordTopicCounts = this.getWordTopicCounts();
     	
     	  if (line == "") { return; }

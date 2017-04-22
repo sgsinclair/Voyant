@@ -45,7 +45,10 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 		margin: 6px;
 	}
 	.notebook-editor-wrapper-hover {
-		border: thin dashed #ccc !important;
+		border: thin dashed rgba(255,255,255,0);
+	}
+	.notebook-editor-wrapper-hover {
+		border: thin dashed rgba(0,0,0,.1) !important;
 	}
 	.notebook-code-editor, .notebook-code-results {
 		margin-left: 2em;
@@ -62,6 +65,9 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 	}
 	.notebook-code-results pre {
 		font-size: smaller;
+	}	
+	.notebook-code-results .info {
+		overflow: scroll
 	}	
 	.cke_button__sourcedialog_label {
 	    display: none !important;

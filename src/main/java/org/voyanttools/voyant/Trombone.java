@@ -181,7 +181,40 @@ public class Trombone extends HttpServlet {
 		resp.setContentType(ResultsOutputFormat.getResultsOutputFormat(parameters.getParameterValue("outputFormat", "json")).getContentType());
 
 
-		if (parameters.containsKey("fetchJSON")) {
+		if (parameters.containsKey("fetchData")) {
+			URL url;
+			URLConnection c;
+			try {
+				url = new URL(parameters.getParameterValue("fetchData").replaceAll(" ", "+"));
+				System.out.println(url);
+				c = url.openConnection();
+			}
+			catch (MalformedURLException e) {
+				throw new IllegalArgumentException("Attempt to use a malformed URL: "+parameters.getParameterValue("fetchJSON"), e);
+			}
+			c.addRequestProperty("User-Agent", "Mozilla/4.0 (compatible; Trombone)");
+			InputStream is = null;
+			try {
+				is = c.getInputStream();
+				resp.setContentType("application/plain;charset=UTF-8");
+				if (parameters.containsKey("format")) {
+					String format = parameters.getParameterValue("format").toUpperCase();
+					if (format.equals("XML")) {
+						resp.setContentType("application/xml;charset=UTF-8");
+					} else if (format.equals("JSON")) {
+						resp.setContentType("application/json;charset=UTF-8");
+					}
+				}
+				IOUtils.copy(is, resp.getWriter());
+			}
+			finally {
+				if (is!=null) {
+					is.close();
+				}
+			}
+			
+		}
+		else if (parameters.containsKey("fetchJSON")) {
 			URL url;
 			URLConnection c;
 			try {
