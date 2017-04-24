@@ -27,7 +27,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     config: {
     	corpus: undefined,
     	categoriesManager: undefined,
-    	categoryWin: undefined
+    	categoryWin: undefined,
+    	parentPanel: undefined
     },
 
     constructor: function(config) {
@@ -164,7 +165,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    			name: 'categoryName',
 	    			allowBlank: false,
 	    			validator: function(val) {
-	    				return this.getCategoriesManager().getCategory(val) === undefined ? true : this.localize('exists');
+	    				return this.getCategoriesManager().getTermsForCategory(val) === undefined ? true : this.localize('exists');
 	    			}.bind(this),
 	    			enableKeyEvents: true,
 	    			listeners: {
@@ -202,24 +203,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     			}
     		}
     	}));
-    	
-//    	this.on('afterrender', function(src) {
-//    		console.log(this.queryById('categories').body);
-//    		Ext.create('Ext.dd.DropTarget', this.queryById('categories').body, {
-//    			ddGroup: 'terms',
-//    			notifyEnter: function(source, e, data) {
-//    				console.log(source, e, data);
-//    			},
-//    			notifyOver: function(source, e, data) {
-//    				console.log(source, e, data);
-//    			},
-//    			notifyDrop: function(source, e, data) {
-//    				console.log(source, e, data);
-//    				return true;
-//    			}
-//    		});
-//    	}, this);
-    	
+
     	this.on('afterrender', function(builder) {
     		builder.on('loadedCorpus', function(src, corpus) {
     			this.setCorpus(corpus);
@@ -234,12 +218,17 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     			panel = builder.up('window').panel;
     		}
     		if (panel) {
+    			this.setParentPanel(panel);
     			panel.on('loadedCorpus', function(src, corpus) {
     				builder.fireEvent('loadedCorpus', src, corpus);
     			}, builder);
     			if (panel.getCorpus && panel.getCorpus()) {builder.fireEvent('loadedCorpus', builder, panel.getCorpus());}
     			else if (panel.getStore && panel.getStore() && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
     				builder.fireEvent('loadedCorpus', builder, panel.getStore().getCorpus());
+    			}
+    		} else {
+    			if (window.console) {
+    				console.warn('couldn\'t find parent panel for CategoriesBuilder');
     			}
     		}
     		
@@ -250,11 +239,51 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     },
     
     addCategory: function(name) {
-    	this.getCategoriesManager().addCategory(name);
-    	
     	var catParent = this.queryById('categories');
+    	
+    	var color;
+    	var termsData = [];
+    	var catman = this.getCategoriesManager();
+    	var terms = catman.getTermsForCategory(name);
+    	if (terms === undefined) {
+    		catman.addCategory(name);
+    		catman.addAttribute('color');
+    	
+	    	var index = catParent.query('grid').length;
+	    	color = this.getParentPanel().getApplication().getColor(index, true);
+	    	catman.setCategoryAttribute(name, 'color', color);
+    	} else {
+    		for (var i = 0; i < terms.length; i++) {
+    			termsData.push({term: terms[i]});
+    		}
+    		color = catman.getCategoryAttribute(name, 'color');
+    	}
+    	
     	return catParent.add({
     		title: name,
+    		header: {
+    			items: [{
+    				xtype: 'colorbutton',
+    				format: '#hex6',
+    				value: color,
+    				width: 30,
+    				height: 15,
+    				listeners: {
+    					change: function(btn, color, pcolor) {
+    						this.getCategoriesManager().setCategoryAttribute(name, 'color', color);
+    					},
+    					afterrender: function(btn) {
+    						var popup = btn.getPopup();
+    						popup.listeners = {
+    							focusleave: function(sel, evt) {
+    								sel.close(); // fix for conflict between selector and parent modal window, when you click outside of the selector
+    							}
+    						};
+    					},
+    					scope: this
+    				}
+    			}]
+    		},
     		xtype: 'panel',
     		frame: true,
     		width: 150,
@@ -262,6 +291,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		layout: 'fit',
     		tools: [{
     			type: 'close',
+    			tooltip: this.localize('removeCategory'),
     			callback: function(panel) {
     				Ext.Msg.confirm(this.localize('removeCategory'), this.localize('confirmRemove'), function(btn) {
     					if (btn === 'yes') {
@@ -276,7 +306,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    		xtype: 'grid',
 	    		category: name,
 	    		store: Ext.create('Ext.data.JsonStore', {
-	    			data: [],
+	    			data: termsData,
 	    			fields: ['term']
 	    		}),
 	    		viewConfig: {
@@ -327,16 +357,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     buildCategories: function() {
     	var cats = this.getCategoriesManager().getCategories();
     	for (var key in cats) {
-    		var data = [];
-    		var terms = cats[key];
-    		for (var i = 0; i < terms.length; i++) {
-    			data.push({term: terms[i]});
-    		}
-    		
-    		var catparent = this.addCategory(key);
-    		var grid = catparent.down('grid');
-    		grid.getStore().loadRawData(data);
-//    		grid.getView().refresh();
+    		this.addCategory(key);
     	}
     }
 });
