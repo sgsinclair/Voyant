@@ -17,7 +17,7 @@ Ext.define('Voyant.util.CategoriesManager', {
 	getCategories: function() {
 		return this.categories;
 	},
-	getTermsForCategory: function(name) {
+	getCategoryTerms: function(name) {
 		return this.categories[name];
 	},
 	

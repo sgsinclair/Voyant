@@ -165,7 +165,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    			name: 'categoryName',
 	    			allowBlank: false,
 	    			validator: function(val) {
-	    				return this.getCategoriesManager().getTermsForCategory(val) === undefined ? true : this.localize('exists');
+	    				return this.getCategoriesManager().getCategoryTerms(val) === undefined ? true : this.localize('exists');
 	    			}.bind(this),
 	    			enableKeyEvents: true,
 	    			listeners: {
@@ -244,7 +244,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	var color;
     	var termsData = [];
     	var catman = this.getCategoriesManager();
-    	var terms = catman.getTermsForCategory(name);
+    	var terms = catman.getCategoryTerms(name);
     	if (terms === undefined) {
     		catman.addCategory(name);
     		catman.addAttribute('color');

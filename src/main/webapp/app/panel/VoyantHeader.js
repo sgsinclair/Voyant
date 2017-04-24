@@ -71,7 +71,24 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	        					handler: function(btn) {
 	        						btn.up('window').close();
 	        					}
-	        				}]
+	        				}],
+	        				listeners: {
+	        					beforedestroy: function(component) {
+	        						// build colorTermAssociations from the categories
+	        						var catman = this.getApplication().getCategoriesManager();
+	        						for (var category in catman.getCategories()) {
+	        							var color = catman.getCategoryAttribute(category, 'color');
+	        							if (color !== undefined) {
+	        								var rgb = this.getApplication().hexToRgb(color);
+	        								var terms = catman.getCategoryTerms(category);
+	        								for (var i = 0; i < terms.length; i++) {
+	        									this.getApplication().colorTermAssociations.replace(terms[i], rgb);
+	        								}
+	        							}
+	        						}
+	        					},
+	        					scope: this
+	        				}
 	        			}).show();
 	        		},
 	        		scope: this
