@@ -97,9 +97,8 @@ Ext.define('Voyant.data.table.Table', {
 			// now we get rows
 			config.rows = [];
 			store.each(function(record) {
-				var cells = [];
 				var data = record.getData();
-				for (key in data) {cells.push(data[key])}
+				var cells = config.headers.map(function(header) {return data[header]}); // only from headers
 				config.rows.push(cells);
 			}, this);
 		}
@@ -110,10 +109,11 @@ Ext.define('Voyant.data.table.Table', {
 		this.setHeaders(Ext.Array.from(config.headers));
 		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
 
+		// if we have no headers, use the index as header
 		if (this.getHeaders().length==0) {
 			var firstRow = this.getRow(0, false);
 			if (firstRow) {
-				this.setHeaders(firstRow.map(function(cell, i) {return String.fromCharCode(65+i)}));
+				this.setHeaders(firstRow.map(function(cell, i) {return i}));
 			}
 		}
 		
@@ -195,7 +195,7 @@ Ext.define('Voyant.data.table.Table', {
 	updateCell: function(row, column, value, replace) {
 		var rows = this.getRows();
 		var r = Ext.isNumber(row) ? row : this.getRowIndex(row);
-		var c = Ext.isNumber(column) ? column : this.getColumnIndex(column);
+		var c = this.getColumnIndex(column);
 		if (rows[row]===undefined) {rows[row]=[]}
 		if (rows[row][c]===undefined || replace) {rows[row][c]=value}
 		else {rows[row][c]+=value}
@@ -208,7 +208,16 @@ Ext.define('Voyant.data.table.Table', {
 	},
 	
 	getColumnIndex: function(column) {
-		if (Ext.isString(column)) {
+		var headers = this.getHeaders();
+		if (Ext.isNumber(column)) {
+			if (headers[column]===undefined) {
+				headers[column]=column;
+				this.getRows().forEach(function(row) {
+					row.splice(column, 0, "");
+				});
+			}
+			return column;
+		} else if (Ext.isString(column)) {
 			if (!this.getHeadersMap()[column]) {
 				// we don't have this column yet, so create it and expand rows
 				this.getHeaders().push(column);
@@ -232,187 +241,15 @@ Ext.define('Voyant.data.table.Table', {
 			tableJson: JSON.stringify({
 				rowkey: this.getRowKey(),
 				headers: this.getHeaders(),
-				rows: this.getRows()
+				rows: this.getRows(),
+				config: config
 			})
 		});
+		delete config.axes;
+		delete config.series;
 		
-		return embed.call(this, cmp, config);
-		
-		if (((Ext.isObject(cmp) || !cmp) && !config) || (cmp && Ext.isString(cmp) && cmp.toLowerCase().indexOf("voyanttabletransform")>-1)) {
-			config = cmp || {};
-
-			return embed.call(this, this.embeddable[0], Ext.apply(config, {
-				tableJson: JSON.stringify({
-					rowkey: this.getRowKey(),
-					headers: this.getHeaders(),
-					rows: this.getRows()
-				})
-			}));
-
-		}
-		
-		// assume it's a chart, but it could possibly be something else?
-		config = config || {};
-		chart = {};
-		
-		// build data
-		var rowKey = this.getRowKey(), headers = this.getHeaders(), data = [];
-		
-		this.eachRow(function(row, i) {
-			if (row) {
-				var map = {};
-				map[rowKey ? rowKey : "A"] = i;
-				row = row.forEach(function(cell, i) {
-					map[headers[i] ? headers[i] : String.fromCharCode(65+i+(rowKey ? 0 : 1))] = cell
-				})
-				data.push(map);
-			}
-		}, false, this);
-		
-		// set chart store
-		Ext.apply(chart, {
-			store: {
-		        fields: Object.keys(data[0]),
-		        data: data
-		    }
-		});
-		
-		// set chart axes
-		if (config.axes) {
-			Ext.apply(chart, {axes: Ext.isArray(config.axes) ? config.axes : [{},{}]});
-			chart.axes.forEach(function(axis, i) {
-				if (Ext.isObject(config.axes)) {
-					Ext.applyIf(axis, config.axes);
-				}
-				Ext.applyIf(axis, {
-			        type: i==1 ? 'numeric' : 'category',
-			        position: i==1 ? "left" : "bottom"
-				})
-			})
-			delete config.axes;
-		} else {
-			Ext.apply(chart, {
-				axes:  [{
-			        type: 'numeric',
-			        position: 'left'
-			    }, {
-			        type: 'category', // row numbers (discrete)
-			        position: 'bottom'
-			    }]
-			})
-		}
-		
-		// set chart series
-		var series = [];
-		for (var i=0, len=chart.store.fields.length; i<len;i++) {
-			if (chart.store.fields[i]==rowKey || (!rowKey && chart.store.fields[i]=="A")) {continue;} // don't chart the row key, that's the x axis 
-			var cfg = {};
-			if (config.series) {
-				if (Ext.isObject(config.series)) {
-					Ext.apply(cfg, config.series);
-				} else if (Ext.isArray(config.series)) {
-					Ext.apply(cfg, config.series[series.length]);
-				}
-			}
-			Ext.applyIf(cfg, {
-		        type: 'line',
-		        xField: rowKey ? rowKey : "A",
-		        yField: chart.store.fields[i],
-		        marker: {
-		        	radius: 2
-		        },
-		        highlightCfg: {
-	                scaling: 2
-	            },
-	            tooltip: {
-	            	trackMouse: true,
-	            	renderer: function (tooltip, record, item) {
-	                    tooltip.setHtml(record.get(item.series.getYField())+": "+record.get(item.series.getYField()));
-	                }
-	            }
-			});
-			series.push(cfg);
-		}
-		Ext.apply(chart, {
-			series: series
-		});
-
-		/*
-		
-		// determine columns/headers/fields
-		var headers = this.getHeaders();
-		var fields = Ext.Array.merge(rowKey===undefined ? ["row-index"] : [], headers);
-		if (headers.length==0) {
-			var max = Ext.Array.max(this.mapRows(function(row) {return row ? row.length : 0}));
-			for (var i=0;i<max;i++) {fields.push(fields.length)}
-		}
-
-		Ext.apply(chart, {
-			store: {
-		        fields: fields,
-		        data: data
-		    }
-		})
-		
-		if (config.axes) {
-			Ext.apply(chart, {axes: config.axes});
-			var positions = ["left", "bottom"]
-			chart.axes.forEach(function(axis, i) {
-				Ext.applyIf(axis, {
-			        type: 'numeric',
-			        position: positions[i]
-				})
-			})
-			delete config.axes;
-		} else {
-			Ext.apply(chart, {
-				axes:  [{
-			        type: 'numeric',
-			        position: 'left'
-			    }, {
-			        type: 'category', // row numbers (discrete)
-			        position: 'bottom'
-			    }]
-			})
-		}
-		
-		if (config.series) {
-			Ext.apply(chart, {series: config.series});
-			
-			chart.series.forEach(function(axis, i) {
-				Ext.applyIf(axis, {
-					type: 'line',
-					xField: rowKey===undefined ? 'row-index' : rowKey,
-					yField: i
-				})
-			})
-			delete config.series;
-		} else {
-			var series = [];
-			debugger
-			for (var i=0, len=fields.length; i<len;i++) {
-				
-				// skip if this is the row key
-				if (i===rowKey || (rowKey==undefined && i+1==len)) {continue;}
-				
-				series.push({
-			        type: 'line',
-			        xField: rowKey===undefined ? 'row-index' : rowKey,
-			        yField: i
-				})
-			}
-			Ext.apply(chart, {
-				series: series
-			});
-		}
-		*/
-		if (config.title) {
-			chart.title = config.title;
-		}
-		Ext.apply(config, {
-			chartJson: JSON.stringify(chart)
-		})
 		embed.call(this, cmp, config);
+		
 	},
 	
 	toTsv: function(config) {

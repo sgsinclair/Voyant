@@ -51,6 +51,7 @@
 
 <link rel="shortcut icon" type="image/ico" href="<%= base %>/resources/voyant/favicon.ico" />
 
+<!-- EXTJS CLASSIC -->
 <script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/ext-all<%= rtl %>.js"></script>
 <script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/charts.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/charts-all<%= rtl %>.css" />
@@ -59,6 +60,17 @@
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/theme-crisp-all<%= rtl %>_2.css" />
 <script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/ux.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/ux-all<%= rtl %>-debug.css" />
+
+<!-- EXTJS MODERN -->
+<!--
+<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/ext-modern-all.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/charts.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0-modern/charts-all<%= rtl %>.css" />
+<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/theme-material/theme-material.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0-modern/theme-material/resources/theme-material-all<%= rtl %>.css" />
+<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/ux.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0-modern/ux-all<%= rtl %>-debug.css" />
+-->
 
 <!-- jQuery -->
 <script type="text/javascript" src="<%= base %>/resources/jquery/current/jquery.min.js"></script>
