@@ -15,7 +15,8 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		showAggregateInDocumentsCount: false,
 		clearOnQuery: false
 	},
-	hasCorpusLoadedListener: false, 
+	hasCorpusLoadedListener: false,
+	isClearing: false, // flag for clearOnQuery
     
     constructor: function(config) {
     	config = config || {};
@@ -107,33 +108,38 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	});
     	
     	me.on("change", function(tags, queries) {
-    		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
-    		me.up('panel').fireEvent("query", me, queries);
-    		if (me.getClearOnQuery()) {
-    			me.removeValue(me.getValueRecords());
+    		if (!me.isClearing) {
+	    		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
+	    		me.up('panel').fireEvent("query", me, queries);
+	    		if (me.getClearOnQuery()) {
+	    			me.isClearing = true;
+	    			me.removeValue(me.getValueRecords());
+	    		}
+	    		if (me.triggers.count) {
+	    			me.triggers.count.show();
+	    			me.triggers.count.getEl().setHtml('0');
+	    			if (queries.length>0) {
+	    				me.getCorpus().getCorpusTerms().load({
+	    					params: {
+	    						query: queries.map(function(q) {return '('+q+')'}).join("|"),
+				    			tokenType: me.getTokenType(),
+				    			stopList: me.getStopList(),
+				    			inDocumentsCountOnly: true
+	    					},
+	    					callback: function(records, operation, success) {
+	    						if (success && records && records.length==1) {
+	    							me.triggers.count.getEl().setHtml(records[0].getInDocumentsCount())
+	    						}
+	    					}
+	    				})
+	    			} else {
+	    				me.triggers.count.hide();
+	    			}
+	    		}
+    		} else {
+    			me.isClearing = false;
     		}
-    		if (me.triggers.count) {
-    			me.triggers.count.show();
-    			me.triggers.count.getEl().setHtml('0');
-    			if (queries.length>0) {
-    				me.getCorpus().getCorpusTerms().load({
-    					params: {
-    						query: queries.map(function(q) {return '('+q+')'}).join("|"),
-			    			tokenType: me.getTokenType(),
-			    			stopList: me.getStopList(),
-			    			inDocumentsCountOnly: true
-    					},
-    					callback: function(records, operation, success) {
-    						if (success && records && records.length==1) {
-    							me.triggers.count.getEl().setHtml(records[0].getInDocumentsCount())
-    						}
-    					}
-    				})
-    			} else {
-    				me.triggers.count.hide();
-    			}
-    		}
-    	})
+    	});
 
     	// we need to make sure the panel is a voyantpanel
     	// so that we get loadedCorpus event after a call to Voyant.util.Toolable.replacePanel
@@ -153,6 +159,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    		parentPanel = me.findParentBy(function(clz) {
     	    			return clz.mixins["Voyant.panel.Panel"];
         			});
+    	    		if (parentPanel == null) {
+    	    			parentPanel = me.up('window').panel;
+    	    		}
     	    		var corpus = parentPanel.getApplication().getCorpus();
     				if (corpus !== undefined) {
     					me.doSetCorpus(corpus);
