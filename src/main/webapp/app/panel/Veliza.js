@@ -13,7 +13,8 @@ Ext.define('Voyant.panel.Veliza', {
     		scriptIntro: "This is an advanced feature that allows you see and edit the script used by Veliza. For more information on the syntax, see the <a href='{0}' target='_blank'>documentation</a>."
     	},
     	api: {
-    		script: ''
+    		script: '',
+    		message: undefined
     	},
 		glyph: 'xf0e6@FontAwesome'
     },
@@ -121,13 +122,23 @@ Ext.define('Voyant.panel.Veliza', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
         
     	this.on('boxready', function(cmp) {
-    		cmp.addSentence("fromThem", "Hello, I'm Veliza, and I'm here to talk to you about your texts (you may know my sister <a href='https://en.wikipedia.org/wiki/ELIZA' target='_blank'>Eliza</a> she's a famous psychotherapist). I'm just learning to talk about text documents, but please, let me know about any anxieties you're feeling about your texts. Type a message in the box below and hit enter. Or, if you're feeling playful, hit the <i>from text</i> bottom in the lower right-hand corner to fetch a sentence from the corpus.")
+    		cmp.addSentence("fromThem", "Hello, I'm Veliza, and I'm here to talk to you about your texts (you may know my sister <a href='https://en.wikipedia.org/wiki/ELIZA' target='_blank'>Eliza</a> she's a famous psychotherapist). I'm just learning to talk about text documents, but please, let me know about any anxieties you're feeling about your texts. Type a message in the box below and hit enter. Or, if you're feeling playful, hit the <i>from text</i> bottom in the lower right-hand corner to fetch a sentence from the corpus.");
+    		this.sendApiParamMessage();
     	})
 
     }, 
     
-    listeners: {
+    sendApiParamMessage: function() {
+		if (this.getApiParam('message')) {
+			if (this.getCorpus()) {
+				this.handleUserSentence(this.getApiParam('message'))
+			} else {
+				console.warn(new Date())
+				Ext.defer(this.sendApiParamMessage, 100, this)
+			}
+		}
     },
+    
     
     handleUserSentence: function(sentence, fromCorpus) {
     	sentence = sentence.trim();
@@ -141,7 +152,7 @@ Ext.define('Voyant.panel.Veliza', {
     		Ext.Ajax.request({
     			url: this.getApplication().getTromboneUrl(),
     			params: {
-    				corpus: me.getCorpus().getId(),
+    				corpus: me.getCorpus() ? me.getCorpus().getId() : undefined,
     				tool: 'corpus.Veliza',
     				sentence: sentence,
     				//previous: this.getPrevious(),

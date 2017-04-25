@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Apr 25 11:12:54 EDT 2017 */
+/* This file created by JSCacher. Last modified: Tue Apr 25 17:28:44 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5959,6 +5959,14 @@ Ext.define('Voyant.util.Api', {
     		}
     	}
     	
+		if (config && Ext.isObject(config.api)) {
+	    	for (var key in config.api) {
+	    		if (this.api[key]) {
+	    			this.setApiParam(key, config.api[key]);
+	    		}
+	    	}
+		}
+		
     	// handle "type"  parameter specially for backwards compatibility
     	if (queryParams["type"] && ("query" in this.api) && !this.getApiParam('query')) {
     		this.setApiParam("query", queryParams['type']);
@@ -7380,9 +7388,12 @@ Ext.define('Voyant.util.Storage', {
 
 Ext.define('Voyant.util.CategoriesManager', {
 	categories: undefined,
+	attributes: undefined,
+	
 	constructor: function(config) {
 		config = config || {};
 		this.categories = {};
+		this.attributes = {};
 		if (config.categories !== undefined) {
 			for (var key in config.categories) {
 				var terms = config.categories[key];
@@ -7390,12 +7401,14 @@ Ext.define('Voyant.util.CategoriesManager', {
 			}
 		}
 	},
+	
 	getCategories: function() {
 		return this.categories;
 	},
-	getCategory: function(name) {
+	getCategoryTerms: function(name) {
 		return this.categories[name];
 	},
+	
 	addCategory: function(name) {
 		if (this.categories[name] === undefined) {
 			this.categories[name] = [];
@@ -7404,6 +7417,7 @@ Ext.define('Voyant.util.CategoriesManager', {
 	removeCategory: function(name) {
 		delete this.categories[name];
 	},
+	
 	addTerm: function(category, term) {
 		this.addTerms(category, [term]);
 	},
@@ -7438,6 +7452,7 @@ Ext.define('Voyant.util.CategoriesManager', {
 			}
 		}
 	},
+	
 	getCategoryForTerm: function(term) {
 		for (var category in this.categories) {
 			if (this.categories[category].indexOf(term) != -1) {
@@ -7445,6 +7460,31 @@ Ext.define('Voyant.util.CategoriesManager', {
 			}
 		}
 		return undefined;
+	},
+	
+	addAttribute: function(name, defaultValue) {
+		if (this.attributes[name] === undefined) {
+			this.attributes[name] = {};
+			if (defaultValue !== undefined) {
+				for (var category in this.categories) {
+					this.setAttributeForCategory(category, name, defaultValue);
+				}
+			}
+		}
+	},
+	removeAttribute: function(name) {
+		delete this.attributes[name];
+	},
+	setCategoryAttribute: function(categoryName, attributeName, attributeValue) {
+		if (this.attributes[attributeName] === undefined) {
+			this.addAttribute(attributeName);
+		}
+		this.attributes[attributeName][categoryName] = attributeValue;
+	},
+	getCategoryAttribute: function(categoryName, attributeName) {
+		if (this.attributes[attributeName] !== undefined) {
+			return this.attributes[attributeName][categoryName];
+		}
 	}
 });
 
@@ -7532,43 +7572,8 @@ Ext.define("Voyant.notebook.util.Embed", {
 	embed: function() { // this is for instances
 		embed.apply(this, arguments);
 	},
-	config: {
-		embeddedConfigParamName: 'embeddedConfig'
-	},
 	constructor: function(config) {
 		var me = this;
-		
-		// try to read embedded json config if it's present
-		if (this.getApiParam) {
-			var embeddedConfig = this.getApiParam('embeddedConfig');
-			if (embeddedConfig) {
-				
-				var dfd = Voyant.application.getDeferred(this);
-    	    	Ext.Ajax.request({
-    	    	    url: Voyant.application.getTromboneUrl(),
-    	    	    params: {
-    	        		tool: 'resource.StoredResource',
-    	        		retrieveResourceId: embeddedConfig
-    	    	    }
-    	    	}).then(function(response) {
-					dfd.resolve();
-	    	    	var json = Ext.util.JSON.decode(response.responseText);
-    	    		var api = Ext.urlDecode(json.storedResource.resource);
-    	    		me.setApiParams(api);
-    	    		me.fireEvent("reconfigure");
-    	    	}).otherwise(function(response) {
-    	    		if (me.getTargetEl) {
-        				Voyant.notebook.util.Show.TARGET = me.getTargetEl();
-        				showError(response);
-    	    		}
-    	    		Voyant.application.showError(response);
-    	    		dfd.reject();
-    	    	})
-				
-			}
-		}
-
-		// don't call parent since this is a mixin whose constructor is called
 	},
 	statics: {
 		i18n: {},
@@ -7662,7 +7667,7 @@ Ext.define("Voyant.notebook.util.Embed", {
 				    	    	    	var json = Ext.util.JSON.decode(response.responseText);
 				    	    	    	var params = {
 				    	    	    		minimal: true,
-				    	    	    		embeddedConfig: json.storedResource.id
+				    	    	    		embeddedApiId: json.storedResource.id
 				    	    	    	}
 				    	    	    	Ext.applyIf(params, Voyant.application.getModifiedApiParams());
 				    	    	    	document.getElementById(iframeId).setAttribute("src",url+Ext.Object.toQueryString(params));
@@ -7682,7 +7687,6 @@ Ext.define("Voyant.notebook.util.Embed", {
 					}
 					if (!isEmbedded) {
 						var embedded = Ext.create(cmp, config);
-						debugger
 						embedded.embed(config);
 					}
 				}
@@ -9152,7 +9156,7 @@ Ext.define('Voyant.data.model.Corpus', {
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization','Voyant.util.Assignable'],
     transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords','getString'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
-    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio','Voyant.panel.DocumentTerms','Voyant.panel.TermsBerry','Voyant.panel.CollocatesGraph','Voyant.panel.Contexts','Voyant.panel.WordTree'],
+    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio','Voyant.panel.DocumentTerms','Voyant.panel.TermsBerry','Voyant.panel.CollocatesGraph','Voyant.panel.Contexts','Voyant.panel.WordTree','Voyant.panel.Veliza'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
@@ -10082,9 +10086,6 @@ Ext.define('Voyant.widget.CodeEditor', {
 		var me = this;
     	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
     	me.buildFromParams();
-    	if (!config.noEmbed) {
-        	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
-    	}
     	Ext.apply(me, {
     		items: {
     			xtype: 'notebookcodeeditor',
@@ -10093,10 +10094,6 @@ Ext.define('Voyant.widget.CodeEditor', {
     		}
     	})
         me.callParent(arguments);
-    	me.on("reconfigure", function() {
-    		this.buildFromParams();
-    		this.down('notebookcodeeditor').editor.setValue(this.getApiParam('content'));
-    	}, this);
 	},
 	initComponent: function(config) {
     	var me = this, config = config || {};
@@ -11372,23 +11369,11 @@ Ext.define('Voyant.widget.VoyantChart', {
     	config = config || {};
     	var me = this;
     	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	if (!config.noEmbed) {
-        	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
-    	}
     	if (this.getApiParam('tableJson')) {
     		Ext.apply(config, this.getConfigFromTableJson());
     	}
     	this.callParent(arguments)
     	
-    	me.on("reconfigure", function() {
-        	if (this.getApiParam('tableJson')) {
-        		var config = this.getConfigFromTableJson();
-        		var newChart = Ext.create('Voyant.widget.VoyantChart', config);
-        		var container = this.up("container");
-        		container.remove(this);
-        		container.add(newChart)
-        	}
-    	})
     },
     initComponent: function(config) {
     	this.callParent(arguments)
@@ -11638,14 +11623,7 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
     	config = config || {};
 		var me = this;
     	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	if (!config.noEmbed) {
-        	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
-    	}
         me.callParent(arguments);
-    	me.on("reconfigure", function() {
-    		this.buildFromParams();
-    		this.fireEvent('afterrender');
-    	}, this);
 	},
 	initComponent: function(config) {
     	var me = this, config = config || {};
@@ -11825,7 +11803,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     config: {
     	corpus: undefined,
     	categoriesManager: undefined,
-    	categoryWin: undefined
+    	categoryWin: undefined,
+    	parentPanel: undefined
     },
 
     constructor: function(config) {
@@ -11962,7 +11941,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    			name: 'categoryName',
 	    			allowBlank: false,
 	    			validator: function(val) {
-	    				return this.getCategoriesManager().getCategory(val) === undefined ? true : this.localize('exists');
+	    				return this.getCategoriesManager().getCategoryTerms(val) === undefined ? true : this.localize('exists');
 	    			}.bind(this),
 	    			enableKeyEvents: true,
 	    			listeners: {
@@ -12000,24 +11979,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     			}
     		}
     	}));
-    	
-//    	this.on('afterrender', function(src) {
-//    		console.log(this.queryById('categories').body);
-//    		Ext.create('Ext.dd.DropTarget', this.queryById('categories').body, {
-//    			ddGroup: 'terms',
-//    			notifyEnter: function(source, e, data) {
-//    				console.log(source, e, data);
-//    			},
-//    			notifyOver: function(source, e, data) {
-//    				console.log(source, e, data);
-//    			},
-//    			notifyDrop: function(source, e, data) {
-//    				console.log(source, e, data);
-//    				return true;
-//    			}
-//    		});
-//    	}, this);
-    	
+
     	this.on('afterrender', function(builder) {
     		builder.on('loadedCorpus', function(src, corpus) {
     			this.setCorpus(corpus);
@@ -12032,12 +11994,17 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     			panel = builder.up('window').panel;
     		}
     		if (panel) {
+    			this.setParentPanel(panel);
     			panel.on('loadedCorpus', function(src, corpus) {
     				builder.fireEvent('loadedCorpus', src, corpus);
     			}, builder);
     			if (panel.getCorpus && panel.getCorpus()) {builder.fireEvent('loadedCorpus', builder, panel.getCorpus());}
     			else if (panel.getStore && panel.getStore() && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
     				builder.fireEvent('loadedCorpus', builder, panel.getStore().getCorpus());
+    			}
+    		} else {
+    			if (window.console) {
+    				console.warn('couldn\'t find parent panel for CategoriesBuilder');
     			}
     		}
     		
@@ -12048,11 +12015,51 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     },
     
     addCategory: function(name) {
-    	this.getCategoriesManager().addCategory(name);
-    	
     	var catParent = this.queryById('categories');
+    	
+    	var color;
+    	var termsData = [];
+    	var catman = this.getCategoriesManager();
+    	var terms = catman.getCategoryTerms(name);
+    	if (terms === undefined) {
+    		catman.addCategory(name);
+    		catman.addAttribute('color');
+    	
+	    	var index = catParent.query('grid').length;
+	    	color = this.getParentPanel().getApplication().getColor(index, true);
+	    	catman.setCategoryAttribute(name, 'color', color);
+    	} else {
+    		for (var i = 0; i < terms.length; i++) {
+    			termsData.push({term: terms[i]});
+    		}
+    		color = catman.getCategoryAttribute(name, 'color');
+    	}
+    	
     	return catParent.add({
     		title: name,
+    		header: {
+    			items: [{
+    				xtype: 'colorbutton',
+    				format: '#hex6',
+    				value: color,
+    				width: 30,
+    				height: 15,
+    				listeners: {
+    					change: function(btn, color, pcolor) {
+    						this.getCategoriesManager().setCategoryAttribute(name, 'color', color);
+    					},
+    					afterrender: function(btn) {
+    						var popup = btn.getPopup();
+    						popup.listeners = {
+    							focusleave: function(sel, evt) {
+    								sel.close(); // fix for conflict between selector and parent modal window, when you click outside of the selector
+    							}
+    						};
+    					},
+    					scope: this
+    				}
+    			}]
+    		},
     		xtype: 'panel',
     		frame: true,
     		width: 150,
@@ -12060,6 +12067,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		layout: 'fit',
     		tools: [{
     			type: 'close',
+    			tooltip: this.localize('removeCategory'),
     			callback: function(panel) {
     				Ext.Msg.confirm(this.localize('removeCategory'), this.localize('confirmRemove'), function(btn) {
     					if (btn === 'yes') {
@@ -12074,7 +12082,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    		xtype: 'grid',
 	    		category: name,
 	    		store: Ext.create('Ext.data.JsonStore', {
-	    			data: [],
+	    			data: termsData,
 	    			fields: ['term']
 	    		}),
 	    		viewConfig: {
@@ -12125,16 +12133,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     buildCategories: function() {
     	var cats = this.getCategoriesManager().getCategories();
     	for (var key in cats) {
-    		var data = [];
-    		var terms = cats[key];
-    		for (var i = 0; i < terms.length; i++) {
-    			data.push({term: terms[i]});
-    		}
-    		
-    		var catparent = this.addCategory(key);
-    		var grid = catparent.down('grid');
-    		grid.getStore().loadRawData(data);
-//    		grid.getView().refresh();
+    		this.addCategory(key);
     	}
     }
 });
@@ -12160,7 +12159,6 @@ Ext.define('Voyant.panel.Panel', {
 	},
 	constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-//		this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.mixins['Voyant.util.Toolable'].constructor.apply(this, arguments);
 		if (!this.glyph) {
 			this.glyph = Ext.ClassManager.getClass(this).glyph
@@ -24658,7 +24656,24 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	        					handler: function(btn) {
 	        						btn.up('window').close();
 	        					}
-	        				}]
+	        				}],
+	        				listeners: {
+	        					beforedestroy: function(component) {
+	        						// build colorTermAssociations from the categories
+	        						var catman = this.getApplication().getCategoriesManager();
+	        						for (var category in catman.getCategories()) {
+	        							var color = catman.getCategoryAttribute(category, 'color');
+	        							if (color !== undefined) {
+	        								var rgb = this.getApplication().hexToRgb(color);
+	        								var terms = catman.getCategoryTerms(category);
+	        								for (var i = 0; i < terms.length; i++) {
+	        									this.getApplication().colorTermAssociations.replace(terms[i], rgb);
+	        								}
+	        							}
+	        						}
+	        					},
+	        					scope: this
+	        				}
 	        			}).show();
 	        		},
 	        		scope: this
@@ -25561,7 +25576,8 @@ Ext.define('Voyant.panel.Veliza', {
     		scriptIntro: "This is an advanced feature that allows you see and edit the script used by Veliza. For more information on the syntax, see the <a href='{0}' target='_blank'>documentation</a>."
     	},
     	api: {
-    		script: ''
+    		script: '',
+    		message: undefined
     	},
 		glyph: 'xf0e6@FontAwesome'
     },
@@ -25669,13 +25685,23 @@ Ext.define('Voyant.panel.Veliza', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
         
     	this.on('boxready', function(cmp) {
-    		cmp.addSentence("fromThem", "Hello, I'm Veliza, and I'm here to talk to you about your texts (you may know my sister <a href='https://en.wikipedia.org/wiki/ELIZA' target='_blank'>Eliza</a> she's a famous psychotherapist). I'm just learning to talk about text documents, but please, let me know about any anxieties you're feeling about your texts. Type a message in the box below and hit enter. Or, if you're feeling playful, hit the <i>from text</i> bottom in the lower right-hand corner to fetch a sentence from the corpus.")
+    		cmp.addSentence("fromThem", "Hello, I'm Veliza, and I'm here to talk to you about your texts (you may know my sister <a href='https://en.wikipedia.org/wiki/ELIZA' target='_blank'>Eliza</a> she's a famous psychotherapist). I'm just learning to talk about text documents, but please, let me know about any anxieties you're feeling about your texts. Type a message in the box below and hit enter. Or, if you're feeling playful, hit the <i>from text</i> bottom in the lower right-hand corner to fetch a sentence from the corpus.");
+    		this.sendApiParamMessage();
     	})
 
     }, 
     
-    listeners: {
+    sendApiParamMessage: function() {
+		if (this.getApiParam('message')) {
+			if (this.getCorpus()) {
+				this.handleUserSentence(this.getApiParam('message'))
+			} else {
+				console.warn(new Date())
+				Ext.defer(this.sendApiParamMessage, 100, this)
+			}
+		}
     },
+    
     
     handleUserSentence: function(sentence, fromCorpus) {
     	sentence = sentence.trim();
@@ -25689,7 +25715,7 @@ Ext.define('Voyant.panel.Veliza', {
     		Ext.Ajax.request({
     			url: this.getApplication().getTromboneUrl(),
     			params: {
-    				corpus: me.getCorpus().getId(),
+    				corpus: me.getCorpus() ? me.getCorpus().getId() : undefined,
     				tool: 'corpus.Veliza',
     				sentence: sentence,
     				//previous: this.getPrevious(),
@@ -26975,11 +27001,11 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		boxready: function() {
 			var me = this;
 			this.editor = ace.edit(Ext.getDom(this.getEl()));
-//			this.$blockScrolling = Infinity;
+			this.editor.$blockScrolling = Infinity;
 			this.editor.getSession().setUseWorker(true);
 			this.editor.setTheme(this.getTheme());
 			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: 35, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			this.editor.setOptions({minLines: 6, maxLines: 25, autoScrollEditorIntoView: true, scrollPastEnd: true});
 			this.editor.setHighlightActiveLine(false);
 			this.editor.renderer.setShowPrintMargin(false);
 			this.editor.renderer.setShowGutter(false);
@@ -28897,11 +28923,12 @@ Ext.define('Voyant.VoyantToolApp', {
 	name : 'VoyantToolApp',
 	statics: {
 		api: {
-			minimal: undefined
+			minimal: undefined,
+			embeddedApiId: undefined
 		}
 	},
 	launch: function() {
-		var items = [];
+		var items = [], me = this;
 		if (!this.getApiParam('minimal')) {
 			items.push({
 		        region: 'south',
@@ -28911,8 +28938,46 @@ Ext.define('Voyant.VoyantToolApp', {
 		items.push({
 	        region: 'center',
 	        layout: 'fit',
+	        itemId: 'toolcontainer',
 	        items: {
-		        xtype: this.getTool()
+		        xtype: this.getApiParam('embeddedApiId') ? 'container' : this.getTool()
+	        },
+	        listeners: {
+	        	afterrender: function(container) {
+	        		if (me.getApiParam('embeddedApiId')) {
+	    				var dfd = me.getDeferred(this);
+	    	    		container.mask(this.localize('loadingConfiguration'));
+	        	    	Ext.Ajax.request({
+	        	    	    url: me.getTromboneUrl(),
+	        	    	    params: {
+	        	        		tool: 'resource.StoredResource',
+	        	        		retrieveResourceId: this.getApiParam('embeddedApiId')
+	        	    	    }
+	        	    	}).then(function(response) {
+	    					dfd.resolve();
+	    	    	    	var json = Ext.util.JSON.decode(response.responseText);
+	        	    		var config = Ext.urlDecode(json.storedResource.resource);
+	        	    		debugger
+	        	    		var tool = Ext.create({
+	        	    			xtype: me.getTool(),
+	        	    			api: config
+	        	    		})
+	        	    		debugger
+	        	    		tool.setApiParams(config);
+	        	    		container.unmask();
+	        	    		container.remove(container.down('container'));
+	        	    		container.add(tool);
+	        	    	}).otherwise(function(response) {
+	        	    		if (me.getTargetEl) {
+	            				Voyant.notebook.util.Show.TARGET = me.getTargetEl();
+	            				showError(response);
+	        	    		}
+	        	    		Voyant.application.showError(response);
+	        	    		dfd.reject();
+	        	    	})
+	    			}
+	        	},
+	        	scope: this
 	        }
 	    });
 		Ext.create('Ext.container.Viewport', {

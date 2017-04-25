@@ -20,7 +20,6 @@ Ext.define('Voyant.panel.Panel', {
 	},
 	constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-//		this.mixins['Voyant.notebook.util.Embeddable'].constructor.apply(this, arguments);
 		this.mixins['Voyant.util.Toolable'].constructor.apply(this, arguments);
 		if (!this.glyph) {
 			this.glyph = Ext.ClassManager.getClass(this).glyph

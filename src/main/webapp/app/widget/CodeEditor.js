@@ -16,9 +16,6 @@ Ext.define('Voyant.widget.CodeEditor', {
 		var me = this;
     	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
     	me.buildFromParams();
-    	if (!config.noEmbed) {
-        	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
-    	}
     	Ext.apply(me, {
     		items: {
     			xtype: 'notebookcodeeditor',
@@ -27,10 +24,6 @@ Ext.define('Voyant.widget.CodeEditor', {
     		}
     	})
         me.callParent(arguments);
-    	me.on("reconfigure", function() {
-    		this.buildFromParams();
-    		this.down('notebookcodeeditor').editor.setValue(this.getApiParam('content'));
-    	}, this);
 	},
 	initComponent: function(config) {
     	var me = this, config = config || {};

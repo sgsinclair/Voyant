@@ -3,11 +3,12 @@ Ext.define('Voyant.VoyantToolApp', {
 	name : 'VoyantToolApp',
 	statics: {
 		api: {
-			minimal: undefined
+			minimal: undefined,
+			embeddedApiId: undefined
 		}
 	},
 	launch: function() {
-		var items = [];
+		var items = [], me = this;
 		if (!this.getApiParam('minimal')) {
 			items.push({
 		        region: 'south',
@@ -17,8 +18,46 @@ Ext.define('Voyant.VoyantToolApp', {
 		items.push({
 	        region: 'center',
 	        layout: 'fit',
+	        itemId: 'toolcontainer',
 	        items: {
-		        xtype: this.getTool()
+		        xtype: this.getApiParam('embeddedApiId') ? 'container' : this.getTool()
+	        },
+	        listeners: {
+	        	afterrender: function(container) {
+	        		if (me.getApiParam('embeddedApiId')) {
+	    				var dfd = me.getDeferred(this);
+	    	    		container.mask(this.localize('loadingConfiguration'));
+	        	    	Ext.Ajax.request({
+	        	    	    url: me.getTromboneUrl(),
+	        	    	    params: {
+	        	        		tool: 'resource.StoredResource',
+	        	        		retrieveResourceId: this.getApiParam('embeddedApiId')
+	        	    	    }
+	        	    	}).then(function(response) {
+	    					dfd.resolve();
+	    	    	    	var json = Ext.util.JSON.decode(response.responseText);
+	        	    		var config = Ext.urlDecode(json.storedResource.resource);
+	        	    		debugger
+	        	    		var tool = Ext.create({
+	        	    			xtype: me.getTool(),
+	        	    			api: config
+	        	    		})
+	        	    		debugger
+	        	    		tool.setApiParams(config);
+	        	    		container.unmask();
+	        	    		container.remove(container.down('container'));
+	        	    		container.add(tool);
+	        	    	}).otherwise(function(response) {
+	        	    		if (me.getTargetEl) {
+	            				Voyant.notebook.util.Show.TARGET = me.getTargetEl();
+	            				showError(response);
+	        	    		}
+	        	    		Voyant.application.showError(response);
+	        	    		dfd.reject();
+	        	    	})
+	    			}
+	        	},
+	        	scope: this
 	        }
 	    });
 		Ext.create('Ext.container.Viewport', {
