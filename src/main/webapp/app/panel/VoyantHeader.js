@@ -4,7 +4,6 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	alias: 'widget.voyantheader',
     statics: {
     	i18n: {
-    		done: 'Done',
     		categoriesBuilder: 'Categories Builder'
     	}
     },
@@ -55,40 +54,11 @@ Ext.define('Voyant.panel.VoyantHeader', {
 					xtype: 'toolmenu',
 					glyph: 'xf02c@FontAwesome',
 					handler: function(btn) {
-	        			Ext.create('Ext.window.Window', {
-	        				title: this.localize('categoriesBuilder'),
-	        				modal: true,
-	        				layout: 'fit',
-	        				height: this.getApplication().getViewport().getHeight()*0.5,
-	        				width: this.getApplication().getViewport().getWidth()*0.75,
+	        			Ext.create('Voyant.widget.CategoriesBuilder', {
 	        				panel: this,
-	        				items: {
-	        					xtype: 'categoriesbuilder',
-	        					categoriesManager: this.getApplication().getCategoriesManager()
-	        				},
-	        				buttons: [{
-	        					text: this.localize('done'),
-	        					handler: function(btn) {
-	        						btn.up('window').close();
-	        					}
-	        				}],
-	        				listeners: {
-	        					beforedestroy: function(component) {
-	        						// build colorTermAssociations from the categories
-	        						var catman = this.getApplication().getCategoriesManager();
-	        						for (var category in catman.getCategories()) {
-	        							var color = catman.getCategoryAttribute(category, 'color');
-	        							if (color !== undefined) {
-	        								var rgb = this.getApplication().hexToRgb(color);
-	        								var terms = catman.getCategoryTerms(category);
-	        								for (var i = 0; i < terms.length; i++) {
-	        									this.getApplication().colorTermAssociations.replace(terms[i], rgb);
-	        								}
-	        							}
-	        						}
-	        					},
-	        					scope: this
-	        				}
+	        				categoriesManager: this.getApplication().getCategoriesManager(),
+	        				height: this.getApplication().getViewport().getHeight()*0.5,
+	        				width: this.getApplication().getViewport().getWidth()*0.75
 	        			}).show();
 	        		},
 	        		scope: this

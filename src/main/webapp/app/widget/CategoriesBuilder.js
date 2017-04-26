@@ -1,5 +1,5 @@
 Ext.define('Voyant.widget.CategoriesBuilder', {
-    extend: 'Ext.container.Container',
+    extend: 'Ext.window.Window',
     mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.CategoriesManager'],
     alias: 'widget.categoriesbuilder',
     statics: {
@@ -17,7 +17,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		add: 'Add',
     		cancel: 'Cancel',
     		exists: 'Category already exists',
-    		confirmRemove: 'Are you sure you want to remove the category?'
+    		confirmRemove: 'Are you sure you want to remove the category?',
+    		done: 'Done'
     	},
     	api: {
     		stopList: 'auto',
@@ -30,9 +31,19 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	categoryWin: undefined,
     	parentPanel: undefined
     },
+    
+    // window defaults
+    modal: true,
+	height: 250,
+	width: 500,
 
     constructor: function(config) {
     	config = config || {};
+    	
+    	if (config.panel) {
+    		this.panel = config.panel;
+    	}
+    	
     	var categoriesManager = config.categoriesManager ? config.categoriesManager : Ext.create('Voyant.util.CategoriesManager');
     	this.setCategoriesManager(categoriesManager);
     	
@@ -145,7 +156,13 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
                     }]
     			}],
     			items: []
-    		}]
+    		}],
+    		buttons: [{
+				text: this.localize('done'),
+				handler: function(btn) {
+					btn.up('window').close();
+				}
+			}]
     	});
     	
     	this.setCategoryWin(Ext.create('Ext.window.Window', {
@@ -211,20 +228,13 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    		terms.getStore().load();
     		}, builder);
     		
-    		var panel = builder.findParentBy(function(clz) {
-    			return clz.mixins['Voyant.panel.Panel'];
-    		});
-    		if (panel == null) {
-    			panel = builder.up('window').panel;
-    		}
-    		if (panel) {
-    			this.setParentPanel(panel);
-    			panel.on('loadedCorpus', function(src, corpus) {
+    		if (this.panel) {
+    			this.panel.on('loadedCorpus', function(src, corpus) {
     				builder.fireEvent('loadedCorpus', src, corpus);
     			}, builder);
-    			if (panel.getCorpus && panel.getCorpus()) {builder.fireEvent('loadedCorpus', builder, panel.getCorpus());}
-    			else if (panel.getStore && panel.getStore() && panel.getStore().getCorpus && panel.getStore().getCorpus()) {
-    				builder.fireEvent('loadedCorpus', builder, panel.getStore().getCorpus());
+    			if (this.panel.getCorpus && this.panel.getCorpus()) {builder.fireEvent('loadedCorpus', builder, this.panel.getCorpus());}
+    			else if (this.panel.getStore && this.panel.getStore() && this.panel.getStore().getCorpus && this.panel.getStore().getCorpus()) {
+    				builder.fireEvent('loadedCorpus', builder, this.panel.getStore().getCorpus());
     			}
     		} else {
     			if (window.console) {
@@ -233,6 +243,21 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		}
     		
     		this.buildCategories();
+    	}, this);
+    	
+    	this.on('beforeclose', function(component) {
+    		// build colorTermAssociations from the categories
+			var catman = this.getCategoriesManager();
+			for (var category in catman.getCategories()) {
+				var color = catman.getCategoryAttribute(category, 'color');
+				if (color !== undefined) {
+					var rgb = this.panel.getApplication().hexToRgb(color);
+					var terms = catman.getCategoryTerms(category);
+					for (var i = 0; i < terms.length; i++) {
+						this.panel.getApplication().colorTermAssociations.replace(terms[i], rgb);
+					}
+				}
+			}
     	}, this);
     	
     	this.callParent(arguments);
@@ -250,7 +275,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		catman.addAttribute('color');
     	
 	    	var index = catParent.query('grid').length;
-	    	color = this.getParentPanel().getApplication().getColor(index, true);
+	    	color = this.panel.getApplication().getColor(index, true);
 	    	catman.setCategoryAttribute(name, 'color', color);
     	} else {
     		for (var i = 0; i < terms.length; i++) {
