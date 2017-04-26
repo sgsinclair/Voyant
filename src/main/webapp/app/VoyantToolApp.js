@@ -37,16 +37,17 @@ Ext.define('Voyant.VoyantToolApp', {
 	    					dfd.resolve();
 	    	    	    	var json = Ext.util.JSON.decode(response.responseText);
 	        	    		var config = Ext.urlDecode(json.storedResource.resource);
-	        	    		debugger
 	        	    		var tool = Ext.create({
 	        	    			xtype: me.getTool(),
 	        	    			api: config
-	        	    		})
-	        	    		debugger
+	        	    		});
 	        	    		tool.setApiParams(config);
 	        	    		container.unmask();
 	        	    		container.remove(container.down('container'));
 	        	    		container.add(tool);
+	        	    		if (config.corpus) {
+	        	    			me.loadCorpusFromParams(config);
+	        	    		}
 	        	    	}).otherwise(function(response) {
 	        	    		if (me.getTargetEl) {
 	            				Voyant.notebook.util.Show.TARGET = me.getTargetEl();

@@ -192,9 +192,12 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
         
 	},
 	
-	initComponent: function() {
+	initComponent: function(config) {
 		var me = this;
-		me.on("afterrender", function(){
+		me.on("afterrender", function() {
+			if (this.editor && this.editor.getMode() != 'ace/mode/javavscript') {
+				this.switchModes(this.editor.getMode(), true)
+			}
 			this.getTargetEl().on("resize", function(el) {
 				var height = 20;
 				me.items.each(function(item) {height+=item.getHeight();})
@@ -204,12 +207,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		me.callParent(arguments);
 	},
 	
-	switchModes: function(mode) {
+	switchModes: function(mode, light) {
 		var runnable = mode=='javascript';
 		this.down('notebookwrapperrun').setVisible(runnable);
 		this.down('notebookwrapperrununtil').setVisible(runnable);
 		this.results.setVisible(runnable);
-		this.editor.switchModes(mode);
+		if (!light) {
+			this.editor.switchModes(mode);
+		}
 	},
 	
 	run: function(runningAll) {

@@ -22,9 +22,11 @@ Ext.define('Voyant.panel.Veliza', {
     	previous: []
     },
     
-    initComponent: function(config) {
+    constructor: function() {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
         var me = this;
-        
         Ext.apply(this, {
     		title: this.localize('title'),
     		glyph: 'xf0e6@FontAwesome',
@@ -53,6 +55,7 @@ Ext.define('Voyant.panel.Veliza', {
     				xtype: 'textarea',
     				name: 'editor',
     				fieldStyle: "white-space: pre",
+    				value: me.getApiParam('script'),
     				flex: 1,
     				listeners: {
     					afterrender: function(editor) {
@@ -68,6 +71,8 @@ Ext.define('Voyant.panel.Veliza', {
     							if (obj && obj.veliza && obj.veliza.script) {
     								editor.setValue(obj.veliza.script);
     								editor.resetOriginalValue();
+    							} else if (obj && obj.veliza && obj.veliza.id) {
+    								me.setApiParam('script', obj.veliza.id);
     							} else {
     								me.showError(me.localize('unableFetchScript'));
     							}
@@ -119,7 +124,6 @@ Ext.define('Voyant.panel.Veliza', {
         })
              
         this.callParent();
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
         
     	this.on('boxready', function(cmp) {
     		cmp.addSentence("fromThem", "Hello, I'm Veliza, and I'm here to talk to you about your texts (you may know my sister <a href='https://en.wikipedia.org/wiki/ELIZA' target='_blank'>Eliza</a> she's a famous psychotherapist). I'm just learning to talk about text documents, but please, let me know about any anxieties you're feeling about your texts. Type a message in the box below and hit enter. Or, if you're feeling playful, hit the <i>from text</i> bottom in the lower right-hand corner to fetch a sentence from the corpus.");
@@ -133,7 +137,7 @@ Ext.define('Voyant.panel.Veliza', {
 			if (this.getCorpus()) {
 				this.handleUserSentence(this.getApiParam('message'))
 			} else {
-				console.warn(new Date())
+				// try to wait for the corpus to be loaded
 				Ext.defer(this.sendApiParamMessage, 100, this)
 			}
 		}
@@ -174,7 +178,7 @@ Ext.define('Voyant.panel.Veliza', {
     		    		for (key in json.params) {
     		    			json.params[key] = json.params[key].trim();
     		    		}
-    		    		veliza += "<br/><iframe width='"+(json.width ? json.width : '100%')+"' height='"+(json.height ? json.height : '350px')+"' src='"+me.getApplication().getBaseUrl()+'tool/'+json.tool+'/?corpus='+me.getCorpus().getId()+'&minimal=true&'+Ext.Object.toQueryString(json.params)+"'></iframe>"
+    		    		veliza += "<br/><iframe width='"+(json.width ? json.width : '100%')+"' height='"+(json.height ? json.height : '250px')+"' src='"+me.getApplication().getBaseUrl()+'tool/'+json.tool+'/?corpus='+me.getCorpus().getId()+'&minimal=true&'+Ext.Object.toQueryString(json.params)+"'></iframe>"
     		    	}
     		    	var sentence = response.veliza.sentence;
     		    	me.setPrevious(response.veliza.previous);

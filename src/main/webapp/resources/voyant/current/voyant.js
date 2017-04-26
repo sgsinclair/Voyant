@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Apr 25 17:28:44 EDT 2017 */
+/* This file created by JSCacher. Last modified: Wed Apr 26 13:39:59 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -10413,7 +10413,8 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		showAggregateInDocumentsCount: false,
 		clearOnQuery: false
 	},
-	hasCorpusLoadedListener: false, 
+	hasCorpusLoadedListener: false,
+	isClearing: false, // flag for clearOnQuery
     
     constructor: function(config) {
     	config = config || {};
@@ -10505,33 +10506,38 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	});
     	
     	me.on("change", function(tags, queries) {
-    		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
-    		me.up('panel').fireEvent("query", me, queries);
-    		if (me.getClearOnQuery()) {
-    			me.removeValue(me.getValueRecords());
+    		if (!me.isClearing) {
+	    		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
+	    		me.up('panel').fireEvent("query", me, queries);
+	    		if (me.getClearOnQuery()) {
+	    			me.isClearing = true;
+	    			me.removeValue(me.getValueRecords());
+	    		}
+	    		if (me.triggers.count) {
+	    			me.triggers.count.show();
+	    			me.triggers.count.getEl().setHtml('0');
+	    			if (queries.length>0) {
+	    				me.getCorpus().getCorpusTerms().load({
+	    					params: {
+	    						query: queries.map(function(q) {return '('+q+')'}).join("|"),
+				    			tokenType: me.getTokenType(),
+				    			stopList: me.getStopList(),
+				    			inDocumentsCountOnly: true
+	    					},
+	    					callback: function(records, operation, success) {
+	    						if (success && records && records.length==1) {
+	    							me.triggers.count.getEl().setHtml(records[0].getInDocumentsCount())
+	    						}
+	    					}
+	    				})
+	    			} else {
+	    				me.triggers.count.hide();
+	    			}
+	    		}
+    		} else {
+    			me.isClearing = false;
     		}
-    		if (me.triggers.count) {
-    			me.triggers.count.show();
-    			me.triggers.count.getEl().setHtml('0');
-    			if (queries.length>0) {
-    				me.getCorpus().getCorpusTerms().load({
-    					params: {
-    						query: queries.map(function(q) {return '('+q+')'}).join("|"),
-			    			tokenType: me.getTokenType(),
-			    			stopList: me.getStopList(),
-			    			inDocumentsCountOnly: true
-    					},
-    					callback: function(records, operation, success) {
-    						if (success && records && records.length==1) {
-    							me.triggers.count.getEl().setHtml(records[0].getInDocumentsCount())
-    						}
-    					}
-    				})
-    			} else {
-    				me.triggers.count.hide();
-    			}
-    		}
-    	})
+    	});
 
     	// we need to make sure the panel is a voyantpanel
     	// so that we get loadedCorpus event after a call to Voyant.util.Toolable.replacePanel
@@ -10551,6 +10557,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	    		parentPanel = me.findParentBy(function(clz) {
     	    			return clz.mixins["Voyant.panel.Panel"];
         			});
+    	    		if (parentPanel == null) {
+    	    			parentPanel = me.up('window').panel;
+    	    		}
     	    		var corpus = parentPanel.getApplication().getCorpus();
     				if (corpus !== undefined) {
     					me.doSetCorpus(corpus);
@@ -25585,9 +25594,11 @@ Ext.define('Voyant.panel.Veliza', {
     	previous: []
     },
     
-    initComponent: function(config) {
+    constructor: function() {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
         var me = this;
-        
         Ext.apply(this, {
     		title: this.localize('title'),
     		glyph: 'xf0e6@FontAwesome',
@@ -25616,6 +25627,7 @@ Ext.define('Voyant.panel.Veliza', {
     				xtype: 'textarea',
     				name: 'editor',
     				fieldStyle: "white-space: pre",
+    				value: me.getApiParam('script'),
     				flex: 1,
     				listeners: {
     					afterrender: function(editor) {
@@ -25631,6 +25643,8 @@ Ext.define('Voyant.panel.Veliza', {
     							if (obj && obj.veliza && obj.veliza.script) {
     								editor.setValue(obj.veliza.script);
     								editor.resetOriginalValue();
+    							} else if (obj && obj.veliza && obj.veliza.id) {
+    								me.setApiParam('script', obj.veliza.id);
     							} else {
     								me.showError(me.localize('unableFetchScript'));
     							}
@@ -25682,7 +25696,6 @@ Ext.define('Voyant.panel.Veliza', {
         })
              
         this.callParent();
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
         
     	this.on('boxready', function(cmp) {
     		cmp.addSentence("fromThem", "Hello, I'm Veliza, and I'm here to talk to you about your texts (you may know my sister <a href='https://en.wikipedia.org/wiki/ELIZA' target='_blank'>Eliza</a> she's a famous psychotherapist). I'm just learning to talk about text documents, but please, let me know about any anxieties you're feeling about your texts. Type a message in the box below and hit enter. Or, if you're feeling playful, hit the <i>from text</i> bottom in the lower right-hand corner to fetch a sentence from the corpus.");
@@ -25696,7 +25709,7 @@ Ext.define('Voyant.panel.Veliza', {
 			if (this.getCorpus()) {
 				this.handleUserSentence(this.getApiParam('message'))
 			} else {
-				console.warn(new Date())
+				// try to wait for the corpus to be loaded
 				Ext.defer(this.sendApiParamMessage, 100, this)
 			}
 		}
@@ -25737,7 +25750,7 @@ Ext.define('Voyant.panel.Veliza', {
     		    		for (key in json.params) {
     		    			json.params[key] = json.params[key].trim();
     		    		}
-    		    		veliza += "<br/><iframe width='"+(json.width ? json.width : '100%')+"' height='"+(json.height ? json.height : '350px')+"' src='"+me.getApplication().getBaseUrl()+'tool/'+json.tool+'/?corpus='+me.getCorpus().getId()+'&minimal=true&'+Ext.Object.toQueryString(json.params)+"'></iframe>"
+    		    		veliza += "<br/><iframe width='"+(json.width ? json.width : '100%')+"' height='"+(json.height ? json.height : '250px')+"' src='"+me.getApplication().getBaseUrl()+'tool/'+json.tool+'/?corpus='+me.getCorpus().getId()+'&minimal=true&'+Ext.Object.toQueryString(json.params)+"'></iframe>"
     		    	}
     		    	var sentence = response.veliza.sentence;
     		    	me.setPrevious(response.veliza.previous);
@@ -27278,9 +27291,12 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
         
 	},
 	
-	initComponent: function() {
+	initComponent: function(config) {
 		var me = this;
-		me.on("afterrender", function(){
+		me.on("afterrender", function() {
+			if (this.editor && this.editor.getMode() != 'ace/mode/javavscript') {
+				this.switchModes(this.editor.getMode(), true)
+			}
 			this.getTargetEl().on("resize", function(el) {
 				var height = 20;
 				me.items.each(function(item) {height+=item.getHeight();})
@@ -27290,12 +27306,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		me.callParent(arguments);
 	},
 	
-	switchModes: function(mode) {
+	switchModes: function(mode, light) {
 		var runnable = mode=='javascript';
 		this.down('notebookwrapperrun').setVisible(runnable);
 		this.down('notebookwrapperrununtil').setVisible(runnable);
 		this.results.setVisible(runnable);
-		this.editor.switchModes(mode);
+		if (!light) {
+			this.editor.switchModes(mode);
+		}
 	},
 	
 	run: function(runningAll) {
@@ -28957,16 +28975,17 @@ Ext.define('Voyant.VoyantToolApp', {
 	    					dfd.resolve();
 	    	    	    	var json = Ext.util.JSON.decode(response.responseText);
 	        	    		var config = Ext.urlDecode(json.storedResource.resource);
-	        	    		debugger
 	        	    		var tool = Ext.create({
 	        	    			xtype: me.getTool(),
 	        	    			api: config
-	        	    		})
-	        	    		debugger
+	        	    		});
 	        	    		tool.setApiParams(config);
 	        	    		container.unmask();
 	        	    		container.remove(container.down('container'));
 	        	    		container.add(tool);
+	        	    		if (config.corpus) {
+	        	    			me.loadCorpusFromParams(config);
+	        	    		}
 	        	    	}).otherwise(function(response) {
 	        	    		if (me.getTargetEl) {
 	            				Voyant.notebook.util.Show.TARGET = me.getTargetEl();

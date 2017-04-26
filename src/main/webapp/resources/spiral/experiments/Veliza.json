@@ -14,7 +14,7 @@
                 "it provides a mechanism for automated dialogue&nbsp;(there's more information in",
                 " the <a data-cke-saved-href=\"../../../docs/#!/guide/veliza\" target=\"_blank\" href",
                 "=\"../../../docs/#!/guide/veliza\" data-tabindex-value=\"none\" tabindex=\"-1\" data-t",
-                "abindex-counter=\"1\">Veliza documentation</a>). Eliza was meant as a parody of a ",
+                "abindex-counter=\"4\">Veliza documentation</a>). Eliza was meant as a parody of a ",
                 "Rogerian psychotherapist, but wouldn't it be interesting to experiment with a ch",
                 "atbot that could help dialogue with a corpus of texts? Veliza's not there yet, b",
                 "ut she's learning, and in this notebook we'll explain a bit more about how she l",
@@ -33,30 +33,23 @@
             ],
             "mode": "javascript",
             "output": [
-                "<div style='height: 74px'> <div class=\"error\">Unable to embed (invalid or no emb",
-                "ed tool specified).Try one of the following widgets: <ul>\"<a href=\"../../docs/#!",
-                "/guide/summary\" target=\"voyantdocs\" data-tabindex-value=\"none\" tabindex=\"-1\" dat",
-                "a-tabindex-counter=\"1\">summary</a>\", \"<a href=\"../../docs/#!/guide/cirrus\" targe",
-                "t=\"voyantdocs\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1",
-                "\">cirrus</a>\", \"<a href=\"../../docs/#!/guide/documents\" target=\"voyantdocs\" data",
-                "-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">documents</a>\", \"",
-                "<a href=\"../../docs/#!/guide/corpusterms\" target=\"voyantdocs\" data-tabindex-valu",
-                "e=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">corpusterms</a>\", \"<a href=\"../",
-                "../docs/#!/guide/reader\" target=\"voyantdocs\" data-tabindex-value=\"none\" tabindex",
-                "=\"-1\" data-tabindex-counter=\"1\">reader</a>\", \"<a href=\"../../docs/#!/guide/trend",
-                "s\" target=\"voyantdocs\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-co",
-                "unter=\"1\">trends</a>\", \"<a href=\"../../docs/#!/guide/termsradio\" target=\"voyantd",
-                "ocs\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">termsrad",
-                "io</a>\", \"<a href=\"../../docs/#!/guide/documentterms\" target=\"voyantdocs\" data-t",
-                "abindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">documentterms</a>\",",
-                " \"<a href=\"../../docs/#!/guide/termsberry\" target=\"voyantdocs\" data-tabindex-val",
-                "ue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">termsberry</a>\", \"<a href=\"../",
-                "../docs/#!/guide/collocatesgraph\" target=\"voyantdocs\" data-tabindex-value=\"none\"",
-                " tabindex=\"-1\" data-tabindex-counter=\"1\">collocatesgraph</a>\", \"<a href=\"../../d",
-                "ocs/#!/guide/contexts\" target=\"voyantdocs\" data-tabindex-value=\"none\" tabindex=\"",
-                "-1\" data-tabindex-counter=\"1\">contexts</a>\", \"<a href=\"../../docs/#!/guide/wordt",
-                "ree\" target=\"voyantdocs\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-",
-                "counter=\"1\">wordtree</a>\"</ul></div></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe src=\"../../tool/Veliza/?me",
+                "ssage=I%20love%20Jane%20Austen.&amp;corpus=austen&amp;debug=true\" style=\"width: ",
+                "90%; height: 400px\" id=\"ext-221\" name=\"ext-221\" data-tabindex-value=\"none\" tabin",
+                "dex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>Veliza has responded to our declaration of love, but it's not very interestin",
+                "g. But we can change that. You'll notice that there's a script editor that can b",
+                "e opened to the right of the panel. By default the current Veliza script will be",
+                " shown and can be edited. However, editing it there in place means that we can't",
+                " describe what we're trying to accomplish, as we can here in Spiral.</p><p>Veliz",
+                "a's script is already edited from the original form (though nothing significant ",
+                "hasn't been removed in Veliza, it's more that there are additional rules). Still",
+                ", let's start with the original script, which we can see in the box below.</p>"
             ]
         },
         {
@@ -503,7 +496,141 @@
         },
         {
             "type": "text",
-            "input": "(Click here to edit.)"
+            "input": [
+                "<p>This isn't the best venue to <a data-cke-saved-href=\"http://www.chayden.net/e",
+                "liza/instructions.txt\" target=\"_blank\" href=\"http://www.chayden.net/eliza/instru",
+                "ctions.txt\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\">e",
+                "xplain the scripting language in detail</a>, but there are some things worth men",
+                "tioning. Each line provides an instruction, and some of the important instructio",
+                "ns are as follows:</p><ul><li><code><strong>pre</strong></code>: [source] [targe",
+                "t] before analysis, substitute the single word in [source] with the word or word",
+                "s in [target]</li><li><code><strong>post</strong></code>: [source] [target] afte",
+                "r&nbsp;analysis, substitute the single word in [source] with the word or words i",
+                "n [target]</li><li><code><strong>synon</strong></code>: [word] [word] …&nbsp;dur",
+                "ing decomposition, treat any of the words as being the same as the first (when t",
+                "he first is written as @word)</li><li><code><strong>key</strong></code>: [word] ",
+                "[weight] define a keyword to be matched during decomposition with an optional we",
+                "ight to define precedence of the keyword<ul><li><code><strong>decomp</strong></c",
+                "ode>: [pattern] a pattern for matching that can include captured asterisks and&n",
+                "bsp;synonyms as well as other words, which are then used for reassembly:<ul><li>",
+                "<code><strong>reasmb</strong></code>: [pattern] a pattern for reassembly when yo",
+                "u can reference matched wildcards and synonyms with&nbsp;parenthetical numbers</",
+                "li></ul></li></ul></li></ul><p>We can load the script above into memory very eas",
+                "ily so that we can use it subsequently.</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": "var originalScript = Notebook.getDataFromBlock();",
+            "mode": "javascript",
+            "output": "<div style='height: 14px'> </div>"
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>Now let's look at adding our own rules and then sending the combine original ",
+                "script (<code>originalScript</code>) and our new script (<code>loveAustenScript<",
+                "/code>) to Veliza with our seed message.</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "pre: like love",
+                "key: love 1",
+                "  decomp: * austen *",
+                "    reasmb: Isn't Jane Austen a wonderful author?"
+            ],
+            "mode": "text",
+            "output": ""
+        },
+        {
+            "type": "code",
+            "input": [
+                "var loveAustenScript = Notebook.getDataFromBlock();",
+                "austen.embed('Veliza', {script: originalScript+loveAustenScript, message: \"I love Jane Austen.\"})"
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-222\" name=\"ext-222\" src=\"../../tool/Veliza/?minimal=true&amp;emb",
+                "eddedApiId=54dc2eb8bd51e09f7b68e3cfcdef6e32&amp;debug=true\" data-tabindex-value=",
+                "\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>Great! Not the most spectacular example of artificial intelligence, but maybe",
+                " it would surprise someone, especially if they happen to be working with the Aus",
+                "ten corpus.</p><p>Veliza allows us to not only capture and reuse words from the ",
+                "incoming message (typed by the user or sent from the text), it also has some spe",
+                "cial syntax to embed certain Voyant tools. Let's see an example:</p><blockquote>",
+                "<pre>key: concordance 1\n&nbsp; &nbsp;decomp: * of the word * *\n&nbsp;&nbsp; &nbs",
+                "p;reasmb: You want to see a concordance of \" (2) \" ? &lt;!-- {\"tool\": \"Contexts\"",
+                ", \"width\": \"600px\", \"params\": {\"query\": \" (2) \"}} --&gt;\n</pre></blockquote><p>T",
+                "his will cause Veliza to recognize the word \"concordance\" followed by \"of the wo",
+                "rd\", followed by a word and then perhaps others, as in the sentence \"Show me a c",
+                "oncordance of the word love.\" If that sentence matches, then we see the output \"",
+                "You want to see a concordance of \" (2)&nbsp;\" ?\" The (2) is a reference to the s",
+                "econd asterisk in our rule, the word following \"of the word\". The HTML comment <",
+                "span style=\"white-space: nowrap;\">&lt;!-- … --&gt;</span> provides instructions ",
+                "for the tool to use, dimensions of the window and our matched word as a query.</",
+                "p><p>Let's add in a bunch more rules and the rerun our call to Veliza.</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "synon: concordance kwic",
+                "synon: word term",
+                "synon: words terms",
+                "synon: often frequently",
+                "synon: appear show",
+                "synon: voyanttool cirrus",
+                "key: occurrences 0",
+                "  decomp: *",
+                "    reasmb: goto concordance",
+                "key: kwic 0",
+                "  decomp: *",
+                "    reasmb: goto concordance",
+                "key: concordance 0",
+                "   decomp: * of the word * *",
+                "\treasmb: You want to see a concordance of \" (2) \" ? <!-- {\"tool\": \"Contexts\", \"width\": \"600px\", \"params\": {\"query\": \" (2) \"}} -->",
+                "   decomp: * of * *",
+                "\treasmb: You want to see a concordance of \" (2) \" ? <!-- {\"tool\": \"Contexts\", \"width\": \"600px\", \"params\": {\"query\": \" (2) \"}} -->",
+                "key: how 0",
+                "   decomp: * often does the word * *",
+                "\treasmb: You want to see the frequency of \" (2) \" ? <!-- {\"tool\": \"CorpusTerms\", \"width\": \"600px\", \"params\": {\"query\": \" (2) \"}} -->",
+                "   decomp: * often does * *",
+                "\treasmb: You want to see the frequency of \" (2) \" ? <!-- {\"tool\": \"CorpusTerms\", \"width\": \"600px\", \"params\": {\"query\": \" (2) \"}} -->",
+                "key: cirrus 0",
+                "   decomp: *",
+                "\treasmb: You want to see a Cirrus ? <!-- {\"tool\": \"cirrus\"} -->",
+                "key: wordcloud 0",
+                "   decomp: *",
+                "\treasmb: goto cirrus",
+                "key: cloud 0",
+                "   decomp: * word cloud *",
+                "\treasmb: goto cirrus",
+                ""
+            ],
+            "mode": "text",
+            "output": ""
+        },
+        {
+            "type": "code",
+            "input": [
+                "extendedScript = Notebook.getDataFromBlock();",
+                "austen.embed(\"Veliza\", {script: originalScript+extendedScript, message: \"Show me a concordance of the word love.\"})"
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-223\" name=\"ext-223\" src=\"../../tool/Veliza/?minimal=true&amp;emb",
+                "eddedApiId=29194827fe95ec55096e81127ce57ab7&amp;debug=true\" data-tabindex-value=",
+                "\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
+            ]
         }
     ]
 }
