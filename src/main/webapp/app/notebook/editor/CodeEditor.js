@@ -19,11 +19,11 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		boxready: function() {
 			var me = this;
 			this.editor = ace.edit(Ext.getDom(this.getEl()));
-//			this.$blockScrolling = Infinity;
+			this.editor.$blockScrolling = Infinity;
 			this.editor.getSession().setUseWorker(true);
 			this.editor.setTheme(this.getTheme());
 			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: 35, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			this.editor.setOptions({minLines: 6, maxLines: 25, autoScrollEditorIntoView: true, scrollPastEnd: true});
 			this.editor.setHighlightActiveLine(false);
 			this.editor.renderer.setShowPrintMargin(false);
 			this.editor.renderer.setShowGutter(false);

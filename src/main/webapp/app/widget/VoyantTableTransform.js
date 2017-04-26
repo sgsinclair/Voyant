@@ -15,14 +15,7 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
     	config = config || {};
 		var me = this;
     	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	if (!config.noEmbed) {
-        	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
-    	}
         me.callParent(arguments);
-    	me.on("reconfigure", function() {
-    		this.buildFromParams();
-    		this.fireEvent('afterrender');
-    	}, this);
 	},
 	initComponent: function(config) {
     	var me = this, config = config || {};

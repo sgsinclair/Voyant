@@ -13,23 +13,11 @@ Ext.define('Voyant.widget.VoyantChart', {
     	config = config || {};
     	var me = this;
     	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	if (!config.noEmbed) {
-        	this.mixins['Voyant.notebook.util.Embed'].constructor.apply(this, arguments);
-    	}
     	if (this.getApiParam('tableJson')) {
     		Ext.apply(config, this.getConfigFromTableJson());
     	}
     	this.callParent(arguments)
     	
-    	me.on("reconfigure", function() {
-        	if (this.getApiParam('tableJson')) {
-        		var config = this.getConfigFromTableJson();
-        		var newChart = Ext.create('Voyant.widget.VoyantChart', config);
-        		var container = this.up("container");
-        		container.remove(this);
-        		container.add(newChart)
-        	}
-    	})
     },
     initComponent: function(config) {
     	this.callParent(arguments)

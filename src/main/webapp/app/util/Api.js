@@ -35,6 +35,14 @@ Ext.define('Voyant.util.Api', {
     		}
     	}
     	
+		if (config && Ext.isObject(config.api)) {
+	    	for (var key in config.api) {
+	    		if (this.api[key]) {
+	    			this.setApiParam(key, config.api[key]);
+	    		}
+	    	}
+		}
+		
     	// handle "type"  parameter specially for backwards compatibility
     	if (queryParams["type"] && ("query" in this.api) && !this.getApiParam('query')) {
     		this.setApiParam("query", queryParams['type']);

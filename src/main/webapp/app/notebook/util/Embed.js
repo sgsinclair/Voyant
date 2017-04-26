@@ -3,43 +3,8 @@ Ext.define("Voyant.notebook.util.Embed", {
 	embed: function() { // this is for instances
 		embed.apply(this, arguments);
 	},
-	config: {
-		embeddedConfigParamName: 'embeddedConfig'
-	},
 	constructor: function(config) {
 		var me = this;
-		
-		// try to read embedded json config if it's present
-		if (this.getApiParam) {
-			var embeddedConfig = this.getApiParam('embeddedConfig');
-			if (embeddedConfig) {
-				
-				var dfd = Voyant.application.getDeferred(this);
-    	    	Ext.Ajax.request({
-    	    	    url: Voyant.application.getTromboneUrl(),
-    	    	    params: {
-    	        		tool: 'resource.StoredResource',
-    	        		retrieveResourceId: embeddedConfig
-    	    	    }
-    	    	}).then(function(response) {
-					dfd.resolve();
-	    	    	var json = Ext.util.JSON.decode(response.responseText);
-    	    		var api = Ext.urlDecode(json.storedResource.resource);
-    	    		me.setApiParams(api);
-    	    		me.fireEvent("reconfigure");
-    	    	}).otherwise(function(response) {
-    	    		if (me.getTargetEl) {
-        				Voyant.notebook.util.Show.TARGET = me.getTargetEl();
-        				showError(response);
-    	    		}
-    	    		Voyant.application.showError(response);
-    	    		dfd.reject();
-    	    	})
-				
-			}
-		}
-
-		// don't call parent since this is a mixin whose constructor is called
 	},
 	statics: {
 		i18n: {},
@@ -133,7 +98,7 @@ Ext.define("Voyant.notebook.util.Embed", {
 				    	    	    	var json = Ext.util.JSON.decode(response.responseText);
 				    	    	    	var params = {
 				    	    	    		minimal: true,
-				    	    	    		embeddedConfig: json.storedResource.id
+				    	    	    		embeddedApiId: json.storedResource.id
 				    	    	    	}
 				    	    	    	Ext.applyIf(params, Voyant.application.getModifiedApiParams());
 				    	    	    	document.getElementById(iframeId).setAttribute("src",url+Ext.Object.toQueryString(params));
@@ -153,7 +118,6 @@ Ext.define("Voyant.notebook.util.Embed", {
 					}
 					if (!isEmbedded) {
 						var embedded = Ext.create(cmp, config);
-						debugger
 						embedded.embed(config);
 					}
 				}
