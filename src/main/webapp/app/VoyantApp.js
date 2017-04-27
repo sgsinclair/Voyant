@@ -1,8 +1,8 @@
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
-	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api','Voyant.util.CategoriesManager'],
-	requires: ['Voyant.util.ResponseError'],
+	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api'],
+	requires: ['Voyant.util.ResponseError','Voyant.util.CategoriesManager'],
     
     name: 'VoyantApp',
     

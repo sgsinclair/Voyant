@@ -1,11 +1,14 @@
 Ext.define('Voyant.util.CategoriesManager', {
-	categories: undefined,
-	attributes: undefined,
+	
+	config: {
+		categories: undefined,
+		features: undefined
+	},
 	
 	constructor: function(config) {
 		config = config || {};
-		this.categories = {};
-		this.attributes = {};
+		this.setCategories({});
+		this.setFeatures({});
 		if (config.categories !== undefined) {
 			for (var key in config.categories) {
 				var terms = config.categories[key];
@@ -14,20 +17,17 @@ Ext.define('Voyant.util.CategoriesManager', {
 		}
 	},
 	
-	getCategories: function() {
-		return this.categories;
-	},
 	getCategoryTerms: function(name) {
-		return this.categories[name];
+		return this.getCategories()[name];
 	},
 	
 	addCategory: function(name) {
-		if (this.categories[name] === undefined) {
-			this.categories[name] = [];
+		if (this.getCategories()[name] === undefined) {
+			this.getCategories()[name] = [];
 		}
 	},
 	removeCategory: function(name) {
-		delete this.categories[name];
+		delete this.getCategories()[name];
 	},
 	
 	addTerm: function(category, term) {
@@ -37,13 +37,13 @@ Ext.define('Voyant.util.CategoriesManager', {
 		if (!Ext.isArray(terms)) {
 			terms = [terms];
 		}
-		if (this.categories[category] === undefined) {
+		if (this.getCategories()[category] === undefined) {
 			this.addCategory(category);
 		}
 		for (var i = 0; i < terms.length; i++) {
 			var term = terms[i];
-			if (this.categories[category].indexOf(term) === -1) {
-				this.categories[category].push(term);
+			if (this.getCategories()[category].indexOf(term) === -1) {
+				this.getCategories()[category].push(term);
 			}
 		}
 	},
@@ -54,48 +54,48 @@ Ext.define('Voyant.util.CategoriesManager', {
 		if (!Ext.isArray(terms)) {
 			terms = [terms];
 		}
-		if (this.categories[category] !== undefined) {
+		if (this.getCategories()[category] !== undefined) {
 			for (var i = 0; i < terms.length; i++) {
 				var term = terms[i];
-				var index = this.categories[category].indexOf(term);
+				var index = this.getCategories()[category].indexOf(term);
 				if (index !== -1) {
-					this.categories[category].splice(index, 1);
+					this.getCategories()[category].splice(index, 1);
 				}
 			}
 		}
 	},
 	
 	getCategoryForTerm: function(term) {
-		for (var category in this.categories) {
-			if (this.categories[category].indexOf(term) != -1) {
+		for (var category in this.getCategories()) {
+			if (this.getCategories()[category].indexOf(term) != -1) {
 				return category;
 			}
 		}
 		return undefined;
 	},
 	
-	addAttribute: function(name, defaultValue) {
-		if (this.attributes[name] === undefined) {
-			this.attributes[name] = {};
+	addFeature: function(name, defaultValue) {
+		if (this.getFeatures()[name] === undefined) {
+			this.getFeatures()[name] = {};
 			if (defaultValue !== undefined) {
-				for (var category in this.categories) {
-					this.setAttributeForCategory(category, name, defaultValue);
+				for (var category in this.getCategories()) {
+					this.setCategoryFeature(category, name, defaultValue);
 				}
 			}
 		}
 	},
-	removeAttribute: function(name) {
-		delete this.attributes[name];
+	removeFeature: function(name) {
+		delete this.getFeatures()[name];
 	},
-	setCategoryAttribute: function(categoryName, attributeName, attributeValue) {
-		if (this.attributes[attributeName] === undefined) {
-			this.addAttribute(attributeName);
+	setCategoryFeature: function(categoryName, featureName, featureValue) {
+		if (this.getFeatures()[featureName] === undefined) {
+			this.addFeature(featureName);
 		}
-		this.attributes[attributeName][categoryName] = attributeValue;
+		this.getFeatures()[featureName][categoryName] = featureValue;
 	},
-	getCategoryAttribute: function(categoryName, attributeName) {
-		if (this.attributes[attributeName] !== undefined) {
-			return this.attributes[attributeName][categoryName];
+	getCategoryFeature: function(categoryName, featureName) {
+		if (this.getFeatures()[featureName] !== undefined) {
+			return this.getFeatures()[featureName][categoryName];
 		}
 	}
 });
