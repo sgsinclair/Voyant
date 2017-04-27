@@ -467,8 +467,14 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			dataIndex: 'category',
 			flex: 1
 		}];
+		var data = [];
 		
-		var features = this.getCategoriesManager().getFeatures();
+		var catman = this.getCategoriesManager();
+		for (var category in catman.getCategories()) {
+			data.push({category: category});
+		}
+		
+		var features = catman.getFeatures();
 		var featuresConfig = Ext.ClassManager.getClass(this).features;
 		
 		for (var feature in features) {
@@ -497,10 +503,21 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				xtype: 'widgetcolumn',
 				widget: widgetConfig
 			});
+			
+			for (var category in catman.getCategories()) {
+				var value = catman.getCategoryFeature(category, feature);
+				for (var i = 0; i < data.length; i++) {
+					if (data[i].category == category) {
+						data[i][feature] = value;
+						break;
+					}
+				}
+			}
 		}
 		
 		var store = Ext.create('Ext.data.JsonStore', {
-			fields: fields
+			fields: fields,
+			data: data
 		});
 		this.queryById('features').reconfigure(store, columns);
     },
