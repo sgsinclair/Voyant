@@ -207,10 +207,10 @@ Ext.define('Voyant.notebook.Notebook', {
     				},
     				xtype: 'toolmenu',
     				glyph: 'xf0c2@FontAwesome',
-    				visible: false,
+    				//visible: false,
     				listeners: {
     					afterrender: function(tool) {
-    						tool.setVisible(false)
+    						tool.setVisible(window.location.hostname=='localhost');
     						me.setSaveItTool(tool);
     					}
     				},
@@ -500,14 +500,17 @@ Ext.define('Voyant.notebook.Notebook', {
     		 me.unmask();
     	     var data = Ext.decode(response.responseText);
     		 var json = me.getBlocksFromString(data.notebook.jsonData);
+    		 json.metadata = json.metadata || {};
+    		 json.metadata.previousNotebook = url;
+    		 Ext.applyIf(json.metadata, {originalUrl: url});
     	     if (json && json.metadata && json.metadata.url) {
-    	    	 if (json.metadata.url!=window.location.href) {
+    	    	 if (new URL(json.metadata.url).hostname!=window.location.hostname) {
     	    		 return Ext.Msg.confirm(me.localize('differentUrlTitle'), new Ext.XTemplate(me.localize('differentUrl')).apply([json.metadata.url, window.location.href]), function(btn) {
     	    			 me.loadData(json, btn=='yes')
     	    		 }, me);
     	    	 }
     	     }
-    		 me.loadBlocksFromString(data.notebook.jsonData, isRun);
+    		 me.loadData(json, isRun);
     	 },
     	 function(response, opts) {
     		 me.showResponseError("Unable to load specified notebook: "+url, response);

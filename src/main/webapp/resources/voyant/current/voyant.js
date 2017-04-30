@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Apr 30 11:34:33 EDT 2017 */
+/* This file created by JSCacher. Last modified: Sun Apr 30 13:50:25 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7078,7 +7078,7 @@ Ext.define('Voyant.util.ToolMenu', {
     renderTpl: ['<div class="x-menu-tool-hover">' + '</div>'+
             '<tpl if="glyph">' + 
             '<span id="{id}-toolEl" class="{baseCls}-glyph {childElCls}" role="presentation" style="font-family: {glyphFontFamily}; '+
-            	'<tpl if="Ext.isSafari || (Ext.isWebKit && Ext.os.name==\'iOS\')">'+ // FIXME: this is an awful hack..
+            	'<tpl if="Ext.os.name==\'iOS\'">'+ // FIXME: this is an awful hack..
             		'margin-right: 15px; '+
             	'</tpl>'+
             '">&#{glyph}</span>' + 
@@ -7087,6 +7087,7 @@ Ext.define('Voyant.util.ToolMenu', {
             '</tpl>'],
     privates: {
         onClick: function() {
+        	
             var me = this,
             returnValue = me.callParent(arguments);
 
@@ -27872,10 +27873,10 @@ Ext.define('Voyant.notebook.Notebook', {
     				},
     				xtype: 'toolmenu',
     				glyph: 'xf0c2@FontAwesome',
-    				visible: false,
+    				//visible: false,
     				listeners: {
     					afterrender: function(tool) {
-    						tool.setVisible(false)
+    						tool.setVisible(window.location.hostname=='localhost');
     						me.setSaveItTool(tool);
     					}
     				},
@@ -28165,14 +28166,17 @@ Ext.define('Voyant.notebook.Notebook', {
     		 me.unmask();
     	     var data = Ext.decode(response.responseText);
     		 var json = me.getBlocksFromString(data.notebook.jsonData);
+    		 json.metadata = json.metadata || {};
+    		 json.metadata.previousNotebook = url;
+    		 Ext.applyIf(json.metadata, {originalUrl: url});
     	     if (json && json.metadata && json.metadata.url) {
-    	    	 if (json.metadata.url!=window.location.href) {
+    	    	 if (new URL(json.metadata.url).hostname!=window.location.hostname) {
     	    		 return Ext.Msg.confirm(me.localize('differentUrlTitle'), new Ext.XTemplate(me.localize('differentUrl')).apply([json.metadata.url, window.location.href]), function(btn) {
     	    			 me.loadData(json, btn=='yes')
     	    		 }, me);
     	    	 }
     	     }
-    		 me.loadBlocksFromString(data.notebook.jsonData, isRun);
+    		 me.loadData(json, isRun);
     	 },
     	 function(response, opts) {
     		 me.showResponseError("Unable to load specified notebook: "+url, response);

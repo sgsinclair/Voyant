@@ -655,7 +655,7 @@ Ext.define('Voyant.util.ToolMenu', {
     renderTpl: ['<div class="x-menu-tool-hover">' + '</div>'+
             '<tpl if="glyph">' + 
             '<span id="{id}-toolEl" class="{baseCls}-glyph {childElCls}" role="presentation" style="font-family: {glyphFontFamily}; '+
-            	'<tpl if="Ext.isSafari || (Ext.isWebKit && Ext.os.name==\'iOS\')">'+ // FIXME: this is an awful hack..
+            	'<tpl if="Ext.os.name==\'iOS\'">'+ // FIXME: this is an awful hack..
             		'margin-right: 15px; '+
             	'</tpl>'+
             '">&#{glyph}</span>' + 
@@ -664,6 +664,7 @@ Ext.define('Voyant.util.ToolMenu', {
             '</tpl>'],
     privates: {
         onClick: function() {
+        	
             var me = this,
             returnValue = me.callParent(arguments);
 
