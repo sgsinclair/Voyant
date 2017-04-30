@@ -38,6 +38,8 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			    	var wrapper = me.up('notebookcodeeditorwrapper');
 			    	if (wrapper) {
 			    		wrapper.setIsRun(false);
+			    		var notebook = wrapper.up(notebook);
+			    		if (notebook) {notebook.setIsEdited(true);}
 			    	}
 		    	}
 		    }, this)

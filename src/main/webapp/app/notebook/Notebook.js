@@ -1,3 +1,7 @@
+/**
+ * @class Notebook
+ * A Spiral Notebook. This should never be instantiated directly, but there are useful static methods that can be called.
+ */
 Ext.define('Voyant.notebook.Notebook', {
 	alternateClassName: ["Notebook"],
 	extend: 'Ext.panel.Panel',
@@ -21,7 +25,10 @@ Ext.define('Voyant.notebook.Notebook', {
 			fetchingNotebook: "Fetching notebook…",
 			openTip: "Open a Spiral Notebook (by pasting in JSON code).",
 			newTip: "Create a new Spiral Notebook in a new window.",
-			runallTip: "Run all code blocks in this notebook"
+			runallTip: "Run all code blocks in this notebook",
+			differentUrlTitle: "Notebook from Different URL",
+			differentUrl: "This notebook seems to be have been located at a different URL. If you're sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook's URL: {0}",
+			saveItTip: "Save this notebook (to a different URL). This button may be disabled if no edits have been made."
     	},
     	api: {
     		input: undefined
@@ -29,10 +36,23 @@ Ext.define('Voyant.notebook.Notebook', {
     	
     	currentBlock: undefined,
  
+    	/**
+    	 * Get a global deferred object (which can be use to ensure that focus remains in a code block while asynchronous actions happen).
+    	 * 
+    	 * 	var deferred = Notebook.getDeferred();
+    	 * 	// ... some asynchronous code
+    	 * 	deferred.resolve();
+    	 */
     	getDeferred: function() {
     		return Voyant.application.getDeferred();
     	},
     	
+    	/**
+    	 * This returns the contents of the previous data block (even if there are other kinds of blocks in between).
+    	 * A data block is a code editing block that has been changed from the default mode "javascript" to another mode
+    	 * (like text). You can change the mode of a block in Spiral by clicking the format icon in the left toolbar
+    	 * for an existing code block.
+    	 */
     	getDataFromBlock: function(where) {
     		if (Voyant.notebook.Notebook.currentBlock) {
     			var previous = Voyant.notebook.Notebook.currentBlock;
@@ -46,6 +66,13 @@ Ext.define('Voyant.notebook.Notebook', {
     		showError("Unable to find data to load");
     	},
     	
+    	/**
+    	 * This fetches content from a URL, often resolving cross-domain data constraints.
+    	 * 
+    	 * @param {String} url The URL load
+    	 * @param {Object} [config] configuration options:
+    	 * - format: json|xml|text (which will determine what kind of object is returned)
+    	 */
     	loadDataFromUrl: function(url, config) {
     		var dfd = Voyant.application.getDeferred();
     		var params = {
@@ -68,7 +95,6 @@ Ext.define('Voyant.notebook.Notebook', {
     			 dfd.resolve(response.responseText);
     		 },
     		 function(response, opts) {
-    			 debugger
     			 dfd.reject(response.responseText);
     		     console.log('server-side failure with status code ' + response.status);
     		 });
@@ -78,15 +104,31 @@ Ext.define('Voyant.notebook.Notebook', {
     	
     },
     config: {
+        /**
+         * @private
+         */
     	metadata: {},
+        /**
+         * @private
+         */
     	version: 2.0,
-    	isEdited: false
+        /**
+         * @private
+         */
+    	isEdited: false,
+        /**
+         * @private
+         */
+    	saveItTool: undefined
     },
     
     docs: {
     	"!name": "Voyant"
     },
     
+    /**
+     * @private
+     */
     constructor: function(config) {
     	config = config || {};
     	var me = this;
@@ -127,6 +169,54 @@ Ext.define('Voyant.notebook.Notebook', {
     		includeTools: {
     			'help': true,
     			'save': true,
+    			'saveIt': {
+    				tooltip: this.localize("saveItTip"),
+    				callback: function() {
+    					me.mask(me.localize('saving'));
+    			    	 Ext.Ajax.request({
+    			    	     url: this.getTromboneUrl(),
+    			    	     params: {
+    			    	    	 tool: 'notebook.NotebookManager',
+    			    	    	 jsonData: Ext.encode(me.getExportAllJson())
+    			    	     },
+    			    	     scope: this
+    			    	 }).then(function(response, opts) {
+    			    		 me.unmask();
+    			    	     var data = Ext.decode(response.responseText);
+    			    	     if (data && data.notebook && data.notebook.notebook) {
+    			    	    	 var url = me.getBaseUrl()+"spiral/"+data.notebook.notebook;
+    			    	    	 var params = me.getApplication().getModifiedApiParams();
+    			    	    	 if (params) {
+    			    	    		 url += "?"+Ext.Object.toQueryString(params);
+    			    	    	 }
+    			    	    	 window.history.pushState({
+ 			    					url: url
+ 			    				}, "Spiral Notebook: "+data.notebook.notebook, url);
+    			    	    	 me.toastInfo({
+    			    	    		 html: me.localize('savedUrlChanged'),
+    			    	    		 anchor: 'tr'
+    			    	    	 });
+    			    	     } else {
+    			    	    	 me.showError(me.localize('savedFailed'))
+    			    	     }
+    			    	 },
+    			    	 function(response, opts) {
+    			    		 me.unmask();
+    			    		 me.showResponseError("Unable to save this notebook.", response);
+    			    	 });
+    				},
+    				xtype: 'toolmenu',
+    				glyph: 'xf0c2@FontAwesome',
+    				visible: false,
+    				listeners: {
+    					afterrender: function(tool) {
+    						tool.setVisible(false)
+    						me.setSaveItTool(tool);
+    					}
+    				},
+    				disabled: true,
+    				scope: this
+    			},
     			'open': {
     				tooltip: this.localize("openTip"),
     				callback: function() {
@@ -267,6 +357,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			urlParts = url.split("/"), notebook = urlParts.shift();
     		if (notebook && urlParts.length>1 && url.charAt(url.length-1)=='/') {url = url.slice(0, -1);} // remove trailing
     		if (!notebook || notebook=="new") {
+    			if (this.getSaveItTool()) {this.getSaveItTool().setVisible(true);}
     			this.loadData(undefined, isRun);
     		} else if (notebook=="gist") {
 				return this.loadFromUrl(url, isRun);
@@ -278,6 +369,9 @@ Ext.define('Voyant.notebook.Notebook', {
         			this.loadFromUrl('alta/SmallerCorpus', isRun);
         			this.loadFromUrl('alta/Tables', isRun);
     			} else {
+    				if (url.indexOf("/")==-1) { // assume stored resource, which means no .json in resources/spiral (but subdirectory is ok)
+    	    			if (this.getSaveItTool()) {this.getSaveItTool().setVisible(true);}
+    				}
         			this.loadFromUrl(url, isRun);
     			}
     		}
@@ -294,6 +388,14 @@ Ext.define('Voyant.notebook.Notebook', {
 	        }
 	    });
     },
+    
+    setIsEdited: function(val) {
+    	if (this.getSaveItTool()) {
+    		this.getSaveItTool().setDisabled(val==false);
+    	}
+		this.callParent(arguments);
+    },
+    
     listeners: {
     	boxready: function() {
     		this.init();
@@ -397,6 +499,14 @@ Ext.define('Voyant.notebook.Notebook', {
     	 }).then(function(response, opts) {
     		 me.unmask();
     	     var data = Ext.decode(response.responseText);
+    		 var json = me.getBlocksFromString(data.notebook.jsonData);
+    	     if (json && json.metadata && json.metadata.url) {
+    	    	 if (json.metadata.url!=window.location.href) {
+    	    		 return Ext.Msg.confirm(me.localize('differentUrlTitle'), new Ext.XTemplate(me.localize('differentUrl')).apply([json.metadata.url, window.location.href]), function(btn) {
+    	    			 me.loadData(json, btn=='yes')
+    	    		 }, me);
+    	    	 }
+    	     }
     		 me.loadBlocksFromString(data.notebook.jsonData, isRun);
     	 },
     	 function(response, opts) {
@@ -467,7 +577,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	}
     },
     
-    loadBlocksFromString: function(string, isRun) {
+    getBlocksFromString: function(string) {
     	if (/^\s*[\[\{]/m.test(string)) {
     		var json = undefined;
     		try {
@@ -480,7 +590,16 @@ Ext.define('Voyant.notebook.Notebook', {
 					details: e.stack+"\n\n"+this.localize("originalJson")+": "+string
 				}).showMsg()
     		}
-    		this.loadData(json, isRun)
+    		return json;
+    	} else {
+        	return undefined;
+    	}
+    },
+    
+    loadBlocksFromString: function(string, isRun) {
+    	if (/^\s*[\[\{]/m.test(string)) {
+    		var json = this.getBlocksFromString(string);
+    		this.loadData(json, isRun);
     	}
     	else {
     		this.loadData(string, isRun); // treat as single content block
@@ -527,7 +646,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	}
     },
     
-    exportAll: function() {
+    getExportAllJson: function() {
     	var blocks = [], maxLen=70, block, type, content, output;
     	this.items.each(function(item) {
     		type = item.isXType('notebookcodeeditorwrapper') ? 'code' : 'text';
@@ -549,29 +668,31 @@ Ext.define('Voyant.notebook.Notebook', {
     		blocks.push(block)
     	}, this)
     	
-    	// if we have one code block, just show the code
-    	if (blocks.length==1 && blocks[0].type=='code') {
-    		blocks = blocks[0].input
-    	}
-    	
     	var metadata = this.getMetadata();
     	Ext.applyIf(metadata, {
     		created: new Date().getTime(),
     		modified: new Date().getTime(),
-    		version: this.getVersion()
+    		version: this.getVersion(),
+    		url: window.location.href
     	})
     	
-    	var data = {
+    	return {
     		metadata: metadata,
     		blocks: blocks
     	}
+    	
+    },
+    exportAll: function() {
 
+    	var data = this.getExportAllJson();
+
+    	// if we have one code block, just show the code
+    	if (data.blocks.length==1 && data.blocks[0].type=='code') {
+    		data.blocks = blocks[0].input
+    	}
+    	
     	Ext.Msg.prompt("Export Notebook", "Currently only copying and pasting the notebook is available. You can select all the contents of the box below and copy to the clipboard.", undefined, undefined, true, JSON && JSON.stringify ? JSON.stringify(data, undefined, 4) : Ext.encode(data))
-    	
-//    	var url = "./?input=" + encodeURIComponent(Ext.encode(blocks));
-//    	var openurl = "window.open().document.write(unescape('"+escape(Ext.encode(blocks))+"')); return false";
-//    	Ext.Msg.alert('', new Ext.Template(this.localize('exportAllLinks')).apply([url,openurl]));
-    	
+
     },
     
     wrap: function(content) {

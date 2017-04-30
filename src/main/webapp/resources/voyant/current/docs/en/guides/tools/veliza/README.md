@@ -13,6 +13,25 @@ Please note that Veliza is stubbornly monolingual, input sentences (including th
 <iframe src="../tool/Veliza/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 500px"></iframe>
 <div style="width: 90%; text-align: center; margin-bottom: 1em;">Veliza with the Works of Jane Austen. You can also <a href="../?view=Veliza" target="_blank">use Veliza with your own corpus</a>.</div>
 
+## Editing the Script
+
+You can view and edit the script that Veliza uses by clicking on the collapsed panel along the right side of the tool. The editor is resizable if you want to make it bigger relative to the chat window, just slide the divider between the two.
+
+There's a [more detailed explanation of the syntax available](http://www.chayden.net/eliza/instructions.txt), but here are the most relevant parts:
+
+	pre: [source] [target] before analysis, substitute the single word in [source] with the word or words in [target]
+	post: [source] [target] after analysis, substitute the single word in [source] with the word or words in [target]
+	synon: [word] [word] … during decomposition, treat any of the words as being the same as the first (when the first is written as @word)
+	key: [word] [weight] define a keyword to be matched during decomposition with an optional weight to define precedence of the keyword
+		decomp: [pattern] a pattern for matching that can include captured asterisks and synonyms as well as other words, which are then used for reassembly:
+			reasmb: [pattern] a pattern for reassembly when you can reference matched wildcards and synonyms with parenthetical numbers
+
+For example here's a rule that says match a sentence with the word "dreamed" and if the phrase has "I dreamed" then reply "Really, " followed by what's captured after I dreamed, in other words the second (2) asterisk.
+
+	key: dreamed 4
+  		decomp: * i dreamed *
+    		reasmb: Really, (2) ?
+
 ## More information
 
 The original Eliza program was written by Joseph Weizenbaum and described in an article entitled ["ELIZA—a computer program for the study of natural language communication between man and machine"](http://dl.acm.org/citation.cfm?doid=365153.365168) (_Communications of the ACM_, 1966). It's important to emphasize that Weizenbaum intended to demonstrate the superficiality of automated communication even though many people were amazed by exchanges with Eliza and found it to be a promising early example of artificial intelligence (some five decades before Siri and its ilk).
