@@ -26,8 +26,21 @@ Ext.define('Voyant.util.CategoriesManager', {
 			this.getCategories()[name] = [];
 		}
 	},
+	renameCategory: function(oldName, newName) {
+		var terms = this.getCategoryTerms(oldName);
+		this.addTerms(newName, terms);
+		for (var feature in this.getFeatures()) {
+			var value = this.getFeatures()[feature][oldName];
+			this.setCategoryFeature(newName, feature, value);
+		}
+		this.removeCategory(oldName);
+		
+	},
 	removeCategory: function(name) {
 		delete this.getCategories()[name];
+		for (var feature in this.getFeatures()) {
+			delete this.getFeatures()[feature][name];
+		}
 	},
 	
 	addTerm: function(category, term) {
@@ -97,5 +110,12 @@ Ext.define('Voyant.util.CategoriesManager', {
 		if (this.getFeatures()[featureName] !== undefined) {
 			return this.getFeatures()[featureName][categoryName];
 		}
+	},
+	
+	getExportData: function() {
+		return {
+			categories: this.getCategories(),
+			features: this.getFeatures()
+		};
 	}
 });
