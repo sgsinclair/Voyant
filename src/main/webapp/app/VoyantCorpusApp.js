@@ -251,7 +251,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
-    		this.colorTermAssociations.clear();
+//    		this.colorTermAssociations.clear();
     		
     		this.on("unhandledEvent", function(src, eventName, data) {
 				var url = this.getBaseUrl() + '?corpus='+corpus.getAliasOrId();

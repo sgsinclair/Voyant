@@ -9,6 +9,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	api: {
     		stopList: 'auto',
+    		categories: undefined,
     		whiteList: undefined, // specify a list of words to use
     		limit: 500,
     		visible: 50,
@@ -35,21 +36,24 @@ Ext.define('Voyant.panel.Cirrus', {
     		{
 	    		xtype: 'listeditor',
 	    		name: 'whiteList'
-    	    },{
-    	        xtype: 'numberfield',
-    	        name: 'label',
-    	        fieldLabel: 'Max words',
-    	        labelAlign: 'right',
-    	        value: 500,
-    	        minValue: 50,
-    	        step: 50,
-    	        listeners: {
-        	        afterrender: function(field) {
-        	        	var win = field.up("window");
-        	        	if (win && win.panel) {field.setFieldLabel(win.panel.localize("maxTerms"))}
-        	        }
-    	        }
     	    },
+    	    {xtype: 'categoriesoption'},
+//    	    {
+//    	    	// TODO this field does nothing
+//    	        xtype: 'numberfield',
+//    	        name: 'label',
+//    	        fieldLabel: 'Max words',
+//    	        labelAlign: 'right',
+//    	        value: 500,
+//    	        minValue: 50,
+//    	        step: 50,
+//    	        listeners: {
+//        	        afterrender: function(field) {
+//        	        	var win = field.up("window");
+//        	        	if (win && win.panel) {field.setFieldLabel(win.panel.localize("maxTerms"))}
+//        	        }
+//    	        }
+//    	    },
     	    {xtype: 'fontfamilyoption'},
     	    {xtype: 'colorpaletteoption'}
 

@@ -1,6 +1,6 @@
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable','Voyant.util.DetailedError'],
-	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.TotalPropertyStatus'],
+	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.CategoriesOption','Voyant.widget.TotalPropertyStatus'],
 	alias: 'widget.voyantpanel',
 	statics: {
 		i18n: {

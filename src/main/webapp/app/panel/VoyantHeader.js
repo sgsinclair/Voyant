@@ -4,7 +4,6 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	alias: 'widget.voyantheader',
     statics: {
     	i18n: {
-    		categoriesBuilder: 'Categories Builder'
     	}
     },
     constructor: function(config) {
@@ -47,21 +46,6 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	        				}
 	        			}, this);
 	        		}
-				},
-				categories: {
-					type: 'categories',
-					tooltip: this.localize('categoriesBuilder'),
-					xtype: 'toolmenu',
-					glyph: 'xf02c@FontAwesome',
-					handler: function(btn) {
-	        			Ext.create('Voyant.widget.CategoriesBuilder', {
-	        				panel: this,
-	        				categoriesManager: this.getApplication().getCategoriesManager(),
-	        				height: this.getApplication().getViewport().getHeight()*0.5,
-	        				width: this.getApplication().getViewport().getWidth()*0.75
-	        			}).show();
-	        		},
-	        		scope: this
 				}
 			}
         })
