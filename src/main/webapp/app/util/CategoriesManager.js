@@ -2,13 +2,16 @@ Ext.define('Voyant.util.CategoriesManager', {
 	
 	config: {
 		categories: undefined,
-		features: undefined
+		features: undefined,
+		featureDefaults: undefined
 	},
 	
 	constructor: function(config) {
-		config = config || {};
 		this.setCategories({});
 		this.setFeatures({});
+		this.setFeatureDefaults({});
+		
+		config = config || {};
 		if (config.categories !== undefined) {
 			for (var key in config.categories) {
 				var terms = config.categories[key];
@@ -86,19 +89,24 @@ Ext.define('Voyant.util.CategoriesManager', {
 		}
 		return undefined;
 	},
+	getFeatureForTerm: function(feature, term) {
+		return this.getCategoryFeature(this.getCategoryForTerm(term), feature);
+	},
 	
 	addFeature: function(name, defaultValue) {
 		if (this.getFeatures()[name] === undefined) {
 			this.getFeatures()[name] = {};
 			if (defaultValue !== undefined) {
-				for (var category in this.getCategories()) {
-					this.setCategoryFeature(category, name, defaultValue);
-				}
+				this.getFeatureDefaults()[name] = defaultValue;
+//				for (var category in this.getCategories()) {
+//					this.setCategoryFeature(category, name, defaultValue);
+//				}
 			}
 		}
 	},
 	removeFeature: function(name) {
 		delete this.getFeatures()[name];
+		delete this.getFeatureDefaults()[name];
 	},
 	setCategoryFeature: function(categoryName, featureName, featureValue) {
 		if (this.getFeatures()[featureName] === undefined) {
@@ -107,9 +115,14 @@ Ext.define('Voyant.util.CategoriesManager', {
 		this.getFeatures()[featureName][categoryName] = featureValue;
 	},
 	getCategoryFeature: function(categoryName, featureName) {
+		var value = undefined;
 		if (this.getFeatures()[featureName] !== undefined) {
-			return this.getFeatures()[featureName][categoryName];
+			value = this.getFeatures()[featureName][categoryName];
+			if (value === undefined) {
+				value = this.getFeatureDefaults()[featureName];
+			}
 		}
+		return value;
 	},
 	
 	getExportData: function() {

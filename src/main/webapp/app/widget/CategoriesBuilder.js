@@ -39,7 +39,6 @@ Ext.define('Voyant.widget.CategoriesOption', {
     					var panel = this.up('window').panel;
     					var win = Ext.create('Voyant.widget.CategoriesBuilder', {
     						panel: panel,
-    						categoriesManager: panel.getApplication().getCategoriesManager(),
     						height: panel.getApplication().getViewport().getHeight()*0.75,
     						width: panel.getApplication().getViewport().getWidth()*0.75
     					});
@@ -105,6 +104,13 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
         	color: {
         		xtype: 'colorfield',
         		format: '#hex6'
+//        		,listeners: {
+//        			render: function(field) {
+//        				field.on('change', function(field, color) {
+//        					field.inputEl.setStyle('background-color', color);
+//        				});
+//        			}
+//        		}
         	},
         	font: {
         		xtype: 'combobox',
@@ -137,14 +143,12 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	
     	if (config.panel) {
     		this.panel = config.panel;
+    		this.app = this.panel.getApplication();
     	} else {
     		if (window.console) {
     			console.warn('can\'t find panel!');
     		}
     	}
-    	
-    	var categoriesManager = config.categoriesManager ? config.categoriesManager : Ext.create('Voyant.util.CategoriesManager');
-    	this.setCategoriesManager(categoriesManager);
     	
     	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
     	this.callParent(arguments);
@@ -154,6 +158,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	Ext.apply(this, {
     		header: false,
     		layout: 'fit',
+    		onEsc: Ext.emptyFn,
     		items: {
 	    		xtype: 'tabpanel',
 	    		title: this.localize('title'),
@@ -185,7 +190,11 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 		    								this.dragData.records.forEach(function(d) {
 		    									text += d.get('term')+', ';
 		    								});
-		    								return text.substr(0, text.length-2);
+		    								text = text.substr(0, text.length-2);
+		    								if (text.length > 20) {
+		    									text = text.substr(0, 20) + '...';
+		    								}
+		    								return text;
 		    							}
 		    						}
 		    					}
@@ -292,7 +301,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				text: this.localize('save'),
 				handler: function(btn) {
 					this.setColorTermAssociations();
-					this.saveData(this.getCategoriesManager().getExportData()).then(function(id) {
+					this.saveData(this.app.getExportData()).then(function(id) {
 						this.setCategoriesId(id);
 						btn.up('window').close();
 					}, function() {
@@ -306,8 +315,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				show: function() {
 					if (this.getCategoriesId()) {
 		    			this.loadData(this.getCategoriesId()).then(function(data) {
-							this.getCategoriesManager().setCategories(data.categories);
-							this.getCategoriesManager().setFeatures(data.features);
+							this.app.setCategories(data.categories);
+							this.app.setFeatures(data.features);
 							this.buildCategories();
 							this.buildFeatures();
 						}, null, null, this);
@@ -315,6 +324,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    				this.buildCategories();
 	    				this.buildFeatures();
 	    			}
+					
+					this.down('tabpanel').setActiveTab(0);
 				},
 				afterrender: function(builder) {
 					builder.on('loadedCorpus', function(src, corpus) {
@@ -330,9 +341,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    			else if (this.panel.getStore && this.panel.getStore() && this.panel.getStore().getCorpus && this.panel.getStore().getCorpus()) {
 	    				builder.fireEvent('loadedCorpus', builder, this.panel.getStore().getCorpus());
 	    			}
-		    		
-	    			this.addFeature('font');
-		    		this.addFeature('color');
 				},
 				scope: this
 			}
@@ -355,7 +363,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    			name: 'categoryName',
 	    			allowBlank: false,
 	    			validator: function(val) {
-	    				return this.getCategoriesManager().getCategoryTerms(val) === undefined ? true : this.localize('exists');
+	    				return this.app.getCategoryTerms(val) === undefined ? true : this.localize('exists');
 	    			}.bind(this),
 	    			enableKeyEvents: true,
 	    			listeners: {
@@ -399,12 +407,12 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     },
     
     addCategory: function(name) {
-    	this.getCategoriesManager().addCategory(name);
+    	this.app.addCategory(name);
     	
     	this.queryById('features').getStore().add({category: name});
 
     	var termsData = [];
-    	var terms = this.getCategoriesManager().getCategoryTerms(name);
+    	var terms = this.app.getCategoryTerms(name);
     	if (terms !== undefined) {
     		for (var i = 0; i < terms.length; i++) {
     			termsData.push({term: terms[i]});
@@ -424,7 +432,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 //    				height: 15,
 //    				listeners: {
 //    					change: function(btn, color, pcolor) {
-//    						this.getCategoriesManager().setCategoryFeature(name, 'color', color);
+//    						this.app.setCategoryFeature(name, 'color', color);
 //    					},
 //    					afterrender: function(btn) {
 //    						var popup = btn.getPopup();
@@ -485,10 +493,10 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		listeners: {
     			beforedrop: function(node, data) {
     				// remove duplicates
-    				var categories = this.up('categoriesbuilder').getCategoriesManager();
+    				var app = this.up('categoriesbuilder').app;
     				for (var i = data.records.length-1; i >= 0; i--) {
     					var term = data.records[i].get('term');
-    					if (categories.getCategoryForTerm(term) !== undefined) {
+    					if (app.getCategoryForTerm(term) !== undefined) {
     						data.records.splice(i, 1);
     					}
     				}
@@ -497,19 +505,19 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     				data.view.getSelectionModel().deselectAll();
     				this.getSelectionModel().deselectAll();
     				
-    				var categories = this.up('categoriesbuilder').getCategoriesManager();
+    				var app = this.up('categoriesbuilder').app;
     				var terms = [];
     				for (var i = 0; i < data.records.length; i++) {
     					var term = data.records[i].get('term');
-    					if (categories.getCategoryForTerm(term) === undefined) {
+    					if (app.getCategoryForTerm(term) === undefined) {
     						terms.push(term);
     					}
     				}
-    				categories.addTerms(name, terms);
+    				app.addTerms(name, terms);
     				
     				var source = data.view.up('grid');
     				if (source.category) {
-    					categories.removeTerms(source.category, terms);
+    					app.removeTerms(source.category, terms);
     				}
     			}
     		}
@@ -525,15 +533,12 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     			xtype: 'textfield',
     			allowBlank: false,
     			validator: function(val) {
-    				return this.getCategoriesManager().getCategoryTerms(val) === undefined || val ===  grid.getTitle() ? true : this.localize('exists');
+    				return this.app.getCategoryTerms(val) === undefined || val ===  grid.getTitle() ? true : this.localize('exists');
     			}.bind(this)
     		},
     		listeners: {
-//    			beforecomplete: function(ed, newvalue, oldvalue) {
-//    				this.up('categoriesbuilder').getCategoriesManager().getCategoryTerms(newvalue);
-//    			},
     			complete: function(ed, newvalue, oldvalue) {
-    				this.getCategoriesManager().renameCategory(oldvalue, newvalue);
+    				this.app.renameCategory(oldvalue, newvalue);
     				this.buildFeatures();
     			},
     			scope: this
@@ -558,11 +563,11 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	var featuresStore = this.queryById('features').getStore();
     	featuresStore.removeAt(featuresStore.findExact('category', name));
     	
-		this.getCategoriesManager().removeCategory(name);
+		this.app.removeCategory(name);
     },
     
     addFeature: function(name) {
-		this.getCategoriesManager().addFeature(name);
+		this.app.addFeature(name);
 		this.buildFeatures();
     },
     
@@ -578,30 +583,41 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 		}];
 		var data = [];
 		
-		var catman = this.getCategoriesManager();
-		for (var category in catman.getCategories()) {
+		for (var category in this.app.getCategories()) {
 			data.push({category: category});
 		}
 		
-		var features = catman.getFeatures();
-		var featuresConfig = Ext.ClassManager.getClass(this).features;
+		var features = this.app.getFeatures();
+		var featuresConfigs = Ext.ClassManager.getClass(this).features;
 		
 		for (var feature in features) {
 			fields.push(feature);
 			
-			var widgetConfig = Ext.apply({
+			var featureConfig = featuresConfigs[feature];
+			var widgetConfig = Ext.applyIf({
 				feature: feature,
 				listeners: {
 					change: function(cmp, newvalue) {
 						if (cmp.rendered) {
 							var rowIndex = cmp.up('gridview').indexOf(cmp.el.up('table'));
-							var category = cmp.up('grid').getStore().getAt(rowIndex).get('category');
-							this.getCategoriesManager().setCategoryFeature(category, cmp.feature, newvalue);
+							var record = cmp.up('grid').getStore().getAt(rowIndex);
+							if (record) {
+								var category = record.get('category');
+								this.app.setCategoryFeature(category, cmp.feature, newvalue);
+							} else {
+								if (window.console) {
+									console.warn('no record for', rowIndex, cmp);
+								}
+							}
 						}
 					},
 					scope: this
 				}
-			}, featuresConfig[feature]);
+			}, featureConfig);
+			if (featureConfig.listeners) {
+				Ext.applyIf(widgetConfig.listeners, featureConfig.listeners);
+			}
+			
 			
 			columns.push({
 				sortable: false,
@@ -613,8 +629,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				widget: widgetConfig
 			});
 			
-			for (var category in catman.getCategories()) {
-				var value = catman.getCategoryFeature(category, feature);
+			for (var category in this.app.getCategories()) {
+				var value = this.app.getCategoryFeature(category, feature);
 				for (var i = 0; i < data.length; i++) {
 					if (data[i].category == category) {
 						data[i][feature] = value;
@@ -634,7 +650,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     buildCategories: function() {
     	this.queryById('categories').removeAll();
     	
-    	var cats = this.getCategoriesManager().getCategories();
+    	var cats = this.app.getCategories();
     	for (var key in cats) {
     		this.addCategory(key);
     	}
@@ -691,15 +707,13 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	},
     
     setColorTermAssociations: function() {
-		var app = this.panel.getApplication();
-		var catman = this.getCategoriesManager();
-		for (var category in catman.getCategories()) {
-			var color = catman.getCategoryFeature(category, 'color');
+		for (var category in this.app.getCategories()) {
+			var color = this.app.getCategoryFeature(category, 'color');
 			if (color !== undefined) {
-				var rgb = app.hexToRgb(color);
-				var terms = catman.getCategoryTerms(category);
+				var rgb = this.app.hexToRgb(color);
+				var terms = this.app.getCategoryTerms(category);
 				for (var i = 0; i < terms.length; i++) {
-					app.colorTermAssociations.replace(terms[i], rgb);
+					this.app.colorTermAssociations.replace(terms[i], rgb);
 				}
 			}
 		}
