@@ -14,12 +14,13 @@ Ext.define('Voyant.panel.TermsBerry', {
         	numInitialTerms: 75,
     		query: undefined,
     		docIndex: undefined,
-    		docId: undefined
+    		docId: undefined,
+    		categories: undefined
     	},
 		glyph: 'xf1db@FontAwesome'
     },
     config: {
-    	options: [{xtype: 'stoplistoption'}],
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	
     	mode: undefined,
     	
@@ -554,6 +555,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 		
     	var text = node.append('text')
     		.attr('clip-path', function(d) { return 'url(#clip-' + idGet(d.term) + ')'; })
+    		.style('font-family', function(d) { return me.getApplication().getFeatureForTerm('font', d.term); })
 			.style('text-anchor', 'middle')
 			.style('cursor', 'default');
 		text.append('tspan')
