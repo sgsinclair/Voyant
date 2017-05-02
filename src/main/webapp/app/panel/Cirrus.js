@@ -315,13 +315,9 @@ Ext.define('Voyant.panel.Cirrus', {
 						.padding(1)
 						.rotate(function() { return ~~(Math.random() * 2) * 90; })
 						.spiral('archimedean')
-						.font(this.getApiParam('fontFamily'))
-						.fontSize(function(d) {
-							return d.fontSize;
-						}.bind(this))
-						.text(function(d) {
-							return d.text;
-						})
+						.font(function(d) { return this.getApplication().getFeatureForTerm('font', d.text); }.bind(this))
+						.fontSize(function(d) {return d.fontSize; }.bind(this))
+						.text(function(d) { return d.text; })
 						.on('end', this.draw.bind(this))
 				);
 				
@@ -409,7 +405,7 @@ Ext.define('Voyant.panel.Cirrus', {
 			.style('font-size', '1px').transition().duration(1000).style('font-size', function(d) { return d.fontSize + 'px'; });
 		
 		wordNodes
-			.style('font-family', function(d) { return d.font; })
+			.style('font-family', function(d) { return panel.getApplication().getFeatureForTerm('font', d.text); })
 			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
 			.text(function(d) { return d.text; })
 			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);})
