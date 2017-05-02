@@ -93,8 +93,10 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		cancel: 'Cancel',
     		features: 'Features',
     		category: 'Category',
+    		
     		color: 'Color',
-    		font: 'Font'
+    		font: 'Font',
+    		orientation: 'Orientation'
     	},
     	api: {
     		stopList: 'auto',
@@ -120,6 +122,16 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
         		store: {
         			fields: ['name', 'value'],
         			data: Voyant.widget.FontFamilyOption.fonts
+        		}
+        	},
+        	orientation: {
+        		xtype: 'combobox',
+        		queryMode: 'local',
+        		displayField: 'name',
+        		valueField: 'value',
+        		store: {
+        			fields: ['name', 'value'],
+        			data: [{name: 'Horizontal', value: 0}, {name: 'Vertical', value: 90}]
         		}
         	}
         }

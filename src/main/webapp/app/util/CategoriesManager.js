@@ -120,6 +120,9 @@ Ext.define('Voyant.util.CategoriesManager', {
 			value = this.getFeatures()[featureName][categoryName];
 			if (value === undefined) {
 				value = this.getFeatureDefaults()[featureName];
+				if (Ext.isFunction(value)) {
+					value = value();
+				}
 			}
 		}
 		return value;

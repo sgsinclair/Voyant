@@ -79,6 +79,8 @@ Ext.define('Voyant.panel.Cirrus', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
+    	this.getApplication().addFeature('orientation', function() { return ~~(Math.random() * 2) * 90; });
+    	
     	this.setCirrusId(Ext.id(null, 'cirrus_'));
     },
     
@@ -313,7 +315,7 @@ Ext.define('Voyant.panel.Cirrus', {
 						.size([width, height])
 						.overflow(true)
 						.padding(1)
-						.rotate(function() { return ~~(Math.random() * 2) * 90; })
+						.rotate(function(d) { return this.getApplication().getFeatureForTerm('orientation', d.text); }.bind(this))
 						.spiral('archimedean')
 						.font(function(d) { return this.getApplication().getFeatureForTerm('font', d.text); }.bind(this))
 						.fontSize(function(d) {return d.fontSize; }.bind(this))
