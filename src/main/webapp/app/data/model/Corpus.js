@@ -34,7 +34,7 @@
 Ext.define('Voyant.data.model.Corpus', {
 	alternateClassName: ["Corpus"],
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization','Voyant.util.Assignable'],
-    transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords','getString'],
+    transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords','getString','getLemmasArray'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
     embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio','Voyant.panel.DocumentTerms','Voyant.panel.TermsBerry','Voyant.panel.CollocatesGraph','Voyant.panel.Contexts','Voyant.panel.WordTree','Voyant.panel.Veliza'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
@@ -418,7 +418,6 @@ Ext.define('Voyant.data.model.Corpus', {
 				Ext.apply(config, {
 					corpus: source
 				});
-				config = {corpus: config};
 			} else { // looks like input (text or URL)
 				Ext.apply(config, {
 					input: source
@@ -620,9 +619,10 @@ Ext.define('Voyant.data.model.Corpus', {
 		return Ext.create("Voyant.data.store.Tokens", Ext.apply(config || {}, {corpus: this}));
 	},
 	
-	each: function(config) {
-		debugger
-		this.getDocuments().each.call(this, arguments);
+	each: function(fn, scope) {
+		this.getDocuments().each(function(doc, i) {
+			fn.call(scope || doc, doc);
+		})
 	},
 	
 	getCorpusCollocates: function(config) {
@@ -833,7 +833,7 @@ Ext.define('Voyant.data.model.Corpus', {
 	    	} else if (Ext.isString(config)) {
 	    		config = {limit: parseInt(config)}
 	    	};
-	    	Ext.apply(config, {
+	    	Ext.applyIf(config, {
     			template: "docTokens2words"
 	    	});
 			return this.getText(config);
@@ -867,6 +867,24 @@ Ext.define('Voyant.data.model.Corpus', {
 			var dfd = Voyant.application.getDeferred(this);
 	    	this.getWords(config).then(function(text) {
 				dfd.resolve(text.split(" "));
+			})
+			return dfd.promise
+		}
+    	
+    },
+    
+    getLemmasArray: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			Ext.applyIf(config, {
+				template: "docTokens2lemmas",
+				withPosLemmas: true
+			})
+	    	this.getWords(config).then(function(text) {
+	    		var lemmas = text.split(" ").map(function(word) {return word.substring(0, word.indexOf("/"))})
+				dfd.resolve(lemmas);
 			})
 			return dfd.promise
 		}

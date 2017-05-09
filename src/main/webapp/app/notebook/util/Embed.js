@@ -82,10 +82,13 @@ Ext.define("Voyant.notebook.util.Embed", {
 								
 		    	    	    	Ext.applyIf(embeddedParams, Voyant.application.getModifiedApiParams());
 								
-								var embeddedConfigParam = Ext.Object.toQueryString(embeddedParams);
+		    	    	    	
+								var embeddedConfigParamEncodded = Ext.encode(embeddedParams);
+								var embeddedConfigParam = encodeURIComponent(embeddedConfigParamEncodded);
+
 								var iframeId = Ext.id();
 								var url = Voyant.application.getRelativeUrl()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/?';
-								if (embeddedConfigParam.length>1800) {
+								if (true || embeddedConfigParam.length>1800) {
 									show('<iframe style="'+config.style+'" id="'+iframeId+'" name="'+iframeId+'"></iframe>');
 									var dfd = Voyant.application.getDeferred(this);
 					    	    	Ext.Ajax.request({

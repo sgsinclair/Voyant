@@ -67,7 +67,7 @@ Ext.define('Voyant.data.model.Document', {
 			Ext.applyIf(config, {
 				limit: 0
 			})
-			var tokens = this.getTokens(config);
+			var tokens = this.getTokens({});
 			tokens.load({
 				params: config,
 				callback: function(records, operation, success) {

@@ -208,7 +208,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	
 	switchModes: function(mode, light) {
-		var runnable = mode=='javascript';
+		var runnable = mode.indexOf('javascript')>-1;
 		this.down('notebookwrapperrun').setVisible(runnable);
 		this.down('notebookwrapperrununtil').setVisible(runnable);
 		this.results.setVisible(runnable);

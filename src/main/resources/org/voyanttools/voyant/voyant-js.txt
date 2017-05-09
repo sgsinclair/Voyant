@@ -89,6 +89,7 @@ app/widget/VoyantChart.js
 app/widget/LiveSearchGrid.js
 app/widget/VoyantTableTransform.js
 app/widget/CategoriesBuilder.js
+app/widget/VoyantNetworkGraph.js
 
 # PANELS
 app/panel/Panel.js

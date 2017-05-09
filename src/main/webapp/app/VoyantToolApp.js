@@ -36,7 +36,8 @@ Ext.define('Voyant.VoyantToolApp', {
 	        	    	}).then(function(response) {
 	    					dfd.resolve();
 	    	    	    	var json = Ext.util.JSON.decode(response.responseText);
-	        	    		var config = Ext.urlDecode(json.storedResource.resource);
+	        	    		var configString = decodeURIComponent(json.storedResource.resource);
+	        	    		var config = Ext.decode(configString);
 	        	    		var tool = Ext.create({
 	        	    			xtype: me.getTool(),
 	        	    			api: config
