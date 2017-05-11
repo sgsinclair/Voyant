@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 09 11:12:42 EDT 2017 */
+/* This file created by JSCacher. Last modified: Thu May 11 16:16:59 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7391,13 +7391,16 @@ Ext.define('Voyant.util.CategoriesManager', {
 	
 	config: {
 		categories: undefined,
-		features: undefined
+		features: undefined,
+		featureDefaults: undefined
 	},
 	
 	constructor: function(config) {
-		config = config || {};
 		this.setCategories({});
 		this.setFeatures({});
+		this.setFeatureDefaults({});
+		
+		config = config || {};
 		if (config.categories !== undefined) {
 			for (var key in config.categories) {
 				var terms = config.categories[key];
@@ -7415,8 +7418,21 @@ Ext.define('Voyant.util.CategoriesManager', {
 			this.getCategories()[name] = [];
 		}
 	},
+	renameCategory: function(oldName, newName) {
+		var terms = this.getCategoryTerms(oldName);
+		this.addTerms(newName, terms);
+		for (var feature in this.getFeatures()) {
+			var value = this.getFeatures()[feature][oldName];
+			this.setCategoryFeature(newName, feature, value);
+		}
+		this.removeCategory(oldName);
+		
+	},
 	removeCategory: function(name) {
 		delete this.getCategories()[name];
+		for (var feature in this.getFeatures()) {
+			delete this.getFeatures()[feature][name];
+		}
 	},
 	
 	addTerm: function(category, term) {
@@ -7462,19 +7478,24 @@ Ext.define('Voyant.util.CategoriesManager', {
 		}
 		return undefined;
 	},
+	getFeatureForTerm: function(feature, term) {
+		return this.getCategoryFeature(this.getCategoryForTerm(term), feature);
+	},
 	
 	addFeature: function(name, defaultValue) {
 		if (this.getFeatures()[name] === undefined) {
 			this.getFeatures()[name] = {};
 			if (defaultValue !== undefined) {
-				for (var category in this.getCategories()) {
-					this.setCategoryFeature(category, name, defaultValue);
-				}
+				this.getFeatureDefaults()[name] = defaultValue;
+//				for (var category in this.getCategories()) {
+//					this.setCategoryFeature(category, name, defaultValue);
+//				}
 			}
 		}
 	},
 	removeFeature: function(name) {
 		delete this.getFeatures()[name];
+		delete this.getFeatureDefaults()[name];
 	},
 	setCategoryFeature: function(categoryName, featureName, featureValue) {
 		if (this.getFeatures()[featureName] === undefined) {
@@ -7483,9 +7504,24 @@ Ext.define('Voyant.util.CategoriesManager', {
 		this.getFeatures()[featureName][categoryName] = featureValue;
 	},
 	getCategoryFeature: function(categoryName, featureName) {
+		var value = undefined;
 		if (this.getFeatures()[featureName] !== undefined) {
-			return this.getFeatures()[featureName][categoryName];
+			value = this.getFeatures()[featureName][categoryName];
+			if (value === undefined) {
+				value = this.getFeatureDefaults()[featureName];
+				if (Ext.isFunction(value)) {
+					value = value();
+				}
+			}
 		}
+		return value;
+	},
+	
+	getExportData: function() {
+		return {
+			categories: this.getCategories(),
+			features: this.getFeatures()
+		};
 	}
 });
 
@@ -8136,6 +8172,44 @@ Ext.define('Voyant.data.model.PrincipalComponent', {
         {name: 'eigenVectors'}
     ]
 });
+/**
+ * Related Term
+ */
+Ext.define('Voyant.data.model.RelatedTerm', {
+    extend: 'Ext.data.Model',
+    fields: [
+             {name: 'source'},
+             {name: 'target'},
+             {name: 'rawFreq', type: 'int'}
+    ],
+    
+    /**
+     * Get the source term.
+     * @returns {String} Returns the term.
+     */
+    getSource: function() {
+    	return this.get('source');
+    },
+    
+    /**
+     * Get the source term.
+     * @returns {String} Returns the term.
+     */
+    getTarget: function() {
+    	return this.get('target');
+    },
+    
+	/**
+	 * Show a one line summary of this term.
+	 */
+	show: function(config) {
+		show(this.getString(config))
+	},
+	
+	getString: function() {
+		return this.getSource()+"-"+this.getTarget();
+	}
+});
 Ext.define('Voyant.data.model.StatisticalAnalysis', {
     extend: 'Ext.data.Model',
     requires: ['Voyant.data.model.PrincipalComponent', 'Voyant.data.model.Dimension', 'Voyant.data.model.AnalysisToken'],
@@ -8765,6 +8839,37 @@ Ext.define('Voyant.data.store.CorpusNgramsBuffered', {
 	}
 });
 
+Ext.define('Voyant.data.store.RelatedTermsMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.RelatedTerm',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.SemanticGraph',
+			'proxy.reader.rootProperty': 'semanticGraph.edges',
+			'proxy.reader.totalProperty': 'semanticGraph.total'
+		}])
+	}
+});
+
+Ext.define('Voyant.data.store.RelatedTerms', {
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.RelatedTermsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.RelatedTermsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.RelatedTermsBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.RelatedTermsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.RelatedTermsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
 Ext.define('Voyant.data.store.TokensMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.Token',
@@ -9488,7 +9593,8 @@ Ext.define('Voyant.data.model.Corpus', {
          {name: 'createdTime', type: 'int'},
          {name: 'createdDate', type: 'date', dateFormat: 'c'},
          {name: 'title', type: 'string'},
-         {name: 'subTitle', type: 'string'}
+         {name: 'subTitle', type: 'string'},
+         {name: 'languagueCodes', type: 'string'}
     ],
     
 	/**
@@ -9820,6 +9926,38 @@ Ext.define('Voyant.data.model.Corpus', {
 		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('subTitle');		
 	},
 	
+	getRelatedWords : function(config) {
+		return Ext.create("Voyant.data.store.RelatedTerms", Ext.apply(config || {}, {corpus: this}))
+	},
+	
+	loadRelatedWords : function(config) {
+		var me = this;
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0
+			})
+			var relatedTerms = this.getRelatedWords();
+			relatedTerms.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(records)
+					} else {
+						dfd.reject(operation.error.response);
+					}
+				}
+			})
+			return dfd.promise
+		}
+	},
+		
 	/**
      * Create a promise for a text representation of all the document bodies in the corpus.
      * 
@@ -11806,6 +11944,76 @@ Ext.define('Ext.ux.grid.TransformGrid', {
     }
 });
 
+Ext.define('Voyant.widget.CategoriesOption', {
+	extend: 'Ext.container.Container',
+	mixins: ['Voyant.util.Localization'],
+	alias: 'widget.categoriesoption',
+	statics: {
+		i18n: {
+			categories: 'Categories',
+			edit: 'Edit'
+		}
+	},
+	config: {
+		builderWin: undefined
+	},
+	initComponent: function() {
+		var value = this.up('window').panel.getApiParam('categories');
+    	var data = value ? [{name: 'categories-'+value, value: value}] : [];
+		
+		Ext.apply(this, {
+    		layout: 'hbox',
+    		items: [{
+    			xtype: 'combo',
+    			queryMode: 'local',
+    			triggerAction: 'all',
+    			fieldLabel: this.localize('categories'),
+    			labelAlign: 'right',
+    			displayField: 'name',
+    			valueField: 'value',
+    			store: {
+    				fields: ['name', 'value'],
+    				data: data
+    			},
+    			name: 'category'
+    		}, {width: 10}, {xtype: 'tbspacer'}, {
+    			xtype: 'button',
+    			text: this.localize('edit'),
+    			ui: 'default-toolbar',
+    			handler: function() {
+    				if (this.getBuilderWin() === undefined) {
+    					var panel = this.up('window').panel;
+    					var win = Ext.create('Voyant.widget.CategoriesBuilder', {
+    						panel: panel,
+    						height: panel.getApplication().getViewport().getHeight()*0.75,
+    						width: panel.getApplication().getViewport().getWidth()*0.75
+    					});
+    					win.on('close', function(win) {
+    						var id = win.getCategoriesId();
+    						if (id !== undefined) {
+	    						var combo = this.down('combo');
+								var name = 'categories-'+id;
+								combo.getStore().add({name: name, value: id});
+								combo.setValue(id);
+								
+								this.up('window').panel.setApiParam('categories', id);
+    						}
+    					}, this);
+    					this.setBuilderWin(win);
+    				}
+    				
+    				var categoriesId = this.down('combo').getValue();
+    				this.getBuilderWin().setCategoriesId(categoriesId);
+					this.getBuilderWin().show();
+    			},
+    			scope: this
+    		}]
+    	});
+		
+		this.callParent(arguments);
+	}
+});
+
 Ext.define('Voyant.widget.CategoriesBuilder', {
     extend: 'Ext.window.Window',
     requires: ['Voyant.widget.FontFamilyOption'],
@@ -11827,11 +12035,14 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		cancel: 'Cancel',
     		exists: 'Category already exists',
     		confirmRemove: 'Are you sure you want to remove the category?',
-    		done: 'Done',
+    		save: 'Save',
+    		cancel: 'Cancel',
     		features: 'Features',
     		category: 'Category',
+    		
     		color: 'Color',
-    		font: 'Font'
+    		font: 'Font',
+    		orientation: 'Orientation'
     	},
     	api: {
     		stopList: 'auto',
@@ -11841,6 +12052,13 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
         	color: {
         		xtype: 'colorfield',
         		format: '#hex6'
+//        		,listeners: {
+//        			render: function(field) {
+//        				field.on('change', function(field, color) {
+//        					field.inputEl.setStyle('background-color', color);
+//        				});
+//        			}
+//        		}
         	},
         	font: {
         		xtype: 'combobox',
@@ -11851,17 +12069,29 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
         			fields: ['name', 'value'],
         			data: Voyant.widget.FontFamilyOption.fonts
         		}
+        	},
+        	orientation: {
+        		xtype: 'combobox',
+        		queryMode: 'local',
+        		displayField: 'name',
+        		valueField: 'value',
+        		store: {
+        			fields: ['name', 'value'],
+        			data: [{name: 'Horizontal', value: 0}, {name: 'Vertical', value: 90}]
+        		}
         	}
         }
     },
     config: {
     	corpus: undefined,
     	categoriesManager: undefined,
-    	categoryWin: undefined,
-    	parentPanel: undefined
+    	builderWin: undefined,
+    	addCategoryWin: undefined,
+    	categoriesId: undefined
     },
     
     // window defaults
+    closeAction: 'hide',
     modal: true,
 	height: 250,
 	width: 500,
@@ -11871,10 +12101,12 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	
     	if (config.panel) {
     		this.panel = config.panel;
+    		this.app = this.panel.getApplication();
+    	} else {
+    		if (window.console) {
+    			console.warn('can\'t find panel!');
+    		}
     	}
-    	
-    	var categoriesManager = config.categoriesManager ? config.categoriesManager : Ext.create('Voyant.util.CategoriesManager');
-    	this.setCategoriesManager(categoriesManager);
     	
     	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
     	this.callParent(arguments);
@@ -11882,152 +12114,197 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     
     initComponent: function() {
     	Ext.apply(this, {
-    		title: this.localize('title'),
-    		layout: 'card',
-    		items: [{
-	    		layout: 'border',
+    		header: false,
+    		layout: 'fit',
+    		onEsc: Ext.emptyFn,
+    		items: {
+	    		xtype: 'tabpanel',
+	    		title: this.localize('title'),
+	    		tabBarHeaderPosition: 1,
 	    		items: [{
-	    			title: this.localize('terms'),
-	    			split: true,
-	    			width: 250,
-	    			region: 'west',
-	    			layout: 'fit',
-	    			items: {
-	    				itemId: 'terms',
-	    				xtype: 'grid',
-	    				store: Ext.create('Voyant.data.store.CorpusTermsBuffered', {
-	    		        	parentPanel: this
-	    		        }),
-	    				viewConfig: {
-	    					plugins: {
-	    						ptype: 'gridviewdragdrop',
-	    						ddGroup: 'terms',
-	    						copy: true,
-	    						enableDrop: false, // can't drop on grid with buffered store
-	    						dragZone: {
-	    							getDragText: function() {
-	    								var text = '';
-	    								this.dragData.records.forEach(function(d) {
-	    									text += d.get('term')+', ';
-	    								});
-	    								return text.substr(0, text.length-2);
-	    							}
-	    						}
-	    					}
-	    				},
-	    				selModel: {
-	    	    			mode: 'MULTI'
-	    	    		},
-	    				columns: [{
-			    			text: this.localize('term'),
-			        		dataIndex: 'term',
-			        		flex: 1,
-			                sortable: true
-			            },{
-			            	text: this.localize('rawFreq'),
-			            	dataIndex: 'rawFreq',
-			                width: 'autoSize',
-			            	sortable: true
-			            },{
-			            	text: this.localize('relativeFreq'),
-			            	dataIndex: 'relativeFreq',
-			            	renderer: function(val) {
-			            		return Ext.util.Format.number(val*1000000, "0,000");
-			            	},
-			                width: 'autoSize',
-			                hidden: true,
-			            	sortable: true
-			            }],
-			            dockedItems: [{
-			                dock: 'bottom',
-			                xtype: 'toolbar',
-			                overflowHandler: 'scroller',
-			                items: [{
-			                    xtype: 'querysearchfield'
-			                }]
-			            }],
-			            listeners: {
-			            	query: function(src, query) {
-			            		this.setApiParam('query', query);
-			            		var store = this.queryById('terms').getStore();
-			            		store.removeAll();
-			            		store.load();
-			            	},
-			            	scope: this
-			            }
-	    			}
+		    		layout: 'border',
+		    		title: this.localize('categories'),
+		    		items: [{
+		    			title: this.localize('terms'),
+		    			split: true,
+		    			width: 250,
+		    			region: 'west',
+		    			layout: 'fit',
+		    			items: {
+		    				itemId: 'terms',
+		    				xtype: 'grid',
+		    				store: Ext.create('Voyant.data.store.CorpusTermsBuffered', {
+		    		        	parentPanel: this
+		    		        }),
+		    				viewConfig: {
+		    					plugins: {
+		    						ptype: 'gridviewdragdrop',
+		    						ddGroup: 'terms',
+		    						copy: true,
+		    						enableDrop: false, // can't drop on grid with buffered store
+		    						dragZone: {
+		    							getDragText: function() {
+		    								var text = '';
+		    								this.dragData.records.forEach(function(d) {
+		    									text += d.get('term')+', ';
+		    								});
+		    								text = text.substr(0, text.length-2);
+		    								if (text.length > 20) {
+		    									text = text.substr(0, 20) + '...';
+		    								}
+		    								return text;
+		    							}
+		    						}
+		    					}
+		    				},
+		    				selModel: {
+		    	    			mode: 'MULTI'
+		    	    		},
+		    				columns: [{
+				    			text: this.localize('term'),
+				        		dataIndex: 'term',
+				        		flex: 1,
+				                sortable: true
+				            },{
+				            	text: this.localize('rawFreq'),
+				            	dataIndex: 'rawFreq',
+				                width: 'autoSize',
+				            	sortable: true
+				            },{
+				            	text: this.localize('relativeFreq'),
+				            	dataIndex: 'relativeFreq',
+				            	renderer: function(val) {
+				            		return Ext.util.Format.number(val*1000000, "0,000");
+				            	},
+				                width: 'autoSize',
+				                hidden: true,
+				            	sortable: true
+				            }],
+				            dockedItems: [{
+				                dock: 'bottom',
+				                xtype: 'toolbar',
+				                overflowHandler: 'scroller',
+				                items: [{
+				                    xtype: 'querysearchfield'
+				                }]
+				            }],
+				            listeners: {
+				            	query: function(src, query) {
+				            		this.setApiParam('query', query);
+				            		var store = this.queryById('terms').getStore();
+				            		store.removeAll();
+				            		store.load();
+				            	},
+				            	scope: this
+				            }
+		    			}
+		    		},{
+		    			title: this.localize('categories'),
+		    			itemId: 'categories',
+		    			region: 'center',
+		    			xtype: 'panel',
+		    			layout: {
+		    				type: 'hbox',
+		    				align: 'stretch'
+		    			},
+		    			scrollable: 'x',
+		    			dockedItems: [{
+		                    dock: 'bottom',
+		                    xtype: 'toolbar',
+		                    overflowHandler: 'scroller',
+		                    items: [{
+		                    	text: this.localize('addCategory'),
+		                    	handler: function() {
+		                    		this.getAddCategoryWin().show();
+		                    	},
+		                    	scope: this
+		                    },{
+		                    	text: this.localize('removeTerms'),
+		                    	handler: function() {
+		                    		this.queryById('categories').query('grid').forEach(function(grid) {
+		                    			grid.getStore().remove(grid.getSelection());
+		                    		}, this);
+		                    	},
+		                    	scope: this
+		                    }]
+		    			}],
+		    			items: []
+		    		}]
 	    		},{
-	    			title: this.localize('categories'),
-	    			itemId: 'categories',
-	    			region: 'center',
-	    			xtype: 'panel',
-	    			layout: {
-	    				type: 'hbox',
-	    				align: 'stretch'
-	    			},
-	    			scrollable: 'x',
-	    			dockedItems: [{
-	                    dock: 'bottom',
-	                    xtype: 'toolbar',
-	                    overflowHandler: 'scroller',
-	                    items: [{
-	                    	text: this.localize('addCategory'),
-	                    	handler: function() {
-	                    		this.getCategoryWin().show();
-	                    	},
-	                    	scope: this
-	                    },{
-	                    	text: this.localize('removeTerms'),
-	                    	handler: function() {
-	                    		this.queryById('categories').query('grid').forEach(function(grid) {
-	                    			grid.getStore().remove(grid.getSelection());
-	                    		}, this);
-	                    	},
-	                    	scope: this
-	                    }]
-	    			}],
-	    			items: []
+	    			layout: 'fit',
+	    			itemId: 'features',
+	    			title: this.localize('features'),
+	    			xtype: 'grid',
+	    			scrollable: 'y',
+	    			store: Ext.create('Ext.data.JsonStore', {
+		    			fields: ['category']
+		    		}),
+	    			columns: [{
+	    				text: this.localize('category'),
+	    				dataIndex: 'category',
+	    				sortable: false,
+	    				hideable: false,
+	    				flex: 1
+	    			}]
 	    		}]
-    		},{
-    			layout: 'fit',
-    			itemId: 'features',
-    			title: this.localize('features'),
-    			xtype: 'grid',
-    			
-    			scrollable: 'y',
-    			store: Ext.create('Ext.data.JsonStore', {
-	    			fields: ['category']
-	    		}),
-    			columns: [{
-    				text: this.localize('category'),
-    				dataIndex: 'category',
-    				sortable: false,
-    				hideable: false,
-    				flex: 1
-    			}]
-    		}],
+    		},
     		buttons: [{
-    			text: this.localize('features'),
-    			handler: function(btn) {
-    				var layout = btn.up('panel').getLayout();
-    				if (layout.getNext()) {
-    					layout.next();
-    					btn.setText(this.localize('categories'));
-    				} else {
-    					layout.prev();
-    					btn.setText(this.localize('features'));
-    				}
-    			},
-    			scope: this
-    		},{
-				text: this.localize('done'),
+				text: this.localize('cancel'),
 				handler: function(btn) {
+					this.setCategoriesId(undefined);
 					btn.up('window').close();
-				}
-			}]
+				},
+				scope: this
+			},{
+				text: this.localize('save'),
+				handler: function(btn) {
+					this.setColorTermAssociations();
+					this.saveData(this.app.getExportData()).then(function(id) {
+						this.setCategoriesId(id);
+						btn.up('window').close();
+					}, function() {
+						this.setCategoriesId(undefined);
+						btn.up('window').close();
+					}, null, this);
+				},
+				scope: this
+			}],
+			listeners: {
+				show: function() {
+					if (this.getCategoriesId()) {
+		    			this.loadData(this.getCategoriesId()).then(function(data) {
+							this.app.setCategories(data.categories);
+							this.app.setFeatures(data.features);
+							this.buildCategories();
+							this.buildFeatures();
+						}, null, null, this);
+	    			} else {
+	    				this.buildCategories();
+	    				this.buildFeatures();
+	    			}
+					
+					this.down('tabpanel').setActiveTab(0);
+				},
+				afterrender: function(builder) {
+					builder.on('loadedCorpus', function(src, corpus) {
+		    			this.setCorpus(corpus);
+			    		var terms = this.queryById('terms');
+			    		terms.getStore().load();
+		    		}, builder);
+		    		
+					this.panel.on('loadedCorpus', function(src, corpus) {
+	    				builder.fireEvent('loadedCorpus', src, corpus);
+	    			}, builder);
+	    			if (this.panel.getCorpus && this.panel.getCorpus()) {builder.fireEvent('loadedCorpus', builder, this.panel.getCorpus());}
+	    			else if (this.panel.getStore && this.panel.getStore() && this.panel.getStore().getCorpus && this.panel.getStore().getCorpus()) {
+	    				builder.fireEvent('loadedCorpus', builder, this.panel.getStore().getCorpus());
+	    			}
+				},
+				scope: this
+			}
     	});
     	
-    	this.setCategoryWin(Ext.create('Ext.window.Window', {
+    	this.setAddCategoryWin(Ext.create('Ext.window.Window', {
     		title: this.localize('addCategory'),
     		modal: true,
     		closeAction: 'hide',
@@ -12044,13 +12321,13 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    			name: 'categoryName',
 	    			allowBlank: false,
 	    			validator: function(val) {
-	    				return this.getCategoriesManager().getCategoryTerms(val) === undefined ? true : this.localize('exists');
+	    				return this.app.getCategoryTerms(val) === undefined ? true : this.localize('exists');
 	    			}.bind(this),
 	    			enableKeyEvents: true,
 	    			listeners: {
 	    				keypress: function(field, evt) {
-	    					if (evt.getKeyName() === Ext.event.Event.ENTER) {
-	    						
+	    					if (evt.getKey() === Ext.event.Event.ENTER) {
+	    						field.up('form').queryById('addCategoryButton').click();
 	    					}
 	    				},
 	    				scope: this
@@ -12062,6 +12339,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    				btn.up('window').close();
 	    			}
 	    		},{
+	    			itemId: 'addCategoryButton',
 	    			text: this.localize('add'),
 	    			handler: function(btn) {
 	    				var form = btn.up('form');
@@ -12082,79 +12360,24 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     			}
     		}
     	}));
-
-    	this.on('afterrender', function(builder) {
-    		builder.on('loadedCorpus', function(src, corpus) {
-    			this.setCorpus(corpus);
-	    		var terms = this.queryById('terms');
-	    		terms.getStore().load();
-    		}, builder);
-    		
-    		if (this.panel) {
-    			this.panel.on('loadedCorpus', function(src, corpus) {
-    				builder.fireEvent('loadedCorpus', src, corpus);
-    			}, builder);
-    			if (this.panel.getCorpus && this.panel.getCorpus()) {builder.fireEvent('loadedCorpus', builder, this.panel.getCorpus());}
-    			else if (this.panel.getStore && this.panel.getStore() && this.panel.getStore().getCorpus && this.panel.getStore().getCorpus()) {
-    				builder.fireEvent('loadedCorpus', builder, this.panel.getStore().getCorpus());
-    			}
-    		} else {
-    			if (window.console) {
-    				console.warn('couldn\'t find parent panel for CategoriesBuilder');
-    			}
-    		}
-    		
-    		this.buildCategories();
-    		
-    		this.addFeature('font');
-    		this.addFeature('color');
-    	}, this);
-    	
-    	this.on('beforeclose', function(component) {
-    		// build colorTermAssociations from the categories
-    		var app = this.panel.getApplication();
-			var catman = this.getCategoriesManager();
-			for (var category in catman.getCategories()) {
-				var color = catman.getCategoryFeature(category, 'color');
-				if (color !== undefined) {
-					var rgb = app.hexToRgb(color);
-					var terms = catman.getCategoryTerms(category);
-					for (var i = 0; i < terms.length; i++) {
-						app.colorTermAssociations.replace(terms[i], rgb);
-					}
-				}
-			}
-//			app.saveCategoriesForCorpus(app.getCorpus().getId());
-    	}, this);
     	
     	this.callParent(arguments);
     },
     
     addCategory: function(name) {
-    	var features = this.queryById('features');
-    	features.getStore().loadRawData([{category: name}], true);
+    	this.app.addCategory(name);
     	
-    	var catParent = this.queryById('categories');
-    	
-    	var color;
+    	this.queryById('features').getStore().add({category: name});
+
     	var termsData = [];
-    	var catman = this.getCategoriesManager();
-    	var terms = catman.getCategoryTerms(name);
-    	if (terms === undefined) {
-    		catman.addCategory(name);
-    		catman.addFeature('color');
-    	
-	    	var index = catParent.query('grid').length;
-	    	color = this.panel.getApplication().getColor(index, true);
-	    	catman.setCategoryFeature(name, 'color', color);
-    	} else {
+    	var terms = this.app.getCategoryTerms(name);
+    	if (terms !== undefined) {
     		for (var i = 0; i < terms.length; i++) {
     			termsData.push({term: terms[i]});
     		}
-    		color = catman.getCategoryFeature(name, 'color');
     	}
     	
-    	return catParent.add({
+    	var grid = this.queryById('categories').add({
     		xtype: 'grid',
     		category: name,
     		title: name,
@@ -12167,7 +12390,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 //    				height: 15,
 //    				listeners: {
 //    					change: function(btn, color, pcolor) {
-//    						this.getCategoriesManager().setCategoryFeature(name, 'color', color);
+//    						this.app.setCategoryFeature(name, 'color', color);
 //    					},
 //    					afterrender: function(btn) {
 //    						var popup = btn.getPopup();
@@ -12226,23 +12449,62 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
                 sortable: true
             }],
     		listeners: {
+    			beforedrop: function(node, data) {
+    				// remove duplicates
+    				var app = this.up('categoriesbuilder').app;
+    				for (var i = data.records.length-1; i >= 0; i--) {
+    					var term = data.records[i].get('term');
+    					if (app.getCategoryForTerm(term) !== undefined) {
+    						data.records.splice(i, 1);
+    					}
+    				}
+    			},
     			drop: function(node, data) {
     				data.view.getSelectionModel().deselectAll();
     				this.getSelectionModel().deselectAll();
     				
-    				var categories = this.up('categoriesbuilder').getCategoriesManager();
+    				var app = this.up('categoriesbuilder').app;
     				var terms = [];
     				for (var i = 0; i < data.records.length; i++) {
-    					terms.push(data.records[i].get('term'));
+    					var term = data.records[i].get('term');
+    					if (app.getCategoryForTerm(term) === undefined) {
+    						terms.push(term);
+    					}
     				}
-    				categories.addTerms(name, terms);
+    				app.addTerms(name, terms);
     				
     				var source = data.view.up('grid');
     				if (source.category) {
-    					categories.removeTerms(source.category, terms);
+    					app.removeTerms(source.category, terms);
     				}
     			}
     		}
+    	});
+    	
+    	var titleEditor = new Ext.Editor({
+    		updateEl: true,
+    		alignment: 'l-l',
+    		autoSize: {
+    			width: 'boundEl'
+    		},
+    		field: {
+    			xtype: 'textfield',
+    			allowBlank: false,
+    			validator: function(val) {
+    				return this.app.getCategoryTerms(val) === undefined || val ===  grid.getTitle() ? true : this.localize('exists');
+    			}.bind(this)
+    		},
+    		listeners: {
+    			complete: function(ed, newvalue, oldvalue) {
+    				this.app.renameCategory(oldvalue, newvalue);
+    				this.buildFeatures();
+    			},
+    			scope: this
+    		}
+    	});
+    	
+    	grid.header.getTitle().textEl.on('dblclick', function(e, t) {
+    		titleEditor.startEdit(t);
     	});
     },
     
@@ -12259,15 +12521,17 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	var featuresStore = this.queryById('features').getStore();
     	featuresStore.removeAt(featuresStore.findExact('category', name));
     	
-		this.getCategoriesManager().removeCategory(name);
+		this.app.removeCategory(name);
     },
     
     addFeature: function(name) {
-		this.getCategoriesManager().addFeature(name);
+		this.app.addFeature(name);
 		this.buildFeatures();
     },
     
     buildFeatures: function() {
+    	this.queryById('features').getStore().removeAll();
+    	
     	var fields = ['category'];
 		var columns = [{
 			sortable: false,
@@ -12277,30 +12541,41 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 		}];
 		var data = [];
 		
-		var catman = this.getCategoriesManager();
-		for (var category in catman.getCategories()) {
+		for (var category in this.app.getCategories()) {
 			data.push({category: category});
 		}
 		
-		var features = catman.getFeatures();
-		var featuresConfig = Ext.ClassManager.getClass(this).features;
+		var features = this.app.getFeatures();
+		var featuresConfigs = Ext.ClassManager.getClass(this).features;
 		
 		for (var feature in features) {
 			fields.push(feature);
 			
-			var widgetConfig = Ext.apply({
+			var featureConfig = featuresConfigs[feature];
+			var widgetConfig = Ext.applyIf({
 				feature: feature,
 				listeners: {
 					change: function(cmp, newvalue) {
 						if (cmp.rendered) {
 							var rowIndex = cmp.up('gridview').indexOf(cmp.el.up('table'));
-							var category = cmp.up('grid').getStore().getAt(rowIndex).get('category');
-							this.getCategoriesManager().setCategoryFeature(category, cmp.feature, newvalue);
+							var record = cmp.up('grid').getStore().getAt(rowIndex);
+							if (record) {
+								var category = record.get('category');
+								this.app.setCategoryFeature(category, cmp.feature, newvalue);
+							} else {
+								if (window.console) {
+									console.warn('no record for', rowIndex, cmp);
+								}
+							}
 						}
 					},
 					scope: this
 				}
-			}, featuresConfig[feature]);
+			}, featureConfig);
+			if (featureConfig.listeners) {
+				Ext.applyIf(widgetConfig.listeners, featureConfig.listeners);
+			}
+			
 			
 			columns.push({
 				sortable: false,
@@ -12312,8 +12587,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				widget: widgetConfig
 			});
 			
-			for (var category in catman.getCategories()) {
-				var value = catman.getCategoryFeature(category, feature);
+			for (var category in this.app.getCategories()) {
+				var value = this.app.getCategoryFeature(category, feature);
 				for (var i = 0; i < data.length; i++) {
 					if (data[i].category == category) {
 						data[i][feature] = value;
@@ -12331,10 +12606,75 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     },
     
     buildCategories: function() {
-    	var cats = this.getCategoriesManager().getCategories();
+    	this.queryById('categories').removeAll();
+    	
+    	var cats = this.app.getCategories();
     	for (var key in cats) {
     		this.addCategory(key);
     	}
+    },
+    
+    loadData: function(id) {
+		var dfd = new Ext.Deferred();
+		
+		var panel = this.panel;
+		Ext.Ajax.request({
+			url: panel.getTromboneUrl(),
+			params: {
+				tool: 'resource.StoredResource',
+                retrieveResourceId: id,
+                failQuietly: true
+			}
+		}).then(function(response) {
+        	var json = Ext.decode(response.responseText);
+        	var id = json.storedResource.id;
+        	var value = json.storedResource.resource;
+        	if (value.length == 0) {
+        		dfd.reject();
+        	} else {
+        		value = Ext.decode(value);
+        		dfd.resolve(value);
+        	}
+        }, function() {
+        	dfd.reject();
+        }, null, this);
+		
+		return dfd.promise;
+	},
+	
+	saveData: function(data) {
+		var dfd = new Ext.Deferred();
+		
+		var dataString = Ext.encode(data);
+		var panel = this.panel;
+		Ext.Ajax.request({
+            url: panel.getTromboneUrl(),
+            params: {
+                tool: 'resource.StoredResource',
+                storeResource: dataString
+            }
+        }).then(function(response) {
+        	var json = Ext.util.JSON.decode(response.responseText);
+        	var id = json.storedResource.id;
+            dfd.resolve(id);
+        }, function(response) {
+            dfd.reject();
+        });
+		
+		return dfd.promise;
+	},
+    
+    setColorTermAssociations: function() {
+		for (var category in this.app.getCategories()) {
+			var color = this.app.getCategoryFeature(category, 'color');
+			if (color !== undefined) {
+				var rgb = this.app.hexToRgb(color);
+				var terms = this.app.getCategoryTerms(category);
+				for (var i = 0; i < terms.length; i++) {
+					this.app.colorTermAssociations.replace(terms[i], rgb);
+				}
+			}
+		}
     }
 });
 Ext.define('Voyant.widget.VoyantNetworkGraph', {
@@ -12416,14 +12756,32 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 	    height = this.getHeight(), targetEl = this.getTargetEl().dom.firstChild.firstChild;
 		
 		targetEl.innerHTML = ""; // clear any existing graph
-
+		
+		var margin = {top: -5, right: -5, bottom: -5, left: -5}
+		
+		var zoomed = function zoomed() {
+        	container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+		}
+		
+    	var zoom = d3.behavior.zoom()
+	        .scaleExtent([1, 10])
+	        .on("zoom", zoomed);
+		
     	var svg = d3.select(targetEl).append("svg")
     	    .attr("width", width)
-    	    .attr("height", height);
-
+    	    .attr("height", height)
+    	
+    	var container = svg
+    	  .append("g")
+    	    .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
+    	    .call( d3.behavior.zoom()
+    		        .scaleExtent([.5, 10])
+    		        .on("zoom", zoomed));
+    	
+    	
     	var force = d3.layout.force()
-    	    .gravity(0.05)
-    	    .distance(100)
+    	    .gravity(0.1)
+    	    .distance(50)
     	    .charge(-100)
     	    .size([width, height]);
 
@@ -12432,13 +12790,13 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	      .links(json.links)
     	      .start();
 
-    	  var link = svg.selectAll(".link")
+    	  var link = container.selectAll(".link")
     	      .data(json.links)
     	    .enter().append("line")
     	      .attr("class", "link")
     	      .attr("stroke", "#eee")
 
-    	  var node = svg.selectAll(".node")
+    	  var node = container.selectAll(".node")
     	      .data(json.nodes)
     	    .enter().append("g")
     	      .attr("class", "node")
@@ -12448,10 +12806,18 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	  	.attr("r", 5)
     	  	.attr("fill", "#ddd")
     	  
+    	  var vals = json.nodes.map(function(d) {return d.value});
+    	  vals.sort();
+
+    	  var fontscale = d3.scale.log()
+    	  		.domain([vals[0], vals[vals.length-1]])
+    	  		.range([8, 36])
+    	  		
     	  node.append("text")
     	      .attr("dx", 12)
     	      .attr("dy", ".35em")
-    	      .text(function(d) { return d.name });
+    	      .text(function(d) { return d.name })
+    	      .attr("font-size", function(d) {return fontscale(d.value)+"px"});
 
     	  force.on("tick", function() {
     	    link.attr("x1", function(d) { return d.source.x; })
@@ -12466,7 +12832,7 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 })
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable','Voyant.util.DetailedError'],
-	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.TotalPropertyStatus'],
+	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.CategoriesOption','Voyant.widget.TotalPropertyStatus'],
 	alias: 'widget.voyantpanel',
 	statics: {
 		i18n: {
@@ -13934,6 +14300,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	api: {
     		stopList: 'auto',
+    		categories: undefined,
     		whiteList: undefined, // specify a list of words to use
     		limit: 500,
     		visible: 50,
@@ -13960,21 +14327,24 @@ Ext.define('Voyant.panel.Cirrus', {
     		{
 	    		xtype: 'listeditor',
 	    		name: 'whiteList'
-    	    },{
-    	        xtype: 'numberfield',
-    	        name: 'label',
-    	        fieldLabel: 'Max words',
-    	        labelAlign: 'right',
-    	        value: 500,
-    	        minValue: 50,
-    	        step: 50,
-    	        listeners: {
-        	        afterrender: function(field) {
-        	        	var win = field.up("window");
-        	        	if (win && win.panel) {field.setFieldLabel(win.panel.localize("maxTerms"))}
-        	        }
-    	        }
     	    },
+    	    {xtype: 'categoriesoption'},
+//    	    {
+//    	    	// TODO this field does nothing
+//    	        xtype: 'numberfield',
+//    	        name: 'label',
+//    	        fieldLabel: 'Max words',
+//    	        labelAlign: 'right',
+//    	        value: 500,
+//    	        minValue: 50,
+//    	        step: 50,
+//    	        listeners: {
+//        	        afterrender: function(field) {
+//        	        	var win = field.up("window");
+//        	        	if (win && win.panel) {field.setFieldLabel(win.panel.localize("maxTerms"))}
+//        	        }
+//    	        }
+//    	    },
     	    {xtype: 'fontfamilyoption'},
     	    {xtype: 'colorpaletteoption'}
 
@@ -13999,6 +14369,8 @@ Ext.define('Voyant.panel.Cirrus', {
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	
+    	this.getApplication().addFeature('orientation', function() { return ~~(Math.random() * 2) * 90; });
     	
     	this.setCirrusId(Ext.id(null, 'cirrus_'));
     },
@@ -14234,15 +14606,11 @@ Ext.define('Voyant.panel.Cirrus', {
 						.size([width, height])
 						.overflow(true)
 						.padding(1)
-						.rotate(function() { return ~~(Math.random() * 2) * 90; })
+						.rotate(function(d) { return this.getApplication().getFeatureForTerm('orientation', d.text); }.bind(this))
 						.spiral('archimedean')
-						.font(this.getApiParam('fontFamily'))
-						.fontSize(function(d) {
-							return d.fontSize;
-						}.bind(this))
-						.text(function(d) {
-							return d.text;
-						})
+						.font(function(d) { return this.getApplication().getFeatureForTerm('font', d.text); }.bind(this))
+						.fontSize(function(d) {return d.fontSize; }.bind(this))
+						.text(function(d) { return d.text; })
 						.on('end', this.draw.bind(this))
 				);
 				
@@ -14330,7 +14698,7 @@ Ext.define('Voyant.panel.Cirrus', {
 			.style('font-size', '1px').transition().duration(1000).style('font-size', function(d) { return d.fontSize + 'px'; });
 		
 		wordNodes
-			.style('font-family', function(d) { return d.font; })
+			.style('font-family', function(d) { return panel.getApplication().getFeatureForTerm('font', d.text); })
 			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
 			.text(function(d) { return d.text; })
 			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);})
@@ -22807,12 +23175,13 @@ Ext.define('Voyant.panel.TermsBerry', {
         	numInitialTerms: 75,
     		query: undefined,
     		docIndex: undefined,
-    		docId: undefined
+    		docId: undefined,
+    		categories: undefined
     	},
 		glyph: 'xf1db@FontAwesome'
     },
     config: {
-    	options: [{xtype: 'stoplistoption'}],
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	
     	mode: undefined,
     	
@@ -23347,6 +23716,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 		
     	var text = node.append('text')
     		.attr('clip-path', function(d) { return 'url(#clip-' + idGet(d.term) + ')'; })
+    		.style('font-family', function(d) { return me.getApplication().getFeatureForTerm('font', d.term); })
 			.style('text-anchor', 'middle')
 			.style('cursor', 'default');
 		text.append('tspan')
@@ -24916,7 +25286,6 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	alias: 'widget.voyantheader',
     statics: {
     	i18n: {
-    		categoriesBuilder: 'Categories Builder'
     	}
     },
     constructor: function(config) {
@@ -24959,21 +25328,6 @@ Ext.define('Voyant.panel.VoyantHeader', {
 	        				}
 	        			}, this);
 	        		}
-				},
-				categories: {
-					type: 'categories',
-					tooltip: this.localize('categoriesBuilder'),
-					xtype: 'toolmenu',
-					glyph: 'xf02c@FontAwesome',
-					handler: function(btn) {
-	        			Ext.create('Voyant.widget.CategoriesBuilder', {
-	        				panel: this,
-	        				categoriesManager: this.getApplication().getCategoriesManager(),
-	        				height: this.getApplication().getViewport().getHeight()*0.5,
-	        				width: this.getApplication().getViewport().getWidth()*0.75
-	        			}).show();
-	        		},
-	        		scope: this
 				}
 			}
         })
@@ -26993,6 +27347,137 @@ Ext.define('Voyant.panel.Topics', {
     	}
     
 });
+
+// assuming Cirrus library is loaded by containing page (via voyant.jsp)
+Ext.define('Voyant.panel.Via', {
+	extend: 'Ext.panel.Panel',
+	mixins: ['Voyant.panel.Panel'],
+	alias: 'widget.via',
+    statics: {
+    	i18n: {
+    		title: "Via",
+    		helpTip: "Via is a tool intended to help you explore the semantic clusters of English texts.",
+    		visible: "Visible",
+    		timedout: "An attempt was made to fetch data but the request took too long. The process may be still ongoing and you could try again in a couple of minutes.",
+    		englishOnly: "You seem to have a text in a language other than English. Unfortunately, at the moment, Via only supports texts in English (because of the current way the lemmatization and synonym operations are programmed)."
+    	},
+    	api: {
+    		stopList: 'auto',
+    		limit: 100,
+    		docIndex: undefined
+    	},
+		glyph: 'xf06e@FontAwesome'
+    },
+    
+    config: {
+    	mode: undefined,
+    	options: [
+    		{xtype: 'stoplistoption'},
+    		{
+	    		xtype: 'listeditor',
+	    		name: 'whiteList'
+    	    }
+    	]
+    },
+    
+    layout: 'fit',
+    
+    constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    },
+    
+    initComponent: function (config) {
+    	Ext.apply(this, {
+    		title: this.localize('title'),
+    		dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                overflowHandler: 'scroller',
+                items: [{
+        			xtype: 'corpusdocumentselector',
+        			singleSelect: true
+        		},{
+        			fieldLabel: this.localize('visible'),
+        			labelWidth: 40,
+        			width: 120,
+        			xtype: 'slider',
+	            	increment: 10,
+	            	minValue: 10,
+	            	maxValue: 1000,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(this.getApiParam("limit"))
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({limit: newvalue});
+	            			this.loadFromCorpus(this.getCorpus());
+	            		},
+	            		scope: this
+	            	}
+                }]
+    		}]
+    	});
+
+    	this.callParent(arguments);
+    	
+    	
+    },
+    
+    listeners: {
+    	resize: function(panel, width, height) {
+    		if (this.getCorpus()) {
+        		this.loadFromCorpus(this.getCorpus())
+    		}
+    	},
+    	
+    	loadedCorpus: function(src, corpus) {
+    		var langs = corpus.get("languageCodes");
+    		var val = Ext.Array.each(langs, function(lang) {
+    			if (lang!='en') {
+    				this.showError(this.localize('englishOnly'));
+    				return false;
+    			}
+    		}, this);
+    		this.loadFromCorpus(corpus);
+    	},
+    	
+    	corpusSelected: function(src, corpus) {
+    		this.setApiParam("docIndex", "");
+    		this.loadFromCorpus(corpus)
+    	},
+    	
+    	documentSelected: function(src, document) {
+    		this.setApiParam("docIndex", document.getIndex());
+    		this.loadFromCorpus(this.getCorpus())
+    	}
+    	
+    	
+    },
+    
+    loadFromCorpus: function(corpus) {
+    	var me = this;
+    	this.mask(this.localize("loading"))
+    	var params = this.getApiParams();
+    	var a = corpus.loadRelatedWords(params).then(function(relatedWords) {
+    		me.unmask()
+    		var graph = me.down("voyantnetworkgraph");
+    		if (graph) {graph.destroy();}
+    		var edges = relatedWords.map(function(item) {return {source: item.getSource(), target: item.getTarget()}})
+    		graph = Ext.create("Voyant.widget.VoyantNetworkGraph", {
+    			json: {edges: edges}
+    		})
+    		me.add(graph)
+    	}, function(response) {
+    		me.unmask();
+    		if (response.timedout) {
+    			me.showError(me.localize('timedout'));
+    		} else {
+        		me.showError(response);
+    		}
+    	});
+    }
+});
 Ext.define("Voyant.notebook.editor.button.Add", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -28531,8 +29016,8 @@ Ext.define('Voyant.notebook.Notebook', {
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
-	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api'],
-	requires: ['Voyant.util.ResponseError','Voyant.util.CategoriesManager'],
+	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api','Voyant.util.CategoriesManager'],
+	requires: ['Voyant.util.ResponseError'],
     
     name: 'VoyantApp',
     
@@ -28548,8 +29033,7 @@ Ext.define('Voyant.VoyantApp', {
     
     config: {
     	baseUrl: undefined,
-    	tromboneUrl: undefined,
-    	categoriesManager: undefined
+    	tromboneUrl: undefined
     },
     
     constructor: function(config) {
@@ -28558,13 +29042,15 @@ Ext.define('Voyant.VoyantApp', {
     	
     	// set the Trombone URL from the baseURL // TODO: maybe allow this to be overridden
 		this.setTromboneUrl(this.config.baseUrl+'trombone');
-
-		this.setCategoriesManager(new Ext.create('Voyant.util.CategoriesManager'));
 		
     	// set the application for the Corpus so that we can use a simple constructor
 		Voyant.application = this;
 		
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+		
+		this.mixins['Voyant.util.CategoriesManager'].constructor.apply(this, arguments);
+		this.addFeature('color');
+		this.addFeature('font', '"Palatino Linotype", "Book Antiqua", Palatino, serif');
 		
 		// call the parent constructor
         this.callParent(arguments);
@@ -28672,6 +29158,8 @@ Ext.define('Voyant.VoyantApp', {
 				if (config.responseText) {
 					// rebundle as error (without nice message)
 					return this.showResponseError(config.statusText, config);
+				} else if (config.statusText) {
+					return this.showResponseError(config.statusText, config)
 				}
 			}
 			// maybe handle other forms
@@ -29084,7 +29572,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
-    		this.colorTermAssociations.clear();
+//    		this.colorTermAssociations.clear();
     		
     		this.on("unhandledEvent", function(src, eventName, data) {
 				var url = this.getBaseUrl() + '?corpus='+corpus.getAliasOrId();

@@ -45,6 +45,7 @@ app/data/model/Document.js
 app/data/model/DocumentQueryMatch.js
 app/data/model/DocumentTerm.js
 app/data/model/PrincipalComponent.js
+app/data/model/RelatedTerm.js
 app/data/model/StatisticalAnalysis.js
 app/data/model/Token.js
 
@@ -61,6 +62,7 @@ app/data/store/Documents.js
 app/data/store/PCAAnalysis.js
 app/data/store/DocSimAnalysis.js
 app/data/store/CorpusNgrams.js
+app/data/store/RelatedTerms.js
 app/data/store/Tokens.js
 app/data/store/TSNEAnalysis.js
 
@@ -135,6 +137,7 @@ app/panel/CustomSet.js
 app/panel/Veliza.js
 app/panel/WordTree.js
 app/panel/Topics.js
+app/panel/Via.js
 
 # NOTEBOOKS
 app/notebook/editor/button/Add.js

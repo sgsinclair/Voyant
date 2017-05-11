@@ -77,14 +77,32 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 	    height = this.getHeight(), targetEl = this.getTargetEl().dom.firstChild.firstChild;
 		
 		targetEl.innerHTML = ""; // clear any existing graph
-
+		
+		var margin = {top: -5, right: -5, bottom: -5, left: -5}
+		
+		var zoomed = function zoomed() {
+        	container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+		}
+		
+    	var zoom = d3.behavior.zoom()
+	        .scaleExtent([1, 10])
+	        .on("zoom", zoomed);
+		
     	var svg = d3.select(targetEl).append("svg")
     	    .attr("width", width)
-    	    .attr("height", height);
-
+    	    .attr("height", height)
+    	
+    	var container = svg
+    	  .append("g")
+    	    .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
+    	    .call( d3.behavior.zoom()
+    		        .scaleExtent([.5, 10])
+    		        .on("zoom", zoomed));
+    	
+    	
     	var force = d3.layout.force()
-    	    .gravity(0.05)
-    	    .distance(100)
+    	    .gravity(0.1)
+    	    .distance(50)
     	    .charge(-100)
     	    .size([width, height]);
 
@@ -93,13 +111,13 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	      .links(json.links)
     	      .start();
 
-    	  var link = svg.selectAll(".link")
+    	  var link = container.selectAll(".link")
     	      .data(json.links)
     	    .enter().append("line")
     	      .attr("class", "link")
     	      .attr("stroke", "#eee")
 
-    	  var node = svg.selectAll(".node")
+    	  var node = container.selectAll(".node")
     	      .data(json.nodes)
     	    .enter().append("g")
     	      .attr("class", "node")
@@ -109,10 +127,18 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	  	.attr("r", 5)
     	  	.attr("fill", "#ddd")
     	  
+    	  var vals = json.nodes.map(function(d) {return d.value});
+    	  vals.sort();
+
+    	  var fontscale = d3.scale.log()
+    	  		.domain([vals[0], vals[vals.length-1]])
+    	  		.range([8, 36])
+    	  		
     	  node.append("text")
     	      .attr("dx", 12)
     	      .attr("dy", ".35em")
-    	      .text(function(d) { return d.name });
+    	      .text(function(d) { return d.name })
+    	      .attr("font-size", function(d) {return fontscale(d.value)+"px"});
 
     	  force.on("tick", function() {
     	    link.attr("x1", function(d) { return d.source.x; })

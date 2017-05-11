@@ -143,6 +143,8 @@ Ext.define('Voyant.VoyantApp', {
 				if (config.responseText) {
 					// rebundle as error (without nice message)
 					return this.showResponseError(config.statusText, config);
+				} else if (config.statusText) {
+					return this.showResponseError(config.statusText, config)
 				}
 			}
 			// maybe handle other forms

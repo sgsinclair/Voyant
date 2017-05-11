@@ -364,7 +364,8 @@ Ext.define('Voyant.data.model.Corpus', {
          {name: 'createdTime', type: 'int'},
          {name: 'createdDate', type: 'date', dateFormat: 'c'},
          {name: 'title', type: 'string'},
-         {name: 'subTitle', type: 'string'}
+         {name: 'subTitle', type: 'string'},
+         {name: 'languagueCodes', type: 'string'}
     ],
     
 	/**
@@ -696,6 +697,38 @@ Ext.define('Voyant.data.model.Corpus', {
 		return this.then ? Voyant.application.getDeferredNestedPromise(this, arguments) : this.get('subTitle');		
 	},
 	
+	getRelatedWords : function(config) {
+		return Ext.create("Voyant.data.store.RelatedTerms", Ext.apply(config || {}, {corpus: this}))
+	},
+	
+	loadRelatedWords : function(config) {
+		var me = this;
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0
+			})
+			var relatedTerms = this.getRelatedWords();
+			relatedTerms.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(records)
+					} else {
+						dfd.reject(operation.error.response);
+					}
+				}
+			})
+			return dfd.promise
+		}
+	},
+		
 	/**
      * Create a promise for a text representation of all the document bodies in the corpus.
      * 
