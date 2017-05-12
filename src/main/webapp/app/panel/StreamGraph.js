@@ -69,7 +69,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 	            	text: this.localize('clearTerms'),
 	            	handler: function() {
 	            		this.setApiParams({query: undefined});
-	            		this.loadFromRecords([])
+	            		this.loadFromRecords([]);
 	            	},
 	            	scope: this
 	            },{
@@ -353,7 +353,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     	}
     	this.getVis().select('g.axis.x').append("text")
 			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-20)+')')
+			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-30)+')')
+			.attr('fill', '#000')
 			.text(xAxisText);
     	
     	this.getVis().append('g')
@@ -370,6 +371,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     	this.getVis().select('g.axis.y').append("text")
 			.attr('text-anchor', 'middle')
 			.attr('transform', 'translate(-'+(this.graphMargin.left-20)+', '+height/2+') rotate(-90)')
+			.attr('fill', '#000')
 			.text(yAxisText);
     },
     
@@ -395,13 +397,11 @@ Ext.define('Voyant.panel.StreamGraph', {
     },
     
     resizeGraph: function() {
-    	var el = this.getLayout().getRenderTarget();
-    	var paddingH = this.graphMargin.left + this.graphMargin.right;
-    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
-    	var width = el.getWidth()-paddingH;
-		var height = el.getHeight()-paddingV;
-
-		d3.select(el.dom).select('svg').attr('width', width+paddingH).attr('height', height+paddingV);
+    	var el = this.body;//getLayout().getRenderTarget();
+    	var width = el.getWidth();
+		var height = el.getHeight();
+		
+		d3.select(el.dom).select('svg').attr('width', width).attr('height', height);
 		
 		// TODO recalculate streams
     }

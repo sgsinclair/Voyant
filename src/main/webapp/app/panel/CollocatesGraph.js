@@ -225,24 +225,15 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         this.on('query', function(src, query) {this.loadFromQuery(query);}, this);
         
         this.on('resize', function(panel, width, height) {
-        	var el = this.getLayout().getRenderTarget();
-        	
-        	var docked = this.getDockedItems();
-        	var dHeight = 0;
-        	for (var i = 0; i < docked.length; i++) {
-        		dHeight += docked[i].getHeight();
-        	}
-        	
-        	var elHeight = height - dHeight;
-        	
-        	el.setHeight(elHeight);
-        	el.setWidth(width);
-        	
         	var vis = Ext.get(this.getVisId());
         	if (vis) {
-        		vis.el.dom.setAttribute('width', width);
+        		var el = this.body;//this.getLayout().getRenderTarget();
+            	var elHeight = el.getHeight();
+            	var elWidth = el.getWidth();
+            	
+        		vis.el.dom.setAttribute('width', elWidth);
         		vis.el.dom.setAttribute('height', elHeight);
-        		this.getVisLayout().force('center', d3.forceCenter(width/2, elHeight/2)).alpha(1).restart();
+        		this.getVisLayout().force('center', d3.forceCenter(elWidth/2, elHeight/2)).alpha(1).restart();
         	}
 		}, this);
         
