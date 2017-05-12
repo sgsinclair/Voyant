@@ -35,7 +35,7 @@ if (typeof define === "function" && define.amd) define(["d3"], cloud);
 else cloud(this.d3);
 
 function cloud(d3) {
-  d3.layout.cloud = function cloud() {
+  d3.layoutCloud = function cloud() {
     var size = [256, 256],
         text = cloudText,
         font = cloudFont,
@@ -85,7 +85,7 @@ function cloud(d3) {
           cloudSprite(d, data, i);
           if (d.hasText && place(board, d, bounds)) {
             tags.push(d);
-            event.word(d);
+            event.call('word', cloud, d);
             if (bounds) cloudBounds(bounds, d);
             else bounds = [{x: d.x + d.x0, y: d.y + d.y0}, {x: d.x + d.x1, y: d.y + d.y1}];
             // Temporary hack
@@ -95,7 +95,7 @@ function cloud(d3) {
         }
         if (i >= n) {
           cloud.stop();
-          event.end(tags, bounds);
+          event.call('end', cloud, tags, bounds);
         }
       }
     }
@@ -179,23 +179,23 @@ function cloud(d3) {
     };
 
     cloud.font = function(_) {
-      return arguments.length ? (font = d3.functor(_), cloud) : font;
+      return arguments.length ? (font = functor(_), cloud) : font;
     };
 
     cloud.fontStyle = function(_) {
-      return arguments.length ? (fontStyle = d3.functor(_), cloud) : fontStyle;
+      return arguments.length ? (fontStyle = functor(_), cloud) : fontStyle;
     };
 
     cloud.fontWeight = function(_) {
-      return arguments.length ? (fontWeight = d3.functor(_), cloud) : fontWeight;
+      return arguments.length ? (fontWeight = functor(_), cloud) : fontWeight;
     };
 
     cloud.rotate = function(_) {
-      return arguments.length ? (rotate = d3.functor(_), cloud) : rotate;
+      return arguments.length ? (rotate = functor(_), cloud) : rotate;
     };
 
     cloud.text = function(_) {
-      return arguments.length ? (text = d3.functor(_), cloud) : text;
+      return arguments.length ? (text = functor(_), cloud) : text;
     };
 
     cloud.spiral = function(_) {
@@ -203,11 +203,11 @@ function cloud(d3) {
     };
 
     cloud.fontSize = function(_) {
-      return arguments.length ? (fontSize = d3.functor(_), cloud) : fontSize;
+      return arguments.length ? (fontSize = functor(_), cloud) : fontSize;
     };
 
     cloud.padding = function(_) {
-      return arguments.length ? (padding = d3.functor(_), cloud) : padding;
+      return arguments.length ? (padding = functor(_), cloud) : padding;
     };
 
     cloud.random = function(_) {
@@ -215,10 +215,12 @@ function cloud(d3) {
     };
     
     cloud.overflow = function(_) {
-	  return arguments.length ? (overflow = d3.functor(_), cloud) : overflow;
+	  return arguments.length ? (overflow = functor(_), cloud) : overflow;
     };
 
-    return d3.rebind(cloud, event, "on");
+    rebind(cloud, event, "on");
+    
+    return cloud;
   };
 
   function cloudText(d) {
@@ -391,6 +393,24 @@ function cloud(d3) {
     };
   }
 
+  // d3.functor replacement
+  function functor(v) {
+	  return typeof v === 'function' ? v : function() { return v; };
+  }
+  
+  function rebind(target, source) {
+	  var i = 1, n = arguments.length, method;
+	  while (++i < n) target[method = arguments[i]] = d3_rebind(target, source, source[method]);
+	  return target;
+  };
+  function d3_rebind(target, source, method) {
+	  return function() {
+	    var value = method.apply(source, arguments);
+	    return value === source ? target : value;
+	  };
+  }
+  
+  
   // TODO reuse arrays?
   function zeroArray(n) {
     var a = [],

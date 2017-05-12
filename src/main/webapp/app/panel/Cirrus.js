@@ -156,7 +156,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
-    		this.initVisLayout(true); // force in case we've changed fontFamily from options
+    		this.initVisLayout(); // force in case we've changed fontFamily from options
     		this.loadFromCorpus(corpus);
     	},
     	
@@ -309,9 +309,8 @@ Ext.define('Voyant.panel.Cirrus', {
     			el.update(""); // make sure to clear existing contents (especially for re-layout)
     	    	var width = el.getWidth();
     			var height = el.getHeight();
-    			
 				this.setVisLayout(
-					d3.layout.cloud()
+					d3.layoutCloud()
 						.size([width, height])
 						.overflow(true)
 						.padding(1)
@@ -364,7 +363,7 @@ Ext.define('Voyant.panel.Cirrus', {
 	    		this.setRelativeSizes();
 	    		this.setAdjustedSizes();
 
-	//    		var fontSizer = d3.scale.pow().range([10, 100]).domain([minSize, maxSize]);
+	//    		var fontSizer = d3.scalePow().range([10, 100]).domain([minSize, maxSize]);
 	    		
 	    		this.getVisLayout().words(terms).start();
     		}
@@ -375,8 +374,6 @@ Ext.define('Voyant.panel.Cirrus', {
     
     draw: function(words, bounds) {
     	var panel = this;
-    	// no longer used
-    	// var fill = d3.scale.category20b();
     	var el = this.getLayout().getRenderTarget();
     	var width = this.getVisLayout().size()[0];
     	var height = this.getVisLayout().size()[1];
@@ -388,28 +385,28 @@ Ext.define('Voyant.panel.Cirrus', {
 			height / Math.abs(bounds[0].y - height / 2)
     	) / 2 : 1;
     	
+		var t = d3.transition().duration(1000);
+			
 		var wordNodes = this.getVis().selectAll('text').data(words, function(d) {return d.text;});
 		
-		wordNodes.transition().duration(1000)
-			.attr('transform', function(d) {
-				return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')';
-			})
+		wordNodes.exit().remove();
+		
+		wordNodes.transition(t)
+			.attr('transform', function(d) { return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')'; })
 			.style('font-size', function(d) { return d.fontSize + 'px'; });
 		
 		wordNodes.enter().append('text')
+			.text(function(d) { return d.text; })
 			.attr('text-anchor', 'middle')
-			.attr('data-freq', function(d) {
-				return d.rawFreq;
-			})
-			.attr('transform', function(d) {
-				return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')';
-			})
-			.style('font-size', '1px').transition().duration(1000).style('font-size', function(d) { return d.fontSize + 'px'; });
-		
-		wordNodes
+			.attr('data-freq', function(d) { return d.rawFreq; })
+			.attr('transform', function(d) { return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')'; })
 			.style('font-family', function(d) { return panel.getApplication().getFeatureForTerm('font', d.text); })
 			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
-			.text(function(d) { return d.text; })
+			.style('font-size', '1px').transition(t).style('font-size', function(d) { return d.fontSize + 'px'; });
+			
+		
+		// TODO can't put this as part of enter
+		wordNodes
 			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);})
 			.on('mouseover', function(obj) {
 				this.getTip().show();
@@ -426,9 +423,7 @@ Ext.define('Voyant.panel.Cirrus', {
 				this.getTip().hide();
 			}.bind(this));
 		
-		wordNodes.exit().remove();
-		
-		this.getVis().transition().duration(1000).attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')scale(' + scale + ')');
+		this.getVis().transition(t).attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')scale(' + scale + ')');
     },
     
     map: function(value, istart, istop, ostart, ostop) {

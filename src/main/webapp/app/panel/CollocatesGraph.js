@@ -12,147 +12,79 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		stopList: 'auto',
     		terms: undefined,
     		context: 5,
-    		centralize: undefined
+    		centralize: undefined,
+    		categories: undefined
     	},
 		glyph: 'xf1e0@FontAwesome'
     },
     
     config: {
-    	node: undefined,
-    	link: undefined,
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	
-    	nodeDataSet: undefined,
-    	edgeDataSet: undefined,
-    	network: undefined,
+    	nodeData: undefined,
+    	linkData: undefined,
+    	
+    	visId: undefined,
+    	vis: undefined,
+    	visLayout: undefined,
+    	nodes: undefined,
+    	links: undefined,
+    	
     	contextMenu: undefined,
     	
-    	force: undefined,
-    	graphHeight: undefined,
-    	graphWidth: undefined,
-    	corpusColours: d3.scale.category10(), // TODO unused
+    	currentNode: undefined,
     	
-    	graphMode: undefined,
+    	networkMode: undefined,
     	
-    	stabilizationTask: undefined // stop simulation if it's run for too long
+    	graphStyle: {
+    		keywordNode: {
+    			normal: {
+    				fill: '#c6dbef',
+    				stroke: '#6baed6'
+    			},
+    			highlight: {
+    				fill: '#9ecae1',
+    				stroke: '#3182bd'
+    			}
+    		},
+    		contextNode: {
+    			normal: {
+    				fill: '#fdd0a2',
+    				stroke: '#fdae6b'
+    			},
+    			highlight: {
+    				fill: '#fd9a53',
+    				stroke: '#e6550d'
+    			}
+    		},
+    		link: {
+    			normal: {
+    				stroke: '#000000',
+    				strokeOpacity: 0.1
+    			},
+    			highlight: {
+    				stroke: '#000000',
+    				strokeOpacity: 0.5
+    			}
+    		}
+    	}
     },
 
     DEFAULT_MODE: 0,
     CENTRALIZED_MODE: 1,
     
-    nodeOptions: {
-    	defaultNode: {
-			shape: 'box',
-			color: {
-				border: 'rgba(0,0,0,0.1)',
-				background: 'rgba(255,255,255,1)'
-			},
-			scaling: {
-				label: {
-					min: 10,
-					max: 30,
-					maxVisible: 50,
-					drawThreshold: 6
-				}
-			}
-    	},
-    	centralizedNode: {
-    		shape: 'text',
-    		scaling: {
-				label: {
-					min: 6,
-					max: 30,
-					maxVisible: 50,
-					drawThreshold: 1
-				}
-			}
-    	}
-	},
-	edgeOptions: {
-		defaultEdge: {
-			color: {
-				color: 'rgba(0,0,0,0.1)',
-				highlight: 'black',
-				hover: 'red'
-			},
-			labelHighlightBold: false,
-			scaling: {
-				min: 1,
-				max: 15
-			},
-			length: undefined
-		},
-		centralizedEdge: {
-			scaling: {
-				min: 1,
-				max: 1
-			},
-			length: 150
-		}
-	},
-	highlightOptions: {
-		font: {
-			color: 'white'
-		},
-		color: {
-			background: 'black',
-			hover: {
-				border: '#CB157F',
-				background: '#EB42A5'
-			}
-		}
-	},
-	physicsOptions: {
-		defaultPhysics: {
-			barnesHut: {
-				gravitationalConstant: -1500,
-				centralGravity: 6,
-				damping: 0.5,
-				avoidOverlap: 0.5,
-				springConstant: 0.04
-			}
-		},
-		centralizedPhysics: {
-			barnesHut: {
-				gravitationalConstant: -1500,
-				centralGravity: 1,
-				damping: 1,
-				avoidOverlap: 0.01,
-				springConstant: 0.2
-			}
-		}
-	},
-	
-	stablizationMaxTime: 5000, // milliseconds that stabilization should run for
-	
-	keywordColor: 'green',
-	contextColor: 'maroon',
-    
     constructor: function(config) {
+    	this.setNodeData([]);
+    	this.setLinkData([]);
+    	
+    	this.setVisId(Ext.id(null, 'links_'));
 
-        this.callParent(arguments);
+    	this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-
-    	this.setNodeDataSet(new vis.DataSet());
-    	this.setEdgeDataSet(new vis.DataSet());
-    	
-    	this.setGraphMode(this.DEFAULT_MODE);
-    	
-    	this.setStabilizationTask(Ext.TaskManager.newTask({
-    		run: function() {
-    			this.getNetwork().stopSimulation();
-    		},
-    		scope: this,
-    		interval: this.stablizationMaxTime,
-    		repeat: 1,
-    		fireOnStart: false
-    	}));
-    	
     },
     
     initComponent: function() {
-    	
         var me = this;
-
         Ext.apply(me, {
     		title: this.localize('title'),
             dockedItems: [{
@@ -165,10 +97,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 	text: me.localize('clearTerms'),
 					glyph: 'xf014@FontAwesome',
                 	handler: function() {
-                		this.getNodeDataSet().clear();
-                		this.getEdgeDataSet().clear();
-                		
-                		this.setGraphMode(this.DEFAULT_MODE);
+                		this.setNodeData([]);
+                    	this.setLinkData([]);
+                		this.setNetworkMode(this.DEFAULT_MODE);
+                		this.refresh();
                 	},
                 	scope: me
                 },this.localize('context'),{
@@ -181,21 +113,22 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 	width: 50,
                 	listeners: {
                 		render: function(slider) {
-                			slider.setValue(me.getApiParam('context'));
+                			slider.setValue(this.getApiParam('context'));
                 		},
-                		changecomplete: {
-                			fn: function(slider, newValue) {
-                    			this.setApiParam("context", slider.getValue());
-                    			if (this.getGraphMode() === this.DEFAULT_MODE) {
-	                    			var terms = this.getNodeDataSet().map(function(node) { return node.label; });
-	                				if (terms.length > 0) {
-	                					this.getNodeDataSet().clear();
-	                					this.loadFromQuery(terms);
-	                				}
-                    			}
-                    		},
-                    		scope: me
-                		}
+                		changecomplete: function(slider, newValue) {
+                			this.setApiParam('context', slider.getValue());
+                			if (this.getNetworkMode() === this.DEFAULT_MODE) {
+                    			var terms = this.getNodeData().map(function(node) { return node.term; });
+                				if (terms.length > 0) {
+                					this.setNodeData([]);
+                					this.setLinkData([]);
+                					this.refresh();
+                					
+                					this.loadFromQuery(terms);
+                				}
+                			}
+                		},
+                		scope: me
                 	}
                 }]
             }]
@@ -216,9 +149,19 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				itemId: 'fixed',
 				listeners: {
 					checkchange: function(c, checked, e) {
-						var n = this.getNetwork().getSelectedNodes();
-						if (n[0] != null) {
-							this.getNodeDataSet().update({id: n[0], fixed: checked});
+						var node = this.getCurrentNode();
+						if (node !== undefined) {
+							var data = {
+								fixed: checked
+							};
+							if (checked) {
+								data.fx = node.x;
+								data.fy = node.y;
+							} else {
+								data.fx = null;
+								data.fy = null;
+							}
+							this.updateDataForNode(node.id, data);
 						}
 					},
 					scope: this
@@ -228,10 +171,15 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				text: 'Fetch Collocates',
 				style: 'margin: 5px;',
 				handler: function(b, e) {
-					var n = this.getNetwork().getSelectedNodes();
-		    		if (n[0] != null) {
-		    			var data = this.getNodeDataSet().get(n[0]);
-		    			this.itemdblclick(data);
+					var node = this.getCurrentNode();
+					if (node !== undefined) {
+						if (this.getNetworkMode() === this.CENTRALIZED_MODE) {
+							this.resetGraph();
+							this.setNetworkMode(this.DEFAULT_MODE);
+							node.start = 0;
+							node.limit = this.getApiParam('limit');
+						}
+		    			this.fetchCollocatesForNode(node);
 		    		}
 				},
 				scope: this
@@ -240,11 +188,11 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				text: 'Centralize',
 				style: 'margin: 5px;',
 				handler: function(b, e) {
-					var n = this.getNetwork().getSelectedNodes();
-		    		if (n[0] != null) {
-		    			this.doCentralize(n[0]);
-                		this.getContextMenu().hide();
+					var node = this.getCurrentNode();
+					if (node !== undefined) {
+		    			this.doCentralize(node.term);
 		    		}
+					this.getContextMenu().hide();
 				},
 				scope: this
 			},{
@@ -252,18 +200,17 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				text: 'Remove',
 				style: 'margin: 5px;',
 				handler: function(b, e) {
-					var n = this.getNetwork().getSelectedNodes();
-					if (n[0] != null) {
-						this.getNodeDataSet().remove(n[0]);
-						b.up('menu').hide();
-						this.forceUpdate();
+					var node = this.getCurrentNode();
+					if (node !== undefined) {
+						this.removeNode(node.id);
 					}
+					b.up('menu').hide();
 				},
 				scope: this
 			}]
 		}));
         
-        this.on("loadedCorpus", function(src, corpus) {
+        this.on('loadedCorpus', function(src, corpus) {
 			if (this.isVisible()) {
 				this.initLoad();
 			}
@@ -275,9 +222,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			}
     	}, this);
         
-        this.on("query", function(src, query) {this.loadFromQuery(query);}, this);
+        this.on('query', function(src, query) {this.loadFromQuery(query);}, this);
         
-        this.on("resize", function(panel, width, height) {
+        this.on('resize', function(panel, width, height) {
         	var el = this.getLayout().getRenderTarget();
         	
         	var docked = this.getDockedItems();
@@ -289,9 +236,14 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         	var elHeight = height - dHeight;
         	
         	el.setHeight(elHeight);
-        	el.setWidth(el.getWidth());
-        	this.setGraphHeight(el.getHeight());
-        	this.setGraphWidth(el.getWidth());
+        	el.setWidth(width);
+        	
+        	var vis = Ext.get(this.getVisId());
+        	if (vis) {
+        		vis.el.dom.setAttribute('width', width);
+        		vis.el.dom.setAttribute('height', elHeight);
+        		this.getVisLayout().force('center', d3.forceCenter(width/2, elHeight/2)).alpha(1).restart();
+        	}
 		}, this);
         
         me.callParent(arguments);
@@ -300,19 +252,11 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     
     initLoad: function() {
 		this.initGraph();
+		this.setNetworkMode(this.DEFAULT_MODE);
 		
 		if (this.getApiParam('centralize')) {
-			this.setGraphMode(this.CENTRALIZED_MODE);
+			this.setNetworkMode(this.CENTRALIZED_MODE);
 			var term = this.getApiParam('centralize');
-			this.getNodeDataSet().update({
-				id: term,
-				label: term,
-				title: term+' ('+1+')',
-				type: 'keyword',
-				value: 1,
-				start: 0,
-				font: {color: this.keywordColor}
-			});
 			this.doCentralize(term);
 		} else {
 			var limit = 3;
@@ -324,7 +268,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				params: {
 					limit: limit,
 					query: query,
-					stopList: this.getApiParam("stopList")
+					stopList: this.getApiParam('stopList')
 				},
 			    callback: function(records, operation, success) {
 			    	if (success) {
@@ -367,14 +311,14 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     loadFromCorpusCollocateRecords: function(records, keywordId) {
     	if (Ext.isArray(records)) {
     		var start = this.getApiParam('limit');
-    		var nodeDS = this.getNodeDataSet();
-    		var edgeDS = this.getEdgeDataSet();
+    		
     		var existingKeys = {};
-    		nodeDS.forEach(function(item) {
+    		this.getNodeData().forEach(function(item) {
     			existingKeys[item.id] = true;
-    		});
+    		}, this);
+    		
     		var newNodes = [];
-    		var newEdges = [];
+    		var newLinks = [];
     		
     		records.forEach(function(corpusCollocate, index) {
     			var term = corpusCollocate.getTerm();
@@ -384,297 +328,457 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     			
     			var termValue = termFreq;
     			var contextValue = contextFreq;
-    			if (this.getGraphMode() === this.CENTRALIZED_MODE) {
+    			if (this.getNetworkMode() === this.CENTRALIZED_MODE) {
     				termValue = 0;
     				contextValue = Math.log(contextFreq);
     			}
     			
+    			var termEntry = undefined;
+    			var contextTermEntry = undefined;
+    			
     			if (index == 0) { // only process keyword once
-    				if (keywordId === undefined) keywordId = term;
+    				if (keywordId === undefined) keywordId = this.idGet(term);
 	    			if (existingKeys[keywordId] !== undefined) {
-	    				nodeDS.update({
-	    					id: keywordId,
-	    					value: termValue,
+	    				this.updateDataForNode(keywordId, {
 	    					title: term+' ('+termFreq+')',
 	    					type: 'keyword',
-	    					font: {color: this.keywordColor}
+	    					value: termValue
 	    				});
 	    			} else {
 	    				existingKeys[keywordId] = true;
-	    				newNodes.push({
-		    				id: term,
-	    					label: term,
+	    				
+	    				termEntry = {
+		    				id: keywordId,
+	    					term: term,
 	    					title: term+' ('+termFreq+')',
 	    					type: 'keyword',
 	    					value: termValue,
 	    					start: start,
-	    					font: {color: this.keywordColor}
-						});
+	    					fixed: false
+						};
+	    				newNodes.push(termEntry);
 	    			}
 				}
     			
     			if (term != contextTerm) {
-	    			var contextNodeKey = contextTerm;
-	    			if (existingKeys[contextNodeKey] !== undefined) {
+	    			var contextId = this.idGet(contextTerm);
+	    			if (existingKeys[contextId] !== undefined) {
 	    			} else {
-	    				existingKeys[contextNodeKey] = true; 
-	    				newNodes.push({
-    	    				id: contextTerm,
-        					label: contextTerm,
+	    				existingKeys[contextId] = true;
+	    				
+	    				contextTermEntry = {
+    	    				id: contextId,
+    	    				term: contextTerm,
         					title: contextTerm+' ('+contextFreq+')',
         					type: 'context',
         					value: contextValue,
         					start: 0,
-        					font: {color: this.contextColor}
-    					});
+        					fixed: false
+    					};
+	    				newNodes.push(contextTermEntry);
 	    			}
 	    			
 	    			var existingLink = null;
-	    			edgeDS.forEach(function(item) {
-	    				if ((item.from == keywordId && item.to == contextNodeKey) || (item.from == contextNodeKey && item.to == keywordId)) {
-	    					existingLink = item;
+	    			var linkData = this.getLinkData();
+	    			for (var i = 0; i < linkData.length; i++) {
+	    				var link = linkData[i];
+	    				if ((link.source.id == keywordId && link.target.id == contextId) || (link.source.id == contextId && link.target.id == keywordId)) {
+	    					existingLink = link;
+	    					break;
 	    				}
-	    			});
-	    			
+	    			}
+
 	    			var linkValue = corpusCollocate.getContextTermRawFreq();
 	    			if (existingLink === null) {
-	    				newEdges.push({from: keywordId, to: contextNodeKey, value: linkValue});
+	    				newLinks.push({source: keywordId, target: contextId, value: linkValue, id: keywordId+'-'+contextId});
 	    			} else if (existingLink.value < linkValue) {
-    					edgeDS.update({id: existingLink.id, value: linkValue});
+//	    				existingLink.value = linkValue;
 	    			}
     			}
     		}, this);
     		
-    		nodeDS.add(newNodes);
-    		edgeDS.add(newEdges);
+    		this.setNodeData(this.getNodeData().concat(newNodes));
+    		this.setLinkData(this.getLinkData().concat(newLinks));
     		
-    		this.forceUpdate();
-    		
-    		this.getNetwork().fit();
+    		this.refresh();		
     	}
     },
     
-    doCentralize: function(node) {
-    	var centralizeLimit = 150;
-		var centerNodeSize = 75;
-		
-		var data = this.getNodeDataSet().get(node);
-		data.fixed = true;
-		data.shape = 'circle';
-		data.scaling = {
-			min: centerNodeSize,
-			max: centerNodeSize
-			,label: {
-				min: centerNodeSize,
-				max: centerNodeSize
+    idGet: function(term) {
+    	return term.replace(/\W/g, '_');
+    },
+    
+    updateDataForNode: function(nodeId, dataObj) {
+    	var data = this.getNodeData();
+		for (var i = 0; i < data.length; i++) {
+			if (data[i].id === nodeId) {
+				Ext.apply(data[i], dataObj);
+				break;
 			}
+		}
+    },
+    
+    removeNode: function(nodeId, removeOrphans) {
+    	var data = this.getNodeData();
+		for (var i = 0; i < data.length; i++) {
+			if (data[i].id === nodeId) {
+				data.splice(i, 1);
+				break;
+			}
+		}
+		
+		data = this.getLinkData();
+		for (var i = data.length-1; i >= 0; i--) {
+			if (data[i].source.id === nodeId || data[i].target.id === nodeId) {
+				data.splice(i, 1);
+			}
+		}
+		
+		if (removeOrphans) {
+			// TODO
+		}
+		
+		this.refresh();
+    },
+    
+    doCentralize: function(term) {
+    	this.resetGraph();
+    	
+    	this.setNetworkMode(this.CENTRALIZED_MODE);
+    	
+    	var data = {
+			id: this.idGet(term),
+			term: term,
+			title: term+' ('+1+')',
+			type: 'keyword',
+			value: 1000,
+			start: 0
 		};
+		this.setNodeData([data]);
+		this.refresh();
 		
-		
-		this.getNodeDataSet().clear();
-		this.getEdgeDataSet().clear();
-		this.getNodeDataSet().add(data);
-		
-		this.setGraphMode(this.CENTRALIZED_MODE);
-		
+		var centralizeLimit = 150;
 		var limit = this.getApiParam('limit');
 		this.setApiParam('limit', centralizeLimit);
-		this.itemdblclick(data);
+		this.fetchCollocatesForNode(data);
 		this.setApiParam('limit', limit);
     },
     
-    applyGraphMode: function(mode) {
-    	mode = mode === undefined ? this.DEFAULT_MODE : mode;
-    	var network = this.getNetwork();
-    	if (network !== undefined) {
+    updateNetworkMode: function(mode) {
+    	if (this.getVisLayout()) {
 	    	if (mode === this.DEFAULT_MODE) {
-	    		network.setOptions({
-	    			physics: this.physicsOptions.defaultPhysics,
-	    			nodes: this.nodeOptions.defaultNode,
-	    			edges: this.edgeOptions.defaultEdge
-	    		});
-	    	} else if (mode === this.CENTRALIZED_MODE) {
-	    		network.setOptions({
-	    			physics: this.physicsOptions.centralizedPhysics,
-	    			nodes: this.nodeOptions.centralizedNode,
-	    			edges: this.edgeOptions.centralizedEdge
-	    		});
+	    		this.getVisLayout()
+		    		.force('link', d3.forceLink().id(function(d) { return d.id; }).distance(30).strength(1))
+					.force('charge', d3.forceManyBody().strength(-100))
+					.force('collide', d3.forceCollide(function(d) { return Math.sqrt(d.bbox.width * d.bbox.height)*2; }));
+	    	} else {
+	    		this.getVisLayout()
+		    		.force('link', d3.forceLink().id(function(d) { return d.id; }).distance(200))
+					.force('charge', d3.forceManyBody().strength(function(d) {
+						if (d.type === 'keyword') {
+							return -10000;
+						} else {
+							return 0;
+						}
+					}))
+					.force('collide', d3.forceCollide(function(d) {
+						if (d.type === 'keyword') {
+							return d.value;
+						} else {
+							return Math.sqrt(d.bbox.width * d.bbox.height);
+						}
+					}));
 	    	}
+    	} else {
+    		console.log('no viz yet');
     	}
-    	
-    	return mode;
     },
     
     initGraph: function() {
     	var el = this.getLayout().getRenderTarget();
-    	el.setWidth(el.getWidth());
-    	el.setHeight(el.getHeight());
-    	this.setGraphHeight(el.getHeight());
-    	this.setGraphWidth(el.getWidth());
+    	el.update('');
+    	var width = el.getWidth();
+    	var height = el.getHeight();
     	
-    	if (this.getNetwork() === undefined) {
-	    	var options = {
-	    		autoResize: true,
-				interaction: {
-	    			hover: true,
-	    			hoverConnectedEdges: true,
-	    			multiselect: false
-	    		}
-	    	};
-	    	
-	    	var network = new vis.Network(el.dom, {
-	    		nodes: this.getNodeDataSet(),
-	    		edges: this.getEdgeDataSet()
-	    	}, options);
-	    	this.setNetwork(network);
-	    	
-	    	this.setGraphMode();
-	    	
-	    	this.getNodeDataSet().on('remove', function(e, props, sender) {
-	    		var key = props.items[0];
-	    		var deadEdges = this.getEdgeDataSet().get({
-	    			filter: function(item) {
-	    				return item.from == key || item.to == key;
-	    			}
-	    		});
-	    		this.getEdgeDataSet().remove(deadEdges);
-	    		var orphans = [];
-	    		this.getNodeDataSet().forEach(function(node) {
-	    			var match = this.getEdgeDataSet().get({
-		    			filter: function(item) {
-		    				return item.from == node.id || item.to == node.id;
-		    			}
-		    		});
-	    			if (match.length == 0) {
-	    				orphans.push(node.id);
-	    			}
-	    		}.bind(this));
-	    		this.getNodeDataSet().remove(orphans);
-	    	}.bind(this));
-	    	
-	    	network.on('dragStart', function(params) {
-	    		var n = params.nodes[0];
-	    		if (n != null) {
-	    			this.getNodeDataSet().update({id: n, fixed: false});
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('dragging', function(params) {
-	    		var n = params.nodes[0];
-	    		if (n != null) {
-		    		if (this.isMasked()) {
-			    		if (!this.isOffCanvas(params.pointer.DOM)) {
-			    			this.unmask();
-			    		}
-			    	}
-			    	else if (this.isOffCanvas(params.pointer.DOM)) {
-			    		this.mask(this.localize("releaseToRemove"));
-			    	}
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('dragEnd', function(params) {
-	    		var n = params.nodes[0];
-	    		if (n != null) {
-	    			if (this.isOffCanvas(params.pointer.DOM)) {
-	    	    		this.unmask();
-	    	    		this.mask("cleaning");
-	    	    		this.getNodeDataSet().remove(n);
-	    	    		this.forceUpdate();
-	    	    		this.unmask();
-	    	    	} else {
-	    	    		this.getNodeDataSet().update({id: n, fixed: true});
-	    	    	}
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('click', function(params) {
-	    		this.getContextMenu().hide();
-	    		if (params) {
-	    			var nodes = this.getNodeDataSet();
-	    			if (params.nodes && params.nodes.length>0) {
-		    			this.dispatchEvent("termsClicked", this, [nodes.get(params.nodes[0]).label])
-		    		} else if (params.edges && params.edges.length>0) {
-		    			var edge = this.getEdgeDataSet().get(params.edges[0]);
-		    			this.dispatchEvent("termsClicked", this, ['"'+nodes.get(edge.from).label+' '+nodes.get(edge.to).label+'"~'+this.getApiParam('context')])
-		    		}
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('doubleClick', function(params) {
-	    		var n = params.nodes[0];
-	    		if (n != null) {
-	    			var data = this.getNodeDataSet().get(n);
-	    			this.itemdblclick(data);
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('oncontext', function(params) {
-	    		params.event.preventDefault();
-	    		var n = this.getNetwork().getNodeAt(params.pointer.DOM);
-	    		if (n != null) {
-	    			this.getNetwork().selectNodes([n]);
-	    			var data = this.getNodeDataSet().get(n);
-	    			var menu = this.getContextMenu();
-	    			menu.queryById('label').setHtml(data.label);
-	    			menu.queryById('fixed').setChecked(data.fixed);
-	    			menu.showAt(params.event.pageX, params.event.pageY);
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('startStabilizing', function() {
-	    		this.getStabilizationTask().restart();
-	    	}.bind(this));
-	    	
-	    	network.on('stabilized', function() {
-	    		this.getStabilizationTask().stop();
-	    		this.getNetwork().fit({
-	    			animation: {
-	    				duration: 500,
-	    				easing: 'linear'
-	    			}
-	    		});
-	    	}.bind(this));
-	    	
-	    	network.on('resize', function(params) {
-	    		this.getNetwork().fit({
-	    			animation: {
-	    				duration: 500,
-	    				easing: 'linear'
-	    			}
-	    		});
-	    	}.bind(this));
-    	}
+    	this.setVisLayout(d3.forceSimulation().force('center', d3.forceCenter(width/2, height/2)));
+    	
+    	var svg = d3.select(el.dom).append('svg').attr('id',this.getVisId()).attr('class', 'linksGraph').attr('width', width).attr('height', height);
+    	var g = svg.append('g');
+    	
+		svg.call(d3.zoom().scaleExtent([1/4, 4]).on('zoom', function() {
+			g.attr('transform', d3.event.transform);
+		})).on('click', function() {
+    		this.getContextMenu().hide();
+    	}.bind(this));
+    	
+    	this.setLinks(g.append('g').attr('class', 'links').selectAll('.link'));
+    	this.setNodes(g.append('g').attr('class', 'nodes').selectAll('.node'));
+		this.setVis(g);
     },
     
-    forceUpdate: function() {
-    	// force visjs to apply scaling
-    	var ids = this.getNodeDataSet().map(function(item) {
-			return {id: item.id};
-		});
-		this.getNodeDataSet().update(ids);
-		ids = this.getEdgeDataSet().map(function(edge) {
-			return {id: edge.id};
-		});
-		this.getEdgeDataSet().update(ids);
+    resetGraph: function() {
+	    this.setNodeData([]);
+		this.setLinkData([]);
+		this.refresh();
     },
     
-    isOffCanvas: function(d) {
-    	return d.x < 0 || d.y < 0 || d.x > this.getGraphWidth() || d.y > this.getGraphHeight();
-    },
+    refresh: function() {
+    	var me = this;
+    	
+    	var nodeData = this.getNodeData();
+    	var linkData = this.getLinkData();
+    	
+//    	var nodeMap = d3.map(nodeData, function(d) { return d.id; });
+//    	var bilinks = [];
+//    	linkData.forEach(function(link) {
+//    		var s = link.source = nodeMap.get(link.source);
+//    		var t = link.target = nodeMap.get(link.target);
+//    		var i = {};
+//    		nodeData.push(i);
+//    		linkData.push({source: s, target: i}, {source: i, target: t});
+//    		bilinks.push([s,i,t]);
+//    	});
+    	
+    	var link = this.getLinks().data(linkData, function(d) { return d.id; });
+    	link.exit().remove();
+		var linkEnter = link.enter().append('line')
+			.attr('class', 'link')
+			.attr('id', function(d) { return d.id; })
+			.on('mouseover', me.linkMouseOver.bind(me))
+			.on('mouseout', me.linkMouseOut.bind(me))
+			.on('click', function(data) {
+				d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.dispatchEvent('termsClicked', this, ['"'+data.source.term+' '+data.target.term+'"~'+this.getApiParam('context')]);
+			}.bind(me))
+//			.style('fill', 'none')
+			.style('cursor', 'pointer')
+			.style('stroke-width', function(d) {
+				if (me.getNetworkMode() === me.DEFAULT_MODE) {
+					return Math.max(1, Math.min(15, Math.sqrt(d.value)));
+				} else {
+					return 1;
+				}
+			});
+			
+		this.setLinks(linkEnter.merge(link));
 
-    itemdblclick: function(d) {
+    	var node = this.getNodes().data(nodeData, function(d) { return d.id; });
+    	node.exit().remove();
+    	var nodeEnter = node.enter().append('g')
+			.attr('class', function(d) { return 'node '+d.type; })
+			.attr('id', function(d) { return d.id; })
+			.on('mouseover', me.nodeMouseOver.bind(me))
+			.on('mouseout', me.nodeMouseOut.bind(me))
+			.on('click', function(data) {
+				d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.dispatchEvent('termsClicked', this, [data.term]);
+			}.bind(me))
+			.on('dblclick', function(data) {
+				d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.fetchCollocatesForNode(data);
+			}.bind(me))
+			.on('contextmenu', function(d, i) {
+				d3.event.preventDefault();
+//				me.getTip().hide();
+				var menu = me.getContextMenu();
+				menu.queryById('label').setHtml(d.term);
+    			menu.queryById('fixed').setChecked(d.fixed);
+				menu.showAt(d3.event.pageX+5, d3.event.pageY-50);
+			})
+			.call(d3.drag()
+				.on('start', function(d) {
+					if (!d3.event.active) me.getVisLayout().alphaTarget(0.3).restart();
+					d.fx = d.x;
+					d.fy = d.y;
+					d.fixed = true;
+				})
+				.on('drag', function(d) {
+					d.fx = d3.event.x;
+					d.fy = d3.event.y;
+					if (me.isMasked()) {
+			    		if (!me.isOffCanvas(d3.event.x, d3.event.y)) {
+			    			me.unmask();
+			    		}
+			    	} else if (me.isOffCanvas(d3.event.x, d3.event.y)) {
+			    		me.mask(me.localize('releaseToRemove'));
+			    	}
+				})
+				.on('end', function(d) {
+					if (!d3.event.active) me.getVisLayout().alphaTarget(0);
+					if (d.fixed != true) {
+						d.fx = null;
+						d.fy = null;
+					}
+					if (me.isOffCanvas(d3.event.x, d3.event.y)) {
+	    	    		me.unmask();
+	    	    		me.mask(me.localize('cleaning'));
+	    	    		me.removeNode(d.id);
+	    	    		me.unmask();
+	    	    	}
+				})
+			);
+    	
+    	nodeEnter.append('title').text(function(d) { return d.title; });
+    	
+    	if (this.getNetworkMode() === this.DEFAULT_MODE) {
+    		nodeEnter.append('rect')
+				.style('stroke-width', 1)
+				.style('stroke-opacity', 1);
+    	} else {
+    		nodeEnter.filter(function(d) { return d.type === 'keyword'; }).append('circle')
+    			.style('stroke-width', 1)
+    			.style('stroke-opacity', 1);
+    	}
+    	
+    	nodeEnter.append('text')
+			.attr('font-family', function(d) { return me.getApplication().getFeatureForTerm('font', d.term); })
+			.attr('font-size', function(d) { return Math.max(10, Math.sqrt(d.value)); })
+			.text(function(d) { return d.term; })
+			.each(function(d) { d.bbox = this.getBBox(); }) // set bounding box for later use
+			.style('cursor', 'pointer')
+			.style('user-select', 'none')
+			.attr('alignment-baseline', 'middle');
+    	
+    	this.setNodes(nodeEnter.merge(node));
+    	
+    	if (this.getNetworkMode() === this.DEFAULT_MODE) {
+	    	this.getVis().selectAll('rect')
+	    		.attr('width', function(d) { return d.bbox.width+16; })
+				.attr('height', function(d) { return d.bbox.height+8; })
+				.attr('rx', function(d) { return Math.max(2, d.bbox.height * 0.2); })
+				.attr('ry', function(d) { return Math.max(2, d.bbox.height * 0.2); })
+				.call(this.applyNodeStyle.bind(this));
+	    	this.getVis().selectAll('text')
+		    	.attr('dx', 8)
+				.attr('dy', function(d) { return d.bbox.height*0.5+4; });
+    	} else {
+    		this.getVis().selectAll('circle')
+    			.attr('r', function(d) { return Math.min(150, d.bbox.width); })
+    			.call(this.applyNodeStyle.bind(this));
+    		this.getVis().selectAll('text')
+		    	.attr('dx', function(d) {
+		    		if (d.type === 'keyword') {
+		    			return -d.bbox.width*0.5;
+			    	} else {
+			    		return 8;
+			    	}
+	    		})
+				.attr('dy', function(d) {
+					if (d.type === 'keyword') {
+						return 0;
+					} else {
+						return d.bbox.height*0.5+4;
+					}
+				});
+    	}
+    	this.getVis().selectAll('line').call(this.applyLinkStyle.bind(this));
+    	
+    	
+    	this.getVisLayout().nodes(nodeData).on('tick', function() {
+    		me.getLinks()
+    			.attr('x1', function(d) { return d.source.x; })
+    			.attr('y1', function(d) { return d.source.y; })
+    			.attr('x2', function(d) { return d.target.x; })
+    			.attr('y2', function(d) { return d.target.y; });
+//    		me.getLinks().attr('d', function(d) {
+//				return 'M' + d[0].x + ',' + d[0].y
+//						+ 'S' + d[1].x + ',' + d[1].y
+//						+ ' ' + d[2].x + ',' + d[2].y;
+//			});
+    		me.getNodes().attr('transform', function(d) {
+    			var x = d.x;
+    			var y = d.y;
+    			if (me.getNetworkMode() === me.DEFAULT_MODE || d.type !== 'keyword') {
+	    			x -= d.bbox.width*0.5;
+	    			y -= d.bbox.height*0.5;
+    			} else {
+    				
+    			}
+    			return 'translate('+x+','+y+')';
+    		});
+    	});
+    	
+    	this.getVisLayout().force('link').links(linkData);
+    	this.getVisLayout().alpha(1).restart();
+    },
+    
+    isOffCanvas: function(x, y) {
+    	var vis = Ext.get(this.getVisId());
+    	return x < 0 || y < 0 || x > vis.getWidth() || y > vis.getHeight();
+    },
+ 
+    applyNodeStyle: function(sel, nodeState) {
+		var state = nodeState === undefined ? 'normal' : nodeState;
+    	sel.style('fill', function(d) { var type = d.type+'Node'; return this.getGraphStyle()[type][state].fill; }.bind(this));
+    	sel.style('stroke', function(d) { var type = d.type+'Node'; return this.getGraphStyle()[type][state].stroke; }.bind(this));
+    },
+    
+    applyLinkStyle: function(sel, linkState) {
+    	var state = linkState === undefined ? 'normal' : linkState;
+    	sel.style('stroke', function(d) { return this.getGraphStyle().link[state].stroke; }.bind(this));
+    	sel.style('stroke-opacity', function(d) { return this.getGraphStyle().link[state].strokeOpacity; }.bind(this));
+    },
+    
+    linkMouseOver: function(d) {
+    	this.getVis().selectAll('line').call(this.applyLinkStyle.bind(this));
+    	this.getVis().select('#'+d.id).call(this.applyLinkStyle.bind(this), 'highlight');
+    },
+    
+    linkMouseOut: function(d) {
+    	this.getVis().selectAll('line').call(this.applyLinkStyle.bind(this));
+    },
+    
+    nodeMouseOver: function(d) {
+    	this.setCurrentNode(d);
+		
+		this.getVis().selectAll('rect').call(this.applyNodeStyle.bind(this));
+		
+		this.getLinks().each(function(link) {
+			var id;
+			if (link.source.id == d.id) {
+				id = link.target.id;
+			} else if (link.target.id == d.id) {
+				id = link.source.id;
+			}
+			if (id !== undefined) {
+				this.getVis().select('#'+id+' rect').call(this.applyNodeStyle.bind(this), 'highlight');
+				this.getVis().select('#'+link.id).call(this.applyLinkStyle.bind(this), 'highlight');
+			}
+		}.bind(this));
+		
+		this.getVis().select('#'+d.id+' rect')
+			.style('stroke-width', 3)
+			.call(this.applyNodeStyle.bind(this), 'highlight');
+    },
+    
+    nodeMouseOut: function(d) {
+    	if (!this.getContextMenu().isVisible()) {
+			this.setCurrentNode(undefined);
+		}
+		
+		this.getVis().selectAll('rect')
+			.style('stroke-width', 1)
+			.call(this.applyNodeStyle.bind(this));
+		
+		this.getVis().selectAll('line')
+			.call(this.applyLinkStyle.bind(this));
+    },
+    
+    fetchCollocatesForNode: function(d) {
     	var limit = this.getApiParam('limit');
     	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	corpusCollocates.load({
-    		params: Ext.apply(this.getApiParams(), {query: d.id, start: d.start, limit: limit}),
+    		params: Ext.apply(this.getApiParams(), {query: d.term, start: d.start, limit: limit}),
     		callback: function(records, operation, success) {
     			if (success) {
-    	    		this.getNodeDataSet().update({id: d.id, start: d.start+limit});
+    				this.updateDataForNode(d.id, {
+    					start: d.start+limit
+    				});
     	    		
-	    			var keywordNodeKey = d.id;
-	    			
-    	    		this.loadFromCorpusCollocateRecords(records, keywordNodeKey);
+    	    		this.loadFromCorpusCollocateRecords(records, d.id);
     			}
     		},
     		scope: this
