@@ -34,7 +34,7 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 			if (tb.dock=='right') {
 				tb.items.each(function(item) {
 					if (item.hasCls("notebookwrappercounter")==false) {
-						item.setVisible(mode);
+						item.getTargetEl().setVisibility(mode);
 					}
 				})
 			} else {
