@@ -2,6 +2,8 @@
 
 The Contexts (or Keywords in Context) tool shows each occurrence of a keyword with a bit of surrounding text (the context). It can be useful for studying more closely how terms are used in different contexts.
 
+Use it with a <a href="../?view=Contexts&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Contexts" target="_blank">your own corpus</a>.
+
 ## Overview
 
 The table view shows the following three columns by default:

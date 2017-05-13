@@ -2,6 +2,8 @@
 
 The Phrases tool shows repeating sequences of words organized by frequency of repetition or number of words in each repeated phrase.
 
+Use it with a <a href="../?view=Phrases&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Phrases" target="_blank">your own corpus</a>.
+
 ## Overview
 
 The table view shows the following columns by default:

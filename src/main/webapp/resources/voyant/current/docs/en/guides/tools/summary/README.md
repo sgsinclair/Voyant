@@ -2,6 +2,9 @@
 
 The Summary provides a simple, textual overview of the current corpus, including (as applicable for multiple documents) number of words, number of unique words, longest and shortest documents, highest and lowest vocabulary density, average number of words per sentence, most frequent words, notable peaks in frequency, and distinctive words.
 
+Use it with a <a href="../?view=Summary&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Summary" target="_blank">your own corpus</a>.
+
+
 ## Overview
 
 The Summary displays 7 categories of information formatted in a bulleted list.

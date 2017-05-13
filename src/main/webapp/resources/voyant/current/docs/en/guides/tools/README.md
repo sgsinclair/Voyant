@@ -268,6 +268,18 @@
 </div>
 
 <div class="thumb-list">
+	<a href="#!/guide/via"><dd>
+		<div class="thumb">
+			<img src="guides/via/icon.png" />
+		</div>
+		<div>
+			<h4>Via</h4>
+			<p>Via is an experimental tool for exploring semantically related terms in English.</p>
+		</div>
+	</dd></a>
+</div>
+
+<div class="thumb-list">
 	<a href="#!/guide/wordtree"><dd>
 		<div class="thumb">
 			<img src="guides/wordtree/icon.png" />

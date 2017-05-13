@@ -2,6 +2,8 @@
 
 The TermsBerry tool provides a way of exploring high frequency terms and their collocates (words that occur in proximity).
 
+Use it with a <a href="../?view=TermsBerry&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=TermsBerry" target="_blank">your own corpus</a>.
+
 ## Overview
 
 The TermsBerry tool is intended to mix the power of visualizing high frequency terms with the utility of exploring how those same terms co-occur (that is, to what extend they appear in proximity with one another). In some ways it's like [Cirrus](#!/guide/cirrus) (the word cloud) but even more useful with the added collocates and corpus coverage information.

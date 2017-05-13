@@ -2,6 +2,8 @@
 
 TermsRadio is a visualization that depicts the change of the frequency of words in a corpus (or within a single document). 
 
+Use it with a <a href="../?view=TermsRadio&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=TermsRadio" target="_blank">your own corpus</a>.
+
 ## Overview
 
 TermsRadio is intended to be used with a corpus that contain several documents and where the order of the documents is meaningful (such as chronological order); it can also be used with a single document that gets automatically segmented. It's designed to animate change over time by scrolling through the corpus with a selected window of documents (the number of documents visible at once).

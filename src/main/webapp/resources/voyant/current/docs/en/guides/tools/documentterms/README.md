@@ -2,6 +2,8 @@
 
 Document Terms is a table view of term frequencies for each document.
 
+Use it with a <a href="../?view=DocumentTerms&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=DocumentTerms" target="_blank">your own corpus</a>.
+
 ## Overview
 
 The table view shows the following five data columns by default:

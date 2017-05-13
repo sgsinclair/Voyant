@@ -2,6 +2,8 @@
 
 Corpus Terms is a table view of term frequencies in the entire corpus.
 
+Use it with a <a href="../?view=CorpusTerms&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=CorpusTerms" target="_blank">your own corpus</a>.
+
 ## Overview
 
 The table view shows the following three data columns by default:

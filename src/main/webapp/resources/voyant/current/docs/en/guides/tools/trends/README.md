@@ -2,6 +2,8 @@
 
 Trends shows a line graph depicting the distribution of a word’s occurrence across a corpus or document.
 
+Use it with a <a href="../?view=Trends&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Trends" target="_blank">your own corpus</a>.
+
 ## Overview
 
 Trends is a line graph visualization that represents the frequencies of terms across documents in a corpus or across segments in a document, depending on the mode.

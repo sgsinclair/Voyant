@@ -2,6 +2,8 @@
 
 Bubbles is a playful visualization of term frequencies by document.
 
+Use it with a <a href="../?view=Bubbles&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Bubbles" target="_blank">your own corpus</a>.
+
 High frequency terms are read in document order, and the current term is shown in the upper right-hand corner. The list of terms below shows a ranking of the cumulative frequencies to that point in the document. The first time a term is encountered a bubble is created and added to the main part of the canvas. The term flashes in yellow as it's being read. The relative size of the bubbles indicates the frequency compared to other terms to the current point in the document.
 
 The total number of terms to be read is shown at the bottom, along with a progress bar. If the corpus is composed of multiple documents, the next document will automatically be fetched and read.

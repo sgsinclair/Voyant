@@ -2,6 +2,8 @@
 	
 Collocates Graph represents keywords and terms that occur in close proximity as a force directed network graph.
 
+Use it with a <a href="../?view=CollocatesGraph&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=CollocatesGraph" target="_blank">your own corpus</a>.
+
 ## Overview
 
 This represents a network graph where keywords in green are shown linked to collocates in maroon. You can hover over a term to see its frequency (for keywords it's the corpus frequency, for collocates it's the frequeny in the context of the linked keywords). 

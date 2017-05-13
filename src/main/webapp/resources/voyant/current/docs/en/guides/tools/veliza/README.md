@@ -2,6 +2,8 @@
 
 Veliza is a (<i>very</i>) experimental tool for having a (limited) natural language exchange (in English) based on your corpus. It is inspired and enabled in large part by the famous <a href="https://en.wikipedia.org/wiki/ELIZA" target="blank">Eliza</a> program written by Joseph Weizenbaum in the 1960s.
 
+Use it with a <a href="../?view=Veliza&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Veliza" target="_blank">your own corpus</a>.
+
 ## Overview
 
 You can type in your own sentence and hit enter (or click the _send_ button). This should generate a generic reply from Veliza that isn't influenced by your texts (that's the current behaviour, though we're considering ways of maybe having your texts influence the replies from Veliza). Keep in mind that the original Eliza was designed as a (parody of a) Rogerian psychotherapist, so the more you write content that sounds like it could be expressed to a psychologist, the more satisfying your results are likely to seem.

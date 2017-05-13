@@ -585,6 +585,35 @@ Ext.define('Voyant.data.model.Corpus', {
 		}
 	},
 	
+	/**
+     * Create a promise for {@link Voyant.data.store.Tokens Tokens}.
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the {@link Voyant.data.store.Tokens Tokens} as an argument.
+     * 
+     * 	new Corpus("Hello Voyant!").loadTokens().then(function(tokens) {
+     * 		tokens.show();
+     * 	});
+     * 
+     * @param {Number/Object} config
+     * 
+     * - when this is a number, it's the maximum number of corpus terms to load (see {@link Voyant.data.store.CorpusTerms#limit})
+     * - otherwise this is a regular config object
+     * 	- **limit**: the maximum number of tokens to return (default is no limit)
+     * 	- **perDocLimit**: the maximum number of tokens to return per document
+     * 	- **start**: where to start (when pageing, default is 0)
+     * 	- **noOthers**: determine if only word tokens are returned (default is false)
+     * 	- **withPosLemmas**: try to populate pos (part-of-speech) tags and lemmas (only works in English for now)
+     * 	- **docIndex**: a comma-separated list of integers of document indices
+     * 	- **docId**: a comma-separated list of document IDs
+     * 	- **stopList**: the ID of an existing stopList resource or an array of words to skip
+     * 	- **whitelist**: the ID of an existing whitelist resource or an array of words to keep
+     * 
+     * 
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return tokens but a promise to return tokens when they're finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * tokens as an argument, as per the example above).
+	 */
 	loadTokens: function(config) {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
@@ -906,7 +935,27 @@ Ext.define('Voyant.data.model.Corpus', {
     	
     },
     
+	/**
+     * Create a promise for an array of lemmas from the corpus (only works for English).
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the lemmas as an argument.
+     * 
+	 * 	new Corpus("Hello world, I like Spiral notebooks!", {language: "en"}).getLemmasArray().then(function(lemmas) {
+			show(lemmas.join(", "))
+	 *  });
+     * 
+     * @param {Number/Object} config
+     * 
+     * - when this is a number, it's the maximum number of words to fetch (though there may be any number of other tokens, like punctuation and space (but no tags).
+     * - otherwise this is a regular config object – see {@link #getText} for more details.
+     * 
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return the words but a promise to return words when it's finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * words as a string argument, as per the example above).
+	 */
     getLemmasArray: function(config) {
+    	config = config || {};
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
@@ -951,7 +1000,6 @@ Ext.define('Voyant.data.model.Corpus', {
 	 * - **width**: a CSS width value for the embedded tool (e.g. "500px", "80em", "50%")
 	 * - **height**: a CSS height value for the embedded tool (e.g. "300px", "10em", "30%")
 	 */
-
     getString: function(config) {
 		var size = this.getDocumentsCount();
 		var message = this.localize('thisCorpus');

@@ -2,6 +2,9 @@
 	
 StreamGraph is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).
 
+Use it with a <a href="../?view=StreamGraph&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=StreamGraph" target="_blank">your own corpus</a>.
+
+
 ## Overview
 
 

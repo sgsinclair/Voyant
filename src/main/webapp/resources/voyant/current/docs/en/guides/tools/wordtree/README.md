@@ -2,6 +2,8 @@
 
 The Word Tree tool allows you to explore how keywords are used in different phrases in the corpus.
 
+Use it with a <a href="../?view=WordTree&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=WordTree" target="_blank">your own corpus</a>.
+
 ## Overview
 
 By default, the most common term is used as the first word tree root.

@@ -2,6 +2,9 @@
 
 The Catalogue tool provides an interface for exploring the contents of a larger, multi-document corpus, as well as for creating a subset (or workset) based on the search criteria. It functions somewhat like a library database or an online store, allowing you to filter documents.
 
+Use it with a <a href="../?view=Catalogue&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Catalogue" target="_blank">your own corpus</a>.
+
+
 ## Overview
 
 By default the following facets are shown:

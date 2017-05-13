@@ -67,8 +67,8 @@ app/data/store/Tokens.js
 app/data/store/TSNEAnalysis.js
 
 # TABLES
-app/data/table/Table.js
-app/data/table/CorpusTerms.js
+app/data/util/Table.js
+app/data/util/NetworkGraph.js
 
 # CORPUS (here because store is needed)
 app/data/model/Corpus.js

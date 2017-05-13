@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu May 11 16:16:59 EDT 2017 */
+/* This file created by JSCacher. Last modified: Sat May 13 18:13:54 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -9221,12 +9221,94 @@ Ext.define('Voyant.data.table.Table', {
 		return table;
 	}
 });
-Ext.define('Voyant.data.table.CorpusTerms', {
-	extend: 'Voyant.data.table.Table',
-	eachCorpusTerm: function() {
-		this.eachRecord.apply(this, arguments);
+/**
+ * @class NetworkGraph
+ * 
+ * A NetworkGraph can facilitate working with network graph data structures, as well as
+ * displaying results (especially with {@link #embed} and {@link show}). 
+ * Here's a simple example showing the Zipf-Law distribution of the top 20 frequency terms.
+ * 
+ * 	new Corpus("austen").loadCorpusTerms(20).then(function(corpusTerms) {
+ * 		var table = new VoyantTable({rowKey: 0}); // use first column as row key
+ * 		corpusTerms.each(function(corpusTerm) {
+ *			table.addRow([corpusTerm.getTerm(), corpusTerm.getRawFreq()]);
+ * 		});
+ * 		table.embed("voyantchart"); // graph table as line chart
+ * 	});
+ */
+Ext.define('Voyant.data.util.NetworkGraph', {
+	alternateClassName: ["NetworkGraph"],
+	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
+	embeddable: [],
+	config: {
+		
+		/**
+		 * @private
+		 */
+		edges: [],
+
+		/**
+		 * @private
+		 */
+		nodes: []
+
+	},
+
+	constructor: function(config, opts) {
+		config = config || {};
+		this.setEdges(Ext.Array.from(config.edges));
+		this.setNodes(Ext.Array.from(config.nodes));
+		this.callParent([config]);
+	},
+	addEdge: function(edge) {
+		this.edges.push(edge);
+	},
+	embed: function(cmp, config) {
+		if (!config && Ext.isObject(cmp)) {
+			config = cmp;
+			cmp = this.embeddable[0];
+		}
+		config = config || {};
+		
+		Ext.apply(config, {
+			tableJson: JSON.stringify({
+				rowkey: this.getRowKey(),
+				headers: this.getHeaders(),
+				rows: this.getRows(),
+				config: config
+			})
+		});
+		delete config.axes;
+		delete config.series;
+		
+		embed.call(this, cmp, config);
+		
+	},
+	
+	getString: function(config) {
+		config = config || {};
+		var table = "<table class='voyant-table' style='"+(config.width ? ' width: '+config.width : '')+"' id='"+(config.id ? config.id : Ext.id())+"'>";
+		var headers = this.getHeaders();
+		if (headers.length) {
+			table+="<thead><tr>";
+			for (var i=0, len = headers.length; i<len; i++) {
+				table+="<th>"+headers[i]+"</th>";
+			}
+			table+="</tr></thead>";
+		}
+		table+="<tbody>";
+		for (var i=0, len = Ext.isNumber(config) ? config : this.getRows().length; i<len; i++) {
+			table+="<tr>";
+			var row = this.getRow(i);
+			row.forEach(function(cell) {
+				table+="<td>"+cell+"</td>";
+			})
+			table+="</tr>";
+		}
+		table+="</tbody></table>";
+		return table;
 	}
-})
+});
 /**
  * @class Corpus
  * Corpus is possibly the most important class since in most cases you'll first create/load a corpus and then
@@ -9814,6 +9896,35 @@ Ext.define('Voyant.data.model.Corpus', {
 		}
 	},
 	
+	/**
+     * Create a promise for {@link Voyant.data.store.Tokens Tokens}.
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the {@link Voyant.data.store.Tokens Tokens} as an argument.
+     * 
+     * 	new Corpus("Hello Voyant!").loadTokens().then(function(tokens) {
+     * 		tokens.show();
+     * 	});
+     * 
+     * @param {Number/Object} config
+     * 
+     * - when this is a number, it's the maximum number of corpus terms to load (see {@link Voyant.data.store.CorpusTerms#limit})
+     * - otherwise this is a regular config object
+     * 	- **limit**: the maximum number of tokens to return (default is no limit)
+     * 	- **perDocLimit**: the maximum number of tokens to return per document
+     * 	- **start**: where to start (when pageing, default is 0)
+     * 	- **noOthers**: determine if only word tokens are returned (default is false)
+     * 	- **withPosLemmas**: try to populate pos (part-of-speech) tags and lemmas (only works in English for now)
+     * 	- **docIndex**: a comma-separated list of integers of document indices
+     * 	- **docId**: a comma-separated list of document IDs
+     * 	- **stopList**: the ID of an existing stopList resource or an array of words to skip
+     * 	- **whitelist**: the ID of an existing whitelist resource or an array of words to keep
+     * 
+     * 
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return tokens but a promise to return tokens when they're finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * tokens as an argument, as per the example above).
+	 */
 	loadTokens: function(config) {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
@@ -10135,7 +10246,27 @@ Ext.define('Voyant.data.model.Corpus', {
     	
     },
     
+	/**
+     * Create a promise for an array of lemmas from the corpus (only works for English).
+     * 
+     * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
+     * provide a function that receives the lemmas as an argument.
+     * 
+	 * 	new Corpus("Hello world, I like Spiral notebooks!", {language: "en"}).getLemmasArray().then(function(lemmas) {
+			show(lemmas.join(", "))
+	 *  });
+     * 
+     * @param {Number/Object} config
+     * 
+     * - when this is a number, it's the maximum number of words to fetch (though there may be any number of other tokens, like punctuation and space (but no tags).
+     * - otherwise this is a regular config object – see {@link #getText} for more details.
+     * 
+	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return the words but a promise to return words when it's finished loading
+	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
+	 * words as a string argument, as per the example above).
+	 */
     getLemmasArray: function(config) {
+    	config = config || {};
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
@@ -10180,7 +10311,6 @@ Ext.define('Voyant.data.model.Corpus', {
 	 * - **width**: a CSS width value for the embedded tool (e.g. "500px", "80em", "50%")
 	 * - **height**: a CSS height value for the embedded tool (e.g. "300px", "10em", "30%")
 	 */
-
     getString: function(config) {
 		var size = this.getDocumentsCount();
 		var message = this.localize('thisCorpus');
@@ -12693,6 +12823,8 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	}
     },
     config: {
+    	edges: undefined,
+    	nodes: undefined,
     	json: undefined
     },
     constructor: function(config) {
@@ -12702,7 +12834,6 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	this.callParent(arguments)
     	this.on("boxready", function(src, corpus) {
     		this.buildGraph();
-
     	}, this);
     },
     initComponent: function(config) {
@@ -12711,9 +12842,15 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     
     getJsonResourcefully: function() {
     	//return {"nodes":[{"name":"Myriel","group":1},{"name":"Napoleon","group":1},{"name":"Mlle.Baptistine","group":1},{"name":"Mme.Magloire","group":1},{"name":"CountessdeLo","group":1},{"name":"Geborand","group":1},{"name":"Champtercier","group":1},{"name":"Cravatte","group":1},{"name":"Count","group":1},{"name":"OldMan","group":1},{"name":"Labarre","group":2},{"name":"Valjean","group":2},{"name":"Marguerite","group":3},{"name":"Mme.deR","group":2},{"name":"Isabeau","group":2},{"name":"Gervais","group":2},{"name":"Tholomyes","group":3},{"name":"Listolier","group":3},{"name":"Fameuil","group":3},{"name":"Blacheville","group":3},{"name":"Favourite","group":3},{"name":"Dahlia","group":3},{"name":"Zephine","group":3},{"name":"Fantine","group":3},{"name":"Mme.Thenardier","group":4},{"name":"Thenardier","group":4},{"name":"Cosette","group":5},{"name":"Javert","group":4},{"name":"Fauchelevent","group":0},{"name":"Bamatabois","group":2},{"name":"Perpetue","group":3},{"name":"Simplice","group":2},{"name":"Scaufflaire","group":2},{"name":"Woman1","group":2},{"name":"Judge","group":2},{"name":"Champmathieu","group":2},{"name":"Brevet","group":2},{"name":"Chenildieu","group":2},{"name":"Cochepaille","group":2},{"name":"Pontmercy","group":4},{"name":"Boulatruelle","group":6},{"name":"Eponine","group":4},{"name":"Anzelma","group":4},{"name":"Woman2","group":5},{"name":"MotherInnocent","group":0},{"name":"Gribier","group":0},{"name":"Jondrette","group":7},{"name":"Mme.Burgon","group":7},{"name":"Gavroche","group":8},{"name":"Gillenormand","group":5},{"name":"Magnon","group":5},{"name":"Mlle.Gillenormand","group":5},{"name":"Mme.Pontmercy","group":5},{"name":"Mlle.Vaubois","group":5},{"name":"Lt.Gillenormand","group":5},{"name":"Marius","group":8},{"name":"BaronessT","group":5},{"name":"Mabeuf","group":8},{"name":"Enjolras","group":8},{"name":"Combeferre","group":8},{"name":"Prouvaire","group":8},{"name":"Feuilly","group":8},{"name":"Courfeyrac","group":8},{"name":"Bahorel","group":8},{"name":"Bossuet","group":8},{"name":"Joly","group":8},{"name":"Grantaire","group":8},{"name":"MotherPlutarch","group":9},{"name":"Gueulemer","group":4},{"name":"Babet","group":4},{"name":"Claquesous","group":4},{"name":"Montparnasse","group":4},{"name":"Toussaint","group":5},{"name":"Child1","group":10},{"name":"Child2","group":10},{"name":"Brujon","group":4},{"name":"Mme.Hucheloup","group":8}],"links":[{"source":1,"target":0,"value":1},{"source":2,"target":0,"value":8},{"source":3,"target":0,"value":10},{"source":3,"target":2,"value":6},{"source":4,"target":0,"value":1},{"source":5,"target":0,"value":1},{"source":6,"target":0,"value":1},{"source":7,"target":0,"value":1},{"source":8,"target":0,"value":2},{"source":9,"target":0,"value":1},{"source":11,"target":10,"value":1},{"source":11,"target":3,"value":3},{"source":11,"target":2,"value":3},{"source":11,"target":0,"value":5},{"source":12,"target":11,"value":1},{"source":13,"target":11,"value":1},{"source":14,"target":11,"value":1},{"source":15,"target":11,"value":1},{"source":17,"target":16,"value":4},{"source":18,"target":16,"value":4},{"source":18,"target":17,"value":4},{"source":19,"target":16,"value":4},{"source":19,"target":17,"value":4},{"source":19,"target":18,"value":4},{"source":20,"target":16,"value":3},{"source":20,"target":17,"value":3},{"source":20,"target":18,"value":3},{"source":20,"target":19,"value":4},{"source":21,"target":16,"value":3},{"source":21,"target":17,"value":3},{"source":21,"target":18,"value":3},{"source":21,"target":19,"value":3},{"source":21,"target":20,"value":5},{"source":22,"target":16,"value":3},{"source":22,"target":17,"value":3},{"source":22,"target":18,"value":3},{"source":22,"target":19,"value":3},{"source":22,"target":20,"value":4},{"source":22,"target":21,"value":4},{"source":23,"target":16,"value":3},{"source":23,"target":17,"value":3},{"source":23,"target":18,"value":3},{"source":23,"target":19,"value":3},{"source":23,"target":20,"value":4},{"source":23,"target":21,"value":4},{"source":23,"target":22,"value":4},{"source":23,"target":12,"value":2},{"source":23,"target":11,"value":9},{"source":24,"target":23,"value":2},{"source":24,"target":11,"value":7},{"source":25,"target":24,"value":13},{"source":25,"target":23,"value":1},{"source":25,"target":11,"value":12},{"source":26,"target":24,"value":4},{"source":26,"target":11,"value":31},{"source":26,"target":16,"value":1},{"source":26,"target":25,"value":1},{"source":27,"target":11,"value":17},{"source":27,"target":23,"value":5},{"source":27,"target":25,"value":5},{"source":27,"target":24,"value":1},{"source":27,"target":26,"value":1},{"source":28,"target":11,"value":8},{"source":28,"target":27,"value":1},{"source":29,"target":23,"value":1},{"source":29,"target":27,"value":1},{"source":29,"target":11,"value":2},{"source":30,"target":23,"value":1},{"source":31,"target":30,"value":2},{"source":31,"target":11,"value":3},{"source":31,"target":23,"value":2},{"source":31,"target":27,"value":1},{"source":32,"target":11,"value":1},{"source":33,"target":11,"value":2},{"source":33,"target":27,"value":1},{"source":34,"target":11,"value":3},{"source":34,"target":29,"value":2},{"source":35,"target":11,"value":3},{"source":35,"target":34,"value":3},{"source":35,"target":29,"value":2},{"source":36,"target":34,"value":2},{"source":36,"target":35,"value":2},{"source":36,"target":11,"value":2},{"source":36,"target":29,"value":1},{"source":37,"target":34,"value":2},{"source":37,"target":35,"value":2},{"source":37,"target":36,"value":2},{"source":37,"target":11,"value":2},{"source":37,"target":29,"value":1},{"source":38,"target":34,"value":2},{"source":38,"target":35,"value":2},{"source":38,"target":36,"value":2},{"source":38,"target":37,"value":2},{"source":38,"target":11,"value":2},{"source":38,"target":29,"value":1},{"source":39,"target":25,"value":1},{"source":40,"target":25,"value":1},{"source":41,"target":24,"value":2},{"source":41,"target":25,"value":3},{"source":42,"target":41,"value":2},{"source":42,"target":25,"value":2},{"source":42,"target":24,"value":1},{"source":43,"target":11,"value":3},{"source":43,"target":26,"value":1},{"source":43,"target":27,"value":1},{"source":44,"target":28,"value":3},{"source":44,"target":11,"value":1},{"source":45,"target":28,"value":2},{"source":47,"target":46,"value":1},{"source":48,"target":47,"value":2},{"source":48,"target":25,"value":1},{"source":48,"target":27,"value":1},{"source":48,"target":11,"value":1},{"source":49,"target":26,"value":3},{"source":49,"target":11,"value":2},{"source":50,"target":49,"value":1},{"source":50,"target":24,"value":1},{"source":51,"target":49,"value":9},{"source":51,"target":26,"value":2},{"source":51,"target":11,"value":2},{"source":52,"target":51,"value":1},{"source":52,"target":39,"value":1},{"source":53,"target":51,"value":1},{"source":54,"target":51,"value":2},{"source":54,"target":49,"value":1},{"source":54,"target":26,"value":1},{"source":55,"target":51,"value":6},{"source":55,"target":49,"value":12},{"source":55,"target":39,"value":1},{"source":55,"target":54,"value":1},{"source":55,"target":26,"value":21},{"source":55,"target":11,"value":19},{"source":55,"target":16,"value":1},{"source":55,"target":25,"value":2},{"source":55,"target":41,"value":5},{"source":55,"target":48,"value":4},{"source":56,"target":49,"value":1},{"source":56,"target":55,"value":1},{"source":57,"target":55,"value":1},{"source":57,"target":41,"value":1},{"source":57,"target":48,"value":1},{"source":58,"target":55,"value":7},{"source":58,"target":48,"value":7},{"source":58,"target":27,"value":6},{"source":58,"target":57,"value":1},{"source":58,"target":11,"value":4},{"source":59,"target":58,"value":15},{"source":59,"target":55,"value":5},{"source":59,"target":48,"value":6},{"source":59,"target":57,"value":2},{"source":60,"target":48,"value":1},{"source":60,"target":58,"value":4},{"source":60,"target":59,"value":2},{"source":61,"target":48,"value":2},{"source":61,"target":58,"value":6},{"source":61,"target":60,"value":2},{"source":61,"target":59,"value":5},{"source":61,"target":57,"value":1},{"source":61,"target":55,"value":1},{"source":62,"target":55,"value":9},{"source":62,"target":58,"value":17},{"source":62,"target":59,"value":13},{"source":62,"target":48,"value":7},{"source":62,"target":57,"value":2},{"source":62,"target":41,"value":1},{"source":62,"target":61,"value":6},{"source":62,"target":60,"value":3},{"source":63,"target":59,"value":5},{"source":63,"target":48,"value":5},{"source":63,"target":62,"value":6},{"source":63,"target":57,"value":2},{"source":63,"target":58,"value":4},{"source":63,"target":61,"value":3},{"source":63,"target":60,"value":2},{"source":63,"target":55,"value":1},{"source":64,"target":55,"value":5},{"source":64,"target":62,"value":12},{"source":64,"target":48,"value":5},{"source":64,"target":63,"value":4},{"source":64,"target":58,"value":10},{"source":64,"target":61,"value":6},{"source":64,"target":60,"value":2},{"source":64,"target":59,"value":9},{"source":64,"target":57,"value":1},{"source":64,"target":11,"value":1},{"source":65,"target":63,"value":5},{"source":65,"target":64,"value":7},{"source":65,"target":48,"value":3},{"source":65,"target":62,"value":5},{"source":65,"target":58,"value":5},{"source":65,"target":61,"value":5},{"source":65,"target":60,"value":2},{"source":65,"target":59,"value":5},{"source":65,"target":57,"value":1},{"source":65,"target":55,"value":2},{"source":66,"target":64,"value":3},{"source":66,"target":58,"value":3},{"source":66,"target":59,"value":1},{"source":66,"target":62,"value":2},{"source":66,"target":65,"value":2},{"source":66,"target":48,"value":1},{"source":66,"target":63,"value":1},{"source":66,"target":61,"value":1},{"source":66,"target":60,"value":1},{"source":67,"target":57,"value":3},{"source":68,"target":25,"value":5},{"source":68,"target":11,"value":1},{"source":68,"target":24,"value":1},{"source":68,"target":27,"value":1},{"source":68,"target":48,"value":1},{"source":68,"target":41,"value":1},{"source":69,"target":25,"value":6},{"source":69,"target":68,"value":6},{"source":69,"target":11,"value":1},{"source":69,"target":24,"value":1},{"source":69,"target":27,"value":2},{"source":69,"target":48,"value":1},{"source":69,"target":41,"value":1},{"source":70,"target":25,"value":4},{"source":70,"target":69,"value":4},{"source":70,"target":68,"value":4},{"source":70,"target":11,"value":1},{"source":70,"target":24,"value":1},{"source":70,"target":27,"value":1},{"source":70,"target":41,"value":1},{"source":70,"target":58,"value":1},{"source":71,"target":27,"value":1},{"source":71,"target":69,"value":2},{"source":71,"target":68,"value":2},{"source":71,"target":70,"value":2},{"source":71,"target":11,"value":1},{"source":71,"target":48,"value":1},{"source":71,"target":41,"value":1},{"source":71,"target":25,"value":1},{"source":72,"target":26,"value":2},{"source":72,"target":27,"value":1},{"source":72,"target":11,"value":1},{"source":73,"target":48,"value":2},{"source":74,"target":48,"value":2},{"source":74,"target":73,"value":3},{"source":75,"target":69,"value":3},{"source":75,"target":68,"value":3},{"source":75,"target":25,"value":3},{"source":75,"target":48,"value":1},{"source":75,"target":41,"value":1},{"source":75,"target":70,"value":1},{"source":75,"target":71,"value":1},{"source":76,"target":64,"value":1},{"source":76,"target":65,"value":1},{"source":76,"target":66,"value":1},{"source":76,"target":63,"value":1},{"source":76,"target":62,"value":1},{"source":76,"target":48,"value":1},{"source":76,"target":58,"value":1}]}
-
-    	return this.getApiParam("jsonData") ? Ext.decode(this.getApiParam("jsonData")) : (this.getApiParam('json') ? this.getApiParam('json') : this.getJson()); 
-    	
+    	if (this.getEdges()) {
+    		return {edges: this.getEdges(), nodes: this.getNodes()}
+    	} else if (this.getApiParam("jsonData")) {
+    		return Ext.decode(this.getApiParam("jsonData"));
+    	} else if (this.getApiParam('json')) {
+    		return  this.getApiParam('json');
+    	} else {
+    		return {edges: this.getEdges(), nodes: this.getNodes()}
+    	}
     },
     
     buildGraph: function(json) {
@@ -12780,7 +12917,7 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	
     	
     	var force = d3.layout.force()
-    	    .gravity(0.1)
+    	    .gravity(0.2)
     	    .distance(50)
     	    .charge(-100)
     	    .size([width, height]);
@@ -12804,7 +12941,7 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 
     	  node.append("circle")
     	  	.attr("r", 5)
-    	  	.attr("fill", "#ddd")
+    	  	.attr("fill", "rgba(0,0,0,.05)")
     	  
     	  var vals = json.nodes.map(function(d) {return d.value});
     	  vals.sort();
@@ -12814,10 +12951,11 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	  		.range([8, 36])
     	  		
     	  node.append("text")
-    	      .attr("dx", 12)
-    	      .attr("dy", ".35em")
+    	      .attr("dx", 0)
+    	      .attr("dy", 0)
     	      .text(function(d) { return d.name })
-    	      .attr("font-size", function(d) {return fontscale(d.value)+"px"});
+    	      .attr("font-size", function(d) {return fontscale(d.value)+"px"})
+    	  	  .attr("text-anchor", "middle");
 
     	  force.on("tick", function() {
     	    link.attr("x1", function(d) { return d.source.x; })
@@ -27376,7 +27514,8 @@ Ext.define('Voyant.panel.Via', {
     		{
 	    		xtype: 'listeditor',
 	    		name: 'whiteList'
-    	    }
+    	    },
+    	    {xtype: 'categoriesoption'}
     	]
     },
     
@@ -27439,6 +27578,9 @@ Ext.define('Voyant.panel.Via', {
     				return false;
     			}
     		}, this);
+    		if (corpus.getWordTokensCount()>100000 && !this.getApiParam("docIndex")) {
+    			this.setApiParam("docIndex", 0)
+    		}
     		this.loadFromCorpus(corpus);
     	},
     	
@@ -27465,7 +27607,7 @@ Ext.define('Voyant.panel.Via', {
     		if (graph) {graph.destroy();}
     		var edges = relatedWords.map(function(item) {return {source: item.getSource(), target: item.getTarget()}})
     		graph = Ext.create("Voyant.widget.VoyantNetworkGraph", {
-    			json: {edges: edges}
+    			edges: edges
     		})
     		me.add(graph)
     	}, function(response) {
@@ -27750,7 +27892,7 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 			if (tb.dock=='right') {
 				tb.items.each(function(item) {
 					if (item.hasCls("notebookwrappercounter")==false) {
-						item.setVisible(mode);
+						item.getTargetEl().setVisibility(mode);
 					}
 				})
 			} else {

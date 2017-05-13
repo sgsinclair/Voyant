@@ -2,6 +2,8 @@
 
 Corpus Collocates is a table view of which terms appear more frequently in proximity to keywords across the entire corpus.
 
+Use it with a <a href="../?view=CorpusCollocates&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=CorpusCollocates" target="_blank">your own corpus</a>.
+
 ## Overview
 
 The table view shows the following three columns by default:

@@ -2,6 +2,8 @@
 
 The Topics tool provides a rudimentary way of generating term clusters from a document or corpus and then seeing how each topic (term cluster) is distributed across the document or corpus.
 
+Use it with a <a href="../?view=Topics&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Topics" target="_blank">your own corpus</a>.
+
 ## Overview
 
 The Topics tool is designed to help you understand what topics (term clusters) exist and how they are distributed. If you have a single document in your corpus then the document will be divided into segments of equal length for the topic modelling (how many text segments depends on the size of the document). If you have multiple documents then the topic modelling is performed on each document. It's worth noting that topic modelling probably works best with shorter documents (article length rather than book length). By default *Topics* only uses the first 1,000 words in a document (see the options for how to modify that).

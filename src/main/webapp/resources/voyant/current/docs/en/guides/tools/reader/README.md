@@ -2,6 +2,8 @@
 
 The Reader tool provides a way of reading documents in the corpus, text is fetched as needed.
 
+Use it with a <a href="../?view=Reader&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Reader" target="_blank">your own corpus</a>.
+
 ## Overview
 
 The Reader tool is composed of two visual components: the Text Reader and the Prospect Viewer.

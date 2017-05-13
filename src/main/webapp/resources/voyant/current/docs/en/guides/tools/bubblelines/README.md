@@ -2,6 +2,7 @@
 
 Bubblelines visualizes the frequency and distribution of terms in a corpus. 
 
+Use it with a <a href="../?view=Bubblelines&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Bubblelines" target="_blank">your own corpus</a>.
 
 ## Overview
 

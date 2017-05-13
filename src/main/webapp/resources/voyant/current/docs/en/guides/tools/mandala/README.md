@@ -2,6 +2,9 @@
 
 Mandala is a conceptual visualization that shows the relationships between terms and documents. Each search term (or magnet) pulls documents toward it based on the term's relative frequency in the corpus.
 
+Use it with a <a href="../?view=Mandala&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Mandala" target="_blank">your own corpus</a>.
+
+
 Hover over a magnet to highlight that search term and documents that contain the search term. Likewise, hover over documents to see which search terms can be found in that document.
 
 You can click on a magnet to edit its search term. Full search functionality is available, though multiple terms for one magnet are combined into one boolean (a document must contain at least one of the terms).

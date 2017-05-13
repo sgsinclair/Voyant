@@ -2,6 +2,8 @@
 
 Microsearch visualizes the frequency and distribution of terms in a corpus. 
 
+Use it with a <a href="../?view=Microsearch&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Microsearch" target="_blank">your own corpus</a>.
+
 ## Overview
 
 Each document in the corpus is represented as a vertical block where the height of the block indicates the relative size of the document compared to others in the corpus. The location of occurrences of search terms is located as red blocks (the brightness of the red further indicates the relative frequency within the corpus). Multiple search terms are collapsed together.

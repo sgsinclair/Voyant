@@ -2,6 +2,8 @@
 
 ScatterPlot is a graph visualization of how words cluster in a corpus document similarity, correspondence analysis or principal component analysis.
 
+Use it with a <a href="../?view=ScatterPlot&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=ScatterPlot" target="_blank">your own corpus</a>.
+
 ## Overview
 
 Principal Component Analysis (PCA) is a technique which takes data in a multidimensional space and optimizes it, reducing the dimensions to a manageable subset. It is a way of transforming the data with respect to its own structure, so that associations between data points become more readily apparent. For example, consider a table of word frequencies for a corpus of ten documents. Each document can be thought of as a dimension, and each word frequency as a data point. Since we cannot visualize a ten dimensional space, we can apply PCA to reduce the number of dimensions to something feasible, like two or three. This is accomplished by transforming the data into a new space wherein the first few dimensions (or components) represent the largest amount of variability in the data. By discarding all but the first two or three dimensions, we will be left with a new data set which ideally contains most of the information in the original, but which is easy to visualize. In the resulting visualization, words that are grouped together are associated, i.e. they follow a similar usage in the corpus.

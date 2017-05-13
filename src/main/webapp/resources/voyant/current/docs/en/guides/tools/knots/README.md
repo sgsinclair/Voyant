@@ -2,6 +2,8 @@
 
 Knots is a creative visualization that represents terms in a single document as a series of twisted lines. Each occurrence of a term is represented by a bend in the line, so the more twisted a line, the more a term repeats and straight stretches represent no occurrences.
 
+Use it with a <a href="../?view=Knots&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Knots" target="_blank">your own corpus</a>.
+
 By default Knots represents the most common terms in the first document of a corpus.
 
 <iframe src="../tool/Knots/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 400px;"></iframe>

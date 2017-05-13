@@ -2,6 +2,9 @@
 
 The Documents tool shows a table of the documents in the corpus and includes functionality for modifying the corpus.
 
+Use it with a <a href="../?view=Documents&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Documents" target="_blank">your own corpus</a>.
+
+
 ## Overview
 
 The table view shows the following columns by default:

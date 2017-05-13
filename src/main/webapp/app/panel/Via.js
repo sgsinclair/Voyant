@@ -27,7 +27,8 @@ Ext.define('Voyant.panel.Via', {
     		{
 	    		xtype: 'listeditor',
 	    		name: 'whiteList'
-    	    }
+    	    },
+    	    {xtype: 'categoriesoption'}
     	]
     },
     
@@ -90,6 +91,9 @@ Ext.define('Voyant.panel.Via', {
     				return false;
     			}
     		}, this);
+    		if (corpus.getWordTokensCount()>100000 && !this.getApiParam("docIndex")) {
+    			this.setApiParam("docIndex", 0)
+    		}
     		this.loadFromCorpus(corpus);
     	},
     	
@@ -116,7 +120,7 @@ Ext.define('Voyant.panel.Via', {
     		if (graph) {graph.destroy();}
     		var edges = relatedWords.map(function(item) {return {source: item.getSource(), target: item.getTarget()}})
     		graph = Ext.create("Voyant.widget.VoyantNetworkGraph", {
-    			json: {edges: edges}
+    			edges: edges
     		})
     		me.add(graph)
     	}, function(response) {
