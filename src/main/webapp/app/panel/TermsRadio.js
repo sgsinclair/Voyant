@@ -139,7 +139,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 		var onLoadHandler = function(mode, store, records, success, operation) {
 			this.setApiParams({mode: mode});
-			
+
 			this.getTermsRadio().loadRecords(records);
 			
 			var query = this.getApiParam('query');
@@ -426,7 +426,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		});
 		
 		this.on('query', function(src, query){
-			if (Ext.isString(query)) {this.fireEvent("termsClicked", src, [query]);}
+			this.fireEvent("termsClicked", src, query);
 	    });
 		
 		this.on("termsClicked", function(src, terms) {
