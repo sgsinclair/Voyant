@@ -497,10 +497,11 @@ Ext.define('Voyant.notebook.Notebook', {
     loadFromUrl: function(url, isRun) {
     	var me = this;
 		if (url.indexOf("https://gist.github.com/")==0 || url.indexOf("https://gist.githubusercontent.com/")==0) {
-			url = "gist"+url.substring(url.indexOf(".com")+4, url.length - (url.charAt(url.length-1) == "/" ? 1 : 0));
+			url = "gist:"+url.substring(url.indexOf(".com")+5, url.length - (url.charAt(url.length-1) == "/" ? 1 : 0)).replace(/\//g, ":");
 		}
-		if (url.indexOf("gist/")==0) {
-			var gistParts = url.substring(5).split("/");
+    	debugger
+		if (url.indexOf("gist:")==0) {
+			var gistParts = url.substring(5).split(":");
 			if (gistParts.length<2) {
 				return this.showError(this.localize("invalidGistUrl"));
 			}
@@ -508,7 +509,7 @@ Ext.define('Voyant.notebook.Notebook', {
 				gistParts.splice(2,1); // remove raw
 			}
 			
-			var gistUrl = "gist/"+gistParts.slice(0,3).join("/");
+			var gistUrl = "gist:"+gistParts.slice(0,3).join(":");
 			window.history.pushState({
 				url: url
 			}, "Spiral Notebook: "+gistUrl, this.getBaseUrl()+"spiral/"+gistUrl);

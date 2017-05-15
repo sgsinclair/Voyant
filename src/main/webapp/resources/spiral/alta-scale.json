@@ -1,0 +1,270 @@
+{
+    "metadata": {
+        "created": 1491488686379,
+        "modified": 1494858876287,
+        "version": 2,
+        "previousNotebook": "alta-scale",
+        "originalUrl": "alta-scale",
+        "url": "http://localhost:8080/voyant/spiral/alta-scale"
+    },
+    "blocks": [
+        {
+            "type": "text",
+            "input": [
+                "<h1 style=\"text-align: center;\">Thinking about Corpus Scale</h1><p>This notebook",
+                " will help you think about corpus scale when working with Spiral Notebooks (it's",
+                " part of the <a data-tabindex-counter=\"57\" data-tabindex-value=\"none\" data-cke-s",
+                "aved-href=\"./\" href=\"./\" tabindex=\"-1\">Art of Literary Text Analysis with Spiral",
+                "&nbsp;Notebooks</a>). In particular, we'll look at:</p><ul><li><a data-tabindex-",
+                "counter=\"10\" data-tabindex-value=\"none\" data-cke-saved-href=\"#kinds\" href=\"#kind",
+                "s\" tabindex=\"-1\">what kinds of corpora are there?</a></li><li><a data-tabindex-c",
+                "ounter=\"9\" data-tabindex-value=\"none\" data-cke-saved-href=\"#smaller\" href=\"#smal",
+                "ler\" tabindex=\"-1\">word frequencies with a smaller corpus</a></li><li><a data-ck",
+                "e-saved-href=\"#larger\" href=\"#larger\" data-tabindex-value=\"none\" tabindex=\"-1\" d",
+                "ata-tabindex-counter=\"6\">word frequencies with a larger corpus</a></li><li><a da",
+                "ta-tabindex-counter=\"57\" data-tabindex-value=\"none\" data-cke-saved-href=\"#next\" ",
+                "href=\"#next\" tabindex=\"-1\">next steps</a></li></ul><h2><img class=\"cke_anchor\" d",
+                "ata-cke-realelement=\"%3Ca%20id%3D%22kinds%22%20data-cke-saved-name%3D%22kinds%22",
+                "%20name%3D%22kinds%22%3E%3C%2Fa%3E\" data-cke-real-node-type=\"1\" alt=\"Ancre\" titl",
+                "e=\"Ancre\" align=\"\" src=\"data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAA",
+                "AALAAAAAABAAEAAAICRAEAOw==\" data-cke-real-element-type=\"anchor\">What Kinds of Co",
+                "rpora are There?&nbsp;&nbsp;</h2><p>A corpus, as a body of text, is a very fluid",
+                " concept. In principle, a corpus can be constituted of a single character (let's",
+                " call that miniscule) or it can be constituted from something like the <a data-t",
+                "abindex-counter=\"10\" data-tabindex-value=\"none\" data-cke-saved-href=\"https://wik",
+                "i.htrc.illinois.edu/display/COM/Extracted+Features+Dataset\" href=\"https://wiki.h",
+                "trc.illinois.edu/display/COM/Extracted+Features+Dataset\" tabindex=\"-1\">HTRC feat",
+                "ures dataset</a> that's extracted from a corpus of -- at last check -- 13.8 mill",
+                "ion volumes and over 2 trillion tokens/words (let's call that colossal). Probabl",
+                "y more relevant to us are corpora in between, maybe from a single book, or a col",
+                "lection of poems or plays, or the entire works of an author, works from a specif",
+                "ic period or genre, works that are thematically related, etc. That's a lot of va",
+                "riety and it doesn't even start to scratch the surface of the kinds of corpora p",
+                "eople use with Voyant and Spiral, other examples include legal documents, news a",
+                "rticles, collections of tweets, survey data.</p><p>Also important is to understa",
+                "nd that a collection of texts might be arranged and rearranged in many ways to c",
+                "onstitute different corpora. For instance, we may start with a collection of all",
+                " the news articles from a given week of an online media source: we could treat t",
+                "he entire collection as a corpus. But we might also (not necessarily instead) wa",
+                "nt to combine all the articles from a given day into a single document and then ",
+                "have seven documents, one for each day. We might treat the different documents d",
+                "ifferently because different tools are better suited to certain corpus sizes. Si",
+                "milarly, we might want to do certain operations in Spiral on a single smaller do",
+                "cument (because of what we're studying or because dealing with the entire corpus",
+                " at once would be overwhelming for the browser).</p><p>A related issue is whethe",
+                "r we are operating on data in the browser or data on the server. For example, in",
+                " the <a data-tabindex-counter=\"10\" data-tabindex-value=\"none\" data-cke-saved-hre",
+                "f=\"alta-tables\" href=\"alta-tables\" tabindex=\"-1\" target=\"_blank\">previous notebo",
+                "ok</a> we counted all the letters in \"The Gold Bug\" though we started by loading",
+                " into the browser memory the entire text of the short story. That worked very we",
+                "ll because \"The Gold Bug\" is relatively short (about 13,700 words), but it would",
+                "n't work so well for our corpus of Jane Austen novels (about 781,000 words). For",
+                " many operations in Spiral, the total number of words in the corpus may be the m",
+                "ost useful measure for gauging the relative size of a corpus. You could have a c",
+                "orpus of 1,000 documents but if they each had only 100 words it would still be s",
+                "maller than our \"Gold Bug\" short story.</p><p>In what follows we will compare do",
+                "ing approximately the same thing with a smaller corpus and with a bigger corpus:",
+                " we will show the highest frequency terms in a chart.</p><h2><img class=\"cke_anc",
+                "hor\" data-cke-realelement=\"%3Ca%20id%3D%22smaller%22%20data-cke-saved-name%3D%22",
+                "smaller%22%20name%3D%22smaller%22%3E%3C%2Fa%3E\" data-cke-real-node-type=\"1\" alt=",
+                "\"Ancre\" title=\"Ancre\" align=\"\" src=\"data:image/gif;base64,R0lGODlhAQABAPABAP///w",
+                "AAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==\" data-cke-real-element-type=\"anchor\">Word",
+                " Frequences with a Smaller Corpus</h2><p>For the smaller corpus, we will once ag",
+                "ain use Poe's \"The Gold Bug\" and we can again use the code we saw in an earlier ",
+                "notebook on <a data-tabindex-counter=\"9\" data-tabindex-value=\"none\" data-cke-sav",
+                "ed-href=\"alta-create#text\" href=\"alta-create#text\" tabindex=\"-1\" target=\"_blank\"",
+                ">Creating a Corpus with Plain Text</a>.</p><p><br></p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "new Corpus(\"https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt\", {",
+                "    inputRemoveUntil: 'THE GOLD-BUG',",
+                "    inputRemoveFrom: 'FOUR BEASTS IN ONE'",
+                "}).assign(\"goldbug\").show();"
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 59px'><div style=\"height: 45px\"><div style=\"height: 31px\"> <",
+                "div class=\"info\">This corpus has 1 document with 13,731 <span class=\"info-tip\" d",
+                "ata-qtip=\"every occurrence of every word (like multiple occurrences of &quot;the",
+                "&quot;) is counted\">total words</span> and 2,756 <span class=\"info-tip\" data-qti",
+                "p=\"multiple occurrences of words (like &quot;the&quot;) are counted once\">unique",
+                " word forms</span>. Created <span class=\"info-tip\" data-qtip=\"2017-04-17, 21:05:",
+                "41\">about 19 minutes ago</span>.</div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>Again we see that the corpus is relatively small with some 13,700 words. In t",
+                "he previous notebook on Tables we saw how we could slurp the entire plain text d",
+                "ocument into a string variable. There's a related function which is to <a data-c",
+                "ke-saved-href=\"../docs/#!/api/Corpus-method-getWordsArray\" href=\"../docs/#!/api/",
+                "Corpus-method-getWordsArray\" target=\"_blank\" data-tabindex-value=\"none\" tabindex",
+                "=\"-1\" data-tabindex-counter=\"6\">get all the words</a> in an array (an ordered li",
+                "st of strings). Note that this function only provides words, no punctuation, tag",
+                "s, or other contents.</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": "goldbug.getWordsArray({transformCase: \"lowercase\"}).assign(\"goldbugWords\").show(100); // show first 100 characters from comma-separated words",
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 59px'><div style=\"height: 45px\"><div style=\"height: 31px\"> <",
+                "div class=\"info\">the,gold,bug,what,ho,what,ho,this,fellow,is,dancing,mad,he,hath",
+                ",been,bitten,by,the,tarantula,all,in,</div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>Now, just as we did with letters in \"The Gold Bug\" we'll create a table of fr",
+                "equencies from our array of words, and immediately chart it.</p>\n"
+            ]
+        },
+        {
+            "type": "code",
+            "input": "new VoyantTable({count: goldbugWords, limit: 20, headers: [\"Words\",\"Counts\"]}).embed(\"VoyantChart\", {width: \"800px\"});",
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 446px'><div style=\"height: 432px\"><div style=\"height: 418px\"",
+                "> <div class=\"info\"><iframe src=\"../tool/VoyantChart/?chartJson=%7B%22store%2",
+                "2%3A%7B%22fields%22%3A%5B%22Words%22%2C%22Counts%22%5D%2C%22data%22%3A%5B%7B%22W",
+                "ords%22%3A%22the%22%2C%22Counts%22%3A884%7D%2C%7B%22Words%22%3A%22of%22%2C%22Cou",
+                "nts%22%3A465%7D%2C%7B%22Words%22%3A%22and%22%2C%22Counts%22%3A359%7D%2C%7B%22Wor",
+                "ds%22%3A%22to%22%2C%22Counts%22%3A333%7D%2C%7B%22Words%22%3A%22i%22%2C%22Counts%",
+                "22%3A331%7D%2C%7B%22Words%22%3A%22a%22%2C%22Counts%22%3A330%7D%2C%7B%22Words%22%",
+                "3A%22in%22%2C%22Counts%22%3A238%7D%2C%7B%22Words%22%3A%22it%22%2C%22Counts%22%3A",
+                "210%7D%2C%7B%22Words%22%3A%22you%22%2C%22Counts%22%3A162%7D%2C%7B%22Words%22%3A%",
+                "22was%22%2C%22Counts%22%3A135%7D%2C%7B%22Words%22%3A%22that%22%2C%22Counts%22%3A",
+                "129%7D%2C%7B%22Words%22%3A%22with%22%2C%22Counts%22%3A114%7D%2C%7B%22Words%22%3A",
+                "%22as%22%2C%22Counts%22%3A113%7D%2C%7B%22Words%22%3A%22for%22%2C%22Counts%22%3A1",
+                "13%7D%2C%7B%22Words%22%3A%22had%22%2C%22Counts%22%3A109%7D%2C%7B%22Words%22%3A%2",
+                "2at%22%2C%22Counts%22%3A108%7D%2C%7B%22Words%22%3A%22he%22%2C%22Counts%22%3A103%",
+                "7D%2C%7B%22Words%22%3A%22this%22%2C%22Counts%22%3A99%7D%2C%7B%22Words%22%3A%22bu",
+                "t%22%2C%22Counts%22%3A99%7D%2C%7B%22Words%22%3A%22we%22%2C%22Counts%22%3A98%7D%5",
+                "D%7D%2C%22axes%22%3A%5B%7B%22type%22%3A%22numeric%22%2C%22position%22%3A%22left%",
+                "22%7D%2C%7B%22type%22%3A%22category%22%2C%22position%22%3A%22bottom%22%7D%5D%2C%",
+                "22series%22%3A%5B%7B%22type%22%3A%22line%22%2C%22xField%22%3A%22Words%22%2C%22yF",
+                "ield%22%3A%22Counts%22%2C%22marker%22%3A%7B%22radius%22%3A2%7D%2C%22highlightCfg",
+                "%22%3A%7B%22scaling%22%3A2%7D%2C%22tooltip%22%3A%7B%22trackMouse%22%3Atrue%7D%7D",
+                "%5D%7D&amp;debug=true\" style=\"width: 800px; height: 400px\" id=\"ext-201\" name=\"ex",
+                "t-201\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"3\"></ifra",
+                "me></div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>There we are, the famous Zipf's Law again! With very few lines of code we've ",
+                "been able to create this chart (some steps are put in separate blocks to ensure ",
+                "that they are run separately and sequentially):</p><blockquote><pre>new Corpus(\"",
+                "https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/r",
+                "aw/goldbug.txt\", {\n&nbsp; &nbsp; inputRemoveUntil: 'THE GOLD-BUG',\n&nbsp; &nbsp;",
+                " inputRemoveFrom: 'FOUR BEASTS IN ONE'\n}).assign(\"goldbug\");\ngoldbug.getWordsArr",
+                "ay({transformCase: \"lowercase\"}).assign(\"goldbugWords\");\nnew VoyantTable({count:",
+                " goldbugWords, limit: 20, headers: [\"Words\",\"Counts\"]}).embed(\"VoyantChart\", {wi",
+                "dth: \"800px\"});\n</pre></blockquote><p>We can do it this way because it's reasona",
+                "ble to handle all the words in the browser memory, but sometimes it's not, so we",
+                " have to use a different approach.</p><h2><img class=\"cke_anchor\" data-cke-reale",
+                "lement=\"%3Ca%20id%3D%22larger%22%20data-cke-saved-name%3D%22larger%22%20name%3D%",
+                "22larger%22%3E%3C%2Fa%3E\" data-cke-real-node-type=\"1\" alt=\"Ancre\" title=\"Ancre\" ",
+                "align=\"\" src=\"data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAAB",
+                "AAEAAAICRAEAOw==\" data-cke-real-element-type=\"anchor\">Word Frequencies with a La",
+                "rger Corpus</h2><p>So, how can show a graph of high frequency terms with a large",
+                "r corpus? The key is to shift more processing to the server instead of doing it ",
+                "in the browser. Above we had to fetch and process&nbsp;in the browser an array w",
+                "ith&nbsp;<em>all</em>&nbsp;the words from the text, but that's not practical for",
+                " larger corpora. Many similar operations&nbsp;<em>are</em>&nbsp;possible, howeve",
+                "r. For instance, we can use <a data-cke-saved-href=\"../docs/#!/api/Corpus-method",
+                "-loadCorpusTerms\" href=\"../docs/#!/api/Corpus-method-loadCorpusTerms\" target=\"_b",
+                "lank\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\">loadCor",
+                "pusTerms</a> to fetch a specified number of terms (from a longer list that by de",
+                "fault is sorted by frequency and that include all words).</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "new Corpus(\"austen\").loadCorpusTerms({limit: 20}).assign(\"austenWords\").show();",
+                ""
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 59px'><div style=\"height: 45px\"><div style=\"height: 31px\"> <",
+                "div class=\"info\">This store contains 20 items with these fields: id, rawFreq, in",
+                "DocumentsCount, relativeFreq, relativePeakedness, relativeSkewness, distribution",
+                "s, typeTokenRatio-lexical, term.</div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>This time we won't use the <code>count</code> parameter when creating a new <",
+                "a data-tabindex-counter=\"5\" data-tabindex-value=\"none\" data-cke-saved-href=\"../d",
+                "ocs/#!/api/VoyantTable\" href=\"../docs/#!/api/VoyantTable\" tabindex=\"-1\" target=\"",
+                "_blank\">Table</a>, but we can simply provide our <a data-tabindex-counter=\"5\" da",
+                "ta-tabindex-value=\"none\" data-cke-saved-href=\"../docs/#!/api/Voyant.data.store.C",
+                "orpusTerms\" href=\"../docs/#!/api/Voyant.data.store.CorpusTerms\" tabindex=\"-1\" ta",
+                "rget=\"_blank\">Corpus Terms store</a> while specifying that we're only interested",
+                " in two columns, \"term\" and \"rawFreq\". Then we simply embed the table as we've d",
+                "one before using the <a data-tabindex-counter=\"5\" data-tabindex-value=\"none\" dat",
+                "a-cke-saved-href=\"../docs/#!/api/Voyant.widget.VoyantChart\" href=\"../docs/#!/api",
+                "/Voyant.widget.VoyantChart\" tabindex=\"-1\" target=\"_blank\">VoyantChart</a> widget",
+                ".</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "new VoyantTable(austenWords, {headers: [\"term\",\"rawFreq\"]}).embed(\"VoyantChart\", {width: \"800px\"});",
+                ""
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 446px'><div style=\"height: 432px\"><div style=\"height: 418px\"",
+                "> <div class=\"info\"><iframe src=\"../tool/VoyantChart/?chartJson=%7B%22store%2",
+                "2%3A%7B%22fields%22%3A%5B%22term%22%2C%22rawFreq%22%5D%2C%22data%22%3A%5B%7B%22t",
+                "erm%22%3A%22the%22%2C%22rawFreq%22%3A28292%7D%2C%7B%22term%22%3A%22to%22%2C%22ra",
+                "wFreq%22%3A26057%7D%2C%7B%22term%22%3A%22and%22%2C%22rawFreq%22%3A24068%7D%2C%7B",
+                "%22term%22%3A%22of%22%2C%22rawFreq%22%3A22913%7D%2C%7B%22term%22%3A%22a%22%2C%22",
+                "rawFreq%22%3A14307%7D%2C%7B%22term%22%3A%22her%22%2C%22rawFreq%22%3A13900%7D%2C%",
+                "7B%22term%22%3A%22i%22%2C%22rawFreq%22%3A13752%7D%2C%7B%22term%22%3A%22in%22%2C%",
+                "22rawFreq%22%3A12146%7D%2C%7B%22term%22%3A%22was%22%2C%22rawFreq%22%3A11752%7D%2",
+                "C%7B%22term%22%3A%22it%22%2C%22rawFreq%22%3A10803%7D%2C%7B%22term%22%3A%22she%22",
+                "%2C%22rawFreq%22%3A10616%7D%2C%7B%22term%22%3A%22not%22%2C%22rawFreq%22%3A9063%7",
+                "D%2C%7B%22term%22%3A%22that%22%2C%22rawFreq%22%3A8777%7D%2C%7B%22term%22%3A%22be",
+                "%22%2C%22rawFreq%22%3A8686%7D%2C%7B%22term%22%3A%22you%22%2C%22rawFreq%22%3A8314",
+                "%7D%2C%7B%22term%22%3A%22he%22%2C%22rawFreq%22%3A7721%7D%2C%7B%22term%22%3A%22ha",
+                "d%22%2C%22rawFreq%22%3A7646%7D%2C%7B%22term%22%3A%22as%22%2C%22rawFreq%22%3A7584",
+                "%7D%2C%7B%22term%22%3A%22for%22%2C%22rawFreq%22%3A7203%7D%2C%7B%22term%22%3A%22w",
+                "ith%22%2C%22rawFreq%22%3A6360%7D%5D%7D%2C%22axes%22%3A%5B%7B%22type%22%3A%22nume",
+                "ric%22%2C%22position%22%3A%22left%22%7D%2C%7B%22type%22%3A%22category%22%2C%22po",
+                "sition%22%3A%22bottom%22%7D%5D%2C%22series%22%3A%5B%7B%22type%22%3A%22line%22%2C",
+                "%22xField%22%3A%22term%22%2C%22yField%22%3A%22rawFreq%22%2C%22marker%22%3A%7B%22",
+                "radius%22%3A2%7D%2C%22highlightCfg%22%3A%7B%22scaling%22%3A2%7D%2C%22tooltip%22%",
+                "3A%7B%22trackMouse%22%3Atrue%7D%7D%5D%7D&amp;debug=true\" style=\"width: 800px; he",
+                "ight: 400px\" id=\"ext-204\" name=\"ext-204\" data-tabindex-value=\"none\" tabindex=\"-1",
+                "\" data-tabindex-counter=\"3\"></iframe></div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<h2><img class=\"cke_anchor\" data-cke-realelement=\"%3Ca%20id%3D%22next%22%20data-",
+                "cke-saved-name%3D%22next%22%20name%3D%22next%22%3E%3C%2Fa%3E\" data-cke-real-node",
+                "-type=\"1\" alt=\"Ancre\" title=\"Ancre\" align=\"\" data-cke-saved-src=\"data:image/gif;",
+                "base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==\" src=\"data:i",
+                "mage/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==\" da",
+                "ta-cke-real-element-type=\"anchor\">Next Steps</h2><p>If you're working sequential",
+                "ly&nbsp;through the <a data-tabindex-counter=\"23\" data-tabindex-value=\"none\" dat",
+                "a-cke-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target=\"_blank\">Art of Literar",
+                "y Text Analysis with Spiral&nbsp;Notebooks</a>, the next notebook&nbsp;is Explor",
+                "ing a Larger Corpus.</p>"
+            ]
+        }
+    ]
+}

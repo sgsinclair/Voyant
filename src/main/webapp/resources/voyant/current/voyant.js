@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 15 09:37:39 EDT 2017 */
+/* This file created by JSCacher. Last modified: Mon May 15 10:01:25 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -14585,7 +14585,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
-    		this.initVisLayout(true); // force in case we've changed fontFamily from options
+    		this.initVisLayout(); // force in case we've changed fontFamily from options
     		this.loadFromCorpus(corpus);
     	},
     	
@@ -14738,9 +14738,8 @@ Ext.define('Voyant.panel.Cirrus', {
     			el.update(""); // make sure to clear existing contents (especially for re-layout)
     	    	var width = el.getWidth();
     			var height = el.getHeight();
-    			
 				this.setVisLayout(
-					d3.layout.cloud()
+					d3.layoutCloud()
 						.size([width, height])
 						.overflow(true)
 						.padding(1)
@@ -14793,7 +14792,7 @@ Ext.define('Voyant.panel.Cirrus', {
 	    		this.setRelativeSizes();
 	    		this.setAdjustedSizes();
 
-	//    		var fontSizer = d3.scale.pow().range([10, 100]).domain([minSize, maxSize]);
+	//    		var fontSizer = d3.scalePow().range([10, 100]).domain([minSize, maxSize]);
 	    		
 	    		this.getVisLayout().words(terms).start();
     		}
@@ -14804,8 +14803,6 @@ Ext.define('Voyant.panel.Cirrus', {
     
     draw: function(words, bounds) {
     	var panel = this;
-    	// no longer used
-    	// var fill = d3.scale.category20b();
     	var el = this.getLayout().getRenderTarget();
     	var width = this.getVisLayout().size()[0];
     	var height = this.getVisLayout().size()[1];
@@ -14817,28 +14814,28 @@ Ext.define('Voyant.panel.Cirrus', {
 			height / Math.abs(bounds[0].y - height / 2)
     	) / 2 : 1;
     	
+		var t = d3.transition().duration(1000);
+			
 		var wordNodes = this.getVis().selectAll('text').data(words, function(d) {return d.text;});
 		
-		wordNodes.transition().duration(1000)
-			.attr('transform', function(d) {
-				return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')';
-			})
+		wordNodes.exit().remove();
+		
+		wordNodes.transition(t)
+			.attr('transform', function(d) { return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')'; })
 			.style('font-size', function(d) { return d.fontSize + 'px'; });
 		
 		wordNodes.enter().append('text')
+			.text(function(d) { return d.text; })
 			.attr('text-anchor', 'middle')
-			.attr('data-freq', function(d) {
-				return d.rawFreq;
-			})
-			.attr('transform', function(d) {
-				return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')';
-			})
-			.style('font-size', '1px').transition().duration(1000).style('font-size', function(d) { return d.fontSize + 'px'; });
-		
-		wordNodes
+			.attr('data-freq', function(d) { return d.rawFreq; })
+			.attr('transform', function(d) { return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')'; })
 			.style('font-family', function(d) { return panel.getApplication().getFeatureForTerm('font', d.text); })
 			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
-			.text(function(d) { return d.text; })
+			.style('font-size', '1px').transition(t).style('font-size', function(d) { return d.fontSize + 'px'; });
+			
+		
+		// TODO can't put this as part of enter
+		wordNodes
 			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);})
 			.on('mouseover', function(obj) {
 				this.getTip().show();
@@ -14855,9 +14852,7 @@ Ext.define('Voyant.panel.Cirrus', {
 				this.getTip().hide();
 			}.bind(this));
 		
-		wordNodes.exit().remove();
-		
-		this.getVis().transition().duration(1000).attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')scale(' + scale + ')');
+		this.getVis().transition(t).attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')scale(' + scale + ')');
     },
     
     map: function(value, istart, istop, ostart, ostop) {
@@ -14943,147 +14938,79 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		stopList: 'auto',
     		terms: undefined,
     		context: 5,
-    		centralize: undefined
+    		centralize: undefined,
+    		categories: undefined
     	},
 		glyph: 'xf1e0@FontAwesome'
     },
     
     config: {
-    	node: undefined,
-    	link: undefined,
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	
-    	nodeDataSet: undefined,
-    	edgeDataSet: undefined,
-    	network: undefined,
+    	nodeData: undefined,
+    	linkData: undefined,
+    	
+    	visId: undefined,
+    	vis: undefined,
+    	visLayout: undefined,
+    	nodes: undefined,
+    	links: undefined,
+    	
     	contextMenu: undefined,
     	
-    	force: undefined,
-    	graphHeight: undefined,
-    	graphWidth: undefined,
-    	corpusColours: d3.scale.category10(), // TODO unused
+    	currentNode: undefined,
     	
-    	graphMode: undefined,
+    	networkMode: undefined,
     	
-    	stabilizationTask: undefined // stop simulation if it's run for too long
+    	graphStyle: {
+    		keywordNode: {
+    			normal: {
+    				fill: '#c6dbef',
+    				stroke: '#6baed6'
+    			},
+    			highlight: {
+    				fill: '#9ecae1',
+    				stroke: '#3182bd'
+    			}
+    		},
+    		contextNode: {
+    			normal: {
+    				fill: '#fdd0a2',
+    				stroke: '#fdae6b'
+    			},
+    			highlight: {
+    				fill: '#fd9a53',
+    				stroke: '#e6550d'
+    			}
+    		},
+    		link: {
+    			normal: {
+    				stroke: '#000000',
+    				strokeOpacity: 0.1
+    			},
+    			highlight: {
+    				stroke: '#000000',
+    				strokeOpacity: 0.5
+    			}
+    		}
+    	}
     },
 
     DEFAULT_MODE: 0,
     CENTRALIZED_MODE: 1,
     
-    nodeOptions: {
-    	defaultNode: {
-			shape: 'box',
-			color: {
-				border: 'rgba(0,0,0,0.1)',
-				background: 'rgba(255,255,255,1)'
-			},
-			scaling: {
-				label: {
-					min: 10,
-					max: 30,
-					maxVisible: 50,
-					drawThreshold: 6
-				}
-			}
-    	},
-    	centralizedNode: {
-    		shape: 'text',
-    		scaling: {
-				label: {
-					min: 6,
-					max: 30,
-					maxVisible: 50,
-					drawThreshold: 1
-				}
-			}
-    	}
-	},
-	edgeOptions: {
-		defaultEdge: {
-			color: {
-				color: 'rgba(0,0,0,0.1)',
-				highlight: 'black',
-				hover: 'red'
-			},
-			labelHighlightBold: false,
-			scaling: {
-				min: 1,
-				max: 15
-			},
-			length: undefined
-		},
-		centralizedEdge: {
-			scaling: {
-				min: 1,
-				max: 1
-			},
-			length: 150
-		}
-	},
-	highlightOptions: {
-		font: {
-			color: 'white'
-		},
-		color: {
-			background: 'black',
-			hover: {
-				border: '#CB157F',
-				background: '#EB42A5'
-			}
-		}
-	},
-	physicsOptions: {
-		defaultPhysics: {
-			barnesHut: {
-				gravitationalConstant: -1500,
-				centralGravity: 6,
-				damping: 0.5,
-				avoidOverlap: 0.5,
-				springConstant: 0.04
-			}
-		},
-		centralizedPhysics: {
-			barnesHut: {
-				gravitationalConstant: -1500,
-				centralGravity: 1,
-				damping: 1,
-				avoidOverlap: 0.01,
-				springConstant: 0.2
-			}
-		}
-	},
-	
-	stablizationMaxTime: 5000, // milliseconds that stabilization should run for
-	
-	keywordColor: 'green',
-	contextColor: 'maroon',
-    
     constructor: function(config) {
+    	this.setNodeData([]);
+    	this.setLinkData([]);
+    	
+    	this.setVisId(Ext.id(null, 'links_'));
 
-        this.callParent(arguments);
+    	this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-
-    	this.setNodeDataSet(new vis.DataSet());
-    	this.setEdgeDataSet(new vis.DataSet());
-    	
-    	this.setGraphMode(this.DEFAULT_MODE);
-    	
-    	this.setStabilizationTask(Ext.TaskManager.newTask({
-    		run: function() {
-    			this.getNetwork().stopSimulation();
-    		},
-    		scope: this,
-    		interval: this.stablizationMaxTime,
-    		repeat: 1,
-    		fireOnStart: false
-    	}));
-    	
     },
     
     initComponent: function() {
-    	
         var me = this;
-
         Ext.apply(me, {
     		title: this.localize('title'),
             dockedItems: [{
@@ -15096,10 +15023,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 	text: me.localize('clearTerms'),
 					glyph: 'xf014@FontAwesome',
                 	handler: function() {
-                		this.getNodeDataSet().clear();
-                		this.getEdgeDataSet().clear();
-                		
-                		this.setGraphMode(this.DEFAULT_MODE);
+                		this.setNodeData([]);
+                    	this.setLinkData([]);
+                		this.setNetworkMode(this.DEFAULT_MODE);
+                		this.refresh();
                 	},
                 	scope: me
                 },this.localize('context'),{
@@ -15112,21 +15039,22 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 	width: 50,
                 	listeners: {
                 		render: function(slider) {
-                			slider.setValue(me.getApiParam('context'));
+                			slider.setValue(this.getApiParam('context'));
                 		},
-                		changecomplete: {
-                			fn: function(slider, newValue) {
-                    			this.setApiParam("context", slider.getValue());
-                    			if (this.getGraphMode() === this.DEFAULT_MODE) {
-	                    			var terms = this.getNodeDataSet().map(function(node) { return node.label; });
-	                				if (terms.length > 0) {
-	                					this.getNodeDataSet().clear();
-	                					this.loadFromQuery(terms);
-	                				}
-                    			}
-                    		},
-                    		scope: me
-                		}
+                		changecomplete: function(slider, newValue) {
+                			this.setApiParam('context', slider.getValue());
+                			if (this.getNetworkMode() === this.DEFAULT_MODE) {
+                    			var terms = this.getNodeData().map(function(node) { return node.term; });
+                				if (terms.length > 0) {
+                					this.setNodeData([]);
+                					this.setLinkData([]);
+                					this.refresh();
+                					
+                					this.loadFromQuery(terms);
+                				}
+                			}
+                		},
+                		scope: me
                 	}
                 }]
             }]
@@ -15147,9 +15075,19 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				itemId: 'fixed',
 				listeners: {
 					checkchange: function(c, checked, e) {
-						var n = this.getNetwork().getSelectedNodes();
-						if (n[0] != null) {
-							this.getNodeDataSet().update({id: n[0], fixed: checked});
+						var node = this.getCurrentNode();
+						if (node !== undefined) {
+							var data = {
+								fixed: checked
+							};
+							if (checked) {
+								data.fx = node.x;
+								data.fy = node.y;
+							} else {
+								data.fx = null;
+								data.fy = null;
+							}
+							this.updateDataForNode(node.id, data);
 						}
 					},
 					scope: this
@@ -15159,10 +15097,15 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				text: 'Fetch Collocates',
 				style: 'margin: 5px;',
 				handler: function(b, e) {
-					var n = this.getNetwork().getSelectedNodes();
-		    		if (n[0] != null) {
-		    			var data = this.getNodeDataSet().get(n[0]);
-		    			this.itemdblclick(data);
+					var node = this.getCurrentNode();
+					if (node !== undefined) {
+						if (this.getNetworkMode() === this.CENTRALIZED_MODE) {
+							this.resetGraph();
+							this.setNetworkMode(this.DEFAULT_MODE);
+							node.start = 0;
+							node.limit = this.getApiParam('limit');
+						}
+		    			this.fetchCollocatesForNode(node);
 		    		}
 				},
 				scope: this
@@ -15171,11 +15114,11 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				text: 'Centralize',
 				style: 'margin: 5px;',
 				handler: function(b, e) {
-					var n = this.getNetwork().getSelectedNodes();
-		    		if (n[0] != null) {
-		    			this.doCentralize(n[0]);
-                		this.getContextMenu().hide();
+					var node = this.getCurrentNode();
+					if (node !== undefined) {
+		    			this.doCentralize(node.term);
 		    		}
+					this.getContextMenu().hide();
 				},
 				scope: this
 			},{
@@ -15183,18 +15126,17 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				text: 'Remove',
 				style: 'margin: 5px;',
 				handler: function(b, e) {
-					var n = this.getNetwork().getSelectedNodes();
-					if (n[0] != null) {
-						this.getNodeDataSet().remove(n[0]);
-						b.up('menu').hide();
-						this.forceUpdate();
+					var node = this.getCurrentNode();
+					if (node !== undefined) {
+						this.removeNode(node.id);
 					}
+					b.up('menu').hide();
 				},
 				scope: this
 			}]
 		}));
         
-        this.on("loadedCorpus", function(src, corpus) {
+        this.on('loadedCorpus', function(src, corpus) {
 			if (this.isVisible()) {
 				this.initLoad();
 			}
@@ -15206,23 +15148,19 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			}
     	}, this);
         
-        this.on("query", function(src, query) {this.loadFromQuery(query);}, this);
+        this.on('query', function(src, query) {this.loadFromQuery(query);}, this);
         
-        this.on("resize", function(panel, width, height) {
-        	var el = this.getLayout().getRenderTarget();
-        	
-        	var docked = this.getDockedItems();
-        	var dHeight = 0;
-        	for (var i = 0; i < docked.length; i++) {
-        		dHeight += docked[i].getHeight();
+        this.on('resize', function(panel, width, height) {
+        	var vis = Ext.get(this.getVisId());
+        	if (vis) {
+        		var el = this.body;//this.getLayout().getRenderTarget();
+            	var elHeight = el.getHeight();
+            	var elWidth = el.getWidth();
+            	
+        		vis.el.dom.setAttribute('width', elWidth);
+        		vis.el.dom.setAttribute('height', elHeight);
+        		this.getVisLayout().force('center', d3.forceCenter(elWidth/2, elHeight/2)).alpha(1).restart();
         	}
-        	
-        	var elHeight = height - dHeight;
-        	
-        	el.setHeight(elHeight);
-        	el.setWidth(el.getWidth());
-        	this.setGraphHeight(el.getHeight());
-        	this.setGraphWidth(el.getWidth());
 		}, this);
         
         me.callParent(arguments);
@@ -15231,19 +15169,11 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     
     initLoad: function() {
 		this.initGraph();
+		this.setNetworkMode(this.DEFAULT_MODE);
 		
 		if (this.getApiParam('centralize')) {
-			this.setGraphMode(this.CENTRALIZED_MODE);
+			this.setNetworkMode(this.CENTRALIZED_MODE);
 			var term = this.getApiParam('centralize');
-			this.getNodeDataSet().update({
-				id: term,
-				label: term,
-				title: term+' ('+1+')',
-				type: 'keyword',
-				value: 1,
-				start: 0,
-				font: {color: this.keywordColor}
-			});
 			this.doCentralize(term);
 		} else {
 			var limit = 3;
@@ -15255,7 +15185,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				params: {
 					limit: limit,
 					query: query,
-					stopList: this.getApiParam("stopList")
+					stopList: this.getApiParam('stopList')
 				},
 			    callback: function(records, operation, success) {
 			    	if (success) {
@@ -15298,14 +15228,14 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     loadFromCorpusCollocateRecords: function(records, keywordId) {
     	if (Ext.isArray(records)) {
     		var start = this.getApiParam('limit');
-    		var nodeDS = this.getNodeDataSet();
-    		var edgeDS = this.getEdgeDataSet();
+    		
     		var existingKeys = {};
-    		nodeDS.forEach(function(item) {
+    		this.getNodeData().forEach(function(item) {
     			existingKeys[item.id] = true;
-    		});
+    		}, this);
+    		
     		var newNodes = [];
-    		var newEdges = [];
+    		var newLinks = [];
     		
     		records.forEach(function(corpusCollocate, index) {
     			var term = corpusCollocate.getTerm();
@@ -15315,297 +15245,457 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     			
     			var termValue = termFreq;
     			var contextValue = contextFreq;
-    			if (this.getGraphMode() === this.CENTRALIZED_MODE) {
+    			if (this.getNetworkMode() === this.CENTRALIZED_MODE) {
     				termValue = 0;
     				contextValue = Math.log(contextFreq);
     			}
     			
+    			var termEntry = undefined;
+    			var contextTermEntry = undefined;
+    			
     			if (index == 0) { // only process keyword once
-    				if (keywordId === undefined) keywordId = term;
+    				if (keywordId === undefined) keywordId = this.idGet(term);
 	    			if (existingKeys[keywordId] !== undefined) {
-	    				nodeDS.update({
-	    					id: keywordId,
-	    					value: termValue,
+	    				this.updateDataForNode(keywordId, {
 	    					title: term+' ('+termFreq+')',
 	    					type: 'keyword',
-	    					font: {color: this.keywordColor}
+	    					value: termValue
 	    				});
 	    			} else {
 	    				existingKeys[keywordId] = true;
-	    				newNodes.push({
-		    				id: term,
-	    					label: term,
+	    				
+	    				termEntry = {
+		    				id: keywordId,
+	    					term: term,
 	    					title: term+' ('+termFreq+')',
 	    					type: 'keyword',
 	    					value: termValue,
 	    					start: start,
-	    					font: {color: this.keywordColor}
-						});
+	    					fixed: false
+						};
+	    				newNodes.push(termEntry);
 	    			}
 				}
     			
     			if (term != contextTerm) {
-	    			var contextNodeKey = contextTerm;
-	    			if (existingKeys[contextNodeKey] !== undefined) {
+	    			var contextId = this.idGet(contextTerm);
+	    			if (existingKeys[contextId] !== undefined) {
 	    			} else {
-	    				existingKeys[contextNodeKey] = true; 
-	    				newNodes.push({
-    	    				id: contextTerm,
-        					label: contextTerm,
+	    				existingKeys[contextId] = true;
+	    				
+	    				contextTermEntry = {
+    	    				id: contextId,
+    	    				term: contextTerm,
         					title: contextTerm+' ('+contextFreq+')',
         					type: 'context',
         					value: contextValue,
         					start: 0,
-        					font: {color: this.contextColor}
-    					});
+        					fixed: false
+    					};
+	    				newNodes.push(contextTermEntry);
 	    			}
 	    			
 	    			var existingLink = null;
-	    			edgeDS.forEach(function(item) {
-	    				if ((item.from == keywordId && item.to == contextNodeKey) || (item.from == contextNodeKey && item.to == keywordId)) {
-	    					existingLink = item;
+	    			var linkData = this.getLinkData();
+	    			for (var i = 0; i < linkData.length; i++) {
+	    				var link = linkData[i];
+	    				if ((link.source.id == keywordId && link.target.id == contextId) || (link.source.id == contextId && link.target.id == keywordId)) {
+	    					existingLink = link;
+	    					break;
 	    				}
-	    			});
-	    			
+	    			}
+
 	    			var linkValue = corpusCollocate.getContextTermRawFreq();
 	    			if (existingLink === null) {
-	    				newEdges.push({from: keywordId, to: contextNodeKey, value: linkValue});
+	    				newLinks.push({source: keywordId, target: contextId, value: linkValue, id: keywordId+'-'+contextId});
 	    			} else if (existingLink.value < linkValue) {
-    					edgeDS.update({id: existingLink.id, value: linkValue});
+//	    				existingLink.value = linkValue;
 	    			}
     			}
     		}, this);
     		
-    		nodeDS.add(newNodes);
-    		edgeDS.add(newEdges);
+    		this.setNodeData(this.getNodeData().concat(newNodes));
+    		this.setLinkData(this.getLinkData().concat(newLinks));
     		
-    		this.forceUpdate();
-    		
-    		this.getNetwork().fit();
+    		this.refresh();		
     	}
     },
     
-    doCentralize: function(node) {
-    	var centralizeLimit = 150;
-		var centerNodeSize = 75;
-		
-		var data = this.getNodeDataSet().get(node);
-		data.fixed = true;
-		data.shape = 'circle';
-		data.scaling = {
-			min: centerNodeSize,
-			max: centerNodeSize
-			,label: {
-				min: centerNodeSize,
-				max: centerNodeSize
+    idGet: function(term) {
+    	return term.replace(/\W/g, '_');
+    },
+    
+    updateDataForNode: function(nodeId, dataObj) {
+    	var data = this.getNodeData();
+		for (var i = 0; i < data.length; i++) {
+			if (data[i].id === nodeId) {
+				Ext.apply(data[i], dataObj);
+				break;
 			}
+		}
+    },
+    
+    removeNode: function(nodeId, removeOrphans) {
+    	var data = this.getNodeData();
+		for (var i = 0; i < data.length; i++) {
+			if (data[i].id === nodeId) {
+				data.splice(i, 1);
+				break;
+			}
+		}
+		
+		data = this.getLinkData();
+		for (var i = data.length-1; i >= 0; i--) {
+			if (data[i].source.id === nodeId || data[i].target.id === nodeId) {
+				data.splice(i, 1);
+			}
+		}
+		
+		if (removeOrphans) {
+			// TODO
+		}
+		
+		this.refresh();
+    },
+    
+    doCentralize: function(term) {
+    	this.resetGraph();
+    	
+    	this.setNetworkMode(this.CENTRALIZED_MODE);
+    	
+    	var data = {
+			id: this.idGet(term),
+			term: term,
+			title: term+' ('+1+')',
+			type: 'keyword',
+			value: 1000,
+			start: 0
 		};
+		this.setNodeData([data]);
+		this.refresh();
 		
-		
-		this.getNodeDataSet().clear();
-		this.getEdgeDataSet().clear();
-		this.getNodeDataSet().add(data);
-		
-		this.setGraphMode(this.CENTRALIZED_MODE);
-		
+		var centralizeLimit = 150;
 		var limit = this.getApiParam('limit');
 		this.setApiParam('limit', centralizeLimit);
-		this.itemdblclick(data);
+		this.fetchCollocatesForNode(data);
 		this.setApiParam('limit', limit);
     },
     
-    applyGraphMode: function(mode) {
-    	mode = mode === undefined ? this.DEFAULT_MODE : mode;
-    	var network = this.getNetwork();
-    	if (network !== undefined) {
+    updateNetworkMode: function(mode) {
+    	if (this.getVisLayout()) {
 	    	if (mode === this.DEFAULT_MODE) {
-	    		network.setOptions({
-	    			physics: this.physicsOptions.defaultPhysics,
-	    			nodes: this.nodeOptions.defaultNode,
-	    			edges: this.edgeOptions.defaultEdge
-	    		});
-	    	} else if (mode === this.CENTRALIZED_MODE) {
-	    		network.setOptions({
-	    			physics: this.physicsOptions.centralizedPhysics,
-	    			nodes: this.nodeOptions.centralizedNode,
-	    			edges: this.edgeOptions.centralizedEdge
-	    		});
+	    		this.getVisLayout()
+		    		.force('link', d3.forceLink().id(function(d) { return d.id; }).distance(30).strength(1))
+					.force('charge', d3.forceManyBody().strength(-100))
+					.force('collide', d3.forceCollide(function(d) { return Math.sqrt(d.bbox.width * d.bbox.height)*2; }));
+	    	} else {
+	    		this.getVisLayout()
+		    		.force('link', d3.forceLink().id(function(d) { return d.id; }).distance(200))
+					.force('charge', d3.forceManyBody().strength(function(d) {
+						if (d.type === 'keyword') {
+							return -10000;
+						} else {
+							return 0;
+						}
+					}))
+					.force('collide', d3.forceCollide(function(d) {
+						if (d.type === 'keyword') {
+							return d.value;
+						} else {
+							return Math.sqrt(d.bbox.width * d.bbox.height);
+						}
+					}));
 	    	}
+    	} else {
+    		console.log('no viz yet');
     	}
-    	
-    	return mode;
     },
     
     initGraph: function() {
     	var el = this.getLayout().getRenderTarget();
-    	el.setWidth(el.getWidth());
-    	el.setHeight(el.getHeight());
-    	this.setGraphHeight(el.getHeight());
-    	this.setGraphWidth(el.getWidth());
+    	el.update('');
+    	var width = el.getWidth();
+    	var height = el.getHeight();
     	
-    	if (this.getNetwork() === undefined) {
-	    	var options = {
-	    		autoResize: true,
-				interaction: {
-	    			hover: true,
-	    			hoverConnectedEdges: true,
-	    			multiselect: false
-	    		}
-	    	};
-	    	
-	    	var network = new vis.Network(el.dom, {
-	    		nodes: this.getNodeDataSet(),
-	    		edges: this.getEdgeDataSet()
-	    	}, options);
-	    	this.setNetwork(network);
-	    	
-	    	this.setGraphMode();
-	    	
-	    	this.getNodeDataSet().on('remove', function(e, props, sender) {
-	    		var key = props.items[0];
-	    		var deadEdges = this.getEdgeDataSet().get({
-	    			filter: function(item) {
-	    				return item.from == key || item.to == key;
-	    			}
-	    		});
-	    		this.getEdgeDataSet().remove(deadEdges);
-	    		var orphans = [];
-	    		this.getNodeDataSet().forEach(function(node) {
-	    			var match = this.getEdgeDataSet().get({
-		    			filter: function(item) {
-		    				return item.from == node.id || item.to == node.id;
-		    			}
-		    		});
-	    			if (match.length == 0) {
-	    				orphans.push(node.id);
-	    			}
-	    		}.bind(this));
-	    		this.getNodeDataSet().remove(orphans);
-	    	}.bind(this));
-	    	
-	    	network.on('dragStart', function(params) {
-	    		var n = params.nodes[0];
-	    		if (n != null) {
-	    			this.getNodeDataSet().update({id: n, fixed: false});
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('dragging', function(params) {
-	    		var n = params.nodes[0];
-	    		if (n != null) {
-		    		if (this.isMasked()) {
-			    		if (!this.isOffCanvas(params.pointer.DOM)) {
-			    			this.unmask();
-			    		}
-			    	}
-			    	else if (this.isOffCanvas(params.pointer.DOM)) {
-			    		this.mask(this.localize("releaseToRemove"));
-			    	}
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('dragEnd', function(params) {
-	    		var n = params.nodes[0];
-	    		if (n != null) {
-	    			if (this.isOffCanvas(params.pointer.DOM)) {
-	    	    		this.unmask();
-	    	    		this.mask("cleaning");
-	    	    		this.getNodeDataSet().remove(n);
-	    	    		this.forceUpdate();
-	    	    		this.unmask();
-	    	    	} else {
-	    	    		this.getNodeDataSet().update({id: n, fixed: true});
-	    	    	}
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('click', function(params) {
-	    		this.getContextMenu().hide();
-	    		if (params) {
-	    			var nodes = this.getNodeDataSet();
-	    			if (params.nodes && params.nodes.length>0) {
-		    			this.dispatchEvent("termsClicked", this, [nodes.get(params.nodes[0]).label])
-		    		} else if (params.edges && params.edges.length>0) {
-		    			var edge = this.getEdgeDataSet().get(params.edges[0]);
-		    			this.dispatchEvent("termsClicked", this, ['"'+nodes.get(edge.from).label+' '+nodes.get(edge.to).label+'"~'+this.getApiParam('context')])
-		    		}
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('doubleClick', function(params) {
-	    		var n = params.nodes[0];
-	    		if (n != null) {
-	    			var data = this.getNodeDataSet().get(n);
-	    			this.itemdblclick(data);
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('oncontext', function(params) {
-	    		params.event.preventDefault();
-	    		var n = this.getNetwork().getNodeAt(params.pointer.DOM);
-	    		if (n != null) {
-	    			this.getNetwork().selectNodes([n]);
-	    			var data = this.getNodeDataSet().get(n);
-	    			var menu = this.getContextMenu();
-	    			menu.queryById('label').setHtml(data.label);
-	    			menu.queryById('fixed').setChecked(data.fixed);
-	    			menu.showAt(params.event.pageX, params.event.pageY);
-	    		}
-	    	}.bind(this));
-	    	
-	    	network.on('startStabilizing', function() {
-	    		this.getStabilizationTask().restart();
-	    	}.bind(this));
-	    	
-	    	network.on('stabilized', function() {
-	    		this.getStabilizationTask().stop();
-	    		this.getNetwork().fit({
-	    			animation: {
-	    				duration: 500,
-	    				easing: 'linear'
-	    			}
-	    		});
-	    	}.bind(this));
-	    	
-	    	network.on('resize', function(params) {
-	    		this.getNetwork().fit({
-	    			animation: {
-	    				duration: 500,
-	    				easing: 'linear'
-	    			}
-	    		});
-	    	}.bind(this));
-    	}
+    	this.setVisLayout(d3.forceSimulation().force('center', d3.forceCenter(width/2, height/2)));
+    	
+    	var svg = d3.select(el.dom).append('svg').attr('id',this.getVisId()).attr('class', 'linksGraph').attr('width', width).attr('height', height);
+    	var g = svg.append('g');
+    	
+		svg.call(d3.zoom().scaleExtent([1/4, 4]).on('zoom', function() {
+			g.attr('transform', d3.event.transform);
+		})).on('click', function() {
+    		this.getContextMenu().hide();
+    	}.bind(this));
+    	
+    	this.setLinks(g.append('g').attr('class', 'links').selectAll('.link'));
+    	this.setNodes(g.append('g').attr('class', 'nodes').selectAll('.node'));
+		this.setVis(g);
     },
     
-    forceUpdate: function() {
-    	// force visjs to apply scaling
-    	var ids = this.getNodeDataSet().map(function(item) {
-			return {id: item.id};
-		});
-		this.getNodeDataSet().update(ids);
-		ids = this.getEdgeDataSet().map(function(edge) {
-			return {id: edge.id};
-		});
-		this.getEdgeDataSet().update(ids);
+    resetGraph: function() {
+	    this.setNodeData([]);
+		this.setLinkData([]);
+		this.refresh();
     },
     
-    isOffCanvas: function(d) {
-    	return d.x < 0 || d.y < 0 || d.x > this.getGraphWidth() || d.y > this.getGraphHeight();
-    },
+    refresh: function() {
+    	var me = this;
+    	
+    	var nodeData = this.getNodeData();
+    	var linkData = this.getLinkData();
+    	
+//    	var nodeMap = d3.map(nodeData, function(d) { return d.id; });
+//    	var bilinks = [];
+//    	linkData.forEach(function(link) {
+//    		var s = link.source = nodeMap.get(link.source);
+//    		var t = link.target = nodeMap.get(link.target);
+//    		var i = {};
+//    		nodeData.push(i);
+//    		linkData.push({source: s, target: i}, {source: i, target: t});
+//    		bilinks.push([s,i,t]);
+//    	});
+    	
+    	var link = this.getLinks().data(linkData, function(d) { return d.id; });
+    	link.exit().remove();
+		var linkEnter = link.enter().append('line')
+			.attr('class', 'link')
+			.attr('id', function(d) { return d.id; })
+			.on('mouseover', me.linkMouseOver.bind(me))
+			.on('mouseout', me.linkMouseOut.bind(me))
+			.on('click', function(data) {
+				d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.dispatchEvent('termsClicked', this, ['"'+data.source.term+' '+data.target.term+'"~'+this.getApiParam('context')]);
+			}.bind(me))
+//			.style('fill', 'none')
+			.style('cursor', 'pointer')
+			.style('stroke-width', function(d) {
+				if (me.getNetworkMode() === me.DEFAULT_MODE) {
+					return Math.max(1, Math.min(15, Math.sqrt(d.value)));
+				} else {
+					return 1;
+				}
+			});
+			
+		this.setLinks(linkEnter.merge(link));
 
-    itemdblclick: function(d) {
+    	var node = this.getNodes().data(nodeData, function(d) { return d.id; });
+    	node.exit().remove();
+    	var nodeEnter = node.enter().append('g')
+			.attr('class', function(d) { return 'node '+d.type; })
+			.attr('id', function(d) { return d.id; })
+			.on('mouseover', me.nodeMouseOver.bind(me))
+			.on('mouseout', me.nodeMouseOut.bind(me))
+			.on('click', function(data) {
+				d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.dispatchEvent('termsClicked', this, [data.term]);
+			}.bind(me))
+			.on('dblclick', function(data) {
+				d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.fetchCollocatesForNode(data);
+			}.bind(me))
+			.on('contextmenu', function(d, i) {
+				d3.event.preventDefault();
+//				me.getTip().hide();
+				var menu = me.getContextMenu();
+				menu.queryById('label').setHtml(d.term);
+    			menu.queryById('fixed').setChecked(d.fixed);
+				menu.showAt(d3.event.pageX+5, d3.event.pageY-50);
+			})
+			.call(d3.drag()
+				.on('start', function(d) {
+					if (!d3.event.active) me.getVisLayout().alphaTarget(0.3).restart();
+					d.fx = d.x;
+					d.fy = d.y;
+					d.fixed = true;
+				})
+				.on('drag', function(d) {
+					d.fx = d3.event.x;
+					d.fy = d3.event.y;
+					if (me.isMasked()) {
+			    		if (!me.isOffCanvas(d3.event.x, d3.event.y)) {
+			    			me.unmask();
+			    		}
+			    	} else if (me.isOffCanvas(d3.event.x, d3.event.y)) {
+			    		me.mask(me.localize('releaseToRemove'));
+			    	}
+				})
+				.on('end', function(d) {
+					if (!d3.event.active) me.getVisLayout().alphaTarget(0);
+					if (d.fixed != true) {
+						d.fx = null;
+						d.fy = null;
+					}
+					if (me.isOffCanvas(d3.event.x, d3.event.y)) {
+	    	    		me.unmask();
+	    	    		me.mask(me.localize('cleaning'));
+	    	    		me.removeNode(d.id);
+	    	    		me.unmask();
+	    	    	}
+				})
+			);
+    	
+    	nodeEnter.append('title').text(function(d) { return d.title; });
+    	
+    	if (this.getNetworkMode() === this.DEFAULT_MODE) {
+    		nodeEnter.append('rect')
+				.style('stroke-width', 1)
+				.style('stroke-opacity', 1);
+    	} else {
+    		nodeEnter.filter(function(d) { return d.type === 'keyword'; }).append('circle')
+    			.style('stroke-width', 1)
+    			.style('stroke-opacity', 1);
+    	}
+    	
+    	nodeEnter.append('text')
+			.attr('font-family', function(d) { return me.getApplication().getFeatureForTerm('font', d.term); })
+			.attr('font-size', function(d) { return Math.max(10, Math.sqrt(d.value)); })
+			.text(function(d) { return d.term; })
+			.each(function(d) { d.bbox = this.getBBox(); }) // set bounding box for later use
+			.style('cursor', 'pointer')
+			.style('user-select', 'none')
+			.attr('alignment-baseline', 'middle');
+    	
+    	this.setNodes(nodeEnter.merge(node));
+    	
+    	if (this.getNetworkMode() === this.DEFAULT_MODE) {
+	    	this.getVis().selectAll('rect')
+	    		.attr('width', function(d) { return d.bbox.width+16; })
+				.attr('height', function(d) { return d.bbox.height+8; })
+				.attr('rx', function(d) { return Math.max(2, d.bbox.height * 0.2); })
+				.attr('ry', function(d) { return Math.max(2, d.bbox.height * 0.2); })
+				.call(this.applyNodeStyle.bind(this));
+	    	this.getVis().selectAll('text')
+		    	.attr('dx', 8)
+				.attr('dy', function(d) { return d.bbox.height*0.5+4; });
+    	} else {
+    		this.getVis().selectAll('circle')
+    			.attr('r', function(d) { return Math.min(150, d.bbox.width); })
+    			.call(this.applyNodeStyle.bind(this));
+    		this.getVis().selectAll('text')
+		    	.attr('dx', function(d) {
+		    		if (d.type === 'keyword') {
+		    			return -d.bbox.width*0.5;
+			    	} else {
+			    		return 8;
+			    	}
+	    		})
+				.attr('dy', function(d) {
+					if (d.type === 'keyword') {
+						return 0;
+					} else {
+						return d.bbox.height*0.5+4;
+					}
+				});
+    	}
+    	this.getVis().selectAll('line').call(this.applyLinkStyle.bind(this));
+    	
+    	
+    	this.getVisLayout().nodes(nodeData).on('tick', function() {
+    		me.getLinks()
+    			.attr('x1', function(d) { return d.source.x; })
+    			.attr('y1', function(d) { return d.source.y; })
+    			.attr('x2', function(d) { return d.target.x; })
+    			.attr('y2', function(d) { return d.target.y; });
+//    		me.getLinks().attr('d', function(d) {
+//				return 'M' + d[0].x + ',' + d[0].y
+//						+ 'S' + d[1].x + ',' + d[1].y
+//						+ ' ' + d[2].x + ',' + d[2].y;
+//			});
+    		me.getNodes().attr('transform', function(d) {
+    			var x = d.x;
+    			var y = d.y;
+    			if (me.getNetworkMode() === me.DEFAULT_MODE || d.type !== 'keyword') {
+	    			x -= d.bbox.width*0.5;
+	    			y -= d.bbox.height*0.5;
+    			} else {
+    				
+    			}
+    			return 'translate('+x+','+y+')';
+    		});
+    	});
+    	
+    	this.getVisLayout().force('link').links(linkData);
+    	this.getVisLayout().alpha(1).restart();
+    },
+    
+    isOffCanvas: function(x, y) {
+    	var vis = Ext.get(this.getVisId());
+    	return x < 0 || y < 0 || x > vis.getWidth() || y > vis.getHeight();
+    },
+ 
+    applyNodeStyle: function(sel, nodeState) {
+		var state = nodeState === undefined ? 'normal' : nodeState;
+    	sel.style('fill', function(d) { var type = d.type+'Node'; return this.getGraphStyle()[type][state].fill; }.bind(this));
+    	sel.style('stroke', function(d) { var type = d.type+'Node'; return this.getGraphStyle()[type][state].stroke; }.bind(this));
+    },
+    
+    applyLinkStyle: function(sel, linkState) {
+    	var state = linkState === undefined ? 'normal' : linkState;
+    	sel.style('stroke', function(d) { return this.getGraphStyle().link[state].stroke; }.bind(this));
+    	sel.style('stroke-opacity', function(d) { return this.getGraphStyle().link[state].strokeOpacity; }.bind(this));
+    },
+    
+    linkMouseOver: function(d) {
+    	this.getVis().selectAll('line').call(this.applyLinkStyle.bind(this));
+    	this.getVis().select('#'+d.id).call(this.applyLinkStyle.bind(this), 'highlight');
+    },
+    
+    linkMouseOut: function(d) {
+    	this.getVis().selectAll('line').call(this.applyLinkStyle.bind(this));
+    },
+    
+    nodeMouseOver: function(d) {
+    	this.setCurrentNode(d);
+		
+		this.getVis().selectAll('rect').call(this.applyNodeStyle.bind(this));
+		
+		this.getLinks().each(function(link) {
+			var id;
+			if (link.source.id == d.id) {
+				id = link.target.id;
+			} else if (link.target.id == d.id) {
+				id = link.source.id;
+			}
+			if (id !== undefined) {
+				this.getVis().select('#'+id+' rect').call(this.applyNodeStyle.bind(this), 'highlight');
+				this.getVis().select('#'+link.id).call(this.applyLinkStyle.bind(this), 'highlight');
+			}
+		}.bind(this));
+		
+		this.getVis().select('#'+d.id+' rect')
+			.style('stroke-width', 3)
+			.call(this.applyNodeStyle.bind(this), 'highlight');
+    },
+    
+    nodeMouseOut: function(d) {
+    	if (!this.getContextMenu().isVisible()) {
+			this.setCurrentNode(undefined);
+		}
+		
+		this.getVis().selectAll('rect')
+			.style('stroke-width', 1)
+			.call(this.applyNodeStyle.bind(this));
+		
+		this.getVis().selectAll('line')
+			.call(this.applyLinkStyle.bind(this));
+    },
+    
+    fetchCollocatesForNode: function(d) {
     	var limit = this.getApiParam('limit');
     	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	corpusCollocates.load({
-    		params: Ext.apply(this.getApiParams(), {query: d.id, start: d.start, limit: limit}),
+    		params: Ext.apply(this.getApiParams(), {query: d.term, start: d.start, limit: limit}),
     		callback: function(records, operation, success) {
     			if (success) {
-    	    		this.getNodeDataSet().update({id: d.id, start: d.start+limit});
+    				this.updateDataForNode(d.id, {
+    					start: d.start+limit
+    				});
     	    		
-	    			var keywordNodeKey = d.id;
-	    			
-    	    		this.loadFromCorpusCollocateRecords(records, keywordNodeKey);
+    	    		this.loadFromCorpusCollocateRecords(records, d.id);
     			}
     		},
     		scope: this
@@ -21903,7 +21993,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 	            	text: this.localize('clearTerms'),
 	            	handler: function() {
 	            		this.setApiParams({query: undefined});
-	            		this.loadFromRecords([])
+	            		this.loadFromRecords([]);
 	            	},
 	            	scope: this
 	            },{
@@ -22088,73 +22178,82 @@ Ext.define('Voyant.panel.StreamGraph', {
     		return app.getColorForTerm(name, true);
     	};
     	
-    	var legendStore = this.down('[xtype=legend]').getStore();
-    	var legendData = [];
-    	var layers = [];
-    	records.forEach(function(record, index) {
-    		var termLayer = [];
-    		var key = record.getTerm();
-    		record.get('distributions').forEach(function(r, i) {
-    			termLayer.push({x: i, y: r});
-    		}, this);
-    		layers.push({name: key, values: termLayer});
-    		legendData.push({id: key, name: key, mark: color(key), active: true});
-    	}, this);
-    	
-    	legendStore.loadData(legendData);
-    	
-    	var processedLayers = this.getVisLayout()(layers);
-    	
     	var steps;
     	if (this.getMode() === this.MODE_DOCUMENT) {
     		steps = this.getApiParam('bins');
     	} else {
     		var bins = this.getApiParam('bins');
     		var docsCount = this.getCorpus().getDocumentsCount();
+    		
     		steps = bins < docsCount ? bins : docsCount;
     	}
-    	steps--;
+    	
+    	var legendData = [];
+    	var keys = [];
+    	var layers = [];
+    	records.forEach(function(record, index) {
+    		var key = record.getTerm();
+    		keys.push(key);
+    		var values = record.get('distributions');
+    		for (var i = 0; i < values.length; i++) {
+    			if (layers[i] === undefined) {
+    				layers[i] = {};
+    			}
+    			layers[i][key] = values[i];
+    		}
+    		legendData.push({id: key, name: key, mark: color(key), active: true});
+    	}, this);
+    	
+    	this.down('[xtype=legend]').getStore().loadData(legendData);
+
+    	this.getVisLayout().keys(keys);
+    	var processedLayers = this.getVisLayout()(layers);
     	
     	var width = this.body.down('svg').getWidth() - this.graphMargin.left - this.graphMargin.right;
-    	var x = d3.scale.linear().domain([0, steps]).range([0, width]);
+    	var x = d3.scaleLinear().domain([0, steps-1]).range([0, width]);
     	
-    	var max = d3.max(processedLayers, function(layer) {
-    		return d3.max(layer.values, function(d) { return d.y0 + d.y; });
+    	var min = d3.min(processedLayers, function(layer) {
+    		return d3.min(layer, function(d) { return d[0]; });
     	});
-
+    	var max = d3.max(processedLayers, function(layer) {
+    		return d3.max(layer, function(d) { return d[1]; });
+    	});
+    	
     	var height = this.body.down('svg').dom.clientHeight - this.graphMargin.top - this.graphMargin.bottom;
-    	var y = d3.scale.linear().domain([0, max]).range([height, 0]);
+    	var y = d3.scaleLinear().domain([min, max]).range([height, 0]);
     	
-    	var area = d3.svg.area()
-	    	.x(function(d) { return x(d.x); })
-			.y0(function(d) { return y(d.y0); })
-			.y1(function(d) { return y(d.y0 + d.y); });
+    	var area = d3.area()
+	    	.x(function(d, i) { return x(i); })
+		    .y0(function(d) { return y(d[0]); })
+		    .y1(function(d) { return y(d[1]); })
+		    .curve(d3.curveCatmullRom);
     	
-    	var xAxis = d3.svg.axis().scale(x).orient('bottom');
+    	var xAxis;
     	if (this.getMode() === this.MODE_CORPUS) {
-    		var tickvals = [];
-    		for (var i = 0; i <= steps; i++) {
-    			tickvals.push(i);
-    		}
-    		xAxis.tickValues(tickvals); // force number of ticks
-    		xAxis.tickFormat(''); // hide tick numbers
+    		var xAxisDomain = [];
+    		this.getCorpus().getDocuments().each(function(doc) {
+    			xAxisDomain.push(doc.getTinyLabel());
+    		});
+    		var xAxisScale = d3.scalePoint().domain(xAxisDomain).range([0, width]);    		
+    		xAxis = d3.axisBottom(xAxisScale);
+    	} else {
+    		xAxis = d3.axisBottom(x);
     	}
     	
-    	var yAxis = d3.svg.axis().scale(y).orient('left');
+    	var yAxis = d3.axisLeft(y);
     	
-    	// join
-    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d.name; });
+    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d; });
     	
-    	// update
-    	paths.attr('d', function(d) { return area(d.values); }).style('fill', function(d, i) { return color(d.name); });
+    	paths
+    		.attr('d', function(d) { return area(d); })
+	    	.style('fill', function(d, i) { return color(d.key); })
+			.select('title').text(function (d) { return d.key; });
     	
-    	// enter
     	paths.enter().append('path')
-		.attr('d', function(d) { return area(d.values); })
-		.style('fill', function(d, i) { return color(d.name); })
-		.append('title').text(function (d) { return d.name; });
+			.attr('d', function(d) { return area(d); })
+			.style('fill', function(d, i) { return color(d.key); })
+			.append('title').text(function (d) { return d.key; });
     	
-    	// exit
     	paths.exit().remove();
     	
     	this.getVis().selectAll('g.axis').remove();
@@ -22166,24 +22265,20 @@ Ext.define('Voyant.panel.StreamGraph', {
     	
     	var xAxisText;
     	if (this.getMode() === this.MODE_CORPUS) {
-    		var stepIncrement = width / steps;
-    		var currStep = 0;
-    		this.getCorpus().getDocuments().each(function(doc) {
-    			this.getVis().select('g.x').append("text")
+    		this.getVis().select('g.axis.x').selectAll('text').each(function() {
+				d3.select(this)
 					.attr('text-anchor', 'end')
-					.attr('transform', 'translate('+currStep+', 10) rotate(-45)')
-					.text(doc.getTinyTitle());
-    			
-    			currStep += stepIncrement;
-    		}, this);
+					.attr('transform', 'rotate(-45)');
+    		});
     		
     		xAxisText = this.localize('documents');
     	} else {
     		xAxisText = this.localize('documentSegments');
     	}
-    	this.getVis().select('g.x').append("text")
+    	this.getVis().select('g.axis.x').append("text")
 			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-20)+')')
+			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-30)+')')
+			.attr('fill', '#000')
 			.text(xAxisText);
     	
     	this.getVis().append('g')
@@ -22197,9 +22292,10 @@ Ext.define('Voyant.panel.StreamGraph', {
     	} else {
     		yAxisText = this.localize('relativeFrequencies');
     	}
-    	this.getVis().select('g.y').append("text")
+    	this.getVis().select('g.axis.y').append("text")
 			.attr('text-anchor', 'middle')
 			.attr('transform', 'translate(-'+(this.graphMargin.left-20)+', '+height/2+') rotate(-90)')
+			.attr('fill', '#000')
 			.text(yAxisText);
     },
     
@@ -22216,14 +22312,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     initGraph: function() {
     	if (this.getVisLayout() === undefined) {
 	    	var el = this.getLayout().getRenderTarget();
-	    	this.setVisLayout(
-				d3.layout.stack()
-					.offset('silhouette')
-					.values(function(d) {
-						return d.values;
-					})
-			);
-			
+	    	
+	    	this.setVisLayout(d3.stack().offset(d3.stackOffsetWiggle).order(d3.stackOrderInsideOut));
 			this.setVis(d3.select(el.dom).append('svg').attr('id',this.getGraphId()).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')'));
 			
 			this.resizeGraph();
@@ -22231,13 +22321,11 @@ Ext.define('Voyant.panel.StreamGraph', {
     },
     
     resizeGraph: function() {
-    	var el = this.getLayout().getRenderTarget();
-    	var paddingH = this.graphMargin.left + this.graphMargin.right;
-    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
-    	var width = el.getWidth()-paddingH;
-		var height = el.getHeight()-paddingV;
-
-		d3.select(el.dom).select('svg').attr('width', width+paddingH).attr('height', height+paddingV);
+    	var el = this.body;//getLayout().getRenderTarget();
+    	var width = el.getWidth();
+		var height = el.getHeight();
+		
+		d3.select(el.dom).select('svg').attr('width', width).attr('height', height);
 		
 		// TODO recalculate streams
     }
@@ -23424,7 +23512,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 	            			slider.setValue(parseInt(this.getApiParam('numInitialTerms')));
 	            		},
 	            		changecomplete: function(slider, newvalue) {
-	            			this.setApiParam("numInitialTerms", newvalue)
+	            			this.setApiParam("numInitialTerms", newvalue);
 	            			this.doLoad();
 	            		},
 	            		scope: this
@@ -23464,11 +23552,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 	            		changecomplete: function(slider, newvalue) {
 	            			// use the inverse of the value since it'll make more sense to the user
 	            			var value = Math.abs(newvalue-(this.MAX_SCALING+1));
-	            			
 	            			this.setScalingFactor(value);
-	            			
-	            			this.getVisLayout().value(function(d) { return Math.pow(d.rawFreq, 1/value); });
-	            			
 	            			this.reload();
 	            		},
 	            		scope: this
@@ -23494,8 +23578,8 @@ Ext.define('Voyant.panel.TermsBerry', {
 				handler: function(b, e) {
 					var node = this.getCurrentNode();
 					if (node !== undefined) {
-						delete this.getCurrentData()[node.term];
-						this.getBlacklist()[node.term] = true;
+						delete this.getCurrentData()[node.data.term];
+						this.getBlacklist()[node.data.term] = true;
 						this.setCurrentNode(undefined);
 					}
 					this.getContextMenu().hide();
@@ -23732,30 +23816,40 @@ Ext.define('Voyant.panel.TermsBerry', {
     },
     
     buildVisFromData: function(data) {
-    	// compute node xy
-    	var processedData = this.getVisLayout().nodes({children: data, collocates:[], term: '', rawFreq: 1});
+    	var me = this;
+    	
+    	var rootId = '$$$root$$$';
+    	data.push({term: rootId, collocates:[], rawFreq:1});
+    	var root = d3.stratify()
+    		.id(function(d) { return d.term; })
+    		.parentId(function(d) {
+    			if (d.term !== rootId) return rootId;
+				else return '';
+			})(data)
+			.sort(function(a, b) { return a.rawFreq < b.rawFreq ? 1 : a.rawFreq > b.rawFreq ? -1 : 0; })
+			.sum(function(d) { return Math.pow(d.rawFreq, 1/me.getScalingFactor()); });
+    	this.getVisLayout()(root);
+    	
     	// join nodes with data
-    	var nodes = this.getVis().selectAll('.node').data(processedData, function(d) { return d.term; } ); // use term as key
+    	var nodes = this.getVis().selectAll('.node').data(root.descendants());
     	
     	// update
     	nodes.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
     	nodes.selectAll('circle').attr('r', function(d) { return d.r; });
     	
-    	var me = this;
-    	
     	var idGet = function(term) {
     		return term.replace(/\W/g, '_'); // remove non-word characters to create valid DOM ids
     	};
     	
-    	var collocateFill = d3.scale.pow().exponent(1/3)
+    	var collocateFill = d3.scalePow().exponent(1/3)
 			.domain([0,this.getMaxCollocateValue()]).range(['#fff', '#bd3163']);
     	
     	var defaultFill;
     	if (this.getMode() === this.MODE_DISTINCT) {
-    		defaultFill = d3.scale.pow().exponent(1/5)
+    		defaultFill = d3.scalePow().exponent(1/5)
     			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#dedede', '#fff']);
     	} else {
-    		defaultFill = d3.scale.linear()
+    		defaultFill = d3.scaleLinear()
 				.domain([this.getMaxFillValue(), this.getMinFillValue()]).range(['#dedede', '#fff']);
     	}
     	
@@ -23763,7 +23857,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     	var size = this.getVisLayout().size();
     	var layoutRadius = Math.min(size[0], size[1]) / 2;
     	var layoutArea = Math.PI*(layoutRadius*layoutRadius);
-    	var totalTerms = nodes[0].length-1;
+    	var totalTerms = data.length;
     	var termArea = layoutArea / totalTerms;
     	var termRadius = Math.sqrt(termArea / Math.PI);
     	var minFontSize = termRadius / 3;
@@ -23771,7 +23865,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     	scalingInverse = Math.max(1, scalingInverse-1); // substract one to avoid too large fonts
     	var maxFontSize = minFontSize * scalingInverse;
 
-    	var textSizer = d3.scale.linear()//pow().exponent(1/2)
+    	var textSizer = d3.scaleLinear()//pow().exponent(1/2)
     		.domain([this.getMinRawFreq(),this.getMaxRawFreq()]).range([minFontSize, maxFontSize]);
     	
     	// enter
@@ -23780,7 +23874,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     		.style('visibility', function(d) { return d.depth > 0 ? 'visible' : 'hidden'; }) // hide root
     		.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
     		.on('click', function(d) {
-    			me.dispatchEvent('termsClicked', me, [d.term]);
+    			me.dispatchEvent('termsClicked', me, [d.data.term]);
     		})
     		.on('mouseover', function(d, i) {
     			me.setCurrentNode(d);
@@ -23788,7 +23882,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     			me.getVis().selectAll('circle')
     				.style('stroke-width', 1)
     				.style('stroke', '#111')
-        			.style('fill', function(d) { return defaultFill(d.inDocumentsCount); });
+        			.style('fill', function(d) { return defaultFill(d.data.fillValue); });
     			
     			d3.select(this).select('circle')
     				.style('fill', '#89e1c2')
@@ -23803,15 +23897,15 @@ Ext.define('Voyant.panel.TermsBerry', {
     			}
     			
     			if (!me.getContextMenu().isVisible()) {
-	    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')<br/>'+fillLabel+': '+d.fillValue;
+	    			var info = '<b>'+d.data.term+'</b> ('+d.data.rawFreq+')<br/>'+fillLabel+': '+d.data.fillValue;
 					var tip = me.getTip();
 					tip.update(info);
 					tip.show();
     			}
 				
-				for (var i = 0; i < d.collocates.length; i++) {
-					var collocate = d.collocates[i];
-					var match = me.getVis().selectAll('.node').filter(function(d) { return d.term === collocate.term; })
+				for (var i = 0; i < d.data.collocates.length; i++) {
+					var collocate = d.data.collocates[i];
+					var match = me.getVis().selectAll('.node').filter(function(d) { return d.data.term === collocate.term; });
 					match.select('circle')
 						.style('fill', function(d) { return collocateFill(collocate.value); })
 						.style('stroke', '#bd3163')
@@ -23828,7 +23922,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 				}
 				
 				me.getVis().selectAll('circle').style('stroke-opacity', me.MIN_STROKE_OPACITY).style('stroke', '#111')
-	    			.style('fill', function(d) { return defaultFill(d.fillValue); });
+	    			.style('fill', function(d) { return defaultFill(d.data.fillValue); });
 				me.getVis().selectAll('tspan.value').text('');
 				me.getTip().hide();
 //				me.getVisInfo().text('');
@@ -23837,37 +23931,39 @@ Ext.define('Voyant.panel.TermsBerry', {
 				d3.event.preventDefault();
 				me.getTip().hide();
 				var menu = me.getContextMenu();
-				menu.queryById('label').setHtml(d.term);
+				menu.queryById('label').setHtml(d.data.term);
 				menu.showAt(d3.event.pageX+5, d3.event.pageY-50);
 			});
     	
     	node.append('circle')
-    		.attr('id', function(d) { return idGet(d.term); })
+    		.attr('id', function(d) {
+    			return idGet(d.data.term);
+			})
 			.attr('r', function(d) { return d.r; })
-			.style('fill', function(d) { return defaultFill(d.fillValue); })
+			.style('fill', function(d) { return defaultFill(d.data.fillValue); })
 			.style('stroke', '#111')
 			.style('stroke-opacity', me.MIN_STROKE_OPACITY)
 			.style('stroke-width', 1);
     	
-    	node.append('clipPath').attr('id', function(d) { return 'clip-' + idGet(d.term); })
-    		.append('use').attr('xlink:href', function(d) { return '#' + idGet(d.term); });
+    	node.append('clipPath').attr('id', function(d) { return 'clip-' + idGet(d.data.term); })
+    		.append('use').attr('xlink:href', function(d) { return '#' + idGet(d.data.term); });
 		
     	var text = node.append('text')
-    		.attr('clip-path', function(d) { return 'url(#clip-' + idGet(d.term) + ')'; })
-    		.style('font-family', function(d) { return me.getApplication().getFeatureForTerm('font', d.term); })
+    		.attr('clip-path', function(d) { return 'url(#clip-' + idGet(d.data.term) + ')'; })
+    		.style('font-family', function(d) { return me.getApplication().getFeatureForTerm('font', d.data.term); })
 			.style('text-anchor', 'middle')
 			.style('cursor', 'default');
 		text.append('tspan')
 			.attr('class', 'term')
-			.style('font-size', function(d) { return textSizer(d.rawFreq); })
+			.style('font-size', function(d) { return textSizer(d.data.rawFreq); })
 			.attr('x', 0)
-			.attr('y', function(d) { return textSizer(d.rawFreq)/4; })
-			.text(function(d) { return d.term; });
+			.attr('y', function(d) { return textSizer(d.data.rawFreq)/4; })
+			.text(function(d) { return d.data.term; });
 		text.append('tspan')
 			.attr('class', 'value')
-			.style('font-size', function(d) { return textSizer(d.rawFreq)*0.75; })
+			.style('font-size', function(d) { return textSizer(d.data.rawFreq)*0.75; })
 			.attr('x', 0)
-			.attr('y', function(d) { return textSizer(d.rawFreq)+1; });
+			.attr('y', function(d) { return textSizer(d.data.rawFreq)+1; });
 		
 		// exit
     	nodes.exit().remove();
@@ -23879,14 +23975,10 @@ Ext.define('Voyant.panel.TermsBerry', {
 		el.update(''); // make sure to clear existing contents (especially for re-layout)
     	var width = el.getWidth();
 		var height = el.getHeight();
-		
+
 		var me = this;
 		this.setVisLayout(
-			d3.layout.pack()
-				.sort(function(a, b) { return a.rawFreq < b.rawFreq ? 1 : a.rawFreq > b.rawFreq ? -1 : 0; })
-				.value(function(d) { return Math.pow(d.rawFreq, 1/me.getScalingFactor()); })
-				.size([width, height])
-				.padding(1.5)
+			d3.pack().size([width, height]).padding(1.5)
 		);
 		
 		var svg = d3.select(el.dom).append('svg').attr('id',this.getVisId()).attr('width', width).attr('height', height);
@@ -28951,10 +29043,11 @@ Ext.define('Voyant.notebook.Notebook', {
     loadFromUrl: function(url, isRun) {
     	var me = this;
 		if (url.indexOf("https://gist.github.com/")==0 || url.indexOf("https://gist.githubusercontent.com/")==0) {
-			url = "gist"+url.substring(url.indexOf(".com")+4, url.length - (url.charAt(url.length-1) == "/" ? 1 : 0));
+			url = "gist:"+url.substring(url.indexOf(".com")+5, url.length - (url.charAt(url.length-1) == "/" ? 1 : 0)).replace(/\//g, ":");
 		}
-		if (url.indexOf("gist/")==0) {
-			var gistParts = url.substring(5).split("/");
+    	debugger
+		if (url.indexOf("gist:")==0) {
+			var gistParts = url.substring(5).split(":");
 			if (gistParts.length<2) {
 				return this.showError(this.localize("invalidGistUrl"));
 			}
@@ -28962,7 +29055,7 @@ Ext.define('Voyant.notebook.Notebook', {
 				gistParts.splice(2,1); // remove raw
 			}
 			
-			var gistUrl = "gist/"+gistParts.slice(0,3).join("/");
+			var gistUrl = "gist:"+gistParts.slice(0,3).join(":");
 			window.history.pushState({
 				url: url
 			}, "Spiral Notebook: "+gistUrl, this.getBaseUrl()+"spiral/"+gistUrl);
@@ -29279,10 +29372,10 @@ Ext.define('Voyant.VoyantApp', {
         this.callParent(arguments);
         
         // palettes
-        var cat10 = d3.scale.category10().range().map(function(val) { return this.hexToRgb(val); }, this);
-        var cat20a = d3.scale.category20().range().map(function(val) { return this.hexToRgb(val); }, this);
-        var cat20b = d3.scale.category20b().range().map(function(val) { return this.hexToRgb(val); }, this);
-        var cat20c = d3.scale.category20c().range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat10 = d3.scaleOrdinal(d3.schemeCategory10).range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20a = d3.scaleOrdinal(d3.schemeCategory20).range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20b = d3.scaleOrdinal(d3.schemeCategory20b).range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20c = d3.scaleOrdinal(d3.schemeCategory20c).range().map(function(val) { return this.hexToRgb(val); }, this);
         this.addColorPalette('d3_cat10', cat10);
         this.addColorPalette('d3_cat20a', cat20a);
         this.addColorPalette('d3_cat20b', cat20b);

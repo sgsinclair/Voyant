@@ -1,0 +1,348 @@
+{
+    "metadata": {
+        "created": 1491488686379,
+        "modified": 1494858760581,
+        "version": 2,
+        "previousNotebook": "alta-tables",
+        "originalUrl": "alta-tables",
+        "url": "http://localhost:8080/voyant/spiral/alta-tables"
+    },
+    "blocks": [
+        {
+            "type": "text",
+            "input": [
+                "<h1 style=\"text-align: center;\">Introducing Custom Tables in Spiral Notebook</h1",
+                "><p>This notebook will help you work with custom Spiral Tables in your&nbsp;note",
+                "books (it's part of the <a data-tabindex-counter=\"52\" data-tabindex-value=\"none\"",
+                " data-cke-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target=\"_blank\">Art of Lit",
+                "erary Text Analysis with Spiral&nbsp;Notebooks</a>). In particular, we'll look a",
+                "t:</p><ul><li><a data-tabindex-counter=\"26\" data-tabindex-value=\"none\" data-cke-",
+                "saved-href=\"#create\" href=\"#create\" tabindex=\"-1\">creating a table</a></li><li><",
+                "a data-tabindex-counter=\"18\" data-tabindex-value=\"none\" data-cke-saved-href=\"#di",
+                "splay\" href=\"#display\" tabindex=\"-1\">displaying data&nbsp;from a table</a></li><",
+                "li><a data-tabindex-counter=\"52\" data-tabindex-value=\"none\" data-cke-saved-href=",
+                "\"#next\" href=\"#next\" tabindex=\"-1\">next steps</a></li></ul><p>In the previous no",
+                "tebook we looked at analyzing Edgar Allan Poe's \"The Gold Bug\" though we didn't ",
+                "spend much time on one of its key topics: cryptography. Indeed, for a literrary ",
+                "short story, there's a fairly good introduction to simple encryption, including ",
+                "this part:</p><blockquote><p>These characters, as any one might readily guess, f",
+                "orm a cipher --that is to say, they convey a meaning …&nbsp;Now, in English, the",
+                " letter which most frequently occurs is 'e'. Afterwards, the succession runs thu",
+                "s:&nbsp;<i>a o i d h n r s t u y c f g l m w b k p q x z</i>. E however predomin",
+                "ates so remarkably that an individual sentence of any length is rarely seen, in ",
+                "which it is not the prevailing character.</p></blockquote><p>Beyond an analysis ",
+                "of the story, wouldn't it be interesting to test this affirmation, and in partic",
+                "ular to see if the sequence of top frequency letters described in the short stor",
+                "y matches the sequence of top frequency letters in text of the short story itsel",
+                "f? We can do that! Sprial can help!</p><h2><img class=\"cke_anchor\" data-cke-real",
+                "element=\"%3Ca%20id%3D%22create%22%20data-cke-saved-name%3D%22create%22%20name%3D",
+                "%22create%22%3E%3C%2Fa%3E\" data-cke-real-node-type=\"1\" alt=\"Ancre\" title=\"Ancre\"",
+                " align=\"\" src=\"data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAA",
+                "BAAEAAAICRAEAOw==\" data-cke-real-element-type=\"anchor\">Creating a Table</h2><p>L",
+                "et's take a moment to describe the steps we'll follow:</p><ul><li>create a corpu",
+                "s with text from \"The Gold Bug\"</li><li>extract the actual text from the corpus<",
+                "/li><li>clean the text (so that we are left with letters from a to z)</li><li>cr",
+                "eate a table of letters and their frequencies</li><li>display output from the ta",
+                "ble</li></ul><h3>Create a Corpus with Text from \"The Gold Bug\"</h3><p>Just as we",
+                " did in the <a data-tabindex-counter=\"29\" data-tabindex-value=\"none\" data-cke-sa",
+                "ved-href=\"http://alta-smaller\" href=\"http://alta-smaller\" tabindex=\"-1\" target=\"",
+                "_blank\">previous notebook</a>, we'll start by <a data-tabindex-counter=\"29\" data",
+                "-tabindex-value=\"none\" data-cke-saved-href=\"http://alta-create#text\" href=\"http:",
+                "//alta-create#text\" tabindex=\"-1\" target=\"_blank\">creating our corpus</a> (in ca",
+                "se it doesn't yet exist).</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "new Corpus(\"https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt\", {",
+                "    inputRemoveUntil: 'THE GOLD-BUG',",
+                "    inputRemoveFrom: 'FOUR BEASTS IN ONE'",
+                "}).assign(\"goldbug\").show();"
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 70px'><div style=\"height: 57px\"><div style=\"height: 44px\"><d",
+                "iv style=\"height: 31px\"> <div class=\"info\">This corpus has 1 document with 13,73",
+                "1 <span class=\"info-tip\" data-qtip=\"every occurrence of every word (like multipl",
+                "e occurrences of &quot;the&quot;) is counted\">total words</span> and 2,756 <span",
+                " class=\"info-tip\" data-qtip=\"multiple occurrences of words (like &quot;the&quot;",
+                ") are counted once\">unique word forms</span>. Created <span class=\"info-tip\" dat",
+                "a-qtip=\"2017-04-17, 21:05:41\">about 19 minutes ago</span>.</div></div></div></di",
+                "v></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<h3>Extract the Actual Text from the Corpus</h3><p>You may recall from the&nbsp;",
+                "<a data-tabindex-counter=\"29\" data-tabindex-value=\"none\" data-cke-saved-href=\"ht",
+                "tp://alts-smaller\" href=\"http://alts-smaller\" tabindex=\"-1\" target=\"_blank\">prev",
+                "ious notebook</a> a discussion of <a data-tabindex-counter=\"29\" data-tabindex-va",
+                "lue=\"none\" data-cke-saved-href=\"http://en.wikipedia.org/wiki/Ajax_(programming)\"",
+                " href=\"http://en.wikipedia.org/wiki/Ajax_(programming)\" tabindex=\"-1\">asynchrono",
+                "us</a> Javascript which led us to use the assign function (instead of the more c",
+                "omplicated <code>promise … then</code> pattern). We can use a similar trick to g",
+                "et our plain text (note that we can assign and show a subset of the string, but ",
+                "any other processing after assign would need to occur in a separate block). We u",
+                "se <a data-cke-saved-href=\"../../docs/#!/api/Corpus-method-getPlainText\" href=\".",
+                "./../docs/#!/api/Corpus-method-getPlainText\" data-tabindex-value=\"none\" tabindex",
+                "=\"-1\" data-tabindex-counter=\"18\">getPlainText</a> here because the text isn't to",
+                "o long, we might not want to do this with a larger corpus of several books.</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "goldbug.getPlainText().assign(\"text\").show(100); // show first 100 characters",
+                ""
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 70px'><div style=\"height: 57px\"><div style=\"height: 44px\"><d",
+                "iv style=\"height: 31px\"> <div class=\"info\">THE GOLD-BUG\n         \n         What ",
+                "ho! what ho! this fellow is dancing mad!\n         \n         He </div></div></div",
+                "></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<h3>Clean the Text</h3>\n\n<p>We have the full text of \"The Gold Bug\", but we're o",
+                "nly interested in counting letters from a to z. In order to prepare the letters ",
+                "to be counted, we'll do two operations:</p>\n\n<ol>\n\t<li>convert the entire text t",
+                "o lowecase characters</li>\n\t<li>remove all the characters that aren't from a to ",
+                "z using a regular expression</li>\n</ol>\n\n<p>The first operation of converting to",
+                " lowercase is trivial, we use the <a href=\"https://developer.mozilla.org/en/docs",
+                "/Web/JavaScript/Reference/Global_Objects/String/toLowerCase\" target=\"_blank\" dat",
+                "a-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"19\">toLowerCase</a>",
+                " function. The second operation is a bit trickier. This isn't the venue to expla",
+                "in <a data-tabindex-counter=\"26\" data-tabindex-value=\"none\" href=\"https://develo",
+                "per.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions\" tabindex=\"-1\">",
+                "regular expressions</a> in detail, but essentially they provide a powerful mecha",
+                "nism for string matching that can use wildcards, character classes and character",
+                " ranges. In our case we can simply&nbsp;strip out all the caracters that are not",
+                " in the range from a to z: [^a-z].</p>\n\n<ul>\n\t<li>[] denotes a set of characters",
+                "</li>\n\t<li>^ specifies to match what is NOT the character that follows</li>\n\t<li",
+                ">a-z is treated as a single range (every character from a to z)</li>\n</ul>\n"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "// convert to lower case and replace non a-z characters with nothing",
+                "var clean = text.toLowerCase().replace(/[^a-z]/g, \"\")",
+                "show(clean.substring(0,50))"
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 70px'><div style=\"height: 57px\"><div style=\"height: 44px\"><d",
+                "iv style=\"height: 31px\"> <div class=\"info\">thegoldbugwhathowhathothisfellowisdan",
+                "cingmadhehath</div></div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<h3>Create a Table of Letter Frequencies</h3>\n\n<p>Creating a&nbsp;<a data-tabind",
+                "ex-counter=\"22\" data-tabindex-value=\"none\" href=\"../../docs/#!/api/Table\" tabind",
+                "ex=\"-1\">Table</a>&nbsp;in Spiral is easy, it can be something as simple as this:",
+                "</p>\n\n<blockquote>\n<pre><code>var table = new VoyantTable();</code></pre>\n</bloc",
+                "kquote>\n\n<p>As we'll see, tables provide convenient methods for updating values ",
+                "and for displaying output. Another benefit of Tables is a convenient way to coun",
+                "t the items in an array. In order to convert our string of letters into an array",
+                " of letters, we'll use the <a data-tabindex-counter=\"26\" data-tabindex-value=\"no",
+                "ne\" href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Glob",
+                "al_Objects/String/split\" tabindex=\"-1\" target=\"_blank\">split</a> function.</p>\n"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "var letters = clean.split(\"\"); // make an array, one letter per item",
+                "var table = new VoyantTable({count: letters, orientation: 'horizontal'}); // create a table with letter counts",
+                "table.show();"
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 103px'><div style=\"height: 90px\"><div style=\"height: 76px\"><",
+                "div style=\"height: 62px\"> <div class=\"info\"><table class=\"voyant-table\" style=\"\"",
+                " id=\"ext-285\"><thead><tr><th>e</th><th>t</th><th>a</th><th>o</th><th>i</th><th>n",
+                "</th><th>s</th><th>h</th><th>r</th><th>d</th><th>l</th><th>u</th><th>c</th><th>m",
+                "</th><th>f</th><th>w</th><th>p</th><th>y</th><th>g</th><th>b</th><th>v</th><th>k",
+                "</th><th>x</th><th>j</th><th>q</th><th>z</th></tr></thead><tbody><tr><td>7625</t",
+                "d><td>5485</td><td>4478</td><td>4208</td><td>4183</td><td>3912</td><td>3516</td>",
+                "<td>3372</td><td>3278</td><td>2533</td><td>2324</td><td>1893</td><td>1523</td><t",
+                "d>1500</td><td>1392</td><td>1303</td><td>1170</td><td>1146</td><td>1143</td><td>",
+                "1031</td><td>525</td><td>351</td><td>120</td><td>111</td><td>60</td><td>44</td><",
+                "/tr></tbody></table></div></div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>So we have a simple output of our table of letters. We definitely see that \"e",
+                "\" is first (counting the letters sorts them automatically by frequency), though ",
+                "the \"t\" is a bit of a surprise compared to the original. Let's try to output the",
+                " two sets of letters together:</p>\n"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "var lettersDescribed = \"e a o i d h n r s t u y c f g l m w b k p q x z\";",
+                "var lettersCounted = table.getHeaders().join(' '); // combine lettes with a space",
+                "show(\"<pre>\"+lettersDescribed+\"\\n\"+lettersCounted+\"</pre>\");",
+                ""
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 110px'><div style=\"height: 97px\"><div style=\"height: 83px\"><",
+                "div style=\"height: 70px\"> <div class=\"info\"><pre>e a o i d h n r s t u y c f g l",
+                " m w b k p q x z\ne t a o i n s h r d l u c m f w p y g b v k x j q z</pre></div>",
+                "</div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>Very interesting! For one thing, this shows that the list of letters describe",
+                "d in the text are missing two members, which we can determine to be \"v\" and \"j\".",
+                " Is this an omission from the author? From the edition? A quick look at some oth",
+                "er editions online suggest that the omission is common, perhaps to all editions.",
+                " The order of many other letters are different, the top letters are the most sig",
+                "nificant (such as the prominence of \"t\" in the text of \"Gold Bug\" that interrupt",
+                "s the sequence of vowels). We'd probably want to compare these frequencies to ot",
+                "her texts as well to see if \"The Gold Bug\" is somehow distinctive (and how commo",
+                "nly the sequence claimed in the text is right or wrong).</p><h2><img class=\"cke_",
+                "anchor\" data-cke-realelement=\"%3Ca%20id%3D%22display%22%20data-cke-saved-name%3D",
+                "%22display%22%20name%3D%22display%22%3E%3C%2Fa%3E\" data-cke-real-node-type=\"1\" a",
+                "lt=\"Ancre\" title=\"Ancre\" align=\"\" src=\"data:image/gif;base64,R0lGODlhAQABAPABAP/",
+                "//wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==\" data-cke-real-element-type=\"anchor\">D",
+                "isplaying Data from a Table</h2><p>Although the default table.show() method that",
+                " we used provides a nice display of the letter frequencies, it's also possible t",
+                "o display data from a table in other ways. In Sprial <code>show()</code> is usua",
+                "lly used for the simplest (and static)&nbsp;output possible while <code>embed()<",
+                "/code> is used for embedding interactive views. We can generate a default grid f",
+                "rom a table by simply calling <a data-tabindex-counter=\"18\" data-tabindex-value=",
+                "\"none\" data-cke-saved-href=\"../docs/#!/api/VoyantTable-method-embed\" href=\"../do",
+                "cs/#!/api/VoyantTable-method-embed\" tabindex=\"-1\" target=\"_blank\">embed</a>&nbsp",
+                ";(with a parameter to indicate that the grid should occupy 100% of the width ava",
+                "ilable).</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": "table.embed({width: \"100%\", height: \"100px\"});",
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 157px'><div style=\"height: 144px\"><div style=\"height: 131px\"",
+                "><div style=\"height: 118px\"> <div class=\"info\"><iframe src=\"../tool/VoyantTableT",
+                "ransform/?tableJson=%7B%22headers%22%3A%5B%22e%22%2C%22t%22%2C%22a%22%2C%22o%22%",
+                "2C%22i%22%2C%22n%22%2C%22s%22%2C%22h%22%2C%22r%22%2C%22d%22%2C%22l%22%2C%22u%22%",
+                "2C%22c%22%2C%22m%22%2C%22f%22%2C%22w%22%2C%22p%22%2C%22y%22%2C%22g%22%2C%22b%22%",
+                "2C%22v%22%2C%22k%22%2C%22x%22%2C%22j%22%2C%22q%22%2C%22z%22%5D%2C%22rows%22%3A%5",
+                "B%5B7625%2C5485%2C4478%2C4208%2C4183%2C3912%2C3516%2C3372%2C3278%2C2533%2C2324%2",
+                "C1893%2C1523%2C1500%2C1392%2C1303%2C1170%2C1146%2C1143%2C1031%2C525%2C351%2C120%",
+                "2C111%2C60%2C44%5D%5D%7D&amp;width=100%25&amp;debug=true\" style=\"width: 100%; he",
+                "ight: 100px\" id=\"ext-286\" name=\"ext-286\" data-tabindex-value=\"none\" tabindex=\"-1",
+                "\" data-tabindex-counter=\"4\"></iframe></div></div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>Although we can show and hide columns (see <a data-tabindex-counter=\"17\" data",
+                "-tabindex-value=\"none\" data-cke-saved-href=\"../docs/#!/guide/grids\" href=\"../doc",
+                "s/#!/guide/grids\" tabindex=\"-1\" target=\"_blank\">documentation on grids</a>), in ",
+                "this case the grid isn't all that useful, and arguably harder to read than outpu",
+                "t from show(). But when tables have several rows of data and one wishes to do th",
+                "ings like sort columns, embedding a table can be useful.</p><p>In this case what",
+                " might be more useful is embedding a chart. However, before we do that, we're go",
+                "ing to recreate our table with the default vertical orientation instead of the h",
+                "orizontal orientation we had previously (which was a very compact way of seeing ",
+                "letters as column headers and counts in the first row, but which arguably isn't ",
+                "a very standard way of showing tabular data).</p>"
+            ]
+        },
+        {
+            "type": "code",
+            "input": [
+                "var verticalTable = new VoyantTable({count: letters, headers: [\"Letter\", \"Count\"]}); // create a table with letter counts",
+                "verticalTable.show();"
+            ],
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 654px'><div style=\"height: 640px\"><div style=\"height: 626px\"",
+                "><div style=\"height: 612px\"> <div class=\"info\"><table class=\"voyant-table\" style",
+                "=\"\" id=\"ext-287\"><thead><tr><th>Letter</th><th>Count</th></tr></thead><tbody><tr",
+                "><td>e</td><td>7625</td></tr><tr><td>t</td><td>5485</td></tr><tr><td>a</td><td>4",
+                "478</td></tr><tr><td>o</td><td>4208</td></tr><tr><td>i</td><td>4183</td></tr><tr",
+                "><td>n</td><td>3912</td></tr><tr><td>s</td><td>3516</td></tr><tr><td>h</td><td>3",
+                "372</td></tr><tr><td>r</td><td>3278</td></tr><tr><td>d</td><td>2533</td></tr><tr",
+                "><td>l</td><td>2324</td></tr><tr><td>u</td><td>1893</td></tr><tr><td>c</td><td>1",
+                "523</td></tr><tr><td>m</td><td>1500</td></tr><tr><td>f</td><td>1392</td></tr><tr",
+                "><td>w</td><td>1303</td></tr><tr><td>p</td><td>1170</td></tr><tr><td>y</td><td>1",
+                "146</td></tr><tr><td>g</td><td>1143</td></tr><tr><td>b</td><td>1031</td></tr><tr",
+                "><td>v</td><td>525</td></tr><tr><td>k</td><td>351</td></tr><tr><td>x</td><td>120",
+                "</td></tr><tr><td>j</td><td>111</td></tr><tr><td>q</td><td>60</td></tr><tr><td>z",
+                "</td><td>44</td></tr></tbody></table></div></div></div></div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>No surprises, but now that we have a more standard table, we can easily creat",
+                "e a line chart that shows the letter counts on the y (vertical) axis and the let",
+                "ters on the x (horizontal) axis.</p>\n"
+            ]
+        },
+        {
+            "type": "code",
+            "input": "verticalTable.embed('VoyantChart', {width: 500});",
+            "mode": "javascript",
+            "output": [
+                "<div style='height: 457px'><div style=\"height: 444px\"><div style=\"height: 431px\"",
+                "><div style=\"height: 418px\"> <div class=\"info\"><iframe style=\"width: 500px; heig",
+                "ht: 400px\" id=\"ext-288\" name=\"ext-288\" src=\"../tool/VoyantChart/?minimal=true&am",
+                "p;embeddedConfig=376832306917e54f37ef5194043b5421&amp;debug=true\" data-tabindex-",
+                "value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"4\"></iframe></div></div></div>",
+                "</div></div>"
+            ]
+        },
+        {
+            "type": "text",
+            "input": [
+                "<p>The resulting graph is something close to what's called <a data-tabindex-coun",
+                "ter=\"9\" data-tabindex-value=\"none\" data-cke-saved-href=\"https://en.wikipedia.org",
+                "/wiki/Zipf%27s_law\" href=\"https://en.wikipedia.org/wiki/Zipf%27s_law\" tabindex=\"",
+                "-1\" target=\"_blank\">Zipf's Law</a> which states that (for many lingustic phenome",
+                "na like letter and word counts), frequency is inversely proportional to rank (or",
+                ", roughly speaking, each letter is about half as frequent as its predecessor). W",
+                "hile not quite a clean curve, the letter counts in Gold Bug somewhat follows Zip",
+                "f's Law.</p><p>So we've looked at how easy and convenient it can be to create a ",
+                "table, in this case of letter frequencies&nbsp;in \"The Gold Bug\" and how tables ",
+                "can be display, including as grids and as charts.</p><h2><img class=\"cke_anchor\"",
+                " data-cke-realelement=\"%3Ca%20id%3D%22next%22%20data-cke-saved-name%3D%22next%22",
+                "%20name%3D%22next%22%3E%3C%2Fa%3E\" data-cke-real-node-type=\"1\" alt=\"Ancre\" title",
+                "=\"Ancre\" align=\"\" src=\"data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAA",
+                "ALAAAAAABAAEAAAICRAEAOw==\" data-cke-real-element-type=\"anchor\">Next Steps</h2><p",
+                ">Here are some exercises to try, based on the contents of this notebook:</p><ul>",
+                "<li>the prominence of the letter \"t\" in \"The Gold Bug\" is certainly unusual, any",
+                " theories why? Could you describe in English (not in code) the steps that might ",
+                "be needed to better understand the use and distribution of the letter \"t\"?</li><",
+                "li>create a new corpus from a different <a data-tabindex-counter=\"8\" data-tabind",
+                "ex-value=\"none\" data-cke-saved-href=\"https://www.gutenberg.org/wiki/Short_Storie",
+                "s_(Bookshelf)\" href=\"https://www.gutenberg.org/wiki/Short_Stories_(Bookshelf)\" t",
+                "abindex=\"-1\" target=\"_blank\">short story</a>&nbsp;and start exploring it in the ",
+                "same way we did here, is the order of letters different?</li></ul><p>If you're w",
+                "orking sequentially&nbsp;through the <a data-tabindex-counter=\"18\" data-tabindex",
+                "-value=\"none\" data-cke-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target=\"_blan",
+                "k\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>, the next notebo",
+                "ok&nbsp;is <a data-tabindex-counter=\"6\" data-tabindex-value=\"none\" data-cke-save",
+                "d-href=\"alta-scale\" href=\"alta-scale\" tabindex=\"-1\" target=\"_blank\">Thinking abo",
+                "ut Scale</a>.</p>"
+            ]
+        }
+    ]
+}
