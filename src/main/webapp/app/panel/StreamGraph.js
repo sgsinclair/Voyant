@@ -21,6 +21,9 @@ Ext.define('Voyant.panel.StreamGraph', {
     	visLayout: undefined,
     	vis: undefined,
     	mode: 'corpus',
+    	
+    	layerData: undefined,
+    	
     	graphId: undefined
     },
     
@@ -249,27 +252,10 @@ Ext.define('Voyant.panel.StreamGraph', {
     },
     
     loadFromRecords: function(records) {
-    	var app = this.getApplication();
-    	var color = function(name) {
-    		return app.getColorForTerm(name, true);
-    	};
-    	
-    	var steps;
-    	if (this.getMode() === this.MODE_DOCUMENT) {
-    		steps = this.getApiParam('bins');
-    	} else {
-    		var bins = this.getApiParam('bins');
-    		var docsCount = this.getCorpus().getDocumentsCount();
-    		
-    		steps = bins < docsCount ? bins : docsCount;
-    	}
-    	
     	var legendData = [];
-    	var keys = [];
     	var layers = [];
     	records.forEach(function(record, index) {
     		var key = record.getTerm();
-    		keys.push(key);
     		var values = record.get('distributions');
     		for (var i = 0; i < values.length; i++) {
     			if (layers[i] === undefined) {
@@ -277,102 +263,126 @@ Ext.define('Voyant.panel.StreamGraph', {
     			}
     			layers[i][key] = values[i];
     		}
-    		legendData.push({id: key, name: key, mark: color(key), active: true});
+    		legendData.push({id: key, name: key, mark: this.getApplication().getColorForTerm(key, true), active: true});
     	}, this);
+    	
+    	this.setLayerData(layers);
     	
     	this.down('[xtype=legend]').getStore().loadData(legendData);
 
-    	this.getVisLayout().keys(keys);
-    	var processedLayers = this.getVisLayout()(layers);
-    	
-    	var width = this.body.down('svg').getWidth() - this.graphMargin.left - this.graphMargin.right;
-    	var x = d3.scaleLinear().domain([0, steps-1]).range([0, width]);
-    	
-    	var min = d3.min(processedLayers, function(layer) {
-    		return d3.min(layer, function(d) { return d[0]; });
-    	});
-    	var max = d3.max(processedLayers, function(layer) {
-    		return d3.max(layer, function(d) { return d[1]; });
-    	});
-    	
-    	var height = this.body.down('svg').dom.clientHeight - this.graphMargin.top - this.graphMargin.bottom;
-    	var y = d3.scaleLinear().domain([min, max]).range([height, 0]);
-    	
-    	var area = d3.area()
-	    	.x(function(d, i) { return x(i); })
-		    .y0(function(d) { return y(d[0]); })
-		    .y1(function(d) { return y(d[1]); })
-		    .curve(d3.curveCatmullRom);
-    	
-    	var xAxis;
-    	if (this.getMode() === this.MODE_CORPUS) {
-    		var xAxisDomain = [];
-    		this.getCorpus().getDocuments().each(function(doc) {
-    			xAxisDomain.push(doc.getTinyLabel());
-    		});
-    		var xAxisScale = d3.scalePoint().domain(xAxisDomain).range([0, width]);    		
-    		xAxis = d3.axisBottom(xAxisScale);
-    	} else {
-    		xAxis = d3.axisBottom(x);
-    	}
-    	
-    	var yAxis = d3.axisLeft(y);
-    	
-    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d; });
-    	
-    	paths
-    		.attr('d', function(d) { return area(d); })
-	    	.style('fill', function(d, i) { return color(d.key); })
-			.select('title').text(function (d) { return d.key; });
-    	
-    	paths.enter().append('path')
-			.attr('d', function(d) { return area(d); })
-			.style('fill', function(d, i) { return color(d.key); })
-			.append('title').text(function (d) { return d.key; });
-    	
-    	paths.exit().remove();
-    	
-    	this.getVis().selectAll('g.axis').remove();
-    	
-    	this.getVis().append('g')
-    		.attr('class', 'axis x')
-    		.attr('transform', 'translate(0,'+height+')')
-    		.call(xAxis);
-    	
-    	var xAxisText;
-    	if (this.getMode() === this.MODE_CORPUS) {
-    		this.getVis().select('g.axis.x').selectAll('text').each(function() {
-				d3.select(this)
-					.attr('text-anchor', 'end')
-					.attr('transform', 'rotate(-45)');
-    		});
+    	this.doLayout();
+    },
+    
+    doLayout: function(layers) {
+    	var layers = this.getLayerData();
+    	if (layers !== undefined) {
+    		var me = this;
     		
-    		xAxisText = this.localize('documents');
-    	} else {
-    		xAxisText = this.localize('documentSegments');
+	    	var keys = [];
+	    	this.down('[xtype=legend]').getStore().each(function(r) { keys.push(r.getId()); });
+	    	
+	    	var steps;
+	    	if (this.getMode() === this.MODE_DOCUMENT) {
+	    		steps = this.getApiParam('bins');
+	    	} else {
+	    		var bins = this.getApiParam('bins');
+	    		var docsCount = this.getCorpus().getDocumentsCount();
+	    		
+	    		steps = bins < docsCount ? bins : docsCount;
+	    	}
+	    	
+	    	this.getVisLayout().keys(keys);
+	    	var processedLayers = this.getVisLayout()(layers);
+	    	
+	    	var width = this.body.down('svg').getWidth() - this.graphMargin.left - this.graphMargin.right;
+	    	var x = d3.scaleLinear().domain([0, steps-1]).range([0, width]);
+	    	
+	    	var min = d3.min(processedLayers, function(layer) {
+	    		return d3.min(layer, function(d) { return d[0]; });
+	    	});
+	    	var max = d3.max(processedLayers, function(layer) {
+	    		return d3.max(layer, function(d) { return d[1]; });
+	    	});
+	    	
+	    	var height = this.body.down('svg').dom.clientHeight - this.graphMargin.top - this.graphMargin.bottom;
+	    	var y = d3.scaleLinear().domain([min, max]).range([height, 0]);
+	    	
+	    	var area = d3.area()
+		    	.x(function(d, i) { return x(i); })
+			    .y0(function(d) { return y(d[0]); })
+			    .y1(function(d) { return y(d[1]); })
+			    .curve(d3.curveCatmullRom);
+	    	
+	    	var xAxis;
+	    	if (this.getMode() === this.MODE_CORPUS) {
+	    		var xAxisDomain = [];
+	    		this.getCorpus().getDocuments().each(function(doc) {
+	    			xAxisDomain.push(doc.getTinyLabel());
+	    		});
+	    		var xAxisScale = d3.scalePoint().domain(xAxisDomain).range([0, width]);    		
+	    		xAxis = d3.axisBottom(xAxisScale);
+	    	} else {
+	    		xAxis = d3.axisBottom(x);
+	    	}
+	    	
+	    	var yAxis = d3.axisLeft(y);
+	    	
+	    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d; });
+	    	
+	    	paths
+	    		.attr('d', function(d) { return area(d); })
+		    	.style('fill', function(d) { return me.getApplication().getColorForTerm(d.key, true); })
+				.select('title').text(function (d) { return d.key; });
+	    	
+	    	paths.enter().append('path')
+				.attr('d', function(d) { return area(d); })
+				.style('fill', function(d) { return me.getApplication().getColorForTerm(d.key, true); })
+				.append('title').text(function (d) { return d.key; });
+	    	
+	    	paths.exit().remove();
+	    	
+	    	this.getVis().selectAll('g.axis').remove();
+	    	
+	    	this.getVis().append('g')
+	    		.attr('class', 'axis x')
+	    		.attr('transform', 'translate(0,'+height+')')
+	    		.call(xAxis);
+	    	
+	    	var xAxisText;
+	    	if (this.getMode() === this.MODE_CORPUS) {
+	    		this.getVis().select('g.axis.x').selectAll('text').each(function() {
+					d3.select(this)
+						.attr('text-anchor', 'end')
+						.attr('transform', 'rotate(-45)');
+	    		});
+	    		
+	    		xAxisText = this.localize('documents');
+	    	} else {
+	    		xAxisText = this.localize('documentSegments');
+	    	}
+	    	this.getVis().select('g.axis.x').append("text")
+				.attr('text-anchor', 'middle')
+				.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-30)+')')
+				.attr('fill', '#000')
+				.text(xAxisText);
+	    	
+	    	this.getVis().append('g')
+				.attr('class', 'axis y')
+				.attr('transform', 'translate(0,0)')
+				.call(yAxis);
+	    	
+	    	var yAxisText;
+	    	if (this.getApiParam('withDistributions') === 'raw') {
+	    		yAxisText = this.localize('rawFrequencies');
+	    	} else {
+	    		yAxisText = this.localize('relativeFrequencies');
+	    	}
+	    	this.getVis().select('g.axis.y').append("text")
+				.attr('text-anchor', 'middle')
+				.attr('transform', 'translate(-'+(this.graphMargin.left-20)+', '+height/2+') rotate(-90)')
+				.attr('fill', '#000')
+				.text(yAxisText);
     	}
-    	this.getVis().select('g.axis.x').append("text")
-			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-30)+')')
-			.attr('fill', '#000')
-			.text(xAxisText);
-    	
-    	this.getVis().append('g')
-			.attr('class', 'axis y')
-			.attr('transform', 'translate(0,0)')
-			.call(yAxis);
-    	
-    	var yAxisText;
-    	if (this.getApiParam('withDistributions') === 'raw') {
-    		yAxisText = this.localize('rawFrequencies');
-    	} else {
-    		yAxisText = this.localize('relativeFrequencies');
-    	}
-    	this.getVis().select('g.axis.y').append("text")
-			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate(-'+(this.graphMargin.left-20)+', '+height/2+') rotate(-90)')
-			.attr('fill', '#000')
-			.text(yAxisText);
     },
     
 	getCurrentTerms: function() {
@@ -403,7 +413,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 		
 		d3.select(el.dom).select('svg').attr('width', width).attr('height', height);
 		
-		// TODO recalculate streams
+		this.doLayout();
     }
 });
 
