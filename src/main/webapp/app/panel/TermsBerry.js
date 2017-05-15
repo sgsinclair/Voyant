@@ -125,7 +125,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 	            			slider.setValue(parseInt(this.getApiParam('numInitialTerms')));
 	            		},
 	            		changecomplete: function(slider, newvalue) {
-	            			this.setApiParam("numInitialTerms", newvalue)
+	            			this.setApiParam("numInitialTerms", newvalue);
 	            			this.doLoad();
 	            		},
 	            		scope: this
@@ -165,11 +165,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 	            		changecomplete: function(slider, newvalue) {
 	            			// use the inverse of the value since it'll make more sense to the user
 	            			var value = Math.abs(newvalue-(this.MAX_SCALING+1));
-	            			
 	            			this.setScalingFactor(value);
-	            			
-	            			this.getVisLayout().value(function(d) { return Math.pow(d.rawFreq, 1/value); });
-	            			
 	            			this.reload();
 	            		},
 	            		scope: this
@@ -195,8 +191,8 @@ Ext.define('Voyant.panel.TermsBerry', {
 				handler: function(b, e) {
 					var node = this.getCurrentNode();
 					if (node !== undefined) {
-						delete this.getCurrentData()[node.term];
-						this.getBlacklist()[node.term] = true;
+						delete this.getCurrentData()[node.data.term];
+						this.getBlacklist()[node.data.term] = true;
 						this.setCurrentNode(undefined);
 					}
 					this.getContextMenu().hide();
@@ -433,30 +429,40 @@ Ext.define('Voyant.panel.TermsBerry', {
     },
     
     buildVisFromData: function(data) {
-    	// compute node xy
-    	var processedData = this.getVisLayout().nodes({children: data, collocates:[], term: '', rawFreq: 1});
+    	var me = this;
+    	
+    	var rootId = '$$$root$$$';
+    	data.push({term: rootId, collocates:[], rawFreq:1});
+    	var root = d3.stratify()
+    		.id(function(d) { return d.term; })
+    		.parentId(function(d) {
+    			if (d.term !== rootId) return rootId;
+				else return '';
+			})(data)
+			.sort(function(a, b) { return a.rawFreq < b.rawFreq ? 1 : a.rawFreq > b.rawFreq ? -1 : 0; })
+			.sum(function(d) { return Math.pow(d.rawFreq, 1/me.getScalingFactor()); });
+    	this.getVisLayout()(root);
+    	
     	// join nodes with data
-    	var nodes = this.getVis().selectAll('.node').data(processedData, function(d) { return d.term; } ); // use term as key
+    	var nodes = this.getVis().selectAll('.node').data(root.descendants());
     	
     	// update
     	nodes.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
     	nodes.selectAll('circle').attr('r', function(d) { return d.r; });
     	
-    	var me = this;
-    	
     	var idGet = function(term) {
     		return term.replace(/\W/g, '_'); // remove non-word characters to create valid DOM ids
     	};
     	
-    	var collocateFill = d3.scale.pow().exponent(1/3)
+    	var collocateFill = d3.scalePow().exponent(1/3)
 			.domain([0,this.getMaxCollocateValue()]).range(['#fff', '#bd3163']);
     	
     	var defaultFill;
     	if (this.getMode() === this.MODE_DISTINCT) {
-    		defaultFill = d3.scale.pow().exponent(1/5)
+    		defaultFill = d3.scalePow().exponent(1/5)
     			.domain([this.getMinFillValue(), this.getMaxFillValue()]).range(['#dedede', '#fff']);
     	} else {
-    		defaultFill = d3.scale.linear()
+    		defaultFill = d3.scaleLinear()
 				.domain([this.getMaxFillValue(), this.getMinFillValue()]).range(['#dedede', '#fff']);
     	}
     	
@@ -464,7 +470,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     	var size = this.getVisLayout().size();
     	var layoutRadius = Math.min(size[0], size[1]) / 2;
     	var layoutArea = Math.PI*(layoutRadius*layoutRadius);
-    	var totalTerms = nodes[0].length-1;
+    	var totalTerms = data.length;
     	var termArea = layoutArea / totalTerms;
     	var termRadius = Math.sqrt(termArea / Math.PI);
     	var minFontSize = termRadius / 3;
@@ -472,7 +478,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     	scalingInverse = Math.max(1, scalingInverse-1); // substract one to avoid too large fonts
     	var maxFontSize = minFontSize * scalingInverse;
 
-    	var textSizer = d3.scale.linear()//pow().exponent(1/2)
+    	var textSizer = d3.scaleLinear()//pow().exponent(1/2)
     		.domain([this.getMinRawFreq(),this.getMaxRawFreq()]).range([minFontSize, maxFontSize]);
     	
     	// enter
@@ -481,7 +487,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     		.style('visibility', function(d) { return d.depth > 0 ? 'visible' : 'hidden'; }) // hide root
     		.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
     		.on('click', function(d) {
-    			me.dispatchEvent('termsClicked', me, [d.term]);
+    			me.dispatchEvent('termsClicked', me, [d.data.term]);
     		})
     		.on('mouseover', function(d, i) {
     			me.setCurrentNode(d);
@@ -489,7 +495,7 @@ Ext.define('Voyant.panel.TermsBerry', {
     			me.getVis().selectAll('circle')
     				.style('stroke-width', 1)
     				.style('stroke', '#111')
-        			.style('fill', function(d) { return defaultFill(d.inDocumentsCount); });
+        			.style('fill', function(d) { return defaultFill(d.data.fillValue); });
     			
     			d3.select(this).select('circle')
     				.style('fill', '#89e1c2')
@@ -504,15 +510,15 @@ Ext.define('Voyant.panel.TermsBerry', {
     			}
     			
     			if (!me.getContextMenu().isVisible()) {
-	    			var info = '<b>'+d.term+'</b> ('+d.rawFreq+')<br/>'+fillLabel+': '+d.fillValue;
+	    			var info = '<b>'+d.data.term+'</b> ('+d.data.rawFreq+')<br/>'+fillLabel+': '+d.data.fillValue;
 					var tip = me.getTip();
 					tip.update(info);
 					tip.show();
     			}
 				
-				for (var i = 0; i < d.collocates.length; i++) {
-					var collocate = d.collocates[i];
-					var match = me.getVis().selectAll('.node').filter(function(d) { return d.term === collocate.term; })
+				for (var i = 0; i < d.data.collocates.length; i++) {
+					var collocate = d.data.collocates[i];
+					var match = me.getVis().selectAll('.node').filter(function(d) { return d.data.term === collocate.term; });
 					match.select('circle')
 						.style('fill', function(d) { return collocateFill(collocate.value); })
 						.style('stroke', '#bd3163')
@@ -529,7 +535,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 				}
 				
 				me.getVis().selectAll('circle').style('stroke-opacity', me.MIN_STROKE_OPACITY).style('stroke', '#111')
-	    			.style('fill', function(d) { return defaultFill(d.fillValue); });
+	    			.style('fill', function(d) { return defaultFill(d.data.fillValue); });
 				me.getVis().selectAll('tspan.value').text('');
 				me.getTip().hide();
 //				me.getVisInfo().text('');
@@ -538,37 +544,39 @@ Ext.define('Voyant.panel.TermsBerry', {
 				d3.event.preventDefault();
 				me.getTip().hide();
 				var menu = me.getContextMenu();
-				menu.queryById('label').setHtml(d.term);
+				menu.queryById('label').setHtml(d.data.term);
 				menu.showAt(d3.event.pageX+5, d3.event.pageY-50);
 			});
     	
     	node.append('circle')
-    		.attr('id', function(d) { return idGet(d.term); })
+    		.attr('id', function(d) {
+    			return idGet(d.data.term);
+			})
 			.attr('r', function(d) { return d.r; })
-			.style('fill', function(d) { return defaultFill(d.fillValue); })
+			.style('fill', function(d) { return defaultFill(d.data.fillValue); })
 			.style('stroke', '#111')
 			.style('stroke-opacity', me.MIN_STROKE_OPACITY)
 			.style('stroke-width', 1);
     	
-    	node.append('clipPath').attr('id', function(d) { return 'clip-' + idGet(d.term); })
-    		.append('use').attr('xlink:href', function(d) { return '#' + idGet(d.term); });
+    	node.append('clipPath').attr('id', function(d) { return 'clip-' + idGet(d.data.term); })
+    		.append('use').attr('xlink:href', function(d) { return '#' + idGet(d.data.term); });
 		
     	var text = node.append('text')
-    		.attr('clip-path', function(d) { return 'url(#clip-' + idGet(d.term) + ')'; })
-    		.style('font-family', function(d) { return me.getApplication().getFeatureForTerm('font', d.term); })
+    		.attr('clip-path', function(d) { return 'url(#clip-' + idGet(d.data.term) + ')'; })
+    		.style('font-family', function(d) { return me.getApplication().getFeatureForTerm('font', d.data.term); })
 			.style('text-anchor', 'middle')
 			.style('cursor', 'default');
 		text.append('tspan')
 			.attr('class', 'term')
-			.style('font-size', function(d) { return textSizer(d.rawFreq); })
+			.style('font-size', function(d) { return textSizer(d.data.rawFreq); })
 			.attr('x', 0)
-			.attr('y', function(d) { return textSizer(d.rawFreq)/4; })
-			.text(function(d) { return d.term; });
+			.attr('y', function(d) { return textSizer(d.data.rawFreq)/4; })
+			.text(function(d) { return d.data.term; });
 		text.append('tspan')
 			.attr('class', 'value')
-			.style('font-size', function(d) { return textSizer(d.rawFreq)*0.75; })
+			.style('font-size', function(d) { return textSizer(d.data.rawFreq)*0.75; })
 			.attr('x', 0)
-			.attr('y', function(d) { return textSizer(d.rawFreq)+1; });
+			.attr('y', function(d) { return textSizer(d.data.rawFreq)+1; });
 		
 		// exit
     	nodes.exit().remove();
@@ -580,14 +588,10 @@ Ext.define('Voyant.panel.TermsBerry', {
 		el.update(''); // make sure to clear existing contents (especially for re-layout)
     	var width = el.getWidth();
 		var height = el.getHeight();
-		
+
 		var me = this;
 		this.setVisLayout(
-			d3.layout.pack()
-				.sort(function(a, b) { return a.rawFreq < b.rawFreq ? 1 : a.rawFreq > b.rawFreq ? -1 : 0; })
-				.value(function(d) { return Math.pow(d.rawFreq, 1/me.getScalingFactor()); })
-				.size([width, height])
-				.padding(1.5)
+			d3.pack().size([width, height]).padding(1.5)
 		);
 		
 		var svg = d3.select(el.dom).append('svg').attr('id',this.getVisId()).attr('width', width).attr('height', height);

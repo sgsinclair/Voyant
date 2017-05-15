@@ -69,7 +69,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 	            	text: this.localize('clearTerms'),
 	            	handler: function() {
 	            		this.setApiParams({query: undefined});
-	            		this.loadFromRecords([])
+	            		this.loadFromRecords([]);
 	            	},
 	            	scope: this
 	            },{
@@ -254,73 +254,82 @@ Ext.define('Voyant.panel.StreamGraph', {
     		return app.getColorForTerm(name, true);
     	};
     	
-    	var legendStore = this.down('[xtype=legend]').getStore();
-    	var legendData = [];
-    	var layers = [];
-    	records.forEach(function(record, index) {
-    		var termLayer = [];
-    		var key = record.getTerm();
-    		record.get('distributions').forEach(function(r, i) {
-    			termLayer.push({x: i, y: r});
-    		}, this);
-    		layers.push({name: key, values: termLayer});
-    		legendData.push({id: key, name: key, mark: color(key), active: true});
-    	}, this);
-    	
-    	legendStore.loadData(legendData);
-    	
-    	var processedLayers = this.getVisLayout()(layers);
-    	
     	var steps;
     	if (this.getMode() === this.MODE_DOCUMENT) {
     		steps = this.getApiParam('bins');
     	} else {
     		var bins = this.getApiParam('bins');
     		var docsCount = this.getCorpus().getDocumentsCount();
+    		
     		steps = bins < docsCount ? bins : docsCount;
     	}
-    	steps--;
+    	
+    	var legendData = [];
+    	var keys = [];
+    	var layers = [];
+    	records.forEach(function(record, index) {
+    		var key = record.getTerm();
+    		keys.push(key);
+    		var values = record.get('distributions');
+    		for (var i = 0; i < values.length; i++) {
+    			if (layers[i] === undefined) {
+    				layers[i] = {};
+    			}
+    			layers[i][key] = values[i];
+    		}
+    		legendData.push({id: key, name: key, mark: color(key), active: true});
+    	}, this);
+    	
+    	this.down('[xtype=legend]').getStore().loadData(legendData);
+
+    	this.getVisLayout().keys(keys);
+    	var processedLayers = this.getVisLayout()(layers);
     	
     	var width = this.body.down('svg').getWidth() - this.graphMargin.left - this.graphMargin.right;
-    	var x = d3.scale.linear().domain([0, steps]).range([0, width]);
+    	var x = d3.scaleLinear().domain([0, steps-1]).range([0, width]);
     	
-    	var max = d3.max(processedLayers, function(layer) {
-    		return d3.max(layer.values, function(d) { return d.y0 + d.y; });
+    	var min = d3.min(processedLayers, function(layer) {
+    		return d3.min(layer, function(d) { return d[0]; });
     	});
-
+    	var max = d3.max(processedLayers, function(layer) {
+    		return d3.max(layer, function(d) { return d[1]; });
+    	});
+    	
     	var height = this.body.down('svg').dom.clientHeight - this.graphMargin.top - this.graphMargin.bottom;
-    	var y = d3.scale.linear().domain([0, max]).range([height, 0]);
+    	var y = d3.scaleLinear().domain([min, max]).range([height, 0]);
     	
-    	var area = d3.svg.area()
-	    	.x(function(d) { return x(d.x); })
-			.y0(function(d) { return y(d.y0); })
-			.y1(function(d) { return y(d.y0 + d.y); });
+    	var area = d3.area()
+	    	.x(function(d, i) { return x(i); })
+		    .y0(function(d) { return y(d[0]); })
+		    .y1(function(d) { return y(d[1]); })
+		    .curve(d3.curveCatmullRom);
     	
-    	var xAxis = d3.svg.axis().scale(x).orient('bottom');
+    	var xAxis;
     	if (this.getMode() === this.MODE_CORPUS) {
-    		var tickvals = [];
-    		for (var i = 0; i <= steps; i++) {
-    			tickvals.push(i);
-    		}
-    		xAxis.tickValues(tickvals); // force number of ticks
-    		xAxis.tickFormat(''); // hide tick numbers
+    		var xAxisDomain = [];
+    		this.getCorpus().getDocuments().each(function(doc) {
+    			xAxisDomain.push(doc.getTinyLabel());
+    		});
+    		var xAxisScale = d3.scalePoint().domain(xAxisDomain).range([0, width]);    		
+    		xAxis = d3.axisBottom(xAxisScale);
+    	} else {
+    		xAxis = d3.axisBottom(x);
     	}
     	
-    	var yAxis = d3.svg.axis().scale(y).orient('left');
+    	var yAxis = d3.axisLeft(y);
     	
-    	// join
-    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d.name; });
+    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d; });
     	
-    	// update
-    	paths.attr('d', function(d) { return area(d.values); }).style('fill', function(d, i) { return color(d.name); });
+    	paths
+    		.attr('d', function(d) { return area(d); })
+	    	.style('fill', function(d, i) { return color(d.key); })
+			.select('title').text(function (d) { return d.key; });
     	
-    	// enter
     	paths.enter().append('path')
-		.attr('d', function(d) { return area(d.values); })
-		.style('fill', function(d, i) { return color(d.name); })
-		.append('title').text(function (d) { return d.name; });
+			.attr('d', function(d) { return area(d); })
+			.style('fill', function(d, i) { return color(d.key); })
+			.append('title').text(function (d) { return d.key; });
     	
-    	// exit
     	paths.exit().remove();
     	
     	this.getVis().selectAll('g.axis').remove();
@@ -332,24 +341,20 @@ Ext.define('Voyant.panel.StreamGraph', {
     	
     	var xAxisText;
     	if (this.getMode() === this.MODE_CORPUS) {
-    		var stepIncrement = width / steps;
-    		var currStep = 0;
-    		this.getCorpus().getDocuments().each(function(doc) {
-    			this.getVis().select('g.x').append("text")
+    		this.getVis().select('g.axis.x').selectAll('text').each(function() {
+				d3.select(this)
 					.attr('text-anchor', 'end')
-					.attr('transform', 'translate('+currStep+', 10) rotate(-45)')
-					.text(doc.getTinyTitle());
-    			
-    			currStep += stepIncrement;
-    		}, this);
+					.attr('transform', 'rotate(-45)');
+    		});
     		
     		xAxisText = this.localize('documents');
     	} else {
     		xAxisText = this.localize('documentSegments');
     	}
-    	this.getVis().select('g.x').append("text")
+    	this.getVis().select('g.axis.x').append("text")
 			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-20)+')')
+			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-30)+')')
+			.attr('fill', '#000')
 			.text(xAxisText);
     	
     	this.getVis().append('g')
@@ -363,9 +368,10 @@ Ext.define('Voyant.panel.StreamGraph', {
     	} else {
     		yAxisText = this.localize('relativeFrequencies');
     	}
-    	this.getVis().select('g.y').append("text")
+    	this.getVis().select('g.axis.y').append("text")
 			.attr('text-anchor', 'middle')
 			.attr('transform', 'translate(-'+(this.graphMargin.left-20)+', '+height/2+') rotate(-90)')
+			.attr('fill', '#000')
 			.text(yAxisText);
     },
     
@@ -382,14 +388,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     initGraph: function() {
     	if (this.getVisLayout() === undefined) {
 	    	var el = this.getLayout().getRenderTarget();
-	    	this.setVisLayout(
-				d3.layout.stack()
-					.offset('silhouette')
-					.values(function(d) {
-						return d.values;
-					})
-			);
-			
+	    	
+	    	this.setVisLayout(d3.stack().offset(d3.stackOffsetWiggle).order(d3.stackOrderInsideOut));
 			this.setVis(d3.select(el.dom).append('svg').attr('id',this.getGraphId()).append('g').attr('transform', 'translate('+this.graphMargin.left+','+this.graphMargin.top+')'));
 			
 			this.resizeGraph();
@@ -397,13 +397,11 @@ Ext.define('Voyant.panel.StreamGraph', {
     },
     
     resizeGraph: function() {
-    	var el = this.getLayout().getRenderTarget();
-    	var paddingH = this.graphMargin.left + this.graphMargin.right;
-    	var paddingV = this.graphMargin.top + this.graphMargin.bottom;
-    	var width = el.getWidth()-paddingH;
-		var height = el.getHeight()-paddingV;
-
-		d3.select(el.dom).select('svg').attr('width', width+paddingH).attr('height', height+paddingV);
+    	var el = this.body;//getLayout().getRenderTarget();
+    	var width = el.getWidth();
+		var height = el.getHeight();
+		
+		d3.select(el.dom).select('svg').attr('width', width).attr('height', height);
 		
 		// TODO recalculate streams
     }

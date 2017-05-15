@@ -41,10 +41,10 @@ Ext.define('Voyant.VoyantApp', {
         this.callParent(arguments);
         
         // palettes
-        var cat10 = d3.scale.category10().range().map(function(val) { return this.hexToRgb(val); }, this);
-        var cat20a = d3.scale.category20().range().map(function(val) { return this.hexToRgb(val); }, this);
-        var cat20b = d3.scale.category20b().range().map(function(val) { return this.hexToRgb(val); }, this);
-        var cat20c = d3.scale.category20c().range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat10 = d3.scaleOrdinal(d3.schemeCategory10).range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20a = d3.scaleOrdinal(d3.schemeCategory20).range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20b = d3.scaleOrdinal(d3.schemeCategory20b).range().map(function(val) { return this.hexToRgb(val); }, this);
+        var cat20c = d3.scaleOrdinal(d3.schemeCategory20c).range().map(function(val) { return this.hexToRgb(val); }, this);
         this.addColorPalette('d3_cat10', cat10);
         this.addColorPalette('d3_cat20a', cat20a);
         this.addColorPalette('d3_cat20b', cat20b);
