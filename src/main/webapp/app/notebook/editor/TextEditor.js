@@ -63,6 +63,11 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 					if (!this.getIsEditRegistered()) {
 						this.findParentByType("notebook").setIsEdited(true);
 						this.setIsEditRegistered(true);
+					} else {
+						var me = this; // make sure to allow edits to be auto-saved every 30 seconds
+						setTimeout(function() {
+							me.setIsEditRegistered(false);
+						}, 30000);
 					}
 				}, this)
 				this.setEditor(editor);

@@ -8,7 +8,8 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		mode: 'ace/mode/javascript',
 		content: '',
 		docs: undefined,
-		isChangeRegistered: false
+		isChangeRegistered: false,
+		editedTimeout: undefined
 	},
 	statics: {
 		i18n: {
@@ -23,7 +24,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.getSession().setUseWorker(true);
 			this.editor.setTheme(this.getTheme());
 			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: 25, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			this.editor.setOptions({minLines: 6, maxLines: Infinity, autoScrollEditorIntoView: true, scrollPastEnd: true});
 			this.editor.setHighlightActiveLine(false);
 			this.editor.renderer.setShowPrintMargin(false);
 			this.editor.renderer.setShowGutter(false);
@@ -31,7 +32,8 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.clearSelection()
 		    this.editor.on("focus", function() {
 		    	me.editor.renderer.setShowGutter(true);
-		    }, this)
+		    }, this);
+		    var moi = this;
 		    this.editor.on("change", function() {
 		    	if (me.getIsChangeRegistered()==false) {
 		    		me.setIsChangeRegistered(true);
@@ -41,8 +43,14 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			    		var notebook = wrapper.up(notebook);
 			    		if (notebook) {notebook.setIsEdited(true);}
 			    	}
+		    	} else {
+		    		if (!me.getEditedTimeout()) { // no timeout, so set it to 30 seconds
+						me.setEditedTimeout(setTimeout(function() {
+							me.setIsChangeRegistered(false);
+						}, 30000));
+		    		}
 		    	}
-		    }, this)
+		    }, this);
 		    this.editor.on("blur", function() {
 		    	me.editor.renderer.setShowGutter(false);
 		    });

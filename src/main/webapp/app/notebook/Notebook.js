@@ -28,7 +28,9 @@ Ext.define('Voyant.notebook.Notebook', {
 			runallTip: "Run all code blocks in this notebook",
 			differentUrlTitle: "Notebook from Different URL",
 			differentUrl: "This notebook seems to be have been located at a different URL. If you're sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook's URL: {0}",
-			saveItTip: "Save this notebook (to a different URL). This button may be disabled if no edits have been made."
+			saveItTip: "Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
+			autoSaveAvailableTitle: "Autosave Available",
+			autoSaveAvailable: "A more recent autosave is available, do you wish to switch to the auto-saved document?"
     	},
     	api: {
     		input: undefined
@@ -119,7 +121,12 @@ Ext.define('Voyant.notebook.Notebook', {
         /**
          * @private
          */
-    	saveItTool: undefined
+    	saveItTool: undefined,
+    	
+		autoSaveTimer: undefined,
+		
+		initialAutoSaveChecked: false
+
     },
     
     docs: {
@@ -392,6 +399,30 @@ Ext.define('Voyant.notebook.Notebook', {
     setIsEdited: function(val) {
     	if (this.getSaveItTool()) {
     		this.getSaveItTool().setDisabled(val==false);
+    		if (!this.getAutoSaveTimer() && this.getMetadata().previousNotebook) {
+    			var me = this;
+    			this.setAutoSaveTimer(setTimeout(function() {
+			    	 Ext.Ajax.request({
+			    	     url: me.getTromboneUrl(),
+			    	     params: {
+			    	    	 tool: 'notebook.NotebookManager',
+			    	    	 jsonData: Ext.encode(me.getExportAllJson()),
+			    	    	 notebook: me.getMetadata().previousNotebook,
+			    	    	 autosave: true
+			    	     },
+			    	     scope: this
+			    	 }).then(function(response, opts) {
+			    	     var data = Ext.decode(response.responseText);
+		    	    	 me.toastInfo({
+		    	    		 html: data && data.notebook && data.notebook.notebook ? me.localize('autoSaved') : me.localize('autoSavedFailed'),
+		    	    		 anchor: 'br'
+		    	    	 });
+			    	 },
+			    	 function(response, opts) {
+			    		 me.showResponseError(me.localize('autoSavedFailed'), response);
+			    	 });
+    			}, 30000))
+    		}
     	}
 		this.callParent(arguments);
     },
@@ -488,7 +519,7 @@ Ext.define('Voyant.notebook.Notebook', {
 			}, "Spiral Notebook: "+url, this.getBaseUrl()+"spiral/?input="+url);
 		}
 		
-    	me.mask(this.localize("fetchingNotebook"))
+    	me.mask(this.localize("fetchingNotebook"));
     	 Ext.Ajax.request({
     	     url: this.getTromboneUrl(),
     	     params: {
@@ -504,13 +535,47 @@ Ext.define('Voyant.notebook.Notebook', {
     		 json.metadata.previousNotebook = url;
     		 Ext.applyIf(json.metadata, {originalUrl: url});
     	     if (json && json.metadata && json.metadata.url) {
-    	    	 if (new URL(json.metadata.url).hostname!=window.location.hostname) {
+	    		 var jsonMetadataUrl;
+	    		 try {
+	    			 jsonMetadataUrl = new URL(json.metadata.url);
+	    		 } catch(e) {
+	    			 // ignore
+	    		 }
+	    		 if (jsonMetadataUrl && jsonMetadataUrl.hostname!=window.location.hostname) {
     	    		 return Ext.Msg.confirm(me.localize('differentUrlTitle'), new Ext.XTemplate(me.localize('differentUrl')).apply([json.metadata.url, window.location.href]), function(btn) {
     	    			 me.loadData(json, btn=='yes')
     	    		 }, me);
     	    	 }
     	     }
     		 me.loadData(json, isRun);
+    		 
+    		 // look for an autosave
+        	 Ext.Ajax.request({
+        	     url: me.getTromboneUrl(),
+        	     params: {
+        	    	 tool: 'notebook.NotebookManager',
+        	    	 notebook: url,
+        	    	 autosave: true,
+        	    	 noCache: true
+        	     },
+        	     scope: me
+        	 }).then(function(response, opts) {
+        	     var data = Ext.decode(response.responseText);
+        		 var json = me.getBlocksFromString(data.notebook.jsonData);
+        		 json.metadata = json.metadata || {};
+        		 if (json.metadata.modified>me.getMetadata().modified) {
+    	    		 return Ext.Msg.confirm(me.localize('autoSaveAvailableTitle'), me.localize('autoSaveAvailable'), function(btn) {
+    	    			 if (btn=='yes') {
+    	    				 me.removeAll();
+    	    				 me.loadData(json, isRun)
+    	    			 }
+    	    		 }, me);
+        		 }
+        	 },
+        	 function(response, opts) {
+        		 debugger
+        	 });
+
     	 },
     	 function(response, opts) {
     		 me.showResponseError("Unable to load specified notebook: "+url, response);
@@ -677,6 +742,9 @@ Ext.define('Voyant.notebook.Notebook', {
     		modified: new Date().getTime(),
     		version: this.getVersion(),
     		url: window.location.href
+    	})
+    	Ext.apply(metadata, {
+    		modified: new Date().getTime()
     	})
     	
     	return {
