@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 15 10:01:25 EDT 2017 */
+/* This file created by JSCacher. Last modified: Tue May 16 16:54:53 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -4197,15 +4197,6 @@ function TermsRadio(config) {
 	this.absMinFreq = 0;
 	this.allData = [];
 	
-	this.theme = Ext.create('Ext.chart.theme.Base');
-	this.colorIndex = [];
-	this.colorMasterList = [];
-	
-	this.colorMasterList = this.theme.getColors();
-	for (var i = 0; i < this.colorMasterList.length; i++) {
-		this.colorIndex.push(this.colorMasterList[i]);
-	}
-	
 	this.continueTransition = true;
 	this.counterSeries = [];
 	this.displayData = [];
@@ -4243,19 +4234,18 @@ function TermsRadio(config) {
 	this.largestW = 0;
 	this.largestH = 0;
 	
-	this.xAxis = {};
-	this.xAxisScale = d3.svg.axis();
-	this.yAxis = {};
-	this.yAxisScale = d3.svg.axis();
+	this.xAxisEl = undefined;
+	this.xAxis = d3.axisBottom();
+	this.xScale = d3.scaleLinear();
+	this.xSliderScale = d3.scaleLinear();
 	
-	this.fontScale = d3.scale.linear();
-	this.opacityScale = d3.scale.linear();
+	this.yAxisEl = undefined;
+	this.yAxis = d3.axisLeft();
+	this.yScale = d3.scaleLinear();
+	this.ySliderScale = d3.scaleLinear();
 	
-	this.yScale = null;
-	this.ySliderScale = null;
-	
-	this.xScale = d3.scale.linear();
-	this.xSliderScale = d3.scale.linear();
+	this.fontScale = d3.scaleLinear();
+	this.opacityScale = d3.scaleLinear();
 	
 	this.container.on('resize', this.doResize, this);
 }
@@ -4622,16 +4612,16 @@ TermsRadio.prototype = {
     
     ,startScroll: function() {
     	//console.log("fn: startScroll")
-    	var toolObject = this;
+    	var me = this;
     	
-    	if(toolObject.numDataPoints > toolObject.numVisPoints && toolObject.shiftCount === 0){
+    	if(me.numDataPoints > me.numVisPoints && me.shiftCount === 0){
 			//manage transition movements and controls
-			toolObject.isTransitioning = true;
+			me.isTransitioning = true;
 			this.manageMvtButtons();
     		
     		//repeat transition
 			setTimeout(function(){
-				toolObject.toggleRightCheck();
+				me.toggleRightCheck();
 			},3000);
 		}
     }
@@ -4730,7 +4720,7 @@ TermsRadio.prototype = {
 	}
 	
     ,drawXAxis: function() {
-    	var toolObject = this;
+    	var me = this;
     	//svg element constants
 		var h = this.container.getHeight(),
 			w = this.container.getWidth();
@@ -4739,27 +4729,26 @@ TermsRadio.prototype = {
 		this.manageAllXScales();
 			
     	//define X axis
-		this.xAxisScale.scale(toolObject.xScale)
-		    .orient('bottom')
-		    .ticks(Math.round(toolObject.numVisPoints))
+		this.xAxis = d3.axisBottom(me.xScale)
+		    .ticks(Math.round(me.numVisPoints))
 		    .tickFormat(function(d){
 		    	var val;
-		    	if(toolObject.parent.getApiParam('mode') === 'document') { 
+		    	if(me.parent.getApiParam('mode') === 'document') { 
 					val = 'Segment ' + (parseInt(d) + 1);
 				}
-				if(toolObject.parent.getApiParam('mode') === 'corpus') {
-					val = d + 1 + '. ' + toolObject.titlesArray[d];
+				if(me.parent.getApiParam('mode') === 'corpus') {
+					val = d + 1 + '. ' + me.titlesArray[d];
 				}
 				return val;
 		    });
 		
 		//draw the x-axis
-		this.xAxis = this.chart.append('g')
+		this.xAxisEl = this.chart.append('g')
     		.attr('class', 'axisX')
     		.attr('transform', 'translate(0,' + (h - this.bPadding) + ')')
-    		.call(this.xAxisScale);
+    		.call(this.xAxis);
     	
-//    	this.xAxis.selectAll('text')
+//    	this.xAxisEl.selectAll('text')
 //			.on('mouseover', function () {
 //				d3.select(this)
 //					.attr('fill', 'red')
@@ -4774,16 +4763,16 @@ TermsRadio.prototype = {
     }
     
     ,styleXAxis: function() {
-    	this.xAxis.selectAll('text')
+    	this.xAxisEl.selectAll('text')
 	        .style('font-family', 'sans-serif')
 	        .style('font-size', '11px');
 
-	    this.xAxis.selectAll('line')
+	    this.xAxisEl.selectAll('line')
 	        .style('fill','none')
 	        .style('stroke','black')
 	        .style('shape-rendering', 'crispEdges');
 	        
-	    this.xAxis.selectAll('path')
+	    this.xAxisEl.selectAll('path')
 	        .style('fill','none')
 	        .style('stroke','black')
 	        .style('shape-rendering', 'crispEdges');
@@ -4797,7 +4786,7 @@ TermsRadio.prototype = {
     }
     
     ,drawYAxis: function() {
-    	var toolObject = this;
+    	var me = this;
     	
     	//svg element constants
 		var h = this.container.getHeight(),
@@ -4806,7 +4795,7 @@ TermsRadio.prototype = {
 		//initialize Y scales
 		this.manageAllYScales();
     	
-    	var yTicksScale = d3.scale.linear()
+    	var yTicksScale = d3.scaleLinear()
 			.domain([200,700])
 			.range([5,15]);
 			
@@ -4816,30 +4805,29 @@ TermsRadio.prototype = {
 			return Math.abs(x - Math.floor(x)) < 0.7 ? numberFormat(d) : "";
 		} 
 		
-		this.yAxisScale.scale(toolObject.yScale)
-	    	.orient('left')
+		this.yAxis = d3.axisLeft(me.yScale)
 	    	.ticks(yTicksScale(h))
 	    	.tickFormat(logFormat)
 			.tickSize(-w + this.rPadding + this.lPadding);
 		
 		//draw the y-axis
-		this.yAxis = this.chart.append('g')
+		this.yAxisEl = this.chart.append('g')
 	    	.attr('class', 'axisY')
 	    	.attr('transform', 'translate(' + this.lPadding + ',0)')
-	    	.call(this.yAxisScale);
+	    	.call(this.yAxis);
 		
-	    this.yAxis.selectAll('text')
+	    this.yAxisEl.selectAll('text')
 	        .style('font-family', 'sans-serif')
 	        .style('font-size', '11px');
 	    
 	    //controls horizontal grid line-opacity
-	    this.yAxis.selectAll('line')
+	    this.yAxisEl.selectAll('line')
 	        .style('fill','none')
 	        .style('stroke','black')
 	        .style('shape-rendering', 'crispEdges')
 	        .style('stroke-opacity', 0.05);
 	        
-	    this.yAxis.selectAll('path')
+	    this.yAxisEl.selectAll('path')
 	        .style('fill','none')
 	        .style('stroke','black')
 	        .style('shape-rendering', 'crispEdges');
@@ -4853,12 +4841,12 @@ TermsRadio.prototype = {
     }
     
     ,drawChart: function() {
-    	var toolObject = this;
+    	var me = this;
     	
     	//create graph text
 	    //attach the nested data to svg:g elements
 		var counterSeriesDiv = this.chart.selectAll('g[class=section]')
-	        .data(toolObject.displayData, function(d) { return d.outerCounter; })
+	        .data(me.displayData, function(d) { return d.outerCounter; })
 	      .enter().append('g')
 	        .attr('class', 'section')
 	        .attr("clip-path", "url(#clip1)");
@@ -4879,42 +4867,42 @@ TermsRadio.prototype = {
     		.data(function(d) { return d.frequencyArray; })
 		  .enter().append('text')
 	        .attr('class', function(d) {
-	        	return toolObject.removeFilteredCharacters(d.wordString);
+	        	return me.removeFilteredCharacters(d.wordString);
 	        })
 	    	.attr('x', function (d) {
 	    		var startPoint = (0.5 / d.numInSeries) - 0.5
 					,valueRange = (d.posInSeries / d.numInSeries * 0.8)
-					,x = d.counter + toolObject.callOffset() + startPoint + valueRange; 
-				return toolObject.xScale(x);
+					,x = d.counter + me.callOffset() + startPoint + valueRange; 
+				return me.xScale(x);
 			})
 	    	.attr('y', function (d) { 
 				var y = d.freq;
-				return toolObject.yScale(y);
+				return me.yScale(y);
 	    	})
 	    	.attr('text-anchor', 'middle')
 	    	.attr('transform', function (d) {
 	    		var startPoint = (0.5 / d.numInSeries) - 0.5
 					,valueRange = (d.posInSeries / d.numInSeries * 0.8)
-					,x = d.counter + toolObject.callOffset() + startPoint + valueRange
+					,x = d.counter + me.callOffset() + startPoint + valueRange
 					,y = d.freq;
-	    		return 'translate(0, 0) rotate(-20 ' + toolObject.xScale(x) + ' '+ toolObject.yScale(y) + ')';
+	    		return 'translate(0, 0) rotate(-20 ' + me.xScale(x) + ' '+ me.yScale(y) + ')';
 	    	})
-	    	.style('font-size', function(d) { return toolObject.fontScale(d.freq) + 'px'; })
-	    	.style('fill-opacity', function(d) { return toolObject.opacityScale(d.freq); })
+	    	.style('font-size', function(d) { return me.fontScale(d.freq) + 'px'; })
+	    	.style('fill-opacity', function(d) { return me.opacityScale(d.freq); })
 	        .text(function(d) { return d.wordString; })
 	        .on('mouseover', function(d) { 
-	 	        d3.select(this).style('cursor', 'pointer').style('font-size', function(d) { return (toolObject.fontScale(d.freq) * toolObject.maxFont / toolObject.fontScale(d.freq)) + 'px'; });
-	 	        var paramsBundle = toolObject.buildParamsBundle(d);
-	 	        toolObject.manageOverlaySlippery(paramsBundle);
+	 	        d3.select(this).style('cursor', 'pointer').style('font-size', function(d) { return (me.fontScale(d.freq) * me.maxFont / me.fontScale(d.freq)) + 'px'; });
+	 	        var paramsBundle = me.buildParamsBundle(d);
+	 	        me.manageOverlaySlippery(paramsBundle);
 	        })
 	        .on('mouseout', function(d) { 
-	        	d3.select(this).style('cursor', 'auto').style('font-size', function(d) { return toolObject.fontScale(d.freq) + 'px'; });
-	        	var paramsBundle = toolObject.buildParamsBundle(d);
-	        	toolObject.manageOverlaySlippery(paramsBundle);
+	        	d3.select(this).style('cursor', 'auto').style('font-size', function(d) { return me.fontScale(d.freq) + 'px'; });
+	        	var paramsBundle = me.buildParamsBundle(d);
+	        	me.manageOverlaySlippery(paramsBundle);
 	        })
 	        .on('click', function(d) {
-	        	var paramsBundle = toolObject.buildParamsBundle(d);
-	        	toolObject.manageOverlaySticky(paramsBundle);
+	        	var paramsBundle = me.buildParamsBundle(d);
+	        	me.manageOverlaySticky(paramsBundle);
 			})
 	  	  .append('title')
 	    	.text(function(d) { return d.wordString; });
@@ -4935,7 +4923,7 @@ TermsRadio.prototype = {
 //        	,lengthVer = h - (totalTopOffset + this.bPadding);
 //        
 //	    //create vertical minimap rectangle and slider
-//	    var sliderPosScale = d3.scale.linear()
+//	    var sliderPosScale = d3.scaleLinear()
 //			.domain([this.absMaxFreq, this.minFreq])
 //			.range([totalTopOffset, lengthVer]);
 //	    
@@ -5042,83 +5030,82 @@ TermsRadio.prototype = {
 	    	.style('fill-opacity', 0.25)
 	    	.style('cursor', 'move');
 	    
-	    var toolObject = this;
-    	var drag = d3.behavior.drag()
-        .origin(Object)
+	    var me = this;
+    	var drag = d3.drag()
         .on('drag', function(d) {
-        	if(!toolObject.isTransitioning) {
+        	if(!me.isTransitioning) {
         		this.drag = true;
         		
-	        	var w = toolObject.parent.getWidth()
+	        	var w = me.parent.getWidth()
 	        		,displaceX = parseInt(d3.event.dx)
 	        		,checkBefore
 	        		,checkAfter
 	        		,pos = 0;
 	        		
 	        	//add up the slider movements as they occur	
-        		toolObject.sliderDragSum += d3.event.dx;
+        		me.sliderDragSum += d3.event.dx;
 	        	
-	        	toolObject.chart.selectAll('#before')
+	        	me.chart.selectAll('#before')
 	        		.attr('x1', function () { 
 	        			checkBefore = parseInt(this.getAttribute('x1'));
 	        			pos = parseInt(this.getAttribute('x1')) + displaceX;
 	        			return parseInt(this.getAttribute('x1'));
 	        		});
 	        	
-	        	toolObject.chart.selectAll('#after')
+	        	me.chart.selectAll('#after')
 	        		.attr('x1', function () { 
 	        			checkAfter = parseInt(this.getAttribute('x1'));
 	        			return parseInt(this.getAttribute('x1'));
 	        		});
 	        	
-	        	if(checkBefore + displaceX < toolObject.lPadding || checkAfter + displaceX > w - toolObject.rPadding) {
+	        	if(checkBefore + displaceX < me.lPadding || checkAfter + displaceX > w - me.rPadding) {
 	        		displaceX = 0;
 	        	}
 	        	
-	        	toolObject.chart.select('#boxBefore')
+	        	me.chart.select('#boxBefore')
 	        		.attr('width', function () { return parseInt(this.getAttribute('width')) + displaceX; });
 	        	
-	        	toolObject.chart.select('#boxAfter')
+	        	me.chart.select('#boxAfter')
 	        		.attr('x', function () { return parseInt(this.getAttribute('x')) + displaceX; })
         			.attr('width', function () { return Math.max(0, parseInt(this.getAttribute('width')) - displaceX); });
 	        		
-	        	toolObject.chart.selectAll('#before')
+	        	me.chart.selectAll('#before')
 	        		.attr('x1', function () { return parseInt(this.getAttribute('x1')) + displaceX; })
 	        		.attr('x2', function () { return parseInt(this.getAttribute('x2')) + displaceX; });
 	        	
-	        	toolObject.chart.selectAll('#after')
+	        	me.chart.selectAll('#after')
         			.attr('x1', function () { return parseInt(this.getAttribute('x1')) + displaceX; })
         			.attr('x2', function () { return parseInt(this.getAttribute('x2')) + displaceX; });
         	}
         })
-        .on('dragend', function(d) {
+        .on('end', function(d) {
         	if(this.drag){
         		this.drag = false;
         		
-        		var inverseSliderScale = d3.scale.linear()
-			    	.domain([0, toolObject.container.getWidth() - (toolObject.lPadding + toolObject.rPadding)])
-			    	.range([0, toolObject.numDataPoints]);
+        		var inverseSliderScale = d3.scaleLinear()
+			    	.domain([0, me.container.getWidth() - (me.lPadding + me.rPadding)])
+			    	.range([0, me.numDataPoints]);
 			    	
 				//calculate the position that everything should transition to
-	        	var moveByThis = inverseSliderScale(toolObject.sliderDragSum),
+	        	var moveByThis = inverseSliderScale(me.sliderDragSum),
 	        		moveShiftCount,
-	        		oldShiftCount = toolObject.shiftCount;
+	        		oldShiftCount = me.shiftCount;
 	        		
 	    		if(moveByThis > 0) moveShiftCount = Math.floor(moveByThis);
 	    		if(moveByThis < 0) moveShiftCount = Math.ceil(moveByThis);
 	    		
 	    		//update shiftCount re-animate 
-	    		toolObject.shiftCount += moveShiftCount;
-	    		if(toolObject.shiftCount < 0) toolObject.shiftCount = 0;
-	    		if(toolObject.shiftCount > toolObject.numDataPoints - 1) toolObject.shiftCount = toolObject.numDataPoints - 1;
+	    		me.shiftCount += moveShiftCount;
+	    		if(me.shiftCount < 0) me.shiftCount = 0;
+	    		if(me.shiftCount > me.numDataPoints - 1) me.shiftCount = me.numDataPoints - 1;
 	    		
-	    		if(toolObject.shiftCount !== oldShiftCount) {
-	    			toolObject.sliderDragSum = 0;
+	    		if(me.shiftCount !== oldShiftCount) {
+	    			me.sliderDragSum = 0;
 	    			
-	        		toolObject.parent.setApiParams({position: toolObject.shiftCount});
-					toolObject.prepareData();
+	        		me.parent.setApiParams({position: me.shiftCount});
+					me.prepareData();
 					
-					toolObject.redraw();
+					me.redraw();
 	        	}
         	}
         });
@@ -5146,7 +5133,7 @@ TermsRadio.prototype = {
     }
 	
 	,animateVis: function() {
-		var toolObject = this;
+		var me = this;
 		
 		//prepare the data for the visualization
 		//shiftCount = 0, means the displayData begins with the same value as nestedData
@@ -5162,10 +5149,10 @@ TermsRadio.prototype = {
 		//if not: shift displayData to a different subset of allData
 		//then display the newly shifted data	
 		if(this.transitionCall === 'left' || this.transitionCall ==='right'){
-			this.xAxis.transition()
+			this.xAxisEl.transition()
 	            .duration(duration)
-	            .ease('linear')
-	            .call(this.xAxisScale);
+	            .ease(d3.easeLinear)
+	            .call(this.xAxis);
 	            
 	        this.styleXAxis();
 	        
@@ -5174,20 +5161,20 @@ TermsRadio.prototype = {
         	//if call is shift move the dataPoints	
         	this.chart.selectAll('.frequencies').transition()
         		.duration(duration)
-	            .ease('linear')
+	            .ease(d3.easeLinear)
 	            .selectAll('text')
 	            .attr('x', function (d) {
 	            	var startPoint = (0.5 / d.numInSeries) - 0.5,
 						valueRange = (d.posInSeries / d.numInSeries * 0.8),
 						x = d.counter + startPoint + valueRange; 
-					return toolObject.xScale(x);
+					return me.xScale(x);
 				})
 				.attr('transform', function (d) {
 		    		var startPoint = (0.5 / d.numInSeries) - 0.5
 						,valueRange = (d.posInSeries / d.numInSeries * 0.8)
 						,x = d.counter + startPoint + valueRange
 						,y = d.freq;
-		    		return 'translate(0, 0) rotate(-20 ' + toolObject.xScale(x) + ' '+ toolObject.yScale(y) + ')';
+		    		return 'translate(0, 0) rotate(-20 ' + me.xScale(x) + ' '+ me.yScale(y) + ')';
 				});
 	    	   
         	//Create navigation bar
@@ -5198,29 +5185,29 @@ TermsRadio.prototype = {
 				
         	this.chart.select('#before').transition()
 				.duration(duration)
-				.ease('linear')
+				.ease(d3.easeLinear)
 			 	.attr('x1', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisStart)
 			 	.attr('x2', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisStart)
 		  	    .attr('y1', this.tPadding + this.getSliderHeight())
 		  	    .attr('y2', this.tPadding)
-		  	    .each('end', function () {
-		  	    	if (toolObject.parent.isMasked()) {
-		  	    		toolObject.parent.unmask();
+		  	    .on('end', function () {
+		  	    	if (me.parent.isMasked()) {
+		  	    		me.parent.unmask();
 		  	    	}
-		  	    	if(toolObject.continueTransition) { 
+		  	    	if(me.continueTransition) { 
 		  	    		setTimeout(function () {
-		  	    			toolObject.callTransition();
+		  	    			me.callTransition();
 		  	    		},50); 
 		  	    	} else { 
 		  	    		//manage transition movements and controls
-		  	    		toolObject.isTransitioning = false;
-		  				toolObject.manageMvtButtons();
+		  	    		me.isTransitioning = false;
+		  				me.manageMvtButtons();
 		  	    	}
 		  	    });
         	
 	  	   this.chart.select('#after').transition()
 				.duration(duration)
-				.ease('linear')
+				.ease(d3.easeLinear)
 			 	.attr('x1', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
 			 	.attr('x2', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
 		  	    .attr('y1', this.tPadding + this.getSliderHeight())
@@ -5228,7 +5215,7 @@ TermsRadio.prototype = {
 		    
 	  	   this.chart.select('#boxBefore').transition()
 				.duration(duration)
-				.ease('linear')
+				.ease(d3.easeLinear)
 	  	    	.attr('x', this.lPadding)
 	  	    	.attr('y', this.tPadding)
 	  	    	.attr('height', this.getSliderHeight())
@@ -5236,7 +5223,7 @@ TermsRadio.prototype = {
 	    
 	  	    this.chart.select('#boxAfter').transition()
 				.duration(duration)
-				.ease('linear')
+				.ease(d3.easeLinear)
 	  	    	.attr('x', (lengthHor * this.shiftCount / (this.numDataPoints - 1)) + offsetVisEnd)
 	  	    	.attr('y', this.tPadding)
 	  	    	.attr('height', this.getSliderHeight())
@@ -5358,7 +5345,7 @@ TermsRadio.prototype = {
 
 	,manageOverlaySticky: function (paramsBundle) {
 //		console.log('fn: manageOverlaySticky')
-		var toolObject = this;
+		var me = this;
 		
 		var term = paramsBundle.type;
 		
@@ -5395,27 +5382,20 @@ TermsRadio.prototype = {
 		this.parent.setApiParams({selectedWords: apiArray});
 		
 		//draw the sticky path
-		var stickyColour = this.colorIndex[0];
-		this.colorIndex.shift();
+		var color = this.parent.getApplication().getColorForTerm(term, true);
 		
 		if (legendAdd === true) {
 			var legend = this.parent.query('[xtype=legend]')[0];
-			legend.getStore().add({name: term, mark: stickyColour});
+			legend.getStore().add({name: term, mark: color});
 		} else {
 			var legend = this.parent.query('[xtype=legend]')[0];
 			var record = legend.getStore().findRecord('name', term);
 			if (record !== null) {
-				record.set('mark', stickyColour);
+				record.set('mark', color);
 				legend.refresh();
 			}
 		}
 		
-		//repopulate colour index if it is empty
-		if(this.colorIndex.length === 0) { 
-			for(var i = 0; i < this.colorMasterList.length; i++){
-				this.colorIndex.push(this.colorMasterList[i]);
-			}
-		}
 		var pathHolder = this.prepareFullPath(term);
 		var lineObject = {
 			word: term, 
@@ -5424,7 +5404,7 @@ TermsRadio.prototype = {
 			fullPath: pathHolder.path,
 			pathMin: pathHolder.min,
 			pathMax: pathHolder.max,
-			colour: stickyColour
+			colour: color
 		};
 		
 		//if this was selected a slippery before click event remove line from navigation bar
@@ -5463,7 +5443,6 @@ TermsRadio.prototype = {
 			}
 		}
 		this.chartOverlayOff(selector);
-		this.colorIndex.push(this.overlayQueue[index].colour);
     	this.overlayQueue.splice(index, 1);
     	if (this.isSliderVisible) {
     		this.sliderOverlayOff(selector);
@@ -5512,11 +5491,11 @@ TermsRadio.prototype = {
 	}
 	
 	,buildSliderPath: function (pathArray) {
-		var toolObject = this;
-		var line = d3.svg.line()
-		    .x(function(d) { return toolObject.xSliderScale(d.x); })
-		    .y(function(d) { return toolObject.ySliderScale(d.y); })
-		    .interpolate("monotone");
+		var me = this;
+		var line = d3.line()
+		    .x(function(d) { return me.xSliderScale(d.x); })
+		    .y(function(d) { return me.ySliderScale(d.y); })
+		    .curve(d3.curveNatural);
 		return line(pathArray);
 	}
 	
@@ -5567,7 +5546,7 @@ TermsRadio.prototype = {
 			this.chart.selectAll('g#slider-line-' + this.overlayQueue[lenA].selector)
 				.select('path')
 				.transition().duration(300)
-				.ease('linear')
+				.ease(d3.easeLinear)
 				.attr("d", this.buildSliderPath(this.overlayQueue[lenA].fullPath));
 		}
 	}
@@ -5642,7 +5621,7 @@ TermsRadio.prototype = {
 	,chartOverlayOn: function(objectToSelect) {
 //		console.log('fn: chartOverlayOn')
 		
-		var toolObject = this;
+		var me = this;
 					
 		//change selected word colour
 		this.chart.selectAll('g[class=section]')
@@ -5660,12 +5639,12 @@ TermsRadio.prototype = {
 		var pos;
 		
 		//draw path
-		var line = d3.svg.line()
+		var line = d3.line()
 		    .x(function(d) { 
 		    	pos = d.x;
-		    	return toolObject.xScale(d.x + toolObject.callOffset()); })
+		    	return me.xScale(d.x + me.callOffset()); })
 		    .y(function(d) { return d.y; })
-		    .interpolate('monotone');
+		    .curve(d3.curveNatural);
 		
 		var path = this.chart.select('.overlay')
 			.append('g')
@@ -5680,18 +5659,18 @@ TermsRadio.prototype = {
 		
 		if(this.transitionCall === 'left' || this.transitionCall ==='right') {
 			path.transition()
-				.duration(toolObject.getDuration())
-				.ease("linear")
+				.duration(me.getDuration())
+				.ease(d3.easeLinear)
 			    .attr("transform", "translate(" + posDif + ")");
 		}
 	}
 	
 	,chartOverlayOff: function(selector){
-		var toolObject = this;
+		var me = this;
 		
 		this.chart.selectAll('text.' + selector)
 	    	.style('fill', 'black')
-	    	.style('fill-opacity', function(d) { return toolObject.opacityScale(d.freq); });
+	    	.style('fill-opacity', function(d) { return me.opacityScale(d.freq); });
 	    
 	    this.chart.select('g.frequency-line-' + selector)
 	    	.remove();
@@ -5726,7 +5705,7 @@ TermsRadio.prototype = {
 	}
 	
 	/*,maxFontScale : function (value) {
-		var scale = d3.scale.linear()
+		var scale = d3.scaleLinear()
 			.domain([600,2000])
 			.range([15,60]);
 		return scale(value);
@@ -5738,8 +5717,8 @@ TermsRadio.prototype = {
 	}
 	
 	,manageYScale: function () {
-		if(this.parent.getApiParam('yAxisScale') == 'linear') this.yScale = d3.scale.linear();
-		if(this.parent.getApiParam('yAxisScale') == 'log') this.yScale = d3.scale.log();
+		if(this.parent.getApiParam('yAxisScale') == 'linear') this.yScale = d3.scaleLinear();
+		if(this.parent.getApiParam('yAxisScale') == 'log') this.yScale = d3.scaleLog();
 		
 		this.yScale.domain([this.minFreq, this.absMaxFreq * this.valFraction * 1.25])
 				.rangeRound([this.container.getHeight() - this.bPadding, (this.tPadding) + this.getSliderHeight()]);
@@ -5749,8 +5728,8 @@ TermsRadio.prototype = {
 		var top = this.tPadding
 			,bottom = this.tPadding + this.getSliderHeight();
 		
-		if(this.parent.getApiParam('yAxisScale') == 'linear') this.ySliderScale = d3.scale.linear();
-		if(this.parent.getApiParam('yAxisScale') == 'log') this.ySliderScale = d3.scale.log();
+		if(this.parent.getApiParam('yAxisScale') == 'linear') this.ySliderScale = d3.scaleLinear();
+		if(this.parent.getApiParam('yAxisScale') == 'log') this.ySliderScale = d3.scaleLog();
 		
 		this.ySliderScale.domain([this.minFreq, this.absMaxFreq])
 				.rangeRound([bottom, top]);
@@ -5815,11 +5794,11 @@ TermsRadio.prototype = {
 	
 	,setTitleLength: function () {
 		//console.log('fn:setTitleLength')
-		var toolObject = this, 
+		var me = this, 
 			item;
 		this.titlesArray = [];
 		
-		var scale = d3.scale.linear()
+		var scale = d3.scaleLinear()
 			.domain([350,1250])
 			.range([10,40]);
 		
@@ -5827,11 +5806,11 @@ TermsRadio.prototype = {
 		for (var i = 0, len = corpus.getDocumentsCount(); i < len; i++) {
 			var item = corpus.getDocument(i);
 			var shortTitle = item.getShortTitle();			
-			if(shortTitle.length <= scale(toolObject.container.getWidth())) {
-				toolObject.titlesArray.push(shortTitle); 
+			if(shortTitle.length <= scale(me.container.getWidth())) {
+				me.titlesArray.push(shortTitle); 
 			} else {
-				var shorterTitle = shortTitle.substring(0,scale(toolObject.container.getWidth()) - 3);
-				toolObject.titlesArray.push(shorterTitle + '...'); 
+				var shorterTitle = shortTitle.substring(0,scale(me.container.getWidth()) - 3);
+				me.titlesArray.push(shorterTitle + '...'); 
 			}
 		}
 	}
@@ -8306,6 +8285,48 @@ Ext.define('Voyant.data.model.Token', {
 		return this.get("rawFreq");
 	}
 });
+/**
+ * Related Term
+ */
+Ext.define('Voyant.data.model.TermCorrelation', {
+    extend: 'Ext.data.Model',
+    fields: [
+             {name: 'source'},
+             {name: 'target'},
+             {name: 'correlation', type: 'float'},
+             {name: 'source-term', calculate: function(data) {return data.source.term}},
+             {name: 'target-term', calculate: function(data) {return data.target.term}},
+             {name: 'source-distributions', calculate: function(data) {return data.source.distributions}},
+             {name: 'target-distributions', calculate: function(data) {return data.target.distributions}}
+    ],
+    
+    /**
+     * Get the source term.
+     * @returns {String} Returns the term.
+     */
+    getSource: function() {
+    	return this.get('source');
+    },
+    
+    /**
+     * Get the source term.
+     * @returns {String} Returns the term.
+     */
+    getTarget: function() {
+    	return this.get('target');
+    },
+    
+	/**
+	 * Show a one line summary of this term.
+	 */
+	show: function(config) {
+		show(this.getString(config))
+	},
+	
+	getString: function() {
+		return this.getSource()+"-"+this.getTarget();
+	}
+});
 Ext.define('Voyant.data.store.VoyantStore', {
 	mixins: ['Voyant.util.Localization'],
 	config: {
@@ -8867,6 +8888,37 @@ Ext.define('Voyant.data.store.RelatedTermsBuffered', {
 	constructor : function(config) {
 		config = config || {};
 		this.mixins['Voyant.data.store.RelatedTermsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+Ext.define('Voyant.data.store.TermCorrelationsMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.TermCorrelation',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.CorpusTermCorrelations',
+			'proxy.reader.rootProperty': 'termCorrelations.correlations',
+			'proxy.reader.totalProperty': 'termCorrelations.total'
+		}])
+	}
+});
+
+Ext.define('Voyant.data.store.TermCorrelations', {
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.TermCorrelationsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.TermCorrelationsMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.TermCorrelationsBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.TermCorrelationsMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.TermCorrelationsMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
 	}
 });
@@ -16247,6 +16299,157 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     }
     
 })
+Ext.define('Voyant.panel.Correlations', {
+	extend: 'Ext.grid.Panel',
+	mixins: ['Voyant.panel.Panel'],
+	alias: 'widget.correlations',
+    statics: {
+    	i18n: {
+    		title: "Correlations",
+    		trendTip: "This represents the relative frequencies of the term.",
+    		minInDocumentsCountRatioLabel: "minimum coverage (%{0})",
+    		source: "Term 1",
+    		target: "Term 2",
+    		correlation: "Correlation",
+    		emptyText: "(No results.)"
+    	},
+    	api: {
+    		query: undefined,
+    		docId: undefined,
+    		docIndex: undefined,
+    		stopList: 'auto',
+    		minInDocumentsCountRatio: 100
+    	},
+		glyph: 'xf0ce@FontAwesome'
+    },
+    config: {
+    	
+    },
+    constructor: function() {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    },
+    
+    initComponent: function() {
+        var me = this;
+
+        Ext.apply(me, { 
+    		title: this.localize('title'),
+    		emptyText: this.localize("emptyText"),
+    		store: Ext.create("Voyant.data.store.TermCorrelationsBuffered", {
+            	parentPanel: this
+	        }),
+
+    		columns: [{
+    			text: this.localize("source"),
+    			toolTip: this.localize("sourceTip"),
+        		dataIndex: 'source-term',
+        		sortable: false
+    		},{
+                xtype: 'widgetcolumn',
+                tooltip: this.localize("trendTip"),
+                width: 100,
+                dataIndex: 'source-distributions',
+                widget: {
+                    xtype: 'sparklineline'
+                },
+                text: '←'
+            },{
+                xtype: 'widgetcolumn',
+                tooltip: this.localize("trendTip"),
+                width: 100,
+                dataIndex: 'target-distributions',
+                widget: {
+                    xtype: 'sparklineline'
+                },
+                text: '→',
+                align: 'right'
+            },{
+    			text: this.localize("target"),
+    			toolTip: this.localize("targetTip"),
+        		dataIndex: 'target-term',
+        		sortable: false
+    		},{
+    			text: this.localize("correlation"),
+    			toolTip: this.localize("correlationTip"),
+        		dataIndex: 'correlation'
+    		}],
+    		
+
+            listeners: {
+            	scope: this,
+				corpusSelected: function() {
+					this.setApiParams({docIndex: undefined, docId: undefined});
+	        		this.getStore().getProxy().setExtraParam('tool', 'corpus.CorpusTermCorrelations');
+	        		this.getStore().load();
+				},
+				
+				documentsSelected: function(src, docs) {
+					var docIds = [];
+					var corpus = this.getStore().getCorpus();
+					docs.forEach(function(doc) {
+						docIds.push(corpus.getDocument(doc).getId())
+					}, this);
+					this.setApiParams({docId: docIds, docIndex: undefined})
+	        		this.getStore().getProxy().setExtraParam('tool', 'corpus.DocumentTermCorrelations');
+	        		this.getStore().load();
+				}
+
+            },
+            dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                overflowHandler: 'scroller',
+                items: [{
+                    xtype: 'querysearchfield'
+                },{
+                    xtype: 'totalpropertystatus'
+                }, {
+                	xtype: 'tbspacer'
+                }, {
+                	xtype: 'tbtext',
+                	itemId: 'minInDocumentsCountRatioLabel',
+                	text: me.localize('minInDocumentsCountRatioLabel')
+                }, {
+        			xtype: 'slider',
+	            	increment: 5,
+	            	minValue: 0,
+	            	maxValue: 100,
+	            	width: 75,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(this.getApiParam("minInDocumentsCountRatio"))
+	            			slider.up('toolbar').getComponent("minInDocumentsCountRatioLabel").setText(new Ext.XTemplate(me.localize("minInDocumentsCountRatioLabel")).apply([this.getApiParam("minInDocumentsCountRatio")]));
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({minInDocumentsCountRatio: newvalue});
+	            			slider.up('toolbar').getComponent("minInDocumentsCountRatioLabel").setText(new Ext.XTemplate(me.localize("minInDocumentsCountRatioLabel")).apply([newvalue]));
+	            			this.getStore().load();
+	            		},
+	            		scope: this
+	            	}
+                },{
+        			xtype: 'corpusdocumentselector'
+        		}]
+            }]
+        });
+        
+        me.on("loadedCorpus", function(src, corpus) {
+        	if (corpus.getDocumentsCount()==1) { // switch to documents mode
+        		this.getStore().getProxy().setExtraParam('tool', 'corpus.DocumentTermCorrelations');
+        	}
+    		this.getStore().load();
+        });
+        
+        me.on("query", function(src, query) {
+        	this.setApiParam("query", query);
+        	this.getStore().load();
+        }, me);
+        
+        me.callParent(arguments);
+     }
+     
+});
 Ext.define('Voyant.panel.CorpusCreator', {
 	extend: 'Ext.form.Panel',
 	requires: ['Ext.form.field.File'],
@@ -21945,6 +22148,9 @@ Ext.define('Voyant.panel.StreamGraph', {
     	visLayout: undefined,
     	vis: undefined,
     	mode: 'corpus',
+    	
+    	layerData: undefined,
+    	
     	graphId: undefined
     },
     
@@ -22173,27 +22379,10 @@ Ext.define('Voyant.panel.StreamGraph', {
     },
     
     loadFromRecords: function(records) {
-    	var app = this.getApplication();
-    	var color = function(name) {
-    		return app.getColorForTerm(name, true);
-    	};
-    	
-    	var steps;
-    	if (this.getMode() === this.MODE_DOCUMENT) {
-    		steps = this.getApiParam('bins');
-    	} else {
-    		var bins = this.getApiParam('bins');
-    		var docsCount = this.getCorpus().getDocumentsCount();
-    		
-    		steps = bins < docsCount ? bins : docsCount;
-    	}
-    	
     	var legendData = [];
-    	var keys = [];
     	var layers = [];
     	records.forEach(function(record, index) {
     		var key = record.getTerm();
-    		keys.push(key);
     		var values = record.get('distributions');
     		for (var i = 0; i < values.length; i++) {
     			if (layers[i] === undefined) {
@@ -22201,102 +22390,126 @@ Ext.define('Voyant.panel.StreamGraph', {
     			}
     			layers[i][key] = values[i];
     		}
-    		legendData.push({id: key, name: key, mark: color(key), active: true});
+    		legendData.push({id: key, name: key, mark: this.getApplication().getColorForTerm(key, true), active: true});
     	}, this);
+    	
+    	this.setLayerData(layers);
     	
     	this.down('[xtype=legend]').getStore().loadData(legendData);
 
-    	this.getVisLayout().keys(keys);
-    	var processedLayers = this.getVisLayout()(layers);
-    	
-    	var width = this.body.down('svg').getWidth() - this.graphMargin.left - this.graphMargin.right;
-    	var x = d3.scaleLinear().domain([0, steps-1]).range([0, width]);
-    	
-    	var min = d3.min(processedLayers, function(layer) {
-    		return d3.min(layer, function(d) { return d[0]; });
-    	});
-    	var max = d3.max(processedLayers, function(layer) {
-    		return d3.max(layer, function(d) { return d[1]; });
-    	});
-    	
-    	var height = this.body.down('svg').dom.clientHeight - this.graphMargin.top - this.graphMargin.bottom;
-    	var y = d3.scaleLinear().domain([min, max]).range([height, 0]);
-    	
-    	var area = d3.area()
-	    	.x(function(d, i) { return x(i); })
-		    .y0(function(d) { return y(d[0]); })
-		    .y1(function(d) { return y(d[1]); })
-		    .curve(d3.curveCatmullRom);
-    	
-    	var xAxis;
-    	if (this.getMode() === this.MODE_CORPUS) {
-    		var xAxisDomain = [];
-    		this.getCorpus().getDocuments().each(function(doc) {
-    			xAxisDomain.push(doc.getTinyLabel());
-    		});
-    		var xAxisScale = d3.scalePoint().domain(xAxisDomain).range([0, width]);    		
-    		xAxis = d3.axisBottom(xAxisScale);
-    	} else {
-    		xAxis = d3.axisBottom(x);
-    	}
-    	
-    	var yAxis = d3.axisLeft(y);
-    	
-    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d; });
-    	
-    	paths
-    		.attr('d', function(d) { return area(d); })
-	    	.style('fill', function(d, i) { return color(d.key); })
-			.select('title').text(function (d) { return d.key; });
-    	
-    	paths.enter().append('path')
-			.attr('d', function(d) { return area(d); })
-			.style('fill', function(d, i) { return color(d.key); })
-			.append('title').text(function (d) { return d.key; });
-    	
-    	paths.exit().remove();
-    	
-    	this.getVis().selectAll('g.axis').remove();
-    	
-    	this.getVis().append('g')
-    		.attr('class', 'axis x')
-    		.attr('transform', 'translate(0,'+height+')')
-    		.call(xAxis);
-    	
-    	var xAxisText;
-    	if (this.getMode() === this.MODE_CORPUS) {
-    		this.getVis().select('g.axis.x').selectAll('text').each(function() {
-				d3.select(this)
-					.attr('text-anchor', 'end')
-					.attr('transform', 'rotate(-45)');
-    		});
+    	this.doLayout();
+    },
+    
+    doLayout: function(layers) {
+    	var layers = this.getLayerData();
+    	if (layers !== undefined) {
+    		var me = this;
     		
-    		xAxisText = this.localize('documents');
-    	} else {
-    		xAxisText = this.localize('documentSegments');
+	    	var keys = [];
+	    	this.down('[xtype=legend]').getStore().each(function(r) { keys.push(r.getId()); });
+	    	
+	    	var steps;
+	    	if (this.getMode() === this.MODE_DOCUMENT) {
+	    		steps = this.getApiParam('bins');
+	    	} else {
+	    		var bins = this.getApiParam('bins');
+	    		var docsCount = this.getCorpus().getDocumentsCount();
+	    		
+	    		steps = bins < docsCount ? bins : docsCount;
+	    	}
+	    	
+	    	this.getVisLayout().keys(keys);
+	    	var processedLayers = this.getVisLayout()(layers);
+	    	
+	    	var width = this.body.down('svg').getWidth() - this.graphMargin.left - this.graphMargin.right;
+	    	var x = d3.scaleLinear().domain([0, steps-1]).range([0, width]);
+	    	
+	    	var min = d3.min(processedLayers, function(layer) {
+	    		return d3.min(layer, function(d) { return d[0]; });
+	    	});
+	    	var max = d3.max(processedLayers, function(layer) {
+	    		return d3.max(layer, function(d) { return d[1]; });
+	    	});
+	    	
+	    	var height = this.body.down('svg').dom.clientHeight - this.graphMargin.top - this.graphMargin.bottom;
+	    	var y = d3.scaleLinear().domain([min, max]).range([height, 0]);
+	    	
+	    	var area = d3.area()
+		    	.x(function(d, i) { return x(i); })
+			    .y0(function(d) { return y(d[0]); })
+			    .y1(function(d) { return y(d[1]); })
+			    .curve(d3.curveCatmullRom);
+	    	
+	    	var xAxis;
+	    	if (this.getMode() === this.MODE_CORPUS) {
+	    		var xAxisDomain = [];
+	    		this.getCorpus().getDocuments().each(function(doc) {
+	    			xAxisDomain.push(doc.getTinyLabel());
+	    		});
+	    		var xAxisScale = d3.scalePoint().domain(xAxisDomain).range([0, width]);    		
+	    		xAxis = d3.axisBottom(xAxisScale);
+	    	} else {
+	    		xAxis = d3.axisBottom(x);
+	    	}
+	    	
+	    	var yAxis = d3.axisLeft(y);
+	    	
+	    	var paths = this.getVis().selectAll('path').data(processedLayers, function(d) { return d; });
+	    	
+	    	paths
+	    		.attr('d', function(d) { return area(d); })
+		    	.style('fill', function(d) { return me.getApplication().getColorForTerm(d.key, true); })
+				.select('title').text(function (d) { return d.key; });
+	    	
+	    	paths.enter().append('path')
+				.attr('d', function(d) { return area(d); })
+				.style('fill', function(d) { return me.getApplication().getColorForTerm(d.key, true); })
+				.append('title').text(function (d) { return d.key; });
+	    	
+	    	paths.exit().remove();
+	    	
+	    	this.getVis().selectAll('g.axis').remove();
+	    	
+	    	this.getVis().append('g')
+	    		.attr('class', 'axis x')
+	    		.attr('transform', 'translate(0,'+height+')')
+	    		.call(xAxis);
+	    	
+	    	var xAxisText;
+	    	if (this.getMode() === this.MODE_CORPUS) {
+	    		this.getVis().select('g.axis.x').selectAll('text').each(function() {
+					d3.select(this)
+						.attr('text-anchor', 'end')
+						.attr('transform', 'rotate(-45)');
+	    		});
+	    		
+	    		xAxisText = this.localize('documents');
+	    	} else {
+	    		xAxisText = this.localize('documentSegments');
+	    	}
+	    	this.getVis().select('g.axis.x').append("text")
+				.attr('text-anchor', 'middle')
+				.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-30)+')')
+				.attr('fill', '#000')
+				.text(xAxisText);
+	    	
+	    	this.getVis().append('g')
+				.attr('class', 'axis y')
+				.attr('transform', 'translate(0,0)')
+				.call(yAxis);
+	    	
+	    	var yAxisText;
+	    	if (this.getApiParam('withDistributions') === 'raw') {
+	    		yAxisText = this.localize('rawFrequencies');
+	    	} else {
+	    		yAxisText = this.localize('relativeFrequencies');
+	    	}
+	    	this.getVis().select('g.axis.y').append("text")
+				.attr('text-anchor', 'middle')
+				.attr('transform', 'translate(-'+(this.graphMargin.left-20)+', '+height/2+') rotate(-90)')
+				.attr('fill', '#000')
+				.text(yAxisText);
     	}
-    	this.getVis().select('g.axis.x').append("text")
-			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate('+width/2+', '+(this.graphMargin.bottom-30)+')')
-			.attr('fill', '#000')
-			.text(xAxisText);
-    	
-    	this.getVis().append('g')
-			.attr('class', 'axis y')
-			.attr('transform', 'translate(0,0)')
-			.call(yAxis);
-    	
-    	var yAxisText;
-    	if (this.getApiParam('withDistributions') === 'raw') {
-    		yAxisText = this.localize('rawFrequencies');
-    	} else {
-    		yAxisText = this.localize('relativeFrequencies');
-    	}
-    	this.getVis().select('g.axis.y').append("text")
-			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate(-'+(this.graphMargin.left-20)+', '+height/2+') rotate(-90)')
-			.attr('fill', '#000')
-			.text(yAxisText);
     },
     
 	getCurrentTerms: function() {
@@ -22327,7 +22540,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 		
 		d3.select(el.dom).select('svg').attr('width', width).attr('height', height);
 		
-		// TODO recalculate streams
+		this.doLayout();
     }
 });
 
@@ -24132,7 +24345,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		
 		var onLoadHandler = function(mode, store, records, success, operation) {
 			this.setApiParams({mode: mode});
-			
+
 			this.getTermsRadio().loadRecords(records);
 			
 			var query = this.getApiParam('query');
@@ -24419,7 +24632,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		});
 		
 		this.on('query', function(src, query){
-			if (Ext.isString(query)) {this.fireEvent("termsClicked", src, [query]);}
+			this.fireEvent("termsClicked", src, query);
 	    });
 		
 		this.on("termsClicked", function(src, terms) {

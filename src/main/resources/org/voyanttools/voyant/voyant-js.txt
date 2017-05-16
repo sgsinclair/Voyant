@@ -48,6 +48,7 @@ app/data/model/PrincipalComponent.js
 app/data/model/RelatedTerm.js
 app/data/model/StatisticalAnalysis.js
 app/data/model/Token.js
+app/data/model/TermCorrelation.js
 
 # STORES
 app/data/store/VoyantStore.js
@@ -63,6 +64,7 @@ app/data/store/PCAAnalysis.js
 app/data/store/DocSimAnalysis.js
 app/data/store/CorpusNgrams.js
 app/data/store/RelatedTerms.js
+app/data/store/TermCorrelations.js
 app/data/store/Tokens.js
 app/data/store/TSNEAnalysis.js
 
@@ -105,6 +107,7 @@ app/panel/Cirrus.js
 app/panel/CollocatesGraph.js
 app/panel/Contexts.js
 app/panel/CorpusCollocates.js
+app/panel/Correlations.js
 app/panel/CorpusCreator.js
 app/panel/Knots.js
 app/panel/Phrases.js
