@@ -497,7 +497,7 @@ Ext.define('Voyant.data.model.Corpus', {
 				}
 				
 				return me;
-			}).otherwise(function(response){
+			}, function(response){
 				Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
 			}).then(function(corpus) {
 				if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {

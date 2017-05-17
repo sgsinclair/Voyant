@@ -5,11 +5,14 @@ Ext.define('Voyant.panel.Correlations', {
     statics: {
     	i18n: {
     		title: "Correlations",
+    		sourceTip: "Term 1 (the pairing is what matters, not the column)",
+    		targetTip: "Term 2 (the pairing is what matters, not the column)",
     		trendTip: "This represents the relative frequencies of the term.",
     		minInDocumentsCountRatioLabel: "minimum coverage (%{0})",
     		source: "Term 1",
     		target: "Term 2",
     		correlation: "Correlation",
+    		correlationTip: "This is a measure of how closely term frequencies correlate (using Pearson's correlation coefficient). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other dropx), scores approaching 0 indicate little or no meaningful corrlation.",
     		emptyText: "(No results.)"
     	},
     	api: {
@@ -41,7 +44,7 @@ Ext.define('Voyant.panel.Correlations', {
 
     		columns: [{
     			text: this.localize("source"),
-    			toolTip: this.localize("sourceTip"),
+    			tooltip: this.localize("sourceTip"),
         		dataIndex: 'source-term',
         		sortable: false
     		},{
@@ -65,12 +68,12 @@ Ext.define('Voyant.panel.Correlations', {
                 align: 'right'
             },{
     			text: this.localize("target"),
-    			toolTip: this.localize("targetTip"),
+    			tooltip: this.localize("targetTip"),
         		dataIndex: 'target-term',
         		sortable: false
     		},{
     			text: this.localize("correlation"),
-    			toolTip: this.localize("correlationTip"),
+    			tooltip: this.localize("correlationTip"),
         		dataIndex: 'correlation'
     		}],
     		

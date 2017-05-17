@@ -2,6 +2,11 @@ Ext.define('Voyant.util.Toolable', {
 	requires: ['Voyant.util.Localization'],
 	statics: {
 		i18n: {
+			exportGridAllJson: "export all available data in JSON",
+			exportAllTitle: "Export All",
+			exportAllJsonWarning: "You're requesting all of the available data (in a JSON format that Voyant uses), are you sure you want to continue?",
+			exportGridAllTsv: "export all available data as tab separated values (text)",
+			exportAllTsvWarning: "You're requesting all of the available data, are you sure you want to continue?"
 		}
 	},
 	constructor: function(config) {
@@ -276,30 +281,39 @@ Ext.define('Voyant.util.Toolable', {
 	       	}]
 		})
 		if (panel.isXType('grid')) {
+			var exportitems = [{
+	       		xtype: 'radio',
+	       		name: 'export',
+	       		inputValue: 'gridCurrentHtml',
+	       		boxLabel: panel.localize('exportGridCurrentHtml')
+    	   },{
+	       		xtype: 'radio',
+	       		name: 'export',
+	       		inputValue: 'gridCurrentTsv',
+	       		boxLabel: panel.localize('exportGridCurrentTsv')
+    	  	}];
+			if (!panel.getExportGridAll || panel.getExportGridAll()!=false) {
+				exportitems.push({
+		       		xtype: 'radio',
+		       		name: 'export',
+		       		inputValue: 'gridAllJson',
+		       		boxLabel: panel.localize('exportGridAllJson')
+	    	   },{
+		       		xtype: 'radio',
+		       		name: 'export',
+		       		inputValue: 'gridAllTsv',
+		       		boxLabel: panel.localize('exportGridAllTsv')
+	    	   })
+			}
 			items.push({
 		       xtype: 'fieldset',
 		       collapsible: true,
 		       collapsed: true,
 		       title: panel.localize('exportGridCurrent'),
-	    	   items: [{
-		       		xtype: 'radio',
-		       		name: 'export',
-		       		inputValue: 'gridCurrentHtml',
-		       		boxLabel: panel.localize('exportGridCurrentHtml')
-	    	   },{
-		       		xtype: 'radio',
-		       		name: 'export',
-		       		inputValue: 'gridCurrentTsv',
-		       		boxLabel: panel.localize('exportGridCurrentTsv')
-	    	  	},{
-		       		xtype: 'radio',
-		       		name: 'export',
-		       		inputValue: 'gridCurrentJson',
-		       		boxLabel: panel.localize('exportGridCurrentJson')
-	    	   }]
+	    	   items: exportitems
 			})
 		}
-		if ((!panel.getExportVisualization || panel.getExportVisualization()) && (panel.down("chart") || panel.getTargetEl().dom.querySelector("canvas") || panel.getTargetEl().dom.querySelector("svg"))) {
+		if ((!panel.getExportVisualization || panel.getExportVisualization()) && panel.isXType("grid")==false && (panel.down("chart") || panel.getTargetEl().dom.querySelector("canvas") || panel.getTargetEl().dom.querySelector("svg"))) {
 			var formats = [{
 				xtype: 'radio',
 				name: 'export',
@@ -579,6 +593,24 @@ Ext.define('Voyant.util.Toolable', {
 	        multiline: true,
 	        value: value
 		});
+	},
+	exportGridAllJson: function(grid, form) {
+		Ext.Msg.confirm(this.localize('exportAllTitle'), this.localize('exportAllJsonWarning'), function(btn) {
+			if (btn=='yes') {
+				var params = {limit: 0, start: 0};
+				Ext.applyIf(params, grid.getStore().getProxy().getExtraParams());
+				this.openUrl(this.getTromboneUrl()+"?"+Ext.Object.toQueryString(params));
+			}
+		}, this)
+	},
+	exportGridAllTsv: function(grid, form) {
+		Ext.Msg.confirm(this.localize('exportAllTitle'), this.localize('exportAllTsvWarning'), function(btn) {
+			if (btn=='yes') {
+				var params = {limit: 0, start: 0, template: this.getXType()+"2tsv"};
+				Ext.applyIf(params, grid.getStore().getProxy().getExtraParams());
+				this.openUrl(this.getTromboneUrl()+"?"+Ext.Object.toQueryString(params));
+			}
+		}, this)
 	},
 	getExportUrl: function() {
 		// start with the application api
