@@ -83,7 +83,7 @@ doubletree.DoubleTree = function() {
 	};
 	var continuationColor = function(info) {
 		return "red";
-	}
+	};
 	var basicStyles = {
 		"node" : {
 			"fill" : "white",
@@ -136,7 +136,7 @@ doubletree.DoubleTree = function() {
 			// element
 			// really, storing containers. Use updateData and redraw to
 			// really do the generation
-			containers.push(this[i]);
+			containers.push(this.node());
 		});
 
 	}
@@ -151,7 +151,7 @@ doubletree.DoubleTree = function() {
 	mine.init = function(containerPattern) {
 		d3.select(d3.selectAll(containerPattern)).call(this);
 		return mine;
-	}
+	};
 
 	/**
 	 * redraw the visualization
@@ -162,7 +162,7 @@ doubletree.DoubleTree = function() {
 		}
 
 		return mine;
-	}
+	};
 
 	/**
 	 * set up the visualization using 2 {@link doubletree.Trie}s
@@ -227,11 +227,11 @@ doubletree.DoubleTree = function() {
 		}
 
 		if (scaleLabels) {
-			textScale = d3.scale.log().range([ kMinFontSize, kFontSize ]);
+			textScale = d3.scaleLog().range([ kMinFontSize, kFontSize ]);
 		} else {
 			textScale = function() {
 				return kFontSize;
-			}
+			};
 			textScale.domain = function() {
 			};
 		}
@@ -249,37 +249,24 @@ doubletree.DoubleTree = function() {
 		var width = visWidth - margin.right - margin.left;
 		var height = visHt - margin.top - margin.bottom;
 
-		containers[0].forEach(function(d, i) {
+		containers.forEach(function(d, i) {
 			var thisContainer = d;
 			var thisVis;
 
-			function zoom() {
-			    var scale = d3.event.scale,
-			        translation = d3.event.translate;
-//			        tbound = -h * scale,
-//			        bbound = h * scale,
-//			        lbound = (-w + m[1]) * scale,
-//			        rbound = (w - m[3]) * scale;
-			    // limit translation to thresholds
-//			    translation = [
-//			        Math.max(Math.min(translation[0], rbound), lbound),
-//			        Math.max(Math.min(translation[1], bbound), tbound)
-//			    ];
-			    
-			    d3.select(thisContainer).select("svg > g").attr("transform", "translate(" + translation + ")" + " scale(" + scale + ")");
-			}
-
 			var tmp = d3.select(thisContainer).select("svg");
-			if (tmp[0][0] == null) {
-				thisVis = d3
-					.select(thisContainer)
-					.append("svg")
+			if (tmp.node() == null) {
+				thisVis = d3.select(thisContainer).append("svg")
 					.attr("width", width + margin.right + margin.left)
 					.attr("height", height + margin.top + margin.bottom)
 					.attr("cursor", "move")
-					.call(d3.behavior.zoom().scaleExtent([1,1]).on("zoom", zoom));
+					.call(d3.zoom().scaleExtent([1,1]).on('zoom', function() {
+						var x = d3.event.transform.x + width/2; // need offset because of initial offset in g element
+						var y = d3.event.transform.y + height/2;
+						d3.select(thisContainer).select("svg > g").attr("transform", 'translate('+x+','+y+')');
+					}));
 
-				thisVis.append("g"); // container for both trees
+				thisVis.append("g") // container for both trees
+					.attr('transform', 'translate('+width/2+','+height/2+')'); // initial offset
 
 			} else {
 				thisVis = tmp;
@@ -313,7 +300,7 @@ doubletree.DoubleTree = function() {
 
 		succeeded = true;
 		return mine;
-	}
+	};
 
 	// hitArray is an array of items, prefixArray and suffixArray are arrays
 	// of arrays of items
@@ -405,7 +392,7 @@ doubletree.DoubleTree = function() {
 
 		mine.setupFromTries(leftTrie, rtTrie);
 		return mine;
-	}
+	};
 
 	/**
 	 * @returns just the <em>ids</em> of the data that satisfies the
@@ -413,7 +400,7 @@ doubletree.DoubleTree = function() {
 	 */
 	mine.filteredIDs = function() {
 		return visibleIDs;
-	}
+	};
 
 	// return how many found
 	/**
@@ -429,7 +416,7 @@ doubletree.DoubleTree = function() {
 		leftTree.search(searchRE);
 		rtTree.search(searchRE);
 
-		var thisVis = d3.select(containers[0][0]);
+		var thisVis = d3.select(containers[0]);
 		var found = thisVis.selectAll("text.foundText");
 
 		if (found.empty()) {
@@ -440,12 +427,12 @@ doubletree.DoubleTree = function() {
 
 		var foundRt = thisVis.selectAll("text.rtNdText.foundText");
 
-		if (foundRt[0][0] != null) {
+		if (foundRt.node() != null) {
 			what--; // root node, and we have 2 of those, so subtract one
 					// from the count
 		}
 		return what;
-	}
+	};
 
 	/**
 	 * clear the visualization of the search results
@@ -456,7 +443,7 @@ doubletree.DoubleTree = function() {
 		leftTree.clearSearch();
 		rtTree.clearSearch();
 		return mine;
-	}
+	};
 
 	/**
 	 * update the showing/hiding of extra information associated with the
@@ -477,7 +464,7 @@ doubletree.DoubleTree = function() {
 		// Safari doesn't update reshowing correctly, so we'll force it to
 		// build this again :( (Chrome works correctly, so it's not a webkit
 		// issue)
-		var thisVis = d3.select(containers[0][0]);
+		var thisVis = d3.select(containers[0]);
 		var tokExtra = thisVis.select('.tokenExtra[display="inline"]');
 		if (!tokExtra.empty()) {
 			var ht = tokExtra.style("height");
@@ -487,7 +474,7 @@ doubletree.DoubleTree = function() {
 		}
 
 		return mine;
-	}
+	};
 
 	// ////////// getter/setters
 	/**
@@ -501,7 +488,7 @@ doubletree.DoubleTree = function() {
 			return visWidth;
 		visWidth = value;
 		return mine;
-	}
+	};
 
 	// ADDED
 	mine.visHeight = function(value) {
@@ -509,7 +496,7 @@ doubletree.DoubleTree = function() {
 			return visHt;
 		visHt = value;
 		return mine;
-	}
+	};
 
 	/**
 	 * Getter/setter for whether the prefixes are displayed on the right or
@@ -527,7 +514,7 @@ doubletree.DoubleTree = function() {
 			return prefixesOnRight;
 		prefixesOnRight = value;
 		return mine;
-	}
+	};
 
 	// NB: doesn't redraw
 	/**
@@ -552,7 +539,7 @@ doubletree.DoubleTree = function() {
 			return filters;
 		filters = value;
 		return mine;
-	}
+	};
 
 	/**
 	 * Getter/setter for the handlers for alt-click and shift-click on the
@@ -571,7 +558,7 @@ doubletree.DoubleTree = function() {
 			return handlers;
 		handlers = value;
 		return mine;
-	}
+	};
 
 	// NB: doesn't redraw
 	/**
@@ -590,7 +577,7 @@ doubletree.DoubleTree = function() {
 			return showTokenExtra;
 		showTokenExtra = value;
 		return mine;
-	}
+	};
 
 	/**
 	 * Getter/setter for scaling the node labels by their frequency.
@@ -605,7 +592,7 @@ doubletree.DoubleTree = function() {
 			return scaleLabels;
 		scaleLabels = value;
 		return mine;
-	}
+	};
 
 	// succeeded is read only
 	/**
@@ -617,7 +604,7 @@ doubletree.DoubleTree = function() {
 	 */
 	mine.succeeded = function() {
 		return succeeded;
-	}
+	};
 
 	/**
 	 * Getter/setter for the function determining the sort order of sibling
@@ -637,7 +624,7 @@ doubletree.DoubleTree = function() {
 			return sortFun;
 		sortFun = value;
 		return mine;
-	}
+	};
 
 	/**
 	 * Getter/setter for the function determining the content of the node
@@ -656,7 +643,7 @@ doubletree.DoubleTree = function() {
 			return nodeText;
 		nodeText = value;
 		return mine;
-	}
+	};
 
 	/**
 	 * Getter/setter for the function determining the content of the "extra"
@@ -675,7 +662,7 @@ doubletree.DoubleTree = function() {
 			return tokenExtraText;
 		tokenExtraText = value;
 		return mine;
-	}
+	};
 
 	/**
 	 * Getter/setter for the function determining the color of the
@@ -693,7 +680,7 @@ doubletree.DoubleTree = function() {
 			return rectColor;
 		rectColor = value;
 		return mine;
-	}
+	};
 
 	/**
 	 * Getter/setter for the function determining the color of the borders
@@ -711,7 +698,7 @@ doubletree.DoubleTree = function() {
 			return rectBorderColor;
 		rectBorderColor = value;
 		return mine;
-	}
+	};
 
 	/**
 	 * Getter/setter for the function determining the color of the text of
@@ -729,7 +716,7 @@ doubletree.DoubleTree = function() {
 			return continuationColor;
 		continuationColor = value;
 		return mine;
-	}
+	};
 
 	/**
 	 * Getter/setter for the styles of the nodes and branches. For now these
@@ -757,10 +744,10 @@ doubletree.DoubleTree = function() {
 				}
 			});
 		return mine;
-	}
+	};
 
 	return mine;
-}
+};
 
 // ////// tree for doubletree
 /** @private */
@@ -790,28 +777,27 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 		sortFun = doubletree.sortByStrFld("token");
 	}
 
-	var tree = d3.layout.tree()
-	//.size([height, width])
-	.nodeSize([ 40, 40 ])
-	.sort(sortFun);
+	var i = 0;
+	var tree = d3.tree()
+	.size([height, width])
+	.nodeSize([ 40, 40 ]);
+	//.sort(sortFun);
 
-	var diagonal = d3.svg.diagonal()
-	// .projection(function(d) { return [d.y, d.x]; }); //CC orig
-	.projection(function(d) {
-		return [ positionX(d.y), positionY(d.x) ];
-	});
+	var diagonal = d3.linkHorizontal()
+		.x(function(d) { return positionX(d.y); })
+		.y(function(d) { return positionY(d.x); });
 
 	vis = vis.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	// //////
 	this.readJSONTree = function(json) {
-		root = json;
-		root.x0 = height / 2;
-		root.y0 = width / 2; // CC orig was 0
+		root = d3.hierarchy(json);
+		root.x0 = 0;
+		root.y0 = 0;
 
 		root.children.forEach(collapse);
 		this.update(root);
-	}
+	};
 
 	// CC had been inside readJSONTree
 	function collapse(d) {
@@ -833,22 +819,17 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 		}
 	}
 
-	var that = this;
-
 	this.update = function(source) {
-		if (!source) {
-			source = root;
-		}
+		// seems unnecessary
+//		if (!source) {
+//			source = root;
+//		}
 
 		// Compute the new tree layout.
-		var nodes = tree.nodes(root).reverse(); // CC orig why reverse?
-		// var nodes = tree.nodes(root);
+		var treeData = tree(root);
+		var nodes = treeData.descendants();
 
-		// we don't want the root to change position, so we need to
-		// compensate
-		dx = root.x - height / 2;
-
-		var baseBranchSegmentWidth = 50;
+		var baseBranchSegmentWidth = 25;
 		// Normalize for fixed-depth.
 		nodes.forEach(function(d) {
 			var textSize = d.textSize;
@@ -856,42 +837,42 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 				textSize = 0;
 				var parent = d.parent;
 				while (parent != null) {
-					textSize += parent.textSize || Ext.draw.TextMeasurer.measureText(parent.name, 'arial').width;
+					var measured = Ext.draw.TextMeasurer.measureText(parent.data.name, 'arial').width;
+					textSize += measured;
 					parent = parent.parent;
 				}
 				d.textSize = textSize; // cache the size so we don't recalculate each time
 			}
-			d.y = d.depth * baseBranchSegmentWidth + textSize;
+			d.y = (d.depth * baseBranchSegmentWidth) + textSize;
 		});
-
+		
+		
 		// Update the nodes…
-		var node = vis.selectAll("g.node_" + toLeft).data(nodes,
-				function(d) {
-					return d.id || (d.id = ++i);
-				});
+		var node = vis.selectAll("g.node_" + toLeft)
+			.data(nodes, function(d) {
+				return d.id || (d.id = ++i);
+			});
 
 		// Enter any new nodes at the parent's previous position.
-		var nodeEnter = node.enter().append("g").attr("class", "node node_" + toLeft).attr("cursor", "pointer").attr( "transform",
-				function(d) {
-					return "translate(" + positionX(source.y0) + "," + positionY(source.x0) + ")";
-				})
-		/*
-		 * doesn't work for webkit; svg really wants the title as separate
-		 * element, see below .attr("title", function(d) { var what =
-		 * doubletree.infoToText(d.info); return what;})
-		 */
-		.on("click", click);
+		var nodeEnter = node.enter().append("g").attr("class", "node node_" + toLeft).attr("cursor", "pointer")
+			.attr("transform", function(d) {
+				return "translate(" + positionX(source.y0) + "," + positionY(source.x0) + ")";
+			})
+			.on("click", click);
 
 		nodeEnter.append("title").text(function(d) {
-			var what = doubletree.infoToText(d.info);
+			var what = doubletree.infoToText(d.data.info);
 			return what;
 		});
 
-		nodeEnter.append("circle").attr("r", 1e-6).style("fill", function(d) {
-			return d._children ? "#fff" : basicStyles.node.fill;
-		}).style("stroke", function(d) {
-			return basicStyles.node.stroke
-		});
+		nodeEnter.append("circle")
+			.attr("r", 1e-6)
+			.style("fill", function(d) {
+				return d._children ? "#fff" : basicStyles.node.fill;
+			})
+			.style("stroke", function(d) {
+				return basicStyles.node.stroke;
+			});
 
 		var txtNode = nodeEnter.append("text").attr("class", function(d) {
 			if (d.depth == 0) {
@@ -920,90 +901,38 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 			 * root -- do this because of differences in counts when
 			 * filtering }
 			 */
-			return textScale(d.info.count) + "pt";
+			return textScale(d.data.info.count) + "pt";
 		});
 
 		txtNode.append("tspan").attr("dy", ".35em").attr("class", "tokenText").text(function(d) {
-			return nodeText(d.info, d.depth < 1);
+			return nodeText(d.data.info, d.depth < 1);
 		}).style("fill-opacity", 1e-6);
 
 		txtNode.append("tspan").attr("dx", ".35em").attr("class", "tokenExtra").text(function(d) {
-			return tokenExtraText(d.info, d.depth < 1);
+			return tokenExtraText(d.data.info, d.depth < 1);
 		}).style("fill-opacity", 1e-6);
 
-		this.drawRects = function() {
-			var which = showTokenExtra ? "inline" : "none";
-			vis.selectAll(".tokenExtra").attr("display", which);
+		
+		this.drawRects();
 
-			node.selectAll("rect").remove(); // remove previous rects
-
-			var nodeRect = node
-					.insert("rect", "text")
-					.attr("class", "nodeRect")
-					.attr("height", function() {
-						var height = this.parentElement.getBBox().height;
-						if (height < 6) {
-							// end of branch, need to prevent negative height
-							height = 6.1;
-						}
-						return height - 6;
-					})
-					.attr("y", function(d) {
-						if (!d.parent) {
-							return -0.5 * this.parentElement.getBBox().height / 2 - 2;
-						} else {
-							return -0.5 * this.parentElement.getBBox().height / 2;
-						}
-					})
-					.attr("width", function() {
-						return this.parentElement.getBBox().width;
-					})
-					.attr("x", function(d) {
-						var parentW = this.parentElement.getBBox().width;
-						if (!d.parent) {
-							return -0.33333 * parentW;
-						}
-						if (!toLeft) {
-							return 0;
-						}
-						return -0.5 * parentW;
-					})
-					// .style("stroke-opacity", 1e-6)
-					.style("stroke-opacity", 1).style("stroke-width", 1)
-					.style("stroke", function(d) {
-						return rectBorderColor(d.info);
-					}).style("fill", function(d) {
-						return rectColor(d.info);
-					}).style("fill-opacity", function(d) {
-						return 1;
-//						if (!d.parent && !toLeft) {
-//							return 1e-6;
-//						} else {
-//							return 1;
-//						}
-					});
-		}
-		try {
-			this.drawRects();
-		} catch (e) {
-			// apparently we're in some version of Opera, which thinks
-			// "this" is the window, not the rect wh
-		}
-
+		var nodeUpdate = nodeEnter.merge(node);
+		
 		// Transition nodes to their new position.
-		var nodeUpdate = node.transition().duration(duration).attr("transform", function(d) {
-			return "translate(" + positionX(d.y) + "," + positionY(d.x) + ")";
-		});
+		nodeUpdate.transition().duration(duration)
+			.attr("transform", function(d) {
+				return "translate(" + positionX(d.y) + "," + positionY(d.x) + ")";
+			});
 
 		nodeUpdate.select("circle")
-		// .attr("r", 4.5)
-		.attr("r", function(d) {
-			return (d.children || d._children) ? 1e-6 : 4.5
-		}).style("fill", function(d) {
-			return d._children ? "#fff" : basicStyles.node.fill;
-		}) // function(d) { return d._children ? "lightsteelblue" : "#fff";
-			// })
-		.style("stroke-width", basicStyles.node["stroke-width"]);
+			// .attr("r", 4.5)
+			.attr("r", function(d) {
+				return (d.children || d._children) ? 1e-6 : 4.5;
+			})
+			.style("fill", function(d) {
+				return d._children ? "#fff" : basicStyles.node.fill;
+			}) // function(d) { return d._children ? "lightsteelblue" : "#fff";
+				// })
+			.style("stroke-width", basicStyles.node["stroke-width"]);
 
 		nodeUpdate.selectAll("tspan").style("fill-opacity", 1);
 
@@ -1018,38 +947,32 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 		nodeExit.selectAll("tspan").style("fill-opacity", 1e-6);
 
 		// Update the links…
-		var link = vis.selectAll("path.link_" + toLeft).data(
-				tree.links(nodes), function(d) {
-					return d.target.id;
-				});
+		var link = vis.selectAll("path.link_" + toLeft)
+			.data(root.links(), function(d) {
+				var id = d.source.id+'-'+d.target.id;
+				return id;
+			});
 
 		// Enter any new links at the parent's previous position.
-		link.enter().insert("path", "g").attr("class", "link link_" + toLeft).attr("d", function(d) {
-//			console.log('new link', d);
-			var o = {
-				x : source.x0,
-				y : source.y0
-			}; // CC orig
-			return diagonal({
-				source : o,
-				target : o
-			});
-		}).style("fill", "none").style("stroke", basicStyles.branch.stroke).style("stroke-width", basicStyles.branch["stroke-width"]);
+		var linkEnter = link.enter().insert("path", "g").attr("class", "link link_" + toLeft)
+			.attr("d", function(d) {
+				var o = {x: source.x0, y: source.y0};
+				return diagonal({source: o, target: o});
+			})
+			.style("fill", "none").style("stroke", basicStyles.branch.stroke).style("stroke-width", basicStyles.branch["stroke-width"]);
 
+		var linkUpdate = linkEnter.merge(link);
+		
 		// Transition links to their new position.
-		link.transition().duration(duration).attr("d", diagonal);
+		linkUpdate.transition().duration(duration).attr("d", diagonal);
 
 		// Transition exiting nodes to the parent's new position.
-		link.exit().transition().duration(duration).attr("d", function(d) {
-			var o = {
-				x : source.x,
-				y : source.y
-			}; // CC orig
-			return diagonal({
-				source : o,
-				target : o
-			}); // CC orig
-		}).remove();
+		var linkExit = link.exit().transition().duration(duration)
+			.attr("d", function(d) {
+				var o = {x: source.x0, y: source.y0};
+				return diagonal({source: o, target: o});
+			})
+			.remove();
 
 		// Stash the old positions for transition.
 		nodes.forEach(function(d) {
@@ -1057,10 +980,66 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 			d.y0 = d.y;
 		});
 
-		this.updateContinuations();
-		
-	}
+		this.updateContinuations();		
+	};
+	
+	this.drawRects = function() {
+		var which = showTokenExtra ? "inline" : "none";
+		vis.selectAll(".tokenExtra").attr("display", which);
 
+		var node = vis.selectAll("g.node_" + toLeft);
+		
+		node.selectAll("rect").remove(); // remove previous rects
+
+		var nodeRect = node
+				.insert("rect", "text")
+				.attr("class", "nodeRect")
+				.attr("height", function() {
+					var height = this.parentElement.getBBox().height;
+					if (height < 6) {
+						// end of branch, need to prevent negative height
+						height = 6.1;
+					}
+					return height - 6;
+				})
+				.attr("y", function(d) {
+					if (!d.parent) {
+						return -0.5 * this.parentElement.getBBox().height / 2 - 2;
+					} else {
+						return -0.5 * this.parentElement.getBBox().height / 2;
+					}
+				})
+				.attr("width", function() {
+					return this.parentElement.getBBox().width;
+				})
+				.attr("x", function(d) {
+					var parentW = this.parentElement.getBBox().width;
+					if (!d.parent) {
+						return -0.33333 * parentW;
+					}
+					if (!toLeft) {
+						return 0;
+					}
+					return -0.5 * parentW;
+				})
+				// .style("stroke-opacity", 1e-6)
+				.style("stroke-opacity", 1).style("stroke-width", 1)
+				.style("stroke", function(d) {
+					return rectBorderColor(d.data.info);
+				}).style("fill", function(d) {
+					return rectColor(d.data.info);
+				}).style("fill-opacity", function(d) {
+					return 1;
+//					if (!d.parent && !toLeft) {
+//						return 1e-6;
+//					} else {
+//						return 1;
+//					}
+				});
+	};
+
+	var that = this;
+	
 	// Toggle children on click.
 	function click(d, i) {
 		if (d3.event.altKey) {
@@ -1079,10 +1058,10 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 		if (!d.parent) {
 			return;
 		}
-		if (that.continuationIDs != d.info.ids) {
-			that.setIds(d.info.ids);
+		if (that.continuationIDs != d.data.info.ids) {
+			that.setIds(d.data.info.ids);
 			that.clickedNode = d.id;
-			dispatch.idsUpdated.apply(that);
+			dispatch.call('idsUpdated', that);
 		}
 
 		collapseSiblings(d); // CC new
@@ -1124,31 +1103,31 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 
 	this.setIds = function(ids) {
 		that.continuationIDs = ids;
-	}
+	};
 	this.updateContinuations = function() {
 		vis.selectAll("g.node_" + toLeft + " text")
 			.classed("continuation", function(d) {
-					var isContinuation = overlap(d.info.ids, that.continuationIDs || {});
+					var isContinuation = overlap(d.data.info.ids, that.continuationIDs || {});
 					return isContinuation;
 			})
 			.style("fill", function(d) {
 				if (d3.select(this).classed("continuation")) {
-					return continuationColor(d.info);
+					return continuationColor(d.data.info);
 				}
 				return "#444"; // default text color
 			}); // this is duplicated from above, nodeUpdate
-	}
+	};
 
 	this.search = function(searchRE) {
 		vis.selectAll("g.node text").classed("foundText", function(d) {
-			var what = searchRE.test(nodeText(d.info));
+			var what = searchRE.test(nodeText(d.data.info));
 			return what;
-		})
-	}
+		});
+	};
 
 	this.clearSearch = function() {
 		vis.selectAll("g.node text").classed("foundText", false);
-	}
+	};
 
 	this.showTokenExtras = function(show) {
 		if (arguments.length == 0) {
@@ -1158,7 +1137,7 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 
 		this.drawRects();
 		return this;
-	}
+	};
 
 	this.setRectColor = function(rectColorFun) {
 		if (arguments.length == 0) {
@@ -1167,14 +1146,14 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 		rectColor = rectColorFun;
 		this.drawRects();
 		return this;
-	}
+	};
 
 	// /////////////
 	function positionX(x) {
-		return toLeft ? width / 2 - x : width / 2 + x;
+		return toLeft ? -x : x;
 	}
 	function positionY(y) {
-		return y - dx;
+		return y;
 	}
 
 	// //default modifier handlers
@@ -1187,7 +1166,7 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 
 	this.readJSONTree(data);
 	return this;
-}
+};
 
 // /////////////////////////////// tree sorting functions
 /**
@@ -1200,8 +1179,8 @@ doubletree.Tree = function(vis, visWidth, visHt, data, toLeft,
 doubletree.sortByStrFld = function(fld) {
 	var field = fld;
 	return function(a, b) {
-		var aUndefined = (undefined == a.info[field]);
-		var bUndefined = (undefined == b.info[field]);
+		var aUndefined = (undefined == a.data.info[field]);
+		var bUndefined = (undefined == b.data.info[field]);
 		if (aUndefined && bUndefined) {
 			return 0;
 		} else if (aUndefined) {
@@ -1209,25 +1188,25 @@ doubletree.sortByStrFld = function(fld) {
 		} else if (bUndefined) {
 			return 1;
 		}
-		var aVal = a.info[field].join(" ").toLowerCase();
-		var bVal = b.info[field].join(" ").toLowerCase();
+		var aVal = a.data.info[field].join(" ").toLowerCase();
+		var bVal = b.data.info[field].join(" ").toLowerCase();
 		if (aVal < bVal) {
 			return -1;
 		} else if (aVal > bVal) {
 			return 1;
 		}
 		return 0;
-	}
-}
+	};
+};
 /**
  * function to sort the nodes according to the count field in the
  * information object
  */
 doubletree.sortByCount = function() {
 	return function(a, b) {
-		return b.info.count - a.info.count;
-	}
-}
+		return b.data.info.count - a.data.info.count;
+	};
+};
 
 /**
  * function to sort the nodes according to the continuations field in the
@@ -1235,9 +1214,9 @@ doubletree.sortByCount = function() {
  */
 doubletree.sortByContinuations = function() {
 	return function(a, b) {
-		return b.info.continuations - a.info.continuations;
-	}
-}
+		return b.data.info.continuations - a.data.info.continuations;
+	};
+};
 
 // /////////////////////////////// some tree filtering functions
 /**
@@ -1250,7 +1229,7 @@ doubletree.filterByMinCount = function(n) {
 	return function(inf) {
 		return inf.count >= n;
 	};
-}
+};
 
 /**
  * function to filter the nodes according to a maximum for the count field
@@ -1262,7 +1241,7 @@ doubletree.filterByMaxCount = function(n) {
 	return function(inf) {
 		return inf.count <= n;
 	};
-}
+};
 
 /**
  * function to filter the nodes according to the "POS" field (if it exists)
@@ -1276,8 +1255,8 @@ doubletree.filterByPOS = function(pos) {
 		return inf["POS"] && inf["POS"].filter(function(p) {
 			return p.search(re) > -1;
 		}).length > 0; // end of ng has no POS
-	}
-}
+	};
+};
 
 // /////////////////////////////// formatting functions
 
@@ -1297,7 +1276,7 @@ doubletree.filterByPOS = function(pos) {
  */
 doubletree.fieldText = function(info, fieldName) {
 	return info[fieldName];
-}
+};
 // extracts the "token" field
 /**
  * convenience function to return the value of the "token" field (if it
@@ -1313,7 +1292,7 @@ doubletree.tokenText = function(info) {
 		tokenText = info.token;//info.token[0]; // don't return all token values, just the first
 	}
 	return tokenText;
-}
+};
 
 /**
  * converts an information object to a string
@@ -1333,7 +1312,7 @@ doubletree.infoToText = function(info) {
 		}
 	}
 	return what;
-}
+};
 // //////////////// internal utility functions
 
 function old_pruneTree(tree, ids) {
@@ -1353,7 +1332,7 @@ function old_pruneTree(tree, ids) {
 		}
 	}
 	tree.children = tree.children.filter(function(c) {
-		return c != null
+		return c != null;
 	});
 
 	// recalculate maxChildren
@@ -1383,7 +1362,7 @@ function new_pruneTree(tree, ids, copyIDs) {
 	}
 
 	// adjust IDs
-	var idNums = Object.keys(ids)
+	var idNums = Object.keys(ids);
 	for ( var i = 0, n = idNums.length; i < n; i++) {
 		var cid = idNums[i];
 		delete tree.info.ids[cid];
@@ -1402,7 +1381,7 @@ function new_pruneTree(tree, ids, copyIDs) {
 		}
 	}
 	tree.children = tree.children.filter(function(c) {
-		return c != null
+		return c != null;
 	});
 	tree.info.continuations = tree.children.length;
 

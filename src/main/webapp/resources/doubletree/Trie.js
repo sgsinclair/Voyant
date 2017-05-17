@@ -135,7 +135,7 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
             if (thisItem != endNG) {
                 subTrie.addNgram(itemArray,id, count);
             }
-        }
+        };
             
          /** @private */
         this.getUniqRoot = function() {
@@ -147,7 +147,7 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
             }
         
             return this;
-        }
+        };
         
         /** @private */
         this.toTree = function(filterFuns) {
@@ -218,7 +218,7 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
             var trieData = JSON.parse(JSON.stringify(this)); //CuC make a copy of the data, to keep the real trie immutable
         
             return toTreeHelper(filterFuns, 0, trieData);
-        }
+        };
     }
     
     
@@ -256,7 +256,7 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
      */
     this.serialize = function() {
         return JSON.stringify(this);
-    }
+    };
     
     /**
      * make this Trie have the values of a previously serialized Trie see {@link #serialize}
@@ -272,7 +272,7 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
         distinguishingFieldsArray = obj.distinguishingFieldsArray();
         trie = obj.trie();
         
-    }
+    };
     
     //getters -- the properties are readonly, set in constructor
     
@@ -280,12 +280,12 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
     /** @private */
     this.endNG = function() {
         return endNG;
-    }
+    };
     //private, only used in deserialization
     /** @private */
     this.rootName = function() {
         return rootName;
-    }
+    };
     
     //private, also a setter, only used in deserialization and getUniqRoot;
     /** @private */
@@ -294,14 +294,14 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
         trie = value;
       }
       return trie;
-    }
+    };
     
     /**
      * @returns whether this Trie uses case sensitive comparison
      */
     this.caseSensitive = function() {
         return ! noCase;
-    }
+    };
     
     /**
      * get the field names in the data
@@ -309,7 +309,7 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
      */
     this.fieldNames = function() {
         return fieldNames;
-    }
+    };
     
     /**
      * get the field delimiter for the data
@@ -317,7 +317,7 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
      */
     this.fieldDelim = function() {
         return fieldDelim;
-    }
+    };
     
     /**
      * get the distinguishing fields for the data
@@ -325,7 +325,7 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
      */
     this.distinguishingFieldsArray = function() {
         return distinguishingFieldsArray;
-    }
+    };
     
     //add key/vals of o2 to o1 and return o1; (top level key-value only, o2 values maintained over o1)
     /** @private */
@@ -336,6 +336,6 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
     }
 
     
-}  
+};  
 
 })();
