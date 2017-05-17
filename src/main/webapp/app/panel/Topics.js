@@ -85,7 +85,8 @@ Ext.define('Voyant.panel.Topics', {
     	 topicWeights : Array(25),
     	 documents: [],
     	 progress: undefined,
-    	 totalIterations: 0
+    	 totalIterations: 0,
+    	 exportGridAll: false
     	
     },
     
@@ -474,7 +475,7 @@ Ext.define('Voyant.panel.Topics', {
 		var limit = parseInt(this.getApiParam('limit'));
 		for (var topic = 0; topic < numTopics; topic++) {
 			var scores = documents.map(function (doc, i) {
-				console.warn(doc, doc.topicCounts[topic], docSortSmoothing, doc.tokens.length, sumDocSortSmoothing);
+//				console.warn(doc, doc.topicCounts[topic], docSortSmoothing, doc.tokens.length, sumDocSortSmoothing);
 				  return (doc.topicCounts[topic] + docSortSmoothing) / (doc.tokens.length + sumDocSortSmoothing);
 			});
 			

@@ -7,7 +7,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
 		options: {
     		xtype: 'stoplistoption'
     	}
-	},
+    },
     statics: {
     	i18n: {
     	},

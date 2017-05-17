@@ -75,6 +75,18 @@
 </div>
 
 <div class="thumb-list">
+	<a href="#!/guide/correlations"><dd>
+		<div class="thumb">
+			<img src="guides/correlations/icon.png" />
+		</div>
+		<div>
+			<h4>Correlations</h4>
+			<p>The Correlations tool enables an exploration of the extent to which term frequencies vary in sync (terms whose frequencies rise and fall together or inversely).</p>
+		</div>
+	</dd></a>
+</div>
+
+<div class="thumb-list">
 	<a href="#!/guide/documentterms"><dd>
 		<div class="thumb">
 			<img src="guides/documentterms/icon.png" />

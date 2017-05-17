@@ -7,6 +7,9 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     	i18n: {
     	}
     },
+    config: {
+    	exportGridAll: false // prevents export all options from grid
+    },
 
     constructor: function(config) {
     	

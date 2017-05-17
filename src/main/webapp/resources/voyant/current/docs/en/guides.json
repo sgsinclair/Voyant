@@ -113,6 +113,11 @@
                         "title": "Corpus Terms"
                     },
                     {
+                        "name": "correlations",
+                        "url": "guides/tools/correlations",
+                        "title": "Correlations"
+                    },
+                    {
                         "name": "documents",
                         "url": "guides/tools/documents",
                         "title": "Documents"
@@ -155,7 +160,7 @@
                     {
                         "name": "scatterplot",
                         "url": "guides/tools/scatterplot",
-                        "title": "Scatter Plot"
+                        "title": "ScatterPlot"
                     },
                     {
                         "name": "streamgraph",
@@ -175,7 +180,7 @@
                     {
                         "name": "termsradio",
                         "url": "guides/tools/termsradio",
-                        "title": "Terms Radio"
+                        "title": "TermsRadio"
                     },
                     {
                         "name": "textualarc",
@@ -198,14 +203,9 @@
                         "title": "Veliza"
                     },
                     {
-                        "name": "via",
-                        "url": "guides/tools/via",
-                        "title": "Via"
-                    },
-                    {
                         "name": "wordtree",
                         "url": "guides/tools/wordtree",
-                        "title": "Word Tree"
+                        "title": "WordTree"
                     }
                 ]
             },
