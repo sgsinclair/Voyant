@@ -96,12 +96,9 @@ Ext.define('Voyant.util.CategoriesManager', {
 	addFeature: function(name, defaultValue) {
 		if (this.getFeatures()[name] === undefined) {
 			this.getFeatures()[name] = {};
-			if (defaultValue !== undefined) {
-				this.getFeatureDefaults()[name] = defaultValue;
-//				for (var category in this.getCategories()) {
-//					this.setCategoryFeature(category, name, defaultValue);
-//				}
-			}
+		}
+		if (defaultValue !== undefined) {
+			this.getFeatureDefaults()[name] = defaultValue;
 		}
 	},
 	removeFeature: function(name) {

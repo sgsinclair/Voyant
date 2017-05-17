@@ -387,26 +387,20 @@ Ext.define('Voyant.panel.Cirrus', {
     	
 		var t = d3.transition().duration(1000);
 			
-		var wordNodes = this.getVis().selectAll('text').data(words, function(d) {return d.text;});
+		var nodes = this.getVis().selectAll('text').data(words, function(d) {return d.text;});
 		
-		wordNodes.exit().remove();
-		
-		wordNodes.transition(t)
-			.attr('transform', function(d) { return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')'; })
-			.style('font-size', function(d) { return d.fontSize + 'px'; });
-		
-		wordNodes.enter().append('text')
+		nodes.exit().transition(t)
+			.style('font-size', '1px')
+			.remove();
+
+		var nodesEnter = nodes.enter().append('text')
 			.text(function(d) { return d.text; })
 			.attr('text-anchor', 'middle')
 			.attr('data-freq', function(d) { return d.rawFreq; })
 			.attr('transform', function(d) { return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')'; })
 			.style('font-family', function(d) { return panel.getApplication().getFeatureForTerm('font', d.text); })
 			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
-			.style('font-size', '1px').transition(t).style('font-size', function(d) { return d.fontSize + 'px'; });
-			
-		
-		// TODO can't put this as part of enter
-		wordNodes
+			.style('font-size', '1px')
 			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);})
 			.on('mouseover', function(obj) {
 				this.getTip().show();
@@ -422,6 +416,14 @@ Ext.define('Voyant.panel.Cirrus', {
 			.on('mouseout', function(obj) {
 				this.getTip().hide();
 			}.bind(this));
+		
+		var nodesUpdate = nodes.merge(nodesEnter);
+		
+		nodesUpdate.transition(t)
+			.style('font-family', function(d) { return panel.getApplication().getFeatureForTerm('font', d.text); })
+			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
+			.attr('transform', function(d) { return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')'; })
+			.style('font-size', function(d) { return d.fontSize + 'px'; });
 		
 		this.getVis().transition(t).attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')scale(' + scale + ')');
     },
