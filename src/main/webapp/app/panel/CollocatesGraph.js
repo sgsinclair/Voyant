@@ -480,8 +480,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 						}
 					}));
 	    	}
-    	} else {
-    		console.log('no viz yet');
     	}
     },
     
