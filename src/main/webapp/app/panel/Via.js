@@ -125,6 +125,7 @@ Ext.define('Voyant.panel.Via', {
         			edges: edges,
         			listeners: {
         				nodeclicked: function(src, node) {
+        					me.dispatchEvent('termsClicked', me, [node.term]);
         				}
         			}
         		})

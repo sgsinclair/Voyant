@@ -14,9 +14,10 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
         }
     },
     config: {
-        vis: undefined, // svg > g el
-        visLayout: undefined, // layout algo
+        vis: undefined, // svg > g element
+        visLayout: undefined, // d3 layout algorithm
         
+        // backing data, don't set through config, use config.nodes & config.edges
         nodeData: undefined,
         edgeData: undefined,
         
