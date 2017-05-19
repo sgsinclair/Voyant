@@ -124,7 +124,7 @@ Ext.define('Voyant.panel.Via', {
     			graph = Ext.create("Voyant.widget.VoyantNetworkGraph", {
         			edges: edges,
         			listeners: {
-        				nodeclick: function(src, node) {
+        				nodeclicked: function(src, node) {
         				}
         			}
         		})

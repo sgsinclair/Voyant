@@ -28,27 +28,44 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
         
         scaleExtent: [0.25, 8],
         
+        fixOnDrag: true, // fix node when dragged
+        
         graphStyle: {
     		node: {
     			normal: {
     				fill: '#c6dbef',
-    				stroke: '#6baed6'
+    				fillOpacity: 1,
+    				stroke: '#6baed6',
+    				strokeOpacity: 1,
+    				strokeWidth: 1
     			},
     			highlight: {
     				fill: '#9ecae1',
-    				stroke: '#3182bd'
+    				fillOpacity: 1,
+    				stroke: '#3182bd',
+    				strokeOpacity: 1,
+    				strokeWidth: 3
     			}
     		},
     		edge: {
     			normal: {
     				stroke: '#000000',
-    				strokeOpacity: 0.25
+    				strokeOpacity: 0.25,
+    				strokeWidth: 1
     			},
     			highlight: {
     				stroke: '#000000',
-    				strokeOpacity: 0.5
+    				strokeOpacity: 0.5,
+    				strokeWidth: 3
     			}
     		}
+    	},
+    	
+    	graphPhysics: {
+    		damping: 0.4, // 0 = no damping, 1 = full damping
+    		gravity: -1,  // negative = repel, positive = attract
+			springLength: 30,
+			springStrength: 1 // 0 = not strong, >1 = probably too strong
     	}
     },
     constructor: function(config) {
@@ -202,7 +219,16 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 		}
     },
     
-    removeNode: function(nodeId) {
+    addNode: function(dataObj) {
+    	if (Ext.isString(dataObj)) {
+    		dataObj = {term: dataObj};
+    	}
+    	if (dataObj.term) {
+    		this.loadJson({nodes: [dataObj]});
+    	}
+    },
+    
+    removeNode: function(nodeId, removeOrphans) {
     	var data = this.getNodeData();
 		for (var i = 0; i < data.length; i++) {
 			if (data[i].id === nodeId) {
@@ -211,11 +237,73 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 			}
 		}
 		
+		var potentialOrphans = {};
 		data = this.getEdgeData();
 		for (var i = data.length-1; i >= 0; i--) {
-			if (data[i].source.id === nodeId || data[i].target.id === nodeId) {
+			var match = false;
+			if (data[i].source.id === nodeId) {
+				match = true;
+				potentialOrphans[data[i].target.id] = true;
+			}
+			if (data[i].target.id === nodeId) {
+				match = true;
+				potentialOrphans[data[i].source.id] = true;
+			}
+			if (match) {
 				data.splice(i, 1);
 			}
+		}
+		
+		if (removeOrphans) {
+			for (var i = 0; i < data.length; i++) {
+				if (potentialOrphans[data[i].source.id]) {
+					delete potentialOrphans[data[i].source.id];
+				}
+				if (potentialOrphans[data[i].target.id]) {
+					delete potentialOrphans[data[i].target.id];
+				}
+			}
+			for (var orphanId in potentialOrphans) {
+				this.removeNode(orphanId, true);
+			}
+		}
+		
+		this.refreshGraph();
+    },
+    
+    addEdge: function(dataObj) {
+    	if (Ext.isObject(dataObj) && dataObj.source && dataObj.target) {
+    		this.loadJson({edges: [dataObj]});
+    	}
+    },
+    
+    removeEdge: function(edgeId, removeOrphans) {
+    	var data = this.getEdgeData();
+    	for (var i = data.length-1; i >= 0; i--) {
+			if (data[i].id === edgeId) {
+				data.splice(i, 1);
+			}
+		}
+		
+		if (removeOrphans) {
+			var potentialOrphans = {};
+			data = this.getNodeData();
+			for (var i = 0; i < data.length; i++) {
+				potentialOrphans[data[i].id] = true;
+			}
+			data = this.getEdgeData();
+			for (var i = 0; i < data.length; i++) {
+				if (potentialOrphans[data[i].source.id]) {
+					delete potentialOrphans[data[i].source.id];
+				}
+				if (potentialOrphans[data[i].target.id]) {
+					delete potentialOrphans[data[i].target.id];
+				}
+			}
+			for (var orphanId in potentialOrphans) {
+				this.removeNode(orphanId, true);
+			}
+			
 		}
 		
 		this.refreshGraph();
@@ -227,11 +315,13 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
         var width = el.getWidth();
         var height = el.getHeight();
         
+        var physics = this.getGraphPhysics();
         this.setVisLayout(d3.forceSimulation()
+        	.velocityDecay(physics.damping)
     		.force('center', d3.forceCenter(width/2, height/2))
-            .force('link', d3.forceLink().id(function(d) { return d.id; }).distance(30).strength(1))
-            .force('charge', d3.forceManyBody().strength(-1))
-            .force('collide', d3.forceCollide(function(d) { return Math.sqrt(d.bbox.width * d.bbox.height)*2; }))
+            .force('link', d3.forceLink().id(function(d) { return d.id; }).distance(physics.springLength).strength(physics.springStrength))
+            .force('charge', d3.forceManyBody().strength(physics.gravity))
+            .force('collide', d3.forceCollide().radius(function(d) { return Math.sqrt(d.bbox.width * d.bbox.height)*2; }))
             .on('tick', function() {
             	 this.getEdgeSelection()
 	                .attr('x1', function(d) { return d.source.x; })
@@ -240,7 +330,11 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 	                .attr('y2', function(d) { return d.target.y; });
 	    
             	 this.getNodeSelection()
-            	 	.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+            	 	.attr('transform', function(d) {
+            	 		var x = d.x - d.bbox.width*0.5;
+            	 		var y = d.y - d.bbox.height*0.5;
+            	 		return 'translate('+x+','+y+')';
+        	 		});
 	        }.bind(this)
         ));
         
@@ -251,7 +345,7 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
             g.attr('transform', d3.event.transform);
         }));
         
-        this.setEdgeSelection(g.append('g').attr('class', 'links').selectAll('.link'));
+        this.setEdgeSelection(g.append('g').attr('class', 'edges').selectAll('.edge'));
         this.setNodeSelection(g.append('g').attr('class', 'nodes').selectAll('.node'));
         this.setVis(g);
     },
@@ -271,12 +365,16 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
         var edge = this.getEdgeSelection().data(edgeData, function(d) { return d.id; });
         edge.exit().remove();
         var edgeEnter = edge.enter().append('line')
-        	.attr('class', 'link')
+        	.attr('class', 'edge')
         	.attr('id', function(d) { return d.id; })
+        	.style('cursor', 'pointer')
+        	.on('mouseover', this.edgeMouseOver.bind(this))
+            .on('mouseout', this.edgeMouseOut.bind(this))
         	.on('click', function(d) {
         		d3.event.stopImmediatePropagation();
 				d3.event.preventDefault();
-				this.fireEvent('linkclick', this, d);
+				this.setCurrentEdge(d);
+				this.fireEvent('edgeclicked', this, d);
         	}.bind(this));
         
         this.setEdgeSelection(edgeEnter.merge(edge));
@@ -287,35 +385,45 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
             .attr('class', 'node')
             .attr('id', function(d) { return d.id; })
             .style('cursor', 'pointer')
+            .on('mouseover', this.nodeMouseOver.bind(this))
+            .on('mouseout', this.nodeMouseOut.bind(this))
             .on('click', function(d) {
 				d3.event.stopImmediatePropagation();
 				d3.event.preventDefault();
-				this.fireEvent('nodeclick', this, d);
+				this.setCurrentNode(d);
+				this.fireEvent('nodeclicked', this, d);
+			}.bind(this))
+			.on('dblclick', function(d) {
+				d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.fireEvent('nodedblclicked', this, d);
 			}.bind(this))
             .call(d3.drag()
                 .on('start', function(d) {
                     if (!d3.event.active) this.getVisLayout().alphaTarget(0.3).restart();
-                    d.fx = d.x;
-                    d.fy = d.y;
-                    d.fixed = true;
+                    if (this.getFixOnDrag()) {
+	                    d.fx = d.x;
+	                    d.fy = d.y;
+                    }
                     this.fireEvent('dragstart', this, d);
             	}.bind(this))
                 .on('drag', function(d) {
-                    d.fx = d3.event.x;
-                    d.fy = d3.event.y;
+                	if (this.getFixOnDrag()) {
+	                    d.fx = d3.event.x;
+	                    d.fy = d3.event.y;
+                	} else {
+                		d.x = d3.event.x;
+                		d.y = d3.event.y;
+                	}
                     this.fireEvent('drag', this, d);
                 }.bind(this))
                 .on('end', function(d) {
                 	if (!d3.event.active) this.getVisLayout().alphaTarget(0);
-                	if (d.fixed != true) {
-                		d.fx = null;
-                		d.fy = null;
-                	}
                 	this.fireEvent('dragend', this, d);
                 }.bind(this))
             );
 
-        nodeEnter.append('circle').attr('r', 5);
+        nodeEnter.append('rect');
         
         var vals = nodeData.map(function(d) {
             var val = d.value;
@@ -325,25 +433,34 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
             return val;
         });
         vals.sort();
-
         var fontscale = d3.scaleLog()
             .domain([vals[0], vals[vals.length-1]])
             .range([8, 36]);
                 
         nodeEnter.append('text')
-            .attr('dx', 0)
-            .attr('dy', 0)
             .text(function(d) { return d.term; })
+//            .attr('font-family', function(d) { return this.getApplication().getFeatureForTerm('font', d.term); }.bind(this))
             .attr('font-size', function(d) {return fontscale(d.value)+'px';})
-            .attr('text-anchor', 'middle')
-            .style('user-select', 'none')
+//            .attr('text-anchor', 'middle')
 			.attr('alignment-baseline', 'middle')
+			.style('user-select', 'none')
             .each(function(d) { d.bbox = this.getBBox(); });
         
         this.setNodeSelection(nodeEnter.merge(node));
+        
+        this.getNodeSelection().selectAll('rect')
+        	.attr('width', function(d) { return d.bbox.width+16; })
+			.attr('height', function(d) { return d.bbox.height+8; })
+			.attr('rx', function(d) { return Math.max(2, d.bbox.height * 0.2); })
+			.attr('ry', function(d) { return Math.max(2, d.bbox.height * 0.2); });
+        
+        this.getNodeSelection().selectAll('text')
+        	.attr('dx', 8)
+			.attr('dy', function(d) { return d.bbox.height*0.5+4; });
+        
 
-        this.getVis().selectAll('line').call(this.applyEdgeStyle.bind(this));
-        this.getVis().selectAll('circle').call(this.applyNodeStyle.bind(this));
+        this.getEdgeSelection().call(this.applyEdgeStyle.bind(this));
+        this.getNodeSelection().call(this.applyNodeStyle.bind(this));
         
         this.getVisLayout().nodes(nodeData);
         this.getVisLayout().force('link').links(edgeData);
@@ -352,13 +469,55 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     
     applyNodeStyle: function(sel, nodeState) {
 		var state = nodeState === undefined ? 'normal' : nodeState;
-    	sel.style('fill', function(d) { return this.getGraphStyle().node[state].fill; }.bind(this));
-    	sel.style('stroke', function(d) { return this.getGraphStyle().node[state].stroke; }.bind(this));
+		var style = this.getGraphStyle().node[state];
+    	sel.selectAll(':not(text)')
+    		.style('fill', function(d) { return style.fill; }.bind(this))
+    		.style('fill-opacity', function(d) { return style.fillOpacity; }.bind(this))
+    		.style('stroke', function(d) { return style.stroke; }.bind(this))
+    		.style('stroke-opacity', function(d) { return style.strokeOpacity; }.bind(this))
+    		.style('stroke-width', function(d) { return style.strokeWidth; }.bind(this));
     },
     
     applyEdgeStyle: function(sel, edgeState) {
     	var state = edgeState === undefined ? 'normal' : edgeState;
-    	sel.style('stroke', function(d) { return this.getGraphStyle().edge[state].stroke; }.bind(this));
-    	sel.style('stroke-opacity', function(d) { return this.getGraphStyle().edge[state].strokeOpacity; }.bind(this));
+    	var style = this.getGraphStyle().edge[state];
+    	sel.style('stroke', function(d) { return style.stroke; }.bind(this))
+	    	.style('stroke-opacity', function(d) { return style.strokeOpacity; }.bind(this))
+	    	.style('stroke-width', function(d) { return style.strokeWidth; }.bind(this));
+    },
+
+    edgeMouseOver: function(d) {
+    	this.getEdgeSelection().call(this.applyEdgeStyle.bind(this));
+    	this.getVis().select('#'+d.id).call(this.applyEdgeStyle.bind(this), 'highlight');
+    },
+    
+    edgeMouseOut: function(d) {
+    	this.getEdgeSelection().call(this.applyEdgeStyle.bind(this));
+    },
+    
+    nodeMouseOver: function(d) {
+    	this.setCurrentNode(d);
+		
+    	this.getNodeSelection().call(this.applyNodeStyle.bind(this));
+		
+		this.getEdgeSelection().each(function(link) {
+			var id;
+			if (link.source.id == d.id) {
+				id = link.target.id;
+			} else if (link.target.id == d.id) {
+				id = link.source.id;
+			}
+			if (id !== undefined) {
+				this.getVis().select('#'+id).call(this.applyNodeStyle.bind(this), 'highlight');
+				this.getVis().select('#'+link.id).call(this.applyEdgeStyle.bind(this), 'highlight');
+			}
+		}.bind(this));
+		
+		this.getVis().select('#'+d.id).call(this.applyNodeStyle.bind(this), 'highlight');
+    },
+    
+    nodeMouseOut: function(d) {
+    	this.getNodeSelection().call(this.applyNodeStyle.bind(this));
+    	this.getEdgeSelection().call(this.applyEdgeStyle.bind(this));
     }
 });
