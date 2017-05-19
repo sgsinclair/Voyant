@@ -78,9 +78,9 @@ Ext.define('Voyant.panel.Via', {
     
     listeners: {
     	resize: function(panel, width, height) {
-    		if (this.getCorpus()) {
-        		this.loadFromCorpus(this.getCorpus())
-    		}
+//    		if (this.getCorpus()) {
+//        		this.loadFromCorpus(this.getCorpus())
+//    		}
     	},
     	
     	loadedCorpus: function(src, corpus) {
@@ -116,13 +116,20 @@ Ext.define('Voyant.panel.Via', {
     	var params = this.getApiParams();
     	var a = corpus.loadRelatedWords(params).then(function(relatedWords) {
     		me.unmask()
-    		var graph = me.down("voyantnetworkgraph");
-    		if (graph) {graph.destroy();}
     		var edges = relatedWords.map(function(item) {return {source: item.getSource(), target: item.getTarget()}})
-    		graph = Ext.create("Voyant.widget.VoyantNetworkGraph", {
-    			edges: edges
-    		})
-    		me.add(graph)
+    		var graph = me.down("voyantnetworkgraph");
+    		if (graph) {
+    			graph.loadJson({edges: edges});
+    		} else {
+    			graph = Ext.create("Voyant.widget.VoyantNetworkGraph", {
+        			edges: edges,
+        			listeners: {
+        				nodeclick: function(src, node) {
+        				}
+        			}
+        		})
+        		me.add(graph)
+    		}
     	}, function(response) {
     		me.unmask();
     		if (response.timedout) {
