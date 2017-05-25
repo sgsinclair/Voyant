@@ -1,8 +1,10 @@
 package org.voyanttools.voyant;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -188,6 +190,14 @@ public class Trombone extends HttpServlet {
 				url = new URL(parameters.getParameterValue("fetchData").replaceAll(" ", "+"));
 				System.out.println(url);
 				c = url.openConnection();
+//				StringBuilder sb = new StringBuilder();
+//				BufferedReader in = new BufferedReader(new InputStreamReader(c.getInputStream()));
+//				String inputLine;
+//				while ((inputLine = in.readLine()) != null) {
+//					sb.append(inputLine);
+//				}
+//				in.close();
+//				System.out.println(sb.toString());
 			}
 			catch (MalformedURLException e) {
 				throw new IllegalArgumentException("Attempt to use a malformed URL: "+parameters.getParameterValue("fetchJSON"), e);
@@ -196,16 +206,17 @@ public class Trombone extends HttpServlet {
 			InputStream is = null;
 			try {
 				is = c.getInputStream();
-				resp.setContentType("application/plain;charset=UTF-8");
-				if (parameters.containsKey("format")) {
-					String format = parameters.getParameterValue("format").toUpperCase();
-					if (format.equals("XML")) {
-						resp.setContentType("application/xml;charset=UTF-8");
-					} else if (format.equals("JSON")) {
-						resp.setContentType("application/json;charset=UTF-8");
-					}
-				}
+				resp.setContentType(c.getContentType());
+//				if (parameters.containsKey("format")) {
+//					String format = parameters.getParameterValue("format").toUpperCase();
+//					if (format.equals("XML")) {
+//						resp.setContentType("application/xml;charset=UTF-8");
+//					} else if (format.equals("JSON")) {
+//						resp.setContentType("application/json;charset=UTF-8");
+//					}
+//				}
 				IOUtils.copy(is, resp.getWriter());
+				resp.flushBuffer();
 			}
 			finally {
 				if (is!=null) {
