@@ -60,8 +60,22 @@ Ext.define('Voyant.notebook.Notebook', {
     			var previous = Voyant.notebook.Notebook.currentBlock;
     			while(previous) {
     				previous = previous.previousSibling();
-    				if (previous.isXType("notebookcodeeditorwrapper") && previous.editor.getMode()!='ace/mode/javascript') {
-    					return previous.getContent().input;
+    				if (previous && previous.isXType("notebookcodeeditorwrapper")) {
+    					if (previous.editor.getMode()=='ace/mode/javascript') {
+    						// we have a JS editor, and we don't want the code, but we have to check for embedded results
+    						var iframe = previous.results.getTargetEl().dom.querySelector("iframe");
+    						if (iframe) {
+    							var win = iframe.contentWindow; editor = win.document.querySelector(".ace_editor");
+    							if (editor && win.ace) {
+    								var e = win.ace.edit(editor);
+    								if (e.getSession().getMode().$id!='ace/mode/javascript') {
+    									return e.getValue();
+    								}
+    							}
+    						}
+    					} else {
+    						return previous.getContent().input;
+    					}
     				}
     			}
     		}
@@ -102,6 +116,30 @@ Ext.define('Voyant.notebook.Notebook', {
     		 });
     		
     		return dfd.promise;
+    	},
+    	
+        /**
+         * Formats the passed number according to the passed format string.
+         *
+         * By default, "," is expected as the thousand separator, and "." is expected as the decimal separator.
+         *
+         * Examples (123456.789):
+         * 
+         * - `0` - (123457) show only digits, no precision
+         * - `0.00` - (123456.79) show only digits, 2 precision
+         * - `0.0000` - (123456.7890) show only digits, 4 precision
+         * - `0,000` - (123,457) show comma and digits, no precision
+         * - `0,000.00` - (123,456.79) show comma and digits, 2 precision
+         * - `0,0.00` - (123,456.79) shortcut method, show comma and digits, 2 precision
+         * - `0.####` - (123,456.789) Allow maximum 4 decimal places, but do not right pad with zeroes
+         * - `0.00##` - (123456.789) Show at least 2 decimal places, maximum 4, but do not right pad with zeroes
+         *
+         * @param {Number} v The number to format.
+         * @param {String} formatString The way you would like to format this text.
+         * @return {String} The formatted number.
+         */
+		formatNumber: function(number, format) {
+    		return Ext.util.Format.number(number, format);
     	}
     	
     },
@@ -123,8 +161,14 @@ Ext.define('Voyant.notebook.Notebook', {
          */
     	saveItTool: undefined,
     	
+        /**
+         * @private
+         */
 		autoSaveTimer: undefined,
 		
+        /**
+         * @private
+         */
 		initialAutoSaveChecked: false
 
     },
@@ -217,7 +261,7 @@ Ext.define('Voyant.notebook.Notebook', {
     				//visible: false,
     				listeners: {
     					afterrender: function(tool) {
-    						tool.setVisible(window.location.hostname=='localhost');
+    						tool.setVisible(true);
     						me.setSaveItTool(tool);
     					}
     				},
@@ -499,7 +543,6 @@ Ext.define('Voyant.notebook.Notebook', {
 		if (url.indexOf("https://gist.github.com/")==0 || url.indexOf("https://gist.githubusercontent.com/")==0) {
 			url = "gist:"+url.substring(url.indexOf(".com")+5, url.length - (url.charAt(url.length-1) == "/" ? 1 : 0)).replace(/\//g, ":");
 		}
-    	debugger
 		if (url.indexOf("gist:")==0) {
 			var gistParts = url.substring(5).split(":");
 			if (gistParts.length<2) {
@@ -557,7 +600,8 @@ Ext.define('Voyant.notebook.Notebook', {
         	    	 tool: 'notebook.NotebookManager',
         	    	 notebook: url,
         	    	 autosave: true,
-        	    	 noCache: true
+        	    	 noCache: true,
+        	    	 failQuietly: true
         	     },
         	     scope: me
         	 }).then(function(response, opts) {
@@ -574,7 +618,7 @@ Ext.define('Voyant.notebook.Notebook', {
         		 }
         	 },
         	 function(response, opts) {
-        		 debugger
+        		 // ignore
         	 });
 
     	 },

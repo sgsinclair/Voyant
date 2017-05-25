@@ -7,19 +7,25 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
 		api: {
 			tableHtml: undefined,
 			tableJson: undefined,
-			width: undefined
+			width: undefined,
+			api: undefined
 		}
     },
     html: '',
+    config: {
+    	hiddenColumns: undefined
+    },
 	constructor: function(config) {
     	config = config || {};
 		var me = this;
-    	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
         me.callParent(arguments);
 	},
 	initComponent: function(config) {
     	var me = this, config = config || {};
     	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	if (this.config.api && this.config.api.tableJson) {
+    		this.setApiParam("tableJson", this.config.api.tableJson);
+    	}
     	me.buildFromParams();
 		me.on('afterrender', function() {
 			var table = this.getTargetEl().down('table');
@@ -30,6 +36,16 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
 					height: this.getApiParam('height') || 20+(table.query('tr').length*24) // based on grid heights in crisp
 				});
 				grid.render(parent);
+				if (this.getHiddenColumns()) {
+					var hides = {}; // map for speed
+					Ext.Array.from(this.getHiddenColumns()).forEach(function(header) {hides[header]=true})
+					grid.getColumns().forEach(function(column) {
+						if (column.text in hides) {column.hide()}
+					});
+					Ext.defer(function() {
+						grid.setWidth(grid.getEl().dom.parentNode.offsetWidth); // resize
+					},10)
+				}
 			}
 		}, me);
 		
@@ -62,6 +78,7 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
 			})
 			html+="</tbody></table>";
 			this.setHtml(html);
+			if (json.config && json.config.hidden) {this.setHiddenColumns(json.config.hidden)}
 		}
 		
 	}

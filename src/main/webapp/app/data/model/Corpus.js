@@ -668,6 +668,10 @@ Ext.define('Voyant.data.model.Corpus', {
 		return Ext.create("Voyant.data.store.DocumentTerms", Ext.apply(config || {}, {corpus: this}));
 	},
 	
+	getDocumentEntities: function(config) {
+		return Ext.create("Voyant.data.store.DocumentEntities", Ext.apply(config || {}, {corpus: this}));
+	},
+	
 	getContexts: function(config) {
 		return Ext.create("Voyant.data.store.Contexts", Ext.apply(config || {}, {corpus: this}));
 	},
@@ -962,7 +966,8 @@ Ext.define('Voyant.data.model.Corpus', {
 			var dfd = Voyant.application.getDeferred(this);
 			Ext.applyIf(config, {
 				template: "docTokens2lemmas",
-				withPosLemmas: true
+				withPosLemmas: true,
+				noOthers: true
 			})
 	    	this.getWords(config).then(function(text) {
 	    		var lemmas = text.split(" ").map(function(word) {return word.substring(0, word.indexOf("/"))})

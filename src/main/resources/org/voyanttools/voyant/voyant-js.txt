@@ -42,6 +42,7 @@ app/data/model/CorpusTerm.js
 app/data/model/CorpusNgram.js
 app/data/model/Dimension.js
 app/data/model/Document.js
+app/data/model/DocumentEntity.js
 app/data/model/DocumentQueryMatch.js
 app/data/model/DocumentTerm.js
 app/data/model/PrincipalComponent.js
@@ -59,6 +60,7 @@ app/data/store/CorpusFacets.js
 app/data/store/CorpusTerms.js
 app/data/store/DocumentQueryMatches.js
 app/data/store/DocumentTerms.js
+app/data/store/DocumentEntities.js
 app/data/store/Documents.js
 app/data/store/PCAAnalysis.js
 app/data/store/DocSimAnalysis.js

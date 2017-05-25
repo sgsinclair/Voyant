@@ -2,6 +2,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	extend: "Ext.Component",
 	alias: "widget.notebookcodeeditor", 
 	mixins: ["Voyant.util.Localization",'Voyant.notebook.util.Embed'],
+	embeddable: ["Voyant.notebook.editor.CodeEditor"],
 	cls: 'notebook-code-editor',
 	config: {
 		theme: 'ace/theme/chrome',
@@ -14,7 +15,13 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	statics: {
 		i18n: {
 			emptyText: "// click here to edit"
+		},
+		api: {
+			content: undefined
 		}
+	},
+	constructor: function(config) {
+		this.callParent(arguments)
 	},
 	listeners: {
 		boxready: function() {
@@ -24,7 +31,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.getSession().setUseWorker(true);
 			this.editor.setTheme(this.getTheme());
 			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: Infinity, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			this.editor.setOptions({minLines: 6, maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10, autoScrollEditorIntoView: true, scrollPastEnd: true});
 			this.editor.setHighlightActiveLine(false);
 			this.editor.renderer.setShowPrintMargin(false);
 			this.editor.renderer.setShowGutter(false);
@@ -106,6 +113,8 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	switchModes: function(mode) {
 		this.setMode('ace/mode/'+mode);
 		this.editor.getSession().setMode(this.getMode());
+		this.editor.setOptions({maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10});
+
 	},
 	
 	getValue: function() {

@@ -31,6 +31,11 @@ Ext.define('Voyant.data.table.Table', {
 		/**
 		 * @private
 		 */
+		rowsMap: {},
+		
+		/**
+		 * @private
+		 */
 		headersMap: {},
 		
 		/**
@@ -43,6 +48,16 @@ Ext.define('Voyant.data.table.Table', {
 		 * @private
 		 */
 		model: undefined
+	},
+	
+	clone: function() {
+		var table = new VoyantTable();
+		table.setRows(Ext.clone(this.getRows()));
+		table.setHeaders(Ext.clone(this.getHeaders()))
+		table.setRowsMap(Ext.clone(this.getRowsMap()))
+		table.setHeadersMap(Ext.clone(this.getHeadersMap()))
+		table.setRowKey(Ext.clone(this.getRowKey()))
+		return table;
 	},
 
 	constructor: function(config, opts) {
@@ -105,8 +120,17 @@ Ext.define('Voyant.data.table.Table', {
 
 				
 		// not sure why config isn't working
-		this.setRows(Ext.Array.from(Ext.isArray(config) ? config : config.rows));
-		this.setHeaders(Ext.Array.from(config.headers));
+		if (!config.rows && Ext.isArray(config)) {
+			config.rows = config;
+		}
+		if (!this.getHeaders()) {
+			if (!config.headers && !config.noHeaders && config.rows) {
+				this.setHeaders(config.rows.shift())
+			} else {
+				this.setHeaders(Ext.Array.from(config.headers));
+			}
+		}
+		this.setRows(Ext.Array.from(config.rows));
 		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
 
 		// if we have no headers, use the index as header
@@ -123,10 +147,11 @@ Ext.define('Voyant.data.table.Table', {
 		});
 		this.setHeadersMap(headersMap);
 		
+		this.reMapRows();
+		
 		this.callParent();
 	},
 	addRow: function(row) {
-		debugger
 		if (Ext.isObject(row)) {
 			var len = this.getRows().length;
 			for (var key in row) {
@@ -196,14 +221,20 @@ Ext.define('Voyant.data.table.Table', {
 		var rows = this.getRows();
 		var r = Ext.isNumber(row) ? row : this.getRowIndex(row);
 		var c = this.getColumnIndex(column);
-		if (rows[row]===undefined) {rows[row]=[]}
-		if (rows[row][c]===undefined || replace) {rows[row][c]=value}
-		else {rows[row][c]+=value}
+		if (rows[r]===undefined) {rows[r]=[]}
+		if (rows[r][c]===undefined || replace) {rows[r][c]=value}
+		else {rows[r][c]+=value}
 	},
 	
 	getRowIndex: function(key) {
+		if (Ext.isNumber(key)) {return key;}
 		if (Ext.isString(key)) {
-			console.error("Implement this"); alert("Unimplemented method: VoyantTable.getRowIndex()");
+			var rowsMap = this.getRowsMap();
+			if (!(key in rowsMap)) {
+				rowsMap[key] = this.getRows().length;
+				this.getRows().push(new Array(this.getHeaders().length))
+			}
+			return rowsMap[key];
 		}
 	},
 	
@@ -213,21 +244,115 @@ Ext.define('Voyant.data.table.Table', {
 			if (headers[column]===undefined) {
 				headers[column]=column;
 				this.getRows().forEach(function(row) {
-					row.splice(column, 0, "");
+					row.splice(column, 0, undefined);
 				});
 			}
 			return column;
 		} else if (Ext.isString(column)) {
-			if (!this.getHeadersMap()[column]) {
+			if (!(column in this.getHeadersMap())) {
 				// we don't have this column yet, so create it and expand rows
 				this.getHeaders().push(column);
 				this.getHeadersMap()[column] = this.getHeaders().length-1
 				this.getRows().forEach(function(row) {
-					row.push("")
+					row.push(undefined)
 				});
 			}
 			return this.getHeadersMap()[column]
 		}
+	},
+	
+	getColumnHeader: function(column) {
+		var c = this.getColumnIndex(column);
+		return this.getHeaders()[c];
+	},
+	
+	/**
+	 * Compute the sum of the values in the column.
+	 * 
+	 * @param {Number/String} column The column index (as a number) or key (as a string).
+	 */
+	getColumnSum: function(column) {
+		return Ext.Array.sum(this.getColumnValues(column, true));
+	},
+	
+	/**
+	 * Compute the sum of the values in the column.
+	 * 
+	 * @param {Number/String} column The column index (as a number) or key (as a string).
+	 */
+	getColumnMean: function(column) {
+		return Ext.Array.mean(this.getColumnValues(column, true));
+	},
+	
+	/**
+	 * Get the largest value in the array.
+	 * 
+	 * @param {Number/String} column The column index (as a number) or key (as a string).
+	 */
+	getColumnMax: function(column) {
+		return Ext.Array.max(this.getColumnValues(column, true));
+	},
+	
+	/**
+	 * Get the smallest value in the array.
+	 * 
+	 * @param {Number/String} column The column index (as a number) or key (as a string).
+	 */
+	getColumnMin: function(column) {
+		return Ext.Array.min(this.getColumnValues(column, true));
+	},
+	
+	getColumnValues: function(column, clean) {
+		var c = this.getColumnIndex(column), vals = [];
+		this.eachRow(function(row) {
+			vals.push(row[c]);
+		});
+		if (clean) {return Ext.Array.clean(vals)}
+		else {return vals;}
+	},
+	
+	/**
+	 * @private
+	 */
+	reMapRows: function() {
+		var rowKey = this.getRowKey();
+		var rowsMap = {}
+		this.eachRow(function(row, i) {
+			if (rowKey in row) {
+				rowsMap[rowKey] = i;
+			}
+		}, true);
+		this.setRowsMap(rowsMap)
+	},
+	
+	sortByColumn: function(columns) {
+		var rows = this.getRows(),
+			sortColumnsIndices = Ext.Array.from(columns).map(function(column) {
+				if (Ext.isObject(column)) {
+					for (key in column) {
+						return {
+							index: this.getColumnIndex(key),
+							direction: column[key].indexOf("asc")>-1 ? 'asc' : 'desc'
+						}
+					}
+				} else {
+					return {
+						index: this.getColumnIndex(column),
+						direction: "desc"
+					}
+				}
+			}, this);
+		rows.sort(function(a, b) {
+			for (var i=0, len=sortColumnsIndices.length; i<len; i++) {
+				var header = sortColumnsIndices[i].index
+				if (a[header]!=b[header]) {
+					if (sortColumnsIndices[i].direction=='asc') {return a[header] > b[header] ? 1 : -1}
+					else {return a[header] > b[header] ? -1 : 1}
+				}
+			}
+		});
+		this.reMapRows();
+		return this;
 	},
 	
 	embed: function(cmp, config) {
@@ -237,13 +362,30 @@ Ext.define('Voyant.data.table.Table', {
 		}
 		config = config || {};
 		
-		Ext.apply(config, {
-			tableJson: JSON.stringify({
+		var columnHeaders = Ext.Array.from(config.headers || this.getHeaders()).map(function(header) {return this.getColumnHeader(header);}, this);
+		var json = {
 				rowkey: this.getRowKey(),
-				headers: this.getHeaders(),
-				rows: this.getRows(),
-				config: config
+				config: config,
+				headers: columnHeaders
+		};
+		if ("headers" in config) {
+			var columnIndices = Ext.Array.from(config.headers).map(function(header) {return this.getColumnIndex(header);}, this);
+			var rows = [];
+			this.getRows().forEach(function(row) {
+				rows.push(columnIndices.map(function(i) {
+					return row[i]
+				}))
 			})
+			Ext.apply(json, {
+				rows: rows
+			})
+		} else {
+			Ext.apply(json, {
+				rows: this.getRows()
+			})
+		}
+		Ext.apply(config, {
+			tableJson: JSON.stringify(json)
 		});
 		delete config.axes;
 		delete config.series;
@@ -274,12 +416,14 @@ Ext.define('Voyant.data.table.Table', {
 		}
 		table+="<tbody>";
 		for (var i=0, len = Ext.isNumber(config) ? config : this.getRows().length; i<len; i++) {
-			table+="<tr>";
 			var row = this.getRow(i);
-			row.forEach(function(cell) {
-				table+="<td>"+cell+"</td>";
-			})
-			table+="</tr>";
+			if (row && Ext.isArray(row)) {
+				table+="<tr>";
+				row.forEach(function(cell) {
+					table+="<td>"+cell+"</td>";
+				})
+				table+="</tr>";
+			}
 		}
 		table+="</tbody></table>";
 		return table;

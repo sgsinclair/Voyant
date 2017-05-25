@@ -37,12 +37,12 @@
 </div>
 
 <div class="thumb-list">
-	<a href="#!/guide/corpuscollocates"><dd>
+	<a href="#!/guide/collocatesgraph"><dd>
 		<div class="thumb">
-			<img src="guides/corpuscollocates/icon.png" />
+			<img src="guides/collocatesgraph/icon.png" />
 		</div>
 		<div>
-			<h4>Corpus Collocates</h4>
+			<h4>Collocates Graph</h4>
 			<p>Collocates Graph represents keywords and terms that occur in close proximity as a force directed network graph.</p>
 		</div>
 	</dd></a>
@@ -279,6 +279,7 @@
 	</dd></a>
 </div>
 
+<!--
 <div class="thumb-list">
 	<a href="#!/guide/via"><dd>
 		<div class="thumb">
@@ -290,6 +291,7 @@
 		</div>
 	</dd></a>
 </div>
+-->
 
 <div class="thumb-list">
 	<a href="#!/guide/wordtree"><dd>

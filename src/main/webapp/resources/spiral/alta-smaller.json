@@ -1,7 +1,7 @@
 {
     "metadata": {
         "created": 1491343622399,
-        "modified": 1494858298347,
+        "modified": 1495548798417,
         "version": 2,
         "previousNotebook": "alta-smaller",
         "originalUrl": "alta-smaller",
@@ -13,57 +13,57 @@
             "input": [
                 "<h1 style=\"text-align: center;\">Exploring a Small Corpus in a Spiral Notebook</h",
                 "1><p>This notebook will help you explore a corpus with Spiral Notebooks (it's pa",
-                "rt of the&nbsp;<a data-tabindex-counter=\"45\" data-tabindex-value=\"none\" data-cke",
+                "rt of the&nbsp;<a data-tabindex-counter=\"46\" data-tabindex-value=\"none\" data-cke",
                 "-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target=\"_blank\">Art of Literary Tex",
                 "t Analysis with Spiral&nbsp;Notebooks</a>). In particular, we'll look at:</p><ul",
-                "><li><a data-tabindex-counter=\"21\" data-tabindex-value=\"none\" data-cke-saved-hre",
+                "><li><a data-tabindex-counter=\"22\" data-tabindex-value=\"none\" data-cke-saved-hre",
                 "f=\"#reuse\" href=\"#reuse\" tabindex=\"-1\">creating a reusable corpus</a></li><li><a",
-                " data-tabindex-counter=\"20\" data-tabindex-value=\"none\" data-cke-saved-href=\"#fre",
+                " data-tabindex-counter=\"21\" data-tabindex-value=\"none\" data-cke-saved-href=\"#fre",
                 "qs\" href=\"#freqs\" tabindex=\"-1\">exploring term frequencies</a></li><li><a data-t",
-                "abindex-counter=\"20\" data-tabindex-value=\"none\" data-cke-saved-href=\"#distributi",
+                "abindex-counter=\"21\" data-tabindex-value=\"none\" data-cke-saved-href=\"#distributi",
                 "ons\" href=\"#distributions\" tabindex=\"-1\">exploring term distributions</a></li><l",
-                "i><a data-tabindex-counter=\"15\" data-tabindex-value=\"none\" data-cke-saved-href=\"",
+                "i><a data-tabindex-counter=\"16\" data-tabindex-value=\"none\" data-cke-saved-href=\"",
                 "#collocates\" href=\"#collocates\" tabindex=\"-1\">exploring term collocates</a></li>",
-                "<li><a data-tabindex-counter=\"9\" data-tabindex-value=\"none\" data-cke-saved-href=",
-                "\"#text\" href=\"#text\" tabindex=\"-1\" target=\"_blank\">exploring text</a></li><li><a",
-                " data-tabindex-counter=\"9\" data-tabindex-value=\"none\" data-cke-saved-href=\"#next",
-                "\" href=\"#next\" tabindex=\"-1\" target=\"_blank\">next steps</a></li></ul><h2><img cl",
-                "ass=\"cke_anchor\" data-cke-realelement=\"%3Ca%20id%3D%22reuse%22%20data-cke-saved-",
-                "name%3D%22reuse%22%20name%3D%22reuse%22%3E%3C%2Fa%3E\" data-cke-real-node-type=\"1",
-                "\" alt=\"Ancre\" title=\"Ancre\" align=\"\" data-cke-saved-src=\"data:image/gif;base64,R",
-                "0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==\" src=\"data:image/gif",
-                ";base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==\" data-cke-r",
-                "eal-element-type=\"anchor\">Crea<span style=\"-webkit-tap-highlight-color: rgba(0, ",
-                "0, 0, 0);\">t</span>ing a Reusable Corpus</h2><p>Most of the code examples until ",
-                "now have created a transient corpus, in other words one that is created and used",
-                " immediately, but not reused. In what follows we will show how we can create a c",
-                "orpus and reuse it elsewhere in the Spiral notebook.</p><p>It's useful to unders",
-                "tand that when we create a corpus we actually get a promise for a corpus that wi",
-                "ll be delivered later. This is the nature of some Javascript code that runs <a d",
-                "ata-tabindex-counter=\"21\" data-tabindex-value=\"none\" data-cke-saved-href=\"https:",
-                "//en.wikipedia.org/wiki/Ajax_(programming)\" href=\"https://en.wikipedia.org/wiki/",
-                "Ajax_(programming)\" tabindex=\"-1\" target=\"_blank\">asynchronously</a>, in other w",
-                "ords where things happen at different times. One way to deal with this situation",
-                " would be to use something like this syntax (which we won't explain in detail si",
-                "nce it's not the syntax we'll use):</p><blockquote><pre>var helloworld;\n<span st",
-                "yle=\"background-color:#F0F8FF;\">new Corpus(\"Hello world!\")</span><span style=\"ba",
-                "ckground-color:#E6E6FA;\">.then(<span style=\"color:#FF0000;\">function(corpus) {\n&",
-                "nbsp;   helloworld = corpus;\n}</span>)</span>;\n</pre></blockquote><p>Instead we'",
-                "ll use a convenience function of Corpus called <a data-tabindex-counter=\"13\" dat",
-                "a-tabindex-value=\"none\" data-cke-saved-href=\"../docs/#!/api/Corpus-method-assign",
-                "\" href=\"../docs/#!/api/Corpus-method-assign\" tabindex=\"-1\" target=\"_blank\">assig",
-                "n</a>, which takes as an argument a string name that is the variable name that w",
-                "ill be used in subsequent code blocks.</p><blockquote><pre>new Corpus(\"Hello wor",
-                "ld!\").<span style=\"background-color:#E6E6FA;\">assign(\"helloworld\")</span>;</pre>",
-                "</blockquote><p>Much easier, yes? There are two crucial things to remember:</p><",
-                "ol><li><code>assign</code> takes a string argument (with quotes) even though lat",
-                "er we use the same word as a variable name (without quotes)</li><li>any referenc",
-                "es to the named corpus should occur in subsequent code blocks (in order to ensur",
-                "e that the corpus has been created)</li></ol><p>We can combine the code from the",
-                " previous notebook <a data-tabindex-counter=\"21\" data-tabindex-value=\"none\" data",
-                "-cke-saved-href=\"alta-create#text\" href=\"alta-create#text\" tabindex=\"-1\" target=",
-                "\"_blank\">Creating a Corpus with Plain Text</a> with this new concept of creating",
-                " a reusable corpus.</p>"
+                "<li><a data-tabindex-counter=\"10\" data-tabindex-value=\"none\" data-cke-saved-href",
+                "=\"#text\" href=\"#text\" tabindex=\"-1\" target=\"_blank\">exploring text</a></li><li><",
+                "a data-tabindex-counter=\"10\" data-tabindex-value=\"none\" data-cke-saved-href=\"#ne",
+                "xt\" href=\"#next\" tabindex=\"-1\" target=\"_blank\">next steps</a></li></ul><h2><img ",
+                "class=\"cke_anchor\" data-cke-realelement=\"%3Ca%20id%3D%22reuse%22%20data-cke-save",
+                "d-name%3D%22reuse%22%20name%3D%22reuse%22%3E%3C%2Fa%3E\" data-cke-real-node-type=",
+                "\"1\" alt=\"Ancre\" title=\"Ancre\" align=\"\" data-cke-saved-src=\"data:image/gif;base64",
+                ",R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==\" src=\"data:image/g",
+                "if;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==\" data-cke",
+                "-real-element-type=\"anchor\">Crea<span style=\"-webkit-tap-highlight-color: rgba(0",
+                ", 0, 0, 0);\">t</span>ing a Reusable Corpus</h2><p>Most of the code examples unti",
+                "l now have created a transient corpus, in other words one that is created and us",
+                "ed immediately, but not reused. In what follows we will show how we can create a",
+                " corpus and reuse it elsewhere in the Spiral notebook.</p><p>It's useful to unde",
+                "rstand that when we create a corpus we actually get a promise for a corpus that ",
+                "will be delivered later. This is the nature of some Javascript code that runs <a",
+                " data-tabindex-counter=\"22\" data-tabindex-value=\"none\" data-cke-saved-href=\"http",
+                "s://en.wikipedia.org/wiki/Ajax_(programming)\" href=\"https://en.wikipedia.org/wik",
+                "i/Ajax_(programming)\" tabindex=\"-1\" target=\"_blank\">asynchronously</a>, in other",
+                " words where things happen at different times. One way to deal with this situati",
+                "on would be to use something like this syntax (which we won't explain in detail ",
+                "since it's not the syntax we'll use):</p><blockquote><pre>var helloworld;\n<span ",
+                "style=\"background-color:#F0F8FF;\">new Corpus(\"Hello world!\")</span><span style=\"",
+                "background-color:#E6E6FA;\">.then(<span style=\"color:#FF0000;\">function(corpus) {",
+                "\n&nbsp;   helloworld = corpus;\n}</span>)</span>;\n</pre></blockquote><p>Instead w",
+                "e'll use a convenience function of Corpus called <a data-tabindex-counter=\"14\" d",
+                "ata-tabindex-value=\"none\" data-cke-saved-href=\"../docs/#!/api/Corpus-method-assi",
+                "gn\" href=\"../docs/#!/api/Corpus-method-assign\" tabindex=\"-1\" target=\"_blank\">ass",
+                "ign</a>, which takes as an argument a string name that is the variable name that",
+                " will be used in subsequent code blocks.</p><blockquote><pre>new Corpus(\"Hello w",
+                "orld!\").<span style=\"background-color:#E6E6FA;\">assign(\"helloworld\")</span>;</pr",
+                "e></blockquote><p>Much easier, yes? There are two crucial things to remember:</p",
+                "><ol><li><code>assign</code> takes a string argument (with quotes) even though l",
+                "ater we use the same word as a variable name (without quotes)</li><li>any refere",
+                "nces to the named corpus should occur in subsequent code blocks (in order to ens",
+                "ure that the corpus has been created)</li></ol><p>We can combine the code from t",
+                "he previous notebook <a data-tabindex-counter=\"22\" data-tabindex-value=\"none\" da",
+                "ta-cke-saved-href=\"alta-create#text\" href=\"alta-create#text\" tabindex=\"-1\" targe",
+                "t=\"_blank\">Creating a Corpus with Plain Text</a> with this new concept of creati",
+                "ng a reusable corpus.</p>"
             ]
         },
         {
@@ -77,20 +77,18 @@
             ],
             "mode": "javascript",
             "output": [
-                "<div style='height: 83px'><div style=\"height: 70px\"><div style=\"height: 57px\"><d",
-                "iv style=\"height: 44px\"><div style=\"height: 31px\"> <div class=\"info\">This corpus",
-                " has 1 document with 13,731 <span class=\"info-tip\" data-qtip=\"every occurrence o",
-                "f every word (like multiple occurrences of &quot;the&quot;) is counted\">total wo",
-                "rds</span> and 2,756 <span class=\"info-tip\" data-qtip=\"multiple occurrences of w",
-                "ords (like &quot;the&quot;) are counted once\">unique word forms</span>. Created ",
-                "<span class=\"info-tip\" data-qtip=\"2017-04-17, 21:05:41\">51 seconds ago</span>.</",
-                "div></div></div></div></div></div>"
+                "<div style='height: 31px'> <div class=\"info\">This corpus has 1 document with 13,",
+                "731 <span class=\"info-tip\" data-qtip=\"every occurrence of every word (like multi",
+                "ple occurrences of &quot;the&quot;) is counted\">total words</span> and 2,756 <sp",
+                "an class=\"info-tip\" data-qtip=\"multiple occurrences of words (like &quot;the&quo",
+                "t;) are counted once\">unique word forms</span>. Created <span class=\"info-tip\" d",
+                "ata-qtip=\"2017-05-23, 10:07:36\">about 4 minutes ago</span>.</div></div>"
             ]
         },
         {
             "type": "text",
             "input": [
-                "<p>By running this code in its own <a data-tabindex-counter=\"21\" data-tabindex-v",
+                "<p>By running this code in its own <a data-tabindex-counter=\"22\" data-tabindex-v",
                 "alue=\"none\" data-cke-saved-href=\"alta-start#code\" href=\"alta-start#code\" tabinde",
                 "x=\"-1\" target=\"_blank\">code block</a> we ensure that subsequent code blocks will",
                 " have access to our new <code>goldbug</code> corpus variable. (But don't forget ",
@@ -105,12 +103,10 @@
             "input": "goldbug.embed('summary'); // we are reusing the goldbug corpus",
             "mode": "javascript",
             "output": [
-                "<div style='height: 470px'><div style=\"height: 457px\"><div style=\"height: 444px\"",
-                "><div style=\"height: 431px\"><div style=\"height: 418px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/Summary/?corpus=38683ce0ee7dc5f581735ed14938c679&amp;debug=true\" ",
-                "style=\"width: 90%; height: 400px\" id=\"ext-493\" name=\"ext-493\" data-tabindex-valu",
-                "e=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></iframe></div></div></div></di",
-                "v></div></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-500\" name=\"ext-500\" src=\"https://voyant-tools.org/tool/Summary/?",
+                "minimal=true&amp;embeddedApiId=e29bb66ee53ad71395af883df399c20c\" data-tabindex-v",
+                "alue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -127,11 +123,11 @@
                 "use the Cirrus word cloud visualization – we can use the <a data-cke-saved-href=",
                 "\"../docs/#!/api/Corpus-method-embed\" href=\"../docs/#!/api/Corpus-method-embed\" t",
                 "arget=\"_blank\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"2",
-                "0\">embed</a> function of our <a data-cke-saved-href=\"../docs/#!/api/Corpus\" href",
+                "1\">embed</a> function of our <a data-cke-saved-href=\"../docs/#!/api/Corpus\" href",
                 "=\"../docs/#!/api/Corpus\" target=\"_blank\" data-tabindex-value=\"none\" tabindex=\"-1",
-                "\" data-tabindex-counter=\"20\">corpus</a> and specify the <a data-cke-saved-href=\"",
+                "\" data-tabindex-counter=\"21\">corpus</a> and specify the <a data-cke-saved-href=\"",
                 "../docs/#!/guide/cirrus\" href=\"../docs/#!/guide/cirrus\" target=\"_blank\" data-tab",
-                "index-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"20\">Cirrus</a> tool to u",
+                "index-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"21\">Cirrus</a> tool to u",
                 "se.</p>"
             ]
         },
@@ -140,12 +136,10 @@
             "input": "goldbug.embed('cirrus');",
             "mode": "javascript",
             "output": [
-                "<div style='height: 470px'><div style=\"height: 457px\"><div style=\"height: 444px\"",
-                "><div style=\"height: 431px\"><div style=\"height: 418px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/Cirrus/?corpus=38683ce0ee7dc5f581735ed14938c679&amp;debug=true\" s",
-                "tyle=\"width: 90%; height: 400px\" id=\"ext-494\" name=\"ext-494\" data-tabindex-value",
-                "=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></iframe></div></div></div></div",
-                "></div></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-501\" name=\"ext-501\" src=\"https://voyant-tools.org/tool/Cirrus/?m",
+                "inimal=true&amp;embeddedApiId=e29bb66ee53ad71395af883df399c20c\" data-tabindex-va",
+                "lue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -163,7 +157,7 @@
                 " and we get no other information than term frequency. To dig a bit deeper we can",
                 " invoke&nbsp;the <a data-cke-saved-href=\"../docs/#!/guide/corpusterms\" href=\"../",
                 "docs/#!/guide/corpusterms\" target=\"_blank\" data-tabindex-value=\"none\" tabindex=\"",
-                "-1\" data-tabindex-counter=\"20\">Corpus Terms</a> tool.</p>"
+                "-1\" data-tabindex-counter=\"21\">Corpus Terms</a> tool.</p>"
             ]
         },
         {
@@ -171,12 +165,10 @@
             "input": "goldbug.embed('corpusterms');",
             "mode": "javascript",
             "output": [
-                "<div style='height: 470px'><div style=\"height: 457px\"><div style=\"height: 444px\"",
-                "><div style=\"height: 431px\"><div style=\"height: 418px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/CorpusTerms/?corpus=38683ce0ee7dc5f581735ed14938c679&amp;debug=tr",
-                "ue\" style=\"width: 90%; height: 400px\" id=\"ext-495\" name=\"ext-495\" data-tabindex-",
-                "value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></iframe></div></div></div>",
-                "</div></div></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-502\" name=\"ext-502\" src=\"https://voyant-tools.org/tool/CorpusTer",
+                "ms/?minimal=true&amp;embeddedApiId=e29bb66ee53ad71395af883df399c20c\" data-tabind",
+                "ex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -193,15 +185,15 @@
                 "can ask what terms appear that have the prefix \"jup*\".</p><p>In the code below w",
                 "e demonstrate the syntax for providing a query to a requested tool – the general",
                 " form is something like this (where the options are defined by&nbsp;<a data-tabi",
-                "ndex-counter=\"20\" data-tabindex-value=\"none\" data-cke-saved-href=\"../docs/#!/api",
+                "ndex-counter=\"21\" data-tabindex-value=\"none\" data-cke-saved-href=\"../docs/#!/api",
                 "/Voyant.panel.CorpusTerms\" href=\"../docs/#!/api/Voyant.panel.CorpusTerms\" tabind",
                 "ex=\"-1\" target=\"_blank\">Corpus Terms</a>):</p><blockquote><pre>corpus.embed('too",
                 "lname', { options } );</pre></blockquote><p>The syntax of the actual query is de",
-                "fined by the <a data-tabindex-counter=\"20\" data-tabindex-value=\"none\" data-cke-s",
+                "fined by the <a data-tabindex-counter=\"21\" data-tabindex-value=\"none\" data-cke-s",
                 "aved-href=\"../docs/#!/guide/search\" href=\"../docs/#!/guide/search\" tabindex=\"-1\"",
                 " target=\"_blank\">search box</a> (you can hover over the question mark in the sea",
                 "rch box for more information).</p><p>We also demonstrate here the use of the hei",
-                "ght and width parameters when <a data-tabindex-counter=\"16\" data-tabindex-value=",
+                "ght and width parameters when <a data-tabindex-counter=\"17\" data-tabindex-value=",
                 "\"none\" data-cke-saved-href=\"../docs/#!/api/Corpus-method-embed\" href=\"../docs/#!",
                 "/api/Corpus-method-embed\" tabindex=\"-1\" target=\"_blank\">embedding</a> a tool (we",
                 " don't need to take up the full size given to a tool by default.</p>"
@@ -212,12 +204,10 @@
             "input": "goldbug.embed('corpusterms', {query: \"^jup*,jup*\", width: \"400px\", height: \"250px\"});",
             "mode": "javascript",
             "output": [
-                "<div style='height: 323px'><div style=\"height: 310px\"><div style=\"height: 296px\"",
-                "><div style=\"height: 282px\"><div style=\"height: 268px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/CorpusTerms/?query=%5Ejup*%2Cjup*&amp;corpus=38683ce0ee7dc5f58173",
-                "5ed14938c679&amp;debug=true\" style=\"width: 400px; height: 250px\" id=\"ext-496\" na",
-                "me=\"ext-496\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\">",
-                "</iframe></div></div></div></div></div></div>"
+                "<div style='height: 268px'> <div class=\"info\"><iframe style=\"width: 400px; heigh",
+                "t: 250px\" id=\"ext-503\" name=\"ext-503\" src=\"https://voyant-tools.org/tool/CorpusT",
+                "erms/?minimal=true&amp;embeddedApiId=85bc3cbb9a5daef52600249f210b4b17\" data-tabi",
+                "ndex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -232,7 +222,7 @@
                 "orpus or in a document – is a given term more present at the beginning, middle o",
                 "r end? As with term frequencies, we have access to a convenient visualization fo",
                 "r term distributions called <a href=\"../../docs/#!/guide/trends\" data-tabindex-v",
-                "alue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"19\">Trends</a>. Since our corpu",
+                "alue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"20\">Trends</a>. Since our corpu",
                 "s is comprised of a single document, Trends will show term distributions within ",
                 "that document (as opposed to term distributions across several documents in a co",
                 "rpus).</p>\n"
@@ -243,12 +233,10 @@
             "input": "goldbug.embed('Trends');",
             "mode": "javascript",
             "output": [
-                "<div style='height: 470px'><div style=\"height: 457px\"><div style=\"height: 444px\"",
-                "><div style=\"height: 431px\"><div style=\"height: 418px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/Trends/?corpus=38683ce0ee7dc5f581735ed14938c679&amp;debug=true\" s",
-                "tyle=\"width: 90%; height: 400px\" id=\"ext-497\" name=\"ext-497\" data-tabindex-value",
-                "=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></iframe></div></div></div></div",
-                "></div></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-504\" name=\"ext-504\" src=\"https://voyant-tools.org/tool/Trends/?m",
+                "inimal=true&amp;embeddedApiId=e29bb66ee53ad71395af883df399c20c\" data-tabindex-va",
+                "lue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -266,7 +254,7 @@
                 "n produce a more specific graph in a way similar to what we did for Corpus Terms",
                 ", though this time we're using configuration options for <a href=\"../../docs/#!/",
                 "api/Voyant.panel.Trends\" target=\"_blank\" data-tabindex-value=\"none\" tabindex=\"-1",
-                "\" data-tabindex-counter=\"19\">Trends</a>.</p>\n\n<p>&nbsp;</p>\n"
+                "\" data-tabindex-counter=\"20\">Trends</a>.</p>\n\n<p>&nbsp;</p>\n"
             ]
         },
         {
@@ -274,12 +262,10 @@
             "input": "goldbug.embed('Trends', {query: \"jupiter,legrand\"});",
             "mode": "javascript",
             "output": [
-                "<div style='height: 470px'><div style=\"height: 457px\"><div style=\"height: 444px\"",
-                "><div style=\"height: 431px\"><div style=\"height: 418px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/Trends/?query=jupiter%2Clegrand&amp;corpus=38683ce0ee7dc5f581735e",
-                "d14938c679&amp;debug=true\" style=\"width: 90%; height: 400px\" id=\"ext-498\" name=\"",
-                "ext-498\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></if",
-                "rame></div></div></div></div></div></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-505\" name=\"ext-505\" src=\"https://voyant-tools.org/tool/Trends/?m",
+                "inimal=true&amp;embeddedApiId=9e3acf3cc0c0380110ebe9b748d8e8fe\" data-tabindex-va",
+                "lue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -300,12 +286,10 @@
             "input": "goldbug.embed('TermsRadio', {bins: 10, visibleBins: 10, height: '600px'});",
             "mode": "javascript",
             "output": [
-                "<div style='height: 670px'><div style=\"height: 657px\"><div style=\"height: 644px\"",
-                "><div style=\"height: 631px\"><div style=\"height: 618px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/TermsRadio/?bins=10&amp;visibleBins=10&amp;corpus=38683ce0ee7dc5f",
-                "581735ed14938c679&amp;debug=true\" style=\"width: 90%; height: 600px\" id=\"ext-499\"",
-                " name=\"ext-499\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"",
-                "5\"></iframe></div></div></div></div></div></div>"
+                "<div style='height: 618px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 600px\" id=\"ext-506\" name=\"ext-506\" src=\"https://voyant-tools.org/tool/TermsRadi",
+                "o/?minimal=true&amp;embeddedApiId=3dc4778e4d808041689d3f63f6b80b0e\" data-tabinde",
+                "x-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -325,12 +309,11 @@
             "input": "goldbug.embed(\"DocumentTerms\", {width: \"400px\", height: \"300px\"});",
             "mode": "javascript",
             "output": [
-                "<div style='height: 370px'><div style=\"height: 357px\"><div style=\"height: 344px\"",
-                "><div style=\"height: 331px\"><div style=\"height: 318px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/DocumentTerms/?corpus=38683ce0ee7dc5f581735ed14938c679&amp;debug=",
-                "true\" style=\"width: 400px; height: 300px\" id=\"ext-500\" name=\"ext-500\" data-tabin",
-                "dex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></iframe></div></div></",
-                "div></div></div></div>"
+                "<div style='height: 318px'> <div class=\"info\"><iframe style=\"width: 400px; heigh",
+                "t: 300px\" id=\"ext-507\" name=\"ext-507\" src=\"https://voyant-tools.org/tool/Documen",
+                "tTerms/?minimal=true&amp;embeddedApiId=e29bb66ee53ad71395af883df399c20c\" data-ta",
+                "bindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div",
+                ">"
             ]
         },
         {
@@ -356,12 +339,10 @@
             "input": "goldbug.embed('TermsBerry', {width: \"600px\", height: \"600px\"});",
             "mode": "javascript",
             "output": [
-                "<div style='height: 670px'><div style=\"height: 657px\"><div style=\"height: 644px\"",
-                "><div style=\"height: 631px\"><div style=\"height: 618px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/TermsBerry/?corpus=38683ce0ee7dc5f581735ed14938c679&amp;debug=tru",
-                "e\" style=\"width: 600px; height: 600px\" id=\"ext-501\" name=\"ext-501\" data-tabindex",
-                "-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></iframe></div></div></div",
-                "></div></div></div>"
+                "<div style='height: 618px'> <div class=\"info\"><iframe style=\"width: 600px; heigh",
+                "t: 600px\" id=\"ext-508\" name=\"ext-508\" src=\"https://voyant-tools.org/tool/TermsBe",
+                "rry/?minimal=true&amp;embeddedApiId=e29bb66ee53ad71395af883df399c20c\" data-tabin",
+                "dex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -379,12 +360,11 @@
             "input": "goldbug.embed('CollocatesGraph', {width: \"500px\", height: \"500px\"});",
             "mode": "javascript",
             "output": [
-                "<div style='height: 570px'><div style=\"height: 557px\"><div style=\"height: 544px\"",
-                "><div style=\"height: 531px\"><div style=\"height: 518px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/CollocatesGraph/?corpus=38683ce0ee7dc5f581735ed14938c679&amp;debu",
-                "g=true\" style=\"width: 500px; height: 500px\" id=\"ext-502\" name=\"ext-502\" data-tab",
-                "index-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></iframe></div></div>",
-                "</div></div></div></div>"
+                "<div style='height: 518px'> <div class=\"info\"><iframe style=\"width: 500px; heigh",
+                "t: 500px\" id=\"ext-509\" name=\"ext-509\" src=\"https://voyant-tools.org/tool/Colloca",
+                "tesGraph/?minimal=true&amp;embeddedApiId=e29bb66ee53ad71395af883df399c20c\" data-",
+                "tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></d",
+                "iv>"
             ]
         },
         {
@@ -405,12 +385,11 @@
             ],
             "mode": "javascript",
             "output": [
-                "<div style='height: 470px'><div style=\"height: 457px\"><div style=\"height: 444px\"",
-                "><div style=\"height: 431px\"><div style=\"height: 418px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/CollocatesGraph/?centralize=massa&amp;corpus=38683ce0ee7dc5f58173",
-                "5ed14938c679&amp;debug=true\" style=\"width: 90%; height: 400px\" id=\"ext-503\" name",
-                "=\"ext-503\" data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></",
-                "iframe></div></div></div></div></div></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-510\" name=\"ext-510\" src=\"https://voyant-tools.org/tool/Collocate",
+                "sGraph/?minimal=true&amp;embeddedApiId=067bdac22273aee4c6f32febb77219df\" data-ta",
+                "bindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div",
+                ">"
             ]
         },
         {
@@ -431,12 +410,10 @@
             "input": "goldbug.embed('Contexts', {query: \"massa\"})",
             "mode": "javascript",
             "output": [
-                "<div style='height: 470px'><div style=\"height: 457px\"><div style=\"height: 444px\"",
-                "><div style=\"height: 431px\"><div style=\"height: 418px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/Contexts/?query=massa&amp;corpus=38683ce0ee7dc5f581735ed14938c679",
-                "&amp;debug=true\" style=\"width: 90%; height: 400px\" id=\"ext-504\" name=\"ext-504\" d",
-                "ata-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></iframe></div",
-                "></div></div></div></div></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-511\" name=\"ext-511\" src=\"https://voyant-tools.org/tool/Contexts/",
+                "?minimal=true&amp;embeddedApiId=657d8f1d031d2b9785e4e1c3c2a4c3a5\" data-tabindex-",
+                "value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -461,9 +438,9 @@
                 "so a common verb and noun.</p><p>If we want to see groupings of words with \"mass",
                 "a\" we can use the <a data-cke-saved-href=\"../docs/#!/guide/phrases\" href=\"../doc",
                 "s/#!/guide/phrases\" target=\"_blank\" data-tabindex-value=\"none\" tabindex=\"-1\" dat",
-                "a-tabindex-counter=\"10\">Phrases</a> tool or the more visual <a data-cke-saved-hr",
+                "a-tabindex-counter=\"11\">Phrases</a> tool or the more visual <a data-cke-saved-hr",
                 "ef=\"../docs/#!/guide/wordtree\" href=\"../docs/#!/guide/wordtree\" target=\"_blank\" ",
-                "data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"10\">WordTree</a>",
+                "data-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"11\">WordTree</a>",
                 " tool.</p>"
             ]
         },
@@ -472,12 +449,10 @@
             "input": "goldbug.embed('WordTree', {query: \"massa\"})",
             "mode": "javascript",
             "output": [
-                "<div style='height: 470px'><div style=\"height: 457px\"><div style=\"height: 444px\"",
-                "><div style=\"height: 431px\"><div style=\"height: 418px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/WordTree/?query=massa&amp;corpus=38683ce0ee7dc5f581735ed14938c679",
-                "&amp;debug=true\" style=\"width: 90%; height: 400px\" id=\"ext-505\" name=\"ext-505\" d",
-                "ata-tabindex-value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></iframe></div",
-                "></div></div></div></div></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-512\" name=\"ext-512\" src=\"https://voyant-tools.org/tool/WordTree/",
+                "?minimal=true&amp;embeddedApiId=657d8f1d031d2b9785e4e1c3c2a4c3a5\" data-tabindex-",
+                "value=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -495,12 +470,12 @@
                 "ple of exploring Poe's \"Gold Bug\" we've looked at various ways of studying term ",
                 "frequencies, distributions and collocates, but we haven't actually read the text",
                 " (unless you read it at the end of the previous notebook on <a data-tabindex-cou",
-                "nter=\"9\" data-tabindex-value=\"none\" data-cke-saved-href=\"http://alta-create#text",
-                "\" href=\"http://alta-create#text\" tabindex=\"-1\" target=\"_blank\">Creating a Corpus",
-                " in Text</a>). Whether one reads a text first, and then analyzes, or analyzes an",
-                "d then reads, or analyzes and reads at the same time, will depend on many factor",
-                "s, including the nature of the corpus and the nature of one's motivations for us",
-                "ing Spiral. In any case, it's simple enough to start reading!</p>"
+                "nter=\"10\" data-tabindex-value=\"none\" data-cke-saved-href=\"http://alta-create#tex",
+                "t\" href=\"http://alta-create#text\" tabindex=\"-1\" target=\"_blank\">Creating a Corpu",
+                "s in Text</a>). Whether one reads a text first, and then analyzes, or analyzes a",
+                "nd then reads, or analyzes and reads at the same time, will depend on many facto",
+                "rs, including the nature of the corpus and the nature of one's motivations for u",
+                "sing Spiral. In any case, it's simple enough to start reading!</p>"
             ]
         },
         {
@@ -508,12 +483,10 @@
             "input": "goldbug.embed('Reader');",
             "mode": "javascript",
             "output": [
-                "<div style='height: 470px'><div style=\"height: 457px\"><div style=\"height: 444px\"",
-                "><div style=\"height: 431px\"><div style=\"height: 418px\"> <div class=\"info\"><ifram",
-                "e src=\"../tool/Reader/?corpus=38683ce0ee7dc5f581735ed14938c679&amp;debug=true\" s",
-                "tyle=\"width: 90%; height: 400px\" id=\"ext-506\" name=\"ext-506\" data-tabindex-value",
-                "=\"none\" tabindex=\"-1\" data-tabindex-counter=\"5\"></iframe></div></div></div></div",
-                "></div></div>"
+                "<div style='height: 418px'> <div class=\"info\"><iframe style=\"width: 90%; height:",
+                " 400px\" id=\"ext-513\" name=\"ext-513\" src=\"https://voyant-tools.org/tool/Reader/?m",
+                "inimal=true&amp;embeddedApiId=e29bb66ee53ad71395af883df399c20c\" data-tabindex-va",
+                "lue=\"none\" tabindex=\"-1\" data-tabindex-counter=\"1\"></iframe></div></div>"
             ]
         },
         {
@@ -529,16 +502,16 @@
                 "about cryptography, what keywords in Corpus Terms might help us identify and stu",
                 "dy that?</li><li>the term \"bug\" is distributed unevenly, when (distriibution) an",
                 "d how (collocates) is it used?</li><li>create a new corpus from a different <a d",
-                "ata-tabindex-counter=\"9\" data-tabindex-value=\"none\" data-cke-saved-href=\"https:/",
-                "/www.gutenberg.org/wiki/Short_Stories_(Bookshelf)\" href=\"https://www.gutenberg.o",
-                "rg/wiki/Short_Stories_(Bookshelf)\" tabindex=\"-1\" target=\"_blank\">short story</a>",
-                "&nbsp;and start exploring it in the same way we did here&nbsp;</li></ul><p>If yo",
-                "u're working sequentially&nbsp;through the <a data-tabindex-counter=\"19\" data-ta",
-                "bindex-value=\"none\" data-cke-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target=",
-                "\"_blank\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>, the next ",
-                "notebook&nbsp;is <a data-tabindex-counter=\"9\" data-tabindex-value=\"none\" data-ck",
-                "e-saved-href=\"alta-tables\" href=\"alta-tables\" tabindex=\"-1\" target=\"_blank\">Intr",
-                "oducing Tables</a>.</p>"
+                "ata-tabindex-counter=\"10\" data-tabindex-value=\"none\" data-cke-saved-href=\"https:",
+                "//www.gutenberg.org/wiki/Short_Stories_(Bookshelf)\" href=\"https://www.gutenberg.",
+                "org/wiki/Short_Stories_(Bookshelf)\" tabindex=\"-1\" target=\"_blank\">short story</a",
+                ">&nbsp;and start exploring it in the same way we did here&nbsp;</li></ul><p>If y",
+                "ou're working sequentially&nbsp;through the <a data-tabindex-counter=\"20\" data-t",
+                "abindex-value=\"none\" data-cke-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target",
+                "=\"_blank\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>, the next",
+                " notebook&nbsp;is <a data-tabindex-counter=\"10\" data-tabindex-value=\"none\" data-",
+                "cke-saved-href=\"alta-tables\" href=\"alta-tables\" tabindex=\"-1\" target=\"_blank\">In",
+                "troducing Tables</a>.</p>"
             ]
         }
     ]

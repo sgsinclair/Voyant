@@ -54,6 +54,10 @@ Ext.define('Voyant.VoyantApp', {
         this.addColorPalette('extjs', extjs);
     },
     
+    getBaseUrlFull: function() {
+    	return window.location.origin+this.getBaseUrl(); // maybe doesn't work in all browsers?
+    },
+
     getRelativeUrl: function() {
     	var url = window.location.pathname.substring(this.getBaseUrl().length);
     	var relative = "";

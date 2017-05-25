@@ -59,7 +59,9 @@ Ext.define('Voyant.widget.VoyantChart', {
 		        data: data
 			},
 	        axes: Ext.isArray(json.config.axes) ? json.config.axes : [{},{}],
-	        series: []
+	        series: [],
+    		legend: json.config.noLegend || Object.keys(data[0]).length<3 ? undefined : {docked:'top'}
+
 		}
 
 		// axes
@@ -72,7 +74,8 @@ Ext.define('Voyant.widget.VoyantChart', {
 			}
 			Ext.applyIf(axis, {
 	        	type: i==0 ? 'numeric' : 'category',
-	        	position: i==0 ? 'left' : 'bottom'
+	        	position: i==0 ? 'left' : 'bottom',
+	        	label: i==0 ? {} : {rotation: {degrees:-30}}
 	        });
 		})
 

@@ -25,7 +25,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','topics','veliza','wordtree']
+			items: ['cirrus','corpusterms','bubblelines','correlations','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','topics','veliza','wordtree']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
@@ -37,8 +37,9 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',
-			items: ['corpusterms','corpuscollocates','phrases','contexts','documentterms','documents','topics']
+			items: ['corpusterms','corpuscollocates','correlations','phrases','contexts','documentterms','documents','topics']
 		},{
+			
 			i18n: 'moreToolsTypeOther',
 			glyph: 'xf035@FontAwesome',
 			items: ['reader','summary','veliza']

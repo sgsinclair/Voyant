@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 17 14:54:53 EDT 2017 */
+/* This file created by JSCacher. Last modified: Wed May 24 17:32:45 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7680,7 +7680,7 @@ Ext.define("Voyant.notebook.util.Embed", {
 								var embeddedConfigParam = encodeURIComponent(embeddedConfigParamEncodded);
 
 								var iframeId = Ext.id();
-								var url = Voyant.application.getRelativeUrl()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/?';
+								var url = Voyant.application.getBaseUrlFull()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/?';
 								if (true || embeddedConfigParam.length>1800) {
 									show('<iframe style="'+config.style+'" id="'+iframeId+'" name="'+iframeId+'"></iframe>');
 									var dfd = Voyant.application.getDeferred(this);
@@ -7715,6 +7715,7 @@ Ext.define("Voyant.notebook.util.Embed", {
 					if (!isEmbedded) {
 						var embedded = Ext.create(cmp, config);
 						embedded.embed(config);
+						isEmbedded = true;
 					}
 				}
 				if (!isEmbedded) {
@@ -8071,7 +8072,7 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getCorpusId: function() {
-    	return this.get('corpus');
+    	return this.get('corpus').getAliasOrId();
     },
     
     isPlainText: function() {
@@ -8087,6 +8088,10 @@ Ext.define('Voyant.data.model.Document', {
     
     show: function() {
     	show(this.getFullLabel())
+    },
+    
+    getCorpus: function() {
+    	return this.get('corpus');
     },
     
     
@@ -8105,7 +8110,6 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getPlainText: function(config) {
-    	debugger
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
@@ -8118,8 +8122,71 @@ Ext.define('Voyant.data.model.Document', {
 			return this.getText(config);
 		}
     	
+    },
+    
+    getLemmasArray: function(config) {
+    	config = config || {};
+    	config.docId = this.getId();
+		return this.getCorpus().getLemmasArray(config);
+//		if (this.then) {
+//			return Voyant.application.getDeferredNestedPromise(this, arguments);
+//		} else {
+//	    	config = config || {};
+//	    	Ext.apply(config, {
+//    			docId: this.getId()
+//	    	});
+//			return this.getCorpus().getLemmasArray(config);
+//		}
+    },
+    
+    getEntities: function(config) {
+    	config = config || {};
+    	Ext.applyIf(config, {
+    		proxy: {}
+    	});
+    	Ext.applyIf(config.proxy, {
+    		extraParams: {}
+    	})
+    	Ext.applyIf(config.proxy.extraParams, {
+    		docIndex: this.get('index')
+    	})
+		return Ext.create("Voyant.data.store.DocumentEntities", Ext.apply(config, {corpus: this.getCorpus(), docId: this.getId()}));
+    },
+    
+    loadEntities: function(config) {
+		var me = this;
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			this.getEntities().load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(records)
+					} else {
+						dfd.reject(operation.error.response);
+					}
+				}
+			})
+			return dfd.promise
+		}
     }
     
+});
+Ext.define('Voyant.data.model.DocumentEntity', {
+    extend: 'Ext.data.Model',
+    fields: [
+             {name: 'term'},
+             {name: 'docIndex', 'type': 'int'},
+             {name: 'rawFreq', type: 'int'},
+             {name: 'type'},
+             {name: 'positions'}
+        ],
+    getTerm: function() {return this.get('term');},
+    getDocIndex: function() {return this.get('docIndex')},
+    getRawFreq: function() {return this.get('rawFreq')},
+    getPositions: function() {return this.get('positions')}
 });
 Ext.define('Voyant.data.model.DocumentQueryMatch', {
     extend: 'Ext.data.Model',
@@ -8717,6 +8784,38 @@ Ext.define('Voyant.data.store.DocumentTermsBuffered', {
 	}
 });
 
+Ext.define('Voyant.data.store.DocumentEntitiesMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+    model: 'Voyant.data.model.DocumentEntity',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.DocumentEntities',
+			'proxy.reader.rootProperty': 'documentEntities.entities',
+			'proxy.reader.totalProperty': 'documentEntities.total'
+		}])
+	}
+});
+
+Ext.define('Voyant.data.store.DocumentEntities', {
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.DocumentEntitiesMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.DocumentEntitiesMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.DocumentEntitiesBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.DocumentEntitiesMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.DocumentEntitiesMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
 Ext.define('Voyant.data.store.DocumentsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.Document',
@@ -9027,6 +9126,11 @@ Ext.define('Voyant.data.table.Table', {
 		/**
 		 * @private
 		 */
+		rowsMap: {},
+		
+		/**
+		 * @private
+		 */
 		headersMap: {},
 		
 		/**
@@ -9039,6 +9143,16 @@ Ext.define('Voyant.data.table.Table', {
 		 * @private
 		 */
 		model: undefined
+	},
+	
+	clone: function() {
+		var table = new VoyantTable();
+		table.setRows(Ext.clone(this.getRows()));
+		table.setHeaders(Ext.clone(this.getHeaders()))
+		table.setRowsMap(Ext.clone(this.getRowsMap()))
+		table.setHeadersMap(Ext.clone(this.getHeadersMap()))
+		table.setRowKey(Ext.clone(this.getRowKey()))
+		return table;
 	},
 
 	constructor: function(config, opts) {
@@ -9101,8 +9215,17 @@ Ext.define('Voyant.data.table.Table', {
 
 				
 		// not sure why config isn't working
-		this.setRows(Ext.Array.from(Ext.isArray(config) ? config : config.rows));
-		this.setHeaders(Ext.Array.from(config.headers));
+		if (!config.rows && Ext.isArray(config)) {
+			config.rows = config;
+		}
+		if (!this.getHeaders()) {
+			if (!config.headers && !config.noHeaders && config.rows) {
+				this.setHeaders(config.rows.shift())
+			} else {
+				this.setHeaders(Ext.Array.from(config.headers));
+			}
+		}
+		this.setRows(Ext.Array.from(config.rows));
 		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
 
 		// if we have no headers, use the index as header
@@ -9119,10 +9242,11 @@ Ext.define('Voyant.data.table.Table', {
 		});
 		this.setHeadersMap(headersMap);
 		
+		this.reMapRows();
+		
 		this.callParent();
 	},
 	addRow: function(row) {
-		debugger
 		if (Ext.isObject(row)) {
 			var len = this.getRows().length;
 			for (var key in row) {
@@ -9192,14 +9316,20 @@ Ext.define('Voyant.data.table.Table', {
 		var rows = this.getRows();
 		var r = Ext.isNumber(row) ? row : this.getRowIndex(row);
 		var c = this.getColumnIndex(column);
-		if (rows[row]===undefined) {rows[row]=[]}
-		if (rows[row][c]===undefined || replace) {rows[row][c]=value}
-		else {rows[row][c]+=value}
+		if (rows[r]===undefined) {rows[r]=[]}
+		if (rows[r][c]===undefined || replace) {rows[r][c]=value}
+		else {rows[r][c]+=value}
 	},
 	
 	getRowIndex: function(key) {
+		if (Ext.isNumber(key)) {return key;}
 		if (Ext.isString(key)) {
-			console.error("Implement this"); alert("Unimplemented method: VoyantTable.getRowIndex()");
+			var rowsMap = this.getRowsMap();
+			if (!(key in rowsMap)) {
+				rowsMap[key] = this.getRows().length;
+				this.getRows().push(new Array(this.getHeaders().length))
+			}
+			return rowsMap[key];
 		}
 	},
 	
@@ -9209,21 +9339,115 @@ Ext.define('Voyant.data.table.Table', {
 			if (headers[column]===undefined) {
 				headers[column]=column;
 				this.getRows().forEach(function(row) {
-					row.splice(column, 0, "");
+					row.splice(column, 0, undefined);
 				});
 			}
 			return column;
 		} else if (Ext.isString(column)) {
-			if (!this.getHeadersMap()[column]) {
+			if (!(column in this.getHeadersMap())) {
 				// we don't have this column yet, so create it and expand rows
 				this.getHeaders().push(column);
 				this.getHeadersMap()[column] = this.getHeaders().length-1
 				this.getRows().forEach(function(row) {
-					row.push("")
+					row.push(undefined)
 				});
 			}
 			return this.getHeadersMap()[column]
 		}
+	},
+	
+	getColumnHeader: function(column) {
+		var c = this.getColumnIndex(column);
+		return this.getHeaders()[c];
+	},
+	
+	/**
+	 * Compute the sum of the values in the column.
+	 * 
+	 * @param {Number/String} column The column index (as a number) or key (as a string).
+	 */
+	getColumnSum: function(column) {
+		return Ext.Array.sum(this.getColumnValues(column, true));
+	},
+	
+	/**
+	 * Compute the sum of the values in the column.
+	 * 
+	 * @param {Number/String} column The column index (as a number) or key (as a string).
+	 */
+	getColumnMean: function(column) {
+		return Ext.Array.mean(this.getColumnValues(column, true));
+	},
+	
+	/**
+	 * Get the largest value in the array.
+	 * 
+	 * @param {Number/String} column The column index (as a number) or key (as a string).
+	 */
+	getColumnMax: function(column) {
+		return Ext.Array.max(this.getColumnValues(column, true));
+	},
+	
+	/**
+	 * Get the smallest value in the array.
+	 * 
+	 * @param {Number/String} column The column index (as a number) or key (as a string).
+	 */
+	getColumnMin: function(column) {
+		return Ext.Array.min(this.getColumnValues(column, true));
+	},
+	
+	getColumnValues: function(column, clean) {
+		var c = this.getColumnIndex(column), vals = [];
+		this.eachRow(function(row) {
+			vals.push(row[c]);
+		});
+		if (clean) {return Ext.Array.clean(vals)}
+		else {return vals;}
+	},
+	
+	/**
+	 * @private
+	 */
+	reMapRows: function() {
+		var rowKey = this.getRowKey();
+		var rowsMap = {}
+		this.eachRow(function(row, i) {
+			if (rowKey in row) {
+				rowsMap[rowKey] = i;
+			}
+		}, true);
+		this.setRowsMap(rowsMap)
+	},
+	
+	sortByColumn: function(columns) {
+		var rows = this.getRows(),
+			sortColumnsIndices = Ext.Array.from(columns).map(function(column) {
+				if (Ext.isObject(column)) {
+					for (key in column) {
+						return {
+							index: this.getColumnIndex(key),
+							direction: column[key].indexOf("asc")>-1 ? 'asc' : 'desc'
+						}
+					}
+				} else {
+					return {
+						index: this.getColumnIndex(column),
+						direction: "desc"
+					}
+				}
+			}, this);
+		rows.sort(function(a, b) {
+			for (var i=0, len=sortColumnsIndices.length; i<len; i++) {
+				var header = sortColumnsIndices[i].index
+				if (a[header]!=b[header]) {
+					if (sortColumnsIndices[i].direction=='asc') {return a[header] > b[header] ? 1 : -1}
+					else {return a[header] > b[header] ? -1 : 1}
+				}
+			}
+		});
+		this.reMapRows();
+		return this;
 	},
 	
 	embed: function(cmp, config) {
@@ -9233,13 +9457,30 @@ Ext.define('Voyant.data.table.Table', {
 		}
 		config = config || {};
 		
-		Ext.apply(config, {
-			tableJson: JSON.stringify({
+		var columnHeaders = Ext.Array.from(config.headers || this.getHeaders()).map(function(header) {return this.getColumnHeader(header);}, this);
+		var json = {
 				rowkey: this.getRowKey(),
-				headers: this.getHeaders(),
-				rows: this.getRows(),
-				config: config
+				config: config,
+				headers: columnHeaders
+		};
+		if ("headers" in config) {
+			var columnIndices = Ext.Array.from(config.headers).map(function(header) {return this.getColumnIndex(header);}, this);
+			var rows = [];
+			this.getRows().forEach(function(row) {
+				rows.push(columnIndices.map(function(i) {
+					return row[i]
+				}))
 			})
+			Ext.apply(json, {
+				rows: rows
+			})
+		} else {
+			Ext.apply(json, {
+				rows: this.getRows()
+			})
+		}
+		Ext.apply(config, {
+			tableJson: JSON.stringify(json)
 		});
 		delete config.axes;
 		delete config.series;
@@ -9270,12 +9511,14 @@ Ext.define('Voyant.data.table.Table', {
 		}
 		table+="<tbody>";
 		for (var i=0, len = Ext.isNumber(config) ? config : this.getRows().length; i<len; i++) {
-			table+="<tr>";
 			var row = this.getRow(i);
-			row.forEach(function(cell) {
-				table+="<td>"+cell+"</td>";
-			})
-			table+="</tr>";
+			if (row && Ext.isArray(row)) {
+				table+="<tr>";
+				row.forEach(function(cell) {
+					table+="<td>"+cell+"</td>";
+				})
+				table+="</tr>";
+			}
 		}
 		table+="</tbody></table>";
 		return table;
@@ -9299,7 +9542,7 @@ Ext.define('Voyant.data.table.Table', {
 Ext.define('Voyant.data.util.NetworkGraph', {
 	alternateClassName: ["NetworkGraph"],
 	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
-	embeddable: [],
+	embeddable: ["Voyant.widget.VoyantNetworkGraph"],
 	config: {
 		
 		/**
@@ -9321,7 +9564,7 @@ Ext.define('Voyant.data.util.NetworkGraph', {
 		this.callParent([config]);
 	},
 	addEdge: function(edge) {
-		this.edges.push(edge);
+		this.getEdges().push(edge);
 	},
 	embed: function(cmp, config) {
 		if (!config && Ext.isObject(cmp)) {
@@ -9329,44 +9572,20 @@ Ext.define('Voyant.data.util.NetworkGraph', {
 			cmp = this.embeddable[0];
 		}
 		config = config || {};
-		
-		Ext.apply(config, {
-			tableJson: JSON.stringify({
-				rowkey: this.getRowKey(),
-				headers: this.getHeaders(),
-				rows: this.getRows(),
+		var json = {
+				edges: this.getEdges(),
+				nodes: this.getNodes(),
 				config: config
-			})
-		});
-		delete config.axes;
-		delete config.series;
-		
+		};
+		Ext.apply(config, {
+			jsonData: JSON.stringify(json)
+		})
 		embed.call(this, cmp, config);
-		
 	},
 	
 	getString: function(config) {
 		config = config || {};
-		var table = "<table class='voyant-table' style='"+(config.width ? ' width: '+config.width : '')+"' id='"+(config.id ? config.id : Ext.id())+"'>";
-		var headers = this.getHeaders();
-		if (headers.length) {
-			table+="<thead><tr>";
-			for (var i=0, len = headers.length; i<len; i++) {
-				table+="<th>"+headers[i]+"</th>";
-			}
-			table+="</tr></thead>";
-		}
-		table+="<tbody>";
-		for (var i=0, len = Ext.isNumber(config) ? config : this.getRows().length; i<len; i++) {
-			table+="<tr>";
-			var row = this.getRow(i);
-			row.forEach(function(cell) {
-				table+="<td>"+cell+"</td>";
-			})
-			table+="</tr>";
-		}
-		table+="</tbody></table>";
-		return table;
+		return this.getEdges().map(function(edge) {edge.source+"-"+edge.target}).join("; ");
 	}
 });
 /**
@@ -10039,6 +10258,10 @@ Ext.define('Voyant.data.model.Corpus', {
 		return Ext.create("Voyant.data.store.DocumentTerms", Ext.apply(config || {}, {corpus: this}));
 	},
 	
+	getDocumentEntities: function(config) {
+		return Ext.create("Voyant.data.store.DocumentEntities", Ext.apply(config || {}, {corpus: this}));
+	},
+	
 	getContexts: function(config) {
 		return Ext.create("Voyant.data.store.Contexts", Ext.apply(config || {}, {corpus: this}));
 	},
@@ -10333,7 +10556,8 @@ Ext.define('Voyant.data.model.Corpus', {
 			var dfd = Voyant.application.getDeferred(this);
 			Ext.applyIf(config, {
 				template: "docTokens2lemmas",
-				withPosLemmas: true
+				withPosLemmas: true,
+				noOthers: true
 			})
 	    	this.getWords(config).then(function(text) {
 	    		var lemmas = text.split(" ").map(function(word) {return word.substring(0, word.indexOf("/"))})
@@ -11775,7 +11999,9 @@ Ext.define('Voyant.widget.VoyantChart', {
 		        data: data
 			},
 	        axes: Ext.isArray(json.config.axes) ? json.config.axes : [{},{}],
-	        series: []
+	        series: [],
+    		legend: json.config.noLegend || Object.keys(data[0]).length<3 ? undefined : {docked:'top'}
+
 		}
 
 		// axes
@@ -11788,7 +12014,8 @@ Ext.define('Voyant.widget.VoyantChart', {
 			}
 			Ext.applyIf(axis, {
 	        	type: i==0 ? 'numeric' : 'category',
-	        	position: i==0 ? 'left' : 'bottom'
+	        	position: i==0 ? 'left' : 'bottom',
+	        	label: i==0 ? {} : {rotation: {degrees:-30}}
 	        });
 		})
 
@@ -11975,19 +12202,25 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
 		api: {
 			tableHtml: undefined,
 			tableJson: undefined,
-			width: undefined
+			width: undefined,
+			api: undefined
 		}
     },
     html: '',
+    config: {
+    	hiddenColumns: undefined
+    },
 	constructor: function(config) {
     	config = config || {};
 		var me = this;
-    	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
         me.callParent(arguments);
 	},
 	initComponent: function(config) {
     	var me = this, config = config || {};
     	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+    	if (this.config.api && this.config.api.tableJson) {
+    		this.setApiParam("tableJson", this.config.api.tableJson);
+    	}
     	me.buildFromParams();
 		me.on('afterrender', function() {
 			var table = this.getTargetEl().down('table');
@@ -11998,6 +12231,16 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
 					height: this.getApiParam('height') || 20+(table.query('tr').length*24) // based on grid heights in crisp
 				});
 				grid.render(parent);
+				if (this.getHiddenColumns()) {
+					var hides = {}; // map for speed
+					Ext.Array.from(this.getHiddenColumns()).forEach(function(header) {hides[header]=true})
+					grid.getColumns().forEach(function(column) {
+						if (column.text in hides) {column.hide()}
+					});
+					Ext.defer(function() {
+						grid.setWidth(grid.getEl().dom.parentNode.offsetWidth); // resize
+					},10)
+				}
 			}
 		}, me);
 		
@@ -12030,6 +12273,7 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
 			})
 			html+="</tbody></table>";
 			this.setHtml(html);
+			if (json.config && json.config.hidden) {this.setHiddenColumns(json.config.hidden)}
 		}
 		
 	}
@@ -12873,161 +13117,527 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     embeddable: ['Voyant.widget.VoyantNetworkGraph'],
     alias: 'widget.voyantnetworkgraph',
     statics: {
-    	i18n: {
-    	},
-    	api: {
-    		jsonData: undefined,
-    		docId: undefined,
-    		docIndex: undefined,
-    		json: undefined
-    	}
+        i18n: {
+        },
+        api: {
+            jsonData: undefined,
+            docId: undefined,
+            docIndex: undefined,
+            json: undefined,
+            api: undefined
+        }
     },
     config: {
-    	edges: undefined,
-    	nodes: undefined,
-    	json: undefined
+        vis: undefined, // svg > g element
+        visLayout: undefined, // d3 layout algorithm
+        
+        // backing data, don't set through config, use config.nodes & config.edges
+        nodeData: undefined,
+        edgeData: undefined,
+        
+        nodeSelection: undefined, // d3 selection for nodes
+        edgeSelection: undefined, // d3 selection for edges
+        
+        currentNode: undefined,
+        currentEdge: undefined,
+        
+        scaleExtent: [0.25, 8],
+        
+        fixOnDrag: true, // fix node when dragged
+        
+        graphStyle: {
+    		node: {
+    			normal: {
+    				fill: '#c6dbef',
+    				fillOpacity: 1,
+    				stroke: '#6baed6',
+    				strokeOpacity: 1,
+    				strokeWidth: 1
+    			},
+    			highlight: {
+    				fill: '#9ecae1',
+    				fillOpacity: 1,
+    				stroke: '#3182bd',
+    				strokeOpacity: 1,
+    				strokeWidth: 3
+    			}
+    		},
+    		edge: {
+    			normal: {
+    				stroke: '#000000',
+    				strokeOpacity: 0.25,
+    				strokeWidth: 1
+    			},
+    			highlight: {
+    				stroke: '#000000',
+    				strokeOpacity: 0.5,
+    				strokeWidth: 3
+    			}
+    		}
+    	},
+    	
+    	graphPhysics: {
+    		damping: 0.4, // 0 = no damping, 1 = full damping
+    		gravity: -1,  // negative = repel, positive = attract
+			springLength: 30,
+			springStrength: 1 // 0 = not strong, >1 = probably too strong
+    	}
     },
     constructor: function(config) {
-    	config = config || {};
-    	var me = this;
-    	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	this.callParent(arguments)
-    	this.on("boxready", function(src, corpus) {
-    		this.buildGraph();
-    	}, this);
+        config = config || {};
+        
+        this.setNodeData([]);
+        this.setEdgeData([]);
+        
+        this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+        this.callParent(arguments);
+        
+        var json = {};
+        if (this.getApiParam('jsonData')) {
+            json = Ext.decode(this.getApiParam('jsonData'));
+        } else if (this.getApiParam('json')) {
+        	json = this.getApiParam('json');
+        } else if (config.json) {
+        	json = config.json;
+        } else if (config.edges) {
+        	json.edges = config.edges;
+        	if (config.nodes) {
+        		json.nodes = config.nodes;
+        	}
+        } else if (config && config.jsonData) {
+        	json = JSON.parse(config.jsonData);
+        }
+        this.loadJson(json);
     },
     initComponent: function(config) {
-    	this.callParent(arguments)
+        this.on('boxready', function(src, corpus) {
+            this.initGraph();
+            this.refreshGraph();
+        }, this);
+        
+        this.on('resize', function(panel, width, height) {
+            var vis = this.body.down('svg');
+            if (vis) {
+                var el = this.body;
+                var elHeight = el.getHeight();
+                var elWidth = el.getWidth();
+                vis.dom.setAttribute('width', elWidth);
+                vis.dom.setAttribute('height', elHeight);
+                this.getVisLayout()
+                    .force('center', d3.forceCenter(elWidth/2, elHeight/2))
+                    .alpha(0.3).restart();
+            }
+        }, this);
+        
+        this.callParent(arguments);
     },
     
-    getJsonResourcefully: function() {
-    	//return {"nodes":[{"name":"Myriel","group":1},{"name":"Napoleon","group":1},{"name":"Mlle.Baptistine","group":1},{"name":"Mme.Magloire","group":1},{"name":"CountessdeLo","group":1},{"name":"Geborand","group":1},{"name":"Champtercier","group":1},{"name":"Cravatte","group":1},{"name":"Count","group":1},{"name":"OldMan","group":1},{"name":"Labarre","group":2},{"name":"Valjean","group":2},{"name":"Marguerite","group":3},{"name":"Mme.deR","group":2},{"name":"Isabeau","group":2},{"name":"Gervais","group":2},{"name":"Tholomyes","group":3},{"name":"Listolier","group":3},{"name":"Fameuil","group":3},{"name":"Blacheville","group":3},{"name":"Favourite","group":3},{"name":"Dahlia","group":3},{"name":"Zephine","group":3},{"name":"Fantine","group":3},{"name":"Mme.Thenardier","group":4},{"name":"Thenardier","group":4},{"name":"Cosette","group":5},{"name":"Javert","group":4},{"name":"Fauchelevent","group":0},{"name":"Bamatabois","group":2},{"name":"Perpetue","group":3},{"name":"Simplice","group":2},{"name":"Scaufflaire","group":2},{"name":"Woman1","group":2},{"name":"Judge","group":2},{"name":"Champmathieu","group":2},{"name":"Brevet","group":2},{"name":"Chenildieu","group":2},{"name":"Cochepaille","group":2},{"name":"Pontmercy","group":4},{"name":"Boulatruelle","group":6},{"name":"Eponine","group":4},{"name":"Anzelma","group":4},{"name":"Woman2","group":5},{"name":"MotherInnocent","group":0},{"name":"Gribier","group":0},{"name":"Jondrette","group":7},{"name":"Mme.Burgon","group":7},{"name":"Gavroche","group":8},{"name":"Gillenormand","group":5},{"name":"Magnon","group":5},{"name":"Mlle.Gillenormand","group":5},{"name":"Mme.Pontmercy","group":5},{"name":"Mlle.Vaubois","group":5},{"name":"Lt.Gillenormand","group":5},{"name":"Marius","group":8},{"name":"BaronessT","group":5},{"name":"Mabeuf","group":8},{"name":"Enjolras","group":8},{"name":"Combeferre","group":8},{"name":"Prouvaire","group":8},{"name":"Feuilly","group":8},{"name":"Courfeyrac","group":8},{"name":"Bahorel","group":8},{"name":"Bossuet","group":8},{"name":"Joly","group":8},{"name":"Grantaire","group":8},{"name":"MotherPlutarch","group":9},{"name":"Gueulemer","group":4},{"name":"Babet","group":4},{"name":"Claquesous","group":4},{"name":"Montparnasse","group":4},{"name":"Toussaint","group":5},{"name":"Child1","group":10},{"name":"Child2","group":10},{"name":"Brujon","group":4},{"name":"Mme.Hucheloup","group":8}],"links":[{"source":1,"target":0,"value":1},{"source":2,"target":0,"value":8},{"source":3,"target":0,"value":10},{"source":3,"target":2,"value":6},{"source":4,"target":0,"value":1},{"source":5,"target":0,"value":1},{"source":6,"target":0,"value":1},{"source":7,"target":0,"value":1},{"source":8,"target":0,"value":2},{"source":9,"target":0,"value":1},{"source":11,"target":10,"value":1},{"source":11,"target":3,"value":3},{"source":11,"target":2,"value":3},{"source":11,"target":0,"value":5},{"source":12,"target":11,"value":1},{"source":13,"target":11,"value":1},{"source":14,"target":11,"value":1},{"source":15,"target":11,"value":1},{"source":17,"target":16,"value":4},{"source":18,"target":16,"value":4},{"source":18,"target":17,"value":4},{"source":19,"target":16,"value":4},{"source":19,"target":17,"value":4},{"source":19,"target":18,"value":4},{"source":20,"target":16,"value":3},{"source":20,"target":17,"value":3},{"source":20,"target":18,"value":3},{"source":20,"target":19,"value":4},{"source":21,"target":16,"value":3},{"source":21,"target":17,"value":3},{"source":21,"target":18,"value":3},{"source":21,"target":19,"value":3},{"source":21,"target":20,"value":5},{"source":22,"target":16,"value":3},{"source":22,"target":17,"value":3},{"source":22,"target":18,"value":3},{"source":22,"target":19,"value":3},{"source":22,"target":20,"value":4},{"source":22,"target":21,"value":4},{"source":23,"target":16,"value":3},{"source":23,"target":17,"value":3},{"source":23,"target":18,"value":3},{"source":23,"target":19,"value":3},{"source":23,"target":20,"value":4},{"source":23,"target":21,"value":4},{"source":23,"target":22,"value":4},{"source":23,"target":12,"value":2},{"source":23,"target":11,"value":9},{"source":24,"target":23,"value":2},{"source":24,"target":11,"value":7},{"source":25,"target":24,"value":13},{"source":25,"target":23,"value":1},{"source":25,"target":11,"value":12},{"source":26,"target":24,"value":4},{"source":26,"target":11,"value":31},{"source":26,"target":16,"value":1},{"source":26,"target":25,"value":1},{"source":27,"target":11,"value":17},{"source":27,"target":23,"value":5},{"source":27,"target":25,"value":5},{"source":27,"target":24,"value":1},{"source":27,"target":26,"value":1},{"source":28,"target":11,"value":8},{"source":28,"target":27,"value":1},{"source":29,"target":23,"value":1},{"source":29,"target":27,"value":1},{"source":29,"target":11,"value":2},{"source":30,"target":23,"value":1},{"source":31,"target":30,"value":2},{"source":31,"target":11,"value":3},{"source":31,"target":23,"value":2},{"source":31,"target":27,"value":1},{"source":32,"target":11,"value":1},{"source":33,"target":11,"value":2},{"source":33,"target":27,"value":1},{"source":34,"target":11,"value":3},{"source":34,"target":29,"value":2},{"source":35,"target":11,"value":3},{"source":35,"target":34,"value":3},{"source":35,"target":29,"value":2},{"source":36,"target":34,"value":2},{"source":36,"target":35,"value":2},{"source":36,"target":11,"value":2},{"source":36,"target":29,"value":1},{"source":37,"target":34,"value":2},{"source":37,"target":35,"value":2},{"source":37,"target":36,"value":2},{"source":37,"target":11,"value":2},{"source":37,"target":29,"value":1},{"source":38,"target":34,"value":2},{"source":38,"target":35,"value":2},{"source":38,"target":36,"value":2},{"source":38,"target":37,"value":2},{"source":38,"target":11,"value":2},{"source":38,"target":29,"value":1},{"source":39,"target":25,"value":1},{"source":40,"target":25,"value":1},{"source":41,"target":24,"value":2},{"source":41,"target":25,"value":3},{"source":42,"target":41,"value":2},{"source":42,"target":25,"value":2},{"source":42,"target":24,"value":1},{"source":43,"target":11,"value":3},{"source":43,"target":26,"value":1},{"source":43,"target":27,"value":1},{"source":44,"target":28,"value":3},{"source":44,"target":11,"value":1},{"source":45,"target":28,"value":2},{"source":47,"target":46,"value":1},{"source":48,"target":47,"value":2},{"source":48,"target":25,"value":1},{"source":48,"target":27,"value":1},{"source":48,"target":11,"value":1},{"source":49,"target":26,"value":3},{"source":49,"target":11,"value":2},{"source":50,"target":49,"value":1},{"source":50,"target":24,"value":1},{"source":51,"target":49,"value":9},{"source":51,"target":26,"value":2},{"source":51,"target":11,"value":2},{"source":52,"target":51,"value":1},{"source":52,"target":39,"value":1},{"source":53,"target":51,"value":1},{"source":54,"target":51,"value":2},{"source":54,"target":49,"value":1},{"source":54,"target":26,"value":1},{"source":55,"target":51,"value":6},{"source":55,"target":49,"value":12},{"source":55,"target":39,"value":1},{"source":55,"target":54,"value":1},{"source":55,"target":26,"value":21},{"source":55,"target":11,"value":19},{"source":55,"target":16,"value":1},{"source":55,"target":25,"value":2},{"source":55,"target":41,"value":5},{"source":55,"target":48,"value":4},{"source":56,"target":49,"value":1},{"source":56,"target":55,"value":1},{"source":57,"target":55,"value":1},{"source":57,"target":41,"value":1},{"source":57,"target":48,"value":1},{"source":58,"target":55,"value":7},{"source":58,"target":48,"value":7},{"source":58,"target":27,"value":6},{"source":58,"target":57,"value":1},{"source":58,"target":11,"value":4},{"source":59,"target":58,"value":15},{"source":59,"target":55,"value":5},{"source":59,"target":48,"value":6},{"source":59,"target":57,"value":2},{"source":60,"target":48,"value":1},{"source":60,"target":58,"value":4},{"source":60,"target":59,"value":2},{"source":61,"target":48,"value":2},{"source":61,"target":58,"value":6},{"source":61,"target":60,"value":2},{"source":61,"target":59,"value":5},{"source":61,"target":57,"value":1},{"source":61,"target":55,"value":1},{"source":62,"target":55,"value":9},{"source":62,"target":58,"value":17},{"source":62,"target":59,"value":13},{"source":62,"target":48,"value":7},{"source":62,"target":57,"value":2},{"source":62,"target":41,"value":1},{"source":62,"target":61,"value":6},{"source":62,"target":60,"value":3},{"source":63,"target":59,"value":5},{"source":63,"target":48,"value":5},{"source":63,"target":62,"value":6},{"source":63,"target":57,"value":2},{"source":63,"target":58,"value":4},{"source":63,"target":61,"value":3},{"source":63,"target":60,"value":2},{"source":63,"target":55,"value":1},{"source":64,"target":55,"value":5},{"source":64,"target":62,"value":12},{"source":64,"target":48,"value":5},{"source":64,"target":63,"value":4},{"source":64,"target":58,"value":10},{"source":64,"target":61,"value":6},{"source":64,"target":60,"value":2},{"source":64,"target":59,"value":9},{"source":64,"target":57,"value":1},{"source":64,"target":11,"value":1},{"source":65,"target":63,"value":5},{"source":65,"target":64,"value":7},{"source":65,"target":48,"value":3},{"source":65,"target":62,"value":5},{"source":65,"target":58,"value":5},{"source":65,"target":61,"value":5},{"source":65,"target":60,"value":2},{"source":65,"target":59,"value":5},{"source":65,"target":57,"value":1},{"source":65,"target":55,"value":2},{"source":66,"target":64,"value":3},{"source":66,"target":58,"value":3},{"source":66,"target":59,"value":1},{"source":66,"target":62,"value":2},{"source":66,"target":65,"value":2},{"source":66,"target":48,"value":1},{"source":66,"target":63,"value":1},{"source":66,"target":61,"value":1},{"source":66,"target":60,"value":1},{"source":67,"target":57,"value":3},{"source":68,"target":25,"value":5},{"source":68,"target":11,"value":1},{"source":68,"target":24,"value":1},{"source":68,"target":27,"value":1},{"source":68,"target":48,"value":1},{"source":68,"target":41,"value":1},{"source":69,"target":25,"value":6},{"source":69,"target":68,"value":6},{"source":69,"target":11,"value":1},{"source":69,"target":24,"value":1},{"source":69,"target":27,"value":2},{"source":69,"target":48,"value":1},{"source":69,"target":41,"value":1},{"source":70,"target":25,"value":4},{"source":70,"target":69,"value":4},{"source":70,"target":68,"value":4},{"source":70,"target":11,"value":1},{"source":70,"target":24,"value":1},{"source":70,"target":27,"value":1},{"source":70,"target":41,"value":1},{"source":70,"target":58,"value":1},{"source":71,"target":27,"value":1},{"source":71,"target":69,"value":2},{"source":71,"target":68,"value":2},{"source":71,"target":70,"value":2},{"source":71,"target":11,"value":1},{"source":71,"target":48,"value":1},{"source":71,"target":41,"value":1},{"source":71,"target":25,"value":1},{"source":72,"target":26,"value":2},{"source":72,"target":27,"value":1},{"source":72,"target":11,"value":1},{"source":73,"target":48,"value":2},{"source":74,"target":48,"value":2},{"source":74,"target":73,"value":3},{"source":75,"target":69,"value":3},{"source":75,"target":68,"value":3},{"source":75,"target":25,"value":3},{"source":75,"target":48,"value":1},{"source":75,"target":41,"value":1},{"source":75,"target":70,"value":1},{"source":75,"target":71,"value":1},{"source":76,"target":64,"value":1},{"source":76,"target":65,"value":1},{"source":76,"target":66,"value":1},{"source":76,"target":63,"value":1},{"source":76,"target":62,"value":1},{"source":76,"target":48,"value":1},{"source":76,"target":58,"value":1}]}
-    	if (this.getEdges()) {
-    		return {edges: this.getEdges(), nodes: this.getNodes()}
-    	} else if (this.getApiParam("jsonData")) {
-    		return Ext.decode(this.getApiParam("jsonData"));
-    	} else if (this.getApiParam('json')) {
-    		return  this.getApiParam('json');
-    	} else {
-    		return {edges: this.getEdges(), nodes: this.getNodes()}
-    	}
-    },
-    
-    buildGraph: function(json) {
-    	json = json || this.getJsonResourcefully();
-    	
-    	if (!json || !json.links) {
-    		if (json && json.edges) {
-    			json.links = json.edges;
-    			delete json.edges;
-    		}
-    		if (!json || !json.links) {
-    			json = json || {};
-    			json.links = [];
-    		}
-    	}
-    	
+    processJson: function(json) {
+    	if (!json || !json.edges) {
+            if (json && json.links) {
+                json.edges = json.links;
+                delete json.links;
+            }
+            if (!json || !json.edges) {
+                json = json || {};
+                json.edges = [];
+            }
+        }
     	if (!json.nodes) {
-    		var wordPos = {};
-    		var wordFreq = {};
     		json.nodes = [];
-    		json.links.forEach(function(edge) {
-    			["source", "target"].forEach(function(loc) {
-	    			if (edge[loc] in wordPos == false) {
-	    				wordPos[edge[loc]] = json.nodes.length;
-	    				wordFreq[edge[loc]] = 1;
-	    				json.nodes.push({name: edge[loc]})
-	    			} else {
-	    				wordFreq[edge[loc]]++;
-	    			}
-	    			edge[loc] = wordPos[edge[loc]];
-	    			edge.value=1;
-    			})
-    		});
-    		json.nodes.forEach(function(node) {
-    			Ext.applyIf(node, {value: wordFreq[node.name]});
-    		});
     	}
+        if (json.nodes.length === 0) {
+            var wordFreq = {};
+            json.edges.forEach(function(edge) {
+                ['source', 'target'].forEach(function(loc) {
+                	var term = edge[loc];
+                    if (term in wordFreq == false) {
+                        wordFreq[term] = 1;
+                        json.nodes.push({term: term});
+                    } else {
+                        wordFreq[term]++;
+                    }
+                    edge.value = 1;
+                });
+            }, this);
+            json.nodes.forEach(function(node) {
+                Ext.applyIf(node, {value: wordFreq[node.term]});
+            });
+        }
+        
+        return json;
+    },
+    
+    loadJson: function(json) {
+    	this.processJson(json);
     	
-		var width = this.getWidth(),
-	    height = this.getHeight(), targetEl = this.getTargetEl().dom.firstChild.firstChild;
+    	var existingTerms = {};
+		this.getNodeData().forEach(function(node) {
+			existingTerms[node.term] = true;
+		}, this);
 		
-		targetEl.innerHTML = ""; // clear any existing graph
-		
-		var margin = {top: -5, right: -5, bottom: -5, left: -5}
-		
-		var zoomed = function zoomed() {
-        	container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    	var newNodes = [];
+    	var newEdges = [];
+    	
+    	json.nodes.forEach(function(node) {
+            if (existingTerms[node.term] === undefined) {
+            	node.id = this.idGet(node.term);
+            	newNodes.push(node);
+            }
+        }, this);
+        json.edges.forEach(function(newedge) {
+            var sourceId = this.idGet(newedge.source);
+            var targetId = this.idGet(newedge.target);
+            var edges = this.getEdgeData();
+            var exists = false;
+            for (var i = 0; i < edges.length; i++) {
+            	var edge = edges[i];
+            	if ((edge.source.id == sourceId && edge.target.id == targetId) || (edge.target.id == sourceId && edge.source.id == targetId)) {
+            		exists = true;
+            		break;
+            	}
+            }
+            if (!exists) {
+            	newedge.source = sourceId;
+            	newedge.target = targetId;
+            	newedge.id = sourceId+'-'+targetId;
+	            newEdges.push(newedge);
+            }
+        }, this);
+        
+        this.setNodeData(this.getNodeData().concat(newNodes));
+        this.setEdgeData(this.getEdgeData().concat(newEdges));
+        
+        this.refreshGraph();
+    },
+    
+    // get a DOM appropriate id
+    idGet: function(term) {
+    	return term.replace(/\W/g, '_');
+    },
+    
+    updateDataForNode: function(nodeId, dataObj) {
+    	var data = this.getNodeData();
+		for (var i = 0; i < data.length; i++) {
+			if (data[i].id === nodeId) {
+				Ext.apply(data[i], dataObj);
+				break;
+			}
+		}
+    },
+    
+    updateDataForEdge: function(edgeId, dataObj) {
+    	var data = this.getEdgeData();
+		for (var i = 0; i < data.length; i++) {
+			if (data[i].id === edgeId) {
+				Ext.apply(data[i], dataObj);
+				break;
+			}
+		}
+    },
+    
+    addNode: function(dataObj) {
+    	if (Ext.isString(dataObj)) {
+    		dataObj = {term: dataObj};
+    	}
+    	if (dataObj.term) {
+    		this.loadJson({nodes: [dataObj]});
+    	}
+    },
+    
+    removeNode: function(nodeId, removeOrphans) {
+    	var data = this.getNodeData();
+		for (var i = 0; i < data.length; i++) {
+			if (data[i].id === nodeId) {
+				data.splice(i, 1);
+				break;
+			}
 		}
 		
-    	var zoom = d3.behavior.zoom()
-	        .scaleExtent([1, 10])
-	        .on("zoom", zoomed);
+		var potentialOrphans = {};
+		data = this.getEdgeData();
+		for (var i = data.length-1; i >= 0; i--) {
+			var match = false;
+			if (data[i].source.id === nodeId) {
+				match = true;
+				potentialOrphans[data[i].target.id] = true;
+			}
+			if (data[i].target.id === nodeId) {
+				match = true;
+				potentialOrphans[data[i].source.id] = true;
+			}
+			if (match) {
+				data.splice(i, 1);
+			}
+		}
 		
-    	var svg = d3.select(targetEl).append("svg")
-    	    .attr("width", width)
-    	    .attr("height", height)
+		if (removeOrphans) {
+			for (var i = 0; i < data.length; i++) {
+				if (potentialOrphans[data[i].source.id]) {
+					delete potentialOrphans[data[i].source.id];
+				}
+				if (potentialOrphans[data[i].target.id]) {
+					delete potentialOrphans[data[i].target.id];
+				}
+			}
+			for (var orphanId in potentialOrphans) {
+				this.removeNode(orphanId, true);
+			}
+		}
+		
+		this.refreshGraph();
+    },
+    
+    addEdge: function(dataObj) {
+    	if (Ext.isObject(dataObj) && dataObj.source && dataObj.target) {
+    		this.loadJson({edges: [dataObj]});
+    	}
+    },
+    
+    removeEdge: function(edgeId, removeOrphans) {
+    	var data = this.getEdgeData();
+    	for (var i = data.length-1; i >= 0; i--) {
+			if (data[i].id === edgeId) {
+				data.splice(i, 1);
+			}
+		}
+		
+		if (removeOrphans) {
+			var potentialOrphans = {};
+			data = this.getNodeData();
+			for (var i = 0; i < data.length; i++) {
+				potentialOrphans[data[i].id] = true;
+			}
+			data = this.getEdgeData();
+			for (var i = 0; i < data.length; i++) {
+				if (potentialOrphans[data[i].source.id]) {
+					delete potentialOrphans[data[i].source.id];
+				}
+				if (potentialOrphans[data[i].target.id]) {
+					delete potentialOrphans[data[i].target.id];
+				}
+			}
+			for (var orphanId in potentialOrphans) {
+				this.removeNode(orphanId, true);
+			}
+			
+		}
+		
+		this.refreshGraph();
+    },
+    
+    initGraph: function() {
+        var el = this.getLayout().getRenderTarget();
+        el.update('');
+        var width = el.getWidth();
+        var height = el.getHeight();
+        
+        var physics = this.getGraphPhysics();
+        this.setVisLayout(d3.forceSimulation()
+        	.velocityDecay(physics.damping)
+    		.force('center', d3.forceCenter(width/2, height/2))
+            .force('link', d3.forceLink().id(function(d) { return d.id; }).distance(physics.springLength).strength(physics.springStrength))
+            .force('charge', d3.forceManyBody().strength(physics.gravity))
+            .force('collide', d3.forceCollide().radius(function(d) { return Math.sqrt(d.bbox.width * d.bbox.height)*2; }))
+            .on('tick', function() {
+            	 this.getEdgeSelection()
+	                .attr('x1', function(d) { return d.source.x; })
+	                .attr('y1', function(d) { return d.source.y; })
+	                .attr('x2', function(d) { return d.target.x; })
+	                .attr('y2', function(d) { return d.target.y; });
+	    
+            	 this.getNodeSelection()
+            	 	.attr('transform', function(d) {
+            	 		var x = d.x - d.bbox.width*0.5;
+            	 		var y = d.y - d.bbox.height*0.5;
+            	 		return 'translate('+x+','+y+')';
+        	 		});
+	        }.bind(this)
+        ));
+        
+        var svg = d3.select(el.dom).append('svg').attr('width', width).attr('height', height);
+        var g = svg.append('g');
+        
+        svg.call(d3.zoom().scaleExtent(this.getScaleExtent()).on('zoom', function() {
+            g.attr('transform', d3.event.transform);
+        }));
+        
+        this.setEdgeSelection(g.append('g').attr('class', 'edges').selectAll('.edge'));
+        this.setNodeSelection(g.append('g').attr('class', 'nodes').selectAll('.node'));
+        this.setVis(g);
+    },
+    
+    resetGraph: function() {
+	    this.setNodeData([]);
+		this.setEdgeData([]);
+		this.refreshGraph();
+    },
+    
+    refreshGraph: function() {
+    	if (this.getVisLayout() === undefined) return;
     	
-    	var container = svg
-    	  .append("g")
-    	    .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
-    	    .call( d3.behavior.zoom()
-    		        .scaleExtent([.5, 10])
-    		        .on("zoom", zoomed));
-    	
-    	
-    	var force = d3.layout.force()
-    	    .gravity(0.2)
-    	    .distance(50)
-    	    .charge(-100)
-    	    .size([width, height]);
+        var edgeData = this.getEdgeData();
+        var nodeData = this.getNodeData();
+        
+        var edge = this.getEdgeSelection().data(edgeData, function(d) { return d.id; });
+        edge.exit().remove();
+        var edgeEnter = edge.enter().append('line')
+        	.attr('class', 'edge')
+        	.attr('id', function(d) { return d.id; })
+        	.style('cursor', 'pointer')
+        	.on('mouseover', this.edgeMouseOver.bind(this))
+            .on('mouseout', this.edgeMouseOut.bind(this))
+        	.on('click', function(d) {
+        		d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.setCurrentEdge(d);
+				this.fireEvent('edgeclicked', this, d);
+        	}.bind(this));
+        
+        this.setEdgeSelection(edgeEnter.merge(edge));
+        
+        var node = this.getNodeSelection().data(nodeData, function(d) { return d.id; });
+        node.exit().remove();
+        var nodeEnter = node.enter().append('g')
+            .attr('class', 'node')
+            .attr('id', function(d) { return d.id; })
+            .style('cursor', 'pointer')
+            .on('mouseover', this.nodeMouseOver.bind(this))
+            .on('mouseout', this.nodeMouseOut.bind(this))
+            .on('click', function(d) {
+				d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.setCurrentNode(d);
+				this.fireEvent('nodeclicked', this, d);
+			}.bind(this))
+			.on('dblclick', function(d) {
+				d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.fireEvent('nodedblclicked', this, d);
+			}.bind(this))
+            .call(d3.drag()
+                .on('start', function(d) {
+                    if (!d3.event.active) this.getVisLayout().alphaTarget(0.3).restart();
+                    if (this.getFixOnDrag()) {
+	                    d.fx = d.x;
+	                    d.fy = d.y;
+                    }
+                    this.fireEvent('dragstart', this, d);
+            	}.bind(this))
+                .on('drag', function(d) {
+                	if (this.getFixOnDrag()) {
+	                    d.fx = d3.event.x;
+	                    d.fy = d3.event.y;
+                	} else {
+                		d.x = d3.event.x;
+                		d.y = d3.event.y;
+                	}
+                    this.fireEvent('drag', this, d);
+                }.bind(this))
+                .on('end', function(d) {
+                	if (!d3.event.active) this.getVisLayout().alphaTarget(0);
+                	this.fireEvent('dragend', this, d);
+                }.bind(this))
+            );
 
-    	  force
-    	      .nodes(json.nodes)
-    	      .links(json.links)
-    	      .start();
+        nodeEnter.append('rect');
+        
+        var vals = nodeData.map(function(d) {
+            var val = d.value;
+            if (d.value == undefined) {
+                d.value = val = 1;
+            }
+            return val;
+        });
+        vals.sort();
+        var fontscale = d3.scaleLog()
+            .domain([vals[0], vals[vals.length-1]])
+            .range([8, 36]);
+                
+        nodeEnter.append('text')
+            .text(function(d) { return d.term; })
+//            .attr('font-family', function(d) { return this.getApplication().getFeatureForTerm('font', d.term); }.bind(this))
+            .attr('font-size', function(d) {return fontscale(d.value)+'px';})
+//            .attr('text-anchor', 'middle')
+			.attr('alignment-baseline', 'middle')
+			.style('user-select', 'none')
+            .each(function(d) { d.bbox = this.getBBox(); });
+        
+        this.setNodeSelection(nodeEnter.merge(node));
+        
+        this.getNodeSelection().selectAll('rect')
+        	.attr('width', function(d) { return d.bbox.width+16; })
+			.attr('height', function(d) { return d.bbox.height+8; })
+			.attr('rx', function(d) { return Math.max(2, d.bbox.height * 0.2); })
+			.attr('ry', function(d) { return Math.max(2, d.bbox.height * 0.2); });
+        
+        this.getNodeSelection().selectAll('text')
+        	.attr('dx', 8)
+			.attr('dy', function(d) { return d.bbox.height*0.5+4; });
+        
 
-    	  var link = container.selectAll(".link")
-    	      .data(json.links)
-    	    .enter().append("line")
-    	      .attr("class", "link")
-    	      .attr("stroke", "#eee")
+        this.getEdgeSelection().call(this.applyEdgeStyle.bind(this));
+        this.getNodeSelection().call(this.applyNodeStyle.bind(this));
+        
+        this.getVisLayout().nodes(nodeData);
+        this.getVisLayout().force('link').links(edgeData);
+        this.getVisLayout().alpha(1).restart();
+    },
+    
+    applyNodeStyle: function(sel, nodeState) {
+		var state = nodeState === undefined ? 'normal' : nodeState;
+		var style = this.getGraphStyle().node[state];
+    	sel.selectAll(':not(text)')
+    		.style('fill', function(d) { return style.fill; }.bind(this))
+    		.style('fill-opacity', function(d) { return style.fillOpacity; }.bind(this))
+    		.style('stroke', function(d) { return style.stroke; }.bind(this))
+    		.style('stroke-opacity', function(d) { return style.strokeOpacity; }.bind(this))
+    		.style('stroke-width', function(d) { return style.strokeWidth; }.bind(this));
+    },
+    
+    applyEdgeStyle: function(sel, edgeState) {
+    	var state = edgeState === undefined ? 'normal' : edgeState;
+    	var style = this.getGraphStyle().edge[state];
+    	sel.style('stroke', function(d) { return style.stroke; }.bind(this))
+	    	.style('stroke-opacity', function(d) { return style.strokeOpacity; }.bind(this))
+	    	.style('stroke-width', function(d) { return style.strokeWidth; }.bind(this));
+    },
 
-    	  var node = container.selectAll(".node")
-    	      .data(json.nodes)
-    	    .enter().append("g")
-    	      .attr("class", "node")
-    	      .call(force.drag);
-
-    	  node.append("circle")
-    	  	.attr("r", 5)
-    	  	.attr("fill", "rgba(0,0,0,.05)")
-    	  
-    	  var vals = json.nodes.map(function(d) {return d.value});
-    	  vals.sort();
-
-    	  var fontscale = d3.scale.log()
-    	  		.domain([vals[0], vals[vals.length-1]])
-    	  		.range([8, 36])
-    	  		
-    	  node.append("text")
-    	      .attr("dx", 0)
-    	      .attr("dy", 0)
-    	      .text(function(d) { return d.name })
-    	      .attr("font-size", function(d) {return fontscale(d.value)+"px"})
-    	  	  .attr("text-anchor", "middle");
-
-    	  force.on("tick", function() {
-    	    link.attr("x1", function(d) { return d.source.x; })
-    	        .attr("y1", function(d) { return d.source.y; })
-    	        .attr("x2", function(d) { return d.target.x; })
-    	        .attr("y2", function(d) { return d.target.y; });
-
-    	    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-    	  });
+    edgeMouseOver: function(d) {
+    	this.getEdgeSelection().call(this.applyEdgeStyle.bind(this));
+    	this.getVis().select('#'+d.id).call(this.applyEdgeStyle.bind(this), 'highlight');
+    },
+    
+    edgeMouseOut: function(d) {
+    	this.getEdgeSelection().call(this.applyEdgeStyle.bind(this));
+    },
+    
+    nodeMouseOver: function(d) {
+    	this.setCurrentNode(d);
+		
+    	this.getNodeSelection().call(this.applyNodeStyle.bind(this));
+		
+		this.getEdgeSelection().each(function(link) {
+			var id;
+			if (link.source.id == d.id) {
+				id = link.target.id;
+			} else if (link.target.id == d.id) {
+				id = link.source.id;
+			}
+			if (id !== undefined) {
+				this.getVis().select('#'+id).call(this.applyNodeStyle.bind(this), 'highlight');
+				this.getVis().select('#'+link.id).call(this.applyEdgeStyle.bind(this), 'highlight');
+			}
+		}.bind(this));
+		
+		this.getVis().select('#'+d.id).call(this.applyNodeStyle.bind(this), 'highlight');
+    },
+    
+    nodeMouseOut: function(d) {
+    	this.getNodeSelection().call(this.applyNodeStyle.bind(this));
+    	this.getEdgeSelection().call(this.applyEdgeStyle.bind(this));
     }
-
-})
+});
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable','Voyant.util.DetailedError'],
 	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.CategoriesOption','Voyant.widget.TotalPropertyStatus'],
@@ -27888,9 +28498,9 @@ Ext.define('Voyant.panel.Via', {
     
     listeners: {
     	resize: function(panel, width, height) {
-    		if (this.getCorpus()) {
-        		this.loadFromCorpus(this.getCorpus())
-    		}
+//    		if (this.getCorpus()) {
+//        		this.loadFromCorpus(this.getCorpus())
+//    		}
     	},
     	
     	loadedCorpus: function(src, corpus) {
@@ -27926,13 +28536,21 @@ Ext.define('Voyant.panel.Via', {
     	var params = this.getApiParams();
     	var a = corpus.loadRelatedWords(params).then(function(relatedWords) {
     		me.unmask()
-    		var graph = me.down("voyantnetworkgraph");
-    		if (graph) {graph.destroy();}
     		var edges = relatedWords.map(function(item) {return {source: item.getSource(), target: item.getTarget()}})
-    		graph = Ext.create("Voyant.widget.VoyantNetworkGraph", {
-    			edges: edges
-    		})
-    		me.add(graph)
+    		var graph = me.down("voyantnetworkgraph");
+    		if (graph) {
+    			graph.loadJson({edges: edges});
+    		} else {
+    			graph = Ext.create("Voyant.widget.VoyantNetworkGraph", {
+        			edges: edges,
+        			listeners: {
+        				nodeclicked: function(src, node) {
+        					me.dispatchEvent('termsClicked', me, [node.term]);
+        				}
+        			}
+        		})
+        		me.add(graph)
+    		}
     	}, function(response) {
     		me.unmask();
     		if (response.timedout) {
@@ -28235,6 +28853,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	extend: "Ext.Component",
 	alias: "widget.notebookcodeeditor", 
 	mixins: ["Voyant.util.Localization",'Voyant.notebook.util.Embed'],
+	embeddable: ["Voyant.notebook.editor.CodeEditor"],
 	cls: 'notebook-code-editor',
 	config: {
 		theme: 'ace/theme/chrome',
@@ -28247,7 +28866,13 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	statics: {
 		i18n: {
 			emptyText: "// click here to edit"
+		},
+		api: {
+			content: undefined
 		}
+	},
+	constructor: function(config) {
+		this.callParent(arguments)
 	},
 	listeners: {
 		boxready: function() {
@@ -28257,7 +28882,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			this.editor.getSession().setUseWorker(true);
 			this.editor.setTheme(this.getTheme());
 			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: Infinity, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			this.editor.setOptions({minLines: 6, maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10, autoScrollEditorIntoView: true, scrollPastEnd: true});
 			this.editor.setHighlightActiveLine(false);
 			this.editor.renderer.setShowPrintMargin(false);
 			this.editor.renderer.setShowGutter(false);
@@ -28339,6 +28964,8 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	switchModes: function(mode) {
 		this.setMode('ace/mode/'+mode);
 		this.editor.getSession().setMode(this.getMode());
+		this.editor.setOptions({maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10});
+
 	},
 	
 	getValue: function() {
@@ -28837,8 +29464,22 @@ Ext.define('Voyant.notebook.Notebook', {
     			var previous = Voyant.notebook.Notebook.currentBlock;
     			while(previous) {
     				previous = previous.previousSibling();
-    				if (previous.isXType("notebookcodeeditorwrapper") && previous.editor.getMode()!='ace/mode/javascript') {
-    					return previous.getContent().input;
+    				if (previous && previous.isXType("notebookcodeeditorwrapper")) {
+    					if (previous.editor.getMode()=='ace/mode/javascript') {
+    						// we have a JS editor, and we don't want the code, but we have to check for embedded results
+    						var iframe = previous.results.getTargetEl().dom.querySelector("iframe");
+    						if (iframe) {
+    							var win = iframe.contentWindow; editor = win.document.querySelector(".ace_editor");
+    							if (editor && win.ace) {
+    								var e = win.ace.edit(editor);
+    								if (e.getSession().getMode().$id!='ace/mode/javascript') {
+    									return e.getValue();
+    								}
+    							}
+    						}
+    					} else {
+    						return previous.getContent().input;
+    					}
     				}
     			}
     		}
@@ -28879,6 +29520,30 @@ Ext.define('Voyant.notebook.Notebook', {
     		 });
     		
     		return dfd.promise;
+    	},
+    	
+        /**
+         * Formats the passed number according to the passed format string.
+         *
+         * By default, "," is expected as the thousand separator, and "." is expected as the decimal separator.
+         *
+         * Examples (123456.789):
+         * 
+         * - `0` - (123457) show only digits, no precision
+         * - `0.00` - (123456.79) show only digits, 2 precision
+         * - `0.0000` - (123456.7890) show only digits, 4 precision
+         * - `0,000` - (123,457) show comma and digits, no precision
+         * - `0,000.00` - (123,456.79) show comma and digits, 2 precision
+         * - `0,0.00` - (123,456.79) shortcut method, show comma and digits, 2 precision
+         * - `0.####` - (123,456.789) Allow maximum 4 decimal places, but do not right pad with zeroes
+         * - `0.00##` - (123456.789) Show at least 2 decimal places, maximum 4, but do not right pad with zeroes
+         *
+         * @param {Number} v The number to format.
+         * @param {String} formatString The way you would like to format this text.
+         * @return {String} The formatted number.
+         */
+		formatNumber: function(number, format) {
+    		return Ext.util.Format.number(number, format);
     	}
     	
     },
@@ -28900,8 +29565,14 @@ Ext.define('Voyant.notebook.Notebook', {
          */
     	saveItTool: undefined,
     	
+        /**
+         * @private
+         */
 		autoSaveTimer: undefined,
 		
+        /**
+         * @private
+         */
 		initialAutoSaveChecked: false
 
     },
@@ -28994,7 +29665,7 @@ Ext.define('Voyant.notebook.Notebook', {
     				//visible: false,
     				listeners: {
     					afterrender: function(tool) {
-    						tool.setVisible(window.location.hostname=='localhost');
+    						tool.setVisible(true);
     						me.setSaveItTool(tool);
     					}
     				},
@@ -29276,7 +29947,6 @@ Ext.define('Voyant.notebook.Notebook', {
 		if (url.indexOf("https://gist.github.com/")==0 || url.indexOf("https://gist.githubusercontent.com/")==0) {
 			url = "gist:"+url.substring(url.indexOf(".com")+5, url.length - (url.charAt(url.length-1) == "/" ? 1 : 0)).replace(/\//g, ":");
 		}
-    	debugger
 		if (url.indexOf("gist:")==0) {
 			var gistParts = url.substring(5).split(":");
 			if (gistParts.length<2) {
@@ -29334,7 +30004,8 @@ Ext.define('Voyant.notebook.Notebook', {
         	    	 tool: 'notebook.NotebookManager',
         	    	 notebook: url,
         	    	 autosave: true,
-        	    	 noCache: true
+        	    	 noCache: true,
+        	    	 failQuietly: true
         	     },
         	     scope: me
         	 }).then(function(response, opts) {
@@ -29351,7 +30022,7 @@ Ext.define('Voyant.notebook.Notebook', {
         		 }
         	 },
         	 function(response, opts) {
-        		 debugger
+        		 // ignore
         	 });
 
     	 },
@@ -29616,6 +30287,10 @@ Ext.define('Voyant.VoyantApp', {
         this.addColorPalette('extjs', extjs);
     },
     
+    getBaseUrlFull: function() {
+    	return window.location.origin+this.getBaseUrl(); // maybe doesn't work in all browsers?
+    },
+
     getRelativeUrl: function() {
     	var url = window.location.pathname.substring(this.getBaseUrl().length);
     	var relative = "";
@@ -29893,7 +30568,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','topics','veliza','wordtree']
+			items: ['cirrus','corpusterms','bubblelines','correlations','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','topics','veliza','wordtree']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
@@ -29905,8 +30580,9 @@ Ext.define('Voyant.VoyantCorpusApp', {
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',
-			items: ['corpusterms','corpuscollocates','phrases','contexts','documentterms','documents','topics']
+			items: ['corpusterms','corpuscollocates','correlations','phrases','contexts','documentterms','documents','topics']
 		},{
+			
 			i18n: 'moreToolsTypeOther',
 			glyph: 'xf035@FontAwesome',
 			items: ['reader','summary','veliza']
@@ -30425,10 +31101,8 @@ Ext.define('Voyant.VoyantToolApp', {
 	    	    	    	var json = Ext.util.JSON.decode(response.responseText);
 	        	    		var configString = decodeURIComponent(json.storedResource.resource);
 	        	    		var config = Ext.decode(configString);
-	        	    		var tool = Ext.create({
-	        	    			xtype: me.getTool(),
-	        	    			api: config
-	        	    		});
+	        	    		config.xtype = me.getTool();
+	        	    		var tool = Ext.create(config);
 	        	    		tool.setApiParams(config);
 	        	    		container.unmask();
 	        	    		container.remove(container.down('container'));

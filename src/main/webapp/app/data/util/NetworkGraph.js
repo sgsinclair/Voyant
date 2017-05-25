@@ -16,7 +16,7 @@
 Ext.define('Voyant.data.util.NetworkGraph', {
 	alternateClassName: ["NetworkGraph"],
 	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
-	embeddable: [],
+	embeddable: ["Voyant.widget.VoyantNetworkGraph"],
 	config: {
 		
 		/**
@@ -38,7 +38,7 @@ Ext.define('Voyant.data.util.NetworkGraph', {
 		this.callParent([config]);
 	},
 	addEdge: function(edge) {
-		this.edges.push(edge);
+		this.getEdges().push(edge);
 	},
 	embed: function(cmp, config) {
 		if (!config && Ext.isObject(cmp)) {
@@ -46,43 +46,19 @@ Ext.define('Voyant.data.util.NetworkGraph', {
 			cmp = this.embeddable[0];
 		}
 		config = config || {};
-		
-		Ext.apply(config, {
-			tableJson: JSON.stringify({
-				rowkey: this.getRowKey(),
-				headers: this.getHeaders(),
-				rows: this.getRows(),
+		var json = {
+				edges: this.getEdges(),
+				nodes: this.getNodes(),
 				config: config
-			})
-		});
-		delete config.axes;
-		delete config.series;
-		
+		};
+		Ext.apply(config, {
+			jsonData: JSON.stringify(json)
+		})
 		embed.call(this, cmp, config);
-		
 	},
 	
 	getString: function(config) {
 		config = config || {};
-		var table = "<table class='voyant-table' style='"+(config.width ? ' width: '+config.width : '')+"' id='"+(config.id ? config.id : Ext.id())+"'>";
-		var headers = this.getHeaders();
-		if (headers.length) {
-			table+="<thead><tr>";
-			for (var i=0, len = headers.length; i<len; i++) {
-				table+="<th>"+headers[i]+"</th>";
-			}
-			table+="</tr></thead>";
-		}
-		table+="<tbody>";
-		for (var i=0, len = Ext.isNumber(config) ? config : this.getRows().length; i<len; i++) {
-			table+="<tr>";
-			var row = this.getRow(i);
-			row.forEach(function(cell) {
-				table+="<td>"+cell+"</td>";
-			})
-			table+="</tr>";
-		}
-		table+="</tbody></table>";
-		return table;
+		return this.getEdges().map(function(edge) {edge.source+"-"+edge.target}).join("; ");
 	}
 });

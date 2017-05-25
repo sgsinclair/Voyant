@@ -87,7 +87,7 @@ Ext.define("Voyant.notebook.util.Embed", {
 								var embeddedConfigParam = encodeURIComponent(embeddedConfigParamEncodded);
 
 								var iframeId = Ext.id();
-								var url = Voyant.application.getRelativeUrl()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/?';
+								var url = Voyant.application.getBaseUrlFull()+"tool/"+name.substring(name.lastIndexOf(".")+1)+'/?';
 								if (true || embeddedConfigParam.length>1800) {
 									show('<iframe style="'+config.style+'" id="'+iframeId+'" name="'+iframeId+'"></iframe>');
 									var dfd = Voyant.application.getDeferred(this);
@@ -122,6 +122,7 @@ Ext.define("Voyant.notebook.util.Embed", {
 					if (!isEmbedded) {
 						var embedded = Ext.create(cmp, config);
 						embedded.embed(config);
+						isEmbedded = true;
 					}
 				}
 				if (!isEmbedded) {

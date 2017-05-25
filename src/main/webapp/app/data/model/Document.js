@@ -195,7 +195,7 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getCorpusId: function() {
-    	return this.get('corpus');
+    	return this.get('corpus').getAliasOrId();
     },
     
     isPlainText: function() {
@@ -211,6 +211,10 @@ Ext.define('Voyant.data.model.Document', {
     
     show: function() {
     	show(this.getFullLabel())
+    },
+    
+    getCorpus: function() {
+    	return this.get('corpus');
     },
     
     
@@ -229,7 +233,6 @@ Ext.define('Voyant.data.model.Document', {
     },
     
     getPlainText: function(config) {
-    	debugger
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
@@ -242,6 +245,55 @@ Ext.define('Voyant.data.model.Document', {
 			return this.getText(config);
 		}
     	
+    },
+    
+    getLemmasArray: function(config) {
+    	config = config || {};
+    	config.docId = this.getId();
+		return this.getCorpus().getLemmasArray(config);
+//		if (this.then) {
+//			return Voyant.application.getDeferredNestedPromise(this, arguments);
+//		} else {
+//	    	config = config || {};
+//	    	Ext.apply(config, {
+//    			docId: this.getId()
+//	    	});
+//			return this.getCorpus().getLemmasArray(config);
+//		}
+    },
+    
+    getEntities: function(config) {
+    	config = config || {};
+    	Ext.applyIf(config, {
+    		proxy: {}
+    	});
+    	Ext.applyIf(config.proxy, {
+    		extraParams: {}
+    	})
+    	Ext.applyIf(config.proxy.extraParams, {
+    		docIndex: this.get('index')
+    	})
+		return Ext.create("Voyant.data.store.DocumentEntities", Ext.apply(config, {corpus: this.getCorpus(), docId: this.getId()}));
+    },
+    
+    loadEntities: function(config) {
+		var me = this;
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			this.getEntities().load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(records)
+					} else {
+						dfd.reject(operation.error.response);
+					}
+				}
+			})
+			return dfd.promise
+		}
     }
     
 });

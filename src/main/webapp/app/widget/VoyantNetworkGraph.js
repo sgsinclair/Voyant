@@ -10,7 +10,8 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
             jsonData: undefined,
             docId: undefined,
             docIndex: undefined,
-            json: undefined
+            json: undefined,
+            api: undefined
         }
     },
     config: {
@@ -90,6 +91,8 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
         	if (config.nodes) {
         		json.nodes = config.nodes;
         	}
+        } else if (config && config.jsonData) {
+        	json = JSON.parse(config.jsonData);
         }
         this.loadJson(json);
     },
