@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 24 17:32:45 EDT 2017 */
+/* This file created by JSCacher. Last modified: Thu May 25 11:40:13 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7673,6 +7673,9 @@ Ext.define("Voyant.notebook.util.Embed", {
 								delete config.width;
 								delete config.height;
 								
+								var corpus = embeddedParams.corpus;
+								delete embeddedParams.corpus;
+								
 		    	    	    	Ext.applyIf(embeddedParams, Voyant.application.getModifiedApiParams());
 								
 		    	    	    	
@@ -7695,6 +7698,9 @@ Ext.define("Voyant.notebook.util.Embed", {
 				    	    	    	var params = {
 				    	    	    		minimal: true,
 				    	    	    		embeddedApiId: json.storedResource.id
+				    	    	    	}
+				    	    	    	if (corpus) {
+				    	    	    		params.corpus = corpus;
 				    	    	    	}
 				    	    	    	Ext.applyIf(params, Voyant.application.getModifiedApiParams());
 				    	    	    	document.getElementById(iframeId).setAttribute("src",url+Ext.Object.toQueryString(params));
@@ -8528,6 +8534,9 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 		Ext.apply(config, {
 			proxy: {
 				type: 'ajax',
+				actionMethods: {
+					read: 'POST'
+				},
 				url: Voyant.application.getTromboneUrl(),
 				extraParams: {
 					tool: 'corpus.CA',
@@ -9626,7 +9635,7 @@ Ext.define('Voyant.data.model.Corpus', {
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization','Voyant.util.Assignable'],
     transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords','getString','getLemmasArray'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
-    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio','Voyant.panel.DocumentTerms','Voyant.panel.TermsBerry','Voyant.panel.CollocatesGraph','Voyant.panel.Contexts','Voyant.panel.WordTree','Voyant.panel.Veliza'],
+    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio','Voyant.panel.DocumentTerms','Voyant.panel.TermsBerry','Voyant.panel.CollocatesGraph','Voyant.panel.Contexts','Voyant.panel.WordTree','Voyant.panel.Veliza','Voyant.panel.ScatterPlot'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
@@ -13179,8 +13188,8 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	graphPhysics: {
     		damping: 0.4, // 0 = no damping, 1 = full damping
     		gravity: -1,  // negative = repel, positive = attract
-			springLength: 30,
-			springStrength: 1 // 0 = not strong, >1 = probably too strong
+			springLength: 10,
+			springStrength: .5 // 0 = not strong, >1 = probably too strong
     	}
     },
     constructor: function(config) {
@@ -21665,6 +21674,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		target: undefined,
     		term: undefined,
     		query: undefined,
+    		whitelist: undefined,
     		label: ['summary', 'docs', 'terms']
     	},
 		glyph: 'xf06e@FontAwesome'
@@ -21691,6 +21701,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	if (config) {
+    		if (config.whitelist) {this.setApiParam("whitelist", config.whitelist)}
+    	}
     },
     
     initComponent: function() {
@@ -22699,7 +22712,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	if (params.target != null) {
     		params.term = terms;
     	}
-
     	if (params.analysis === 'pca') {
     		this.getPcaStore().load({
 	    		params: params

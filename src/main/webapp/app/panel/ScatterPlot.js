@@ -30,6 +30,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		target: undefined,
     		term: undefined,
     		query: undefined,
+    		whitelist: undefined,
     		label: ['summary', 'docs', 'terms']
     	},
 		glyph: 'xf06e@FontAwesome'
@@ -56,6 +57,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    	if (config) {
+    		if (config.whitelist) {this.setApiParam("whitelist", config.whitelist)}
+    	}
     },
     
     initComponent: function() {
@@ -1064,7 +1068,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	if (params.target != null) {
     		params.term = terms;
     	}
-
     	if (params.analysis === 'pca') {
     		this.getPcaStore().load({
 	    		params: params

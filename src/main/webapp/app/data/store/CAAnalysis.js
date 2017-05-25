@@ -14,6 +14,9 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 		Ext.apply(config, {
 			proxy: {
 				type: 'ajax',
+				actionMethods: {
+					read: 'POST'
+				},
 				url: Voyant.application.getTromboneUrl(),
 				extraParams: {
 					tool: 'corpus.CA',

@@ -66,8 +66,8 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	graphPhysics: {
     		damping: 0.4, // 0 = no damping, 1 = full damping
     		gravity: -1,  // negative = repel, positive = attract
-			springLength: 30,
-			springStrength: 1 // 0 = not strong, >1 = probably too strong
+			springLength: 10,
+			springStrength: .5 // 0 = not strong, >1 = probably too strong
     	}
     },
     constructor: function(config) {

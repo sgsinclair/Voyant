@@ -80,6 +80,9 @@ Ext.define("Voyant.notebook.util.Embed", {
 								delete config.width;
 								delete config.height;
 								
+								var corpus = embeddedParams.corpus;
+								delete embeddedParams.corpus;
+								
 		    	    	    	Ext.applyIf(embeddedParams, Voyant.application.getModifiedApiParams());
 								
 		    	    	    	
@@ -102,6 +105,9 @@ Ext.define("Voyant.notebook.util.Embed", {
 				    	    	    	var params = {
 				    	    	    		minimal: true,
 				    	    	    		embeddedApiId: json.storedResource.id
+				    	    	    	}
+				    	    	    	if (corpus) {
+				    	    	    		params.corpus = corpus;
 				    	    	    	}
 				    	    	    	Ext.applyIf(params, Voyant.application.getModifiedApiParams());
 				    	    	    	document.getElementById(iframeId).setAttribute("src",url+Ext.Object.toQueryString(params));
