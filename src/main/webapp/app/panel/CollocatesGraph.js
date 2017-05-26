@@ -29,6 +29,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	visLayout: undefined,
     	nodes: undefined,
     	links: undefined,
+    	zoom: undefined,
     	
     	contextMenu: undefined,
     	
@@ -66,6 +67,25 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     				stroke: '#000000',
     				strokeOpacity: 0.5
     			}
+    		}
+    	},
+    	
+    	graphPhysics: {
+    		defaultMode: {
+	    		damping: 0.4, // 0 = no damping, 1 = full damping
+	    		centralGravity: 0.1, // 0 = no grav, 1 = high grav
+	    		nodeGravity: -50,  // negative = repel, positive = attract
+				springLength: 100,
+				springStrength: 0.25, // 0 = not strong, >1 = probably too strong
+				collisionScale: 1.25 // 1 = default, 0 = no collision 
+    		},
+    		centralizedMode: {
+    			damping: 0.4, // 0 = no damping, 1 = full damping
+    			centralGravity: 0.1, // 0 = no grav, 1 = high grav
+	    		nodeGravity: -1,  // negative = repel, positive = attract
+				springLength: 200,
+				springStrength: 1, // 0 = not strong, >1 = probably too strong
+				collisionScale: 1 // 1 = default, 0 = no collision 
     		}
     	}
     },
@@ -233,7 +253,12 @@ Ext.define('Voyant.panel.CollocatesGraph', {
             	
         		vis.el.dom.setAttribute('width', elWidth);
         		vis.el.dom.setAttribute('height', elHeight);
-        		this.getVisLayout().force('center', d3.forceCenter(elWidth/2, elHeight/2)).alpha(1).restart();
+        		this.getVisLayout()
+        			.force('x', d3.forceX(elWidth/2))
+	    			.force('y', d3.forceY(elHeight/2));
+//        			.alpha(0.5).restart(); // restarting physics messes up zoomToFit
+        		
+        		this.zoomToFit();
         	}
 		}, this);
         
@@ -303,6 +328,10 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	if (Ext.isArray(records)) {
     		var start = this.getApiParam('limit');
     		
+    		var el = this.getLayout().getRenderTarget();
+    		var cX = el.getWidth()/2;
+    		var cY = el.getHeight()/2;
+    		
     		var existingKeys = {};
     		this.getNodeData().forEach(function(item) {
     			existingKeys[item.id] = true;
@@ -345,7 +374,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    					type: 'keyword',
 	    					value: termValue,
 	    					start: start,
-	    					fixed: false
+	    					fixed: false,
+	    					x: cX,
+	    					y: cY
 						};
 	    				newNodes.push(termEntry);
 	    			}
@@ -364,7 +395,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         					type: 'context',
         					value: contextValue,
         					start: 0,
-        					fixed: false
+        					fixed: false,
+	    					x: cX,
+	    					y: cY
     					};
 	    				newNodes.push(contextTermEntry);
 	    			}
@@ -458,13 +491,19 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     updateNetworkMode: function(mode) {
     	if (this.getVisLayout()) {
 	    	if (mode === this.DEFAULT_MODE) {
+	    		var physics = this.getGraphPhysics().defaultMode;
 	    		this.getVisLayout()
-		    		.force('link', d3.forceLink().id(function(d) { return d.id; }).distance(30).strength(1))
-					.force('charge', d3.forceManyBody().strength(-100))
-					.force('collide', d3.forceCollide(function(d) { return Math.sqrt(d.bbox.width * d.bbox.height)*2; }));
+	    			.velocityDecay(physics.damping)
+		    		.force('link', d3.forceLink().id(function(d) { return d.id; }).distance(physics.springLength).strength(physics.springStrength))
+					.force('charge', d3.forceManyBody().strength(physics.nodeGravity))
+					.force('collide', d3.forceCollide(function(d) { return Math.sqrt(d.bbox.width * d.bbox.height) * physics.collisionScale; }));
+	    		this.getVisLayout().force('x').strength(physics.centralGravity);
+	    		this.getVisLayout().force('y').strength(physics.centralGravity);
 	    	} else {
+	    		var physics = this.getGraphPhysics().centralizedMode;
 	    		this.getVisLayout()
-		    		.force('link', d3.forceLink().id(function(d) { return d.id; }).distance(200))
+	    			.velocityDecay(physics.damping)
+		    		.force('link', d3.forceLink().id(function(d) { return d.id; }).distance(physics.springLength).strength(physics.springStrength))
 					.force('charge', d3.forceManyBody().strength(function(d) {
 						if (d.type === 'keyword') {
 							return -10000;
@@ -476,9 +515,11 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 						if (d.type === 'keyword') {
 							return d.value;
 						} else {
-							return Math.sqrt(d.bbox.width * d.bbox.height);
+							return Math.sqrt(d.bbox.width * d.bbox.height) * physics.collisionScale;
 						}
 					}));
+	    		this.getVisLayout().force('x').strength(physics.centralGravity);
+	    		this.getVisLayout().force('y').strength(physics.centralGravity);
 	    	}
     	}
     },
@@ -489,14 +530,53 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	var width = el.getWidth();
     	var height = el.getHeight();
     	
-    	this.setVisLayout(d3.forceSimulation().force('center', d3.forceCenter(width/2, height/2)));
+    	this.setVisLayout(d3.forceSimulation()
+    		.force('x', d3.forceX(width/2))
+    		.force('y', d3.forceY(height/2))
+			.on('tick', function() {
+	    		this.getLinks()
+	    			.attr('x1', function(d) { return d.source.x; })
+	    			.attr('y1', function(d) { return d.source.y; })
+	    			.attr('x2', function(d) { return d.target.x; })
+	    			.attr('y2', function(d) { return d.target.y; });
+	//    		this.getLinks().attr('d', function(d) {
+	//				return 'M' + d[0].x + ',' + d[0].y
+	//						+ 'S' + d[1].x + ',' + d[1].y
+	//						+ ' ' + d[2].x + ',' + d[2].y;
+	//			});
+	    		this.getNodes().attr('transform', function(d) {
+	    			var x = d.x;
+	    			var y = d.y;
+	    			if (this.getNetworkMode() === this.DEFAULT_MODE || d.type !== 'keyword') {
+		    			x -= d.bbox.width*0.5;
+		    			y -= d.bbox.height*0.5;
+	    			} else {
+	    				
+	    			}
+	    			return 'translate('+x+','+y+')';
+	    		}.bind(this));
+	    		
+	    		if (this.getVisLayout().alpha() < 0.075) {
+	    			this.getVisLayout().alpha(-1); // trigger end event
+	    		}
+	    	}.bind(this))
+	    	.on('end', function() {
+	    		this.zoomToFit();
+	    	}.bind(this))
+		);
     	
     	var svg = d3.select(el.dom).append('svg').attr('id',this.getVisId()).attr('class', 'linksGraph').attr('width', width).attr('height', height);
     	var g = svg.append('g');
     	
-		svg.call(d3.zoom().scaleExtent([1/4, 4]).on('zoom', function() {
-			g.attr('transform', d3.event.transform);
-		})).on('click', function() {
+    	var zoom = d3.zoom()
+    		.scaleExtent([1/4, 4])
+    		.on('zoom', function() {
+				g.attr('transform', d3.event.transform);
+			});
+    	this.setZoom(zoom);
+		svg.call(zoom);
+		
+		svg.on('click', function() {
     		this.getContextMenu().hide();
     	}.bind(this));
     	
@@ -575,7 +655,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				var menu = me.getContextMenu();
 				menu.queryById('label').setHtml(d.term);
     			menu.queryById('fixed').setChecked(d.fixed);
-				menu.showAt(d3.event.pageX+5, d3.event.pageY-50);
+				menu.showAt(d3.event.pageX+10, d3.event.pageY-50);
 			})
 			.call(d3.drag()
 				.on('start', function(d) {
@@ -666,30 +746,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	this.getVis().selectAll('line').call(this.applyLinkStyle.bind(this));
     	
     	
-    	this.getVisLayout().nodes(nodeData).on('tick', function() {
-    		me.getLinks()
-    			.attr('x1', function(d) { return d.source.x; })
-    			.attr('y1', function(d) { return d.source.y; })
-    			.attr('x2', function(d) { return d.target.x; })
-    			.attr('y2', function(d) { return d.target.y; });
-//    		me.getLinks().attr('d', function(d) {
-//				return 'M' + d[0].x + ',' + d[0].y
-//						+ 'S' + d[1].x + ',' + d[1].y
-//						+ ' ' + d[2].x + ',' + d[2].y;
-//			});
-    		me.getNodes().attr('transform', function(d) {
-    			var x = d.x;
-    			var y = d.y;
-    			if (me.getNetworkMode() === me.DEFAULT_MODE || d.type !== 'keyword') {
-	    			x -= d.bbox.width*0.5;
-	    			y -= d.bbox.height*0.5;
-    			} else {
-    				
-    			}
-    			return 'translate('+x+','+y+')';
-    		});
-    	});
-    	
+    	this.getVisLayout().nodes(nodeData);
     	this.getVisLayout().force('link').links(linkData);
     	this.getVisLayout().alpha(1).restart();
     },
@@ -697,6 +754,23 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     isOffCanvas: function(x, y) {
     	var vis = Ext.get(this.getVisId());
     	return x < 0 || y < 0 || x > vis.getWidth() || y > vis.getHeight();
+    },
+    
+    zoomToFit: function(paddingPercent, transitionDuration) {
+    	var bounds = this.getVis().node().getBBox();
+    	var width = bounds.width;
+    	var height = bounds.height;
+    	var midX = bounds.x + width/2;
+    	var midY = bounds.y + height/2;
+    	var svg = this.getVis().node().parentElement;
+    	var fullWidth = svg.clientWidth;
+    	var fullHeight = svg.clientHeight;
+    	var scale = (paddingPercent || 0.8) / Math.max(width/fullWidth, height/fullHeight);
+    	var translate = [fullWidth/2 - scale*midX, fullHeight/2 - scale*midY];
+    	d3.select(svg)
+    		.transition()
+    		.duration(transitionDuration || 500)
+    		.call(this.getZoom().transform, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale));
     },
  
     applyNodeStyle: function(sel, nodeState) {
