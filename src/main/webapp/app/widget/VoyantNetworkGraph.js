@@ -18,7 +18,7 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
         vis: undefined, // svg > g element
         visLayout: undefined, // d3 layout algorithm
         
-        // backing data, don't set through config, use config.nodes & config.edges
+        // backing data. don't set through config, use config.nodes & config.edges
         nodeData: undefined,
         edgeData: undefined,
         
@@ -28,9 +28,21 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
         currentNode: undefined,
         currentEdge: undefined,
         
-        scaleExtent: [0.25, 8],
+        zoom: undefined, // d3 zoom
+        zoomExtent: [0.25, 8],
         
         fixOnDrag: true, // fix node when dragged
+        
+        nodeScaling: {
+        	minSize: 8,
+        	maxSize: 36,
+        	scalingFunction: undefined
+        },
+        edgeScaling: {
+        	minSize: 1,
+        	maxSize: 10,
+        	scalingFunction: undefined
+        },
         
         graphStyle: {
     		node: {
@@ -65,9 +77,11 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	
     	graphPhysics: {
     		damping: 0.4, // 0 = no damping, 1 = full damping
-    		gravity: -1,  // negative = repel, positive = attract
-			springLength: 10,
-			springStrength: .5 // 0 = not strong, >1 = probably too strong
+    		centralGravity: 0.1, // 0 = no grav, 1 = high grav
+    		nodeGravity: -50,  // negative = repel, positive = attract
+			springLength: 100,
+			springStrength: 0.25, // 0 = not strong, >1 = probably too strong
+			collisionScale: 1.25 // 1 = default, 0 = no collision 
     	}
     },
     constructor: function(config) {
@@ -111,8 +125,12 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
                 vis.dom.setAttribute('width', elWidth);
                 vis.dom.setAttribute('height', elHeight);
                 this.getVisLayout()
-                    .force('center', d3.forceCenter(elWidth/2, elHeight/2))
-                    .alpha(0.3).restart();
+                    .force('x', d3.forceX(elWidth/2))
+	    			.force('y', d3.forceY(elHeight/2));
+                
+                if (this.getVisLayout().alpha() < 0.075) {
+                	this.getVisLayout().alpha(-1); // trigger end/zoomToFit
+                }
             }
         }, this);
         
@@ -148,8 +166,13 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
                 });
             }, this);
             json.nodes.forEach(function(node) {
-                Ext.applyIf(node, {value: wordFreq[node.term]});
+            	var val = wordFreq[node.term] === undefined ? 1 : wordFreq[node.term];
+                Ext.applyIf(node, {value: val});
             });
+        } else {
+        	json.nodes.forEach(function(node) {
+        		Ext.applyIf(node, {value: 1});
+        	});
         }
         
         return json;
@@ -322,10 +345,11 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
         var physics = this.getGraphPhysics();
         this.setVisLayout(d3.forceSimulation()
         	.velocityDecay(physics.damping)
-    		.force('center', d3.forceCenter(width/2, height/2))
+    		.force('x', d3.forceX(width/2).strength(physics.centralGravity))
+    		.force('y', d3.forceY(height/2).strength(physics.centralGravity))
             .force('link', d3.forceLink().id(function(d) { return d.id; }).distance(physics.springLength).strength(physics.springStrength))
-            .force('charge', d3.forceManyBody().strength(physics.gravity))
-            .force('collide', d3.forceCollide().radius(function(d) { return Math.sqrt(d.bbox.width * d.bbox.height)*2; }))
+            .force('charge', d3.forceManyBody().strength(physics.nodeGravity))
+            .force('collide', d3.forceCollide().radius(function(d) { return Math.sqrt(d.bbox.width * d.bbox.height)*physics.collisionScale; }))
             .on('tick', function() {
             	 this.getEdgeSelection()
 	                .attr('x1', function(d) { return d.source.x; })
@@ -339,15 +363,26 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
             	 		var y = d.y - d.bbox.height*0.5;
             	 		return 'translate('+x+','+y+')';
         	 		});
-	        }.bind(this)
-        ));
+            	 
+            	 if (this.getVisLayout().alpha() < 0.075) {
+ 	    			this.getVisLayout().alpha(-1); // trigger end event
+ 	    		}
+	        }.bind(this))
+	        .on('end', function() {
+	    		this.zoomToFit();
+	    	}.bind(this))
+        );
         
         var svg = d3.select(el.dom).append('svg').attr('width', width).attr('height', height);
         var g = svg.append('g');
         
-        svg.call(d3.zoom().scaleExtent(this.getScaleExtent()).on('zoom', function() {
-            g.attr('transform', d3.event.transform);
-        }));
+        var zoom = d3.zoom()
+		.scaleExtent(this.getZoomExtent())
+		.on('zoom', function() {
+			g.attr('transform', d3.event.transform);
+		});
+		this.setZoom(zoom);
+		svg.call(zoom);
         
         this.setEdgeSelection(g.append('g').attr('class', 'edges').selectAll('.edge'));
         this.setNodeSelection(g.append('g').attr('class', 'nodes').selectAll('.node'));
@@ -366,12 +401,28 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
         var edgeData = this.getEdgeData();
         var nodeData = this.getNodeData();
         
+        var nodeExtent = d3.extent(nodeData, function(d) { return d.value; });
+        var nodeSum = d3.sum(nodeData, function(d) { return d.value; });
+        var edgeExtent = d3.extent(edgeData, function(d) { return d.value; });
+        var edgeSum = d3.sum(edgeData, function(d) { return d.value; });
+
+        var edgeScaling = this.getEdgeScaling();
+        if (edgeScaling.scalingFunction === undefined) {
+        	edgeScaling.scalingFunction = d3.scaleLinear().domain(edgeExtent).range([edgeScaling.minSize, edgeScaling.maxSize]);
+        }
+        
+        var nodeScaling = this.getNodeScaling();
+        if (nodeScaling.scalingFunction === undefined) {
+        	nodeScaling.scalingFunction = d3.scaleLog().domain(nodeExtent).range([nodeScaling.minSize, nodeScaling.maxSize]);
+        }
+        
         var edge = this.getEdgeSelection().data(edgeData, function(d) { return d.id; });
         edge.exit().remove();
         var edgeEnter = edge.enter().append('line')
         	.attr('class', 'edge')
         	.attr('id', function(d) { return d.id; })
         	.style('cursor', 'pointer')
+        	.style('stroke-width', function(d) { return edgeScaling.scalingFunction(d.value); })
         	.on('mouseover', this.edgeMouseOver.bind(this))
             .on('mouseout', this.edgeMouseOut.bind(this))
         	.on('click', function(d) {
@@ -402,6 +453,11 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 				d3.event.preventDefault();
 				this.fireEvent('nodedblclicked', this, d);
 			}.bind(this))
+			.on('contextmenu', function(d) {
+				d3.event.stopImmediatePropagation();
+				d3.event.preventDefault();
+				this.fireEvent('nodecontextclicked', this, d);
+			}.bind(this))
             .call(d3.drag()
                 .on('start', function(d) {
                     if (!d3.event.active) this.getVisLayout().alphaTarget(0.3).restart();
@@ -409,7 +465,7 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 	                    d.fx = d.x;
 	                    d.fy = d.y;
                     }
-                    this.fireEvent('dragstart', this, d);
+                    this.fireEvent('nodedragstart', this, d);
             	}.bind(this))
                 .on('drag', function(d) {
                 	if (this.getFixOnDrag()) {
@@ -419,32 +475,20 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
                 		d.x = d3.event.x;
                 		d.y = d3.event.y;
                 	}
-                    this.fireEvent('drag', this, d);
+                    this.fireEvent('nodedrag', this, d);
                 }.bind(this))
                 .on('end', function(d) {
                 	if (!d3.event.active) this.getVisLayout().alphaTarget(0);
-                	this.fireEvent('dragend', this, d);
+                	this.fireEvent('nodedragend', this, d);
                 }.bind(this))
             );
 
         nodeEnter.append('rect');
-        
-        var vals = nodeData.map(function(d) {
-            var val = d.value;
-            if (d.value == undefined) {
-                d.value = val = 1;
-            }
-            return val;
-        });
-        vals.sort();
-        var fontscale = d3.scaleLog()
-            .domain([vals[0], vals[vals.length-1]])
-            .range([8, 36]);
                 
         nodeEnter.append('text')
             .text(function(d) { return d.term; })
 //            .attr('font-family', function(d) { return this.getApplication().getFeatureForTerm('font', d.term); }.bind(this))
-            .attr('font-size', function(d) {return fontscale(d.value)+'px';})
+            .attr('font-size', function(d) {return nodeScaling.scalingFunction(d.value)+'px';})
 //            .attr('text-anchor', 'middle')
 			.attr('alignment-baseline', 'middle')
 			.style('user-select', 'none')
@@ -471,6 +515,32 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
         this.getVisLayout().alpha(1).restart();
     },
     
+    zoomToFit: function(paddingPercent, transitionDuration) {
+    	var bounds = this.getVis().node().getBBox();
+    	var width = bounds.width;
+    	var height = bounds.height;
+    	var midX = bounds.x + width/2;
+    	var midY = bounds.y + height/2;
+    	var svg = this.getVis().node().parentElement;
+    	var fullWidth = svg.clientWidth;
+    	var fullHeight = svg.clientHeight;
+    	var scale = (paddingPercent || 0.8) / Math.max(width/fullWidth, height/fullHeight);
+    	var translate = [fullWidth/2 - scale*midX, fullHeight/2 - scale*midY];
+    	d3.select(svg)
+    		.transition()
+    		.duration(transitionDuration || 500)
+    		.call(this.getZoom().transform, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale));
+    },
+    
+    nodeScaling: function(min, max, total, value) {
+    	if (min === max) {
+    		return 0.5;
+    	} else {
+    		var scale = 1 / (max - min);
+    		return Math.max(0, (value-min)*scale);
+    	}
+    },
+    
     applyNodeStyle: function(sel, nodeState) {
 		var state = nodeState === undefined ? 'normal' : nodeState;
 		var style = this.getGraphStyle().node[state];
@@ -486,8 +556,8 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	var state = edgeState === undefined ? 'normal' : edgeState;
     	var style = this.getGraphStyle().edge[state];
     	sel.style('stroke', function(d) { return style.stroke; }.bind(this))
-	    	.style('stroke-opacity', function(d) { return style.strokeOpacity; }.bind(this))
-	    	.style('stroke-width', function(d) { return style.strokeWidth; }.bind(this));
+	    	.style('stroke-opacity', function(d) { return style.strokeOpacity; }.bind(this));
+//	    	.style('stroke-width', function(d) { return style.strokeWidth; }.bind(this));
     },
 
     edgeMouseOver: function(d) {
