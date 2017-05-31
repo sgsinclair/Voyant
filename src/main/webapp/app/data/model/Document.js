@@ -180,7 +180,7 @@ Ext.define('Voyant.data.model.Document', {
     
     getShortLabel: function() {
     	var author = this.getAuthor(25);
-    	return (parseInt(this.getIndex())+1) + ') <i>' + this.getShortTitle() + (author ? "</i> ("+author+")" : '')
+    	return (parseInt(this.getIndex())+1) + ') <i>' + this.getShortTitle() + "</i>" +(author ? " ("+author+")" : '')
     },
     
     getTinyLabel: function() {

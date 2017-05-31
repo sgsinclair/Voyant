@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu May 25 11:40:13 EDT 2017 */
+/* This file created by JSCacher. Last modified: Tue May 30 21:00:56 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8063,7 +8063,7 @@ Ext.define('Voyant.data.model.Document', {
     
     getShortLabel: function() {
     	var author = this.getAuthor(25);
-    	return (parseInt(this.getIndex())+1) + ') <i>' + this.getShortTitle() + (author ? "</i> ("+author+")" : '')
+    	return (parseInt(this.getIndex())+1) + ') <i>' + this.getShortTitle() + "</i>" +(author ? " ("+author+")" : '')
     },
     
     getTinyLabel: function() {
@@ -9256,6 +9256,7 @@ Ext.define('Voyant.data.table.Table', {
 		this.callParent();
 	},
 	addRow: function(row) {
+		if (Ext.isArray(row))
 		if (Ext.isObject(row)) {
 			var len = this.getRows().length;
 			for (var key in row) {
@@ -9264,6 +9265,10 @@ Ext.define('Voyant.data.table.Table', {
 			
 		} else if (Ext.isArray(row)) {
 			this.getRows().push(row);
+			var header = this.getColumnIndex(this.getRowKey());
+			if (header!==undefined && row[header]!==undefined) {
+				this.getRowsMap()[row[header]] = this.getRows().length-1;
+			}
 		}
 	},
 	eachRecord: function(fn, scope) {
@@ -9285,15 +9290,16 @@ Ext.define('Voyant.data.table.Table', {
 		}
 	},
 	getRow: function(index, asMap) {
+		var r = this.getRowIndex(index);
 		if (asMap) {
 			var row = {};
 			var headers = this.getHeaders();
-			Ext.Array.from(this.getRows()[index]).forEach(function(item, i) {
+			Ext.Array.from(this.getRows()[r]).forEach(function(item, i) {
 				row[headers[i] || i] = item;
 			}, this);
 			return row;
 		} else {
-			return this.getRows()[index];
+			return this.getRows()[r];
 		}
 	},
 	getRecord: function(index) {
@@ -9328,6 +9334,10 @@ Ext.define('Voyant.data.table.Table', {
 		if (rows[r]===undefined) {rows[r]=[]}
 		if (rows[r][c]===undefined || replace) {rows[r][c]=value}
 		else {rows[r][c]+=value}
+		// add to rowsMap if this is the header
+		if (this.getHeaders()[c]===this.getRowKey()) {
+			this.getRowsMap()[column] = r;
+		}
 	},
 	
 	getRowIndex: function(key) {
@@ -9467,6 +9477,7 @@ Ext.define('Voyant.data.table.Table', {
 		config = config || {};
 		
 		var columnHeaders = Ext.Array.from(config.headers || this.getHeaders()).map(function(header) {return this.getColumnHeader(header);}, this);
+		
 		var json = {
 				rowkey: this.getRowKey(),
 				config: config,
@@ -9502,7 +9513,9 @@ Ext.define('Voyant.data.table.Table', {
 		var tsv = this.getHeaders().join("\t");
 		this.getRows().forEach(function(row, i) {
 			if (config && Ext.isNumber(config) && i>config) {return;}
-			tsv += "\n"+row.map(function(cell) {return cell.replace(/(\n|\t)/g, "")}).join("\t");
+			tsv += "\n"+row.map(function(cell) {
+				return Ext.isString(cell) ? cell.replace(/(\n|\t)/g, "") : cell;
+			}).join("\t");
 		})
 		return tsv;
 	},
@@ -9572,8 +9585,13 @@ Ext.define('Voyant.data.util.NetworkGraph', {
 		this.setNodes(Ext.Array.from(config.nodes));
 		this.callParent([config]);
 	},
-	addEdge: function(edge) {
-		this.getEdges().push(edge);
+	addEdge: function(src, target, value) {
+		this.getEdges().push(Ext.isObject(src) ? src : {source: src, target: target, value: value});
+	},
+	getNode: function(term) {
+		return Ext.Array.binarySearch(this.getNodes(), term, undefined, undefined, function(lhs, rhs) {
+			return (lhs.term < rhs.term) ? -1 : ((lhs.term > rhs.term) ? 1 : 0);
+		})
 	},
 	embed: function(cmp, config) {
 		if (!config && Ext.isObject(cmp)) {
@@ -9586,6 +9604,21 @@ Ext.define('Voyant.data.util.NetworkGraph', {
 				nodes: this.getNodes(),
 				config: config
 		};
+		if (config.limit && json.edges.length>config.limit) {
+			json.edges = json.edges.slice(0, config.limit);
+			var terms = {};
+			json.edges.forEach(function(edge) {
+				terms["_"+edge.source] = true;
+				terms["_"+edge.target] = true;
+			})
+			var nodes = [];
+			json.nodes.forEach(function(node) {
+				if ("_"+node.term in terms) {
+					nodes.push(node);
+				}
+			});
+			json.nodes = nodes;
+		}
 		Ext.apply(config, {
 			jsonData: JSON.stringify(json)
 		})
@@ -11962,7 +11995,10 @@ Ext.define('Voyant.widget.VoyantChart', {
     	config = config || {};
     	var me = this;
     	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	if (this.getApiParam('tableJson')) {
+    	if ("tableJson" in config) {
+    		Ext.apply(config, this.getConfigFromTableJson(config.tableJson));
+    	}
+    	else if (this.getApiParam('tableJson')) {
     		Ext.apply(config, this.getConfigFromTableJson());
     	}
     	this.callParent(arguments)
@@ -11972,8 +12008,8 @@ Ext.define('Voyant.widget.VoyantChart', {
     	this.callParent(arguments)
     },
     
-    getConfigFromTableJson: function() {
-    	var jsonString = this.getApiParam('tableJson');
+    getConfigFromTableJson: function(jsonString) {
+    	jsonString = jsonString || this.getApiParam('tableJson');
     	if (!jsonString) {return {}};
     	
 		var json = JSON.parse(jsonString);
@@ -30200,13 +30236,12 @@ Ext.define('Voyant.notebook.Notebook', {
     	var metadata = this.getMetadata();
     	Ext.applyIf(metadata, {
     		created: new Date().getTime(),
-    		modified: new Date().getTime(),
-    		version: this.getVersion(),
-    		url: window.location.href
+    		version: this.getVersion()
     	})
     	Ext.apply(metadata, {
-    		modified: new Date().getTime()
-    	})
+    		modified: new Date().getTime(),
+    		url: window.location.href
+    	});
     	
     	return {
     		metadata: metadata,

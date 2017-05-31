@@ -568,7 +568,8 @@ Ext.define('Voyant.notebook.Notebook', {
     	     url: this.getTromboneUrl(),
     	     params: {
     	    	 tool: 'notebook.NotebookManager',
-    	    	 notebook: url
+    	    	 notebook: url,
+    	    	 noCache: true // make sure we load most recent
     	     },
     	     scope: this
     	 }).then(function(response, opts) {
@@ -784,13 +785,12 @@ Ext.define('Voyant.notebook.Notebook', {
     	var metadata = this.getMetadata();
     	Ext.applyIf(metadata, {
     		created: new Date().getTime(),
-    		modified: new Date().getTime(),
-    		version: this.getVersion(),
-    		url: window.location.href
+    		version: this.getVersion()
     	})
     	Ext.apply(metadata, {
-    		modified: new Date().getTime()
-    	})
+    		modified: new Date().getTime(),
+    		url: window.location.href
+    	});
     	
     	return {
     		metadata: metadata,

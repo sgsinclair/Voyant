@@ -13,7 +13,10 @@ Ext.define('Voyant.widget.VoyantChart', {
     	config = config || {};
     	var me = this;
     	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	if (this.getApiParam('tableJson')) {
+    	if ("tableJson" in config) {
+    		Ext.apply(config, this.getConfigFromTableJson(config.tableJson));
+    	}
+    	else if (this.getApiParam('tableJson')) {
     		Ext.apply(config, this.getConfigFromTableJson());
     	}
     	this.callParent(arguments)
@@ -23,8 +26,8 @@ Ext.define('Voyant.widget.VoyantChart', {
     	this.callParent(arguments)
     },
     
-    getConfigFromTableJson: function() {
-    	var jsonString = this.getApiParam('tableJson');
+    getConfigFromTableJson: function(jsonString) {
+    	jsonString = jsonString || this.getApiParam('tableJson');
     	if (!jsonString) {return {}};
     	
 		var json = JSON.parse(jsonString);

@@ -37,8 +37,13 @@ Ext.define('Voyant.data.util.NetworkGraph', {
 		this.setNodes(Ext.Array.from(config.nodes));
 		this.callParent([config]);
 	},
-	addEdge: function(edge) {
-		this.getEdges().push(edge);
+	addEdge: function(src, target, value) {
+		this.getEdges().push(Ext.isObject(src) ? src : {source: src, target: target, value: value});
+	},
+	getNode: function(term) {
+		return Ext.Array.binarySearch(this.getNodes(), term, undefined, undefined, function(lhs, rhs) {
+			return (lhs.term < rhs.term) ? -1 : ((lhs.term > rhs.term) ? 1 : 0);
+		})
 	},
 	embed: function(cmp, config) {
 		if (!config && Ext.isObject(cmp)) {
@@ -51,6 +56,21 @@ Ext.define('Voyant.data.util.NetworkGraph', {
 				nodes: this.getNodes(),
 				config: config
 		};
+		if (config.limit && json.edges.length>config.limit) {
+			json.edges = json.edges.slice(0, config.limit);
+			var terms = {};
+			json.edges.forEach(function(edge) {
+				terms["_"+edge.source] = true;
+				terms["_"+edge.target] = true;
+			})
+			var nodes = [];
+			json.nodes.forEach(function(node) {
+				if ("_"+node.term in terms) {
+					nodes.push(node);
+				}
+			});
+			json.nodes = nodes;
+		}
 		Ext.apply(config, {
 			jsonData: JSON.stringify(json)
 		})
