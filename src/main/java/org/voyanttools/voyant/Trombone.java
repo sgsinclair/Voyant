@@ -206,6 +206,7 @@ public class Trombone extends HttpServlet {
 			InputStream is = null;
 			try {
 				is = c.getInputStream();
+				c.setReadTimeout(60000);
 				resp.setContentType(c.getContentType());
 //				if (parameters.containsKey("format")) {
 //					String format = parameters.getParameterValue("format").toUpperCase();
@@ -232,6 +233,7 @@ public class Trombone extends HttpServlet {
 				url = new URL(parameters.getParameterValue("fetchJSON").replaceAll(" ", "+"));
 				System.out.println(url);
 				c = url.openConnection();
+				c.setReadTimeout(0);
 			}
 			catch (MalformedURLException e) {
 				throw new IllegalArgumentException("Attempt to use a malformed URL: "+parameters.getParameterValue("fetchJSON"), e);
@@ -245,6 +247,7 @@ public class Trombone extends HttpServlet {
 				//application/json
 				resp.setContentType("application/json;charset=UTF-8");
 				IOUtils.copy(is, resp.getWriter());
+				resp.flushBuffer();
 			}
 			finally {
 				if (is!=null) {

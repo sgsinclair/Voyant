@@ -95,9 +95,11 @@ Ext.define('Voyant.notebook.Notebook', {
        		     url: Voyant.application.getTromboneUrl(),
     		     params: {
     		    	 fetchData: url
-    		     }
+    		     },
+    		     scope: this
     		}
     		if (config && config.format) {params.format = config.format}
+    		if (config && "timeout" in config) {params.timeout = config.timeout}
     		Ext.Ajax.request(params).then(function(response, opts) {
     			 if (config && config.format) {
     				 if (config.format.toLowerCase()=='json') {
@@ -111,8 +113,9 @@ Ext.define('Voyant.notebook.Notebook', {
     			 dfd.resolve(response.responseText);
     		 },
     		 function(response, opts) {
-    			 dfd.reject(response.responseText);
+    			 Voyant.application.showResponseError((response.statusText=="communication failure" ? "Unable to load data, the connection timedout." : "Unable to load data"), response); // can't seem to scope right
     		     console.log('server-side failure with status code ' + response.status);
+    			 dfd.reject(response.responseText);
     		 });
     		
     		return dfd.promise;
