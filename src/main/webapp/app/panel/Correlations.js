@@ -5,6 +5,7 @@ Ext.define('Voyant.panel.Correlations', {
     statics: {
     	i18n: {
     		title: "Correlations",
+    		helpTip: "The Correlations tool enables an exploration of the extent to which term frequencies vary in sync (terms whose frequencies rise and fall together or inversely).",
     		sourceTip: "Term 1 (the pairing is what matters, not the column)",
     		targetTip: "Term 2 (the pairing is what matters, not the column)",
     		trendTip: "This represents the relative frequencies of the term.",

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed May 31 16:29:50 EDT 2017 */
+/* This file created by JSCacher. Last modified: Mon Jun 05 10:24:59 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -10749,7 +10749,6 @@ Ext.define('Voyant.widget.CorpusSelector', {
         store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]]
     },*/
     initComponent: function(config) {
-    	debugger
     	var me = this;
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
     	Ext.applyIf(this, {
@@ -10774,7 +10773,6 @@ Ext.define('Voyant.widget.CorpusSelector', {
     
     replaceStoreItemsFromDefinition: function(definition) {
     	var data = [], items = definition.split(";");
-    	debugger
     	for (var i=0; i<items.length; i++) {
     		var nameValue = items[i].split(":");
     		if (nameValue[0]) {
@@ -17113,6 +17111,7 @@ Ext.define('Voyant.panel.Correlations', {
     statics: {
     	i18n: {
     		title: "Correlations",
+    		helpTip: "The Correlations tool enables an exploration of the extent to which term frequencies vary in sync (terms whose frequencies rise and fall together or inversely).",
     		sourceTip: "Term 1 (the pairing is what matters, not the column)",
     		targetTip: "Term 2 (the pairing is what matters, not the column)",
     		trendTip: "This represents the relative frequencies of the term.",
@@ -24684,7 +24683,10 @@ Ext.define('Voyant.panel.TermsBerry', {
     },
     
     resetVis: function() {
-    	this.getVis().selectAll('.node').remove();
+    	var vis = this.getVis();
+    	if (vis) {
+        	vis.selectAll('.node').remove();
+    	}
     },
     
     getTopTerms: function(query) {
@@ -24850,6 +24852,8 @@ Ext.define('Voyant.panel.TermsBerry', {
     buildVisFromData: function(data) {
     	var me = this;
     	
+    	if (!this.getVis()) {return;} // not initialized
+    	
     	var rootId = '$$$root$$$';
     	data.push({term: rootId, collocates:[], rawFreq:1});
     	var root = d3.stratify()
@@ -24860,7 +24864,9 @@ Ext.define('Voyant.panel.TermsBerry', {
 			})(data)
 			.sort(function(a, b) { return a.rawFreq < b.rawFreq ? 1 : a.rawFreq > b.rawFreq ? -1 : 0; })
 			.sum(function(d) { return Math.pow(d.rawFreq, 1/me.getScalingFactor()); });
-    	this.getVisLayout()(root);
+    	if (this.getVisLayout()) {
+        	this.getVisLayout()(root);
+    	}
     	
     	// join nodes with data
     	var nodes = this.getVis().selectAll('.node').data(root.descendants());
@@ -26646,6 +26652,8 @@ Ext.define('Voyant.panel.CorpusSet', {
     	tabBarHeaderPosition: 0,
         items: [{
 	        xtype: 'reader' // termsradio added and set to default during loadedCorpus below when in non-consumptive mode
+        },{
+	        xtype: 'termsberry'
         }]
     }, {
     	region: 'east',
@@ -26696,6 +26704,8 @@ Ext.define('Voyant.panel.CorpusSet', {
 	    			xtype: 'contexts'
     			},{
 	    			xtype: 'bubblelines' // is set to default during loadedCorpus below when in non-consumptive mode
+    			},{
+	    			xtype: 'correlations'
     			}]
     	}]
     }],
@@ -26750,7 +26760,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     	loadedCorpus: function(src, corpus) {
     		if (this.hasCorpusAccess(corpus)==false && !this.getApiParam('panels')) {
     			var tabpanels = this.query("voyanttabpanel");
-    			tabpanels[1].add({xtype: 'termsradio'}); // reader
+//    			tabpanels[1].add({xtype: 'termsradio'}); // reader
     			tabpanels[1].setActiveTab(1); // reader
     			tabpanels[1].getActiveTab().fireEvent("loadedCorpus", src, corpus); // make sure to load corpus
     			tabpanels[4].setActiveTab(1); // contexts

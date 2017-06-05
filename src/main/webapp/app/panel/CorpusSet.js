@@ -41,6 +41,8 @@ Ext.define('Voyant.panel.CorpusSet', {
     	tabBarHeaderPosition: 0,
         items: [{
 	        xtype: 'reader' // termsradio added and set to default during loadedCorpus below when in non-consumptive mode
+        },{
+	        xtype: 'termsberry'
         }]
     }, {
     	region: 'east',
@@ -91,6 +93,8 @@ Ext.define('Voyant.panel.CorpusSet', {
 	    			xtype: 'contexts'
     			},{
 	    			xtype: 'bubblelines' // is set to default during loadedCorpus below when in non-consumptive mode
+    			},{
+	    			xtype: 'correlations'
     			}]
     	}]
     }],
@@ -145,7 +149,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     	loadedCorpus: function(src, corpus) {
     		if (this.hasCorpusAccess(corpus)==false && !this.getApiParam('panels')) {
     			var tabpanels = this.query("voyanttabpanel");
-    			tabpanels[1].add({xtype: 'termsradio'}); // reader
+//    			tabpanels[1].add({xtype: 'termsradio'}); // reader
     			tabpanels[1].setActiveTab(1); // reader
     			tabpanels[1].getActiveTab().fireEvent("loadedCorpus", src, corpus); // make sure to load corpus
     			tabpanels[4].setActiveTab(1); // contexts

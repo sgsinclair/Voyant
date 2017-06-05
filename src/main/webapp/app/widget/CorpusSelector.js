@@ -20,7 +20,6 @@ Ext.define('Voyant.widget.CorpusSelector', {
         store:[['shakespeare',"Shakespeare's Plays"],['austen',"Austen's Novels"]]
     },*/
     initComponent: function(config) {
-    	debugger
     	var me = this;
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
     	Ext.applyIf(this, {
@@ -45,7 +44,6 @@ Ext.define('Voyant.widget.CorpusSelector', {
     
     replaceStoreItemsFromDefinition: function(definition) {
     	var data = [], items = definition.split(";");
-    	debugger
     	for (var i=0; i<items.length; i++) {
     		var nameValue = items[i].split(":");
     		if (nameValue[0]) {

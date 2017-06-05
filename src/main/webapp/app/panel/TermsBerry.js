@@ -265,7 +265,10 @@ Ext.define('Voyant.panel.TermsBerry', {
     },
     
     resetVis: function() {
-    	this.getVis().selectAll('.node').remove();
+    	var vis = this.getVis();
+    	if (vis) {
+        	vis.selectAll('.node').remove();
+    	}
     },
     
     getTopTerms: function(query) {
@@ -430,6 +433,8 @@ Ext.define('Voyant.panel.TermsBerry', {
     
     buildVisFromData: function(data) {
     	var me = this;
+    	
+    	if (!this.getVis()) {return;} // not initialized
     	
     	var rootId = '$$$root$$$';
     	data.push({term: rootId, collocates:[], rawFreq:1});
