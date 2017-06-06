@@ -101,8 +101,9 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 			baseUrl: '<%= base %>/',
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>',
-			allowInput: '<%= System.getProperty("org.voyanttools.server.allowinput")==null ? "" : System.getProperty("org.voyanttools.server.allowinput") %>'			
+			allowInput: '<%= System.getProperty("org.voyanttools.server.allowinput")==null ? "" : System.getProperty("org.voyanttools.server.allowinput") %>'
 		}
 	});
 </script>
+<title>Spiral</title>
 <%@ include file="../../resources/jsp/post_app.jsp" %>

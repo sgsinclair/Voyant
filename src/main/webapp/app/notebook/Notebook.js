@@ -186,7 +186,7 @@ Ext.define('Voyant.notebook.Notebook', {
     constructor: function(config) {
     	config = config || {};
     	var me = this;
-    	var libs = ["Corpus"];
+    	var libs = ["Corpus","Notebook","NetworkGraph","VoyantTable"];
     	this.docsLoading = libs.length;
     	libs.forEach(function(lib) {
     		 Ext.Ajax.request({
@@ -240,7 +240,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			    	     if (data && data.notebook && data.notebook.notebook) {
     			    	    	 var url = me.getBaseUrl()+"spiral/"+data.notebook.notebook;
     			    	    	 var params = me.getApplication().getModifiedApiParams();
-    			    	    	 if (params) {
+    			    	    	 if (Object.keys(params).length>0) {
     			    	    		 url += "?"+Ext.Object.toQueryString(params);
     			    	    	 }
     			    	    	 window.history.pushState({
@@ -407,7 +407,8 @@ Ext.define('Voyant.notebook.Notebook', {
     	}
     	else {
     		var url = location.href.replace(location.hash,"").replace(location.search,''),
-    			url = url.substring(url.indexOf("/spiral/")+8), // grab after notebook
+    			url = url.substring(url.indexOf("/spiral/")+8); // grab after notebook
+    			if (url.charAt(url.length-1)=="?") {url = url.substring(0, url.length-1);}
     			urlParts = url.split("/"), notebook = urlParts.shift();
     		if (notebook && urlParts.length>1 && url.charAt(url.length-1)=='/') {url = url.slice(0, -1);} // remove trailing
     		if (!notebook || notebook=="new") {
@@ -417,11 +418,12 @@ Ext.define('Voyant.notebook.Notebook', {
 				return this.loadFromUrl(url, isRun);
     		} else {
     			// special compilation of a notebook series
-    			if (url=='alta/' && queryParams && queryParams.all && queryParams.all=='true') {
-        			this.loadFromUrl('alta/Start', isRun);
-        			this.loadFromUrl('alta/Create', isRun);
-        			this.loadFromUrl('alta/SmallerCorpus', isRun);
-        			this.loadFromUrl('alta/Tables', isRun);
+    			if (url=='alta' && queryParams && queryParams.all && queryParams.all=='true') {
+        			this.loadFromUrl('alta-start', isRun);
+        			this.loadFromUrl('alta-create', isRun);
+        			this.loadFromUrl('alta-smaller', isRun);
+        			this.loadFromUrl('alta-tables', isRun);
+        			this.loadFromUrl('alta-scale', isRun);
     			} else {
     				if (url.indexOf("/")==-1) { // assume stored resource, which means no .json in resources/spiral (but subdirectory is ok)
     	    			if (this.getSaveItTool()) {this.getSaveItTool().setVisible(true);}
@@ -574,6 +576,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	    	 notebook: url,
     	    	 noCache: true // make sure we load most recent
     	     },
+    	     timeout: 60000,
     	     scope: this
     	 }).then(function(response, opts) {
     		 me.unmask();
@@ -607,12 +610,12 @@ Ext.define('Voyant.notebook.Notebook', {
         	    	 noCache: true,
         	    	 failQuietly: true
         	     },
+        	     timeout: 60000,
         	     scope: me
         	 }).then(function(response, opts) {
         	     var data = Ext.decode(response.responseText);
         		 var json = me.getBlocksFromString(data.notebook.jsonData);
-        		 json.metadata = json.metadata || {};
-        		 if (json.metadata.modified>me.getMetadata().modified) {
+        		 if (json && "metadata" in json && "modified" in json.metadata && json.metadata.modified>me.getMetadata().modified) {
     	    		 return Ext.Msg.confirm(me.localize('autoSaveAvailableTitle'), me.localize('autoSaveAvailable'), function(btn) {
     	    			 if (btn=='yes') {
     	    				 me.removeAll();

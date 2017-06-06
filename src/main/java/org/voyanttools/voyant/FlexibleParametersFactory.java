@@ -70,6 +70,7 @@ public class FlexibleParametersFactory {
 		final FlexibleParameters parameters = new FlexibleParameters();
 		parameters.setParameter("VOYANT_VERSION", version!=null ? version : "");
 		parameters.setParameter("VOYANT_BUILD", build!=null ? build : "");
+		parameters.setParameter("VOYANT_REMOTE_ID", request.getHeader("X-FORWARDED-FOR")!=null ? request.getHeader("X-FORWARDED-FOR") : request.getRemoteAddr());
 
 		final HttpParametersDecoder parametersDecoder = new HttpParametersDecoder(parameters);
 		
