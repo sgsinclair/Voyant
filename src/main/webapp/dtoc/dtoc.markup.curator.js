@@ -290,5 +290,25 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 			}
 			if (callback) callback.call(this, tagData);
 		}.createDelegate(this));
+	},
+	
+	_getDocumentXml: function(docId, callback) {
+		var params = {
+			tool: 'corpus.DocumentTokens',
+			corpus: this.getCorpus().getId(),
+			docId: docId,
+			template: 'docTokensPlusStructure2html',
+			outputFormat: 'html',
+			limit: 0
+		};
+		Ext.Ajax.request({
+           url: this.getTromboneUrl(),
+           params: params,
+           success: function(response, options) {
+				if (callback) callback(response.responseXML);
+           },
+           scope: this
+        });
 	}
+
 });

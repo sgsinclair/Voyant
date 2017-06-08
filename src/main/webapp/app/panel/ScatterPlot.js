@@ -55,6 +55,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     docFreqTipTemplate: null,
     
     constructor: function(config) {
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	if (config) {

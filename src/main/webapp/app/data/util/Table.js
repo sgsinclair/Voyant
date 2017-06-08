@@ -365,6 +365,35 @@ Ext.define('Voyant.data.table.Table', {
 		return this;
 	},
 	
+	loadCorrespondenceAnalysis: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+	    	config = config || {};
+			var dfd = Voyant.application.getDeferred(this);
+			Ext.apply(config, {
+		        columnHeaders: true,
+		        rowHeaders: true,
+		        tool: 'corpus.CA',
+		        analysisInput: table.toTsv(),
+		        inputFormat: 'tsv'				
+			});
+			var ca = Ext.create("Voyant.data.store.CAAnalysis", {noCorpus: true});
+			ca.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(ca, records)
+					} else {
+						dfd.reject(operation.error.response);
+					}
+				}
+			})
+			return dfd.promise
+		}
+		
+	},
+	
 	embed: function(cmp, config) {
 		if (!config && Ext.isObject(cmp)) {
 			config = cmp;

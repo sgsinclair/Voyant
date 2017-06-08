@@ -30,6 +30,7 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 		         simpleSortMode: true
 			 }
 		});
+		if (config.noCorpus) {delete config.proxy.extraParams.corpus;}
 		
 		this.callParent([config]);
 

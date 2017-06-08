@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Jun 06 12:47:33 EDT 2017 */
+/* This file created by JSCacher. Last modified: Thu Jun 08 14:55:49 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8550,6 +8550,7 @@ Ext.define('Voyant.data.store.CAAnalysis', {
 		         simpleSortMode: true
 			 }
 		});
+		if (config.noCorpus) {delete config.proxy.extraParams.corpus;}
 		
 		this.callParent([config]);
 
@@ -9467,6 +9468,35 @@ Ext.define('Voyant.data.table.Table', {
 		});
 		this.reMapRows();
 		return this;
+	},
+	
+	loadCorrespondenceAnalysis: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+	    	config = config || {};
+			var dfd = Voyant.application.getDeferred(this);
+			Ext.apply(config, {
+		        columnHeaders: true,
+		        rowHeaders: true,
+		        tool: 'corpus.CA',
+		        analysisInput: table.toTsv(),
+		        inputFormat: 'tsv'				
+			});
+			var ca = Ext.create("Voyant.data.store.CAAnalysis", {noCorpus: true});
+			ca.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(ca, records)
+					} else {
+						dfd.reject(operation.error.response);
+					}
+				}
+			})
+			return dfd.promise
+		}
+		
 	},
 	
 	embed: function(cmp, config) {
@@ -21878,6 +21908,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     docFreqTipTemplate: null,
     
     constructor: function(config) {
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	if (config) {
