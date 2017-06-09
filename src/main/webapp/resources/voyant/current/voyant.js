@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jun 08 14:55:49 EDT 2017 */
+/* This file created by JSCacher. Last modified: Thu Jun 08 20:33:43 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -29847,6 +29847,7 @@ Ext.define('Voyant.notebook.Notebook', {
     		     me.docsLoading--;
     		 },
     		 function(response, opts) {
+    		     me.docsLoading--;
     		     console.log('server-side failure with status code ' + response.status);
     		 });
 

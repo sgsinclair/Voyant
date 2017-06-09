@@ -212,6 +212,7 @@ Ext.define('Voyant.notebook.Notebook', {
     		     me.docsLoading--;
     		 },
     		 function(response, opts) {
+    		     me.docsLoading--;
     		     console.log('server-side failure with status code ' + response.status);
     		 });
 
