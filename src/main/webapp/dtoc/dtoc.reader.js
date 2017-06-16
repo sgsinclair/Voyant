@@ -315,6 +315,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 				
 				this._processLanguage();
 				this._processImages();
+				this._processLinks();
 				if (index > 0) {
     				this._processHeader();
     				this._processNotes();
@@ -502,6 +503,18 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			var image = images[i];
 			var url = image.getAttribute('url');
 			var noteNumber = Ext.DomHelper.insertBefore(image, '<img src="'+url+'" />', true);
+		}
+	},
+	
+	_processLinks: function() {
+		var links = Ext.DomQuery.select('ref[@target]', this.readerContainer.dom);
+		for (var i = 0; i < links.length; i++) {
+			var link = links[i];
+			var url = link.getAttribute('target');
+			var firstChar = url.charAt(0);
+			if (firstChar !== '/' && firstChar !== '?' && firstChar !== '#') { // simple test for external links
+				Ext.get(link).wrap({tag: 'a', href: url, target: '_blank'});
+			}
 		}
 	},
 	
