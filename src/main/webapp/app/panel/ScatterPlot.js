@@ -59,7 +59,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	if (config) {
-    		if (config.whitelist) {this.setApiParam("whitelist", config.whitelist)}
+    		if (config.whitelist) {this.setApiParam("whitelist", config.whitelist);}
     	}
     },
     
@@ -453,7 +453,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         		var sel = selections[0];
                         		if (sel !== undefined) {
 	                        		var term = sel.get('term');
-	                        		var isDoc = sel.get('category') === 'doc';
+	                        		var isDoc = sel.get('category') === 'document';
 	                        		this.selectTerm(term, isDoc);
 	                        		
 	                        		if (isDoc) {
