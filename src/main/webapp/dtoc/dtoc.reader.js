@@ -511,8 +511,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		for (var i = 0; i < links.length; i++) {
 			var link = links[i];
 			var url = link.getAttribute('target');
-			var firstChar = url.charAt(0);
-			if (firstChar !== '/' && firstChar !== '?' && firstChar !== '#') { // simple test for external links
+			if (url.indexOf("http://")===0 || url.indexOf("https://")===0) {
 				Ext.get(link).wrap({tag: 'a', href: url, target: '_blank'});
 			}
 		}
