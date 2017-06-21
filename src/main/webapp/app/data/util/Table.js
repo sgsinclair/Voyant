@@ -63,7 +63,6 @@ Ext.define('Voyant.data.table.Table', {
 	constructor: function(config, opts) {
 
 		config = config || {};
-		
 		if (config.fromBlock) {
 			var data = Voyant.notebook.Notebook.getDataFromBlock(config.fromBlock);
 			if (data) {
@@ -118,7 +117,6 @@ Ext.define('Voyant.data.table.Table', {
 			}, this);
 		}
 
-				
 		// not sure why config isn't working
 		if (!config.rows && Ext.isArray(config)) {
 			config.rows = config;
@@ -329,7 +327,7 @@ Ext.define('Voyant.data.table.Table', {
 		var rowsMap = {}
 		this.eachRow(function(row, i) {
 			if (rowKey in row) {
-				rowsMap[rowKey] = i;
+				rowsMap[row[rowKey]] = i;
 			}
 		}, true);
 		this.setRowsMap(rowsMap)

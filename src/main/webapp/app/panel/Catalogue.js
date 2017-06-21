@@ -144,6 +144,11 @@ Ext.define('Voyant.panel.Catalogue', {
     		        		itemId: 'status',
     		        		xtype: 'tbtext'
     		        	}]
+    		        }, {
+    		        	xtype: 'reader',
+    		        	flex: 1,
+    		        	height: '100%',
+    		        	align: 'stretch'
     		        }]
     	});
 
@@ -334,7 +339,7 @@ Ext.define('Voyant.panel.Catalogue', {
     							matchingDocIds.push(docId);
     							var doc = documentQueryMatches.getCorpus().getDocument(docId);
     							var item = "<li id='"+results.getId()+'_'+docId+"' class='cataloguedoc'>";
-    							item += "<i>"+doc.getTitle()+"</i>";
+    							item += "<a href='#' class='cataloguedoctitle' data='"+docId+"'>"+doc.getTitle()+"</a>";
     							for (facet in facets) {
     								if (facets[facet].length==0) {continue;}
     								var labelItems = "";
@@ -377,6 +382,16 @@ Ext.define('Voyant.panel.Catalogue', {
     					})
     					list += "</ul>";
     					results.update(list);
+    					var me = this;
+    					var lnks = results.query(".cataloguedoctitle");
+    					lnks.forEach(function(lnk) {
+    						Ext.get(lnk).on("click", function(e,el) {
+    							this.dispatchEvent("documentSelected", me, el.getAttribute("data"));
+    						}, me)
+    					});
+    					if (lnks.length==1) {
+    						this.dispatchEvent("documentSelected", me, lnks[0].getAttribute("data"));
+    					}
     					this.queryById('status').update(new Ext.XTemplate(this.localize('queryMatches')).apply([matchingDocIds.length,this.getCorpus().getDocumentsCount()]))
     					this.setMatchingDocIds(Ext.Array.clone(matchingDocIds));
     					if (matchingDocIds.length>0) {

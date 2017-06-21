@@ -315,6 +315,12 @@ Ext.define('Voyant.panel.Reader', {
             		});
             		this.loadQueryTerms(queryTerms);
         		},
+        		documentSelected: function(src, document) {
+        			var corpus = this.getTokensStore().getCorpus();
+        			var doc = corpus.getDocument(document);
+        			this.setApiParams({'skipToDocId': doc.getId(), start: 0});
+					this.load(true);
+        		},
         		documentsClicked: function(src, documents, corpus) {
         			if (documents.length > 0) {
             			var doc = documents[0];

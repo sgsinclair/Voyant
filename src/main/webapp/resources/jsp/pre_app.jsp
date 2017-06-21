@@ -7,7 +7,7 @@
 	String lang = "en";
 	
 	//hard-coded for now
-	String[] langs = new String[]{"en","ar","bs","cz","fr","he","hr","it","ja","sr"};
+	String[] langs = new String[]{"en","es","ar","bs","cz","fr","he","hr","it","ja","sr"};
 	
 	//try first with parameter
 	if (request.getParameter("lang")!=null) {
@@ -113,5 +113,5 @@
 	<% } 
 } %>
 
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=9<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=9&lang=<%= lang %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=11<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=11&lang=<%= lang %>"></script>

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jun 08 20:33:43 EDT 2017 */
+/* This file created by JSCacher. Last modified: Wed Jun 21 15:57:53 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -9168,7 +9168,6 @@ Ext.define('Voyant.data.table.Table', {
 	constructor: function(config, opts) {
 
 		config = config || {};
-		
 		if (config.fromBlock) {
 			var data = Voyant.notebook.Notebook.getDataFromBlock(config.fromBlock);
 			if (data) {
@@ -9223,7 +9222,6 @@ Ext.define('Voyant.data.table.Table', {
 			}, this);
 		}
 
-				
 		// not sure why config isn't working
 		if (!config.rows && Ext.isArray(config)) {
 			config.rows = config;
@@ -9434,7 +9432,7 @@ Ext.define('Voyant.data.table.Table', {
 		var rowsMap = {}
 		this.eachRow(function(row, i) {
 			if (rowKey in row) {
-				rowsMap[rowKey] = i;
+				rowsMap[row[rowKey]] = i;
 			}
 		}, true);
 		this.setRowsMap(rowsMap)
@@ -14868,6 +14866,11 @@ Ext.define('Voyant.panel.Catalogue', {
     		        		itemId: 'status',
     		        		xtype: 'tbtext'
     		        	}]
+    		        }, {
+    		        	xtype: 'reader',
+    		        	flex: 1,
+    		        	height: '100%',
+    		        	align: 'stretch'
     		        }]
     	});
 
@@ -15058,7 +15061,7 @@ Ext.define('Voyant.panel.Catalogue', {
     							matchingDocIds.push(docId);
     							var doc = documentQueryMatches.getCorpus().getDocument(docId);
     							var item = "<li id='"+results.getId()+'_'+docId+"' class='cataloguedoc'>";
-    							item += "<i>"+doc.getTitle()+"</i>";
+    							item += "<a href='#' class='cataloguedoctitle' data='"+docId+"'>"+doc.getTitle()+"</a>";
     							for (facet in facets) {
     								if (facets[facet].length==0) {continue;}
     								var labelItems = "";
@@ -15101,6 +15104,16 @@ Ext.define('Voyant.panel.Catalogue', {
     					})
     					list += "</ul>";
     					results.update(list);
+    					var me = this;
+    					var lnks = results.query(".cataloguedoctitle");
+    					lnks.forEach(function(lnk) {
+    						Ext.get(lnk).on("click", function(e,el) {
+    							this.dispatchEvent("documentSelected", me, el.getAttribute("data"));
+    						}, me)
+    					});
+    					if (lnks.length==1) {
+    						this.dispatchEvent("documentSelected", me, lnks[0].getAttribute("data"));
+    					}
     					this.queryById('status').update(new Ext.XTemplate(this.localize('queryMatches')).apply([matchingDocIds.length,this.getCorpus().getDocumentsCount()]))
     					this.setMatchingDocIds(Ext.Array.clone(matchingDocIds));
     					if (matchingDocIds.length>0) {
@@ -17637,7 +17650,17 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    name: 'inputFormat',
 						    queryMode:'local',
 						    store:[['',me.localize('inputFormatAuto')],['dtoc','DToC: Dynamic Table of Contexts'],['TEI',"TEI: Text Encoding Initative"],['TEI',"TEI Corpus"],['RSS',"Really Simple Syndication: RSS"]],
-						    value: ''
+						    value: '',
+						    listeners: {
+						    	afterrender: {
+						    		fn: function(combo) {
+						    			if (window.location.pathname.indexOf("/dtoc/")>-1) {
+						    				combo.setValue('dtoc');
+						    			}
+						    		},
+						    		scope: me
+						    	}
+						    }
 						},{
 							xtype: 'container',
 							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-xml'])+'</i></p>',
@@ -21361,6 +21384,12 @@ Ext.define('Voyant.panel.Reader', {
             		});
             		this.loadQueryTerms(queryTerms);
         		},
+        		documentSelected: function(src, document) {
+        			var corpus = this.getTokensStore().getCorpus();
+        			var doc = corpus.getDocument(document);
+        			this.setApiParams({'skipToDocId': doc.getId(), start: 0});
+					this.load(true);
+        		},
         		documentsClicked: function(src, documents, corpus) {
         			if (documents.length > 0) {
             			var doc = documents[0];
@@ -21912,7 +21941,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	if (config) {
-    		if (config.whitelist) {this.setApiParam("whitelist", config.whitelist)}
+    		if (config.whitelist) {this.setApiParam("whitelist", config.whitelist);}
     	}
     },
     
@@ -22306,7 +22335,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
                         		var sel = selections[0];
                         		if (sel !== undefined) {
 	                        		var term = sel.get('term');
-	                        		var isDoc = sel.get('category') === 'doc';
+	                        		var isDoc = sel.get('category') === 'document';
 	                        		this.selectTerm(term, isDoc);
 	                        		
 	                        		if (isDoc) {

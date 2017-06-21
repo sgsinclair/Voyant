@@ -133,7 +133,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "title":"Documents",
 "error":"Error",
 "addTip":"Click here to add new documents to this corpus.",
-"keepFilteredDocuments":"Create a <i>new</i> corpus that only keeps the {0:plural('filtered document')}?",
+"keepFilteredDocuments":"Create a <i>new</i> corpus that only keeps the {0:plural('selected document')}?",
 "remove":"Remove",
 "documentAuthor":"Author",
 "selectOrFilterError":"You need to first select documents by clicking on one or more rows or by performing a search query.",
