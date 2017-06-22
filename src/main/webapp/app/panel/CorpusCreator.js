@@ -346,17 +346,18 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    name: 'inputFormat',
 						    queryMode:'local',
 						    store:[['',me.localize('inputFormatAuto')],['dtoc','DToC: Dynamic Table of Contexts'],['TEI',"TEI: Text Encoding Initative"],['TEI',"TEI Corpus"],['RSS',"Really Simple Syndication: RSS"]],
-						    value: ''/*,
+						    value: '',
 						    listeners: {
 						    	afterrender: {
 						    		fn: function(combo) {
-						    			if (window.location.pathname.indexOf("/dtoc/")>-1) {
-						    				combo.setValue('dtoc');
+						    			var inputFormat = this.getApiParam('inputFormat');
+						    			if (inputFormat) {
+						    				combo.setValue(inputFormat);
 						    			}
 						    		},
 						    		scope: me
 						    	}
-						    }*/
+						    }
 						},{
 							xtype: 'container',
 							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-xml'])+'</i></p>',

@@ -49,8 +49,13 @@ Ext.onReady(function(){
 						includeTools: [],
 						collapsed: true
 					}, {
-						xtype: 'corpuscreator'}
-					]
+						xtype: 'corpuscreator',
+						listeners: {
+							afterrender: function(cc) {
+								cc.setApiParam('inputFormat', 'dtoc'); // make this default
+							}
+						}
+					}]
 				}).show();
             }
 		}
