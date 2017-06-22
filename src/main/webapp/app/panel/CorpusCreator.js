@@ -346,7 +346,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    name: 'inputFormat',
 						    queryMode:'local',
 						    store:[['',me.localize('inputFormatAuto')],['dtoc','DToC: Dynamic Table of Contexts'],['TEI',"TEI: Text Encoding Initative"],['TEI',"TEI Corpus"],['RSS',"Really Simple Syndication: RSS"]],
-						    value: '',
+						    value: ''/*,
 						    listeners: {
 						    	afterrender: {
 						    		fn: function(combo) {
@@ -356,7 +356,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    		},
 						    		scope: me
 						    	}
-						    }
+						    }*/
 						},{
 							xtype: 'container',
 							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-xml'])+'</i></p>',

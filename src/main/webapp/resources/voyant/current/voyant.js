@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jun 21 15:57:53 EDT 2017 */
+/* This file created by JSCacher. Last modified: Thu Jun 22 10:13:02 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -17650,7 +17650,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    name: 'inputFormat',
 						    queryMode:'local',
 						    store:[['',me.localize('inputFormatAuto')],['dtoc','DToC: Dynamic Table of Contexts'],['TEI',"TEI: Text Encoding Initative"],['TEI',"TEI Corpus"],['RSS',"Really Simple Syndication: RSS"]],
-						    value: '',
+						    value: ''/*,
 						    listeners: {
 						    	afterrender: {
 						    		fn: function(combo) {
@@ -17660,7 +17660,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 						    		},
 						    		scope: me
 						    	}
-						    }
+						    }*/
 						},{
 							xtype: 'container',
 							html: '<p><i>'+new Ext.Template(me.localize('advancedOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-xml'])+'</i></p>',

@@ -688,6 +688,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		var names = '';
 		var colon = ': ';
 		var authors = doc.get('author');
+		titleHtml = "";
 		if (authors !== undefined) {
 			if (typeof authors === 'string') {
 				authors = [authors];
@@ -705,8 +706,9 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			    // no authors so get rid of colon
 			    colon = '';
 			}
+			titleHtml += '<span class="author">'+names+'</span>'+colon;
 		}
-		titleHtml = '<span class="author">'+names+'</span>'+colon+'<span class="title">'+title+'</span>';
+		titleHtml += '<span class="title">'+title+'</span>';
 		this.setTitle(titleHtml);
 		
 		this.resizeReaderComponents();
