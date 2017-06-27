@@ -364,6 +364,18 @@ Ext.define('Voyant.data.table.Table', {
 	},
 	
 	loadCorrespondenceAnalysis: function(config) {
+		return this._doAnalysisLoad('table.CA', 'Voyant.data.store.CAAnalysis', config);
+	},
+	
+	loadPrincipalComponentAnalysis: function(config) {
+		return this._doAnalysisLoad('table.PCA', 'Voyant.data.store.PCAAnalysis', config);
+	},
+	
+	loadTSNEAnalysis: function(config) {
+		return this._doAnalysisLoad('table.TSNE', 'Voyant.data.store.TSNEAnalysis', config);		
+	},
+	
+	_doAnalysisLoad: function(tool, store, config) {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
@@ -372,16 +384,16 @@ Ext.define('Voyant.data.table.Table', {
 			Ext.apply(config, {
 		        columnHeaders: true,
 		        rowHeaders: true,
-		        tool: 'corpus.CA',
+		        tool: tool,
 		        analysisInput: table.toTsv(),
 		        inputFormat: 'tsv'				
 			});
-			var ca = Ext.create("Voyant.data.store.CAAnalysis", {noCorpus: true});
-			ca.load({
+			var store = Ext.create(store, {noCorpus: true});
+			store.load({
 				params: config,
 				callback: function(records, operation, success) {
 					if (success) {
-						dfd.resolve(ca, records)
+						dfd.resolve(store, records)
 					} else {
 						dfd.reject(operation.error.response);
 					}
@@ -389,7 +401,6 @@ Ext.define('Voyant.data.table.Table', {
 			})
 			return dfd.promise
 		}
-		
 	},
 	
 	embed: function(cmp, config) {
