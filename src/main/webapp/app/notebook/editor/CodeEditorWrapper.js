@@ -266,7 +266,20 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	
 	clearResults: function() {
 		this.results.show();
-		this.results.update(' ');
+		
+		var panel = this.results.el.down('.x-panel');
+		if (panel) {
+			var id = panel.id;
+			var cmp = Ext.getCmp(id);
+			if (cmp) {
+				cmp.destroy();
+			} else {
+				panel.destroy();
+			}
+		} else {
+			this.results.update(' ');
+		}
+		
 		this.getTargetEl().fireEvent('resize');
 	},
 	
