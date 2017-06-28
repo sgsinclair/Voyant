@@ -56,11 +56,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-        this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-    	if (config) {
+		if (config) {
     		if (config.whitelist) {this.setApiParam("whitelist", config.whitelist);}
+    		if (config.analysis) {this.setApiParam("analysis", config.analysis);}
     	}
+		this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
     
     initComponent: function() {
@@ -495,6 +496,13 @@ Ext.define('Voyant.panel.ScatterPlot', {
 				this.queryById('termsGrid').collapse();
 			}
 		}, this);
+        
+        this.on('beforedestroy', function(component) {
+        	var oldChart = this.queryById('chart');
+        	if (oldChart !== null) {
+        		this.queryById('chartParent').remove(oldChart);
+        	}
+        }, this);
         
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
