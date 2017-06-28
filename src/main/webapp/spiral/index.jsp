@@ -44,11 +44,14 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 		padding: 6px;
 		margin: 6px;
 	}
-	.notebook-editor-wrapper-hover {
-		border: thin dashed rgba(255,255,255,0);
+	.notebook-text-wrapper .x-panel-body {
+	   border: thin solid rgba(0,0,0,0) !important;
 	}
-	.notebook-editor-wrapper-hover {
-		border: thin dashed rgba(0,0,0,.1) !important;
+	.notebook-code-wrapper .x-panel-body {
+	   border: thin solid rgba(0,0,0,0) !important;
+	}
+	.x-panel .notebook-editor-wrapper-hover.x-panel-body {
+		border: thin dashed rgba(0,0,0,.2) !important;
 	}
 	.notebook-code-editor, .notebook-code-results {
 		margin-left: 2em;
