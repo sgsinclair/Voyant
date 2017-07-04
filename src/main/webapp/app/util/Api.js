@@ -41,6 +41,7 @@ Ext.define('Voyant.util.Api', {
 	    			this.setApiParam(key, config.api[key]);
 	    		}
 	    	}
+	    	delete config.api; // remove so it doesn't overwrite default api
 		}
 		
     	// handle "type"  parameter specially for backwards compatibility

@@ -56,10 +56,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-		if (config) {
-    		if (config.whitelist) {this.setApiParam("whitelist", config.whitelist);}
-    		if (config.analysis) {this.setApiParam("analysis", config.analysis);}
-    	}
 		this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
