@@ -31,6 +31,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	links: undefined,
     	zoom: undefined,
     	
+    	dragging: false,
+    	
     	contextMenu: undefined,
     	
     	currentNode: undefined,
@@ -556,7 +558,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			return 'translate('+x+','+y+')';
 	    		}.bind(this));
 	    		
-	    		if (this.getVisLayout().alpha() < 0.075) {
+	    		if (!this.getDragging() && this.getVisLayout().alpha() < 0.075) {
 	    			this.getVisLayout().alpha(-1); // trigger end event
 	    		}
 	    	}.bind(this))
@@ -659,12 +661,14 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			})
 			.call(d3.drag()
 				.on('start', function(d) {
-					if (!d3.event.active) me.getVisLayout().alphaTarget(0.3).restart();
+					me.setDragging(true);
+					if (!d3.event.active) me.getVisLayout().alpha(0.3).restart();
 					d.fx = d.x;
 					d.fy = d.y;
 					d.fixed = true;
 				})
 				.on('drag', function(d) {
+					me.getVisLayout().alpha(0.3); // don't let simulation end while the user is dragging
 					d.fx = d3.event.x;
 					d.fy = d3.event.y;
 					if (me.isMasked()) {
@@ -676,7 +680,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			    	}
 				})
 				.on('end', function(d) {
-					if (!d3.event.active) me.getVisLayout().alphaTarget(0);
+					me.setDragging(false);
+//					if (!d3.event.active) me.getVisLayout().alpha(0);
 					if (d.fixed != true) {
 						d.fx = null;
 						d.fy = null;
