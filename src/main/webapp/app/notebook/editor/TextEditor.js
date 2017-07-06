@@ -43,6 +43,13 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 					this.handleClick(cmp);
 				}
 			}, this);
+		},
+		removed: function(cmp, container) {
+			// properly remove editor
+			if (cmp.getEditor()) {
+				cmp.getEditor().focusManager.blur(true); //focusManager bug workaround, see: https://dev.ckeditor.com/ticket/16825
+				cmp.getEditor().destroy();
+			}
 		}
 	},
 	
