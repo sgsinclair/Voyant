@@ -375,7 +375,7 @@ Ext.define('Voyant.data.table.Table', {
 		return this._doAnalysisLoad('table.TSNE', 'Voyant.data.store.TSNEAnalysis', config);		
 	},
 	
-	_doAnalysisLoad: function(tool, store, config) {
+	_doAnalysisLoad: function(tool, storeType, config) {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
@@ -385,10 +385,10 @@ Ext.define('Voyant.data.table.Table', {
 		        columnHeaders: true,
 		        rowHeaders: true,
 		        tool: tool,
-		        analysisInput: table.toTsv(),
-		        inputFormat: 'tsv'				
+		        analysisInput: this.toTsv(),
+		        inputFormat: 'tsv'
 			});
-			var store = Ext.create(store, {noCorpus: true});
+			var store = Ext.create(storeType, {noCorpus: true});
 			store.load({
 				params: config,
 				callback: function(records, operation, success) {
