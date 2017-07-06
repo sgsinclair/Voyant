@@ -10,6 +10,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		content: '',
 		docs: undefined,
 		isChangeRegistered: false,
+		editor: undefined,
 		editedTimeout: undefined
 	},
 	statics: {
@@ -21,27 +22,26 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		}
 	},
 	constructor: function(config) {
-		this.callParent(arguments)
+		this.callParent(arguments);
 	},
 	listeners: {
 		boxready: function() {
 			var me = this;
-			this.editor = ace.edit(Ext.getDom(this.getEl()));
-			this.editor.$blockScrolling = Infinity;
-			this.editor.getSession().setUseWorker(true);
-			this.editor.setTheme(this.getTheme());
-			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10, autoScrollEditorIntoView: true, scrollPastEnd: true});
-			this.editor.setHighlightActiveLine(false);
-			this.editor.renderer.setShowPrintMargin(false);
-			this.editor.renderer.setShowGutter(false);
-			this.editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
-			this.editor.clearSelection()
-		    this.editor.on("focus", function() {
-		    	me.editor.renderer.setShowGutter(true);
+			var editor = ace.edit(Ext.getDom(this.getEl()));
+			editor.$blockScrolling = Infinity;
+			editor.getSession().setUseWorker(true);
+			editor.setTheme(this.getTheme());
+			editor.getSession().setMode(this.getMode());
+			editor.setOptions({minLines: 6, maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			editor.setHighlightActiveLine(false);
+			editor.renderer.setShowPrintMargin(false);
+			editor.renderer.setShowGutter(false);
+			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
+			editor.clearSelection();
+		    editor.on("focus", function() {
+		    	me.getEditor().renderer.setShowGutter(true);
 		    }, this);
-		    var moi = this;
-		    this.editor.on("change", function() {
+		    editor.on("change", function() {
 		    	if (me.getIsChangeRegistered()==false) {
 		    		me.setIsChangeRegistered(true);
 			    	var wrapper = me.up('notebookcodeeditorwrapper');
@@ -58,10 +58,10 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		    		}
 		    	}
 		    }, this);
-		    this.editor.on("blur", function() {
-		    	me.editor.renderer.setShowGutter(false);
+		    editor.on("blur", function() {
+		    	me.getEditor().renderer.setShowGutter(false);
 		    });
-			this.editor.commands.addCommand({
+			editor.commands.addCommand({
 				name: 'run',
 			    bindKey: {win: "Shift-Enter", mac: "Shift-Enter"}, // additional bindings like alt/cmd-enter don't seem to work
 			    exec: function(editor) {
@@ -71,9 +71,10 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			    	}
 			    }				
 			});
+			this.setEditor(editor);
 			
 			ace.config.loadModule('ace/ext/tern', function () {
-	            me.editor.setOptions({
+	            me.getEditor().setOptions({
 	                /**
 	                 * Either `true` or `false` or to enable with custom options pass object that
 	                 * has options for tern server: http://ternjs.net/doc/manual.html#server_api
@@ -107,17 +108,23 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	                enableBasicAutocompletion: true
 	            });
 	        });
+		},
+		removed: function(cmp, container) {
+			if (cmp.getEditor()) {
+				cmp.getEditor().destroy();
+			}
 		}
+		
 	},
 	
 	switchModes: function(mode) {
 		this.setMode('ace/mode/'+mode);
-		this.editor.getSession().setMode(this.getMode());
-		this.editor.setOptions({maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10});
+		this.getEditor().getSession().setMode(this.getMode());
+		this.getEditor().setOptions({maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10});
 
 	},
 	
 	getValue: function() {
-		return this.editor.getValue();
+		return this.getEditor().getValue();
 	}
 })
