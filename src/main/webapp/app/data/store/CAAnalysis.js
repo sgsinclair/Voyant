@@ -1,45 +1,33 @@
+Ext.define('Voyant.data.store.CAAnalysisMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+	embeddable: ['Voyant.panel.ScatterPlot'],
+    model: 'Voyant.data.model.StatisticalAnalysis',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.CA',
+			'proxy.reader.rootProperty': 'correspondenceAnalysis',
+			'proxy.reader.totalProperty': 'correspondenceAnalysis.totalTerms'
+		}])
+		config.proxy.extraParams.withDistributions = true;
+	}
+});
+
 Ext.define('Voyant.data.store.CAAnalysis', {
 	extend: 'Ext.data.Store',
-	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.StatisticalAnalysis',
-	config: {
-		corpus: undefined
-	},
-	
+	mixins: ['Voyant.data.store.CAAnalysisMixin'],
 	constructor : function(config) {
-		
 		config = config || {};
-		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-			proxy: {
-				type: 'ajax',
-				actionMethods: {
-					read: 'POST'
-				},
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.CA',
-					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'correspondenceAnalysis',
-		             totalProperty: 'correspondenceAnalysis.totalTerms'
-		         },
-		         simpleSortMode: true
-			 }
-		});
-		if (config.noCorpus) {delete config.proxy.extraParams.corpus;}
-		
+		this.mixins['Voyant.data.store.CAAnalysisMixin'].constructor.apply(this, [config])
 		this.callParent([config]);
+	}
+});
 
-	},
-	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
+Ext.define('Voyant.data.store.CAAnalysisBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.CAAnalysisMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.CAAnalysisMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
 	}
 });

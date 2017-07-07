@@ -1,5 +1,5 @@
 Ext.define('Voyant.data.store.VoyantStore', {
-	mixins: ['Voyant.util.Localization'],
+	mixins: ['Voyant.util.Localization','Voyant.notebook.util.Embed'],
 	config: {
 		corpus: undefined,
 		parentPanel: undefined
@@ -90,7 +90,6 @@ Ext.define('Voyant.data.store.VoyantStore', {
 						}
 					},
 					scope: this
-					
 			}
 		}
 		
@@ -105,6 +104,28 @@ Ext.define('Voyant.data.store.VoyantStore', {
 	getString: function(config) {
 		var count = this.getCount();
 		return "This store contains "+this.getCount()+" items"+(count>0 ? " with these fields: "+this.getAt(0).getFields().map(function(field) {return field.getName()}).join(", ") : "")+"."
+	},
+	
+	embed: function(cmp, config) {
+		if (!config && Ext.isObject(cmp)) {
+			config = cmp;
+			cmp = this.embeddable[0];
+		}
+		config = config || {};
+		
+		var data = [];
+		this.each(function(record) {
+			data.push(record.data);
+		}, this);
+		
+		Ext.apply(config, {
+			storeJson: JSON.stringify({
+				storeClass: Ext.getClassName(this),
+				storeData: data
+			})
+		});
+		
+		embed.call(this, cmp, config);
 	}
 	
 });

@@ -70,7 +70,10 @@ Ext.define("Voyant.notebook.util.Embed", {
 									if (Ext.getClassName(this)=='Voyant.data.model.Corpus') {
 										embeddedParams.corpus = this.getId();
 									} else if (this.getCorpus) {
-										embeddedParams.corpus = this.getCorpus().getId();
+										var corpus = this.getCorpus();
+										if (corpus) {
+											embeddedParams.corpus = this.getCorpus().getId();
+										}
 									}
 								}
 								Ext.applyIf(config, {

@@ -31,7 +31,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		term: undefined,
     		query: undefined,
     		whitelist: undefined,
-    		label: ['summary', 'docs', 'terms']
+    		label: ['summary', 'docs', 'terms'],
+    		storeJson: undefined
     	},
 		glyph: 'xf06e@FontAwesome'
     },
@@ -56,6 +57,10 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+		if ("storeJson" in config) {
+    		var json = JSON.parse(config.storeJson);
+    		Ext.apply(config, json);
+    	}
 		this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
@@ -73,6 +78,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	this.setDocSimStore(Ext.create('Voyant.data.store.DocSimAnalysis', {
     		listeners: {load: this.maskAndBuildChart, scope: this}
     	}));
+    	
     	this.setTermStore(Ext.create('Ext.data.JsonStore', {
 			fields: [
 				{name: 'term'},
@@ -491,6 +497,9 @@ Ext.define('Voyant.panel.ScatterPlot', {
 				this.queryById('optionsPanel').collapse();
 				this.queryById('termsGrid').collapse();
 			}
+			if (this.config.storeClass && this.config.storeData) {
+				this.loadStoreFromJson(this.config.storeClass, this.config.storeData);
+			}
 		}, this);
         
         this.on('beforedestroy', function(component) {
@@ -545,6 +554,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		this.queryById('perplexity').setVisible(analysis === 'tsne');
 		this.queryById('iterations').setVisible(analysis === 'tsne');
 		if (analysis === 'ca') {
+			// TODO handling for when there's no corpus
 			if (this.getCorpus().getDocumentsCount() == 3) {
 				this.setApiParam('dimensions', 2);
 				this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
@@ -552,11 +562,31 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		}
     },
     
+    loadStoreFromJson: function(storeClass, storeData) {
+		if (storeClass == 'Voyant.data.store.CAAnalysis') {
+			this.getCaStore().loadRawData(storeData);
+			this.doAnalysisChange('ca');
+			this.maskAndBuildChart.call(this, this.getCaStore());
+		} else if (storeClass == 'Voyant.data.store.PCAAnalysis') {
+			this.getPcaStore().loadRawData(storeData);
+			this.doAnalysisChange('pca');
+			this.maskAndBuildChart.call(this, this.getPcaStore());
+		} else if (storeClass == 'Voyant.data.store.TSNEAnalysis') {
+			this.getTsneStore().loadRawData(storeData);
+			this.doAnalysisChange('tsne');
+			this.maskAndBuildChart.call(this, this.getTsneStore());
+		} else if (storeClass == 'Voyant.data.store.DocSimAnalysis') {
+			this.getDocSimStore().loadRawData(storeData);
+			this.doAnalysisChange('docSim');
+			this.maskAndBuildChart.call(this, this.getDocSimStore());
+		}
+    },
+    
     maskAndBuildChart: function(store) {
     	this.queryById('chartParent').mask(this.localize('plotting'));
     	Ext.defer(this.buildChart, 50, this, [store]);
     },
-    
+
     buildChart: function(store) {
     	var that = this; // needed for tooltip renderer
     	
