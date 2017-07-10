@@ -10,7 +10,10 @@ Ext.define('Voyant.panel.Catalogue', {
     	api: {
     		config: undefined,
     		stopList: 'auto',
-    		facet: ['facet.title','facet.author','facet.language']
+    		facet: ['facet.title','facet.author','facet.language'],
+    		title: undefined,
+    		splash: undefined,
+    		reader: "reader"
     	},
 		glyph: 'xf1ea@FontAwesome'
     },
@@ -22,7 +25,7 @@ Ext.define('Voyant.panel.Catalogue', {
     
     constructor: function(config) {
     	config = config || {};
-
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments); // we need api
     	Ext.apply(this, {
     		title: this.localize('title'),
     		layout: 'hbox',
@@ -79,76 +82,82 @@ Ext.define('Voyant.panel.Catalogue', {
     		        			this.findParentByType('panel').updateResults(Ext.isString(query) ? [query] : query)
     		        		}
     		        	},
-    		        	bbar: [{
-    		        		itemId: 'sendToVoyant',
-    		        		text: this.localize('sendToVoyantButton'),
-    		        		disabled: true,
-    		        		handler: function() {
-    		        			this.mask(this.localize("exportInProgress"));
-    		        			var catalogue = this;
-    		            		Ext.Ajax.request({
-    		            			url: this.getApplication().getTromboneUrl(),
-    		            			params: {
-    		            				corpus: this.getCorpus().getId(),
-    		            				tool: 'corpus.CorpusManager',
-    		            				keepDocuments: true,
-    		            				docId: this.getMatchingDocIds()
-    		            			},
-    		            		    success: function(response, opts) {
-    		            		    	catalogue.unmask();
-    		            		    	var json = Ext.JSON.decode(response.responseText);
-	                    				var url = catalogue.getBaseUrl()+"?corpus="+json.corpus.id;
-	                    				catalogue.openUrl(url);
-    		            		    },
-    		            		    failure: function(response, opts) {
-    		            		    	catalogue.unmask();
-    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
-    		            		    }
-    		            		})
-
-    		        		},
-    		        		scope: this
-    		        	},{
-    		        		itemId: 'export',
-    		        		text: this.localize('downloadButton'),
-    		        		disabled: true,
-    		        		handler: function() {
-    		        			this.mask(this.localize("exportInProgress"));
-    		        			var catalogue = this;
-    		            		Ext.Ajax.request({
-    		            			url: this.getApplication().getTromboneUrl(),
-    		            			params: {
-    		            				corpus: this.getCorpus().getId(),
-    		            				tool: 'corpus.CorpusManager',
-    		            				keepDocuments: true,
-    		            				docId: this.getMatchingDocIds()
-    		            			},
-    		            		    success: function(response, opts) {
-    		            		    	catalogue.unmask();
-    		            		    	var json = Ext.JSON.decode(response.responseText);
-    		            		    	catalogue.downloadFromCorpusId(json.corpus.id);
-    		            		    },
-    		            		    failure: function(response, opts) {
-    		            		    	catalogue.unmask();
-    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
-    		            		    }
-    		            		})
-
-    		        		},
-    		        		scope: this
-    		        	},{
-    		        		xtype: 'querysearchfield',
-    		        		width: 200,
-    		        		flex: 1
-    		        	},{
-    		        		itemId: 'status',
-    		        		xtype: 'tbtext'
-    		        	}]
+    		    		dockedItems: [{
+    		                dock: 'bottom',
+    		                xtype: 'toolbar',
+    		                overflowHandler: 'scroller',
+    		                items: [{
+	    		        		itemId: 'sendToVoyant',
+	    		        		text: this.localize('sendToVoyantButton'),
+	    		        		disabled: true,
+	    		        		handler: function() {
+	    		        			this.mask(this.localize("exportInProgress"));
+	    		        			var catalogue = this;
+	    		            		Ext.Ajax.request({
+	    		            			url: this.getApplication().getTromboneUrl(),
+	    		            			params: {
+	    		            				corpus: this.getCorpus().getId(),
+	    		            				tool: 'corpus.CorpusManager',
+	    		            				keepDocuments: true,
+	    		            				docId: this.getMatchingDocIds()
+	    		            			},
+	    		            		    success: function(response, opts) {
+	    		            		    	catalogue.unmask();
+	    		            		    	var json = Ext.JSON.decode(response.responseText);
+		                    				var url = catalogue.getBaseUrl()+"?corpus="+json.corpus.id;
+		                    				catalogue.openUrl(url);
+	    		            		    },
+	    		            		    failure: function(response, opts) {
+	    		            		    	catalogue.unmask();
+	    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
+	    		            		    }
+	    		            		})
+	
+	    		        		},
+	    		        		scope: this
+	    		        	},{
+	    		        		itemId: 'export',
+	    		        		text: this.localize('downloadButton'),
+	    		        		disabled: true,
+	    		        		handler: function() {
+	    		        			this.mask(this.localize("exportInProgress"));
+	    		        			var catalogue = this;
+	    		            		Ext.Ajax.request({
+	    		            			url: this.getApplication().getTromboneUrl(),
+	    		            			params: {
+	    		            				corpus: this.getCorpus().getId(),
+	    		            				tool: 'corpus.CorpusManager',
+	    		            				keepDocuments: true,
+	    		            				docId: this.getMatchingDocIds()
+	    		            			},
+	    		            		    success: function(response, opts) {
+	    		            		    	catalogue.unmask();
+	    		            		    	var json = Ext.JSON.decode(response.responseText);
+	    		            		    	catalogue.downloadFromCorpusId(json.corpus.id);
+	    		            		    },
+	    		            		    failure: function(response, opts) {
+	    		            		    	catalogue.unmask();
+	    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
+	    		            		    }
+	    		            		})
+	
+	    		        		},
+	    		        		scope: this
+	    		        	},{
+	    		        		xtype: 'querysearchfield',
+	    		        		width: 200,
+	    		        		flex: 1
+	    		        	},{
+	    		        		itemId: 'status',
+	    		        		xtype: 'tbtext'
+	    		        	}]
+    		    		}]
     		        }, {
-    		        	xtype: 'reader',
+    		        	xtype: this.getApiParam("reader"),
     		        	flex: 1,
     		        	height: '100%',
-    		        	align: 'stretch'
+    		        	align: 'stretch',
+    		        	header: false
     		        }]
     	});
 
@@ -159,6 +168,11 @@ Ext.define('Voyant.panel.Catalogue', {
     	this.on('loadedCorpus', function(src, corpus) {
     		this.queryById('status').update(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]))
     		if (!this.getCustomResultsHtml()) {
+    			if (this.getApiParam("splash")) {
+        			this.setCustomResultsHtml(this.getApiParam("splash"));
+        			this.updateResults();
+        			return;
+    			}
     			this.setCustomResultsHtml(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]));
     			this.updateResults();
     	    	Ext.Ajax.request({
@@ -246,7 +260,11 @@ Ext.define('Voyant.panel.Catalogue', {
 				panel.getFacets()['lexical'] = labels;
 				panel.updateResults();
 			})*/
-    	})
+    		
+        	var title = this.getApiParam("title");
+        	if (title) {this.setTitle(title)}
+    	});
+    	
     	
     },
     

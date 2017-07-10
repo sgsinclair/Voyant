@@ -26,7 +26,7 @@ Ext.define('Voyant.panel.Panel', {
 		}
 		
 		this.on("afterrender", function() {
-			if (this.getApiParam('subtitle') && this.getTitle()) {
+			if (this.getXType()!='facet' && this.getApiParam('subtitle') && this.getTitle()) {
 				this.setTitle(this.getTitle()+" <i style='font-size: smaller;'>"+this.getApiParam('subtitle')+"</i>")
 			}
 			if (this.isXType("grid")) {

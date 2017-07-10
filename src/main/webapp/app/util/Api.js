@@ -29,9 +29,15 @@ Ext.define('Voyant.util.Api', {
 		}, this)
 		
     	var queryParams = Ext.Object.fromQueryString(document.location.search);
+		var xtype = this.getXType ? this.getXType() : undefined;
     	for (var key in queryParams) {
     		if (this.api[key]) {
     			this.setApiParam(key, queryParams[key]);
+    		} else if (xtype && key.indexOf(".")>0) {
+    			var k = key.substring(key.indexOf(".")+1);
+    			if (k && k in this.api) {
+    				this.setApiParam(k, queryParams[key])
+    			}
     		}
     	}
     	

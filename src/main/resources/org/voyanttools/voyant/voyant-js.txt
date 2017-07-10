@@ -122,6 +122,7 @@ app/panel/RezoViz.js
 app/panel/MicroSearch.js
 app/panel/Mandala.js
 app/panel/Reader.js
+app/panel/SimpleDocReader.js
 app/panel/ScatterPlot.js
 app/panel/StreamGraph.js
 app/panel/Summary.js

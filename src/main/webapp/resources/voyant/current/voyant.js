@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jun 22 16:55:56 EDT 2017 */
+/* This file created by JSCacher. Last modified: Sun Jul 09 18:22:49 PDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5911,9 +5911,15 @@ Ext.define('Voyant.util.Api', {
 		}, this)
 		
     	var queryParams = Ext.Object.fromQueryString(document.location.search);
+		var xtype = this.getXType ? this.getXType() : undefined;
     	for (var key in queryParams) {
     		if (this.api[key]) {
     			this.setApiParam(key, queryParams[key]);
+    		} else if (xtype && key.indexOf(".")>0) {
+    			var k = key.substring(key.indexOf(".")+1);
+    			if (k && k in this.api) {
+    				this.setApiParam(k, queryParams[key])
+    			}
     		}
     	}
     	
@@ -5923,6 +5929,7 @@ Ext.define('Voyant.util.Api', {
 	    			this.setApiParam(key, config.api[key]);
 	    		}
 	    	}
+	    	delete config.api; // remove so it doesn't overwrite default api
 		}
 		
     	// handle "type"  parameter specially for backwards compatibility
@@ -6380,7 +6387,7 @@ Ext.define('Voyant.util.SparkLine', {
 	}
 });
 Ext.define('Voyant.util.Toolable', {
-	requires: ['Voyant.util.Localization'],
+	requires: ['Voyant.util.Localization','Voyant.util.Api'],
 	statics: {
 		i18n: {
 			exportGridAllJson: "export all available data in JSON",
@@ -6388,10 +6395,15 @@ Ext.define('Voyant.util.Toolable', {
 			exportAllJsonWarning: "You're requesting all of the available data (in a JSON format that Voyant uses), are you sure you want to continue?",
 			exportGridAllTsv: "export all available data as tab separated values (text)",
 			exportAllTsvWarning: "You're requesting all of the available data, are you sure you want to continue?"
+		},
+		api: {
+			suppressTools: false
 		}
 	},
 	constructor: function(config) {
 		config = config || {};
+		if (this.getApiParam && this.getApiParam("suppressTools")=="true") {return;}
+		if ("header" in config && config.header===false) {return;}
 		var me = this;
 		var moreTools = undefined;
 		var parent = this.up('component');
@@ -7663,7 +7675,10 @@ Ext.define("Voyant.notebook.util.Embed", {
 									if (Ext.getClassName(this)=='Voyant.data.model.Corpus') {
 										embeddedParams.corpus = this.getId();
 									} else if (this.getCorpus) {
-										embeddedParams.corpus = this.getCorpus().getId();
+										var corpus = this.getCorpus();
+										if (corpus) {
+											embeddedParams.corpus = this.getCorpus().getId();
+										}
 									}
 								}
 								Ext.applyIf(config, {
@@ -8409,7 +8424,7 @@ Ext.define('Voyant.data.model.TermCorrelation', {
 	}
 });
 Ext.define('Voyant.data.store.VoyantStore', {
-	mixins: ['Voyant.util.Localization'],
+	mixins: ['Voyant.util.Localization','Voyant.notebook.util.Embed'],
 	config: {
 		corpus: undefined,
 		parentPanel: undefined
@@ -8500,7 +8515,6 @@ Ext.define('Voyant.data.store.VoyantStore', {
 						}
 					},
 					scope: this
-					
 			}
 		}
 		
@@ -8515,55 +8529,64 @@ Ext.define('Voyant.data.store.VoyantStore', {
 	getString: function(config) {
 		var count = this.getCount();
 		return "This store contains "+this.getCount()+" items"+(count>0 ? " with these fields: "+this.getAt(0).getFields().map(function(field) {return field.getName()}).join(", ") : "")+"."
-	}
-	
-});
-Ext.define('Voyant.data.store.CAAnalysis', {
-	extend: 'Ext.data.Store',
-	//mixins: ['Voyant.util.Transferable','Voyant.notebook.util.Embeddable'],
-    model: 'Voyant.data.model.StatisticalAnalysis',
-	config: {
-		corpus: undefined
 	},
 	
-	constructor : function(config) {
-		
+	embed: function(cmp, config) {
+		if (!config && Ext.isObject(cmp)) {
+			config = cmp;
+			cmp = this.embeddable[0];
+		}
 		config = config || {};
 		
-		// create proxy in constructor so we can set the Trombone URL
-		Ext.apply(config, {
-			proxy: {
-				type: 'ajax',
-				actionMethods: {
-					read: 'POST'
-				},
-				url: Voyant.application.getTromboneUrl(),
-				extraParams: {
-					tool: 'corpus.CA',
-					corpus: config && config.corpus ? (Ext.isString(config.corpus) ? config.corpus : config.corpus.getId()) : undefined
-		         },
-		         reader: {
-		             type: 'json',
-		             rootProperty: 'correspondenceAnalysis',
-		             totalProperty: 'correspondenceAnalysis.totalTerms'
-		         },
-		         simpleSortMode: true
-			 }
-		});
-		if (config.noCorpus) {delete config.proxy.extraParams.corpus;}
+		var data = [];
+		this.each(function(record) {
+			data.push(record.data);
+		}, this);
 		
-		this.callParent([config]);
-
-	},
+		Ext.apply(config, {
+			storeJson: JSON.stringify({
+				storeClass: Ext.getClassName(this),
+				storeData: data
+			})
+		});
+		
+		embed.call(this, cmp, config);
+	}
 	
-	setCorpus: function(corpus) {
-		if (corpus) {
-			this.getProxy().setExtraParam('corpus', Ext.isString(corpus) ? corpus : corpus.getId());
-		}
-		this.callParent(arguments);
+});
+Ext.define('Voyant.data.store.CAAnalysisMixin', {
+	mixins: ['Voyant.data.store.VoyantStore'],
+	embeddable: ['Voyant.panel.ScatterPlot'],
+    model: 'Voyant.data.model.StatisticalAnalysis',
+	constructor : function(config) {
+		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
+			'proxy.extraParams.tool': 'corpus.CA',
+			'proxy.reader.rootProperty': 'correspondenceAnalysis',
+			'proxy.reader.totalProperty': 'correspondenceAnalysis.totalTerms'
+		}])
+		config.proxy.extraParams.withDistributions = true;
 	}
 });
 
+Ext.define('Voyant.data.store.CAAnalysis', {
+	extend: 'Ext.data.Store',
+	mixins: ['Voyant.data.store.CAAnalysisMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.CAAnalysisMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
+
+Ext.define('Voyant.data.store.CAAnalysisBuffered', {
+	extend: 'Ext.data.BufferedStore',
+	mixins: ['Voyant.data.store.CAAnalysisMixin'],
+	constructor : function(config) {
+		config = config || {};
+		this.mixins['Voyant.data.store.CAAnalysisMixin'].constructor.apply(this, [config])
+		this.callParent([config]);
+	}
+});
 Ext.define('Voyant.data.store.ContextsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.Context',
@@ -8883,6 +8906,7 @@ Ext.define('Voyant.data.store.DocumentsBuffered', {
 
 Ext.define('Voyant.data.store.PCAAnalysisMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
+	embeddable: ['Voyant.panel.ScatterPlot'],
     model: 'Voyant.data.model.StatisticalAnalysis',
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
@@ -9072,6 +9096,7 @@ Ext.define('Voyant.data.store.TokensBuffered', {
 });
 Ext.define('Voyant.data.store.TSNEAnalysisMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
+	embeddable: ['Voyant.panel.ScatterPlot'],
     model: 'Voyant.data.model.StatisticalAnalysis',
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
@@ -9469,6 +9494,18 @@ Ext.define('Voyant.data.table.Table', {
 	},
 	
 	loadCorrespondenceAnalysis: function(config) {
+		return this._doAnalysisLoad('table.CA', 'Voyant.data.store.CAAnalysis', config);
+	},
+	
+	loadPrincipalComponentAnalysis: function(config) {
+		return this._doAnalysisLoad('table.PCA', 'Voyant.data.store.PCAAnalysis', config);
+	},
+	
+	loadTSNEAnalysis: function(config) {
+		return this._doAnalysisLoad('table.TSNE', 'Voyant.data.store.TSNEAnalysis', config);		
+	},
+	
+	_doAnalysisLoad: function(tool, storeType, config) {
 		if (this.then) {
 			return Voyant.application.getDeferredNestedPromise(this, arguments);
 		} else {
@@ -9477,16 +9514,16 @@ Ext.define('Voyant.data.table.Table', {
 			Ext.apply(config, {
 		        columnHeaders: true,
 		        rowHeaders: true,
-		        tool: 'corpus.CA',
-		        analysisInput: table.toTsv(),
-		        inputFormat: 'tsv'				
+		        tool: tool,
+		        analysisInput: this.toTsv(),
+		        inputFormat: 'tsv'
 			});
-			var ca = Ext.create("Voyant.data.store.CAAnalysis", {noCorpus: true});
-			ca.load({
+			var store = Ext.create(storeType, {noCorpus: true});
+			store.load({
 				params: config,
 				callback: function(records, operation, success) {
 					if (success) {
-						dfd.resolve(ca, records)
+						dfd.resolve(store, records)
 					} else {
 						dfd.reject(operation.error.response);
 					}
@@ -9494,7 +9531,6 @@ Ext.define('Voyant.data.table.Table', {
 			})
 			return dfd.promise
 		}
-		
 	},
 	
 	embed: function(cmp, config) {
@@ -13807,7 +13843,7 @@ Ext.define('Voyant.panel.Panel', {
 		}
 		
 		this.on("afterrender", function() {
-			if (this.getApiParam('subtitle') && this.getTitle()) {
+			if (this.getXType()!='facet' && this.getApiParam('subtitle') && this.getTitle()) {
 				this.setTitle(this.getTitle()+" <i style='font-size: smaller;'>"+this.getApiParam('subtitle')+"</i>")
 			}
 			if (this.isXType("grid")) {
@@ -14007,8 +14043,9 @@ Ext.define('Voyant.widget.Facet', {
         Ext.applyIf(config || {}, {
         	includeTools: [], // don't show tools in header
         	rowLines: false,
-        	columnLines: false // ignored?
-        })
+        	columnLines: false, // ignored?
+        	subtitle: undefined
+        });
         this.mixins['Voyant.panel.Panel'].constructor.apply(this, [config]);
 	},
 	
@@ -14732,7 +14769,10 @@ Ext.define('Voyant.panel.Catalogue', {
     	api: {
     		config: undefined,
     		stopList: 'auto',
-    		facet: ['facet.title','facet.author','facet.language']
+    		facet: ['facet.title','facet.author','facet.language'],
+    		title: undefined,
+    		splash: undefined,
+    		reader: "reader"
     	},
 		glyph: 'xf1ea@FontAwesome'
     },
@@ -14744,7 +14784,7 @@ Ext.define('Voyant.panel.Catalogue', {
     
     constructor: function(config) {
     	config = config || {};
-
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments); // we need api
     	Ext.apply(this, {
     		title: this.localize('title'),
     		layout: 'hbox',
@@ -14801,76 +14841,82 @@ Ext.define('Voyant.panel.Catalogue', {
     		        			this.findParentByType('panel').updateResults(Ext.isString(query) ? [query] : query)
     		        		}
     		        	},
-    		        	bbar: [{
-    		        		itemId: 'sendToVoyant',
-    		        		text: this.localize('sendToVoyantButton'),
-    		        		disabled: true,
-    		        		handler: function() {
-    		        			this.mask(this.localize("exportInProgress"));
-    		        			var catalogue = this;
-    		            		Ext.Ajax.request({
-    		            			url: this.getApplication().getTromboneUrl(),
-    		            			params: {
-    		            				corpus: this.getCorpus().getId(),
-    		            				tool: 'corpus.CorpusManager',
-    		            				keepDocuments: true,
-    		            				docId: this.getMatchingDocIds()
-    		            			},
-    		            		    success: function(response, opts) {
-    		            		    	catalogue.unmask();
-    		            		    	var json = Ext.JSON.decode(response.responseText);
-	                    				var url = catalogue.getBaseUrl()+"?corpus="+json.corpus.id;
-	                    				catalogue.openUrl(url);
-    		            		    },
-    		            		    failure: function(response, opts) {
-    		            		    	catalogue.unmask();
-    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
-    		            		    }
-    		            		})
-
-    		        		},
-    		        		scope: this
-    		        	},{
-    		        		itemId: 'export',
-    		        		text: this.localize('downloadButton'),
-    		        		disabled: true,
-    		        		handler: function() {
-    		        			this.mask(this.localize("exportInProgress"));
-    		        			var catalogue = this;
-    		            		Ext.Ajax.request({
-    		            			url: this.getApplication().getTromboneUrl(),
-    		            			params: {
-    		            				corpus: this.getCorpus().getId(),
-    		            				tool: 'corpus.CorpusManager',
-    		            				keepDocuments: true,
-    		            				docId: this.getMatchingDocIds()
-    		            			},
-    		            		    success: function(response, opts) {
-    		            		    	catalogue.unmask();
-    		            		    	var json = Ext.JSON.decode(response.responseText);
-    		            		    	catalogue.downloadFromCorpusId(json.corpus.id);
-    		            		    },
-    		            		    failure: function(response, opts) {
-    		            		    	catalogue.unmask();
-    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
-    		            		    }
-    		            		})
-
-    		        		},
-    		        		scope: this
-    		        	},{
-    		        		xtype: 'querysearchfield',
-    		        		width: 200,
-    		        		flex: 1
-    		        	},{
-    		        		itemId: 'status',
-    		        		xtype: 'tbtext'
-    		        	}]
+    		    		dockedItems: [{
+    		                dock: 'bottom',
+    		                xtype: 'toolbar',
+    		                overflowHandler: 'scroller',
+    		                items: [{
+	    		        		itemId: 'sendToVoyant',
+	    		        		text: this.localize('sendToVoyantButton'),
+	    		        		disabled: true,
+	    		        		handler: function() {
+	    		        			this.mask(this.localize("exportInProgress"));
+	    		        			var catalogue = this;
+	    		            		Ext.Ajax.request({
+	    		            			url: this.getApplication().getTromboneUrl(),
+	    		            			params: {
+	    		            				corpus: this.getCorpus().getId(),
+	    		            				tool: 'corpus.CorpusManager',
+	    		            				keepDocuments: true,
+	    		            				docId: this.getMatchingDocIds()
+	    		            			},
+	    		            		    success: function(response, opts) {
+	    		            		    	catalogue.unmask();
+	    		            		    	var json = Ext.JSON.decode(response.responseText);
+		                    				var url = catalogue.getBaseUrl()+"?corpus="+json.corpus.id;
+		                    				catalogue.openUrl(url);
+	    		            		    },
+	    		            		    failure: function(response, opts) {
+	    		            		    	catalogue.unmask();
+	    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
+	    		            		    }
+	    		            		})
+	
+	    		        		},
+	    		        		scope: this
+	    		        	},{
+	    		        		itemId: 'export',
+	    		        		text: this.localize('downloadButton'),
+	    		        		disabled: true,
+	    		        		handler: function() {
+	    		        			this.mask(this.localize("exportInProgress"));
+	    		        			var catalogue = this;
+	    		            		Ext.Ajax.request({
+	    		            			url: this.getApplication().getTromboneUrl(),
+	    		            			params: {
+	    		            				corpus: this.getCorpus().getId(),
+	    		            				tool: 'corpus.CorpusManager',
+	    		            				keepDocuments: true,
+	    		            				docId: this.getMatchingDocIds()
+	    		            			},
+	    		            		    success: function(response, opts) {
+	    		            		    	catalogue.unmask();
+	    		            		    	var json = Ext.JSON.decode(response.responseText);
+	    		            		    	catalogue.downloadFromCorpusId(json.corpus.id);
+	    		            		    },
+	    		            		    failure: function(response, opts) {
+	    		            		    	catalogue.unmask();
+	    		            		    	me.showResponseError("Unable to export corpus: "+catalogue.getCorpus().getId(), response);
+	    		            		    }
+	    		            		})
+	
+	    		        		},
+	    		        		scope: this
+	    		        	},{
+	    		        		xtype: 'querysearchfield',
+	    		        		width: 200,
+	    		        		flex: 1
+	    		        	},{
+	    		        		itemId: 'status',
+	    		        		xtype: 'tbtext'
+	    		        	}]
+    		    		}]
     		        }, {
-    		        	xtype: 'reader',
+    		        	xtype: this.getApiParam("reader"),
     		        	flex: 1,
     		        	height: '100%',
-    		        	align: 'stretch'
+    		        	align: 'stretch',
+    		        	header: false
     		        }]
     	});
 
@@ -14881,6 +14927,11 @@ Ext.define('Voyant.panel.Catalogue', {
     	this.on('loadedCorpus', function(src, corpus) {
     		this.queryById('status').update(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]))
     		if (!this.getCustomResultsHtml()) {
+    			if (this.getApiParam("splash")) {
+        			this.setCustomResultsHtml(this.getApiParam("splash"));
+        			this.updateResults();
+        			return;
+    			}
     			this.setCustomResultsHtml(new Ext.XTemplate(this.localize('noMatches')).apply([corpus.getDocumentsCount()]));
     			this.updateResults();
     	    	Ext.Ajax.request({
@@ -14968,7 +15019,11 @@ Ext.define('Voyant.panel.Catalogue', {
 				panel.getFacets()['lexical'] = labels;
 				panel.updateResults();
 			})*/
-    	})
+    		
+        	var title = this.getApiParam("title");
+        	if (title) {this.setTitle(title)}
+    	});
+    	
     	
     },
     
@@ -15785,6 +15840,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	links: undefined,
     	zoom: undefined,
     	
+    	dragging: false,
+    	
     	contextMenu: undefined,
     	
     	currentNode: undefined,
@@ -16310,7 +16367,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			return 'translate('+x+','+y+')';
 	    		}.bind(this));
 	    		
-	    		if (this.getVisLayout().alpha() < 0.075) {
+	    		if (!this.getDragging() && this.getVisLayout().alpha() < 0.075) {
 	    			this.getVisLayout().alpha(-1); // trigger end event
 	    		}
 	    	}.bind(this))
@@ -16413,12 +16470,14 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			})
 			.call(d3.drag()
 				.on('start', function(d) {
-					if (!d3.event.active) me.getVisLayout().alphaTarget(0.3).restart();
+					me.setDragging(true);
+					if (!d3.event.active) me.getVisLayout().alpha(0.3).restart();
 					d.fx = d.x;
 					d.fy = d.y;
 					d.fixed = true;
 				})
 				.on('drag', function(d) {
+					me.getVisLayout().alpha(0.3); // don't let simulation end while the user is dragging
 					d.fx = d3.event.x;
 					d.fy = d3.event.y;
 					if (me.isMasked()) {
@@ -16430,7 +16489,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			    	}
 				})
 				.on('end', function(d) {
-					if (!d3.event.active) me.getVisLayout().alphaTarget(0);
+					me.setDragging(false);
+//					if (!d3.event.active) me.getVisLayout().alpha(0);
 					if (d.fixed != true) {
 						d.fx = null;
 						d.fy = null;
@@ -21109,12 +21169,12 @@ Ext.define('Voyant.panel.Reader', {
     
     INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling
     
-    constructor: function() {
+    constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
     
-    initComponent: function() {
+    initComponent: function(config) {
     	var tokensStore = Ext.create("Voyant.data.store.Tokens");
     	var me = this;
     	tokensStore.on("beforeload", function(store) {
@@ -21285,7 +21345,6 @@ Ext.define('Voyant.panel.Reader', {
     	}, this);
     	
     	Ext.apply(this, {
-    		title: this.localize('title'),
     		cls: 'voyant-reader',
     	    layout: 'fit',
     	    items: {
@@ -21881,6 +21940,129 @@ Ext.define('Voyant.panel.Reader', {
     }
 });
 
+Ext.define('Voyant.panel.SimpleDocReader', {
+	extend: 'Ext.panel.Panel',
+	mixins: ['Voyant.panel.Panel'],
+	alias: 'widget.simpledocreader',
+	isConsumptive: true,
+    statics: {
+    	i18n: {
+    		noNext: "No next document.",
+    		noPrevious: "No previous document."
+    	},
+    	api: {
+    		docIndex: undefined,
+    		docId: undefined
+    	},
+    	glyph: 'xf0f6@FontAwesome'
+	},
+    config: {
+    },
+    
+    constructor: function(config) {
+        this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    },
+    
+    initComponent: function(config) {
+    	var me = this;
+    	Ext.apply(this, {
+    		html: '<iframe style="width: 100%; height: 100%; border: none;"></iframe>',
+    		dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                overflowHandler: 'scroller',
+                items: [{
+                	glyph: 'xf060@FontAwesome',
+            		handler: this.fetchPrevious,
+            		scope: this
+            	},{
+            		glyph: 'xf061@FontAwesome',
+            		handler: this.fetchNext,
+            		scope: this
+                }]
+    		}],
+    		listeners: {
+    			loadedCorpus: function(src, corpus) {
+    				
+    				// we can keep the reader blank to begin
+    				if (this.getApiParam("autoLoadOnLoadedCorpus", "false")==="true") {return;}
+    				
+    				this.fireEvent("documentSelected", this, 0);
+    				
+    			},
+        		documentSelected: function(src, document) {
+        			this.setApiParams({
+        				docIndex: this.getCorpus().getDocument(document).getIndex(),
+        				docId: undefined
+        			});
+        			this.fetch();
+        		},
+        		scope: this
+    		}
+    	});
+    	
+        this.callParent(arguments);
+    },
+    
+	fetchPrevious: function() {
+		var doc;
+		if (this.getApiParam("docIndex")!==undefined) {doc = this.getCorpus().getDocument(this.getApiParam("docIndex"));}
+		else if (this.getApiParam("docId")!==undefined) {doc = this.getCorpus().getDocument(this.getApiParam("docId"));}
+		else {doc = this.getCorpus().getDocument(1);}
+		if (doc.getIndex()>0) {
+			this.setApiParams({docIndex: doc.getIndex()-1, docId: undefined});
+			this.fetch();
+		} else {
+			this.toastInfo(this.localize('noPrevious'))
+		}
+	},
+	
+	fetchNext: function() {
+		var doc;
+		if (this.getApiParam("docIndex")!==undefined) {doc = this.getCorpus().getDocument(this.getApiParam("docIndex"));}
+		else if (this.getApiParam("docId")!==undefined) {doc = this.getCorpus().getDocument(this.getApiParam("docId"));}
+		else {
+			this.setApiParams({docIndex: 0, docId: undefined});
+			return this.fetch();
+		}
+		if (doc.getIndex()<this.getCorpus().getDocumentsCount()-1) {
+			this.setApiParams({docIndex: doc.getIndex()+1, docId: undefined});
+			this.fetch();
+		} else {
+			this.toastInfo(this.localize('noNext'))
+		}
+	},
+	
+	fetch: function() {
+		var doc;
+		if (this.getApiParam("docIndex")!==undefined) {doc = this.getCorpus().getDocument(this.getApiParam("docIndex"));}
+		else if (this.getApiParam("docId")!==undefined) {doc = this.getCorpus().getDocument(this.getApiParam("docId"));}
+		else {doc = this.getCorpus().getDocument(0);}
+		var iframe = this.getTargetEl().down("iframe", true);
+		iframe.setAttribute("src", "about:blank")
+		if (this.getApiParam("originalUrlMetadataKey")) {
+			var url = doc.get(this.getApiParam("originalUrlMetadataKey"));
+			if (url) {
+				iframe.setAttribute("src", url)
+				return;
+			}
+		}
+		
+		var params = {
+			corpus: this.getCorpus().getId(),
+			docIndex: doc.getIndex(),
+			tool: 'corpus.DocumentTokens',
+			template: 'docTokensPlusStructure2html',
+			outputFormat: 'html',
+			limit: 0
+		}
+		var url = this.getTromboneUrl() + "?" + Ext.Object.toQueryString(params);
+		iframe.setAttribute("src", url);
+
+	}
+});
+
 Ext.define('Voyant.panel.ScatterPlot', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -21914,7 +22096,8 @@ Ext.define('Voyant.panel.ScatterPlot', {
     		term: undefined,
     		query: undefined,
     		whitelist: undefined,
-    		label: ['summary', 'docs', 'terms']
+    		label: ['summary', 'docs', 'terms'],
+    		storeJson: undefined
     	},
 		glyph: 'xf06e@FontAwesome'
     },
@@ -21939,11 +22122,12 @@ Ext.define('Voyant.panel.ScatterPlot', {
     
     constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-        this.callParent(arguments);
-    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-    	if (config) {
-    		if (config.whitelist) {this.setApiParam("whitelist", config.whitelist);}
+		if ("storeJson" in config) {
+    		var json = JSON.parse(config.storeJson);
+    		Ext.apply(config, json);
     	}
+		this.callParent(arguments);
+    	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
     
     initComponent: function() {
@@ -21959,6 +22143,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
     	this.setDocSimStore(Ext.create('Voyant.data.store.DocSimAnalysis', {
     		listeners: {load: this.maskAndBuildChart, scope: this}
     	}));
+    	
     	this.setTermStore(Ext.create('Ext.data.JsonStore', {
 			fields: [
 				{name: 'term'},
@@ -22377,7 +22562,17 @@ Ext.define('Voyant.panel.ScatterPlot', {
 				this.queryById('optionsPanel').collapse();
 				this.queryById('termsGrid').collapse();
 			}
+			if (this.config.storeClass && this.config.storeData) {
+				this.loadStoreFromJson(this.config.storeClass, this.config.storeData);
+			}
 		}, this);
+        
+        this.on('beforedestroy', function(component) {
+        	var oldChart = this.queryById('chart');
+        	if (oldChart !== null) {
+        		this.queryById('chartParent').remove(oldChart);
+        	}
+        }, this);
         
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
@@ -22424,6 +22619,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		this.queryById('perplexity').setVisible(analysis === 'tsne');
 		this.queryById('iterations').setVisible(analysis === 'tsne');
 		if (analysis === 'ca') {
+			// TODO handling for when there's no corpus
 			if (this.getCorpus().getDocumentsCount() == 3) {
 				this.setApiParam('dimensions', 2);
 				this.queryById('dimensions').menu.items.get(0).setChecked(true); // need 1-2 docs or 4+ docs for 3 dimensions
@@ -22431,11 +22627,31 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		}
     },
     
+    loadStoreFromJson: function(storeClass, storeData) {
+		if (storeClass == 'Voyant.data.store.CAAnalysis') {
+			this.getCaStore().loadRawData(storeData);
+			this.doAnalysisChange('ca');
+			this.maskAndBuildChart.call(this, this.getCaStore());
+		} else if (storeClass == 'Voyant.data.store.PCAAnalysis') {
+			this.getPcaStore().loadRawData(storeData);
+			this.doAnalysisChange('pca');
+			this.maskAndBuildChart.call(this, this.getPcaStore());
+		} else if (storeClass == 'Voyant.data.store.TSNEAnalysis') {
+			this.getTsneStore().loadRawData(storeData);
+			this.doAnalysisChange('tsne');
+			this.maskAndBuildChart.call(this, this.getTsneStore());
+		} else if (storeClass == 'Voyant.data.store.DocSimAnalysis') {
+			this.getDocSimStore().loadRawData(storeData);
+			this.doAnalysisChange('docSim');
+			this.maskAndBuildChart.call(this, this.getDocSimStore());
+		}
+    },
+    
     maskAndBuildChart: function(store) {
     	this.queryById('chartParent').mask(this.localize('plotting'));
     	Ext.defer(this.buildChart, 50, this, [store]);
     },
-    
+
     buildChart: function(store) {
     	var that = this; // needed for tooltip renderer
     	
@@ -29122,6 +29338,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		content: '',
 		docs: undefined,
 		isChangeRegistered: false,
+		editor: undefined,
 		editedTimeout: undefined
 	},
 	statics: {
@@ -29133,27 +29350,26 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		}
 	},
 	constructor: function(config) {
-		this.callParent(arguments)
+		this.callParent(arguments);
 	},
 	listeners: {
 		boxready: function() {
 			var me = this;
-			this.editor = ace.edit(Ext.getDom(this.getEl()));
-			this.editor.$blockScrolling = Infinity;
-			this.editor.getSession().setUseWorker(true);
-			this.editor.setTheme(this.getTheme());
-			this.editor.getSession().setMode(this.getMode());
-			this.editor.setOptions({minLines: 6, maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10, autoScrollEditorIntoView: true, scrollPastEnd: true});
-			this.editor.setHighlightActiveLine(false);
-			this.editor.renderer.setShowPrintMargin(false);
-			this.editor.renderer.setShowGutter(false);
-			this.editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
-			this.editor.clearSelection()
-		    this.editor.on("focus", function() {
-		    	me.editor.renderer.setShowGutter(true);
+			var editor = ace.edit(Ext.getDom(this.getEl()));
+			editor.$blockScrolling = Infinity;
+			editor.getSession().setUseWorker(true);
+			editor.setTheme(this.getTheme());
+			editor.getSession().setMode(this.getMode());
+			editor.setOptions({minLines: 6, maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			editor.setHighlightActiveLine(false);
+			editor.renderer.setShowPrintMargin(false);
+			editor.renderer.setShowGutter(false);
+			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
+			editor.clearSelection();
+		    editor.on("focus", function() {
+		    	me.getEditor().renderer.setShowGutter(true);
 		    }, this);
-		    var moi = this;
-		    this.editor.on("change", function() {
+		    editor.on("change", function() {
 		    	if (me.getIsChangeRegistered()==false) {
 		    		me.setIsChangeRegistered(true);
 			    	var wrapper = me.up('notebookcodeeditorwrapper');
@@ -29170,10 +29386,10 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		    		}
 		    	}
 		    }, this);
-		    this.editor.on("blur", function() {
-		    	me.editor.renderer.setShowGutter(false);
+		    editor.on("blur", function() {
+		    	me.getEditor().renderer.setShowGutter(false);
 		    });
-			this.editor.commands.addCommand({
+			editor.commands.addCommand({
 				name: 'run',
 			    bindKey: {win: "Shift-Enter", mac: "Shift-Enter"}, // additional bindings like alt/cmd-enter don't seem to work
 			    exec: function(editor) {
@@ -29183,9 +29399,10 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			    	}
 			    }				
 			});
+			this.setEditor(editor);
 			
 			ace.config.loadModule('ace/ext/tern', function () {
-	            me.editor.setOptions({
+	            me.getEditor().setOptions({
 	                /**
 	                 * Either `true` or `false` or to enable with custom options pass object that
 	                 * has options for tern server: http://ternjs.net/doc/manual.html#server_api
@@ -29219,18 +29436,24 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	                enableBasicAutocompletion: true
 	            });
 	        });
+		},
+		removed: function(cmp, container) {
+			if (cmp.getEditor()) {
+				cmp.getEditor().destroy();
+			}
 		}
+		
 	},
 	
 	switchModes: function(mode) {
 		this.setMode('ace/mode/'+mode);
-		this.editor.getSession().setMode(this.getMode());
-		this.editor.setOptions({maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10});
+		this.getEditor().getSession().setMode(this.getMode());
+		this.getEditor().setOptions({maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10});
 
 	},
 	
 	getValue: function() {
-		return this.editor.getValue();
+		return this.getEditor().getValue();
 	}
 })
 Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
@@ -29501,7 +29724,20 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	
 	clearResults: function() {
 		this.results.show();
-		this.results.update(' ');
+		
+		var panel = this.results.el.down('.x-panel');
+		if (panel) {
+			var id = panel.id;
+			var cmp = Ext.getCmp(id);
+			if (cmp) {
+				cmp.destroy();
+			} else {
+				panel.destroy();
+			}
+		} else {
+			this.results.update(' ');
+		}
+		
 		this.getTargetEl().fireEvent('resize');
 	},
 	
@@ -29580,6 +29816,13 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 					this.handleClick(cmp);
 				}
 			}, this);
+		},
+		removed: function(cmp, container) {
+			// properly remove editor
+			if (cmp.getEditor()) {
+				cmp.getEditor().focusManager.blur(true); //focusManager bug workaround, see: https://dev.ckeditor.com/ticket/16825
+				cmp.getEditor().destroy();
+			}
 		}
 	},
 	

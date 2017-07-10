@@ -1,5 +1,5 @@
 Ext.define('Voyant.util.Toolable', {
-	requires: ['Voyant.util.Localization'],
+	requires: ['Voyant.util.Localization','Voyant.util.Api'],
 	statics: {
 		i18n: {
 			exportGridAllJson: "export all available data in JSON",
@@ -7,10 +7,15 @@ Ext.define('Voyant.util.Toolable', {
 			exportAllJsonWarning: "You're requesting all of the available data (in a JSON format that Voyant uses), are you sure you want to continue?",
 			exportGridAllTsv: "export all available data as tab separated values (text)",
 			exportAllTsvWarning: "You're requesting all of the available data, are you sure you want to continue?"
+		},
+		api: {
+			suppressTools: false
 		}
 	},
 	constructor: function(config) {
 		config = config || {};
+		if (this.getApiParam && this.getApiParam("suppressTools")=="true") {return;}
+		if ("header" in config && config.header===false) {return;}
 		var me = this;
 		var moreTools = undefined;
 		var parent = this.up('component');

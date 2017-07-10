@@ -39,12 +39,12 @@ Ext.define('Voyant.panel.Reader', {
     
     INITIAL_LIMIT: 1000, // need to keep track since limit can be changed when scrolling
     
-    constructor: function() {
+    constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
     
-    initComponent: function() {
+    initComponent: function(config) {
     	var tokensStore = Ext.create("Voyant.data.store.Tokens");
     	var me = this;
     	tokensStore.on("beforeload", function(store) {
@@ -215,7 +215,6 @@ Ext.define('Voyant.panel.Reader', {
     	}, this);
     	
     	Ext.apply(this, {
-    		title: this.localize('title'),
     		cls: 'voyant-reader',
     	    layout: 'fit',
     	    items: {
