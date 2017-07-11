@@ -132,6 +132,7 @@ Ext.define('Voyant.panel.Documents', {
     		}, {
     			text: this.localize('downloadButton'),
 		    	glyph: 'xf019@FontAwesome',
+    			itemId: 'downloadButton',
     			handler: function() {
     				me.downloadFromCorpusId(me.getStore().getCorpus().getId())
     			}
@@ -222,6 +223,7 @@ Ext.define('Voyant.panel.Documents', {
     		this.store.load({params: this.getApiParams()});
     		if (this.hasCorpusAccess(corpus)==false) {
     			this.queryById('modifyButton').hide();
+    			this.queryById('downloadButton').hide();
     		}
     		/*
     		var me = this;

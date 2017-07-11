@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Jul 09 18:22:49 PDT 2017 */
+/* This file created by JSCacher. Last modified: Mon Jul 10 20:51:16 PDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -19379,6 +19379,7 @@ Ext.define('Voyant.panel.Documents', {
     		}, {
     			text: this.localize('downloadButton'),
 		    	glyph: 'xf019@FontAwesome',
+    			itemId: 'downloadButton',
     			handler: function() {
     				me.downloadFromCorpusId(me.getStore().getCorpus().getId())
     			}
@@ -19469,6 +19470,7 @@ Ext.define('Voyant.panel.Documents', {
     		this.store.load({params: this.getApiParams()});
     		if (this.hasCorpusAccess(corpus)==false) {
     			this.queryById('modifyButton').hide();
+    			this.queryById('downloadButton').hide();
     		}
     		/*
     		var me = this;
