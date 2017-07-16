@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Jul 10 20:51:16 PDT 2017 */
+/* This file created by JSCacher. Last modified: Fri Jul 14 16:26:03 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -21347,6 +21347,7 @@ Ext.define('Voyant.panel.Reader', {
     	}, this);
     	
     	Ext.apply(this, {
+    		title: this.localize('title'),
     		cls: 'voyant-reader',
     	    layout: 'fit',
     	    items: {
@@ -30137,6 +30138,31 @@ Ext.define('Voyant.notebook.Notebook', {
     			'saveIt': {
     				tooltip: this.localize("saveItTip"),
     				callback: function() {
+    					/*
+    					if (!("previousUrl" in this.getMetadata())) {
+    						var passWin = Ext.create('Ext.window.Window', {
+    				            title: me.localize('saveNewSpiralTitle'),
+    						    layout: 'fit',
+    						    items: {
+    						    	padding: 10,
+    				                flex: 1,
+    				                width: 300,
+    				                layout: {
+    				                    type: 'vbox',
+    				                    align: 'stretch'
+    				                },
+    				                items: [
+    				                    {
+    				                        html: '<p>'+me.localize('saveNewSpiralMessage')+'</p>'
+    				                    },{
+    				                    	xtype: 'textfield',
+    				                    	fieldLabel: me.localize('password')
+    				                    }
+    				                ],
+
+    						This appears to be a new Spiral notebook. You can choos
+    					}
+    					*/
     					me.mask(me.localize('saving'));
     			    	 Ext.Ajax.request({
     			    	     url: this.getTromboneUrl(),
@@ -30225,6 +30251,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     },
+    
     autoScroll: true,
     exportToolClick: function() {
     	var panel = this.up('panel');

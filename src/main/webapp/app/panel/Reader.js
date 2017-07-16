@@ -215,6 +215,7 @@ Ext.define('Voyant.panel.Reader', {
     	}, this);
     	
     	Ext.apply(this, {
+    		title: this.localize('title'),
     		cls: 'voyant-reader',
     	    layout: 'fit',
     	    items: {

@@ -227,6 +227,31 @@ Ext.define('Voyant.notebook.Notebook', {
     			'saveIt': {
     				tooltip: this.localize("saveItTip"),
     				callback: function() {
+    					/*
+    					if (!("previousUrl" in this.getMetadata())) {
+    						var passWin = Ext.create('Ext.window.Window', {
+    				            title: me.localize('saveNewSpiralTitle'),
+    						    layout: 'fit',
+    						    items: {
+    						    	padding: 10,
+    				                flex: 1,
+    				                width: 300,
+    				                layout: {
+    				                    type: 'vbox',
+    				                    align: 'stretch'
+    				                },
+    				                items: [
+    				                    {
+    				                        html: '<p>'+me.localize('saveNewSpiralMessage')+'</p>'
+    				                    },{
+    				                    	xtype: 'textfield',
+    				                    	fieldLabel: me.localize('password')
+    				                    }
+    				                ],
+
+    						This appears to be a new Spiral notebook. You can choos
+    					}
+    					*/
     					me.mask(me.localize('saving'));
     			    	 Ext.Ajax.request({
     			    	     url: this.getTromboneUrl(),
@@ -315,6 +340,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     },
+    
     autoScroll: true,
     exportToolClick: function() {
     	var panel = this.up('panel');
