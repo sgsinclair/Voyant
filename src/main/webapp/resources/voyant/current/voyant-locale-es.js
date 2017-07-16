@@ -2,7 +2,7 @@ Voyant.util.Localization.LANGUAGE='es'
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"¿Estás seguro de querrer de nuevo empezar (y dejar el actual corpus)?",
 "title":"Voyant Tools",
-"helpTip":"Voyant Tools es un entorno de lectura y análisis basado en web para textos digitales.",
+"helpTip":"Voyant Tools es un entorno de lectura y análisis para textos digitales basado en web",
 "homeTip":"Clic para comenzar de nuevo desde la pantalla de creación del corpus",
 "home":"Comenzar de nuevo "});
 Ext.apply(Voyant.panel.Topics.i18n, {
@@ -18,7 +18,7 @@ Ext.apply(Voyant.panel.Topics.i18n, {
 "runIterations":"Iteraciones {0} ejecutadas",
 "parsingDocuments":"Análisis gramatical de los documentos...",
 "topicTip":"Esto proveé una lista ordenada de los diez términos más significativos en el agrupamiento de tópicos.",
-"helpTip":"En el actual corpus, esta herramienta realizara un modelo del tópico.(<a href=\"https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation\" target=\"_blank\">LDA</a>). Inicialmente las palabras son asignadas de manera aleatoria a cada topico y con cada iteración cada uno de ellos se perfecciona. Tener en cuenta que debido a la asignación aleatoria los resultados serán diferentes cada vez que esta herramienta se ejecute. ",
+"helpTip":"En el actual corpus, esta herramienta realizara un modelo del tópico.(<a href=\"https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation\" target=\"_blank\">LDA</a>). Inicialmente las palabras son asignadas de manera aleatoria a cada topico y con cada iteración, cada uno de ellos, se perfecciona. Tener en cuenta que debido a la asignación aleatoria los resultados serán diferentes cada vez que esta herramienta se ejecute. ",
 "loadingDocuments":"Cargando documentos... ",
 "runIterationsTip":"Esto ejecutara iteraciones (100 por defecto) en los tópicos actuales. (En otras palabras, los tópicos no son reemplazados, ellos son refinados. ",
 "perDocLimitHigh":"Este valor es alto. Por favor, notar que si incluye demasiados términos (el valor por defecto es 1,000) el problema podría ocurrir en le servidor o en su navegador. ",
@@ -38,7 +38,7 @@ Ext.apply(Voyant.panel.Cirrus.i18n, {
 "options":"Opciones ",
 "scale":"Escala ",
 "title":"Cirrus",
-"helpTip":"</p><p>Cirrus provides a wordcloud view of the most frequently occurring words in the corpus or document –&nbsp;this provides a convenient (though reductive) overview of the content. Features include</p><ul><li>term frequency appears when hovering over words</li><li>clicking on terms may produce results in other tools if any are displayed</li></ul>",
+"helpTip":"</ p> <p> Cirrus proporciona una vista de \"nube de palabras\" de aquellas que se repiten con mayor frecuencia en el corpus o en el documento - & nbsp; esto proporciona una visión general y conveniente (aunque reducida) del contenido. Las características incluyen </ p> <ul> <li> la frecuencia del término aparece cuando se cierne sobre las palabras </ li> <li> al hacer clic en los términos puede producirse resultados en otras herramientas si estas están activas </ li>",
 "visibleTerms":"Términos "});
 Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "emptyQuery":"tipea la consulta aquí",
@@ -50,7 +50,7 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "exportNewCorpus":"Nuevo Corpus",
 "title":"Buscador de documentos ",
 "loading":"cargando corpus",
-"addRow":"Añadir Fila. ",
+"addRow":"Añadir Fila",
 "operator":"Operador ",
 "textField":"texto (por defecto) ",
 "unsuccessfulQuery":"Sin capacidad para completar la consulta",
@@ -100,7 +100,7 @@ Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "visibleSegments":"Visible ",
 "visibleSegmentsTip":"Esta opción determina cuántos documentos / segmentos se muestran a la vez.",
 "reset":"Reiniciar ",
-"segmentsTip":"Esta opción le permite definir cuántos segmentos debe dividirse un documento (tenga en cuenta que esta opción sólo se aplica a la distribución dentro de un documento, no a la distribución a través de un corpus).",
+"segmentsTip":"Esta opción le permite definir en cuántos segmentos debe dividirse un documento (tenga en cuenta que esta opción sólo se aplica a la distribución dentro de un documento, no a la distribución a través de un corpus).",
 "termNotFound":"Término no encontrado.",
 "fractionTip":"Esta opción le permite definir el número de palabras visualizadas. Por ejemplo, 20 mantendrá solamente las palabras que ocurren con el 20% más bajo de frecuencia."});
 Ext.apply(Voyant.util.Downloadable.i18n, {
@@ -110,17 +110,17 @@ Ext.apply(Voyant.util.Downloadable.i18n, {
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"Contar (contexto)",
 "matchingTerms":"{contar}",
-"contextTerm":"Collocate",
+"contextTerm":"Contexto del término",
 "emptyText":"Sin resultados coincidentes ",
 "termTip":"Este es el término de palabra clave en torno al cual se cuentan los términos de colocación (contexto).",
 "termRawFreqTip":"El número de veces en que un término clave ocurre dentro del corpus. ",
-"title":"Collacates",
+"title":"Colocaciones",
 "termRawFreq":"Contar (palabara clave)",
 "context":"contexto ",
 "term":"Término",
-"helpTip":"<p>Corpus Collacates es una tabla para visualizar cual de los términos aparece con más frecuencia de acuerdo a su próximidad con las palabras clave a través de todo el corpus. Las características incluyen:</p><ul><li>reordenar por palabra, palabra collocate, contar palabras collocate </li><li>a caja de búsqueda de consulta (Coloque el cursor sobre el icono de aumento para obtener ayuda con la sintaxis)</li></ul>",
-"contextTermRawFreqTip":"El número de veces que esta colocación se produce cerca del término de palabra clave en el corpus.",
-"contextTermTip":"Este es el término de colocación (contexto) que se produce cerca del término de palabra clave."});
+"helpTip":"<p>Corpus de las Colocaciones es una tabla para visualizar cual de los términos aparece con más frecuencia de acuerdo a su próximidad con las palabras clave a través de todo el corpus. Las características incluyen:</p><ul><li>reordenar por palabra, palabra collocate, contar palabras collocate </li><li>a caja de búsqueda de consulta (Coloque el cursor sobre el icono de aumento para obtener ayuda con la sintaxis)</li></ul>",
+"contextTermRawFreqTip":"El número de veces que el contexto del término se produce cerca del de la palabra clave en el corpus.",
+"contextTermTip":"Este es el contexto del término que se produce cerca de la palabra clave."});
 Ext.apply(Voyant.panel.Documents.i18n, {
 "keepTip":"Haga clic aquí para crear un nuevo corpus que sólo incluya documentos seleccionados o filtrados (consulta de búsqueda).",
 "reorderFilteredError":"No puede reordenar un corpus filtrado (después de la consulta de búsqueda). Por favor, cree primero un nuevo corpus (con el botón <i> Eliminar </ i> o <i> Mantener </ i>) y vuelva a ordenar el nuevo corpus.",
@@ -171,9 +171,9 @@ Ext.apply(Voyant.panel.Bubbles.i18n, {
 "soundTip":"Alternar el sonido",
 "sound":"sonido ",
 "adaptation":"Adaptado de <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\"><i>Pares de Letras</i></a> by Martin Ignacio Bereciartua",
-"title":"Bubbles ",
+"title":"Burbujas",
 "speedTip":"Controla la velocidad de la visualización ",
-"helpTip":"Bubbles es una visualización lúdica de términos frecuentes al interior de un documento",
+"helpTip":"Burbujas es una visualización lúdica de términos frecuentes al interior de un documento",
 "speed":"velocidad "});
 Ext.apply(Voyant.widget.CorpusDocumentSelector.i18n, {
 "corpus":"Corpus",
@@ -185,24 +185,24 @@ Ext.apply(Voyant.panel.Reader.i18n, {
 "helpTip":"<p>La herramienta Lector proporciona una vista del texto del corpus. Las características incluyen: </p><ul><li> información de frecuencia aparece al pasar el ratón sobre una palabra </li><li>la información de distribución aparece en un gráfico al final al hacer clic en una palabra </li><li> a El gráfico de barras en la parte inferior indica el tamaño relativo de cada documento en el corpus </li><li> un cuadro de búsqueda para consultas (coloque el cursor sobre el icono de ampliación para obtener ayuda con la sintaxis) </li></ul>"});
 Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "fetchingCorpus":"Recuperando el corpus",
-"moreToolsTypeViz":"Herramientas de visualización ",
-"noPasswordGiven":"Por favor, proveer código de acceso ",
+"moreToolsTypeViz":"Herramientas de Visualización ",
+"noPasswordGiven":"Por favor, proveer código de acceso. ",
 "passwordValidationError":"Lo siento, un error inesperado ocurrió cuando trate de validar tu código de acceso",
 "passwordRequiredMessage":"Este corpus requiere un código de acceso ",
 "didYouKnow":"¿Lo sabias? ",
 "passwordRequiredTitle":"Requiere código de acceso",
 "password":"código de acceso ",
-"didYouKnowText":"¡Ayuda y opciones están disponibles!",
-"moreToolsScaleDocument":"Herramientas para Documentos",
+"didYouKnowText":"¡Las opciones de ayuda se encuentran disponibles!",
+"moreToolsScaleDocument":"Herramientas para los Documentos",
 "moreToolsTypeGrid":"Herramientas de Grilla ",
-"moreToolsType":"Herramientas por tipo",
+"moreToolsType":"Herramientas por Tipo",
 "moreToolsTypeOther":"Otras Herramientas ",
 "nonConsumptiveButton":"Acceso limitado ",
-"moreToolsScaleCorpus":"Herramientas para Corpus",
-"nonConsumptiveMessage":"Alternativamente, puede hacer clic en el botón <i>Acceso limitado</i> para continuar con una funcionalidad limitada (en general, este acceso no consuntivo le permite explorar datos derivados del corpus sin permitirle leer texto del corpus).",
+"moreToolsScaleCorpus":"Herramientas para el Corpus",
+"nonConsumptiveMessage":"Alternativamente, puedes hacer clic en el botón <i>Acceso limitado</i> para continuar con una funcionalidad limitada (en general, este acceso no consuntivo permitirá explorar datos derivados del corpus sin permitirte leer texto del corpus).",
 "passwordValidateButton":"Validar",
 "moreToolsScale":"Herramientas por Escala",
-"badPassword":"Lo siento, no parece un código de acceso válido "});
+"badPassword":"Lo siento, no parece un código de acceso válido. "});
 Ext.apply(Voyant.panel.Bubblelines.i18n, {
 "findTerm":"Encontrar Término ",
 "showTerm":"Mostrar Término ",
@@ -213,14 +213,14 @@ Ext.apply(Voyant.panel.Bubblelines.i18n, {
 "title":"Líneas de búrbuja ",
 "type":"Visualización",
 "separateLines":"Líneas Separadas para Términos ",
-"help":"Bubblelines visualiza la frecuencia y repetición del uso de un término al interior de un corpus. Cada documento del corpus es representado como una línea horizontal y divivido en segmentos de igual longitud. Cada término es representado como una búrbuja, el tamaño de ésta indica su frecuencia en el correspondiente segmento de texto. La longitud del diámetro de la búrbuja indica la mayor frecuencia del término. ",
+"help":"Líneas de Búrbuja visualiza la frecuencia y repetición del uso de un término al interior de un corpus. Cada documento del corpus es representado como una línea horizontal y divivido en segmentos de igual longitud. Cada término es representado como una búrbuja, el tamaño de ésta indica su frecuencia en el correspondiente segmento de texto. La longitud del diámetro de la búrbuja indica la mayor frecuencia del término. ",
 "total":"Total",
 "granularity":"Granularidad ",
 "options":"Opciones"});
 Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "corpusComparisonDifference":"Comparación",
 "matchingTerms":"Términos coincidentes: {count}",
-"corpusComparisonDifferenceTip":"Esta es la diferencia entre los términos frecuencia relativa en este corpus y la frecuencia relativa en un corpus de comparación (se puede definir un corpus de comparación en las opciones de herramientas).",
+"corpusComparisonDifferenceTip":"Esta es la diferencia entre los términos de la frecuencia relativa en este corpus y la frecuencia relativa de un corpus usado para comparación (se puede definir un corpus de comparación en las opciones de herramientas).",
 "emptyText":"Sin resultados coincidentes ",
 "termTip":"El término en el corpus",
 "title":"Términos ",
@@ -231,10 +231,10 @@ Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "relativeSkewness":"Oblicuidad",
 "relativeFreqTip":"La frecuencia relativa (por millón) de este término en todo el corpus.",
 "trendTip":"Esto representa la tendencia de las frecuencias relativas para cada cada término en el documento del corpus.",
-"helpTip":"</p><p>Términos de Corpus es una vista de la tabla de términos que aparecen en todo el corpus. Las características incluyen: </ li> reordenar por <i> término </i> y <i> contar </i> (haga clic en los encabezados de columna) </li> <li> El término tendencias de frecuencia a través del corpus (si el corpus tiene múltiples documentos) o a través del documento (si el corpus tiene sólo un documento) </li> <li> columnas adicionales disponibles (frecuencia relativa, distribución pico y sesgo) haciendo clic en la flecha que aparece cuando se cierne sobre un encabezado </li><li> un cuadro de búsqueda para consultas (coloque el cursor sobre el icono de ampliación para obtener ayuda con la sintaxis) </li> </ul>",
+"helpTip":"</p><p>Los términos del Corpus se visualizan en una tabla con los términos que aparecen en todo el corpus. Las características incluyen: </ li> reordenar por <i> término </i> y <i> contar </i> (haga clic en los encabezados de columna) </li> <li> El término tendencias de frecuencia a través del corpus (si el corpus tiene múltiples documentos) o a través del documento (si el corpus tiene sólo un documento) </li> <li> columnas adicionales disponibles (frecuencia relativa, distribución pico y sesgo) haciendo clic en la flecha que aparece cuando se cierne sobre un encabezado </li><li> un cuadro de búsqueda para consultas (coloque el cursor sobre el icono de ampliación para obtener ayuda con la sintaxis) </li> </ul>",
 "relativeSkewnessTip":"Esta es una medida estadística de la simetría de las frecuencias relativas de un término a través de la corpus."});
 Ext.apply(Voyant.panel.NoTool.i18n, {
-"notImplemented":"<p>La herramienta<i>{0}</i> existía en una versión anterior de Voyant Tools pero no se ha implementado en esta versión. Algunas herramientas pueden ser reimplementadas eventualmente, mientras que otras son poco probables de ser implementadas debido a que eran experimentales, inútiles o dependen de tecnologías que ya no son compatibles (como Adobe Flash y Applets Java). </p> <p> Como usar la nueva versión de Voyant o si intenta usar la herramienta <i> {0} </i> en la versión anterior. </p>",
+"notImplemented":"<p>La herramienta<i>{0}</i> existía en una versión anterior de Voyant Tools pero no se ha implementado en esta versión. Algunas herramientas pueden ser reimplementadas eventualmente, mientras que otras no porque son experimentales, no son útiles o dependen de tecnologías que ya no son compatibles (como Adobe Flash y Applets Java </p><p> Por favor, decida si desea utilizar la nueva versión de Voyant o si prefiere utilizar la herramienta <i> {0} </ i> en la versión anterior. </p></p>",
 "badToolSpecified":"La herramienta <i> {0} </ i> no existe. Usted será redirigido a la página principal de Voyant Tools.",
 "currentButton":"Usar la versión actual",
 "oldButton":"Usar la versión antigua",
@@ -250,8 +250,8 @@ Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 "releaseToRemove":"Liberar para eliminar este término ",
 "context":"Contexto ",
 "clearTerms":"Limpiar",
-"title":"Enlaces ",
-"helpTip":"<p>Collocates graph shows a network graph of higher frequency terms that appear in proximity. Keywords are shown in blue and collocates (words in proximity) are showing in orange. Features include:</p><ul><li>hovering over keywords shows their frequency in the corpus</li><li>hovering over collocates shows their frequency in proximity (not their total frequency)</li><li>double-clicking on any word fetches more results</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>"});
+"title":"Enlaces",
+"helpTip":"<p>El gráfico de Colocaciones muestra un gráfico de red de los términos con una frecuencia más alta que aparecen por proximidad. Las palabras clave se muestran en azul y los colocaciones (palabras en la proximidad) se muestran en naranja. Las características incluyen: </p> <ul> <li> flotando sobre palabras clave se muestra su frecuencia en el corpus </ li> <li> flotando sobre las colocaciones se muestra su frecuencia en proximidad (no su frecuencia total) </ li> <li> un cuadro de búsqueda para consultas (coloque el cursor sobre el icono de ampliación para obtener ayuda con la sintaxis) </ li> </ ul>"});
 Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "cancel":"Cancelar ",
 "accessModeWithoutPassword":"otros accesos ",
@@ -259,33 +259,33 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "reveal":"Revelar ",
 "OpenExisting":"Abrir un corpus existente ",
 "tableNoHeadersRow":"Sin encabezados de fila ",
-"accessOptionsText":"Si lo desea, especificar una o más contraseñas de accesos (separados por comas)",
+"accessOptionsText":"Si lo desea, define una o más contraseñas de accesos (separados por comas)",
 "tableDocumentsRows":"Desde la celda de cada fila",
 "gearTip":"Opciones ",
-"tokenizationWordBoundaries":"Límites de palabras Simple",
-"numberEmpty":"Al menos un número de columna actual se encuentra vacia ",
+"tokenizationWordBoundaries":"Límite Simple de Palabras",
+"numberEmpty":"Al menos un número de columna actual se encuentra vacia.",
 "tokenization":"Segmentación",
 "tokenizationWhitespace":"Solo para espacios en blanco ",
 "inputRemoveFrom":"omitir desde ",
 "xpathContent":"Contenidos",
-"numbersNeedCommas":"Por favor, usar coma (,) para separar múltiples números. ",
-"textOptionsText":"Estas opciones le permiten ignorar parte de un documento de texto especificando expresiones regulares.",
+"numbersNeedCommas":"Por favor, usa coma (,) para separar múltiples números. ",
+"textOptionsText":"Estas opciones te permiten ignorar parte de un documento de texto y especificar expresiones regulares.",
 "tableDocumentsTable":"Desde la tabla completa",
 "UploadLocal":"Cargar uno o mas documentos desde tu computadora",
-"helpTip":"Esta herramienta le permite crear un corpus de una de tres maneras:<ol><li>escribiendo o pegando texto en el cuadro de texto y haciendo clic en <i>Revelar</i>; Si cada línea del cuadro de texto es una URL, el texto se obtiene de esas URL, de lo contrario el contenido se tratará como un solo documento</li><li>haga clic en el botón<i>Abrir</i>para abrir un corpus existente</li><li>haga clic en el botón<i>Cargar</i>para cargar uno o más archivos de su computadora (puede seleccionar varios archivos mediante las teclas Ctrl y/o Shift)</li></ol>",
+"helpTip":"Esta herramienta permitirá crear un corpus de tres maneras:<ol><li>escribiendo o pegando texto en el cuadro y haciendo clic en <i>Revelar</i>; Si cada línea en el cuadro de texto es una URL, el texto se obtiene de aquellas URL, de lo contrario el contenido se tratará como un solo documento</li><li>Haga clic en el botón<i>Abrir</i>para abrir un corpus existente</li><li>Haga clic en el botón<i>Cargar</i>para cargar uno o más archivos de su computadora (puede seleccionar varios archivos mediante las teclas Ctrl y/o Shift)</li></ol>",
 "xmlOptionsText":"Definir Expresiones XPath para cualquiera de las siguientes:",
 "tableTitle":"Título ",
 "noTextProvided":"Sin provisión de texto ",
 "tableContent":"Contenido ",
 "xpathDocuments":"Documentos ",
 "tokenizationAuto":"Automático (altamente recomendable)",
-"numbersCommasOnly":"Solamente, números separados por comas.",
-"tableOptionsText":"Especifique cómo deben extraerse los documentos (actualmente sólo se admite para MS Excel: .XLS, XLSX). Para obtener más información, consulte la documentación sobre la creación de un corpus con <a href=\"{0}\" target=\"voyantdocs\"> datos tabulares </a>.",
+"numbersCommasOnly":"Solamente números separados por comas.",
+"tableOptionsText":"Especifica cómo deben extraerse los documentos (actualmente sólo se admite para MS Excel: .XLS, XLSX). Para obtener más información, consulta la documentación sobre la creación de un corpus con <a href=\"{0}\" target=\"voyantdocs\"> datos tabulares </a>.",
 "PleaseSelectExisting":"Por favor, asegurese de seleccionar un corpus. ",
 "inputFormat":"Formato de ingreso ",
 "tableDocumentsColumns":"Desde las columnas completas",
-"accessModeWithoutPasswordText":"Si especifica una <i> contraseña de acceso </i>, también puede especificar qué acceso se concede a los usuarios sin la contraseña.",
-"tableContentText":"Especifique qué números de columna contienen contenido (o deje en blanco para utilizar todas las columnas). La columa más a la izquierda es la columna 1. Defina varios documentos separando columnas con una coma o combinando columnas usando el signo más(+). Por ejemplo, \"1 + 2,3\" (sin comillas) combinaría las columnas 1 y 2 en un documento y utilizará la columna 3 para un segundo documento.",
+"accessModeWithoutPasswordText":"Si tú estableces una <i> contraseña de acceso </i>, también puedes determinar qué tipo acceso se concede a los usuarios sin la contraseña.",
+"tableContentText":"Especifica qué números de columna contienen contenido (o deja en blanco para utilizar todas las columnas). La primera columna a la izquierda es la columna 1. Define varios documentos separando columnas con una coma o combinando columnas usando el signo más(+). Por ejemplo, \"1 + 2,3\" (sin comillas) combinaría las columnas 1 y 2 en un documento y utilizará la columna 3 para un segundo documento.",
 "inputRemoveFromAfter":"omitir desde después ",
 "corpusSubTitle":"Subtítutlo del corpus ",
 "numberZero":"0 es invalido, la primera columna es 1 ",
@@ -294,12 +294,12 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "fileTypesWarning":"Advertencia de tipos de archivos ",
 "accessModeNone":"ninguno ",
 "tokenizationOptions":"Segmentación ",
-"advancedOptionsText":"Para obtener más información sobre las opciones avanzadas, presentadas a continaución, consulte la documentación de <a href=\"{0}\" target=\"voyantdocs\"> creación de un corpus </a>.",
+"advancedOptionsText":"Para obtener más información sobre las opciones avanzadas, presentadas a continuación, consulta la documentación de <a href=\"{0}\" target=\"voyantdocs\"> creación de un corpus </a>.",
 "tableDocuments":"Documentos",
 "inputRemoveUntilAfter":"omitir hasta después",
-"noAllowInputMessage":"Este servidor se ha configurado para NO permitir la adición de nuevos documentos. Si puede, póngase en contacto con el administrador del servidor",
-"fileTypesMessage":"Tiene uno o más archivos que pueden causar problemas por ser incompatibles o irreconocibles.",
-"errorNotXmlContinue":"Ha seleccionado un formato de entrada XML pero la entrada no aparece como XML. ¿Seguro que desea continuar?",
+"noAllowInputMessage":"Este servidor se ha configurado para NO permitir la adición de nuevos documentos. Si puedes, contactar al administrador del servidor",
+"fileTypesMessage":"Tienes uno o más archivos que pueden causar problemas por ser incompatibles o irreconocibles.",
+"errorNotXmlContinue":"Has seleccionado un formato de entrada XML pero este no aparece como XML. ¿Seguro que desea continuar?",
 "SelectExisting":"Seleccionar un corpus existente",
 "textOptions":"Texto ",
 "tableOptions":"Tablas ",
@@ -308,7 +308,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "title":"Añadir textos",
 "error":"Error ",
 "sureContinue":"¿Estas seguro de querer continuar?",
-"Open":"Abierto ",
+"Open":"Abrir ",
 "inputRemoveUntil":"omitir hasta ",
 "badFiles":"incompatible (error probable):",
 "emptyInput":"Escriba una o más URL en líneas separadas o péguelas en un texto completo.",
@@ -316,18 +316,18 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessPassword":"código de acceso",
 "adminPassword":"código de administrador ",
 "accessModeNonConsumptive":"limitado (no-consuntivo)",
-"tableMetadataText":"Estas opciones sólo se utilizan cuando los documentos se extraen de las celdas de cada fila (consulte la primera opción de esta sección). La misma sintaxis que la opción de contenido anterior: números de columna separados por comas o combinados con un signo más(+).",
+"tableMetadataText":"Estas opciones sólo se utilizan cuando los documentos se extraen de las celdas de cada fila (consulte la primera opción de esta sección). La misma sintaxis que la opción del contenido anterior: números de columna separados por comas o combinados con un signo más(+).",
 "xpathAuthor":"Autor ",
 "corpusOptions":"Corpus",
 "xpathTitle":"Título ",
-"pleaseProvideText":"Por favor, proveer texto en el campo de texto (o seleccionar cargar texto). ",
-"invalidForm":"Se han utilizado valores no válidos, sitúe sobre campos con cuadros rojos para obtener explicaciones.",
+"pleaseProvideText":"Por favor, proveer texto en el cuadro de texto (o seleccionar cargar texto). ",
+"invalidForm":"Has utilizado valores no válidos, sitúa sobre campos con cuadros rojos para obtener explicaciones.",
 "tableAuthor":"Autor ",
 "gearWinTitle":"Opciones ",
 "uploadingCorpus":"Cargando corpus... ",
 "corpusTitle":"Título del corpus",
 "accessOptions":"Gestión de Acceso",
-"tableNoHeadersRowText":"Determina si se omite o no la primera fila (si hay una fila de encabezado). Cuando hay una fila de encabezado, puede usarse para definir el título del documento automáticamente cuando se extraen documentos de columnas enteras (en este caso, deje el campo de título en blanco)."});
+"tableNoHeadersRowText":"Determina si omites o no la primera fila (si existe una fila de encabezado). Cuando tienes una fila de encabezado, puedes usarla para definir el título del documento automáticamente al extraer documentos de columnas enteras (en este caso, deja el campo de título en blanco)."});
 Ext.apply(Voyant.util.DetailedError.i18n, {
 "error":"Error"});
 Ext.apply(Voyant.panel.Summary.i18n, {
@@ -336,7 +336,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "more":"Más.. ",
 "averageWordsPerSentence":"Promedio de palabras por oración: ",
 "mostFrequentWords":"<b>Palabra más frecuente</b> en el corpus: ",
-"title":"Resumen ",
+"title":"Sumario",
 "numberOfTerms":"número de palabras en este documento",
 "lowest":"Más bajo: ",
 "docsLength":"Extensión del documento",
@@ -345,7 +345,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "highest":"Más alto: ",
 "distinctiveWords":"<b>Palabras diferenciadas</b> (comparado con el resto del corpus): ",
 "docsDensity":"Densidad del vocabulario ",
-"helpTip":"<p>La herramienta <i> Resumen </i> proporciona información general sobre el corpus. Muchos elementos de la herramienta son enlaces que activan otras vistas. Las características incluyen: </li> palabras completas (tokens) y formas de palabras (tipos) y edad del corpus </li> <li> términos más frecuentes en el corpus </li> <li> Corpus con más de un documento <ul><li> documentos ordenados por longitud y densidad de vocabulario </li><li> palabras distintivas para cada documento (por TF-IDF score) </li></li></ul>",
+"helpTip":"<p>La herramienta <i> Sumario </i> proporciona información general sobre el corpus. Muchos elementos de la herramienta son enlaces que activan otras vistas. Las características incluyen: </li> palabras completas (tokens) y formas de palabras (tipos) y edad del corpus </li> <li> términos más frecuentes en el corpus </li> <li> Corpus con más de un documento <ul><li> documentos ordenados por longitud y densidad de vocabulario </li><li> palabras distintivas para cada documento (por TF-IDF score) </li></li></ul>",
 "moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Next {0} of {1} remaining</a>",
 "items":"artículos",
 "shortest":"Más corto: "});
@@ -356,7 +356,7 @@ Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
 "label":"Familia de fuentes "});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"Editores",
-"sendToVoyantButton":"Nuevo Corpues Voyant ",
+"sendToVoyantButton":"Nuevo Corpus Voyant ",
 "downloadButton":"Descargar archivo ZIP",
 "sendToVoyantNoQuery":"Actualmente no se ha especificado ninguna consulta, pero puede <a href=\"{0}\" target=\"_blank\"> abrir el corpus actual en una nueva ventana </a>.",
 "lexicalLabel":"Texto-Completo ",
@@ -365,7 +365,7 @@ Ext.apply(Voyant.panel.Subset.i18n, {
 "authorLabel":"Autores ",
 "title":"Constructor Conjuntos de Trabajo"});
 Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
-"titleLabel":"titulo ",
+"titleLabel":"título",
 "authorLabel":"autor",
 "availableLabel":"excluye: ",
 "enabledLabel":"incluye: ",
@@ -398,7 +398,7 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "trendTip":"Este es un gráfico de sparkline (líneas de luz) que representa la distribución del término dentro de segmentos lineales del documento (por defecto 10 segmentos de igual tamaño).",
 "tfidf":"Nivel significativo ",
 "title":"Términos del documento ",
-"helpTip":"<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
+"helpTip":"<p>Términos del documento es una tabla para visualizar los términos que aparecen en cada documento. Sus características incluyen :</p><ul><li>reordenar por <i>Term</i>, <i>Contar</i> (frequency absoluta), and <i>Relativa</i> frecuencia (clic en el encabezado de columna)</li><li>con un gráfico sparkline se visualizara la distribución de la frecuencia de los términos a través de los documentos</li><li>columnas adicionales disponibles (<i>Significancia</i> or TF-IDF) al hacer clic en la flecha que aparece flotando por encima del encabezado</li><li>una caja para las consultas de investigación (Colocar el cursor sobre el icono de aumento para obtener ayuda con la sintaxis)</li></ul>",
 "zscoreTip":"La puntuación Z, o <a href=\"https://en.wikipedia.org/wiki/Standard_score\" target=\"_blank\"> puntuación estándar </a>, es un valor normalizado para la frecuencia absoluta del término en comparación con otros en el mismo documento. Se calcula tomando la frecuencia de un término en un documento, restando la frecuencia media de todos los términos y dividiendo la diferencia por la desviación estándar de todas las frecuencias de término."});
 Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hasNdocuments":"tiene {count} documentos",
@@ -407,7 +407,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "thisCorpus":"Este corpus ",
 "created":"Creado ",
 "isEmpty":"esta vacio ",
-"widthNwordsAndNTypes":"Con {words} <span class=\"info-tip\" data-qtip=\"cada ocurrencia de cada palabra (como múltiples  occurrencias de &quot;the&quot;) fueron contadas\">total de palabras</span> y {types} <span class=\"info-tip\" data-qtip=\"palabras con múltiples concurrencias (como &quot;the&quot;) fueron contadas una vez\">formulario de palabra única</span>",
+"widthNwordsAndNTypes":"con {words} <span class=\"info-tip\" data-qtip=\"cada ocurrencia de cada palabra (como múltiples  occurrencias de &quot;the&quot;) fueron contadas\">total de palabras</span> y {types} <span class=\"info-tip\" data-qtip=\"palabras con múltiples concurrencias (como &quot;the&quot;) fueron contadas una vez\">formulario de palabra única</span>",
 "noCorpusOrInput":"Sin especificación de ingreso o ID del corpus.",
 "hoursAgo":"hace {count} horas atrás ",
 "minutesAgo":"hace {count} minutos atrás",
@@ -425,10 +425,10 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "dayAgo":"hace un día atrás "});
 Ext.apply(Voyant.panel.WordTree.i18n, {
 "emptyText":"Sin resultados coincidentes. ",
-"title":"WordTree "});
+"title":"Árbol de Palabras"});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "original":"original ",
-"VOYANTTip":"Esta es una versión normalizada del contenido: cuando los documentos fuente están en XML, este será principalmente el contenido original y para la mayoría de los otros formatos, de documentos fuente, será simple contenido HTML.",
+"VOYANTTip":"Esta es una versión normalizada del contenido: Principalmente, este será el contenido original cuando los documentos fuente están en XML y, para la mayoría de los otros formatos de documentos fuente, será simple contenido HTML.",
 "fieldLabel":"Formato de archivo ",
 "voyantXml":"Voyant XML",
 "plainText":"texto plano ",
@@ -436,52 +436,52 @@ Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "TXTTip":"Esto producirá un texto plano de cada documento "});
 Ext.apply(Voyant.panel.ScatterSet.i18n, {
 "title":"Scatter",
-"helpTip":"Esta es la vista especialidad para trabajar con gráficos de dispersión"});
+"helpTip":"Esta es la vista especializada para trabajar con gráficos de dispersión"});
 Ext.apply(Voyant.util.Toolable.i18n, {
 "exportTitle":"Exportar",
 "exportError":"Error al exportar",
-"exportDataTsvMessage":"Copia los datos que están debajo, pueden ser pegados en una hoja de cálculo o un archivo de texto. ",
-"exportViewFieldset":"Exportar vista (Herramientas y datos)",
-"exportSvgMessage":"<p>Esta es una miniatura de la imagen en SVG, click botón derecho o ctrl-click en la imagen para salvarla en gran tamaño en tu disco duro. </p><p>Otra alternativa, copiar el codigo HTML que esta debajo.</p>",
-"exportDataJsonMessage":"Copia los datos qeu están debajo, pueden ser usados en otra aplicación web. ",
-"plusTip":"Click para seleccionar otra herramienta en este mismo panel (reemplazara la herramienta actual)",
+"exportDataTsvMessage":"Los datos que están debajo, pueden ser copiados y pegados en una hoja de cálculo o un archivo de texto. ",
+"exportViewFieldset":"Exportar vista (Herramientas y Datos)",
+"exportSvgMessage":"<p>Esta es una miniatura de la imagen en SVG, click botón derecho o ctrl-click en la imagen para salvarla, con un gran tamaño, en tu disco duro. </p><p>Otra alternativa, copiar el codigo HTML que esta debajo.</p>",
+"exportDataJsonMessage":"Los datos qeu están debajo, pueden ser usados en otra aplicación web. ",
+"plusTip":"Click para seleccionar otra herramienta en este mismo panel (reemplazará la herramienta actual)",
 "gearTip":"Definir opciones para esta herramienta ",
 "cancelTitle":"Cancelar",
-"exportViewHtmlEmbed":"un bloque HTML para embeber esta vista en otra página web. ",
+"exportViewHtmlEmbed":"un bloque HTML para incrustar esta vista en otra página web. ",
 "exportGridCurrent":"Exportar los datos actuales ",
-"exportSvgTitle":"Exporta SVG",
-"maximizeTip":"Abre esta herramienta en una nueva ventana ",
+"exportSvgTitle":"Exportar SVG",
+"maximizeTip":"Abrir esta herramienta en una nueva ventana ",
 "exportGridCurrentTsv":"exportar los datos actuales como valores separados por tabulación (text)",
-"exportVizTitle":"Exporta la visualización ",
-"exportDataTitle":"Exporta datos",
+"exportVizTitle":"Exportar la visualización",
+"exportDataTitle":"Exportar datos",
 "optionsTitle":"Opciones ",
 "exportBiblioTitle":"Exportar Referencias Bibliográficas",
 "confirmTitle":"Confirmar ",
 "moreHelp":"Más ayuda",
-"exportViewUrl":"URL para esta vista (Herramientas y datos)",
-"helpTip":"Actualmente no esta disponible la ayuda para esta herramienta especifica. Click en este icono para visitar el sitio de la <a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Documentación de ayuda </a>.",
+"exportViewUrl":"URL para esta vista (Herramientas y Datos)",
+"helpTip":"Actualmente no esta disponible la ayuda para esta herramienta en particular. Click en este icono para visitar el sitio de la <a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Documentación de ayuda </a>.",
 "export":"Exportar",
-"exportDataHtmlMessage":"Copia los datos que están debajo, pueden ser pegados en al interior de una página HTML o usados como XML",
-"exportPngTitle":"Exporta PNG",
-"exportPngMessage":"<p>Esta es una miniatura de la imagen en PNG, click botón derecho o ctrl-click en la imagen para salvarla en gran tamaño en tu disco duro. </p><p>Otra alternativa, copiar el codigo HTML que esta debajo.</p>",
+"exportDataHtmlMessage":"Los datos que están debajo pueden ser copiados y pegados al interior de una página HTML o usados como XML",
+"exportPngTitle":"Exportar PNG",
+"exportPngMessage":"<p>Esta es una miniatura de la imagen en PNG, click botón derecho o ctrl-click en la imagen para salvarla, con un gran tamaño, en tu disco duro. </p><p>Otra alternativa, copiar el codigo HTML que esta debajo.</p>",
 "exportGridCurrentHtml":"exportar los datos actuales como HTML ",
-"exportViewEmbedMessage":"Tú puedes copiar y pegar el codigo HTML, de la sección de abajo, en otra página web. Tener en cuenta, que algunos sistema de gestión de contenidos (como WordPress) podrían necesiar un adcional para manejar las etiquetas &lt;iframe&gt",
-"exportPng":"Exporta esta visualización en PNG",
+"exportViewEmbedMessage":"El codigo HTML, de la sección de abajo, puede ser copiado en otra página web. Tener en cuenta, que algunos sistema de gestión de contenidos (como WordPress) podrían necesitar una pequeña aplicación (plug-in) para manejar las etiquetas &lt;iframe&gt",
+"exportPng":"Exportar esta visualización en PNG",
 "reset":"Reiniciar",
 "exportViewBiblio":"una referencia bibliográfica para esta vista ",
-"exportViewEmbedTitle":"Bloque de HTML para embeber",
+"exportViewEmbedTitle":"Bloque de HTML para incrustar",
 "exportNoFunction":"Una función de exportación fue definida por... no esta disponible",
 "exportGridCurrentJson":"exportar los datos actuales como JSON",
-"exportSvg":"exporta esta visualización en SVG",
-"saveTip":"Exportar hacia URL, datos, referencia bibliográfica o herramienta embebida. "});
+"exportSvg":"exportar esta visualización en SVG",
+"saveTip":"Exportar hacia URL, datos, referencia bibliográfica o para incrustar esta herramienta. "});
 Ext.apply(Voyant.panel.TextualArc.i18n, {
 "minRawFreqTip":"El mínimo número de ocurriencia por términos. Por defecto, esto se fija en 2 (palabras repetidas) para mejorar el rendimiento, fijarlo en 1 podría, demorar considerablemente las cosas. ",
 "search":"filtros",
 "minRawFreq":"Frecuencia mínima",
 "adaptation":"Inspirado por W. Bradford Paley's <a href=\"http://textarc.org\" target=\"_blank\">TextArc</a>",
-"title":"TextualArc",
+"title":"Arco Textual",
 "speedTip":"Controla la velocidad de la visualización",
-"helpTip":"TextualArc es una visualización de los términos en un documento que incluye un centroide de términos ponderado y un arco que sigue los términos en el orden del documento.",
+"helpTip":"Arco Textual es una visualización de los términos en un documento que incluye un centroide de términos ponderado y un arco que sigue los términos en el orden del documento.",
 "speed":"velocidad "});
 Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "freqsMode":"Frecuencias",
@@ -490,9 +490,9 @@ Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "documents":"Documento ",
 "documentSegments":"Segmento del documento ",
 "clearTerms":"Limpiar Términos ",
-"title":"StreamGraph",
+"title":"Gráfico de flujo",
 "rawFrequencies":"Frecuencia absoluta",
-"helpTip":"StreamGraph es una visualización que representa el cambio de la frecuencia de las palabras en un corpus (o dentro de un solo documento).",
+"helpTip":"Gráfico de flujo es una visualización que representa el cambio de la frecuencia de las palabras en un corpus (o dentro de un solo documento).",
 "segments":"Segmentos "});
 Ext.apply(Voyant.notebook.util.Embed.i18n, {
 "tryWidget":"Prueba uno de los siguientes widgets",
@@ -527,7 +527,7 @@ Ext.apply(Voyant.panel.Phrases.i18n, {
 "overlapLength":"priorizar las frases más largas",
 "overlapMenu":"Elija un filtro de superposición:",
 "term":"Término ",
-"helpTip":"<P> Las frases de Corpus son una vista de la tabla de frases que se repiten en todo el corpus. <! - Las características incluyen: </ p> <ul> <li> reordenación por palabra clave, > Un cuadro de búsqueda para consultas (coloque el cursor sobre el ícono de aumento para obtener ayuda con la sintaxis) </ li> </ ul> ->"});
+"helpTip":"<P>Las frases del Corpus se visualizan en una tabla con frases que se repiten en todo el corpus. <! - Las características incluyen: </ p> <ul> <li> reordenación por palabra clave, > Un cuadro de búsqueda para consultas (coloque el cursor sobre el ícono de aumento para obtener ayuda con la sintaxis) </ li> </ ul> ->"});
 Ext.apply(Voyant.panel.Trends.i18n, {
 "relativeFrequencies":"Frecuencias relativas ",
 "documents":"Documentos",
@@ -542,7 +542,7 @@ Ext.apply(Voyant.panel.Trends.i18n, {
 "rawFrequencies":"Frecuencias sin pulir",
 "helpTip":"<p><i>Tendencias </ i> muestra un gráfico lineal de las frecuencias relativas a través del corpus (para documentos múltiples) o dentro de un documento. Las características incluyen </li></ul><li> un cuadro de búsqueda para consultas (coloque el cursor sobre el icono de ampliación para obtener ayuda con la sintaxis) </li> </ul>",
 "relative":"Relativo",
-"failedGetDocumentTerms":"Fracaso al obtener términos del documento para Tendencias "});
+"failedGetDocumentTerms":"Fracasó al obtener términos del documento para Tendencias "});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"Cancelar ",
 "de":"Alemán ",
@@ -550,20 +550,20 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "no":"Noruego ",
 "auto":"Auto-detección ",
 "bg":"Bulgaria ",
-"noEditAutoMessage":"La lista automática de palabras excluidas no puede ser editada. Por favor, seleccionar una nueva lista de palabras excluidas definidas por el usuario. ",
+"noEditAutoMessage":"La lista automática de palabras excluidas dejará de ser editada. Por favor, seleccione una nueva lista de palabras excluidas definidas por el usuario. ",
 "lt":"Latvian ",
 "lv":"Lituano",
 "none":"Ninguno ",
 "fr":"Francés",
-"hu":"Hungaro ",
+"hu":"Húngaro",
 "br":"Breton ",
-"editStopListTitle":"Editar lista de palabras excluidas",
+"editStopListTitle":"Editar la lista de palabras excluidas",
 "hy":"Armenio ",
 "se":"Sueco ",
-"ga":"Irlandes ",
+"ga":"Irlandés ",
 "id":"Indonesia ",
 "ok":"Salvar",
-"ca":"Catalan ",
+"ca":"Catalán",
 "new":"Nueva lista -definida por el usuario-",
 "gl":"Galicia ",
 "el":"Griego ",
@@ -574,25 +574,25 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "it":"Italiano ",
 "noEditAutoTitle":"Error en la edición de las palabras excluidas",
 "es":"Español",
-"editStopListMessage":"Esta es la lista de palabras excluidas, un termino por línea. ",
+"editStopListMessage":"Esta es la lista de palabras excluidas, cada término en una línea. ",
 "applyGlobally":"Aplicar a todo",
 "eu":"Vasco",
 "editList":"Editar lista",
-"ar":"Arabe ",
-"th":"Tailandes",
+"ar":"Árabe ",
+"th":"Tailandés",
 "cz":"Checo",
-"ja":"Japones ",
+"ja":"Japonés",
 "ckb":"Kurdo ",
 "fa":"Farsi ",
 "ro":"Rumano ",
-"nl":"Holandes",
+"nl":"Holandés",
 "tr":"Turco "});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
 "sendToVoyantButton":"Nuevo corpus Voyant ",
 "cancel":"Cancelar ",
 "select":"Seleccionar ",
 "exportInProgress":"Preparando tu corpus para exportar... ",
-"facet.titleTitle":"Titulos ",
+"facet.titleTitle":"Títulos  ",
 "title":"Catálogo",
 "lexicalTitle":"Términos",
 "clickToOpenCorpus":"Please <a href=\"{0}\" target=\"_blank\" class=\"link\">click here</a> to access your new corpus (since popup windows are blocked).",
@@ -600,10 +600,10 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "facet.languageTitle":"Lenguajes ",
 "noMatches":"Sin coincidencias (afuera {0} documentos).",
 "selectValidFacet":"Por favor, seleccionar una faceta valida",
-"plusFacetTip":"Agregar nueva ",
+"plusFacetTip":"Agregar una nueva faceta",
 "facet.collectionTitle":"Colecciones ",
 "matchingDocuments":"número de documentos coincidentes",
-"helpTip":"La herramienta de <i>Catálogo</i> provee una interface para probar una interface para la exploración de multiples y extensos documentos de un corpus así como también la creación un subconjunto (trabajo conjunto) basado en los criterios de búsqueda. Esto funciona como base de datos de una libreria o de una tienda en línea, permitiendote filtrar los documentos. ",
+"helpTip":"La herramienta de <i>Catálogo</i> provee una interfaz para explorar los múltiples y extensos contenidos de documentos de un corpus así como también la creación un subconjunto (trabajo conjunto) basado en los criterios de búsqueda. Esto funciona como una base de datos en una libreria o en una tienda en línea, permitiendote filtrar los documentos.",
 "export":"Exportar",
 "downloadButton":"Descargar",
 "facet.pubPlaceTitle":"Lugar de la publicación",
@@ -612,7 +612,7 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "exportTip":"Crear un nuevo corpus Voyant con los documentos seleccionados ",
 "facet.authorTitle":"Autores ",
 "closeFacetTip":"Remover esta faceta",
-"selectFacet":"Seleccinar faceta",
+"selectFacet":"Seleccionar una Faceta",
 "loadingSnippets":"cargando bloques de texto ",
 "facet.pubDateTitle":"Fechas de Publicación",
 "facet.publisherTitle":"Editores"});
@@ -628,8 +628,8 @@ Ext.apply(Voyant.panel.TopicContexts.i18n, {
 "title":"Topic Contexts",
 "helpTip":"Contextos del tema"});
 Ext.apply(Voyant.panel.BubblelinesSet.i18n, {
-"title":"Piel de Bubblelines ",
-"helpTip":"Esta es una vista especializada para trabajar con Bubblelines "});
+"title":"Piel de Líneas de Burbujas",
+"helpTip":"Esta es una vista especializada para trabajar con Líneas de Burbujas"});
 Ext.apply(Voyant.panel.Knots.i18n, {
 "findTerm":"Encuentra el término ",
 "settings":"Opciones de configuración",
@@ -637,7 +637,7 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 "tangles":"Girar ",
 "showTerm":"Mostar el término ",
 "sound":"sonido ",
-"clearTerms":"Limpiar ",
+"clearTerms":"Limpiar",
 "removeTerm":"Remover el término",
 "hideTerm":"Ocultar el término ",
 "title":"Knots",
@@ -685,20 +685,20 @@ Ext.apply(Voyant.panel.Contexts.i18n, {
 "left":"Izquierda ",
 "corpusTip":"Reiniciar al modo corpus (todos los documentos desde su contexto)",
 "rightTip":"Contexto del lado derecho de la palabra clave ",
-"context":"contexto ",
+"context":"contexto",
 "leftTip":"Contexto del lado izquierdo de la palabra clave",
 "position":"Posición ",
 "positionTip":"La posición de la palabra clave dentro del documento",
-"helpTip":"La herramienta \"Palabras clave en contexto\" muestra cada ocurrencia de una palabra clave con un poco de texto circundante (el contexto). Puede ser útil para estudiar más de cerca cómo se usan los términos en diferentes contextos. Características: <p> </p> <ul> <li> reordenación del documento, por palabra clave o por contexto izquierdo o derecho </li> <li>un cuadro de búsqueda para consultas (pase el ratón sobre el icono de ampliación para obtener ayuda con la sintaxis ) </li> </ul>"});
+"helpTip":"La herramienta \"Palabras Claves en Contexto\" muestra cada ocurrencia de una palabra clave con un poco de texto circundante (el contexto). Puede ser útil para estudiar más de cerca cómo se usan los términos en diferentes contextos. Características: <p> </p> <ul> <li> reordenación del documento, por palabra clave o por contexto izquierdo o derecho </li> <li>un cuadro de búsqueda para consultas (pase el ratón sobre el icono de ampliación para obtener ayuda con la sintaxis ) </li> </ul>"});
 Ext.apply(Voyant.VoyantDefaultApp.i18n, {
 "voyantIs":"<a href=\"./docs/#!/guide/about\"> Voyant Tools es un entorno de lectura y análisis basado en web para textos digitales </a>.",
 "noViewKnownErrorTpl":"La vista seleccionada ({view}) no se ha migrado de la versión anterior de Voyant (y probablemente no lo será). {Additional} En su lugar, se utilizará la vista predeterminada.",
 "convertSkinMsg":"La piel de conversión se utilizó para la exportación de documentos y esa funcionalidad ya está disponible en la herramienta Documentos.",
 "noViewErrorTitle":"Vista No Especificada",
-"helpTip":"Voyant Tools es un entorno de lectura y análisis basado en la web para textos digitales. <P> </ p>",
+"helpTip":"Voyant Tools es un entorno de lectura y análisis basado en la web para textos digitales. <p> </ p>",
 "noViewErrorTpl":"No se encontró ninguna vista con el nombre \"<i> {view} </ i>\". En su lugar, se utilizará la vista predeterminada."});
 Ext.apply(Voyant.widget.Facet.i18n, {
-"emptyText":"No se encotrarón valores"});
+"emptyText":"No se encontrarón valores"});
 Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "relFreq":"Relativo ",
 "xAxis":"Eje X",
@@ -742,7 +742,7 @@ Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"Voyant Tools ",
 "privacy":"Privacidad ",
 "voyantLink":"<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools</a>",
-"privacyMsg":"Los desarrolladores de Voyant Tools recopilan datos del sitio con relación a los parametros con que las herramientas son invocadas  (las direcciones IP también se registran para poder identificar múltiples solicitudes durante una misma sesión). Además, Voyant Tools utiliza Google Analytics (consulte la Política de privacidad de Google y la sección <em> Información de registro </ em> en particular). Los datos registrados localmente y los datos de Google Analytics serán utilizados por el equipo de desarrollo con el fin de depurar y mejorar las herramientas, así como para entender cómo los investigadores los están utilizando. Estos datos también pueden utilizarse para fines de investigación en forma anónima y agregada. Tenga en cuenta que los textos enviados a Voyant Tools se almacenan para permitir el acceso persistente durante una sesión de trabajo y entre sesiones de trabajo. Si tiene preguntas sobre los datos que se están recopilando y cómo se está utilizando, o para solicitar que se elimine un corpus, póngase en contacto con Stéfan Sinclair. Haga clic en este link para mas información."});
+"privacyMsg":"Los desarrolladores de Voyant Tools recopilan datos del sitio con relación a los parametros con que las herramientas son invocadas  (las direcciones IP también se registran para identificar múltiples solicitudes durante una misma sesión). Además, Voyant Tools utiliza Google Analytics (consulte la Política de privacidad de Google y la sección <em> Información de registro </ em> en particular). Los datos registrados localmente y los datos de Google Analytics serán utilizados por el equipo de desarrollo con el fin de depurar y mejorar las herramientas, así como para entender cómo los investigadores la utilizan. Estos datos también pueden emplearse para fines de investigación en forma anónima y agregada. Tenga en cuenta que los textos enviados a Voyant Tools se almacenan para permitir el acceso persistente durante una sesión de trabajo y entre sesiones de trabajo. Si tiene preguntas sobre los datos que se están recopilando y cómo se utilizan, o para solicitar que se elimine un corpus, póngase en contacto con Stéfan Sinclair. Haga clic en este link para mas información."});
 Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchTip":"<div>Búsqueda sintáctica (presiona enter/return para desencadenar una búsqueda):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: término exacto coincidente <i>abrigo</i></li><li><b>coat*</b>: términos coincidentes que inician con <i>abrigo</i>como un término</li><li><b>^abrigo*</b>: términos coincidentes que inician con <i>abrigo</i> como términos separados (abrigo, abrigos, etc.)</li><li><b>*igo</b>: términos coincidentes que terminan con <i>igo</i> como un término</li><li><b>^*igo</b>: términos coincidentes que terminan con <i>igo</i> como múltiples términos</li><li><b>abrigo,chaqueta</b>: Hacer coincidir cada término separados por comas como términos separados</li><li><b>abrigo|chaqueta</b>: términos coincidentes separados por barra como un termino en solitario</li><li><b>\"abrigo de invierno\"</b>: <i>abrigo de invierno</i> como una frase</li><li><b>\"mitones de abrigo\"~5</b>: <i>abrigo</i> cercano <i>mitones</i> (within 5 words)</li><li><b>^abrigo*,chaqueta|parka,\"mitones de abrigo\"~5</b>: sintaxis combinada</li></ul>",
 "querySearchDocsModeTip":"<div>Búsqueda sintáctica para documentos(presionar enter/return para desencadenar una búsqueda):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: Coincide con cada término <i>abrigo</i></li><li><b>abrigo*</b>: términos coincidentes que inician con <i>abrigo</i></li><li><b>abrigo,chaqueta</b>: cada término coincidente separado por comas como términos separados</li><li><b>\"abrigo de invierno\"</b>: <i>abrigo de invierno</i> como frase</li><li><b>\"mitones de abrigo\"~5</b>: <i>abrigo</i> cercano <i>mitones</i> (dentro de 5 palabras)</li><li><b>+invierno +abrigo</b>: cada término precedido por el signo más (+)</li><li><b>+\"winter coat\" +mitten*</b>: sintaxis combinada</li></ul>",
@@ -755,11 +755,11 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "en":"Inglés",
 "hr":"Croata",
 "it":"Italiano ",
-"languageTitle":"Opciones de la interfaz de lenguaje ",
+"languageTitle":"Opciones de lenguaje de la interfaz ",
 "fr":"Francés ",
 "ar":"Arabico",
 "bs":"Bosnio",
-"chooseLanguage":"Interfaz de lenguaje ",
+"chooseLanguage":"Lenguaje de la interfaz",
 "cz":"Checo",
 "ja":"Japones ",
 "he":"Hebreo ",
