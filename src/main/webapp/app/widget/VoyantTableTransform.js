@@ -26,8 +26,8 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
     	if (this.config.api && this.config.api.tableJson) {
     		this.setApiParam("tableJson", this.config.api.tableJson);
     	}
-    	me.buildFromParams();
 		me.on('afterrender', function() {
+	    	me.buildFromParams();
 			var table = this.getTargetEl().down('table');
 			if (table) {
 				var parent = table.parent();

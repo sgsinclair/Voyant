@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Jul 14 16:26:03 EDT 2017 */
+/* This file created by JSCacher. Last modified: Sun Sep 03 15:51:46 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -12328,8 +12328,8 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
     	if (this.config.api && this.config.api.tableJson) {
     		this.setApiParam("tableJson", this.config.api.tableJson);
     	}
-    	me.buildFromParams();
 		me.on('afterrender', function() {
+	    	me.buildFromParams();
 			var table = this.getTargetEl().down('table');
 			if (table) {
 				var parent = table.parent();
