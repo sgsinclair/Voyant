@@ -26,7 +26,7 @@ Ext.define('Voyant.panel.Reader', {
     	insertWhere: 'beforeEnd',
     	locationMarker: undefined,
     	lastLocationUpdate: new Date(),
-    	isDetailedGraph: true
+    	isDetailedGraph: true,
     },
     
     SCROLL_UP: -1,
@@ -219,6 +219,14 @@ Ext.define('Voyant.panel.Reader', {
 	    		if (query) {
 	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
 	    		}
+    		} else {
+    			this.on("loadedCorpus", function() {
+        			this.load();
+    	    		var query = this.getApiParam('query');
+    	    		if (query) {
+    	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
+    	    		}
+    			}, this);
     		}
     	}, this);
     	
@@ -793,7 +801,8 @@ Ext.define('Voyant.panel.Reader', {
     updateText: function(contents) {
     	var loadingMask = this.getInnerContainer().down('.loading');
     	if (loadingMask) loadingMask.destroy();
-    	var inserted = this.getInnerContainer().first().insertHtml(this.getInsertWhere(), contents, true); // return Element, not dom
+    	// FIXME: something is weird here in tool/Reader mode, this.getInnerContainer() seems empty but this.getInnerContainer().first() gets the canvas?!?
+    	var inserted = this.getInnerContainer().first().insertHtml(this.getInsertWhere()/* where is this defined? */, contents, true); // return Element, not dom
     	if (inserted && this.getScrollIntoView()) {
     		inserted.dom.scrollIntoView(); // use dom
     		// we can't rely on the returned element because it can be a transient fly element, but the id is right in a deferred call
