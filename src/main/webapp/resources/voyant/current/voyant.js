@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Sep 08 09:30:26 EDT 2017 */
+/* This file created by JSCacher. Last modified: Fri Sep 08 10:43:02 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -12025,16 +12025,27 @@ Ext.define('Voyant.widget.VoyantChart', {
     	config = config || {};
     	var me = this;
     	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	if ("tableJson" in config) {
-    		Ext.apply(config, this.getConfigFromTableJson(config.tableJson));
-    	}
-    	else if (this.getApiParam('tableJson')) {
-    		Ext.apply(config, this.getConfigFromTableJson());
-    	}
     	this.callParent(arguments)
     	
     },
     initComponent: function(config) {
+    	config = config || {};
+    	this.on("afterrender", function() {
+        	if (config && "tableJson" in config) {
+        		Ext.apply(this, this.getConfigFromTableJson(config.tableJson));
+        	}
+        	else if (this.getApiParam('tableJson')) {
+        		var chart = this.getConfigFromTableJson();
+        		this.setAxes(chart.axes);
+        		this.setSeries(chart.series);
+        		this.setLegend(chart.legend);
+        		this.setStore(chart.store);
+        		this.redraw();
+//        		Ext.apply(this, this.getConfigFromTableJson());
+//        		debugger
+//		    	Ext.create('cartesianchart', chart).render(this.body)
+        	}
+    	}, this)
     	this.callParent(arguments)
     },
     

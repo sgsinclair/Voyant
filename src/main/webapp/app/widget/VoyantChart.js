@@ -13,16 +13,24 @@ Ext.define('Voyant.widget.VoyantChart', {
     	config = config || {};
     	var me = this;
     	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	if ("tableJson" in config) {
-    		Ext.apply(config, this.getConfigFromTableJson(config.tableJson));
-    	}
-    	else if (this.getApiParam('tableJson')) {
-    		Ext.apply(config, this.getConfigFromTableJson());
-    	}
     	this.callParent(arguments)
     	
     },
     initComponent: function(config) {
+    	config = config || {};
+    	this.on("afterrender", function() {
+        	if (config && "tableJson" in config) {
+        		Ext.apply(this, this.getConfigFromTableJson(config.tableJson));
+        	}
+        	else if (this.getApiParam('tableJson')) {
+        		var chart = this.getConfigFromTableJson();
+        		this.setAxes(chart.axes);
+        		this.setSeries(chart.series);
+        		this.setLegend(chart.legend);
+        		this.setStore(chart.store);
+        		this.redraw();
+        	}
+    	}, this)
     	this.callParent(arguments)
     },
     
