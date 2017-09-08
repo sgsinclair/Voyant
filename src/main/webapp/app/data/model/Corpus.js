@@ -456,44 +456,12 @@ Ext.define('Voyant.data.model.Corpus', {
 				params: config
 			}).then(function(response) {
 				me.set(Ext.JSON.decode(response.responseText).corpus.metadata);
-				var rId = 'titles-'+me.getId();
+				// removed calls to set title and subtitle which should now be in metadata
 				if (config.title || config.subTitle) {
-					// store title and subTitle until they become part of metadata
 					me.set('title', config.title);
 					me.set('subTitle', config.subTitle);
-					Ext.Ajax.request({
-			    	    url: Voyant.application.getTromboneUrl(),
-			    	    params: {
-			        		tool: 'resource.StoredResource',
-			    			storeResource: Ext.encode({title: config.title, subTitle: config.subTitle}),
-			    			resourceId: rId
-			    	    }
-			    	});
 				} else {
-					// try to load stored title and subTitle
-					Ext.Ajax.request({
-			    	    url: Voyant.application.getTromboneUrl(),
-			    	    params: {
-			        		tool: 'resource.StoredResource',
-			        		verifyResourceId: rId
-			    	    }
-			    	}).then(function(response) {
-			    		var json = Ext.util.JSON.decode(response.responseText);
-			    		if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
-				    		Ext.Ajax.request({
-					    	    url: Voyant.application.getTromboneUrl(),
-					    	    params: {
-					        		tool: 'resource.StoredResource',
-					        		retrieveResourceId: rId
-					    	    }
-					    	}).then(function(response) {
-					    		var json = Ext.util.JSON.decode(response.responseText);
-				    	    	var value = json.storedResource.resource;
-				    	    	var titles = Ext.decode(value);
-				    	    	me.set(titles);
-				    	    });
-				    	}
-			    	});
+					// (removed calls for title and subtitle which should now be part of metadata
 				}
 				
 				return me;

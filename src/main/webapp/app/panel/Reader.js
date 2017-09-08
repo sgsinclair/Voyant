@@ -45,7 +45,14 @@ Ext.define('Voyant.panel.Reader', {
     },
     
     initComponent: function(config) {
-    	var tokensStore = Ext.create("Voyant.data.store.Tokens");
+    	var tokensStore = Ext.create("Voyant.data.store.Tokens", {
+    		parentTool: this,
+    		proxy: {
+    			extraParams: {
+    				forTool: 'reader'
+    			}
+    		}
+    	})
     	var me = this;
     	tokensStore.on("beforeload", function(store) {
     		return me.hasCorpusAccess(store.getCorpus());
@@ -105,7 +112,8 @@ Ext.define('Voyant.panel.Reader', {
 					withDistributions: true,
 					// TODO handle positions
 					withPositions: true,
-					bins: 25
+					bins: 25,
+					forTool: 'reader'
 				},
 				reader: {
 					type: 'json',

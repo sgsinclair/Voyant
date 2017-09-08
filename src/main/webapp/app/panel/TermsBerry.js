@@ -231,7 +231,14 @@ Ext.define('Voyant.panel.TermsBerry', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
-    		this.doLoad();
+    		if (this.isVisible()) {
+        		this.doLoad();
+    		}
+    	},
+    	activate: function() {
+    		if (this.getCorpus()) {
+    			this.doLoad();
+    		}
     	}
     },
     

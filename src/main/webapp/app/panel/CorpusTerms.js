@@ -84,7 +84,8 @@ Ext.define('Voyant.panel.CorpusTerms', {
         	parentPanel: this,
         	proxy: {
         		extraParams: {
-        			withDistributions: 'relative'
+        			withDistributions: 'relative',
+        			forTool: 'corpusterms'
         		}
         	}
         });
@@ -200,8 +201,17 @@ Ext.define('Voyant.panel.CorpusTerms', {
     		if (corpus.getDocumentsCount()>100) {
     			this.getStore().getProxy().setExtraParam('bins', this.getApiParam('maxBins'));
     		}
-    		this.getStore().load()
+    		if (this.isVisible()) {
+        		this.getStore().load()
+    		}
     	}, me);
+    	
+    	me.on("activate", function() { // load after tab activate (if we're in a tab panel)
+    		if (me.getStore().getCorpus()) {
+    			me.getStore().load({params: this.getApiParams()});
+    		}
+    	}, me);
+
     	
     	me.on("query", function(src, query) {
     		this.setApiParam('query', query);

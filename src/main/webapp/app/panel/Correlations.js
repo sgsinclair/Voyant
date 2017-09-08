@@ -141,10 +141,16 @@ Ext.define('Voyant.panel.Correlations', {
         	if (corpus.getDocumentsCount()==1) { // switch to documents mode
         		this.getStore().getProxy().setExtraParam('tool', 'corpus.DocumentTermCorrelations');
         	}
-    		this.getStore().load();
+        	if (this.isVisible()) {
+        		this.getStore().load();
+        	}
         });
         
-        me.on("query", function(src, query) {
+    	me.on("activate", function() { // load after tab activate (if we're in a tab panel)
+    		if (this.getStore().getCorpus()) {this.getStore().load();}
+    	}, this)
+
+    	me.on("query", function(src, query) {
         	this.setApiParam("query", query);
         	this.getStore().load();
         }, me);

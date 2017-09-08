@@ -262,7 +262,8 @@ Ext.define('Voyant.panel.Contexts', {
         		    params: {
         				limit: 1,
         				query: this.getApiParam("query"),
-        				stopList: this.getApiParam("stopList")
+        				stopList: this.getApiParam("stopList"),
+        				forTool: 'contexts'
         			}
             	});
         	}

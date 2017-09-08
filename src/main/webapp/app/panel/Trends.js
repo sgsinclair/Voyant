@@ -98,7 +98,6 @@ Ext.define('Voyant.panel.Trends', {
      * @private
      */
     constructor: function(config) {
-
     	this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 
@@ -308,7 +307,8 @@ Ext.define('Voyant.panel.Trends', {
     		this.loadFromDocumentTerms(this.getApiParam('query') ? undefined : this.getCorpus().getDocumentTerms({
     			proxy: {
     				extraParams: {
-    					limit: this.getApiParam('limit')
+    					limit: this.getApiParam('limit'),
+    					forTool: 'trends'
     				}
     			}
     		}))
@@ -317,7 +317,13 @@ Ext.define('Voyant.panel.Trends', {
     
     loadFromDocumentTerms: function(documentTerms) {
     	if (this.getCorpus()) {
-        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({});
+        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({
+        		proxy: {
+        			extraParams: {
+        				forTool: 'trends'
+        			}
+        		}
+        	});
     		documentTerms.load({
     		    callback: function(records, operation, success) {
     		    	if (success) {
@@ -351,7 +357,8 @@ Ext.define('Voyant.panel.Trends', {
 			this.loadFromCorpusTerms(corpus.getCorpusTerms({
 				proxy: {
 					extraParams: {
-						limit: this.getApiParam('limit')
+						limit: this.getApiParam('limit'),
+						forTool: 'trends'
 					}
 				}
 			}))
@@ -363,7 +370,15 @@ Ext.define('Voyant.panel.Trends', {
     		if (this.getCorpus().getDocumentsCount()==1) {
     			this.loadFromDocumentTerms();
     		} else {
-        		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
+        		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({
+        			autoLoad: false,
+        			proxy: {
+        				extraParams: {
+        					forTool: 'trends'
+        				}
+        			}
+        			
+        		});
         		var params = this.getApiParams(['stopList','query','withDistributions',"bins"]);
         		// ensure that we're not beyond the number of documents
         		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {

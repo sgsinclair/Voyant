@@ -23,7 +23,12 @@ Ext.define('Voyant.panel.Documents', {
     constructor: function(config) {
     	
     	var store = Ext.create("Voyant.data.store.Documents", {
-    	    selModel: {pruneRemoved: false}
+    	    selModel: {pruneRemoved: false},
+    	    proxy: {
+    	    	extraParams: {
+    	    		forTool: 'documents'
+    	    	}
+    	    }
     	});
     	
     	var dockedItemsItems = [{
@@ -220,7 +225,9 @@ Ext.define('Voyant.panel.Documents', {
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		this.store.setCorpus(corpus);
-    		this.store.load({params: this.getApiParams()});
+    		if (this.isVisible()) {
+        		this.store.load({params: this.getApiParams()});
+    		}
     		if (this.hasCorpusAccess(corpus)==false) {
     			this.queryById('modifyButton').hide();
     			this.queryById('downloadButton').hide();
@@ -247,6 +254,12 @@ Ext.define('Voyant.panel.Documents', {
     		})
     		*/
     	})
+    	
+    	this.on("activate", function() { // load after tab activate (if we're in a tab panel)
+    		if (this.getStore().getCorpus()) {
+    			this.getStore().load({params: this.getApiParams()});
+    		}
+    	}, this);
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('query', function(src, query) {

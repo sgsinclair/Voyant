@@ -29,7 +29,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
-    		store.load();
+    		if (this.isVisible()) {
+        		store.load();
+    		}
     	});
     	
     	if (config.embedded) {

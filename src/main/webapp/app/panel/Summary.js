@@ -302,7 +302,7 @@ Ext.define('Voyant.panel.Summary', {
     					params: {
     						limit: me.getApiParam('limit'),
     						stopList: me.getApiParam('stopList'),
-    						forTool: this.xtype
+    						forTool: 'summary'
     					},
     					callback: function(records, operation, success) {
     						if (success && records && records.length>0) {
@@ -362,7 +362,7 @@ Ext.define('Voyant.panel.Summary', {
 						stopList: this.getApiParam('stopList'),
     					sort: 'TFIDF',
     					dir: 'DESC',
-    					forTool: this.xtype
+    					forTool: 'summary'
     				},
     				scope: this,
     				callback: function(records, operation, success) {

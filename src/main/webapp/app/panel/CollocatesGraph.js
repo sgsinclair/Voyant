@@ -260,7 +260,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			.force('y', d3.forceY(elHeight/2));
 //        			.alpha(0.5).restart(); // restarting physics messes up zoomToFit
         		
-        		this.zoomToFit();
+        		Ext.Function.defer(this.zoomToFit, 100, this);
+ //       		this.zoomToFit();
         	}
 		}, this);
         
@@ -563,7 +564,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    		}
 	    	}.bind(this))
 	    	.on('end', function() {
-	    		this.zoomToFit();
+        		Ext.Function.defer(this.zoomToFit, 100, this);
 	    	}.bind(this))
 		);
     	
@@ -772,6 +773,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	var fullHeight = svg.clientHeight;
     	var scale = (paddingPercent || 0.8) / Math.max(width/fullWidth, height/fullHeight);
     	var translate = [fullWidth/2 - scale*midX, fullHeight/2 - scale*midY];
+    	if (width<1) {return} // FIXME: something strange with spiral
+ 
     	d3.select(svg)
     		.transition()
     		.duration(transitionDuration || 500)

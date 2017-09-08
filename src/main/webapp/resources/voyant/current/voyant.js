@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Sep 03 15:51:46 EDT 2017 */
+/* This file created by JSCacher. Last modified: Fri Sep 08 09:30:26 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -10152,44 +10152,12 @@ Ext.define('Voyant.data.model.Corpus', {
 				params: config
 			}).then(function(response) {
 				me.set(Ext.JSON.decode(response.responseText).corpus.metadata);
-				var rId = 'titles-'+me.getId();
+				// removed calls to set title and subtitle which should now be in metadata
 				if (config.title || config.subTitle) {
-					// store title and subTitle until they become part of metadata
 					me.set('title', config.title);
 					me.set('subTitle', config.subTitle);
-					Ext.Ajax.request({
-			    	    url: Voyant.application.getTromboneUrl(),
-			    	    params: {
-			        		tool: 'resource.StoredResource',
-			    			storeResource: Ext.encode({title: config.title, subTitle: config.subTitle}),
-			    			resourceId: rId
-			    	    }
-			    	});
 				} else {
-					// try to load stored title and subTitle
-					Ext.Ajax.request({
-			    	    url: Voyant.application.getTromboneUrl(),
-			    	    params: {
-			        		tool: 'resource.StoredResource',
-			        		verifyResourceId: rId
-			    	    }
-			    	}).then(function(response) {
-			    		var json = Ext.util.JSON.decode(response.responseText);
-			    		if (json && json.storedResource && json.storedResource.id && json.storedResource.id != '') {
-				    		Ext.Ajax.request({
-					    	    url: Voyant.application.getTromboneUrl(),
-					    	    params: {
-					        		tool: 'resource.StoredResource',
-					        		retrieveResourceId: rId
-					    	    }
-					    	}).then(function(response) {
-					    		var json = Ext.util.JSON.decode(response.responseText);
-				    	    	var value = json.storedResource.resource;
-				    	    	var titles = Ext.decode(value);
-				    	    	me.set(titles);
-				    	    });
-				    	}
-			    	});
+					// (removed calls for title and subtitle which should now be part of metadata
 				}
 				
 				return me;
@@ -16069,7 +16037,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    			.force('y', d3.forceY(elHeight/2));
 //        			.alpha(0.5).restart(); // restarting physics messes up zoomToFit
         		
-        		this.zoomToFit();
+        		Ext.Function.defer(this.zoomToFit, 100, this);
+ //       		this.zoomToFit();
         	}
 		}, this);
         
@@ -16372,7 +16341,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    		}
 	    	}.bind(this))
 	    	.on('end', function() {
-	    		this.zoomToFit();
+        		Ext.Function.defer(this.zoomToFit, 100, this);
 	    	}.bind(this))
 		);
     	
@@ -16581,6 +16550,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	var fullHeight = svg.clientHeight;
     	var scale = (paddingPercent || 0.8) / Math.max(width/fullWidth, height/fullHeight);
     	var translate = [fullWidth/2 - scale*midX, fullHeight/2 - scale*midY];
+    	if (width<1) {return} // FIXME: something strange with spiral
+ 
     	d3.select(svg)
     		.transition()
     		.duration(transitionDuration || 500)
@@ -16927,7 +16898,8 @@ Ext.define('Voyant.panel.Contexts', {
         		    params: {
         				limit: 1,
         				query: this.getApiParam("query"),
-        				stopList: this.getApiParam("stopList")
+        				stopList: this.getApiParam("stopList"),
+        				forTool: 'contexts'
         			}
             	});
         	}
@@ -17350,10 +17322,16 @@ Ext.define('Voyant.panel.Correlations', {
         	if (corpus.getDocumentsCount()==1) { // switch to documents mode
         		this.getStore().getProxy().setExtraParam('tool', 'corpus.DocumentTermCorrelations');
         	}
-    		this.getStore().load();
+        	if (this.isVisible()) {
+        		this.getStore().load();
+        	}
         });
         
-        me.on("query", function(src, query) {
+    	me.on("activate", function() { // load after tab activate (if we're in a tab panel)
+    		if (this.getStore().getCorpus()) {this.getStore().load();}
+    	}, this)
+
+    	me.on("query", function(src, query) {
         	this.setApiParam("query", query);
         	this.getStore().load();
         }, me);
@@ -18907,7 +18885,8 @@ Ext.define('Voyant.panel.CorpusTerms', {
         	parentPanel: this,
         	proxy: {
         		extraParams: {
-        			withDistributions: 'relative'
+        			withDistributions: 'relative',
+        			forTool: 'corpusterms'
         		}
         	}
         });
@@ -19023,8 +19002,17 @@ Ext.define('Voyant.panel.CorpusTerms', {
     		if (corpus.getDocumentsCount()>100) {
     			this.getStore().getProxy().setExtraParam('bins', this.getApiParam('maxBins'));
     		}
-    		this.getStore().load()
+    		if (this.isVisible()) {
+        		this.getStore().load()
+    		}
     	}, me);
+    	
+    	me.on("activate", function() { // load after tab activate (if we're in a tab panel)
+    		if (me.getStore().getCorpus()) {
+    			me.getStore().load({params: this.getApiParams()});
+    		}
+    	}, me);
+
     	
     	me.on("query", function(src, query) {
     		this.setApiParam('query', query);
@@ -19069,7 +19057,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
     	this.on('loadedCorpus', function(src, corpus) {
     		var store = this.getStore();
     		store.setCorpus(corpus);
-    		store.load();
+    		if (this.isVisible()) {
+        		store.load();
+    		}
     	});
     	
     	if (config.embedded) {
@@ -19270,7 +19260,12 @@ Ext.define('Voyant.panel.Documents', {
     constructor: function(config) {
     	
     	var store = Ext.create("Voyant.data.store.Documents", {
-    	    selModel: {pruneRemoved: false}
+    	    selModel: {pruneRemoved: false},
+    	    proxy: {
+    	    	extraParams: {
+    	    		forTool: 'documents'
+    	    	}
+    	    }
     	});
     	
     	var dockedItemsItems = [{
@@ -19467,7 +19462,9 @@ Ext.define('Voyant.panel.Documents', {
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
     		this.store.setCorpus(corpus);
-    		this.store.load({params: this.getApiParams()});
+    		if (this.isVisible()) {
+        		this.store.load({params: this.getApiParams()});
+    		}
     		if (this.hasCorpusAccess(corpus)==false) {
     			this.queryById('modifyButton').hide();
     			this.queryById('downloadButton').hide();
@@ -19494,6 +19491,12 @@ Ext.define('Voyant.panel.Documents', {
     		})
     		*/
     	})
+    	
+    	this.on("activate", function() { // load after tab activate (if we're in a tab panel)
+    		if (this.getStore().getCorpus()) {
+    			this.getStore().load({params: this.getApiParams()});
+    		}
+    	}, this);
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('query', function(src, query) {
@@ -21177,7 +21180,14 @@ Ext.define('Voyant.panel.Reader', {
     },
     
     initComponent: function(config) {
-    	var tokensStore = Ext.create("Voyant.data.store.Tokens");
+    	var tokensStore = Ext.create("Voyant.data.store.Tokens", {
+    		parentTool: this,
+    		proxy: {
+    			extraParams: {
+    				forTool: 'reader'
+    			}
+    		}
+    	})
     	var me = this;
     	tokensStore.on("beforeload", function(store) {
     		return me.hasCorpusAccess(store.getCorpus());
@@ -21237,7 +21247,8 @@ Ext.define('Voyant.panel.Reader', {
 					withDistributions: true,
 					// TODO handle positions
 					withPositions: true,
-					bins: 25
+					bins: 25,
+					forTool: 'reader'
 				},
 				reader: {
 					type: 'json',
@@ -23947,7 +23958,7 @@ Ext.define('Voyant.panel.Summary', {
     					params: {
     						limit: me.getApiParam('limit'),
     						stopList: me.getApiParam('stopList'),
-    						forTool: this.xtype
+    						forTool: 'summary'
     					},
     					callback: function(records, operation, success) {
     						if (success && records && records.length>0) {
@@ -24007,7 +24018,7 @@ Ext.define('Voyant.panel.Summary', {
 						stopList: this.getApiParam('stopList'),
     					sort: 'TFIDF',
     					dir: 'DESC',
-    					forTool: this.xtype
+    					forTool: 'summary'
     				},
     				scope: this,
     				callback: function(records, operation, success) {
@@ -24929,7 +24940,14 @@ Ext.define('Voyant.panel.TermsBerry', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
-    		this.doLoad();
+    		if (this.isVisible()) {
+        		this.doLoad();
+    		}
+    	},
+    	activate: function() {
+    		if (this.getCorpus()) {
+    			this.doLoad();
+    		}
     	}
     },
     
@@ -25909,7 +25927,6 @@ Ext.define('Voyant.panel.Trends', {
      * @private
      */
     constructor: function(config) {
-
     	this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
 
@@ -26119,7 +26136,8 @@ Ext.define('Voyant.panel.Trends', {
     		this.loadFromDocumentTerms(this.getApiParam('query') ? undefined : this.getCorpus().getDocumentTerms({
     			proxy: {
     				extraParams: {
-    					limit: this.getApiParam('limit')
+    					limit: this.getApiParam('limit'),
+    					forTool: 'trends'
     				}
     			}
     		}))
@@ -26128,7 +26146,13 @@ Ext.define('Voyant.panel.Trends', {
     
     loadFromDocumentTerms: function(documentTerms) {
     	if (this.getCorpus()) {
-        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({});
+        	documentTerms = documentTerms || this.getCorpus().getDocumentTerms({
+        		proxy: {
+        			extraParams: {
+        				forTool: 'trends'
+        			}
+        		}
+        	});
     		documentTerms.load({
     		    callback: function(records, operation, success) {
     		    	if (success) {
@@ -26162,7 +26186,8 @@ Ext.define('Voyant.panel.Trends', {
 			this.loadFromCorpusTerms(corpus.getCorpusTerms({
 				proxy: {
 					extraParams: {
-						limit: this.getApiParam('limit')
+						limit: this.getApiParam('limit'),
+						forTool: 'trends'
 					}
 				}
 			}))
@@ -26174,7 +26199,15 @@ Ext.define('Voyant.panel.Trends', {
     		if (this.getCorpus().getDocumentsCount()==1) {
     			this.loadFromDocumentTerms();
     		} else {
-        		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({autoLoad: false});
+        		corpusTerms = corpusTerms || this.getCorpus().getCorpusTerms({
+        			autoLoad: false,
+        			proxy: {
+        				extraParams: {
+        					forTool: 'trends'
+        				}
+        			}
+        			
+        		});
         		var params = this.getApiParams(['stopList','query','withDistributions',"bins"]);
         		// ensure that we're not beyond the number of documents
         		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
@@ -31641,8 +31674,7 @@ Ext.define('Voyant.VoyantToolApp', {
 	    	    	    	var json = Ext.util.JSON.decode(response.responseText);
 	        	    		var configString = decodeURIComponent(json.storedResource.resource);
 	        	    		var config = Ext.decode(configString);
-	        	    		config.xtype = me.getTool();
-	        	    		var tool = Ext.create(config);
+	        	    		var tool = Ext.create({xtype: me.getTool()});
 	        	    		tool.setApiParams(config);
 	        	    		container.unmask();
 	        	    		container.remove(container.down('container'));
