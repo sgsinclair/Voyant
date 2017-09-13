@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Sep 08 11:54:49 EDT 2017 */
+/* This file created by JSCacher. Last modified: Wed Sep 13 09:51:17 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7560,7 +7560,7 @@ Ext.define("Voyant.notebook.util.Show", {
 					contents = this;
 				}
 				contents = contents.getString ? contents.getString() : contents.toString();
-				if (len) {contents = contents.substring(0,len)}
+				if (len && Ext.isNumber(len)) {contents = contents.substring(0,len)}
 				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
 				Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
 			}
@@ -21169,7 +21169,7 @@ Ext.define('Voyant.panel.Reader', {
     	insertWhere: 'beforeEnd',
     	locationMarker: undefined,
     	lastLocationUpdate: new Date(),
-    	isDetailedGraph: true,
+    	isDetailedGraph: true
     },
     
     SCROLL_UP: -1,

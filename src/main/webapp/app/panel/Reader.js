@@ -26,7 +26,7 @@ Ext.define('Voyant.panel.Reader', {
     	insertWhere: 'beforeEnd',
     	locationMarker: undefined,
     	lastLocationUpdate: new Date(),
-    	isDetailedGraph: true,
+    	isDetailedGraph: true
     },
     
     SCROLL_UP: -1,

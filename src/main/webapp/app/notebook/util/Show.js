@@ -30,11 +30,11 @@ Ext.define("Voyant.notebook.util.Show", {
 					});
 					contents = allContents;
 				} else if (Ext.isString(this) || this instanceof String) {
-					len = contents;
+					if (Ext.isNumber(contents)) {len = contents;}
 					contents = this;
 				}
 				contents = contents.getString ? contents.getString() : contents.toString();
-				if (len) {contents = contents.substring(0,len)}
+				if (len && Ext.isNumber(len)) {contents = contents.substring(0,len)}
 				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
 				Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
 			}
