@@ -211,10 +211,6 @@ Ext.define('Voyant.panel.Topics', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.resetData();
-        // set calculated values
-        var numTopics = parseInt(this.getApiParam('numTopics'));
-        this.setTokensPerTopic(this.zeros(numTopics));
-        this.setTopicWeights(this.zeros(numTopics))
         
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
@@ -323,8 +319,8 @@ Ext.define('Voyant.panel.Topics', {
 		this.setRequestedSweeps(0);
 		this.setWordTopicCounts({});
 		this.setTopicWordCounts([]);
-		this.setTokensPerTopic([]);
-		this.setTopicWeights(Array(numTopics));
+		this.setTokensPerTopic(this.zeros(numTopics));
+		this.setTopicWeights(this.zeros(numTopics));
 		this.setDocuments([]);
 		this.setTotalIterations(0);
     },
