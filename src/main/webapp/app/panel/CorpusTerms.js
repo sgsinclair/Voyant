@@ -118,6 +118,26 @@ Ext.define('Voyant.panel.CorpusTerms', {
                     xtype: 'totalpropertystatus'
                 }]
             }],
+            
+            plugins: [{
+                ptype: 'rowexpander',
+                rowBodyTpl: new Ext.XTemplate('')
+            }],
+            viewConfig: {
+                listeners: {
+                    // TODO widget disappears when scrolled off screen
+                    expandbody: function(rowNode, record, expandRow, eOpts) {
+                        if (expandRow.innerText==='' || (eOpts && eOpts.force)) {
+                            Ext.create('Voyant.widget.CorpusTermSummary', {
+                                record: record,
+                                header: false,
+                                renderTo: expandRow.querySelector('div')
+                            });
+                        }
+                    },
+                    scope: this
+                }
+            },
 
     		columns: [{
                 xtype: 'rownumberer',

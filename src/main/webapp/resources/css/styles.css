@@ -108,6 +108,17 @@ a {
 }
 */
 
+/* CorpusTermSummary */
+
+.corpus-term-summary .section {
+	margin-top: 1em;
+}
+.corpus-term-summary .header {
+    font-weight: bold;
+}
+.corpus-term-summary .contents {
+}
+
 /* Reader */
 
 .voyant-reader .x-panel-body .keyword, .voyant-reader .x-panel-body .word:hover, .keyword {
