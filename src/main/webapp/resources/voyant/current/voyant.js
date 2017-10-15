@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Sep 13 09:51:17 EDT 2017 */
+/* This file created by JSCacher. Last modified: Sun Oct 15 19:27:21 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7556,7 +7556,7 @@ Ext.define("Voyant.notebook.util.Show", {
 					});
 					contents = allContents;
 				} else if (Ext.isString(this) || this instanceof String) {
-					len = contents;
+					if (Ext.isNumber(contents)) {len = contents;}
 					contents = this;
 				}
 				contents = contents.getString ? contents.getString() : contents.toString();
@@ -10814,6 +10814,211 @@ Ext.define('Voyant.widget.CorpusSelector', {
     	this.setStore(data);
     }
 })
+Ext.define('Voyant.widget.CorpusTermSummary', {
+    extend: 'Ext.panel.Panel',
+    mixins: ['Voyant.panel.Panel'],
+    alias: 'widget.corpustermsummary',
+    statics: {
+        i18n: {
+            title: 'Corpus Term Summary: ',
+            items: 'Items',
+            loading: 'Loading...',
+            distribution: 'Distribution: ',
+            collocates: 'Collocates: ',
+            correlations: 'Correlations: ',
+            phrases: 'Phrases: '
+        },
+        api: {
+            stopList: 'auto',
+            query: undefined,
+            limit: 5
+        }
+    },
+    config: {
+        corpus: undefined,
+        record: undefined, // Voyant.data.model.CorpusTerm
+        collocatesStore: undefined,
+        correlationsStore: undefined,
+        phrasesStore: undefined,
+        documentTermsStore: undefined
+    },
+    cls: 'corpus-term-summary',
+
+    constructor: function(config) {
+        if (config.record === undefined) {
+            console.warn('CorpusTermSummary: no config.record!');
+            return false;
+        }
+        
+        Ext.apply(this, {
+            items: {
+                itemId: 'main',
+                minHeight: 200,
+                scrollable: true,
+                margin: 5
+            },
+            dockedItems: {
+                dock: 'bottom',
+                xtype: 'toolbar',
+                items: {
+                    fieldLabel: this.localize('items'),
+                    labelWidth: 40,
+                    width: 120,
+                    xtype: 'slider',
+                    increment: 5,
+                    minValue: 5,
+                    maxValue: 59,
+                    listeners: {
+                        boxready: function(slider) {
+                            slider.setValue(this.getApiParam('limit'));
+                        },
+                        changecomplete: function(slider, newvalue) {
+                            this.setApiParam('limit', newvalue);
+                            this.loadStuff();
+                        },
+                        scope: this
+                    }
+                }
+            },
+            listeners: {
+                boxready: function() {
+                    this.body.on('click', function(e) {
+                        var target = e.getTarget(null, null, true);
+                        if (target && target.dom.tagName == 'A') {
+                            if (target.hasCls('corpus-type')) {
+                                this.dispatchEvent('termsClicked', this, [target.getHtml()]);
+                            }
+                        }
+                    }, this, {stopPropagation: true});
+                    
+                    this.getDockedItems().forEach(function(i) {
+                       i.getEl().on('click', null, this, {stopPropagation: true}); // stop owner container from receiving clicks
+                    });
+                    
+                    this.loadStuff();
+                },
+                scope: this
+            }
+        });
+        
+        Ext.applyIf(config, {
+            title: this.localize('title')+config.record.getTerm()
+        });
+
+        this.callParent(arguments);
+        this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+        
+        var corpus = this.getRecord().store.getCorpus();
+        this.setCorpus(corpus);
+
+        this.setApiParam('query', this.getRecord().getTerm());
+        
+        this.setCollocatesStore(Ext.create('Voyant.data.store.CorpusCollocates', { corpus: corpus }));
+        this.setCorrelationsStore(Ext.create('Voyant.data.store.TermCorrelations', { corpus: corpus }));
+        this.setPhrasesStore(Ext.create('Voyant.data.store.CorpusNgrams', { corpus: corpus }));
+        this.setDocumentTermsStore(Ext.create('Voyant.data.store.DocumentTerms', { corpus: corpus }));
+        
+    },
+
+    loadStuff: function() {
+        this.getComponent('main').removeAll();
+        
+        var docIndexes = [];
+        for (var i = 0; i < this.getCorpus().getDocumentsCount(); i++) {
+            docIndexes[i] = i;
+        }
+        this.getComponent('main').add({
+            xtype: 'container',
+            cls: 'section',
+            layout: 'hbox',
+            align: 'bottom',
+            items: [{
+                xtype: 'container',
+                html: '<div class="header">'+this.localize('distribution')+'</div>'
+            },{
+                itemId: 'distLine',
+                xtype: 'sparklineline',
+                values: [],
+                height: 20,
+                width: 200
+            }],
+            listeners: {
+                afterrender: function(container) {
+                    container.mask(this.localize('loading'));
+                    // TODO make distribution bins reflective of doc sizes
+                    this.getDocumentTermsStore().load({
+                        params: {
+                            query: this.getApiParam('query'),
+                            docIndex: docIndexes,
+                            withDistributions: true,
+                            bins: parseInt(this.getApiParam('limit'))*2
+                        },
+                        callback: function(records, op, success) {
+                            if (success && records && records.length>0) {
+                                var arrays = records.map(function(r) { return r.getDistributions(); });
+                                var values = arrays.reduce(function(a,b) { return a.concat(b); });
+                                this.down('#distLine').setValues(values);
+                                container.unmask();
+                            }
+                        },
+                        scope: this
+                    });
+                },
+                scope: this
+            }
+        });
+        
+        this.addSection(
+            this.localize('collocates'), this.getCollocatesStore(), this.getApiParams(),
+            '<tpl for="." between="; "><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordId="{term}">{term}</a><span style="font-size: smaller"> ({val})</span></tpl>',
+            function(r) {
+                return {term: r.getContextTerm(), val: r.getContextTermRawFreq()}
+            }
+        );
+        
+        this.addSection(
+            this.localize('correlations'), this.getCorrelationsStore(), this.getApiParams(),
+            '<tpl for="." between="; "><a href="#" onclick="return false" class="corpus-type keyword" voyant:recordId="{term}">{term}</a><span style="font-size: smaller"> ({val})</span></tpl>',
+            function(r) {
+                return {term: r.get('source-term'), val: r.get('source').rawFreq}
+            }
+        );
+        
+        this.addSection(
+            this.localize('phrases'), this.getPhrasesStore(), Ext.apply({minLength: 3, sort: 'length'}, this.getApiParams()),
+            '<tpl for="."><div>&ldquo;{phrase}&rdquo;</div></tpl>',
+            function(r) {
+                return {phrase: r.getTerm()}
+            }
+        );
+    },
+    
+    addSection: function(title, store, params, template, mapping) {
+        return this.getComponent('main').add({
+            xtype: 'container',
+            html: '<div class="header">'+title+'</div>',
+            cls: 'section',
+            listeners: {
+                afterrender: function(container) {
+                    container.mask(this.localize('loading'));
+                    store.load({
+                        params: params,
+                        callback: function(records, op, success) {
+                            if (success && records && records.length>0) {
+                                container.unmask();
+                                Ext.dom.Helper.append(container.getTargetEl().first().first(),
+                                    new Ext.XTemplate('<div class="contents">'+template+'</div>').apply(records.map(mapping))
+                                );
+                            }
+                        }
+                    });
+                },
+                scope: this
+            }
+        });
+    }
+});
+
 Ext.define('Voyant.widget.ListEditor', {
     extend: 'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
@@ -10930,7 +11135,7 @@ Ext.define('Voyant.widget.StopListOption', {
     	var value = this.up('window').panel.getApiParam('stopList');
     	
     	var data = [];
-    	"ar:stop.ar.arabic-lucene.txt,bg:stop.bu.bulgarian-lucene.txt,br:stop.br.breton-lucene.txt,ca:stop.ca.catalan-lucene.txt,ckb:stop.ckb-turkish-lucene.txt,cn:stop.cn.chinese-lawrence.txt,cz:stop.cz.czech-lucene.txt,de:stop.de.german.txt,el:stop.el.greek-lucene.txt,en:stop.en.taporware.txt,es:stop.es.spanish.txt,eu:stop.eu.basque-lucene.txt,fa:stop.fa.farsi-lucene.txt,fr:stop.fr.veronis.txt,ga:stop.ga-irish-lucene.txt,gl:stop.ga.galician-lucene.txt,hi:stop.hi.hindi-lucene.txt,hu:stop.hu.hungarian.txt,hy:stop.hy.armenian-lucene.txt,id:stop.id.indonesian-lucene.txt,it:stop.it.italian.txt,ja:stop.ja.japanese-lucene.txt,lv:stop.lv.latvian-lucene.txt,lt:stop.lt.lithuanian-lucene.txt,mu:stop.mu.multi.txt,nl:stop.nl.dutch.txt,no:stop.no.norwegian.txt,ro:stop.ro.romanian-lucene.txt,se:stop.se.swedish-long.txt,th:stop.th.thai-lucene.txt,tr:stop.tr.turkish-lucene.txt".split(",").forEach(function(lang) {
+    	"ar:stop.ar.arabic-lucene.txt,bg:stop.bu.bulgarian-lucene.txt,br:stop.br.breton-lucene.txt,ca:stop.ca.catalan-lucene.txt,ckb:stop.ckb-turkish-lucene.txt,cn:stop.cn.chinese-lawrence.txt,cz:stop.cz.czech-lucene.txt,de:stop.de.german.txt,el:stop.el.greek-lucene.txt,en:stop.en.taporware.txt,es:stop.es.spanish.txt,eu:stop.eu.basque-lucene.txt,fa:stop.fa.farsi-lucene.txt,fr:stop.fr.veronis.txt,ga:stop.ga-irish-lucene.txt,gl:stop.ga.galician-lucene.txt,grc:stop.grc.ancient-greek.txt,hi:stop.hi.hindi-lucene.txt,hu:stop.hu.hungarian.txt,hy:stop.hy.armenian-lucene.txt,id:stop.id.indonesian-lucene.txt,it:stop.it.italian.txt,ja:stop.ja.japanese-lucene.txt,la:stop.la.latin.txt,lv:stop.lv.latvian-lucene.txt,lt:stop.lt.lithuanian-lucene.txt,mu:stop.mu.multi.txt,nl:stop.nl.dutch.txt,no:stop.no.norwegian.txt,ro:stop.ro.romanian-lucene.txt,se:stop.se.swedish-long.txt,th:stop.th.thai-lucene.txt,tr:stop.tr.turkish-lucene.txt".split(",").forEach(function(lang) {
     		var parts = lang.split(":")
     		data.push({name: this.localize(parts[0]), value: parts[1]})
     	}, this);
@@ -18927,6 +19132,26 @@ Ext.define('Voyant.panel.CorpusTerms', {
                     xtype: 'totalpropertystatus'
                 }]
             }],
+            
+            plugins: [{
+                ptype: 'rowexpander',
+                rowBodyTpl: new Ext.XTemplate('')
+            }],
+            viewConfig: {
+                listeners: {
+                    // TODO widget disappears when scrolled off screen
+                    expandbody: function(rowNode, record, expandRow, eOpts) {
+                        if (expandRow.innerText==='' || (eOpts && eOpts.force)) {
+                            Ext.create('Voyant.widget.CorpusTermSummary', {
+                                record: record,
+                                header: false,
+                                renderTo: expandRow.querySelector('div')
+                            });
+                        }
+                    },
+                    scope: this
+                }
+            },
 
     		columns: [{
                 xtype: 'rownumberer',
@@ -28575,10 +28800,6 @@ Ext.define('Voyant.panel.Topics', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
     	this.resetData();
-        // set calculated values
-        var numTopics = parseInt(this.getApiParam('numTopics'));
-        this.setTokensPerTopic(this.zeros(numTopics));
-        this.setTopicWeights(this.zeros(numTopics))
         
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
@@ -28687,8 +28908,8 @@ Ext.define('Voyant.panel.Topics', {
 		this.setRequestedSweeps(0);
 		this.setWordTopicCounts({});
 		this.setTopicWordCounts([]);
-		this.setTokensPerTopic([]);
-		this.setTopicWeights(Array(numTopics));
+		this.setTokensPerTopic(this.zeros(numTopics));
+		this.setTopicWeights(this.zeros(numTopics));
 		this.setDocuments([]);
 		this.setTotalIterations(0);
     },
