@@ -117,6 +117,7 @@
 <script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=13&lang=<%= lang %>"></script>
 
 <% // ridiculous hack for Safari 11 that seems to hide fieldsets, tested with desktop and iPad
+	// https://www.sencha.com/forum/showthread.php?423768&p=1282921&viewfull=1#post1282921
 String userAgent = request.getHeader("user-agent");
 if (userAgent.indexOf("Safari") > -1 && (userAgent.indexOf("Version/11.0 Safari") > -1 || userAgent.indexOf("Version/11.0 Mobile") > -1)) { %>
 	<style>
