@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Oct 27 14:29:45 EDT 2017 */
+/* This file created by JSCacher. Last modified: Fri Oct 27 15:24:33 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -13791,7 +13791,6 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	this.getEdgeSelection().call(this.applyEdgeStyle.bind(this));
     }
 });
-
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable','Voyant.util.DetailedError'],
 	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.CategoriesOption','Voyant.widget.TotalPropertyStatus'],

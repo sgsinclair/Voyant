@@ -115,3 +115,12 @@
 
 <script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=13<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
 <script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=13&lang=<%= lang %>"></script>
+
+<% // ridiculous hack for Safari 11 that seems to hide fieldsets, tested with desktop and iPad
+String userAgent = request.getHeader("user-agent");
+if (userAgent.indexOf("Safari") > -1 && (userAgent.indexOf("Version/11.0 Safari") > -1 || userAgent.indexOf("Version/11.0 Mobile") > -1)) { %>
+	<style>
+	/* ridiculous hack for Safari 11 that seems to hide fieldsets */
+	.x-fieldset {overflow: visible;}
+	</style>
+<% } %>
