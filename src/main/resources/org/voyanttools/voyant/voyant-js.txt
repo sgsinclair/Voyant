@@ -80,7 +80,7 @@ app/data/model/Corpus.js
 # WIDGETS
 app/widget/CodeEditor.js
 app/widget/CorpusSelector.js
-app/widget/CorpusTermSummary.js
+# app/widget/CorpusTermSummary.js
 app/widget/ListEditor.js
 app/widget/StopListOption.js
 app/widget/QuerySearchField.js
@@ -98,6 +98,7 @@ app/widget/VoyantTableTransform.js
 app/widget/CategoriesBuilder.js
 app/widget/VoyantNetworkGraph.js
 
+
 # PANELS
 app/panel/Panel.js
 app/panel/VoyantTabPanel.js
@@ -110,6 +111,7 @@ app/panel/Cirrus.js
 app/panel/CollocatesGraph.js
 app/panel/Contexts.js
 app/panel/CorpusCollocates.js
+app/panel/CorpusTermSummary.js
 app/panel/Correlations.js
 app/panel/CorpusCreator.js
 app/panel/Knots.js
