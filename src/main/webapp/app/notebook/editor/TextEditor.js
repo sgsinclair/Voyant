@@ -11,10 +11,11 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 				    	{ name: 'colors', items: [ 'TextColor', 'BGColor' ] },
 				    	{ name: 'styles', items: [ 'Styles', 'Format' ] },
 				    	{ name: 'links', items: [ 'Link', 'Unlink', 'Anchor'] },
-				    	{ name: 'insert', items: [ 'Image', 'Table', 'Iframe' ] },
+				    	{ name: 'insert', items: [ 'Image', 'Table' ] },
 				    	{ name: 'document', items: [ 'Sourcedialog', 'Stopediting'] }
 		    ],
-		    extraPlugins: 'stopediting,sourcedialog,iframe,justify,colorbutton',
+		    extraPlugins: 'stopediting,sourcedialog,justify,colorbutton',
+		    removePlugins: 'iframe',
 			allowedContent: true,
 			toolbarCanCollapse: true,
 			startupFocus: true
