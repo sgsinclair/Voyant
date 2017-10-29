@@ -35,6 +35,7 @@
 		<url-pattern>/tool/*</url-pattern>
 	</servlet-mapping>
 	
+	<!-- we changed from spiral to spyral, we'll redirect in spyral -->
 	<servlet-mapping>
 		<servlet-name>spiral</servlet-name>
 		<url-pattern>/spiral/*</url-pattern>
@@ -42,7 +43,17 @@
 	
 	<servlet>
 		<servlet-name>spiral</servlet-name>
-		<jsp-file>/spiral/index.jsp</jsp-file>
+		<jsp-file>/spyral/index.jsp</jsp-file>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>spyral</servlet-name>
+		<url-pattern>/spyral/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>spyral</servlet-name>
+		<jsp-file>/spyral/index.jsp</jsp-file>
 	</servlet>
 	
 	<!-- this is to handle a bad URL in Hermeneutica the book -->

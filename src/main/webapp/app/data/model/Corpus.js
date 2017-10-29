@@ -371,7 +371,7 @@ Ext.define('Voyant.data.model.Corpus', {
 	/**
      * Create a promise for a new Corpus with relevant data loaded.
      * 
-     * The typical usage in Spiral is to call {@link #assign} in a first code block:
+     * The typical usage in Spyral is to call {@link #assign} in a first code block:
      * 
      * 		new Corpus("Hello Voyant!").assign("corpus");
      * 
@@ -913,7 +913,7 @@ Ext.define('Voyant.data.model.Corpus', {
      * The typical usage is to chain the returned promise with {@link Ext.promise.Promise#then then} and
      * provide a function that receives the lemmas as an argument.
      * 
-	 * 	new Corpus("Hello world, I like Spiral notebooks!", {language: "en"}).getLemmasArray().then(function(lemmas) {
+	 * 	new Corpus("Hello world, I like Spyral notebooks!", {language: "en"}).getLemmasArray().then(function(lemmas) {
 			show(lemmas.join(", "))
 	 *  });
      * 

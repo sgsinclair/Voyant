@@ -25,7 +25,7 @@ Ext.define("Voyant.notebook.editor.button.Counter", {
 	},
 	updateHtml: function() {
 		var pos = this.getOrder()+1;
-		var lnk = 'spiralcounter_'+pos;
+		var lnk = 'spyralcounter_'+pos;
 		this.setHtml('<a name="'+lnk+'" id="'+lnk+'" href="#'+lnk+'">'+pos+'</a>');
 	}
 })

@@ -3,7 +3,7 @@
         "created": 1496929631651,
         "version": 2,
         "modified": 1496950159544,
-        "url": "http://localhost:8080/voyant/spiral/tmp-ca?debug=true&run=true",
+        "url": "http://localhost:8080/voyant/spyral/tmp-ca?debug=true&run=true",
         "previousNotebook": "tmp-ca",
         "originalUrl": "f581a032b35f64040d6e5a0ad16c556f"
     },
@@ -11,9 +11,9 @@
         {
             "type": "text",
             "input": [
-                "<h1 style=\"text-align: center;\">Spiral Notebook Template (title)</h1><p>This is ",
-                "a Spiral Notebook, a dynamic document that combines writing, code and data in se",
-                "rvice of reading, analyzing and interpreting digital texts.</p><p>Spiral Noteboo",
+                "<h1 style=\"text-align: center;\">Spyral Notebook Template (title)</h1><p>This is ",
+                "a Spyral Notebook, a dynamic document that combines writing, code and data in se",
+                "rvice of reading, analyzing and interpreting digital texts.</p><p>Spyral Noteboo",
                 "ks are composed of text blocks (like this one) and code blocks (like the one bel",
                 "ow). You can <span class=\"marker\">click on the blocks to edit</span> them and ad",
                 "d new blocks by clicking add icon that appears in the left column when hovering ",

@@ -5,17 +5,17 @@
         "version": 2,
         "previousNotebook": "alta-tables",
         "originalUrl": "alta-tables",
-        "url": "https://voyant-tools.org/spiral/alta-tables"
+        "url": "https://voyant-tools.org/spyral/alta-tables"
     },
     "blocks": [
         {
             "type": "text",
             "input": [
-                "<h1 style=\"text-align: center;\">Introducing Custom Tables in Spiral Notebook</h1",
-                "><p>This notebook will help you work with custom Spiral Tables in your&nbsp;note",
+                "<h1 style=\"text-align: center;\">Introducing Custom Tables in Spyral Notebook</h1",
+                "><p>This notebook will help you work with custom Spyral Tables in your&nbsp;note",
                 "books (it's part of the <a data-tabindex-counter=\"54\" data-tabindex-value=\"none\"",
                 " data-cke-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target=\"_blank\">Art of Lit",
-                "erary Text Analysis with Spiral&nbsp;Notebooks</a>). In particular, we'll look a",
+                "erary Text Analysis with Spyral&nbsp;Notebooks</a>). In particular, we'll look a",
                 "t:</p><ul><li><a data-tabindex-counter=\"28\" data-tabindex-value=\"none\" data-cke-",
                 "saved-href=\"#create\" href=\"#create\" tabindex=\"-1\">creating a table</a></li><li><",
                 "a data-tabindex-counter=\"20\" data-tabindex-value=\"none\" data-cke-saved-href=\"#di",
@@ -138,7 +138,7 @@
             "input": [
                 "<h3>Create a Table of Letter Frequencies</h3>\n\n<p>Creating a&nbsp;<a data-tabind",
                 "ex-counter=\"24\" data-tabindex-value=\"none\" href=\"../../docs/#!/api/Table\" tabind",
-                "ex=\"-1\">Table</a>&nbsp;in Spiral is easy, it can be something as simple as this:",
+                "ex=\"-1\">Table</a>&nbsp;in Spyral is easy, it can be something as simple as this:",
                 "</p>\n\n<blockquote>\n<pre><code>var table = new VoyantTable();</code></pre>\n</bloc",
                 "kquote>\n\n<p>As we'll see, tables provide convenient methods for updating values ",
                 "and for displaying output. Another benefit of Tables is a convenient way to coun",
@@ -319,7 +319,7 @@
                 "e same way we did here, is the order of letters different?</li></ul><p>If you're",
                 " working sequentially&nbsp;through the <a data-tabindex-counter=\"20\" data-tabind",
                 "ex-value=\"none\" data-cke-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target=\"_bl",
-                "ank\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>, the next note",
+                "ank\">Art of Literary Text Analysis with Spyral&nbsp;Notebooks</a>, the next note",
                 "book&nbsp;is <a data-tabindex-counter=\"8\" data-tabindex-value=\"none\" data-cke-sa",
                 "ved-href=\"alta-scale\" href=\"alta-scale\" tabindex=\"-1\" target=\"_blank\">Thinking a",
                 "bout Scale</a>.</p>"

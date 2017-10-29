@@ -5,17 +5,17 @@
         "version": 2,
         "previousNotebook": "alta-smaller",
         "originalUrl": "alta-smaller",
-        "url": "https://voyant-tools.org/spiral/alta-smaller"
+        "url": "https://voyant-tools.org/spyral/alta-smaller"
     },
     "blocks": [
         {
             "type": "text",
             "input": [
-                "<h1 style=\"text-align: center;\">Exploring a Small Corpus in a Spiral Notebook</h",
-                "1><p>This notebook will help you explore a corpus with Spiral Notebooks (it's pa",
+                "<h1 style=\"text-align: center;\">Exploring a Small Corpus in a Spyral Notebook</h",
+                "1><p>This notebook will help you explore a corpus with Spyral Notebooks (it's pa",
                 "rt of the&nbsp;<a data-tabindex-counter=\"47\" data-tabindex-value=\"none\" data-cke",
                 "-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target=\"_blank\">Art of Literary Tex",
-                "t Analysis with Spiral&nbsp;Notebooks</a>). In particular, we'll look at:</p><ul",
+                "t Analysis with Spyral&nbsp;Notebooks</a>). In particular, we'll look at:</p><ul",
                 "><li><a data-tabindex-counter=\"23\" data-tabindex-value=\"none\" data-cke-saved-hre",
                 "f=\"#reuse\" href=\"#reuse\" tabindex=\"-1\">creating a reusable corpus</a></li><li><a",
                 " data-tabindex-counter=\"22\" data-tabindex-value=\"none\" data-cke-saved-href=\"#fre",
@@ -37,7 +37,7 @@
                 ", 0, 0, 0);\">t</span>ing a Reusable Corpus</h2><p>Most of the code examples unti",
                 "l now have created a transient corpus, in other words one that is created and us",
                 "ed immediately, but not reused. In what follows we will show how we can create a",
-                " corpus and reuse it elsewhere in the Spiral notebook.</p><p>It's useful to unde",
+                " corpus and reuse it elsewhere in the Spyral notebook.</p><p>It's useful to unde",
                 "rstand that when we create a corpus we actually get a promise for a corpus that ",
                 "will be delivered later. This is the nature of some Javascript code that runs <a",
                 " data-tabindex-counter=\"23\" data-tabindex-value=\"none\" data-cke-saved-href=\"http",
@@ -118,7 +118,7 @@
                 "ode-type=\"1\" alt=\"Ancre\" title=\"Ancre\" align=\"\" src=\"data:image/gif;base64,R0lGO",
                 "DlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==\" data-cke-real-element-t",
                 "ype=\"anchor\">Exploring Term Frequencies</h2><p>So, we have a reusable corpus in ",
-                "Spiral, now what? Sometimes we come to a corpus with pre-existing questions, som",
+                "Spyral, now what? Sometimes we come to a corpus with pre-existing questions, som",
                 "etimes we just want to start exploring. We can begin with simple term frequencie",
                 "s, what are the most frequent terms in the document? To start exploring, we can ",
                 "use the Cirrus word cloud visualization – we can use the <a data-cke-saved-href=",
@@ -249,7 +249,7 @@
             "input": [
                 "<p>By default Trends will show the distribution&nbsp;of the top 5 terms in our d",
                 "ocument. Because we are in single document mode, we see the raw frequencies for ",
-                "10 equal segments of text: Spiral divides the text into 10 equal parts and then ",
+                "10 equal segments of text: Spyral divides the text into 10 equal parts and then ",
                 "counts frequencies in each part. We can use the \"Segments\" slider to get a finer",
                 "-tune look at distribution, dividing the document into 20 segments, for instance",
                 ".</p>\n\n<p>We can click on the terms in the top legend to toggle them on and off.",
@@ -481,7 +481,7 @@
                 "s in Text</a>). Whether one reads a text first, and then analyzes, or analyzes a",
                 "nd then reads, or analyzes and reads at the same time, will depend on many facto",
                 "rs, including the nature of the corpus and the nature of one's motivations for u",
-                "sing Spiral. In any case, it's simple enough to start reading!</p>"
+                "sing Spyral. In any case, it's simple enough to start reading!</p>"
             ]
         },
         {
@@ -515,7 +515,7 @@
                 ">&nbsp;and start exploring it in the same way we did here&nbsp;</li></ul><p>If y",
                 "ou're working sequentially&nbsp;through the <a data-tabindex-counter=\"21\" data-t",
                 "abindex-value=\"none\" data-cke-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target",
-                "=\"_blank\">Art of Literary Text Analysis with Spiral&nbsp;Notebooks</a>, the next",
+                "=\"_blank\">Art of Literary Text Analysis with Spyral&nbsp;Notebooks</a>, the next",
                 " notebook&nbsp;is <a data-tabindex-counter=\"11\" data-tabindex-value=\"none\" data-",
                 "cke-saved-href=\"alta-tables\" href=\"alta-tables\" tabindex=\"-1\" target=\"_blank\">In",
                 "troducing Tables</a>.</p>"

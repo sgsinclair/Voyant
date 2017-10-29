@@ -1,4 +1,12 @@
-<%@ include file="../../resources/jsp/pre_app.jsp" %>
+<% // we changed from spiral to spyral, so redirect if needed
+if (request.getServletPath().equals("/spiral")) {
+    response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+    StringBuffer url = request.getRequestURL();
+    String query = request.getQueryString();
+    if (query!=null) {url.append("?").append(query);}
+	response.setHeader("Location", url.toString().replace("/spiral/","/spyral/"));
+    return;
+} %><%@ include file="../../resources/jsp/pre_app.jsp" %>
 
 <script src="<%= base %>/resources/ckeditor/ckeditor4.6.2/ckeditor.js"></script>
 <script>
@@ -108,5 +116,5 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 		}
 	});
 </script>
-<title>Spiral</title>
+<title>Spyral</title>
 <%@ include file="../../resources/jsp/post_app.jsp" %>

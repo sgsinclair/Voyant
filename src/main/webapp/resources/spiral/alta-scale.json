@@ -12,9 +12,9 @@
             "type": "text",
             "input": [
                 "<h1 style=\"text-align: center;\">Thinking about Corpus Scale</h1><p>This notebook",
-                " will help you think about corpus scale when working with Spiral Notebooks (it's",
+                " will help you think about corpus scale when working with Spyral Notebooks (it's",
                 " part of the <a data-tabindex-counter=\"58\" data-tabindex-value=\"none\" data-cke-s",
-                "aved-href=\"./\" href=\"./\" tabindex=\"-1\">Art of Literary Text Analysis with Spiral",
+                "aved-href=\"./\" href=\"./\" tabindex=\"-1\">Art of Literary Text Analysis with Spyral",
                 "&nbsp;Notebooks</a>). In particular, we'll look at:</p><ul><li><a data-tabindex-",
                 "counter=\"11\" data-tabindex-value=\"none\" data-cke-saved-href=\"#kinds\" href=\"#kind",
                 "s\" tabindex=\"-1\">what kinds of corpora are there?</a></li><li><a data-tabindex-c",
@@ -40,7 +40,7 @@
                 "llection of poems or plays, or the entire works of an author, works from a speci",
                 "fic period or genre, works that are thematically related, etc. That's a lot of v",
                 "ariety and it doesn't even start to scratch the surface of the kinds of corpora ",
-                "people use with Voyant and Spiral, other examples include legal documents, news ",
+                "people use with Voyant and Spyral, other examples include legal documents, news ",
                 "articles, collections of tweets, survey data.</p><p>Also important is to underst",
                 "and that a collection of texts might be arranged and rearranged in many ways to ",
                 "constitute different corpora. For instance, we may start with a collection of al",
@@ -49,7 +49,7 @@
                 "ant to combine all the articles from a given day into a single document and then",
                 " have seven documents, one for each day. We might treat the different documents ",
                 "differently because different tools are better suited to certain corpus sizes. S",
-                "imilarly, we might want to do certain operations in Spiral on a single smaller d",
+                "imilarly, we might want to do certain operations in Spyral on a single smaller d",
                 "ocument (because of what we're studying or because dealing with the entire corpu",
                 "s at once would be overwhelming for the browser).</p><p>A related issue is wheth",
                 "er we are operating on data in the browser or data on the server. For example, i",
@@ -59,7 +59,7 @@
                 "g into the browser memory the entire text of the short story. That worked very w",
                 "ell because \"The Gold Bug\" is relatively short (about 13,700 words), but it woul",
                 "dn't work so well for our corpus of Jane Austen novels (about 781,000 words). Fo",
-                "r many operations in Spiral, the total number of words in the corpus may be the ",
+                "r many operations in Spyral, the total number of words in the corpus may be the ",
                 "most useful measure for gauging the relative size of a corpus. You could have a ",
                 "corpus of 1,000 documents but if they each had only 100 words it would still be ",
                 "smaller than our \"Gold Bug\" short story.</p><p>In what follows we will compare d",
@@ -219,7 +219,7 @@
                 "ta-cke-real-element-type=\"anchor\">Next Steps</h2><p>If you're working sequential",
                 "ly&nbsp;through the <a data-tabindex-counter=\"24\" data-tabindex-value=\"none\" dat",
                 "a-cke-saved-href=\"alta\" href=\"alta\" tabindex=\"-1\" target=\"_blank\">Art of Literar",
-                "y Text Analysis with Spiral&nbsp;Notebooks</a>, the next notebook&nbsp;is Explor",
+                "y Text Analysis with Spyral&nbsp;Notebooks</a>, the next notebook&nbsp;is Explor",
                 "ing a Larger Corpus.</p>"
             ]
         }

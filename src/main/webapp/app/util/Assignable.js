@@ -15,7 +15,7 @@ Ext.define('Voyant.util.Assignable', {
      *  		helloworld.show();
      *  	})
      *  
-     * Note that when using `assign` in spiral, any references to the name variable should occur in separate, subsequent code blocks. 
+     * Note that when using `assign` in spyral, any references to the name variable should occur in separate, subsequent code blocks. 
      * 
      * 		new Corpus("Hello Voyant!").assign("corpus");
      * 

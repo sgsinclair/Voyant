@@ -773,7 +773,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	var fullHeight = svg.clientHeight;
     	var scale = (paddingPercent || 0.8) / Math.max(width/fullWidth, height/fullHeight);
     	var translate = [fullWidth/2 - scale*midX, fullHeight/2 - scale*midY];
-    	if (width<1) {return} // FIXME: something strange with spiral
+    	if (width<1) {return} // FIXME: something strange with spyral
  
     	d3.select(svg)
     		.transition()
