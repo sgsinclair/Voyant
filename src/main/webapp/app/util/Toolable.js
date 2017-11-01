@@ -455,6 +455,8 @@ Ext.define('Voyant.util.Toolable', {
 		this.openUrl(this.getExportUrl());
 	},
 	exportEmbed: function() {
+		var asTool = this.isXType('voyantheader')==false;
+		console.warn(this.xtype, asTool)
 		Ext.Msg.show({
 		    title: this.localize('exportViewEmbedTitle'),
 		    message: this.localize('exportViewEmbedMessage'),
@@ -468,7 +470,7 @@ Ext.define('Voyant.util.Toolable', {
 	        	"you should add an explicit protocol (https if you're using voyant-tools.org, otherwise\n"+
 	        	"it depends on this server.\n"+
 	        	"Feel free to change the height and width values or other styling below: -->\n"+
-	        	"<iframe style='width: 100%; height: 800px' src='"+this.getExportUrl()+"'></iframe>"
+	        	"<iframe style='width: "+(asTool ? this.getWidth()+"px" : "100%")+"; height: "+(asTool ? this.getHeight()+"px" : "800px")+";' src='"+this.getExportUrl(asTool)+"'></iframe>"
 		});
 	},
 	exportBiblio: function() {
@@ -617,19 +619,20 @@ Ext.define('Voyant.util.Toolable', {
 			}
 		}, this)
 	},
-	getExportUrl: function() {
+	getExportUrl: function(asTool) {
 		// start with the application api
 		var api = this.getApplication().getModifiedApiParams();
+		var toolForUrl = Ext.getClassName(this).split(".").pop();
 		if (this.isXType('voyantheader')==false) {
 			delete api.panels; // not needed for individual tools
 			// add (and overwrite if need be) this tool's api
 			Ext.apply(api, this.getModifiedApiParams());
-			api.view=Ext.getClassName(this).split(".").pop()
+			if (!asTool) {api.view=toolForUrl;}
 		}
 		if (!api.corpus) {
 			api.corpus = this.getApplication().getCorpus().getAliasOrId();
 		}
-		return this.getApplication().getBaseUrl()+'?'+Ext.Object.toQueryString(api);
+		return this.getApplication().getBaseUrl()+(asTool ? "tool/"+toolForUrl+"/" : "")+'?'+Ext.Object.toQueryString(api);
 	},
 	helpToolClick: function(panel) {
 		if (panel.isXType('voyanttabpanel')) {panel = panel.getActiveTab()}
