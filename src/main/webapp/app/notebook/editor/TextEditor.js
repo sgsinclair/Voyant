@@ -21,7 +21,8 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 			startupFocus: true
 		},
 		editor: undefined,
-		isEditRegistered: false
+		isEditRegistered: false,
+		currentHeight: 0
 	},
 	statics: {
 		i18n: {
@@ -68,9 +69,15 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 					editor.setReadOnly(true);
 				})
 				editor.on("change", function() {
+					var editorHeight = editor.container.$.clientHeight;
+					if (editorHeight!=this.getCurrentHeight()) {
+						this.findParentByType("notebookeditorwrapper").setHeight(editorHeight);
+						this.setCurrentHeight(editor.container.$.clientHeight)
+					}
 					if (!this.getIsEditRegistered()) {
 						this.findParentByType("notebook").setIsEdited(true);
 						this.setIsEditRegistered(true);
+
 					} else {
 						var me = this; // make sure to allow edits to be auto-saved every 30 seconds
 						setTimeout(function() {

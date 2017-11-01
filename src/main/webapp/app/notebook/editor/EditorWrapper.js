@@ -16,10 +16,11 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 			this.getDockedItems().forEach(function(tb) {
 				tb.getTargetEl().setVisibilityMode(Ext.dom.Element.VISIBILITY);
 			});
-			this.setActiveMode(false);
+			//this.setActiveMode(false);
 			this.body.on("click", function() {
 				this.removeCls("notebook-editor-wrapper-hover");
-			});
+				this.setActiveMode(true); // added for touch devices
+			}, this);
 			this.mon(this.getEl(), "mouseover", function() {
 				this.setActiveMode(true);
 			}, this);

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Oct 29 10:13:45 EDT 2017 */
+/* This file created by JSCacher. Last modified: Wed Nov 01 11:46:22 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -29566,10 +29566,11 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 			this.getDockedItems().forEach(function(tb) {
 				tb.getTargetEl().setVisibilityMode(Ext.dom.Element.VISIBILITY);
 			});
-			this.setActiveMode(false);
+			//this.setActiveMode(false);
 			this.body.on("click", function() {
 				this.removeCls("notebook-editor-wrapper-hover");
-			});
+				this.setActiveMode(true); // added for touch devices
+			}, this);
 			this.mon(this.getEl(), "mouseover", function() {
 				this.setActiveMode(true);
 			}, this);
@@ -30061,14 +30062,15 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 				    	{ name: 'insert', items: [ 'Image', 'Table' ] },
 				    	{ name: 'document', items: [ 'Sourcedialog', 'Stopediting'] }
 		    ],
-		    extraPlugins: 'stopediting,sourcedialog,justify,colorbutton',
+		    extraPlugins: 'stopediting,sourcedialog,justify,colorbutton,autogrow',
 		    removePlugins: 'iframe',
 			allowedContent: true,
 			toolbarCanCollapse: true,
 			startupFocus: true
 		},
 		editor: undefined,
-		isEditRegistered: false
+		isEditRegistered: false,
+		currentHeight: 0
 	},
 	statics: {
 		i18n: {
@@ -30115,9 +30117,15 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 					editor.setReadOnly(true);
 				})
 				editor.on("change", function() {
+					var editorHeight = editor.container.$.clientHeight;
+					if (editorHeight!=this.getCurrentHeight()) {
+						this.findParentByType("notebookeditorwrapper").setHeight(editorHeight);
+						this.setCurrentHeight(editor.container.$.clientHeight)
+					}
 					if (!this.getIsEditRegistered()) {
 						this.findParentByType("notebook").setIsEdited(true);
 						this.setIsEditRegistered(true);
+
 					} else {
 						var me = this; // make sure to allow edits to be auto-saved every 30 seconds
 						setTimeout(function() {
