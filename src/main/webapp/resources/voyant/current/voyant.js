@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* This file created by JSCacher. Last modified: Fri Nov 03 14:53:18 EDT 2017 */
+=======
+/* This file created by JSCacher. Last modified: Wed Nov 01 20:40:32 EDT 2017 */
+>>>>>>> branch 'master' of https://github.com/sgsinclair/Voyant.git
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
