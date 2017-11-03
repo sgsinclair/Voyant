@@ -130,13 +130,8 @@ Ext.define('Voyant.panel.Cirrus', {
         		var jsonData = Ext.decode(dataString, true);
         		if (jsonData !== null) {        			
         			this.setApiParam('inlineData', jsonData);
-
-        			var corpus;
-        			new Corpus().then(function(data) {
-        				corpus = data;
-        				var app = this.getApplication();
-        				app.dispatchEvent('loadedCorpus', app, corpus);
-        			}, null, null, this);
+	        	    	this.setTerms(jsonData);
+	        	    	this.buildFromTerms();
         		}
         	}
     	},

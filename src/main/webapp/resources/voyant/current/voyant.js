@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Nov 01 12:18:06 EDT 2017 */
+/* This file created by JSCacher. Last modified: Fri Nov 03 14:53:18 EDT 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -10139,7 +10139,7 @@ Ext.define('Voyant.data.model.Corpus', {
 		
 		if (Ext.isObject(config)) {
 			
-			if (!config.corpus && !config.input) {
+			if (!config.corpus && !config.input && !config.inlineData) {
 				Voyant.application.showError(this.localize("noCorpusOrInput")+": "+config);
 				Ext.defer(function() {
 					dfd.reject(this.localize("noCorpusOrInput")+": "+config)
@@ -15419,13 +15419,8 @@ Ext.define('Voyant.panel.Cirrus', {
         		var jsonData = Ext.decode(dataString, true);
         		if (jsonData !== null) {        			
         			this.setApiParam('inlineData', jsonData);
-
-        			var corpus;
-        			new Corpus().then(function(data) {
-        				corpus = data;
-        				var app = this.getApplication();
-        				app.dispatchEvent('loadedCorpus', app, corpus);
-        			}, null, null, this);
+	        	    	this.setTerms(jsonData);
+	        	    	this.buildFromTerms();
         		}
         	}
     	},
@@ -21420,7 +21415,8 @@ Ext.define('Voyant.panel.Reader', {
     		parentTool: this,
     		proxy: {
     			extraParams: {
-    				forTool: 'reader'
+    				forTool: 'reader',
+    				a: 'b'
     			}
     		}
     	})
@@ -22162,9 +22158,11 @@ Ext.define('Voyant.panel.Reader', {
     		this.getInnerContainer().setHtml('<div class="readerContainer"><div class="loading">'+this.localize('loading')+'</div></div>');
 			this.getInnerContainer().first().first().mask();
     	}
+
     	this.getTokensStore().load(Ext.apply(config || {}, {
     		params: Ext.apply(this.getApiParams(), {
-    			stripTags: 'blocksOnly'
+    			stripTags: 'blocksOnly',
+    			stopList: ''
     		})
     	}));
     },

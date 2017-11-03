@@ -440,7 +440,7 @@ Ext.define('Voyant.data.model.Corpus', {
 		
 		if (Ext.isObject(config)) {
 			
-			if (!config.corpus && !config.input) {
+			if (!config.corpus && !config.input && !config.inlineData) {
 				Voyant.application.showError(this.localize("noCorpusOrInput")+": "+config);
 				Ext.defer(function() {
 					dfd.reject(this.localize("noCorpusOrInput")+": "+config)

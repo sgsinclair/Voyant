@@ -793,7 +793,8 @@ Ext.define('Voyant.panel.Reader', {
     	}
     	this.getTokensStore().load(Ext.apply(config || {}, {
     		params: Ext.apply(this.getApiParams(), {
-    			stripTags: 'blocksOnly'
+    			stripTags: 'blocksOnly',
+    			stopList: '' // token requests shouldn't have stopList
     		})
     	}));
     },
