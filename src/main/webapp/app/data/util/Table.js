@@ -66,6 +66,7 @@ Ext.define('Voyant.data.table.Table', {
 		if (config.fromBlock) {
 			var data = Voyant.notebook.Notebook.getDataFromBlock(config.fromBlock);
 			if (data) {
+				data = data.trim();
 				config.rows = [];
 				data.split(/\n+/).forEach(function(line,i) {
 					var cells = line.split("\t");

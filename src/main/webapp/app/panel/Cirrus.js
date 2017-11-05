@@ -1,4 +1,3 @@
-
 // assuming Cirrus library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Cirrus', {
 	extend: 'Ext.panel.Panel',
@@ -131,6 +130,7 @@ Ext.define('Voyant.panel.Cirrus', {
         		if (jsonData !== null) {        			
         			this.setApiParam('inlineData', jsonData);
 	        	    	this.setTerms(jsonData);
+            		this.initVisLayout(); // force in case we've changed fontFamily from options
 	        	    	this.buildFromTerms();
         		}
         	}
@@ -335,6 +335,7 @@ Ext.define('Voyant.panel.Cirrus', {
 	    			var words = [];
 	    			for (var i = 0; i < terms.length; i++) {
 	    				var t = terms[i];
+	    				if (!t.text && t.term) {t.text=t.term;}
 	    				words.push({word: t.text, size: t.rawFreq, label: t.rawFreq});
 	    			}
 	    			this.cirrusFlashApp.clearAll();
@@ -359,7 +360,7 @@ Ext.define('Voyant.panel.Cirrus', {
 	    		this.setAdjustedSizes();
 
 	//    		var fontSizer = d3.scalePow().range([10, 100]).domain([minSize, maxSize]);
-	    		
+
 	    		this.getVisLayout().words(terms).start();
     		}
     	} else {

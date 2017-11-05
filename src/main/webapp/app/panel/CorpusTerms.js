@@ -77,6 +77,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
     
+    
     initComponent: function() {
         var me = this;
 

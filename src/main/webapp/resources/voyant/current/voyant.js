@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-/* This file created by JSCacher. Last modified: Fri Nov 03 14:53:18 EDT 2017 */
-=======
-/* This file created by JSCacher. Last modified: Wed Nov 01 20:40:32 EDT 2017 */
->>>>>>> branch 'master' of https://github.com/sgsinclair/Voyant.git
+/* This file created by JSCacher. Last modified: Sun Nov 05 11:21:44 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -9203,6 +9199,7 @@ Ext.define('Voyant.data.table.Table', {
 		if (config.fromBlock) {
 			var data = Voyant.notebook.Notebook.getDataFromBlock(config.fromBlock);
 			if (data) {
+				data = data.trim();
 				config.rows = [];
 				data.split(/\n+/).forEach(function(line,i) {
 					var cells = line.split("\t");
@@ -9739,7 +9736,7 @@ Ext.define('Voyant.data.model.Corpus', {
     mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show','Voyant.util.Transferable','Voyant.util.Localization','Voyant.util.Assignable'],
     transferable: ['loadCorpusTerms','loadTokens','getPlainText','getText','getWords','getString','getLemmasArray'],
 //    transferable: ['getSize','getId','getDocument','getDocuments','getCorpusTerms','getDocumentsCount','getWordTokensCount','getWordTypesCount','getDocumentTerms'],
-    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio','Voyant.panel.DocumentTerms','Voyant.panel.TermsBerry','Voyant.panel.CollocatesGraph','Voyant.panel.Contexts','Voyant.panel.WordTree','Voyant.panel.Veliza','Voyant.panel.ScatterPlot'],
+    embeddable: ['Voyant.panel.Summary','Voyant.panel.Cirrus','Voyant.panel.Documents','Voyant.panel.CorpusTerms','Voyant.panel.Reader','Voyant.panel.Trends','Voyant.panel.TermsRadio','Voyant.panel.DocumentTerms','Voyant.panel.TermsBerry','Voyant.panel.CollocatesGraph','Voyant.panel.Contexts','Voyant.panel.WordTree','Voyant.panel.Veliza','Voyant.panel.ScatterPlot','Voyant.panel.Topics'],
 	requires: ['Voyant.util.ResponseError','Voyant.data.store.CorpusTerms','Voyant.data.store.Documents'/*,'Voyant.panel.Documents'*/],
     extend: 'Ext.data.Model',
     config: {
@@ -15291,7 +15288,6 @@ Ext.define('Voyant.panel.Catalogue', {
     
 });
 
-
 // assuming Cirrus library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Cirrus', {
 	extend: 'Ext.panel.Panel',
@@ -15424,6 +15420,7 @@ Ext.define('Voyant.panel.Cirrus', {
         		if (jsonData !== null) {        			
         			this.setApiParam('inlineData', jsonData);
 	        	    	this.setTerms(jsonData);
+            		this.initVisLayout(); // force in case we've changed fontFamily from options
 	        	    	this.buildFromTerms();
         		}
         	}
@@ -15628,6 +15625,7 @@ Ext.define('Voyant.panel.Cirrus', {
 	    			var words = [];
 	    			for (var i = 0; i < terms.length; i++) {
 	    				var t = terms[i];
+	    				if (!t.text && t.term) {t.text=t.term;}
 	    				words.push({word: t.text, size: t.rawFreq, label: t.rawFreq});
 	    			}
 	    			this.cirrusFlashApp.clearAll();
@@ -15652,7 +15650,7 @@ Ext.define('Voyant.panel.Cirrus', {
 	    		this.setAdjustedSizes();
 
 	//    		var fontSizer = d3.scalePow().range([10, 100]).domain([minSize, maxSize]);
-	    		
+
 	    		this.getVisLayout().words(terms).start();
     		}
     	} else {
@@ -19093,6 +19091,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     },
     
+    
     initComponent: function() {
         var me = this;
 
@@ -21419,8 +21418,7 @@ Ext.define('Voyant.panel.Reader', {
     		parentTool: this,
     		proxy: {
     			extraParams: {
-    				forTool: 'reader',
-    				a: 'b'
+    				forTool: 'reader'
     			}
     		}
     	})
@@ -22162,11 +22160,10 @@ Ext.define('Voyant.panel.Reader', {
     		this.getInnerContainer().setHtml('<div class="readerContainer"><div class="loading">'+this.localize('loading')+'</div></div>');
 			this.getInnerContainer().first().first().mask();
     	}
-
     	this.getTokensStore().load(Ext.apply(config || {}, {
     		params: Ext.apply(this.getApiParams(), {
     			stripTags: 'blocksOnly',
-    			stopList: ''
+    			stopList: '' // token requests shouldn't have stopList
     		})
     	}));
     },
