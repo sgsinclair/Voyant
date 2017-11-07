@@ -123,14 +123,15 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     listeners: {
-    	afterrender: function() {
-    		var dataString = this.getApiParam('inlineData');
+    	boxready: function() {
+			this.initVisLayout(); // force in case we've changed fontFamily from options
+
+			var dataString = this.getApiParam('inlineData');
         	if (dataString !== undefined) {
         		var jsonData = Ext.decode(dataString, true);
         		if (jsonData !== null) {
         			this.setApiParam('inlineData', jsonData);
 	        	    this.setTerms(jsonData);
-            		this.initVisLayout(); // force in case we've changed fontFamily from options
 	        	    this.buildFromTerms();
         		}
         	}
@@ -172,12 +173,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	
     	ensureCorpusView: function(src, corpus) {
     		if (this.getMode() != this.MODE_CORPUS) {this.loadFromCorpus(corpus);}
-    	},
-    	
-    	boxready: function() {
-			this.initVisLayout();
     	}
-    	
     },
     
     loadFromCorpus: function(corpus) {
@@ -186,18 +182,18 @@ Ext.define('Voyant.panel.Cirrus', {
 			this.setApiParams({docId: undefined, docIndex: undefined});
 			this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
     	} else {
-    		if (jsonData !== undefined) {
-    			var records = [];
-    			for (var i = 0; i < jsonData.length; i++) {
-					var wordData = jsonData[i];
-					wordData.term = wordData.text; // inlineData/CorpusTerm format mismatch
-    				var record = Ext.create('Voyant.data.model.CorpusTerm', wordData);
-    				records.push(record);
-    			}
-    			this.setRecords(records);
-    			this.setMode(this.MODE_CORPUS);
-    			this.loadFromTermsRecords();
-    		}
+    		// if (jsonData !== undefined) {
+    		// 	var records = [];
+    		// 	for (var i = 0; i < jsonData.length; i++) {
+			// 		var wordData = jsonData[i];
+			// 		wordData.term = wordData.text; // inlineData/CorpusTerm format mismatch
+    		// 		var record = Ext.create('Voyant.data.model.CorpusTerm', wordData);
+    		// 		records.push(record);
+    		// 	}
+    		// 	this.setRecords(records);
+    		// 	this.setMode(this.MODE_CORPUS);
+    		// 	this.loadFromTermsRecords();
+    		// }
     	}
     },
     
@@ -303,7 +299,7 @@ Ext.define('Voyant.panel.Cirrus', {
     			var el = this.getLayout().getRenderTarget();
     			el.update(""); // make sure to clear existing contents (especially for re-layout)
     	    	var width = el.getWidth();
-    			var height = el.getHeight();
+				var height = el.getHeight();
 				this.setVisLayout(
 					d3.layoutCloud()
 						.size([width, height])
@@ -328,7 +324,7 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     buildFromTerms: function() {
-    	var terms = this.getTerms();
+		var terms = this.getTerms();
     	if (this.rendered && terms) {
     		if (this.getApiParam('cirrusForceFlash') === true) {
     			if (this.cirrusFlashApp !== undefined && this.cirrusFlashApp.clearAll !== undefined) {
