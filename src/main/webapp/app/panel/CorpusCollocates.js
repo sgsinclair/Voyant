@@ -52,7 +52,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
         			docIndex: undefined
         		});
         		if (this.isVisible()) {
-            		this.getStore().clearAndLoad({params: this.getApiParams()});
+            		this.loadFromApis();
         		}
     		}
     	});
@@ -66,7 +66,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     			query: undefined
     		})
     		if (this.isVisible()) {
-        		this.getStore().clearAndLoad({params: this.getApiParams()});
+        		this.loadFromApis();
     		}
     	});
     	
@@ -159,10 +159,12 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 		},
                 		changecomplete: function(slider, newValue) {
                 			me.setApiParam("context", slider.getValue());
-           		        	me.getStore().clearAndLoad({params: me.getApiParams()});
+							me.loadFromApis();
                 		}
                 	}
-                }]
+                },{
+        			xtype: 'corpusdocumentselector'
+        		}]
             }],
     		columns: [{
     			text: this.localize("term"),
@@ -201,31 +203,44 @@ Ext.define('Voyant.panel.CorpusCollocates', {
             }*/],
             
             listeners: {
-            	termsClicked: {
-            		fn: function(src, terms) {
-                		if (this.getStore().getCorpus()) { // make sure we have a corpus
-                    		var queryTerms = [];
-                    		terms.forEach(function(term) {
-                    			if (Ext.isString(term)) {queryTerms.push(term);}
-                    			else if (term.term) {queryTerms.push(term.term);}
-                    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
-                    		});
-                    		if (queryTerms.length > 0) {
-                    			this.setApiParams({
-                    				docIndex: undefined,
-                    				docId: undefined,
-                    				query: queryTerms
-                    			});
-                        		if (this.isVisible()) {
-                            		if (this.isVisible()) {
-                                		this.getStore().clearAndLoad({params: this.getApiParams()});
-                            		}
-                        		}
-                    		}
-                		}
-                	},
-                	scope: this
-            	}
+				scope: this,
+            	termsClicked: function(src, terms) {
+					if (this.getStore().getCorpus()) { // make sure we have a corpus
+						var queryTerms = [];
+						terms.forEach(function(term) {
+							if (Ext.isString(term)) {queryTerms.push(term);}
+							else if (term.term) {queryTerms.push(term.term);}
+							else if (term.getTerm) {queryTerms.push(term.getTerm());}
+						});
+						if (queryTerms.length > 0) {
+							this.setApiParams({
+								docIndex: undefined,
+								docId: undefined,
+								query: queryTerms
+							});
+							if (this.isVisible()) {
+								this.loadFromApis();
+							}
+						}
+					}
+				},
+
+				corpusSelected: function() {
+					if (this.getStore().getCorpus()) {
+						this.setApiParams({docId: undefined, docIndex: undefined})
+						this.loadFromApis();
+					}
+				},
+				
+				documentsSelected: function(src, docs) {
+					var docIds = [];
+					var corpus = this.getStore().getCorpus();
+					docs.forEach(function(doc) {
+						docIds.push(corpus.getDocument(doc).getId())
+					}, this);
+					this.setApiParams({docId: docIds, docIndex: undefined});
+					this.loadFromApis();
+				}
             }
         });
 
