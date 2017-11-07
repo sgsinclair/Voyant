@@ -127,11 +127,11 @@ Ext.define('Voyant.panel.Cirrus', {
     		var dataString = this.getApiParam('inlineData');
         	if (dataString !== undefined) {
         		var jsonData = Ext.decode(dataString, true);
-        		if (jsonData !== null) {        			
+        		if (jsonData !== null) {
         			this.setApiParam('inlineData', jsonData);
-	        	    	this.setTerms(jsonData);
+	        	    this.setTerms(jsonData);
             		this.initVisLayout(); // force in case we've changed fontFamily from options
-	        	    	this.buildFromTerms();
+	        	    this.buildFromTerms();
         		}
         	}
     	},
@@ -186,11 +186,11 @@ Ext.define('Voyant.panel.Cirrus', {
 			this.setApiParams({docId: undefined, docIndex: undefined});
 			this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
     	} else {
-//    		var jsonData = this.getApiParam('inlineData');
     		if (jsonData !== undefined) {
     			var records = [];
     			for (var i = 0; i < jsonData.length; i++) {
-    				var wordData = jsonData[i];
+					var wordData = jsonData[i];
+					wordData.term = wordData.text; // inlineData/CorpusTerm format mismatch
     				var record = Ext.create('Voyant.data.model.CorpusTerm', wordData);
     				records.push(record);
     			}
