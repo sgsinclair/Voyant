@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Nov 05 11:21:44 EST 2017 */
+/* This file created by JSCacher. Last modified: Tue Nov 07 17:09:38 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -10319,7 +10319,7 @@ Ext.define('Voyant.data.model.Corpus', {
 	
 	each: function(fn, scope) {
 		this.getDocuments().each(function(doc, i) {
-			fn.call(scope || doc, doc);
+			fn.call(scope || doc, doc, i);
 		})
 	},
 	
@@ -15288,6 +15288,7 @@ Ext.define('Voyant.panel.Catalogue', {
     
 });
 
+
 // assuming Cirrus library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Cirrus', {
 	extend: 'Ext.panel.Panel',
@@ -15413,15 +15414,16 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     listeners: {
-    	afterrender: function() {
-    		var dataString = this.getApiParam('inlineData');
+    	boxready: function() {
+			this.initVisLayout(); // force in case we've changed fontFamily from options
+
+			var dataString = this.getApiParam('inlineData');
         	if (dataString !== undefined) {
         		var jsonData = Ext.decode(dataString, true);
-        		if (jsonData !== null) {        			
+        		if (jsonData !== null) {
         			this.setApiParam('inlineData', jsonData);
-	        	    	this.setTerms(jsonData);
-            		this.initVisLayout(); // force in case we've changed fontFamily from options
-	        	    	this.buildFromTerms();
+	        	    this.setTerms(jsonData);
+	        	    this.buildFromTerms();
         		}
         	}
     	},
@@ -15442,7 +15444,13 @@ Ext.define('Voyant.panel.Cirrus', {
     	
     	loadedCorpus: function(src, corpus) {
     		this.initVisLayout(); // force in case we've changed fontFamily from options
-    		this.loadFromCorpus(corpus);
+    		if (this.getApiParam("docIndex")) {
+    			this.fireEvent("documentSelected", this, corpus.getDocument(this.getApiParam("docIndex")));
+    		} else if (this.getApiParam("docId")) {
+    			this.fireEvent("documentSelected", this, corpus.getDocument(this.getApiParam("docId")));
+    		} else {
+        		this.loadFromCorpus(corpus);
+    		}
     	},
     	
     	corpusSelected: function(src, corpus) {
@@ -15451,6 +15459,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	documentSelected: function(src, document) {
+    		debugger
     		if (document) {
         		var corpus = this.getCorpus();
         		var document = corpus.getDocument(document);
@@ -15462,12 +15471,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	
     	ensureCorpusView: function(src, corpus) {
     		if (this.getMode() != this.MODE_CORPUS) {this.loadFromCorpus(corpus);}
-    	},
-    	
-    	boxready: function() {
-			this.initVisLayout();
     	}
-    	
     },
     
     loadFromCorpus: function(corpus) {
@@ -15476,18 +15480,18 @@ Ext.define('Voyant.panel.Cirrus', {
 			this.setApiParams({docId: undefined, docIndex: undefined});
 			this.loadFromCorpusTerms(corpus.getCorpusTerms({autoload: false, pageSize: this.getApiParam("maxVisible"), parentPanel: this}));
     	} else {
-//    		var jsonData = this.getApiParam('inlineData');
-    		if (jsonData !== undefined) {
-    			var records = [];
-    			for (var i = 0; i < jsonData.length; i++) {
-    				var wordData = jsonData[i];
-    				var record = Ext.create('Voyant.data.model.CorpusTerm', wordData);
-    				records.push(record);
-    			}
-    			this.setRecords(records);
-    			this.setMode(this.MODE_CORPUS);
-    			this.loadFromTermsRecords();
-    		}
+    		// if (jsonData !== undefined) {
+    		// 	var records = [];
+    		// 	for (var i = 0; i < jsonData.length; i++) {
+			// 		var wordData = jsonData[i];
+			// 		wordData.term = wordData.text; // inlineData/CorpusTerm format mismatch
+    		// 		var record = Ext.create('Voyant.data.model.CorpusTerm', wordData);
+    		// 		records.push(record);
+    		// 	}
+    		// 	this.setRecords(records);
+    		// 	this.setMode(this.MODE_CORPUS);
+    		// 	this.loadFromTermsRecords();
+    		// }
     	}
     },
     
@@ -15593,7 +15597,7 @@ Ext.define('Voyant.panel.Cirrus', {
     			var el = this.getLayout().getRenderTarget();
     			el.update(""); // make sure to clear existing contents (especially for re-layout)
     	    	var width = el.getWidth();
-    			var height = el.getHeight();
+				var height = el.getHeight();
 				this.setVisLayout(
 					d3.layoutCloud()
 						.size([width, height])
@@ -15618,7 +15622,7 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     buildFromTerms: function() {
-    	var terms = this.getTerms();
+		var terms = this.getTerms();
     	if (this.rendered && terms) {
     		if (this.getApiParam('cirrusForceFlash') === true) {
     			if (this.cirrusFlashApp !== undefined && this.cirrusFlashApp.clearAll !== undefined) {
@@ -17003,7 +17007,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
         			docIndex: undefined
         		});
         		if (this.isVisible()) {
-            		this.getStore().clearAndLoad({params: this.getApiParams()});
+            		this.loadFromApis();
         		}
     		}
     	});
@@ -17017,7 +17021,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     			query: undefined
     		})
     		if (this.isVisible()) {
-        		this.getStore().clearAndLoad({params: this.getApiParams()});
+        		this.loadFromApis();
     		}
     	});
     	
@@ -17110,10 +17114,12 @@ Ext.define('Voyant.panel.CorpusCollocates', {
                 		},
                 		changecomplete: function(slider, newValue) {
                 			me.setApiParam("context", slider.getValue());
-           		        	me.getStore().clearAndLoad({params: me.getApiParams()});
+							me.loadFromApis();
                 		}
                 	}
-                }]
+                },{
+        			xtype: 'corpusdocumentselector'
+        		}]
             }],
     		columns: [{
     			text: this.localize("term"),
@@ -17152,31 +17158,44 @@ Ext.define('Voyant.panel.CorpusCollocates', {
             }*/],
             
             listeners: {
-            	termsClicked: {
-            		fn: function(src, terms) {
-                		if (this.getStore().getCorpus()) { // make sure we have a corpus
-                    		var queryTerms = [];
-                    		terms.forEach(function(term) {
-                    			if (Ext.isString(term)) {queryTerms.push(term);}
-                    			else if (term.term) {queryTerms.push(term.term);}
-                    			else if (term.getTerm) {queryTerms.push(term.getTerm());}
-                    		});
-                    		if (queryTerms.length > 0) {
-                    			this.setApiParams({
-                    				docIndex: undefined,
-                    				docId: undefined,
-                    				query: queryTerms
-                    			});
-                        		if (this.isVisible()) {
-                            		if (this.isVisible()) {
-                                		this.getStore().clearAndLoad({params: this.getApiParams()});
-                            		}
-                        		}
-                    		}
-                		}
-                	},
-                	scope: this
-            	}
+				scope: this,
+            	termsClicked: function(src, terms) {
+					if (this.getStore().getCorpus()) { // make sure we have a corpus
+						var queryTerms = [];
+						terms.forEach(function(term) {
+							if (Ext.isString(term)) {queryTerms.push(term);}
+							else if (term.term) {queryTerms.push(term.term);}
+							else if (term.getTerm) {queryTerms.push(term.getTerm());}
+						});
+						if (queryTerms.length > 0) {
+							this.setApiParams({
+								docIndex: undefined,
+								docId: undefined,
+								query: queryTerms
+							});
+							if (this.isVisible()) {
+								this.loadFromApis();
+							}
+						}
+					}
+				},
+
+				corpusSelected: function() {
+					if (this.getStore().getCorpus()) {
+						this.setApiParams({docId: undefined, docIndex: undefined})
+						this.loadFromApis();
+					}
+				},
+				
+				documentsSelected: function(src, docs) {
+					var docIds = [];
+					var corpus = this.getStore().getCorpus();
+					docs.forEach(function(doc) {
+						docIds.push(corpus.getDocument(doc).getId())
+					}, this);
+					this.setApiParams({docId: docIds, docIndex: undefined});
+					this.loadFromApis();
+				}
             }
         });
 

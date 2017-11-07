@@ -1,3 +1,4 @@
+
 // assuming Cirrus library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Cirrus', {
 	extend: 'Ext.panel.Panel',
@@ -153,7 +154,13 @@ Ext.define('Voyant.panel.Cirrus', {
     	
     	loadedCorpus: function(src, corpus) {
     		this.initVisLayout(); // force in case we've changed fontFamily from options
-    		this.loadFromCorpus(corpus);
+    		if (this.getApiParam("docIndex")) {
+    			this.fireEvent("documentSelected", this, corpus.getDocument(this.getApiParam("docIndex")));
+    		} else if (this.getApiParam("docId")) {
+    			this.fireEvent("documentSelected", this, corpus.getDocument(this.getApiParam("docId")));
+    		} else {
+        		this.loadFromCorpus(corpus);
+    		}
     	},
     	
     	corpusSelected: function(src, corpus) {
@@ -162,6 +169,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	documentSelected: function(src, document) {
+    		debugger
     		if (document) {
         		var corpus = this.getCorpus();
         		var document = corpus.getDocument(document);

@@ -619,7 +619,7 @@ Ext.define('Voyant.data.model.Corpus', {
 	
 	each: function(fn, scope) {
 		this.getDocuments().each(function(doc, i) {
-			fn.call(scope || doc, doc);
+			fn.call(scope || doc, doc, i);
 		})
 	},
 	
