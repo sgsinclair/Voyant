@@ -1,4 +1,3 @@
-
 // assuming Cirrus library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Cirrus', {
 	extend: 'Ext.panel.Panel',
@@ -169,7 +168,6 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	documentSelected: function(src, document) {
-    		debugger
     		if (document) {
         		var corpus = this.getCorpus();
         		var document = corpus.getDocument(document);
@@ -235,7 +233,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	if (visible>records.length) {visible=records.length;}
     	var terms = [];
     	for (var i=0; i<visible; i++) {
-    		terms.push({text: records[i].get('term'), rawFreq: records[i].get('rawFreq')});
+    		terms.push({text: records[i].get('term').replace(/"/g,''), rawFreq: records[i].get('rawFreq')});
     	}
     	this.setTerms(terms);
     	this.buildFromTerms();
