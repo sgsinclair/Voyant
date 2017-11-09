@@ -9,8 +9,9 @@ Several tools include a search box that allows you to specify advanced search qu
 * `^*oat`: match terms that end with **suffix** _oat_ as **separate terms** (coat, moat, etc.)
 * `coat,jacket`: match each term **separated by commas** as **separate terms**
 * `coat|jacket`: match terms **separated by pipes** as a **single term**
-* `"winter coat"`: winter coat as a **phrase**
-* `"coat mittens"~5`: match coat **near** mittens (within 5 words)
+* `"winter coat"`: _winter coat_ as an exact **phrase** (word order matters)
+* `"winter coat"~0`: _winter coat_ or _coat winter_ **phrase** (word order doesn't matter but 0 words in between)
+* `"coat mittens"~5`: match _coat_ **near** _mittens_ (within 5 words)
 * `^coat*,jacket|parka,"coat mittens"~5`: **combine** syntaxes
 
 To complete a search, hit enter. Resetting a search is usually as simple as deleting the contents of the search box and pressing enter.

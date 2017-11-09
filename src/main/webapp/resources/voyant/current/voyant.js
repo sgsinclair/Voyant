@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Nov 07 17:09:38 EST 2017 */
+/* This file created by JSCacher. Last modified: Thu Nov 09 10:06:05 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -15288,7 +15288,6 @@ Ext.define('Voyant.panel.Catalogue', {
     
 });
 
-
 // assuming Cirrus library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Cirrus', {
 	extend: 'Ext.panel.Panel',
@@ -15459,7 +15458,6 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	documentSelected: function(src, document) {
-    		debugger
     		if (document) {
         		var corpus = this.getCorpus();
         		var document = corpus.getDocument(document);
@@ -15525,7 +15523,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	if (visible>records.length) {visible=records.length;}
     	var terms = [];
     	for (var i=0; i<visible; i++) {
-    		terms.push({text: records[i].get('term'), rawFreq: records[i].get('rawFreq')});
+    		terms.push({text: records[i].get('term').replace(/"/g,''), rawFreq: records[i].get('rawFreq')});
     	}
     	this.setTerms(terms);
     	this.buildFromTerms();
