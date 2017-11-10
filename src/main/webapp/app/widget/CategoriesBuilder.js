@@ -12,6 +12,7 @@ Ext.define('Voyant.widget.CategoriesOption', {
 		builderWin: undefined
 	},
 	initComponent: function() {
+	    // TODO set value of option to current categories id if it exists
 		var value = this.up('window').panel.getApiParam('categories');
     	var data = value ? [{name: 'categories-'+value, value: value}] : [];
 		
@@ -312,8 +313,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			},{
 				text: this.localize('save'),
 				handler: function(btn) {
-					this.setColorTermAssociations();
-					this.saveData(this.app.getExportData()).then(function(id) {
+					this.app.setColorTermAssociations();
+					this.app.saveCategoryData().then(function(id) {
 						this.setCategoriesId(id);
 						btn.up('window').close();
 					}, function() {
@@ -326,9 +327,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			listeners: {
 				show: function() {
 					if (this.getCategoriesId()) {
-		    			this.loadData(this.getCategoriesId()).then(function(data) {
-							this.app.setCategories(data.categories);
-							this.app.setFeatures(data.features);
+		    			this.app.loadCategoryData(this.getCategoriesId()).then(function(data) {
 							this.buildCategories();
 							this.buildFeatures();
 						}, null, null, this);
@@ -666,68 +665,5 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	for (var key in cats) {
     		this.addCategory(key);
     	}
-    },
-    
-    loadData: function(id) {
-		var dfd = new Ext.Deferred();
-		
-		var panel = this.panel;
-		Ext.Ajax.request({
-			url: panel.getTromboneUrl(),
-			params: {
-				tool: 'resource.StoredResource',
-                retrieveResourceId: id,
-                failQuietly: true
-			}
-		}).then(function(response) {
-        	var json = Ext.decode(response.responseText);
-        	var id = json.storedResource.id;
-        	var value = json.storedResource.resource;
-        	if (value.length == 0) {
-        		dfd.reject();
-        	} else {
-        		value = Ext.decode(value);
-        		dfd.resolve(value);
-        	}
-        }, function() {
-        	dfd.reject();
-        }, null, this);
-		
-		return dfd.promise;
-	},
-	
-	saveData: function(data) {
-		var dfd = new Ext.Deferred();
-		
-		var dataString = Ext.encode(data);
-		var panel = this.panel;
-		Ext.Ajax.request({
-            url: panel.getTromboneUrl(),
-            params: {
-                tool: 'resource.StoredResource',
-                storeResource: dataString
-            }
-        }).then(function(response) {
-        	var json = Ext.util.JSON.decode(response.responseText);
-        	var id = json.storedResource.id;
-            dfd.resolve(id);
-        }, function(response) {
-            dfd.reject();
-        });
-		
-		return dfd.promise;
-	},
-    
-    setColorTermAssociations: function() {
-		for (var category in this.app.getCategories()) {
-			var color = this.app.getCategoryFeature(category, 'color');
-			if (color !== undefined) {
-				var rgb = this.app.hexToRgb(color);
-				var terms = this.app.getCategoryTerms(category);
-				for (var i = 0; i < terms.length; i++) {
-					this.app.colorTermAssociations.replace(terms[i], rgb);
-				}
-			}
-		}
     }
 });

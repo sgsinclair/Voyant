@@ -125,10 +125,77 @@ Ext.define('Voyant.util.CategoriesManager', {
 		return value;
 	},
 	
-	getExportData: function() {
+	setColorTermAssociations: function() {
+        for (var category in this.getCategories()) {
+            var color = this.getCategoryFeature(category, 'color');
+            if (color !== undefined) {
+                var rgb = this.hexToRgb(color);
+                var terms = this.getCategoryTerms(category);
+                for (var i = 0; i < terms.length; i++) {
+                    this.colorTermAssociations.replace(terms[i], rgb);
+                }
+            }
+        }
+    },
+	
+	getCategoryExportData: function() {
 		return {
 			categories: this.getCategories(),
 			features: this.getFeatures()
 		};
-	}
+	},
+	
+	loadCategoryData: function(id) {
+        var dfd = new Ext.Deferred();
+        
+        Ext.Ajax.request({
+            url: this.getTromboneUrl(),
+            params: {
+                tool: 'resource.StoredResource',
+                retrieveResourceId: id,
+                failQuietly: true
+            }
+        }).then(function(response) {
+            var json = Ext.decode(response.responseText);
+            var id = json.storedResource.id;
+            var value = json.storedResource.resource;
+            if (value.length == 0) {
+                dfd.reject();
+            } else {
+                value = Ext.decode(value);
+                
+                this.setCategories(value.categories);
+                this.setFeatures(value.features);
+                
+                dfd.resolve(value);
+            }
+        }, function() {
+            dfd.reject();
+        }, null, this);
+        
+        return dfd.promise;
+    },
+    
+    saveCategoryData: function(data) {
+        data = data || this.getCategoryExportData();
+        
+        var dfd = new Ext.Deferred();
+        
+        var dataString = Ext.encode(data);
+        Ext.Ajax.request({
+            url: this.getTromboneUrl(),
+            params: {
+                tool: 'resource.StoredResource',
+                storeResource: dataString
+            }
+        }).then(function(response) {
+            var json = Ext.util.JSON.decode(response.responseText);
+            var id = json.storedResource.id;
+            dfd.resolve(id);
+        }, function(response) {
+            dfd.reject();
+        });
+        
+        return dfd.promise;
+    }
 });

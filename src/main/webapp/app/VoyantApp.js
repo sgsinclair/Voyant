@@ -22,7 +22,6 @@ Ext.define('Voyant.VoyantApp', {
     },
     
     constructor: function(config) {
-    	
     	this.setBaseUrl(this.config.baseUrl);
     	
     	// set the Trombone URL from the baseURL // TODO: maybe allow this to be overridden
@@ -76,6 +75,15 @@ Ext.define('Voyant.VoyantApp', {
     	Ext.apply(Ext.tip.QuickTipManager.getQuickTip(), {
     	    showDelay: 50 // shorten the delay before showing
     	});
+    	
+    	// check for categories
+    	var queryParams = Ext.Object.fromQueryString(document.location.search);
+    	if (queryParams.categories) {
+    	    this.loadCategoryData(queryParams.categories).then(function() {
+    	        this.setColorTermAssociations();
+    	    }, null, null, this);
+    	}
+    	
 		this.callParent(arguments);
     },
     
