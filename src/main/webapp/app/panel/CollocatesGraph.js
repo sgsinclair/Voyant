@@ -240,7 +240,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         
         this.on('activate', function() { // load after tab activate (if we're in a tab panel)
 			if (this.getCorpus()) {
-				Ext.Function.defer(this.initLoad, 100, this);
+			    if (this.getNodeData().length === 0) { // only initLoad if there isn't already data
+			        Ext.Function.defer(this.initLoad, 100, this);
+			    }
 			}
     	}, this);
         
@@ -491,7 +493,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		this.setApiParam('limit', limit);
     },
     
-    updateNetworkMode: function(mode) {
+    // called by setNetworkMode
+    applyNetworkMode: function(mode) {
     	if (this.getVisLayout()) {
 	    	if (mode === this.DEFAULT_MODE) {
 	    		var physics = this.getGraphPhysics().defaultMode;
@@ -525,6 +528,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    		this.getVisLayout().force('y').strength(physics.centralGravity);
 	    	}
     	}
+    	
+    	return mode; // need to return mode for it to actually be set
     },
     
     initGraph: function() {
