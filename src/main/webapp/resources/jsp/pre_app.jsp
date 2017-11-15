@@ -113,8 +113,8 @@
 	<% } 
 } %>
 
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=2.4-M3pr2<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=2.4-M3pr2&lang=<%= lang %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=2.4-M3pr5<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=2.4-M3pr5&lang=<%= lang %>"></script>
 
 <% // ridiculous hack for Safari 11 that seems to hide fieldsets, tested with desktop and iPad
 	// https://www.sencha.com/forum/showthread.php?423768&p=1282921&viewfull=1#post1282921

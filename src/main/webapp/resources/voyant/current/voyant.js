@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Nov 09 10:06:05 EST 2017 */
+/* This file created by JSCacher. Last modified: Wed Nov 15 16:11:43 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7519,12 +7519,79 @@ Ext.define('Voyant.util.CategoriesManager', {
 		return value;
 	},
 	
-	getExportData: function() {
+	setColorTermAssociations: function() {
+        for (var category in this.getCategories()) {
+            var color = this.getCategoryFeature(category, 'color');
+            if (color !== undefined) {
+                var rgb = this.hexToRgb(color);
+                var terms = this.getCategoryTerms(category);
+                for (var i = 0; i < terms.length; i++) {
+                    this.colorTermAssociations.replace(terms[i], rgb);
+                }
+            }
+        }
+    },
+	
+	getCategoryExportData: function() {
 		return {
 			categories: this.getCategories(),
 			features: this.getFeatures()
 		};
-	}
+	},
+	
+	loadCategoryData: function(id) {
+        var dfd = new Ext.Deferred();
+        
+        Ext.Ajax.request({
+            url: this.getTromboneUrl(),
+            params: {
+                tool: 'resource.StoredResource',
+                retrieveResourceId: id,
+                failQuietly: true
+            }
+        }).then(function(response) {
+            var json = Ext.decode(response.responseText);
+            var id = json.storedResource.id;
+            var value = json.storedResource.resource;
+            if (value.length == 0) {
+                dfd.reject();
+            } else {
+                value = Ext.decode(value);
+                
+                this.setCategories(value.categories);
+                this.setFeatures(value.features);
+                
+                dfd.resolve(value);
+            }
+        }, function() {
+            dfd.reject();
+        }, null, this);
+        
+        return dfd.promise;
+    },
+    
+    saveCategoryData: function(data) {
+        data = data || this.getCategoryExportData();
+        
+        var dfd = new Ext.Deferred();
+        
+        var dataString = Ext.encode(data);
+        Ext.Ajax.request({
+            url: this.getTromboneUrl(),
+            params: {
+                tool: 'resource.StoredResource',
+                storeResource: dataString
+            }
+        }).then(function(response) {
+            var json = Ext.util.JSON.decode(response.responseText);
+            var id = json.storedResource.id;
+            dfd.resolve(id);
+        }, function(response) {
+            dfd.reject();
+        });
+        
+        return dfd.promise;
+    }
 });
 
 Ext.define("Voyant.notebook.util.Show", {
@@ -12479,6 +12546,7 @@ Ext.define('Voyant.widget.CategoriesOption', {
 		builderWin: undefined
 	},
 	initComponent: function() {
+	    // TODO set value of option to current categories id if it exists
 		var value = this.up('window').panel.getApiParam('categories');
     	var data = value ? [{name: 'categories-'+value, value: value}] : [];
 		
@@ -12779,8 +12847,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			},{
 				text: this.localize('save'),
 				handler: function(btn) {
-					this.setColorTermAssociations();
-					this.saveData(this.app.getExportData()).then(function(id) {
+					this.app.setColorTermAssociations();
+					this.app.saveCategoryData().then(function(id) {
 						this.setCategoriesId(id);
 						btn.up('window').close();
 					}, function() {
@@ -12793,9 +12861,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			listeners: {
 				show: function() {
 					if (this.getCategoriesId()) {
-		    			this.loadData(this.getCategoriesId()).then(function(data) {
-							this.app.setCategories(data.categories);
-							this.app.setFeatures(data.features);
+		    			this.app.loadCategoryData(this.getCategoriesId()).then(function(data) {
 							this.buildCategories();
 							this.buildFeatures();
 						}, null, null, this);
@@ -13133,69 +13199,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	for (var key in cats) {
     		this.addCategory(key);
     	}
-    },
-    
-    loadData: function(id) {
-		var dfd = new Ext.Deferred();
-		
-		var panel = this.panel;
-		Ext.Ajax.request({
-			url: panel.getTromboneUrl(),
-			params: {
-				tool: 'resource.StoredResource',
-                retrieveResourceId: id,
-                failQuietly: true
-			}
-		}).then(function(response) {
-        	var json = Ext.decode(response.responseText);
-        	var id = json.storedResource.id;
-        	var value = json.storedResource.resource;
-        	if (value.length == 0) {
-        		dfd.reject();
-        	} else {
-        		value = Ext.decode(value);
-        		dfd.resolve(value);
-        	}
-        }, function() {
-        	dfd.reject();
-        }, null, this);
-		
-		return dfd.promise;
-	},
-	
-	saveData: function(data) {
-		var dfd = new Ext.Deferred();
-		
-		var dataString = Ext.encode(data);
-		var panel = this.panel;
-		Ext.Ajax.request({
-            url: panel.getTromboneUrl(),
-            params: {
-                tool: 'resource.StoredResource',
-                storeResource: dataString
-            }
-        }).then(function(response) {
-        	var json = Ext.util.JSON.decode(response.responseText);
-        	var id = json.storedResource.id;
-            dfd.resolve(id);
-        }, function(response) {
-            dfd.reject();
-        });
-		
-		return dfd.promise;
-	},
-    
-    setColorTermAssociations: function() {
-		for (var category in this.app.getCategories()) {
-			var color = this.app.getCategoryFeature(category, 'color');
-			if (color !== undefined) {
-				var rgb = this.app.hexToRgb(color);
-				var terms = this.app.getCategoryTerms(category);
-				for (var i = 0; i < terms.length; i++) {
-					this.app.colorTermAssociations.replace(terms[i], rgb);
-				}
-			}
-		}
     }
 });
 Ext.define('Voyant.widget.VoyantNetworkGraph', {
@@ -16027,7 +16030,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
         
         this.on('activate', function() { // load after tab activate (if we're in a tab panel)
 			if (this.getCorpus()) {
-				Ext.Function.defer(this.initLoad, 100, this);
+			    if (this.getNodeData().length === 0) { // only initLoad if there isn't already data
+			        Ext.Function.defer(this.initLoad, 100, this);
+			    }
 			}
     	}, this);
         
@@ -16278,7 +16283,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		this.setApiParam('limit', limit);
     },
     
-    updateNetworkMode: function(mode) {
+    // called by setNetworkMode
+    applyNetworkMode: function(mode) {
     	if (this.getVisLayout()) {
 	    	if (mode === this.DEFAULT_MODE) {
 	    		var physics = this.getGraphPhysics().defaultMode;
@@ -16312,6 +16318,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 	    		this.getVisLayout().force('y').strength(physics.centralGravity);
 	    	}
     	}
+    	
+    	return mode; // need to return mode for it to actually be set
     },
     
     initGraph: function() {
@@ -31094,7 +31102,6 @@ Ext.define('Voyant.VoyantApp', {
     },
     
     constructor: function(config) {
-    	
     	this.setBaseUrl(this.config.baseUrl);
     	
     	// set the Trombone URL from the baseURL // TODO: maybe allow this to be overridden
@@ -31148,6 +31155,15 @@ Ext.define('Voyant.VoyantApp', {
     	Ext.apply(Ext.tip.QuickTipManager.getQuickTip(), {
     	    showDelay: 50 // shorten the delay before showing
     	});
+    	
+    	// check for categories
+    	var queryParams = Ext.Object.fromQueryString(document.location.search);
+    	if (queryParams.categories) {
+    	    this.loadCategoryData(queryParams.categories).then(function() {
+    	        this.setColorTermAssociations();
+    	    }, null, null, this);
+    	}
+    	
 		this.callParent(arguments);
     },
     
