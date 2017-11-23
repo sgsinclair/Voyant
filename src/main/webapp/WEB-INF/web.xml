@@ -12,7 +12,7 @@
 	
 	<context-param>
 		<param-name>build</param-name>
-		<param-value>M3pr5</param-value>
+		<param-value>M3pr6</param-value>
 	</context-param>
 	
 	<servlet>

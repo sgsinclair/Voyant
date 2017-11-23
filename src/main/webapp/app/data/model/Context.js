@@ -3,6 +3,7 @@ Ext.define('Voyant.data.model.Context', {
     fields: [
              {name: 'id'},
              {name: 'docIndex', 'type': 'int'},
+             {name: 'position', 'type': 'int'},
              {name: 'docId'},
              {name: 'left'},
              {name: 'keyword'},
@@ -15,6 +16,7 @@ Ext.define('Voyant.data.model.Context', {
         getMiddle: function() {return this.get("middle")},
         getHighlightedMiddle: function() {return "<span class='keyword'>"+this.getMiddle()+"</span>"},
         getRight: function() {return this.get("right")},
+        getPosition: function() {return this.get("position")},
         getHighlightedContext: function() {return this.getLeft()+this.getHighlightedMiddle()+this.getRight();}
 	
 });

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Nov 15 16:11:43 EST 2017 */
+/* This file created by JSCacher. Last modified: Thu Nov 23 14:38:53 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7847,6 +7847,7 @@ Ext.define('Voyant.data.model.Context', {
     fields: [
              {name: 'id'},
              {name: 'docIndex', 'type': 'int'},
+             {name: 'position', 'type': 'int'},
              {name: 'docId'},
              {name: 'left'},
              {name: 'keyword'},
@@ -7859,6 +7860,7 @@ Ext.define('Voyant.data.model.Context', {
         getMiddle: function() {return this.get("middle")},
         getHighlightedMiddle: function() {return "<span class='keyword'>"+this.getMiddle()+"</span>"},
         getRight: function() {return this.get("right")},
+        getPosition: function() {return this.get("position")},
         getHighlightedContext: function() {return this.getLeft()+this.getHighlightedMiddle()+this.getRight();}
 	
 });
@@ -10405,6 +10407,34 @@ Ext.define('Voyant.data.model.Corpus', {
 	
 	getDocumentEntities: function(config) {
 		return Ext.create("Voyant.data.store.DocumentEntities", Ext.apply(config || {}, {corpus: this}));
+	},
+	
+	loadContexts: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0
+			})
+			var contexts = this.getContexts();
+			contexts.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(contexts)
+					} else {
+						dfd.reject(operation)
+					}
+				}
+			})
+			return dfd.promise
+		}
+		
 	},
 	
 	getContexts: function(config) {
@@ -28104,7 +28134,8 @@ Ext.define('Voyant.panel.Veliza', {
     			itemId: 'chat',
 	    		html: "<form class='chat'></form>",
 	    		region: 'center',
-	    		flex: 2
+	    		flex: 2,
+	    		autoScroll: true
     		},{
     			itemId: 'script',
     			xtype: 'form',
@@ -28201,16 +28232,24 @@ Ext.define('Voyant.panel.Veliza', {
     sendApiParamMessage: function() {
 		if (this.getApiParam('message')) {
 			if (this.getCorpus()) {
-				this.handleUserSentence(this.getApiParam('message'))
+				var sentences = Ext.Array.from(this.getApiParam('message'));
+				var sentence = sentences.shift();
+				if (sentence) {
+					if (sentences) {
+						this.setApiParam("message", sentences);
+					}
+					this.handleUserSentence(sentence, undefined, true)
+					
+				}
 			} else {
 				// try to wait for the corpus to be loaded
-				Ext.defer(this.sendApiParamMessage, 100, this)
+				Ext.defer(this.sendApiParamMessage, 100, this, [true])
 			}
 		}
     },
     
     
-    handleUserSentence: function(sentence, fromCorpus) {
+    handleUserSentence: function(sentence, fromCorpus, noScroll) {
     	sentence = sentence.trim();
     	if (sentence || fromCorpus) {
     		if (sentence) {
@@ -28248,16 +28287,24 @@ Ext.define('Voyant.panel.Veliza', {
     		    	}
     		    	var sentence = response.veliza.sentence;
     		    	me.setPrevious(response.veliza.previous);
+
     		    	if (fromCorpus) {
     		    		meta = response.veliza.docIndex > -1 ? me.getCorpus().getDocument(response.veliza.docIndex).getShortLabel() : undefined;
     		    		me.addSentence("myMessage", sentence, meta);
-    			    	Ext.Function.defer(function() {
-            		    	this.addSentence("fromThem", veliza);
-            		    	this.body.scroll('b', Infinity)
-    			    	}, 500, me);
+        			    	Ext.Function.defer(function() {
+                		    	this.addSentence("fromThem", veliza);
+                		    	if (!noScroll) {
+                    		    	this.body.scroll('b', Infinity)                		    		
+                		    	}
+        			    	}, 500, me);
     		    	} else {
         		    	me.addSentence("fromThem", veliza);
-        		    	me.body.scroll('b', Infinity)
+        		    	if (!noScroll) {
+            		    	me.body.scroll('b', Infinity)                		    		
+        		    	}
+    		    	}
+    		    	if (me.getApiParam("message")) { // any more messages to show?
+    		    		me.sendApiParamMessage();
     		    	}
     		    },
     		    failure: function(response, opts) {

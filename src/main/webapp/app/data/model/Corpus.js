@@ -640,6 +640,34 @@ Ext.define('Voyant.data.model.Corpus', {
 		return Ext.create("Voyant.data.store.DocumentEntities", Ext.apply(config || {}, {corpus: this}));
 	},
 	
+	loadContexts: function(config) {
+		if (this.then) {
+			return Voyant.application.getDeferredNestedPromise(this, arguments);
+		} else {
+			var dfd = Voyant.application.getDeferred(this);
+			config = config || {};
+			if (Ext.isNumber(config)) {
+				config = {limit: config};
+			}
+			Ext.applyIf(config, {
+				limit: 0
+			})
+			var contexts = this.getContexts();
+			contexts.load({
+				params: config,
+				callback: function(records, operation, success) {
+					if (success) {
+						dfd.resolve(contexts)
+					} else {
+						dfd.reject(operation)
+					}
+				}
+			})
+			return dfd.promise
+		}
+		
+	},
+	
 	getContexts: function(config) {
 		return Ext.create("Voyant.data.store.Contexts", Ext.apply(config || {}, {corpus: this}));
 	},
