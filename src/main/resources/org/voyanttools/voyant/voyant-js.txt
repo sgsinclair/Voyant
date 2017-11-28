@@ -30,6 +30,7 @@ app/util/Variants.js
 app/util/Downloadable.js
 app/util/Storage.js
 app/util/CategoriesManager.js
+app/util/DiacriticsRemover.js
 app/notebook/util/Show.js
 app/notebook/util/Embed.js
 
@@ -145,6 +146,7 @@ app/panel/BubblelinesSet.js
 app/panel/CustomSet.js
 app/panel/Veliza.js
 app/panel/WordTree.js
+app/panel/WordWall.js
 app/panel/Topics.js
 app/panel/Via.js
 
