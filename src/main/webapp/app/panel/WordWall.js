@@ -248,7 +248,7 @@ Ext.define('Voyant.panel.WordWall', {
         });
         this.setLetterDistribution(letterDist);
 
-        this.runSimulation();
+        this.runSimulation(this.getTerms());
     },
 
     initVis: function() {
@@ -264,33 +264,34 @@ Ext.define('Voyant.panel.WordWall', {
         this.setNodes(g.append('g').attr('class', 'nodes').selectAll('.node'));
     },
 
-    runSimulation: function() {
+    runSimulation: function(terms) {
         var el = this.getLayout().getRenderTarget();
         var width = el.getWidth();
         var height = el.getHeight();
 
-        var node = this.getNodes().data(this.getTerms(), function(d) { return d.id; });
+        // add nodes and set bounding boxes
+        var nodeUpdate = this.getNodes().data(terms, function(d) { return d.id; });
+
+        var nodeEnter = nodeUpdate.enter().append('g')
+            .attr('class', 'node')
+            .attr('id', function(d) { return d.id; });
+
+        nodeEnter.append('title').text(function(d) { return d.title; });
 
         var textSizer = function(value) {
-            var t = this.getTerms().length / this.MAX_TERMS;
+            var t = Math.min(1, terms.length / this.MAX_TERMS);
             var exponent = t*2+1;
             value = this.getFrequencyScale()(value);
             var val = d3.scalePow().exponent(exponent).domain([0, 1]).range([this.getMinFontSize(), this.getMaxFontSize()])(value);
             return val;
         }.bind(this);
 
-        var nodeEnter = node.enter().append('g')
-            .attr('class', 'node')
-            .attr('id', function(d) { return d.id; });
-
-        nodeEnter.append('title').text(function(d) { return d.title; });
-
         nodeEnter.append('text')
             .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
             .attr('font-size', function(d) { return textSizer(d.value); })
             .attr('fill', function(d) { return this.getApplication().getFeatureForTerm('color', d.term); }.bind(this))
             .attr('fill-opacity', 0)
-            .attr('class', 'doFadeIn')
+            .classed('doFadeIn', true)
             .text(function(d) { return d.term; })
             .each(function(d) {
                 var bbox = this.getBBox();
@@ -304,12 +305,13 @@ Ext.define('Voyant.panel.WordWall', {
             .style('user-select', 'none')
             .attr('alignment-baseline', 'middle');
 
-        this.setNodes(nodeEnter.merge(node));
+        this.setNodes(nodeEnter.merge(nodeUpdate));
 
+        // pass all the info to the worker
         var worker = new Worker(this.getBaseUrl()+'resources/d3/WordWallWorker.js');
         if (window.console) console.time("runSim");
         worker.postMessage({
-            terms: this.getTerms(),
+            terms: terms,
             width: width,
             height: height,
             minFreq: this.getMinFreq(),
@@ -334,56 +336,22 @@ Ext.define('Voyant.panel.WordWall', {
                 case "end":
                     if (window.console) console.timeEnd("runSim");
                     this.getDockedItems()[1].getComponent('status').update('');
-                    this.drawNodes(event.data.nodes);
+                    this.updateNodePositions(event.data.nodes);
                     break;
             }
         }.bind(this)
     },
 
-    drawNodes: function(nodes) {
-
-        this.getNodes().remove();
-
-        this.setNodes(this.getVis().append('g').attr('class', 'nodes').selectAll('.node'));
-        
-        var node = this.getNodes().data(nodes, function(d) { return d.id; });
-
-        var textSizer = function(value) {
-            var t = this.getTerms().length / this.MAX_TERMS;
-            var exponent = t*2+1;
-            value = this.getFrequencyScale()(value);
-            var val = d3.scalePow().exponent(exponent).domain([0, 1]).range([this.getMinFontSize(), this.getMaxFontSize()])(value);
-            return val;
-        }.bind(this);
-
-        var nodeEnter = node.enter().append('g')
-            .attr('class', 'node')
-            .attr('id', function(d) { return d.id; });
-
-        nodeEnter.append('title').text(function(d) { return d.title; });
-
-        nodeEnter.append('text')
-            .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
-            .attr('font-size', function(d) { return textSizer(d.value); })
-            .attr('fill', function(d) { return this.getApplication().getFeatureForTerm('color', d.term); }.bind(this))
-            .attr('fill-opacity', 0)
-            .attr('class', 'doFadeIn')
-            .text(function(d) { return d.term; })
-            .style('cursor', 'pointer')
-            .style('user-select', 'none')
-            .attr('alignment-baseline', 'middle');
-
-        this.setNodes(nodeEnter.merge(node));
-
-        this.getNodes().attr('transform', function(d) {
+    updateNodePositions: function(nodes) {
+        var nodeUpdate = this.getNodes().data(nodes, function(d) { return d.id; });
+        nodeUpdate.attr('transform', function(d) {
             var x = d.x;
             var y = d.y;
-
             return 'translate('+x+','+y+')';
         }.bind(this));
 
-        var newText = this.getVis().selectAll('text.doFadeIn');
-        newText.transition().duration(500).attr('fill-opacity', 1).attr('class', '');
+        this.getVis().selectAll('text.doFadeIn').classed('doFadeIn', false)
+            .transition().duration(500).attr('fill-opacity', 1);
     },
 
     updateMinFreq: function() {
