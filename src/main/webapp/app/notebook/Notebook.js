@@ -142,8 +142,12 @@ Ext.define('Voyant.notebook.Notebook', {
          * @return {String} The formatted number.
          */
 		formatNumber: function(number, format) {
-    		return Ext.util.Format.number(number, format);
-    	}
+    			return Ext.util.Format.number(number, format);
+    		},
+    		
+    		getTarget: function() {
+    			return Voyant.notebook.util.Show.TARGET;
+    		}
     	
     },
     config: {
