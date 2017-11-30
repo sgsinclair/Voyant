@@ -40,6 +40,7 @@ Ext.define('Voyant.panel.WordWall', {
         segmentDelay: 5000, // delay before displaying new segment data
         segmentDelayTimer: undefined,
         
+        webWorker: undefined,
         isSimulating: false, // are we running a webworker simulation?
         
         transitionTime: 1000, // time to transition between old and new nodes
@@ -236,6 +237,9 @@ Ext.define('Voyant.panel.WordWall', {
         this.setNodes(g.append('g').attr('class', 'nodes').selectAll('.node'));
 
         this.setTempNodes(g.append('g').attr('class', 'tempNodes').selectAll('text'));
+
+        this.setWebWorker(new Worker(this.getBaseUrl()+'resources/d3/WordWallWorker.js'));
+        this.getWebWorker().onmessage = this.handleWebWorkerMessage.bind(this);
     },
 
     initLoad: function() {
@@ -376,9 +380,8 @@ Ext.define('Voyant.panel.WordWall', {
         var height = el.getHeight();
 
         // pass all the info to the worker
-        var worker = new Worker(this.getBaseUrl()+'resources/d3/WordWallWorker.js');
         if (window.console) console.time("runSim");
-        worker.postMessage({
+        this.getWebWorker().postMessage({
             terms: terms,
             width: width,
             height: height,
@@ -390,25 +393,26 @@ Ext.define('Voyant.panel.WordWall', {
             chargeStrength: this.getChargeStrength(),
             letterDistribution: this.getLetterDistribution()
         });
+    },
 
-        worker.onmessage = function(event) {
-            switch (event.data.type) {
-                case "progress":
-                    var t = event.data.progress;
-                    var percent = parseInt(t * 100);
-                    this.getDockedItems()[1].getComponent('status').update(percent+'%');
-                    break;
-                case "msg":
-                    if (window.console) console.log(event.data.msg);
-                    break;
-                case "end":
-                    if (window.console) console.timeEnd("runSim");
-                    this.getDockedItems()[1].getComponent('status').update('');
-                    this.setIsSimulating(false);
-                    this.getSegmentTermsQueue().push(event.data.nodes);
-                    break;
-            }
-        }.bind(this)
+    handleWebWorkerMessage: function(event) {
+        switch (event.data.type) {
+            case "progress":
+                var t = event.data.progress;
+                var percent = parseInt(t * 100);
+                this.getDockedItems()[1].getComponent('status').update(percent+'%');
+                break;
+            case "msg":
+                if (window.console) console.log(event.data.msg);
+                break;
+            case "end":
+                if (window.console) console.timeEnd("runSim");
+                // TODO adjust segment delay if it's less than the runSim time
+                this.getDockedItems()[1].getComponent('status').update('');
+                this.setIsSimulating(false);
+                this.getSegmentTermsQueue().push(event.data.nodes);
+                break;
+        }
     },
 
     updateNodePositions: function() {
@@ -460,7 +464,7 @@ Ext.define('Voyant.panel.WordWall', {
 
             nodeUpdate.exit().transition().duration(this.getTransitionTime()).attr('fill-opacity', 0).remove();
 
-            d3.timeout(function() {
+            setTimeout(function() {
                 this.setIsTransitioning(false);
             }.bind(this), this.getTransitionTime());
 
