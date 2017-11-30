@@ -10,10 +10,12 @@ Ext.define('Voyant.panel.WordWall', {
             xStrength: 'X Strength',
             yStrength: 'Y Strength',
             chargeStrength: 'Charge Strength',
-            chargeDistance: 'Charge Distance'
+            chargeDistance: 'Charge Distance',
+            delay: 'Fetch Delay',
+            transition: 'Transition Speed'
         },
         api: {
-            limit: 150,
+            limit: 500,
             stopList: 'auto'
         },
         glyph: 'xf1e0@FontAwesome'
@@ -24,13 +26,26 @@ Ext.define('Voyant.panel.WordWall', {
         vis: undefined,
         simulation: undefined, // force layout
         nodes: undefined, // svg nodes
+        tempNodes: undefined, // used to calculate text size and bounding boxes
         zoom: undefined,
 
-        nodeData: undefined,
-        
         terms: undefined,
         segments: undefined,
+
+
+        currentSegment: undefined,
+        segmentTerms: undefined,
+        segmentTermsQueue: [],
+
+        segmentDelay: 5000, // delay before displaying new segment data
+        segmentDelayTimer: undefined,
         
+        isSimulating: false, // are we running a webworker simulation?
+        
+        transitionTime: 1000, // time to transition between old and new nodes
+        isTransitioning: false, // are we transitioning between nodes?
+        
+
         minFreq: undefined,
         maxFreq: undefined,
         letterDistribution: undefined,
@@ -85,6 +100,37 @@ Ext.define('Voyant.panel.WordWall', {
                         },
                         scope: this
                     }
+                },this.localize('delay'),{
+                    width: 50,
+                    xtype: 'slider',
+                    minValue: 1,
+                    maxValue: 60,
+                    increment: 1,
+                    listeners: {
+                        render: function(slider) {
+                            slider.setValue(this.getSegmentDelay()/1000);
+                        },
+                        changecomplete: function(slider, newValue) {
+                            this.setSegmentDelay(slider.getValue()*1000);
+                            this.restartSegmentTimer();
+                        },
+                        scope: this
+                    }
+                },this.localize('transition'),{
+                    width: 50,
+                    xtype: 'slider',
+                    minValue: 100,
+                    maxValue: 5000,
+                    increment: 1,
+                    listeners: {
+                        render: function(slider) {
+                            slider.setValue(this.getTransitionTime());
+                        },
+                        changecomplete: function(slider, newValue) {
+                            this.setTransitionTime(slider.getValue());
+                        },
+                        scope: this
+                    }
                 },this.localize('xStrength'),{
                     width: 50,
                     xtype: 'slider',
@@ -97,7 +143,6 @@ Ext.define('Voyant.panel.WordWall', {
                         },
                         changecomplete: function(slider, newValue) {
                             this.setXForceStrength(slider.getValue()/1000);
-                            this.refresh();
                         },
                         scope: this
                     }
@@ -113,7 +158,6 @@ Ext.define('Voyant.panel.WordWall', {
                         },
                         changecomplete: function(slider, newValue) {
                             this.setYForceStrength(slider.getValue()/1000);
-                            this.refresh();
                         },
                         scope: this
                     }
@@ -129,7 +173,6 @@ Ext.define('Voyant.panel.WordWall', {
                         },
                         changecomplete: function(slider, newValue) {
                             this.setChargeStrength(slider.getValue());
-                            this.refresh();
                         },
                         scope: this
                     }
@@ -145,7 +188,6 @@ Ext.define('Voyant.panel.WordWall', {
                         },
                         changecomplete: function(slider, newValue) {
                             this.setChargeDistance(slider.getValue());
-                            this.refresh();
                         },
                         scope: this
                     }
@@ -181,10 +223,23 @@ Ext.define('Voyant.panel.WordWall', {
         this.callParent(arguments);
     },
     
+    initVis: function() {
+        var el = this.getLayout().getRenderTarget();
+        el.update('');
+        var width = el.getWidth();
+        var height = el.getHeight();
+
+        var svg = d3.select(el.dom).append('svg').attr('id',this.getVisId()).attr('class', 'wordWall').attr('width', width).attr('height', height);
+        var g = svg.append('g');
+        this.setVis(g);
+        
+        this.setNodes(g.append('g').attr('class', 'nodes').selectAll('.node'));
+
+        this.setTempNodes(g.append('g').attr('class', 'tempNodes').selectAll('text'));
+    },
+
     initLoad: function() {
         this.initVis();
-
-        this.setNodeData([]);
         
         var params = this.getApiParams();
         params.tool = 'corpus.CorpusSegmentTerms';
@@ -195,9 +250,12 @@ Ext.define('Voyant.panel.WordWall', {
             success: function(response) {
                 var data = Ext.decode(response.responseText);
                 this.setSegments(data.corpusSegmentTerms.segments);
-                
                 this.setTerms(data.corpusSegmentTerms.terms);
-                this.processTerms();
+                
+                this.setCurrentSegment(this.getSegments().length);
+                this.getNextSegment();
+
+                this.restartSegmentTimer();
             },
             failure: function(response) {
                 if (window.console) console.log('failed', response);
@@ -206,31 +264,57 @@ Ext.define('Voyant.panel.WordWall', {
         })
     },
 
-    processTerms: function() {
+    restartSegmentTimer: function() {
+        clearInterval(this.getSegmentDelayTimer());
+
+        this.setSegmentDelayTimer(setInterval(function() {
+            this.updateNodePositions();
+        }.bind(this), this.getSegmentDelay()));
+    },
+
+    getNextSegment: function() {
+        var index = this.getCurrentSegment();
+        index++;
+        if (index >= this.getSegments().length) {
+            index = 0;
+        }
+        this.setCurrentSegment(index);
+        this.processTermsForSegment(this.getCurrentSegment());
+    },
+
+    processTermsForSegment: function(segmentIndex) {
         var min = Number.MAX_VALUE;
         var max = Number.MIN_VALUE;
         var letterDistMap = {a:0,b:0,c:0,d:0,e:0,f:0,g:0,h:0,i:0,j:0,k:0,l:0,m:0,n:0,o:0,p:0,q:0,r:0,s:0,t:0,u:0,v:0,w:0,x:0,y:0,z:0};
 
         this.getTerms().forEach(function(d) {
             d.id = this.idGet(d.term);
-            d.value = d.rawFreqs.reduce(function(sum, value) {
-                return sum+value;
-            });
-            d.title = d.term+' ('+d.value+')';
-            if (d.value < min) {
-                min = d.value;
-            }
-            if (d.value > max) {
-                max = d.value;
-            }
+            // d.value = d.rawFreqs.reduce(function(sum, value) {
+            //     return sum+value;
+            // });
+            d.value = d.rawFreqs[segmentIndex];
+            if (d.value > 0) {
+                if (d.value < min) {
+                    min = d.value;
+                }
+                if (d.value > max) {
+                    max = d.value;
+                }
 
-            var firstLetter = this.removeDiacritics(d.term.charAt(0)).toLowerCase();
-            d.letter = firstLetter;
-            if (letterDistMap[firstLetter] === undefined) {
-                letterDistMap[firstLetter] = 0;
+                d.title = d.term+' ('+d.value+')';
+
+                var firstLetter = this.removeDiacritics(d.term.charAt(0)).toLowerCase();
+                d.letter = firstLetter;
+                if (letterDistMap[firstLetter] === undefined) {
+                    letterDistMap[firstLetter] = 0;
+                }
+                letterDistMap[firstLetter]++;
             }
-            letterDistMap[firstLetter]++;
         }, this);
+
+        this.setSegmentTerms(this.getTerms().filter(function(d) {
+            return d.value > 0;
+        }));
 
         this.setMinFreq(min);
         this.setMaxFreq(max);
@@ -248,37 +332,15 @@ Ext.define('Voyant.panel.WordWall', {
         });
         this.setLetterDistribution(letterDist);
 
-        this.runSimulation(this.getTerms());
+        this.calculateNodeSizes(this.getSegmentTerms());
+        this.runSimulation(this.getSegmentTerms());
     },
 
-    initVis: function() {
-        var el = this.getLayout().getRenderTarget();
-        el.update('');
-        var width = el.getWidth();
-        var height = el.getHeight();
-
-        var svg = d3.select(el.dom).append('svg').attr('id',this.getVisId()).attr('class', 'wordWall').attr('width', width).attr('height', height);
-        var g = svg.append('g');
-        this.setVis(g);
+    // determine each node's font size and bounding box and store them for later use
+    calculateNodeSizes: function(terms) {
+        var nodes = this.getTempNodes().data(terms, function(d) { return d.id; });
         
-        this.setNodes(g.append('g').attr('class', 'nodes').selectAll('.node'));
-    },
-
-    runSimulation: function(terms) {
-        var el = this.getLayout().getRenderTarget();
-        var width = el.getWidth();
-        var height = el.getHeight();
-
-        // add nodes and set bounding boxes
-        var nodeUpdate = this.getNodes().data(terms, function(d) { return d.id; });
-
-        var nodeEnter = nodeUpdate.enter().append('g')
-            .attr('class', 'node')
-            .attr('id', function(d) { return d.id; });
-
-        nodeEnter.append('title').text(function(d) { return d.title; });
-
-        var textSizer = function(value) {
+        var fontSizer = function(value) {
             var t = Math.min(1, terms.length / this.MAX_TERMS);
             var exponent = t*2+1;
             value = this.getFrequencyScale()(value);
@@ -286,12 +348,14 @@ Ext.define('Voyant.panel.WordWall', {
             return val;
         }.bind(this);
 
-        nodeEnter.append('text')
-            .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
-            .attr('font-size', function(d) { return textSizer(d.value); })
-            .attr('fill', function(d) { return this.getApplication().getFeatureForTerm('color', d.term); }.bind(this))
+        nodes.enter().append('text')
             .attr('fill-opacity', 0)
-            .classed('doFadeIn', true)
+            .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
+            .attr('font-size', function(d) {
+                var fontSize = fontSizer(d.value);
+                d.fontSize = fontSize;
+                return fontSize;
+            })
             .text(function(d) { return d.term; })
             .each(function(d) {
                 var bbox = this.getBBox();
@@ -300,12 +364,16 @@ Ext.define('Voyant.panel.WordWall', {
                 d.bbox.y = bbox.y;
                 d.bbox.width = bbox.width;
                 d.bbox.height = bbox.height;
-            }) // set bounding box for later use
-            .style('cursor', 'pointer')
-            .style('user-select', 'none')
-            .attr('alignment-baseline', 'middle');
+            })
+            .remove();
+    },
 
-        this.setNodes(nodeEnter.merge(nodeUpdate));
+    runSimulation: function(terms) {
+        this.setIsSimulating(true);
+
+        var el = this.getLayout().getRenderTarget();
+        var width = el.getWidth();
+        var height = el.getHeight();
 
         // pass all the info to the worker
         var worker = new Worker(this.getBaseUrl()+'resources/d3/WordWallWorker.js');
@@ -336,22 +404,68 @@ Ext.define('Voyant.panel.WordWall', {
                 case "end":
                     if (window.console) console.timeEnd("runSim");
                     this.getDockedItems()[1].getComponent('status').update('');
-                    this.updateNodePositions(event.data.nodes);
+                    this.setIsSimulating(false);
+                    this.getSegmentTermsQueue().push(event.data.nodes);
                     break;
             }
         }.bind(this)
     },
 
-    updateNodePositions: function(nodes) {
-        var nodeUpdate = this.getNodes().data(nodes, function(d) { return d.id; });
-        nodeUpdate.attr('transform', function(d) {
-            var x = d.x;
-            var y = d.y;
-            return 'translate('+x+','+y+')';
-        }.bind(this));
+    updateNodePositions: function() {
+        if (this.getIsTransitioning()) {
+            Ext.Function.defer(this.updateNodePositions, 100, this);
+        } else {
+            this.setIsTransitioning(true);
 
-        this.getVis().selectAll('text.doFadeIn').classed('doFadeIn', false)
-            .transition().duration(500).attr('fill-opacity', 1);
+            var nodes = this.getSegmentTermsQueue().shift();
+            if (this.getSegmentTermsQueue().length == 0) {
+                this.getNextSegment();
+            }
+            
+            var nodeUpdate = this.getNodes().data(nodes, function(d) { return d.id; });
+            
+            nodeUpdate.transition().duration(this.getTransitionTime()).attr('transform', function(d) {
+                var x = d.x;
+                var y = d.y;
+                return 'translate('+x+','+y+')';
+            });
+
+            var nodeEnter = nodeUpdate.enter().append('g')
+                .attr('class', 'node')
+                .attr('id', function(d) { return d.id; })
+                .attr('transform', function(d) {
+                    var x = d.x;
+                    var y = d.y;
+                    return 'translate('+x+','+y+')';
+                })
+                .attr('fill-opacity', 0);
+
+            nodeEnter.append('title').text(function(d) { return d.title; });
+
+            nodeEnter.append('text')
+                .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
+                .attr('font-size', function(d) { return d.fontSize; })
+                .attr('fill', function(d) { return this.getApplication().getFeatureForTerm('color', d.term); }.bind(this))
+                .style('cursor', 'pointer')
+                .style('user-select', 'none')
+                .attr('alignment-baseline', 'middle')
+                .text(function(d) { return d.term; });
+
+            nodeEnter.transition().duration(this.getTransitionTime()).attr('fill-opacity', 1);
+
+            var allNodes = nodeEnter.merge(nodeUpdate);
+
+            allNodes.select('text').transition().duration(this.getTransitionTime())
+                .attr('font-size', function(d) { return d.fontSize; });
+
+            nodeUpdate.exit().transition().duration(this.getTransitionTime()).attr('fill-opacity', 0).remove();
+
+            d3.timeout(function() {
+                this.setIsTransitioning(false);
+            }.bind(this), this.getTransitionTime());
+
+            this.setNodes(allNodes);
+        }
     },
 
     updateMinFreq: function() {
@@ -360,10 +474,6 @@ Ext.define('Voyant.panel.WordWall', {
 
     updateMaxFreq: function() {
         this.setFrequencyScale(d3.scaleLog().domain([this.getMinFreq(), this.getMaxFreq()]).range([0, 1]));
-    },
-    
-    refresh: function(simAlpha) {
-        this.runSimulation();
     },
 
     zoomToFit: function(paddingPercent, transitionDuration) {
