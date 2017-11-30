@@ -352,6 +352,8 @@ Ext.define('Voyant.panel.WordWall', {
             return val;
         }.bind(this);
 
+        var bboxTotal = 0;
+
         nodes.enter().append('text')
             .attr('fill-opacity', 0)
             .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
@@ -368,8 +370,26 @@ Ext.define('Voyant.panel.WordWall', {
                 d.bbox.y = bbox.y;
                 d.bbox.width = bbox.width;
                 d.bbox.height = bbox.height;
+
+                bboxTotal += bbox.width*bbox.height;
             })
             .remove();
+
+        var el = this.getLayout().getRenderTarget();
+        var width = el.getWidth();
+        var height = el.getHeight();
+
+        // adapt font size to available space
+        var availableSpace = width*height;
+        if (bboxTotal > availableSpace*0.6) {
+            this.setMaxFontSize(this.getMaxFontSize()*0.9);
+            this.setMinFontSize(this.getMinFontSize()*0.9);
+            this.calculateNodeSizes(terms);
+        } else if (bboxTotal < availableSpace*0.5) {
+            this.setMaxFontSize(this.getMaxFontSize()*1.1);
+            this.setMinFontSize(this.getMinFontSize()*1.1);
+            this.calculateNodeSizes(terms);
+        }
     },
 
     runSimulation: function(terms) {
