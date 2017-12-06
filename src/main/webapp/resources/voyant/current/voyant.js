@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Nov 30 13:47:08 EST 2017 */
+/* This file created by JSCacher. Last modified: Wed Dec 06 15:54:06 EST 2017 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -11146,18 +11146,51 @@ Ext.define('Voyant.widget.StopListOption', {
     alias: 'widget.stoplistoption',
     layout: 'hbox',
     statics: {
-    	i18n: {
-    	}
+    		stoplists: {
+    		    ar: "stop.ar.arabic-lucene.txt",
+    			bg: "stop.bu.bulgarian-lucene.txt",
+    			br: "stop.br.breton-lucene.txt",
+    			ca: "stop.ca.catalan-lucene.txt",
+    			ckb: "stop.ckb-turkish-lucene.txt",
+    			cn: "stop.cn.chinese-lawrence.txt",
+    			cz: "stop.cz.czech-lucene.txt",
+    			de: "stop.de.german.txt",
+    			el: "stop.el.greek-lucene.txt",
+    			en: "stop.en.taporware.txt",
+    			es: "stop.es.spanish.txt",
+    			eu: "stop.eu.basque-lucene.txt",
+    			fa: "stop.fa.farsi-lucene.txt",
+    			fr: "stop.fr.veronis.txt",
+    			ga: "stop.ga-irish-lucene.txt",
+    			gl: "stop.ga.galician-lucene.txt",
+    			grc: "stop.grc.ancient-greek.txt",
+    			hi: "stop.hi.hindi-lucene.txt",
+    			hu: "stop.hu.hungarian.txt",
+    			hy: "stop.hy.armenian-lucene.txt",
+    			id: "stop.id.indonesian-lucene.txt",
+    			it: "stop.it.italian.txt",
+    			ja: "stop.ja.japanese-lucene.txt",
+    			la: "stop.la.latin.txt",
+    			lv: "stop.lv.latvian-lucene.txt",
+    			lt: "stop.lt.lithuanian-lucene.txt",
+    			mu: "stop.mu.multi.txt",
+    			nl: "stop.nl.dutch.txt",
+    			no: "stop.no.norwegian.txt",
+    			ro: "stop.ro.romanian-lucene.txt",
+    			se: "stop.se.swedish-long.txt",
+    			th: "stop.th.thai-lucene.txt",
+    			tr: "stop.tr.turkish-lucene.txt"
+    		},
+	    	i18n: {
+	    	}
     },
     initComponent: function(config) {
     	var me = this;
     	var value = this.up('window').panel.getApiParam('stopList');
-    	
     	var data = [];
-    	"ar:stop.ar.arabic-lucene.txt,bg:stop.bu.bulgarian-lucene.txt,br:stop.br.breton-lucene.txt,ca:stop.ca.catalan-lucene.txt,ckb:stop.ckb-turkish-lucene.txt,cn:stop.cn.chinese-lawrence.txt,cz:stop.cz.czech-lucene.txt,de:stop.de.german.txt,el:stop.el.greek-lucene.txt,en:stop.en.taporware.txt,es:stop.es.spanish.txt,eu:stop.eu.basque-lucene.txt,fa:stop.fa.farsi-lucene.txt,fr:stop.fr.veronis.txt,ga:stop.ga-irish-lucene.txt,gl:stop.ga.galician-lucene.txt,grc:stop.grc.ancient-greek.txt,hi:stop.hi.hindi-lucene.txt,hu:stop.hu.hungarian.txt,hy:stop.hy.armenian-lucene.txt,id:stop.id.indonesian-lucene.txt,it:stop.it.italian.txt,ja:stop.ja.japanese-lucene.txt,la:stop.la.latin.txt,lv:stop.lv.latvian-lucene.txt,lt:stop.lt.lithuanian-lucene.txt,mu:stop.mu.multi.txt,nl:stop.nl.dutch.txt,no:stop.no.norwegian.txt,ro:stop.ro.romanian-lucene.txt,se:stop.se.swedish-long.txt,th:stop.th.thai-lucene.txt,tr:stop.tr.turkish-lucene.txt".split(",").forEach(function(lang) {
-    		var parts = lang.split(":")
-    		data.push({name: this.localize(parts[0]), value: parts[1]})
-    	}, this);
+    	for (id in Voyant.widget.StopListOption.stoplists) {
+    		data.push({name: this.localize(id), value: Voyant.widget.StopListOption.stoplists[id]})
+    	}
     	data.sort(function(a,b) { // sort by label
     		return a.name < b.name ? -1 : 1;
     	})
@@ -29138,6 +29171,8 @@ Ext.define('Voyant.panel.WordWall', {
             return val;
         }.bind(this);
 
+        var bboxTotal = 0;
+
         nodes.enter().append('text')
             .attr('fill-opacity', 0)
             .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
@@ -29154,8 +29189,26 @@ Ext.define('Voyant.panel.WordWall', {
                 d.bbox.y = bbox.y;
                 d.bbox.width = bbox.width;
                 d.bbox.height = bbox.height;
+
+                bboxTotal += bbox.width*bbox.height;
             })
             .remove();
+
+        var el = this.getLayout().getRenderTarget();
+        var width = el.getWidth();
+        var height = el.getHeight();
+
+        // adapt font size to available space
+        var availableSpace = width*height;
+        if (bboxTotal > availableSpace*0.6) {
+            this.setMaxFontSize(this.getMaxFontSize()*0.9);
+            this.setMinFontSize(this.getMinFontSize()*0.9);
+            this.calculateNodeSizes(terms);
+        } else if (bboxTotal < availableSpace*0.5) {
+            this.setMaxFontSize(this.getMaxFontSize()*1.1);
+            this.setMinFontSize(this.getMinFontSize()*1.1);
+            this.calculateNodeSizes(terms);
+        }
     },
 
     runSimulation: function(terms) {
@@ -30316,7 +30369,8 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		docs: undefined,
 		isChangeRegistered: false,
 		editor: undefined,
-		editedTimeout: undefined
+		editedTimeout: undefined,
+		lines: 0
 	},
 	statics: {
 		i18n: {
@@ -30346,22 +30400,27 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		    editor.on("focus", function() {
 		    	me.getEditor().renderer.setShowGutter(true);
 		    }, this);
-		    editor.on("change", function() {
-		    	if (me.getIsChangeRegistered()==false) {
-		    		me.setIsChangeRegistered(true);
-			    	var wrapper = me.up('notebookcodeeditorwrapper');
-			    	if (wrapper) {
-			    		wrapper.setIsRun(false);
-			    		var notebook = wrapper.up(notebook);
-			    		if (notebook) {notebook.setIsEdited(true);}
-			    	}
-		    	} else {
-		    		if (!me.getEditedTimeout()) { // no timeout, so set it to 30 seconds
-						me.setEditedTimeout(setTimeout(function() {
-							me.setIsChangeRegistered(false);
-						}, 30000));
+		    editor.on("change", function(ev, editor) {
+		    		var lines = editor.getSession().getScreenLength();
+		    		if (lines!=me.getLines()) {
+		    			me.up('notebookcodeeditorwrapper').setSize({height: lines*editor.renderer.lineHeight+editor.renderer.scrollBar.getWidth()})
+		    			me.setLines(lines);
 		    		}
-		    	}
+			    	if (me.getIsChangeRegistered()==false) {
+			    		me.setIsChangeRegistered(true);
+				    	var wrapper = me.up('notebookcodeeditorwrapper');
+				    	if (wrapper) {
+				    		wrapper.setIsRun(false);
+				    		var notebook = wrapper.up(notebook);
+				    		if (notebook) {notebook.setIsEdited(true);}
+				    	}
+			    	} else {
+			    		if (!me.getEditedTimeout()) { // no timeout, so set it to 30 seconds
+							me.setEditedTimeout(setTimeout(function() {
+								me.setIsChangeRegistered(false);
+							}, 30000));
+			    		}
+			    	}
 		    }, this);
 		    editor.on("blur", function() {
 		    	me.getEditor().renderer.setShowGutter(false);
@@ -30726,6 +30785,9 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				}
 			}
 			this.results.unmask();
+			if (this.results.getTargetEl().getHtml().trim().length==0) {
+				this.results.hide();
+			}
 			this.getTargetEl().fireEvent('resize');
 		}
 		else {
@@ -31040,6 +31102,27 @@ Ext.define('Voyant.notebook.Notebook', {
     		
     		getTarget: function() {
     			return Voyant.notebook.util.Show.TARGET;
+    		},
+    		
+    		getStopwords: function(id) {
+    			var dfd = this.getDeferred();
+    			if (id && id in Voyant.widget.StopListOption.stoplists) {
+    				id = Voyant.widget.StopListOption.stoplists[id];
+    			}
+    	    		Ext.Ajax.request({
+	    	    	    url: Voyant.application.getTromboneUrl(),
+	    	    	    params: {
+	    	        		tool: 'resource.KeywordsManager',
+	    	    			stopList: id
+	    	    	    },
+	    	    	    success: function(response){
+	    	    	    		var json = Ext.util.JSON.decode(response.responseText);
+	    	    	    		var keywords = json.keywords.keywords;
+	    	    	    		dfd.resolve(keywords);
+	    	    	    },
+		    	    	scope: this
+	    	    	});
+    	    		return dfd.promise;
     		}
     	
     },

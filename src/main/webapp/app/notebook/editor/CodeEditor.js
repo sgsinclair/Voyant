@@ -11,7 +11,8 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		docs: undefined,
 		isChangeRegistered: false,
 		editor: undefined,
-		editedTimeout: undefined
+		editedTimeout: undefined,
+		lines: 0
 	},
 	statics: {
 		i18n: {
@@ -41,22 +42,27 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		    editor.on("focus", function() {
 		    	me.getEditor().renderer.setShowGutter(true);
 		    }, this);
-		    editor.on("change", function() {
-		    	if (me.getIsChangeRegistered()==false) {
-		    		me.setIsChangeRegistered(true);
-			    	var wrapper = me.up('notebookcodeeditorwrapper');
-			    	if (wrapper) {
-			    		wrapper.setIsRun(false);
-			    		var notebook = wrapper.up(notebook);
-			    		if (notebook) {notebook.setIsEdited(true);}
-			    	}
-		    	} else {
-		    		if (!me.getEditedTimeout()) { // no timeout, so set it to 30 seconds
-						me.setEditedTimeout(setTimeout(function() {
-							me.setIsChangeRegistered(false);
-						}, 30000));
+		    editor.on("change", function(ev, editor) {
+		    		var lines = editor.getSession().getScreenLength();
+		    		if (lines!=me.getLines()) {
+		    			me.up('notebookcodeeditorwrapper').setSize({height: lines*editor.renderer.lineHeight+editor.renderer.scrollBar.getWidth()})
+		    			me.setLines(lines);
 		    		}
-		    	}
+			    	if (me.getIsChangeRegistered()==false) {
+			    		me.setIsChangeRegistered(true);
+				    	var wrapper = me.up('notebookcodeeditorwrapper');
+				    	if (wrapper) {
+				    		wrapper.setIsRun(false);
+				    		var notebook = wrapper.up(notebook);
+				    		if (notebook) {notebook.setIsEdited(true);}
+				    	}
+			    	} else {
+			    		if (!me.getEditedTimeout()) { // no timeout, so set it to 30 seconds
+							me.setEditedTimeout(setTimeout(function() {
+								me.setIsChangeRegistered(false);
+							}, 30000));
+			    		}
+			    	}
 		    }, this);
 		    editor.on("blur", function() {
 		    	me.getEditor().renderer.setShowGutter(false);

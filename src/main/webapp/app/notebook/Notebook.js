@@ -147,6 +147,27 @@ Ext.define('Voyant.notebook.Notebook', {
     		
     		getTarget: function() {
     			return Voyant.notebook.util.Show.TARGET;
+    		},
+    		
+    		getStopwords: function(id) {
+    			var dfd = this.getDeferred();
+    			if (id && id in Voyant.widget.StopListOption.stoplists) {
+    				id = Voyant.widget.StopListOption.stoplists[id];
+    			}
+    	    		Ext.Ajax.request({
+	    	    	    url: Voyant.application.getTromboneUrl(),
+	    	    	    params: {
+	    	        		tool: 'resource.KeywordsManager',
+	    	    			stopList: id
+	    	    	    },
+	    	    	    success: function(response){
+	    	    	    		var json = Ext.util.JSON.decode(response.responseText);
+	    	    	    		var keywords = json.keywords.keywords;
+	    	    	    		dfd.resolve(keywords);
+	    	    	    },
+		    	    	scope: this
+	    	    	});
+    	    		return dfd.promise;
     		}
     	
     },

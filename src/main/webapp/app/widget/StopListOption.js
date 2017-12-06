@@ -4,18 +4,51 @@ Ext.define('Voyant.widget.StopListOption', {
     alias: 'widget.stoplistoption',
     layout: 'hbox',
     statics: {
-    	i18n: {
-    	}
+    		stoplists: {
+    		    ar: "stop.ar.arabic-lucene.txt",
+    			bg: "stop.bu.bulgarian-lucene.txt",
+    			br: "stop.br.breton-lucene.txt",
+    			ca: "stop.ca.catalan-lucene.txt",
+    			ckb: "stop.ckb-turkish-lucene.txt",
+    			cn: "stop.cn.chinese-lawrence.txt",
+    			cz: "stop.cz.czech-lucene.txt",
+    			de: "stop.de.german.txt",
+    			el: "stop.el.greek-lucene.txt",
+    			en: "stop.en.taporware.txt",
+    			es: "stop.es.spanish.txt",
+    			eu: "stop.eu.basque-lucene.txt",
+    			fa: "stop.fa.farsi-lucene.txt",
+    			fr: "stop.fr.veronis.txt",
+    			ga: "stop.ga-irish-lucene.txt",
+    			gl: "stop.ga.galician-lucene.txt",
+    			grc: "stop.grc.ancient-greek.txt",
+    			hi: "stop.hi.hindi-lucene.txt",
+    			hu: "stop.hu.hungarian.txt",
+    			hy: "stop.hy.armenian-lucene.txt",
+    			id: "stop.id.indonesian-lucene.txt",
+    			it: "stop.it.italian.txt",
+    			ja: "stop.ja.japanese-lucene.txt",
+    			la: "stop.la.latin.txt",
+    			lv: "stop.lv.latvian-lucene.txt",
+    			lt: "stop.lt.lithuanian-lucene.txt",
+    			mu: "stop.mu.multi.txt",
+    			nl: "stop.nl.dutch.txt",
+    			no: "stop.no.norwegian.txt",
+    			ro: "stop.ro.romanian-lucene.txt",
+    			se: "stop.se.swedish-long.txt",
+    			th: "stop.th.thai-lucene.txt",
+    			tr: "stop.tr.turkish-lucene.txt"
+    		},
+	    	i18n: {
+	    	}
     },
     initComponent: function(config) {
     	var me = this;
     	var value = this.up('window').panel.getApiParam('stopList');
-    	
     	var data = [];
-    	"ar:stop.ar.arabic-lucene.txt,bg:stop.bu.bulgarian-lucene.txt,br:stop.br.breton-lucene.txt,ca:stop.ca.catalan-lucene.txt,ckb:stop.ckb-turkish-lucene.txt,cn:stop.cn.chinese-lawrence.txt,cz:stop.cz.czech-lucene.txt,de:stop.de.german.txt,el:stop.el.greek-lucene.txt,en:stop.en.taporware.txt,es:stop.es.spanish.txt,eu:stop.eu.basque-lucene.txt,fa:stop.fa.farsi-lucene.txt,fr:stop.fr.veronis.txt,ga:stop.ga-irish-lucene.txt,gl:stop.ga.galician-lucene.txt,grc:stop.grc.ancient-greek.txt,hi:stop.hi.hindi-lucene.txt,hu:stop.hu.hungarian.txt,hy:stop.hy.armenian-lucene.txt,id:stop.id.indonesian-lucene.txt,it:stop.it.italian.txt,ja:stop.ja.japanese-lucene.txt,la:stop.la.latin.txt,lv:stop.lv.latvian-lucene.txt,lt:stop.lt.lithuanian-lucene.txt,mu:stop.mu.multi.txt,nl:stop.nl.dutch.txt,no:stop.no.norwegian.txt,ro:stop.ro.romanian-lucene.txt,se:stop.se.swedish-long.txt,th:stop.th.thai-lucene.txt,tr:stop.tr.turkish-lucene.txt".split(",").forEach(function(lang) {
-    		var parts = lang.split(":")
-    		data.push({name: this.localize(parts[0]), value: parts[1]})
-    	}, this);
+    	for (id in Voyant.widget.StopListOption.stoplists) {
+    		data.push({name: this.localize(id), value: Voyant.widget.StopListOption.stoplists[id]})
+    	}
     	data.sort(function(a,b) { // sort by label
     		return a.name < b.name ? -1 : 1;
     	})

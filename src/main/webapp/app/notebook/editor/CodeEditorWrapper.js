@@ -291,6 +291,9 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				}
 			}
 			this.results.unmask();
+			if (this.results.getTargetEl().getHtml().trim().length==0) {
+				this.results.hide();
+			}
 			this.getTargetEl().fireEvent('resize');
 		}
 		else {
