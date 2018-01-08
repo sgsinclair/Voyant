@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Dec 06 15:54:06 EST 2017 */
+/* This file created by JSCacher. Last modified: Mon Jan 08 13:26:57 EST 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -5395,7 +5395,7 @@ TermsRadio.prototype = {
 		}
 		
 		//make sure there is no path already present
-		this.chart.select('g[class=frequency-line-' + selector + ']').remove();
+		this.chart.select('g[class=frequency-line-' + selector.replace(/'/g, "\\'") + ']').remove();
 
 		this.overlayQueue.push(lineObject);
 		this.chartOverlayOn(lineObject);
@@ -5497,7 +5497,7 @@ TermsRadio.prototype = {
 	}
 	
 	,sliderOverlayOff: function (selector) {
-	    this.chart.selectAll('g[id=slider-line-' + selector + ']')
+	    this.chart.selectAll('g[id=slider-line-' + selector.replace(/'/g, "\\'") + ']')
 	    	.remove();
 	    
 	    //update slider overlay axis
@@ -5522,7 +5522,7 @@ TermsRadio.prototype = {
 		//transition all other paths
 		var lenA = this.overlayQueue.length;
 		while(lenA-- > 0){
-			this.chart.selectAll('g#slider-line-' + this.overlayQueue[lenA].selector)
+			this.chart.selectAll('g#slider-line-' + this.overlayQueue[lenA].selector.replace(/'/g, "\\'"))
 				.select('path')
 				.transition().duration(300)
 				.ease(d3.easeLinear)
@@ -5605,7 +5605,7 @@ TermsRadio.prototype = {
 		//change selected word colour
 		this.chart.selectAll('g[class=section]')
 			.selectAll('g[class=frequencies]')
-			.selectAll('text[class=' + objectToSelect.selector + ']')
+			.selectAll('text[class=' + objectToSelect.selector.replace(/'/g,"\\'") + ']')
 			.style('fill', objectToSelect.colour)
 			.style('fill-opacity', 1);
 	    	
@@ -5647,11 +5647,11 @@ TermsRadio.prototype = {
 	,chartOverlayOff: function(selector){
 		var me = this;
 		
-		this.chart.selectAll('text.' + selector)
+		this.chart.selectAll('text.' + selector.replace(/'/g, "\\'"))
 	    	.style('fill', 'black')
 	    	.style('fill-opacity', function(d) { return me.opacityScale(d.freq); });
 	    
-	    this.chart.select('g.frequency-line-' + selector)
+	    this.chart.select('g.frequency-line-' + selector.replace(/'/g, "\\'"))
 	    	.remove();
 	}
 	
