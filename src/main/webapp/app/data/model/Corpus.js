@@ -406,7 +406,6 @@ Ext.define('Voyant.data.model.Corpus', {
 	 * Corpus as an argument, as per the example above).
 	 */
 	constructor : function(source, config) {
-		
 		source = source || {};
 		config = config || {};
 				
@@ -468,6 +467,9 @@ Ext.define('Voyant.data.model.Corpus', {
 			}, function(response){
 				Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
 			}).then(function(corpus) {
+				if (corpus.getDocumentsCount()==0) {
+					Voyant.application.showError(me.localize("thisCorpus")+" "+me.localize("isEmpty")+".");
+				}
 				if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {
 					me.getDocuments().load({
 						params: {
