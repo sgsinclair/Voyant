@@ -485,11 +485,19 @@ Ext.define('Voyant.panel.CorpusCreator', {
 							]
 						},{
 	        				xtype: 'fieldset',
-	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-tokenization' target='voyantdocs'>"+me.localize('tokenizationOptions')+"</a>",
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-processing' target='voyantdocs'>"+me.localize('processingOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        items: [
 								{
+								    xtype:'combo',
+								    fieldLabel: me.localize("language"),
+								    name: 'language',
+								    queryMode:'local', //?
+								    store:[['',me._localizeClass(Voyant.widget.StopListOption, "auto")],['cn',me._localizeClass(Voyant.widget.StopListOption, "cn")],['bo',me._localizeClass(Voyant.widget.StopListOption, "bo")],['grc',me._localizeClass(Voyant.widget.StopListOption, "grc")]],
+								    forceSelection:true,
+								    value: ''
+								},{
 								    xtype:'combo',
 								    fieldLabel: me.localize('tokenization'),
 								    name: 'tokenization',

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Jan 08 13:26:57 EST 2018 */
+/* This file created by JSCacher. Last modified: Thu Jan 11 15:20:56 EST 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -10298,7 +10298,6 @@ Ext.define('Voyant.data.model.Corpus', {
 	 * Corpus as an argument, as per the example above).
 	 */
 	constructor : function(source, config) {
-		
 		source = source || {};
 		config = config || {};
 				
@@ -10360,6 +10359,9 @@ Ext.define('Voyant.data.model.Corpus', {
 			}, function(response){
 				Voyant.application.showResponseError(me.localize('failedCreateCorpus'), response);
 			}).then(function(corpus) {
+				if (corpus.getDocumentsCount()==0) {
+					Voyant.application.showError(me.localize("thisCorpus")+" "+me.localize("isEmpty")+".");
+				}
 				if (!('docsLimit' in config) || (config.docsLimit!==false && config.docsLimit>0)) {
 					me.getDocuments().load({
 						params: {
@@ -18251,11 +18253,19 @@ Ext.define('Voyant.panel.CorpusCreator', {
 							]
 						},{
 	        				xtype: 'fieldset',
-	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-tokenization' target='voyantdocs'>"+me.localize('tokenizationOptions')+"</a>",
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-processing' target='voyantdocs'>"+me.localize('processingOptions')+"</a>",
 	                        collapsible: true,
 	                        collapsed: true,
 	                        items: [
 								{
+								    xtype:'combo',
+								    fieldLabel: me.localize("language"),
+								    name: 'language',
+								    queryMode:'local', //?
+								    store:[['',me._localizeClass(Voyant.widget.StopListOption, "auto")],['cn',me._localizeClass(Voyant.widget.StopListOption, "cn")],['bo',me._localizeClass(Voyant.widget.StopListOption, "bo")],['grc',me._localizeClass(Voyant.widget.StopListOption, "grc")]],
+								    forceSelection:true,
+								    value: ''
+								},{
 								    xtype:'combo',
 								    fieldLabel: me.localize('tokenization'),
 								    name: 'tokenization',
