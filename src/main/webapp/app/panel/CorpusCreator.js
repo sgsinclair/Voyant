@@ -10,6 +10,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     	},
     	api: {
     		inputFormat: undefined,
+    		language: undefined,
     		xmlDocumentsXpath: undefined,
     		xmlContentXpath: undefined,
     		xmlTitleXpath: undefined,
