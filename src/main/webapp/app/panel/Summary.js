@@ -4,7 +4,7 @@
  */
 Ext.define('Voyant.panel.Summary', {
 	extend: 'Ext.panel.Panel',
-	mixins: ['Voyant.panel.Panel', 'Voyant.util.SparkLine'],
+	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.summary',
     statics: {
     	i18n: {
@@ -68,7 +68,7 @@ Ext.define('Voyant.panel.Summary', {
 	            	maxValue: 59,
 	            	listeners: {
 	            		afterrender: function(slider) {
-	            			slider.setValue(this.getApiParam("visible"))
+	            			slider.setValue(this.getApiParam("limit"))
 	            		},
 	            		changecomplete: function(slider, newvalue) {
 	            			this.setApiParams({limit: newvalue});
