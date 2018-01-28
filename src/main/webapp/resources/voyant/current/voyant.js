@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Jan 28 17:07:07 EST 2018 */
+/* This file created by JSCacher. Last modified: Sun Jan 28 17:12:45 EST 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -29584,7 +29584,9 @@ Ext.define('Voyant.panel.WordWall', {
             chargeStrength: 'Charge Strength',
             chargeDistance: 'Charge Distance',
             delay: 'Fetch Delay',
-            transition: 'Transition Speed'
+            transition: 'Transition Speed',
+            stop: 'Stop',
+            start: 'Start'
         },
         api: {
             limit: 500,
@@ -29604,6 +29606,7 @@ Ext.define('Voyant.panel.WordWall', {
         terms: undefined,
         segments: undefined,
 
+        filterOutUniqueTerms: true, // whether to remove terms that don't appear in all segments
 
         currentSegment: undefined,
         segmentTerms: undefined,
@@ -29615,7 +29618,7 @@ Ext.define('Voyant.panel.WordWall', {
         webWorker: undefined,
         isSimulating: false, // are we running a webworker simulation?
         
-        transitionTime: 1000, // time to transition between old and new nodes
+        transitionTime: 2000, // time to transition between old and new nodes
         isTransitioning: false, // are we transitioning between nodes?
         
 
@@ -29635,11 +29638,15 @@ Ext.define('Voyant.panel.WordWall', {
         maxFontSize: 60
     },
 
+    count: 0,
+
     MIN_TERMS: 10,
     MAX_TERMS: 2000,
     
     MIN_SCALING: 1,
     MAX_SCALING: 20,
+    
+    debugMsg: false,
 
     constructor: function(config) {
         this.mixins['Voyant.util.DiacriticsRemover'].constructor.apply(this, arguments);
@@ -29765,6 +29772,19 @@ Ext.define('Voyant.panel.WordWall', {
                         scope: this
                     }
                 },{
+                    xtype: 'button',
+                    text: this.localize('stop'),
+                    handler: function(b) {
+                        if (b.getText() === this.localize('stop')) {
+                            clearInterval(this.getSegmentDelayTimer());
+                            b.setText(this.localize('start'))
+                        } else {
+                            this.restartSegmentTimer();
+                            b.setText(this.localize('stop'));
+                        }
+                    },
+                    scope: this
+                },{
                     itemId: 'status',
                     xtype: 'tbtext',
                     text: ''
@@ -29810,13 +29830,17 @@ Ext.define('Voyant.panel.WordWall', {
 
         this.setTempNodes(g.append('g').attr('class', 'tempNodes').selectAll('text'));
 
-        this.setWebWorker(new Worker(this.getBaseUrl()+'resources/d3/WordWallWorker.js'));
-        this.getWebWorker().onmessage = this.handleWebWorkerMessage.bind(this);
+        if (this.getWebWorker() === undefined) {
+            this.setWebWorker(new Worker(this.getBaseUrl()+'resources/d3/WordWallWorker.js'));
+            this.getWebWorker().onmessage = this.handleWebWorkerMessage.bind(this);
+        }
     },
 
     initLoad: function() {
         this.initVis();
         
+        this.count = 0;
+
         var params = this.getApiParams();
         params.tool = 'corpus.CorpusSegmentTerms';
         
@@ -29826,7 +29850,13 @@ Ext.define('Voyant.panel.WordWall', {
             success: function(response) {
                 var data = Ext.decode(response.responseText);
                 this.setSegments(data.corpusSegmentTerms.segments);
-                this.setTerms(data.corpusSegmentTerms.terms);
+
+                var terms = data.corpusSegmentTerms.terms;
+                if (this.getFilterOutUniqueTerms()) {
+                    terms = terms.filter(function(el, index) { return el.rawFreqs.indexOf(0) == -1 });
+                }
+
+                this.setTerms(terms);
                 
                 this.setCurrentSegment(this.getSegments().length);
                 this.getNextSegment();
@@ -29834,7 +29864,7 @@ Ext.define('Voyant.panel.WordWall', {
                 this.restartSegmentTimer();
             },
             failure: function(response) {
-                if (window.console) console.log('failed', response);
+                if (this.debugMsg) console.log('failed', response);
             },
             scope: this
         })
@@ -29855,6 +29885,7 @@ Ext.define('Voyant.panel.WordWall', {
             index = 0;
         }
         this.setCurrentSegment(index);
+        if (this.debugMsg) console.log('getNextSegment', index);
         this.processTermsForSegment(this.getCurrentSegment());
     },
 
@@ -29972,7 +30003,7 @@ Ext.define('Voyant.panel.WordWall', {
         var height = el.getHeight();
 
         // pass all the info to the worker
-        if (window.console) console.time("runSim");
+        if (this.debugMsg) console.time("runSim");
         this.getWebWorker().postMessage({
             terms: terms,
             width: width,
@@ -29995,10 +30026,10 @@ Ext.define('Voyant.panel.WordWall', {
                 this.getDockedItems()[1].getComponent('status').update(percent+'%');
                 break;
             case "msg":
-                if (window.console) console.log(event.data.msg);
+                if (this.debugMsg) console.log(event.data.msg);
                 break;
             case "end":
-                if (window.console) console.timeEnd("runSim");
+                if (this.debugMsg) console.timeEnd("runSim");
                 // TODO adjust segment delay if it's less than the runSim time
                 this.getDockedItems()[1].getComponent('status').update('');
                 this.setIsSimulating(false);
@@ -30011,56 +30042,64 @@ Ext.define('Voyant.panel.WordWall', {
         if (this.getIsTransitioning()) {
             Ext.Function.defer(this.updateNodePositions, 100, this);
         } else {
-            this.setIsTransitioning(true);
-
+            this.count++;
             var nodes = this.getSegmentTermsQueue().shift();
-            if (this.getSegmentTermsQueue().length == 0) {
-                this.getNextSegment();
-            }
-            
-            var nodeUpdate = this.getNodes().data(nodes, function(d) { return d.id; });
-            
-            nodeUpdate.transition().duration(this.getTransitionTime()).attr('transform', function(d) {
-                var x = d.x;
-                var y = d.y;
-                return 'translate('+x+','+y+')';
-            });
+            if (this.debugMsg) console.log('queue length', this.getSegmentTermsQueue().length);
+            if (nodes === undefined) {
+                if (this.debugMsg) console.log('no nodes', this.count);
+                if (this.getIsSimulating() === false) {
+                    this.getNextSegment();
+                }
+            } else {
+                this.setIsTransitioning(true);
+                if (this.getSegmentTermsQueue().length == 0) {
+                    this.getNextSegment();
+                }
+                
+                var nodeUpdate = this.getNodes().data(nodes, function(d) { return d.id; });
 
-            var nodeEnter = nodeUpdate.enter().append('g')
-                .attr('class', 'node')
-                .attr('id', function(d) { return d.id; })
-                .attr('transform', function(d) {
+                nodeUpdate.transition().duration(this.getTransitionTime()).attr('transform', function(d) {
                     var x = d.x;
                     var y = d.y;
                     return 'translate('+x+','+y+')';
-                })
-                .attr('fill-opacity', 0);
+                });
 
-            nodeEnter.append('title').text(function(d) { return d.title; });
+                var nodeEnter = nodeUpdate.enter().append('g')
+                    .attr('class', 'node')
+                    .attr('id', function(d) { return d.id; })
+                    .attr('transform', function(d) {
+                        var x = d.x;
+                        var y = d.y;
+                        return 'translate('+x+','+y+')';
+                    })
+                    .attr('fill-opacity', 0);
 
-            nodeEnter.append('text')
-                .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
-                .attr('font-size', function(d) { return d.fontSize; })
-                .attr('fill', function(d) { return this.getApplication().getFeatureForTerm('color', d.term); }.bind(this))
-                .style('cursor', 'pointer')
-                .style('user-select', 'none')
-                .attr('alignment-baseline', 'middle')
-                .text(function(d) { return d.term; });
+                nodeEnter.append('title').text(function(d) { return d.title; });
 
-            nodeEnter.transition().duration(this.getTransitionTime()).attr('fill-opacity', 1);
+                nodeEnter.append('text')
+                    .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
+                    .attr('font-size', function(d) { return d.fontSize; })
+                    .attr('fill', function(d) { return this.getApplication().getFeatureForTerm('color', d.term); }.bind(this))
+                    .style('cursor', 'pointer')
+                    .style('user-select', 'none')
+                    .attr('alignment-baseline', 'middle')
+                    .text(function(d) { return d.term; });
 
-            var allNodes = nodeEnter.merge(nodeUpdate);
+                nodeEnter.transition().duration(this.getTransitionTime()).attr('fill-opacity', 1);
 
-            allNodes.select('text').transition().duration(this.getTransitionTime())
-                .attr('font-size', function(d) { return d.fontSize; });
+                var allNodes = nodeEnter.merge(nodeUpdate);
 
-            nodeUpdate.exit().transition().duration(this.getTransitionTime()).attr('fill-opacity', 0).remove();
+                allNodes.select('text').transition().duration(this.getTransitionTime())
+                    .attr('font-size', function(d) { return d.fontSize; });
 
-            setTimeout(function() {
-                this.setIsTransitioning(false);
-            }.bind(this), this.getTransitionTime());
+                nodeUpdate.exit().transition().duration(this.getTransitionTime()).attr('fill-opacity', 0).remove();
 
-            this.setNodes(allNodes);
+                setTimeout(function() {
+                    this.setIsTransitioning(false);
+                }.bind(this), this.getTransitionTime());
+
+                this.setNodes(allNodes);
+            }
         }
     },
 
