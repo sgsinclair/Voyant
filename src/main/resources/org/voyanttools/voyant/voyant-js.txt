@@ -115,6 +115,7 @@ app/panel/CorpusCollocates.js
 app/panel/CorpusTermSummary.js
 app/panel/Correlations.js
 app/panel/CorpusCreator.js
+app/panel/DreamScape.js
 app/panel/Knots.js
 app/panel/Phrases.js
 app/panel/CorpusTerms.js
