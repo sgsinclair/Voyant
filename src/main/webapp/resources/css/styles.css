@@ -613,3 +613,7 @@ table.voyant-table td:last-child {
 .dreamscape .ol-popup-closer:after {
     content: "X";
 }
+.dreamscape .popup-content {
+    max-height:380px;
+    overflow-y: auto;
+}
