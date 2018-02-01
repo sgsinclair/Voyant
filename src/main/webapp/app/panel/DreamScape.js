@@ -81,8 +81,8 @@ Ext.define('Voyant.panel.DreamScape', {
             "rgb(0, 0, 128)",
             "rgb(60, 180, 75)",
             "rgb(143,124,0)",
-            "rgb(157,204,0)",
-        ],
+            "rgb(157,204,0)"
+        ]
 	},
 	
 	html: '<div class="map"></div><div class="ol-popup"><a href="#" class="ol-popup-closer"></a><div class="popup-content"></div></div>',
@@ -98,8 +98,8 @@ Ext.define('Voyant.panel.DreamScape', {
     				// Utility function to get layer by id
     				if (ol.Map.prototype.getLayer === undefined) {
     				    ol.Map.prototype.getLayer = function (id) {
-    				        let layer = undefined;
-    				        this.getLayers().forEach((lyr) => {
+    				        var layer = undefined;
+    				        this.getLayers().forEach(function(lyr) {
     				            if (id === lyr.get('id')) {
     				                layer = lyr;
     				            }
@@ -313,35 +313,35 @@ Ext.define('Voyant.panel.DreamScape', {
     			
     			// Add a click handler to the map to render the popup
         		var panel = this;
-    			map.on('singleclick', (event) => {
-                    const pixel = event.pixel;
-                    const features = map.getFeaturesAtPixel(pixel);
+    			map.on('singleclick', function(event) {
+                    var pixel = event.pixel;
+                    var features = map.getFeaturesAtPixel(pixel);
                     if(features) {
-                        let infos = "<ul>";
-                        features.forEach( (feature) => {
+                        var infos = "<ul>";
+                        features.forEach( function(feature) {
                             if( feature.getGeometry().getType() === "Circle" && feature.get("selected")) {
-                                const featureOccurences = feature.get("occurences");
-                                featureOccurences.forEach(entry => {
-                                    infos += `<li>${entry.description} : ${entry.infos.author}, <a href=${entry.infos.url} target='_blank'>${entry.infos.title}</a>, ${entry.infos.year} ${entry.order}</li>`;
+                                var featureOccurences = feature.get("occurences");
+                                featureOccurences.forEach(function(entry) {
+                                    infos += '<li>'+entry.description+' : '+entry.infos.author+', <a href="'+entry.infos.url+'" target="_blank">'+entry.infos.title+'</a>, '+entry.infos.year+' '+entry.order+'</li>';
                                 });
-                                let header = feature.get("text");
+                                var header = feature.get("text");
                                 infos += "</ul>";
                                 if(feature.get("alternates").length > 0) {
-                                    header += ` (${feature.get("alternates")})`;
+                                    header += ' ('+feature.get("alternates")+')';
                                 }
-                                const coordinate = event.coordinate;
-                                panel.getContentEl().setHtml(`<h3>${header}</h3>${infos}`);
+                                var coordinate = event.coordinate;
+                                panel.getContentEl().setHtml('<h3>'+header+'</h3>'+infos);
                                 panel.getOverlay().setPosition(coordinate);
                             } else if(feature.get("selected")) {
-                                const featureOccurences = feature.get("occurences");
-                                featureOccurences.forEach(entry => {
-                                    infos += `<li>from : ${entry.from.description} : ${entry.from.infos.author}, <a href=${entry.from.infos.url} target='_blank'>${entry.from.infos.title}</a>, ${entry.from.infos.year} ${entry.from.order} ,
-                                                    to: ${entry.to.description} : ${entry.to.infos.author}, <a href=${entry.to.infos.url} target='_blank'>${entry.to.infos.title}</a>, ${entry.to.infos.year} ${entry.to.order}</li>`;
+                                var featureOccurences = feature.get("occurences");
+                                featureOccurences.forEach(function(entry) {
+                                    infos += '<li>from : '+entry.from.description+' : '+entry.from.infos.author+', <a href="'+entry.from.infos.url+'" target="_blank">'+entry.from.infos.title+'</a>, '+entry.from.infos.year+' '+entry.from.order+', '+
+                                              'to: '+entry.to.description+' : '+entry.to.infos.author+' , <a href="'+entry.to.infos.url+'" target="_blank">'+entry.to.infos.title+'</a>, '+entry.to.infos.year+' '+entry.to.order+'</li>';
                                 });
-                                let header = feature.get("text");
+                                var header = feature.get("text");
                                 infos += "</ul>";
-                                const coordinate = event.coordinate;
-                                panel.getContentEl().setHtml(`<h3>${header}</h3>${infos}`);
+                                var coordinate = event.coordinate;
+                                panel.getContentEl().setHtml('<h3>'+header+'</h3>'+infos);
                                 panel.getOverlay().setPosition(coordinate);
                             }
                         });
@@ -349,7 +349,7 @@ Ext.define('Voyant.panel.DreamScape', {
     			});
     			
     			// Layer for selected vector
-    			const selectedLayer = new ol.layer.Vector({
+    			var selectedLayer = new ol.layer.Vector({
     			    map: map,
     			    source: new ol.source.Vector({
     			        wrapX: false,
@@ -357,7 +357,7 @@ Ext.define('Voyant.panel.DreamScape', {
     			    }),
     			    zIndex: 10,
     			    selected: true,
-    			    style: (feature) => {
+    			    style: function(feature) {
     			    if(feature.getGeometry().getType() === "Circle")
     			        {
     			            return panel.cityStyleFunction(feature, map.getView().getResolution());
@@ -370,21 +370,21 @@ Ext.define('Voyant.panel.DreamScape', {
     			});
     			
     			// Add handler to update selected vector when mouse is moved
-    			map.on('pointermove', (event) => {
+    			map.on('pointermove', function(event) {
     			    selectedLayer.getSource().clear();
-                    const coordinate = event.coordinate;
-                    const pixel = event.pixel;
-                    const features = map.getFeaturesAtPixel(pixel);
+                    var coordinate = event.coordinate;
+                    var pixel = event.pixel;
+                    var features = map.getFeaturesAtPixel(pixel);
                     if(features) {
-                        let i = 0;
+                        var i = 0;
                         while(features[i].get("selected")){
                             i++;
                             if (i === features.length) break;
                         }
                         if (i < features.length) {
-                            const feature = features[i];
+                            var feature = features[i];
 
-                            const baseTextStyle = {
+                            var baseTextStyle = {
                                 font: '12px Calibri,sans-serif',
                                 textAlign: 'center',
                                 offsetY: -15,
@@ -399,12 +399,12 @@ Ext.define('Voyant.panel.DreamScape', {
 
                             baseTextStyle.text = feature.get("text");
 
-                            const textOverlayStyle = new ol.style.Style({
+                            var textOverlayStyle = new ol.style.Style({
                                 text: new ol.style.Text(baseTextStyle),
                                 zIndex: 1
                             });
 
-                            const selectedFeature = new ol.Feature({
+                            var selectedFeature = new ol.Feature({
                                 text: feature.get("text"),
                                 geometry: feature.getGeometry(),
                                 occurences: feature.get("occurences"),
@@ -416,11 +416,11 @@ Ext.define('Voyant.panel.DreamScape', {
                                 visible: feature.get("visible")
                             });
                             selectedLayer.getSource().addFeature(selectedFeature);
-                            const geometry = feature.getGeometry();
-                            const point = geometry.getClosestPoint(coordinate);
-                            const textFeature = new ol.Feature({
+                            var geometry = feature.getGeometry();
+                            var point = geometry.getClosestPoint(coordinate);
+                            var textFeature = new ol.Feature({
                                 geometry: new ol.geom.Point(point),
-                                selected: true,
+                                selected: true
                             });
                             textFeature.setStyle(textOverlayStyle);
                             selectedLayer.getSource().addFeature(textFeature);
@@ -440,36 +440,36 @@ Ext.define('Voyant.panel.DreamScape', {
     // Style for vector after animation
     travelStyleFunction: function(feature, resolution) {
         // default color is red, selected feature is blue and first 8 layers have pre-defined colors
-        let color = "rgb(255, 0, 0)";
+        var color = "rgb(255, 0, 0)";
         if (feature.get("selected")) {
             color = "rgb(0, 0, 255)";
         } else if (feature.get("color")) {
             color = feature.get("color");
         }
 
-        const width = 0.5 + Math.sqrt(feature.get("occurences").length/parseFloat(this.getTotalEntries()) * this.getSizeRatio() * 0.2);
+        var width = 0.5 + Math.sqrt(feature.get("occurences").length/parseFloat(this.getTotalEntries()) * this.getSizeRatio() * 0.2);
 
-        const stroke = new ol.style.Stroke({
+        var stroke = new ol.style.Stroke({
             color: color,
             width: width
         });
 
-        const styles = [
+        var styles = [
             new ol.style.Style({
                 stroke: stroke
             })];
 
         // Add arrow at the end of vectors
-        const geometry = feature.getGeometry();
-        const end = geometry.getLastCoordinate();
-        const beforeEnd = geometry.getCoordinateAt(0.9);
-        const dx = end[0] - beforeEnd[0];
-        const dy = end[1] - beforeEnd[1];
-        const rotation = Math.atan2(dy, dx);
+        var geometry = feature.getGeometry();
+        var end = geometry.getLastCoordinate();
+        var beforeEnd = geometry.getCoordinateAt(0.9);
+        var dx = end[0] - beforeEnd[0];
+        var dy = end[1] - beforeEnd[1];
+        var rotation = Math.atan2(dy, dx);
 
-        const lineStr1 = new ol.geom.LineString([end, [end[0] - 10 * resolution, end[1] + 10 * resolution]]);
+        var lineStr1 = new ol.geom.LineString([end, [end[0] - 10 * resolution, end[1] + 10 * resolution]]);
         lineStr1.rotate(rotation, end);
-        const lineStr2 = new ol.geom.LineString([end, [end[0] - 10 * resolution, end[1] - 10 * resolution]]);
+        var lineStr2 = new ol.geom.LineString([end, [end[0] - 10 * resolution, end[1] - 10 * resolution]]);
         lineStr2.rotate(rotation, end);
 
         styles.push(new ol.style.Style({
@@ -487,7 +487,7 @@ Ext.define('Voyant.panel.DreamScape', {
     // Style for cities
     cityStyleFunction: function(feature, resolution) {
         // default color is red, selected feature is blue and first 8 layers have pre-defined colors
-        let color = "rgb(255, 0, 0)";
+        var color = "rgb(255, 0, 0)";
         if (feature.get("selected")) {
             color = "rgb(0, 0, 255)";
         } else if (feature.get("color")) {
@@ -497,7 +497,7 @@ Ext.define('Voyant.panel.DreamScape', {
             return (new ol.style.Style({
                 stroke: new ol.style.Stroke({
                     color: color,
-                    width: feature.get("width"),
+                    width: feature.get("width")
                 })
             }));
         } else {
@@ -507,7 +507,7 @@ Ext.define('Voyant.panel.DreamScape', {
     
     // Style for vector during animation
     animationStyleFunction: function (feature) {
-        let color = "rgb(255, 0, 0)";
+        var color = "rgb(255, 0, 0)";
         if (feature.get("color")) {
             color = feature.get("color");
         }
@@ -522,10 +522,10 @@ Ext.define('Voyant.panel.DreamScape', {
     // Add feature to animation layer with a delay
     addLater: function(feature, timeout, filterId) {
     		var map = this.getMap();
-        const timedEvent = window.setTimeout(() => {
+        var timedEvent = window.setTimeout(function() {
             feature.set('start', new Date().getTime());
-            const layer = map.getLayer("animation" + filterId);
-            const source = layer.getSource();
+            var layer = map.getLayer("animation" + filterId);
+            var source = layer.getSource();
             source.addFeature(feature);
         }, timeout);
         this.getTimedEvents()[filterId].push(timedEvent);
@@ -534,44 +534,44 @@ Ext.define('Voyant.panel.DreamScape', {
     // Animate travels for a layer
     animateTravels: function(event, filterId) {
         var map = this.getMap(), panel = this;
-        const vectorContext = event.vectorContext;
-        const frameState = event.frameState;
-        const layer = map.getLayer("animation" + filterId);
-        const features = layer.getSource().getFeatures();
-        features.forEach( (feature) => {
+        var vectorContext = event.vectorContext;
+        var frameState = event.frameState;
+        var layer = map.getLayer("animation" + filterId);
+        var features = layer.getSource().getFeatures();
+        features.forEach( function(feature) {
             if (!feature.get('finished')) {
                 if(feature.getGeometry().getType() === "Circle"){
                     feature.set('finished', true);
                 } else {
                     // only draw the lines for which the animation has not finished yet
-                    const coords = feature.getGeometry().getCoordinates();
-                    const elapsedTime = frameState.time - feature.get('start');
-                    const elapsedPoints = elapsedTime * panel.getPointsPerMs();
+                    var coords = feature.getGeometry().getCoordinates();
+                    var elapsedTime = frameState.time - feature.get('start');
+                    var elapsedPoints = elapsedTime * panel.getPointsPerMs();
 
                     if (elapsedPoints >= coords.length) {
                         feature.set('finished', true);
                     }
 
-                    const maxIndex = Math.min(elapsedPoints, coords.length);
-                    const currentLine = new ol.geom.LineString(coords.slice(0, maxIndex));
+                    var maxIndex = Math.min(elapsedPoints, coords.length);
+                    var currentLine = new ol.geom.LineString(coords.slice(0, maxIndex));
                     vectorContext.setStyle(this.animationStyleFunction(feature));
                     // directly draw the line with the vector context
                     vectorContext.drawGeometry(currentLine);
                 }
             }
-        } );
+        }, this);
         // tell OpenLayers to continue the animation
         map.render();
     },
     // Filtering that should be done server side
     serverSideFiltering: function(author, title, yearBegin, yearEnd, maxResults) {
-            const dataFile = this.getBaseUrl()+'resources/dreamscape/cities4.json';
-            return fetch(dataFile).then((response) => response.json()).then((json) => {
-            const citiesData = json.cities;
-            const cities = [];
-            const entries = [];
-            let i = 0;
-            citiesData.forEach((city) => {
+            var dataFile = this.getBaseUrl()+'resources/dreamscape/cities4.json';
+            return fetch(dataFile).then(function(response) {return response.json()}).then(function(json) {
+            var citiesData = json.cities;
+            var cities = [];
+            var entries = [];
+            var i = 0;
+            citiesData.forEach(function(city) {
                 if (city.infos.author.toLowerCase().includes(author) &&
                     city.infos.title.toLowerCase().includes(title) &&
                     (yearBegin === "" || city.infos.year >= yearBegin) &&
@@ -584,7 +584,7 @@ Ext.define('Voyant.panel.DreamScape', {
                             coordinates: city.coordinates
                         };
                     } else {
-                        const cityObject = cities[city.coordinates];
+                        var cityObject = cities[city.coordinates];
                         cityObject.occurences.push({infos: city.infos, description:city.description, order: i});
                         if (city.description !== cityObject.description && cityObject.alternates.indexOf(city.description) < 0) {
                             cityObject.alternates.push(city.description);
@@ -595,28 +595,28 @@ Ext.define('Voyant.panel.DreamScape', {
             });
 
             // Transform key-value array to regular array so it can be sorted
-            const citiesWithoutKey = [];
+            var citiesWithoutKey = [];
             for(coords in cities) {
                 citiesWithoutKey.push(cities[coords]);
             }
-            citiesWithoutKey.sort((a, b) => {
+            citiesWithoutKey.sort(function(a, b) {
                 return (b.occurences.length - a.occurences.length)
             });
 
             // Keep only the most common location up to maxResults number
-            const cityResults = citiesWithoutKey.splice(0, maxResults);
+            var cityResults = citiesWithoutKey.splice(0, maxResults);
 
             // Place all occurences of most common locations in an array and sort them by their order of appearance
-            cityResults.forEach((city) => {
-                city.occurences.forEach((entry) => {
+            cityResults.forEach(function(city) {
+                city.occurences.forEach(function(entry) {
                     entry.coordinates = city.coordinates;
                     entries.push(entry);
                 });
             });
-            entries.sort((a, b) => {
+            entries.sort(function(a, b) {
                 return a.order - b.order
             });
-            const results = {cities: cityResults, entries: entries};
+            var results = {cities: cityResults, entries: entries};
 
             // return both lists as a JSON string
             return resultsJson = JSON.stringify(results);
@@ -627,47 +627,47 @@ Ext.define('Voyant.panel.DreamScape', {
         var timedEvents = this.getTimedEvents(), cities = this.getCities(),
     			map = this.getMap(), colors = this.getColors();
     		
-        timedEvents[filterId].forEach(event => window.clearTimeout(event));
+        timedEvents[filterId].forEach(function(event) { window.clearTimeout(event)});
         cities[filterId] = [];
-        const citiesLayer = map.getLayer("cities" + filterId);
+        var citiesLayer = map.getLayer("cities" + filterId);
         citiesLayer.getSource().clear();
-        const vectorLayer = map.getLayer("layer" + filterId);
+        var vectorLayer = map.getLayer("layer" + filterId);
         vectorLayer.setVisible(true);
 //        document.getElementById("showHideButton" + filterId).innerText = "Hide travels";
 //        document.getElementById("showHideCitiesButton" + filterId).innerText = "Hide cities";
         vectorLayer.getSource().clear();
         var panel = this;
-//      const author = document.getElementById("author" + filterId).value.toLowerCase();
-        const author = "";
-//      const title = document.getElementById("title" + filterId).value.toLowerCase();
-        const title = "";
-//      const yearBegin = document.getElementById("yearBegin" + filterId).value;
-        const yearBegin = "";
-//      const yearEnd = document.getElementById("yearEnd" + filterId).value;
-        const yearEnd = "";
-        map.getView().on("change:resolution", () => {
-            citiesLayer.getSource().getFeatures().forEach(feature => {
-                const zoom = map.getView().getZoom();
-                const width = 5 + Math.sqrt(feature.get("occurences").length/parseFloat(this.getTotalEntries()) * this.getSizeRatio());
+//      var author = document.getElementById("author" + filterId).value.toLowerCase();
+        var author = "";
+//      var title = document.getElementById("title" + filterId).value.toLowerCase();
+        var title = "";
+//      var yearBegin = document.getElementById("yearBegin" + filterId).value;
+        var yearBegin = "";
+//      var yearEnd = document.getElementById("yearEnd" + filterId).value;
+        var yearEnd = "";
+        map.getView().on("change:resolution",function () {
+            citiesLayer.getSource().getFeatures().forEach(function(feature) {
+                var zoom = map.getView().getZoom();
+                var width = 5 + Math.sqrt(feature.get("occurences").length/parseFloat(panel.getTotalEntries()) * panel.getSizeRatio());
                 feature.set("width", width);
-                feature.set("visible", width * zoom > this.getZoomTreshold());
+                feature.set("visible", width * zoom > panel.getZoomTreshold());
             });
-            this.generateTravels(filterId);
+            panel.generateTravels(filterId);
         });
-        this.serverSideFiltering(author, title, yearBegin, yearEnd, this.getMaxResults()).then(results => JSON.parse(results)).then(results => {
-            nbOfEntries = this.getNbOfEntries();
+        this.serverSideFiltering(author, title, yearBegin, yearEnd, this.getMaxResults()).then(function(results) {return JSON.parse(results)}).then(function(results) {
+            nbOfEntries = panel.getNbOfEntries();
             nbOfEntries[filterId] = results.entries.length;
-            let totalEntries = 0;
-            nbOfEntries.forEach(entries => {totalEntries += entries});
+            var totalEntries = 0;
+            nbOfEntries.forEach(function(entries) {totalEntries += entries});
             panel.setTotalEntries(totalEntries);
             coordinatesSequence = panel.getCoordinatesSequence();
             coordinatesSequence[filterId] = results.entries;
-            results.cities.forEach((city) => {
-                const coordinates = [parseFloat(city.coordinates[1]), parseFloat(city.coordinates[0])];
-                const circle = new ol.geom.Circle(coordinates);
+            results.cities.forEach(function(city) {
+                var coordinates = [parseFloat(city.coordinates[1]), parseFloat(city.coordinates[0])];
+                var circle = new ol.geom.Circle(coordinates);
                 circle.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-                const color = colors[filterId];
-                const feature = new ol.Feature({
+                var color = colors[filterId];
+                var feature = new ol.Feature({
                     geometry: circle,
                     description: city.description,
                     alternates: city.alternates,
@@ -681,15 +681,15 @@ Ext.define('Voyant.panel.DreamScape', {
                 citiesLayer.getSource().addFeature(feature);
                 cities[filterId][coordinates] = feature;
             });
-        }).then(() => {
+        }).then(function() {
             // Trigger calculation if feature sizes
-            const resolution = map.getView().getResolution() + 1;
+            var resolution = map.getView().getResolution() + 1;
             map.getView().setResolution(resolution);
-            this.animateLayer(filterId);
+            panel.animateLayer(filterId);
         });
     //document.getElementById("showHideButton" + filterId).disabled = false;
     //document.getElementById("showHideCitiesButton" + filterId).disabled = false;
-    //const button = document.getElementById("animateButton"+filterId);
+    //var button = document.getElementById("animateButton"+filterId);
     //button.disabled = false;
     //button.innerText = "Animate";
     //button.onclick = () => animateLayer(filterId);
@@ -702,7 +702,7 @@ Ext.define('Voyant.panel.DreamScape', {
     		
         timedEvents[filterCount] = [];
 
-        const filterLayer = new ol.layer.Vector({
+        var filterLayer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 wrapX: false,
                 useSpatialIndex: false // optional, might improve performance
@@ -716,7 +716,7 @@ Ext.define('Voyant.panel.DreamScape', {
         });
         map.addLayer(filterLayer);
 
-        const citiesLayer = new ol.layer.Vector({
+        var citiesLayer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 wrapX: false,
                 useSpatialIndex: false // optional, might improve performance
@@ -727,7 +727,7 @@ Ext.define('Voyant.panel.DreamScape', {
         });
         map.addLayer(citiesLayer);
 
-        const animationLayer = new ol.layer.Vector({
+        var animationLayer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 wrapX: false,
                 useSpatialIndex: false // optional, might improve performance
@@ -738,7 +738,7 @@ Ext.define('Voyant.panel.DreamScape', {
         map.addLayer(animationLayer);
 
         /*
-        const para = document.createElement("div");
+        var para = document.createElement("div");
         para.id = "filter" + filterCount;
         para.style.color = colors[filterCount];
         para.innerHTML = `<label for="author${filterCount}">Author :</label>
@@ -754,24 +754,24 @@ Ext.define('Voyant.panel.DreamScape', {
                 <button onclick="toggleTravelsVisibility(${filterCount})" disabled id="showHideButton${filterCount}">Show travels</button>
                 <button onclick="toggleCitiesVisibility(${filterCount})" disabled id="showHideCitiesButton${filterCount}">Show cities</button>
                 <button onclick="animateLayer(${filterCount})" disabled id="animateButton${filterCount}">Animate</button>`;
-        const element = document.getElementById("filters");
+        var element = document.getElementById("filters");
         element.appendChild(para);
         */
         this.setFilterCount(filterCount+1);
         this.filter(filterCount);
     },
     generateTravels: function (filterId) {
-        const cities = this.getCities();
+        var cities = this.getCities();
         if(Object.keys(cities[filterId]).length > 0){
-            const vectorLayer = map.getLayer("layer" + filterId);
+            var vectorLayer = map.getLayer("layer" + filterId);
             vectorLayer.getSource().clear();
-            const travels = this.getTravels();
+            var travels = this.getTravels();
             travels[filterId] = [];
-            let previousCoordinates = undefined;
-            let foundStart = false;
-            let previousEntry = undefined;
-            for (let i = 0; i < coordinatesSequence[filterId].length; i++) {
-                const entry = coordinatesSequence[filterId][i];
+            var previousCoordinates = undefined;
+            var foundStart = false;
+            var previousEntry = undefined;
+            for (var i = 0; i < coordinatesSequence[filterId].length; i++) {
+                var entry = coordinatesSequence[filterId][i];
                 if (!foundStart) {
                     previousCoordinates = [entry.coordinates[1], entry.coordinates[0]];
                     if (cities[filterId][previousCoordinates].get("visible")) {
@@ -779,26 +779,26 @@ Ext.define('Voyant.panel.DreamScape', {
                         foundStart = true;
                     }
                 } else {
-                    const coordinates = [entry.coordinates[1], entry.coordinates[0]];
-                    const key = [previousCoordinates, coordinates];
+                    var coordinates = [entry.coordinates[1], entry.coordinates[0]];
+                    var key = [previousCoordinates, coordinates];
                     if ((previousCoordinates[0] !== coordinates[0] || previousCoordinates[1] !== coordinates[1]) &&
                         cities[filterId][coordinates].get("visible")) {
                         if (!travels[filterId][key]) {
-                            const previousCity = cities[filterId][previousCoordinates].get("description");
-                            const nextCity = cities[filterId][coordinates].get("description");
-                            const description = `${previousCity}-${nextCity}`;
+                            var previousCity = cities[filterId][previousCoordinates].get("description");
+                            var nextCity = cities[filterId][coordinates].get("description");
+                            var description = previousCity+'-'+nextCity;
                             // create an arc circle between the two locations
-                            const arcGenerator = new arc.GreatCircle(
+                            var arcGenerator = new arc.GreatCircle(
                                 {x: previousCoordinates[0], y: previousCoordinates[1]},
                                 {x: coordinates[0], y: coordinates[1]});
 
-                            const arcLine = arcGenerator.Arc(this.getPointsPerArc(), {offset: 100});
-                            arcLine.geometries.forEach(geometry => {
-                                const line = new ol.geom.LineString(geometry.coords);
+                            var arcLine = arcGenerator.Arc(this.getPointsPerArc(), {offset: 100});
+                            arcLine.geometries.forEach(function(geometry) {
+                                var line = new ol.geom.LineString(geometry.coords);
                                 line.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-                                const colors = this.getColors();
-                                const color = colors[filterId];
-                                const feature = new ol.Feature({
+                                var colors = this.getColors();
+                                var color = colors[filterId];
+                                var feature = new ol.Feature({
                                     geometry: line,
                                     description: description,
                                     text: description + "(1)",
@@ -811,13 +811,13 @@ Ext.define('Voyant.panel.DreamScape', {
                                 });
                                 vectorLayer.getSource().addFeature(feature);
                                 travels[filterId][key] = feature;
-                            });
+                            }, this);
                             previousCoordinates = coordinates;
                             previousEntry = entry;
                         } else {
-                            const occurences = travels[filterId][key].get("occurences");
+                            var occurences = travels[filterId][key].get("occurences");
                             occurences.push({from: previousEntry, to: entry});
-                            const text = travels[filterId][key].get("description") + "(" + occurences.length + ")";
+                            var text = travels[filterId][key].get("description") + "(" + occurences.length + ")";
                             travels[filterId][key].set("text", text);
                         }
 
@@ -829,18 +829,18 @@ Ext.define('Voyant.panel.DreamScape', {
     // Called when the animate button is pressed
     animateLayer: function(filterId) {
     		var timedEvents = this.getTimedEvents(), map = this.getMap();
-        timedEvents[filterId].forEach(event => window.clearTimeout(event));
-        const filterLayer = map.getLayer("layer" + filterId);
-        let i = 0;
-        let crossedDateLine = false;
-        let secondPartDelay = 0;
-        filterLayer.getSource().getFeatures().forEach( (feature) => {
-            const animationFeature = new ol.Feature({
+        timedEvents[filterId].forEach(function(event) {window.clearTimeout(event)});
+        var filterLayer = map.getLayer("layer" + filterId);
+        var i = 0;
+        var crossedDateLine = false;
+        var secondPartDelay = 0;
+        filterLayer.getSource().getFeatures().forEach( function(feature) {
+            var animationFeature = new ol.Feature({
                 geometry: feature.getGeometry(),
                 color: feature.get("color"),
-                finished: false,
+                finished: false
             });
-            const delayBetweenVectors = this.getDelayBetweenVectors();
+            var delayBetweenVectors = this.getDelayBetweenVectors();
             // This fixes animation for travels crossing the date line
             if(animationFeature.getGeometry().getCoordinates().length < this.getPointsPerArc()) {
                 if (crossedDateLine) {
@@ -860,11 +860,11 @@ Ext.define('Voyant.panel.DreamScape', {
         map.on('postcompose', function(event) {
         		this.animateTravels(event, filterId);
         }, this);
-//        const button = document.getElementById("animateButton"+filterId);
+//        var button = document.getElementById("animateButton"+filterId);
 //        button.innerText = "Stop";
 //        button.onclick = () => stopAnimation(filterId);
 //        // event to swich back button to animate once animation is done
-//        const restoreAnimate = window.setTimeout(() => {
+//        var restoreAnimate = window.setTimeout(() => {
 //            button.innerText = "Animate";
 //            button.onclick = () => animateLayer(filterId);
 //        }, delayBetweenVectors * (filterLayer.getSource().getFeatures().length - 1) );
