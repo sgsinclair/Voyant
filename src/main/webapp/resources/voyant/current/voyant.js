@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jan 31 19:48:02 EST 2018 */
+/* This file created by JSCacher. Last modified: Thu Feb 01 17:05:38 EST 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -20790,9 +20790,14 @@ Ext.define('Voyant.panel.Documents', {
         
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
+    		
     		this.store.setCorpus(corpus);
     		if (this.isVisible()) {
         		this.store.load({params: this.getApiParams()});
+    		} else {
+    			this.on('afterrender', function() {
+            		this.store.load({params: this.getApiParams()});
+    			}, this);
     		}
     		if (this.hasCorpusAccess(corpus)==false) {
     			this.queryById('modifyButton').hide();
