@@ -1,42 +1,42 @@
 Ext.define('Voyant.panel.DreamScape', {
     extend: 'Ext.Panel',
     xtype: 'dreamscape',
-	mixins: ['Voyant.panel.Panel'],
+    mixins: ['Voyant.panel.Panel'],
     statics: {
-	    	i18n: {
-	    		title: 'DreamScape',
-	    		show: "Show",
-	    		showTip: "Determine what information to display.",
-	    		filter: "Filter",
-	    		filterTip: "Determine any filters to use.",
-	    		authorLabel: 'authors',
-	    		noauthor: "No authors defined in this corpus.",
-	    		titleLabel: 'titles',
-	    		keywordLabel: 'keywords',
-	    		pubDateLabel: 'years',
-	    		nopubDate: "No publication years defined in this corpus.",
-	    		animationSpeed: "Speed",
-	    		cities: "cities",
-	    		connections: "connections"
-	    	},
-	    	api: {
-	    		stopList: 'auto',
-	    		author: undefined,
-	    		title: undefined,
-	    		keyword: undefined,
-	    		pubDate: undefined
-	    	},
-		glyph: 'xf124@FontAwesome'
+        i18n: {
+            title: 'DreamScape',
+            show: "Show",
+            showTip: "Determine what information to display.",
+            filter: "Filter",
+            filterTip: "Determine any filters to use.",
+            authorLabel: 'authors',
+            noauthor: "No authors defined in this corpus.",
+            titleLabel: 'titles',
+            keywordLabel: 'keywords',
+            pubDateLabel: 'years',
+            nopubDate: "No publication years defined in this corpus.",
+            animationSpeed: "Speed",
+            cities: "cities",
+            connections: "connections"
+        },
+        api: {
+            stopList: 'auto',
+            author: undefined,
+            title: undefined,
+            keyword: undefined,
+            pubDate: undefined
+        },
+        glyph: 'xf124@FontAwesome'
     },
-	config: {
-		map: undefined, // OL object, should be set during init
-		overlay: undefined, // OL object, should be set during init
-		contentEl: undefined, // EXTJS Element, where info is shown
-		isOpenLayersLoaded: false,
-		isArcLoaded: false,
-		
+    config: {
+        map: undefined, // OL object, should be set during init
+        overlay: undefined, // OL object, should be set during init
+        contentEl: undefined, // EXTJS Element, where info is shown
+        isOpenLayersLoaded: false,
+        isArcLoaded: false,
+
         // Maximum number of locations to be returned by the server
-        maxResults: 50,
+        maxResults: 400,
 
         // Constant that changes how zoomed the map must be for cities with less occurences to appear
         // The lower the value, the sooner small cities will appear
@@ -72,6 +72,9 @@ Ext.define('Voyant.panel.DreamScape', {
 
         travels: [],
 
+        // Array to contain texts infos
+        texts: [],
+
         // Colors of the different filters
         colors : [
             "rgb(230, 25, 75)",
@@ -82,361 +85,384 @@ Ext.define('Voyant.panel.DreamScape', {
             "rgb(60, 180, 75)",
             "rgb(143,124,0)",
             "rgb(157,204,0)"
-        ]
-	},
-	
-	html: '<div class="map"></div><div class="ol-popup"><a href="#" class="ol-popup-closer"></a><div class="popup-content"></div></div>',
-	
-	cls: 'dreamscape',
+        ],
+
+        filters: []
+    },
+
+    html: '<div class="map"></div><div class="ol-popup"><a href="#" class="ol-popup-closer"></a><div class="popup-content"></div></div>',
+
+    cls: 'dreamscape',
 
     constructor: function(config) {
         this.callParent(arguments);
-    		this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-    		Ext.Loader.loadScript({
-    			url: this.getBaseUrl()+"resources/openlayers/ol.js",
-    			onLoad: function() {
-    				// Utility function to get layer by id
-    				if (ol.Map.prototype.getLayer === undefined) {
-    				    ol.Map.prototype.getLayer = function (id) {
-    				        var layer = undefined;
-    				        this.getLayers().forEach(function(lyr) {
-    				            if (id === lyr.get('id')) {
-    				                layer = lyr;
-    				            }
-    				        });
-    				        return layer;
-    				    }
-    				}
-    				this.setIsOpenLayersLoaded(true);
-    			},
-    			scope: this
-    		});
-    		Ext.Loader.loadScript({
-    			url: this.getBaseUrl()+"resources/dreamscape/arc.js",
-    			onLoad: function() {
-    				this.setIsArcLoaded(true);
-    			},
-    			scope: this
-    		});
-    }, 
+        this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+        Ext.Loader.loadScript({
+            url: this.getBaseUrl()+"resources/openlayers/ol.js",
+            onLoad: function() {
+                // Utility function to get layer by id
+                if (ol.Map.prototype.getLayer === undefined) {
+                    ol.Map.prototype.getLayer = function (id) {
+                        var layer = undefined;
+                        this.getLayers().forEach(function(lyr) {
+                            if (id === lyr.get('id')) {
+                                layer = lyr;
+                            }
+                        });
+                        return layer;
+                    }
+                }
+                this.setIsOpenLayersLoaded(true);
+            },
+            scope: this
+        });
+        Ext.Loader.loadScript({
+            url: this.getBaseUrl()+"resources/dreamscape/arc.js",
+            onLoad: function() {
+                this.setIsArcLoaded(true);
+            },
+            scope: this
+        });
+    },
     initComponent: function() {
         var me = this;
-        
+
         Ext.apply(this, {
-        		title: this.localize('title'),
-        		dockedItems: [{
+            title: this.localize('title'),
+            dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
                 overflowHandler: 'scroller',
                 items: [{
-	    				text: this.localize('show'),
-	    				tooltip: this.localize('showTip'),
-	    				menu: {
-	    					defaults: {
-	        			        xtype: 'menucheckitem',
-	        			        checkHandler: function(item, checked) {
-    			        			var map = this.getMap().getLayer(item.getItemId()+"0");
-    			        			map.setVisible(checked)
-	        			        	},
-	        			        	scope: this,
-	        			        	checked: true
-	        				},
-	        				items: [{
-	        			        text: this.localize('cities'),
-	        			        itemId: 'cities'
-	        				},{
-	        			        text: this.localize('connections'),
-	        			        itemId: 'layer'
-	        				}]
-	    				}
-    				},{
-	    				text: this.localize('filter'),
-	    				tooltip: this.localize('filterTip'),
-	    				menu: {
-		    				defaults: {
-		                		xtype: 'querysearchfield',
-		                		labelWidth: 60,
-				        		labelAlign: 'right',
-				        		width: 250,
-				        		maxWidth: 250,
-				        		listeners: {
-				        			change: function(cmp, vals) {
-				        				console.warn(cmp, vals)
-				        			}
-				        		}
-		                	
-		                },
-	    					items: [{
-		    		        		fieldLabel: this.localize('authorLabel'),
-		    		        		tokenType: 'author',
-		    		        		itemId: 'author',
-		    		        		hidden: true
-	            			},{
-		    		        		fieldLabel: this.localize('titleLabel'),
-		    		        		tokenType: 'title'
-	            			},{
-		    		        		fieldLabel: this.localize('keywordLabel')
-	            			},{
-		    		        		xtype: 'multislider',
-		    		        		fieldLabel: this.localize('pubDateLabel'),
-		    		        		itemId: 'pubDate',
-		    		        		hidden: true
-	            			}]
-	    				}
-    					
-    				}/*,'-',{
-		        		xtype: 'slider',
-		        		fieldLabel: this.localize('animationSpeed'),
-		        		minValue: 1,
-		        		maxValue: 40,
-		        		value: 2,
-		        		width: 150,
-		        		listeners: {
-		        			changecomplete: function(slider, val) {
-		        			    this.setPointsPerMs(val / 40.0);
-		        			    this.setDelayBetweenVectors(this.getPointsPerArc() / this.getPointsPerMs());
-		        			},
-		        			scope: this
-		        		}
-        			}*/]
-        		}]
+                    text: this.localize('show'),
+                    tooltip: this.localize('showTip'),
+                    menu: {
+                        defaults: {
+                            xtype: 'menucheckitem',
+                            checkHandler: function(item, checked) {
+                                var map = this.getMap().getLayer(item.getItemId()+"0");
+                                map.setVisible(checked)
+                            },
+                            scope: this,
+                            checked: true
+                        },
+                        items: [{
+                            text: this.localize('cities'),
+                            itemId: 'cities'
+                        },{
+                            text: this.localize('connections'),
+                            itemId: 'layer'
+                        }]
+                    }
+                },{
+                    text: this.localize('filter'),
+                    tooltip: this.localize('filterTip'),
+                    menu: {
+                        defaults: {
+                            xtype: 'querysearchfield',
+                            labelWidth: 60,
+                            labelAlign: 'right',
+                            width: 250,
+                            maxWidth: 250,
+                            listeners: {
+                                scope: this,
+                                change: function(cmp, vals) {
+                                    filters = this.getFilters();
+                                    filter = filters[0];
+                                    filter[cmp.getItemId()] = vals[0];
+                                    console.warn(cmp, vals)
+                                }
+                            }
+
+                        },
+                        items: [{
+                            fieldLabel: this.localize('authorLabel'),
+                            tokenType: 'author',
+                            itemId: 'author'
+                        },{
+                            fieldLabel: this.localize('titleLabel'),
+                            itemId: 'title',
+                            tokenType: 'title'
+                        },{
+                            fieldLabel: this.localize('keywordLabel'),
+                            hidden: true
+                        },{
+                            xtype: 'multislider',
+                            fieldLabel: this.localize('pubDateLabel'),
+                            itemId: 'pubDate',
+                            hidden: true
+                        },{
+                            xtype: 'button',
+                            text: 'filter',
+                            scope:this,
+                            handler: function() {
+                                var filters = this.getFilters();
+                                var filter = filters[0];
+                                var author = filter.author ? filter.author : "";
+                                var title = filter.title ? filter.title : "";
+                                var yearBegin = filter.yearBegin ? filter.yearBegin : "";
+                                var yearEnd = filter.yearEnd ? filter.yearEnd : "";
+                                this.filter(0, author, title, yearBegin, yearEnd);
+                            }
+                        }],
+                    },
+
+
+                }/*,'-',{
+                        xtype: 'slider',
+                        fieldLabel: this.localize('animationSpeed'),
+                        minValue: 1,
+                        maxValue: 40,
+                        value: 2,
+                        width: 150,
+                        listeners: {
+                            changecomplete: function(slider, val) {
+                                this.setPointsPerMs(val / 40.0);
+                                this.setDelayBetweenVectors(this.getPointsPerArc() / this.getPointsPerMs());
+                            },
+                            scope: this
+                        }
+                    }*/]
+            }]
         })
-        
+
         this.on("loadedCorpus", function(src, corpus) {
-        	
-    			// see if we have any authors
-    			new Voyant.data.store.CorpusTerms({corpus: corpus}).load({
-    				params: {
-    					tokenType: "author",
-    					limit: 1
-    				},
-    				callback: function(records, operation, success) {
-    					if (success && records && records.length==1) {
-    						this.down('toolbar').getComponent("author").show();
-					} else {
-						this.toastInfo(this.localize('noauthor'));						
-					}
-    				},
-				scope: this
-    			});
-    			
-    			// figure out pubDate limits (or hide if needed)
-    			new Voyant.data.store.CorpusTerms({corpus: corpus}).load({
-    				params: {
-    					tokenType: "pubDate",
-    					sort: "TERMASC",
-    					limit: 1
-    				},
-    				callback: function(records, operation, success) {
-    					if (success && !records && records.length==1) {
-    						var min = parseInt(records[0].getTerm());
-			    			new Voyant.data.store.CorpusTerms({corpus: corpus}).load({
-			    				params: {
-			    					tokenType: "pubDate",
-			    					sort: "TERMDESC",
-			    					limit: 1
-			    				},
-			    				callback: function(records, operation, success) {
-			    					if (success && !records && records.length==1) {
-									var max = parseInt(records[0].getTerm());
-									var pubDate = this.down('toolbar').getComponent("pubDate");
-									pubDate.setMinValue(min);
-									pubDate.setMaxValue(max);
-									pubDate.show();
-								}
-			    				},
-							scope: this
-			    			});
-					} else {
-						this.toastInfo(this.localize('nopubDate'));
-					}
-    				},
-				scope: this
-    			});
-    			
-    			this.tryInit();
-    			
-    			
-    		}, this);
-        
+
+            // see if we have any authors
+            new Voyant.data.store.CorpusTerms({corpus: corpus}).load({
+                params: {
+                    tokenType: "author",
+                    limit: 1
+                },
+                callback: function(records, operation, success) {
+                    if (success && records && records.length==1) {
+                        this.down('toolbar').getComponent("author").show();
+                    } else {
+                        this.toastInfo(this.localize('noauthor'));
+                    }
+                },
+                scope: this
+            });
+
+            // figure out pubDate limits (or hide if needed)
+            new Voyant.data.store.CorpusTerms({corpus: corpus}).load({
+                params: {
+                    tokenType: "pubDate",
+                    sort: "TERMASC",
+                    limit: 1
+                },
+                callback: function(records, operation, success) {
+                    if (success && !records && records.length==1) {
+                        var min = parseInt(records[0].getTerm());
+                        new Voyant.data.store.CorpusTerms({corpus: corpus}).load({
+                            params: {
+                                tokenType: "pubDate",
+                                sort: "TERMDESC",
+                                limit: 1
+                            },
+                            callback: function(records, operation, success) {
+                                if (success && !records && records.length==1) {
+                                    var max = parseInt(records[0].getTerm());
+                                    var pubDate = this.down('toolbar').getComponent("pubDate");
+                                    pubDate.setMinValue(min);
+                                    pubDate.setMaxValue(max);
+                                    pubDate.show();
+                                }
+                            },
+                            scope: this
+                        });
+                    } else {
+                        this.toastInfo(this.localize('nopubDate'));
+                    }
+                },
+                scope: this
+            });
+
+            this.tryInit();
+
+
+        }, this);
+
         this.callParent();
     },
-    
+
     tryInit: function() {
-    		if (this.getIsOpenLayersLoaded() && this.getIsArcLoaded()) {
-        		var el = this.body.down('.map').setId(Ext.id());
-        		var overlayEl = this.body.down('.ol-popup');
-        		var overlay = new ol.Overlay({
-        		    element: overlayEl.dom,
-        		    autoPan: true,
-        		    autoPanAnimation: {
-        		        duration: 250
-        		    }
-        		});
-        		this.setOverlay(overlay);
-        		
-        		// Add a click handler to hide the popup
-        		var closer = overlayEl.down(".ol-popup-closer").dom;
-        		closer.onclick = function() {
-        		    overlay.setPosition(undefined);
-        		    closer.blur();
-        		    return false;
-        		};
-        		
-        		this.setContentEl(overlayEl.down('.popup-content'));
-    			var map = new ol.Map({
-    			    layers: [
-    			        new ol.layer.Tile({
-    			            preload: Infinity,
-    			            source: new ol.source.Stamen({
-    			                //cacheSize: 2048,
-    			                layer: 'watercolor'
-    			            })
-    			        }),
+        if (this.getIsOpenLayersLoaded() && this.getIsArcLoaded()) {
+            var el = this.body.down('.map').setId(Ext.id());
+            var overlayEl = this.body.down('.ol-popup');
+            var overlay = new ol.Overlay({
+                element: overlayEl.dom,
+                autoPan: true,
+                autoPanAnimation: {
+                    duration: 250
+                }
+            });
+            this.setOverlay(overlay);
 
-    			        new ol.layer.Tile({
-    			            preload: Infinity,
-    			            source: new ol.source.Stamen({
-    			                cacheize: 2048,
-    			                layer: 'toner-hybrid'
-    			            })
-    			        })
-    			    ],
-    			    target: el.getId(),
-    			    loadTilesWhileInteracting: true,
-    			    overlays: [overlay],
-    			    view: new ol.View({
-    			        center: [1500000, 6000000],
-    			        zoom: 2
-    			    })
-    			});
-    			
-    			// Add a click handler to the map to render the popup
-        		var panel = this;
-    			map.on('singleclick', function(event) {
-                    var pixel = event.pixel;
-                    var features = map.getFeaturesAtPixel(pixel);
-                    if(features) {
-                        var infos = "<ul>";
-                        features.forEach( function(feature) {
-                            if( feature.getGeometry().getType() === "Circle" && feature.get("selected")) {
-                                var featureOccurences = feature.get("occurences");
-                                featureOccurences.forEach(function(entry) {
-                                    infos += '<li>'+entry.description+' : '+entry.infos.author+', <a href="'+entry.infos.url+'" target="_blank">'+entry.infos.title+'</a>, '+entry.infos.year+' '+entry.order+'</li>';
-                                });
-                                var header = feature.get("text");
-                                infos += "</ul>";
-                                if(feature.get("alternates").length > 0) {
-                                    header += ' ('+feature.get("alternates")+')';
-                                }
-                                var coordinate = event.coordinate;
-                                panel.getContentEl().setHtml('<h3>'+header+'</h3>'+infos);
-                                panel.getOverlay().setPosition(coordinate);
-                            } else if(feature.get("selected")) {
-                                var featureOccurences = feature.get("occurences");
-                                featureOccurences.forEach(function(entry) {
-                                    infos += '<li>from : '+entry.from.description+' : '+entry.from.infos.author+', <a href="'+entry.from.infos.url+'" target="_blank">'+entry.from.infos.title+'</a>, '+entry.from.infos.year+' '+entry.from.order+', '+
-                                              'to: '+entry.to.description+' : '+entry.to.infos.author+' , <a href="'+entry.to.infos.url+'" target="_blank">'+entry.to.infos.title+'</a>, '+entry.to.infos.year+' '+entry.to.order+'</li>';
-                                });
-                                var header = feature.get("text");
-                                infos += "</ul>";
-                                var coordinate = event.coordinate;
-                                panel.getContentEl().setHtml('<h3>'+header+'</h3>'+infos);
-                                panel.getOverlay().setPosition(coordinate);
+            // Add a click handler to hide the popup
+            var closer = overlayEl.down(".ol-popup-closer").dom;
+            closer.onclick = function() {
+                overlay.setPosition(undefined);
+                closer.blur();
+                return false;
+            };
+
+            this.setContentEl(overlayEl.down('.popup-content'));
+            var map = new ol.Map({
+                layers: [
+                    new ol.layer.Tile({
+                        preload: Infinity,
+                        source: new ol.source.Stamen({
+                            //cacheSize: 2048,
+                            layer: 'watercolor'
+                        })
+                    }),
+
+                    new ol.layer.Tile({
+                        preload: Infinity,
+                        source: new ol.source.Stamen({
+                            cacheize: 2048,
+                            layer: 'toner-hybrid'
+                        })
+                    })
+                ],
+                target: el.getId(),
+                loadTilesWhileInteracting: true,
+                overlays: [overlay],
+                view: new ol.View({
+                    center: [1500000, 6000000],
+                    minResolution: 50,
+                    zoom: 0
+                })
+            });
+
+            // Add a click handler to the map to render the popup
+            var panel = this;
+            map.on('singleclick', function(event) {
+                var pixel = event.pixel;
+                var features = map.getFeaturesAtPixel(pixel);
+                texts = panel.getTexts();
+                if(features) {
+                    var infos = "<ul>";
+                    features.forEach( function(feature) {
+                        if( feature.getGeometry().getType() === "Circle" && feature.get("selected")) {
+                            var featureOccurences = feature.get("occurences");
+                            featureOccurences.forEach(function(entry) {
+                                infos += '<li>'+entry.name+' : '+texts[entry.docIndex].authors+', <a href="#" onclick="console.log(\'triggerEventHere\'+'+entry.offset+');return false;">'+texts[entry.docIndex].title+'</a>, '+texts[entry.docIndex].year+' '+entry.offset+'</li>';
+                            });
+                            var header = feature.get("text");
+                            infos += "</ul>";
+                            if(feature.get("alternates").length > 0) {
+                                header += ' ('+feature.get("alternates")+')';
                             }
+                            var coordinate = event.coordinate;
+                            panel.getContentEl().setHtml('<h3>'+header+'</h3>'+infos);
+                            panel.getOverlay().setPosition(coordinate);
+                        } else if(feature.get("selected")) {
+                            var featureOccurences = feature.get("occurences");
+                            featureOccurences.forEach(function(travel) {
+                                infos += '<li>from : '+travel.from.name+' : '+texts[travel.from.docIndex].authors+', <a href="#" onclick="console.log(\'triggerEventHere\'+'+travel.from.offset+');return false;">'+texts[travel.from.docIndex].title+'</a>, '+texts[travel.from.docIndex].year+', '+
+                                    'to: '+travel.to.name+' : '+texts[travel.to.docIndex].authors+' , <a href="#" onclick="console.log(\'triggerEventHere\'+'+travel.to.offset+');return false;">'+texts[travel.to.docIndex].title+'</a>, '+texts[travel.to.docIndex].year+'</li>';
+                            });
+                            var header = feature.get("text");
+                            infos += "</ul>";
+                            var coordinate = event.coordinate;
+                            panel.getContentEl().setHtml('<h3>'+header+'</h3>'+infos);
+                            panel.getOverlay().setPosition(coordinate);
+                        }
+                    });
+                }
+            });
+
+            // Layer for selected vector
+            var selectedLayer = new ol.layer.Vector({
+                map: map,
+                source: new ol.source.Vector({
+                    wrapX: false,
+                    useSpatialIndex: false // optional, might improve performance
+                }),
+                zIndex: 10,
+                selected: true,
+                style: function(feature) {
+                    if(feature.getGeometry().getType() === "Circle")
+                    {
+                        return panel.cityStyleFunction(feature, map.getView().getResolution());
+                    } else {
+                        return panel.travelStyleFunction(feature, map.getView().getResolution());
+                    }
+                },
+                updateWhileAnimating: true, // optional, for instant visual feedback
+                updateWhileInteracting: true // optional, for instant visual feedback
+            });
+
+            // Add handler to update selected vector when mouse is moved
+            map.on('pointermove', function(event) {
+                selectedLayer.getSource().clear();
+                var coordinate = event.coordinate;
+                var pixel = event.pixel;
+                var features = map.getFeaturesAtPixel(pixel);
+                if(features) {
+                    var i = 0;
+                    while(features[i].get("selected")){
+                        i++;
+                        if (i === features.length) break;
+                    }
+                    if (i < features.length) {
+                        var feature = features[i];
+
+                        var baseTextStyle = {
+                            font: '12px Calibri,sans-serif',
+                            textAlign: 'center',
+                            offsetY: -15,
+                            fill: new ol.style.Fill({
+                                color: [0,0,0,1]
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: [255,255,255,0.5],
+                                width: 4
+                            })
+                        };
+
+                        baseTextStyle.text = feature.get("text");
+
+                        var textOverlayStyle = new ol.style.Style({
+                            text: new ol.style.Text(baseTextStyle),
+                            zIndex: 1
                         });
+
+                        var selectedFeature = new ol.Feature({
+                            text: feature.get("text"),
+                            geometry: feature.getGeometry(),
+                            occurences: feature.get("occurences"),
+                            alternates: feature.get("alternates"),
+                            selected: true,
+                            filterId: feature.get("filterId"),
+                            coordinates: feature.get("coordinates"),
+                            width: feature.get("width"),
+                            visible: feature.get("visible")
+                        });
+                        selectedLayer.getSource().addFeature(selectedFeature);
+                        var geometry = feature.getGeometry();
+                        var point = geometry.getClosestPoint(coordinate);
+                        var textFeature = new ol.Feature({
+                            geometry: new ol.geom.Point(point),
+                            selected: true
+                        });
+                        textFeature.setStyle(textOverlayStyle);
+                        selectedLayer.getSource().addFeature(textFeature);
                     }
-    			});
-    			
-    			// Layer for selected vector
-    			var selectedLayer = new ol.layer.Vector({
-    			    map: map,
-    			    source: new ol.source.Vector({
-    			        wrapX: false,
-    			        useSpatialIndex: false // optional, might improve performance
-    			    }),
-    			    zIndex: 10,
-    			    selected: true,
-    			    style: function(feature) {
-    			    if(feature.getGeometry().getType() === "Circle")
-    			        {
-    			            return panel.cityStyleFunction(feature, map.getView().getResolution());
-    			        } else {
-    			            return panel.travelStyleFunction(feature, map.getView().getResolution());
-    			        }
-    			    },
-    			    updateWhileAnimating: true, // optional, for instant visual feedback
-    			    updateWhileInteracting: true // optional, for instant visual feedback
-    			});
-    			
-    			// Add handler to update selected vector when mouse is moved
-    			map.on('pointermove', function(event) {
-    			    selectedLayer.getSource().clear();
-                    var coordinate = event.coordinate;
-                    var pixel = event.pixel;
-                    var features = map.getFeaturesAtPixel(pixel);
-                    if(features) {
-                        var i = 0;
-                        while(features[i].get("selected")){
-                            i++;
-                            if (i === features.length) break;
-                        }
-                        if (i < features.length) {
-                            var feature = features[i];
 
-                            var baseTextStyle = {
-                                font: '12px Calibri,sans-serif',
-                                textAlign: 'center',
-                                offsetY: -15,
-                                fill: new ol.style.Fill({
-                                    color: [0,0,0,1]
-                                }),
-                                stroke: new ol.style.Stroke({
-                                    color: [255,255,255,0.5],
-                                    width: 4
-                                })
-                            };
+                }
+            });
 
-                            baseTextStyle.text = feature.get("text");
+            this.setMap(map);
 
-                            var textOverlayStyle = new ol.style.Style({
-                                text: new ol.style.Text(baseTextStyle),
-                                zIndex: 1
-                            });
-
-                            var selectedFeature = new ol.Feature({
-                                text: feature.get("text"),
-                                geometry: feature.getGeometry(),
-                                occurences: feature.get("occurences"),
-                                alternates: feature.get("alternates"),
-                                selected: true,
-                                filterId: feature.get("filterId"),
-                                coordinates: feature.get("coordinates"),
-                                width: feature.get("width"),
-                                visible: feature.get("visible")
-                            });
-                            selectedLayer.getSource().addFeature(selectedFeature);
-                            var geometry = feature.getGeometry();
-                            var point = geometry.getClosestPoint(coordinate);
-                            var textFeature = new ol.Feature({
-                                geometry: new ol.geom.Point(point),
-                                selected: true
-                            });
-                            textFeature.setStyle(textOverlayStyle);
-                            selectedLayer.getSource().addFeature(textFeature);
-                        }
-
-                    }
-    			});
-    			
-    			this.setMap(map);
-    			
-    			this.addFilter();
-    		} else {
-    			Ext.defer(this.tryInit, 500, this); // try again in a half second
-    		}
+            this.addFilter();
+        } else {
+            Ext.defer(this.tryInit, 500, this); // try again in a half second
+        }
     },
- 
+
     // Style for vector after animation
     travelStyleFunction: function(feature, resolution) {
         // default color is red, selected feature is blue and first 8 layers have pre-defined colors
@@ -483,7 +509,7 @@ Ext.define('Voyant.panel.DreamScape', {
 
         return styles;
     },
-    
+
     // Style for cities
     cityStyleFunction: function(feature, resolution) {
         // default color is red, selected feature is blue and first 8 layers have pre-defined colors
@@ -504,7 +530,7 @@ Ext.define('Voyant.panel.DreamScape', {
             return false;
         }
     },
-    
+
     // Style for vector during animation
     animationStyleFunction: function (feature) {
         var color = "rgb(255, 0, 0)";
@@ -518,10 +544,10 @@ Ext.define('Voyant.panel.DreamScape', {
             })
         }));
     },
-    
+
     // Add feature to animation layer with a delay
     addLater: function(feature, timeout, filterId) {
-    		var map = this.getMap();
+        var map = this.getMap();
         var timedEvent = window.setTimeout(function() {
             feature.set('start', new Date().getTime());
             var layer = map.getLayer("animation" + filterId);
@@ -530,7 +556,7 @@ Ext.define('Voyant.panel.DreamScape', {
         }, timeout);
         this.getTimedEvents()[filterId].push(timedEvent);
     },
-    
+
     // Animate travels for a layer
     animateTravels: function(event, filterId) {
         var map = this.getMap(), panel = this;
@@ -565,86 +591,94 @@ Ext.define('Voyant.panel.DreamScape', {
     },
     // Filtering that should be done server side
     serverSideFiltering: function(author, title, yearBegin, yearEnd, maxResults) {
-            var dataFile = this.getBaseUrl()+'resources/dreamscape/cities4.json';
-            return fetch(dataFile).then(function(response) {return response.json()}).then(function(json) {
-            var citiesData = json.cities;
-            var cities = [];
+        var dataFile = this.getBaseUrl()+'resources/dreamscape/datafile.json';
+        return fetch(dataFile).then(function(response) {return response.json()}).then(function(json) {
+            var annotatedCollection = json.AnnotatedCollection;
+            var locations = [];
             var entries = [];
-            var i = 0;
-            citiesData.forEach(function(city) {
-                if (city.infos.author.toLowerCase().includes(author) &&
-                    city.infos.title.toLowerCase().includes(title) &&
-                    (yearBegin === "" || city.infos.year >= yearBegin) &&
-                    (yearEnd === "" || city.infos.year <= yearEnd)) {
-                    if (!cities[city.coordinates]) {
-                        cities[city.coordinates] = {
-                            description: city.description,
-                            alternates: [],
-                            occurences: [{infos: city.infos, description:city.description, order: i}],
-                            coordinates: city.coordinates
-                        };
-                    } else {
-                        var cityObject = cities[city.coordinates];
-                        cityObject.occurences.push({infos: city.infos, description:city.description, order: i});
-                        if (city.description !== cityObject.description && cityObject.alternates.indexOf(city.description) < 0) {
-                            cityObject.alternates.push(city.description);
+            var texts = [];
+            var docIndex = 0;
+            annotatedCollection.forEach(function(text) {
+                if (text.authors.toLowerCase().includes(author.toLowerCase()) &&
+                    text.title.toLowerCase().includes(title.toLowerCase()) &&
+                    (yearBegin === "" || text.year >= yearBegin) &&
+                    (yearEnd === "" || text.year <= yearEnd)) {
+                    texts[docIndex] = {
+                        authors: text.authors,
+                        title: text.title,
+                        year: text.year
+                    };
+                    text.locs.forEach(function(loc) {
+                        coordinates = [loc.lat, loc.long];
+                        if(!locations[coordinates]) {
+                            locations[coordinates] = {
+                                name: loc.name,
+                                alternates: [],
+                                coordinates: coordinates,
+                                occurences: [{name: loc.name, coordinates: coordinates, docIndex: docIndex, offset: loc.offset, conf: loc.conf}]
+                            };
+                        } else {
+                            var locObject = locations[coordinates];
+                            locObject.occurences.push({name: loc.name, coordinates: locObject.coordinates, docIndex: docIndex, offset: loc.offset, conf: loc.conf});
+                            if (loc.name !== locObject.name && locObject.alternates.indexOf(loc.name) < 0) {
+                                locObject.alternates.push(loc.name);
+                            }
                         }
-                    }
+                    })
                 }
-                i++;
+                docIndex++;
             });
 
             // Transform key-value array to regular array so it can be sorted
-            var citiesWithoutKey = [];
-            for(coords in cities) {
-                citiesWithoutKey.push(cities[coords]);
+            var locationsWithoutKey = [];
+            for(coords in locations) {
+                locationsWithoutKey.push(locations[coords]);
             }
-            citiesWithoutKey.sort(function(a, b) {
+            locationsWithoutKey.sort(function(a, b) {
                 return (b.occurences.length - a.occurences.length)
             });
 
             // Keep only the most common location up to maxResults number
-            var cityResults = citiesWithoutKey.splice(0, maxResults);
+            var locationsResults = locationsWithoutKey.splice(0, maxResults);
+
+            var textsResults = [];
 
             // Place all occurences of most common locations in an array and sort them by their order of appearance
-            cityResults.forEach(function(city) {
-                city.occurences.forEach(function(entry) {
-                    entry.coordinates = city.coordinates;
+            locationsResults.forEach(function(location) {
+                location.occurences.forEach(function(entry) {
                     entries.push(entry);
+                    if(!textsResults[entry.docIndex]){
+                        textsResults[entry.docIndex] = texts[entry.docIndex];
+                    }
                 });
             });
             entries.sort(function(a, b) {
-                return a.order - b.order
+                var x = a.docIndex - b.docIndex;
+                return x == 0? a.offset - b.offset : x;
             });
-            var results = {cities: cityResults, entries: entries};
+            var results = {locations: locationsResults, entries: entries, texts: textsResults};
 
             // return both lists as a JSON string
             return resultsJson = JSON.stringify(results);
-            })
+        })
     },
     // Called when the filter button is pressed
-    filter: function(filterId) {
+    filter: function(filterId, author, title, yearBegin, yearEnd) {
+        author = typeof author !== 'undefined' ? author : "";
+        title = typeof title !== 'undefined' ? title : "";
+        yearBegin = typeof yearBegin !== 'undefined' ? yearBegin : "";
+        yearEnd = typeof yearEnd !== 'undefined' ? yearEnd : "";
         var timedEvents = this.getTimedEvents(), cities = this.getCities(),
-    			map = this.getMap(), colors = this.getColors();
-    		
+            map = this.getMap(), colors = this.getColors();
+
         timedEvents[filterId].forEach(function(event) { window.clearTimeout(event)});
         cities[filterId] = [];
         var citiesLayer = map.getLayer("cities" + filterId);
         citiesLayer.getSource().clear();
         var vectorLayer = map.getLayer("layer" + filterId);
         vectorLayer.setVisible(true);
-//        document.getElementById("showHideButton" + filterId).innerText = "Hide travels";
-//        document.getElementById("showHideCitiesButton" + filterId).innerText = "Hide cities";
         vectorLayer.getSource().clear();
         var panel = this;
-//      var author = document.getElementById("author" + filterId).value.toLowerCase();
-        var author = "";
-//      var title = document.getElementById("title" + filterId).value.toLowerCase();
-        var title = "";
-//      var yearBegin = document.getElementById("yearBegin" + filterId).value;
-        var yearBegin = "";
-//      var yearEnd = document.getElementById("yearEnd" + filterId).value;
-        var yearEnd = "";
         map.getView().on("change:resolution",function () {
             citiesLayer.getSource().getFeatures().forEach(function(feature) {
                 var zoom = map.getView().getZoom();
@@ -655,6 +689,8 @@ Ext.define('Voyant.panel.DreamScape', {
             panel.generateTravels(filterId);
         });
         this.serverSideFiltering(author, title, yearBegin, yearEnd, this.getMaxResults()).then(function(results) {return JSON.parse(results)}).then(function(results) {
+            console.log(results);
+            panel.setTexts(results.texts);
             nbOfEntries = panel.getNbOfEntries();
             nbOfEntries[filterId] = results.entries.length;
             var totalEntries = 0;
@@ -662,18 +698,18 @@ Ext.define('Voyant.panel.DreamScape', {
             panel.setTotalEntries(totalEntries);
             coordinatesSequence = panel.getCoordinatesSequence();
             coordinatesSequence[filterId] = results.entries;
-            results.cities.forEach(function(city) {
-                var coordinates = [parseFloat(city.coordinates[1]), parseFloat(city.coordinates[0])];
+            results.locations.forEach(function(location) {
+                var coordinates = [parseFloat(location.coordinates[1]), parseFloat(location.coordinates[0])];
                 var circle = new ol.geom.Circle(coordinates);
                 circle.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
                 var color = colors[filterId];
                 var feature = new ol.Feature({
                     geometry: circle,
-                    description: city.description,
-                    alternates: city.alternates,
-                    text: city.description + "(" + city.occurences.length + ")",
+                    description: location.name,
+                    alternates: location.alternates,
+                    text: location.name + "(" + location.occurences.length + ")",
                     finished: true,
-                    occurences: city.occurences,
+                    occurences: location.occurences,
                     color: color,
                     filterId: filterId,
                     coordinates: coordinates
@@ -685,27 +721,32 @@ Ext.define('Voyant.panel.DreamScape', {
             // Trigger calculation if feature sizes
             var resolution = map.getView().getResolution() + 1;
             map.getView().setResolution(resolution);
+            // Adjust view to show newly filtered citiesç
+            if(citiesLayer.getSource().getFeatures().length > 0){
+                map.getView().fit(citiesLayer.getSource().getExtent())
+            }
             panel.animateLayer(filterId);
         });
-    //document.getElementById("showHideButton" + filterId).disabled = false;
-    //document.getElementById("showHideCitiesButton" + filterId).disabled = false;
-    //var button = document.getElementById("animateButton"+filterId);
-    //button.disabled = false;
-    //button.innerText = "Animate";
-    //button.onclick = () => animateLayer(filterId);
+        //document.getElementById("showHideButton" + filterId).disabled = false;
+        //document.getElementById("showHideCitiesButton" + filterId).disabled = false;
+        //var button = document.getElementById("animateButton"+filterId);
+        //button.disabled = false;
+        //button.innerText = "Animate";
+        //button.onclick = () => animateLayer(filterId);
     },
-    
+
     // Called when the Add Filter button is pressed. Create new fields and layer.
     addFilter: function() {
-    		var timedEvents = this.getTimedEvents(), filterCount = this.getFilterCount();
-    			map = this.getMap();
-    		
+        var timedEvents = this.getTimedEvents(), filterCount = this.getFilterCount();
+        map = this.getMap();
+        var filters = this.getFilters();
+        filters[filterCount] = {};
         timedEvents[filterCount] = [];
 
         var filterLayer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 wrapX: false,
-                useSpatialIndex: false // optional, might improve performance
+                useSpatialIndex: true // needed to call getExtent()
             }),
             id: "layer" + filterCount,
             visible: false,
@@ -719,7 +760,7 @@ Ext.define('Voyant.panel.DreamScape', {
         var citiesLayer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 wrapX: false,
-                useSpatialIndex: false // optional, might improve performance
+                useSpatialIndex: true // needed to call getExtent()
             }),
             id: "cities" + filterCount,
             opacity: 0.7,
@@ -730,7 +771,7 @@ Ext.define('Voyant.panel.DreamScape', {
         var animationLayer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 wrapX: false,
-                useSpatialIndex: false // optional, might improve performance
+                useSpatialIndex: true // needed to call getExtent()
             }),
             id: "animation" + filterCount,
             style: null
@@ -828,7 +869,7 @@ Ext.define('Voyant.panel.DreamScape', {
     },
     // Called when the animate button is pressed
     animateLayer: function(filterId) {
-    		var timedEvents = this.getTimedEvents(), map = this.getMap();
+        var timedEvents = this.getTimedEvents(), map = this.getMap();
         timedEvents[filterId].forEach(function(event) {window.clearTimeout(event)});
         var filterLayer = map.getLayer("layer" + filterId);
         var i = 0;
@@ -858,7 +899,7 @@ Ext.define('Voyant.panel.DreamScape', {
             }
         }, this);
         map.on('postcompose', function(event) {
-        		this.animateTravels(event, filterId);
+            this.animateTravels(event, filterId);
         }, this);
 //        var button = document.getElementById("animateButton"+filterId);
 //        button.innerText = "Stop";
