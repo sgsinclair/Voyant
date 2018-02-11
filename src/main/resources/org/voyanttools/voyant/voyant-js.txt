@@ -74,6 +74,7 @@ app/data/store/TSNEAnalysis.js
 # TABLES
 app/data/util/Table.js
 app/data/util/NetworkGraph.js
+app/data/util/Geonames.js
 
 # CORPUS (here because store is needed)
 app/data/model/Corpus.js

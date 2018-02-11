@@ -24,7 +24,8 @@ Ext.define('Voyant.panel.DreamScape', {
             author: undefined,
             title: undefined,
             keyword: undefined,
-            pubDate: undefined
+            pubDate: undefined,
+            minPopulation: 15000
         },
         glyph: 'xf124@FontAwesome'
     },
@@ -87,7 +88,9 @@ Ext.define('Voyant.panel.DreamScape', {
             "rgb(157,204,0)"
         ],
 
-        filters: []
+        filters: [],
+        
+        corpus: undefined
     },
 
     html: '<div class="map"></div><div class="ol-popup"><a href="#" class="ol-popup-closer"></a><div class="popup-content"></div></div>',
@@ -204,8 +207,8 @@ Ext.define('Voyant.panel.DreamScape', {
                                 var yearEnd = filter.yearEnd ? filter.yearEnd : "";
                                 this.filter(0, author, title, yearBegin, yearEnd);
                             }
-                        }],
-                    },
+                        }]
+                    }
 
 
                 }/*,'-',{
@@ -458,6 +461,7 @@ Ext.define('Voyant.panel.DreamScape', {
             this.setMap(map);
 
             this.addFilter();
+                        
         } else {
             Ext.defer(this.tryInit, 500, this); // try again in a half second
         }
@@ -589,10 +593,58 @@ Ext.define('Voyant.panel.DreamScape', {
         // tell OpenLayers to continue the animation
         map.render();
     },
+    
+    fetchDataFromStaticFile: function() {
+        var dataFile = this.getBaseUrl()+'resources/dreamscape/datafile.json';
+    		return fetch(dataFile).then(function(response) {return response.json()})
+    },
+    
+    fetchDataFromServer: function(author, title, yearBegin, yearEnd, maxResults) {
+        var me = this, params = {};
+        Ext.apply(params, {
+        		minPopulation: this.getApiParam('minPopulation')
+        });
+        var queries = [];
+        if (author) {queries.push("author:"+title)}
+        if (title) {queries.push("title:"+title)}
+        if (yearBegin && yearEnd) {queries.push("pubDate:["+yearBegin+"-"+yearEnd+"]")}
+        if (queries) {params.query=queries;}
+        if (maxResults) {params.limit = maxResults;}
+        return new Voyant.data.util.Geonames({
+        		corpus: this.getCorpus()
+        }).load(params).then(function(geonames) {
+        		// the data file actually doesn't specify each city occurrence, it already groups them by connection
+        		// so we'll go through and look at each source and also the final target
+        		var occurrencesByDocument = [];
+        		me.getCorpus().each(function(doc) {
+        			occurrencesByDocument.push({
+        				locs: [],
+        				filename: doc.get("location"),
+        				URL: '',
+        				title: doc.getTitle(),
+        				year: parseInt(doc.getTitle()), // only works for austen
+        				authors: doc.getAuthor()
+        			})
+        		})
+        		geonames.eachConnectionOccurrence(function(connectionOccurrence) {
+        			occurrencesByDocument[connectionOccurrence.docIndex].locs.push({
+        				long: connectionOccurrence.source.longitude,
+        				lat: connectionOccurrence.source.latitude,
+        				conf: Math.random(), // random for now
+        				offset: connectionOccurrence.source.position, // N.B. token position, not offset
+        				name:connectionOccurrence.source.label
+        			});
+        		});
+        		return {AnnotatedCollection: occurrencesByDocument}
+        })
+
+    	
+    },
+    
     // Filtering that should be done server side
     serverSideFiltering: function(author, title, yearBegin, yearEnd, maxResults) {
-        var dataFile = this.getBaseUrl()+'resources/dreamscape/datafile.json';
-        return fetch(dataFile).then(function(response) {return response.json()}).then(function(json) {
+        //return this.fetchDataFromStaticFile().then(function(json) {
+        return this.fetchDataFromServer(author, title, yearBegin, yearEnd, maxResults).then(function(json) {
             var annotatedCollection = json.AnnotatedCollection;
             var locations = [];
             var entries = [];
