@@ -1,6470 +1,1292 @@
-{
-  "AnnotatedCollection": [
-    {
-      "locs": [
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "-59.3285",
-          "lat": "-14.7604",
-          "conf": "0.0708",
-          "offset": 482,
-          "name": "Blue"
-        },
-        {
-          "long": "-102.4871",
-          "lat": "20.9959",
-          "conf": "0.3331",
-          "offset": 946,
-          "name": "Harold"
-        },
-        {
-          "long": "-71.4901",
-          "lat": "-38.7628",
-          "conf": "0.1127",
-          "offset": 487,
-          "name": "Witmer"
-        },
-        {
-          "long": "70.7549",
-          "lat": "0.6149",
-          "conf": "0.8561",
-          "offset": 331,
-          "name": "Sardis"
-        },
-        {
-          "long": "-139.9511",
-          "lat": "25.0771",
-          "conf": "0.5854",
-          "offset": 208,
-          "name": "Dunnavant"
-        },
-        {
-          "long": "-59.3285",
-          "lat": "-14.7604",
-          "conf": "0.0708",
-          "offset": 482,
-          "name": "Blue"
-        },
-        {
-          "long": "-102.4871",
-          "lat": "20.9959",
-          "conf": "0.3331",
-          "offset": 946,
-          "name": "Harold"
-        },
-        {
-          "long": "-71.4901",
-          "lat": "-38.7628",
-          "conf": "0.1127",
-          "offset": 487,
-          "name": "Witmer"
-        },
-        {
-          "long": "70.7549",
-          "lat": "0.6149",
-          "conf": "0.8561",
-          "offset": 331,
-          "name": "Sardis"
-        },
-        {
-          "long": "-139.9511",
-          "lat": "25.0771",
-          "conf": "0.5854",
-          "offset": 208,
-          "name": "Dunnavant"
-        },
-        {
-          "long": "-59.3285",
-          "lat": "-14.7604",
-          "conf": "0.0708",
-          "offset": 482,
-          "name": "Blue"
-        },
-        {
-          "long": "-102.4871",
-          "lat": "20.9959",
-          "conf": "0.3331",
-          "offset": 946,
-          "name": "Harold"
-        },
-        {
-          "long": "-71.4901",
-          "lat": "-38.7628",
-          "conf": "0.1127",
-          "offset": 487,
-          "name": "Witmer"
-        },
-        {
-          "long": "70.7549",
-          "lat": "0.6149",
-          "conf": "0.8561",
-          "offset": 331,
-          "name": "Sardis"
-        },
-        {
-          "long": "-139.9511",
-          "lat": "25.0771",
-          "conf": "0.5854",
-          "offset": 208,
-          "name": "Dunnavant"
-        },
-        {
-          "long": "-59.3285",
-          "lat": "-14.7604",
-          "conf": "0.0708",
-          "offset": 482,
-          "name": "Blue"
-        },
-        {
-          "long": "-102.4871",
-          "lat": "20.9959",
-          "conf": "0.3331",
-          "offset": 946,
-          "name": "Harold"
-        },
-        {
-          "long": "-71.4901",
-          "lat": "-38.7628",
-          "conf": "0.1127",
-          "offset": 487,
-          "name": "Witmer"
-        },
-        {
-          "long": "70.7549",
-          "lat": "0.6149",
-          "conf": "0.8561",
-          "offset": 331,
-          "name": "Sardis"
-        },
-        {
-          "long": "-139.9511",
-          "lat": "25.0771",
-          "conf": "0.5854",
-          "offset": 208,
-          "name": "Dunnavant"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "-59.3285",
-          "lat": "-14.7604",
-          "conf": "0.0708",
-          "offset": 482,
-          "name": "Blue"
-        },
-        {
-          "long": "-102.4871",
-          "lat": "20.9959",
-          "conf": "0.3331",
-          "offset": 946,
-          "name": "Harold"
-        },
-        {
-          "long": "-71.4901",
-          "lat": "-38.7628",
-          "conf": "0.1127",
-          "offset": 487,
-          "name": "Witmer"
-        },
-        {
-          "long": "70.7549",
-          "lat": "0.6149",
-          "conf": "0.8561",
-          "offset": 331,
-          "name": "Sardis"
-        },
-        {
-          "long": "-139.9511",
-          "lat": "25.0771",
-          "conf": "0.5854",
-          "offset": 208,
-          "name": "Dunnavant"
-        },
-        {
-          "long": "-59.3285",
-          "lat": "-14.7604",
-          "conf": "0.0708",
-          "offset": 482,
-          "name": "Blue"
-        },
-        {
-          "long": "-102.4871",
-          "lat": "20.9959",
-          "conf": "0.3331",
-          "offset": 946,
-          "name": "Harold"
-        },
-        {
-          "long": "-71.4901",
-          "lat": "-38.7628",
-          "conf": "0.1127",
-          "offset": 487,
-          "name": "Witmer"
-        },
-        {
-          "long": "70.7549",
-          "lat": "0.6149",
-          "conf": "0.8561",
-          "offset": 331,
-          "name": "Sardis"
-        },
-        {
-          "long": "-139.9511",
-          "lat": "25.0771",
-          "conf": "0.5854",
-          "offset": 208,
-          "name": "Dunnavant"
-        },
-        {
-          "long": "-59.3285",
-          "lat": "-14.7604",
-          "conf": "0.0708",
-          "offset": 482,
-          "name": "Blue"
-        },
-        {
-          "long": "-102.4871",
-          "lat": "20.9959",
-          "conf": "0.3331",
-          "offset": 946,
-          "name": "Harold"
-        },
-        {
-          "long": "-71.4901",
-          "lat": "-38.7628",
-          "conf": "0.1127",
-          "offset": 487,
-          "name": "Witmer"
-        },
-        {
-          "long": "70.7549",
-          "lat": "0.6149",
-          "conf": "0.8561",
-          "offset": 331,
-          "name": "Sardis"
-        },
-        {
-          "long": "-139.9511",
-          "lat": "25.0771",
-          "conf": "0.5854",
-          "offset": 208,
-          "name": "Dunnavant"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "135.4215",
-          "lat": "-26.5669",
-          "conf": "0.5456",
-          "offset": 402,
-          "name": "Bridgetown"
-        },
-        {
-          "long": "-114.682",
-          "lat": "67.8081",
-          "conf": "0.3333",
-          "offset": 410,
-          "name": "Rew"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "153.2089",
-          "lat": "-21.3162",
-          "conf": "0.5656",
-          "offset": 204,
-          "name": "Jacksonburg"
-        },
-        {
-          "long": "-56.6507",
-          "lat": "-8.5438",
-          "conf": "0.6947",
-          "offset": 509,
-          "name": "Woodlake"
-        },
-        {
-          "long": "-68.408",
-          "lat": "45.3126",
-          "conf": "0.3282",
-          "offset": 833,
-          "name": "Dennard"
-        },
-        {
-          "long": "67.8777",
-          "lat": "-41.5436",
-          "conf": "0.2638",
-          "offset": 133,
-          "name": "Chesapeake"
-        },
-        {
-          "long": "-106.3586",
-          "lat": "69.0873",
-          "conf": "0.99",
-          "offset": 370,
-          "name": "Dupuyer"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "138.4731",
-          "lat": "67.3932",
-          "conf": "0.4006",
-          "offset": 787,
-          "name": "Kapowsin"
-        },
-        {
-          "long": "145.984",
-          "lat": "52.3261",
-          "conf": "0.286",
-          "offset": 840,
-          "name": "Freetown"
-        },
-        {
-          "long": "-153.3043",
-          "lat": "1.465",
-          "conf": "0.8718",
-          "offset": 265,
-          "name": "Graniteville"
-        },
-        {
-          "long": "-96.9325",
-          "lat": "36.099",
-          "conf": "0.5179",
-          "offset": 365,
-          "name": "Jennings"
-        },
-        {
-          "long": "-87.6717",
-          "lat": "-7.2418",
-          "conf": "0.6958",
-          "offset": 861,
-          "name": "Brazos"
-        },
-        {
-          "long": "-160.8078",
-          "lat": "-21.4497",
-          "conf": "0.6963",
-          "offset": 748,
-          "name": "Indio"
-        },
-        {
-          "long": "-126.7076",
-          "lat": "-13.0395",
-          "conf": "0.2916",
-          "offset": 859,
-          "name": "Bagtown"
-        },
-        {
-          "long": "-61.8149",
-          "lat": "-11.7806",
-          "conf": "0.7856",
-          "offset": 586,
-          "name": "Tioga"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 722,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "-165.7668",
-          "lat": "20.2532",
-          "conf": "0.6703",
-          "offset": 727,
-          "name": "Wright"
-        },
-        {
-          "long": "99.942",
-          "lat": "43.8865",
-          "conf": "0.2188",
-          "offset": 392,
-          "name": "Weogufka"
-        },
-        {
-          "long": "42.9352",
-          "lat": "-40.6532",
-          "conf": "0.3124",
-          "offset": 965,
-          "name": "Rockbridge"
-        },
-        {
-          "long": "148.2276",
-          "lat": "38.1595",
-          "conf": "0.6007",
-          "offset": 788,
-          "name": "Fingerville"
-        },
-        {
-          "long": "90.5881",
-          "lat": "-27.861",
-          "conf": "0.3308",
-          "offset": 966,
-          "name": "Gilgo"
-        },
-        {
-          "long": "-73.865",
-          "lat": "-25.4749",
-          "conf": "0.658",
-          "offset": 90,
-          "name": "Bynum"
-        },
-        {
-          "long": "35.0143",
-          "lat": "-7.4522",
-          "conf": "0.3951",
-          "offset": 659,
-          "name": "Tyhee"
-        },
-        {
-          "long": "21.7462",
-          "lat": "65.6747",
-          "conf": "0.8243",
-          "offset": 373,
-          "name": "Dragoon"
-        },
-        {
-          "long": "-39.4053",
-          "lat": "71.3514",
-          "conf": "0.2012",
-          "offset": 299,
-          "name": "Southview"
-        },
-        {
-          "long": "145.3323",
-          "lat": "50.2903",
-          "conf": "0.542",
-          "offset": 815,
-          "name": "Graball"
-        },
-        {
-          "long": "143.9829",
-          "lat": "71.6406",
-          "conf": "0.5955",
-          "offset": 408,
-          "name": "Bedias"
-        },
-        {
-          "long": "-122.6514",
-          "lat": "-11.8108",
-          "conf": "0.7978",
-          "offset": 960,
-          "name": "Boomer"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 272,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "-163.4673",
-          "lat": "3.2583",
-          "conf": "0.561",
-          "offset": 617,
-          "name": "Staples"
-        },
-        {
-          "long": "113.2275",
-          "lat": "19.5633",
-          "conf": "0.1368",
-          "offset": 153,
-          "name": "Day"
-        },
-        {
-          "long": "-76.9888",
-          "lat": "-14.17",
-          "conf": "0.5636",
-          "offset": 701,
-          "name": "Libertytown"
-        },
-        {
-          "long": "-5.1976",
-          "lat": "-9.9921",
-          "conf": "0.5927",
-          "offset": 831,
-          "name": "Glenbrook"
-        },
-        {
-          "long": "-1.737",
-          "lat": "56.4415",
-          "conf": "0.3077",
-          "offset": 204,
-          "name": "Shasta"
-        },
-        {
-          "long": "123.8035",
-          "lat": "26.4077",
-          "conf": "0.4554",
-          "offset": 322,
-          "name": "Beason"
-        },
-        {
-          "long": "-68.3377",
-          "lat": "12.0394",
-          "conf": "0.2977",
-          "offset": 237,
-          "name": "Hegins"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 172,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "19.2402",
-          "lat": "53.276",
-          "conf": "0.5393",
-          "offset": 572,
-          "name": "Devon"
-        },
-        {
-          "long": "74.1813",
-          "lat": "-43.8982",
-          "conf": "0.2008",
-          "offset": 600,
-          "name": "Ironton"
-        },
-        {
-          "long": "2.1157",
-          "lat": "-36.6293",
-          "conf": "0.8373",
-          "offset": 136,
-          "name": "Carlton"
-        },
-        {
-          "long": "69.0826",
-          "lat": "-13.1081",
-          "conf": "0.4919",
-          "offset": 9,
-          "name": "Crucible"
-        },
-        {
-          "long": "85.6521",
-          "lat": "-39.1176",
-          "conf": "0.4456",
-          "offset": 118,
-          "name": "Epworth"
-        },
-        {
-          "long": "12.3192",
-          "lat": "-35.6107",
-          "conf": "0.8135",
-          "offset": 626,
-          "name": "Farmington"
-        },
-        {
-          "long": "168.3307",
-          "lat": "36.1694",
-          "conf": "0.5945",
-          "offset": 459,
-          "name": "Rivereno"
-        },
-        {
-          "long": "22.7698",
-          "lat": "32.523",
-          "conf": "0.7743",
-          "offset": 403,
-          "name": "Harborton"
-        },
-        {
-          "long": "38.8863",
-          "lat": "13.378",
-          "conf": "0.6896",
-          "offset": 156,
-          "name": "Barrelville"
-        },
-        {
-          "long": "-29.748",
-          "lat": "27.9902",
-          "conf": "0.6237",
-          "offset": 421,
-          "name": "Gwynn"
-        },
-        {
-          "long": "123.0277",
-          "lat": "50.3311",
-          "conf": "0.8257",
-          "offset": 613,
-          "name": "Urbana"
-        },
-        {
-          "long": "-34.2338",
-          "lat": "24.4243",
-          "conf": "0.7431",
-          "offset": 465,
-          "name": "Blue"
-        },
-        {
-          "long": "-91.8414",
-          "lat": "-6.0757",
-          "conf": "0.8368",
-          "offset": 701,
-          "name": "Wikieup"
-        },
-        {
-          "long": "-84.8982",
-          "lat": "20.6257",
-          "conf": "0.0209",
-          "offset": 576,
-          "name": "Mooresburg"
-        },
-        {
-          "long": "-19.7296",
-          "lat": "17.0925",
-          "conf": "0.221",
-          "offset": 699,
-          "name": "Kerby"
-        },
-        {
-          "long": "61.785",
-          "lat": "-10.9449",
-          "conf": "0.7091",
-          "offset": 277,
-          "name": "Hiwasse"
-        },
-        {
-          "long": "53.6291",
-          "lat": "-3.6398",
-          "conf": "0.9522",
-          "offset": 97,
-          "name": "Volta"
-        },
-        {
-          "long": "45.918",
-          "lat": "71.8091",
-          "conf": "0.6369",
-          "offset": 802,
-          "name": "Talpa"
-        },
-        {
-          "long": "-63.8905",
-          "lat": "51.7793",
-          "conf": "0.4987",
-          "offset": 352,
-          "name": "Wattsville"
-        },
-        {
-          "long": "87.1021",
-          "lat": "67.7889",
-          "conf": "0.7024",
-          "offset": 724,
-          "name": "Brooktrails"
-        },
-        {
-          "long": "112.2682",
-          "lat": "45.6436",
-          "conf": "0.2128",
-          "offset": 927,
-          "name": "Roeville"
-        },
-        {
-          "long": "-109.4141",
-          "lat": "49.8664",
-          "conf": "0.2516",
-          "offset": 453,
-          "name": "Konterra"
-        },
-        {
-          "long": "156.2299",
-          "lat": "46.7114",
-          "conf": "0.6506",
-          "offset": 319,
-          "name": "Greenwich"
-        },
-        {
-          "long": "17.3617",
-          "lat": "38.8541",
-          "conf": "0.6967",
-          "offset": 931,
-          "name": "Summerfield"
-        },
-        {
-          "long": "141.4175",
-          "lat": "49.7346",
-          "conf": "0.7542",
-          "offset": 635,
-          "name": "Jacksonwald"
-        },
-        {
-          "long": "127.0094",
-          "lat": "14.5955",
-          "conf": "0.9097",
-          "offset": 895,
-          "name": "Taft"
-        },
-        {
-          "long": "47.8507",
-          "lat": "21.1275",
-          "conf": "0.4759",
-          "offset": 525,
-          "name": "Waikele"
-        },
-        {
-          "long": "55.6036",
-          "lat": "75.6427",
-          "conf": "0.8592",
-          "offset": 245,
-          "name": "Kanauga"
-        },
-        {
-          "long": "-9.1638",
-          "lat": "-41.1959",
-          "conf": "0.1893",
-          "offset": 925,
-          "name": "Darlington"
-        },
-        {
-          "long": "-107.8786",
-          "lat": "3.0381",
-          "conf": "0.9661",
-          "offset": 837,
-          "name": "Echo"
-        },
-        {
-          "long": "150.5923",
-          "lat": "48.6472",
-          "conf": "0.1174",
-          "offset": 751,
-          "name": "Katonah"
-        },
-        {
-          "long": "-42.2259",
-          "lat": "-30.3916",
-          "conf": "0.7246",
-          "offset": 131,
-          "name": "Northchase"
-        },
-        {
-          "long": "-48.5899",
-          "lat": "62.4381",
-          "conf": "0.2277",
-          "offset": 916,
-          "name": "Cresaptown"
-        },
-        {
-          "long": "-42.6775",
-          "lat": "-14.1851",
-          "conf": "0.7525",
-          "offset": 277,
-          "name": "Tampico"
-        },
-        {
-          "long": "124.4728",
-          "lat": "-47.6673",
-          "conf": "0.8897",
-          "offset": 693,
-          "name": "Wyoming"
-        },
-        {
-          "long": "161.9035",
-          "lat": "51.1373",
-          "conf": "0.5095",
-          "offset": 46,
-          "name": "Dundee"
-        },
-        {
-          "long": "-142.9012",
-          "lat": "34.5764",
-          "conf": "0.5234",
-          "offset": 973,
-          "name": "Waterloo"
-        },
-        {
-          "long": "-102.7224",
-          "lat": "69.614",
-          "conf": "0.4288",
-          "offset": 478,
-          "name": "Coyote"
-        },
-        {
-          "long": "-163.6314",
-          "lat": "21.2643",
-          "conf": "0.9749",
-          "offset": 766,
-          "name": "Trinway"
-        },
-        {
-          "long": "-6.6271",
-          "lat": "58.1055",
-          "conf": "0.4956",
-          "offset": 269,
-          "name": "Terlingua"
-        },
-        {
-          "long": "125.5527",
-          "lat": "57.5813",
-          "conf": "0.4894",
-          "offset": 395,
-          "name": "Lavalette"
-        },
-        {
-          "long": "158.8154",
-          "lat": "-15.9653",
-          "conf": "0.6681",
-          "offset": 268,
-          "name": "Cliffside"
-        },
-        {
-          "long": "-43.4109",
-          "lat": "72.3622",
-          "conf": "0.4411",
-          "offset": 929,
-          "name": "Calpine"
-        },
-        {
-          "long": "144.3988",
-          "lat": "78.3419",
-          "conf": "0.0769",
-          "offset": 565,
-          "name": "Churchill"
-        },
-        {
-          "long": "-42.5601",
-          "lat": "7.3308",
-          "conf": "0.3108",
-          "offset": 279,
-          "name": "Basye"
-        },
-        {
-          "long": "-65.8923",
-          "lat": "-44.7125",
-          "conf": "0.8631",
-          "offset": 152,
-          "name": "Blodgett"
-        },
-        {
-          "long": "163.7112",
-          "lat": "79.9997",
-          "conf": "0.9337",
-          "offset": 169,
-          "name": "Bladensburg"
-        },
-        {
-          "long": "119.6218",
-          "lat": "40.5777",
-          "conf": "0.7068",
-          "offset": 65,
-          "name": "Delco"
-        }
-      ],
-      "filename": "est",
-      "year": 1505,
-      "URL": "http://www.google.com",
-      "title": "cillum eu",
-      "authors": "Stefan Sinclair"
-    },
-    {
-      "locs": [
-        {
-          "long": "32.4786",
-          "lat": "53.9378",
-          "conf": "0.2228",
-          "offset": 483,
-          "name": "Orin"
-        },
-        {
-          "long": "-106.3946",
-          "lat": "61.4478",
-          "conf": "0.0953",
-          "offset": 160,
-          "name": "Sylvanite"
-        },
-        {
-          "long": "-38.4823",
-          "lat": "28.0266",
-          "conf": "0.4641",
-          "offset": 620,
-          "name": "Morningside"
-        },
-        {
-          "long": "-134.7371",
-          "lat": "-27.0984",
-          "conf": "0.2953",
-          "offset": 352,
-          "name": "Boyd"
-        },
-        {
-          "long": "55.6062",
-          "lat": "66.4731",
-          "conf": "0.8688",
-          "offset": 215,
-          "name": "Brogan"
-        },
-        {
-          "long": "-137.5746",
-          "lat": "-5.2222",
-          "conf": "0.7336",
-          "offset": 184,
-          "name": "Weogufka"
-        },
-        {
-          "long": "-69.9471",
-          "lat": "-20.5525",
-          "conf": "0.553",
-          "offset": 745,
-          "name": "Herbster"
-        },
-        {
-          "long": "-2.3785",
-          "lat": "79.8397",
-          "conf": "0.2788",
-          "offset": 181,
-          "name": "Cedarville"
-        },
-        {
-          "long": "153.2534",
-          "lat": "47.3943",
-          "conf": "0.9226",
-          "offset": 799,
-          "name": "Advance"
-        },
-        {
-          "long": "155.7194",
-          "lat": "67.6428",
-          "conf": "0.1097",
-          "offset": 165,
-          "name": "Waukeenah"
-        },
-        {
-          "long": "44.1862",
-          "lat": "-45.3641",
-          "conf": "0.0667",
-          "offset": 650,
-          "name": "Websterville"
-        },
-        {
-          "long": "25.1064",
-          "lat": "48.1674",
-          "conf": "0.4987",
-          "offset": 252,
-          "name": "Escondida"
-        },
-        {
-          "long": "120.9877",
-          "lat": "-46.4231",
-          "conf": "0.4893",
-          "offset": 940,
-          "name": "Eden"
-        },
-        {
-          "long": "8.0331",
-          "lat": "65.997",
-          "conf": "0.0718",
-          "offset": 680,
-          "name": "Coinjock"
-        },
-        {
-          "long": "-153.0088",
-          "lat": "34.7453",
-          "conf": "0.4926",
-          "offset": 368,
-          "name": "Trinway"
-        },
-        {
-          "long": "91.0274",
-          "lat": "-45.3363",
-          "conf": "0.9068",
-          "offset": 330,
-          "name": "Marion"
-        },
-        {
-          "long": "-68.3435",
-          "lat": "13.2916",
-          "conf": "0.5206",
-          "offset": 474,
-          "name": "Blairstown"
-        },
-        {
-          "long": "-8.7453",
-          "lat": "76.339",
-          "conf": "0.6568",
-          "offset": 410,
-          "name": "Columbus"
-        },
-        {
-          "long": "61.246",
-          "lat": "-35.6585",
-          "conf": "0.2241",
-          "offset": 674,
-          "name": "Newkirk"
-        },
-        {
-          "long": "-77.9023",
-          "lat": "-31.1022",
-          "conf": "0.6989",
-          "offset": 46,
-          "name": "Rosburg"
-        },
-        {
-          "long": "-1.7704",
-          "lat": "-11.1868",
-          "conf": "0.0978",
-          "offset": 722,
-          "name": "Murillo"
-        },
-        {
-          "long": "-25.6191",
-          "lat": "-9.7502",
-          "conf": "0.318",
-          "offset": 225,
-          "name": "Nord"
-        },
-        {
-          "long": "-70.1892",
-          "lat": "47.0125",
-          "conf": "0.4814",
-          "offset": 475,
-          "name": "Southview"
-        },
-        {
-          "long": "117.1128",
-          "lat": "-37.6017",
-          "conf": "0.7007",
-          "offset": 221,
-          "name": "Richmond"
-        },
-        {
-          "long": "-62.5662",
-          "lat": "73.6142",
-          "conf": "0.4619",
-          "offset": 417,
-          "name": "Clarktown"
-        },
-        {
-          "long": "71.0027",
-          "lat": "-30.2018",
-          "conf": "0.1677",
-          "offset": 149,
-          "name": "Marbury"
-        },
-        {
-          "long": "78.3907",
-          "lat": "-17.1608",
-          "conf": "0.2887",
-          "offset": 247,
-          "name": "Abrams"
-        },
-        {
-          "long": "-94.4181",
-          "lat": "21.507",
-          "conf": "0.6458",
-          "offset": 599,
-          "name": "Ferney"
-        },
-        {
-          "long": "1.7922",
-          "lat": "38.7479",
-          "conf": "0.735",
-          "offset": 59,
-          "name": "Aberdeen"
-        },
-        {
-          "long": "90.3062",
-          "lat": "51.5127",
-          "conf": "0.8385",
-          "offset": 885,
-          "name": "Wikieup"
-        },
-        {
-          "long": "-144.5231",
-          "lat": "42.4586",
-          "conf": "0.3413",
-          "offset": 926,
-          "name": "Kenwood"
-        },
-        {
-          "long": "-87.4009",
-          "lat": "-29.5022",
-          "conf": "0.5597",
-          "offset": 223,
-          "name": "Elrama"
-        },
-        {
-          "long": "155.8657",
-          "lat": "25.8954",
-          "conf": "0.5661",
-          "offset": 198,
-          "name": "Shaft"
-        },
-        {
-          "long": "-137.3884",
-          "lat": "-44.0663",
-          "conf": "0.4797",
-          "offset": 368,
-          "name": "Nutrioso"
-        },
-        {
-          "long": "-89.4495",
-          "lat": "-20.1392",
-          "conf": "0.3639",
-          "offset": 421,
-          "name": "Brownlee"
-        },
-        {
-          "long": "44.6524",
-          "lat": "-49.6122",
-          "conf": "0.9349",
-          "offset": 83,
-          "name": "Wyoming"
-        },
-        {
-          "long": "-56.4848",
-          "lat": "54.2766",
-          "conf": "0.4361",
-          "offset": 58,
-          "name": "Hachita"
-        },
-        {
-          "long": "124.14",
-          "lat": "32.9234",
-          "conf": "0.6872",
-          "offset": 890,
-          "name": "Stollings"
-        },
-        {
-          "long": "5.2732",
-          "lat": "-26.7601",
-          "conf": "0.3374",
-          "offset": 375,
-          "name": "Indio"
-        },
-        {
-          "long": "-68.9874",
-          "lat": "6.2338",
-          "conf": "0.712",
-          "offset": 835,
-          "name": "Coventry"
-        },
-        {
-          "long": "48.7146",
-          "lat": "31.2422",
-          "conf": "0.479",
-          "offset": 821,
-          "name": "Templeton"
-        },
-        {
-          "long": "63.9669",
-          "lat": "38.4499",
-          "conf": "0.7581",
-          "offset": 551,
-          "name": "Whitestone"
-        },
-        {
-          "long": "15.941",
-          "lat": "-13.2998",
-          "conf": "0.096",
-          "offset": 309,
-          "name": "Gibbsville"
-        },
-        {
-          "long": "-87.4015",
-          "lat": "12.4718",
-          "conf": "0.8728",
-          "offset": 125,
-          "name": "Allison"
-        },
-        {
-          "long": "69.7822",
-          "lat": "-7.3809",
-          "conf": "0.6268",
-          "offset": 288,
-          "name": "Oasis"
-        },
-        {
-          "long": "21.4404",
-          "lat": "21.8019",
-          "conf": "0.9142",
-          "offset": 772,
-          "name": "Loyalhanna"
-        },
-        {
-          "long": "-140.9076",
-          "lat": "5.3923",
-          "conf": "0.7471",
-          "offset": 754,
-          "name": "Orick"
-        },
-        {
-          "long": "-104.6874",
-          "lat": "-24.3659",
-          "conf": "0.8259",
-          "offset": 484,
-          "name": "Farmington"
-        },
-        {
-          "long": "-4.248",
-          "lat": "12.5167",
-          "conf": "0.2689",
-          "offset": 168,
-          "name": "Wiscon"
-        },
-        {
-          "long": "-61.3247",
-          "lat": "-2.2171",
-          "conf": "0.0382",
-          "offset": 277,
-          "name": "Baker"
-        },
-        {
-          "long": "-47.3429",
-          "lat": "40.8523",
-          "conf": "0.8189",
-          "offset": 626,
-          "name": "Keyport"
-        },
-        {
-          "long": "94.0811",
-          "lat": "67.4698",
-          "conf": "0.3837",
-          "offset": 148,
-          "name": "Sabillasville"
-        },
-        {
-          "long": "12.0254",
-          "lat": "-9.3091",
-          "conf": "0.0777",
-          "offset": 944,
-          "name": "Laurelton"
-        },
-        {
-          "long": "62.7488",
-          "lat": "77.529",
-          "conf": "0.3554",
-          "offset": 622,
-          "name": "Chamberino"
-        },
-        {
-          "long": "25.7665",
-          "lat": "72.9883",
-          "conf": "0.7823",
-          "offset": 148,
-          "name": "Grayhawk"
-        },
-        {
-          "long": "-91.1453",
-          "lat": "72.4666",
-          "conf": "0.735",
-          "offset": 403,
-          "name": "Crisman"
-        },
-        {
-          "long": "-60.8717",
-          "lat": "64.9639",
-          "conf": "0.3034",
-          "offset": 106,
-          "name": "Tetherow"
-        },
-        {
-          "long": "-154.1074",
-          "lat": "-34.2402",
-          "conf": "0.2512",
-          "offset": 27,
-          "name": "Riverton"
-        },
-        {
-          "long": "71.4009",
-          "lat": "14.7038",
-          "conf": "0.1204",
-          "offset": 71,
-          "name": "Haring"
-        },
-        {
-          "long": "151.4585",
-          "lat": "54.9084",
-          "conf": "0.241",
-          "offset": 813,
-          "name": "Lupton"
-        },
-        {
-          "long": "104.9345",
-          "lat": "14.0848",
-          "conf": "0.4492",
-          "offset": 709,
-          "name": "Evergreen"
-        },
-        {
-          "long": "84.5208",
-          "lat": "26.9813",
-          "conf": "0.547",
-          "offset": 128,
-          "name": "Stonybrook"
-        },
-        {
-          "long": "-84.9923",
-          "lat": "34.4129",
-          "conf": "0.6449",
-          "offset": 985,
-          "name": "Vicksburg"
-        },
-        {
-          "long": "-72.7457",
-          "lat": "40.7665",
-          "conf": "0.513",
-          "offset": 710,
-          "name": "Dennard"
-        },
-        {
-          "long": "51.1443",
-          "lat": "-26.5099",
-          "conf": "0.3485",
-          "offset": 26,
-          "name": "Innsbrook"
-        },
-        {
-          "long": "-0.3421",
-          "lat": "21.9523",
-          "conf": "0.0008",
-          "offset": 196,
-          "name": "Siglerville"
-        },
-        {
-          "long": "56.6864",
-          "lat": "-41.5729",
-          "conf": "0.7998",
-          "offset": 252,
-          "name": "Reinerton"
-        },
-        {
-          "long": "-14.2923",
-          "lat": "79.2493",
-          "conf": "0.4742",
-          "offset": 948,
-          "name": "Darrtown"
-        },
-        {
-          "long": "61.4224",
-          "lat": "8.8263",
-          "conf": "0.5714",
-          "offset": 618,
-          "name": "Terlingua"
-        },
-        {
-          "long": "57.0919",
-          "lat": "21.7305",
-          "conf": "0.4253",
-          "offset": 622,
-          "name": "Layhill"
-        },
-        {
-          "long": "-77.1791",
-          "lat": "-5.8751",
-          "conf": "0.4132",
-          "offset": 832,
-          "name": "Sims"
-        },
-        {
-          "long": "136.497",
-          "lat": "-11.4267",
-          "conf": "0.6156",
-          "offset": 532,
-          "name": "Chalfant"
-        },
-        {
-          "long": "-124.7463",
-          "lat": "41.9524",
-          "conf": "0.9089",
-          "offset": 438,
-          "name": "Leland"
-        },
-        {
-          "long": "-85.9202",
-          "lat": "65.3316",
-          "conf": "0.5369",
-          "offset": 98,
-          "name": "Hegins"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "83.7953",
-          "lat": "-45.5126",
-          "conf": "0.1681",
-          "offset": 419,
-          "name": "Comptche"
-        },
-        {
-          "long": "-164.3204",
-          "lat": "55.8687",
-          "conf": "0.6732",
-          "offset": 794,
-          "name": "Hoehne"
-        },
-        {
-          "long": "-122.1259",
-          "lat": "-20.0122",
-          "conf": "0.5761",
-          "offset": 260,
-          "name": "Enoree"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "98.7959",
-          "lat": "28.3986",
-          "conf": "0.4099",
-          "offset": 414,
-          "name": "Roosevelt"
-        },
-        {
-          "long": "-81.0358",
-          "lat": "-25.6686",
-          "conf": "0.747",
-          "offset": 311,
-          "name": "Brandywine"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.3692",
-          "offset": 323,
-          "name": "Makena"
-        },
-        {
-          "long": "9.154",
-          "lat": "7.1036",
-          "conf": "0.0885",
-          "offset": 936,
-          "name": "Whitewater"
-        },
-        {
-          "long": "139.2391",
-          "lat": "18.9309",
-          "conf": "0.2133",
-          "offset": 468,
-          "name": "Trona"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 772,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "49.4137",
-          "lat": "79.7356",
-          "conf": "0.0277",
-          "offset": 345,
-          "name": "Neibert"
-        },
-        {
-          "long": "-68.4692",
-          "lat": "-30.4892",
-          "conf": "0.2368",
-          "offset": 296,
-          "name": "Crown"
-        },
-        {
-          "long": "40.154",
-          "lat": "-10.4888",
-          "conf": "0.0164",
-          "offset": 625,
-          "name": "Riceville"
-        },
-        {
-          "long": "160.1995",
-          "lat": "72.0747",
-          "conf": "0.5426",
-          "offset": 867,
-          "name": "Woodburn"
-        },
-        {
-          "long": "71.0553",
-          "lat": "24.2857",
-          "conf": "0.1238",
-          "offset": 285,
-          "name": "Veyo"
-        },
-        {
-          "long": "145.4846",
-          "lat": "6.6299",
-          "conf": "0.2315",
-          "offset": 431,
-          "name": "Cloverdale"
-        },
-        {
-          "long": "99.1868",
-          "lat": "8.4124",
-          "conf": "0.9531",
-          "offset": 400,
-          "name": "Rockbridge"
-        },
-        {
-          "long": "146.2793",
-          "lat": "11.6813",
-          "conf": "0.6505",
-          "offset": 179,
-          "name": "Cressey"
-        },
-        {
-          "long": "124.1477",
-          "lat": "-0.3213",
-          "conf": "0.002",
-          "offset": 70,
-          "name": "Grazierville"
-        },
-        {
-          "long": "141.0769",
-          "lat": "19.926",
-          "conf": "0.3418",
-          "offset": 583,
-          "name": "Bascom"
-        },
-        {
-          "long": "118.4905",
-          "lat": "28.0654",
-          "conf": "0.0524",
-          "offset": 428,
-          "name": "Carlos"
-        },
-        {
-          "long": "-0.751",
-          "lat": "-11.2586",
-          "conf": "0.2437",
-          "offset": 726,
-          "name": "Lindisfarne"
-        },
-        {
-          "long": "111.6024",
-          "lat": "-13.5253",
-          "conf": "0.3373",
-          "offset": 153,
-          "name": "Shepardsville"
-        },
-        {
-          "long": "-99.9235",
-          "lat": "11.6239",
-          "conf": "0.948",
-          "offset": 358,
-          "name": "Wright"
-        },
-        {
-          "long": "-105.7657",
-          "lat": "46.0456",
-          "conf": "0.343",
-          "offset": 206,
-          "name": "Rosedale"
-        },
-        {
-          "long": "127.146",
-          "lat": "18.4743",
-          "conf": "0.5501",
-          "offset": 324,
-          "name": "Sussex"
-        },
-        {
-          "long": "-34.873",
-          "lat": "26.3466",
-          "conf": "0.0896",
-          "offset": 783,
-          "name": "Foxworth"
-        },
-        {
-          "long": "-150.571",
-          "lat": "-13.1685",
-          "conf": "0.483",
-          "offset": 410,
-          "name": "Falmouth"
-        },
-        {
-          "long": "-119.0084",
-          "lat": "72.3249",
-          "conf": "0.7112",
-          "offset": 274,
-          "name": "Coultervillle"
-        },
-        {
-          "long": "87.5663",
-          "lat": "-24.3413",
-          "conf": "0.6133",
-          "offset": 543,
-          "name": "Torboy"
-        },
-        {
-          "long": "-167.9204",
-          "lat": "67.7696",
-          "conf": "0.8392",
-          "offset": 544,
-          "name": "Limestone"
-        },
-        {
-          "long": "-14.2707",
-          "lat": "73.2003",
-          "conf": "0.9548",
-          "offset": 782,
-          "name": "Wanamie"
-        },
-        {
-          "long": "81.295",
-          "lat": "50.6593",
-          "conf": "0.3641",
-          "offset": 720,
-          "name": "Biehle"
-        },
-        {
-          "long": "-86.3865",
-          "lat": "71.6425",
-          "conf": "0.7519",
-          "offset": 607,
-          "name": "Greenwich"
-        },
-        {
-          "long": "-130.5266",
-          "lat": "-10.7574",
-          "conf": "0.5158",
-          "offset": 786,
-          "name": "Grenelefe"
-        },
-        {
-          "long": "-137.475",
-          "lat": "-4.9234",
-          "conf": "0.3674",
-          "offset": 376,
-          "name": "Hatteras"
-        },
-        {
-          "long": "135.5536",
-          "lat": "-25.4765",
-          "conf": "0.2805",
-          "offset": 43,
-          "name": "Enlow"
-        },
-        {
-          "long": "-107.3155",
-          "lat": "-20.3885",
-          "conf": "0.6481",
-          "offset": 662,
-          "name": "Cliff"
-        }
-      ],
-      "filename": "sit",
-      "year": 1433,
-      "URL": "http://www.google.com",
-      "title": "et officia",
-      "authors": "Gabriel Bernier-Colborne"
-    },
-    {
-      "locs": [
-        {
-          "long": "142.7873",
-          "lat": "59.5368",
-          "conf": "0.957",
-          "offset": 451,
-          "name": "Witmer"
-        },
-        {
-          "long": "-96.0146",
-          "lat": "69.7352",
-          "conf": "0.47",
-          "offset": 525,
-          "name": "Caberfae"
-        },
-        {
-          "long": "-50.9318",
-          "lat": "7.5416",
-          "conf": "0.8173",
-          "offset": 285,
-          "name": "Martinsville"
-        },
-        {
-          "long": "100.1652",
-          "lat": "26.6559",
-          "conf": "0.7334",
-          "offset": 130,
-          "name": "Blackgum"
-        },
-        {
-          "long": "-23.0156",
-          "lat": "25.735",
-          "conf": "0.7763",
-          "offset": 917,
-          "name": "Cavalero"
-        },
-        {
-          "long": "71.46",
-          "lat": "64.0262",
-          "conf": "0.2821",
-          "offset": 521,
-          "name": "Dundee"
-        },
-        {
-          "long": "73.5227",
-          "lat": "-32.0523",
-          "conf": "0.706",
-          "offset": 264,
-          "name": "Hickory"
-        },
-        {
-          "long": "60.2027",
-          "lat": "18.7851",
-          "conf": "0.6497",
-          "offset": 752,
-          "name": "Chloride"
-        },
-        {
-          "long": "138.0867",
-          "lat": "1.2644",
-          "conf": "0.9372",
-          "offset": 119,
-          "name": "Cochranville"
-        },
-        {
-          "long": "35.8068",
-          "lat": "46.2246",
-          "conf": "0.4987",
-          "offset": 786,
-          "name": "Greer"
-        },
-        {
-          "long": "-69.0065",
-          "lat": "28.6854",
-          "conf": "0.686",
-          "offset": 870,
-          "name": "Tibbie"
-        },
-        {
-          "long": "-157.6327",
-          "lat": "79.3035",
-          "conf": "0.6541",
-          "offset": 754,
-          "name": "Logan"
-        },
-        {
-          "long": "94.6814",
-          "lat": "-19.5172",
-          "conf": "0.3311",
-          "offset": 715,
-          "name": "Ola"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "115.0972",
-          "lat": "66.9999",
-          "conf": "0.8969",
-          "offset": 100,
-          "name": "Nadine"
-        },
-        {
-          "long": "143.6462",
-          "lat": "60.7412",
-          "conf": "0.0835",
-          "offset": 458,
-          "name": "Craig"
-        },
-        {
-          "long": "139.5861",
-          "lat": "10.1944",
-          "conf": "0.0026",
-          "offset": 813,
-          "name": "Charco"
-        },
-        {
-          "long": "-113.322",
-          "lat": "-26.6497",
-          "conf": "0.4703",
-          "offset": 385,
-          "name": "Kennedyville"
-        },
-        {
-          "long": "38.1032",
-          "lat": "-10.8682",
-          "conf": "0.9107",
-          "offset": 922,
-          "name": "Wakulla"
-        },
-        {
-          "long": "-82.7205",
-          "lat": "5.793",
-          "conf": "0.2045",
-          "offset": 266,
-          "name": "Floris"
-        },
-        {
-          "long": "-36.5651",
-          "lat": "19.5671",
-          "conf": "0.1432",
-          "offset": 774,
-          "name": "Veyo"
-        },
-        {
-          "long": "1.913",
-          "lat": "73.3297",
-          "conf": "0.6823",
-          "offset": 220,
-          "name": "Camino"
-        },
-        {
-          "long": "100.534",
-          "lat": "48.8457",
-          "conf": "0.0112",
-          "offset": 372,
-          "name": "Devon"
-        },
-        {
-          "long": "-153.3706",
-          "lat": "56.7288",
-          "conf": "0.7545",
-          "offset": 761,
-          "name": "Turpin"
-        },
-        {
-          "long": "-155.6577",
-          "lat": "-31.7433",
-          "conf": "0.0941",
-          "offset": 860,
-          "name": "Lodoga"
-        },
-        {
-          "long": "114.9211",
-          "lat": "-36.2216",
-          "conf": "0.4573",
-          "offset": 709,
-          "name": "Frank"
-        },
-        {
-          "long": "-161.7862",
-          "lat": "27.5897",
-          "conf": "0.3873",
-          "offset": 757,
-          "name": "Rosine"
-        },
-        {
-          "long": "-158.0175",
-          "lat": "11.5096",
-          "conf": "0.9513",
-          "offset": 545,
-          "name": "Sanders"
-        },
-        {
-          "long": "-44.6203",
-          "lat": "64.4505",
-          "conf": "0.2473",
-          "offset": 937,
-          "name": "Emison"
-        },
-        {
-          "long": "-140.2575",
-          "lat": "75.9111",
-          "conf": "0.0798",
-          "offset": 582,
-          "name": "Grayhawk"
-        },
-        {
-          "long": "74.6419",
-          "lat": "31.1878",
-          "conf": "0.0606",
-          "offset": 488,
-          "name": "Bergoo"
-        },
-        {
-          "long": "-31.3796",
-          "lat": "-21.9111",
-          "conf": "0.9395",
-          "offset": 112,
-          "name": "Orick"
-        },
-        {
-          "long": "131.0326",
-          "lat": "33.4299",
-          "conf": "0.4009",
-          "offset": 955,
-          "name": "Thermal"
-        },
-        {
-          "long": "-61.9741",
-          "lat": "52.882",
-          "conf": "0.4254",
-          "offset": 654,
-          "name": "Macdona"
-        },
-        {
-          "long": "126.8927",
-          "lat": "44.6894",
-          "conf": "0.7769",
-          "offset": 891,
-          "name": "Whitestone"
-        },
-        {
-          "long": "-9.8512",
-          "lat": "-22.0799",
-          "conf": "0.0907",
-          "offset": 177,
-          "name": "Lavalette"
-        },
-        {
-          "long": "-154.6539",
-          "lat": "-46.436",
-          "conf": "0.9953",
-          "offset": 73,
-          "name": "Keller"
-        },
-        {
-          "long": "79.7277",
-          "lat": "33.3277",
-          "conf": "0.6489",
-          "offset": 769,
-          "name": "Gasquet"
-        },
-        {
-          "long": "126.4081",
-          "lat": "77.4594",
-          "conf": "0.1619",
-          "offset": 365,
-          "name": "Greensburg"
-        },
-        {
-          "long": "-165.8351",
-          "lat": "2.6114",
-          "conf": "0.165",
-          "offset": 316,
-          "name": "Elizaville"
-        },
-        {
-          "long": "64.8866",
-          "lat": "3.8744",
-          "conf": "0.4083",
-          "offset": 730,
-          "name": "Kaka"
-        },
-        {
-          "long": "25.6494",
-          "lat": "-43.6436",
-          "conf": "0.8027",
-          "offset": 866,
-          "name": "Dixonville"
-        },
-        {
-          "long": "-89.0699",
-          "lat": "-17.9631",
-          "conf": "0.835",
-          "offset": 18,
-          "name": "Faxon"
-        },
-        {
-          "long": "91.3837",
-          "lat": "73.9379",
-          "conf": "0.4781",
-          "offset": 442,
-          "name": "Brazos"
-        },
-        {
-          "long": "-112.3617",
-          "lat": "19.2015",
-          "conf": "0.4325",
-          "offset": 970,
-          "name": "Falmouth"
-        },
-        {
-          "long": "-34.0457",
-          "lat": "-15.0872",
-          "conf": "0.3588",
-          "offset": 603,
-          "name": "Marne"
-        },
-        {
-          "long": "-124.0706",
-          "lat": "52.7686",
-          "conf": "0.3865",
-          "offset": 654,
-          "name": "Ventress"
-        },
-        {
-          "long": "129.907",
-          "lat": "-47.5744",
-          "conf": "0.5714",
-          "offset": 648,
-          "name": "Leroy"
-        },
-        {
-          "long": "-120.2854",
-          "lat": "42.1598",
-          "conf": "0.9643",
-          "offset": 976,
-          "name": "Ahwahnee"
-        },
-        {
-          "long": "-152.6205",
-          "lat": "1.6511",
-          "conf": "0.1278",
-          "offset": 888,
-          "name": "Belfair"
-        },
-        {
-          "long": "-75.5316",
-          "lat": "-38.1969",
-          "conf": "0.9897",
-          "offset": 892,
-          "name": "Eureka"
-        },
-        {
-          "long": "-168.3021",
-          "lat": "42.3658",
-          "conf": "0.4661",
-          "offset": 128,
-          "name": "Blandburg"
-        },
-        {
-          "long": "115.1403",
-          "lat": "69.976",
-          "conf": "0.0516",
-          "offset": 373,
-          "name": "Gordon"
-        },
-        {
-          "long": "-63.9626",
-          "lat": "68.7835",
-          "conf": "0.2179",
-          "offset": 695,
-          "name": "Haring"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 102,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "114.8738",
-          "lat": "6.0246",
-          "conf": "0.0566",
-          "offset": 567,
-          "name": "Sanford"
-        },
-        {
-          "long": "24.5789",
-          "lat": "-36.9617",
-          "conf": "0.509",
-          "offset": 338,
-          "name": "Centerville"
-        },
-        {
-          "long": "89.0843",
-          "lat": "-4.4986",
-          "conf": "0.3604",
-          "offset": 316,
-          "name": "Jackpot"
-        },
-        {
-          "long": "98.6281",
-          "lat": "-8.0059",
-          "conf": "0.3196",
-          "offset": 282,
-          "name": "Cumminsville"
-        },
-        {
-          "long": "61.0265",
-          "lat": "26.9737",
-          "conf": "0.7128",
-          "offset": 31,
-          "name": "Alfarata"
-        },
-        {
-          "long": "82.9912",
-          "lat": "-46.5026",
-          "conf": "0.6371",
-          "offset": 470,
-          "name": "Foscoe"
-        },
-        {
-          "long": "-7.2561",
-          "lat": "-28.3057",
-          "conf": "0.9361",
-          "offset": 574,
-          "name": "Gorst"
-        },
-        {
-          "long": "-69.725",
-          "lat": "-7.383",
-          "conf": "0.1552",
-          "offset": 472,
-          "name": "Draper"
-        },
-        {
-          "long": "9.5944",
-          "lat": "6.1227",
-          "conf": "0.157",
-          "offset": 199,
-          "name": "Mansfield"
-        },
-        {
-          "long": "-12.8803",
-          "lat": "13.0655",
-          "conf": "0.3378",
-          "offset": 165,
-          "name": "Kidder"
-        },
-        {
-          "long": "84.2148",
-          "lat": "-26.3535",
-          "conf": "0.6003",
-          "offset": 315,
-          "name": "Gulf"
-        },
-        {
-          "long": "-2.2791",
-          "lat": "74.0058",
-          "conf": "0.355",
-          "offset": 419,
-          "name": "Morriston"
-        },
-        {
-          "long": "-43.3457",
-          "lat": "-9.7376",
-          "conf": "0.304",
-          "offset": 83,
-          "name": "Albrightsville"
-        },
-        {
-          "long": "-23.2505",
-          "lat": "-39.6101",
-          "conf": "0.8289",
-          "offset": 734,
-          "name": "Bynum"
-        },
-        {
-          "long": "-28.6701",
-          "lat": "43.6989",
-          "conf": "0.6133",
-          "offset": 834,
-          "name": "Holcombe"
-        },
-        {
-          "long": "73.7581",
-          "lat": "6.4006",
-          "conf": "0.7071",
-          "offset": 642,
-          "name": "Coyote"
-        },
-        {
-          "long": "75.3054",
-          "lat": "59.502",
-          "conf": "0.3127",
-          "offset": 660,
-          "name": "Delshire"
-        },
-        {
-          "long": "30.861",
-          "lat": "-9.2875",
-          "conf": "0.0359",
-          "offset": 863,
-          "name": "Alleghenyville"
-        },
-        {
-          "long": "43.089",
-          "lat": "54.6778",
-          "conf": "0.3301",
-          "offset": 31,
-          "name": "Topaz"
-        },
-        {
-          "long": "63.478",
-          "lat": "75.6724",
-          "conf": "0.2882",
-          "offset": 356,
-          "name": "Fairmount"
-        },
-        {
-          "long": "138.9872",
-          "lat": "14.7387",
-          "conf": "0.7659",
-          "offset": 179,
-          "name": "Sexton"
-        },
-        {
-          "long": "56.5997",
-          "lat": "43.8714",
-          "conf": "0.5886",
-          "offset": 330,
-          "name": "Coinjock"
-        },
-        {
-          "long": "-123.0164",
-          "lat": "35.0543",
-          "conf": "0.0282",
-          "offset": 391,
-          "name": "Darbydale"
-        },
-        {
-          "long": "-111.3537",
-          "lat": "56.2033",
-          "conf": "0.7972",
-          "offset": 211,
-          "name": "Movico"
-        },
-        {
-          "long": "51.5302",
-          "lat": "9.6863",
-          "conf": "0.4327",
-          "offset": 52,
-          "name": "Southview"
-        },
-        {
-          "long": "-94.6379",
-          "lat": "38.0545",
-          "conf": "0.8279",
-          "offset": 907,
-          "name": "Oberlin"
-        },
-        {
-          "long": "-3.5033",
-          "lat": "44.2402",
-          "conf": "0.4523",
-          "offset": 384,
-          "name": "Norwood"
-        },
-        {
-          "long": "-167.831",
-          "lat": "11.4745",
-          "conf": "0.9153",
-          "offset": 217,
-          "name": "Dante"
-        },
-        {
-          "long": "140.3328",
-          "lat": "67.25",
-          "conf": "0.6903",
-          "offset": 680,
-          "name": "Cazadero"
-        },
-        {
-          "long": "122.6933",
-          "lat": "32.0205",
-          "conf": "0.1872",
-          "offset": 658,
-          "name": "Bangor"
-        },
-        {
-          "long": "16.8175",
-          "lat": "-18.9125",
-          "conf": "0.3617",
-          "offset": 581,
-          "name": "Bridgetown"
-        },
-        {
-          "long": "50.2819",
-          "lat": "-5.0171",
-          "conf": "0.137",
-          "offset": 235,
-          "name": "Berlin"
-        },
-        {
-          "long": "-74.3023",
-          "lat": "-0.5685",
-          "conf": "0.968",
-          "offset": 679,
-          "name": "Libertytown"
-        },
-        {
-          "long": "-163.8252",
-          "lat": "75.1324",
-          "conf": "0.9035",
-          "offset": 291,
-          "name": "Guilford"
-        },
-        {
-          "long": "-105.4634",
-          "lat": "0.0496",
-          "conf": "0.6642",
-          "offset": 68,
-          "name": "Zeba"
-        },
-        {
-          "long": "-161.2011",
-          "lat": "-49.1897",
-          "conf": "0.9531",
-          "offset": 397,
-          "name": "Sussex"
-        },
-        {
-          "long": "-110.0022",
-          "lat": "-42.5201",
-          "conf": "0.0377",
-          "offset": 887,
-          "name": "Harviell"
-        },
-        {
-          "long": "-13.4368",
-          "lat": "54.8824",
-          "conf": "0.7422",
-          "offset": 335,
-          "name": "Ona"
-        },
-        {
-          "long": "-161.2011",
-          "lat": "-49.1897",
-          "conf": "0.9531",
-          "offset": 397,
-          "name": "Sussex"
-        },
-        {
-          "long": "-110.0022",
-          "lat": "-42.5201",
-          "conf": "0.0377",
-          "offset": 887,
-          "name": "Harviell"
-        },
-        {
-          "long": "-13.4368",
-          "lat": "54.8824",
-          "conf": "0.7422",
-          "offset": 335,
-          "name": "Ona"
-        },
-        {
-          "long": "-161.2011",
-          "lat": "-49.1897",
-          "conf": "0.9531",
-          "offset": 397,
-          "name": "Sussex"
-        },
-        {
-          "long": "-110.0022",
-          "lat": "-42.5201",
-          "conf": "0.0377",
-          "offset": 887,
-          "name": "Harviell"
-        },
-        {
-          "long": "-13.4368",
-          "lat": "54.8824",
-          "conf": "0.7422",
-          "offset": 335,
-          "name": "Ona"
-        },
-        {
-          "long": "-161.2011",
-          "lat": "-49.1897",
-          "conf": "0.9531",
-          "offset": 397,
-          "name": "Sussex"
-        },
-        {
-          "long": "-110.0022",
-          "lat": "-42.5201",
-          "conf": "0.0377",
-          "offset": 887,
-          "name": "Harviell"
-        },
-        {
-          "long": "-13.4368",
-          "lat": "54.8824",
-          "conf": "0.7422",
-          "offset": 335,
-          "name": "Ona"
-        },
-        {
-          "long": "-161.2011",
-          "lat": "-49.1897",
-          "conf": "0.9531",
-          "offset": 397,
-          "name": "Sussex"
-        },
-        {
-          "long": "-110.0022",
-          "lat": "-42.5201",
-          "conf": "0.0377",
-          "offset": 887,
-          "name": "Harviell"
-        },
-        {
-          "long": "-13.4368",
-          "lat": "54.8824",
-          "conf": "0.7422",
-          "offset": 335,
-          "name": "Ona"
-        },
-        {
-          "long": "-161.2011",
-          "lat": "-49.1897",
-          "conf": "0.9531",
-          "offset": 397,
-          "name": "Sussex"
-        },
-        {
-          "long": "-110.0022",
-          "lat": "-42.5201",
-          "conf": "0.0377",
-          "offset": 887,
-          "name": "Harviell"
-        },
-        {
-          "long": "-13.4368",
-          "lat": "54.8824",
-          "conf": "0.7422",
-          "offset": 335,
-          "name": "Ona"
-        },
-        {
-          "long": "-161.2011",
-          "lat": "-49.1897",
-          "conf": "0.9531",
-          "offset": 397,
-          "name": "Sussex"
-        },
-        {
-          "long": "-110.0022",
-          "lat": "-42.5201",
-          "conf": "0.0377",
-          "offset": 887,
-          "name": "Harviell"
-        },
-        {
-          "long": "-13.4368",
-          "lat": "54.8824",
-          "conf": "0.7422",
-          "offset": 335,
-          "name": "Ona"
-        },
-        {
-          "long": "-161.2011",
-          "lat": "-49.1897",
-          "conf": "0.9531",
-          "offset": 397,
-          "name": "Sussex"
-        },
-        {
-          "long": "-110.0022",
-          "lat": "-42.5201",
-          "conf": "0.0377",
-          "offset": 887,
-          "name": "Harviell"
-        },
-        {
-          "long": "-13.4368",
-          "lat": "54.8824",
-          "conf": "0.7422",
-          "offset": 335,
-          "name": "Ona"
-        },
-        {
-          "long": "-161.2011",
-          "lat": "-49.1897",
-          "conf": "0.9531",
-          "offset": 397,
-          "name": "Sussex"
-        },
-        {
-          "long": "-110.0022",
-          "lat": "-42.5201",
-          "conf": "0.0377",
-          "offset": 887,
-          "name": "Harviell"
-        },
-        {
-          "long": "-13.4368",
-          "lat": "54.8824",
-          "conf": "0.7422",
-          "offset": 335,
-          "name": "Ona"
-        },
-        {
-          "long": "-161.0813",
-          "lat": "-3.7353",
-          "conf": "0.0628",
-          "offset": 571,
-          "name": "Rose"
-        },
-        {
-          "long": "69.4776",
-          "lat": "77.5149",
-          "conf": "0.2534",
-          "offset": 397,
-          "name": "Homeworth"
-        },
-        {
-          "long": "163.3857",
-          "lat": "-28.1863",
-          "conf": "0.12",
-          "offset": 783,
-          "name": "Wright"
-        },
-        {
-          "long": "-25.2932",
-          "lat": "-31.0945",
-          "conf": "0.8403",
-          "offset": 546,
-          "name": "Hobucken"
-        },
-        {
-          "long": "-34.1159",
-          "lat": "64.7715",
-          "conf": "0.7504",
-          "offset": 996,
-          "name": "Wollochet"
-        },
-        {
-          "long": "158.9787",
-          "lat": "3.2143",
-          "conf": "0.8569",
-          "offset": 200,
-          "name": "Clinton"
-        },
-        {
-          "long": "-169.3287",
-          "lat": "30.9396",
-          "conf": "0.5463",
-          "offset": 614,
-          "name": "Gerton"
-        },
-        {
-          "long": "-63.9348",
-          "lat": "76.7445",
-          "conf": "0.5047",
-          "offset": 142,
-          "name": "Chesapeake"
-        }
-      ],
-      "filename": "quis",
-      "year": 1472,
-      "URL": "http://www.google.com",
-      "title": "veniam cillum",
-      "authors": "Caroline Barriere"
-    },
-    {
-      "locs": [
-        {
-          "long": "166.9133",
-          "lat": "-37.9979",
-          "conf": "0.3824",
-          "offset": 163,
-          "name": "Trexlertown"
-        },
-        {
-          "long": "61.2746",
-          "lat": "-48.3732",
-          "conf": "0.1601",
-          "offset": 125,
-          "name": "Cliff"
-        },
-        {
-          "long": "-86.9215",
-          "lat": "19.1615",
-          "conf": "0.1819",
-          "offset": 413,
-          "name": "Gracey"
-        },
-        {
-          "long": "-36.0677",
-          "lat": "29.4623",
-          "conf": "0.9613",
-          "offset": 955,
-          "name": "Clay"
-        },
-        {
-          "long": "73.1797",
-          "lat": "-18.4928",
-          "conf": "0.5594",
-          "offset": 8,
-          "name": "Mahtowa"
-        },
-        {
-          "long": "-79.4419",
-          "lat": "-19.3137",
-          "conf": "0.5027",
-          "offset": 378,
-          "name": "Bentley"
-        },
-        {
-          "long": "-129.2819",
-          "lat": "16.1353",
-          "conf": "0.4753",
-          "offset": 937,
-          "name": "Floris"
-        },
-        {
-          "long": "136.8302",
-          "lat": "5.91",
-          "conf": "0.9044",
-          "offset": 351,
-          "name": "Sheatown"
-        },
-        {
-          "long": "65.5878",
-          "lat": "-33.2469",
-          "conf": "0.0913",
-          "offset": 320,
-          "name": "Alden"
-        },
-        {
-          "long": "18.5504",
-          "lat": "-32.1535",
-          "conf": "0.9152",
-          "offset": 427,
-          "name": "Rodman"
-        },
-        {
-          "long": "-35.8",
-          "lat": "-1.3004",
-          "conf": "0.9653",
-          "offset": 333,
-          "name": "Sanford"
-        },
-        {
-          "long": "-65.8262",
-          "lat": "6.3986",
-          "conf": "0.2347",
-          "offset": 441,
-          "name": "Herbster"
-        },
-        {
-          "long": "120.0279",
-          "lat": "-5.1801",
-          "conf": "0.3834",
-          "offset": 625,
-          "name": "Cleary"
-        },
-        {
-          "long": "-79.0711",
-          "lat": "20.7818",
-          "conf": "0.9854",
-          "offset": 186,
-          "name": "Bartley"
-        },
-        {
-          "long": "117.7477",
-          "lat": "17.8425",
-          "conf": "0.253",
-          "offset": 819,
-          "name": "Summertown"
-        },
-        {
-          "long": "129.4283",
-          "lat": "59.1394",
-          "conf": "0.9725",
-          "offset": 832,
-          "name": "Finderne"
-        },
-        {
-          "long": "-90.2673",
-          "lat": "43.2141",
-          "conf": "0.0819",
-          "offset": 553,
-          "name": "Nutrioso"
-        },
-        {
-          "long": "-84.1239",
-          "lat": "37.9011",
-          "conf": "0.0359",
-          "offset": 165,
-          "name": "Orason"
-        },
-        {
-          "long": "-116.9728",
-          "lat": "-21.6267",
-          "conf": "0.4964",
-          "offset": 281,
-          "name": "Watrous"
-        },
-        {
-          "long": "82.1208",
-          "lat": "50.6817",
-          "conf": "0.1323",
-          "offset": 920,
-          "name": "Thomasville"
-        },
-        {
-          "long": "-54.235",
-          "lat": "21.4882",
-          "conf": "0.3102",
-          "offset": 218,
-          "name": "Trinway"
-        },
-        {
-          "long": "-56.8943",
-          "lat": "8.3976",
-          "conf": "0.1336",
-          "offset": 829,
-          "name": "Richville"
-        },
-        {
-          "long": "-82.9814",
-          "lat": "79.9385",
-          "conf": "0.6395",
-          "offset": 764,
-          "name": "Calvary"
-        },
-        {
-          "long": "65.2614",
-          "lat": "-47.9683",
-          "conf": "0.6324",
-          "offset": 992,
-          "name": "Hegins"
-        },
-        {
-          "long": "73.602",
-          "lat": "-15.9247",
-          "conf": "0.2881",
-          "offset": 830,
-          "name": "Cassel"
-        },
-        {
-          "long": "-133.9745",
-          "lat": "29.994",
-          "conf": "0.9156",
-          "offset": 247,
-          "name": "Hayes"
-        },
-        {
-          "long": "-18.9266",
-          "lat": "60.0746",
-          "conf": "0.8247",
-          "offset": 324,
-          "name": "Welda"
-        },
-        {
-          "long": "58.6988",
-          "lat": "73.5883",
-          "conf": "0.3951",
-          "offset": 308,
-          "name": "Bison"
-        },
-        {
-          "long": "-99.5495",
-          "lat": "66.6326",
-          "conf": "0.7215",
-          "offset": 378,
-          "name": "Toftrees"
-        },
-        {
-          "long": "-52.0899",
-          "lat": "66.2868",
-          "conf": "0.4839",
-          "offset": 399,
-          "name": "Harmon"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 22,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "-16.5126",
-          "lat": "76.4882",
-          "conf": "0.8912",
-          "offset": 954,
-          "name": "Morriston"
-        },
-        {
-          "long": "166.6",
-          "lat": "40.1948",
-          "conf": "0.5317",
-          "offset": 275,
-          "name": "Falconaire"
-        },
-        {
-          "long": "127.1636",
-          "lat": "28.9464",
-          "conf": "0.8692",
-          "offset": 285,
-          "name": "Slovan"
-        },
-        {
-          "long": "-73.3165",
-          "lat": "50.4561",
-          "conf": "0.3114",
-          "offset": 921,
-          "name": "Venice"
-        },
-        {
-          "long": "-125.3863",
-          "lat": "-17.9355",
-          "conf": "0.7979",
-          "offset": 377,
-          "name": "Bradenville"
-        },
-        {
-          "long": "-35.3988",
-          "lat": "-6.458",
-          "conf": "0.7615",
-          "offset": 675,
-          "name": "Stevens"
-        },
-        {
-          "long": "-25.2732",
-          "lat": "-40.8184",
-          "conf": "0.1035",
-          "offset": 900,
-          "name": "Harborton"
-        },
-        {
-          "long": "-11.653",
-          "lat": "73.9347",
-          "conf": "0.3912",
-          "offset": 89,
-          "name": "Templeton"
-        },
-        {
-          "long": "-46.6543",
-          "lat": "56.455",
-          "conf": "0.0068",
-          "offset": 248,
-          "name": "Boling"
-        },
-        {
-          "long": "147.3071",
-          "lat": "0.3536",
-          "conf": "0.9633",
-          "offset": 265,
-          "name": "Abrams"
-        },
-        {
-          "long": "-110.217",
-          "lat": "52.5887",
-          "conf": "0.8703",
-          "offset": 253,
-          "name": "Gorham"
-        },
-        {
-          "long": "-52.992",
-          "lat": "-38.4217",
-          "conf": "0.4595",
-          "offset": 107,
-          "name": "Martinez"
-        },
-        {
-          "long": "28.614",
-          "lat": "-23.2897",
-          "conf": "0.7926",
-          "offset": 339,
-          "name": "Henrietta"
-        },
-        {
-          "long": "68.9142",
-          "lat": "62.1561",
-          "conf": "0.0074",
-          "offset": 271,
-          "name": "Lookingglass"
-        },
-        {
-          "long": "-169.842",
-          "lat": "78.7465",
-          "conf": "0.7788",
-          "offset": 358,
-          "name": "Wedgewood"
-        },
-        {
-          "long": "-10.599",
-          "lat": "-14.4106",
-          "conf": "0.3231",
-          "offset": 641,
-          "name": "Eastvale"
-        },
-        {
-          "long": "-63.3266",
-          "lat": "61.9407",
-          "conf": "0.0176",
-          "offset": 940,
-          "name": "Defiance"
-        },
-        {
-          "long": "165.5957",
-          "lat": "13.367",
-          "conf": "0.8533",
-          "offset": 742,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "-31.0764",
-          "lat": "22.0979",
-          "conf": "0.993",
-          "offset": 745,
-          "name": "Mooresburg"
-        }
-      ],
-      "filename": "culpa",
-      "year": 1447,
-      "URL": "http://www.google.com",
-      "title": "eiusmod voluptate",
-      "authors": "Caroline Barriere"
-    },
-    {
-      "locs": [
-        {
-          "long": "-134.4289",
-          "lat": "12.0945",
-          "conf": "0.2925",
-          "offset": 522,
-          "name": "Dixie"
-        },
-        {
-          "long": "-55.9535",
-          "lat": "8.1259",
-          "conf": "0.8568",
-          "offset": 750,
-          "name": "Canoochee"
-        },
-        {
-          "long": "-28.4703",
-          "lat": "-44.5129",
-          "conf": "0.6796",
-          "offset": 230,
-          "name": "Kraemer"
-        },
-        {
-          "long": "-99.9229",
-          "lat": "53.1304",
-          "conf": "0.5524",
-          "offset": 326,
-          "name": "Kenwood"
-        },
-        {
-          "long": "-83.0107",
-          "lat": "66.685",
-          "conf": "0.0013",
-          "offset": 295,
-          "name": "Brecon"
-        },
-        {
-          "long": "17.6159",
-          "lat": "65.4044",
-          "conf": "0.4939",
-          "offset": 290,
-          "name": "Belleview"
-        },
-        {
-          "long": "47.7139",
-          "lat": "1.5748",
-          "conf": "0.7896",
-          "offset": 354,
-          "name": "Emory"
-        },
-        {
-          "long": "90.867",
-          "lat": "-8.431",
-          "conf": "0.0481",
-          "offset": 675,
-          "name": "Corriganville"
-        },
-        {
-          "long": "24.0393",
-          "lat": "73.8229",
-          "conf": "0.3838",
-          "offset": 911,
-          "name": "Rosburg"
-        },
-        {
-          "long": "-16.7637",
-          "lat": "45.0427",
-          "conf": "0.5862",
-          "offset": 557,
-          "name": "Springdale"
-        },
-        {
-          "long": "-150.5608",
-          "lat": "35.8283",
-          "conf": "0.6655",
-          "offset": 545,
-          "name": "Beechmont"
-        },
-        {
-          "long": "-37.769",
-          "lat": "-23.3052",
-          "conf": "0.9193",
-          "offset": 658,
-          "name": "Tampico"
-        },
-        {
-          "long": "111.3971",
-          "lat": "48.5458",
-          "conf": "0.4931",
-          "offset": 441,
-          "name": "Blanford"
-        },
-        {
-          "long": "12.5722",
-          "lat": "-23.8577",
-          "conf": "0.7039",
-          "offset": 617,
-          "name": "Glenshaw"
-        },
-        {
-          "long": "73.8542",
-          "lat": "68.0464",
-          "conf": "0.6764",
-          "offset": 146,
-          "name": "Crawfordsville"
-        },
-        {
-          "long": "121.9528",
-          "lat": "-39.7269",
-          "conf": "0.3901",
-          "offset": 811,
-          "name": "Bancroft"
-        },
-        {
-          "long": "66.6435",
-          "lat": "-22.25",
-          "conf": "0.8218",
-          "offset": 556,
-          "name": "Jamestown"
-        },
-        {
-          "long": "-109.4029",
-          "lat": "-34.4261",
-          "conf": "0.474",
-          "offset": 51,
-          "name": "Heil"
-        },
-        {
-          "long": "-20.6493",
-          "lat": "68.486",
-          "conf": "0.042",
-          "offset": 696,
-          "name": "Cassel"
-        },
-        {
-          "long": "-137.3162",
-          "lat": "-20.8157",
-          "conf": "0.142",
-          "offset": 757,
-          "name": "Nile"
-        },
-        {
-          "long": "-99.8084",
-          "lat": "-4.0117",
-          "conf": "0.8359",
-          "offset": 374,
-          "name": "Kingstowne"
-        },
-        {
-          "long": "-109.4847",
-          "lat": "-4.1258",
-          "conf": "0.3499",
-          "offset": 306,
-          "name": "Greenock"
-        },
-        {
-          "long": "44.1951",
-          "lat": "-26.4604",
-          "conf": "0.3807",
-          "offset": 300,
-          "name": "Lindisfarne"
-        },
-        {
-          "long": "96.6005",
-          "lat": "63.4291",
-          "conf": "0.2819",
-          "offset": 572,
-          "name": "Coventry"
-        },
-        {
-          "long": "161.7594",
-          "lat": "18.2404",
-          "conf": "0.561",
-          "offset": 443,
-          "name": "Guilford"
-        },
-        {
-          "long": "62.9102",
-          "lat": "12.2468",
-          "conf": "0.6906",
-          "offset": 95,
-          "name": "Cavalero"
-        },
-        {
-          "long": "5.3005",
-          "lat": "62.3876",
-          "conf": "0.6907",
-          "offset": 652,
-          "name": "Eden"
-        },
-        {
-          "long": "-13.5321",
-          "lat": "-46.069",
-          "conf": "0.395",
-          "offset": 420,
-          "name": "Norris"
-        },
-        {
-          "long": "123.1464",
-          "lat": "0.3402",
-          "conf": "0.5354",
-          "offset": 57,
-          "name": "Harrodsburg"
-        },
-        {
-          "long": "-46.708",
-          "lat": "30.196",
-          "conf": "0.2579",
-          "offset": 771,
-          "name": "Woodruff"
-        },
-        {
-          "long": "-96.1667",
-          "lat": "67.88",
-          "conf": "0.3935",
-          "offset": 142,
-          "name": "Klondike"
-        },
-        {
-          "long": "128.4802",
-          "lat": "73.5822",
-          "conf": "0.5447",
-          "offset": 195,
-          "name": "Crenshaw"
-        },
-        {
-          "long": "-34.3086",
-          "lat": "7.1378",
-          "conf": "0.5625",
-          "offset": 559,
-          "name": "Holcombe"
-        },
-        {
-          "long": "-59.3285",
-          "lat": "-14.7604",
-          "conf": "0.0708",
-          "offset": 482,
-          "name": "Blue"
-        },
-        {
-          "long": "-102.4871",
-          "lat": "20.9959",
-          "conf": "0.3331",
-          "offset": 946,
-          "name": "Harold"
-        },
-        {
-          "long": "-71.4901",
-          "lat": "-38.7628",
-          "conf": "0.1127",
-          "offset": 487,
-          "name": "Witmer"
-        },
-        {
-          "long": "70.7549",
-          "lat": "0.6149",
-          "conf": "0.8561",
-          "offset": 331,
-          "name": "Sardis"
-        },
-        {
-          "long": "-139.9511",
-          "lat": "25.0771",
-          "conf": "0.5854",
-          "offset": 208,
-          "name": "Dunnavant"
-        },
-        {
-          "long": "-59.3285",
-          "lat": "-14.7604",
-          "conf": "0.0708",
-          "offset": 482,
-          "name": "Blue"
-        },
-        {
-          "long": "-102.4871",
-          "lat": "20.9959",
-          "conf": "0.3331",
-          "offset": 946,
-          "name": "Harold"
-        },
-        {
-          "long": "-71.4901",
-          "lat": "-38.7628",
-          "conf": "0.1127",
-          "offset": 487,
-          "name": "Witmer"
-        },
-        {
-          "long": "70.7549",
-          "lat": "0.6149",
-          "conf": "0.8561",
-          "offset": 331,
-          "name": "Sardis"
-        },
-        {
-          "long": "-139.9511",
-          "lat": "25.0771",
-          "conf": "0.5854",
-          "offset": 208,
-          "name": "Dunnavant"
-        },
-        {
-          "long": "-59.3285",
-          "lat": "-14.7604",
-          "conf": "0.0708",
-          "offset": 482,
-          "name": "Blue"
-        },
-        {
-          "long": "-102.4871",
-          "lat": "20.9959",
-          "conf": "0.3331",
-          "offset": 946,
-          "name": "Harold"
-        },
-        {
-          "long": "-71.4901",
-          "lat": "-38.7628",
-          "conf": "0.1127",
-          "offset": 487,
-          "name": "Witmer"
-        },
-        {
-          "long": "70.7549",
-          "lat": "0.6149",
-          "conf": "0.8561",
-          "offset": 331,
-          "name": "Sardis"
-        },
-        {
-          "long": "-139.9511",
-          "lat": "25.0771",
-          "conf": "0.5854",
-          "offset": 208,
-          "name": "Dunnavant"
-        },
-        {
-          "long": "-15.0648",
-          "lat": "9.5644",
-          "conf": "0.7599",
-          "offset": 108,
-          "name": "Graball"
-        },
-        {
-          "long": "-9.6484",
-          "lat": "67.8313",
-          "conf": "0.2007",
-          "offset": 924,
-          "name": "Bowden"
-        },
-        {
-          "long": "63.9216",
-          "lat": "-48.039",
-          "conf": "0.7533",
-          "offset": 140,
-          "name": "Chautauqua"
-        },
-        {
-          "long": "-29.4221",
-          "lat": "24.9229",
-          "conf": "0.8484",
-          "offset": 893,
-          "name": "Williams"
-        },
-        {
-          "long": "18.0027",
-          "lat": "79.0505",
-          "conf": "0.393",
-          "offset": 171,
-          "name": "Chamberino"
-        },
-        {
-          "long": "36.9757",
-          "lat": "-34.7784",
-          "conf": "0.6934",
-          "offset": 295,
-          "name": "Marne"
-        },
-        {
-          "long": "-99.6479",
-          "lat": "-30.9112",
-          "conf": "0.3048",
-          "offset": 710,
-          "name": "Curtice"
-        },
-        {
-          "long": "137.6719",
-          "lat": "-31.383",
-          "conf": "0.513",
-          "offset": 893,
-          "name": "Condon"
-        },
-        {
-          "long": "-165.4525",
-          "lat": "-13.2684",
-          "conf": "0.1151",
-          "offset": 410,
-          "name": "Nord"
-        },
-        {
-          "long": "-12.5025",
-          "lat": "-15.855",
-          "conf": "0.2448",
-          "offset": 328,
-          "name": "Sterling"
-        },
-        {
-          "long": "-94.4429",
-          "lat": "-13.5519",
-          "conf": "0.4044",
-          "offset": 608,
-          "name": "Marion"
-        },
-        {
-          "long": "-119.9883",
-          "lat": "43.4333",
-          "conf": "0.9498",
-          "offset": 590,
-          "name": "Kirk"
-        },
-        {
-          "long": "144.6576",
-          "lat": "20.3955",
-          "conf": "0.0881",
-          "offset": 784,
-          "name": "Juarez"
-        },
-        {
-          "long": "10.6027",
-          "lat": "-30.1901",
-          "conf": "0.7036",
-          "offset": 96,
-          "name": "Castleton"
-        },
-        {
-          "long": "-59.1665",
-          "lat": "-17.1363",
-          "conf": "0.1837",
-          "offset": 179,
-          "name": "Montura"
-        },
-        {
-          "long": "-146.1623",
-          "lat": "79.2892",
-          "conf": "0.6021",
-          "offset": 585,
-          "name": "Concho"
-        },
-        {
-          "long": "103.6583",
-          "lat": "-35.1901",
-          "conf": "0.3801",
-          "offset": 194,
-          "name": "Floriston"
-        },
-        {
-          "long": "132.0135",
-          "lat": "48.9538",
-          "conf": "0.1406",
-          "offset": 432,
-          "name": "Faywood"
-        },
-        {
-          "long": "151.4215",
-          "lat": "36.2623",
-          "conf": "0.0405",
-          "offset": 385,
-          "name": "Sena"
-        },
-        {
-          "long": "-57.2035",
-          "lat": "3.375",
-          "conf": "0.0658",
-          "offset": 438,
-          "name": "Westwood"
-        },
-        {
-          "long": "-43.4147",
-          "lat": "-2.7808",
-          "conf": "0.8942",
-          "offset": 23,
-          "name": "Sidman"
-        },
-        {
-          "long": "142.7183",
-          "lat": "61.9433",
-          "conf": "0.1911",
-          "offset": 124,
-          "name": "Ruckersville"
-        },
-        {
-          "long": "44.3367",
-          "lat": "-22.4129",
-          "conf": "0.0971",
-          "offset": 788,
-          "name": "Troy"
-        },
-        {
-          "long": "-15.5214",
-          "lat": "64.6161",
-          "conf": "0.0436",
-          "offset": 11,
-          "name": "Konterra"
-        },
-        {
-          "long": "105.2174",
-          "lat": "77.6932",
-          "conf": "0.2927",
-          "offset": 505,
-          "name": "Rowe"
-        },
-        {
-          "long": "4.6485",
-          "lat": "34.1368",
-          "conf": "0.7172",
-          "offset": 321,
-          "name": "Ona"
-        },
-        {
-          "long": "70.7122",
-          "lat": "-20.6639",
-          "conf": "0.6528",
-          "offset": 507,
-          "name": "Forbestown"
-        },
-        {
-          "long": "74.0034",
-          "lat": "-43.2062",
-          "conf": "0.0888",
-          "offset": 653,
-          "name": "Omar"
-        },
-        {
-          "long": "28.0272",
-          "lat": "-29.4284",
-          "conf": "0.6423",
-          "offset": 658,
-          "name": "Gardners"
-        },
-        {
-          "long": "-154.2281",
-          "lat": "-12.5281",
-          "conf": "0.2288",
-          "offset": 751,
-          "name": "Hinsdale"
-        },
-        {
-          "long": "-114.5645",
-          "lat": "-35.3007",
-          "conf": "0.2808",
-          "offset": 705,
-          "name": "Loveland"
-        },
-        {
-          "long": "4.117",
-          "lat": "-30.9226",
-          "conf": "0.2263",
-          "offset": 264,
-          "name": "Summerfield"
-        },
-        {
-          "long": "113.5149",
-          "lat": "-48.9128",
-          "conf": "0.1377",
-          "offset": 648,
-          "name": "Hailesboro"
-        },
-        {
-          "long": "-42.3152",
-          "lat": "-40.1165",
-          "conf": "0.9867",
-          "offset": 168,
-          "name": "Alafaya"
-        },
-        {
-          "long": "-58.139",
-          "lat": "31.6589",
-          "conf": "0.9551",
-          "offset": 155,
-          "name": "Fairfield"
-        },
-        {
-          "long": "-114.3838",
-          "lat": "-29.0478",
-          "conf": "0.8107",
-          "offset": 897,
-          "name": "Wescosville"
-        },
-        {
-          "long": "-6.3356",
-          "lat": "-26.4905",
-          "conf": "0.5017",
-          "offset": 36,
-          "name": "Baker"
-        },
-        {
-          "long": "157.0931",
-          "lat": "62.7053",
-          "conf": "0.0976",
-          "offset": 828,
-          "name": "Cornucopia"
-        },
-        {
-          "long": "72.1874",
-          "lat": "-17.8096",
-          "conf": "0.8524",
-          "offset": 528,
-          "name": "Walton"
-        },
-        {
-          "long": "25.9837",
-          "lat": "-6.847",
-          "conf": "0.1518",
-          "offset": 124,
-          "name": "Rose"
-        },
-        {
-          "long": "57.3262",
-          "lat": "-28.716",
-          "conf": "0.6007",
-          "offset": 943,
-          "name": "Leola"
-        },
-        {
-          "long": "127.4309",
-          "lat": "26.4847",
-          "conf": "0.9451",
-          "offset": 270,
-          "name": "Dawn"
-        },
-        {
-          "long": "-113.8139",
-          "lat": "23.2147",
-          "conf": "0.1997",
-          "offset": 135,
-          "name": "Riegelwood"
-        },
-        {
-          "long": "-33.8559",
-          "lat": "25.1106",
-          "conf": "0.0504",
-          "offset": 820,
-          "name": "Dixonville"
-        },
-        {
-          "long": "-69.6989",
-          "lat": "-30.0711",
-          "conf": "0.827",
-          "offset": 56,
-          "name": "Aguila"
-        },
-        {
-          "long": "118.0736",
-          "lat": "-3.7943",
-          "conf": "0.7291",
-          "offset": 544,
-          "name": "Munjor"
-        },
-        {
-          "long": "155.8497",
-          "lat": "-37.3381",
-          "conf": "0.8096",
-          "offset": 351,
-          "name": "Deputy"
-        },
-        {
-          "long": "-153.2864",
-          "lat": "-32.128",
-          "conf": "0.4485",
-          "offset": 396,
-          "name": "Rew"
-        },
-        {
-          "long": "-169.4403",
-          "lat": "44.7334",
-          "conf": "0.7565",
-          "offset": 130,
-          "name": "Glasgow"
-        },
-        {
-          "long": "11.4526",
-          "lat": "48.943",
-          "conf": "0.2824",
-          "offset": 37,
-          "name": "Rockingham"
-        },
-        {
-          "long": "34.8811",
-          "lat": "64.5734",
-          "conf": "0.0563",
-          "offset": 76,
-          "name": "Riner"
-        },
-        {
-          "long": "-10.7467",
-          "lat": "60.9852",
-          "conf": "0.9822",
-          "offset": 278,
-          "name": "Hendersonville"
-        },
-        {
-          "long": "120.2702",
-          "lat": "20.5735",
-          "conf": "0.4933",
-          "offset": 15,
-          "name": "Nelson"
-        },
-        {
-          "long": "-85.3269",
-          "lat": "53.5571",
-          "conf": "0.896",
-          "offset": 346,
-          "name": "Waterview"
-        },
-        {
-          "long": "164.414",
-          "lat": "-1.0391",
-          "conf": "0.1909",
-          "offset": 628,
-          "name": "Vale"
-        },
-        {
-          "long": "-121.6536",
-          "lat": "47.724",
-          "conf": "0.5879",
-          "offset": 812,
-          "name": "Collins"
-        },
-        {
-          "long": "31.9693",
-          "lat": "-21.6026",
-          "conf": "0.827",
-          "offset": 290,
-          "name": "Edinburg"
-        },
-        {
-          "long": "-64.9731",
-          "lat": "51.5028",
-          "conf": "0.614",
-          "offset": 674,
-          "name": "Cutter"
-        },
-        {
-          "long": "-148.7144",
-          "lat": "-46.9268",
-          "conf": "0.5898",
-          "offset": 728,
-          "name": "Moraida"
-        },
-        {
-          "long": "136.5566",
-          "lat": "36.0836",
-          "conf": "0.2214",
-          "offset": 742,
-          "name": "Adelino"
-        },
-        {
-          "long": "-31.7008",
-          "lat": "33.9317",
-          "conf": "0.3254",
-          "offset": 607,
-          "name": "Manila"
-        },
-        {
-          "long": "44.3367",
-          "lat": "-22.4129",
-          "conf": "0.0971",
-          "offset": 788,
-          "name": "Troy"
-        }
-      ],
-      "filename": "cupidatat",
-      "year": 1494,
-      "URL": "http://www.google.com",
-      "title": "ut nulla",
-      "authors": "Gabriel Bernier-Colborne"
-    },
-    {
-      "locs": [
-        {
-          "long": "43.3367",
-          "lat": "-21.4129",
-          "conf": "0.0971",
-          "offset": 788,
-          "name": "Charny"
-        }
-      ],
-      "filename": "dlksjf",
-      "year": 1494,
-      "URL": "http://www.google.com",
-      "title": "ut nulla",
-      "authors": "Jerome Labonte"
-    }
-  ]
-}
+[
+  {
+    "locs": [
+      {
+        "offset": 0,
+        "name": "LONDON",
+        "conf": 0.990244,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 32,
+        "name": "Egypt",
+        "conf": 0.759266,
+        "lat": "30.033333333333335",
+        "long": "31.216666666666665"
+      }
+    ],
+    "filename": "A58819.xml",
+    "year": 1692,
+    "title": "A sermon preached before the queen the 22d of May, 1692 upon occasion of the late victory obtained by Their Majesties fleet over the French / by John Scott ...",
+    "URL": "/misc/data18/patx/barrieca/McGill-Sinclair/code/texts/1/A58819.txt",
+    "authors": "Scott, John, 1639-1695"
+  },
+  {
+    "locs": [
+      {
+        "offset": 184,
+        "name": "Spain",
+        "conf": 0.999838,
+        "lat": "40.43333333333333",
+        "long": "-3.7"
+      },
+      {
+        "offset": 81,
+        "name": "Dunkirk",
+        "conf": 0.947835,
+        "lat": "51.0383",
+        "long": "2.3775"
+      },
+      {
+        "offset": 89,
+        "name": "Ireland",
+        "conf": 0.988227,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 878,
+        "name": "Ireland",
+        "conf": 0.988633,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 1036,
+        "name": "Ireland",
+        "conf": 0.999625,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 1425,
+        "name": "Ireland",
+        "conf": 0.977838,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 1750,
+        "name": "Ireland",
+        "conf": 0.997216,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 311,
+        "name": "Ireland",
+        "conf": 0.985964,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 540,
+        "name": "Ireland",
+        "conf": 0.998274,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 823,
+        "name": "Ireland",
+        "conf": 0.998678,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 1166,
+        "name": "Ireland",
+        "conf": 0.967031,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 189,
+        "name": "Spain",
+        "conf": 0.999966,
+        "lat": "40.43333333333333",
+        "long": "-3.7"
+      },
+      {
+        "offset": 73,
+        "name": "London",
+        "conf": 0.992499,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 652,
+        "name": "Hammersmith",
+        "conf": 0.987324,
+        "lat": "51.4928",
+        "long": "-0.2229"
+      },
+      {
+        "offset": 288,
+        "name": "Spain",
+        "conf": 0.999977,
+        "lat": "40.43333333333333",
+        "long": "-3.7"
+      },
+      {
+        "offset": 1425,
+        "name": "Spain",
+        "conf": 0.999978,
+        "lat": "40.43333333333333",
+        "long": "-3.7"
+      },
+      {
+        "offset": 1549,
+        "name": "Brussels",
+        "conf": 0.999708,
+        "lat": "50.85",
+        "long": "4.35"
+      },
+      {
+        "offset": 41,
+        "name": "Kensington",
+        "conf": 0.989428,
+        "lat": "51.5",
+        "long": "-0.19"
+      },
+      {
+        "offset": 79,
+        "name": "London",
+        "conf": 0.9999,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 58,
+        "name": "Hammersmith",
+        "conf": 0.71077,
+        "lat": "51.4928",
+        "long": "-0.2229"
+      },
+      {
+        "offset": 123,
+        "name": "London",
+        "conf": 0.996546,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 214,
+        "name": "London",
+        "conf": 0.999747,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 9,
+        "name": "London",
+        "conf": 0.996046,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 326,
+        "name": "London",
+        "conf": 0.995678,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 1317,
+        "name": "London",
+        "conf": 0.999151,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 191,
+        "name": "Ireland",
+        "conf": 0.975181,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 70,
+        "name": "London",
+        "conf": 0.99974,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 9,
+        "name": "London",
+        "conf": 0.947675,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 87,
+        "name": "London",
+        "conf": 0.998354,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 2162,
+        "name": "London",
+        "conf": 0.994975,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 2388,
+        "name": "London",
+        "conf": 0.999801,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 726,
+        "name": "London",
+        "conf": 0.999982,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 343,
+        "name": "London",
+        "conf": 0.991936,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 149,
+        "name": "London",
+        "conf": 0.99947,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 326,
+        "name": "London",
+        "conf": 0.997382,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 112,
+        "name": "Ireland",
+        "conf": 0.97803,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 237,
+        "name": "London",
+        "conf": 0.997981,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 392,
+        "name": "London",
+        "conf": 0.991341,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 222,
+        "name": "Israel",
+        "conf": 0.999403,
+        "lat": "31.783333333333335",
+        "long": "35.21666666666667"
+      },
+      {
+        "offset": 99,
+        "name": "France",
+        "conf": 0.998781,
+        "lat": "48.85666666666667",
+        "long": "2.350833333333333"
+      },
+      {
+        "offset": 334,
+        "name": "London",
+        "conf": 0.993736,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 488,
+        "name": "Ireland",
+        "conf": 0.972296,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 270,
+        "name": "Ireland",
+        "conf": 0.645383,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 88,
+        "name": "Ireland",
+        "conf": 0.99915,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 508,
+        "name": "Ireland",
+        "conf": 0.990605,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 1186,
+        "name": "London",
+        "conf": 0.998055,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 1419,
+        "name": "London",
+        "conf": 0.994239,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 472,
+        "name": "Ireland",
+        "conf": 0.996069,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 92,
+        "name": "Ireland",
+        "conf": 0.998603,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 56,
+        "name": "Ireland",
+        "conf": 0.997282,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 0,
+        "name": "London",
+        "conf": 0.997819,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 150,
+        "name": "London",
+        "conf": 0.997472,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 115,
+        "name": "London",
+        "conf": 0.999869,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 247,
+        "name": "London",
+        "conf": 0.999698,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 41,
+        "name": "Poland",
+        "conf": 0.998998,
+        "lat": "52.21666666666667",
+        "long": "21.033333333333335"
+      },
+      {
+        "offset": 78,
+        "name": "Poland",
+        "conf": 0.99834,
+        "lat": "52.21666666666667",
+        "long": "21.033333333333335"
+      },
+      {
+        "offset": 583,
+        "name": "Brazil",
+        "conf": 0.999985,
+        "lat": "-15.783333333333333",
+        "long": "-47.86666666666667"
+      },
+      {
+        "offset": 455,
+        "name": "Hungary",
+        "conf": 0.999424,
+        "lat": "47.43333333333333",
+        "long": "19.25"
+      },
+      {
+        "offset": 783,
+        "name": "Rome",
+        "conf": 0.998637,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 67,
+        "name": "Ireland",
+        "conf": 0.982819,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 248,
+        "name": "Warwick",
+        "conf": 0.817634,
+        "lat": "52.28",
+        "long": "-1.59"
+      },
+      {
+        "offset": 297,
+        "name": "Manchester",
+        "conf": 0.758697,
+        "lat": "53.46666666666667",
+        "long": "-2.2333333333333334"
+      },
+      {
+        "offset": 80,
+        "name": "Sweden",
+        "conf": 0.999763,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 91,
+        "name": "Denmark",
+        "conf": 0.999975,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 878,
+        "name": "Sweden",
+        "conf": 0.998059,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 921,
+        "name": "Sweden",
+        "conf": 0.994785,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 8,
+        "name": "Denmark",
+        "conf": 0.999453,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 512,
+        "name": "Denmark",
+        "conf": 0.938413,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 537,
+        "name": "Denmark",
+        "conf": 0.979165,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 567,
+        "name": "Sweden",
+        "conf": 0.999075,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 616,
+        "name": "Norway",
+        "conf": 0.999932,
+        "lat": "59.93333333333333",
+        "long": "10.683333333333334"
+      },
+      {
+        "offset": 734,
+        "name": "Sweden",
+        "conf": 0.942476,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 770,
+        "name": "Denmark",
+        "conf": 0.93797,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 856,
+        "name": "Denmark",
+        "conf": 0.999971,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 867,
+        "name": "Norway",
+        "conf": 0.99751,
+        "lat": "59.93333333333333",
+        "long": "10.683333333333334"
+      },
+      {
+        "offset": 978,
+        "name": "Bremen",
+        "conf": 0.930491,
+        "lat": "53.083333333333336",
+        "long": "8.8"
+      },
+      {
+        "offset": 1078,
+        "name": "Denmark",
+        "conf": 0.998618,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 1252,
+        "name": "Sweden",
+        "conf": 0.990076,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 1283,
+        "name": "Denmark",
+        "conf": 0.988695,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 193,
+        "name": "Denmark",
+        "conf": 0.99999,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 204,
+        "name": "Norway",
+        "conf": 0.988058,
+        "lat": "59.93333333333333",
+        "long": "10.683333333333334"
+      },
+      {
+        "offset": 229,
+        "name": "Sweden",
+        "conf": 0.999614,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 475,
+        "name": "Denmark",
+        "conf": 0.985263,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 517,
+        "name": "Sweden",
+        "conf": 0.895175,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 700,
+        "name": "Sweden",
+        "conf": 0.98535,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 724,
+        "name": "Denmark",
+        "conf": 0.99863,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 852,
+        "name": "Denmark",
+        "conf": 0.994282,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 130,
+        "name": "Denmark",
+        "conf": 0.980109,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 204,
+        "name": "Sweden",
+        "conf": 0.719725,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 447,
+        "name": "Denmark",
+        "conf": 0.999815,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 743,
+        "name": "Denmark",
+        "conf": 0.982414,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 823,
+        "name": "Denmark",
+        "conf": 0.992268,
+        "lat": "55.71666666666667",
+        "long": "12.566666666666666"
+      },
+      {
+        "offset": 853,
+        "name": "Sweden",
+        "conf": 0.90668,
+        "lat": "59.35",
+        "long": "18.066666666666666"
+      },
+      {
+        "offset": 77,
+        "name": "London",
+        "conf": 0.914249,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 135,
+        "name": "Brussels",
+        "conf": 0.999529,
+        "lat": "50.85",
+        "long": "4.35"
+      },
+      {
+        "offset": 145,
+        "name": "Ostend",
+        "conf": 0.99933,
+        "lat": "51.233333333333334",
+        "long": "2.9166666666666665"
+      },
+      {
+        "offset": 147,
+        "name": "London",
+        "conf": 0.999926,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 81,
+        "name": "Ireland",
+        "conf": 0.971042,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 933,
+        "name": "Rome",
+        "conf": 0.976587,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 1774,
+        "name": "Rome",
+        "conf": 0.998725,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 581,
+        "name": "Poland",
+        "conf": 0.995885,
+        "lat": "52.21666666666667",
+        "long": "21.033333333333335"
+      },
+      {
+        "offset": 1576,
+        "name": "Poland",
+        "conf": 0.999146,
+        "lat": "52.21666666666667",
+        "long": "21.033333333333335"
+      },
+      {
+        "offset": 1630,
+        "name": "Poland",
+        "conf": 0.999901,
+        "lat": "52.21666666666667",
+        "long": "21.033333333333335"
+      },
+      {
+        "offset": 426,
+        "name": "Brandenburg",
+        "conf": 0.969604,
+        "lat": "52.36194444444445",
+        "long": "13.008055555555556"
+      },
+      {
+        "offset": 451,
+        "name": "Hungary",
+        "conf": 0.999958,
+        "lat": "47.43333333333333",
+        "long": "19.25"
+      },
+      {
+        "offset": 427,
+        "name": "Ireland",
+        "conf": 0.989612,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 159,
+        "name": "London",
+        "conf": 0.998542,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 221,
+        "name": "London",
+        "conf": 0.999061,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 430,
+        "name": "London",
+        "conf": 0.998189,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 25,
+        "name": "Dunkirk",
+        "conf": 0.988769,
+        "lat": "51.0383",
+        "long": "2.3775"
+      },
+      {
+        "offset": 210,
+        "name": "Bergen",
+        "conf": 0.548469,
+        "lat": "60.38944444444444",
+        "long": "5.33"
+      },
+      {
+        "offset": 49,
+        "name": "Dunkirk",
+        "conf": 0.992813,
+        "lat": "51.0383",
+        "long": "2.3775"
+      },
+      {
+        "offset": 249,
+        "name": "Ireland",
+        "conf": 0.966182,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 557,
+        "name": "Dunkirk",
+        "conf": 0.998096,
+        "lat": "51.0383",
+        "long": "2.3775"
+      },
+      {
+        "offset": 1067,
+        "name": "Dunkirk",
+        "conf": 0.999534,
+        "lat": "51.0383",
+        "long": "2.3775"
+      },
+      {
+        "offset": 163,
+        "name": "Cambridge",
+        "conf": 0.976508,
+        "lat": "52.205",
+        "long": "0.119"
+      }
+    ],
+    "filename": "A40752.xml",
+    "year": 1658,
+    "title": "A Further narrative of the passages of these times in the Common-wealth of England an act for renouncing and disanulling the pretended title of Charls Stuart, and for the taking away of the Court of Wards and Liveries, the judgment ... against James Naylor the Quaker : with the triall of Miles Sundercombe ...",
+    "URL": "/misc/data18/patx/barrieca/McGill-Sinclair/code/texts/1/A40752.txt"
+  },
+  {
+    "locs": [
+      {
+        "offset": 0,
+        "name": "LONDON",
+        "conf": 0.999322,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 186,
+        "name": "Rome",
+        "conf": 0.991252,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 261,
+        "name": "Rome",
+        "conf": 0.998249,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 106,
+        "name": "Rome",
+        "conf": 0.996714,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 443,
+        "name": "Rome",
+        "conf": 0.999897,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 757,
+        "name": "Rome",
+        "conf": 0.999251,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 326,
+        "name": "Rome",
+        "conf": 0.998058,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 551,
+        "name": "Rome",
+        "conf": 0.999769,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 516,
+        "name": "Rome",
+        "conf": 0.999825,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 396,
+        "name": "Rome",
+        "conf": 0.940541,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 133,
+        "name": "Jerusalem",
+        "conf": 0.999509,
+        "lat": "31.783333333333335",
+        "long": "35.21666666666667"
+      }
+    ],
+    "filename": "A12799.xml",
+    "year": 1623,
+    "title": "The Christian sword and buckler, or, A letter by D. Sprint to a man seuen yeares grieuously afflicted in conscience and fearefully possessed by the Diuel very comfortable and commodious to withstand the assaults of Sathan.",
+    "URL": "/misc/data18/patx/barrieca/McGill-Sinclair/code/texts/1/A12799.txt",
+    "authors": "Sprint, John, d. 1623"
+  },
+  {
+    "locs": [{
+      "offset": 45,
+      "name": "London",
+      "conf": 0.99975,
+      "lat": "51.507222222222225",
+      "long": "-0.1275"
+    }],
+    "filename": "A92203.xml",
+    "year": 1653,
+    "title": "The complaint of many free-holders, farmer, and others, of the Common-wealth of England:  Against the unlawfull planting of English tobacco. With an act of Parliament prohibiting the same.",
+    "URL": "/misc/data18/patx/barrieca/McGill-Sinclair/code/texts/1/A92203.txt",
+    "authors": "Read, Robert, fl. 1653-1656"
+  },
+  {
+    "locs": [
+      {
+        "offset": 219,
+        "name": "London",
+        "conf": 0.998978,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 0,
+        "name": "LONDON",
+        "conf": 0.999677,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 228,
+        "name": "London",
+        "conf": 0.999316,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 175,
+        "name": "London",
+        "conf": 0.993218,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 102,
+        "name": "London",
+        "conf": 0.998841,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 1457,
+        "name": "London",
+        "conf": 0.998967,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 757,
+        "name": "Ireland",
+        "conf": 0.982064,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 188,
+        "name": "Ireland",
+        "conf": 0.998015,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 190,
+        "name": "London",
+        "conf": 0.997786,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 536,
+        "name": "Ireland",
+        "conf": 0.997921,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      },
+      {
+        "offset": 735,
+        "name": "Ireland",
+        "conf": 0.90477,
+        "lat": "53.416666666666664",
+        "long": "-8.0"
+      }
+    ],
+    "filename": "A91232.xml",
+    "title": "New Presbyterian light springing out of Independent darkness. or VI. important new queries proposed to the Army, and their friends and party of the Houses;:  concerning the late ordinance for repeal of the new militia of London, setled by an ordinance of both Houses, when full and free, for an whole year, (not yet one quarter expired;) and other late repeals of ordinances and votes; and the high declaration against the intended petition and engagement of the Londoners and others, for the speedy settlement of the kingdomes peace: occasioned by the debates thereof in the Common Councel in the Guildhal on Saturday last, the 24 of this instant Iuly. Discovering the dangerous consequences of repealing ordinances and votes, and the Independents, sectaries, and Armies plots, to blast the honour, justice, and reputation of this Parliament, thereby to dissolve it and all others in it; their false pretences of peace, when they intend nought lesse; and their strange injustice and malice against Presbyterians, which will end in their own dishonour and downfal.",
+    "URL": "/misc/data18/patx/barrieca/McGill-Sinclair/code/texts/1/A91232.txt",
+    "authors": "Prynne, William, 1600-1669"
+  },
+  {
+    "locs": [
+      {
+        "offset": 0,
+        "name": "London",
+        "conf": 0.99999,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 3,
+        "name": "Jerusalem",
+        "conf": 0.999998,
+        "lat": "31.783333333333335",
+        "long": "35.21666666666667"
+      },
+      {
+        "offset": 5,
+        "name": "Rome",
+        "conf": 0.999845,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 5,
+        "name": "Rome",
+        "conf": 0.990396,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 10,
+        "name": "Rome",
+        "conf": 0.817938,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 17,
+        "name": "Israel",
+        "conf": 0.99314,
+        "lat": "31.783333333333335",
+        "long": "35.21666666666667"
+      },
+      {
+        "offset": 29,
+        "name": "Israel",
+        "conf": 0.999271,
+        "lat": "31.783333333333335",
+        "long": "35.21666666666667"
+      },
+      {
+        "offset": 45,
+        "name": "Queens",
+        "conf": 0.999816,
+        "lat": "40.75",
+        "long": "-73.86666666666666"
+      },
+      {
+        "offset": 34,
+        "name": "Israel",
+        "conf": 0.999958,
+        "lat": "31.783333333333335",
+        "long": "35.21666666666667"
+      },
+      {
+        "offset": 9,
+        "name": "Israel",
+        "conf": 0.999952,
+        "lat": "31.783333333333335",
+        "long": "35.21666666666667"
+      }
+    ],
+    "filename": "A96612.xml",
+    "year": 1652,
+    "title": "The fourth paper, presented by Maior Butler, to the Honourable Committee of Parliament, for the propagating the gospel of Christ Jesus.:  VVhich paper was humbly owned, and was, and is attended to be made good by Major Butler. Mr. Charles Vane. Col. Danvers. Mr. Iackson. Mr. VVall. And Mr. Turner. Also a letter from Mr. Goad, to Major Butler, upon occasion of the said paper and proposals. Together with a testimony to the said fourth paper, by way of explanation upon the four proposals of it. / By R.W. Unto which is subjoyned the fifteen proposals of the ministers.",
+    "URL": "/misc/data18/patx/barrieca/McGill-Sinclair/code/texts/1/A96612.txt",
+    "authors": "Williams, Roger, 1604?-1683"
+  },
+  {
+    "locs": [
+      {
+        "offset": 16,
+        "name": "Bern",
+        "conf": 0.999531,
+        "lat": "46.95",
+        "long": "7.45"
+      },
+      {
+        "offset": 25,
+        "name": "Geneva",
+        "conf": 0.975678,
+        "lat": "46.2",
+        "long": "6.15"
+      }
+    ],
+    "filename": "A38076.xml",
+    "year": 1695,
+    "title": "Remarks upon a book lately published by Dr. Will. Sherlock ... entituled, A modest examination of the Oxford decree, &c.",
+    "URL": "/misc/data18/patx/barrieca/McGill-Sinclair/code/texts/1/A38076.txt",
+    "authors": "Edwards, Jonathan, 1629-1712"
+  },
+  {
+    "locs": [
+      {
+        "offset": 194,
+        "name": "Egypt",
+        "conf": 0.999468,
+        "lat": "30.033333333333335",
+        "long": "31.216666666666665"
+      },
+      {
+        "offset": 0,
+        "name": "London",
+        "conf": 0.91885,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 1381,
+        "name": "Israel",
+        "conf": 0.999946,
+        "lat": "31.783333333333335",
+        "long": "35.21666666666667"
+      },
+      {
+        "offset": 226,
+        "name": "Egypt",
+        "conf": 0.998108,
+        "lat": "30.033333333333335",
+        "long": "31.216666666666665"
+      },
+      {
+        "offset": 542,
+        "name": "Egypt",
+        "conf": 0.998667,
+        "lat": "30.033333333333335",
+        "long": "31.216666666666665"
+      },
+      {
+        "offset": 1703,
+        "name": "Egypt",
+        "conf": 0.999956,
+        "lat": "30.033333333333335",
+        "long": "31.216666666666665"
+      },
+      {
+        "offset": 708,
+        "name": "Egypt",
+        "conf": 0.999826,
+        "lat": "30.033333333333335",
+        "long": "31.216666666666665"
+      }
+    ],
+    "filename": "A35833.xml",
+    "year": 1655,
+    "title": "The discovery of mans return to his first estate by the operation of the power of God in the great work of regeneration with a word to all saints who set their faces towards Sion to seek the Lord their God ... : a word to the back-slider who hath tasted of the good word of God ... : with a discovery of mystery-Babylon and her merchants  .... / written by one whom the people of this world calls a Quaker, whose name in the flesh is William Deusbury, but hath a new name the world knows not written in the book of life.",
+    "URL": "/misc/data18/patx/barrieca/McGill-Sinclair/code/texts/1/A35833.txt",
+    "authors": "Dewsbury, William, 1621-1688"
+  },
+  {
+    "locs": [
+      {
+        "offset": 0,
+        "name": "LONDON",
+        "conf": 0.999723,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 0,
+        "name": "Rome",
+        "conf": 0.709725,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 10,
+        "name": "Rome",
+        "conf": 0.99997,
+        "lat": "41.9",
+        "long": "12.5"
+      },
+      {
+        "offset": 17,
+        "name": "Jerusalem",
+        "conf": 0.999182,
+        "lat": "31.783333333333335",
+        "long": "35.21666666666667"
+      }
+    ],
+    "filename": "A67825.xml",
+    "year": 1688,
+    "title": "A sermon exhorting to union in religion preach'd at Bow-Church, May 20th, and published at the desire of the auditory / by E. Young.",
+    "URL": "/misc/data18/patx/barrieca/McGill-Sinclair/code/texts/1/A67825.txt",
+    "authors": "Young, Edward, 1641 or 2-1705"
+  },
+  {
+    "locs": [
+      {
+        "offset": 0,
+        "name": "London",
+        "conf": 0.999933,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 2011,
+        "name": "France",
+        "conf": 0.999089,
+        "lat": "48.85666666666667",
+        "long": "2.350833333333333"
+      },
+      {
+        "offset": 455,
+        "name": "London",
+        "conf": 0.999591,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 1274,
+        "name": "London",
+        "conf": 0.999531,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 1799,
+        "name": "York",
+        "conf": 0.986091,
+        "lat": "53.958333333333336",
+        "long": "-1.0802777777777777"
+      },
+      {
+        "offset": 2098,
+        "name": "York",
+        "conf": 0.813926,
+        "lat": "53.958333333333336",
+        "long": "-1.0802777777777777"
+      },
+      {
+        "offset": 709,
+        "name": "London",
+        "conf": 0.990245,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      },
+      {
+        "offset": 1083,
+        "name": "London",
+        "conf": 0.993065,
+        "lat": "51.507222222222225",
+        "long": "-0.1275"
+      }
+    ],
+    "filename": "A95483.xml",
+    "year": 1642,
+    "title": "Two strange prophesies, predicting wonderfull events, to betide this yeere of danger, in this clymate, whereof some have already come to passe.:  Well worthy of note: the one being found in the reigne of King Edward the fourth: the other in the reigne of King Henry the eighth: named Mother Shipton.",
+    "URL": "/misc/data18/patx/barrieca/McGill-Sinclair/code/texts/1/A95483.txt",
+    "authors": "Shipton, Mother (Ursula)"
+  }
+]

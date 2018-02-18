@@ -127,6 +127,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 				    			inDocumentsCountOnly: true
 	    					},
 	    					callback: function(records, operation, success) {
+	    						debugger
 	    						if (success && records && records.length==1) {
 	    							me.triggers.count.getEl().setHtml(records[0].getInDocumentsCount())
 	    						}
@@ -147,10 +148,17 @@ Ext.define('Voyant.widget.QuerySearchField', {
     		return clz.mixins["Voyant.panel.Panel"];
 		});
     	if (parentPanel != null) {
-	    	parentPanel.on("loadedCorpus", function(src, corpus) {
-	    		me.doSetCorpus(corpus);
-	    	}, me);
-	    	me.hasCorpusLoadedListener = true;
+    		if (parentPanel.getCorpus && parentPanel.getCorpus()) {
+    			me.on("afterrender", function(c) {
+    				this.doSetCorpus(parentPanel.getCorpus());	
+    			})
+    			me.hasCorpusLoadedListener = true;    			
+    		} else {
+	    	    	parentPanel.on("loadedCorpus", function(src, corpus) {
+	    	    		me.doSetCorpus(corpus);
+	    	    	}, me);
+	    	    	me.hasCorpusLoadedListener = true;    			
+    		}
     	}
     	
     	me.on("afterrender", function(c) {
@@ -208,23 +216,32 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	    		if (this.getApiParam) {this.setStopList(this.getApiParam("stopList"))}
 	    		else {
 	    			var parent = this.up("panel");
-	    			if (parent && parent.getApiParam) {
-	    				this.setStopList(parent.getApiParam("stopList"))
+	    			while (parent) {
+	    				if (parent && parent.getApiParam) {
+		    				this.setStopList(parent.getApiParam("stopList"))
+		    				break;
+		    			}
+	    				parent = parent.up("panel");
 	    			}
 	    		}
 			}
-	
-			this.setStore(corpus.getCorpusTerms({
-				corpus: corpus,
+
+			var store = corpus.getCorpusTerms({				
+				corpus: corpus.getAliasOrId(),
 				proxy: {
 					extraParams: {
-		    			limit: 10,
-		    			tokenType: this.tokenType,
-		    			stopList: this.getStopList(),
-		    			inDocumentsCountOnly: this.getInDocumentsCountOnly()
+			    			limit: 10,
+			    			tokenType: this.tokenType,
+			    			stopList: this.getStopList(),
+			    			inDocumentsCountOnly: this.getInDocumentsCountOnly()
 					}
 				}
-			}));
+			});
+			store.on("load", function() {
+				this.fireEvent.apply(this, ["load"].concat(Array.prototype.slice.call(arguments)));
+			}, this);
+
+			this.setStore(store);
     	}
     }
     
