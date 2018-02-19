@@ -504,9 +504,7 @@ Ext.define('Voyant.panel.DreamScape', {
                                     connections.forEach(function (connection) {
                                         if(connection.get("target") === feature.get("cityId") || connection.get("source") === feature.get("cityId")) {
                                             selectedLayer.getSource().addFeature(new ol.Feature({
-                                                text: connection.get("text"),
                                                 geometry: connection.getGeometry(),
-                                                forms: connection.get("forms"),
                                                 selected: true,
                                                 coordinates: connection.get("coordinates"),
                                                 width: connection.get("width"),
@@ -895,7 +893,7 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                             {x: currentConnectionOccurrence.source.longitude, y: currentConnectionOccurrence.source.latitude},
                             {x: currentConnectionOccurrence.target.longitude, y: currentConnectionOccurrence.target.latitude});
                         var arcLine = arcGenerator.Arc(100, {offset: 100});
-                        var label = currentConnectionOccurrence.source.label+" -> "+currentConnectionOccurrence.target.label + " ("+currentConnectionOccurrence.rawFreq+")"
+                        var label = currentConnectionOccurrence.source.label+" -> "+currentConnectionOccurrence.target.label;
                         arcLine.geometries.forEach(function(geometry) {
                             var line = new ol.geom.LineString([]); // can be empty since we generate a line during next animate call
                             line.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
