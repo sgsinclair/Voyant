@@ -736,7 +736,8 @@ Ext.define('Voyant.widget.GeonamesFilter', {
         currentConnectionOccurrence: undefined,
         animationLayer: undefined,
         millisPerAnimation: 2000,
-        stepByStepMode: false
+        stepByStepMode: false,
+        keepAnimationInFrame: true,
     },
     constructor: function(config) {
         config = config || {};
@@ -839,6 +840,13 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                             me.animate();
                             this.setText(me.getStepByStepMode()?'Continuous Mode':'Step-by-Step Mode');
                         }
+                    },{
+                        xtype: 'menucheckitem',
+                        checked: true,
+                        checkHandler: function(item, checked) {
+                            me.setKeepAnimationInFrame(checked);
+                        },
+                        text: "Keep animation in frame"
                     }]
                 }
             });
@@ -965,6 +973,14 @@ Ext.define('Voyant.widget.GeonamesFilter', {
 
                     }
                 } else if (features.length>0) {
+                    if(this.getKeepAnimationInFrame()) {
+                        var map = this.up('panel').getMap();
+                        var extent = map.getView().calculateExtent(map.getSize());
+                        var isVisible = ol.extent.containsExtent(extent, features[0].getGeometry().getExtent());
+                        if(!isVisible) {
+                            map.getView().setZoom(map.getView().getZoom() - 1);
+                        }
+                    }
                     var coords = features[0].getGeometry().getCoordinates(),
                         allcoords = features[0].get("allcoords");
                     if (coords.length<allcoords.length) {
