@@ -660,7 +660,7 @@ Ext.define('Voyant.panel.DreamScape', {
             map.getView().fit(layerSource.getExtent());
         }
 
-        map.getLayer(filter.getId()+"-cities").setVisible(Ext.Array.contains(hide, "cities")==false)
+        map.getLayer(filter.getId()+"-cities").setVisible(Ext.Array.contains(hide, "cities")==false);
 
         layerSource = map.getLayer(filter.getId()+"-connections").getSource();
         layerSource.clear();
@@ -704,7 +704,7 @@ Ext.define('Voyant.panel.DreamScape', {
 
         map.getLayer(filter.getId()+"-connections").setVisible(Ext.Array.contains(hide, "connections")==false)
 
-        filter.animate();
+        //filter.animate();
 
     }
 
@@ -735,7 +735,8 @@ Ext.define('Voyant.widget.GeonamesFilter', {
         timeout: undefined,
         currentConnectionOccurrence: undefined,
         animationLayer: undefined,
-        millisPerAnimation: 2000
+        millisPerAnimation: 2000,
+        stepByStepMode: false
     },
     constructor: function(config) {
         config = config || {};
@@ -744,63 +745,103 @@ Ext.define('Voyant.widget.GeonamesFilter', {
         });
         this.setGeonames(geonames);
         var me = this;
-        Ext.applyIf(config, {
-            tooltip: this.localize('filterTip'),
-            style: "background-color: white; color: "+config.color,
-            glyph: 'xf0b0@FontAwesome',
-            menu: {
-                defaults: {
-                    xtype: 'querysearchfield',
-                    labelWidth: 60,
-                    labelAlign: 'right',
-                    width: 250,
-                    maxWidth: 250,
-                    listeners: { // don't set scope to this so that load keeps the widget scope
+        Ext.applyIf(config,
+            {
+                tooltip: this.localize('filterTip'),
+                style: "background-color: white; color: "+config.color,
+                glyph: 'xf0b0@FontAwesome',
+                menu: {
+                    defaults: {
+                        xtype: 'querysearchfield',
+                        labelWidth: 60,
+                        labelAlign: 'right',
+                        width: 250,
+                        maxWidth: 250,
+                        listeners: { // don't set scope to this so that load keeps the widget scope
 
-                        change: function(cmp, vals) {
-                            me.loadGeonames();
-                        },
-                        load: function(store, records, success, operation) {
-                            if (records.length==0 && operation.getParams().query=="") {
-                                Ext.Msg.show({
-                                    buttonText: {ok: me.localize('close')},
-                                    icon: Ext.MessageBox.INFO,
-                                    message: me.localize("noDataForField"),
-                                    buttons: Ext.Msg.OK
-                                });
-                                this.disable();
+                            change: function(cmp, vals) {
+                                me.loadGeonames();
+                            },
+                            load: function(store, records, success, operation) {
+                                if (records.length==0 && operation.getParams().query=="") {
+                                    Ext.Msg.show({
+                                        buttonText: {ok: me.localize('close')},
+                                        icon: Ext.MessageBox.INFO,
+                                        message: me.localize("noDataForField"),
+                                        buttons: Ext.Msg.OK
+                                    });
+                                    this.disable();
+                                }
                             }
                         }
-                    }
 
-                },
-                items: [{
-                    fieldLabel: this.localize('authorLabel'),
-                    tokenType: 'author',
-                    itemId: 'author'
-                },{
-                    fieldLabel: this.localize('titleLabel'),
-                    itemId: 'title',
-                    tokenType: 'title'
-                },{
-                    fieldLabel: this.localize('keywordLabel'),
-                    hidden: true
-                },{
-                    xtype: 'multislider',
-                    fieldLabel: this.localize('pubDateLabel'),
-                    itemId: 'pubDate',
-                    hidden: true
-                }, {
-                    xtype: 'button',
-                    text: 'remove',
-                    scope:this,
-                    handler: function(cmp) {
-                        // assumes coupling with dreamscape
-                        this.fireEvent("removeFilterWidget", this);
-                        cmp.ownerCt.ownerCmp.destroy();
-                    }
-                }]
-            }})
+                    },
+                    items: [{
+                        fieldLabel: this.localize('authorLabel'),
+                        tokenType: 'author',
+                        itemId: 'author'
+                    },{
+                        fieldLabel: this.localize('titleLabel'),
+                        itemId: 'title',
+                        tokenType: 'title'
+                    },{
+                        fieldLabel: this.localize('keywordLabel'),
+                        hidden: true
+                    },{
+                        xtype: 'multislider',
+                        fieldLabel: this.localize('pubDateLabel'),
+                        itemId: 'pubDate',
+                        hidden: true
+                    }, {
+                        xtype: 'button',
+                        text: 'remove',
+                        scope:this,
+                        handler: function(cmp) {
+                            // assumes coupling with dreamscape
+                            this.fireEvent("removeFilterWidget", this);
+                            cmp.ownerCt.ownerCmp.destroy();
+                        }
+                    }, {
+                        xtype: 'button',
+                        text: 'Play',
+                        scope:this,
+                        handler: function(cmp) {
+                            // assumes coupling with dreamscape
+                            this.animate();
+                        }
+                    }, {
+                        xtype: 'button',
+                        text: 'Stop/Reset',
+                        scope:this,
+                        handler: function(cmp) {
+                            this.getAnimationLayer().getSource().clear();
+                            this.clearAnimation();
+                            this.setCurrentConnectionOccurrence(this.getGeonames().getConnectionOccurrence(0));
+                        }
+                    }, {
+                        xtype: 'numberfield',
+                        fieldLabel: 'Connection nb',
+                        minValue: 0,
+                        // TODO bind value to index of current connections so it changes when updated
+                        value:0,
+                        listeners: {
+                            change: function(cmp, newVal, oldVal) {
+                                this.setCurrentConnectionOccurrence(this.getGeonames().getConnectionOccurrence(newVal));
+                                this.animate();
+                            },
+                            scope: this
+                        }
+                    },{
+                        xtype: 'button',
+                        text: me.getStepByStepMode()?'Continuous Mode':'Step-by-Step Mode',
+                        handler: function(cmp) {
+                            me.setStepByStepMode(!me.getStepByStepMode());
+                            me.animate();
+                            this.setText(me.getStepByStepMode()?'Continuous Mode':'Step-by-Step Mode');
+                        }
+                    }]
+                }
+            });
         this.callParent([config]);
         this.on("afterrender", function(cmp) {
             cmp.getTargetEl().down('.x-btn-glyph').setStyle('color', this.getColor());
@@ -816,7 +857,7 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                     message = cmp.localize(currentCitiesCount==totalCitiesCount && currentConnectionsCount==totalConnectionsCount ? "loadedAll" : "loadedSome") +
                         "<br><br>"+cmp.localize("disclaimer");
                     panel.toastInfo({
-//        					autoCloseDelay: 5000,
+//        				autoCloseDelay: 5000,
                         closable: true,
                         maxWidth: '90%',
                         html: new Ext.Template(cmp.localize("disclaimer")).apply({
@@ -914,12 +955,14 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                             currentConnectionOccurrence.target.left+" <span class='keyword'>"+currentConnectionOccurrence.target.middle+"</span> "+currentConnectionOccurrence.target.right
                         )
                         return this.setTimeout(setTimeout(this.animate.bind(this), 1));
+
                     } else {
                         if (!this.getGeonames()) {return;}
                         currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence.index+1);
                         this.setCurrentConnectionOccurrence(currentConnectionOccurrence);
                         animationLayer.getSource().clear();
                         return this.setTimeout(setTimeout(this.animate.bind(this), 1));
+
                     }
                 } else if (features.length>0) {
                     var coords = features[0].getGeometry().getCoordinates(),
@@ -931,12 +974,15 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                         line.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
                         features[0].set("geometry", line);
                         return this.setTimeout(setTimeout(this.animate.bind(this), 25));
+
                     }
                     // if we get here, all features should have been changed
                     currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence.index+1);
                     this.setCurrentConnectionOccurrence(currentConnectionOccurrence);
                     animationLayer.getSource().clear();
-                    return this.setTimeout(setTimeout(this.animate.bind(this), 1));
+                    if(!this.getStepByStepMode()) {
+                        return this.setTimeout(setTimeout(this.animate.bind(this), 1));
+                    }
                 }
             }
         } else {
