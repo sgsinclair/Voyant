@@ -46,13 +46,16 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	}]
     },
     
-    launch: function() {
+    launch: function(config) {
 		this.callParent(arguments);
 
     	if (this.hasQueryToLoad()) {
         	var queryParams = Ext.Object.fromQueryString(document.location.search);
         	if (!queryParams.corpus && this.getCorpusId && this.getCorpusId()) {
         		queryParams.corpus = this.getCorpusId();
+        	}
+        	if (config && config.useCache) { // for large corpora
+        		queryParams.useCache = config.useCache;
         	}
         	this.loadCorpusFromParams(queryParams);
         	
