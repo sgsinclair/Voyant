@@ -83,51 +83,83 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 			},
 			store: tagStore,
 			forceFit: true,
-			bbar: [{
-				xtype: 'button',
-				text: 'Add',
-				glyph: 'xf067@FontAwesome',
-				handler: function(b) {
-					this.store.loadData([{
-						tagName: '',
-						label: '',
-						freq: 0,
-						type: 't'
-					}], true);
-					var numRecords = this.store.getCount();
-					this.getPlugin('cellEditor').startEditByPosition({row: numRecords-1, column: 0});
-				},
-				scope: this
-			},' ',{
-				xtype: 'button',
-				text: 'Remove Selected',
-				glyph: 'xf068@FontAwesome',
-				handler: function(b) {
-					var sels = this.getSelection();
-					
-					var comboStore = this.tagCombo.getStore();
-					for (var i = 0; i < sels.length; i++) {
-					    var tagName = sels[i].get('tagName');
-					    delete this.disabledTags[tagName];
-					    var r = comboStore.findRecord('tag', tagName);
-					    if (r !== null) {
-					        r.set('disabled', false);
-					    }
-					}
-					
-					this.store.remove(sels);
-				},
-				scope: this
-			},' ',{
-				xtype: 'button',
-				text: 'Show Selected',
-				glyph: 'xf002@FontAwesome',
-				handler: function(b) {
-					var sels = this.getSelection();
-					//console.debug(sels);
-					this.handleSelections(sels);
-				},
-				scope: this
+			dockedItems: [{
+			    xtype: 'toolbar',
+			    dock: 'bottom',
+			    enableOverflow: true,
+			    items: [{
+    				xtype: 'button',
+    				text: 'Add',
+    				glyph: 'xf067@FontAwesome',
+    				handler: function(b) {
+    					this.store.loadData([{
+    						tagName: '',
+    						label: '',
+    						freq: 0,
+    						type: 't'
+    					}], true);
+    					var numRecords = this.store.getCount();
+    					this.getPlugin('cellEditor').startEditByPosition({row: numRecords-1, column: 0});
+    				},
+    				scope: this
+    			},' ',{
+    				xtype: 'button',
+    				text: 'Remove Selected',
+    				glyph: 'xf068@FontAwesome',
+    				handler: function(b) {
+    					var sels = this.getSelection();
+    					
+    					var comboStore = this.tagCombo.getStore();
+    					for (var i = 0; i < sels.length; i++) {
+    					    var tagName = sels[i].get('tagName');
+    					    delete this.disabledTags[tagName];
+    					    var r = comboStore.findRecord('tag', tagName);
+    					    if (r !== null) {
+    					        r.set('disabled', false);
+    					    }
+    					}
+    					
+    					this.store.remove(sels);
+    				},
+    				scope: this
+    			},' ',{
+    				xtype: 'button',
+    				text: 'Show Selected',
+    				glyph: 'xf002@FontAwesome',
+    				handler: function(b) {
+    					var sels = this.getSelection();
+    					//console.debug(sels);
+    					this.handleSelections(sels);
+    				},
+    				scope: this
+    			},' ',{
+    			    xtype: 'button',
+    			    text: 'Import',
+    			    handler: this.showImportWindow,
+    			    scope: this
+    			},' ',{
+                    xtype: 'button',
+                    text: 'Export',
+                    handler: function(b) {
+                        var data = this.exportTagData();
+                        var output = '';
+                        for (var i = 0; i < data.length; i++) {
+                            var e = data[i];
+                            output += e.tagName+'\t'+e.label+'\n';
+                        }
+                        
+                        Ext.Msg.show({
+                            title: 'Export',
+                            message: 'Curated tags in TSV format, for export:',
+                            buttons: Ext.MessageBox.OK,
+                            value: output,
+                            multiline: true,
+                            width: Ext.getBody().getWidth()-50,
+                            icon: Ext.MessageBox.INFO
+                        });
+                    },
+                    scope: this
+                }]
 			}],
 			viewConfig: {
 				stripeRows: true
@@ -240,6 +272,8 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 			}
 			waitTracker--;
 			if (waitTracker == 0) {
+			    this.body.unmask();
+			    this._maskEl = null;
 				this.getApplication().dispatchEvent('tagsSelected', this, tags);
 			}
 		}
@@ -268,6 +302,7 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 		if (!waitForHits) {
 			this.getApplication().dispatchEvent('tagsSelected', this, tags);
 		} else {
+		    this._maskEl = this.body.mask('Fetching Selections', 'loadMask');
 			for (var docId in newTags) {
 				waitTracker++;
 				this.getHitsForTags(newTags[docId], docId, doDispatch);
@@ -308,6 +343,55 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 				if (callback) callback(response.responseXML);
            },
            scope: this
+        });
+	},
+	
+	showImportWindow: function() {
+	    Ext.Msg.show({
+            title: 'Import Curation',
+            message: 'Paste your curation.<br/>The expected format is TSV and each entry should contain the tag/path followed by the label.',
+            buttons: Ext.Msg.OKCANCEL,
+            buttonText: {
+                ok: 'Import',
+                cancel: 'Cancel'
+            },
+            icon: Ext.Msg.INFO,
+            multiline: true,
+            fn: function(btn, value, win) {
+                if (btn == 'ok' && value != '') {
+                    this.getApplication().setCuratorId(undefined);
+                    
+                    this.curatedTags = {};
+                    this.tagTotals = {};
+                    for (var docId in this.savedTags) {
+                        this.savedTags[docId] = {};
+                    }
+                    
+                    var tagData = [];
+                    var entries = value.split('\n');
+                    for (var i = 0; i < entries.length; i++) {
+                        var entry = entries[i];
+                        var values = entry.split('\t');
+                        if (values.length == 2) {
+                            var tag = values[0];
+                            var label = values[1];
+                            if (tag != '' && label != '') {
+                                var type = tag.match(/^\w+$/) == null ? 'x' : 't';
+                                var data = {
+                                    tagName: tag,
+                                    label: label,
+                                    type: type
+                                };
+                                this.curatedTags[tag] = data;
+                                tagData.push(data);
+                            }
+                        }
+                    }
+                    
+                    this.store.loadData(tagData, false);
+                }
+            },
+            scope: this
         });
 	}
 
