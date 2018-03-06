@@ -104,62 +104,51 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
     				scope: this
     			},' ',{
     				xtype: 'button',
-    				text: 'Remove Selected',
+    				text: 'Remove',
     				glyph: 'xf068@FontAwesome',
-    				handler: function(b) {
-    					var sels = this.getSelection();
-    					
-    					var comboStore = this.tagCombo.getStore();
-    					for (var i = 0; i < sels.length; i++) {
-    					    var tagName = sels[i].get('tagName');
-    					    delete this.disabledTags[tagName];
-    					    var r = comboStore.findRecord('tag', tagName);
-    					    if (r !== null) {
-    					        r.set('disabled', false);
-    					    }
-    					}
-    					
-    					this.store.remove(sels);
-    				},
+    				handler: this.doRemoveSelections,
     				scope: this
     			},' ',{
     				xtype: 'button',
-    				text: 'Show Selected',
+    				text: 'Show',
     				glyph: 'xf002@FontAwesome',
-    				handler: function(b) {
-    					var sels = this.getSelection();
-    					//console.debug(sels);
-    					this.handleSelections(sels);
-    				},
+    				handler: this.doShowSelections,
     				scope: this
     			},' ',{
     			    xtype: 'button',
-    			    text: 'Import',
-    			    handler: this.showImportWindow,
-    			    scope: this
-    			},' ',{
-                    xtype: 'button',
-                    text: 'Export',
-                    handler: function(b) {
-                        var data = this.exportTagData();
-                        var output = '';
-                        for (var i = 0; i < data.length; i++) {
-                            var e = data[i];
-                            output += e.tagName+'\t'+e.label+'\n';
-                        }
-                        
-                        Ext.Msg.show({
-                            title: 'Export',
-                            message: 'Curated tags in TSV format, for export:',
-                            buttons: Ext.MessageBox.OK,
-                            value: output,
-                            multiline: true,
-                            width: Ext.getBody().getWidth()-50,
-                            icon: Ext.MessageBox.INFO
-                        });
-                    },
-                    scope: this
-                }]
+    			    text: 'Import/Export',
+    			    menu: {
+    			        plain: true,
+    			        items: [{
+                            xtype: 'button',
+                            text: 'Import',
+                            handler: this.showImportWindow,
+                            scope: this
+                        },'-',{
+                            xtype: 'button',
+                            text: 'Export',
+                            handler: function(b) {
+                                var data = this.exportTagData();
+                                var output = '';
+                                for (var i = 0; i < data.length; i++) {
+                                    var e = data[i];
+                                    output += e.tagName+'\t'+e.label+'\n';
+                                }
+                                
+                                Ext.Msg.show({
+                                    title: 'Export',
+                                    message: 'Curated tags in TSV format, for export:',
+                                    buttons: Ext.MessageBox.OK,
+                                    value: output,
+                                    multiline: true,
+                                    width: Ext.getBody().getWidth()-50,
+                                    icon: Ext.MessageBox.INFO
+                                });
+                            },
+                            scope: this
+                        }]
+    			    }
+    			}]
 			}],
 			viewConfig: {
 				stripeRows: true
@@ -257,57 +246,97 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 		
 	},
 	
-	handleSelections: function(selections) {
-		var waitForHits = false;
-		var waitTracker = 0;
-		var newTags = {};
-		var tags = [];
-		
-		function doDispatch(data) {
-			for (var tagName in data) {
-				var a = data[tagName];
-				if (a != null) {
-					tags = tags.concat([a]);
-				}
-			}
-			waitTracker--;
-			if (waitTracker == 0) {
-			    this.body.unmask();
-			    this._maskEl = null;
-				this.getApplication().dispatchEvent('tagsSelected', this, tags);
-			}
-		}
-		
-		for (var i = 0; i < selections.length; i++) {
-			var sel = selections[i].data;
-			for (var docId in this.savedTags) {
-				var tagData = this.savedTags[docId][sel.tagName];
-				if (tagData === undefined) {
-					waitForHits = true;
-					if (newTags[docId] == null) {
-						newTags[docId] = [];
-					}
-					newTags[docId].push(sel);
-				} else if (tagData !== null) {  // if it's null, then we've already checked this tag/xpath
-					if (tagData[0] && tagData[0].label != sel.label) {
-						// update label
-						for (var j = 0; j < tagData.length; j++) {
-							tagData[j].label = sel.label;
-						}
-					}
-					tags.push(tagData);
-				}
-			}
-		}
-		if (!waitForHits) {
-			this.getApplication().dispatchEvent('tagsSelected', this, tags);
-		} else {
-		    this._maskEl = this.body.mask('Fetching Selections', 'loadMask');
-			for (var docId in newTags) {
-				waitTracker++;
-				this.getHitsForTags(newTags[docId], docId, doDispatch);
-			}
-		}
+	doRemoveSelections: function() {
+	    var selections = this.getSelection();
+	    if (selections.length > 0) {
+	        Ext.Msg.confirm('Remove Selections', 'Do you really want to remove the selected entries?',
+	            function(button) {
+	                if (button === 'yes') {
+	                    var comboStore = this.tagCombo.getStore();
+	                    for (var i = 0; i < selections.length; i++) {
+	                        var tagName = selections[i].get('tagName');
+	                        delete this.disabledTags[tagName];
+	                        var r = comboStore.findRecord('tag', tagName);
+	                        if (r !== null) {
+	                            r.set('disabled', false);
+	                        }
+	                    }
+	                    this.store.remove(selections);
+	                }
+	            }.bind(this)
+	        );
+        } else {
+            Ext.Msg.show({
+                title: 'No Selections',
+                message: 'You must select at least one entry to remove.',
+                buttons: Ext.Msg.OK,
+                icon: Ext.Msg.INFO
+            });
+        }
+	},
+	
+	doShowSelections: function(selections) {
+	    var selections = this.getSelection();
+	    
+	    if (selections.length > 0) {
+    		var waitForHits = false;
+    		var waitTracker = 0;
+    		var newTags = {};
+    		var tags = [];
+    		
+    		function doDispatch(data) {
+    			for (var tagName in data) {
+    				var a = data[tagName];
+    				if (a != null) {
+    					tags = tags.concat([a]);
+    				}
+    			}
+    			waitTracker--;
+    			if (waitTracker == 0) {
+    			    this.body.unmask();
+    			    this._maskEl = null;
+    				this.getApplication().dispatchEvent('tagsSelected', this, tags);
+    			}
+    		}
+    		
+    		for (var i = 0; i < selections.length; i++) {
+    			var sel = selections[i].data;
+    			for (var docId in this.savedTags) {
+    				var tagData = this.savedTags[docId][sel.tagName];
+    				if (tagData === undefined) {
+    					waitForHits = true;
+    					if (newTags[docId] == null) {
+    						newTags[docId] = [];
+    					}
+    					newTags[docId].push(sel);
+    				} else if (tagData !== null) {  // if it's null, then we've already checked this tag/xpath
+    					if (tagData[0] && tagData[0].label != sel.label) {
+    						// update label
+    						for (var j = 0; j < tagData.length; j++) {
+    							tagData[j].label = sel.label;
+    						}
+    					}
+    					tags.push(tagData);
+    				}
+    			}
+    		}
+    		if (!waitForHits) {
+    			this.getApplication().dispatchEvent('tagsSelected', this, tags);
+    		} else {
+    		    this._maskEl = this.body.mask('Fetching Selections', 'loadMask');
+    			for (var docId in newTags) {
+    				waitTracker++;
+    				this.getHitsForTags(newTags[docId], docId, doDispatch);
+    			}
+    		}
+	    } else {
+	        Ext.Msg.show({
+                title: 'No Selections',
+                message: 'You must select at least one entry to show.',
+                buttons: Ext.Msg.OK,
+                icon: Ext.Msg.INFO
+            });
+	    }
 	},
 	
 	getHitsForTags: function(tagArray, docId, callback) {
@@ -359,7 +388,7 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
             multiline: true,
             fn: function(btn, value, win) {
                 if (btn == 'ok' && value != '') {
-                    this.getApplication().setCuratorId(undefined);
+                    this.getApplication().setApiParam('curatorId', undefined);
                     
                     this.curatedTags = {};
                     this.tagTotals = {};
@@ -389,6 +418,13 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
                     }
                     
                     this.store.loadData(tagData, false);
+                    
+                    // TODO fix tagCombo
+//                    var comboStore = this.tagCombo.getStore();
+//                    var r = comboStore.findRecord('tag', e.value);
+//                    if (r !== null) r.set('disabled', true);
+//                    r = comboStore.findRecord('tag', e.originalValue);
+//                    if (r !== null) r.set('disabled', false);
                 }
             },
             scope: this

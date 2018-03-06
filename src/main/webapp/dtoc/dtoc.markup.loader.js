@@ -25,7 +25,7 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 		}
 		
 		if (this.curatedTags != null) {
-			var curId = this.getApplication().getCuratorId();
+			var curId = this.getApplication().getApiParam('curatorId');
 			if (curId !== undefined) {
 				this.getApplication().getStoredResource('curatedtags-'+curId+'-'+this.getCorpus().getId()).then(function(value) {
 					this.savedTags = value;
@@ -72,7 +72,7 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 	_storeTags: function() {
 		var rId = this.getCorpus().getId();
 		if (this.curatedTags != null) {
-			var cId = this.getApplication().getCuratorId();
+			var cId = this.getApplication().getApiParam('curatorId');
 			if (cId === undefined) return;
 			rId = 'curatedtags-'+cId+'-'+rId;
 		} else {
