@@ -370,7 +370,7 @@ Ext.define('Voyant.panel.DreamScape', {
         this.on("resize", function() {
             var ticker = this.body.down(".ticker");
             //ticker.setTop(this.getTargetEl().getHeight()-ticker.getHeight()-4)
-        }, this)
+        }, this);
 
         this.callParent();
     },
@@ -414,7 +414,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 var features = map.getFeaturesAtPixel(pixel);
                 if(features) {
                     features.forEach( function(feature) {
-                        if( feature.getGeometry().getType() === "Circle" && feature.get("selected")) { // city
+                        if( feature.get("type") === "city" && feature.get("selected")) { // city
                             panel.dispatchEvent("termsClicked", panel, [feature.get("forms").join("|")])
                         }
                     }, this);
@@ -431,7 +431,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 zIndex: 10,
                 selected: true,
                 style: function(feature) {
-                    if(feature.getGeometry().getType() === "Circle")
+                    if(feature.get("type") === "city")
                     {
                         return panel.cityStyleFunction(feature, map.getView().getResolution());
                     } else {
@@ -485,7 +485,8 @@ Ext.define('Voyant.panel.DreamScape', {
                             coordinates: feature.get("coordinates"),
                             width: feature.get("width"),
                             visible: feature.get("visible"),
-                            color: feature.get("color")
+                            color: feature.get("color"),
+                            type: feature.get("type")
                         });
                         selectedLayer.getSource().addFeature(selectedFeature);
                         var geometry = feature.getGeometry();
@@ -498,7 +499,7 @@ Ext.define('Voyant.panel.DreamScape', {
                         selectedLayer.getSource().addFeature(textFeature);
 
                         // Highlight all connection where selected city is source or target
-                        if(geometry.getType() === "Circle") {
+                        if(feature.get("type") === "city") {
                             var layers = panel.getMap().getLayers();
                             layers.forEach(function (layer) {
                                 var layerId = layer.get("id");
@@ -575,12 +576,17 @@ Ext.define('Voyant.panel.DreamScape', {
 
     // Style for cities
     cityStyleFunction: function(feature, resolution) {
-        console.log(feature);
         if(feature.get("visible")) {
             return (new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: feature.get("color"),
-                    width: feature.get("width")
+                image: new ol.style.Circle({
+                    radius: feature.get("width"),
+                    fill: new ol.style.Fill({
+                        color: feature.get("color")
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: 'rgb(255, 255, 255)',
+                        width: 1
+                    })
                 })
             }));
         } else {
@@ -645,7 +651,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 validCitiesHash[city.id]=true;
                 var coordinates = [parseFloat(city.longitude), parseFloat(city.latitude)]
                 var feature = new ol.Feature({
-                    geometry: new ol.geom.Circle(coordinates).transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857')),
+                    geometry: new ol.geom.Point(coordinates).transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857')),
                     text: city.label + " ("+city.rawFreq+")",
                     description: city.label,
                     color: color,
@@ -654,7 +660,8 @@ Ext.define('Voyant.panel.DreamScape', {
                     visible: true,
                     coordinates: coordinates,
                     forms: city.forms,
-                    cityId: city.id
+                    cityId: city.id,
+                    type: "city",
                 });
                 layerSource.addFeature(feature);
             }
