@@ -486,7 +486,8 @@ Ext.define('Voyant.panel.DreamScape', {
                             width: feature.get("width"),
                             visible: feature.get("visible"),
                             color: feature.get("color"),
-                            type: feature.get("type")
+                            type: feature.get("type"),
+                            conf: feature.get("conf")
                         });
                         selectedLayer.getSource().addFeature(selectedFeature);
                         var geometry = feature.getGeometry();
@@ -577,6 +578,8 @@ Ext.define('Voyant.panel.DreamScape', {
     // Style for cities
     cityStyleFunction: function(feature, resolution) {
         if(feature.get("visible")) {
+            var diameter = Math.PI * 2 * feature.get("width");
+            var confArc = feature.get("conf") ? diameter * feature.get("conf") : diameter;
             return (new ol.style.Style({
                 image: new ol.style.Circle({
                     radius: feature.get("width"),
@@ -584,8 +587,9 @@ Ext.define('Voyant.panel.DreamScape', {
                         color: feature.get("color")
                     }),
                     stroke: new ol.style.Stroke({
+                        lineDash: [confArc, diameter - confArc],
                         color: 'rgb(255, 255, 255)',
-                        width: 1
+                        width: 2
                     })
                 })
             }));
@@ -662,6 +666,7 @@ Ext.define('Voyant.panel.DreamScape', {
                     forms: city.forms,
                     cityId: city.id,
                     type: "city",
+                    conf: city.conf
                 });
                 layerSource.addFeature(feature);
             }
