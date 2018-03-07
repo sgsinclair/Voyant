@@ -30,7 +30,7 @@
 		validateCorpusLoadParams: function(params) {
 			params.docsLimit=0
 		},
-	    launch: function() {
+	    launch: function(config) {
 
 	    	if (!this.hasQueryToLoad()) {
 		    	location.replace("?corpus=dream")
@@ -242,7 +242,9 @@
 			    }]
 			});
 
-			this.callParent(arguments);
+			config = config || {};
+			config.useCache=true
+			this.callParent([config]);
 
 		}
 	});

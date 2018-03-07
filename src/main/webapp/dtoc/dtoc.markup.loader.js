@@ -25,8 +25,8 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 		}
 		
 		if (this.curatedTags != null) {
-			var curId = this.getApplication().getCuratorId();
-			if (curId != null) {
+			var curId = this.getApplication().getApiParam('curatorId');
+			if (curId !== undefined) {
 				this.getApplication().getStoredResource('curatedtags-'+curId+'-'+this.getCorpus().getId()).then(function(value) {
 					this.savedTags = value;
 					dfd.resolve();
@@ -72,7 +72,7 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 	_storeTags: function() {
 		var rId = this.getCorpus().getId();
 		if (this.curatedTags != null) {
-			var cId = this.getApplication().getCuratorId();
+			var cId = this.getApplication().getApiParam('curatorId');
 			if (cId === undefined) return;
 			rId = 'curatedtags-'+cId+'-'+rId;
 		} else {
@@ -87,7 +87,7 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 	 * @param {Document} xml The xml document.
 	 * @param {String} docId The id for the document.
 	 * @param {Object} [customTagSet] An object containing a set of tags to look for, in the same format as curatedTags
-	 * @returns The tag metadata.
+	 * @returns {Object} The tag metadata.
 	 */
 	_parseTags: function(xml, docId, customTagSet) {
 		var docBody = Ext.DomQuery.jsSelect('div[class="document"]', xml)[0];

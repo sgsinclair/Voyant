@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Feb 17 20:48:11 EST 2018 */
+/* This file created by JSCacher. Last modified: Thu Feb 22 15:36:36 EST 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -18547,7 +18547,7 @@ Ext.define('Voyant.panel.DreamScape', {
         isOpenLayersLoaded: false,
         isArcLoaded: false,
         animationDelay: 25, // determines the delay between animation calls
-        
+
         filterWidgets: new Ext.util.MixedCollection()
     },
 
@@ -18587,12 +18587,12 @@ Ext.define('Voyant.panel.DreamScape', {
     },
     initComponent: function() {
         var me = this;
-		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments); // we need api
-		var hide = this.getApiParam("hide");
-		if (Ext.isString(hide)) {
-			hide = hide.split(',');
-			this.setApiParam('hide');
-		}
+        this.mixins['Voyant.util.Api'].constructor.apply(this, arguments); // we need api
+        var hide = this.getApiParam("hide");
+        if (Ext.isString(hide)) {
+            hide = hide.split(',');
+            this.setApiParam('hide');
+        }
         Ext.apply(this, {
             title: this.localize('title'),
             bodyBorder: true,
@@ -18609,19 +18609,19 @@ Ext.define('Voyant.panel.DreamScape', {
                             defaults: {
                                 xtype: 'menucheckitem',
                                 checkHandler: function(item, checked) {
-                                		var map = this.getMap(), id = item.getItemId();
-                                		this.getFilterWidgets().each(function(filter) {
-                                			map.getLayer(filter.getId()+"-"+id).setVisible(checked);
-                                		})
-                                		var hide = Ext.Array.from(this.getApiParam('hide'));
-                                		if (checked) {
-                                			hide = Ext.Array.remove(hide, id);
-                                		} else {
-                                			hide.push(id);
-                                			hide = Ext.Array.unique(hide);
-                                		}
-                                		this.setApiParam("hide", hide);
-                                		item.getMenu().setDisabled(checked==false);
+                                    var map = this.getMap(), id = item.getItemId();
+                                    this.getFilterWidgets().each(function(filter) {
+                                        map.getLayer(filter.getId()+"-"+id).setVisible(checked);
+                                    })
+                                    var hide = Ext.Array.from(this.getApiParam('hide'));
+                                    if (checked) {
+                                        hide = Ext.Array.remove(hide, id);
+                                    } else {
+                                        hide.push(id);
+                                        hide = Ext.Array.unique(hide);
+                                    }
+                                    this.setApiParam("hide", hide);
+                                    item.getMenu().setDisabled(checked==false);
                                 },
                                 scope: this,
                                 checked: true
@@ -18631,246 +18631,249 @@ Ext.define('Voyant.panel.DreamScape', {
                                 checked: Ext.Array.contains(hide, "cities")==false,
                                 itemId: 'cities',
                                 menu: {
-                                		defaults: {
-                        		            labelAlign: 'right',
-                                			labelWidth: 140
-                                		},
-                                		items: [{
-                                			xtype: 'numberfield',
-                                			fieldLabel: this.localize('citiesMaxCount'),
-                                			minValue: 1,
-                                			value: parseInt(this.getApiParam('citiesMaxCount')),
-                                			listeners: {
-                                				change: function(cmp, newVal, oldVal) {
-                                					this.getFilterWidgets().each(function(filter) {
-                                						this.setApiParam('citiesMaxCount', newVal);
-                                						var currentCitiesCount = filter.getGeonames().getCitiesCount();
-                                						if (newVal<oldVal || newVal<=currentCitiesCount) {
-                                							this.filterUpdate(filter);
-                                						} else if (filter.getGeonames().hasMoreCities()) {
-                                							filter.loadGeonames()
-                                						} else {
-                                							cmp.setValue(currentCitiesCount); // will call change
-                                							this.toastInfo(new Ext.XTemplate(this.localize("allNCitiesShown")).apply([currentCitiesCount]))
-                                						}
-                                					}, this);
-                                				},
-                                				scope: this
-                                			}
-                                		},{
-                                			xtype: 'numberfield',
-                                			fieldLabel: this.localize('citiesMinPopulation'),
-                                			minValue: 1,
-                                			value: parseInt(this.getApiParam('minPopulation')),
-                                			listeners: {
-                                				change: function(cmp, newVal, oldVal) {
-                                					this.getFilterWidgets().each(function(filter) {
-                                						this.setApiParam('minPopulation', newVal);
-                                						if (newVal>oldVal) {
-                                							this.filterUpdate(filter);
-                                						} else {
-                                							filter.loadGeonames()
-                                						}
-                                					}, this);
-                                				},
-                                				scope: this
-                                			}
-                                		},{
-                                			xtype: 'numberfield',
-                                			fieldLabel: this.localize('citiesMinFreq'),
-                                			minValue: 1,
-                                			value: parseInt(this.getApiParam('citiesMinFreq')),
-                                			listeners: {
-                                				change: function(cmp, newVal, oldVal) {
-                                					this.getFilterWidgets().each(function(filter) {
-                                						this.setApiParam('citiesMinFreq', newVal);
-                                						if (newVal>oldVal) {
-                                							this.filterUpdate(filter);
-                                						} else {
-                                							filter.loadGeonames()
-                                						}
-                                					}, this);
-                                				},
-                                				scope: this
-                                			}
-                                		}]
+                                    defaults: {
+                                        labelAlign: 'right',
+                                        labelWidth: 140
+                                    },
+                                    items: [{
+                                        xtype: 'numberfield',
+                                        fieldLabel: this.localize('citiesMaxCount'),
+                                        minValue: 1,
+                                        value: parseInt(this.getApiParam('citiesMaxCount')),
+                                        listeners: {
+                                            change: function(cmp, newVal, oldVal) {
+                                                this.getFilterWidgets().each(function(filter) {
+                                                    this.setApiParam('citiesMaxCount', newVal);
+                                                    var currentCitiesCount = filter.getGeonames().getCitiesCount();
+                                                    if (newVal<oldVal || newVal<=currentCitiesCount) {
+                                                        this.filterUpdate(filter);
+                                                    } else if (filter.getGeonames().hasMoreCities()) {
+                                                        filter.loadGeonames()
+                                                    } else {
+                                                        cmp.setValue(currentCitiesCount); // will call change
+                                                        this.toastInfo(new Ext.XTemplate(this.localize("allNCitiesShown")).apply([currentCitiesCount]))
+                                                    }
+                                                }, this);
+                                            },
+                                            scope: this
+                                        }
+                                    },{
+                                        xtype: 'numberfield',
+                                        fieldLabel: this.localize('citiesMinPopulation'),
+                                        minValue: 1,
+                                        value: parseInt(this.getApiParam('minPopulation')),
+                                        listeners: {
+                                            change: function(cmp, newVal, oldVal) {
+                                                this.getFilterWidgets().each(function(filter) {
+                                                    this.setApiParam('minPopulation', newVal);
+                                                    if (newVal>oldVal) {
+                                                        this.filterUpdate(filter);
+                                                    } else {
+                                                        filter.loadGeonames()
+                                                    }
+                                                }, this);
+                                            },
+                                            scope: this
+                                        }
+                                    },{
+                                        xtype: 'numberfield',
+                                        fieldLabel: this.localize('citiesMinFreq'),
+                                        minValue: 1,
+                                        value: parseInt(this.getApiParam('citiesMinFreq')),
+                                        listeners: {
+                                            change: function(cmp, newVal, oldVal) {
+                                                this.getFilterWidgets().each(function(filter) {
+                                                    this.setApiParam('citiesMinFreq', newVal);
+                                                    if (newVal>oldVal) {
+                                                        this.filterUpdate(filter);
+                                                    } else {
+                                                        filter.loadGeonames()
+                                                    }
+                                                }, this);
+                                            },
+                                            scope: this
+                                        }
+                                    }]
                                 }
                             },{
                                 text: this.localize('connections'),
                                 checked: Ext.Array.contains(hide, "connections")==false,
                                 itemId: 'connections',
                                 menu: {
-	                            		defaults: {
-	                            			labelWidth: 140,
-                        		            labelAlign: 'right'
-	                            		},
-                                		items: [{
-                                			xtype: 'numberfield',
-                                			fieldLabel: this.localize('connectionsMaxCount'),
-                                			minValue: 1,
-                                			value: parseInt(this.getApiParam('connectionsMaxCount')),
-                                			listeners: {
-                                				change: function(cmp, newVal, oldVal) {
-                                					this.getFilterWidgets().each(function(filter) {
-                                						this.setApiParam('connectionsMaxCount', newVal);
-                                						if (newVal>oldVal) {
-                                							this.filterUpdate(filter);
-                                						} else {
-                                							filter.loadGeonames()
-                                						}
-                                					}, this);
-                                				},
-                                				scope: this
-                                			}
-                                		},{
-                                			xtype: 'numberfield',
-                                			fieldLabel: this.localize('connectionsMinFreq'),
-                                			minValue: 1,
-                                			value: parseInt(this.getApiParam('connectionsMinFreq')),
-                                			listeners: {
-                                				change: function(cmp, newVal, oldVal) {
-                                					this.getFilterWidgets().each(function(filter) {
-                                						this.setApiParam('connectionsMinFreq', newVal);
-                                						if (newVal>oldVal) {
-                                							this.filterUpdate(filter);
-                                						} else {
-                                							filter.loadGeonames()
-                                						}
-                                					}, this);
-                                				},
-                                				scope: this
-                                			}
-                                		}]
+                                    defaults: {
+                                        labelWidth: 140,
+                                        labelAlign: 'right'
+                                    },
+                                    items: [{
+                                        xtype: 'numberfield',
+                                        fieldLabel: this.localize('connectionsMaxCount'),
+                                        minValue: 1,
+                                        value: parseInt(this.getApiParam('connectionsMaxCount')),
+                                        listeners: {
+                                            change: function(cmp, newVal, oldVal) {
+                                                this.getFilterWidgets().each(function(filter) {
+                                                    this.setApiParam('connectionsMaxCount', newVal);
+                                                    if (newVal>oldVal) {
+                                                        this.filterUpdate(filter);
+                                                    } else {
+                                                        filter.loadGeonames()
+                                                    }
+                                                }, this);
+                                            },
+                                            scope: this
+                                        }
+                                    },{
+                                        xtype: 'numberfield',
+                                        fieldLabel: this.localize('connectionsMinFreq'),
+                                        minValue: 1,
+                                        value: parseInt(this.getApiParam('connectionsMinFreq')),
+                                        listeners: {
+                                            change: function(cmp, newVal, oldVal) {
+                                                this.getFilterWidgets().each(function(filter) {
+                                                    this.setApiParam('connectionsMinFreq', newVal);
+                                                    if (newVal>oldVal) {
+                                                        this.filterUpdate(filter);
+                                                    } else {
+                                                        filter.loadGeonames()
+                                                    }
+                                                }, this);
+                                            },
+                                            scope: this
+                                        }
+                                    }]
                                 }
-                                	
+
                             },{
                                 xtype: 'menucheckitem',
                                 checked: Ext.Array.contains(hide, "animation")==false,
                                 text: this.localize('animations'),
                                 itemId: 'animation',
                                 menu: {
-                                		defaults: {
-                        		            labelWidth: 170,
-                        		            labelAlign: 'right',
-                                			width: 280
-                                		},
-                                		items: [{
-                                			xtype: 'sliderfield',
-										fieldLabel: this.localize('millisPerAnimation'),
-										value: parseInt(this.getApiParam('millisPerAnimation')),
-										minValue: this.getAnimationDelay(),
-										maxValue: 10000,
-										listeners: {
-											change: function(cmp, newVal, oldVal) {
-												this.getFilterWidgets().each(function(filter) {
-													filter.setMillisPerAnimation(newVal);
-													filter.animate();
-												}, this);
-											},
-											scope: this
-										}
-                                     }]
+                                    defaults: {
+                                        labelWidth: 170,
+                                        labelAlign: 'right',
+                                        width: 280
+                                    },
+                                    items: [{
+                                        xtype: 'sliderfield',
+                                        fieldLabel: this.localize('millisPerAnimation'),
+                                        value: parseInt(this.getApiParam('millisPerAnimation')),
+                                        minValue: this.getAnimationDelay(),
+                                        maxValue: 10000,
+                                        listeners: {
+                                            change: function(cmp, newVal, oldVal) {
+                                                this.getFilterWidgets().each(function(filter) {
+                                                    filter.setMillisPerAnimation(newVal);
+                                                    filter.animate();
+                                                }, this);
+                                            },
+                                            scope: this
+                                        }
+                                    }]
                                 }
                             }]
                         }
                     },'-', {
-                    		text: this.localize('add'),
-                    		itemId: 'addFilter',
-                    		handler: function(cmp) {
-                    			var colors = this.getApplication().getColorPalette(undefined, true),
-                    				color = colors[0]; // default to first
-                    			
-                    			// find an available color
-                    			for (var i=0, len=colors.length; i<len; i++) {
-                    				var hasMatch = false;
-                    				this.getFilterWidgets().each(function(filter) {
-                    					if (filter.getColor()==colors[i]) {
-                    						hasMatch = true;
-                    						return false;
-                    					}
-                    				})
-                    				if (hasMatch==false) {
-                    					color = colors[i];
-                    					break;
-                    				}
-                    			}
-                    			var filter = cmp.ownerCt.add({
-                    				xtype: 'geonamesfilter',
-                    				corpus: this.getCorpus(),
-                    				color: color,
-                    				listeners: {
-                    					removeFilterWidget: function(filter) {
-                    						var map = this.getMap(), id = filter.getItemId(), filters = this.getFilterWidgets();
-                    						["connections","cities","animation"].forEach(function(layer) {
-                    							map.removeLayer(map.getLayer(id+"-"+layer));
-                    						})
-                    						filters.remove(filter);
-                    						if (filters.getCount()==0) { // we always want at least one filter
-                    				            // simulate adding a filter
-                    				            this.getDockedComponent('bottomToolbar').getComponent('addFilter').click();
-                    						}
-                    					},
-                    					filterUpdate: this.filterUpdate,
-                    					scope: this
-                    				}
-                    			})
-                    			this.getFilterWidgets().add(filter.getId(), filter);
-                    			
-                    	        var map = this.getMap();
-                    	        
-                    	        var connectionsLayer = new ol.layer.Vector({
-                    	            source: new ol.source.Vector({
-                    	                wrapX: false,
-                    	                useSpatialIndex: true // needed to call getExtent()
-                    	            }),
-                    	            id: filter.getId()+"-connections",
-                    	            visible: true,
-                    	            opacity: 0.2,
-                    	            style: this.travelStyleFunction.bind(this),
-                    	            updateWhileAnimating: true, // optional, for instant visual feedback
-                    	            updateWhileInteracting: true // optional, for instant visual feedback
-                    	        });
-                    	        map.addLayer(connectionsLayer);
+                        text: this.localize('add'),
+                        itemId: 'addFilter',
+                        handler: function(cmp) {
+                            var colors = this.getApplication().getColorPalette(undefined, true),
+                                color = colors[0]; // default to first
 
-                    	        var citiesLayer = new ol.layer.Vector({
-                    	            source: new ol.source.Vector({
-                    	                wrapX: false,
-                    	                useSpatialIndex: true // needed to call getExtent()
-                    	            }),
-                    	            id: filter.getId()+"-cities",
-                    	            opacity: 0.5,
-                    	            style: this.cityStyleFunction.bind(this)
-                    	        });
-                    	        map.addLayer(citiesLayer);
+                            // find an available color
+                            for (var i=0, len=colors.length; i<len; i++) {
+                                var hasMatch = false;
+                                this.getFilterWidgets().each(function(filter) {
+                                    if (filter.getColor()==colors[i]) {
+                                        hasMatch = true;
+                                        return false;
+                                    }
+                                })
+                                if (hasMatch==false) {
+                                    color = colors[i];
+                                    break;
+                                }
+                            }
+                            var filter = cmp.ownerCt.add({
+                                xtype: 'geonamesfilter',
+                                corpus: this.getCorpus(),
+                                color: color,
+                                listeners: {
+                                    removeFilterWidget: function(filter) {
+                                        var map = this.getMap(), id = filter.getItemId(), filters = this.getFilterWidgets();
+                                        ["connections","cities","animation"].forEach(function(layer) {
+                                            map.removeLayer(map.getLayer(id+"-"+layer));
+                                        })
+                                        filters.remove(filter);
+                                        if (filters.getCount()==0) { // we always want at least one filter
+                                            // simulate adding a filter
+                                            this.getDockedComponent('bottomToolbar').getComponent('addFilter').click();
+                                        }
+                                    },
+                                    filterUpdate: this.filterUpdate,
+                                    scope: this
+                                }
+                            })
+                            this.getFilterWidgets().add(filter.getId(), filter);
 
-                    	        var animationLayer = new ol.layer.Vector({
-                    	            source: new ol.source.Vector({
-                    	                wrapX: false,
-                    	                useSpatialIndex: true // needed to call getExtent()
-                    	            }),
-                    	            id: filter.getId()+"-animation",
-                    	            style:  this.animationStyleFunction.bind(this)
-                    	        });
-                    	        map.addLayer(animationLayer);
-                    		},
-                    		scope: this
+                            var map = this.getMap();
+
+                            var connectionsLayer = new ol.layer.Vector({
+                                source: new ol.source.Vector({
+                                    wrapX: false,
+                                    useSpatialIndex: true // needed to call getExtent()
+                                }),
+                                id: filter.getId()+"-connections",
+                                visible: true,
+                                opacity: 0.2,
+                                style: this.travelStyleFunction.bind(this),
+                                updateWhileAnimating: true, // optional, for instant visual feedback
+                                updateWhileInteracting: true // optional, for instant visual feedback
+                            });
+                            map.addLayer(connectionsLayer);
+
+                            var citiesLayer = new ol.layer.Vector({
+                                source: new ol.source.Vector({
+                                    wrapX: false,
+                                    useSpatialIndex: true // needed to call getExtent()
+                                }),
+                                id: filter.getId()+"-cities",
+                                opacity: 0.5,
+                                style: this.cityStyleFunction.bind(this)
+                            });
+                            map.addLayer(citiesLayer);
+
+                            var animationLayer = new ol.layer.Vector({
+                                source: new ol.source.Vector({
+                                    wrapX: false,
+                                    useSpatialIndex: true // needed to call getExtent()
+                                }),
+                                id: filter.getId()+"-animation",
+                                style:  this.animationStyleFunction.bind(this)
+                            });
+                            map.addLayer(animationLayer);
+                        },
+                        scope: this
                     }]
             }]
         });
-        
+
         this.on("loadedCorpus", function(src, corpus) {
             this.tryInit();
         }, this);
+        
+        this.on("resize", function() {
+        	    var ticker = this.body.down(".ticker");
+            ticker.setTop(this.getTargetEl().getHeight()-ticker.getHeight()-4)
+        }, this)
 
         this.callParent();
     },
 
     tryInit: function() {
         if (this.getIsOpenLayersLoaded() && this.getIsArcLoaded()) {
-        	
+
             var el = this.body.down('.map').setId(Ext.id());
-            var ticker = this.body.down(".ticker");
-            ticker.setTop(this.getTargetEl().getHeight()-ticker.getHeight()-4)
 
             var panel = this;
             var map = new ol.Map({
@@ -18907,7 +18910,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 if(features) {
                     features.forEach( function(feature) {
                         if( feature.getGeometry().getType() === "Circle" && feature.get("selected")) { // city
-                        		panel.dispatchEvent("termsClicked", panel, [feature.get("forms").join("|")])
+                            panel.dispatchEvent("termsClicked", panel, [feature.get("forms").join("|")])
                         }
                     }, this);
                 }
@@ -18976,7 +18979,8 @@ Ext.define('Voyant.panel.DreamScape', {
                             selected: true,
                             coordinates: feature.get("coordinates"),
                             width: feature.get("width"),
-                            visible: feature.get("visible")
+                            visible: feature.get("visible"),
+                            color: feature.get("color")
                         });
                         selectedLayer.getSource().addFeature(selectedFeature);
                         var geometry = feature.getGeometry();
@@ -18987,6 +18991,29 @@ Ext.define('Voyant.panel.DreamScape', {
                         });
                         textFeature.setStyle(textOverlayStyle);
                         selectedLayer.getSource().addFeature(textFeature);
+
+                        // Highlight all connection where selected city is source or target
+                        if(geometry.getType() === "Circle") {
+                            var layers = panel.getMap().getLayers();
+                            layers.forEach(function (layer) {
+                                var layerId = layer.get("id");
+                                if (layerId && layerId.indexOf("connections") !== -1) {
+                                    connections = layer.getSource().getFeatures();
+                                    connections.forEach(function (connection) {
+                                        if(connection.get("target") === feature.get("cityId") || connection.get("source") === feature.get("cityId")) {
+                                            selectedLayer.getSource().addFeature(new ol.Feature({
+                                                geometry: connection.getGeometry(),
+                                                selected: true,
+                                                coordinates: connection.get("coordinates"),
+                                                width: connection.get("width"),
+                                                visible: connection.get("visible"),
+                                                color: connection.get("color")
+                                            }));
+                                        }
+                                    })
+                                }
+                            })
+                        }
                     }
 
                 }
@@ -18996,16 +19023,16 @@ Ext.define('Voyant.panel.DreamScape', {
 
             // simulate adding a filter
             this.getDockedComponent('bottomToolbar').getComponent('addFilter').click();
-            
+
             //this.addFilter();
         } else {
             Ext.defer(this.tryInit, 500, this); // try again in a half second
         }
     },
-    
+
     // Style for vector after animation
     travelStyleFunction: function(feature, resolution) {
-    	
+
         var stroke = new ol.style.Stroke({
             color: feature.get('color'),
             width: feature.get('width')
@@ -19046,7 +19073,7 @@ Ext.define('Voyant.panel.DreamScape', {
         if(feature.get("visible")) {
             return (new ol.style.Style({
                 stroke: new ol.style.Stroke({
-                    color: feature.get("selected") ? "rgb(0,0,0)" : feature.get("color"),
+                    color: feature.get("color"),
                     width: feature.get("width")
                 })
             }));
@@ -19057,7 +19084,7 @@ Ext.define('Voyant.panel.DreamScape', {
 
     // Style for vector during animation
     animationStyleFunction: function (feature) {
-    		return [new ol.style.Style({
+        return [new ol.style.Style({
             stroke: new ol.style.Stroke({
                 color: feature.get("color"),
                 width: 5
@@ -19085,99 +19112,100 @@ Ext.define('Voyant.panel.DreamScape', {
         });
         this.getApplication().dispatchEvent('termLocationClicked', this, [term]);
     },
-    
+
     filterUpdate: function(filter) {
-    		
-    		filter.clearAnimation();
-    		
-    		var map = this.getMap(), color = filter.getColor();
-    		
-    		var citiesMaxCount = parseInt(this.getApiParam("citiesMaxCount"));
 
-    		// determine max rawFreq for sizing
-    		var max = 0;
-    		filter.getGeonames().eachCity(function(city) {if (city.rawFreq>max) {max=city.rawFreq;}}, this, citiesMaxCount);
-    		
-    		// generate cities
-    		var layerSource = map.getLayer(filter.getId()+"-cities").getSource();
-    		
-    		var hide = Ext.Array.from(this.getApiParam("hide"));
+        filter.clearAnimation();
 
-    		layerSource.clear();
-    		var minPopulation = parseInt(this.getApiParam("minPopulation"));
-    		var citiesMinFreq = parseInt(this.getApiParam("citiesMinFreq"));
-    		var validCitiesHash = {};
-    		filter.getGeonames().eachCity(function(city) {
-    			if ((!minPopulation || city.population>=minPopulation) && (!citiesMinFreq || city.rawFreq>=citiesMinFreq)) {
-    				validCitiesHash[city.id]=true;
-	    			var coordinates = [parseFloat(city.longitude), parseFloat(city.latitude)]
-	    			var feature = new ol.Feature({
-	                geometry: new ol.geom.Circle(coordinates).transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857')),
-	                text: city.label + " ("+city.rawFreq+")",
-	                description: city.label,
-	                color: color,
-	                selected: false,
-	                width: 3+ (Math.sqrt(city.rawFreq/max)*20),
-	                visible: true,
-	                coordinates: coordinates,
-	                forms: city.forms
-	            });
-	    			layerSource.addFeature(feature);
-    			}
-   		}, this, citiesMaxCount);
-    		
-    		if (layerSource.getFeatures().length>0) {
-    	        map.getView().fit(layerSource.getExtent());    			
-    		}
-        
-        map.getLayer(filter.getId()+"-cities").setVisible(Ext.Array.contains(hide, "cities")==false)
-                
-		layerSource = map.getLayer(filter.getId()+"-connections").getSource();
+        var map = this.getMap(), color = filter.getColor();
+
+        var citiesMaxCount = parseInt(this.getApiParam("citiesMaxCount"));
+
+        // determine max rawFreq for sizing
+        var max = 0;
+        filter.getGeonames().eachCity(function(city) {if (city.rawFreq>max) {max=city.rawFreq;}}, this, citiesMaxCount);
+
+        // generate cities
+        var layerSource = map.getLayer(filter.getId()+"-cities").getSource();
+
+        var hide = Ext.Array.from(this.getApiParam("hide"));
+
         layerSource.clear();
-        
-        if (Object.keys(validCitiesHash).length==0) {
-        		this.toastInfo("No cities available for current criteria.");
+        var minPopulation = parseInt(this.getApiParam("minPopulation"));
+        var citiesMinFreq = parseInt(this.getApiParam("citiesMinFreq"));
+        var validCitiesHash = {};
+        filter.getGeonames().eachCity(function(city) {
+            if ((!minPopulation || city.population>=minPopulation) && (!citiesMinFreq || city.rawFreq>=citiesMinFreq)) {
+                validCitiesHash[city.id]=true;
+                var coordinates = [parseFloat(city.longitude), parseFloat(city.latitude)]
+                var feature = new ol.Feature({
+                    geometry: new ol.geom.Circle(coordinates).transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857')),
+                    text: city.label + " ("+city.rawFreq+")",
+                    description: city.label,
+                    color: color,
+                    selected: false,
+                    width: 3+ (Math.sqrt(city.rawFreq/max)*20),
+                    visible: true,
+                    coordinates: coordinates,
+                    forms: city.forms,
+                    cityId: city.id
+                });
+                layerSource.addFeature(feature);
+            }
+        }, this, citiesMaxCount);
+
+        if (layerSource.getFeatures().length>0) {
+            map.getView().fit(layerSource.getExtent());
         }
-		
-		max = 0;
-		filter.getGeonames().eachConnection(function(connection) {
-			if (connection.rawFreq>max) {max=connection.rawFreq;}
-		}, this);
-		
-		// we'll go through all collections to see if we have valid cities
-		var counter = 0,
-			maxConnectionsCount = parseInt(this.getApiParam('connectionsMaxCount')),
-			connectionsMinFreq = parseInt(this.getApiParam('connectionsMinFreq'));
-		filter.getGeonames().eachConnection(function(connection) {
-			if ((!connectionsMinFreq || connection.rawFreq>=connectionsMinFreq) && (!maxConnectionsCount || counter<maxConnectionsCount) && connection.source.id in validCitiesHash && connection.target.id in validCitiesHash && (!minPopulation || (connection.source.population>=minPopulation && connection.target.population>=minPopulation))) {
-				var arcGenerator = new arc.GreatCircle(
-	                    {x: connection.source.longitude, y: connection.source.latitude},
-	                    {x: connection.target.longitude, y: connection.target.latitude});
-				var arcLine = arcGenerator.Arc(100, {offset: 100});
-				var label = connection.source.label+" -> "+connection.target.label + " ("+connection.rawFreq+")"
-	            arcLine.geometries.forEach(function(geometry) {
-	                var line = new ol.geom.LineString(geometry.coords);
-	                line.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-	                var feature = new ol.Feature({
-	                    geometry: line,
-	                    text: label,
-	                    color: color,
-	                    width: 3+ (Math.sqrt(connection.rawFreq/max)*10),
-	                    source: connection.source.id,
-	                    target: connection.target.id
-	                });
-	                layerSource.addFeature(feature);
-	            }, this);
-				counter++;
-			}
-		}, this);
-		
+
+        map.getLayer(filter.getId()+"-cities").setVisible(Ext.Array.contains(hide, "cities")==false);
+
+        layerSource = map.getLayer(filter.getId()+"-connections").getSource();
+        layerSource.clear();
+
+        if (Object.keys(validCitiesHash).length==0) {
+            this.toastInfo("No cities available for current criteria.");
+        }
+
+        max = 0;
+        filter.getGeonames().eachConnection(function(connection) {
+            if (connection.rawFreq>max) {max=connection.rawFreq;}
+        }, this);
+
+        // we'll go through all collections to see if we have valid cities
+        var counter = 0,
+            maxConnectionsCount = parseInt(this.getApiParam('connectionsMaxCount')),
+            connectionsMinFreq = parseInt(this.getApiParam('connectionsMinFreq'));
+        filter.getGeonames().eachConnection(function(connection) {
+            if ((!connectionsMinFreq || connection.rawFreq>=connectionsMinFreq) && (!maxConnectionsCount || counter<maxConnectionsCount) && connection.source.id in validCitiesHash && connection.target.id in validCitiesHash && (!minPopulation || (connection.source.population>=minPopulation && connection.target.population>=minPopulation))) {
+                var arcGenerator = new arc.GreatCircle(
+                    {x: connection.source.longitude, y: connection.source.latitude},
+                    {x: connection.target.longitude, y: connection.target.latitude});
+                var arcLine = arcGenerator.Arc(100, {offset: 100});
+                var label = connection.source.label+" -> "+connection.target.label + " ("+connection.rawFreq+")"
+                arcLine.geometries.forEach(function(geometry) {
+                    var line = new ol.geom.LineString(geometry.coords);
+                    line.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+                    var feature = new ol.Feature({
+                        geometry: line,
+                        text: label,
+                        color: color,
+                        width: 3+ (Math.sqrt(connection.rawFreq/max)*10),
+                        source: connection.source.id,
+                        target: connection.target.id
+                    });
+                    layerSource.addFeature(feature);
+                }, this);
+                counter++;
+            }
+        }, this);
+
         map.getLayer(filter.getId()+"-connections").setVisible(Ext.Array.contains(hide, "connections")==false)
-			
-		filter.animate();
+
+        filter.animate();
 
     }
-    
+
 });
 
 Ext.define('Voyant.widget.GeonamesFilter', {
@@ -19189,6 +19217,8 @@ Ext.define('Voyant.widget.GeonamesFilter', {
             filter: 'Filter',
             authorLabel: 'authors',
             titleLabel: 'titles',
+            keywordLabel: 'full text',
+            pubDateLabel: "dates",
             loading: "Loading geographical information…",
 //            loadedAll: "All available cities and connections have been loaded (see options under the <i>Show</i> menu in the toolbar).",
 //            loadedSome: "Loaded {currentCitiesCount} of {totalCitiesCount} available locations and {currentConnectionsCount} of {totalConnectionsCount} available connections (see options under the <b>Show</b> menu in the toolbar).",
@@ -19199,228 +19229,387 @@ Ext.define('Voyant.widget.GeonamesFilter', {
         }
     },
     config: {
-    		corpus: undefined, // used by querysearchfields among other things
-    		geonames: undefined,
-    		color: "#f00",
-    		timeout: undefined,
-    		currentConnectionOccurrence: undefined,
-    		animationLayer: undefined,
-    		millisPerAnimation: 2000
+        corpus: undefined, // used by querysearchfields among other things
+        geonames: undefined,
+        color: "#f00",
+        timeout: undefined,
+        currentConnectionOccurrence: undefined,
+        animationLayer: undefined,
+        millisPerAnimation: 2000,
+        stepByStepMode: false,
+        keepAnimationInFrame: true
     },
     constructor: function(config) {
-    		config = config || {};
-    		var geonames = new Voyant.data.util.Geonames({
-    			corpus: config.corpus
-    		});
-    		this.setGeonames(geonames);
-    		var me = this;
-    		Ext.applyIf(config, {
-		    tooltip: this.localize('filterTip'),
-		    style: "background-color: white; color: "+config.color,
-			glyph: 'xf0b0@FontAwesome',
-		    menu: {
-		        defaults: {
-		            xtype: 'querysearchfield',
-		            labelWidth: 60,
-		            labelAlign: 'right',
-		            width: 250,
-		            maxWidth: 250,
-		            listeners: { // don't set scope to this so that load keeps the widget scope
-		                
-		                change: function(cmp, vals) {
-		                		me.loadGeonames();
-		                },
-		                load: function(store, records, success, operation) {
-		                		if (records.length==0 && operation.getParams().query=="") {
-		                			Ext.Msg.show({
-		                				buttonText: {ok: me.localize('close')},
-		                				icon: Ext.MessageBox.INFO,
-		                				message: me.localize("noDataForField"),
-		                				buttons: Ext.Msg.OK
-		                			});
-		                			this.disable();
-		                		}
-		                }
-		            }
-		
-		        },
-		        items: [{
-		            fieldLabel: this.localize('authorLabel'),
-		            tokenType: 'author',
-		            itemId: 'author'
-		        },{
-		            fieldLabel: this.localize('titleLabel'),
-		            itemId: 'title',
-		            tokenType: 'title'
-		        },{
-		            fieldLabel: this.localize('keywordLabel'),
-		            hidden: true
-		        },{
-		            xtype: 'multislider',
-		            fieldLabel: this.localize('pubDateLabel'),
-		            itemId: 'pubDate',
-		            hidden: true
-		        }, {
-		             xtype: 'button',
-		             text: 'remove',
-		             scope:this,
-		             handler: function(cmp) {
-		            	 	// assumes coupling with dreamscape
-		            	 	this.fireEvent("removeFilterWidget", this);
-		            	 	cmp.ownerCt.ownerCmp.destroy();
-		             }
-		         }]
-		    }})
-    		this.callParent([config]);
-    		this.on("afterrender", function(cmp) {
-    			cmp.getTargetEl().down('.x-btn-glyph').setStyle('color', this.getColor());
-    			var panel = cmp.up("panel")
-    			panel.mask(cmp.localize("loading"));
-    			cmp.loadGeonames().then(function(geonames) {
-    				panel.unmask();
-    				if (panel.getFilterWidgets().getCount()==1) {
-    					var currentCitiesCount = geonames.getCitiesCount(),
-    						totalCitiesCount = geonames.getTotalCitiesCount(),
-    						currentConnectionsCount = geonames.getConnectionsCount(),
-    						totalConnectionsCount = geonames.getTotalConnectionsCount();
-						message = cmp.localize(currentCitiesCount==totalCitiesCount && currentConnectionsCount==totalConnectionsCount ? "loadedAll" : "loadedSome") +
-							"<br><br>"+cmp.localize("disclaimer");
-        				panel.toastInfo({
-//        					autoCloseDelay: 5000,
-        					closable: true,
-        					maxWidth: '90%',
-        					html: new Ext.Template(cmp.localize("disclaimer")).apply({
-            					currentCitiesCount: currentCitiesCount,
-            					totalCitiesCount: totalCitiesCount,
-            					currentConnectionsCount: currentConnectionsCount,
-            					totalConnectionsCount: totalConnectionsCount,
-            					url: panel.getBaseUrl()+"docs/#!/guide/dreamscape"
-            				})
-            				
-        				});
-    				}
-    			})
-		}, this);
+        config = config || {};
+        var geonames = new Voyant.data.util.Geonames({
+            corpus: config.corpus
+        });
+        this.setGeonames(geonames);
+        var me = this;
+        Ext.applyIf(config,
+            {
+                tooltip: this.localize('filterTip'),
+                style: "background-color: white; color: "+config.color,
+                glyph: 'xf0b0@FontAwesome',
+                menu: {
+                    defaults: {
+                        xtype: 'querysearchfield',
+                        labelWidth: 60,
+                        labelAlign: 'right',
+                        width: 250,
+                        maxWidth: 250,
+                        padding: 2,
+                        listeners: { // don't set scope to this so that load keeps the widget scope
+                            change: function(cmp, vals) {
+                                me.loadGeonames();
+                            },
+                            load: function(store, records, success, operation) {
+                                if (records.length==0 && operation.getParams().query=="") {
+                                    Ext.Msg.show({
+                                        buttonText: {ok: me.localize('close')},
+                                        icon: Ext.MessageBox.INFO,
+                                        message: me.localize("noDataForField"),
+                                        buttons: Ext.Msg.OK
+                                    });
+                                    this.disable();
+                                }
+                            }
+                        }
+
+                    },
+                    items: [{
+                        fieldLabel: this.localize('authorLabel'),
+                        tokenType: 'author',
+                        itemId: 'author'
+                    },{
+                        fieldLabel: this.localize('titleLabel'),
+                        itemId: 'title',
+                        tokenType: 'title'
+                    },{
+                        fieldLabel: this.localize('keywordLabel')
+                    },{
+                        xtype: 'multislider',
+                        fieldLabel: this.localize('pubDateLabel'),
+                        itemId: 'pubDate',
+                        tokenType: 'pubDate',
+                        values: [0,1],
+                        hidden: true,
+                        listeners: {
+                        		afterrender: function(cmp) {
+                        			this.getCorpus().getCorpusTerms().load({
+                        				params: {
+                        					tokenType: 'pubDate',
+                        					limit: 1,
+                        					sort: "TERMASC"
+                        				},
+                        				callback: function(records) {
+                        					if (records.length==0) {
+                        						// no pubDate, see if we can parse from titles
+                        						var vals = [];
+                        						this.getCorpus().each(function(doc) {
+                        							var val = parseInt(doc.getTitle());
+                        							if (isNaN(val)==false) {
+                            							vals.push(parseInt(doc.getTitle()))
+                        							}
+                        						}, this);
+                        						if (vals.length>1) {
+                        							cmp.setMinValue(vals[0]);
+                        							cmp.setMaxValue(vals[vals.length-1]);
+                        							cmp.tokenType = 'title';
+                        							cmp.suspendEvent('changecomplete'); 
+                        							cmp.setValue([vals[0], vals[vals.length-1]]);
+                        							cmp.resumeEvent('changecomplete');
+                        							cmp.setVisible(true);
+                        						}
+                        					} else {
+                        						cmp.setMinValue(parseInt(records[0].getTerm()))
+			                        			this.getCorpus().getCorpusTerms().load({
+			                        				params: {
+			                        					tokenType: 'pubDate',
+			                        					limit: 1,
+			                        					sort: "TERMDESC"
+			                        				},
+			                        				callback: function(records) {
+		                        						cmp.setMaxValue(parseInt(records[0].getTerm())),
+	                        							cmp.setVisible(true);
+			                        				},
+			                        				scope: this
+			                        			});
+                        					}
+                        				},
+                        				scope: this
+                        			})
+                        		},
+                        		changecomplete: function(cmp, newVal) {
+                        			this.loadGeonames();
+                        		},
+                        		scope: this
+                        }
+                    }, {
+                    		xtype: 'fieldset',
+                    		title: "Animation",
+                    		items: [{
+                    			xtype: 'container',
+                        		layout: 'hbox',
+                        		defaults: {
+                        			xtype: 'button',
+                        			text: "",
+                        			ui: 'default-toolbar'
+                        		},
+                        		items: [{
+                                 glyph: 'xf048@FontAwesome', // step back
+                                 handler: function() {
+                                     this.getAnimationLayer().getSource().clear();
+                                     this.clearAnimation();
+                                     var currentConnectionOccurrence = this.getCurrentConnectionOccurrence();
+                                    	currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence ? currentConnectionOccurrence.index-1 : 0);                             	
+                                     this.setCurrentConnectionOccurrence(currentConnectionOccurrence);  
+                                     this.animate();
+                                 },
+                                 scope: this
+                        		},{
+                                 glyph: 'xf04c@FontAwesome', // play
+                                 handler: function(cmp) {
+                                	 	if (cmp.getGlyph().glyphConfig=="xf04b@FontAwesome") {
+                                        this.clearAnimation();
+                                	 		cmp.setGlyph(new Ext.Glyph('xf04c@FontAwesome'));
+                                	 		this.setStepByStepMode(false);
+                                	 		this.animate();
+                                	 	} else {
+                                	 		cmp.setGlyph(new Ext.Glyph('xf04b@FontAwesome'));
+//                                         this.clearAnimation();
+//                                         this.getAnimationLayer().getSource().clear();
+                              	 		this.setStepByStepMode(true);
+                                	 	}
+//                                     this.setCurrentConnectionOccurrence(this.getGeonames().getConnectionOccurrence(0));
+                                 },
+                                 scope: this              	
+
+                        		},{
+                                 glyph: 'xf051@FontAwesome', // step forward
+                                 handler: function() {
+                                     this.getAnimationLayer().getSource().clear();
+                                     this.clearAnimation();
+                                     var currentConnectionOccurrence = this.getCurrentConnectionOccurrence();
+                                    	currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence ? currentConnectionOccurrence.index+1 : 0);                             	
+                                     this.setCurrentConnectionOccurrence(currentConnectionOccurrence);  
+                                     this.animate();
+                                 },
+                                 scope: this
+                        		}, {
+                        			xtype: 'tbtext',
+                        			text: "&nbsp;&nbsp;"
+                        		}, {
+                                glyph: 'xf01e@FontAwesome', // reset
+                                handler: function() {
+                                    this.getAnimationLayer().getSource().clear();
+                                    this.clearAnimation();
+                                    this.setCurrentConnectionOccurrence(this.getGeonames().getConnectionOccurrence(0));                               	
+                                    this.animate();
+                                },
+                                scope: this
+                        		}]
+                        	}, {
+                            xtype: 'checkbox',
+                            checked: true,
+                            checkHandler: function(item, checked) {
+                                me.setKeepAnimationInFrame(checked);
+                            },
+                            boxLabel: "Keep animation in frame"
+                         }]
+                    		
+                    },{
+                    		xtype: "container",
+                    		text: "&nbsp;"
+                    },{
+                        xtype: 'button',
+                        text: 'remove',
+                        scope:this,
+                        //margin: 3,
+                        handler: function(cmp) {
+                            // assumes coupling with dreamscape
+                            this.fireEvent("removeFilterWidget", this);
+                            cmp.ownerCt.ownerCmp.destroy();
+                        }
+                    }]
+                }
+            });
+        this.callParent([config]);
+        
+        this.on("resize", function(cmp) {
+        		
+        })
+        this.on("afterrender", function(cmp) {
+            cmp.getTargetEl().down('.x-btn-glyph').setStyle('color', this.getColor());
+            var panel = cmp.up("panel")
+            panel.mask(cmp.localize("loading"));
+            cmp.loadGeonames().then(function(geonames) {
+                panel.unmask();
+                if (panel.getFilterWidgets().getCount()==1) {
+                    var currentCitiesCount = geonames.getCitiesCount(),
+                        totalCitiesCount = geonames.getTotalCitiesCount(),
+                        currentConnectionsCount = geonames.getConnectionsCount(),
+                        totalConnectionsCount = geonames.getTotalConnectionsCount();
+                    message = cmp.localize(currentCitiesCount==totalCitiesCount && currentConnectionsCount==totalConnectionsCount ? "loadedAll" : "loadedSome") +
+                        "<br><br>"+cmp.localize("disclaimer");
+                    panel.toastInfo({
+//        				autoCloseDelay: 5000,
+                        closable: true,
+                        maxWidth: '90%',
+                        html: new Ext.Template(cmp.localize("disclaimer")).apply({
+                            currentCitiesCount: currentCitiesCount,
+                            totalCitiesCount: totalCitiesCount,
+                            currentConnectionsCount: currentConnectionsCount,
+                            totalConnectionsCount: totalConnectionsCount,
+                            url: panel.getBaseUrl()+"docs/#!/guide/dreamscape"
+                        })
+
+                    });
+                }
+            })
+        }, this);
     },
     loadGeonames: function(params) {
-    		var me = this;
-    		params = params || {};
-    		
-    		// add queries
-    		var queries  = [];
-    		this.query('querysearchfield').forEach(function(querysearchfield) {
-    			var id = querysearchfield.getItemId();
-    			querysearchfield.getValue().forEach(function(query) {
-    				queries.push(id+":"+query);
-    			})
-    		});
-    		if (queries.length>0 && !("query" in params)) {params.query=queries;}
-    		
-    		// add params from tool
-    		var panel  = this.up('panel');
-    		if (panel && panel.getApiParams) {
-    			Ext.applyIf(params, panel.getApiParams(["minPopulation","connectionsMaxCount","connectionsMinFreq"]))
-    		}
+        var me = this;
+        params = params || {};
 
-    		this.mask("…");
-    		var geonames = this.getGeonames();
-    		return geonames.load(params).then(function() {
-	    		me.unmask();
-	    		me.fireEvent("filterUpdate", me, geonames);
-	    		return geonames;
-	    	}); 	
+        // add queries
+        var queries  = [];
+        this.query('querysearchfield').forEach(function(querysearchfield) {
+            var id = querysearchfield.getItemId();
+            querysearchfield.getValue().forEach(function(query) {
+                queries.push(id+":"+query);
+            })
+        });
+        var pubDateSlider = this.down("multislider");
+        if (pubDateSlider && pubDateSlider.isVisible()) {
+        		var vals = pubDateSlider.getValue();
+        		queries.push(pubDateSlider.tokenType+":["+vals[0]+"-"+vals[1]+"]")
+        }
+        if (queries.length>0 && !("query" in params)) {params.query=queries;}
+
+        // add params from tool
+        var panel  = this.up('panel');
+        if (panel && panel.getApiParams) {
+            Ext.applyIf(params, panel.getApiParams(["minPopulation","connectionsMaxCount","connectionsMinFreq"]))
+        }
+
+        this.mask("…");
+        var geonames = this.getGeonames();
+        return geonames.load(params).then(function() {
+            me.unmask();
+            me.fireEvent("filterUpdate", me, geonames);
+            return geonames;
+        });
     },
-    
+
     clearAnimation: function() {
-    		if (this.getTimeout()) {clearTimeout(this.getTimeout());}
+        if (this.getTimeout()) {clearTimeout(this.getTimeout());}
     },
-    
+
     animate: function() {
-		this.clearAnimation();
-		var currentConnectionOccurrence = this.getCurrentConnectionOccurrence();
-		if (currentConnectionOccurrence) {
-			var animationLayer = this.getAnimationLayer();
-			if (!animationLayer) {
-				animationLayer = this.up('panel').getMap().getLayer(this.getId()+"-animation");
-				this.setAnimationLayer(animationLayer);
-			}
-			if (animationLayer) {
-				var features = animationLayer.getSource().getFeatures();
-				if (features.length==0) {
-					var panel =  this.up('panel');
-					if (!panel) {return;}
-					var connectionsLayerSource = panel.getMap().getLayer(this.getId()+"-connections").getSource();
-					var connectionsFeatures = connectionsLayerSource.getFeatures();
-					var hasMatch = false;
-					for (var i=0, len=connectionsFeatures.length; i<len; i++) {
-						if (currentConnectionOccurrence.source.id==connectionsFeatures[i].get("source") && currentConnectionOccurrence.target.id==connectionsFeatures[i].get("target")) {
-							hasMatch = true;
-							break;
-						}
-					}
-					if (hasMatch) {
-						var arcGenerator = new arc.GreatCircle(
-			                    {x: currentConnectionOccurrence.source.longitude, y: currentConnectionOccurrence.source.latitude},
-			                    {x: currentConnectionOccurrence.target.longitude, y: currentConnectionOccurrence.target.latitude});
-						var arcLine = arcGenerator.Arc(100, {offset: 100});
-						var label = currentConnectionOccurrence.source.label+" -> "+currentConnectionOccurrence.target.label + " ("+currentConnectionOccurrence.rawFreq+")"
-			            arcLine.geometries.forEach(function(geometry) {
-			                var line = new ol.geom.LineString([]); // can be empty since we generate a line during next animate call
-			                line.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-			                var feature = new ol.Feature({
-			                    geometry: line,
-			                    allcoords: geometry.coords ,
-			                    text: label,
-			                    color: this.getColor(),
-			                    width: 5,
-			                    start: new Date().getTime()
-			                });
-			                animationLayer.getSource().addFeature(feature);
-			            }, this);
-						var ticker = panel.body.down(".ticker");
-						
-						panel.body.down(".ticker").setHtml(
-							currentConnectionOccurrence.source.left+" <span class='keyword'>"+currentConnectionOccurrence.source.middle+"</span> "+currentConnectionOccurrence.source.right+" … "+
-							currentConnectionOccurrence.target.left+" <span class='keyword'>"+currentConnectionOccurrence.target.middle+"</span> "+currentConnectionOccurrence.target.right
-						)
-						return this.setTimeout(setTimeout(this.animate.bind(this), 1));
-					} else {
-						if (!this.getGeonames()) {return;}
-						currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence.index+1);
-						this.setCurrentConnectionOccurrence(currentConnectionOccurrence);
-						animationLayer.getSource().clear();
-						return this.setTimeout(setTimeout(this.animate.bind(this), 1));
-					}
-				} else if (features.length>0) {
-					var coords = features[0].getGeometry().getCoordinates(),
-						allcoords = features[0].get("allcoords");
-					if (coords.length<allcoords.length) {
-						var elapsed = new Date().getTime()-features[0].get('start'),
-							len = elapsed*allcoords.length/this.getMillisPerAnimation()
-							line = new ol.geom.LineString(allcoords.slice(0,len));
-		                line.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-		                features[0].set("geometry", line);
-						return this.setTimeout(setTimeout(this.animate.bind(this), 25));
-					}
-					// if we get here, all features should have been changed
-					currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence.index+1);
-					this.setCurrentConnectionOccurrence(currentConnectionOccurrence);
-					animationLayer.getSource().clear();
-					return this.setTimeout(setTimeout(this.animate.bind(this), 1));
-				}
-			}
-		} else {
-			if (!this.getGeonames()) {return;}
-			currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(0);
-			if (currentConnectionOccurrence) {
-				this.setCurrentConnectionOccurrence(currentConnectionOccurrence);
-				return this.setTimeout(setTimeout(this.animate.bind(this), 1));
-			}
-		}
+        this.clearAnimation();
+        var currentConnectionOccurrence = this.getCurrentConnectionOccurrence();
+        if (currentConnectionOccurrence) {
+            var animationLayer = this.getAnimationLayer();
+            if (!animationLayer) {
+                animationLayer = this.up('panel').getMap().getLayer(this.getId()+"-animation");
+                this.setAnimationLayer(animationLayer);
+            }
+            if (animationLayer) {
+                var features = animationLayer.getSource().getFeatures();
+                if (features.length==0) {
+                    var panel =  this.up('panel');
+                    if (!panel) {return;}
+                    var connectionsLayerSource = panel.getMap().getLayer(this.getId()+"-connections").getSource();
+                    var connectionsFeatures = connectionsLayerSource.getFeatures();
+                    var hasMatch = false;
+                    for (var i=0, len=connectionsFeatures.length; i<len; i++) {
+                        if (currentConnectionOccurrence.source.id==connectionsFeatures[i].get("source") && currentConnectionOccurrence.target.id==connectionsFeatures[i].get("target")) {
+                            hasMatch = connectionsFeatures[i];
+                            break;
+                        }
+                    }
+                    if (hasMatch) {
+                    		// check to see if we need to reposition the map, use displayed feature as basis for extent
+                        if(this.getKeepAnimationInFrame()) {
+
+	                    		var map = panel.getMap();
+	                        var extent = panel.getMap().getView().calculateExtent(map.getSize());
+	                        var isVisible = ol.extent.containsExtent(extent, hasMatch.getGeometry().getExtent());
+	                        if(!isVisible) {
+	                            map.getView().setZoom(map.getView().getZoom() - 1);
+	                        }
+                        }
+
+                        var arcGenerator = new arc.GreatCircle(
+                            {x: currentConnectionOccurrence.source.longitude, y: currentConnectionOccurrence.source.latitude},
+                            {x: currentConnectionOccurrence.target.longitude, y: currentConnectionOccurrence.target.latitude});
+                        var arcLine = arcGenerator.Arc(100, {offset: 100});
+                        var label = currentConnectionOccurrence.source.label+" -> "+currentConnectionOccurrence.target.label;
+                        arcLine.geometries.forEach(function(geometry) {
+                            var line = new ol.geom.LineString([]); // can be empty since we generate a line during next animate call
+                            line.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+                            var feature = new ol.Feature({
+                                geometry: line,
+                                allcoords: geometry.coords ,
+                                text: label,
+                                color: this.getColor(),
+                                width: 5,
+                                start: new Date().getTime()
+                            });
+                            animationLayer.getSource().addFeature(feature);
+                        }, this);
+
+                        var ticker = panel.body.down(".ticker");
+
+                        panel.body.down(".ticker").setHtml(
+                            currentConnectionOccurrence.source.left+" <span class='keyword'>"+currentConnectionOccurrence.source.middle+"</span> "+currentConnectionOccurrence.source.right+" … "+
+                            currentConnectionOccurrence.target.left+" <span class='keyword'>"+currentConnectionOccurrence.target.middle+"</span> "+currentConnectionOccurrence.target.right
+                        )
+                        return this.setTimeout(setTimeout(this.animate.bind(this), 1));
+
+                    } else {
+                        if (!this.getGeonames()) {return;}
+                        currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence.index+1);
+                        this.setCurrentConnectionOccurrence(currentConnectionOccurrence);
+                        animationLayer.getSource().clear();
+                        return this.setTimeout(setTimeout(this.animate.bind(this), 1));
+
+                    }
+                } else if (features.length>0) {
+
+                    var coords = features[0].getGeometry().getCoordinates(),
+                        allcoords = features[0].get("allcoords");
+                    if (coords.length<allcoords.length) {
+                        var elapsed = new Date().getTime()-features[0].get('start'),
+                            len = elapsed*allcoords.length/this.getMillisPerAnimation()
+                        line = new ol.geom.LineString(allcoords.slice(0,len));
+                        line.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+                        features[0].set("geometry", line);
+                        return this.setTimeout(setTimeout(this.animate.bind(this), 25));
+
+                    }
+                    // if we get here, all features should have been changed
+                    currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence.index+1);
+                    if(!this.getStepByStepMode()) {
+                        this.setCurrentConnectionOccurrence(currentConnectionOccurrence);
+                        animationLayer.getSource().clear();
+                        return this.setTimeout(setTimeout(this.animate.bind(this), 1));
+                    }
+                }
+            }
+        } else {
+            if (!this.getGeonames()) {return;}
+            currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(0);
+            if (currentConnectionOccurrence) {
+                this.setCurrentConnectionOccurrence(currentConnectionOccurrence);
+                return this.setTimeout(setTimeout(this.animate.bind(this), 1));
+            }
+        }
     }
 
 });
-
 // assuming Knots library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Knots', {
 	extend: 'Ext.panel.Panel',
@@ -33320,13 +33509,16 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	}]
     },
     
-    launch: function() {
+    launch: function(config) {
 		this.callParent(arguments);
 
     	if (this.hasQueryToLoad()) {
         	var queryParams = Ext.Object.fromQueryString(document.location.search);
         	if (!queryParams.corpus && this.getCorpusId && this.getCorpusId()) {
         		queryParams.corpus = this.getCorpusId();
+        	}
+        	if (config && config.useCache) { // for large corpora
+        		queryParams.useCache = config.useCache;
         	}
         	this.loadCorpusFromParams(queryParams);
         	

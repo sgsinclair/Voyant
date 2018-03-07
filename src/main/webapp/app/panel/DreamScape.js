@@ -366,6 +366,11 @@ Ext.define('Voyant.panel.DreamScape', {
         this.on("loadedCorpus", function(src, corpus) {
             this.tryInit();
         }, this);
+        
+        this.on("resize", function() {
+        	    var ticker = this.body.down(".ticker");
+            ticker.setTop(this.getTargetEl().getHeight()-ticker.getHeight()-4)
+        }, this)
 
         this.on("resize", function() {
             var ticker = this.body.down(".ticker");
@@ -500,6 +505,7 @@ Ext.define('Voyant.panel.DreamScape', {
                         selectedLayer.getSource().addFeature(textFeature);
 
                         // Highlight all connection where selected city is source or target
+
                         if(feature.get("type") === "city") {
                             var layers = panel.getMap().getLayers();
                             layers.forEach(function (layer) {
@@ -591,7 +597,6 @@ Ext.define('Voyant.panel.DreamScape', {
                         color: 'rgb(255, 255, 255)',
                         width: 2
                     })
-                })
             }));
         } else {
             return false;
@@ -655,6 +660,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 validCitiesHash[city.id]=true;
                 var coordinates = [parseFloat(city.longitude), parseFloat(city.latitude)]
                 var feature = new ol.Feature({
+
                     geometry: new ol.geom.Point(coordinates).transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857')),
                     text: city.label + " ("+city.rawFreq+")",
                     description: city.label,
@@ -813,111 +819,111 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                         values: [0,1],
                         hidden: true,
                         listeners: {
-                            afterrender: function(cmp) {
-                                this.getCorpus().getCorpusTerms().load({
-                                    params: {
-                                        tokenType: 'pubDate',
-                                        limit: 1,
-                                        sort: "TERMASC"
-                                    },
-                                    callback: function(records) {
-                                        if (records.length==0) {
-                                            // no pubDate, see if we can parse from titles
-                                            var vals = [];
-                                            this.getCorpus().each(function(doc) {
-                                                var val = parseInt(doc.getTitle());
-                                                if (isNaN(val)==false) {
-                                                    vals.push(parseInt(doc.getTitle()))
-                                                }
-                                            }, this);
-                                            if (vals.length>1) {
-                                                cmp.setMinValue(vals[0]);
-                                                cmp.setMaxValue(vals[vals.length-1]);
-                                                cmp.tokenType = 'title';
-                                                cmp.suspendEvent('changecomplete');
-                                                cmp.setValue([vals[0], vals[vals.length-1]]);
-                                                cmp.resumeEvent('changecomplete');
-                                                cmp.setVisible(true);
-                                            }
-                                        } else {
-                                            cmp.setMinValue(parseInt(records[0].getTerm()))
-                                            this.getCorpus().getCorpusTerms().load({
-                                                params: {
-                                                    tokenType: 'pubDate',
-                                                    limit: 1,
-                                                    sort: "TERMDESC"
-                                                },
-                                                callback: function(records) {
-                                                    cmp.setMaxValue(parseInt(records[0].getTerm())),
-                                                        cmp.setVisible(true);
-                                                },
-                                                scope: this
-                                            });
-                                        }
-                                    },
-                                    scope: this
-                                })
-                            },
-                            changecomplete: function(cmp, newVal) {
-                                this.loadGeonames();
-                            },
-                            scope: this
+                        		afterrender: function(cmp) {
+                        			this.getCorpus().getCorpusTerms().load({
+                        				params: {
+                        					tokenType: 'pubDate',
+                        					limit: 1,
+                        					sort: "TERMASC"
+                        				},
+                        				callback: function(records) {
+                        					if (records.length==0) {
+                        						// no pubDate, see if we can parse from titles
+                        						var vals = [];
+                        						this.getCorpus().each(function(doc) {
+                        							var val = parseInt(doc.getTitle());
+                        							if (isNaN(val)==false) {
+                            							vals.push(parseInt(doc.getTitle()))
+                        							}
+                        						}, this);
+                        						if (vals.length>1) {
+                        							cmp.setMinValue(vals[0]);
+                        							cmp.setMaxValue(vals[vals.length-1]);
+                        							cmp.tokenType = 'title';
+                        							cmp.suspendEvent('changecomplete'); 
+                        							cmp.setValue([vals[0], vals[vals.length-1]]);
+                        							cmp.resumeEvent('changecomplete');
+                        							cmp.setVisible(true);
+                        						}
+                        					} else {
+                        						cmp.setMinValue(parseInt(records[0].getTerm()))
+			                        			this.getCorpus().getCorpusTerms().load({
+			                        				params: {
+			                        					tokenType: 'pubDate',
+			                        					limit: 1,
+			                        					sort: "TERMDESC"
+			                        				},
+			                        				callback: function(records) {
+		                        						cmp.setMaxValue(parseInt(records[0].getTerm())),
+	                        							cmp.setVisible(true);
+			                        				},
+			                        				scope: this
+			                        			});
+                        					}
+                        				},
+                        				scope: this
+                        			})
+                        		},
+                        		changecomplete: function(cmp, newVal) {
+                        			this.loadGeonames();
+                        		},
+                        		scope: this
                         }
                     }, {
-                        xtype: 'fieldset',
-                        title: "Animation",
-                        items: [{
-                            xtype: 'container',
-                            layout: 'hbox',
-                            defaults: {
-                                xtype: 'button',
-                                text: "",
-                                ui: 'default-toolbar'
-                            },
-                            items: [{
-                                glyph: 'xf048@FontAwesome', // step back
-                                handler: function() {
-                                    this.getAnimationLayer().getSource().clear();
-                                    this.clearAnimation();
-                                    var currentConnectionOccurrence = this.getCurrentConnectionOccurrence();
-                                    currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence ? currentConnectionOccurrence.index-1 : 0);
-                                    this.setCurrentConnectionOccurrence(currentConnectionOccurrence);
-                                    this.animate();
-                                },
-                                scope: this
-                            },{
-                                glyph: 'xf04c@FontAwesome', // play
-                                handler: function(cmp) {
-                                    if (cmp.getGlyph().glyphConfig=="xf04b@FontAwesome") {
+                    		xtype: 'fieldset',
+                    		title: "Animation",
+                    		items: [{
+                    			xtype: 'container',
+                        		layout: 'hbox',
+                        		defaults: {
+                        			xtype: 'button',
+                        			text: "",
+                        			ui: 'default-toolbar'
+                        		},
+                        		items: [{
+                                 glyph: 'xf048@FontAwesome', // step back
+                                 handler: function() {
+                                     this.getAnimationLayer().getSource().clear();
+                                     this.clearAnimation();
+                                     var currentConnectionOccurrence = this.getCurrentConnectionOccurrence();
+                                    	currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence ? currentConnectionOccurrence.index-1 : 0);                             	
+                                     this.setCurrentConnectionOccurrence(currentConnectionOccurrence);  
+                                     this.animate();
+                                 },
+                                 scope: this
+                        		},{
+                                 glyph: 'xf04c@FontAwesome', // play
+                                 handler: function(cmp) {
+                                	 	if (cmp.getGlyph().glyphConfig=="xf04b@FontAwesome") {
                                         this.clearAnimation();
-                                        cmp.setGlyph(new Ext.Glyph('xf04c@FontAwesome'));
-                                        this.setStepByStepMode(false);
-                                        this.animate();
-                                    } else {
-                                        cmp.setGlyph(new Ext.Glyph('xf04b@FontAwesome'));
+                                	 		cmp.setGlyph(new Ext.Glyph('xf04c@FontAwesome'));
+                                	 		this.setStepByStepMode(false);
+                                	 		this.animate();
+                                	 	} else {
+                                	 		cmp.setGlyph(new Ext.Glyph('xf04b@FontAwesome'));
 //                                         this.clearAnimation();
 //                                         this.getAnimationLayer().getSource().clear();
-                                        this.setStepByStepMode(true);
-                                    }
+                              	 		this.setStepByStepMode(true);
+                                	 	}
 //                                     this.setCurrentConnectionOccurrence(this.getGeonames().getConnectionOccurrence(0));
-                                },
-                                scope: this
+                                 },
+                                 scope: this              	
 
-                            },{
-                                glyph: 'xf051@FontAwesome', // step forward
-                                handler: function() {
-                                    this.getAnimationLayer().getSource().clear();
-                                    this.clearAnimation();
-                                    var currentConnectionOccurrence = this.getCurrentConnectionOccurrence();
-                                    currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence ? currentConnectionOccurrence.index+1 : 0);
-                                    this.setCurrentConnectionOccurrence(currentConnectionOccurrence);
-                                    this.animate();
-                                },
-                                scope: this
-                            }, {
-                                xtype: 'tbtext',
-                                text: "&nbsp;&nbsp;"
-                            }, {
+                        		},{
+                                 glyph: 'xf051@FontAwesome', // step forward
+                                 handler: function() {
+                                     this.getAnimationLayer().getSource().clear();
+                                     this.clearAnimation();
+                                     var currentConnectionOccurrence = this.getCurrentConnectionOccurrence();
+                                    	currentConnectionOccurrence = this.getGeonames().getConnectionOccurrence(currentConnectionOccurrence ? currentConnectionOccurrence.index+1 : 0);                             	
+                                     this.setCurrentConnectionOccurrence(currentConnectionOccurrence);  
+                                     this.animate();
+                                 },
+                                 scope: this
+                        		}, {
+                        			xtype: 'tbtext',
+                        			text: "&nbsp;&nbsp;"
+                        		}, {
                                 glyph: 'xf01e@FontAwesome', // reset
                                 handler: function() {
                                     this.getAnimationLayer().getSource().clear();
@@ -953,10 +959,6 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                 }
             });
         this.callParent([config]);
-
-        this.on("resize", function(cmp) {
-
-        })
         this.on("afterrender", function(cmp) {
             cmp.getTargetEl().down('.x-btn-glyph').setStyle('color', this.getColor());
             var panel = cmp.up("panel")
@@ -971,7 +973,8 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                     message = cmp.localize(currentCitiesCount==totalCitiesCount && currentConnectionsCount==totalConnectionsCount ? "loadedAll" : "loadedSome") +
                         "<br><br>"+cmp.localize("disclaimer");
                     panel.toastInfo({
-//                      autoCloseDelay: 5000,
+                        autoCloseDelay: 5000,
+
                         closable: true,
                         maxWidth: '90%',
                         html: new Ext.Template(cmp.localize("disclaimer")).apply({
@@ -1001,8 +1004,8 @@ Ext.define('Voyant.widget.GeonamesFilter', {
         });
         var pubDateSlider = this.down("multislider");
         if (pubDateSlider && pubDateSlider.isVisible()) {
-            var vals = pubDateSlider.getValue();
-            queries.push(pubDateSlider.tokenType+":["+vals[0]+"-"+vals[1]+"]")
+        		var vals = pubDateSlider.getValue();
+        		queries.push(pubDateSlider.tokenType+":["+vals[0]+"-"+vals[1]+"]")
         }
         if (queries.length>0 && !("query" in params)) {params.query=queries;}
 
