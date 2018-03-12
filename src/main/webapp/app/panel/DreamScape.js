@@ -372,6 +372,11 @@ Ext.define('Voyant.panel.DreamScape', {
             ticker.setTop(this.getTargetEl().getHeight()-ticker.getHeight()-4)
         }, this)
 
+        this.on("resize", function() {
+            var ticker = this.body.down(".ticker");
+            //ticker.setTop(this.getTargetEl().getHeight()-ticker.getHeight()-4)
+        }, this);
+
         this.callParent();
     },
 
@@ -414,7 +419,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 var features = map.getFeaturesAtPixel(pixel);
                 if(features) {
                     features.forEach( function(feature) {
-                        if( feature.getGeometry().getType() === "Circle" && feature.get("selected")) { // city
+                        if( feature.get("type") === "city" && feature.get("selected")) { // city
                             panel.dispatchEvent("termsClicked", panel, [feature.get("forms").join("|")])
                         }
                     }, this);
@@ -431,7 +436,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 zIndex: 10,
                 selected: true,
                 style: function(feature) {
-                    if(feature.getGeometry().getType() === "Circle")
+                    if(feature.get("type") === "city")
                     {
                         return panel.cityStyleFunction(feature, map.getView().getResolution());
                     } else {
@@ -485,7 +490,9 @@ Ext.define('Voyant.panel.DreamScape', {
                             coordinates: feature.get("coordinates"),
                             width: feature.get("width"),
                             visible: feature.get("visible"),
-                            color: feature.get("color")
+                            color: feature.get("color"),
+                            type: feature.get("type"),
+                            conf: feature.get("conf")
                         });
                         selectedLayer.getSource().addFeature(selectedFeature);
                         var geometry = feature.getGeometry();
@@ -498,7 +505,8 @@ Ext.define('Voyant.panel.DreamScape', {
                         selectedLayer.getSource().addFeature(textFeature);
 
                         // Highlight all connection where selected city is source or target
-                        if(geometry.getType() === "Circle") {
+
+                        if(feature.get("type") === "city") {
                             var layers = panel.getMap().getLayers();
                             layers.forEach(function (layer) {
                                 var layerId = layer.get("id");
@@ -576,11 +584,19 @@ Ext.define('Voyant.panel.DreamScape', {
     // Style for cities
     cityStyleFunction: function(feature, resolution) {
         if(feature.get("visible")) {
+            var diameter = Math.PI * 2 * feature.get("width");
+            var confArc = feature.get("conf") ? diameter * feature.get("conf") : diameter;
             return (new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: feature.get("color"),
-                    width: feature.get("width")
-                })
+                image: new ol.style.Circle({
+                    radius: feature.get("width"),
+                    fill: new ol.style.Fill({
+                        color: feature.get("color")
+                    }),
+                    stroke: new ol.style.Stroke({
+                        lineDash: [confArc, diameter - confArc],
+                        color: 'rgb(255, 255, 255)',
+                        width: 2
+                    })
             }));
         } else {
             return false;
@@ -644,7 +660,8 @@ Ext.define('Voyant.panel.DreamScape', {
                 validCitiesHash[city.id]=true;
                 var coordinates = [parseFloat(city.longitude), parseFloat(city.latitude)]
                 var feature = new ol.Feature({
-                    geometry: new ol.geom.Circle(coordinates).transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857')),
+
+                    geometry: new ol.geom.Point(coordinates).transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857')),
                     text: city.label + " ("+city.rawFreq+")",
                     description: city.label,
                     color: color,
@@ -653,7 +670,9 @@ Ext.define('Voyant.panel.DreamScape', {
                     visible: true,
                     coordinates: coordinates,
                     forms: city.forms,
-                    cityId: city.id
+                    cityId: city.id,
+                    type: "city",
+                    conf: city.conf
                 });
                 layerSource.addFeature(feature);
             }
@@ -909,23 +928,23 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                                 handler: function() {
                                     this.getAnimationLayer().getSource().clear();
                                     this.clearAnimation();
-                                    this.setCurrentConnectionOccurrence(this.getGeonames().getConnectionOccurrence(0));                               	
+                                    this.setCurrentConnectionOccurrence(this.getGeonames().getConnectionOccurrence(0));
                                     this.animate();
                                 },
                                 scope: this
-                        		}]
-                        	}, {
+                            }]
+                        }, {
                             xtype: 'checkbox',
                             checked: true,
-                            checkHandler: function(item, checked) {
+                            handler: function(item, checked) {
                                 me.setKeepAnimationInFrame(checked);
                             },
                             boxLabel: "Keep animation in frame"
-                         }]
-                    		
+                        }]
+
                     },{
-                    		xtype: "container",
-                    		text: "&nbsp;"
+                        xtype: "container",
+                        text: "&nbsp;"
                     },{
                         xtype: 'button',
                         text: 'remove',
@@ -940,10 +959,6 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                 }
             });
         this.callParent([config]);
-        
-        this.on("resize", function(cmp) {
-        		
-        })
         this.on("afterrender", function(cmp) {
             cmp.getTargetEl().down('.x-btn-glyph').setStyle('color', this.getColor());
             var panel = cmp.up("panel")
@@ -958,7 +973,8 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                     message = cmp.localize(currentCitiesCount==totalCitiesCount && currentConnectionsCount==totalConnectionsCount ? "loadedAll" : "loadedSome") +
                         "<br><br>"+cmp.localize("disclaimer");
                     panel.toastInfo({
-//        				autoCloseDelay: 5000,
+                        autoCloseDelay: 5000,
+
                         closable: true,
                         maxWidth: '90%',
                         html: new Ext.Template(cmp.localize("disclaimer")).apply({
@@ -1036,15 +1052,14 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                         }
                     }
                     if (hasMatch) {
-                    		// check to see if we need to reposition the map, use displayed feature as basis for extent
+                        // check to see if we need to reposition the map, use displayed feature as basis for extent
                         if(this.getKeepAnimationInFrame()) {
-
-	                    		var map = panel.getMap();
-	                        var extent = panel.getMap().getView().calculateExtent(map.getSize());
-	                        var isVisible = ol.extent.containsExtent(extent, hasMatch.getGeometry().getExtent());
-	                        if(!isVisible) {
-	                            map.getView().setZoom(map.getView().getZoom() - 1);
-	                        }
+                            var map = panel.getMap();
+                            var extent = panel.getMap().getView().calculateExtent(map.getSize());
+                            var isVisible = ol.extent.containsExtent(extent, hasMatch.getGeometry().getExtent());
+                            if(!isVisible) {
+                                map.getView().setZoom(map.getView().getZoom() - 1);
+                            }
                         }
 
                         var arcGenerator = new arc.GreatCircle(
