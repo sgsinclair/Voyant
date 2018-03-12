@@ -367,17 +367,7 @@ Ext.define('Voyant.panel.DreamScape', {
             this.tryInit();
         }, this);
         
-        this.on("resize", function() {
-        	    var ticker = this.body.down(".ticker");
-            ticker.setTop(this.getTargetEl().getHeight()-ticker.getHeight()-4)
-        }, this)
-
-        this.on("resize", function() {
-            var ticker = this.body.down(".ticker");
-            //ticker.setTop(this.getTargetEl().getHeight()-ticker.getHeight()-4)
-        }, this);
-
-        this.callParent();
+         this.callParent();
     },
 
     tryInit: function() {
@@ -492,7 +482,7 @@ Ext.define('Voyant.panel.DreamScape', {
                             visible: feature.get("visible"),
                             color: feature.get("color"),
                             type: feature.get("type"),
-                            conf: feature.get("conf")
+                            confidence: feature.get("confidence")
                         });
                         selectedLayer.getSource().addFeature(selectedFeature);
                         var geometry = feature.getGeometry();
@@ -585,7 +575,7 @@ Ext.define('Voyant.panel.DreamScape', {
     cityStyleFunction: function(feature, resolution) {
         if(feature.get("visible")) {
             var diameter = Math.PI * 2 * feature.get("width");
-            var confArc = feature.get("conf") ? diameter * feature.get("conf") : diameter;
+            var confArc = feature.get("confidence") ? diameter * feature.get("confidence") : diameter;
             return (new ol.style.Style({
                 image: new ol.style.Circle({
                     radius: feature.get("width"),
@@ -597,6 +587,7 @@ Ext.define('Voyant.panel.DreamScape', {
                         color: 'rgb(255, 255, 255)',
                         width: 2
                     })
+                })
             }));
         } else {
             return false;
@@ -672,7 +663,7 @@ Ext.define('Voyant.panel.DreamScape', {
                     forms: city.forms,
                     cityId: city.id,
                     type: "city",
-                    conf: city.conf
+                    confidence: city.confidence ? city.confidence*100 : undefined
                 });
                 layerSource.addFeature(feature);
             }

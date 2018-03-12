@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Feb 22 15:36:36 EST 2018 */
+/* This file created by JSCacher. Last modified: Mon Mar 12 16:51:45 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6394,7 +6394,9 @@ Ext.define('Voyant.util.Toolable', {
 			exportAllTitle: "Export All",
 			exportAllJsonWarning: "You're requesting all of the available data (in a JSON format that Voyant uses), are you sure you want to continue?",
 			exportGridAllTsv: "export all available data as tab separated values (text)",
-			exportAllTsvWarning: "You're requesting all of the available data, are you sure you want to continue?"
+			exportAllTsvWarning: "You're requesting all of the available data, are you sure you want to continue?",
+			scaleLabel: "scaling ({0})",
+			loading: "Loading…"
 		},
 		api: {
 			suppressTools: false
@@ -6712,7 +6714,26 @@ Ext.define('Voyant.util.Toolable', {
 				name: 'export',
 				inputValue: 'png',
 				boxLabel: panel.localize('exportPng')
-	    	}];
+			},{
+				xtype: 'slider',
+				width: 200,
+				value: 1,
+				minValue: .5,
+				maxValue: 10,
+				increment: .5,
+				labelAlign: 'right',
+				decimalPrecision: 1,
+				itemId: 'scale',
+				fieldLabel: new Ext.Template(panel.localize("scaleLabel")).apply([1]),
+				listeners: {
+					change: function(slider, newVal) {
+						this.setFieldLabel(new Ext.Template(panel.localize("scaleLabel")).apply([newVal]))
+					},
+					changecomplete: function(slider) {
+						slider.previousSibling().setValue(true); // make sure PNG is selected
+					}
+				}
+			}];
 			if (panel.getTargetEl().dom.querySelector("svg")) {
 				formats.push({
 					xtype: 'radio',
@@ -6790,43 +6811,127 @@ Ext.define('Voyant.util.Toolable', {
 	exportPngData: function(img) {
 		Ext.Msg.show({
 		    title: this.localize('exportPngTitle'),
-		    message: '<img src="'+img+'" style="float: right; max-width: 200px; max-height: 200px; border: thin dotted #ccc;"/>'+this.localize('exportPngMessage'),
+		    message: '<img class="thumb" src="'+img+'" style="float: right; max-width: 200px; max-height: 200px; border: thin dotted #ccc;"/>'+this.localize('exportPngMessage'),
 		    buttons: Ext.Msg.OK,
 		    icon: Ext.Msg.INFO,
 		    prompt: true,
 	        multiline: true,
 	        value: '<img src="'+img+'" />'
-		});		
+		});
 	},
-	exportPng: function() {
-		var img;
-		
-		var draw = this.down('draw');
-		if (draw) {
-			return this.exportPngData(draw.getImage().data);
-		}
-		
-		var chart = this.down('chart'); // first try finding a chart
-		if (chart) {
-			return this.exportPngData(this.down('chart').getImage().data);
-		}
+	exportPng: function(panel, form) {
+		var scale = 1;
+		if (form) {
+			form.mask(panel.localize('loading'));
 
-		var targetEl = this.getTargetEl().dom;
+			var slider = form.queryById("scale");
+			if (slider && slider.getValue) {
+				scale = slider.getValue();
+			}
+		}
 		
-		var canvas = targetEl.querySelector("canvas"); // next try finding a canvas
+var canvasSurface = this.down('draw') || this.down('chart');
+		if (canvasSurface && (canvasSurface.isChart || canvasSurface.isCanvas)) {
+
+			// first part taken from EXTJ Draw.getImage()
+			// http://docs.sencha.com/extjs/6.2.0/classic/src/Container.js-2.html#Ext.draw.Container-method-getImage
+			// reproduced here because we want to scale the image in the canvas, not the final image
+			var size = canvasSurface.innerElement.getSize(),
+            		surfaces = Array.prototype.slice.call(canvasSurface.items.items),
+            		zIndexes = canvasSurface.surfaceZIndexes,
+            		image, imageElement,
+            		i, j, surface, zIndex;
+ 
+	        // Sort the surfaces by zIndex using insertion sort. 
+	        for (j = 1; j < surfaces.length; j++) {
+	            surface = surfaces[j];
+	            zIndex = zIndexes[surface.type];
+	            i = j - 1;
+	            while (i >= 0 && zIndexes[surfaces[i].type] > zIndex) {
+	                surfaces[i + 1] = surfaces[i];
+	                i--;
+	            }
+	            surfaces[i + 1] = surface;
+	        }
+	        
+	        // next part taken from EXTJS Canvas Flatten
+	        // http://docs.sencha.com/extjs/6.2.0/classic/src/Canvas.js-1.html#line897
+	        // reproduced here because we want to scale the image when drawing to the new canvas
+	        
+	        var targetCanvas = document.createElement('canvas'),
+            className = Ext.getClassName(surfaces[0]),
+            ratio = surfaces[0].devicePixelRatio * scale,
+            ctx = targetCanvas.getContext('2d'),
+            surface, canvas, rect, i, j, xy;
+
+	        targetCanvas.width = Math.ceil(size.width * ratio);
+	        targetCanvas.height = Math.ceil(size.height * ratio);
+	
+	        
+	        for (i = 0; i < surfaces.length; i++) {
+	            surface = surfaces[i];
+	            if (Ext.getClassName(surface) !== className) {
+	                continue;
+	            }
+	            rect = surface.getRect();
+	            surfaceSize = surface.el.getSize();
+	            for (j = 0; j < surface.canvases.length; j++) {
+	                canvas = surface.canvases[j];
+	                xy = canvas.getOffsetsTo(canvas.getParent());
+	                ctx.drawImage(canvas.dom, (rect[0] + xy[0]) * ratio, (rect[1] + xy[1]) * ratio, surfaceSize.width*ratio,surfaceSize.height*ratio);
+	            }
+	        }
+	        if (form && form.isVisible()) {form.unmask();}
+	        
+	        // now we're ready
+			return this.exportPngData(targetCanvas.toDataURL());
+		}
+		
+//		var chart = this.down('chart'); // first try finding a chart
+//		if (chart) {
+//			return this.exportPngData(this.down('chart').getImage().data);
+//		}
+//
+		var targetEl = this.getTargetEl().dom,
+			canvas = targetEl.querySelector("canvas"); // next try finding a canvas
 		if (canvas) {
-			return this.exportPngData(canvas.toDataURL("image/png"));
+			if (scale==1) {
+				var data = canvas.toDataURL("image/png");
+		        if (form && form.isVisible()) {form.unmask();}
+				return this.exportPngData(data);
+			}
+	        var targetCanvas = document.createElement('canvas'),
+            ctx = targetCanvas.getContext('2d');
+	        targetCanvas.width = Math.ceil(canvas.width * scale);
+	        targetCanvas.height = Math.ceil(canvas.height * scale);
+
+			  var image = new Image;
+			  image.src = canvas.toDataURL("image/png");
+			  image.panel = this;
+			  image.onload = function() {
+				  ctx.drawImage(image, 0, 0, targetCanvas.width, targetCanvas.height);
+				  img = targetCanvas.toDataURL("image/png");
+			        if (form && form.isVisible()) {form.unmask();}
+				  this.panel.exportPngData.call(this.panel, img);
+			  };	
+			  return;
 		}
 		
 		var svg = targetEl.querySelector("svg"); // finally try finding an SVG
 		if (svg) {
-			var html = d3.select(svg)
-				.attr("version", 1.1)
-				.attr("xmlns", "http://www.w3.org/2000/svg")
-				.node().parentNode.innerHTML;
+			var width = targetEl.offsetWidth*scale,
+				height = targetEl.offsetHeight*scale
+			var clone = svg.cloneNode(true); // we don't want to scale, etc. the original
+			clone.setAttribute("version", 1.1)
+			clone.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+			clone.setAttribute("transform", "scale("+scale+")")
+			clone.setAttribute("width", width)
+			clone.setAttribute("height", height)
+			
+			var html = clone.outerHTML,
 			  img = 'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)));
 
-			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: targetEl.offsetWidth,height:targetEl.offsetHeight}),
+			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: width,height:height}),
 			  context = canvas.getContext("2d"), me=this;
 			  
 			  var image = new Image;
@@ -6835,6 +6940,7 @@ Ext.define('Voyant.util.Toolable', {
 			  image.onload = function() {
 				  context.drawImage(image, 0, 0);
 				  img = canvas.toDataURL("image/png");
+		        if (form && form.isVisible()) {form.unmask();}
 				  return this.panel.exportPngData.call(this.panel, img);
 			  };
 		}
@@ -18862,12 +18968,7 @@ Ext.define('Voyant.panel.DreamScape', {
             this.tryInit();
         }, this);
         
-        this.on("resize", function() {
-        	    var ticker = this.body.down(".ticker");
-            ticker.setTop(this.getTargetEl().getHeight()-ticker.getHeight()-4)
-        }, this)
-
-        this.callParent();
+         this.callParent();
     },
 
     tryInit: function() {
@@ -18909,7 +19010,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 var features = map.getFeaturesAtPixel(pixel);
                 if(features) {
                     features.forEach( function(feature) {
-                        if( feature.getGeometry().getType() === "Circle" && feature.get("selected")) { // city
+                        if( feature.get("type") === "city" && feature.get("selected")) { // city
                             panel.dispatchEvent("termsClicked", panel, [feature.get("forms").join("|")])
                         }
                     }, this);
@@ -18926,7 +19027,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 zIndex: 10,
                 selected: true,
                 style: function(feature) {
-                    if(feature.getGeometry().getType() === "Circle")
+                    if(feature.get("type") === "city")
                     {
                         return panel.cityStyleFunction(feature, map.getView().getResolution());
                     } else {
@@ -18980,7 +19081,9 @@ Ext.define('Voyant.panel.DreamScape', {
                             coordinates: feature.get("coordinates"),
                             width: feature.get("width"),
                             visible: feature.get("visible"),
-                            color: feature.get("color")
+                            color: feature.get("color"),
+                            type: feature.get("type"),
+                            confidence: feature.get("confidence")
                         });
                         selectedLayer.getSource().addFeature(selectedFeature);
                         var geometry = feature.getGeometry();
@@ -18993,7 +19096,8 @@ Ext.define('Voyant.panel.DreamScape', {
                         selectedLayer.getSource().addFeature(textFeature);
 
                         // Highlight all connection where selected city is source or target
-                        if(geometry.getType() === "Circle") {
+
+                        if(feature.get("type") === "city") {
                             var layers = panel.getMap().getLayers();
                             layers.forEach(function (layer) {
                                 var layerId = layer.get("id");
@@ -19071,10 +19175,19 @@ Ext.define('Voyant.panel.DreamScape', {
     // Style for cities
     cityStyleFunction: function(feature, resolution) {
         if(feature.get("visible")) {
+            var diameter = Math.PI * 2 * feature.get("width");
+            var confArc = feature.get("confidence") ? diameter * feature.get("confidence") : diameter;
             return (new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: feature.get("color"),
-                    width: feature.get("width")
+                image: new ol.style.Circle({
+                    radius: feature.get("width"),
+                    fill: new ol.style.Fill({
+                        color: feature.get("color")
+                    }),
+                    stroke: new ol.style.Stroke({
+                        lineDash: [confArc, diameter - confArc],
+                        color: 'rgb(255, 255, 255)',
+                        width: 2
+                    })
                 })
             }));
         } else {
@@ -19139,7 +19252,8 @@ Ext.define('Voyant.panel.DreamScape', {
                 validCitiesHash[city.id]=true;
                 var coordinates = [parseFloat(city.longitude), parseFloat(city.latitude)]
                 var feature = new ol.Feature({
-                    geometry: new ol.geom.Circle(coordinates).transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857')),
+
+                    geometry: new ol.geom.Point(coordinates).transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857')),
                     text: city.label + " ("+city.rawFreq+")",
                     description: city.label,
                     color: color,
@@ -19148,7 +19262,9 @@ Ext.define('Voyant.panel.DreamScape', {
                     visible: true,
                     coordinates: coordinates,
                     forms: city.forms,
-                    cityId: city.id
+                    cityId: city.id,
+                    type: "city",
+                    confidence: city.confidence ? city.confidence*100 : undefined
                 });
                 layerSource.addFeature(feature);
             }
@@ -19404,23 +19520,23 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                                 handler: function() {
                                     this.getAnimationLayer().getSource().clear();
                                     this.clearAnimation();
-                                    this.setCurrentConnectionOccurrence(this.getGeonames().getConnectionOccurrence(0));                               	
+                                    this.setCurrentConnectionOccurrence(this.getGeonames().getConnectionOccurrence(0));
                                     this.animate();
                                 },
                                 scope: this
-                        		}]
-                        	}, {
+                            }]
+                        }, {
                             xtype: 'checkbox',
                             checked: true,
-                            checkHandler: function(item, checked) {
+                            handler: function(item, checked) {
                                 me.setKeepAnimationInFrame(checked);
                             },
                             boxLabel: "Keep animation in frame"
-                         }]
-                    		
+                        }]
+
                     },{
-                    		xtype: "container",
-                    		text: "&nbsp;"
+                        xtype: "container",
+                        text: "&nbsp;"
                     },{
                         xtype: 'button',
                         text: 'remove',
@@ -19435,10 +19551,6 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                 }
             });
         this.callParent([config]);
-        
-        this.on("resize", function(cmp) {
-        		
-        })
         this.on("afterrender", function(cmp) {
             cmp.getTargetEl().down('.x-btn-glyph').setStyle('color', this.getColor());
             var panel = cmp.up("panel")
@@ -19453,7 +19565,8 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                     message = cmp.localize(currentCitiesCount==totalCitiesCount && currentConnectionsCount==totalConnectionsCount ? "loadedAll" : "loadedSome") +
                         "<br><br>"+cmp.localize("disclaimer");
                     panel.toastInfo({
-//        				autoCloseDelay: 5000,
+                        autoCloseDelay: 5000,
+
                         closable: true,
                         maxWidth: '90%',
                         html: new Ext.Template(cmp.localize("disclaimer")).apply({
@@ -19531,15 +19644,14 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                         }
                     }
                     if (hasMatch) {
-                    		// check to see if we need to reposition the map, use displayed feature as basis for extent
+                        // check to see if we need to reposition the map, use displayed feature as basis for extent
                         if(this.getKeepAnimationInFrame()) {
-
-	                    		var map = panel.getMap();
-	                        var extent = panel.getMap().getView().calculateExtent(map.getSize());
-	                        var isVisible = ol.extent.containsExtent(extent, hasMatch.getGeometry().getExtent());
-	                        if(!isVisible) {
-	                            map.getView().setZoom(map.getView().getZoom() - 1);
-	                        }
+                            var map = panel.getMap();
+                            var extent = panel.getMap().getView().calculateExtent(map.getSize());
+                            var isVisible = ol.extent.containsExtent(extent, hasMatch.getGeometry().getExtent());
+                            if(!isVisible) {
+                                map.getView().setZoom(map.getView().getZoom() - 1);
+                            }
                         }
 
                         var arcGenerator = new arc.GreatCircle(
