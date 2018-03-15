@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Mar 15 13:42:55 EDT 2018 */
+/* This file created by JSCacher. Last modified: Thu Mar 15 15:05:07 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -11228,7 +11228,13 @@ Ext.define('Voyant.widget.CorpusSelector', {
 	    	if (this.getApiParam("openMenu")) {
 				data = this.getStoreItemsFromDefinition(this.getApiParam("openMenu"));
 		} else if (Voyant.application && Voyant.application.getOpenMenu && Voyant.application.getOpenMenu()) {
-				data = this. getStoreItemsFromDefinition(Voyant.application.getOpenMenu());
+			var arg = Voyant.application.getOpenMenu();
+			arg = decodeURIComponent(arg);
+			arg = arg.replace(/\+/g,' ');
+			if (arg.charAt(0)=='"' && arg.charAt(arg.length-1)=='"') {
+				arg = arg.substring(1, arg.length-1);
+			}
+			data = this.getStoreItemsFromDefinition(arg);
 	    	}
 	
 	    	Ext.applyIf(config, {

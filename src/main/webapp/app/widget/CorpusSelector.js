@@ -21,7 +21,13 @@ Ext.define('Voyant.widget.CorpusSelector', {
 	    	if (this.getApiParam("openMenu")) {
 				data = this.getStoreItemsFromDefinition(this.getApiParam("openMenu"));
 		} else if (Voyant.application && Voyant.application.getOpenMenu && Voyant.application.getOpenMenu()) {
-				data = this. getStoreItemsFromDefinition(Voyant.application.getOpenMenu());
+			var arg = Voyant.application.getOpenMenu();
+			arg = decodeURIComponent(arg);
+			arg = arg.replace(/\+/g,' ');
+			if (arg.charAt(0)=='"' && arg.charAt(arg.length-1)=='"') {
+				arg = arg.substring(1, arg.length-1);
+			}
+			data = this.getStoreItemsFromDefinition(arg);
 	    	}
 	
 	    	Ext.applyIf(config, {
