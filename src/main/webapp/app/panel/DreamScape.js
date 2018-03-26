@@ -33,7 +33,14 @@ Ext.define('Voyant.panel.DreamScape', {
             webMercatorProjection: "Web Mercator (Default)",
             mercatorProjection: "Mercator (WGS84)",
             gallPetersProjection: "Gall Peters (Equal Area)",
-            sphereMollweideProjection: "Sphere mollweide (Equal Area)"
+            sphereMollweideProjection: "Sphere mollweide (Equal Area)",
+            annotate: "Annotate",
+            baseLayer: "Base Layer",
+            baseLayerTip: "Determine map base layer",
+            watercolor: "Stamen watercolor",
+            osm: "Open Street Map",
+            wms4326: "WMS 4326",
+            arcGIS: "National Geographic World Map - ArcGIS"
         },
         api: {
             stopList: 'auto',
@@ -60,10 +67,14 @@ Ext.define('Voyant.panel.DreamScape', {
         animationDelay: 25, // determines the delay between animation calls
         isProj4Loaded: false,
         projection: undefined,
-        filterWidgets: new Ext.util.MixedCollection()
+        filterWidgets: new Ext.util.MixedCollection(),
+        drawInteraction: undefined,
+        drawMode: false,
+        currentAnnotation: undefined,
+        baseLayers: {}
     },
 
-    html: '<div class="map"></div><div class="ticker"></div>',
+    html: '<div class="map"></div><div class="ticker"></div><div class="ol-popup"><a href="#" class="ol-popup-closer"></a><div class="popup-content"></div></div>',
 
     cls: 'dreamscape',
 
@@ -293,6 +304,51 @@ Ext.define('Voyant.panel.DreamScape', {
                             }]
                         }
                     },'-', {
+                        text: this.localize('baseLayer'),
+                        tooltip: this.localize('baseLayerTip'),
+                        menu: {
+                            items: [{
+                                xtype: 'radiogroup',
+                                columns: 1,
+                                vertical: true,
+                                defaults: {
+                                    handler: function(item, checked) {
+                                        if(checked){
+                                            var panel = this;
+                                            id = item.getItemId();
+                                            var layer = this.getBaseLayers()[id];
+                                            if (layer) {
+                                                layer.setOpacity(1);
+                                                this.getMap().getLayers().setAt(0, layer);
+                                            }
+                                            if(id == 'osm' || id == 'arcGIS') {
+                                                this.getMap().getLayer("overlayLayer").setVisible(false);
+                                            } else {
+                                                this.getMap().getLayer("overlayLayer").setVisible(true);
+                                            }
+                                        }
+                                    },
+                                    scope: this
+                                },
+                                items: [
+                                    {
+                                        boxLabel: this.localize('watercolor'),
+                                        itemId: 'watercolor',
+                                        checked: true,
+                                    },{
+                                        boxLabel: this.localize('wms4326'),
+                                        itemId: 'wms4326'
+                                    },{
+                                        boxLabel: this.localize('osm'),
+                                        itemId: 'osm'
+                                    },{
+                                        boxLabel: this.localize('arcGIS'),
+                                        itemId: 'arcGIS'
+                                    }
+                                ]
+                            }]
+                        }
+                    }, '-', {
                         text: this.localize('projection'),
                         tooltip: this.localize('projectionTip'),
                         menu: {
@@ -444,6 +500,23 @@ Ext.define('Voyant.panel.DreamScape', {
                             map.addLayer(animationLayer);
                         },
                         scope: this
+                    }, '-', {
+                        xtype: 'button',
+                        enableToggle: true,
+                        text: this.localize('annotate'),
+                        itemId: 'annotate',
+                        handler: function(cmp) {
+                            if(this.getDrawMode()) {
+                                this.getMap().removeInteraction(this.getDrawInteraction());
+                                this.setDrawMode(false);
+                                cmp.toggle(false);
+                            } else {
+                                this.getMap().addInteraction(this.getDrawInteraction());
+                                this.setDrawMode(true);
+                                cmp.toggle(true);
+                            }
+                        },
+                        scope: this
                     }]
             }]
         });
@@ -458,17 +531,68 @@ Ext.define('Voyant.panel.DreamScape', {
     tryInit: function() {
         if (this.getIsOpenLayersLoaded() && this.getIsArcLoaded() && this.getIsProj4Loaded()) {
             var el = this.body.down('.map').setId(Ext.id());
+            var overlayEl = this.body.down('.ol-popup');
+            var overlay = new ol.Overlay({
+                element: overlayEl.dom,
+                autoPan: true,
+                autoPanAnimation: {
+                    duration: 250
+                }
+            });
+            this.setOverlay(overlay);
             var panel = this;
+            // Add a click handler to hide the popup
+            var closer = overlayEl.down(".ol-popup-closer").dom;
+            closer.onclick = function() {
+                overlay.setPosition(undefined);
+                closer.blur();
+                if(panel.getDrawMode()) {
+                    panel.getDockedComponent('bottomToolbar').getComponent('annotate').click();
+                }
+                return false;
+            };
+            var baseLayers = this.getBaseLayers();
+            baseLayers['wms4326'] = new ol.layer.Tile({
+                preload: Infinity,
+                source: new ol.source.TileWMS({
+                    url: 'https://ahocevar.com/geoserver/wms',
+                    crossOrigin: '',
+                    params: {
+                        'LAYERS': 'ne:NE1_HR_LC_SR_W_DR',
+                        'TILED': true
+                    },
+                    projection: 'EPSG:4326'
+                })
+            });
+
+            baseLayers['watercolor'] =  new ol.layer.Tile({
+                preload: Infinity,
+                source: new ol.source.Stamen({
+                    //cacheSize: 2048,
+                    layer: 'watercolor',
+                    projection: "EPSG:3857"
+                })
+            });
+
+            baseLayers['osm'] = new ol.layer.Tile({
+                preload: Infinity,
+                source: new ol.source.OSM({
+                    projection: "EPSG:3857"
+                })
+            });
+
+            baseLayers['arcGIS'] = new ol.layer.Tile({
+                preload: Infinity,
+                source: new ol.source.TileArcGISRest({
+                    url: "https://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer",
+                    projection: "EPSG:3857"
+                })
+            });
+
+            this.setContentEl(overlayEl.down('.popup-content'));
             var map = new ol.Map({
                 layers: [
-                    new ol.layer.Tile({
-                        preload: Infinity,
-                        source: new ol.source.Stamen({
-                            //cacheSize: 2048,
-                            layer: 'watercolor',
-                            projection: "EPSG:3857"
-                        })
-                    }),
+                    baseLayers['watercolor'],
 
                     new ol.layer.Tile({
                         preload: Infinity,
@@ -476,9 +600,11 @@ Ext.define('Voyant.panel.DreamScape', {
                             cacheize: 2048,
                             layer: 'toner-hybrid',
                             projection: "EPSG:3857"
-                        })
+                        }),
+                        id: 'overlayLayer'
                     })
                 ],
+                overlays: [overlay],
                 target: el.getId(),
                 loadTilesWhileInteracting: true,
                 view: new ol.View({
@@ -493,9 +619,22 @@ Ext.define('Voyant.panel.DreamScape', {
                 var pixel = event.pixel;
                 var features = map.getFeaturesAtPixel(pixel);
                 if(features) {
+                    var foundFeature = false;
                     features.forEach( function(feature) {
                         if( feature.get("type") === "city" && feature.get("selected")) { // city
                             panel.dispatchEvent("termsClicked", panel, [feature.get("forms").join("|")])
+                            foundFeature = true;
+                        } else if (feature.get("type") === "connection" && feature.get("selected")) { // connection
+                            window.alert("You clicked connection " + feature.get("text"));
+                            foundFeature = true
+                        } else if (feature.get("type") == "annotation" && !foundFeature) { //annotation
+                            panel.setCurrentAnnotation(feature);
+                            panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60">'+(feature.get("text")?feature.get("text"):"")+'</textarea>' +
+                                '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Delete</button>');
+                            panel.getOverlay().setPosition(event.coordinate);
+                            panel.getContentEl().down('.deleteAnnotation').dom.onclick = function() {panel.deleteAnnotation()};
+                            panel.getContentEl().down('.saveAnnotation').dom.onclick = function() {panel.saveAnnotation()};
+                            panel.getContentEl().down('.annotation-text').dom.focus();
                         }
                     }, this);
                 }
@@ -514,99 +653,135 @@ Ext.define('Voyant.panel.DreamScape', {
                     if(feature.get("type") === "city")
                     {
                         return panel.cityStyleFunction(feature, map.getView().getResolution());
-                    } else {
+                    } else if(feature.get("type") === "connection") {
                         return panel.travelStyleFunction(feature, map.getView().getResolution());
                     }
                 },
                 updateWhileAnimating: true, // optional, for instant visual feedback
                 updateWhileInteracting: true // optional, for instant visual feedback
             });
-
             // Add handler to update selected vector when mouse is moved
             map.on('pointermove', function(event) {
-                selectedLayer.getSource().clear();
-                var coordinate = event.coordinate;
-                var pixel = event.pixel;
-                var features = map.getFeaturesAtPixel(pixel);
-                if(features) {
-                    var i = 0;
-                    while(features[i].get("selected")){
-                        i++;
-                        if (i === features.length) break;
-                    }
-                    if (i < features.length) {
-                        var feature = features[i];
+                if(!panel.getDrawMode()) {
+                    selectedLayer.getSource().clear();
+                    var coordinate = event.coordinate;
+                    var pixel = event.pixel;
+                    var features = map.getFeaturesAtPixel(pixel);
+                    if(features) {
+                        var i = 0;
+                        while(features[i].get("selected")){
+                            i++;
+                            if (i === features.length) break;
+                        }
+                        if (i < features.length) {
+                            var feature = features[i];
 
-                        var baseTextStyle = {
-                            font: '12px Calibri,sans-serif',
-                            textAlign: 'center',
-                            offsetY: -15,
-                            fill: new ol.style.Fill({
-                                color: [0,0,0,1]
-                            }),
-                            stroke: new ol.style.Stroke({
-                                color: [255,255,255,0.5],
-                                width: 4
-                            })
-                        };
+                            var baseTextStyle = {
+                                font: '12px Calibri,sans-serif',
+                                textAlign: 'center',
+                                offsetY: -15,
+                                fill: new ol.style.Fill({
+                                    color: [0,0,0,1]
+                                }),
+                                stroke: new ol.style.Stroke({
+                                    color: [255,255,255,0.5],
+                                    width: 4
+                                })
+                            };
 
-                        baseTextStyle.text = feature.get("text");
+                            baseTextStyle.text = feature.get("text");
 
-                        var textOverlayStyle = new ol.style.Style({
-                            text: new ol.style.Text(baseTextStyle),
-                            zIndex: 1
-                        });
+                            var textOverlayStyle = new ol.style.Style({
+                                text: new ol.style.Text(baseTextStyle),
+                                zIndex: 1
+                            });
 
-                        var selectedFeature = new ol.Feature({
-                            text: feature.get("text"),
-                            geometry: feature.getGeometry(),
-                            forms: feature.get("forms"),
-                            selected: true,
-                            coordinates: feature.get("coordinates"),
-                            width: feature.get("width"),
-                            visible: feature.get("visible"),
-                            color: feature.get("color"),
-                            type: feature.get("type"),
-                            confidence: feature.get("confidence")
-                        });
-                        selectedLayer.getSource().addFeature(selectedFeature);
-                        var geometry = feature.getGeometry();
-                        var point = geometry.getClosestPoint(coordinate);
-                        var textFeature = new ol.Feature({
-                            geometry: new ol.geom.Point(point),
-                            selected: true
-                        });
-                        textFeature.setStyle(textOverlayStyle);
-                        selectedLayer.getSource().addFeature(textFeature);
+                            if (!(feature.get("type") === "annotation")) {
+                                var selectedFeature = new ol.Feature({
+                                    text: feature.get("text"),
+                                    geometry: feature.getGeometry(),
+                                    forms: feature.get("forms"),
+                                    selected: true,
+                                    coordinates: feature.get("coordinates"),
+                                    width: feature.get("width"),
+                                    visible: feature.get("visible"),
+                                    color: feature.get("color"),
+                                    type: feature.get("type"),
+                                    confidence: feature.get("confidence")
+                                });
+                                selectedLayer.getSource().addFeature(selectedFeature);
+                            }
+                            var geometry = feature.getGeometry();
+                            var point = event.coordinate;
+                            var textFeature = new ol.Feature({
+                                geometry: new ol.geom.Point(point),
+                                selected: true
+                            });
+                            textFeature.setStyle(textOverlayStyle);
+                            selectedLayer.getSource().addFeature(textFeature);
 
-                        // Highlight all connection where selected city is source or target
+                            // Highlight all connection where selected city is source or target
 
-                        if(feature.get("type") === "city") {
-                            var layers = panel.getMap().getLayers();
-                            layers.forEach(function (layer) {
-                                var layerId = layer.get("id");
-                                if (layerId && layerId.indexOf("connections") !== -1) {
-                                    connections = layer.getSource().getFeatures();
-                                    connections.forEach(function (connection) {
-                                        if(connection.get("target") === feature.get("cityId") || connection.get("source") === feature.get("cityId")) {
-                                            selectedLayer.getSource().addFeature(new ol.Feature({
-                                                geometry: connection.getGeometry(),
-                                                selected: true,
-                                                coordinates: connection.get("coordinates"),
-                                                width: connection.get("width"),
-                                                visible: connection.get("visible"),
-                                                color: connection.get("color")
-                                            }));
-                                        }
-                                    })
-                                }
-                            })
+                            if(feature.get("type") === "city") {
+                                var layers = panel.getMap().getLayers();
+                                layers.forEach(function (layer) {
+                                    var layerId = layer.get("id");
+                                    if (layerId && layerId.indexOf("connections") !== -1) {
+                                        connections = layer.getSource().getFeatures();
+                                        connections.forEach(function (connection) {
+                                            if(connection.get("target") === feature.get("cityId") || connection.get("source") === feature.get("cityId")) {
+                                                selectedLayer.getSource().addFeature(new ol.Feature({
+                                                    geometry: connection.getGeometry(),
+                                                    selected: true,
+                                                    coordinates: connection.get("coordinates"),
+                                                    width: connection.get("width"),
+                                                    visible: connection.get("visible"),
+                                                    color: connection.get("color"),
+                                                    type: connection.get("type")
+                                                }));
+                                            }
+                                        })
+                                    }
+                                })
+                            }
                         }
                     }
-
                 }
             });
+            var source = new ol.source.Vector({wrapX: false});
 
+            var annotations = new ol.layer.Vector({
+                source: source,
+                id: "annotations"
+            });
+
+            if (localStorage['annotations']) {
+                var geofeatures = JSON.parse(localStorage['annotations']);
+                var geojson = new ol.format.GeoJSON();
+                var features = geojson.readFeatures(geofeatures);
+                source.addFeatures(features);
+            }
+
+            map.addLayer(annotations);
+
+            this.setDrawInteraction(
+                new ol.interaction.Draw({
+                    source: source,
+                    type: "Polygon",
+                    freehand: true,
+                    alias: "draw"
+                })
+            );
+            this.getDrawInteraction().on('drawend', function (evt) {
+                evt.feature.set('type', 'annotation');
+                panel.setCurrentAnnotation(evt.feature);
+                panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60"></textarea>'+
+                    '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Cancel</button>');
+                panel.getContentEl().down('.deleteAnnotation').dom.onclick = function() {panel.deleteAnnotation()};
+                panel.getContentEl().down('.saveAnnotation').dom.onclick = function() {panel.saveAnnotation()};
+                panel.getOverlay().setPosition(evt.feature.getGeometry().getLastCoordinate());
+                panel.getContentEl().down('.annotation-text').dom.focus();
+            });
             this.setMap(map);
 
             // simulate adding a filter
@@ -614,6 +789,41 @@ Ext.define('Voyant.panel.DreamScape', {
         } else {
             Ext.defer(this.tryInit, 500, this); // try again in a half second
         }
+    },
+
+    deleteAnnotation: function() {
+        this.body.down('.ol-popup').down(".ol-popup-closer").dom.click();
+        this.getMap().getLayer("annotations").getSource().removeFeature(this.getCurrentAnnotation());
+        var geojson  = new ol.format.GeoJSON;
+        var features = this.getMap().getLayer("annotations").getSource().getFeatures();
+        var transformedFeatures = [];
+        var projection = this.getProjection();
+        features.forEach(function (feature) {
+            transformedFeature = feature.clone();
+            transformedFeature.getGeometry().transform(projection?projection:'EPSG:3857', 'EPSG:3857');
+            transformedFeatures.push(transformedFeature);
+        })
+        var json = geojson.writeFeatures(transformedFeatures);
+        localStorage['annotations'] = JSON.stringify(json);
+    },
+
+    saveAnnotation: function() {
+        this.getCurrentAnnotation().set("text", this.getContentEl().down('.annotation-text').dom.value);
+        this.getOverlay().setPosition(undefined);
+        if(this.getDrawMode()) {
+            this.getDockedComponent('bottomToolbar').getComponent('annotate').click();
+        }
+        var geojson  = new ol.format.GeoJSON;
+        var features = this.getMap().getLayer("annotations").getSource().getFeatures();
+        var transformedFeatures = [];
+        var projection = this.getProjection();
+        features.forEach(function (feature) {
+            transformedFeature = feature.clone();
+            transformedFeature.getGeometry().transform(projection?projection:'EPSG:3857', 'EPSG:3857');
+            transformedFeatures.push(transformedFeature);
+        })
+        var json = geojson.writeFeatures(transformedFeatures);
+        localStorage['annotations'] = JSON.stringify(json);
     },
 
     // Style for vector after animation
@@ -793,7 +1003,8 @@ Ext.define('Voyant.panel.DreamScape', {
                         color: color,
                         width: 3+ (Math.sqrt(connection.rawFreq/max)*10),
                         source: connection.source.id,
-                        target: connection.target.id
+                        target: connection.target.id,
+                        type: "connection"
                     });
                     layerSource.addFeature(feature);
                 }, this);
@@ -838,7 +1049,7 @@ Ext.define('Voyant.widget.GeonamesFilter', {
         animationLayer: undefined,
         millisPerAnimation: 2000,
         stepByStepMode: false,
-        keepAnimationInFrame: true
+        keepAnimationInFrame: false
     },
     constructor: function(config) {
         config = config || {};
@@ -1117,8 +1328,8 @@ Ext.define('Voyant.widget.GeonamesFilter', {
             }
             if (animationLayer) {
                 var features = animationLayer.getSource().getFeatures();
+                //var panel =  this.up('panel');
                 if (features.length==0) {
-                    var panel =  this.up('panel');
                     if (!panel) {return;}
                     var connectionsLayerSource = panel.getMap().getLayer(this.getId()+"-connections").getSource();
                     var connectionsFeatures = connectionsLayerSource.getFeatures();
