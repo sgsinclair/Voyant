@@ -304,6 +304,77 @@ Ext.define('Voyant.panel.DreamScape', {
                             }]
                         }
                     },'-', {
+                        text: this.localize('projection'),
+                        tooltip: this.localize('projectionTip'),
+                        menu: {
+                            items: [{
+                                xtype: 'radiogroup',
+                                columns: 1,
+                                vertical: true,
+                                defaults: {
+                                    handler: function(item, checked) {
+                                        if(checked){
+                                            var panel = this;
+                                            id = item.getItemId();
+                                            var view = undefined
+                                            if (id === "webMercatorProjection") {
+                                                this.setProjection(ol.proj.get('EPSG:3857'));
+                                            } else if (id === "mercatorProjection") {
+                                                this.setProjection(ol.proj.get('EPSG:4326'));
+                                            } else if (id === "gallPetersProjection") {
+                                                proj4.defs('cea',"+proj=cea +lon_0=0 +lat_ts=45 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs");
+                                                var gallPetersProjection = ol.proj.get('cea');
+                                                this.setProjection(gallPetersProjection);
+                                            } else if (id === "sphereMollweideProjection") {
+                                                proj4.defs('ESRI:54009', '+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
+                                                var sphereMollweideProjection = ol.proj.get('ESRI:54009');
+                                                sphereMollweideProjection.setExtent([-18e6, -9e6, 18e6, 9e6]);
+                                                this.setProjection(sphereMollweideProjection);
+                                            }
+                                            var newProjExtent = this.getProjection().getExtent();
+                                            // If using Mercator projection, earth with is measured in degrees, otherwise it's in meters
+                                            var earthWidth = this.getProjection() == ol.proj.get("EPSG:4326") ? 360 : 40075016.68557849;
+                                            var newView = new ol.View({
+                                                projection: this.getProjection(),
+                                                center: ol.extent.getCenter(newProjExtent || [0, 0, 0, 0]),
+                                                maxResolution: earthWidth / panel.body.dom.offsetWidth,
+                                                zoom: 0
+                                            });
+                                            var map = this.getMap();
+                                            var layers = map.getLayers();
+                                            layers.forEach(function(layer) {
+                                                if(layer.getSource().getFeatures){
+                                                    var features = layer.getSource().getFeatures();
+                                                    features.forEach(function(feature){
+                                                        var newGeometry = feature.getGeometry().transform(map.getView().getProjection(), panel.getProjection());
+                                                        feature.setGeometry(newGeometry);
+                                                    })
+                                                }
+                                            });
+                                            map.setView(newView);
+                                        }
+                                    },
+                                    scope: this
+                                },
+                                items: [
+                                    {
+                                        boxLabel: this.localize('webMercatorProjection'),
+                                        itemId: 'webMercatorProjection',
+                                        checked: true,
+                                    },{
+                                        boxLabel: this.localize('mercatorProjection'),
+                                        itemId: 'mercatorProjection'
+                                    },{
+                                        boxLabel: this.localize('gallPetersProjection'),
+                                        itemId: 'gallPetersProjection'
+                                    },{
+                                        boxLabel: this.localize('sphereMollweideProjection'),
+                                        itemId: 'sphereMollweideProjection'
+                                    }
+                                ]
+                            }]
+                        }
+                    }, '-', {
                         text: this.localize('baseLayer'),
                         tooltip: this.localize('baseLayerTip'),
                         menu: {
@@ -551,6 +622,28 @@ Ext.define('Voyant.panel.DreamScape', {
                 }
                 return false;
             };
+
+            this.setContentEl(overlayEl.down('.popup-content'));
+            var map = new ol.Map({
+                layers: [
+                    new ol.layer.Tile({
+                        preload: Infinity,
+                        source: new ol.source.Stamen({
+                            //cacheSize: 2048,
+                            layer: 'watercolor',
+                            projection: "EPSG:3857"
+                        })
+                    }),
+            // Add a click handler to hide the popup
+            var closer = overlayEl.down(".ol-popup-closer").dom;
+            closer.onclick = function() {
+                overlay.setPosition(undefined);
+                closer.blur();
+                if(panel.getDrawMode()) {
+                    panel.getDockedComponent('bottomToolbar').getComponent('annotate').click();
+                }
+                return false;
+            };
             var baseLayers = this.getBaseLayers();
             baseLayers['wms4326'] = new ol.layer.Tile({
                 preload: Infinity,
@@ -624,13 +717,13 @@ Ext.define('Voyant.panel.DreamScape', {
                         if( feature.get("type") === "city" && feature.get("selected")) { // city
                             panel.dispatchEvent("termsClicked", panel, [feature.get("forms").join("|")])
                             foundFeature = true;
-                        } else if (feature.get("type") === "connection" && feature.get("selected")) { // connection
+                        } else if (feature.get("type") === "connection" && feature.get("selected") && !foundFeature) { // connection
                             window.alert("You clicked connection " + feature.get("text"));
                             foundFeature = true
                         } else if (feature.get("type") == "annotation" && !foundFeature) { //annotation
                             panel.setCurrentAnnotation(feature);
                             panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60">'+(feature.get("text")?feature.get("text"):"")+'</textarea>' +
-                                '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Delete</button>');
+                            							'<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Delete</button>');
                             panel.getOverlay().setPosition(event.coordinate);
                             panel.getContentEl().down('.deleteAnnotation').dom.onclick = function() {panel.deleteAnnotation()};
                             panel.getContentEl().down('.saveAnnotation').dom.onclick = function() {panel.saveAnnotation()};
@@ -756,10 +849,10 @@ Ext.define('Voyant.panel.DreamScape', {
             });
 
             if (localStorage['annotations']) {
-                var geofeatures = JSON.parse(localStorage['annotations']);
-                var geojson = new ol.format.GeoJSON();
-                var features = geojson.readFeatures(geofeatures);
-                source.addFeatures(features);
+            	var geofeatures = JSON.parse(localStorage['annotations']);
+            	var geojson = new ol.format.GeoJSON();
+            	var features = geojson.readFeatures(geofeatures);
+            	source.addFeatures(features);
             }
 
             map.addLayer(annotations);
@@ -776,7 +869,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 evt.feature.set('type', 'annotation');
                 panel.setCurrentAnnotation(evt.feature);
                 panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60"></textarea>'+
-                    '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Cancel</button>');
+                								'<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Cancel</button>');
                 panel.getContentEl().down('.deleteAnnotation').dom.onclick = function() {panel.deleteAnnotation()};
                 panel.getContentEl().down('.saveAnnotation').dom.onclick = function() {panel.saveAnnotation()};
                 panel.getOverlay().setPosition(evt.feature.getGeometry().getLastCoordinate());
@@ -1328,7 +1421,6 @@ Ext.define('Voyant.widget.GeonamesFilter', {
             }
             if (animationLayer) {
                 var features = animationLayer.getSource().getFeatures();
-                //var panel =  this.up('panel');
                 if (features.length==0) {
                     if (!panel) {return;}
                     var connectionsLayerSource = panel.getMap().getLayer(this.getId()+"-connections").getSource();
