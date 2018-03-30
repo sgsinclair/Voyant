@@ -1247,7 +1247,7 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                             }]
                         }, {
                             xtype: 'checkbox',
-                            checked: true,
+                            checked: false,
                             handler: function(item, checked) {
                                 me.setKeepAnimationInFrame(checked);
                             },
