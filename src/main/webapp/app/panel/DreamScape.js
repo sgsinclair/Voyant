@@ -627,29 +627,32 @@ Ext.define('Voyant.panel.DreamScape', {
                             foundFeature = true;
                         } else if (feature.get("type") === "connection" && feature.get("selected") && !foundFeature) { // connection
                             panel.getFilterWidgets().each(function (filter) {
-                                var occurences = filter.getGeonames().getAllConnectionOccurrences(feature.get("source"), feature.get("target"));
-                                var infos = "<ul>";
-                                var docIndex = -1;
-                                occurences.forEach(function(occ) {
-                                    if(occ.docIndex != docIndex) {
-                                        docIndex = occ.docIndex;
-                                        infos += panel.getCorpus().getDocument(docIndex).getFullLabel() + ':<br>';
-                                    }
-                                    infos += '<li>'+ occ.source.left+'<a href="http://www.geonames.org/' + occ.source.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.source.position+' location='+occ.source.form+' class="termLocationLink">' + occ.source.form + '</a> '+occ.source.right + ' [...] ' +
-                                        occ.target.left+'<a href="http://www.geonames.org/' + occ.target.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.target.position+' location='+occ.target.form+' class="termLocationLink">' + occ.target.form + '</a> '+occ.target.right + '</li>';
-                                });
-                                var header = feature.get("text");
-                                infos += "</ul>";
-                                panel.getContentEl().setHtml('<h3>' + header + '</h3>' + infos);
-                                //content.innerHTML = `<h3>${header}</h3>${infos}`;
-                                panel.getOverlay().setPosition(event.coordinate);
-                                var links = Ext.select('.termLocationLink');
-                                links.elements.forEach(function(link) {
-                                    link.onmouseover = function(){panel.showTermInCorpus(link.getAttribute("docIndex"), link.getAttribute("offset"), link.getAttribute('location'))};
-                                });
+                                var geonames = filter.getGeonames();
+                                if (geonames != null) {
+                                    var occurrences = geonames.getAllConnectionOccurrences(feature.get("source"), feature.get("target"));
+                                    var infos = "<ul>";
+                                    var docIndex = -1;
+                                    occurrences.forEach(function(occ) {
+                                        if(occ.docIndex != docIndex) {
+                                            docIndex = occ.docIndex;
+                                            infos += panel.getCorpus().getDocument(docIndex).getFullLabel() + ':<br>';
+                                        }
+                                        infos += '<li>'+ occ.source.left+'<a href="http://www.geonames.org/' + occ.source.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.source.position+' location='+occ.source.form+' class="termLocationLink">' + occ.source.form + '</a> '+occ.source.right + ' [...] ' +
+                                            occ.target.left+'<a href="http://www.geonames.org/' + occ.target.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.target.position+' location='+occ.target.form+' class="termLocationLink">' + occ.target.form + '</a> '+occ.target.right + '</li>';
+                                    });
+                                    var header = feature.get("text");
+                                    infos += "</ul>";
+                                    panel.getContentEl().setHtml('<h3>' + header + '</h3>' + infos);
+                                    //content.innerHTML = `<h3>${header}</h3>${infos}`;
+                                    panel.getOverlay().setPosition(event.coordinate);
+                                    var links = Ext.select('.termLocationLink');
+                                    links.elements.forEach(function(link) {
+                                        link.onmouseover = function(){panel.showTermInCorpus(link.getAttribute("docIndex"), link.getAttribute("offset"), link.getAttribute('location'))};
+                                    });
+                                }
                             });
                             foundFeature = true
-                        } else if (feature.get("type") == "annotation" && !foundFeature) { //annotation
+                        } else if (feature.get("type") === "annotation" && !foundFeature) { //annotation
                             panel.setCurrentAnnotation(feature);
                             panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60">'+(feature.get("text")?feature.get("text"):"")+'</textarea>' +
                                                         '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Delete</button>');
@@ -1342,6 +1345,7 @@ Ext.define('Voyant.widget.GeonamesFilter', {
 
     animate: function() {
         var panel = this.up('panel');
+        if (!panel) {return;}
         this.clearAnimation();
         var currentConnectionOccurrence = this.getCurrentConnectionOccurrence();
         if (currentConnectionOccurrence) {
