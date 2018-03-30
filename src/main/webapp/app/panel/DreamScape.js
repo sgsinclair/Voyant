@@ -626,12 +626,33 @@ Ext.define('Voyant.panel.DreamScape', {
                             panel.dispatchEvent("termsClicked", panel, [feature.get("forms").join("|")])
                             foundFeature = true;
                         } else if (feature.get("type") === "connection" && feature.get("selected") && !foundFeature) { // connection
-                            window.alert("You clicked connection " + feature.get("text"));
+                            panel.getFilterWidgets().each(function (filter) {
+                                var occurences = filter.getGeonames().getAllConnectionOccurrences(feature.get("source"), feature.get("target"));
+                                var infos = "<ul>";
+                                var docIndex = -1;
+                                occurences.forEach(function(occ) {
+                                    if(occ.docIndex != docIndex) {
+                                        docIndex = occ.docIndex;
+                                        infos += panel.getCorpus().getDocument(docIndex).getFullLabel() + ':<br>';
+                                    }
+                                    infos += '<li>'+ occ.source.left+'<a href="http://www.geonames.org/' + occ.source.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.source.position+' location='+occ.source.form+' class="termLocationLink">' + occ.source.form + '</a> '+occ.source.right + ' [...] ' +
+                                        occ.target.left+'<a href="http://www.geonames.org/' + occ.target.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.target.position+' location='+occ.target.form+' class="termLocationLink">' + occ.target.form + '</a> '+occ.target.right + '</li>';
+                                });
+                                var header = feature.get("text");
+                                infos += "</ul>";
+                                panel.getContentEl().setHtml('<h3>' + header + '</h3>' + infos);
+                                //content.innerHTML = `<h3>${header}</h3>${infos}`;
+                                panel.getOverlay().setPosition(event.coordinate);
+                                var links = Ext.select('.termLocationLink');
+                                links.elements.forEach(function(link) {
+                                    link.onmouseover = function(){panel.showTermInCorpus(link.getAttribute("docIndex"), link.getAttribute("offset"), link.getAttribute('location'))};
+                                });
+                            });
                             foundFeature = true
                         } else if (feature.get("type") == "annotation" && !foundFeature) { //annotation
                             panel.setCurrentAnnotation(feature);
                             panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60">'+(feature.get("text")?feature.get("text"):"")+'</textarea>' +
-                            							'<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Delete</button>');
+                                                        '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Delete</button>');
                             panel.getOverlay().setPosition(event.coordinate);
                             panel.getContentEl().down('.deleteAnnotation').dom.onclick = function() {panel.deleteAnnotation()};
                             panel.getContentEl().down('.saveAnnotation').dom.onclick = function() {panel.saveAnnotation()};
@@ -708,7 +729,9 @@ Ext.define('Voyant.panel.DreamScape', {
                                     visible: feature.get("visible"),
                                     color: feature.get("color"),
                                     type: feature.get("type"),
-                                    confidence: feature.get("confidence")
+                                    confidence: feature.get("confidence"),
+                                    source: feature.get("source"),
+                                    target: feature.get("target")
                                 });
                                 selectedLayer.getSource().addFeature(selectedFeature);
                             }
@@ -757,10 +780,10 @@ Ext.define('Voyant.panel.DreamScape', {
             });
 
             if (localStorage['annotations']) {
-            	var geofeatures = JSON.parse(localStorage['annotations']);
-            	var geojson = new ol.format.GeoJSON();
-            	var features = geojson.readFeatures(geofeatures);
-            	source.addFeatures(features);
+                var geofeatures = JSON.parse(localStorage['annotations']);
+                var geojson = new ol.format.GeoJSON();
+                var features = geojson.readFeatures(geofeatures);
+                source.addFeatures(features);
             }
 
             map.addLayer(annotations);
@@ -777,7 +800,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 evt.feature.set('type', 'annotation');
                 panel.setCurrentAnnotation(evt.feature);
                 panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60"></textarea>'+
-                								'<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Cancel</button>');
+                                            '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Cancel</button>');
                 panel.getContentEl().down('.deleteAnnotation').dom.onclick = function() {panel.deleteAnnotation()};
                 panel.getContentEl().down('.saveAnnotation').dom.onclick = function() {panel.saveAnnotation()};
                 panel.getOverlay().setPosition(evt.feature.getGeometry().getLastCoordinate());
