@@ -110,5 +110,16 @@ Ext.define('Voyant.data.util.Geonames', {
 			return occurrence;
 		}
 		return null;
-	}
+	},
+    getAllConnectionOccurrences: function(sourceId, targetId) {
+        // TODO return all occurences of connection with given source and target, including those not loaded yet
+        var occurences = [];
+        for (var i = 0; i < this.getTotalConnectionsCount(); i++) {
+            var occurence = this.getConnectionOccurrence(i);
+            if (occurence && occurence.target.id == targetId && occurence.source.id == sourceId) {
+                occurences.push(occurence);
+            }
+        }
+        return occurences
+    }
 });
