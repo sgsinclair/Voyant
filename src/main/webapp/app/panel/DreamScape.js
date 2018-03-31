@@ -34,7 +34,13 @@ Ext.define('Voyant.panel.DreamScape', {
             mercatorProjection: "Mercator (WGS84)",
             gallPetersProjection: "Gall Peters (Equal Area)",
             sphereMollweideProjection: "Sphere mollweide (Equal Area)",
-            annotate: "Annotate"
+            annotate: "Annotate",
+            baseLayer: "Base Layer",
+            baseLayerTip: "Determine map base layer",
+            watercolor: "Stamen watercolor",
+            osm: "Open Street Map",
+            wms4326: "WMS 4326",
+            arcGIS: "National Geographic World Map - ArcGIS"
         },
         api: {
             stopList: 'auto',
@@ -64,7 +70,8 @@ Ext.define('Voyant.panel.DreamScape', {
         filterWidgets: new Ext.util.MixedCollection(),
         drawInteraction: undefined,
         drawMode: false,
-        currentAnnotation: undefined
+        currentAnnotation: undefined,
+        baseLayers: {}
     },
 
     html: '<div class="map"></div><div class="ticker"></div><div class="ol-popup"><a href="#" class="ol-popup-closer"></a><div class="popup-content"></div></div>',
@@ -296,7 +303,52 @@ Ext.define('Voyant.panel.DreamScape', {
                                 }
                             }]
                         }
-                    },'-', {
+                    }, '-', {
+                        text: this.localize('baseLayer'),
+                        tooltip: this.localize('baseLayerTip'),
+                        menu: {
+                            items: [{
+                                xtype: 'radiogroup',
+                                columns: 1,
+                                vertical: true,
+                                defaults: {
+                                    handler: function(item, checked) {
+                                        if(checked){
+                                            var panel = this;
+                                            id = item.getItemId();
+                                            var layer = this.getBaseLayers()[id];
+                                            if (layer) {
+                                                layer.setOpacity(1);
+                                                this.getMap().getLayers().setAt(0, layer);
+                                            }
+                                            if(id == 'osm' || id == 'arcGIS') {
+                                                this.getMap().getLayer("overlayLayer").setVisible(false);
+                                            } else {
+                                                this.getMap().getLayer("overlayLayer").setVisible(true);
+                                            }
+                                        }
+                                    },
+                                    scope: this
+                                },
+                                items: [
+                                    {
+                                        boxLabel: this.localize('watercolor'),
+                                        itemId: 'watercolor',
+                                        checked: true,
+                                    },{
+                                        boxLabel: this.localize('wms4326'),
+                                        itemId: 'wms4326'
+                                    },{
+                                        boxLabel: this.localize('osm'),
+                                        itemId: 'osm'
+                                    },{
+                                        boxLabel: this.localize('arcGIS'),
+                                        itemId: 'arcGIS'
+                                    }
+                                ]
+                            }]
+                        }
+                    }, '-', {
                         text: this.localize('projection'),
                         tooltip: this.localize('projectionTip'),
                         menu: {
@@ -500,17 +552,48 @@ Ext.define('Voyant.panel.DreamScape', {
                 return false;
             };
 
+            var baseLayers = this.getBaseLayers();
+            baseLayers['wms4326'] = new ol.layer.Tile({
+                preload: Infinity,
+                source: new ol.source.TileWMS({
+                    url: 'https://ahocevar.com/geoserver/wms',
+                    crossOrigin: '',
+                    params: {
+                        'LAYERS': 'ne:NE1_HR_LC_SR_W_DR',
+                        'TILED': true
+                    },
+                    projection: 'EPSG:4326'
+                })
+            });
+
+            baseLayers['watercolor'] =  new ol.layer.Tile({
+                preload: Infinity,
+                source: new ol.source.Stamen({
+                    //cacheSize: 2048,
+                    layer: 'watercolor',
+                    projection: "EPSG:3857"
+                })
+            });
+
+            baseLayers['osm'] = new ol.layer.Tile({
+                preload: Infinity,
+                source: new ol.source.OSM({
+                    projection: "EPSG:3857"
+                })
+            });
+
+            baseLayers['arcGIS'] = new ol.layer.Tile({
+                preload: Infinity,
+                source: new ol.source.TileArcGISRest({
+                    url: "https://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer",
+                    projection: "EPSG:3857"
+                })
+            });
+
             this.setContentEl(overlayEl.down('.popup-content'));
             var map = new ol.Map({
                 layers: [
-                    new ol.layer.Tile({
-                        preload: Infinity,
-                        source: new ol.source.Stamen({
-                            //cacheSize: 2048,
-                            layer: 'watercolor',
-                            projection: "EPSG:3857"
-                        })
-                    }),
+                    baseLayers['watercolor'],
 
                     new ol.layer.Tile({
                         preload: Infinity,
@@ -518,7 +601,8 @@ Ext.define('Voyant.panel.DreamScape', {
                             cacheize: 2048,
                             layer: 'toner-hybrid',
                             projection: "EPSG:3857"
-                        })
+                        }),
+                        id: 'overlayLayer'
                     })
                 ],
                 overlays: [overlay],
@@ -541,13 +625,37 @@ Ext.define('Voyant.panel.DreamScape', {
                         if( feature.get("type") === "city" && feature.get("selected")) { // city
                             panel.dispatchEvent("termsClicked", panel, [feature.get("forms").join("|")])
                             foundFeature = true;
-                        } else if (feature.get("type") === "connection" && feature.get("selected")) { // connection
-                            window.alert("You clicked connection " + feature.get("text"));
+                        } else if (feature.get("type") === "connection" && feature.get("selected") && !foundFeature) { // connection
+                            panel.getFilterWidgets().each(function (filter) {
+                                var geonames = filter.getGeonames();
+                                if (geonames != null) {
+                                    var occurrences = geonames.getAllConnectionOccurrences(feature.get("source"), feature.get("target"));
+                                    var infos = "<ul>";
+                                    var docIndex = -1;
+                                    occurrences.forEach(function(occ) {
+                                        if(occ.docIndex != docIndex) {
+                                            docIndex = occ.docIndex;
+                                            infos += panel.getCorpus().getDocument(docIndex).getFullLabel() + ':<br>';
+                                        }
+                                        infos += '<li>'+ occ.source.left+'<a href="http://www.geonames.org/' + occ.source.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.source.position+' location='+occ.source.form+' class="termLocationLink">' + occ.source.form + '</a> '+occ.source.right + ' [...] ' +
+                                            occ.target.left+'<a href="http://www.geonames.org/' + occ.target.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.target.position+' location='+occ.target.form+' class="termLocationLink">' + occ.target.form + '</a> '+occ.target.right + '</li>';
+                                    });
+                                    var header = feature.get("text");
+                                    infos += "</ul>";
+                                    panel.getContentEl().setHtml('<h3>' + header + '</h3>' + infos);
+                                    //content.innerHTML = `<h3>${header}</h3>${infos}`;
+                                    panel.getOverlay().setPosition(event.coordinate);
+                                    var links = Ext.select('.termLocationLink');
+                                    links.elements.forEach(function(link) {
+                                        link.onmouseover = function(){panel.showTermInCorpus(link.getAttribute("docIndex"), link.getAttribute("offset"), link.getAttribute('location'))};
+                                    });
+                                }
+                            });
                             foundFeature = true
-                        } else if (feature.get("type") == "annotation" && !foundFeature) { //annotation
+                        } else if (feature.get("type") === "annotation" && !foundFeature) { //annotation
                             panel.setCurrentAnnotation(feature);
-                            panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60">'+(feature.get("text")?feature.get("text"):"")+'</textarea>' + 
-                            							'<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Delete</button>');
+                            panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60">'+(feature.get("text")?feature.get("text"):"")+'</textarea>' +
+                                                        '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Delete</button>');
                             panel.getOverlay().setPosition(event.coordinate);
                             panel.getContentEl().down('.deleteAnnotation').dom.onclick = function() {panel.deleteAnnotation()};
                             panel.getContentEl().down('.saveAnnotation').dom.onclick = function() {panel.saveAnnotation()};
@@ -624,7 +732,9 @@ Ext.define('Voyant.panel.DreamScape', {
                                     visible: feature.get("visible"),
                                     color: feature.get("color"),
                                     type: feature.get("type"),
-                                    confidence: feature.get("confidence")
+                                    confidence: feature.get("confidence"),
+                                    source: feature.get("source"),
+                                    target: feature.get("target")
                                 });
                                 selectedLayer.getSource().addFeature(selectedFeature);
                             }
@@ -673,10 +783,10 @@ Ext.define('Voyant.panel.DreamScape', {
             });
 
             if (localStorage['annotations']) {
-            	var geofeatures = JSON.parse(localStorage['annotations']);
-            	var geojson = new ol.format.GeoJSON();
-            	var features = geojson.readFeatures(geofeatures);
-            	source.addFeatures(features);
+                var geofeatures = JSON.parse(localStorage['annotations']);
+                var geojson = new ol.format.GeoJSON();
+                var features = geojson.readFeatures(geofeatures);
+                source.addFeatures(features);
             }
 
             map.addLayer(annotations);
@@ -693,7 +803,7 @@ Ext.define('Voyant.panel.DreamScape', {
                 evt.feature.set('type', 'annotation');
                 panel.setCurrentAnnotation(evt.feature);
                 panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60"></textarea>'+
-                								'<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Cancel</button>');
+                                            '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Cancel</button>');
                 panel.getContentEl().down('.deleteAnnotation').dom.onclick = function() {panel.deleteAnnotation()};
                 panel.getContentEl().down('.saveAnnotation').dom.onclick = function() {panel.saveAnnotation()};
                 panel.getOverlay().setPosition(evt.feature.getGeometry().getLastCoordinate());
@@ -708,39 +818,38 @@ Ext.define('Voyant.panel.DreamScape', {
         }
     },
 
-        // Style for vector after animation
     deleteAnnotation: function() {
-    	this.body.down('.ol-popup').down(".ol-popup-closer").dom.click();
-    	this.getMap().getLayer("annotations").getSource().removeFeature(this.getCurrentAnnotation());
-    	var geojson  = new ol.format.GeoJSON;
-	    var features = this.getMap().getLayer("annotations").getSource().getFeatures();
-	    var transformedFeatures = [];
-	    var projection = this.getProjection();
-	    features.forEach(function (feature) {
-	    	transformedFeature = feature.clone();
-	    	transformedFeature.getGeometry().transform(projection?projection:'EPSG:3857', 'EPSG:3857');
-	    	transformedFeatures.push(transformedFeature);
-	    })
-	    var json = geojson.writeFeatures(transformedFeatures);
+        this.body.down('.ol-popup').down(".ol-popup-closer").dom.click();
+        this.getMap().getLayer("annotations").getSource().removeFeature(this.getCurrentAnnotation());
+        var geojson  = new ol.format.GeoJSON;
+        var features = this.getMap().getLayer("annotations").getSource().getFeatures();
+        var transformedFeatures = [];
+        var projection = this.getProjection();
+        features.forEach(function (feature) {
+            transformedFeature = feature.clone();
+            transformedFeature.getGeometry().transform(projection?projection:'EPSG:3857', 'EPSG:3857');
+            transformedFeatures.push(transformedFeature);
+        })
+        var json = geojson.writeFeatures(transformedFeatures);
         localStorage['annotations'] = JSON.stringify(json);
     },
 
     saveAnnotation: function() {
-  		this.getCurrentAnnotation().set("text", this.getContentEl().down('.annotation-text').dom.value);
-  		this.getOverlay().setPosition(undefined);
+        this.getCurrentAnnotation().set("text", this.getContentEl().down('.annotation-text').dom.value);
+        this.getOverlay().setPosition(undefined);
         if(this.getDrawMode()) {
             this.getDockedComponent('bottomToolbar').getComponent('annotate').click();
         }
         var geojson  = new ol.format.GeoJSON;
-	    var features = this.getMap().getLayer("annotations").getSource().getFeatures();
-	    var transformedFeatures = [];
-	    var projection = this.getProjection();
-	    features.forEach(function (feature) {
-	    	transformedFeature = feature.clone();
-	    	transformedFeature.getGeometry().transform(projection?projection:'EPSG:3857', 'EPSG:3857');
-	    	transformedFeatures.push(transformedFeature);
-	    })
-	    var json = geojson.writeFeatures(transformedFeatures);
+        var features = this.getMap().getLayer("annotations").getSource().getFeatures();
+        var transformedFeatures = [];
+        var projection = this.getProjection();
+        features.forEach(function (feature) {
+            transformedFeature = feature.clone();
+            transformedFeature.getGeometry().transform(projection?projection:'EPSG:3857', 'EPSG:3857');
+            transformedFeatures.push(transformedFeature);
+        })
+        var json = geojson.writeFeatures(transformedFeatures);
         localStorage['annotations'] = JSON.stringify(json);
     },
 
@@ -1141,7 +1250,7 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                             }]
                         }, {
                             xtype: 'checkbox',
-                            checked: true,
+                            checked: false,
                             handler: function(item, checked) {
                                 me.setKeepAnimationInFrame(checked);
                             },
@@ -1236,6 +1345,7 @@ Ext.define('Voyant.widget.GeonamesFilter', {
 
     animate: function() {
         var panel = this.up('panel');
+        if (!panel) {return;}
         this.clearAnimation();
         var currentConnectionOccurrence = this.getCurrentConnectionOccurrence();
         if (currentConnectionOccurrence) {
@@ -1246,7 +1356,6 @@ Ext.define('Voyant.widget.GeonamesFilter', {
             }
             if (animationLayer) {
                 var features = animationLayer.getSource().getFeatures();
-                //var panel =  this.up('panel');
                 if (features.length==0) {
                     if (!panel) {return;}
                     var connectionsLayerSource = panel.getMap().getLayer(this.getId()+"-connections").getSource();
