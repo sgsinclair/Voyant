@@ -334,7 +334,7 @@ Ext.define('Voyant.panel.DreamScape', {
                                     {
                                         boxLabel: this.localize('watercolor'),
                                         itemId: 'watercolor',
-                                        checked: true,
+                                        checked: true
                                     },{
                                         boxLabel: this.localize('wms4326'),
                                         itemId: 'wms4326'
@@ -405,7 +405,7 @@ Ext.define('Voyant.panel.DreamScape', {
                                     {
                                         boxLabel: this.localize('webMercatorProjection'),
                                         itemId: 'webMercatorProjection',
-                                        checked: true,
+                                        checked: true
                                     },{
                                         boxLabel: this.localize('mercatorProjection'),
                                         itemId: 'mercatorProjection'
