@@ -313,6 +313,8 @@ Ext.define('Voyant.panel.DToC.Reader', {
 					this.nextButton.show();
 				}
 				
+				this._processRdf();
+				
 				this._processLanguage();
 				this._processImages();
 				this._processLinks();
@@ -372,6 +374,11 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			this.fetchDocument(data);
 		}
 	},
+	
+	_processRdf: function() {
+        var rdf = Ext.get(Ext.DomQuery.select('rdf\\:rdf', this.readerContainer.dom));
+        rdf.remove();
+    },
 	
 	_processLanguage: function() {
 	    var langEl = Ext.get(Ext.DomQuery.select('div[xml\\:lang]', this.readerContainer.dom)[0]);
@@ -684,7 +691,8 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		docId = docId || this.currentDocId;
 		var doc = this.getCorpus().getDocument(docId);
 		var titleHtml = '';
-		var title = doc.get('title').normalize();
+		var title = doc.get('title') || '';
+		title = title.normalize();
 		var names = '';
 		var colon = ': ';
 		var authors = doc.get('author');

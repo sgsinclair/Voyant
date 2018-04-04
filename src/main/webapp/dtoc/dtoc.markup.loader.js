@@ -4,6 +4,7 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 	
 	TAG_SNIPPET_WORD_LENGTH: 10,
 	ignoreSpans: true, // ignoring spans drastically reduces the size of the tag data
+	ignoredPrefixes: ['rdf','cw'], // ignore tags with these prefixes (cw used by cwrc-writer docs) 
 	
 	doLoadAllTags: function() {
 		var dfd = new Ext.Deferred();
@@ -164,6 +165,7 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 			var tag, nodeName, tokenId, dataObj, text, surrText;
 			for (var i = 0; i < tags.length; i++) {
 				tag = tags[i];
+				if (this.ignoredPrefixes.indexOf(tag.prefix) !== -1) continue;
 				nodeName = tag.nodeName;
 				if (this.ignoreSpans && nodeName.toLowerCase() === 'span') continue;
 				tokenId = tag.getAttribute('tokenid');
