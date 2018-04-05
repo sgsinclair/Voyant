@@ -90,7 +90,7 @@
 <script src="<%= base %>/resources/ace/2017-04-16/src-noconflict/ace.js"></script>
 
 <!-- FontAwesome -->
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/fontawesome/current/css/font-awesome.min.css" />
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/fontawesome/4.4.0/font-awesome-all<%= rtl %>.css" />
 
 <!-- spectrum -->
 <script type="text/javascript" src="<%=base %>/resources/spectrum/spectrum.js"></script>
