@@ -37,10 +37,12 @@ Ext.define('Voyant.panel.DreamScape', {
             annotate: "Annotate",
             baseLayer: "Base Layer",
             baseLayerTip: "Determine map base layer",
-            watercolor: "Stamen watercolor",
+            watercolor: "Stamen watercolor (Default)",
             osm: "Open Street Map",
             wms4326: "WMS 4326",
-            arcGIS: "National Geographic World Map - ArcGIS"
+            arcGIS: "National Geographic World Map - ArcGIS",
+            map: "Map",
+            mapTip: "Define base layer and projection"
         },
         api: {
             stopList: 'auto',
@@ -123,6 +125,7 @@ Ext.define('Voyant.panel.DreamScape', {
             hide = hide.split(',');
             this.setApiParam('hide');
         }
+        var iconBase = this.getApplication().getBaseUrl()+"resources/dreamscape/";
         Ext.apply(this, {
             title: this.localize('title'),
             bodyBorder: true,
@@ -303,123 +306,162 @@ Ext.define('Voyant.panel.DreamScape', {
                                 }
                             }]
                         }
-                    }, '-', {
-                        text: this.localize('baseLayer'),
-                        tooltip: this.localize('baseLayerTip'),
+                    }, {
+                        text: this.localize('map'),
+                        tooltip: this.localize('mapTip'),
                         menu: {
-                            items: [{
-                                xtype: 'radiogroup',
-                                columns: 1,
-                                vertical: true,
-                                defaults: {
-                                    handler: function(item, checked) {
-                                        if(checked){
-                                            var panel = this;
-                                            id = item.getItemId();
-                                            var layer = this.getBaseLayers()[id];
-                                            if (layer) {
-                                                layer.setOpacity(1);
-                                                this.getMap().getLayers().setAt(0, layer);
-                                            }
-                                            if(id == 'osm' || id == 'arcGIS') {
-                                                this.getMap().getLayer("overlayLayer").setVisible(false);
-                                            } else {
-                                                this.getMap().getLayer("overlayLayer").setVisible(true);
-                                            }
+                        		items: [
+                        			{
+                                        text: this.localize('baseLayer'),
+                                        tooltip: this.localize('baseLayerTip'),
+                                        glyph: 'xf065@FontAwesome',
+                                        menu: {
+                                            items: [{
+                                                xtype: 'radiogroup',
+                                                columns: 1,
+                                                vertical: true,
+                                                defaults: {
+                                                	  cls: 'map-menu-item',
+                                                    handler: function(item, checked) {
+                                                        if(checked){
+                                                            var panel = this;
+                                                            id = item.getItemId();
+                                                            var layer = this.getBaseLayers()[id];
+                                                            if (layer) {
+                                                                layer.setOpacity(1);
+                                                                this.getMap().getLayers().setAt(0, layer);
+                                                            }
+                                                            if(id == 'osm' || id == 'arcGIS') {
+                                                                this.getMap().getLayer("overlayLayer").setVisible(false);
+                                                            } else {
+                                                                this.getMap().getLayer("overlayLayer").setVisible(true);
+                                                            }
+                                                        }
+                                                    },
+                                                    listeners: {
+                                                        afterrender: function(item) {
+                                                            Ext.create('Ext.tip.ToolTip', {
+                                                                target: item,
+                                                                html: '<div class="map-menu-item-tooltip '+item.getItemId()+'"></div>',
+                                                                anchor: 'right'
+                                                            });
+                                                        }
+                                                    },
+                                                    scope: this
+                                                },
+                                                items: [
+                                                    {
+                                                        boxLabel: this.localize('watercolor'),
+                                                        itemId: 'watercolor',
+                                                        cls: ['map-menu-item','watercolor'],
+                                                        checked: true
+                                                    },{
+                                                        boxLabel: this.localize('wms4326'),
+                                                        cls: ['map-menu-item','wms4326'],
+                                                        itemId: 'wms4326'
+                                                    },{
+                                                        boxLabel: this.localize('osm'),
+                                                        cls: ['map-menu-item','osm'],
+                                                        itemId: 'osm'
+                                                    },{
+                                                        boxLabel: this.localize('arcGIS'),
+                                                        cls: ['map-menu-item','arcGIS'],
+                                                        itemId: 'arcGIS'
+                                                    }
+                                                ]
+                                            }]
                                         }
-                                    },
-                                    scope: this
-                                },
-                                items: [
-                                    {
-                                        boxLabel: this.localize('watercolor'),
-                                        itemId: 'watercolor',
-                                        checked: true
                                     },{
-                                        boxLabel: this.localize('wms4326'),
-                                        itemId: 'wms4326'
-                                    },{
-                                        boxLabel: this.localize('osm'),
-                                        itemId: 'osm'
-                                    },{
-                                        boxLabel: this.localize('arcGIS'),
-                                        itemId: 'arcGIS'
-                                    }
-                                ]
-                            }]
-                        }
-                    }, '-', {
-                        text: this.localize('projection'),
-                        tooltip: this.localize('projectionTip'),
-                        menu: {
-                            items: [{
-                                xtype: 'radiogroup',
-                                columns: 1,
-                                vertical: true,
-                                defaults: {
-                                    handler: function(item, checked) {
-                                        if(checked){
-                                            var panel = this;
-                                            id = item.getItemId();
-                                            var view = undefined
-                                            if (id === "webMercatorProjection") {
-                                                this.setProjection(ol.proj.get('EPSG:3857'));
-                                            } else if (id === "mercatorProjection") {
-                                                this.setProjection(ol.proj.get('EPSG:4326'));
-                                            } else if (id === "gallPetersProjection") {
-                                                proj4.defs('cea',"+proj=cea +lon_0=0 +lat_ts=45 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs");
-                                                var gallPetersProjection = ol.proj.get('cea');
-                                                this.setProjection(gallPetersProjection);
-                                            } else if (id === "sphereMollweideProjection") {
-                                                proj4.defs('ESRI:54009', '+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
-                                                var sphereMollweideProjection = ol.proj.get('ESRI:54009');
-                                                sphereMollweideProjection.setExtent([-18e6, -9e6, 18e6, 9e6]);
-                                                this.setProjection(sphereMollweideProjection);
-                                            }
-                                            var newProjExtent = this.getProjection().getExtent();
-                                            // If using Mercator projection, earth with is measured in degrees, otherwise it's in meters
-                                            var earthWidth = this.getProjection() == ol.proj.get("EPSG:4326") ? 360 : 40075016.68557849;
-                                            var newView = new ol.View({
-                                                projection: this.getProjection(),
-                                                center: ol.extent.getCenter(newProjExtent || [0, 0, 0, 0]),
-                                                maxResolution: earthWidth / panel.body.dom.offsetWidth,
-                                                zoom: 0
-                                            });
-                                            var map = this.getMap();
-                                            var layers = map.getLayers();
-                                            layers.forEach(function(layer) {
-                                                if(layer.getSource().getFeatures){
-                                                    var features = layer.getSource().getFeatures();
-                                                    features.forEach(function(feature){
-                                                        var newGeometry = feature.getGeometry().transform(map.getView().getProjection(), panel.getProjection());
-                                                        feature.setGeometry(newGeometry);
-                                                    })
-                                                }
-                                            });
-                                            map.setView(newView);
+                                        text: this.localize('projection'),
+                                        tooltip: this.localize('projectionTip'),
+                                        glyph: 'xf31e@FontAwesome',
+                                        menu: {
+                                            items: [{
+                                                xtype: 'radiogroup',
+                                                columns: 1,
+                                                vertical: true,
+                                                defaults: {
+                                                    handler: function(item, checked) {
+                                                        if(checked){
+                                                            var panel = this;
+                                                            id = item.getItemId();
+                                                            var view = undefined
+                                                            if (id === "webMercatorProjection") {
+                                                                this.setProjection(ol.proj.get('EPSG:3857'));
+                                                            } else if (id === "mercatorProjection") {
+                                                                this.setProjection(ol.proj.get('EPSG:4326'));
+                                                            } else if (id === "gallPetersProjection") {
+                                                                proj4.defs('cea',"+proj=cea +lon_0=0 +lat_ts=45 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs");
+                                                                var gallPetersProjection = ol.proj.get('cea');
+                                                                this.setProjection(gallPetersProjection);
+                                                            } else if (id === "sphereMollweideProjection") {
+                                                                proj4.defs('ESRI:54009', '+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
+                                                                var sphereMollweideProjection = ol.proj.get('ESRI:54009');
+                                                                sphereMollweideProjection.setExtent([-18e6, -9e6, 18e6, 9e6]);
+                                                                this.setProjection(sphereMollweideProjection);
+                                                            }
+                                                            var newProjExtent = this.getProjection().getExtent();
+                                                            // If using Mercator projection, earth with is measured in degrees, otherwise it's in meters
+                                                            var earthWidth = this.getProjection() == ol.proj.get("EPSG:4326") ? 360 : 40075016.68557849;
+                                                            var newView = new ol.View({
+                                                                projection: this.getProjection(),
+                                                                center: ol.extent.getCenter(newProjExtent || [0, 0, 0, 0]),
+                                                                maxResolution: earthWidth / panel.body.dom.offsetWidth,
+                                                                zoom: 0
+                                                            });
+                                                            var map = this.getMap();
+                                                            var layers = map.getLayers();
+                                                            layers.forEach(function(layer) {
+                                                                if(layer.getSource().getFeatures){
+                                                                    var features = layer.getSource().getFeatures();
+                                                                    features.forEach(function(feature){
+                                                                        var newGeometry = feature.getGeometry().transform(map.getView().getProjection(), panel.getProjection());
+                                                                        feature.setGeometry(newGeometry);
+                                                                    })
+                                                                }
+                                                            });
+                                                            
+                                                            map.setView(newView);
+                                                        }
+                                                    },
+                                                    listeners: {
+                                                        afterrender: function(item) {
+                                                            Ext.create('Ext.tip.ToolTip', {
+                                                                target: item,
+                                                                html: '<div class="map-menu-item-tooltip '+item.getItemId()+'"></div>',
+                                                                anchor: 'right'
+                                                            });
+                                                        }
+                                                    },
+                                                    scope: this
+                                                },
+                                                items: [
+                                                    {
+                                                        boxLabel: this.localize('webMercatorProjection'),
+                                                        itemId: 'webMercatorProjection',
+                                                        cls: ['map-menu-item','webMercatorProjection'],
+                                                        checked: true
+                                                    },{
+                                                        boxLabel: this.localize('mercatorProjection'),
+                                                        cls: ['map-menu-item','mercatorProjection'],
+                                                        itemId: 'mercatorProjection'
+                                                   },{
+                                                        boxLabel: this.localize('gallPetersProjection'),
+                                                        cls: ['map-menu-item','gallPetersProjection'],
+                                                        itemId: 'gallPetersProjection'
+                                                    },{
+                                                        boxLabel: this.localize('sphereMollweideProjection'),
+                                                        cls: ['map-menu-item','sphereMollweideProjection'],
+                                                       itemId: 'sphereMollweideProjection'
+                                                    }
+                                                ]
+                                            }]
+                                            
                                         }
-                                    },
-                                    scope: this
-                                },
-                                items: [
-                                    {
-                                        boxLabel: this.localize('webMercatorProjection'),
-                                        itemId: 'webMercatorProjection',
-                                        checked: true
-                                    },{
-                                        boxLabel: this.localize('mercatorProjection'),
-                                        itemId: 'mercatorProjection'
-                                    },{
-                                        boxLabel: this.localize('gallPetersProjection'),
-                                        itemId: 'gallPetersProjection'
-                                    },{
-                                        boxLabel: this.localize('sphereMollweideProjection'),
-                                        itemId: 'sphereMollweideProjection'
                                     }
-                                ]
-                            }]
+                        		]
                         }
-                    }, '-', {
+                    }, {
                         text: this.localize('add'),
                         itemId: 'addFilter',
                         handler: function(cmp) {
@@ -810,6 +852,27 @@ Ext.define('Voyant.panel.DreamScape', {
                 panel.getContentEl().down('.annotation-text').dom.focus();
             });
             this.setMap(map);
+            
+            var zoom = this.getTargetEl().down(".ol-zoom");
+            Ext.create('Ext.Button', {
+            		glyph:'xf075@FontAwesome',
+            		cls: 'annotate',
+            		renderTo: this.getTargetEl().down(".ticker").parent(),
+            		tooltip: 'annotateTip',
+            		enableToggle: true,
+            		handler: function(cmp) {
+                        if(this.getDrawMode()) {
+                            this.getMap().removeInteraction(this.getDrawInteraction());
+                            this.setDrawMode(false);
+                            cmp.toggle(false);
+                        } else {
+                            this.getMap().addInteraction(this.getDrawInteraction());
+                            this.setDrawMode(true);
+                            cmp.toggle(true);
+                        }
+                 },
+            		scope: this
+            	})
 
             // simulate adding a filter
             this.getDockedComponent('bottomToolbar').getComponent('addFilter').click();
@@ -817,7 +880,7 @@ Ext.define('Voyant.panel.DreamScape', {
             Ext.defer(this.tryInit, 500, this); // try again in a half second
         }
     },
-
+    
     deleteAnnotation: function() {
         this.body.down('.ol-popup').down(".ol-popup-closer").dom.click();
         this.getMap().getLayer("annotations").getSource().removeFeature(this.getCurrentAnnotation());

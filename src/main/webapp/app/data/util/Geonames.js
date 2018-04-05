@@ -12,7 +12,6 @@ Ext.define('Voyant.data.util.Geonames', {
 		this.setCorpus(config.corpus);
 	},
 	load: function(params) {
-
 		var dfd = Voyant.application.getDeferred(this);
 		var me = this, localParams = {
 			corpus: this.getCorpus().getAliasOrId(),
@@ -26,13 +25,28 @@ Ext.define('Voyant.data.util.Geonames', {
 			me.setData({});
 		}
 
-		
 		Ext.Ajax.request({
 			url: Voyant.application.getTromboneUrl(),
 			params: localParams,
 			scope: this
 		}).then(function(response) {
 			var data = Ext.JSON.decode(response.responseText);
+			
+			/*
+			new Voyant.widget.ProgressMonitor({
+				progress: {
+					id: 'test',
+					completion: 0.1,
+					code: 'launch',
+					status: 'LAUNCH',
+					message: "launching launching"
+				},
+				failure: function(responseOrProgress) {
+					debugger;
+				},
+				scope: me
+			});*/
+
 			if (data && data.geonames) {
 				if (!params.noOverwrite) {
 					me.setData(data.geonames);

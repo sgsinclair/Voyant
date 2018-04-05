@@ -96,6 +96,7 @@ app/widget/FontFamilyOption.js
 app/widget/ColorPaletteOption.js
 app/widget/VoyantChart.js
 app/widget/LiveSearchGrid.js
+app/widget/ProgressMonitor.js
 app/widget/VoyantTableTransform.js
 app/widget/CategoriesBuilder.js
 app/widget/VoyantNetworkGraph.js
