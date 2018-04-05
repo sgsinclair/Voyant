@@ -99,6 +99,11 @@ Ext.define('Voyant.panel.Panel', {
 	},
 	
 	showError: function(config, response) {
+		if (Ext.isString(config)) {
+			config = {
+				message: config
+			}
+		}
 		Ext.applyIf(config, {
 			title: this.localize("error")+" ("+this.localize("title")+")"
 		})

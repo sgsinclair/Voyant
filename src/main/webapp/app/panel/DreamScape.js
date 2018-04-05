@@ -43,7 +43,10 @@ Ext.define('Voyant.panel.DreamScape', {
             wms4326: "WMS 4326",
             arcGIS: "National Geographic World Map - ArcGIS",
             map: "Map",
-            mapTip: "Define base layer and projection"
+            mapTip: "Define base layer and projection",
+            annotationsUpdated: "Annotations have been stored. Please export new URL if you would like to reference it.",
+            annotationsUpdateFailed: "An error occured while trying to store the anntoations.",
+            annotationsLoadFailed: "An error occured while trying to load the anntoations."
         },
         api: {
             stopList: 'auto',
@@ -57,7 +60,8 @@ Ext.define('Voyant.panel.DreamScape', {
             citiesMinFreq: 1,
             connectionsMaxCount: 2500,
             connectionsMinFreq: 1,
-            millisPerAnimation: 2000
+            millisPerAnimation: 2000,
+            annotationsId: undefined
         },
         glyph: 'xf124@FontAwesome'
     },
@@ -74,7 +78,9 @@ Ext.define('Voyant.panel.DreamScape', {
         drawInteraction: undefined,
         drawMode: false,
         currentAnnotation: undefined,
-        baseLayers: {}
+        baseLayers: {},
+        annotations: undefined, // set during init if any values are stored, shouldn't be looked up (getAnnotations) after init
+        annotationsLoadedIfAvailable: false // check api and local storage
     },
 
     html: '<div class="map"></div><div class="ticker"></div><div class="ol-popup"><a href="#" class="ol-popup-closer"></a><div class="popup-content"></div></div>',
@@ -117,6 +123,36 @@ Ext.define('Voyant.panel.DreamScape', {
             },
             scope: this
         });
+        var annotationsId = this.getApiParam("annotationsId");
+        if (annotationsId) {
+        		var me = this;
+	    		Ext.Ajax.request({
+	    			url: this.getTromboneUrl(),
+	    			params: {
+		        		tool: 'resource.StoredResource',
+		        		retrieveResourceId: annotationsId
+	    			},
+	    			scope: this
+	    		}).then(function(response) {
+	    			var data = Ext.JSON.decode(response.responseText);
+	    			if (data.storedResource.resource) {
+	    				var annotations = Ext.JSON.decode(data.storedResource.resource)
+	    				if (Ext.isString(annotations)) {
+	    					annotations = Ext.JSON.decode(annotations);
+	    					me.setAnnotations(annotations)
+	    				}
+	    			}
+    				if (!me.getAnnotations()) {
+    					me.showError(me.localize("annotationsLoadFailed"));
+    				}
+                me.setAnnotationsLoadedIfAvailable(true);
+	    		}, function(response) {
+	    			me.showResponseError(me.localize("annotationsLoadFailed"), response);
+                me.setAnnotationsLoadedIfAvailable(true);
+	    		});
+        } else {
+            this.setAnnotationsLoadedIfAvailable(true);
+        }
     },
     initComponent: function() {
         var me = this;
@@ -551,7 +587,7 @@ Ext.define('Voyant.panel.DreamScape', {
     },
 
     tryInit: function() {
-        if (this.getIsOpenLayersLoaded() && this.getIsArcLoaded() && this.getIsProj4Loaded()) {
+        if (this.getIsOpenLayersLoaded() && this.getIsArcLoaded() && this.getIsProj4Loaded() && this.getAnnotationsLoadedIfAvailable()) {
             var el = this.body.down('.map').setId(Ext.id());
             var overlayEl = this.body.down('.ol-popup');
             var overlay = new ol.Overlay({
@@ -804,10 +840,10 @@ Ext.define('Voyant.panel.DreamScape', {
                 id: "annotations"
             });
 
-            if (localStorage['annotations']) {
-                var geofeatures = JSON.parse(localStorage['annotations']);
+            var annotationsObj = this.getAnnotations();
+            if (annotationsObj) {
                 var geojson = new ol.format.GeoJSON();
-                var features = geojson.readFeatures(geofeatures);
+                var features = geojson.readFeatures(annotationsObj);
                 source.addFeatures(features);
             }
 
@@ -870,15 +906,37 @@ Ext.define('Voyant.panel.DreamScape', {
             transformedFeatures.push(transformedFeature);
         })
         var json = geojson.writeFeatures(transformedFeatures);
-        localStorage['annotations'] = JSON.stringify(json);
+        this.storeAnnotations(json);
+//        localStorage['annotations'] = JSON.stringify(json);
+    },
+    
+    storeAnnotations: function(json) {
+    		this.mask("storingAnnotations");
+    		var me = this;
+    		Ext.Ajax.request({
+    			url: this.getTromboneUrl(),
+    			params: {
+	        		tool: 'resource.StoredResource',
+	    			storeResource: JSON.stringify(json)
+    			},
+    			scope: this
+    		}).then(function(response) {
+    			me.unmask();
+    			var data = Ext.JSON.decode(response.responseText);
+    			me.setApiParam("annotationsId", data.storedResource.id);
+    			me.toastInfo(me.localize('annotationsUpdated'));
+    		}, function(response) {
+    			me.unmask();
+    			me.showResponseError(me.localize("annotationsUpdateFailed"), response);
+    		});
     },
 
     saveAnnotation: function() {
         this.getCurrentAnnotation().set("text", this.getContentEl().down('.annotation-text').dom.value);
         this.getOverlay().setPosition(undefined);
-        if(this.getDrawMode()) {
-            this.getDockedComponent('bottomToolbar').getComponent('annotate').click();
-        }
+//        if(this.getDrawMode()) {
+//            this.getDockedComponent('bottomToolbar').getComponent('annotate').click();
+//        }
         var geojson  = new ol.format.GeoJSON;
         var features = this.getMap().getLayer("annotations").getSource().getFeatures();
         var transformedFeatures = [];
@@ -889,7 +947,8 @@ Ext.define('Voyant.panel.DreamScape', {
             transformedFeatures.push(transformedFeature);
         })
         var json = geojson.writeFeatures(transformedFeatures);
-        localStorage['annotations'] = JSON.stringify(json);
+        this.storeAnnotations(json);
+//        localStorage['annotations'] = JSON.stringify(json);
     },
 
     // Style for vector after animation
