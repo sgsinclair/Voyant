@@ -12,8 +12,10 @@ Ext.define('Voyant.panel.Correlations', {
     		minInDocumentsCountRatioLabel: "minimum coverage (%{0})",
     		source: "Term 1",
     		target: "Term 2",
-    		correlation: "Correlation",
-    		correlationTip: "This is a measure of how closely term frequencies correlate (using Pearson's correlation coefficient). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other dropx), scores approaching 0 indicate little or no meaningful corrlation.",
+    		correlation: "Correlation (r)",
+    		correlationTip: "This is a measure of how closely term frequencies correlate (using Pearson's correlation coefficient or a simple regression). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other dropx), scores approaching 0 indicate little or no meaningful corrlation.",
+    		significance: "Significance (p)",
+    		significanceTip: "This is a measure of the signifiance of the correlation value. Often a significance of .05 or less indicates a strong correlation (which allows us to reject the null hypothesis that values are randomly distributed). The validity of this measure depends on assumptions about a normal distribution of the data. Also, don't forget that we typically have a relatively small number of values (frequencies from segments in a texts or from texts in a document), so these values should be used with care.",
     		emptyText: "(No results.)"
     	},
     	api: {
@@ -76,6 +78,10 @@ Ext.define('Voyant.panel.Correlations', {
     			text: this.localize("correlation"),
     			tooltip: this.localize("correlationTip"),
         		dataIndex: 'correlation'
+    		},{
+    			text: this.localize("significance"),
+    			tooltip: this.localize("significanceTip"),
+        		dataIndex: 'significance'
     		}],
     		
 
