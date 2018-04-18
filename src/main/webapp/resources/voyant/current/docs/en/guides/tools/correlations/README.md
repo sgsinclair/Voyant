@@ -12,10 +12,14 @@ The table view shows the following columns by default:
 - *Trends*: two sparklines (mini graphs) that show the distribution of relative frequencies (the left one is for Term 1 and the right one is for Term 2)
 - *Term 2*: the second term of the pair (the order or the terms doesn't matter)
 - *Correlation*: the Pearsons correlation coefficient for this pair of words
+- *Significance*: the siginficance of the correlation value (lower is better)
 
 By default, correlations are shown for the corpus, unless the corpus contains only one document, in which case correlations are show for terms in that one document.
 
-The correlation coefficient is calculated by comparing the relative frequencies of terms (relative to each document for the corpus or relative to each segment of document). A coefficient that approaches 1 indicates that values correlate positively, they rise and fall together. A coefficient that approaches -1 indicates that values correlate negatively, frequencies rise for one term as it drops for the other. Coefficients that approach 0 indicate little correlation, positive or negative. 
+The correlation coefficient is calculated by comparing the relative frequencies of terms (relative to each document for the corpus or relative to each segment of document). A coefficient that approaches 1 indicates that values correlate positively, they rise and fall together. A coefficient that approaches -1 indicates that values correlate negatively, frequencies rise for one term as it drops for the other. Coefficients that approach 0 indicate little correlation, positive or negative. This value is the Pearsons correlation as calculated by the [Apache Math Commons library SimpleRegression class](http://commons.apache.org/proper/commons-math/javadocs/api-3.6.1/org/apache/commons/math3/stat/regression/SimpleRegression.html).
+
+This significance value is a measure of confidence in the correlation value. Often a significance of .05 or less indicates a strong correlation (which allows us to reject the null hypothesis that values are randomly distributed). The validity of this measure depends on assumptions about a normal distribution of the data. Also, don't forget that we typically have a relatively small number of values (frequencies from segments in a texts or from texts in a document), so these values should be used with care.
+
 
 <iframe src="../tool/Correlations/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 350px;"></iframe>
 <div style="width: 90%; text-align: center; margin-bottom: 1em;">Contexts with the Works of Jane Austen. You can also <a href="../?view=Correlations" target="_blank">use Correlations with your own corpus</a>.</div>
