@@ -40,7 +40,7 @@ The Dynamic Table of Contexts Browser is an online reading environment for digit
 
 The Dynamic Table of Contexts developed from the question of how best to leverage the kind of tagging or semantic markup used in the digital humanities to publish born digital scholarship involving long-form argumentation of the kind found in scholarly books. The browser, which resembles an e-book interface of the kind encountered at websites such as archive.org, combines tagging of the structure of the text with the tagging of named entities (people, places, organizations, titles) and with search functionality. Together, these provide users with a unique environment for browsing and navigating through the digital book, one that combines the Table of Contents with the Index. The result is a dynamic browsing environment in which the user can see where the materials that interest her are located within the structure of the volume.
 
-More information is available at the [CWRC website](http://www.cwrc.ca/cwrc_news/dtoc/).
+More information is available at the [CWRC website](http://cwrc.ca/Documentation/public/index.html#DITA_Files-Various_Applications/DToC/OverviewDToC.html).
 
 ## Next Steps
 
