@@ -3,7 +3,6 @@
 Ext.define('Voyant.panel.DToC.MarkupLoader', {
 	
 	TAG_SNIPPET_WORD_LENGTH: 10,
-	ignoreSpans: true, // ignoring spans drastically reduces the size of the tag data
 	ignoredPrefixes: ['rdf','cw'], // ignore tags with these prefixes (cw used by cwrc-writer docs) 
 	
 	doLoadAllTags: function() {
@@ -56,7 +55,7 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 				tool: 'corpus.DocumentTokens',
 				corpus: this.getCorpus().getId(),
 				docId: docId,
-				template: 'docTokensPlusStructure2html',
+				template: 'docTokens2textPlusTokenIds',
 				outputFormat: 'xml',
 				limit: 0
 			}
@@ -91,7 +90,7 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 	 * @returns {Object} The tag metadata.
 	 */
 	_parseTags: function(xml, docId, customTagSet) {
-		var docBody = Ext.DomQuery.jsSelect('div[class="document"]', xml)[0];
+		var docBody = xml.documentElement;
 		
 		var shortRe = new RegExp('(([^\\s]+\\s\\s*){'+this.TAG_SNIPPET_WORD_LENGTH+'})(.*)'); // get first X words
 		var prevRe = new RegExp('(.*)(\\s([^\\s]+\\s\\s*){'+Math.floor(this.TAG_SNIPPET_WORD_LENGTH/2)+'})'); // get last X words
@@ -165,10 +164,12 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 			var tag, nodeName, tokenId, dataObj, text, surrText;
 			for (var i = 0; i < tags.length; i++) {
 				tag = tags[i];
+				
 				if (this.ignoredPrefixes.indexOf(tag.prefix) !== -1) continue;
+				
 				nodeName = tag.nodeName;
-				if (this.ignoreSpans && nodeName.toLowerCase() === 'span') continue;
 				tokenId = tag.getAttribute('tokenid');
+				
 				if (tokenId == null) {
 					// empty tags lack tokenid attribute
 				} else {
@@ -191,14 +192,6 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 					} else {
 						dataObj.text += '&hellip;';
 					}
-					
-					// FIXME temp fix, title not allowed outside of head in html
-					// see similar fix in docTokensPlusStructure2html.xsl
-					if (nodeName == 'title') {
-						dataObj.tagName = 'xmlTitle';
-					} else if (nodeName == 'head') {
-	                    dataObj.tagName = 'xmlHead';
-	                }
 					
 					if (data[nodeName] == null) {
 						data[nodeName] = [dataObj];
@@ -262,7 +255,7 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 			}
 			
 			// process header
-			var head = docBody.querySelectorAll('xmlHead').item(0);
+			var head = docBody.querySelectorAll('head').item(0);
 			if (head) {
 			    // special handling for TEI docs
 				// TODO save in stored resource
@@ -326,7 +319,7 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 				        }
 				    } catch (e) {
 				        if (window.console) {
-				            console.log('bad ID', id);
+				            console.warn('bad ID', id);
 				        }
 				    }
 					if (hit) {

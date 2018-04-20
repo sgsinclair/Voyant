@@ -8,7 +8,9 @@ Ext.define('VoyantDTOCApp', {
         api: {
             curatorId: undefined,
             curatorTsv: undefined,
-            inkeTags: false
+            inkeTags: false,
+            docId: undefined,
+            docIndex: undefined // TODO handle docIndex
         }
 	},
 	colors: {
@@ -74,10 +76,18 @@ Ext.define('VoyantDTOCApp', {
                     	Ext.getCmp('dtcTools').remove(Ext.getCmp('dtcIndex'), true);
                     	Ext.getCmp('dtcMarkup').loadAllTags(true);
                     }
-                    this.dispatchEvent('corpusDocumentSelected', this, {docId: this.getCorpus().getDocument(0).getId()});
+                    var docId = this.getApiParam('docId');
+                    if (docId === undefined) {
+                        docId = this.getCorpus().getDocument(0).getId();
+                    }
+                    this.dispatchEvent('corpusDocumentSelected', this, {docId: docId});
                 }, function() {
                 	Ext.getCmp('dtcMarkup').loadAllTags(true);
-                	this.dispatchEvent('corpusDocumentSelected', this, {docId: this.getCorpus().getDocument(0).getId()});
+                	var docId = this.getApiParam('docId');
+                    if (docId === undefined) {
+                        docId = this.getCorpus().getDocument(0).getId();
+                    }
+                	this.dispatchEvent('corpusDocumentSelected', this, {docId: docId});
                 }, null, this);
     		}
     		
@@ -147,11 +157,11 @@ Ext.define('VoyantDTOCApp', {
 			id: 'dtcStats',
 			xtype: 'dtocStats'
 		}
-//			,{
-//				title: 'Annotations',
-//				id: 'dtcAnnotator',
-//				xtype: 'dtocAnnotator'
-//			}
+//		,{
+//			title: 'Annotations',
+//			id: 'dtcAnnotator',
+//			xtype: 'dtocAnnotator'
+//		}
 		];
         
 		this.viewport = Ext.create('Ext.container.Viewport', {
@@ -417,6 +427,7 @@ Ext.define('VoyantDTOCApp', {
 			}
 			dtcMarkup.store.loadData(tagData, false);
 			dtcMarkup.loadAllTags(true);
+			dtcMarkup.updateChapterFilter();
 		}
     },
     
@@ -635,6 +646,8 @@ Ext.define('VoyantDTOCApp', {
 
     	var titlesMode = Ext.getCmp('dtcToc').getTitlesMode();
     	form.getComponent('titles').setValue(titlesMode);
+    	
+    	form.getComponent('frequency').setValue(this.showFreqInReader);
     	
     	form.getComponent('mode').setValue(this.isCurator ? 'curator' : 'default');
 	},

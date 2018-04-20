@@ -260,7 +260,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		});
 		Ext.apply(params, {
 			tool: 'corpus.DocumentTokens',
-			template: 'docTokensPlusStructure2html',
+			template: 'docTokens2spans',
 			outputFormat: 'html'
 		});
 
@@ -272,21 +272,29 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		
 		if (window.history.pushState) {
 			// add the docId to the url (for proper annotation storage)
-//			var app = this.getApplication();
-//			var url = app.getBaseUrl()+'?';
-//			url += 'skin=dtc&';
-//			url += 'corpus='+app.getCorpus().getId()+'&';
-//			url += 'docId='+params.docId+'&';
-//			for (var key in app.query) {
-//				if (key != 'skin' && key != 'corpus' && key != 'docId') {
-//					url += key+'='+app.query[key]+'&'
-//				}
-//			}
-//			url = url.substring(0, url.length-1);
-//			window.history.pushState({
-//				corpus: app.getCorpus().getId(),
-//				docId: params.docId
-//			}, 'Doc: '+params.docId, url);
+		    // TODO use docIndex instead
+			var app = this.getApplication();
+			var corpusId = app.getCorpus().getId();
+			var docId = params.docId;
+			var inkeTags = app.getApiParam('inkeTags');
+			var curatorId = app.getApiParam('curatorId');
+			var debug = app.getApiParam('debug');
+			
+			var url = app.getBaseUrl()+'dtoc/';
+			url += '?corpus='+corpusId+'&docId='+docId;
+			if (inkeTags !== false) {
+			    url += '&inkeTags=true';
+			} else if (curatorId !== undefined) {
+			    url += '&curatorId='+curatorId;
+			}
+			if (debug !== undefined) {
+			    url += '&debug=true';
+			}
+			
+			window.history.pushState({
+				corpus: corpusId,
+				docId: docId
+			}, 'Doc: '+docId, url);
 		}
 		
 		this.setReaderTitle();
@@ -393,7 +401,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	    var parent = Ext.get(Ext.DomQuery.select('#dtcReaderDivWrapper')[0]).first();
 	    parent.addCls('coverPage');
 	    
-	    var firstNote = Ext.get(Ext.DomQuery.select('#dtcReaderDivWrapper note')[0]);
+	    var firstNote = Ext.get(Ext.DomQuery.select('#dtcReaderDivWrapper [data-tag=note]')[0]);
 	    if (firstNote != null) {
 	    	firstNote.setStyle('marginLeft', '5em');
 	    }
@@ -425,27 +433,9 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	},
 	
 	_processHeader: function() {
-		var header = Ext.get(Ext.DomQuery.select('xmlHead', this.readerContainer.dom)[0]);
-		if (header != null) {
-			header.setVisibilityMode(Ext.Element.DISPLAY);
-			header.hide();
-		}
-        var bylines = Ext.DomQuery.select('byline', this.readerContainer.dom);
-		for (var i = 0; i < bylines.length; i++) {
-		    var byline = Ext.get(bylines[i]);
-            byline.setVisibilityMode(Ext.Element.DISPLAY);
-            byline.hide();
-		}
-		var docauthors = Ext.DomQuery.select('docAuthor', this.readerContainer.dom);
-		for (var i = 0; i < docauthors.length; i++) {
-		    var docauthor = Ext.get(docauthors[i]);
-		    docauthor.setVisibilityMode(Ext.Element.DISPLAY);
-            docauthor.hide();
-		}
-		var firstP = Ext.get(Ext.DomQuery.select('#dtcReaderDivWrapper div[type] > p', this.readerContainer.dom)[0]);
+		var firstP = Ext.get(Ext.DomQuery.select('#dtcReaderDivWrapper [data-tag=div][type] > [data-tag=p]', this.readerContainer.dom)[0]);
 		if (firstP != null) {
-			firstP.addCls('firstParagraph');
-			var firstSpan = firstP.child('span');
+			var firstSpan = firstP.down('span.word');
 			if (firstSpan) {
 				var text = firstSpan.dom.textContent;
 				var dropText = '<span class="dropCap">'+text.substring(0, 1)+'</span>'+text.substring(1);
@@ -458,7 +448,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		this.hideAllNotes(true);
 	    this.tokenToolTipsMap = {};
 	    
-		var notes = Ext.DomQuery.select('note', this.readerContainer.dom);
+		var notes = Ext.DomQuery.select('[data-tag=note]', this.readerContainer.dom);
 		for (var i = 0; i < notes.length; i++) {
 			var note = notes[i];
 			var noteNumber = Ext.DomHelper.insertBefore(note, '<span class="noteNumber">'+(i+1)+'</span>', true);
@@ -478,12 +468,12 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	},
 	
 	_processBibls: function() {
-		var bibls = Ext.DomQuery.select('list > item > bibl', this.readerContainer.dom);
+		var bibls = Ext.DomQuery.select('[data-tag=list] > [data-tag=item] > [data-tag=bibl]', this.readerContainer.dom);
 		for (var i = 0; i < bibls.length; i++) {
 			var bibl = bibls[i];
 			var id = bibl.getAttribute('xml:id');
 			if (id != null) {
-				var refs = Ext.DomQuery.select('ref[target*='+id+']', this.readerContainer.dom);
+				var refs = Ext.DomQuery.select('[data-tag=ref][target*='+id+']', this.readerContainer.dom);
 				for (var j = 0; j < refs.length; j++) {
 					var ref = refs[j];
 					var biblNumber = Ext.DomHelper.insertAfter(ref, '<span class="noteNumber">'+(i+1)+'</span>', true);
@@ -505,16 +495,29 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	},
 	
 	_processImages: function() {
-		var images = Ext.DomQuery.select('graphic', this.readerContainer.dom);
-		for (var i = 0; i < images.length; i++) {
-			var image = images[i];
+		var graphics = Ext.DomQuery.select('[data-tag=graphic]', this.readerContainer.dom);
+		for (var i = 0; i < graphics.length; i++) {
+			var image = graphics[i];
 			var url = image.getAttribute('url');
-			var noteNumber = Ext.DomHelper.insertBefore(image, '<img src="'+url+'" />', true);
+			if (image.parentElement.getAttribute('data-tag').toLowerCase() == 'figure') {
+			    var title = '';
+			    var figDesc = Ext.DomQuery.select('[data-tag=graphic] ~ [data-tag=figDesc]', image.parentElement)
+			    if (figDesc.length > 0) {
+			        title = figDesc[0].textContent;
+			    }
+			    var img = Ext.DomHelper.insertBefore(image, '<img src="'+url+'" title="'+title+'"/>', true);
+			    img.on('load', function(evt, img) {
+			        var el = Ext.get(img);
+			        el.dom.parentElement.style.width = el.getWidth()+'px';
+			    }, this);
+			} else {
+			    Ext.DomHelper.insertBefore(image, '<img src="'+url+'" />', true);
+			}
 		}
 	},
 	
 	_processLinks: function() {
-		var links = Ext.DomQuery.select('ref[@target]', this.readerContainer.dom);
+		var links = Ext.DomQuery.select('[data-tag=ref][@target]', this.readerContainer.dom);
 		for (var i = 0; i < links.length; i++) {
 			var link = links[i];
 			var url = link.getAttribute('target');
@@ -734,25 +737,6 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			scrollTop = this.readerContainer.dom.scrollHeight;
 		}
 		this.readerContainer.scrollTo('top', scrollTop, false);
-	},
-	
-	_getDocumentXml: function(docId, callback) {
-		var params = {
-			tool: 'corpus.DocumentTokens',
-			corpus: this.getCorpus().getId(),
-			docId: docId,
-			template: 'docTokensPlusStructure2html',
-			outputFormat: 'html',
-			limit: 0
-		};
-		Ext.Ajax.request({
-           url: this.getTromboneUrl(),
-           params: params,
-           success: function(response, options) {
-				if (callback) callback(response.responseXML);
-           },
-           scope: this
-        });
 	}
 });
 

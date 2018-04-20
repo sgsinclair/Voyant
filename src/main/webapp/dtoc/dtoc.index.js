@@ -294,6 +294,10 @@ Ext.define('Voyant.panel.DToC.Index', {
 	},
 	
 	doChapterFilter: function(docId, local) {
+	    if (docId === this.currentChapterFilter) {
+	        docId = null;
+	    }
+	    
 		var menuItem;
 		this.down('#indexChapterFilter').getMenu().items.each(function(item) {
 			if (item.initialConfig.docId === docId) {
@@ -303,7 +307,7 @@ Ext.define('Voyant.panel.DToC.Index', {
 			}
 		}, this);
 		
-		if (docId === null || docId === this.currentChapterFilter) {
+		if (docId === null) {
 			this.currentChapterFilter = null;
 			this.collapseAll();
 			this.getStore().clearFilter();
