@@ -625,7 +625,12 @@ table.voyant-table td:last-child {
 	background-color: rgba(255,255,255,.5);
 	text-align: center;
 }
-
+.dreamscape .contextMenu .menuItem {
+    padding: 5px;
+}
+.dreamscape .contextMenu .menuItem:hover {
+    background-color: #ccc;
+}
 .map-menu-item label {
     background-position: left;
     background-repeat: no-repeat;
