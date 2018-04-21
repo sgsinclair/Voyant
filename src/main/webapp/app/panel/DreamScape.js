@@ -717,7 +717,8 @@ Ext.define('Voyant.panel.DreamScape', {
                                         el.addEventListener( "contextmenu", function(e) {
                                             e.preventDefault();
                                             panel.openContextMenu(e.layerX, e.layerY, el);
-                                        });
+                                            return false;
+                                        }, false);
                                     }
 
                                     links.elements.forEach(function(link) {
@@ -914,7 +915,8 @@ Ext.define('Voyant.panel.DreamScape', {
             map.getViewport().addEventListener('contextmenu', function (e) {
                 e.preventDefault();
                 panel.openContextMenu(e.layerX, e.layerY);
-            });
+                return false;
+            }, false);
 
             this.setMap(map);
 
