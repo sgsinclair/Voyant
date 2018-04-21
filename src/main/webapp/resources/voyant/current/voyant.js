@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 05 16:26:33 EDT 2018 */
+/* This file created by JSCacher. Last modified: Wed Apr 18 10:07:23 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8691,6 +8691,7 @@ Ext.define('Voyant.data.model.TermCorrelation', {
              {name: 'source'},
              {name: 'target'},
              {name: 'correlation', type: 'float'},
+             {name: 'significance', type: 'float'},
              {name: 'source-term', calculate: function(data) {return data.source.term}},
              {name: 'target-term', calculate: function(data) {return data.target.term}},
              {name: 'source-distributions', calculate: function(data) {return data.source.distributions}},
@@ -9998,6 +9999,12 @@ Ext.define('Voyant.data.util.NetworkGraph', {
 });
 Ext.define('Voyant.data.util.Geonames', {
     mixins: ['Voyant.util.Localization'],
+    statics: {
+    		i18n: {
+    			failedToFetchGeonames: "Failed to load location information."
+    		}
+    },
+
 	config: {
 		data: {},
 		queries: undefined,
@@ -10009,8 +10016,8 @@ Ext.define('Voyant.data.util.Geonames', {
 		this.callParent([config]);
 		this.setCorpus(config.corpus);
 	},
-	load: function(params) {
-		var dfd = Voyant.application.getDeferred(this);
+	load: function(params, dfd) {
+		dfd = dfd || Voyant.application.getDeferred(this);
 		var me = this, localParams = {
 			corpus: this.getCorpus().getAliasOrId(),
 			queries: this.getQueries(),
@@ -10029,29 +10036,26 @@ Ext.define('Voyant.data.util.Geonames', {
 			scope: this
 		}).then(function(response) {
 			var data = Ext.JSON.decode(response.responseText);
-			
-			/*
-			new Voyant.widget.ProgressMonitor({
-				progress: {
-					id: 'test',
-					completion: 0.1,
-					code: 'launch',
-					status: 'LAUNCH',
-					message: "launching launching"
-				},
-				failure: function(responseOrProgress) {
-					debugger;
-				},
-				scope: me
-			});*/
-
+			if (data.progress && data.progress.progress) {
+				new Voyant.widget.ProgressMonitor({
+					progress: data.progress.progress,
+					success: function() {
+						debugger
+						me.call(me, params, dfd);
+					},
+					failure: function(responseOrProgress) {
+						Voyant.application.showResponseError(me.localize("failedToFetchGeonames"), responseOrProgress);
+					},
+					scope: me
+				});
+			}
 			if (data && data.geonames) {
 				if (!params.noOverwrite) {
 					me.setData(data.geonames);
 				}
 				dfd.resolve(data);
 			}
-		}, function(response){
+		}, function(response) {
 			Voyant.application.showResponseError(me.localize('failedToFetchGeonames'), response);
 		});
 		return dfd.promise;
@@ -12808,7 +12812,8 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 	statics: {
 		i18n: {
 			noProgress: "This progress monitor was incorrectly initialized.",
-			progress: "Progress"
+			progress: "Progress",
+			badProgress: "Unable to understand the progress report from the server"
 		}
 	},
 	config: {
@@ -12841,10 +12846,17 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 				Ext.Ajax.request({
 				     url: Voyant.application.getTromboneUrl(),
 				     params: {
-				    	 	tool: progress.tool || "util.ProgressMonitor",
+				    	 	tool: progress.tool || "progress.ProgressMonitor",
 				    	 	id: progress.id
 				     }
 				 }).then(function(response, opt) {
+					 var data = Ext.decode(response.responseText);
+					 if (data.progress && data.progress.progress) {
+						 this.setProgress(data.progress.progress)
+						 me.update(); // recurse (delay happens during call)
+					 } else {
+						 me.finish(false, me.localize("badProgress"))
+					 }
 				 }, function(response, opt) {
 					 me.finish(false, response);
 				 });
@@ -12857,7 +12869,6 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 	finish: function(success, response) {
 		var callback = success ? this.getSuccess() : this.getFailure();
 		var args = this.getArgs(), progress = this.getProgress(), scope = this.getScope();
-		debugger
 		this.close();
 		if (callback && callback.apply) {
 			callback.apply(scope, [success ? args : response || progress]);
@@ -12870,9 +12881,7 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 		this.msgbox.close();
 		this.destroy();
 	}
-	
-	
-	
+
 })
 Ext.define('Voyant.widget.VoyantTableTransform', {
 	extend: 'Ext.panel.Panel',
@@ -17963,8 +17972,10 @@ Ext.define('Voyant.panel.Correlations', {
     		minInDocumentsCountRatioLabel: "minimum coverage (%{0})",
     		source: "Term 1",
     		target: "Term 2",
-    		correlation: "Correlation",
-    		correlationTip: "This is a measure of how closely term frequencies correlate (using Pearson's correlation coefficient). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other dropx), scores approaching 0 indicate little or no meaningful corrlation.",
+    		correlation: "Correlation (r)",
+    		correlationTip: "This is a measure of how closely term frequencies correlate (using Pearson's correlation coefficient or a simple regression). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other dropx), scores approaching 0 indicate little or no meaningful corrlation.",
+    		significance: "Significance (p)",
+    		significanceTip: "This is a measure of the signifiance of the correlation value. Often a significance of .05 or less indicates a strong correlation (which allows us to reject the null hypothesis that values are randomly distributed). The validity of this measure depends on assumptions about a normal distribution of the data. Also, don't forget that we typically have a relatively small number of values (frequencies from segments in a texts or from texts in a document), so these values should be used with care.",
     		emptyText: "(No results.)"
     	},
     	api: {
@@ -18027,6 +18038,10 @@ Ext.define('Voyant.panel.Correlations', {
     			text: this.localize("correlation"),
     			tooltip: this.localize("correlationTip"),
         		dataIndex: 'correlation'
+    		},{
+    			text: this.localize("significance"),
+    			tooltip: this.localize("significanceTip"),
+        		dataIndex: 'significance'
     		}],
     		
 

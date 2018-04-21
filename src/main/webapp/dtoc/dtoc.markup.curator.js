@@ -23,8 +23,8 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	this.mixins['Voyant.panel.DToC.MarkupBase'].constructor.apply(this, arguments);
-
     },
+    
     initComponent: function() {
     	var tagStore = Ext.create('Ext.data.JsonStore', {
 			fields: [
@@ -169,11 +169,6 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 			listeners: {
 				edit: function(editor, e) {
 					if (e.field == 'tagName') {
-						if (e.value == 'title') {
-							e.record.set('tagName', 'xmlTitle');
-						} else if (e.value == 'head') {
-                            e.record.set('tagName', 'xmlHead');
-                        }
 						// determine whether tag or xpath
 						var type = e.value.match(/^\w+$/) == null ? 'x' : 't';
 						e.record.set('type', type);
@@ -345,8 +340,8 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 			var t = tagArray[i];
 			customTagSet[t.tagName] = t;
 		}
-		this._getDocumentXml(docId, function(xml) {
-			var tagData = this._parseTags(xml, docId, customTagSet);
+		this._getDocumentXml(docId, function(html) {
+			var tagData = this._parseTags(html, docId, customTagSet);
 //			console.debug(tagData);
 			for (var tagName in tagData) {
 				var t = tagData[tagName];
@@ -361,8 +356,8 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 			tool: 'corpus.DocumentTokens',
 			corpus: this.getCorpus().getId(),
 			docId: docId,
-			template: 'docTokensPlusStructure2html',
-			outputFormat: 'html',
+			template: 'docTokens2textPlusTokenIds',
+			outputFormat: 'xml',
 			limit: 0
 		};
 		Ext.Ajax.request({

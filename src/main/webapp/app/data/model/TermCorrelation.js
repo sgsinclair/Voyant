@@ -7,6 +7,7 @@ Ext.define('Voyant.data.model.TermCorrelation', {
              {name: 'source'},
              {name: 'target'},
              {name: 'correlation', type: 'float'},
+             {name: 'significance', type: 'float'},
              {name: 'source-term', calculate: function(data) {return data.source.term}},
              {name: 'target-term', calculate: function(data) {return data.target.term}},
              {name: 'source-distributions', calculate: function(data) {return data.source.distributions}},

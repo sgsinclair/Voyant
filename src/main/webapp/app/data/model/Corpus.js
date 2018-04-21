@@ -350,6 +350,18 @@ Ext.define('Voyant.data.model.Corpus', {
     	 * 
     	 * This is currently not used, except in the Dynamic Table of Contexts skin. Still, it may be worth specifying a title for later use.
     	 */
+    	 
+    	 /**
+    	 * @cfg {String} curatorTsv a simple TSV of paths and labels for the DToC interface
+    	 *
+    	 * The DToC skin allows curation of XML tags and attributes in order to constrain the entries shown in the interface or to provide friendlier labels. This assumes plain text unicode input with one definition per line where the simple XPath expression is separated by a tab from a label.
+    	 *
+    	 *   	 p    	 paragraph
+    	 *   	 ref[@target*="religion"]    	 religion
+    	 *
+    	  * For more information see the DToC documentation on [Curating Tags](http://cwrc.ca/Documentation/public/index.html#DITA_Files-Various_Applications/DToC/CuratingTags.html)
+    	 */
+    	 
     	
     	
     	documentsStore: undefined

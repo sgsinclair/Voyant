@@ -1,5 +1,7 @@
 <%@ include file="../resources/jsp/pre_app.jsp" %>
 
+<!-- <script src="https://hypothes.is/embed.js" async></script> -->
+
 <script src="wgxpath/wgxpath.install.js"></script>
 
 <script src="dtoc.app.js"></script>
@@ -7,6 +9,7 @@
 <script src="dtoc.markup.loader.js"></script>
 <script src="dtoc.markup.js"></script>
 <script src="dtoc.markup.curator.js"></script>
+<!-- <script src="annotator/dtoc.annotator.js"></script> -->
 <script src="dtoc.index.js"></script>
 <script src="dtoc.stats.js"></script>
 <script src="dtoc.docmodel.js"></script>
@@ -74,6 +77,7 @@ Ext.onReady(function(){
  -->
 
 <link href="css/dtc.css" rel="stylesheet" type="text/css" />
+<link href="css/tei.css" rel="stylesheet" type="text/css" />
 <title>Dynamic Table of Contexts</title>
 </head>
 <body>

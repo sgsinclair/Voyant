@@ -516,7 +516,7 @@ body {
 	padding: 15px 5px 15px 10px;
 }
 
-.author {
+#dtcReader .x-panel-header-top .author {
 	font-style: italic;
 }
 
@@ -531,236 +531,237 @@ body {
     line-height: 25px;
 }
 
-#dtcReaderContainer .coverPage note {
-    display: block !important;
-}
-
-#dtcReaderContainer .coverPage addrLine {
-    display: block;
-}
-
-#dtcReaderContainer .coverPage biblFull {
-    display: block;
-}
-
-#dtcReaderContainer .coverPage resp {
-    display: block;
-}
-
-#dtcReaderContainer .coverPage ab {
-    display: block;
-}
-
-#dtcReaderContainer .coverPage ab persname {
-    font-variant: small-caps;
-}
-
-#dtcReaderContainer .coverPage list > item > list > item {
-    margin-left: 30px;
-}
-
-#dtcReaderContainer p {
-	margin: 20px 0;
-}
-
-#dtcReaderContainer note {
-	display: none;
-}
-
-#dtcReaderContainer .dropCap {
-	font-size: 46px;
-	float: left;
-	margin: 6px 6px 0 0;
-	line-height: 0.8;
-}
-
-#dtcReaderContainer .noteNumber {
-	font-family: 'Nunito', Arial, sans-serif;
-	font-size: 12px;
-	font-weight: 400;
-	padding: 0 2px 2px;
-	margin-right: -2px;
-	position: relative;
-	bottom: 6px;
-	left: -4px;
-}
-
-#dtcReaderContainer .noteNumber:hover {
-	color: #fff;
-	background-color: #F47922;
-	cursor: pointer;
+#dtcReaderContainer .loading-indicator {
+    font-family: Arial, sans-serif;
+    padding: 10px 20px;
 }
 
 #dtcReaderButtons {
-	margin: 16px auto;
-	text-align: center;
+    margin: 16px auto;
+    text-align: center;
+}
+
+#dtcReaderContainer .dropCap {
+    font-size: 46px;
+    float: left;
+    margin: 6px 6px 0 0;
+    line-height: 0.8;
+}
+
+#dtcReaderContainer .noteNumber {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 0 2px 2px;
+    margin-right: -2px;
+    position: relative;
+    bottom: 6px;
+    left: -4px;
+}
+
+#dtcReaderContainer .noteNumber:hover {
+    color: #fff;
+    background-color: #F47922;
+    cursor: pointer;
 }
 
 .dtcReaderNote {
-	background-color: #FFFFFF;
+    background-color: #FFFFFF;
     border: 2px solid #F47922;
     border-radius: 4px;
-	-moz-border-radius: 4px;
-	box-shadow: 4px 4px 4px 1px #818284;
+    -moz-border-radius: 4px;
+    box-shadow: 4px 4px 4px 1px #818284;
 }
 
 .dtcReaderNote .x-tip-header-title {
-	cursor: move;
-	margin: 1px 0 0 3px !important;
+    cursor: move;
+    margin: 1px 0 0 3px !important;
 }
 
 .dtcReaderNote .x-title-text {
-	color: #231f20;
-	font-size: 14px;
-	font-weight: 400;
-	font-family: 'Nunito', Arial, sans-serif;
+    color: #231f20;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: 'Nunito', Arial, sans-serif;
 }
 
 .dtcReaderNote .x-tip-body {
-	color: #000;
-	font-family: 'Nunito', Arial, sans-serif;
-	font-weight: 300;
+    color: #000;
+    font-family: 'Nunito', Arial, sans-serif;
+    font-weight: 300;
     font-size: 14px;
-	border: none;
+    border: none;
 }
 
-#dtcReaderContainer titlepage {
+#dtcReaderContainer .coverPage [data-tag=front] {
+    margin: 0;
+    padding: 0;
+}
+
+#dtcReaderContainer .coverPage [data-tag=note] {
+    display: block !important;
+    color: inherit;
+}
+
+#dtcReaderContainer .coverPage [data-tag=note]:before {
+    content: none;
+}
+
+#dtcReaderContainer .coverPage [data-tag=addrLine] {
     display: block;
 }
 
-#dtcReaderContainer doctitle {
+#dtcReaderContainer .coverPage [data-tag=biblFull] {
     display: block;
-    font-size: 120%;
+}
+
+#dtcReaderContainer .coverPage [data-tag=resp] {
+    display: block;
+}
+
+#dtcReaderContainer .coverPage [data-tag=ab] {
+    display: block;
+}
+
+#dtcReaderContainer .coverPage [data-tag=ab] [data-tag=persname] {
+    font-variant: small-caps;
+}
+
+#dtcReaderContainer .coverPage [data-tag=list] > [data-tag=item] > [data-tag=list] > [data-tag=item] {
+    margin-left: 30px;
+}
+
+#dtcReaderContainer [rend="bold"] {
     font-weight: bold;
 }
 
-#dtcReaderContainer s {
-    text-decoration: none !important;
+#dtcReaderContainer [rend="italic"] {
+    font-style: italic;
 }
 
-#dtcReaderContainer figure {
+#dtcReaderContainer [data-tag=p] {
+	margin: 20px 0;
+}
+
+#dtcReaderContainer [data-tag=note] {
+	display: none;
+}
+
+#dtcReaderContainer [data-tag=docTitle] {
+    font-size: 120%;
+}
+
+#dtcReaderContainer [data-tag=figure] {
     margin: 10px 0px !important;
 }
 
-#dtcReaderContainer list {
+#dtcReaderContainer [data-tag=graphic] {
+    display: none;
+}
+
+#dtcReaderContainer [data-tag=figDesc] {
+    display: none;
+}
+
+#dtcReaderContainer [data-tag=figure] > [data-tag=head] {
+    font-weight: normal;
+    text-align: center;
+}
+
+#dtcReaderContainer [data-tag=figure] > [data-tag=p], #dtcReaderContainer [data-tag=figure] > [data-tag=ab] {
+    text-align: center;
+}
+
+#dtcReaderContainer [data-tag=list] {
 	counter-reset: item;
 }
 
-#dtcReaderContainer list > item {
+#dtcReaderContainer [data-tag=list] > [data-tag=item] {
 	counter-increment: item;
 	display: list-item;
 	margin: 15px 0;
 	list-style: none;
 }
 
-#dtcReaderContainer list > item:before {
+#dtcReaderContainer [data-tag=list] > [data-tag=item]:before {
 	content: counter(item) ".";
 }
 
-#dtcReaderContainer q::before, #dtcReaderContainer quote::before {
+#dtcReaderContainer [data-tag=q]::before, #dtcReaderContainer [data-tag=quote]::before {
     content: "";
 }
-#dtcReaderContainer q::after, #dtcReaderContainer quote::after {
+#dtcReaderContainer [data-tag=q]::after, #dtcReaderContainer [data-tag=quote]::after {
     content: "";
 }
 
-#dtcReaderContainer q:not([type="block"]):not([rend="bloc"])::before, #dtcReaderContainer quote:not([type="block"]):not([rend="bloc"])::before {
+#dtcReaderContainer [data-tag=q]:not([type="block"]):not([rend="bloc"])::before, #dtcReaderContainer [data-tag=quote]:not([type="block"]):not([rend="bloc"])::before {
     content: "\201C";
 }
-#dtcReaderContainer q:not([type="block"]):not([rend="bloc"])::after, #dtcReaderContainer quote:not([type="block"]):not([rend="bloc"])::after {
+#dtcReaderContainer [data-tag=q]:not([type="block"]):not([rend="bloc"])::after, #dtcReaderContainer [data-tag=quote]:not([type="block"]):not([rend="bloc"])::after {
     content: "\201D";
 }
 
-#dtcReaderContainer q[type="block"], #dtcReaderContainer q[rend="bloc"], #dtcReaderContainer quote[type="block"], #dtcReaderContainer quote[rend="bloc"] {
+#dtcReaderContainer [data-tag=q][type="block"], #dtcReaderContainer [data-tag=q][rend="bloc"], #dtcReaderContainer [data-tag=quote][type="block"], #dtcReaderContainer [data-tag=quote][rend="bloc"] {
 	display: block;
 	margin: 10px 40px;
 }
 
-#dtcReaderContainer xmltitle[level="a"]::before {
-    content: "\201C";
+/* hide chapter header */
+#dtcReaderContainer div > [data-tag=div] > [data-tag=head],
+#dtcReaderContainer div > [data-tag=div] > [data-tag=docAuthor],
+#dtcReaderContainer div > [data-tag=div] > [data-tag=byline] {
+    display: none;
 }
 
-#dtcReaderContainer xmltitle[level="a"]::after {
-    content: "\201D";
-}
-
-#dtcReaderContainer xmltitle[level="m"] {
-    font-style: italic;
-}
-
-#dtcReaderContainer xmltitle[level="j"] {
-    font-style: italic;
-}
-
-#dtcReaderContainer xmlhead {
+#dtcReaderContainer [data-tag=head] {
     display: block;
     font-weight: bold;
 }
 
-#dtcReaderContainer bibl {
+#dtcReaderContainer [data-tag=bibl] {
     display: block;
     margin: 8px 0;
     padding-left: 24px;
     text-indent: -24px;
 }
 
-#dtcReaderContainer table {
-    display: table;
+#dtcReaderContainer [data-tag=table] {
     table-layout: fixed;
     width: 80%;
     border-collapse: collapse;
     margin-bottom: 30px;
 }
 
-#dtcReaderContainer tr {
-    display: table-row;
-}
-
-#dtcReaderContainer td {
-    display: table-cell;
+#dtcReaderContainer [data-tag=cell] {
     border-top: 1px solid black;
     border-bottom: 1px solid black;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    border-right: none;
+    border-left: none;
+    padding: 5px 0px;
     text-align: center;
     word-wrap: break-word;
 }
 
-#dtcReaderContainer td p {
+#dtcReaderContainer [data-tag=cell] [data-tag=p] {
 	margin: 0;
 }
 
-#dtcReaderContainer l:first-child:before {
+#dtcReaderContainer [data-tag=l]:first-child:before {
     content: none;
 }
-#dtcReaderContainer l:before {
+#dtcReaderContainer [data-tag=l]:before {
 	content: "\A";
 	white-space: pre;
 }
 
-#dtcReaderContainer lg {
-    display: block;
+#dtcReaderContainer [data-tag=lg] {
     margin-bottom: 20px;
 }
 
-#dtcReaderContainer [rend="bold"] {
-	font-weight: bold;
+#dtcReaderContainer [data-tag=l] {
+    display: inline;
 }
 
-#dtcReaderContainer [rend="italic"] {
-	font-style: italic;
-}
-
-#dtcReaderContainer .loading-indicator {
-	font-family: Arial, sans-serif;
-	padding: 10px 20px;
-}
-
-#dtcDocumentationContainer {
-	overflow: auto;
-	height: 100%;
-}
-
-#dtcDocumentationContainer div {
-	margin: 10px 5px;
+#dtcReaderContainer [data-tag=l]:after {
+    content: none;
 }

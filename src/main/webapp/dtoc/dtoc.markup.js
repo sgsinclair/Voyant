@@ -295,6 +295,10 @@ Ext.define('Voyant.panel.DToC.Markup', {
 	},
 	
 	doChapterFilter: function(docId, local) {
+	    if (docId === this.currentChapterFilter) {
+	        docId = null;
+	    }
+	    
 		var menuItem;
 		this.down('#markupChapterFilter').getMenu().items.each(function(item) {
 			if (item.initialConfig.docId === docId) {
@@ -307,7 +311,7 @@ Ext.define('Voyant.panel.DToC.Markup', {
 		var textFilter = this.down('#filter').getValue();
 		var regex = new RegExp('.*'+textFilter+'.*', 'i');
 		
-		if (docId === null || docId === this.currentChapterFilter) {
+		if (docId === null) {
 			this.currentChapterFilter = null;
 			this.getStore().clearFilter();
 			this.getStore().each(function(record) {
