@@ -522,8 +522,9 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	var midX = bounds.x + width/2;
     	var midY = bounds.y + height/2;
     	var svg = this.getVis().node().parentElement;
-    	var fullWidth = svg.clientWidth;
-    	var fullHeight = svg.clientHeight;
+    	var svgRect = svg.getBoundingClientRect();
+        var fullWidth = svgRect.width;
+        var fullHeight = svgRect.height;
     	var scale = (paddingPercent || 0.8) / Math.max(width/fullWidth, height/fullHeight);
     	var translate = [fullWidth/2 - scale*midX, fullHeight/2 - scale*midY];
     	d3.select(svg)
