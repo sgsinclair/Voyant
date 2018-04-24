@@ -490,7 +490,7 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 //            .attr('font-family', function(d) { return this.getApplication().getFeatureForTerm('font', d.term); }.bind(this))
             .attr('font-size', function(d) {return nodeScaling.scalingFunction(d.value)+'px';})
 //            .attr('text-anchor', 'middle')
-			.attr('alignment-baseline', 'middle')
+			.attr('dominant-baseline', 'middle')
 			.style('user-select', 'none')
             .each(function(d) { d.bbox = this.getBBox(); });
         

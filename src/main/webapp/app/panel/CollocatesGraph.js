@@ -720,7 +720,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			.each(function(d) { d.bbox = this.getBBox(); }) // set bounding box for later use
 			.style('cursor', 'pointer')
 			.style('user-select', 'none')
-			.attr('alignment-baseline', 'middle');
+			.attr('dominant-baseline', 'middle');
     	
     	this.setNodes(nodeEnter.merge(node));
     	
