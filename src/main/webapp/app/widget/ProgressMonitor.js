@@ -5,7 +5,8 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 	statics: {
 		i18n: {
 			noProgress: "This progress monitor was incorrectly initialized.",
-			progress: "Progress"
+			progress: "Progress",
+			badProgress: "Unable to understand the progress report from the server"
 		}
 	},
 	config: {
@@ -14,6 +15,7 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 		success: undefined,
 		failure: undefined,
 		args: undefined,
+		tool: undefined,
 		delay: 1000
 	},
 	constructor: function(config) {
@@ -38,10 +40,17 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 				Ext.Ajax.request({
 				     url: Voyant.application.getTromboneUrl(),
 				     params: {
-				    	 	tool: progress.tool || "util.ProgressMonitor",
+				    	 	tool: "progress.ProgressMonitor",
 				    	 	id: progress.id
 				     }
 				 }).then(function(response, opt) {
+					 var data = Ext.decode(response.responseText);
+					 if (data && data.progress.progress) {
+						 me.setProgress(data.progress.progress);
+						 me.update();
+					 } else {
+						 me.finish(false, me.localize("badProgress"))
+					 }
 				 }, function(response, opt) {
 					 me.finish(false, response);
 				 });
@@ -54,7 +63,6 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 	finish: function(success, response) {
 		var callback = success ? this.getSuccess() : this.getFailure();
 		var args = this.getArgs(), progress = this.getProgress(), scope = this.getScope();
-		debugger
 		this.close();
 		if (callback && callback.apply) {
 			callback.apply(scope, [success ? args : response || progress]);
@@ -67,7 +75,5 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 		this.msgbox.close();
 		this.destroy();
 	}
-	
-	
-	
+
 })

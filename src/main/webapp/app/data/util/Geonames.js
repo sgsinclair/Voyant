@@ -1,22 +1,30 @@
 Ext.define('Voyant.data.util.Geonames', {
     mixins: ['Voyant.util.Localization'],
+    statics: {
+    		i18n: {
+    			failedToFetchGeonames: "Failed to load location information."
+    		}
+    },
+
 	config: {
 		data: {},
 		queries: undefined,
 		corpus: undefined,
-		isIncrementalLoadingOccurrences: false
+		isIncrementalLoadingOccurrences: false,
+		previousParams: {}
 	},
 	constructor: function(config, opts) {
 		config = config || {};
 		this.callParent([config]);
 		this.setCorpus(config.corpus);
 	},
-	load: function(params) {
-		var dfd = Voyant.application.getDeferred(this);
+	load: function(params, dfd) {
+		this.setPreviousParams(params);
+		dfd = dfd || Voyant.application.getDeferred(this);
 		var me = this, localParams = {
 			corpus: this.getCorpus().getAliasOrId(),
 			queries: this.getQueries(),
-			tool: 'corpus.Geonames',
+			tool: 'corpus.Dreamscape',
 			limit: 200
 		};
 		Ext.apply(localParams, params || {});
@@ -31,101 +39,101 @@ Ext.define('Voyant.data.util.Geonames', {
 			scope: this
 		}).then(function(response) {
 			var data = Ext.JSON.decode(response.responseText);
-			
-			/*
-			new Voyant.widget.ProgressMonitor({
-				progress: {
-					id: 'test',
-					completion: 0.1,
-					code: 'launch',
-					status: 'LAUNCH',
-					message: "launching launching"
-				},
-				failure: function(responseOrProgress) {
-					debugger;
-				},
-				scope: me
-			});*/
-
-			if (data && data.geonames) {
+			if (data && data.dreamscape && data.dreamscape.progress) {
+				new Voyant.widget.ProgressMonitor({
+					progress: data.dreamscape.progress,
+					tool: 'corpus.Dreamscape',
+					success: function() {
+						me.load.call(me, params, dfd);
+					},
+					failure: function(responseOrProgress) {
+						Voyant.application.showResponseError(me.localize("failedToFetchGeonames"), responseOrProgress);
+					},
+					scope: me
+				});
+			}
+			if (data && data.dreamscape && !data.dreamscape.progress) {
 				if (!params.noOverwrite) {
-					me.setData(data.geonames);
+					me.setData(data.dreamscape);
 				}
 				dfd.resolve(data);
 			}
-		}, function(response){
+		}, function(response) {
 			Voyant.application.showResponseError(me.localize('failedToFetchGeonames'), response);
 		});
 		return dfd.promise;
 	},
 	getCitiesCount: function() {
-		return Object.keys(this.getData().cities.cities).length;
+		return Object.keys(this.getData().locations.locations).length;
 	},
 	getTotalCitiesCount: function() {
-		return this.getData().cities.total;
+		return this.getData().locations.total;
 	},
 	hasMoreCities: function() {
 		return this.getCitiesCount()<this.getTotalCitiesCount();
 	},
 	eachCity: function(fn, scope, max) {
-		var cities = this.getData().cities.cities, orderedCities = [];
-		for (var id in cities) { // create a sortable list with id
-			orderedCities.push(Ext.apply(cities[id], {id: id}))
+		var locations = this.getData().locations.locations, orderedLocations = [];
+		for (var id in locations) { // create a sortable list with id
+			orderedLocations.push(Ext.apply(locations[id], {id: id}))
 		}
-		orderedCities.sort(function(c1, c2) { // order by rawFreq (count)
+		orderedLocations.sort(function(c1, c2) { // order by rawFreq (count)
 			return c1.rawFreq == c2.rawFreq ? c1.label - c2.label : c2.rawFreq - c1.rawFreq;
 		});
-		if (max && orderedCities.length>max) {orderedCities = orderedCities.slice(0,max)}
-		orderedCities.forEach(function(city) {fn.call(scope, city);});
+		if (max && orderedLocations.length>max) {orderedLocations = orderedLocations.slice(0,max)}
+		orderedLocations.forEach(function(location) {fn.call(scope, location);});
 	},
 	getConnectionsCount: function() {
-		return Object.keys(this.getData().connectionCounts.connectionCounts).length;
+		return this.getData().connections.connections.length;
 	},
 	getTotalConnectionsCount: function() {
-		return this.getData().connectionCounts.total;
+		return this.getData().connections.total;
 	},
 	eachConnection: function(fn, scope, max) {
-		var connections = this.getData().connectionCounts.connectionCounts, cities = this.getData().cities.cities; orderedConnections = [];
-		for (var id in connections) { // create a sortable list with id
-			var parts = id.split("-");
-			orderedConnections.push({
-				source: Ext.apply({id: parts[0]}, cities[parts[0]]),
-				target: Ext.apply({id: parts[1]}, cities[parts[1]]),
-				rawFreq: connections[id]
+		var connections = this.getData().connections.connections,
+			locations = this.getData().locations.locations;
+			orderedConnections = [];
+		for (var i=0, len=connections.length; i<len; i++) {
+			fn.call(scope, {
+				source: Ext.apply({id: connections[i].source}, locations[connections[i].source]),
+				target: Ext.apply({id: connections[i].target}, locations[connections[i].target]),
+				rawFreq: connections[i].rawFreq
 			});
+			if (i>max) {break;}
 		}
-		orderedConnections.sort(function(c1, c2) { // order by rawFreq (count)
-			return c2.rawFreq - c1.rawFreq;
-		});
-		if (max && orderedConnections.length>max) {orderedConnections = orderedConnections.slice(0, max)}
-		orderedConnections.forEach(function(connection) {fn.call(scope, connection)});
 	},
 	getConnectionOccurrence: function(index) {
-		if (!this.getData().cities) {return undefined;}
-		var connections = this.getData().connections, cities = this.getData().cities.cities;
-		if (!this.getIsIncrementalLoadingOccurrences() && connections.connections.length<connections.total && index+100>connections.connections.length) {
+		if (!this.getData().locations) {return undefined;}
+		var connectionOccurrencesData = this.getData().connectionOccurrences,
+			connectionOccurrences = connectionOccurrencesData.connectionOccurrences;
+			locations = this.getData().locations.locations;
+		if (!this.getIsIncrementalLoadingOccurrences() && connectionOccurrences.length<connectionOccurrencesData.total && index+100>connectionOccurrences.length) {
 			this.setIsIncrementalLoadingOccurrences(true);
 			var me = this;
-			this.load({
-				start: connections.connections.length,
+			var params = {};
+			Ext.apply(params, this.getPreviousParams);
+			Ext.apply(params, {
+				start: connectionOccurrences.length,
 				noOverwrite: true,
-				suppressCities: true,
+				suppressLocations: true,
 				suppressConnections: true
-			}).then(function(data) {
+			});
+			this.load(params).then(function(data) {
 				me.setIsIncrementalLoadingOccurrences(false);
-				connections.connections = connections.connections.concat(data.geonames.connections.connections);
+				connectionOccurrences = connectionOccurrences.concat(data.dreamscape.connectionOccurrences.connectionOccurrences);
 			})
 		}
-		if (connections && connections.connections[index]) {
-			var occurrence = connections.connections[index];
+		if (connectionOccurrences && connectionOccurrences[index]) {
+			var occurrence = connectionOccurrences[index];
 			occurrence.index = index;
-			Ext.apply(occurrence.source, cities[occurrence.source.id]);
-			Ext.apply(occurrence.target, cities[occurrence.target.id]);
+			Ext.apply(occurrence.source, locations[occurrence.source.location]);
+			Ext.apply(occurrence.target, locations[occurrence.target.location]);
 			return occurrence;
 		}
 		return null;
 	},
     getAllConnectionOccurrences: function(sourceId, targetId) {
+    	debugger
         // TODO return all occurences of connection with given source and target, including those not loaded yet
         var occurences = [];
         for (var i = 0; i < this.getTotalConnectionsCount(); i++) {

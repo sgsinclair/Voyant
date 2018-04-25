@@ -1120,7 +1120,7 @@ Ext.define('Voyant.panel.DreamScape', {
 
             if ((!minPopulation || city.population>=minPopulation) && (!citiesMinFreq || city.rawFreq>=citiesMinFreq)) {
                 validCitiesHash[city.id]=true;
-                var coordinates = [parseFloat(city.longitude), parseFloat(city.latitude)]
+                var coordinates = [parseFloat(city.lng), parseFloat(city.lat)]
                 var feature = new ol.Feature({
 
                     geometry: new ol.geom.Point(coordinates).transform(ol.proj.get('EPSG:4326'), panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857')),
@@ -1166,8 +1166,8 @@ Ext.define('Voyant.panel.DreamScape', {
         filter.getGeonames().eachConnection(function(connection) {
             if ((!connectionsMinFreq || connection.rawFreq>=connectionsMinFreq) && (!maxConnectionsCount || counter<maxConnectionsCount) && connection.source.id in validCitiesHash && connection.target.id in validCitiesHash && (!minPopulation || (connection.source.population>=minPopulation && connection.target.population>=minPopulation))) {
                 var arcGenerator = new arc.GreatCircle(
-                    {x: connection.source.longitude, y: connection.source.latitude},
-                    {x: connection.target.longitude, y: connection.target.latitude});
+                    {x: connection.source.lng, y: connection.source.lat},
+                    {x: connection.target.lng, y: connection.target.lat});
                 var arcLine = arcGenerator.Arc(100, {offset: 100});
                 var label = connection.source.label+" -> "+connection.target.label + " ("+connection.rawFreq+")"
                 arcLine.geometries.forEach(function(geometry) {
@@ -1194,7 +1194,7 @@ Ext.define('Voyant.panel.DreamScape', {
 
     },
 
-    openContextMenu(x, y, el) {
+    openContextMenu: function(x, y, el) {
         var panel = this;
         if(el === undefined) { // Case where we're editing all occurrences
             var features = panel.getMap().getFeaturesAtPixel([x,y]);
@@ -1772,8 +1772,8 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                         }
 
                         var arcGenerator = new arc.GreatCircle(
-                            {x: currentConnectionOccurrence.source.longitude, y: currentConnectionOccurrence.source.latitude},
-                            {x: currentConnectionOccurrence.target.longitude, y: currentConnectionOccurrence.target.latitude});
+                            {x: currentConnectionOccurrence.source.lng, y: currentConnectionOccurrence.source.lat},
+                            {x: currentConnectionOccurrence.target.lng, y: currentConnectionOccurrence.target.lat});
                         var arcLine = arcGenerator.Arc(100, {offset: 100});
                         var label = currentConnectionOccurrence.source.label+" -> "+currentConnectionOccurrence.target.label;
                         arcLine.geometries.forEach(function(geometry) {

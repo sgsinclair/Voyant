@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Apr 18 10:07:23 EDT 2018 */
+/* This file created by JSCacher. Last modified: Wed Apr 25 09:14:46 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -10009,7 +10009,8 @@ Ext.define('Voyant.data.util.Geonames', {
 		data: {},
 		queries: undefined,
 		corpus: undefined,
-		isIncrementalLoadingOccurrences: false
+		isIncrementalLoadingOccurrences: false,
+		previousParams: {}
 	},
 	constructor: function(config, opts) {
 		config = config || {};
@@ -10017,11 +10018,12 @@ Ext.define('Voyant.data.util.Geonames', {
 		this.setCorpus(config.corpus);
 	},
 	load: function(params, dfd) {
+		this.setPreviousParams(params);
 		dfd = dfd || Voyant.application.getDeferred(this);
 		var me = this, localParams = {
 			corpus: this.getCorpus().getAliasOrId(),
 			queries: this.getQueries(),
-			tool: 'corpus.Geonames',
+			tool: 'corpus.Dreamscape',
 			limit: 200
 		};
 		Ext.apply(localParams, params || {});
@@ -10036,12 +10038,12 @@ Ext.define('Voyant.data.util.Geonames', {
 			scope: this
 		}).then(function(response) {
 			var data = Ext.JSON.decode(response.responseText);
-			if (data.progress && data.progress.progress) {
+			if (data && data.dreamscape && data.dreamscape.progress) {
 				new Voyant.widget.ProgressMonitor({
-					progress: data.progress.progress,
+					progress: data.dreamscape.progress,
+					tool: 'corpus.Dreamscape',
 					success: function() {
-						debugger
-						me.call(me, params, dfd);
+						me.load.call(me, params, dfd);
 					},
 					failure: function(responseOrProgress) {
 						Voyant.application.showResponseError(me.localize("failedToFetchGeonames"), responseOrProgress);
@@ -10049,9 +10051,9 @@ Ext.define('Voyant.data.util.Geonames', {
 					scope: me
 				});
 			}
-			if (data && data.geonames) {
+			if (data && data.dreamscape && !data.dreamscape.progress) {
 				if (!params.noOverwrite) {
-					me.setData(data.geonames);
+					me.setData(data.dreamscape);
 				}
 				dfd.resolve(data);
 			}
@@ -10061,73 +10063,76 @@ Ext.define('Voyant.data.util.Geonames', {
 		return dfd.promise;
 	},
 	getCitiesCount: function() {
-		return Object.keys(this.getData().cities.cities).length;
+		return Object.keys(this.getData().locations.locations).length;
 	},
 	getTotalCitiesCount: function() {
-		return this.getData().cities.total;
+		return this.getData().locations.total;
 	},
 	hasMoreCities: function() {
 		return this.getCitiesCount()<this.getTotalCitiesCount();
 	},
 	eachCity: function(fn, scope, max) {
-		var cities = this.getData().cities.cities, orderedCities = [];
-		for (var id in cities) { // create a sortable list with id
-			orderedCities.push(Ext.apply(cities[id], {id: id}))
+		var locations = this.getData().locations.locations, orderedLocations = [];
+		for (var id in locations) { // create a sortable list with id
+			orderedLocations.push(Ext.apply(locations[id], {id: id}))
 		}
-		orderedCities.sort(function(c1, c2) { // order by rawFreq (count)
+		orderedLocations.sort(function(c1, c2) { // order by rawFreq (count)
 			return c1.rawFreq == c2.rawFreq ? c1.label - c2.label : c2.rawFreq - c1.rawFreq;
 		});
-		if (max && orderedCities.length>max) {orderedCities = orderedCities.slice(0,max)}
-		orderedCities.forEach(function(city) {fn.call(scope, city);});
+		if (max && orderedLocations.length>max) {orderedLocations = orderedLocations.slice(0,max)}
+		orderedLocations.forEach(function(location) {fn.call(scope, location);});
 	},
 	getConnectionsCount: function() {
-		return Object.keys(this.getData().connectionCounts.connectionCounts).length;
+		return this.getData().connections.connections.length;
 	},
 	getTotalConnectionsCount: function() {
-		return this.getData().connectionCounts.total;
+		return this.getData().connections.total;
 	},
 	eachConnection: function(fn, scope, max) {
-		var connections = this.getData().connectionCounts.connectionCounts, cities = this.getData().cities.cities; orderedConnections = [];
-		for (var id in connections) { // create a sortable list with id
-			var parts = id.split("-");
-			orderedConnections.push({
-				source: Ext.apply({id: parts[0]}, cities[parts[0]]),
-				target: Ext.apply({id: parts[1]}, cities[parts[1]]),
-				rawFreq: connections[id]
+		var connections = this.getData().connections.connections,
+			locations = this.getData().locations.locations;
+			orderedConnections = [];
+		for (var i=0, len=connections.length; i<len; i++) {
+			fn.call(scope, {
+				source: Ext.apply({id: connections[i].source}, locations[connections[i].source]),
+				target: Ext.apply({id: connections[i].target}, locations[connections[i].target]),
+				rawFreq: connections[i].rawFreq
 			});
+			if (i>max) {break;}
 		}
-		orderedConnections.sort(function(c1, c2) { // order by rawFreq (count)
-			return c2.rawFreq - c1.rawFreq;
-		});
-		if (max && orderedConnections.length>max) {orderedConnections = orderedConnections.slice(0, max)}
-		orderedConnections.forEach(function(connection) {fn.call(scope, connection)});
 	},
 	getConnectionOccurrence: function(index) {
-		if (!this.getData().cities) {return undefined;}
-		var connections = this.getData().connections, cities = this.getData().cities.cities;
-		if (!this.getIsIncrementalLoadingOccurrences() && connections.connections.length<connections.total && index+100>connections.connections.length) {
+		if (!this.getData().locations) {return undefined;}
+		var connectionOccurrencesData = this.getData().connectionOccurrences,
+			connectionOccurrences = connectionOccurrencesData.connectionOccurrences;
+			locations = this.getData().locations.locations;
+		if (!this.getIsIncrementalLoadingOccurrences() && connectionOccurrences.length<connectionOccurrencesData.total && index+100>connectionOccurrences.length) {
 			this.setIsIncrementalLoadingOccurrences(true);
 			var me = this;
-			this.load({
-				start: connections.connections.length,
+			var params = {};
+			Ext.apply(params, this.getPreviousParams);
+			Ext.apply(params, {
+				start: connectionOccurrences.length,
 				noOverwrite: true,
-				suppressCities: true,
+				suppressLocations: true,
 				suppressConnections: true
-			}).then(function(data) {
+			});
+			this.load(params).then(function(data) {
 				me.setIsIncrementalLoadingOccurrences(false);
-				connections.connections = connections.connections.concat(data.geonames.connections.connections);
+				connectionOccurrences = connectionOccurrences.concat(data.dreamscape.connectionOccurrences.connectionOccurrences);
 			})
 		}
-		if (connections && connections.connections[index]) {
-			var occurrence = connections.connections[index];
+		if (connectionOccurrences && connectionOccurrences[index]) {
+			var occurrence = connectionOccurrences[index];
 			occurrence.index = index;
-			Ext.apply(occurrence.source, cities[occurrence.source.id]);
-			Ext.apply(occurrence.target, cities[occurrence.target.id]);
+			Ext.apply(occurrence.source, locations[occurrence.source.location]);
+			Ext.apply(occurrence.target, locations[occurrence.target.location]);
 			return occurrence;
 		}
 		return null;
 	},
     getAllConnectionOccurrences: function(sourceId, targetId) {
+    	debugger
         // TODO return all occurences of connection with given source and target, including those not loaded yet
         var occurences = [];
         for (var i = 0; i < this.getTotalConnectionsCount(); i++) {
@@ -10491,6 +10496,18 @@ Ext.define('Voyant.data.model.Corpus', {
     	 * 
     	 * This is currently not used, except in the Dynamic Table of Contexts skin. Still, it may be worth specifying a title for later use.
     	 */
+    	 
+    	 /**
+    	 * @cfg {String} curatorTsv a simple TSV of paths and labels for the DToC interface
+    	 *
+    	 * The DToC skin allows curation of XML tags and attributes in order to constrain the entries shown in the interface or to provide friendlier labels. This assumes plain text unicode input with one definition per line where the simple XPath expression is separated by a tab from a label.
+    	 *
+    	 *   	 p    	 paragraph
+    	 *   	 ref[@target*="religion"]    	 religion
+    	 *
+    	  * For more information see the DToC documentation on [Curating Tags](http://cwrc.ca/Documentation/public/index.html#DITA_Files-Various_Applications/DToC/CuratingTags.html)
+    	 */
+    	 
     	
     	
     	documentsStore: undefined
@@ -12822,6 +12839,7 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 		success: undefined,
 		failure: undefined,
 		args: undefined,
+		tool: undefined,
 		delay: 1000
 	},
 	constructor: function(config) {
@@ -12846,14 +12864,14 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 				Ext.Ajax.request({
 				     url: Voyant.application.getTromboneUrl(),
 				     params: {
-				    	 	tool: progress.tool || "progress.ProgressMonitor",
+				    	 	tool: "progress.ProgressMonitor",
 				    	 	id: progress.id
 				     }
 				 }).then(function(response, opt) {
 					 var data = Ext.decode(response.responseText);
-					 if (data.progress && data.progress.progress) {
-						 this.setProgress(data.progress.progress)
-						 me.update(); // recurse (delay happens during call)
+					 if (data && data.progress.progress) {
+						 me.setProgress(data.progress.progress);
+						 me.update();
 					 } else {
 						 me.finish(false, me.localize("badProgress"))
 					 }
@@ -14229,7 +14247,7 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
 //            .attr('font-family', function(d) { return this.getApplication().getFeatureForTerm('font', d.term); }.bind(this))
             .attr('font-size', function(d) {return nodeScaling.scalingFunction(d.value)+'px';})
 //            .attr('text-anchor', 'middle')
-			.attr('alignment-baseline', 'middle')
+			.attr('dominant-baseline', 'middle')
 			.style('user-select', 'none')
             .each(function(d) { d.bbox = this.getBBox(); });
         
@@ -14261,8 +14279,9 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	var midX = bounds.x + width/2;
     	var midY = bounds.y + height/2;
     	var svg = this.getVis().node().parentElement;
-    	var fullWidth = svg.clientWidth;
-    	var fullHeight = svg.clientHeight;
+    	var svgRect = svg.getBoundingClientRect();
+        var fullWidth = svgRect.width;
+        var fullHeight = svgRect.height;
     	var scale = (paddingPercent || 0.8) / Math.max(width/fullWidth, height/fullHeight);
     	var translate = [fullWidth/2 - scale*midX, fullHeight/2 - scale*midY];
     	d3.select(svg)
@@ -17051,7 +17070,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			.each(function(d) { d.bbox = this.getBBox(); }) // set bounding box for later use
 			.style('cursor', 'pointer')
 			.style('user-select', 'none')
-			.attr('alignment-baseline', 'middle');
+			.attr('dominant-baseline', 'middle');
     	
     	this.setNodes(nodeEnter.merge(node));
     	
@@ -17105,12 +17124,13 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	var midX = bounds.x + width/2;
     	var midY = bounds.y + height/2;
     	var svg = this.getVis().node().parentElement;
-    	var fullWidth = svg.clientWidth;
-    	var fullHeight = svg.clientHeight;
+    	var svgRect = svg.getBoundingClientRect();
+    	var fullWidth = svgRect.width;
+    	var fullHeight = svgRect.height;
     	var scale = (paddingPercent || 0.8) / Math.max(width/fullWidth, height/fullHeight);
     	var translate = [fullWidth/2 - scale*midX, fullHeight/2 - scale*midY];
     	if (width<1) {return} // FIXME: something strange with spyral
- 
+     	
     	d3.select(svg)
     		.transition()
     		.duration(transitionDuration || 500)
@@ -18803,7 +18823,8 @@ Ext.define('Voyant.panel.DreamScape', {
         currentAnnotation: undefined,
         baseLayers: {},
         annotations: undefined, // set during init if any values are stored, shouldn't be looked up (getAnnotations) after init
-        annotationsLoadedIfAvailable: false // check api and local storage
+        annotationsLoadedIfAvailable: false, // check api and local storage,
+        overrides: {}
     },
 
     html: '<div class="map"></div><div class="ticker"></div><div class="ol-popup"><a href="#" class="ol-popup-closer"></a><div class="popup-content"></div></div>',
@@ -18848,31 +18869,31 @@ Ext.define('Voyant.panel.DreamScape', {
         });
         var annotationsId = this.getApiParam("annotationsId");
         if (annotationsId) {
-        		var me = this;
-	    		Ext.Ajax.request({
-	    			url: this.getTromboneUrl(),
-	    			params: {
-		        		tool: 'resource.StoredResource',
-		        		retrieveResourceId: annotationsId
-	    			},
-	    			scope: this
-	    		}).then(function(response) {
-	    			var data = Ext.JSON.decode(response.responseText);
-	    			if (data.storedResource.resource) {
-	    				var annotations = Ext.JSON.decode(data.storedResource.resource)
-	    				if (Ext.isString(annotations)) {
-	    					annotations = Ext.JSON.decode(annotations);
-	    					me.setAnnotations(annotations)
-	    				}
-	    			}
-    				if (!me.getAnnotations()) {
-    					me.showError(me.localize("annotationsLoadFailed"));
-    				}
+            var me = this;
+            Ext.Ajax.request({
+                url: this.getTromboneUrl(),
+                params: {
+                    tool: 'resource.StoredResource',
+                    retrieveResourceId: annotationsId
+                },
+                scope: this
+            }).then(function(response) {
+                var data = Ext.JSON.decode(response.responseText);
+                if (data.storedResource.resource) {
+                    var annotations = Ext.JSON.decode(data.storedResource.resource)
+                    if (Ext.isString(annotations)) {
+                        annotations = Ext.JSON.decode(annotations);
+                        me.setAnnotations(annotations)
+                    }
+                }
+                if (!me.getAnnotations()) {
+                    me.showError(me.localize("annotationsLoadFailed"));
+                }
                 me.setAnnotationsLoadedIfAvailable(true);
-	    		}, function(response) {
-	    			me.showResponseError(me.localize("annotationsLoadFailed"), response);
+            }, function(response) {
+                me.showResponseError(me.localize("annotationsLoadFailed"), response);
                 me.setAnnotationsLoadedIfAvailable(true);
-	    		});
+            });
         } else {
             this.setAnnotationsLoadedIfAvailable(true);
         }
@@ -18921,7 +18942,7 @@ Ext.define('Voyant.panel.DreamScape', {
                                 checked: true
                             },
                             items: [{
-                            		xtype: 'menuitem',
+                                xtype: 'menuitem',
                                 text: this.localize('baseLayer'),
                                 tooltip: this.localize('baseLayerTip'),
                                 glyph: 'xf279@FontAwesome',
@@ -18931,7 +18952,7 @@ Ext.define('Voyant.panel.DreamScape', {
                                         columns: 1,
                                         vertical: true,
                                         defaults: {
-                                        	  cls: 'map-menu-item',
+                                            cls: 'map-menu-item',
                                             handler: function(item, checked) {
                                                 if(checked){
                                                     var panel = this;
@@ -18982,7 +19003,7 @@ Ext.define('Voyant.panel.DreamScape', {
                                     }]
                                 }
                             },{
-                            		xtype: 'menuitem',
+                                xtype: 'menuitem',
                                 text: this.localize('projection'),
                                 tooltip: this.localize('projectionTip'),
                                 glyph: 'xf0ac@FontAwesome',
@@ -19031,7 +19052,7 @@ Ext.define('Voyant.panel.DreamScape', {
                                                             })
                                                         }
                                                     });
-                                                    
+
                                                     map.setView(newView);
                                                 }
                                             },
@@ -19056,18 +19077,18 @@ Ext.define('Voyant.panel.DreamScape', {
                                                 boxLabel: this.localize('mercatorProjection'),
                                                 cls: ['map-menu-item','mercatorProjection'],
                                                 itemId: 'mercatorProjection'
-                                           },{
+                                            },{
                                                 boxLabel: this.localize('gallPetersProjection'),
                                                 cls: ['map-menu-item','gallPetersProjection'],
                                                 itemId: 'gallPetersProjection'
                                             },{
                                                 boxLabel: this.localize('sphereMollweideProjection'),
                                                 cls: ['map-menu-item','sphereMollweideProjection'],
-                                               itemId: 'sphereMollweideProjection'
+                                                itemId: 'sphereMollweideProjection'
                                             }
                                         ]
                                     }]
-                                    
+
                                 }
                             },'-',{
                                 text: this.localize('cities'),
@@ -19327,6 +19348,8 @@ Ext.define('Voyant.panel.DreamScape', {
             closer.onclick = function() {
                 overlay.setPosition(undefined);
                 closer.blur();
+                panel.getMap().getLayer("preview").getSource().clear();
+
 //                if(panel.getDrawMode()) {
 //                    panel.getDockedComponent('bottomToolbar').getComponent('annotate').click();
 //                }
@@ -19416,18 +19439,33 @@ Ext.define('Voyant.panel.DreamScape', {
                                     occurrences.forEach(function(occ) {
                                         if(occ.docIndex != docIndex) {
                                             docIndex = occ.docIndex;
-                                            infos += panel.getCorpus().getDocument(docIndex).getFullLabel() + ':<br>';
+                                            infos += '<h4>' + panel.getCorpus().getDocument(docIndex).getFullLabel() + ':</h4>';
                                         }
-                                        infos += '<li>'+ occ.source.left+'<a href="http://www.geonames.org/' + occ.source.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.source.position+' location='+occ.source.form+' class="termLocationLink">' + occ.source.form + '</a> '+occ.source.right + ' [...] ' +
-                                            occ.target.left+'<a href="http://www.geonames.org/' + occ.target.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.target.position+' location='+occ.target.form+' class="termLocationLink">' + occ.target.form + '</a> '+occ.target.right + '</li>';
+                                        var sourceAlternates = {"6077243":[-73.58781, 45.50884], "524901": [37.61556, 55.75222]}; // TODO Add real alternate ids from server
+                                        var sourceCoordinates = [-10,10]; // TODO add real coordinates from server
+                                        var targetAlternates = {"6077243":[-73.58781, 45.50884], "524901": [37.61556, 55.75222]}; // TODO Add real alternate ids from server
+                                        var targetCoordinates = [-10,10]; // TODO add real coordinates from server
+                                        infos += '<li>'+ occ.source.left+'<a href="http://www.geonames.org/' + occ.source.id + '" target="_blank" docIndex='+occ.docIndex +' offset='+occ.source.position+
+                                            ' location='+occ.source.form + ' cityId=' + occ.source.id + ' coordinates=' + JSON.stringify(sourceCoordinates) + ' alternates=' + JSON.stringify(sourceAlternates) + ' class="termLocationLink">' + occ.source.form + '</a> '+occ.source.right + ' [...] ' +
+                                            occ.target.left+'<a href="http://www.geonames.org/' + occ.target.id + '" target="_blank" docIndex='+occ.docIndex+' offset='+occ.target.position+
+                                            ' location='+occ.target.form+ ' cityId=' + occ.target.id + ' coordinates=' + JSON.stringify(targetCoordinates) + ' alternates=' + JSON.stringify(targetAlternates) + ' class="termLocationLink">' + occ.target.form + '</a> '+occ.target.right + '</li>';
                                     });
                                     var header = feature.get("text");
                                     infos += "</ul>";
                                     panel.getContentEl().setHtml('<h3>' + header + '</h3>' + infos);
-                                    //content.innerHTML = `<h3>${header}</h3>${infos}`;
                                     panel.getOverlay().setPosition(event.coordinate);
                                     var links = Ext.select('.termLocationLink');
+
+                                    function contextMenuListener(el) {
+                                        el.addEventListener( "contextmenu", function(e) {
+                                            e.preventDefault();
+                                            panel.openContextMenu(e.layerX, e.layerY, el);
+                                            return false;
+                                        }, false);
+                                    }
+
                                     links.elements.forEach(function(link) {
+                                        contextMenuListener(link);
                                         link.onmouseover = function(){panel.showTermInCorpus(link.getAttribute("docIndex"), link.getAttribute("offset"), link.getAttribute('location'))};
                                     });
                                 }
@@ -19436,7 +19474,7 @@ Ext.define('Voyant.panel.DreamScape', {
                         } else if (feature.get("type") === "annotation" && !foundFeature) { //annotation
                             panel.setCurrentAnnotation(feature);
                             panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60">'+(feature.get("text")?feature.get("text"):"")+'</textarea>' +
-                                                        '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Delete</button>');
+                                '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Delete</button>');
                             panel.getOverlay().setPosition(event.coordinate);
                             panel.getContentEl().down('.deleteAnnotation').dom.onclick = function() {panel.deleteAnnotation()};
                             panel.getContentEl().down('.saveAnnotation').dom.onclick = function() {panel.saveAnnotation()};
@@ -19466,6 +19504,30 @@ Ext.define('Voyant.panel.DreamScape', {
                 updateWhileAnimating: true, // optional, for instant visual feedback
                 updateWhileInteracting: true // optional, for instant visual feedback
             });
+
+            // Layer for edit preview
+            var previewLayer = new ol.layer.Vector({
+                map: map,
+                source: new ol.source.Vector({
+                    wrapX: false,
+                    useSpatialIndex: false // optional, might improve performance
+                }),
+                preview: true,
+                zIndex: 15,
+                id: "preview",
+                style: function(feature) {
+                    if(feature.get("type") === "city")
+                    {
+                        return panel.cityStyleFunction(feature, map.getView().getResolution());
+                    } else if(feature.get("type") === "connection") {
+                        return panel.travelStyleFunction(feature, map.getView().getResolution());
+                    }
+                },
+                updateWhileAnimating: true, // optional, for instant visual feedback
+                updateWhileInteracting: true // optional, for instant visual feedback
+            });
+            map.addLayer(previewLayer);
+
             // Add handler to update selected vector when mouse is moved
             map.on('pointermove', function(event) {
                 if(!panel.getDrawMode()) {
@@ -19513,9 +19575,11 @@ Ext.define('Voyant.panel.DreamScape', {
                                     visible: feature.get("visible"),
                                     color: feature.get("color"),
                                     type: feature.get("type"),
+                                    alternates: feature.get("alternates"),
                                     confidence: feature.get("confidence"),
                                     source: feature.get("source"),
-                                    target: feature.get("target")
+                                    target: feature.get("target"),
+                                    cityId: feature.get("cityId")
                                 });
                                 selectedLayer.getSource().addFeature(selectedFeature);
                             }
@@ -19584,30 +19648,37 @@ Ext.define('Voyant.panel.DreamScape', {
                 evt.feature.set('type', 'annotation');
                 panel.setCurrentAnnotation(evt.feature);
                 panel.getContentEl().setHtml('<textarea class="annotation-text" rows="5" cols="60"></textarea>'+
-                                            '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Cancel</button>');
+                    '<button class="saveAnnotation">Save</button><button class="deleteAnnotation">Cancel</button>');
                 panel.getContentEl().down('.deleteAnnotation').dom.onclick = function() {panel.deleteAnnotation()};
                 panel.getContentEl().down('.saveAnnotation').dom.onclick = function() {panel.saveAnnotation()};
                 panel.getOverlay().setPosition(evt.feature.getGeometry().getLastCoordinate());
                 panel.getContentEl().down('.annotation-text').dom.focus();
             });
+
+            map.getViewport().addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+                panel.openContextMenu(e.layerX, e.layerY);
+                return false;
+            }, false);
+
             this.setMap(map);
-            
+
             var zoom = this.getTargetEl().down(".ol-zoom");
             Ext.create('Ext.Button', {
-            		glyph:'xf075@FontAwesome',
-            		cls: 'annotate',
-            		renderTo: this.getTargetEl().down(".ticker").parent(),
-            		tooltip: this.localize('annotateTip'),
-            		enableToggle: true,
-            		toggleHandler: function(cmp, state) {
-            			if (state) {
+                glyph:'xf075@FontAwesome',
+                cls: 'annotate',
+                renderTo: this.getTargetEl().down(".ticker").parent(),
+                tooltip: this.localize('annotateTip'),
+                enableToggle: true,
+                toggleHandler: function(cmp, state) {
+                    if (state) {
                         this.getMap().addInteraction(this.getDrawInteraction());
-            			} else {
+                    } else {
                         this.getMap().removeInteraction(this.getDrawInteraction());
-            			}
-                 },
-            		scope: this
-            	})
+                    }
+                },
+                scope: this
+            })
 
             // simulate adding a filter
             this.getDockedComponent('bottomToolbar').getComponent('addFilter').click();
@@ -19615,7 +19686,7 @@ Ext.define('Voyant.panel.DreamScape', {
             Ext.defer(this.tryInit, 500, this); // try again in a half second
         }
     },
-    
+
     deleteAnnotation: function() {
         this.body.down('.ol-popup').down(".ol-popup-closer").dom.click();
         this.getMap().getLayer("annotations").getSource().removeFeature(this.getCurrentAnnotation());
@@ -19632,26 +19703,26 @@ Ext.define('Voyant.panel.DreamScape', {
         this.storeAnnotations(json);
 //        localStorage['annotations'] = JSON.stringify(json);
     },
-    
+
     storeAnnotations: function(json) {
-    		this.mask("storingAnnotations");
-    		var me = this;
-    		Ext.Ajax.request({
-    			url: this.getTromboneUrl(),
-    			params: {
-	        		tool: 'resource.StoredResource',
-	    			storeResource: JSON.stringify(json)
-    			},
-    			scope: this
-    		}).then(function(response) {
-    			me.unmask();
-    			var data = Ext.JSON.decode(response.responseText);
-    			me.setApiParam("annotationsId", data.storedResource.id);
-    			me.toastInfo(me.localize('annotationsUpdated'));
-    		}, function(response) {
-    			me.unmask();
-    			me.showResponseError(me.localize("annotationsUpdateFailed"), response);
-    		});
+        this.mask("storingAnnotations");
+        var me = this;
+        Ext.Ajax.request({
+            url: this.getTromboneUrl(),
+            params: {
+                tool: 'resource.StoredResource',
+                storeResource: JSON.stringify(json)
+            },
+            scope: this
+        }).then(function(response) {
+            me.unmask();
+            var data = Ext.JSON.decode(response.responseText);
+            me.setApiParam("annotationsId", data.storedResource.id);
+            me.toastInfo(me.localize('annotationsUpdated'));
+        }, function(response) {
+            me.unmask();
+            me.showResponseError(me.localize("annotationsUpdateFailed"), response);
+        });
     },
 
     saveAnnotation: function() {
@@ -19792,7 +19863,7 @@ Ext.define('Voyant.panel.DreamScape', {
 
             if ((!minPopulation || city.population>=minPopulation) && (!citiesMinFreq || city.rawFreq>=citiesMinFreq)) {
                 validCitiesHash[city.id]=true;
-                var coordinates = [parseFloat(city.longitude), parseFloat(city.latitude)]
+                var coordinates = [parseFloat(city.lng), parseFloat(city.lat)]
                 var feature = new ol.Feature({
 
                     geometry: new ol.geom.Point(coordinates).transform(ol.proj.get('EPSG:4326'), panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857')),
@@ -19805,10 +19876,10 @@ Ext.define('Voyant.panel.DreamScape', {
                     coordinates: coordinates,
                     forms: city.forms,
                     cityId: city.id,
+                    alternates: {"6077243":[-73.58781, 45.50884], "524901": [37.61556, 55.75222]}, // TODO Add real alternate ids from server
                     type: "city",
                     confidence: city.confidence ? city.confidence*100 : undefined
                 });
-
                 layerSource.addFeature(feature);
             }
         }, this, citiesMaxCount);
@@ -19838,8 +19909,8 @@ Ext.define('Voyant.panel.DreamScape', {
         filter.getGeonames().eachConnection(function(connection) {
             if ((!connectionsMinFreq || connection.rawFreq>=connectionsMinFreq) && (!maxConnectionsCount || counter<maxConnectionsCount) && connection.source.id in validCitiesHash && connection.target.id in validCitiesHash && (!minPopulation || (connection.source.population>=minPopulation && connection.target.population>=minPopulation))) {
                 var arcGenerator = new arc.GreatCircle(
-                    {x: connection.source.longitude, y: connection.source.latitude},
-                    {x: connection.target.longitude, y: connection.target.latitude});
+                    {x: connection.source.lng, y: connection.source.lat},
+                    {x: connection.target.lng, y: connection.target.lat});
                 var arcLine = arcGenerator.Arc(100, {offset: 100});
                 var label = connection.source.label+" -> "+connection.target.label + " ("+connection.rawFreq+")"
                 arcLine.geometries.forEach(function(geometry) {
@@ -19864,6 +19935,249 @@ Ext.define('Voyant.panel.DreamScape', {
 
         filter.animate();
 
+    },
+
+    openContextMenu: function(x, y, el) {
+        var panel = this;
+        if(el === undefined) { // Case where we're editing all occurrences
+            var features = panel.getMap().getFeaturesAtPixel([x,y]);
+            var feature = features != null ?features[0]:undefined;
+            if(feature && feature.get("type") === "city") {
+                var title = "Edit " + feature.get("text");
+                panel.getContentEl().setHtml('<div class="contextMenu">' +
+                    (feature!=undefined?('<h3>'+ title +'</h3>'):'') +
+                    '<div class="menuItem removeLocation">Remove (not a location)</div>' +
+                    '<div class="menuItem editLocation">Edit (move location)</div>' + '</div>');
+                var alternates = feature.get("alternates");
+                alternates[feature.get("cityId")] = feature.get("coordinates");
+                var location = panel.getMap().getCoordinateFromPixel([x, y]);
+                var id = feature.get("cityId");
+                panel.getContentEl().down('.removeLocation').dom.onclick = function() {panel.handleContextMenuEvent('remove', title, id, alternates, x, y)};
+                panel.getContentEl().down('.editLocation').dom.onclick = function() {panel.handleContextMenuEvent('edit', title, id, alternates, x, y)};
+                panel.getOverlay().setPosition(location);
+            }
+        } else { // Case where we're editing a single occurrence
+            var docIndex = el.getAttribute("docIndex");
+            var position = el.getAttribute("offset");
+            var id = el.getAttribute("cityId");
+            var alternates = JSON.parse(el.getAttribute("alternates"));
+            alternates[id] = JSON.parse(el.getAttribute("coordinates"));
+            var title = "Edit "  + el.getAttribute("location") + " (document: " + docIndex + ", position: " + position + ")";
+            panel.getContentEl().setHtml('<div class="contextMenu">' +
+                '<h3>'+ title +'</h3>'+
+                '<div class="menuItem removeLocation"> Remove (not a location) </div>' +
+                '<div class="menuItem editLocation"> Edit (move location) </div>' +
+                '</div>');
+            panel.getContentEl().down('.removeLocation').dom.onclick = function() {panel.handleContextMenuEvent('remove', title, id, alternates, x, y, docIndex, position)};
+            panel.getContentEl().down('.editLocation').dom.onclick = function() {panel.handleContextMenuEvent('edit', title, id, alternates, x, y, docIndex, position)};
+        }
+
+    },
+
+    handleContextMenuEvent: function(option, title, id, alternates, x, y, docIndex, position) {
+        var panel = this;
+        if(option === "remove") {
+            this.removeLocation(id, docIndex, position);
+            this.getOverlay().setPosition(undefined);
+        } else if(option === "edit") {
+            var selectMenu = '<select class="locationSelect">';
+            for(altId in alternates) {
+                if (altId === id) {
+                    selectMenu += '<option value="' + altId + '" selected>' + altId + ' (current)</option>';
+                } else {
+                    selectMenu += '<option value="' + altId + '">' + altId + ' (' + alternates[altId] + ')</option>';
+                }
+            };
+            selectMenu += '</select><button class="saveLocationEditionButton">Save</button>';
+            this.getContentEl().setHtml('<h3>'+title+'</h3>'+selectMenu);
+            var selectElement = panel.getContentEl().down('.locationSelect').dom;
+            var newId = selectElement.value;
+            var newCoordinates = alternates[newId];
+            this.getContentEl().down('.saveLocationEditionButton').dom.onclick = function() {
+                var previewLayer = panel.getMap().getLayer("preview").getSource().clear();
+                var newId = selectElement.value;
+                if(id != newId) {
+                    var newCoordinates = alternates[newId];
+                    panel.editLocation(id, newId, newCoordinates, docIndex, position);
+                }
+                panel.getOverlay().setPosition(undefined);
+            };
+            // Preview Change
+            panel.previewEditLocation(id, newId, newCoordinates, docIndex)
+            selectElement.onchange = function() {
+                var newId = selectElement.value;
+                var newCoordinates = alternates[newId];
+                panel.previewEditLocation(id, newId, newCoordinates, docIndex);
+            }
+        }
+    },
+
+    removeLocation: function(id, docIndex, position) {
+        // Make sure there is an entry for this id
+        this.getOverrides()[id] = this.getOverrides()[id]?this.getOverrides()[id]:{};
+        // If location removed for all occurences
+        if(docIndex === undefined){
+            this.getOverrides()[id]["general"] = false;
+            // Remove instanlty all feature that have this location as id, source or target
+            this.getMap().getLayers().forEach(function (layer) {
+                if(layer.getSource().getFeatures) {
+                    layer.getSource().getFeatures().forEach(function(feat) {
+                        if (feat.get("cityId") === id || feat.get("source") === id || feat.get("target") === id) {
+                            layer.getSource().removeFeature(feat);
+                        }
+                    })
+                }
+            });
+        } else { // Only one occurence removed
+            this.getOverrides()[id][[docIndex, position]] = false;
+            // TODO edit and refresh all connections where id is used to update counts or delete connections features.
+        }
+        localStorage['overrides'] = JSON.stringify(this.getOverrides());
+
+    },
+
+    previewEditLocation: function(id, newId, newCoordinates, oneOccurence) {
+        var panel = this;
+        var previewLayer = panel.getMap().getLayer("preview");
+        previewLayer.getSource().clear();
+        this.getMap().getLayers().forEach(function (layer) {
+            if(layer.getSource().getFeatures) {
+                layer.getSource().getFeatures().forEach(function(feat) {
+                    // TODO check feature with new id already exists and update if it does
+                    if (feat.get("cityId") === id) {
+                        var previewGeometry = new ol.geom.Point(newCoordinates).transform(ol.proj.get('EPSG:4326'), panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857'));
+                        var previewCityFeature = new ol.Feature({
+                            width: feat.get("width"),
+                            color: "rgb(255,0,0)",
+                            geometry: previewGeometry,
+                            type: "city",
+                            visible: true
+                        })
+                        previewLayer.getSource().addFeature(previewCityFeature);
+                        // Make sure city preview is visible
+                        var map = panel.getMap();
+                        var extent = panel.getMap().getView().calculateExtent(map.getSize());
+                        var isVisible = ol.extent.containsExtent(extent, previewCityFeature.getGeometry().getExtent());
+                        if(!isVisible) {
+                            newExtent = ol.extent.extend(extent, previewCityFeature.getGeometry().getExtent());
+                            map.getView().fit(newExtent);
+                        }
+                    } else if (feat.get("source") === id && oneOccurence === undefined) {
+                        var endPoint = new ol.geom.Point(feat.get("geometry").getLastCoordinate());
+                        endPoint.transform(panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857'), ol.proj.get('EPSG:4326'));
+                        var arcGenerator = new arc.GreatCircle(
+                            {x: newCoordinates[0] , y: newCoordinates[1]},
+                            {x: endPoint.getCoordinates()[0], y: endPoint.getCoordinates()[1]});
+                        var arcLine = arcGenerator.Arc(100, {offset: 100});
+                        arcLine.geometries.forEach(function(geometry) {
+                            var line = new ol.geom.LineString(geometry.coords);
+                            line.transform(ol.proj.get('EPSG:4326'), panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857'));
+                            var feature = new ol.Feature({
+                                geometry: line,
+                                text: feat.get("text"),
+                                color: "rgb(255,0,0)",
+                                width: feat.get("width"),
+                                visible: true,
+                                type: "connection"
+                            });
+                            previewLayer.getSource().addFeature(feature);
+                        });
+                    } else if (feat.get("target") === id && oneOccurence === undefined) {
+                        var startPoint = new ol.geom.Point(feat.get("geometry").getFirstCoordinate());
+                        startPoint.transform(panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857'), ol.proj.get('EPSG:4326'));
+                        var arcGenerator = new arc.GreatCircle(
+                            {x: startPoint.getCoordinates()[0] , y: startPoint.getCoordinates()[1]},
+                            {x: newCoordinates[0], y: newCoordinates[1]});
+                        var arcLine = arcGenerator.Arc(100, {offset: 100});
+                        arcLine.geometries.forEach(function(geometry) {
+                            var line = new ol.geom.LineString(geometry.coords);
+                            line.transform(ol.proj.get('EPSG:4326'), panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857'));
+                            var feature = new ol.Feature({
+                                geometry: line,
+                                text: feat.get("text"),
+                                color: "rgb(255,0,0)",
+                                width: feat.get("width"),
+                                visible: true,
+                                type: "connection"
+                            });
+                            previewLayer.getSource().addFeature(feature);
+                        });
+                    }
+                })
+            }
+        })
+    },
+
+    editLocation: function(id, newId, newCoordinates, docIndex, position) {
+        this.getOverrides()[id] = this.getOverrides()[id]?this.getOverrides()[id]:{};
+        if(docIndex === undefined){
+            var panel = this;
+            this.getOverrides()[id]["general"] = newId;
+            this.getMap().getLayers().forEach(function (layer) {
+                if(layer.getSource().getFeatures) {
+                    layer.getSource().getFeatures().forEach(function(feat) {
+                        // TODO check feature with new id already exists and update if it does
+                        if (feat.get("cityId") === id) {
+                            //if (feat.get("id") === id) {
+                            feat.set("cityId", newId);
+                            //feat.set("id", newId);
+                            feat.set("coordinates", newCoordinates);
+                            feat.set("geometry",
+                                new ol.geom.Point(newCoordinates).transform(ol.proj.get('EPSG:4326'), panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857')));
+                        } else if (feat.get("source") === id) {
+                            var oldGeom = feat.get("geometry");
+                            oldGeom.transform(panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857'), ol.proj.get('EPSG:4326'));
+                            var arcGenerator = new arc.GreatCircle(
+                                {x: newCoordinates[0] , y: newCoordinates[1]},
+                                {x: oldGeom.getLastCoordinate()[0], y: oldGeom.getLastCoordinate()[1]});
+                            var arcLine = arcGenerator.Arc(100, {offset: 100});
+                            arcLine.geometries.forEach(function(geometry) {
+                                var line = new ol.geom.LineString(geometry.coords);
+                                line.transform(ol.proj.get('EPSG:4326'), panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857'));
+                                var feature = new ol.Feature({
+                                    geometry: line,
+                                    text: feat.get("text"),
+                                    color: feat.get("color"),
+                                    width: feat.get("width"),
+                                    source: newId,
+                                    target: feat.get("target"),
+                                    type: "connection"
+                                });
+                                layer.getSource().addFeature(feature);
+                                layer.getSource().removeFeature(feat);
+                            });
+                        } else if (feat.get("target") === id) {
+                            var oldGeom = feat.get("geometry");
+                            oldGeom.transform(panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857'), ol.proj.get('EPSG:4326'));
+                            var arcGenerator = new arc.GreatCircle(
+                                {x: oldGeom.getFirstCoordinate()[0], y: oldGeom.getFirstCoordinate()[1]},
+                                {x: newCoordinates[0], y: newCoordinates[1]});
+                            var arcLine = arcGenerator.Arc(100, {offset: 100});
+                            arcLine.geometries.forEach(function(geometry) {
+                                var line = new ol.geom.LineString(geometry.coords);
+                                line.transform(ol.proj.get('EPSG:4326'), panel.getProjection()?panel.getProjection():ol.proj.get('EPSG:3857'));
+                                var feature = new ol.Feature({
+                                    geometry: line,
+                                    text: feat.get("text"),
+                                    color: feat.get("color"),
+                                    width: feat.get("width"),
+                                    source: feat.get("source"),
+                                    target: newId,
+                                    type: "connection"
+                                });
+                                layer.getSource().addFeature(feature);
+                                layer.getSource().removeFeature(feat);
+                            });
+                        }
+                    })
+                }
+            })
+        } else {
+            this.getOverrides()[id][[docIndex, position]] = newId;
+            // TODO refresh all connections where old or new id are used to update counts, create or delete connections features.
+            // TODO update all city feature with new or old id to update count, create or delete feature
+        }
+        localStorage["overrides"] = JSON.stringify(this.getOverrides());
     }
 
 });
@@ -20195,13 +20509,14 @@ Ext.define('Voyant.widget.GeonamesFilter', {
                             var extent = panel.getMap().getView().calculateExtent(map.getSize());
                             var isVisible = ol.extent.containsExtent(extent, hasMatch.getGeometry().getExtent());
                             if(!isVisible) {
-                                map.getView().setZoom(map.getView().getZoom() - 1);
+                                newExtent = ol.extent.extend(extent, hasMatch.getGeometry().getExtent());
+                                map.getView().fit(newExtent);
                             }
                         }
 
                         var arcGenerator = new arc.GreatCircle(
-                            {x: currentConnectionOccurrence.source.longitude, y: currentConnectionOccurrence.source.latitude},
-                            {x: currentConnectionOccurrence.target.longitude, y: currentConnectionOccurrence.target.latitude});
+                            {x: currentConnectionOccurrence.source.lng, y: currentConnectionOccurrence.source.lat},
+                            {x: currentConnectionOccurrence.target.lng, y: currentConnectionOccurrence.target.lat});
                         var arcLine = arcGenerator.Arc(100, {offset: 100});
                         var label = currentConnectionOccurrence.source.label+" -> "+currentConnectionOccurrence.target.label;
                         arcLine.geometries.forEach(function(geometry) {
@@ -25916,7 +26231,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 	    		return d3.max(layer, function(d) { return d[1]; });
 	    	});
 	    	
-	    	var height = this.body.down('svg').dom.clientHeight - this.graphMargin.top - this.graphMargin.bottom;
+	    	var height = this.body.down('svg').getHeight() - this.graphMargin.top - this.graphMargin.bottom;
 	    	var y = d3.scaleLinear().domain([min, max]).range([height, 0]);
 	    	
 	    	var area = d3.area()
