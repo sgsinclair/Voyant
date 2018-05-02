@@ -128,8 +128,37 @@ Ext.define('Voyant.panel.Cirrus', {
 
 			var dataString = this.getApiParam('inlineData');
         	if (dataString !== undefined) {
-        		var jsonData = Ext.decode(dataString, true);
-        		if (jsonData !== null) {
+        		if (dataString.charAt(0)=="[") {
+            		var jsonData = Ext.decode(dataString, true);
+        		} else {
+        			if (dataString.indexOf(":")>-1) {
+        				jsonData = [];
+        				dataString.split(",").forEach(function(term) {
+        					parts = term.split(":");
+        					jsonData.push({
+        						text: parts[0],
+        						rawFreq: parseInt(parts[1])
+        					})
+        				})
+        			} else {
+        				var terms = {}
+        				jsonData = [];
+        				dataString.split(",").forEach(function(term) {
+        					if (term in terms) {
+        						terms[term]++;
+        					} else {
+        						terms[term] = 1;
+        					}
+        				});
+        				for (term in terms) {
+        					jsonData.push({
+        						text: term,
+        						rawFreq: terms[term]
+        					})
+        				}
+        			}
+        		}
+        		if (jsonData !== null && jsonData.length>0) {
         			this.setApiParam('inlineData', jsonData);
 	        	    this.setTerms(jsonData);
 	        	    this.buildFromTerms();

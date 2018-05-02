@@ -120,7 +120,7 @@ Ext.define('Voyant.data.util.Geonames', {
 			});
 			this.load(params).then(function(data) {
 				me.setIsIncrementalLoadingOccurrences(false);
-				connectionOccurrences = connectionOccurrences.concat(data.dreamscape.connectionOccurrences.connectionOccurrences);
+				me.getData().connectionOccurrences.connectionOccurrences = connectionOccurrences.concat(data.dreamscape.connectionOccurrences.connectionOccurrences);
 			})
 		}
 		if (connectionOccurrences && connectionOccurrences[index]) {
