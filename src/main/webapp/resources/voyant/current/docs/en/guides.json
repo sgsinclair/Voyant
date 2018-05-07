@@ -128,6 +128,11 @@
                         "title": "Document Terms"
                     },
                     {
+                        "name": "dreamscape",
+                        "url": "guides/tools/dreamscape",
+                        "title": "Dreamscape"
+                    },
+                    {
                         "name": "knots",
                         "url": "guides/tools/knots",
                         "title": "Knots"
