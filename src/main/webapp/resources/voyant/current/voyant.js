@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 01 14:27:41 EDT 2018 */
+/* This file created by JSCacher. Last modified: Mon May 07 15:47:52 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -10041,6 +10041,7 @@ Ext.define('Voyant.data.util.Geonames', {
 			if (data && data.dreamscape && data.dreamscape.progress) {
 				new Voyant.widget.ProgressMonitor({
 					progress: data.dreamscape.progress,
+					maxMillisSinceStart: 1000*60*60, // an hour (!)
 					tool: 'corpus.Dreamscape',
 					success: function() {
 						me.load.call(me, params, dfd);
@@ -12830,7 +12831,11 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 		i18n: {
 			noProgress: "This progress monitor was incorrectly initialized.",
 			progress: "Progress",
-			badProgress: "Unable to understand the progress report from the server"
+			badProgress: "Unable to understand the progress report from the server",
+			aborted: "Error",
+			finished: "Finished",
+			launch: "Launching…",
+			running: "Working…"
 		}
 	},
 	config: {
@@ -12840,16 +12845,17 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 		failure: undefined,
 		args: undefined,
 		tool: undefined,
-		delay: 1000
+		delay: 1000,
+		maxMillisSinceStart: undefined
 	},
 	constructor: function(config) {
+		config = config || {};
 		this.mixins['Voyant.util.Localization'].constructor.apply(this, arguments);
 		if (!config || !config.progress || !config.progress.id) {
 			return Voyant.application.showError(this.localize("noProgress"))
 		}
 		this.initConfig(config);
 		this.callParent(arguments);
-		this.msgbox = Ext.Msg.wait("&nbsp;",this.localize("progress"));
 		this.update();
 	},
 
@@ -12857,7 +12863,14 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 		var progress = this.getProgress(), scope = this.getScope();
 		var msg = scope.localize ? scope.localize(progress.code) : this.localize(progress.code);
 		if (msg=="["+progress.code+"]") {msg=progress.message}
-		this.msgbox.updateProgress(progress.completion, parseInt(progress.completion*100)+"%", msg); 
+		msg+=" ("+(parseInt(progress.completion*100))+"%)";
+		var text = this.localize(progress.status);
+		if (!this.msgbox || this.msgbox.msg.html!=msg || !this.msgbox.progressBar || this.msgbox.progressBar.getText()!=text) {
+			console.warn((this.msgbox ? this.msgbox.msg.html : ""), msg)
+			this.msgbox = Ext.Msg.wait(msg, this.localize("progress"), {
+				text: text
+			});
+		}
 		if (progress.status=="LAUNCH" || progress.status=="RUNNING") {
 			var me = this;
 			Ext.defer(function() {
@@ -12865,7 +12878,8 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 				     url: Voyant.application.getTromboneUrl(),
 				     params: {
 				    	 	tool: "progress.ProgressMonitor",
-				    	 	id: progress.id
+				    	 	id: progress.id,
+				    	 	maxMillisSinceStart: me.getMaxMillisSinceStart()
 				     }
 				 }).then(function(response, opt) {
 					 var data = Ext.decode(response.responseText);
@@ -12882,6 +12896,7 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 		} else {
 			this.finish(progress.status=="FINISHED", msg);
 		}
+		if (this.getDelay()<5000) {this.setDelay(this.getDelay()+500)} // longer delay, up to 5 secs
 	},
 	
 	finish: function(success, response) {
@@ -12896,7 +12911,9 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 	},
 	
 	close: function() {
-		this.msgbox.close();
+		if (this.msgbox) {
+			this.msgbox.close();
+		}
 		this.destroy();
 	}
 

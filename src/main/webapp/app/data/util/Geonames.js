@@ -42,6 +42,7 @@ Ext.define('Voyant.data.util.Geonames', {
 			if (data && data.dreamscape && data.dreamscape.progress) {
 				new Voyant.widget.ProgressMonitor({
 					progress: data.dreamscape.progress,
+					maxMillisSinceStart: 1000*60*60, // an hour (!)
 					tool: 'corpus.Dreamscape',
 					success: function() {
 						me.load.call(me, params, dfd);
