@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue May 22 12:58:24 MDT 2018 */
+/* This file created by JSCacher. Last modified: Tue May 22 13:23:32 MDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -16520,12 +16520,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
                 },{
                 	text: me.localize('clearTerms'),
 					glyph: 'xf014@FontAwesome',
-                	handler: function() {
-                		this.setNodeData([]);
-                    	this.setLinkData([]);
-                		this.setNetworkMode(this.DEFAULT_MODE);
-                		this.refresh();
-                	},
+                	handler: this.resetGraph,
                 	scope: me
                 },this.localize('context'),{
                 	xtype: 'slider',
@@ -16703,9 +16698,22 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		}
     },
     
+    resetGraph: function() {
+		this.setNodeData([]);
+    	this.setLinkData([]);
+		this.setNetworkMode(this.DEFAULT_MODE);
+		this.refresh();
+    },
+    
     loadFromQuery: function(query) {
+    	if (Ext.isArray(query) && query.length==0) {
+    		this.setApiParam("query", undefined);
+    		this.resetGraph();
+    		return;
+    	}
     	this.setApiParams({
-    		mode: 'corpus'
+    		mode: 'corpus',
+    		query: query
     	});
     	var params = this.getApiParams();
     	(Ext.isString(query) ? [query] : query).forEach(function(q) {
@@ -16873,6 +16881,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     doCentralize: function(term) {
+    	this.setApiParam("centralize",term);
     	this.resetGraph();
     	
     	this.setNetworkMode(this.CENTRALIZED_MODE);
