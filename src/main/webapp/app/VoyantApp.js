@@ -295,6 +295,16 @@ Ext.define('Voyant.VoyantApp', {
 		}
 		return color;
 	},
+	
+	getRgb: function(index, alpha) {
+		var color = this.getColor(index);
+		 return "rgba("+color[0]+","+color[1]+","+color[2]+","+alpha+")";
+	},
+	
+	getRgbaForTerm: function(term, alpha) {
+		 var color = this.getColorForTerm(term);
+		 return "rgba("+color[0]+","+color[1]+","+color[2]+","+alpha+")";
+	},
 
 	/**
 	 * Opens a URL in a new window (handling the case when popup windows aren't allowed).

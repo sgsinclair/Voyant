@@ -637,6 +637,12 @@ Ext.define('Voyant.data.model.Corpus', {
 		})
 	},
 	
+	map: function(fn, scope) {
+		return this.getDocuments().getRange().map(function(doc, i) {
+			return fn.call(scope || doc, doc, i)
+		}, scope || this)
+	},
+	
 	getCorpusCollocates: function(config) {
 		return Ext.create("Voyant.data.store.CorpusCollocates", Ext.apply(config || {}, {corpus: this}));
 	},

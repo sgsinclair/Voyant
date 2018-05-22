@@ -98,6 +98,13 @@
 
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/css/styles.css" />
 
+<!-- highcharts -->
+<!-- 
+<script type="text/javascript" src="<%=base %>/resources/highcharts/Highcharts-6.1.0/code/highcharts.js"></script>
+<script type="text/javascript" src="<%=base %>/resources/highcharts/Highcharts-6.1.0/code/modules/drilldown.js"></script>
+<script type="text/javascript" src="<%=base %>/resources/highcharts/custom-events/customEvents.min.js"></script>
+ -->
+ 
 <%
 	// check to see if there's CSS in the URL
 	if (request.getParameter("cssInline")!=null) { 
