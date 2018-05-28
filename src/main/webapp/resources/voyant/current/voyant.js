@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 28 10:49:35 EDT 2018 */
+/* This file created by JSCacher. Last modified: Mon May 28 11:22:16 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -16595,6 +16595,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 						if (this.getNetworkMode() === this.CENTRALIZED_MODE) {
 							this.resetGraph();
 							this.setNetworkMode(this.DEFAULT_MODE);
+							this.setApiParam('centralize', undefined);
 							node.start = 0;
 							node.limit = this.getApiParam('limit');
 						}
@@ -16680,7 +16681,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 			var limit = 3;
 			var query = this.getApiParam('query');
 			if (query !== undefined) {
-				limit = query.split(',').length;
+				limit = Ext.isArray(query) ? query.length : query.split(',').length;
 			}
 			this.getCorpus().getCorpusTerms({autoLoad: false}).load({
 				params: {
@@ -16872,6 +16873,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				data.splice(i, 1);
 			}
 		}
+		
+		
+		this.setApiParam("query", Ext.Array.remove(Ext.Array.from(this.getApiParam("query")), nodeId));
 		
 		if (removeOrphans) {
 			// TODO
@@ -17257,6 +17261,13 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     
     fetchCollocatesForNode: function(d) {
     	var limit = this.getApiParam('limit');
+    	var query = this.getApiParam("query");
+    	
+    	var query = Ext.Array.from(this.getApiParam("query"));
+    	Ext.Array.include(query, d.term)
+    	console.warn(query)
+		this.setApiParam("query", query);
+
     	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
     	corpusCollocates.load({
     		params: Ext.apply(this.getApiParams(), {query: d.term, start: d.start, limit: limit}),
