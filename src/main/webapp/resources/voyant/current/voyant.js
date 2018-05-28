@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 28 11:22:16 EDT 2018 */
+/* This file created by JSCacher. Last modified: Mon May 28 12:14:08 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -17265,7 +17265,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	
     	var query = Ext.Array.from(this.getApiParam("query"));
     	Ext.Array.include(query, d.term)
-    	console.warn(query)
 		this.setApiParam("query", query);
 
     	var corpusCollocates = this.getCorpus().getCorpusCollocates({autoLoad: false});
@@ -29043,7 +29042,7 @@ Ext.define('Voyant.panel.Trends', {
     	    			if (!data[i]) {
     	    				data[i] = {"index": docLabels[i]};
     	    			}
-    	    			data[i]["_"+index] = r;
+    	    			data[i]["_"+index] = withDistributions=='relative' ? r.toFixed(7) : r;
     	    			data[i]["term"+index] = term;
     	    		}, this);
     	    		
@@ -29126,7 +29125,7 @@ Ext.define('Voyant.panel.Trends', {
     		color = colors.length==1 ? colors[0] : colors[pos];
         var html = "<span class='x-legend-item-marker' style='background:"+color+
         		"; left: 2px;'></span> <span style='padding-left: 1.2em; font-weight: bold;'>"+
-        		term+"</span>: +"+record.get(ctx.field)+
+        		term+"</span>: "+record.get(ctx.field)+
     			"<br/><i>"+this.getCorpus().getDocument(docIndex).getShortTitle()+"</i>"
 		if (this.getApiParam("mode")=="corpus") {
     		html+="<div style='font-size: smaller'>"+this.localize('dblClickItem')
@@ -29192,7 +29191,7 @@ Ext.define('Voyant.panel.Trends', {
     	    			if (!data[i]) {
     	    				data[i] = {docIndex: docIndex, index: (i+1)};
     	    			}
-    	    			data[i]["_"+index+"_"+docIndex] = r;
+    	    			data[i]["_"+index+"_"+docIndex] = withDistributions=='relative' ? r.toFixed(7) : r;
     	    			data[i]["term"+index] = term;
     	    		}, this);
 
