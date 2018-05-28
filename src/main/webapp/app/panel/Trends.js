@@ -21,7 +21,49 @@ Ext.define('Voyant.panel.Trends', {
 	    /**
 	     * @private
 	     */
-    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
+    	options: [{xtype: 'stoplistoption'},
+    		{
+    			name: 'bins',
+		    	xtype: 'slider',
+		    	labelAlign: 'right',
+		    	width: 200,
+		    	minValue: 2,
+		    	maxValue: 100,
+	        	listeners: {
+	        		afterrender: function(slider) {
+	        			var trends = slider.up("window").panel;
+	        			slider.setFieldLabel(trends.localize("segmentsSlider"));
+	        		}
+	        	}    		
+    		},{
+                xtype: 'radiogroup',
+		    	labelAlign: 'right',
+                columns: 3,
+                vertical: true,
+                name: 'withDistributions',
+                items: [{
+                    boxLabel: 'raw',
+                    name: 'withDistributions',
+                    inputValue: 'raw'
+                },{
+                    boxLabel: 'relative',
+                    name: 'withDistributions',
+                    inputValue: 'relative',
+                    style: 'margin-left: 1em;'
+                }],
+	        	listeners: {
+	        		afterrender: function(radiogroup) {
+	        			var panel = this.up("window").panel;
+	        			this.setFieldLabel("frequencies");
+	        			var val = panel.getApiParam("withDistributions");
+	        			radiogroup.getBoxes().forEach(function(item) {
+	        				item.setBoxLabel(panel.localize(item.inputValue));
+	        				item.checked = item.inputValue==val;
+	        			});
+	        			this.setValue({withDistributions: val});
+	        		}
+	        	}
+    		},{xtype: 'colorpaletteoption'}]
 	},
     statics: {
     	i18n: {
@@ -36,7 +78,17 @@ Ext.define('Voyant.panel.Trends', {
     		drillTerm: "Terms",
     		drillTermTip: "View the distribution of this term within all documents.",
     		drillDocument: "Document",
-    		drillDocumentTip: "View the distribution of all current terms within this document."
+    		drillDocumentTip: "View the distribution of all current terms within this document.",
+    		noResults: "No Results",
+    		segment: "segment:",
+    		display: "Display",
+    		labels: "Show Labels",
+    		area: "Area",
+    		bar: "Columns",
+    		line: "Line",
+    		stacked: "Stacked Bar",
+    		barline: "Line + Stacked Bar"
+    		
     	},
     	api: {
     		
@@ -95,14 +147,18 @@ Ext.define('Voyant.panel.Trends', {
     		/**
     		 * @cfg {String} mode Force the mode to be either "corpus" (distribution of terms across documents) or "document" (distribution of terms within a document); usually this is correctly set by default according to whether the corpus has one document ("document") or more than one ("corpus").
     		 */
-    		mode: "corpus"
+    		mode: "corpus",
+    		
+    		chartType: 'barline',
+    		
+    		labels: false
     	},
 		glyph: 'xf201@FontAwesome'
     },
     
     layout: 'fit',
     documentTermsStore: undefined,
-    segments: undefined,
+    //segments: undefined,
     
     /**
      * @private
@@ -113,6 +169,7 @@ Ext.define('Voyant.panel.Trends', {
     },
     
     initComponent: function() {
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments); // we need api
     	Ext.apply(this, {
     		title: this.localize('title'),
             dockedItems: [{
@@ -131,33 +188,70 @@ Ext.define('Voyant.panel.Trends', {
                 			mode: undefined,
                 			query: undefined
                 		});
-                		// clear query (and trigger redraw)
-                		//btn.ownerCt.down("querysearchfield").setValue("");
                 		this.loadCorpusTerms();
                 	},
                 	scope: this
-                },{
-			    	itemId: 'segmentsSlider',
-			    	xtype: 'slider',
-			    	fieldLabel: this.localize('segmentsSlider'),
-			    	fieldAlign: 'right',
-			    	labelWidth: 70,
-			    	width: 150,
-			    	minValue: 2,
-			    	maxValue: 100,
-			    	hidden: true,
-	            	listeners: {
-	            		afterrender: function(slider) {
-	            			this.segments = slider;
-	            			slider.setValue(parseInt(this.getApiParam("bins")))
-	            		},
-	            		changecomplete: function(slider, newvalue) {
-	            			this.setApiParams({bins: newvalue});
-	            			this.loadDocumentTerms();
-	            		},
-	            		scope: this
-	            	}
-	    		}]
+				},{
+					text: this.localize('display'),
+					tooltip: this.localize('displayTip'),
+					glyph: 'xf013@FontAwesome',
+					menu: {
+						listeners: {
+							afterrender: function(menu) {
+								var val = this.getApiParam("chartType");
+								menu.items.each(function(item) {
+									if (item.getItemId()==val) {
+										item.addCls(item.activeCls);
+									}
+								})
+							},
+							scope: this
+						},
+	                    defaults: {
+	                        xtype: 'menuitem',
+	                        handler: function(item, checked) {
+	                        	if (item.xtype=="menucheckitem") { // labels
+		                        	this.setApiParam("labels", item.checked);
+	                        	} else {
+		                        	this.setApiParam("chartType", item.getItemId());
+	                        	}
+	                        	this.loadCorpusTerms();
+	                        },
+	                        scope: this
+	                    },
+	                    items: [{
+	                    	xtype: 'menucheckitem',
+	                    	text: this.localize('labels'),
+	                        tooltip: this.localize('labelsTip'),
+	                        checked: this.getApiParam("labels")===true || this.getApiParam("labels")=="true"
+	                    },'-',{
+	                        itemId: 'area',
+	                        text: this.localize('area'),
+	                        tooltip: this.localize('areaTip'),
+	                        glyph: 'xe76b@Sencha-Examples'
+	                    },{
+	                        itemId: 'bar',
+	                        text: this.localize('bar'),
+	                        tooltip: this.localize('barTip'),
+	                        glyph: 'xe768@Sencha-Examples'
+	                    },{
+	                        itemId: 'line',
+	                        text: this.localize('line'),
+	                        tooltip: this.localize('lineTip'),
+	                        glyph: 'xe773@Sencha-Examples'
+	                    },{
+	                        itemId: 'stacked',
+	                        text: this.localize('stacked'),
+	                        tooltip: this.localize('stackedTip'),
+	                        glyph: 'xe6c8@Sencha-Examples'
+	                    },{
+	                        itemId: 'barline',
+	                        text: this.localize('barline'),
+	                        tooltip: this.localize('barlineTip'),
+	                        glyph: 'xe779@Sencha-Examples'
+	                    }]
+					}
+				}]
             }]
     	});
         this.callParent(arguments);
@@ -219,7 +313,7 @@ Ext.define('Voyant.panel.Trends', {
     		return;
     	}
     	params = params || {};
-    	this.segments.hide();
+    	//this.segments.hide();
     	var withDistributions = this.getApiParam("withDistributions");
     	Ext.applyIf(params, {
     		bins: this.getCorpus().getDocumentsCount(),
@@ -231,46 +325,58 @@ Ext.define('Voyant.panel.Trends', {
     	this.getCorpus().getCorpusTerms().load({
     		params: params,
     		callback: function(records, operation, success) {
-    			var data = [], series = [];
+    			var data = [], series = [], chartType = this.getApiParam('chartType');
     			records.forEach(function(record, index) {
-    	    		var term = record.get('term');
+    	    		var term = record.get('term'), docIndex = record.get("docIndex");
     	    		var color = this.getApplication().getColorForTerm(term, true);
     	    		record.get('distributions').forEach(function(r, i) {
     	    			if (!data[i]) {
     	    				data[i] = {"index": docLabels[i]};
     	    			}
     	    			data[i]["_"+index] = r;
+    	    			data[i]["term"+index] = term;
     	    		}, this);
-    	        	series.push({
-    	    			title: term,
-    	    			xField: 'index',
-    	    			yField: '_'+index,
-    	    			term: term,
-    	    			colors: [color],
-    	                tooltip: {
-    	                    trackMouse: true,
-    	                    renderer: function (toolTip, record, ctx) {
-    	                    	var html = "<span class='x-legend-item-marker' style='background:"+color+"; left: 2px;'></span> <span style='padding-left: 1.2em; font-weight: bold;'>"+
-    	                    		ctx.series.term+"</span>: +"+record.get(ctx.field);
-    	                    	if (this.getCorpus().getDocumentsCount()>1) {
-    	                    		html+="<br/><i>"+this.getCorpus().getDocument(ctx.index).getShortTitle()+"</i>";
-    	                    	}
-    	                    	html+="<div style='font-size: smaller'>"+this.localize('dblClickItem')
-    	                    	toolTip.setHtml(html);
-    	                    },
-    	                    scope: this
-    	                },
-    	    			label: {
-    	                   color: color,
-    	                   renderer: function(sprite, config, rendererData, index) {
-    	                	   return term;
-    	                  }
-    	                }
-    	        	})
+    	    		
+    	    		
+    	    		if (chartType!='bar') {
+    	    			var kinds = chartType=='barline' ? ["bar","line"] : [chartType];
+    	    			kinds.forEach(function(kind) {
+    	    	        	series.push({
+    	    	        		type: kind=='stacked' ? 'bar' : kind,
+    	    	    			title: term,
+    	    	    			xField: 'index',
+    	    	    			yField: '_'+index,
+    	    	    			term: term,
+    	    	    			colors: [color],
+    	    	    			label: chartType=='barline' && kind=='bar' ? {
+    	    	    				display: 'none'
+    	    	    			} : {
+    	    	    				field: "term"+index
+    	    	    			}
+    	    	        	})
+    	    			}, this);
+    	    		}
     			}, this);
-
+    			
+    			var terms = records.map(function(r) {return r.getTerm()})
+    			var colors = terms.map(function(term) {
+	    			return  this.getApplication().getColorForTerm(term, true);
+	    		}, this);
+	    		if (chartType=='bar') {
+		    		series.push({
+		    			type:'bar',
+		    			title: terms,
+			    		colors: colors,
+		    			xField: 'index',
+		    			yField: data.length>0 ? Object.keys(data[0]).filter(function(field) {return field.charAt(0)=="_"}) : undefined,
+    	    			label: {
+    	    				field: records.map(function(r,i) {return "term"+i;})
+    	    			}
+		    		})
+	    		}
+	    		
     	    	var store = Ext.create('Ext.data.JsonStore', {
-    	    		fields: Object.keys(data[0]),
+    	    		fields: data.length>0 ? Object.keys(data[0]) : undefined,
     	    		data: data
     	    	});
 
@@ -298,6 +404,28 @@ Ext.define('Voyant.panel.Trends', {
     	});
   
     },
+    
+    getItemToolTip: function (toolTip, record, ctx) {
+    	
+    	var parts = ctx.field.split("_"),
+    		docIndex = parts.length==2 ? ctx.index : parts[2],
+    		pos = parseInt(parts[1]),
+    		title = ctx.series.getTitle(),
+    		term = Ext.isArray(title) ? title[pos] : title,
+    		colors = ctx.series.getColors(),
+    		color = colors.length==1 ? colors[0] : colors[pos];
+        var html = "<span class='x-legend-item-marker' style='background:"+color+
+        		"; left: 2px;'></span> <span style='padding-left: 1.2em; font-weight: bold;'>"+
+        		term+"</span>: +"+record.get(ctx.field)+
+    			"<br/><i>"+this.getCorpus().getDocument(docIndex).getShortTitle()+"</i>"
+		if (this.getApiParam("mode")=="corpus") {
+    		html+="<div style='font-size: smaller'>"+this.localize('dblClickItem')
+		} else {
+			html+="<br/>"+this.localize('segment')+" "+(ctx.index+1)
+		}
+    	toolTip.setHtml(html);
+    },
+    
 
     loadDocumentTerms: function(params) {
     	if (!this.getApiParam("query")) {
@@ -314,7 +442,7 @@ Ext.define('Voyant.panel.Trends', {
         	})
     		return;
     	}
-    	this.segments.show();
+    	//this.segments.show();
     	this.setApiParam("mode", "document"); // just to be sure
     	params = params || {};
     	var withDistributions = this.getApiParam("withDistributions");
@@ -336,7 +464,7 @@ Ext.define('Voyant.panel.Trends', {
     	this.getCorpus().getDocumentTerms().load({
     		params: params,
     		callback: function(records, operation, success) {
-    			var data = [], series = [];
+    			var data = [], series = [],  chartType = this.getApiParam('chartType');
     			if (!singleDoc) { // legend is easier to read if sorted by term then doc
         			records.sort(function(a,b) {
         				if (a.getTerm()==b.getTerm()) {
@@ -355,35 +483,52 @@ Ext.define('Voyant.panel.Trends', {
     	    				data[i] = {docIndex: docIndex, index: (i+1)};
     	    			}
     	    			data[i]["_"+index+"_"+docIndex] = r;
+    	    			data[i]["term"+index] = term;
     	    		}, this);
-    	        	series.push({
-    	    			title: term + (singleDoc ? "" : " ("+(this.getCorpus().getDocument(docIndex).getTinyTitle())+")"),
-    	    			xField: 'index',
-    	    			yField: '_'+index+"_"+docIndex,
-    	    			term: term,
-    	    			docIndex: docIndex,
-    	    			colors: [color],
-    	                tooltip: {
-    	                    trackMouse: true,
-    	                    renderer: function (toolTip, record, ctx) {
-    	                    	var html = "<span class='x-legend-item-marker' style='background:"+color+"; left: 2px;'></span> <span style='padding-left: 1.2em; font-weight: bold;'>"+
-    	                    		ctx.series.term+"</span>: +"+record.get(ctx.field)+
-    	                    		"<br/><i>"+this.getCorpus().getDocument(docIndex).getShortTitle()+"</i>";
-    	                    	toolTip.setHtml(html);
-    	                    },
-    	                    scope: this
-    	                },
-    	    			label: {
-    	                   color: color,
-    	                   renderer: function(text, sprite, config, rendererData, index) {
-    	                	   return term
-    	                  }
-    	                }
-    	        	})
+
+    	    		if (chartType!='bar') {
+    	    			var kinds = chartType=='barline' ? ["bar","line"] : [chartType];
+    	    			kinds.forEach(function(kind) {
+    	    	        	series.push({
+    	    	        		type: kind=='stacked' ? 'bar' : kind,
+    	    	    			title: singleDoc ? term : (docIndex+1)+") "+term,
+    	    	    			xField: 'index',
+    	    	    			yField: '_'+index+"_"+docIndex,
+    	    	    			term: term,
+    	    	    			colors: [color],
+    	    	    			label: chartType=='barline' && kind=='bar' ? {
+    	    	    				display: 'none'
+    	    	    			} : {
+    	    	    				field: "term"+index
+    	    	    			}
+    	    	        	})
+    	    			}, this);
+    	    		}
+    	    		
     			}, this);
     			
+	    		if (chartType=='bar') {
+	    			var isOneTerm = Ext.Array.unique(records.map(function(r) {return r.getTerm()})).length;
+	    			var terms = records.map(function(r) {return (1+r.get("docIndex"))	+") "+r.getTerm()})
+	    			var colors = records.map(function(r) {
+		    			return  isOneTerm ? this.getApplication().getColor(r.get("docIndex"), true) : this.getApplication().getColorForTerm(r.getTerm(), true);
+		    		}, this);
+
+		    		series.push({
+		    			type:'bar',
+		    			title: terms.length>0 ? terms : this.localize("noResults"),
+			    		colors: colors,
+		    			xField: 'index',
+		    			yField: data.length>0 ? Object.keys(data[0]).filter(function(field) {return field.charAt(0)=="_"}) : undefined,
+		    			label: {
+		    				field: terms
+		    			}
+		    		})
+	    		}
+
+    			
     	    	var store = Ext.create('Ext.data.JsonStore', {
-    	    		fields: Object.keys(data[0]),
+    	    		fields: data.length>0 ? Object.keys(data[0]) : undefined,
     	    		data: data
     	    	});
 
@@ -413,22 +558,40 @@ Ext.define('Voyant.panel.Trends', {
 
     
     buildChart: function(config) {
+    	var chartType = this.getApiParam('chartType'), labels = false;
+    	if (this.getApiParam("labels")===true || this.getApiParam("labels")=="true") {labels=true}
+    	
+    	Ext.applyIf(config, {
+    		cls: this.getApiParam("mode")
+    	});
+
     	config.series.forEach(function(serie) {
     		Ext.applyIf(serie, {
-				type: 'line',
+				stacked: serie.type=='bar' ? false : true,
+				showInLegend: chartType=='barline' && serie.type=='line' ? false : true,
     			smooth: true,
-    			marker: {
+    			showMarkers: serie.type=='bar' ? false : true,
+    			marker: chartType=='barline' && serie.type=='line' ? null : {
     			    type: 'circle',
     			    radius: 2
     			},
                 style: {
                     lineWidth: 1,
-                    strokeOpacity: .5
+                    fillOpacity: chartType=='barline' && serie.type=='bar' ? .01 : 1,
+                    strokeOpacity: chartType=='barline' && serie.type=='bar' ? .1 : 1
                 },
+                highlight: true,
                 highlightCfg: {
-                	scaling: 2
+                	scaling: serie.type=="bar" ? 1.1 : 2
                 },
-    			label: {},
+    			label: {
+//    				display: 'none'
+    			},
+    			tooltip: {
+                    trackMouse: true,
+                    renderer: this.getItemToolTip,
+                    scope: this
+    			},
                 listeners: {
                 	itemclick: function(chart,item,event,eOpts ) {
             			if (this.clickTimer) {clearTimeout(this.clickTimer);}
@@ -512,8 +675,9 @@ Ext.define('Voyant.panel.Trends', {
                 display: 'over',
                 field: 'index',
                 fontSize: 11,
-                translateY: 9
-    		})
+                translateY: chartType=='line' ? 9 : undefined
+    		});
+    		if (!labels) {serie.label.display="none";} // hide label 
     	}, this)
     	Ext.applyIf(config, {
     		animation: true,
@@ -522,7 +686,23 @@ Ext.define('Voyant.panel.Trends', {
     	        moveEvents: true
     	    },
     		legend: {
-    			docked:'top'
+    			docked:'top',
+    			listeners: {
+    				itemclick: function(legend, record, dom, index) {
+    					// make sure to hide related series
+    					if (legend.getStore().getCount()<legend.chart.series.length && this.getApiParam("chartType")=="barline") {
+        					var term = record.get("name"), disabled = record.get("disabled");
+        					legend.chart.series.forEach(function(serie) {
+        						if (serie.getTitle()==term) {
+        							serie.setHidden(disabled);
+        							
+        						}
+        					})
+        					legend.chart.redraw(); // not working?
+    					}
+    				},
+    				scope: this
+    			}
     		},
     		interactions: ['itemhighlight','crosszoom'],
     	    listeners: {}
@@ -550,7 +730,7 @@ Ext.define('Voyant.panel.Trends', {
     		})
     		Ext.applyIf(axis.title, {scaling: .75});
     		Ext.applyIf(axis.label, {scaling: .75});
-    		if (axis.type=='category' && this.getApiParam("mode")=="corpus") {
+    		if (axis.type=='category') {
     			var titles = "";
     			config.store.each(function(r) {titles+=r.get("index")})
     			if (titles.length>this.getTargetEl().getWidth()/9) {
@@ -561,10 +741,25 @@ Ext.define('Voyant.panel.Trends', {
         		})
     		}
     	}, this)
+    	    	
     	// remove existing chart
     	this.query('chart').forEach(function(chart) {this.remove(chart, true);}, this);
+    	
+    	// create new chart
 		var chart = Ext.create("Ext.chart.CartesianChart", config);
     	this.add(chart);
+    },
+    
+    reloadFromChart: function() {
+    	var chart = this.down('chart');
+    	if (chart) {
+    		var terms = [];
+    		chart.series.forEach(function(serie) {
+    			terms.push(serie.getTitle());
+    		});
+    		this.fireEvent("termsClicked", this, terms);
+    	}
     }
+
 
  });

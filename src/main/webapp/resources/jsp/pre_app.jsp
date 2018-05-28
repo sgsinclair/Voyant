@@ -60,6 +60,7 @@
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/theme-crisp-all<%= rtl %>_2.css" />
 <script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/ux.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/ux-all<%= rtl %>-debug.css" />
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/examples/style.css" />
 
 <!-- EXTJS MODERN -->
 <!--
