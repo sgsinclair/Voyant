@@ -4,9 +4,6 @@ Ext.define('Voyant.panel.TermsBerry', {
 	alias: 'widget.termsberry',
     statics: {
     	i18n: {
-    		tfidf: 'tf-idf',
-    		inDocs: 'In Docs',
-    		reset: 'Reset'
     	},
     	api: {
     		stopList: 'auto',

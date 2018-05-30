@@ -1,14 +1,32 @@
 Voyant.util.Localization.LANGUAGE='cz'
+Ext.apply(Voyant.panel.Correlations.i18n, {
+"sourceTip":"Term 1 (the pairing is what matters, not the column)",
+"emptyText":"(No results.)",
+"significanceTip":"This is a measure of the signifiance of the correlation value. Often a significance of .05 or less indicates a strong correlation (which allows us to reject the null hypothesis that values are randomly distributed). The validity of this measure depends on assumptions about a normal distribution of the data. Also, don’t forget that we typically have a relatively small number of values (frequencies from segments in a text or from documents in a corpus), so these values should be used with care.",
+"targetTip":"Term 2 (the pairing is what matters, not the column)",
+"source":"Term 1",
+"title":"Correlations",
+"target":"Term 2",
+"significance":"Significance (p)",
+"correlation":"Correlation (r)",
+"correlationTip":"This is a measure of how closely term frequencies correlate (using Pearson’s correlation coefficient or a simple regression). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other drops), scores approaching 0 indicate little or no meaningful correlation.",
+"trendTip":"This represents the relative frequencies of the term.",
+"helpTip":"The Correlations tool enables an exploration of the extent to which term frequencies vary in sync (terms whose frequencies rise and fall together or inversely).",
+"minInDocumentsCountRatioLabel":"minimum coverage (%{0})"});
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"Opravdu chcete začít znovu (a opustit stávající korpus)?",
 "title":"Voyant Tools",
 "helpTip":"Voyant Tools jsou webovým prostředím pro čtení a analýzu digitálních textů.",
 "homeTip":"Klikněte zde pro návrat do obrazovky pro vytvoření korpusu.",
 "home":"Začít znovu"});
+Ext.apply(Voyant.data.util.Geonames.i18n, {
+"failedToFetchGeonames":"Failed to load location information."});
+Ext.apply(Voyant.notebook.editor.CodeEditor.i18n, {
+"emptyText":"// click here to edit"});
 Ext.apply(Voyant.panel.Topics.i18n, {
 "scores":"Scores",
 "adaptation":"adapted from David Mimno's <a href=\"https://github.com/mimno/jsLDA\" target=\"_blank\">jsLDA</a>",
-"scoresTip":"This represents the score of each document (in corpus order) for the row's topic.",
+"scoresTip":"This represents the score of each document (in corpus order) for the row’s topic.",
 "numTopics":"Topics",
 "title":"Topics",
 "loadingStopWords":"Loading stopwords…",
@@ -20,13 +38,13 @@ Ext.apply(Voyant.panel.Topics.i18n, {
 "topicTip":"This provides an ordered list of the ten most signifiant terms in the topic cluster. ",
 "helpTip":"This tool performs topic modelling (<a href=\"https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation\" target=\"_blank\">LDA</a>) on the current corpus. Initially words are randomly assigned to each topic and with each iteration the topics become more refined. Please note that because of the initial random assignment, results will be different each time this tool is run.",
 "loadingDocuments":"Loading documents…",
-"runIterationsTip":"This runs iterations (100 by default) on the current topics (in other words, the topics aren't replaced, they're refined).",
 "perDocLimitHigh":"This value seems high. Please note that problems may occur on the server or in your browser if you include too many terms (default is 1,000).",
-"searchTip":"Highlight the topics that contain the search (even partial words), don't forget that each topic is limited to the top 10 terms.",
+"runIterationsTip":"This runs iterations (100 by default) on the current topics (in other words, the topics aren’t replaced, they’re refined).",
 "iterations":"Iterations",
+"searchTip":"Highlight the topics that contain the search (even partial words), don’t forget that each topic is limited to the top 10 terms.",
 "runningIterations":"Performing topic modelling.",
-"runningIterationsCount":"Running {0} iterations.",
 "perDocLimitTip":"The maximum number of terms to include from the start of a document (set this to a very high number or to zero to have no limit, but beware that high values can cause problems on the server or in your browser).",
+"runningIterationsCount":"Running {0} iterations.",
 "limitTermsTip":"Determine the number of terms to show for each topic.",
 "totalDone":"({0} iterations done)",
 "numTopicsTip":"Determine the number of topics (or term clusters) to produce. Note that changing this value will regenerate topics (and that results will be different even with the same number of topics).",
@@ -48,33 +66,38 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "query":"Dotaz",
 "count":"Počet",
 "exportNewCorpus":"Nový korpus",
-"title":"Vyhledávač dokumentů",
-"loading":"nahrávání korpusu",
 "addRow":"Přidat řádek",
+"loading":"nahrávání korpusu",
+"title":"Vyhledávač dokumentů",
 "operator":"Operátor",
 "textField":"text (výchozí)",
 "unsuccessfulQuery":"Dotaz se nepodařilo dokončit.",
-"pubPlaceField":"místo vydání",
 "advancedField":"<i>pokročilý dotaz</i>",
+"pubPlaceField":"místo vydání",
 "authorField":"autor",
 "noMatches":"Nebyla nalezena žádná shoda (z {0} dokumentů).",
 "field":"Pole",
 "deleteRowTip":"Pro vymazání řádku klikněte zde",
 "publisherField":"vydavatel",
-"pubDateField":"datum vydání",
-"exportNewCorpusTip":"Vytvořit nový korpus z dokumentů odpovídajících hledanému výrazu (tlačítko bude neaktivní, pokud nejsou nalezeny žádné shody)."});
+"exportNewCorpusTip":"Vytvořit nový korpus z dokumentů odpovídajících hledanému výrazu (tlačítko bude neaktivní, pokud nejsou nalezeny žádné shody).",
+"pubDateField":"datum vydání"});
+Ext.apply(Voyant.notebook.editor.button.RunAll.i18n, {
+"tip":"Run all code blocks below."});
 Ext.apply(Voyant.panel.TermsBerry.i18n, {
 "scaling":"Scaling",
 "distinctTerms":"Distinct Terms",
-"topTerms":"Top Terms",
-"numTerms":"Terms",
 "context":"Context",
-"title":"TermsBerry",
-"strategy":"Strategy"});
+"numTerms":"Terms",
+"topTerms":"Top Terms",
+"reset":"Reset",
+"inDocs":"In Docs",
+"tfidf":"tf-idf",
+"strategy":"Strategy",
+"title":"TermsBerry"});
 Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
-"paletteEditor":"Editor palety",
 "add":"Přidat",
 "cancel":"Zrušit",
+"paletteEditor":"Editor palety",
 "editList":"Editace seznamu",
 "saveNewPalette":"Uložit novou paletu",
 "clear":"Smazat",
@@ -84,15 +107,15 @@ Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"Panel kontroly nastavení pro slovní zobrazení",
 "linear":"Lineární",
 "log":"Logaritimická",
-"displayPanel":"Zobrazovací panel",
 "completingTransition":"Dokončování přechodu.",
+"displayPanel":"Zobrazovací panel",
 "removeTerm":"Odstranit<b>{0}</b>",
 "yScale":"Měřítko osy Y",
 "title":"Termínové vlny",
 "type":"Vizualizace",
 "speed":"Rychlost",
-"segments":"Segmenty",
 "fraction":"Slovní zobrazení",
+"segments":"Segmenty",
 "duration":"Rychlost",
 "help":"Nástroj TermsRadio pro termínové vlny lze použít pro sledování výskytu slov napříč korpusem ve vymezeném časovém období.",
 "resetTip":"Obnovit vizualizaci do počátečního stavu.",
@@ -107,20 +130,18 @@ Ext.apply(Voyant.util.Downloadable.i18n, {
 "exportTitle":"Exportovat",
 "downloadButton":"Stáhnout",
 "cancelButton":"Zrušit"});
-Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
-"contextTermRawFreq":"Počet (kontext)",
-"matchingTerms":"{count}",
-"contextTerm":"Kolokát",
-"emptyText":"Vyhledávacím kritériím neodpovídají žádné výsledky.",
-"termTip":"Toto je klíčové slovo, v jehož okolí jsou počítány kolokáty (kontext).",
-"termRawFreqTip":"Kolikrát se klíčové slovo vyskytuje v korpusu",
-"title":"Kolokáty",
-"termRawFreq":"Počet (klíčového slova)",
-"context":"kontext",
-"term":"Termín",
-"helpTip":"<p>Korpusové kolokáty poskytují tabulkové zobrazení toho, které termíny se objevují s vyšší frekvencí v blízkosti klíčových slov napříč celým korpusem. Funkce zahrnují:</p><ul><li>změna uspořádání podle klíčového slova, kolokátu, četnosti kolokátu</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu lupy, pokud potřebujte nápovědu pro syntax</li></ul>",
-"contextTermRawFreqTip":"Kolikrát se daný kolokát vyskytuje v blízkosti klíčového slova napříč korpusem.",
-"contextTermTip":"Toto je kolokační termín (kontext), který se vyskytuje v blízkosti klíčového slova."});
+Ext.apply(Voyant.panel.WordWall.i18n, {
+"scaling":"Scaling",
+"yStrength":"Y Strength",
+"delay":"Fetch Delay",
+"stop":"Stop",
+"terms":"Terms",
+"chargeDistance":"Charge Distance",
+"chargeStrength":"Charge Strength",
+"start":"Start",
+"xStrength":"X Strength",
+"title":"Wall of Words",
+"transition":"Transition Speed"});
 Ext.apply(Voyant.panel.Documents.i18n, {
 "keepTip":"Klikněte zde pro vytvoření nového korpusu, který bude zahrnovat pouze vybrané nebo filtrované (pomocí vyhledávacího dotazu) dokumenty.",
 "reorderFilteredError":"U filtrovaného korpusu (po zadání vyhledávacího dotazu) nelze změnit uspořádání. Nejdříve prosím vytvořte nový korpus (pomocí tlačítek <i>Odstranit</i> nebo <i>Ponechat</i> button) a následně změňte uspořádání nového korpusu.",
@@ -130,9 +151,9 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "language":"Jazyk",
 "reorder":"Změnit uspořádání",
 "removeSelectedDocuments":"Vytvořit <i>nový</i> korpus, který odebere (NEBUDE obsahovat) {0:plural('selected document')}?",
-"title":"Dokumenty",
-"error":"Chyba",
 "addTip":"Klikněte zde pro přidání nových dokumentů do tohoto korpusu.",
+"error":"Chyba",
+"title":"Dokumenty",
 "keepFilteredDocuments":"Vytvořit <i>nový</i> korpus, který ponechá pouze {0:plural('filtered document')}?",
 "remove":"Odstranit",
 "documentAuthor":"Autor",
@@ -153,36 +174,48 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"Váš korpus obsahuje pouze jeden dokument, nemůžete dokumenty odstranit ani ponechat dokumenty, abyste vytvořili nový korpus.",
 "modify":"Změnit",
-"typeTokenRatioLexical":"Poměr",
 "modifyTip":"Klikněte na toto tlačítko pro vytvoření nového korpusu pomocí přidání nových dokumentů, vybráním podmnožiny dokumentů nebo změnou pořadí dokumentů.",
 "reorderDocuments":"Vytvořit <i>nový</i> korpus na základě zobrazeného pořadí?",
+"typeTokenRatioLexical":"Poměr",
 "keep":"Ponechat",
 "reorderOriginalError":"Nejdříve prosím změňte uspořádání korpusu (pomocí myši přetáhněte řádky v tabulce)."});
-Ext.apply(Voyant.panel.Panel.i18n, {
-"trend":"Trend",
-"relativeFreq":"Relativní",
-"colon":": ",
+Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
+"contextTermRawFreq":"Počet (kontext)",
+"matchingTerms":"{count}",
+"contextTerm":"Kolokát",
+"emptyText":"Vyhledávacím kritériím neodpovídají žádné výsledky.",
+"termRawFreqTip":"Kolikrát se klíčové slovo vyskytuje v korpusu",
+"termTip":"Toto je klíčové slovo, v jehož okolí jsou počítány kolokáty (kontext).",
+"title":"Kolokáty",
+"termRawFreq":"Počet (klíčového slova)",
+"context":"kontext",
 "term":"Termín",
-"rawFreq":"Počet",
-"loading":"Nahrávání",
-"error":"Chyba",
-"info":"Informace"});
+"helpTip":"<p>Korpusové kolokáty poskytují tabulkové zobrazení toho, které termíny se objevují s vyšší frekvencí v blízkosti klíčových slov napříč celým korpusem. Funkce zahrnují:</p><ul><li>změna uspořádání podle klíčového slova, kolokátu, četnosti kolokátu</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu lupy, pokud potřebujte nápovědu pro syntax</li></ul>",
+"contextTermRawFreqTip":"Kolikrát se daný kolokát vyskytuje v blízkosti klíčového slova napříč korpusem.",
+"contextTermTip":"Toto je kolokační termín (kontext), který se vyskytuje v blízkosti klíčového slova."});
 Ext.apply(Voyant.panel.Bubbles.i18n, {
 "soundTip":"Přepíná zvuk.",
 "sound":"zvuk",
 "adaptation":"Adaptováno z <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\"><i>Letter Pairs</i>, jejichž autorem je Martin Ignacio Bereciartua</a>",
-"title":"Bubliny",
 "speedTip":"Ovládá rychlost vizualizace.",
+"title":"Bubliny",
 "helpTip":"Bubliny jsou hravou vizualizací frekventovaných termínů v dokumentu.",
 "speed":"rychlost"});
+Ext.apply(Voyant.panel.Panel.i18n, {
+"trend":"Trend",
+"relativeFreq":"Relativní",
+"colon":": ",
+"rawFreq":"Počet",
+"term":"Termín",
+"error":"Chyba",
+"loading":"Nahrávání",
+"info":"Informace"});
+Ext.apply(Voyant.notebook.editor.TextEditor.i18n, {
+"emptyText":"(Click here to edit.)",
+"enableEditingTitle":"Enable Editing?"});
 Ext.apply(Voyant.widget.CorpusDocumentSelector.i18n, {
 "corpus":"Korpus",
 "scale":"Měřítko"});
-Ext.apply(Voyant.panel.Reader.i18n, {
-"documentFrequency":"<p>Nástroj Čtenář nabízí zobrazení textu z korpusu. Funkce zahrnují:</p><ul><li>informace o frekvenci se objeví při najetí kurzoru na slovo</li><li>informace o distribuci se objeví v grafu ve spodní části stránky po kliknutí na slovo</li><li>sloupcový graf ve spodní části stránky ukazuje relativní velikost každého dokumentu v korpusu</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud potřebujte nápovědu pro syntax)</li></ul>",
-"limitedAccess":"Toto je korpus s omezeným přístupem a funkčnost tohoto nástroje je omezena.",
-"title":"Čtenář",
-"helpTip":"<p>Nástroj Čtenář nabízí zobrazení textu z korpusu. Funkce zahrnují:</p><ul><li>informace o frekvence se objeví při najetí kurzoru na slovo</li><li>informace o distribuci se objeví v grafu ve spodní části stránky po kliknutí na slovo</li><li>sloupcový graf ve spodní části stránky ukazuje relativní velikost každého dokumentu v korpusu</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud potřebujete  nápovědu pro syntax)</li></ul>"});
 Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "fetchingCorpus":"Načítání vašeho korpusu",
 "moreToolsTypeViz":"Vizualizační nástroje",
@@ -191,8 +224,8 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "passwordRequiredMessage":"Tento korpus vyžaduje přístupové heslo.",
 "didYouKnow":"Did you know?",
 "passwordRequiredTitle":"Je vyžadováno heslo",
-"password":"přístupové heslo",
 "didYouKnowText":"Help and options are available!",
+"password":"přístupové heslo",
 "moreToolsScaleDocument":"Dokumentové nástroje",
 "moreToolsTypeGrid":"Maticové nástroje",
 "moreToolsType":"Nástroje podle typu",
@@ -203,20 +236,11 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "passwordValidateButton":"Ověřit",
 "moreToolsScale":"Nástroje podle měřítka",
 "badPassword":"Promiňte, toto heslo není platné."});
-Ext.apply(Voyant.panel.Bubblelines.i18n, {
-"findTerm":"Najdi termín",
-"showTerm":"Ukázat termín",
-"corpusTooSmall":"Zadaný korpus je pro tento nástroj příliš malý.",
-"clearTerms":"Vymazat",
-"removeTerm":"Odstranit termín",
-"hideTerm":"Schovej termín",
-"title":"Bublinový graf",
-"type":"Vizualizace",
-"separateLines":"Oddělené řádky pro termíny",
-"help":"Bublinový graf (Bubblelines) vizualizuje frekvenci a opakování užití termínu v korpusu. Každý dokument v korpusu je reprezentován jako horizontální přímka a rozdělen do segmentů stejné délky. Každý termín je reprezentován jako bublina, přičemž velikost bubliny ukazuje frekvenci termínu v odpovídajícím úseku textu. Čím větší je průměr bubliny, tím častěji se termín vyskytuje.",
-"total":"Celkem",
-"granularity":"Granularita",
-"options":"Nastavení"});
+Ext.apply(Voyant.panel.Reader.i18n, {
+"documentFrequency":"<p>Nástroj Čtenář nabízí zobrazení textu z korpusu. Funkce zahrnují:</p><ul><li>informace o frekvenci se objeví při najetí kurzoru na slovo</li><li>informace o distribuci se objeví v grafu ve spodní části stránky po kliknutí na slovo</li><li>sloupcový graf ve spodní části stránky ukazuje relativní velikost každého dokumentu v korpusu</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud potřebujte nápovědu pro syntax)</li></ul>",
+"limitedAccess":"Toto je korpus s omezeným přístupem a funkčnost tohoto nástroje je omezena.",
+"title":"Čtenář",
+"helpTip":"<p>Nástroj Čtenář nabízí zobrazení textu z korpusu. Funkce zahrnují:</p><ul><li>informace o frekvence se objeví při najetí kurzoru na slovo</li><li>informace o distribuci se objeví v grafu ve spodní části stránky po kliknutí na slovo</li><li>sloupcový graf ve spodní části stránky ukazuje relativní velikost každého dokumentu v korpusu</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud potřebujete  nápovědu pro syntax)</li></ul>"});
 Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "corpusComparisonDifference":"Komparace",
 "matchingTerms":"Termíny odpovídající kritériím vyhledávání: {count}",
@@ -233,31 +257,45 @@ Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "trendTip":"Toto reprezentuje trend relativních frekvencí pro každý termín v každém dokumentu korpusu.",
 "helpTip":"</p><p>Nástroj Termíny korpusu poskytuje tabulkové zobrazení termínů, které se objevují v celém korpusu. Funkce zahrnují:</p><ul><li>změna uspořádání pomocí <i>termín</i> a <i>počet</i> (klikněte na záhlaví sloupců)</li><li>řádkový minigraf (sparkline) trendů frekvence termínu napříč korpusem (pokud korpus obsahuje více dokumentů) nebo napříč dokumentem (pokud korpus obsahuje pouze jeden dokument)</li><li>zpřístupnění dodatečných sloupců (relativní frekvence, špičatost a šikmost rozdělení) pomocí kliknutí na šipku, která se objeví po najetí kurzoru na záhlaví</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy pro nápovědu syntaxe</li></ul>",
 "relativeSkewnessTip":"Toto je statistická míra symetrie relativních frekvencí termínu napříč korpusem."});
+Ext.apply(Voyant.panel.Bubblelines.i18n, {
+"findTerm":"Najdi termín",
+"showTerm":"Ukázat termín",
+"corpusTooSmall":"Zadaný korpus je pro tento nástroj příliš malý.",
+"clearTerms":"Vymazat",
+"hideTerm":"Schovej termín",
+"removeTerm":"Odstranit termín",
+"title":"Bublinový graf",
+"type":"Vizualizace",
+"separateLines":"Oddělené řádky pro termíny",
+"help":"Bublinový graf (Bubblelines) vizualizuje frekvenci a opakování užití termínu v korpusu. Každý dokument v korpusu je reprezentován jako horizontální přímka a rozdělen do segmentů stejné délky. Každý termín je reprezentován jako bublina, přičemž velikost bubliny ukazuje frekvenci termínu v odpovídajícím úseku textu. Čím větší je průměr bubliny, tím častěji se termín vyskytuje.",
+"total":"Celkem",
+"granularity":"Granularita",
+"options":"Nastavení"});
+Ext.apply(Voyant.panel.CustomSet.i18n, {
+"noSuchTool":"Zvolený nástroj ({0}) neexistuje.",
+"title":"Uživatelsky definované zobrazení.",
+"helpTip":"Toto je uživatelsky definované zobrazení."});
 Ext.apply(Voyant.panel.NoTool.i18n, {
 "notImplemented":"<p>Nástroj <i>{0}</i> existoval v předchozí verzi Voyant Tools, ale v této verzi nebyl implementován. Některé nástroje mohou být výhledově opět implementovány, avšak u dalších je pravděpodobnost opětovné implementace nízká, neboť byly experimentální, neužitečné nebo závisely na technologiích, kiteré již nejsou podporované (jako Adobe Flash nebo Java aplety).</p><p> Rozhodněte se prosím, zda chcete použít novou verzi Voyant, nebo chcete zkusit použít nástroj <i>{0}</i> ve staré verzi.</p> ",
 "badToolSpecified":"Nástroj <i>{0}</i> neexistuje. Budete přesměrováni na hlavní stránku Voyant Tools.",
 "currentButton":"Použít aktuální verzi",
 "oldButton":"Použít starou verzi",
 "noToolSpecified":"Nebyl zvolen žádný nástroj.  Budete přesměrováni na hlavní stránku Voyant Tools.",
-"title":"Žádný takový nástroj neexistuje.",
-"error":"Chyba."});
-Ext.apply(Voyant.panel.CustomSet.i18n, {
-"noSuchTool":"Zvolený nástroj ({0}) neexistuje.",
-"title":"Uživatelsky definované zobrazení.",
-"helpTip":"Toto je uživatelsky definované zobrazení."});
+"error":"Chyba.",
+"title":"Žádný takový nástroj neexistuje."});
 Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 "cleaning":"Čištění",
-"releaseToRemove":"Uvolněte pro odstranění tohoto termínu",
 "context":"Kontext",
+"releaseToRemove":"Uvolněte pro odstranění tohoto termínu",
 "clearTerms":"Vymazat",
 "title":"Vazby",
 "helpTip":"<p>Graf kolokátů ukazuje síťový graf termínů s vyšší frekvencí, které se objevují ve vzájemné blízkosti. Klíčová slova jsou vyobrazena zeleně a kolokáty (slova v blízkosti) oranžově. Funkce zahrnují:</p><ul><li>po najetí kurzoru na klíčová slova se ukáže jejich frekvence v korpusu</li><li>po najetí kurzoru na kolokáty se ukáže jejich frekvence v blízkosti klíčového slvoa (nikoliv jejich celková frekvence)</li><li>dvojitým kliknutím myši na kterékoliv slovo budou načteny další výsledky</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy pro nápovědu syntaxe</li></ul>"});
 Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "cancel":"Zrušit",
 "accessModeWithoutPassword":"jiný typ přístupu",
-"xpathGroupBy":"Seskupit podle",
-"reveal":"Odhalit",
 "OpenExisting":"Otevřít existující korpus",
+"reveal":"Odhalit",
+"xpathGroupBy":"Seskupit podle",
 "tableNoHeadersRow":"Bez řádku záhlaví",
 "accessOptionsText":"Přejete-li si, můžete zadat jedno, nebo více přístupových hesel (oddělených čárkou).",
 "tableDocumentsRows":"z buněk každé řádky",
@@ -266,11 +304,11 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationWordBoundaries":"Jednoduché hranice slov",
 "numberEmpty":"Nejméně jedno číslo sloupce je aktuálně prázdné.",
 "tokenization":"Tokenizace",
-"tokenizationWhitespace":"Whitespace Only",
 "inputRemoveFrom":"omit from",
+"tokenizationWhitespace":"Whitespace Only",
 "xpathContent":"Obsah",
-"numbersNeedCommas":"Prosím použijte čárku k oddělení více čísel.",
 "textOptionsText":"These options allow you to ignore part of a text document by specifying regular expressions.",
+"numbersNeedCommas":"Prosím použijte čárku k oddělení více čísel.",
 "tableDocumentsTable":"z celé tabulky",
 "UploadLocal":"Nahrát jeden nebo více dokumentů z vašeho počítače.",
 "helpTip":"Tento nástroj umožňuje vytvořit korpus jedním ze tří způsobů:<ol><li>napsáním nebo vložením textu do textového pole a kliknutím na <i>Odhalit</i>; pokud je každý řádek v textovém poli adresou URL, text se načte z těchto URL odkazů, v ostatních případech je obsah považován za jeden dokument </li><li>klikněte na tlačítko <i>Otevřít</i> pro otevření existujícího korpusu</li><li>klikněte na tlačítko <i>Nahrát</i> pro nahrání jednoho nebo více souborů ze svého počítače (více souborů můžete vybrat při stisknutí klávesy Ctrl a/nebo Shift)</li></ol>",
@@ -278,11 +316,11 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableTitle":"Název",
 "noTextProvided":"Nebyl vložen žádný text.",
 "tableContent":"Obsah",
-"xpathDocuments":"Dokumenty",
 "tokenizationAuto":"Automatická (velmi doporučováno)",
+"xpathDocuments":"Dokumenty",
 "numbersCommasOnly":"Pouze čísla oddělená čárkou.",
-"tableOptionsText":"Specifikujte, jak by měly být dokumenty extrahovány (v současnosti podporováno pro MS Excel: .xls, xlsx). Pro více informací konzultujte dokumentaci o vytváření korpusu s <a href=\"{0}\" target=\"voyantdocs\">tabulkovými daty</a>.",
 "PleaseSelectExisting":"Prosím ujistěte se, že jste vybrali korpus.",
+"tableOptionsText":"Specifikujte, jak by měly být dokumenty extrahovány (v současnosti podporováno pro MS Excel: .xls, xlsx). Pro více informací konzultujte dokumentaci o vytváření korpusu s <a href=\"{0}\" target=\"voyantdocs\">tabulkovými daty</a>.",
 "inputFormat":"Formát vstupu",
 "tableDocumentsColumns":"z celých sloupců",
 "accessModeWithoutPasswordText":"Pokud zadáte <i>přístupové heslo</i> můžete také specifikovat, jaký typ přístupu bude poskytnut uživatelům bez hesla.",
@@ -296,33 +334,33 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeNone":"žádný",
 "tokenizationOptions":"Tokenizace",
 "advancedOptionsText":"Pro více informací o níže uvedeném pokročilém nastavení konzultujte dokumentaci k<a href=\"{0}\" target=\"voyantdocs\">vytvoření nového korpusu</a>.",
+"inputRemoveUntilAfter":"omit until after",
 "tableDocuments":"Dokumenty",
-"inputRemoveUntilAfter":"omit unti after",
 "processingOptions":"Processing",
 "noAllowInputMessage":"This server has been configured to NOT allow new documents to be added. Please contact the server administrator (if you can).",
-"fileTypesMessage":"Máte jeden nebo více souborů s nekompatibilní nebo nerozpoznanou příponou souboru, což může způsobit problémy.",
-"errorNotXmlContinue":"Zvolili jste XML formát vstupu, ale vstup se nezdá být v tomto formátu. Jste si jisti, že chcete pokračovat?",
 "SelectExisting":"Vybrat existující korpus",
+"errorNotXmlContinue":"Zvolili jste XML formát vstupu, ale vstup se nezdá být v tomto formátu. Jste si jisti, že chcete pokračovat?",
+"fileTypesMessage":"Máte jeden nebo více souborů s nekompatibilní nebo nerozpoznanou příponou souboru, což může způsobit problémy.",
 "textOptions":"Text",
 "tableOptions":"Tabulky",
-"xmlOptions":"XML",
 "Upload":"Nahrát",
-"title":"Přidat texty",
+"xmlOptions":"XML",
 "error":"Chyba",
+"title":"Přidat texty",
 "sureContinue":"Jste si jisti, že chcete pokračovat?",
-"Open":"Otevřít",
 "inputRemoveUntil":"omit until",
+"Open":"Otevřít",
 "badFiles":"nekompatibilní (pravděpodobná chyba):",
 "emptyInput":"Zadejte jednu nebo více URL adres na zvláštní řádky, nebo vložte plný text.",
 "ok":"OK",
 "accessPassword":"přístupový kód",
-"adminPassword":"administrátorský kód",
 "accessModeNonConsumptive":"omezený (bez uživatelských oprávnění)",
+"adminPassword":"administrátorský kód",
 "tableMetadataText":"Tyto možnosti nastavení se použijí pouze pokud jsou dokumenty extrahovány z buňek na každém řádku (viz první možnost v této sekci). Syntax je stejná jako u výše uvedených možností nastavení Obsahu: čísla sloupců oddělenná čárkami nebo sloučenná znaménkem plus.",
 "xpathAuthor":"Autor",
 "corpusOptions":"Corpus",
-"xpathTitle":"Název",
 "pleaseProvideText":"Prosím vložte text do textového pole (případně zvolte Otevřít nebo Nahrát)",
+"xpathTitle":"Název",
 "invalidForm":"Byly použity neplatné hodnoty, prosím najeďte kurzorem na červeně označená pole pro vysvětlení.",
 "tableAuthor":"Autor",
 "gearWinTitle":"Nastavení",
@@ -330,8 +368,16 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "corpusTitle":"Corpus Title",
 "accessOptions":"Správa přístupu",
 "tableNoHeadersRowText":"Určuje, zda má být přeskočen první řádek (pokud obsahuje záhlaví tabulky). Pokud tabulka obsahuje záhlaví, lze toto použít k automatickému přiřazení názvu dokumentu, když jsou dokumenty extrahovány z celých sloupců (v tomto případě ponechte pole názvu nevyplněné)."});
+Ext.apply(Voyant.panel.Via.i18n, {
+"timedout":"An attempt was made to fetch data but the request took too long. The process may be still ongoing and you could try again in a couple of minutes.",
+"visible":"Visible",
+"englishOnly":"You seem to have a text in a language other than English. Unfortunately, at the moment, Via only supports texts in English (because of the current way the lemmatization and synonym operations are programmed).",
+"title":"Via",
+"helpTip":"Via is a tool intended to help you explore the semantic clusters of English texts."});
 Ext.apply(Voyant.util.DetailedError.i18n, {
 "error":"Chyba"});
+Ext.apply(Voyant.notebook.editor.button.Edit.i18n, {
+"tip":"Edit"});
 Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"Nejdelší:",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
@@ -339,23 +385,29 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "averageWordsPerSentence":"Average Words Per Sentence:",
 "mostFrequentWords":"Nejvíce <b>frekventovaná slova</b> v korpusu: ",
 "title":"Shrnutí",
-"numberOfTerms":"počet slov v dokumentu",
 "lowest":"Nejnižší:",
+"numberOfTerms":"počet slov v dokumentu",
 "docsLength":"Délka dokumentu:",
 "corpusType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"corpus-type keyword\" voyant:recordid=\"{id}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
-"seeAll":"Vše..",
 "highest":"Nejvyšší:",
+"seeAll":"Vše..",
 "distinctiveWords":"<b>Charakteristická slova</b> (ve srovnání se zbytkem korpusu): ",
 "docsDensity":"Hustota slovní zásoby:",
 "helpTip":"<p>Nástroj <i>Shrnutí</i> poskytuje souhrnné informace o korpusu. Mnoho prvků v tomto nástroji jsou odkazy, kterými se spouští další zobrazení. Funkce zahrnují:</p><ul><li>celkový počet slov (tokenů) a slovních forem (typů) a stáří korpusu</li><li>nejvíce frekventovaná slova v korpusu</li><li>pro korpusy s více než jedním dokumentem<ul><li>řazení dokumentu podle délky a slovní hustoty</li><li>charakteristická slova pro každý dokument (podle hodnoty TF-IDF)</li></ul></li></ul>",
-"moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Další {0} z {1} zbývajících</a>",
 "items":"položky",
+"moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Další {0} z {1} zbývajících</a>",
 "shortest":"Nejkratší:"});
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
 "title":"Zobrazení korpusu",
 "helpTip":"Toto je výchozí zobrazení korpusu pro obecné účely."});
+Ext.apply(Voyant.notebook.editor.button.Movement.i18n, {
+"tip":"Move / Remove Controls"});
 Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
 "label":"Rodina písma"});
+Ext.apply(Voyant.notebook.editor.button.Remove.i18n, {
+"tip":"remove this block",
+"confirmRemove":"Are you sure you want to remove this block (and lose any content in the editor)?",
+"confirmRemoveTitle":"Confirm Remove"});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"Vydavatelé",
 "sendToVoyantButton":"Nový Voyant korpus",
@@ -363,24 +415,17 @@ Ext.apply(Voyant.panel.Subset.i18n, {
 "sendToVoyantNoQuery":"Aktuálně není zvoleno žádné kritérium vyhledávání, ale můžete <a href=\"{0}\" target=\"_blank\">otevřít stávájící korpus v novém okně</a>.",
 "lexicalLabel":"Plný text",
 "noMatches":"Stávajícím kritériím vyhledávání neodpovídá žádný dokument, prosím nejdříve změňte kritéria vyhledávání.",
-"titleLabel":"Názvy",
 "authorLabel":"Autoři",
+"titleLabel":"Názvy",
 "title":"Vytvoření pracovní sady"});
-Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
-"titleLabel":"název",
-"authorLabel":"autor",
-"availableLabel":"vyloučit:",
-"enabledLabel":"zahrnout:",
-"fieldLabel":"Názvy souborů",
-"pubDateLabel":"datum"});
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"Přidat",
 "cancel":"zrušit",
 "clear":"Smazat",
 "labelsTip":"Přepíná zobrazování štítků",
 "update":"aktualizovat",
-"title":"Mandala",
 "addTip":"Přidat magnet (vyhledávací termín).",
+"title":"Mandala",
 "remove":"odstranit",
 "labels":"štítky",
 "clearTip":"Smazání všech magnetů (vyhledávacích termínů).",
@@ -389,6 +434,13 @@ Ext.apply(Voyant.panel.Mandala.i18n, {
 "helpTip":"Mandala je konceptuální vizualizací, která ukazuje vztahy mezi termíny a dokumenty. Každý vyhledávací termín (neboli magnet) k sobě přitahuje dokumenty v závislosti na relativní frekvenci termínu v korpusu."});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"Zvolte korpus"});
+Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
+"authorLabel":"autor",
+"availableLabel":"vyloučit:",
+"titleLabel":"název",
+"enabledLabel":"zahrnout:",
+"fieldLabel":"Názvy souborů",
+"pubDateLabel":"datum"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "matchingTerms":"Termíny odpovídající kritériím vyhledávání: {count}",
 "tfidfTip":"Významnost se zde měří pomocí hodnoty TF-IDF (vypočítává se ze dvou složek: četnost slova v dokumentu a převrácená četnost slova ve všech dokumentech), což je běžný způsob vyjádření důležitosti termínu v dokumentu v poměru ke zbytku korpusu.",
@@ -397,8 +449,8 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "relativeFreqTip":"Relativní frekvence (na milión) tohoto termínu v každém dokumentu.",
 "termTip":"Termín v jednom specifickém dokumentu.",
 "zscore":"Z-skóre",
-"trendTip":"Toto je řádkový minigraf (sparkline), který reprezentuje rozdělení termínu uvnitř lineárních segmentů dokumentu (ve výchozím nastavení 10 segmentů stejné velikosti).",
 "tfidf":"Významnost",
+"trendTip":"Toto je řádkový minigraf (sparkline), který reprezentuje rozdělení termínu uvnitř lineárních segmentů dokumentu (ve výchozím nastavení 10 segmentů stejné velikosti).",
 "title":"Dokumentové termíny",
 "helpTip":"</p><p>Nástroj Dokumentové termíny poskytuje tabulkové zobrazení termínů, které se objevují v každém dokumentu. Funkce zahrnují: </p><ul><li>změna uspořádání pomocí <i>termínů</i> a <i>počet</i> (prostá frekvence), a <i>relativní</i> frekvence (klikněte na záhlaví sloupců)</li><li>řádkový minigraf (sparkline) trendů frekvence termínu napříč dokumenty</li><li>zpřístupnění dodatečných sloupců (<i>Významnost</i> neboli TF-IDF, tj. četnost slova v dokumentu - převrácená četnost slova ve všech dokumentech) pomocí kliknutí na šipku, která se objeví po najetí kurzoru na záhlaví</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud potřebujete nápovědu pro syntax</li></ul>",
 "zscoreTip":"Z-skóre nebo standardizované skóre představuje normalizovanou hodnotu prosté (absolutní) frekvence termínu ve srovnání s frekvencemi dalších termínů ve stejném dokumentu."});
@@ -414,65 +466,80 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hoursAgo":"asi před {count} hodinami",
 "minutesAgo":"asi před {count} minutami",
 "minuteAgo":"asi před minutou",
-"monthAgo":"asi před měsícem",
 "hourAgo":"asi před hodinou",
+"monthAgo":"asi před měsícem",
 "failedCreateCorpus":"Pokus vytvořit korpus se nezdařil.",
 "has1document":"obsahuje 1 dokument",
-"yearsAgo":"asi před {count} lety",
 "secondAgo":"asi před vteřinou",
+"yearsAgo":"asi před {count} lety",
 "now":"nyní",
 "badDataTypeCorpus":"Unable to recognize a valid data type for this corpus: ",
-"yearAgo":"asi před rokem",
 "secondsAgo":"asi před {count} vteřinami",
+"yearAgo":"asi před rokem",
 "dayAgo":"asi před jedním dnem"});
+Ext.apply(Voyant.notebook.editor.button.Add.i18n, {
+"tip":"Add New Block",
+"title":"Spyral Notebook"});
+Ext.apply(Voyant.widget.CategoriesOption.i18n, {
+"edit":"Edit",
+"categories":"Categories"});
 Ext.apply(Voyant.panel.WordTree.i18n, {
 "emptyText":"Vyhledávacímu výrazu neodpovídají žádné výsledky.",
 "title":"Slovní strom"});
+Ext.apply(Voyant.notebook.editor.button.RunUntil.i18n, {
+"tip":"Run all code blocks up to and including this one."});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "original":"originál",
 "VOYANTTip":"Toto je normalizovaná verze obsahu: pokud jsou zdrojové dokumenty v XML, půjde především o původní obsah, zatímco pro většinu ostatních zdrojových dokumentů se bude jednat o prostý HTML obsah.",
 "fieldLabel":"Formát souboru",
-"voyantXml":"Voyant XML",
 "plainText":"prostý text",
+"voyantXml":"Voyant XML",
 "SOURCETip":"Poskytnutí zdrojových dokumentů v jejich původních formátech. V některých případech to znamená, že  může být poskytnut jeden archiv (např. soubor ZIP).",
 "TXTTip":"Vytvoření prosté textové verze každého dokumentu."});
 Ext.apply(Voyant.panel.ScatterSet.i18n, {
 "title":"Bodový graf",
 "helpTip":"Toto je specializované zobrazení pro práci s bodovými grafy."});
 Ext.apply(Voyant.util.Toolable.i18n, {
-"exportTitle":"Export",
 "exportError":"Chyba exportu",
+"exportTitle":"Export",
+"exportAllTsvWarning":"You’re requesting all of the available data, are you sure you want to continue?",
 "exportDataTsvMessage":"Zkopírovat níže uvedená data, lze je vložit do tabulky nebo textového souboru.",
-"exportViewFieldset":"Exportovat zobrazení (Nástroje a data)",
 "exportSvgMessage":"<p>Toto je náhled SVG obrázku. Pro uložení origináu v plné velikosti na pevný disk klikněte na obrázek pravým tlačítkem myši nebo na něj klikněte při současném stisknutí klávesy ctrl .</p><p>Můžete také zkopírovat níže uvedený SVG kód.</p>",
+"exportViewFieldset":"Exportovat zobrazení (Nástroje a data)",
 "exportDataJsonMessage":"Zkopírovat níže uvedená data, lze je použít v jiných webových aplikacích.",
 "plusTip":"Klikněte zde pro volbu jiného nástroje v tomto umístění panelu (aktuální nástroj bude nahrazen).",
+"exportGridAllJson":"export all available data in JSON",
 "gearTip":"Definovat možnosti pro tento nástroj.",
 "cancelTitle":"Zrušit",
-"exportViewHtmlEmbed":"fragment HTML kódu pro vložení tohoto zobrazení do jiné webové stránky",
 "exportGridCurrent":"Exportovat aktuální data",
+"exportViewHtmlEmbed":"fragment HTML kódu pro vložení tohoto zobrazení do jiné webové stránky",
 "exportSvgTitle":"Exportovat SVG",
-"maximizeTip":"Otevřít tento nástroj v novém okně",
 "exportGridCurrentTsv":"export aktuálních dat jako hodnot (textu) oddělených tabulátory",
 "exportVizTitle":"Exportovat Vizualizaci",
+"maximizeTip":"Otevřít tento nástroj v novém okně",
 "exportDataTitle":"Exportovat Data",
 "optionsTitle":"Možnosti",
+"scaleLabel":"scaling ({0})",
 "exportBiblioTitle":"Exportovat bibliografický odkaz",
 "confirmTitle":"Potvrdit",
 "moreHelp":"Další nápověda…",
+"exportGridAllTsv":"export all available data as tab separated values (text)",
 "exportViewUrl":"odkaz URL pro toto zobrazení (nástroje a data)",
-"helpTip":"V současnosti není dostupná žádná specifická nápověda pro zvolený nástroj. Klikněte na tuto ikonu pro navštívení stránky <a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Dokumentace Voyant Tools</a>.",
 "export":"Exportovat",
+"helpTip":"V současnosti není dostupná žádná specifická nápověda pro zvolený nástroj. Klikněte na tuto ikonu pro navštívení stránky <a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Dokumentace Voyant Tools</a>.",
 "exportDataHtmlMessage":"Zkopírovat níže uvedená data, lze je vložit do HTML stránky nebo použít jako XML",
-"exportPngTitle":"Exportovat PNG",
 "exportPngMessage":"<p>Toto je náhled PNG obrázku. Pro uložení origináu v plné velikosti na pevný disk klikněte na obrázek pravým tlačítkem myši nebo na něj klikněte při současném stisknutí klávesy ctrl .</p><p>Můžete také zkopírovat níže uvedený HTML kód.</p>",
+"exportPngTitle":"Exportovat PNG",
+"exportAllTitle":"Export All",
+"exportAllJsonWarning":"You’re requesting all of the available data (in the JSON format that Voyant uses), are you sure you want to continue?",
+"loading":"Loading…",
 "exportGridCurrentHtml":"export aktuálních dat ve formátu HTML",
 "exportViewEmbedMessage":"Fragment HTML kódu z níže uvedeného rámečku můžete zkopírovat a vložit do jiné webové stránky. Pamatujte, že některé systémy pro správu obsahu (např. WordPress) mohou vyžadovat zvláštní plugin pro zacházení s &lt;iframe&gt; značkami.",
 "exportPng":"export této vizualizace jako PNG obrázku",
 "reset":"Obnovit",
 "exportViewBiblio":"bibliografický odkaz pro toto zobrazení",
-"exportViewEmbedTitle":"Vlož fragment HTML kódu",
 "exportNoFunction":"Funkce exportu byla definována jako nedostupná.",
+"exportViewEmbedTitle":"Vlož fragment HTML kódu",
 "exportGridCurrentJson":"export aktuálních dat ve formátu JSON",
 "exportSvg":"export této vizualizace v SVG formátu",
 "saveTip":"Exportovat URL, vložitelný nástroj, data nebo bibliografický odkaz."});
@@ -481,10 +548,71 @@ Ext.apply(Voyant.panel.TextualArc.i18n, {
 "search":"filtr",
 "minRawFreq":"minimální frekvence",
 "adaptation":"Inspirováno aplikací <a href=\"http://textarc.org\" target=\"_blank\">TextArc</a>, kterou vytvořil W. Bradford Paley.",
-"title":"Textová klenba",
 "speedTip":"Ovládá rychlost vizualizace.",
+"title":"Textová klenba",
 "helpTip":"Textová klenba (TextualArc), je vizualizací termínů v dokumentu, která zahrnuje vážený centroid (definiční bod) termínů a oblouk sledující termíny v dokumentovém řazení.",
 "speed":"rychlost"});
+Ext.apply(Voyant.panel.DreamScape.i18n, {
+"baseLayerTip":"Determine map base layer",
+"cancel":"Cancel",
+"occurrences":"Occurrences",
+"annotateTip":"To annotate, click this icon, select a region and enter text in the box that will appear. If you don’t select a region you can click again to exit annotation mode. If you do select a region please click this icon again if you wish to add another annotation.",
+"displayTip":"Configure various aspects of the display",
+"osm":"Open Street Map",
+"annotate":"Annotate",
+"millisPerAnimation":"milliseconds per animation",
+"pubDateLabel":"years'",
+"animate":"Animate",
+"citiesMinPopulation":"minimum population",
+"viewOccurrencesTip":"Select this to see the location in Voyant.",
+"annotationsUpdateFailed":"An error occured while trying to store the annotations.",
+"wms4326":"WMS 4326",
+"mapTip":"Define base layer and projection",
+"editAnnotation":"Edit Annotation",
+"nopubDate":"No publication years defined in this corpus.",
+"removeLocationTip":"If this is not a valid place name, you can remove it (this applies to all occurrences).",
+"connections":"Connections",
+"removeLocation":"Remove Location",
+"add":"Add Filter",
+"keywordLabel":"keywords'",
+"editAnnotationMessage":"Add an annotation. To remove an existing annotation, remove the text and click OK.",
+"cities":"Cities",
+"baseLayer":"Base Layer",
+"annotationsLoadFailed":"An error occured while trying to load the annotations.",
+"projectionTip":"Determine map projection",
+"sphereMollweideProjection":"Sphere mollweide (Equal Area)",
+"animationSpeed":"Speed",
+"watercolor":"Stamen watercolor (Default)",
+"authorLabel":"authors'",
+"titleLabel":"titles",
+"title":"DreamScape",
+"webMercatorProjection":"Web Mercator (Default)",
+"noauthor":"No authors defined in this corpus.",
+"mercatorProjection":"Mercator (WGS84)",
+"viewOccurrences":"View Occurrences",
+"citiesMaxCount":"maximum count",
+"animations":"Animations",
+"connectionsMinFreq":"minimum occurrences",
+"openInVoyant":"Open in Voyant",
+"projection":"Projection",
+"removeLocationConfirm":"Are you sure you want to remove all occurrences of this location?",
+"annotationsUpdated":"Annotations have been stored. Please export new URL if you would like to reference it.",
+"map":"Map",
+"editLocationServerError":"An error occurred while trying to load alternate locations.",
+"editLocationTitle":"Select an alternative location",
+"arcGIS":"National Geographic World Map – ArcGIS",
+"viewConnections":"View Connection Occurrences",
+"display":"Display",
+"gallPetersProjection":"Gall Peters (Equal Area)",
+"editLocation":"Select Alternative Location",
+"editLocationNoLocationsFound":"No locations found.",
+"citiesMinFreq":"minimum occurrences",
+"filter":"Filter",
+"allNCitiesShown":"All {0} available cities shown.",
+"filterTip":"Determine any filters to use",
+"connectionsMaxCount":"maximum count",
+"editLocationTip":"If this place name is valid but the location is wrong, you can select an alternate location (this applies to all occurrences).",
+"editLocationNoAlternativesFound":"No alternative locations found."});
 Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "freqsMode":"Frekvence",
 "freqsModeTip":"Určuje, zda jsou frekvence vyjádřeny jako prosté počty, nebo jako relativní počty (za dokument či segment).",
@@ -492,8 +620,8 @@ Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "documents":"Dokumenty",
 "documentSegments":"Segmenty dokumentu",
 "clearTerms":"Vymazat termíny",
-"title":"Tokový graf",
 "rawFrequencies":"Prosté frekvence",
+"title":"Tokový graf",
 "helpTip":"Tokový graf (StreamGraph) je vizualizace, která zobrazuje změny frekvence slov v korpusu (nebo v jednom dokumentu).",
 "segments":"Segmenty"});
 Ext.apply(Voyant.notebook.util.Embed.i18n, {
@@ -502,8 +630,8 @@ Ext.apply(Voyant.notebook.util.Embed.i18n, {
 Ext.apply(Voyant.widget.ListEditor.i18n, {
 "cancel":"Zrušit",
 "editList":"Editovat seznam",
-"new":"Nový uživatelský seznam",
 "editListMessage":"Toto je seznam, každá řádka odpovídá jednomu termínu.",
+"new":"Nový uživatelský seznam",
 "editListTitle":"Editovat seznam",
 "label":"Seznam:",
 "none":"Žádný",
@@ -511,6 +639,8 @@ Ext.apply(Voyant.widget.ListEditor.i18n, {
 "whiteListLabel":"Bílá listina:"});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"Možnosti stažení"});
+Ext.apply(Voyant.notebook.editor.button.Run.i18n, {
+"tip":"Run the script in this block (Shift-Enter)"});
 Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
 "totalPropertyStatus":"{count:number(\"0,000\")}"});
 Ext.apply(Voyant.panel.Phrases.i18n, {
@@ -520,31 +650,77 @@ Ext.apply(Voyant.panel.Phrases.i18n, {
 "overlapFreq":"upřednostňovat nejfrekventovanější slovní spojení",
 "emptyText":"Vyhledávacím kritériím neodpovídají žádné výsledky.",
 "length":"Délka",
-"termTip":"Toto je klíčové slovní spojení (jde o obecnou formu, při každém výskytu se může objevit trochu jinak).",
 "termRawFreqTip":"Kolikrát se slovní spojení vyskytuje v korpusu.",
-"title":"Slovní spojení",
+"termTip":"Toto je klíčové slovní spojení (jde o obecnou formu, při každém výskytu se může objevit trochu jinak).",
 "lengthTip":"Horní a spodní hranice délky slovních spojení (kolik slov je obsaženo v každém slovním spojení).",
-"termRawFreq":"Počet",
+"title":"Slovní spojení",
 "overlap":"Překrývání",
 "overlapLength":"upřednostňovat nejdelší slovní spojení",
+"termRawFreq":"Počet",
 "overlapMenu":"Zvolte filtr pro překrývání:",
 "term":"Termín",
 "helpTip":"<p>Nástroj Slovní spojení v korpusu nabízí tabulkové zobrazení opakujících se slovních spojení v celém korpusu.<!-- Funkce zahrnují:</p><ul><li>změna uspořádání podle klíčového slova, kolokátu, četnosti kolokátu</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu lupy, pokud potřebujte nápovědu pro  syntax</li></ul>-->"});
+Ext.apply(Voyant.notebook.editor.button.Counter.i18n, {
+"tip":"Edit"});
 Ext.apply(Voyant.panel.Trends.i18n, {
-"relativeFrequencies":"Relativní frekvence",
+"stacked":"Stacked Bar",
+"segmentsTitle":"Document Segments",
 "documents":"Dokumenty",
-"raw":"Prosté",
-"segmentsSlider":"Segmenty",
+"line":"Line",
 "scale":"Měřítko",
+"relativeTitle":"Relative Frequencies",
 "title":"Trendy",
+"toggleTip":"Click to toggle the visibility of this series.",
 "segments":"Segmenty dokumentu",
+"resetTip":"Reset to initial view.",
+"bar":"Columns",
 "freqsMode":"<p><i>Trendy</i> ukazují čárový graf relativních frekvencí napříč korpusem (pro více dokumentů), nebo uvnitř dokumentu. Funkce zahrnují </p><ul><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud chcete získat nápovědu pro syntax)</li></ul>",
-"freqsModeTip":"Určuje, zda jsou frekvence vyjádřeny jako prosté frekvence, nebo jako relativní frekvence (za dokument či segment).",
+"dblClickItem":"Double-click to drilldown.",
+"segment":"segment:",
+"noResults":"No Results",
 "options":"Nastavení",
+"drillDocumentTip":"View the distribution of all current terms within this document.",
 "rawFrequencies":"Prosté frekvence",
 "helpTip":"<p><i>Trendy</i> ukazují čárový graf relativních četností napříč korpusem (pro více dokumentů), nebo uvnitř dokumentu. Funkce zahrnují </p><ul><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy, pokud chcete získat nápovědu k syntaxi)</li></ul>",
-"relative":"Relativní",
-"failedGetDocumentTerms":"Failed to get document terms for Trends."});
+"area":"Area",
+"relativeFrequencies":"Relativní frekvence",
+"drillTermTip":"View the distribution of this term within all documents.",
+"barline":"Line + Stacked Bar",
+"display":"Display",
+"raw":"Prosté",
+"segmentsSlider":"Segmenty",
+"labels":"Show Labels",
+"freqsModeTip":"Určuje, zda jsou frekvence vyjádřeny jako prosté frekvence, nebo jako relativní frekvence (za dokument či segment).",
+"drillTerm":"Terms",
+"rawTitle":"Raw Frequencies",
+"reset":"Reset",
+"corpusTitle":"Corpus (Documents)",
+"drillDocument":"Document",
+"failedGetDocumentTerms":"Failed to get document terms for Trends.",
+"relative":"Relativní"});
+Ext.apply(Voyant.notebook.editor.button.MoveDown.i18n, {
+"tip":"move this block down"});
+Ext.apply(Voyant.notebook.Notebook.i18n, {
+"newTip":"Create a new Spyral Notebook in a new window.",
+"autoSaveAvailableTitle":"Autosave Available",
+"cannotMoveLower":"This block is already at the bottom and cannot be moved lower.",
+"failedNotebookLoad":"Failed to load the specified notebook. A new notebook template will be presented instead.",
+"openTip":"Open a Spyral Notebook (by pasting in JSON code).",
+"differentUrl":"This notebook seems to be have been located at a different URL. If you’re sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook’s URL: {0}",
+"cannotMoveHigher":"This block is already at the top and cannot be moved higher.",
+"fetchingNotebook":"Fetching notebook…",
+"exportHtml":"HTML (suitable for saving or printing)",
+"exportJson":"Spyral Notebook data format (JSON)",
+"failedNotebookParse":"The loaded notebook appears to have a syntax error and will probably not run as is.",
+"saveItTip":"Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
+"exportAllLinks":"<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
+"originalJson":"Original JSON string",
+"editsAndLeaving":"It looks like you’ve been editing content and you will lose any content if you follow this link. Continue?",
+"differentUrlTitle":"Notebook from different URL",
+"autoSaveAvailable":"A more recent autosave is available, do you wish to switch to the auto-saved document?",
+"helpTip":"Spyral Notebooks are dynamic documents that combine text, code and interactive tools, they are a form of <a href=\"https://en.wikipedia.org/wiki/Literate_programming\" target=\"_blank\">literate programming</a>.",
+"eror":"Error",
+"runallTip":"Run all code blocks in this notebook"});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"Zrušit",
 "de":"němčina",
@@ -573,16 +749,16 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "el":"řečtina",
 "mu":"více jazyků",
 "en":"angličtina",
-"label":"Stop slova:",
 "cn":"čínština",
 "it":"italština",
+"label":"Stop slova:",
 "noEditAutoTitle":"Chyba editace seznamu stop slov",
 "es":"španělština",
-"editStopListMessage":"Toto je seznam stop slov s jedním termínem na řádek.",
 "applyGlobally":"použít globálně",
+"editStopListMessage":"Toto je seznam stop slov s jedním termínem na řádek.",
 "eu":"baskičtina",
-"editList":"Editace seznamu",
 "ar":"arabština",
+"editList":"Editace seznamu",
 "th":"thajština",
 "la":"Latin",
 "cz":"čeština",
@@ -598,8 +774,8 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "select":"Zvolit",
 "exportInProgress":"Příprava vašeho korpusu pro exportt…",
 "facet.titleTitle":"Názvy",
-"title":"Katalog",
 "lexicalTitle":"Termíny",
+"title":"Katalog",
 "clickToOpenCorpus":"Prosím <a href=\"{0}\" target=\"_blank\" class=\"link\">klikněte zde</a> pro přístup k vašemu novému korpusu (jelikož vyskakovací okna jsou blokována).",
 "rawFreqs":"celkový výskyt (absolutní frekvence)",
 "facet.languageTitle":"Jazyky",
@@ -608,8 +784,8 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "plusFacetTip":"Přidat novou fasetu",
 "facet.collectionTitle":"Sbírky",
 "matchingDocuments":"počet dokumentů odpovídajících vyhledávacím kritériím",
-"helpTip":"<p>Nástroj <i>Katalog</i> poskytuje rozhraní pro prozkoumání obsahu větších korpusů složených z více dokumentů. Rovněž umožňuje vytvářet podmnožiny (nebo pracovní sady) podle vyhledávacích kritérií. Funguje podobně jako knihovnická databáze nebo eshop v tom smyslu, že umožňuje filtrovat dokumenty.",
 "export":"Exportovat",
+"helpTip":"<p>Nástroj <i>Katalog</i> poskytuje rozhraní pro prozkoumání obsahu větších korpusů složených z více dokumentů. Rovněž umožňuje vytvářet podmnožiny (nebo pracovní sady) podle vyhledávacích kritérií. Funguje podobně jako knihovnická databáze nebo eshop v tom smyslu, že umožňuje filtrovat dokumenty.",
 "downloadButton":"Stáhnout",
 "facet.pubPlaceTitle":"Místa vydání",
 "queryMatches":"Hledanému výrazu odpovídá celkem {0} dokumentů (z {1}).",
@@ -624,17 +800,55 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 Ext.apply(Voyant.panel.CollocatesSet.i18n, {
 "title":"Bodový graf",
 "helpTip":"Toto je specializované zobrazení pro práci s bodovými grafy."});
+Ext.apply(Voyant.panel.Veliza.i18n, {
+"scriptEditor":"Script Editor",
+"title":"Veliza",
+"typeAndEnter":"Type text and hit enter.",
+"scriptIntro":"This is an advanced feature that allows you see and edit the script used by Veliza. For more information on the syntax, see the <a href='{0}' target='_blank'>documentation</a>.",
+"send":"send",
+"fromCorpus":"from text"});
+Ext.apply(Voyant.notebook.editor.CodeEditorWrapper.i18n, {
+"modeJson":"JSON",
+"previousNotRun":"There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?",
+"modeCsv":"CSV (comma-separated values)",
+"modeJavascript":"Javascript (default)",
+"enableEditing":"By default editing is disable, do you wish to enable editing now?",
+"modeHtml":"HTML",
+"modeData":"Data",
+"modeTsv":"TSV (tab-separated values)",
+"modeXml":"XML",
+"modeCode":"Code",
+"previousNotRunTitle":"Previous Code Blocks",
+"modeText":"Text"});
 Ext.apply(Voyant.panel.MicroSearch.i18n, {
-"title":"MikroVyhledávání",
 "loading":"Nahrávání termínů...",
+"title":"MikroVyhledávání",
 "helpTip":"Tento nástroj ukazuje přehled celého korpusu a umožňuje vizualizovat distribuci vyhledávacích termínů."});
 Ext.apply(Voyant.panel.TopicContexts.i18n, {
 "reset":"obnovit",
 "title":"Tematické kontexty",
 "helpTip":"Tematické kontexty"});
+Ext.apply(Voyant.notebook.editor.button.MoveUp.i18n, {
+"tip":"move this block up"});
+Ext.apply(Voyant.widget.ProgressMonitor.i18n, {
+"running":"Working…",
+"aborted":"Error",
+"noProgress":"This progress monitor was incorrectly initialized.",
+"badProgress":"Unable to understand the progress report from the server.",
+"progress":"Progress",
+"finished":"Finished",
+"launch":"Launching…"});
 Ext.apply(Voyant.panel.BubblelinesSet.i18n, {
 "title":"Motiv vzhledu bublinového grafu.",
 "helpTip":"Toto je specializované zobrazení pro práci s bublinovvými grafy."});
+Ext.apply(Voyant.widget.CorpusTermSummary.i18n, {
+"collocates":"Collocates:",
+"distribution":"Distribution:",
+"loading":"Loading...",
+"phrases":"Phrases:",
+"title":"Corpus Term Summary:",
+"correlations":"Correlations:",
+"items":"Items"});
 Ext.apply(Voyant.panel.Knots.i18n, {
 "findTerm":"Najít termín",
 "settings":"Nastavení",
@@ -643,15 +857,15 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 "showTerm":"Ukázat termín",
 "sound":"zvuk",
 "clearTerms":"Smazat",
-"removeTerm":"Odstranit termín",
 "hideTerm":"Skrýt termín",
+"removeTerm":"Odstranit termín",
+"noTermsFound":"V tomto dokumentu nebyly nalezeny žádné termíny",
 "title":"Uzly",
 "type":"Vizualizace",
-"noTermsFound":"V tomto dokumentu nebyly nalezeny žádné termíny",
 "speed":"Rychlost",
 "soundTip":"Přepínač zvukové funkce nástroje Uzly.",
-"options":"Možnosti",
-"context":"Kontext"});
+"context":"Kontext",
+"options":"Možnosti"});
 Ext.apply(Voyant.VoyantApp.i18n, {
 "serverResponseError":"Chybové hlášení serveru:",
 "error":"Chyba zobrazení.",
@@ -661,8 +875,8 @@ Ext.apply(Voyant.panel.RezoViz.i18n, {
 "loadingEntities":"Nahrávání entit…",
 "minEdgeCount":"Minimální počet hran",
 "noEntities":"Žádné entity k vykreslení.",
-"title":"RezoViz",
 "stiffness":"Tuhost",
+"title":"RezoViz",
 "people":"Lidé",
 "friction":"Napětí",
 "repulsion":"Odpudivá síla",
@@ -671,8 +885,8 @@ Ext.apply(Voyant.panel.RezoViz.i18n, {
 "locations":"Místa",
 "categories":"Kategorie"});
 Ext.apply(Voyant.widget.DocumentSelector.i18n, {
-"cancel":"Zrušit",
 "all":"vše",
+"cancel":"Zrušit",
 "selectAll":"Vše",
 "documents":"Dokumenty",
 "ok":"Potvrdit",
@@ -689,8 +903,8 @@ Ext.apply(Voyant.panel.Contexts.i18n, {
 "documentTip":"Dokument se zaznamenaným výskytem",
 "left":"Vlevo",
 "corpusTip":"Obnovit v režimu korpusu (kontexty ze všech dokumentů).",
-"rightTip":"Kontext napravo od klíčového slova",
 "context":"kontext",
+"rightTip":"Kontext napravo od klíčového slova",
 "leftTip":"Kontext nalevo od klíčového slova",
 "position":"Pozice",
 "positionTip":"Pozice klíčového slova v dokumentu",
@@ -702,24 +916,28 @@ Ext.apply(Voyant.VoyantDefaultApp.i18n, {
 "noViewErrorTitle":"Chyba zobrazení.",
 "helpTip":"Voyant Tools jsou webovým prostředím pro čtení a analýzu digitálních textů. <p></p>",
 "noViewErrorTpl":"Nebylo nalezeno žádné zobrazení s názvem \"<i>{view}</i>\". Místo něj bude použito výchozí zobrazení."});
-Ext.apply(Voyant.widget.Facet.i18n, {
-"emptyText":"Nebyly nalezeny žádné hodnoty"});
 Ext.apply(Voyant.panel.ScatterPlot.i18n, {
+"tsne":"t-SNE",
 "relFreq":"Relativní",
-"xAxis":"Osa X",
 "termsLabel":"Termíny",
+"xAxis":"Osa X",
 "summaryLabel":"Shnrutí",
 "title":"Bodový graf",
 "nearby":"V blízkosti",
 "remove":"Odstranit",
 "pca":"Analýza hlavních komponent",
+"analyzing":"Analyzing",
+"output":"Output",
 "docSim":"Podobnost dokumentů",
+"perplexity":"Perplexity",
 "noTermSelected":"Nebyl vybrán žádný termín.",
 "freqsMode":"Frekvence",
+"reload":"Reload",
 "terms":"Termíny",
 "tokenFreqTip":"<b>{0}</b><br><b>Prostá frekvence</b><br>{1}<br><b>Relativní frekvence</b><br>{2}",
-"term":"Termín",
+"options":"Options",
 "docFreqTip":"<b>{0}</b><br><b>Počet slov</b><br>{1}",
+"term":"Termín",
 "rawFrequencies":"Prosté frekvence",
 "dimension":"Rozměr",
 "helpTip":"<p>Bodový graf ukazuje souvztažnost (korespondenci) užití slov v korpusu. Tato vizualizace se odvíjí od statistické analýzy, která vezme souvztažnost  daných slov za každý dokument (kde každý dokument reprezentuje jeden rozměr) a redukuje ji do trojrozměrného prostoru, aby přístupným způsobem vizualizovala data pomocí bodového grafu.</p>",
@@ -728,31 +946,39 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "pcTitle":"Procentuální podíl celkové variace vysvětlený každým komponentem",
 "relativeFrequencies":"Relativní frekvence",
 "addTerm":"Přidej termín",
+"plotting":"Plotting",
 "numTerms":"Termíny",
 "removeTerm":"Odstranit <b>{0}</b>",
 "tfidf":"TF-IDF",
 "analysis":"Analýza",
 "fill":"Vyplnit",
 "loading":"Nahrávání",
+"iterations":"Iterations",
 "labels":"Popisky",
+"input":"Input",
 "freqsModeTip":"Určuje, zda jsou frekvence vyjádřeny jako relativní četnosti, prosté četnosti, nebo jako TF-IDF (vypočítává se ze dvou složek: četnost slova v dokumentu a převrácená četnost slova ve všech dokumentech).",
 "yAxis":"Osa Y",
 "pc":"PC",
-"nearbyTerm":"V blízkosti <b>{0}</b>",
 "docsLabel":"Dokumenty",
-"rawFreq":"Absolutní",
+"nearbyTerm":"V blízkosti <b>{0}</b>",
 "caTitle":"Procentuální podíl celkové asociace vysvětlené každou dimenzí",
+"rawFreq":"Absolutní",
 "dimensions":"Dimenze"});
 Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"Voyant Tools",
 "privacy":"Ochrana soukromí",
 "voyantLink":"<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools</a>",
 "privacyMsg":"Vývojáři Voyant Tools sbírají ze stránky data o tom, jaké nástroje jsou používány a s jakými parametry (IP adresy jsou také protokolovány, aby bylo možné identifikovat vícenásobné požadavky během jedné relace). Kromě toho Voyant Tools používají Google Analytics (viz Google's Privacy Policy především sekce <em>Log Information</em>). Lokálně protokolovaná data a data z Google Analytics budou vývojářským týmem použita k odstranění chyb a vylepšení nástrojů a také k lepšímu porozumění tomu, jak je badatelé využívají. Tato data mohou být v anonymizované a agregované formě rovněž využita pro výzkumné účely. Upozorňujeme, že texty odeslané do Voyant Tools jsou ukládány, aby k nim byl umožněn soustavný přístup během pracovní relace a mezi více relacemi. Pokud máte dotazy ohledně sbíraných dat a jejich použití nebo chcete-li požádat o odstranění korpusu, kontaktujte prosím Stéfana Sinclaira. Pro více informací klikněte na tento odkaz."});
+Ext.apply(Voyant.widget.Facet.i18n, {
+"emptyText":"Nebyly nalezeny žádné hodnoty"});
 Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchTip":"<div>Syntax vyhledávání (stisknutím klávesy enter/return zahájíte vyhledávání):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>^kabát*</b>: vyhledat termíny začínající na <i>kabát</i> jako samostatné termíny (kabát, kabáty, atd.)</li><li><b>kabát,bunda</b>: vyhledat termíny oddělené čárkami jako samostatné termíny</li><li><b>kabát|bunda</b>: vyhledat termíny oddělené svislou čárou jako jeden termín</li><li><b>\"zimní kabát\"</b>: <i>zimní kabát</i> jako slovní spojení</li><li><b>\"kabát rukavice\"~5</b>: <i>kabát</i> v blízkosti <i>rukavice</i> (v okolí 5 slov)</li><li><b>^kabát*,bunda|parka,\"kabát rukavice\"~5</b>: kombinovaná syntax</li></ul>",
 "querySearchDocsModeTip":"<div>Syntax pro vyhledávání v dokumentech  (stisknutím klávesy enter/return zahájíte vyhledávání):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>kabát</b>: vyhledat přesné znění<i>kabát</i></li><li><b>kabát*</b>: vyhledat termíny začínající na <i>kabát</i></li><li><b>kabát,bunda</b>: vyhledat termíny oddělené čárkami jako samostatné termíny</li><li><b>\"zimní kabát\"</b>: <i>zimní kabát</i> jako slovní spojení</li><li><b>\"kabát rukavice\"~5</b>: <i>kabát</i> v blízkosti <i>rukavice</i> (v okolí 5 slov)</li><li><b>+zimní +kabát</b>: vyhledat každý termín, kterému předchází plus (+)</li><li><b>+\"zimní kabát\" +rukavice*</b>: kombinovaná syntax</li></ul>",
 "querySearch":"Vyhledávání",
 "aggregateInDocumentsCount":"Toto je počet dokumentů vyhovujících kritériím vyhledávání (každý započtený dokument obsahuje aspoň jeden vyhledávaný termín)."});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"němčina",
 "thisLanguage":"čeština",
@@ -760,8 +986,8 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "en":"angličtina",
 "hr":"chorvatština",
 "it":"italština",
-"languageTitle":"Možnosti jazykového rozhraní",
 "fr":"francouzština",
+"languageTitle":"Možnosti jazykového rozhraní",
 "ar":"arabština",
 "bs":"bosenština",
 "chooseLanguage":"Jazyk rozhraní",

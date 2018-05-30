@@ -5,12 +5,6 @@ Ext.define('Voyant.panel.Veliza', {
 	autoScroll: true,
     statics: {
     	i18n: {
-    		title: "Veliza",
-    		typeAndEnter: "Type text and hit enter.",
-    		send: "send",
-    		fromCorpus: "from text",
-    		scriptEditor: "Script Editor",
-    		scriptIntro: "This is an advanced feature that allows you see and edit the script used by Veliza. For more information on the syntax, see the <a href='{0}' target='_blank'>documentation</a>."
     	},
     	api: {
     		script: '',

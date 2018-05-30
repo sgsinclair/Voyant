@@ -4,9 +4,6 @@ Ext.define("Voyant.notebook.editor.button.Edit", {
 	alias: 'widget.notebookwrapperedit',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Edit"
-			}
 		}
 	},
 	constructor: function(config) {

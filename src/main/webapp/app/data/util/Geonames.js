@@ -2,7 +2,6 @@ Ext.define('Voyant.data.util.Geonames', {
     mixins: ['Voyant.util.Localization'],
     statics: {
     		i18n: {
-    			failedToFetchGeonames: "Failed to load location information."
     		}
     },
 

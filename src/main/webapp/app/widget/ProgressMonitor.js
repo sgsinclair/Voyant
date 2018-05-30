@@ -4,13 +4,6 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 	msgbox: undefined,
 	statics: {
 		i18n: {
-			noProgress: "This progress monitor was incorrectly initialized.",
-			progress: "Progress",
-			badProgress: "Unable to understand the progress report from the server",
-			aborted: "Error",
-			finished: "Finished",
-			launch: "Launching…",
-			running: "Working…"
 		}
 	},
 	config: {

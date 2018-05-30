@@ -5,17 +5,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	cls: 'notebook-code-wrapper',
 	statics: {
 		i18n: {
-			previousNotRunTitle: "Previous Code Blocks",
-			previousNotRun: "There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?",
-			modeCode: "Code",
-			modeData: "Data",
-			modeJavascript: "Javascript (default)",
-			modeJson: "JSON",
-			modeText: "Text",
-			modeCsv: "CSV (comma-separated values)",
-			modeTsv: "TSV (tab-separated values)",
-			modeHtml: "HTML",
-			modeXml: "XML"
 		}
 	},
 	config: {

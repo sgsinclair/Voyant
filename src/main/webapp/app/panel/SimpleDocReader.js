@@ -5,8 +5,6 @@ Ext.define('Voyant.panel.SimpleDocReader', {
 	isConsumptive: true,
     statics: {
     	i18n: {
-    		noNext: "No next document.",
-    		noPrevious: "No previous document."
     	},
     	api: {
     		docIndex: undefined,

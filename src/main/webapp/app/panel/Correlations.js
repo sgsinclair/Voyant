@@ -4,19 +4,6 @@ Ext.define('Voyant.panel.Correlations', {
 	alias: 'widget.correlations',
     statics: {
     	i18n: {
-    		title: "Correlations",
-    		helpTip: "The Correlations tool enables an exploration of the extent to which term frequencies vary in sync (terms whose frequencies rise and fall together or inversely).",
-    		sourceTip: "Term 1 (the pairing is what matters, not the column)",
-    		targetTip: "Term 2 (the pairing is what matters, not the column)",
-    		trendTip: "This represents the relative frequencies of the term.",
-    		minInDocumentsCountRatioLabel: "minimum coverage (%{0})",
-    		source: "Term 1",
-    		target: "Term 2",
-    		correlation: "Correlation (r)",
-    		correlationTip: "This is a measure of how closely term frequencies correlate (using Pearson's correlation coefficient or a simple regression). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other dropx), scores approaching 0 indicate little or no meaningful corrlation.",
-    		significance: "Significance (p)",
-    		significanceTip: "This is a measure of the signifiance of the correlation value. Often a significance of .05 or less indicates a strong correlation (which allows us to reject the null hypothesis that values are randomly distributed). The validity of this measure depends on assumptions about a normal distribution of the data. Also, don't forget that we typically have a relatively small number of values (frequencies from segments in a texts or from texts in a document), so these values should be used with care.",
-    		emptyText: "(No results.)"
     	},
     	api: {
     		query: undefined,

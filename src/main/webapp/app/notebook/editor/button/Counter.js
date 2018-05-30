@@ -4,9 +4,6 @@ Ext.define("Voyant.notebook.editor.button.Counter", {
 	alias: 'widget.notebookwrappercounter',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Edit"
-			}
 		}
 	},
 	config: {

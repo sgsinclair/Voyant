@@ -4,9 +4,6 @@ Ext.define("Voyant.notebook.editor.button.Add", {
 	alias: 'widget.notebookwrapperadd',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Add New Block"
-			}
 		}
 	},
 	constructor: function(config) {

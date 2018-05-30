@@ -1,14 +1,32 @@
 Voyant.util.Localization.LANGUAGE='ar'
+Ext.apply(Voyant.panel.Correlations.i18n, {
+"sourceTip":"Term 1 (the pairing is what matters, not the column)",
+"emptyText":"(No results.)",
+"significanceTip":"This is a measure of the signifiance of the correlation value. Often a significance of .05 or less indicates a strong correlation (which allows us to reject the null hypothesis that values are randomly distributed). The validity of this measure depends on assumptions about a normal distribution of the data. Also, don’t forget that we typically have a relatively small number of values (frequencies from segments in a text or from documents in a corpus), so these values should be used with care.",
+"targetTip":"Term 2 (the pairing is what matters, not the column)",
+"source":"Term 1",
+"title":"Correlations",
+"target":"Term 2",
+"significance":"Significance (p)",
+"correlation":"Correlation (r)",
+"correlationTip":"This is a measure of how closely term frequencies correlate (using Pearson’s correlation coefficient or a simple regression). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other drops), scores approaching 0 indicate little or no meaningful correlation.",
+"trendTip":"This represents the relative frequencies of the term.",
+"helpTip":"The Correlations tool enables an exploration of the extent to which term frequencies vary in sync (terms whose frequencies rise and fall together or inversely).",
+"minInDocumentsCountRatioLabel":"minimum coverage (%{0})"});
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"هل  تريد البدء من جديد (والخروج من المكنزة الحالية)؟",
 "title":"فواينت تولز (ادوات فواينت)",
 "helpTip":" فوايانت تولز هو محيط متوفر على شبكة الانترنت  لقراءة وتحليل النصوص الرقمية",
 "homeTip":"إضغط للرجوع الى شاسة إنشاء المكنز",
 "home":"البدأ من جديد"});
+Ext.apply(Voyant.data.util.Geonames.i18n, {
+"failedToFetchGeonames":"Failed to load location information."});
+Ext.apply(Voyant.notebook.editor.CodeEditor.i18n, {
+"emptyText":"// click here to edit"});
 Ext.apply(Voyant.panel.Topics.i18n, {
 "scores":"Scores",
 "adaptation":"adapted from David Mimno's <a href=\"https://github.com/mimno/jsLDA\" target=\"_blank\">jsLDA</a>",
-"scoresTip":"This represents the score of each document (in corpus order) for the row's topic.",
+"scoresTip":"This represents the score of each document (in corpus order) for the row’s topic.",
 "numTopics":"Topics",
 "title":"Topics",
 "loadingStopWords":"Loading stopwords…",
@@ -20,13 +38,13 @@ Ext.apply(Voyant.panel.Topics.i18n, {
 "topicTip":"This provides an ordered list of the ten most signifiant terms in the topic cluster. ",
 "helpTip":"This tool performs topic modelling (<a href=\"https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation\" target=\"_blank\">LDA</a>) on the current corpus. Initially words are randomly assigned to each topic and with each iteration the topics become more refined. Please note that because of the initial random assignment, results will be different each time this tool is run.",
 "loadingDocuments":"Loading documents…",
-"runIterationsTip":"This runs iterations (100 by default) on the current topics (in other words, the topics aren't replaced, they're refined).",
 "perDocLimitHigh":"This value seems high. Please note that problems may occur on the server or in your browser if you include too many terms (default is 1,000).",
-"searchTip":"Highlight the topics that contain the search (even partial words), don't forget that each topic is limited to the top 10 terms.",
+"runIterationsTip":"This runs iterations (100 by default) on the current topics (in other words, the topics aren’t replaced, they’re refined).",
 "iterations":"Iterations",
+"searchTip":"Highlight the topics that contain the search (even partial words), don’t forget that each topic is limited to the top 10 terms.",
 "runningIterations":"Performing topic modelling.",
-"runningIterationsCount":"Running {0} iterations.",
 "perDocLimitTip":"The maximum number of terms to include from the start of a document (set this to a very high number or to zero to have no limit, but beware that high values can cause problems on the server or in your browser).",
+"runningIterationsCount":"Running {0} iterations.",
 "limitTermsTip":"Determine the number of terms to show for each topic.",
 "totalDone":"({0} iterations done)",
 "numTopicsTip":"Determine the number of topics (or term clusters) to produce. Note that changing this value will regenerate topics (and that results will be different even with the same number of topics).",
@@ -48,33 +66,38 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "query":"عملية بحث",
 "count":"عدد",
 "exportNewCorpus":"مكنز جديد",
-"title":"دوكيومنتس فايندر (ايجاد المستندات)",
-"loading":"تحميل المكنز جاري",
 "addRow":"اضافة صف",
+"loading":"تحميل المكنز جاري",
+"title":"دوكيومنتس فايندر (ايجاد المستندات)",
 "operator":"عامل",
 "textField":"نص (افتراضي)",
 "unsuccessfulQuery":"لا يمكن إنجار عملية البحث",
-"pubPlaceField":"مكان النشر",
 "advancedField":"<i>عملية بحث متقدم</i>",
+"pubPlaceField":"مكان النشر",
 "authorField":"المؤلف",
 "noMatches":"لا يوجد تطابق (من عدد من المستندات:{0}). ",
 "field":"حقل",
 "deleteRowTip":"انقر لمحي الصف",
 "publisherField":"الناشر",
-"pubDateField":"تاريخ النشر",
-"exportNewCorpusTip":"انشاء مكنز جديد من المستندات المطابقة (الزرسيكون معطل في حال عدم وجود مستندات مطابقة) "});
+"exportNewCorpusTip":"انشاء مكنز جديد من المستندات المطابقة (الزرسيكون معطل في حال عدم وجود مستندات مطابقة) ",
+"pubDateField":"تاريخ النشر"});
+Ext.apply(Voyant.notebook.editor.button.RunAll.i18n, {
+"tip":"Run all code blocks below."});
 Ext.apply(Voyant.panel.TermsBerry.i18n, {
 "scaling":"Scaling",
 "distinctTerms":"Distinct Terms",
-"topTerms":"Top Terms",
-"numTerms":"Terms",
 "context":"Context",
-"title":"TermsBerry",
-"strategy":"Strategy"});
+"numTerms":"Terms",
+"topTerms":"Top Terms",
+"reset":"Reset",
+"inDocs":"In Docs",
+"tfidf":"tf-idf",
+"strategy":"Strategy",
+"title":"TermsBerry"});
 Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
-"paletteEditor":"Palette Editor",
 "add":"إضافة",
 "cancel":"إلغاء",
+"paletteEditor":"Palette Editor",
 "editList":"تحرير القائمة ",
 "saveNewPalette":"Save New Palette",
 "clear":"إزالة",
@@ -84,15 +107,15 @@ Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"إطارالتحكم بإعدادات كشف الكلمات",
 "linear":"خطي",
 "log":"لوغارتمي",
-"displayPanel":"إطار الكشف",
 "completingTransition":"التحويل جاري",
+"displayPanel":"إطار الكشف",
 "removeTerm":"إزالة <b>{0}</b>",
 "yScale":"المحور العمودي",
 "title":"ترمز راديو (عرض زمني)",
 "type":"عرض مرئي",
 "speed":"سرعة",
-"segments":"شرائح",
 "fraction":"كشف الكلمات",
+"segments":"شرائح",
 "duration":"سرعة",
 "help":"بالامكان اكتشاف عدد وقوع الكلمات في مكنز يمتدد فترة زمنية",
 "resetTip":"إعادة تنضيد العرض المرئي الى البداية",
@@ -107,20 +130,18 @@ Ext.apply(Voyant.util.Downloadable.i18n, {
 "exportTitle":"تصدير ",
 "downloadButton":"تحميل",
 "cancelButton":"إلغاء"});
-Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
-"contextTermRawFreq":"عدد (السياق)",
-"matchingTerms":"{count}",
-"contextTerm":"تضام ",
-"emptyText":"لا يوجد نتائج مطابقة",
-"termTip":"الكلمة المفتاحية التي تعد حولها تضام الكلمات (في السياق) ",
-"termRawFreqTip":"عدد مرات وقوع الكلمات المفتاحية في المكنز",
-"title":"كولوكايتس (الكلمات المتضامة)",
-"termRawFreq":"عدد (الكلمة المفتاحية)",
-"context":"السياق",
-"term":"كلمة",
-"helpTip":"<p>كوربوس كولوكايتس: يظهر جدول الكلمات اكبر تواتر للكلمات التي تتواجد بالقرب من الكلمات المفتاحية في سائر المكنز. الوظائف المتاحة: </p><ul><li>إعادة الترتيب بحسب الكلمة المفتاحية, تضام الكلمات, عدد تضام الكلمات</li><li>مربع بحث الاستعلام (يرجى التحليق فوق ايقونة المكبرة للمساعدة في تركيب الجمل)</li></ul>",
-"contextTermRawFreqTip":"عدد وقوع الكلمة المتضامة بالقرب من الكلمة المفتاحية في المكنز",
-"contextTermTip":"الكلمة المتضامة (في السياق) التي تقع بالقرب من الكلمة المفتاحية"});
+Ext.apply(Voyant.panel.WordWall.i18n, {
+"scaling":"Scaling",
+"yStrength":"Y Strength",
+"delay":"Fetch Delay",
+"stop":"Stop",
+"terms":"Terms",
+"chargeDistance":"Charge Distance",
+"chargeStrength":"Charge Strength",
+"start":"Start",
+"xStrength":"X Strength",
+"title":"Wall of Words",
+"transition":"Transition Speed"});
 Ext.apply(Voyant.panel.Documents.i18n, {
 "keepTip":"النقرهنا لإنشاء مكنز جديد يحتوي المستندات المختارة اوالمرشحة (حسب عملية البحث)",
 "reorderFilteredError":"لا يمكن اعادة ترتيب مكنز مرشح (بعد عملية البحث). يرجى انشاء مكنز جديد اولا (مستخدما زر<i>ازالة</i>او<i>حفظ </i>ومن ثم اعادة ترتيب المكنز الجديد.",
@@ -130,9 +151,9 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "language":"لغة",
 "reorder":"إعادة التنظيم",
 "removeSelectedDocuments":"انشاء مكنز <i>جديد</i>لازالة (لا يشمل) {0:plural('selected document')}?",
-"title":"دوكيومنتس (المستندات)",
-"error":"وقع خطأ",
 "addTip":"النقرهنا لإضافة مستندات جديدة  إلى هذا المكنز ",
+"error":"وقع خطأ",
+"title":"دوكيومنتس (المستندات)",
 "keepFilteredDocuments":" انشاء مكنز <i>جديد</i>يحافظ فقط على{0:plural('filtered document')}?",
 "remove":"إزالة",
 "documentAuthor":"مؤلف",
@@ -153,36 +174,48 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"يحتوي المكنز على مستند واحد فقط , لا يمكن ازالة او الحفاظ على المستندات لانشاء مكنز جديد",
 "modify":"تعديل",
-"typeTokenRatioLexical":"نسبة",
 "modifyTip":"النقر على هذا الزر لانشاء مكنز جديد بواسطة اضافة مستندات جديدة, بتحديد مجموعة فرعية للمستندات او باعادة ترتيب المستندات",
 "reorderDocuments":"انشاء مكنز <i>جديد</i>بناء على الترتيب الظاهر؟",
+"typeTokenRatioLexical":"نسبة",
 "keep":"حفظ",
 "reorderOriginalError":"يرجى اعادة ترتيب المكنز اولا (سحب والقاء الصفوف في الجدول)"});
-Ext.apply(Voyant.panel.Panel.i18n, {
-"trend":"إتجاه",
-"relativeFreq":"نسبة",
-"colon":": ",
+Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
+"contextTermRawFreq":"عدد (السياق)",
+"matchingTerms":"{count}",
+"contextTerm":"تضام ",
+"emptyText":"لا يوجد نتائج مطابقة",
+"termRawFreqTip":"عدد مرات وقوع الكلمات المفتاحية في المكنز",
+"termTip":"الكلمة المفتاحية التي تعد حولها تضام الكلمات (في السياق) ",
+"title":"كولوكايتس (الكلمات المتضامة)",
+"termRawFreq":"عدد (الكلمة المفتاحية)",
+"context":"السياق",
 "term":"كلمة",
-"rawFreq":"عدد",
-"loading":"تحميل",
-"error":"وقع خطأ",
-"info":"معلومات"});
+"helpTip":"<p>كوربوس كولوكايتس: يظهر جدول الكلمات اكبر تواتر للكلمات التي تتواجد بالقرب من الكلمات المفتاحية في سائر المكنز. الوظائف المتاحة: </p><ul><li>إعادة الترتيب بحسب الكلمة المفتاحية, تضام الكلمات, عدد تضام الكلمات</li><li>مربع بحث الاستعلام (يرجى التحليق فوق ايقونة المكبرة للمساعدة في تركيب الجمل)</li></ul>",
+"contextTermRawFreqTip":"عدد وقوع الكلمة المتضامة بالقرب من الكلمة المفتاحية في المكنز",
+"contextTermTip":"الكلمة المتضامة (في السياق) التي تقع بالقرب من الكلمة المفتاحية"});
 Ext.apply(Voyant.panel.Bubbles.i18n, {
 "soundTip":"تبديل الصوت",
 "sound":"صوت",
 "adaptation":"<a href=\"https://www.m-i-b.com.ar/letters/en/\"  target=\"_blank\"><i>Letter Pairs</i> ل Martin Ignacio  Bereciartua</a>مستوحاة من ",
-"title":"بوبلز(فقاعات)",
 "speedTip":"التحكم بسرعة العرض المرئ",
+"title":"بوبلز(فقاعات)",
 "helpTip":"بوبلزهو عرض مرئي ممتع للكلمات المتكررة في مستند",
 "speed":"سرعة"});
+Ext.apply(Voyant.panel.Panel.i18n, {
+"trend":"إتجاه",
+"relativeFreq":"نسبة",
+"colon":": ",
+"rawFreq":"عدد",
+"term":"كلمة",
+"error":"وقع خطأ",
+"loading":"تحميل",
+"info":"معلومات"});
+Ext.apply(Voyant.notebook.editor.TextEditor.i18n, {
+"emptyText":"(Click here to edit.)",
+"enableEditingTitle":"Enable Editing?"});
 Ext.apply(Voyant.widget.CorpusDocumentSelector.i18n, {
 "corpus":"مكنز",
 "scale":"حجم"});
-Ext.apply(Voyant.panel.Reader.i18n, {
-"documentFrequency":"تواتر المستند:",
-"limitedAccess":"هذا المكنز محدود الوصول ووظيفة هذه الاداة محدودة ايضا.",
-"title":"ريدر (أداة القراءة)",
-"helpTip":"<p>اداة الريدر تعرض تفاصيل عن المستندات الموجودة في المكنز. المميزات المتاحة:</p><ul><li> يظهرعدد التواتر عند التحليق فوق كلمة ما </li><li>يظهر مخطط التوزيع في الاسفل عند النقر على كلمة ما</li><li>يظهررسم بياني شريطي في الاسفل ويشير الى الحجم النسبي لكل مستند في المكنز</li><li>مربع البحث (يرجى التحليق فوق ايقونة التكبير للمساعدة في تركيب الجمل)</li></ul>"});
 Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "fetchingCorpus":"توصيل المكنز",
 "moreToolsTypeViz":"أدوات العرض المرئي",
@@ -191,8 +224,8 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "passwordRequiredMessage":"رمزالوصول مطلوب لهذا المكنز",
 "didYouKnow":"Did you know?",
 "passwordRequiredTitle":"رمزالوصول مطلوب",
-"password":"رمز الوصول",
 "didYouKnowText":"Help and options are available!",
+"password":"رمز الوصول",
 "moreToolsScaleDocument":"أدوات المستند",
 "moreToolsTypeGrid":"أدوات جدولية",
 "moreToolsType":"أدوات بحسب النوع",
@@ -203,20 +236,11 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "passwordValidateButton":"التحقق",
 "moreToolsScale":"أدوات بحسب الحجم",
 "badPassword":"عذرا رمز الوصول غير صحيح"});
-Ext.apply(Voyant.panel.Bubblelines.i18n, {
-"findTerm":"البحث عن كلمات",
-"showTerm":"كشف الكلمة",
-"corpusTooSmall":"حجم المكنز صغير جداً",
-"clearTerms":"محي",
-"removeTerm":"إزالة الكلمة",
-"hideTerm":"حجب الكلمة",
-"title":"بوبل لاينز (خط الفقاعات)",
-"type":"عرض مرئي",
-"separateLines":"خطوط مختلفة للكلمات",
-"help":"بابل لاينز (خط الفقاعات) هو أداة مرئية تظهر التواتر والتكرار لكلمة ما موجودة في مكنز. يمثل كل خط افقي مستند في المكنز ويتم تقسيم الخط الى شرائح متساوية الطول. تمثل كل فقاعة كلمة واحدة. وقطرالفقاعة يتناسب طردا مع العدد التصاعدي لتكرار الكلمة في شريحة النص المذكور   ",
-"total":"المجموع",
-"granularity":"التَّحَبُّب",
-"options":"خيارات"});
+Ext.apply(Voyant.panel.Reader.i18n, {
+"documentFrequency":"تواتر المستند:",
+"limitedAccess":"هذا المكنز محدود الوصول ووظيفة هذه الاداة محدودة ايضا.",
+"title":"ريدر (أداة القراءة)",
+"helpTip":"<p>اداة الريدر تعرض تفاصيل عن المستندات الموجودة في المكنز. المميزات المتاحة:</p><ul><li> يظهرعدد التواتر عند التحليق فوق كلمة ما </li><li>يظهر مخطط التوزيع في الاسفل عند النقر على كلمة ما</li><li>يظهررسم بياني شريطي في الاسفل ويشير الى الحجم النسبي لكل مستند في المكنز</li><li>مربع البحث (يرجى التحليق فوق ايقونة التكبير للمساعدة في تركيب الجمل)</li></ul>"});
 Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "corpusComparisonDifference":"المقارنة",
 "matchingTerms":"الكلمات المطابقة",
@@ -233,31 +257,45 @@ Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "trendTip":"اتجاه التواترات النسبية لكل كلمة في كل مستند في مجمل المكنز",
 "helpTip":" </p><p>كوربوس تيرمز هو عرض جدولي للكلمات التي تظهر في مجمل المكنز. الوظائف المتاحة:</p><ul><li>اعادة الترتيب بحسب <i>الكلمة</i>والعدد</i>(النقر على ترويسة العواميد)</li><li>يظهر مخطط مؤشر لاتجاهات المبينة على توترات الكلمات عبر المكنز (في حال تواجد مستندات متعددة في المكنز) او عبر المستند (في حال تواجد مستند واحد في المكنز)</li><li>العواميد الاضافية المتوفرة (التواترات النسبية,عدم انتظام التوزيع والانحراف) النقرعلى السهم الذي يظهرعند التحليق فوق الترويسة </li><li>مربع البحث (يرجى التحليق فوق ايقونة المكبرة للمساعدة في تركيب الجمل)</li></ul>",
 "relativeSkewnessTip":"القياس الاحصائي لتماثل التواترات النسبية لكلمة في مجمل المكنز "});
+Ext.apply(Voyant.panel.Bubblelines.i18n, {
+"findTerm":"البحث عن كلمات",
+"showTerm":"كشف الكلمة",
+"corpusTooSmall":"حجم المكنز صغير جداً",
+"clearTerms":"محي",
+"hideTerm":"حجب الكلمة",
+"removeTerm":"إزالة الكلمة",
+"title":"بوبل لاينز (خط الفقاعات)",
+"type":"عرض مرئي",
+"separateLines":"خطوط مختلفة للكلمات",
+"help":"بابل لاينز (خط الفقاعات) هو أداة مرئية تظهر التواتر والتكرار لكلمة ما موجودة في مكنز. يمثل كل خط افقي مستند في المكنز ويتم تقسيم الخط الى شرائح متساوية الطول. تمثل كل فقاعة كلمة واحدة. وقطرالفقاعة يتناسب طردا مع العدد التصاعدي لتكرار الكلمة في شريحة النص المذكور   ",
+"total":"المجموع",
+"granularity":"التَّحَبُّب",
+"options":"خيارات"});
+Ext.apply(Voyant.panel.CustomSet.i18n, {
+"noSuchTool":"الأدة المطلوبة ({0}) غير متوفرة ",
+"title":"كاستوم فيو(عرض تفصيلي)",
+"helpTip":"هذا العرض تفصيلي"});
 Ext.apply(Voyant.panel.NoTool.i18n, {
 "notImplemented":"هذه الاداة موجودة في نسخة قديمة ولم يتم تنفيذها في هذه النسخة. سيتم تنفيذ بعض الأدوات لاحقا ولكن لن يشمل ذالك بعض منها لانها اما كانت تجريبية او غير ناجحة اوتابعة لبرامج  غير مدعومة حاليا (مثل ادوب فلاش وجافا ابليتس) الرجاء اختيار النسخة الحالية او النسخة السابقة.",
 "badToolSpecified":"لا توجد أداة <i>{0}</i>. سيتم اعادة توجيهك للصفحة الرئيسية لفوايانت تولز.",
 "currentButton":"اختر النسخة الجديدة",
 "oldButton":"اخترالنسخة السابقة",
 "noToolSpecified":"لم يتم تحديد الأداة. سيتم اعادة توجيهك للصفحة الرئيسية لفوايانت تولز.",
-"title":"لا توجد هذه الأداة",
-"error":"خطأ"});
-Ext.apply(Voyant.panel.CustomSet.i18n, {
-"noSuchTool":"الأدة المطلوبة ({0}) غير متوفرة ",
-"title":"كاستوم فيو(عرض تفصيلي)",
-"helpTip":"هذا العرض تفصيلي"});
+"error":"خطأ",
+"title":"لا توجد هذه الأداة"});
 Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 "cleaning":"ترتيب",
-"releaseToRemove":"أفلت لإزالة الكلمة",
 "context":"سياق",
+"releaseToRemove":"أفلت لإزالة الكلمة",
 "clearTerms":"محي ",
 "title":" لينكس (روابط)",
 "helpTip":"<p>كولوكايتز: تظهر شبكة الرسم بياني اكبر تواترللكلمات المتضامة (التي تتواجد بالقرب من بعضها). تظهر الكلمات المفتاحية باللون الازرق  والكلمات المتضامة باللون البرتقالي. الوظائف المتاحة:</p><ul><li>التحويم فوق الكلمات المفتاحية تظهر تواترها في المكنز</li><li>التحويم فوق الكلمات المتضامة تظهر تواترها  عن قرب وليس على مستوى المكنز</li><li>النقر المزدوج على اية كلمة يحضر نتائج اضافية</li><li>مربع البحث للاستفسارات الخاصة (التحويم فوق ايقونة التكبيرللمساعدة في طريقة البحث)</li></ul>"});
 Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "cancel":"إلغاء",
 "accessModeWithoutPassword":"وصول آخر",
-"xpathGroupBy":"تصنيف",
-"reveal":"كشف",
 "OpenExisting":"فتح مكنز متوفر",
+"reveal":"كشف",
+"xpathGroupBy":"تصنيف",
 "tableNoHeadersRow":"لا توجد ترويسة",
 "accessOptionsText":"بالامكان تحديد اكثر من كلمة سرللوصول (فاصلة محددة) ",
 "tableDocumentsRows":"من الخلايا في كل صف",
@@ -266,11 +304,11 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationWordBoundaries":"حدود بسيطة  للكلمة",
 "numberEmpty":"يوجد على الاقل عمود واحد فارغ حاليا",
 "tokenization":"تفصيل الكلمات",
-"tokenizationWhitespace":"Whitespace Only",
 "inputRemoveFrom":"omit from",
+"tokenizationWhitespace":"Whitespace Only",
 "xpathContent":"محتويات",
-"numbersNeedCommas":"الرجاء إستعمال الفاصلة للفصل بين الأرقام المتعددة",
 "textOptionsText":"These options allow you to ignore part of a text document by specifying regular expressions.",
+"numbersNeedCommas":"الرجاء إستعمال الفاصلة للفصل بين الأرقام المتعددة",
 "tableDocumentsTable":"من الجدول الكامل",
 "UploadLocal":"تحميل مستند واحد او اكثر من حاسوبك",
 "helpTip":"تتيح الأداة إنشاء مكنزبثلاثة طرق:<ol><li>عند طباعة اولصق نص في مربع النصوص و النقر على مفتاح <i>الكشف</i>;عند استعمال قائمة URL على كل سطر مربع النصوص يتم إحضار النص من هذه المواقع والا سيتم معاجة المحتويات كمستند واحد</li><li>النقر على مفتاح<i>فتح</i>لإستخدام المكنزالمتوفر</li><li>النقر على مفتاح<i>تحميل</i>لتحميل مستند او اكثر من حسوبك (بالامكان اختيار عدد من المستندات بالضغط على مفتاحي SHIFT او التحكم)</li></ol>",
@@ -278,11 +316,11 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableTitle":"عنوان",
 "noTextProvided":"لا يوجد نص",
 "tableContent":"محتويات",
-"xpathDocuments":"مستندات",
 "tokenizationAuto":"تلقائي (يوصى به بشدة)",
+"xpathDocuments":"مستندات",
 "numbersCommasOnly":"ارقام محددة بفاصلة فقط",
-"tableOptionsText":"اختيار طريقة إستخراج المستندات (الصيغات المعتمدة حصريا من MS Excel: .XLS, XLSX فقط). للمزيد من المعلومات انظرالتوثيق حول انشاء مكنزمن<a href=\"{0}\" target=\"voyantdoc\"\" البيانات المجدولة</a>.",
 "PleaseSelectExisting":"الرجاء إختيار مكنز",
+"tableOptionsText":"اختيار طريقة إستخراج المستندات (الصيغات المعتمدة حصريا من MS Excel: .XLS, XLSX فقط). للمزيد من المعلومات انظرالتوثيق حول انشاء مكنزمن<a href=\"{0}\" target=\"voyantdoc\"\" البيانات المجدولة</a>.",
 "inputFormat":"صيغة الإدخال",
 "tableDocumentsColumns":"من جميع الخلايا في العمود",
 "accessModeWithoutPasswordText":"اذا حُددت <i>كلمة سر الوصول</i> يمكنك أيضا تحديد مجال النفاذ لمستخدمين ليس لديهم كلمة السر",
@@ -296,33 +334,33 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeNone":"غير متوفر",
 "tokenizationOptions":"خيارات تفصيل الكلمات",
 "advancedOptionsText":"للمزيد من المعلومات عن الخيارات المتقدمة المتاحة, انظرالتوثيق حول <a href=\"{0}\" target=\"voyantdocs\">إنشاء المكنز</a>.",
+"inputRemoveUntilAfter":"omit until after",
 "tableDocuments":"مستندات",
-"inputRemoveUntilAfter":"omit unti after",
 "processingOptions":"Processing",
 "noAllowInputMessage":"This server has been configured to NOT allow new documents to be added. Please contact the server administrator (if you can).",
-"fileTypesMessage":"ملحقات بعض الملفات غير صالحة او غير معرفة قد تسبب اخطأ.",
-"errorNotXmlContinue":"تم اختيارتنسيق الإدخال XML ولكن المدخلات ليس بصيغة XML. هل تريد الإستمرار؟",
 "SelectExisting":"اختيار مكنز محدد",
+"errorNotXmlContinue":"تم اختيارتنسيق الإدخال XML ولكن المدخلات ليس بصيغة XML. هل تريد الإستمرار؟",
+"fileTypesMessage":"ملحقات بعض الملفات غير صالحة او غير معرفة قد تسبب اخطأ.",
 "textOptions":"Text",
 "tableOptions":"جداول",
-"xmlOptions":"XML",
 "Upload":"تحميل",
-"title":"آد تكتس (إدخال النصوص)",
+"xmlOptions":"XML",
 "error":"وقع خطأ",
+"title":"آد تكتس (إدخال النصوص)",
 "sureContinue":"هل تريد الإستمرار؟",
-"Open":"فتح",
 "inputRemoveUntil":"omit until",
+"Open":"فتح",
 "badFiles":"غير صالحة (خطأ محتمل)",
 "emptyInput":"إدخال URL واحد او اكثر على سطور مختلفة او لصق نص كامل ",
 "ok":"متابع",
 "accessPassword":"رمز الوصول",
-"adminPassword":"رمز الإدارة",
 "accessModeNonConsumptive":"محدود  (لا استهلاكي)",
+"adminPassword":"رمز الإدارة",
 "tableMetadataText":"الخيارات متاحة فقط عندما تستخرج البيانات من الخلايا في كل صف كما في الخيار الاول في هذا القسم. اتبع ذات الطريقة الموجودة في خيار المضمون في الاعلى. ارقام العواميد المفصولة او مدموجة برمز +.",
 "xpathAuthor":"مؤلف",
 "corpusOptions":"Corpus",
-"xpathTitle":"عنوان",
 "pleaseProvideText":"الرجاء إدخال نص في الاطار او اختيار فتح \ تحميل",
+"xpathTitle":"عنوان",
 "invalidForm":"قيم غير صالحة. يرجى التحليق فوق الاطارات الحمرأ للإرشادات",
 "tableAuthor":"مؤلف",
 "gearWinTitle":"خيارات",
@@ -330,8 +368,16 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "corpusTitle":"Corpus Title",
 "accessOptions":"إدارة الوصول",
 "tableNoHeadersRowText":"في حال وجود ترويسة سيتم تخطي الصف الاول. وستستخدم الترويسة لتحديد عنوان المستند تلقائيا عند استخراج المستند كليا من العمود. في هذه الحالة يجب ترك رأس العمود خال. "});
+Ext.apply(Voyant.panel.Via.i18n, {
+"timedout":"An attempt was made to fetch data but the request took too long. The process may be still ongoing and you could try again in a couple of minutes.",
+"visible":"Visible",
+"englishOnly":"You seem to have a text in a language other than English. Unfortunately, at the moment, Via only supports texts in English (because of the current way the lemmatization and synonym operations are programmed).",
+"title":"Via",
+"helpTip":"Via is a tool intended to help you explore the semantic clusters of English texts."});
 Ext.apply(Voyant.util.DetailedError.i18n, {
 "error":"وقع خطأ"});
+Ext.apply(Voyant.notebook.editor.button.Edit.i18n, {
+"tip":"Edit"});
 Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"اطول:",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
@@ -339,23 +385,29 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "averageWordsPerSentence":"Average Words Per Sentence:",
 "mostFrequentWords":"الكلمات<b>الاكثر تواجدا</b> في المكنز: ",
 "title":"  ساماري (ملخص)",
-"numberOfTerms":"عدد الكلمات في هذا المستند",
 "lowest":"اقل:",
+"numberOfTerms":"عدد الكلمات في هذا المستند",
 "docsLength":"طول المستند:",
 "corpusType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"corpus-type keyword\" voyant:recordid=\"{id}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
-"seeAll":"الجميع:",
 "highest":"اعلى:",
+"seeAll":"الجميع:",
 "distinctiveWords":"الكلمات<b>المميزة</b> (بالقارنة مع بقية المكنز):",
 "docsDensity":"كثافة المفردات:",
 "helpTip":"<p>اداة <i>الساماري</i> تعرض معلومات عامة عن المكنز. تحتوي الاداة على روابط تمكننا من الحصول على عروض اخرى. المميزات المتاحة:</p><ul><li>جميع الكلمات (رموز) واشكال الكلمات (انماط) وعمر المكنز</li><li>والكلمات الاكتر تواجدا في المكنز</li><li>في حال وجود اكثر من مستند في المكانز<ul><li> تصنيف المستندات بحسب طولها و كثافة مفرداتها </li><li>الكلمات المميزة لكل مستند (بحسب قياس TF-IDF )</li></ul></li></ul>   ",
-"moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">الباقية {0}من{1}</a> ",
 "items":"عناصر",
+"moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">الباقية {0}من{1}</a> ",
 "shortest":"اقصر:"});
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
 "title":"كوربوس فيو (عرض للمكنز)",
 "helpTip":"هذا  هو العرض الاعتيادي للغايات العامة للمكنزة "});
+Ext.apply(Voyant.notebook.editor.button.Movement.i18n, {
+"tip":"Move / Remove Controls"});
 Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
 "label":"اسرة الخطوط"});
+Ext.apply(Voyant.notebook.editor.button.Remove.i18n, {
+"tip":"remove this block",
+"confirmRemove":"Are you sure you want to remove this block (and lose any content in the editor)?",
+"confirmRemoveTitle":"Confirm Remove"});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"الناشرون",
 "sendToVoyantButton":"مكنز فويانت جديد",
@@ -363,24 +415,17 @@ Ext.apply(Voyant.panel.Subset.i18n, {
 "sendToVoyantNoQuery":"لم يتم تحديد كلمة بحث, يمكنك  <a href=\"{0}\" target=\"_blank\"> فتح المكنز الحالي في نافذة جديدة</a>.",
 "lexicalLabel":"النص الكامل",
 "noMatches":"المعاير الحالية لا تطابق اي من المستندات, يرجى تعديل البحث اولا",
-"titleLabel":"العناوين",
 "authorLabel":"المؤلفون",
+"titleLabel":"العناوين",
 "title":"ورك سيت بيلدر (إنشاء المكنز الجزئي) "});
-Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
-"titleLabel":"عنوان",
-"authorLabel":"مؤلف",
-"availableLabel":"إستبعاد",
-"enabledLabel":"إدراج",
-"fieldLabel":"إسم الملفات",
-"pubDateLabel":"تاريخ"});
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"إضافة",
 "cancel":"الغاء",
 "clear":"إزالة",
 "labelsTip":"تبديل مظهر السمات",
 "update":"تحديث",
-"title":"مندالا",
 "addTip":"إضافة مغناطيس (كلمة البحث)",
+"title":"مندالا",
 "remove":"حذف",
 "labels":"سمات",
 "clearTip":"إزالة جميع المغناطيسات (كلمة البحث)",
@@ -389,6 +434,13 @@ Ext.apply(Voyant.panel.Mandala.i18n, {
 "helpTip":"مندالا هو عرض مرئي مفهومي يبين العلاقات بين الكلمات والمستندات. تجر كل كلمة بحث (أي مغناطيس) المستندات باتجاها حسب التواتر النسبي للكلمات في المكنز."});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"إختيار مكنز"});
+Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
+"authorLabel":"مؤلف",
+"availableLabel":"إستبعاد",
+"titleLabel":"عنوان",
+"enabledLabel":"إدراج",
+"fieldLabel":"إسم الملفات",
+"pubDateLabel":"تاريخ"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "matchingTerms":"الكلمة المطابقة:{count}",
 "tfidfTip":"تقاس الدلالة بواسطة معيارTF-IDF, طريقة معتمدة للتعبير عن اهمية الكلمة في مستند بالنسبة لبقية المكنز ",
@@ -397,8 +449,8 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "relativeFreqTip":"التواتر النسبي (لكل مليون) لهذه الكلمة في كل مستند",
 "termTip":"الكلمة في مستند مفرد محدد",
 "zscore":"معيار Z-Score",
-"trendTip":"المخطط المؤشر الذي يظهرتوزيع الكلمة في الاقسام الخطية للمستند (عشرة اقسام متساوية الحجم افتراضيا)",
 "tfidf":"الدلالة",
+"trendTip":"المخطط المؤشر الذي يظهرتوزيع الكلمة في الاقسام الخطية للمستند (عشرة اقسام متساوية الحجم افتراضيا)",
 "title":"دوكيومنت تيرمز(كلمات المستند)",
 "helpTip":"دوكيومنت تيرمز هو عرض جدولي للكلمات التي تظهر في كل مستندز المميزات المتاحة:</p><ul><li>اعادة الترتيب بحسب <i>الكلمة</i>, <i>عدد </i>(التواتر الاساسي), و التواتر <i>النسبي</i>(النقر على ترويسة العواميد)</li><li>مخطط مؤشر لتوزيع التواترات لكلمة عبر المستندات</li><li>عواميد اضافية متاحة (<i>مستوى الدلالة</i>اوTF-IDF) النقر على السهم الذي يظهرعند التحليق فوق الترويسة </li><li>مربع البحث (يرجى التحليق فوق ايقونة المكبرة للمساعدة في تركيب الجمل)</li></ul>",
 "zscoreTip":"معيار او المعيار المعتمد هو قيمة موحدة للتواتر الاساسي لكلمة بالمقارنة مع التواترات الاخرى لكلمات في نفس المستند. ."});
@@ -414,65 +466,80 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hoursAgo":"منذ  حوالي عدد من الساعات : {count}",
 "minutesAgo":"منذ  حوالي عدد من الدقائق : {count}",
 "minuteAgo":"منذ حوالي دقيقة",
-"monthAgo":"منذ حوالي شهر",
 "hourAgo":"منذ حوالي ساعة",
+"monthAgo":"منذ حوالي شهر",
 "failedCreateCorpus":"محاولة فاشلة لإنشاء مكنز",
 "has1document":"يحتوي على مستند واحد",
-"yearsAgo":"منذ  حوالي عدد من السنوات : {count}",
 "secondAgo":"منذ حوالي ثانية",
+"yearsAgo":"منذ  حوالي عدد من السنوات : {count}",
 "now":"الآن",
 "badDataTypeCorpus":"Unable to recognize a valid data type for this corpus: ",
-"yearAgo":"منذ حوالي سنة",
 "secondsAgo":"منذ  حوالي عدد من الثوان : {count}",
+"yearAgo":"منذ حوالي سنة",
 "dayAgo":"منذ حوالي يوم"});
+Ext.apply(Voyant.notebook.editor.button.Add.i18n, {
+"tip":"Add New Block",
+"title":"Spyral Notebook"});
+Ext.apply(Voyant.widget.CategoriesOption.i18n, {
+"edit":"Edit",
+"categories":"Categories"});
 Ext.apply(Voyant.panel.WordTree.i18n, {
 "emptyText":"لا يوجد نتائج مطابقة",
 "title":"ورد تري (شجرة الكلمات)"});
+Ext.apply(Voyant.notebook.editor.button.RunUntil.i18n, {
+"tip":"Run all code blocks up to and including this one."});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "original":"أصلي",
 "VOYANTTip":"النسخة التالية قد تم تسويتها: يظهر المستند بشكله الاصيل عند كتابة المحتوى بصيغة XML بينما يظهر المحتوى بصيغة HTML عندما تكون المستندات بصيغة إدخال مختلفة ",
 "fieldLabel":"صيغة الملف",
-"voyantXml":"فوايانت XML",
 "plainText":"نص خالص",
+"voyantXml":"فوايانت XML",
 "SOURCETip":"انتاج المستندات بصيغتها الاصيلة جاري. قد يتم انتاج ملف مضغوط واحد على سبيل المثال. ",
 "TXTTip":"انتاج نص خالص لكل مستند. "});
 Ext.apply(Voyant.panel.ScatterSet.i18n, {
 "title":"سكاتر (تشتت)",
 "helpTip":"هذا العرض خاص لمخطط التشتت"});
 Ext.apply(Voyant.util.Toolable.i18n, {
-"exportTitle":"تصدير",
 "exportError":"تصديرخطأ",
+"exportTitle":"تصدير",
+"exportAllTsvWarning":"You’re requesting all of the available data, are you sure you want to continue?",
 "exportDataTsvMessage":"نسخ البيانات التالية ولصقها داخل جدول بيانات اوملف نصي",
-"exportViewFieldset":"تصدير العرض (أدوات وبيانات)",
 "exportSvgMessage":"<p>صورة مصغرة لل SVG: بالإمكان النقر على اليمين او النقر على مفتاح التحكم لحفظ الصورة بالحجم الكامل.</p><p> اوبدلا من ذالك نسخ الSVG من الاسفل.</p> ",
+"exportViewFieldset":"تصدير العرض (أدوات وبيانات)",
 "exportDataJsonMessage":"نسخ البيانات التالية ولصقها داخل تطبيقات متوفرة على الانترنت",
 "plusTip":"النقرلإختيار أداة جديدة في هذا الإطار. سيتم إستبدال الأداة الحالية",
+"exportGridAllJson":"export all available data in JSON",
 "gearTip":"اختيارات الأداة",
 "cancelTitle":"إلغاء",
-"exportViewHtmlEmbed":" جزيء HTML لتضمين العرض في صفحة اخرى ",
 "exportGridCurrent":"تصدير البيانات الحالية",
+"exportViewHtmlEmbed":" جزيء HTML لتضمين العرض في صفحة اخرى ",
 "exportSvgTitle":"تصدير بصيغة SVG",
-"maximizeTip":"فتح الاداة في نافذة جديدة",
 "exportGridCurrentTsv":"تصدير البيانات الحالية بصيغة TSV ",
 "exportVizTitle":"تصدير العرض المرئي",
+"maximizeTip":"فتح الاداة في نافذة جديدة",
 "exportDataTitle":"تصدير البيانات",
 "optionsTitle":"ختيارات",
+"scaleLabel":"scaling ({0})",
 "exportBiblioTitle":"تصدير المرجع البيبليوغرافي",
 "confirmTitle":"تأكيد",
 "moreHelp":"لمزيد من المعلومات",
+"exportGridAllTsv":"export all available data as tab separated values (text)",
 "exportViewUrl":"طلب URL لهذا العرض (أدوات وبيانات)",
-"helpTip":"لائحة المساعدة الخاصة  بالأداة غير متوفرة: النقر على الأيقونة للوصل الى موقع توثيق فوايانت تولز <a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools Documentation</a> site.",
 "export":"تصدير",
+"helpTip":"لائحة المساعدة الخاصة  بالأداة غير متوفرة: النقر على الأيقونة للوصل الى موقع توثيق فوايانت تولز <a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools Documentation</a> site.",
 "exportDataHtmlMessage":"نسخ البيانات التالية ولصقها داخل صفحة HTML اوإستخدامها كXML",
-"exportPngTitle":"تصدير بصيغة PNG",
 "exportPngMessage":"<p>صورة مصغرة لل PNG: بالإمكان النقر على اليمين او النقر على مفتاح التحكم لحفظ الصورة بالحجم الكامل.</p><p> او بدلا من ذالك نسخ ال HTML من الاسفل.</p>",
+"exportPngTitle":"تصدير بصيغة PNG",
+"exportAllTitle":"Export All",
+"exportAllJsonWarning":"You’re requesting all of the available data (in the JSON format that Voyant uses), are you sure you want to continue?",
+"loading":"Loading…",
 "exportGridCurrentHtml":"تصدير البيانات الحالية  بصيغة HTML ",
 "exportViewEmbedMessage":"نسخ ولصق جزيء HTML من الاسفل الى صفحة اخرى. ملاحظة!  تحتاج بعض نظم إدارة المحتوى ك WordPress الى مساعد لقبول وسوم  &lt;iframe&gt; ",
 "exportPng":"تصدير العرض المرئي بصيغة PNG ",
 "reset":"إعادة ضبط الخيارات",
 "exportViewBiblio":"مرجع بيبليوغرافي للعرض",
-"exportViewEmbedTitle":"تضمين  جزيء HTML ",
 "exportNoFunction":"وظيفة التصدير غير معرّفة ",
+"exportViewEmbedTitle":"تضمين  جزيء HTML ",
 "exportGridCurrentJson":"تصدير البيانات الحالية بصيغة JSON ",
 "exportSvg":"تصدير العرض المرئي بصيغة SVG ",
 "saveTip":"تصدير: URL , أداة قابلة للتضمين , بيانات او مرجع بيبليوغرافي"});
@@ -481,10 +548,71 @@ Ext.apply(Voyant.panel.TextualArc.i18n, {
 "search":"ترشيح",
 "minRawFreq":"تواتر الحد الأدنى",
 "adaptation":" W. Bradford Paley <a href=\"http://textarc.org\" target=\"_blank\">TextArc</a>مستوحاة من",
-"title":"تكستوال ارك (القوس النصي)",
 "speedTip":"التحكم بسرعة العرض المرئي",
+"title":"تكستوال ارك (القوس النصي)",
 "helpTip":"تكستوال ارك هو عرض مرئي  للكلمات الموجودة في المستند والذي يتضمن نقطة مركزية مرجحة للكلمات وقوس الذي يتبع الكلمات في ترتيبها في المنستند  ",
 "speed":"سرعة"});
+Ext.apply(Voyant.panel.DreamScape.i18n, {
+"baseLayerTip":"Determine map base layer",
+"cancel":"Cancel",
+"occurrences":"Occurrences",
+"annotateTip":"To annotate, click this icon, select a region and enter text in the box that will appear. If you don’t select a region you can click again to exit annotation mode. If you do select a region please click this icon again if you wish to add another annotation.",
+"displayTip":"Configure various aspects of the display",
+"osm":"Open Street Map",
+"annotate":"Annotate",
+"millisPerAnimation":"milliseconds per animation",
+"pubDateLabel":"years'",
+"animate":"Animate",
+"citiesMinPopulation":"minimum population",
+"viewOccurrencesTip":"Select this to see the location in Voyant.",
+"annotationsUpdateFailed":"An error occured while trying to store the annotations.",
+"wms4326":"WMS 4326",
+"mapTip":"Define base layer and projection",
+"editAnnotation":"Edit Annotation",
+"nopubDate":"No publication years defined in this corpus.",
+"removeLocationTip":"If this is not a valid place name, you can remove it (this applies to all occurrences).",
+"connections":"Connections",
+"removeLocation":"Remove Location",
+"add":"Add Filter",
+"keywordLabel":"keywords'",
+"editAnnotationMessage":"Add an annotation. To remove an existing annotation, remove the text and click OK.",
+"cities":"Cities",
+"baseLayer":"Base Layer",
+"annotationsLoadFailed":"An error occured while trying to load the annotations.",
+"projectionTip":"Determine map projection",
+"sphereMollweideProjection":"Sphere mollweide (Equal Area)",
+"animationSpeed":"Speed",
+"watercolor":"Stamen watercolor (Default)",
+"authorLabel":"authors'",
+"titleLabel":"titles",
+"title":"DreamScape",
+"webMercatorProjection":"Web Mercator (Default)",
+"noauthor":"No authors defined in this corpus.",
+"mercatorProjection":"Mercator (WGS84)",
+"viewOccurrences":"View Occurrences",
+"citiesMaxCount":"maximum count",
+"animations":"Animations",
+"connectionsMinFreq":"minimum occurrences",
+"openInVoyant":"Open in Voyant",
+"projection":"Projection",
+"removeLocationConfirm":"Are you sure you want to remove all occurrences of this location?",
+"annotationsUpdated":"Annotations have been stored. Please export new URL if you would like to reference it.",
+"map":"Map",
+"editLocationServerError":"An error occurred while trying to load alternate locations.",
+"editLocationTitle":"Select an alternative location",
+"arcGIS":"National Geographic World Map – ArcGIS",
+"viewConnections":"View Connection Occurrences",
+"display":"Display",
+"gallPetersProjection":"Gall Peters (Equal Area)",
+"editLocation":"Select Alternative Location",
+"editLocationNoLocationsFound":"No locations found.",
+"citiesMinFreq":"minimum occurrences",
+"filter":"Filter",
+"allNCitiesShown":"All {0} available cities shown.",
+"filterTip":"Determine any filters to use",
+"connectionsMaxCount":"maximum count",
+"editLocationTip":"If this place name is valid but the location is wrong, you can select an alternate location (this applies to all occurrences).",
+"editLocationNoAlternativesFound":"No alternative locations found."});
 Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "freqsMode":"التواترات",
 "freqsModeTip":"تحديد نوعية التواترات: نسبية, اساسية (في كل مستند اوشريحة).  ",
@@ -492,8 +620,8 @@ Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "documents":"مستندات",
 "documentSegments":"شرائح المستند ",
 "clearTerms":"إزالة الكلمات",
-"title":"ستريم غراف (عرض انسيابي)",
 "rawFrequencies":"التواترات الاساسية",
+"title":"ستريم غراف (عرض انسيابي)",
 "helpTip":"ستريم غراف هو عرض انسيابي مرئي يظهر التغير في تواترالكلمات في مكنز (او في مستند واحد)",
 "segments":"شرائح"});
 Ext.apply(Voyant.notebook.util.Embed.i18n, {
@@ -502,8 +630,8 @@ Ext.apply(Voyant.notebook.util.Embed.i18n, {
 Ext.apply(Voyant.widget.ListEditor.i18n, {
 "cancel":"الغاء",
 "editList":"تحرير القائمة",
-"new":"قائمة جديدة معرفة من قبل المستخدم",
 "editListMessage":"القائمة: كلمة واحدة لكل سطر",
+"new":"قائمة جديدة معرفة من قبل المستخدم",
 "editListTitle":"تحرير القائمة",
 "label":"قائمة",
 "none":"غير متوفر",
@@ -511,6 +639,8 @@ Ext.apply(Voyant.widget.ListEditor.i18n, {
 "whiteListLabel":"القائمة البيضاء (الكلمات المسموحة)"});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"إختيارات التنزيل "});
+Ext.apply(Voyant.notebook.editor.button.Run.i18n, {
+"tip":"Run the script in this block (Shift-Enter)"});
 Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
 "totalPropertyStatus":"{count:number(\"0,000\")}"});
 Ext.apply(Voyant.panel.Phrases.i18n, {
@@ -520,31 +650,77 @@ Ext.apply(Voyant.panel.Phrases.i18n, {
 "overlapFreq":"الاولوية للعبارات الاكثر تكرارا",
 "emptyText":"لا توجد نتائج مطابقة",
 "length":"طول",
-"termTip":"العبارة المفتاحية كما تظهر بشكل عام قد تختلف قليلا في بعض الحالات",
 "termRawFreqTip":"عدد وقوع العبارة في المكنز",
-"title":"فرايزيز(عبارات)",
+"termTip":"العبارة المفتاحية كما تظهر بشكل عام قد تختلف قليلا في بعض الحالات",
 "lengthTip":"الحد الأقصى و الحد الإدنى لطول الأعبارات (عدد الكلمات في كل العبارة)",
-"termRawFreq":"عدد",
+"title":"فرايزيز(عبارات)",
 "overlap":"تراكب",
 "overlapLength":"الاولوية لاطول العبارات",
+"termRawFreq":"عدد",
 "overlapMenu":"اختيار ترشيح التراكب",
 "term":"كلمة",
 "helpTip":"  <p>كوربوس فرايزيز هو عرض جدولي لعبارات متكررة من مجمل المكنز.<!-- الميزات المتاحة:</p<ul><li> اعادة الترتيب حسب الكلمة المفتاحية او الكلمة المتضامة او عدد الكلمة المتضامة</li><li>مربع البحث للإستفسارات (التحويم على أيقونة التكبير للمساعدة في طريقة البحث)</li></ul>-->"});
+Ext.apply(Voyant.notebook.editor.button.Counter.i18n, {
+"tip":"Edit"});
 Ext.apply(Voyant.panel.Trends.i18n, {
-"relativeFrequencies":"التواترالنسبية",
+"stacked":"Stacked Bar",
+"segmentsTitle":"Document Segments",
 "documents":"المستندات",
-"raw":"أساسي",
-"segmentsSlider":"شرائح",
+"line":"Line",
 "scale":"الحجم",
+"relativeTitle":"Relative Frequencies",
 "title":" ترندز(اتجاهات)",
+"toggleTip":"Click to toggle the visibility of this series.",
 "segments":"شرائح المستند",
+"resetTip":"Reset to initial view.",
+"bar":"Columns",
 "freqsMode":"التواترات",
-"freqsModeTip":"تحدد التواتر كعدد أساسي او نسبي (في كل مستند او شريحة)",
+"dblClickItem":"Double-click to drilldown.",
+"segment":"segment:",
+"noResults":"No Results",
 "options":"فواينت تولز",
+"drillDocumentTip":"View the distribution of all current terms within this document.",
 "rawFrequencies":"التواترالاساسية",
 "helpTip":"<p><i>ترندز</i> يظهر خط الرسم البياني للتواترات النسبية عبر المكنز (في حالة وجود مستندات متعددة) او داخل المستند. الوظائف المتاحة:</p><ul><li>مربع البحث للإستفسارات (التحويم على أيقونة التكبير للمساعدة في طريقة البحث)",
-"relative":"نسبي",
-"failedGetDocumentTerms":"Failed to get document terms for Trends."});
+"area":"Area",
+"relativeFrequencies":"التواترالنسبية",
+"drillTermTip":"View the distribution of this term within all documents.",
+"barline":"Line + Stacked Bar",
+"display":"Display",
+"raw":"أساسي",
+"segmentsSlider":"شرائح",
+"labels":"Show Labels",
+"freqsModeTip":"تحدد التواتر كعدد أساسي او نسبي (في كل مستند او شريحة)",
+"drillTerm":"Terms",
+"rawTitle":"Raw Frequencies",
+"reset":"Reset",
+"corpusTitle":"Corpus (Documents)",
+"drillDocument":"Document",
+"failedGetDocumentTerms":"Failed to get document terms for Trends.",
+"relative":"نسبي"});
+Ext.apply(Voyant.notebook.editor.button.MoveDown.i18n, {
+"tip":"move this block down"});
+Ext.apply(Voyant.notebook.Notebook.i18n, {
+"newTip":"Create a new Spyral Notebook in a new window.",
+"autoSaveAvailableTitle":"Autosave Available",
+"cannotMoveLower":"This block is already at the bottom and cannot be moved lower.",
+"failedNotebookLoad":"Failed to load the specified notebook. A new notebook template will be presented instead.",
+"openTip":"Open a Spyral Notebook (by pasting in JSON code).",
+"differentUrl":"This notebook seems to be have been located at a different URL. If you’re sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook’s URL: {0}",
+"cannotMoveHigher":"This block is already at the top and cannot be moved higher.",
+"fetchingNotebook":"Fetching notebook…",
+"exportHtml":"HTML (suitable for saving or printing)",
+"exportJson":"Spyral Notebook data format (JSON)",
+"failedNotebookParse":"The loaded notebook appears to have a syntax error and will probably not run as is.",
+"saveItTip":"Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
+"exportAllLinks":"<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
+"originalJson":"Original JSON string",
+"editsAndLeaving":"It looks like you’ve been editing content and you will lose any content if you follow this link. Continue?",
+"differentUrlTitle":"Notebook from different URL",
+"autoSaveAvailable":"A more recent autosave is available, do you wish to switch to the auto-saved document?",
+"helpTip":"Spyral Notebooks are dynamic documents that combine text, code and interactive tools, they are a form of <a href=\"https://en.wikipedia.org/wiki/Literate_programming\" target=\"_blank\">literate programming</a>.",
+"eror":"Error",
+"runallTip":"Run all code blocks in this notebook"});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"الغاء",
 "de":"الماني",
@@ -573,16 +749,16 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "el":"يوناني",
 "mu":"متعدد اللغات",
 "en":"انكليزي",
-"label":"كلمات مستبعدة",
 "cn":"صيني",
 "it":"ايطالي",
+"label":"كلمات مستبعدة",
 "noEditAutoTitle":"خطأ في تحرير قائمة الكلمات المستبعدة",
 "es":"اسباني",
-"editStopListMessage":"الرجاء إدخال كلمة واحدة على كل سطر",
 "applyGlobally":"تطبيق شامل",
+"editStopListMessage":"الرجاء إدخال كلمة واحدة على كل سطر",
 "eu":"باسكي",
-"editList":"تحرير القائمة ",
 "ar":"عربي",
+"editList":"تحرير القائمة ",
 "th":"تايلندي",
 "la":"Latin",
 "cz":"تشيكي",
@@ -598,8 +774,8 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "select":"إختيار",
 "exportInProgress":"إعداد المكنز للتصدير",
 "facet.titleTitle":"عناوين",
-"title":"كاتلوغ (فهرس)",
 "lexicalTitle":"كلمات",
+"title":"كاتلوغ (فهرس)",
 "clickToOpenCorpus":"الرجاء <a href=\"{0}\" target=\"_blank\" class=\"link\">النقر هنا</a> للوصول اى المكنز الجديد (حيث تم حجب النوافذ المنبثقة).",
 "rawFreqs":"مجموع عدد الظهور (التواتر الاساسي)",
 "facet.languageTitle":"لغات",
@@ -608,8 +784,8 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "plusFacetTip":"إضافة سطيح جديد",
 "facet.collectionTitle":"مجموعات",
 "matchingDocuments":"عدد المستندات المطابقة",
-"helpTip":"توفر أداة <i>الفهرس</i> واجهة لاكتشاف محتويات مكنز كبير الحجم  أومتعدد المستندات بالاضافة الى إنشاء مكنز ثانوي بحسب معايير البحث. يقوم بعمل قاعدة البيانات أو متجر على الانترنت ليتيح لك امكانية ترشيح المستندات",
 "export":"تصدير ",
+"helpTip":"توفر أداة <i>الفهرس</i> واجهة لاكتشاف محتويات مكنز كبير الحجم  أومتعدد المستندات بالاضافة الى إنشاء مكنز ثانوي بحسب معايير البحث. يقوم بعمل قاعدة البيانات أو متجر على الانترنت ليتيح لك امكانية ترشيح المستندات",
 "downloadButton":"تحميل",
 "facet.pubPlaceTitle":"مكان النشر",
 "queryMatches":"عدد من المستندات مطابقة {0} من {1}",
@@ -624,17 +800,55 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 Ext.apply(Voyant.panel.CollocatesSet.i18n, {
 "title":"سكاتر (تشتت)",
 "helpTip":"هذا العرض خاص لمخطط التشتت"});
+Ext.apply(Voyant.panel.Veliza.i18n, {
+"scriptEditor":"Script Editor",
+"title":"Veliza",
+"typeAndEnter":"Type text and hit enter.",
+"scriptIntro":"This is an advanced feature that allows you see and edit the script used by Veliza. For more information on the syntax, see the <a href='{0}' target='_blank'>documentation</a>.",
+"send":"send",
+"fromCorpus":"from text"});
+Ext.apply(Voyant.notebook.editor.CodeEditorWrapper.i18n, {
+"modeJson":"JSON",
+"previousNotRun":"There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?",
+"modeCsv":"CSV (comma-separated values)",
+"modeJavascript":"Javascript (default)",
+"enableEditing":"By default editing is disable, do you wish to enable editing now?",
+"modeHtml":"HTML",
+"modeData":"Data",
+"modeTsv":"TSV (tab-separated values)",
+"modeXml":"XML",
+"modeCode":"Code",
+"previousNotRunTitle":"Previous Code Blocks",
+"modeText":"Text"});
 Ext.apply(Voyant.panel.MicroSearch.i18n, {
-"title":"ميكرو سيرتش (بحث دقيق)",
 "loading":"تحميل الكلمات",
+"title":"ميكرو سيرتش (بحث دقيق)",
 "helpTip":"تعرض هذه الاداة  تقدمة عامة للمكنز وتظهر توزيع كلمات البحث"});
 Ext.apply(Voyant.panel.TopicContexts.i18n, {
 "reset":"إعادة تنضيد ",
 "title":"توبيك كونتكتز (سياقات المواضيع)",
 "helpTip":"سياقات المواضيع"});
+Ext.apply(Voyant.notebook.editor.button.MoveUp.i18n, {
+"tip":"move this block up"});
+Ext.apply(Voyant.widget.ProgressMonitor.i18n, {
+"running":"Working…",
+"aborted":"Error",
+"noProgress":"This progress monitor was incorrectly initialized.",
+"badProgress":"Unable to understand the progress report from the server.",
+"progress":"Progress",
+"finished":"Finished",
+"launch":"Launching…"});
 Ext.apply(Voyant.panel.BubblelinesSet.i18n, {
 "title":"بوبل لاينز (غلاف)",
 "helpTip":"هذا العرض خاص  (بوبل لاينز) "});
+Ext.apply(Voyant.widget.CorpusTermSummary.i18n, {
+"collocates":"Collocates:",
+"distribution":"Distribution:",
+"loading":"Loading...",
+"phrases":"Phrases:",
+"title":"Corpus Term Summary:",
+"correlations":"Correlations:",
+"items":"Items"});
 Ext.apply(Voyant.panel.Knots.i18n, {
 "findTerm":"البحث عن كلمات",
 "settings":"إعدادات",
@@ -643,15 +857,15 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 "showTerm":"كشف الكلمة",
 "sound":"صوت",
 "clearTerms":"محي ",
-"removeTerm":"إزالة الكلمة",
 "hideTerm":"إخفاء الكلمة",
+"removeTerm":"إزالة الكلمة",
+"noTermsFound":"لا توجد كلمات في المكنز",
 "title":"نوتس (عقد)",
 "type":"عرض مرئي",
-"noTermsFound":"لا توجد كلمات في المكنز",
 "speed":"سرعة",
 "soundTip":"تشغيل الصوت عند نوتس ",
-"options":"خيارات",
-"context":"سياق"});
+"context":"سياق",
+"options":"خيارات"});
 Ext.apply(Voyant.VoyantApp.i18n, {
 "serverResponseError":"رسالة خطأ من النظام الخادم:",
 "error":"وقع خطأ",
@@ -661,8 +875,8 @@ Ext.apply(Voyant.panel.RezoViz.i18n, {
 "loadingEntities":"تحميل العناصر جاري",
 "minEdgeCount":"العدد الادنى للاضلاع",
 "noEntities":"لا توجد عناصر للتخطيط",
-"title":"ريزو فيز",
 "stiffness":"صلابة",
+"title":"ريزو فيز",
 "people":"اشخاص",
 "friction":"احتكاك",
 "repulsion":"التنافر",
@@ -671,8 +885,8 @@ Ext.apply(Voyant.panel.RezoViz.i18n, {
 "locations":"مواقع",
 "categories":"فئات"});
 Ext.apply(Voyant.widget.DocumentSelector.i18n, {
-"cancel":"إلغاء",
 "all":"جميع",
+"cancel":"إلغاء",
 "selectAll":"جميع",
 "documents":"المستندات",
 "ok":"تم",
@@ -689,8 +903,8 @@ Ext.apply(Voyant.panel.Contexts.i18n, {
 "documentTip":"المستند الحاوي لكلمات الظهور",
 "left":"يسار",
 "corpusTip":"الرجوع الى نسق المكنز (السياقات من جميع المستندات)",
-"rightTip":"السياق يميناً",
 "context":"سياق",
+"rightTip":"السياق يميناً",
 "leftTip":"سياق يساراً",
 "position":"الموضع",
 "positionTip":"موضع الكلمة المفتاحية داخل المستند",
@@ -702,24 +916,28 @@ Ext.apply(Voyant.VoyantDefaultApp.i18n, {
 "noViewErrorTitle":"كشف الخطأ",
 "helpTip":" فوايانت تولز هي محيط لقراءة وتحليل النصوص الرقمية وهي متوفرة على شبكة الانترنت",
 "noViewErrorTpl":"لا يوجد عرض باسم\"<i>{view}</i>\".  سيتم استجدام العرض الافتراضي."});
-Ext.apply(Voyant.widget.Facet.i18n, {
-"emptyText":"لا توجد نتائج"});
 Ext.apply(Voyant.panel.ScatterPlot.i18n, {
+"tsne":"t-SNE",
 "relFreq":"نسبي",
-"xAxis":"المحور الافقي",
 "termsLabel":"الكلمات",
+"xAxis":"المحور الافقي",
 "summaryLabel":"ملخص",
 "title":"سكاتر بلوت (مخطط التشتت)",
 "nearby":"بالقرب ",
 "remove":"إزالة",
 "pca":"تحليل المركبات الرئيسية",
+"analyzing":"Analyzing",
+"output":"Output",
 "docSim":"تشابه في المستند",
+"perplexity":"Perplexity",
 "noTermSelected":"لم يتم اختيار كلمة",
 "freqsMode":"تواترات",
+"reload":"Reload",
 "terms":"كلمات",
 "tokenFreqTip":"<b>{0}</b><br><b>التواتر الاساسي</b><br>{1}<br><b>التواتر النسبي</b><br>{2}",
-"term":"كلمة",
+"options":"Options",
 "docFreqTip":"<b>{0}</b><br><b> عدد الكلمات </b><br>{1}",
+"term":"كلمة",
 "rawFrequencies":"التواتر الأساسي",
 "dimension":"بُعد",
 "helpTip":"<p>سكاتر بلوت يظهر تقابل الكلمات في المكنز. يعتمد هذا العرض المرئي على التحليل الاحصائي للكلمات حيث يتم تقابل الكلمة في كل مستند (يعتبر كل مستند بُعد) و تحويلها الى نموذج ثلاثي الابعاد لتسهيل عملية العرض على هيئة العرض التشتتي.</p>",
@@ -728,31 +946,39 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "pcTitle":"النسبة المؤية للاختلاف الاجمالي المشروحة في كل مركب ",
 "relativeFrequencies":"التواتر النسبي",
 "addTerm":"اضافة كلمة",
+"plotting":"Plotting",
 "numTerms":"كلمات",
 "removeTerm":"إزالة <b>{0}</b>",
 "tfidf":"TF-IDF",
 "analysis":"تحليل",
 "fill":"التشغيل",
 "loading":"التحميل جاري",
+"iterations":"Iterations",
 "labels":"سمات",
+"input":"Input",
 "freqsModeTip":"تحديد نوعية التواترات: نسبية, اساسية, او TF-IDF ",
 "yAxis":"المحور العمودي",
 "pc":"PC",
-"nearbyTerm":"بالقرب <b>{0}</b>",
 "docsLabel":"المستندات",
-"rawFreq":"أساسي",
+"nearbyTerm":"بالقرب <b>{0}</b>",
 "caTitle":"النسبة المؤية للتوافق الاجمالي المشروحة في كل بعد ",
+"rawFreq":"أساسي",
 "dimensions":"احداثيات"});
 Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"فواينت تولز",
 "privacy":"سياسة الخصوصية",
 "voyantLink":"<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">فواينت تولز</a>",
 "privacyMsg":"يقوم مطوري فوايانت تولز بجمع البيانات من الموقع عن استخدام الادوات واعداداتها (و بجمع عناوين آي بي لكي يتم تشغيل الطلبات المتعددة خلال جلسة عمل واحدة).كما تستخدم فوايانت تولزخدمة التحليل لغوغل (انظر سياسة الخصوصية لغوغل و خاصة جزء <em>معلومات السجل</em>). تستخدم البيانات المسجة محلياً و البيانات من خدمة التحليل لغوغل من قبل فريق المطورين من اجل تتبع الاخطاء وتحسين الادوات, ولدراسة طرق استخدامها في الابحاث. يمكن استخدام هذه البيانات لاغراض بحثية بشكل مجهول وجماعي. يرجى التنويه بان النصوص المدخلة يتم تخزينها للسماح بالاستخدام الثابت خلال جلسة عمل واحد او اكثر. لمزيد من المعلومات عن تخزين واستخدام البيانات او لطلب ازالة مكنز من فوايانت تولز يرجى الاتصال ب Stéfan Sinclair .  يرجى النقر على هذا الرابط لمعلومات اضافية. "});
+Ext.apply(Voyant.widget.Facet.i18n, {
+"emptyText":"لا توجد نتائج"});
 Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchTip":"<div>إضغط على مفتاح الدخول للبحث في الجمل </div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>معطف</b>: طابق كلمة <i>معطف</i></li><li><b>معطف*</b>: طابق الكلمات التي تبدأ بحروف <i>معطف</i> ككلمة واحدة</li><li><b>^معطف*</b>: طابق الكلمات التي تبدأ بحروف <i>معطف</i> </li><li><b>*عطف</b>: طابق الكلمات التي تنتهي بالاحرف<i>عطف</i>  ككلمات منفصلة معطف معطفي او معطفين</li><li><b>^*عطف</b>: طابق الكلمات التي تنتهي بالاحرف<i>عطف</i> ككلمات منفصلة</li><li><b>معطف,جاكيت</b>: طابق الكلمات المحددة بفاصلة ككلمات منفصلة</li><li><b>معطف|جاكيت</b>: طابق الكلمات المحددة بانبوبة الاتصال ككلمة واحدة </li><li><b>\" معطف شتوي\"</b>: <i>معطف شتوي</i> كعبارة </li><li><b>\"معطف قفاز\"~5</b>: <i>معطف</i> بالقرب من <i>قفاز </i>ما بين خمسة كلكات</li><li><b>^معطف*,معطف|جاكيت,\"معطف قفاز\"~5</b>: جمع البحوث الثلاثة</li></ul>",
 "querySearchDocsModeTip":"<div>طريقة البحث عن المستندات (مفتاح الدخول يبدأ البحث) :</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b> تطابق حرفي للكلمة  <i>معطف </i></li><li><b>معطف *</b>: تطابق الكلمات التي تبدأ ب <i>معطف </i></li><li><b>معطف ,جاكيت</b> طابق الكلمات المحددة بفاصلة ككلمات منفصلة</li><li><b>\" معطف شتوي\"</b>: <i>معطف شتوي</i> كعبارة </li><li><b>\"معطف,قفاز\"~5</b>:<i>معطف</i> بالقرب من <i>قفاز </i>ما بين خمسة كلمات</li><li><b>+معطف+شتوي</li></ul>طابق كل كلمة مسبوقة ب (+) +معطف+ قفاز*</b>: جمع طرق البحث</li></ul>",
 "querySearch":"بحث",
 "aggregateInDocumentsCount":"عدد المستندات التي تعادل معاير البحث (كل مستند ظاهر يحتوي على الاقل كلمة بحث واحدة)"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"الماني",
 "thisLanguage":"عربي",
@@ -760,8 +986,8 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "en":"انكليزي",
 "hr":"كرواتي",
 "it":"ايطالي",
-"languageTitle":"خيارات لواجهة اللغة",
 "fr":"فرنسي",
+"languageTitle":"خيارات لواجهة اللغة",
 "ar":"عربي",
 "bs":"بوسني",
 "chooseLanguage":"لغة الواجهة",

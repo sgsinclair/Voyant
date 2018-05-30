@@ -5,16 +5,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	alias: 'widget.scatterplot',
     statics: {
     	i18n: {
-    		tsne: 't-SNE',
-    		terms: 'Terms',
-    		reload: 'Reload',
-    		options: 'Options',
-    		input: 'Input',
-    		output: 'Output',
-    		perplexity: 'Perplexity',
-    		iterations: 'Iterations',
-    		analyzing: 'Analyzing',
-    		plotting: 'Plotting'
     	},
     	api: {
     		docId: undefined,

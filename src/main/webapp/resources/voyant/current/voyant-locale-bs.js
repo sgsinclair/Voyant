@@ -1,14 +1,32 @@
 Voyant.util.Localization.LANGUAGE='bs'
+Ext.apply(Voyant.panel.Correlations.i18n, {
+"sourceTip":"Term 1 (the pairing is what matters, not the column)",
+"emptyText":"(No results.)",
+"significanceTip":"This is a measure of the signifiance of the correlation value. Often a significance of .05 or less indicates a strong correlation (which allows us to reject the null hypothesis that values are randomly distributed). The validity of this measure depends on assumptions about a normal distribution of the data. Also, don’t forget that we typically have a relatively small number of values (frequencies from segments in a text or from documents in a corpus), so these values should be used with care.",
+"targetTip":"Term 2 (the pairing is what matters, not the column)",
+"source":"Term 1",
+"title":"Correlations",
+"target":"Term 2",
+"significance":"Significance (p)",
+"correlation":"Correlation (r)",
+"correlationTip":"This is a measure of how closely term frequencies correlate (using Pearson’s correlation coefficient or a simple regression). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other drops), scores approaching 0 indicate little or no meaningful correlation.",
+"trendTip":"This represents the relative frequencies of the term.",
+"helpTip":"The Correlations tool enables an exploration of the extent to which term frequencies vary in sync (terms whose frequencies rise and fall together or inversely).",
+"minInDocumentsCountRatioLabel":"minimum coverage (%{0})"});
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"Jeste li sigurni da želite krenuti od početka (i napustiti trenutni korpus)?",
 "title":"Voyant Tools",
 "helpTip":"Voyant Tools je mrežno okruženje za čitanje i analizu digitalnih tekstova.",
 "homeTip":"Kliknite kako biste krenuli od početka sa ekrana za izgradnju korpusa.",
 "home":"Krenite od početka"});
+Ext.apply(Voyant.data.util.Geonames.i18n, {
+"failedToFetchGeonames":"Failed to load location information."});
+Ext.apply(Voyant.notebook.editor.CodeEditor.i18n, {
+"emptyText":"// click here to edit"});
 Ext.apply(Voyant.panel.Topics.i18n, {
 "scores":"Scores",
 "adaptation":"adapted from David Mimno's <a href=\"https://github.com/mimno/jsLDA\" target=\"_blank\">jsLDA</a>",
-"scoresTip":"This represents the score of each document (in corpus order) for the row's topic.",
+"scoresTip":"This represents the score of each document (in corpus order) for the row’s topic.",
 "numTopics":"Topics",
 "title":"Topics",
 "loadingStopWords":"Loading stopwords…",
@@ -20,13 +38,13 @@ Ext.apply(Voyant.panel.Topics.i18n, {
 "topicTip":"This provides an ordered list of the ten most signifiant terms in the topic cluster. ",
 "helpTip":"This tool performs topic modelling (<a href=\"https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation\" target=\"_blank\">LDA</a>) on the current corpus. Initially words are randomly assigned to each topic and with each iteration the topics become more refined. Please note that because of the initial random assignment, results will be different each time this tool is run.",
 "loadingDocuments":"Loading documents…",
-"runIterationsTip":"This runs iterations (100 by default) on the current topics (in other words, the topics aren't replaced, they're refined).",
 "perDocLimitHigh":"This value seems high. Please note that problems may occur on the server or in your browser if you include too many terms (default is 1,000).",
-"searchTip":"Highlight the topics that contain the search (even partial words), don't forget that each topic is limited to the top 10 terms.",
+"runIterationsTip":"This runs iterations (100 by default) on the current topics (in other words, the topics aren’t replaced, they’re refined).",
 "iterations":"Iterations",
+"searchTip":"Highlight the topics that contain the search (even partial words), don’t forget that each topic is limited to the top 10 terms.",
 "runningIterations":"Performing topic modelling.",
-"runningIterationsCount":"Running {0} iterations.",
 "perDocLimitTip":"The maximum number of terms to include from the start of a document (set this to a very high number or to zero to have no limit, but beware that high values can cause problems on the server or in your browser).",
+"runningIterationsCount":"Running {0} iterations.",
 "limitTermsTip":"Determine the number of terms to show for each topic.",
 "totalDone":"({0} iterations done)",
 "numTopicsTip":"Determine the number of topics (or term clusters) to produce. Note that changing this value will regenerate topics (and that results will be different even with the same number of topics).",
@@ -48,33 +66,38 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "query":"Upit",
 "count":"Zbroj",
 "exportNewCorpus":"Novi korpus",
-"title":"Pretraga dokumenata",
-"loading":"korpus se učitava...",
 "addRow":"Dodati red",
+"loading":"korpus se učitava...",
+"title":"Pretraga dokumenata",
 "operator":"Operator",
 "textField":"tekst (početna postavka)",
 "unsuccessfulQuery":"Pretraga je neizvršiva",
-"pubPlaceField":"mjesto izdanja",
 "advancedField":"<i>napredno pretraživanje</i>",
+"pubPlaceField":"mjesto izdanja",
 "authorField":"autor",
 "noMatches":"Nema odgovarajućih rezultata (od {0} dokumenata).",
 "field":"Polje",
 "deleteRowTip":"Kliknite da izbrišete ovaj red",
 "publisherField":"izdavač",
-"pubDateField":"datum objavljivanja",
-"exportNewCorpusTip":"Izgraditi novi korpus od odgovarajućih dokumenata (gumb je deaktiviran ako nema rezultata)."});
+"exportNewCorpusTip":"Izgraditi novi korpus od odgovarajućih dokumenata (gumb je deaktiviran ako nema rezultata).",
+"pubDateField":"datum objavljivanja"});
+Ext.apply(Voyant.notebook.editor.button.RunAll.i18n, {
+"tip":"Run all code blocks below."});
 Ext.apply(Voyant.panel.TermsBerry.i18n, {
 "scaling":"Scaling",
 "distinctTerms":"Distinct Terms",
-"topTerms":"Top Terms",
-"numTerms":"Terms",
 "context":"Context",
-"title":"TermsBerry",
-"strategy":"Strategy"});
+"numTerms":"Terms",
+"topTerms":"Top Terms",
+"reset":"Reset",
+"inDocs":"In Docs",
+"tfidf":"tf-idf",
+"strategy":"Strategy",
+"title":"TermsBerry"});
 Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
-"paletteEditor":"Editor za paletu",
 "add":"Dodati",
 "cancel":"Poništiti",
+"paletteEditor":"Editor za paletu",
 "editList":"Revizija liste",
 "saveNewPalette":"Snimiti novu paletu",
 "clear":"Obrisati",
@@ -84,15 +107,15 @@ Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"Panel za podešavanje postavki za vizualizaciju riječi",
 "linear":"Linearno",
 "log":"Logaritamsko",
-"displayPanel":"Pokazni panel",
 "completingTransition":"Završiti prelaz.",
+"displayPanel":"Pokazni panel",
 "removeTerm":"Ukloniti <b>{0}</b>",
 "yScale":"Razmjer y-ose",
 "title":"TermsRadio",
 "type":"Vizualizacija",
 "speed":"Brzina",
-"segments":"Segmenti",
 "fraction":"Prikaz riječi",
+"segments":"Segmenti",
 "duration":"Brzina",
 "help":"Ova alatka se može koristiti za pregled pojava riječi u korpusu kroz određeno vremensko razdoblje.",
 "resetTip":"Resetiranje vizualizacije u početno stanje",
@@ -107,20 +130,18 @@ Ext.apply(Voyant.util.Downloadable.i18n, {
 "exportTitle":"Eksport",
 "downloadButton":"Preuzimanje",
 "cancelButton":"Poništite izbor"});
-Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
-"contextTermRawFreq":"Zbroj (kontekst)",
-"matchingTerms":"{zbroj}",
-"contextTerm":"Kolokat",
-"emptyText":"Nema odgovarajućih rezultata",
-"termTip":"Ovo je ključni termin oko koga se broje kolokati (kontekst).",
-"termRawFreqTip":"Broj puta koliko se ključni termin pojavljuje u korpusu.",
-"title":"Kolokati",
-"termRawFreq":"Zbroj (ključna riječ)",
-"context":"kontekst",
-"term":"Termin",
-"helpTip":"Kolokati u korpusu je tabelarni prikaz termina koji se češće pojavljuju u blizini ključnih riječi unutar cijelog korpusa. Redoslijed dokumenata se može zamijeniti na osnovu ključnih riječi, kolokata kao i njihovog zbroja. Okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita).",
-"contextTermRawFreqTip":"Broj puta koliko se ovaj kolokat pojavljuje blizu ključnog termina u korpusu.",
-"contextTermTip":"Ovo je kolokat (kontekst) koji se pojavljuje u blizini ključnog termina."});
+Ext.apply(Voyant.panel.WordWall.i18n, {
+"scaling":"Scaling",
+"yStrength":"Y Strength",
+"delay":"Fetch Delay",
+"stop":"Stop",
+"terms":"Terms",
+"chargeDistance":"Charge Distance",
+"chargeStrength":"Charge Strength",
+"start":"Start",
+"xStrength":"X Strength",
+"title":"Wall of Words",
+"transition":"Transition Speed"});
 Ext.apply(Voyant.panel.Documents.i18n, {
 "keepTip":"Kliknite ovdje da kreirate novi korpus koji samo sadrži dokumente koje ste odabrali ili filtrirali uz pomoć pretraga",
 "reorderFilteredError":"Ne možete promijeniti redoslijed korpusa koji ste filtrirali poslije pretrage. Prvo izgradite novi korpus (klikom na <i>Remove</i> ili <i>Keep</i>).",
@@ -130,9 +151,9 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "language":"Jezik",
 "reorder":"Promijeniti redoslijed",
 "removeSelectedDocuments":"Izgradite <i>novi</i> korpus koji uklanja (NE uključuje) {0:plural('selected document')}?",
-"title":"Dokumenti",
-"error":"Greška",
 "addTip":"Kliknite ovdje da dodate nove dokumente u ovaj korpus.",
+"error":"Greška",
+"title":"Dokumenti",
 "keepFilteredDocuments":"Izgradite <i>novi</i> korpus koji samo sadrži {0:plural('filtered document')}?",
 "remove":"Ukloniti",
 "documentAuthor":"Autor",
@@ -153,36 +174,48 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"Vaš korpus sadrži samo jedan dokument; ne možete ukloniti niti zadržati dokumente da izgradite novi korpus",
 "modify":"Izmijeniti",
-"typeTokenRatioLexical":"Omjer",
 "modifyTip":"Kliknite ovdje da kreirate novi korpus dodavajući nove dokumente, birajući podset dokumentata ili mijenjajući redoslijed dokumenata",
 "reorderDocuments":"Izgraditi <i>novi</i> korpus na osnovu datog redoslijeda?",
+"typeTokenRatioLexical":"Omjer",
 "keep":"Zadržati",
 "reorderOriginalError":"Prvo filtrirajte korpus (povucite i ispustite redove unutar tabele)"});
-Ext.apply(Voyant.panel.Panel.i18n, {
-"trend":"Trend",
-"relativeFreq":"Relativno",
-"colon":":",
+Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
+"contextTermRawFreq":"Zbroj (kontekst)",
+"matchingTerms":"{zbroj}",
+"contextTerm":"Kolokat",
+"emptyText":"Nema odgovarajućih rezultata",
+"termRawFreqTip":"Broj puta koliko se ključni termin pojavljuje u korpusu.",
+"termTip":"Ovo je ključni termin oko koga se broje kolokati (kontekst).",
+"title":"Kolokati",
+"termRawFreq":"Zbroj (ključna riječ)",
+"context":"kontekst",
 "term":"Termin",
-"rawFreq":"Zbroj",
-"loading":"Učitavanje",
-"error":"Greška",
-"info":"Informacija"});
+"helpTip":"Kolokati u korpusu je tabelarni prikaz termina koji se češće pojavljuju u blizini ključnih riječi unutar cijelog korpusa. Redoslijed dokumenata se može zamijeniti na osnovu ključnih riječi, kolokata kao i njihovog zbroja. Okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita).",
+"contextTermRawFreqTip":"Broj puta koliko se ovaj kolokat pojavljuje blizu ključnog termina u korpusu.",
+"contextTermTip":"Ovo je kolokat (kontekst) koji se pojavljuje u blizini ključnog termina."});
 Ext.apply(Voyant.panel.Bubbles.i18n, {
 "soundTip":"podešavanje zvuka",
 "sound":"Zvuk",
 "adaptation":"Prilagođeno iz <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\"><i>Letter Pairs,</i></a> Martin Ignacio Bereciartua",
-"title":"Bubbles",
 "speedTip":"Kontrola brzine vizualizacije.",
+"title":"Bubbles",
 "helpTip":"Bubbles je zabavna vizualizacija najučestalijih termina unutar dokumenta.",
 "speed":"brzina"});
+Ext.apply(Voyant.panel.Panel.i18n, {
+"trend":"Trend",
+"relativeFreq":"Relativno",
+"colon":":",
+"rawFreq":"Zbroj",
+"term":"Termin",
+"error":"Greška",
+"loading":"Učitavanje",
+"info":"Informacija"});
+Ext.apply(Voyant.notebook.editor.TextEditor.i18n, {
+"emptyText":"(Click here to edit.)",
+"enableEditingTitle":"Enable Editing?"});
 Ext.apply(Voyant.widget.CorpusDocumentSelector.i18n, {
 "corpus":"Korpus",
 "scale":"Razmjer"});
-Ext.apply(Voyant.panel.Reader.i18n, {
-"documentFrequency":"Učestalost u dokumentu",
-"limitedAccess":"Ovo je korpus sa limitiranim dostupom i funkcionalnost alatke je oganičena.",
-"title":"Čitač",
-"helpTip":"<p> Alatka Čitač nudi pregled tekstova unutar korpusa. Uključuje funkcije, kao što su: </p><ul><li>podaci o učestalosti prilikom pozicioniranja kursora na riječ </li><li>grafički prikaz distribucije u dnu prilikom klika na riječ </li><li> stupčasti grafikon u dnu koji pokazuje relativnu veličinu svakog dokumenta u korpusu </li><li> okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita)</li></ul>"});
 Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "fetchingCorpus":"Vaš korpus se učitava",
 "moreToolsTypeViz":"atke za vizualizaciju",
@@ -191,8 +224,8 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "passwordRequiredMessage":"Ovaj korpus zahtijeva pristupnu šifru.",
 "didYouKnow":"Znate li?",
 "passwordRequiredTitle":"Potrebna je pristupna šifra",
-"password":"pristupna šifra",
 "didYouKnowText":"Upute i opcije su na raspolaganju!",
+"password":"pristupna šifra",
 "moreToolsScaleDocument":"Alatke za dokumente",
 "moreToolsTypeGrid":"Alatke za tabele",
 "moreToolsType":"Alatke po vrsti",
@@ -203,20 +236,11 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "passwordValidateButton":"Potvrditi",
 "moreToolsScale":"Alatke po razmjeru",
 "badPassword":"Nažalost, izgleda da je pristupna šifra nevažeća"});
-Ext.apply(Voyant.panel.Bubblelines.i18n, {
-"findTerm":"Pronaći termin",
-"showTerm":"Prikazati termin",
-"corpusTooSmall":"Dati korpus je premalen za ovu alatku.",
-"clearTerms":"Obrisati",
-"removeTerm":"Ukloniti termin",
-"hideTerm":"Sakriti termin",
-"title":"Bubblelines",
-"type":"Vizualizacija",
-"separateLines":"Odvojeni redovi za termine",
-"help":"Bubblelines vizualizira učestalost i ponovnu upotrebu termina u korpusu. Svaki dokument u korpusu je predstavljen horizontalnom linijom i podijeljen u segmente jednake dužine. Svaki termin je predstavljen kao balon čija veličina izražava učestalost u datom segmentu teksta. Što je veća učestalost termina, to je i veći radijus balona.",
-"total":"Suma",
-"granularity":"Zrnatost",
-"options":"Opcije"});
+Ext.apply(Voyant.panel.Reader.i18n, {
+"documentFrequency":"Učestalost u dokumentu",
+"limitedAccess":"Ovo je korpus sa limitiranim dostupom i funkcionalnost alatke je oganičena.",
+"title":"Čitač",
+"helpTip":"<p> Alatka Čitač nudi pregled tekstova unutar korpusa. Uključuje funkcije, kao što su: </p><ul><li>podaci o učestalosti prilikom pozicioniranja kursora na riječ </li><li>grafički prikaz distribucije u dnu prilikom klika na riječ </li><li> stupčasti grafikon u dnu koji pokazuje relativnu veličinu svakog dokumenta u korpusu </li><li> okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita)</li></ul>"});
 Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "corpusComparisonDifference":"Poređenje",
 "matchingTerms":"Pronađeni termini: {0}",
@@ -233,31 +257,45 @@ Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "trendTip":"Predstavlja trend relativne učestalosti svakog termina u svakom dokumentu unutar korpusa.",
 "helpTip":"</p><p>Termini u korpusu je tabelarni prikaz termina koji se pojavljuju unutar cijelog korpusa. Uključuje funkcije, kao što su:</p><ul><li>sortiranje po <i>terminu</i> i <i>zbroju</i> (kliknuti na zaglavlje kolone)</li><li>grafikon sparkline za trend učestalosti termina unutar korpusa (ukoliko korpus sadrži više dokumenata) ili unutar dokumenta (ukoliko se korpus sastoji od samo jednog dokumenta) </li><li>dodatne kolone (relativna učestalost, oštrina i asimetričnost distribucije) dostupne su klikom na strijelicu koja se pojavljuje pozicioniranjem kursora na zaglavlje</li><li>okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita).</li></ul>",
 "relativeSkewnessTip":"Ovo je statistička mjera za simetriju relativne učestalosti termina u cijelom korpusu."});
+Ext.apply(Voyant.panel.Bubblelines.i18n, {
+"findTerm":"Pronaći termin",
+"showTerm":"Prikazati termin",
+"corpusTooSmall":"Dati korpus je premalen za ovu alatku.",
+"clearTerms":"Obrisati",
+"hideTerm":"Sakriti termin",
+"removeTerm":"Ukloniti termin",
+"title":"Bubblelines",
+"type":"Vizualizacija",
+"separateLines":"Odvojeni redovi za termine",
+"help":"Bubblelines vizualizira učestalost i ponovnu upotrebu termina u korpusu. Svaki dokument u korpusu je predstavljen horizontalnom linijom i podijeljen u segmente jednake dužine. Svaki termin je predstavljen kao balon čija veličina izražava učestalost u datom segmentu teksta. Što je veća učestalost termina, to je i veći radijus balona.",
+"total":"Suma",
+"granularity":"Zrnatost",
+"options":"Opcije"});
+Ext.apply(Voyant.panel.CustomSet.i18n, {
+"noSuchTool":"Navedena alatka ({0}) ne postoji.",
+"title":"Personalizovani prikaz",
+"helpTip":"Ovo je personalizovani prikaz."});
 Ext.apply(Voyant.panel.NoTool.i18n, {
 "notImplemented":"Alatka <i>{0}</i> je postojala u ranijoj verziji Voyant Tools, ali nije bila implementirana u ovoj verziji. Moguće je da će neke alatke biti opet implementirane, dok druge neće zbog njihove eksperimentalne prirode, niske koristi ili ovisnosti o nepodržanim tehnologijama (npr. Adobe Flash ili Java Applets.)</p><p> Odlučite da li želite koristiti novu verziju Voytnat Tools ili alatku <i>{0}</i> u ranijoj verziji.",
 "badToolSpecified":"Alatka <i>{0}</i> ne postoji. Bićete preusmjereni na početnu stranicu Voyant Tools.",
 "currentButton":"Koristite trenutnu verziju",
 "oldButton":"Koristite staru verziju",
 "noToolSpecified":"Nije odabrana nijedna alatka. Bićete preusmjereni na početnu stranicu Voyant Tools.",
-"title":"Nepostojeća alatka",
-"error":"Greška"});
-Ext.apply(Voyant.panel.CustomSet.i18n, {
-"noSuchTool":"Navedena alatka ({0}) ne postoji.",
-"title":"Personalizovani prikaz",
-"helpTip":"Ovo je personalizovani prikaz."});
+"error":"Greška",
+"title":"Nepostojeća alatka"});
 Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 "cleaning":"Čišćenje",
-"releaseToRemove":"Otpustiti za uklanjanje ovog termina",
 "context":"Kontekst",
+"releaseToRemove":"Otpustiti za uklanjanje ovog termina",
 "clearTerms":"Brisanje",
 "title":"Veze",
 "helpTip":"Grafikon kolokata prikazuje mrežu termina koji se pojavljuju u blizini sa većom učestalošću. Ključne riječi su označene plavom, a kolokati (riječi u blizini) narandžastom bojom. Pozicioniranjem kursora na ključne riječi otkriva se njihova učestalost u korpusu. Pozicioniranjem kursora na kolokate otkriva se njihova učestalost u blizini (ne njihova ukupna učestalost). Dvostruki klik na bilo koju riječ donosi dodatne rezultate. Okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita)."});
 Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "cancel":"Poništiti",
 "accessModeWithoutPassword":"drugi oblik pristupa",
-"xpathGroupBy":"Grupisati po",
-"reveal":"Otkrivanje",
 "OpenExisting":"Otvoriti postojeći korpus",
+"reveal":"Otkrivanje",
+"xpathGroupBy":"Grupisati po",
 "tableNoHeadersRow":"Ne sadrži zaglavlje",
 "accessOptionsText":"Po želji, odredite jednu ili više lozinki (razdvojene zarezima)",
 "tableDocumentsRows":"iz ćelija u svakom redu",
@@ -266,11 +304,11 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationWordBoundaries":"Jednostavne granice riječi",
 "numberEmpty":"Najmanje jedan broj kolone je trenutno prazan",
 "tokenization":"Tokenizacija",
-"tokenizationWhitespace":"Samo prazan prostor",
 "inputRemoveFrom":"omit from",
+"tokenizationWhitespace":"Samo prazan prostor",
 "xpathContent":"Sadržaj",
-"numbersNeedCommas":"Zarezom razdvojite više brojeva",
 "textOptionsText":"These options allow you to ignore part of a text document by specifying regular expressions.",
+"numbersNeedCommas":"Zarezom razdvojite više brojeva",
 "tableDocumentsTable":"iz cijele tabele",
 "UploadLocal":"Otpremiti jedan ili više dokumenata sa vašeg računara",
 "helpTip":"Ova alatka omogućava izgradnju korpusa na jedan od tri načina: tipkanjem ili lijepljenjem teksta u okvir i klikom na <i>Otkrivanje</i>; ako je svaki red unutar okvira jedan URL, tekst se učitava sa tih URL-a, u suprotnom, sadržaj se tretira kao jedinstven dokument. Klikom na <i>Otvaranje</i> prikazuje se postojeći korpus. Klikom na <i>Otprema</i> dodaje se jedna ili više datoteka sa vašeg računara (možete odjednom odabrati više datoteka koristeći Ctrl i/ili Shift tipke).",
@@ -278,11 +316,11 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableTitle":"Naslov",
 "noTextProvided":"Nije dostavljen nikakav tekst",
 "tableContent":"Sadržaj",
-"xpathDocuments":"Dokumenti",
 "tokenizationAuto":"Automatski (preporučljivo)",
+"xpathDocuments":"Dokumenti",
 "numbersCommasOnly":"Samo brojevi razdvojeni zarezom",
-"tableOptionsText":"Odredite kako bi dokumenti trebali biti ekstraktirani (trenutno je samo podržan MS Excel: .xls, xlsx). Za više informacija, pogledajte dokumentaciju o stvaranju korpusa sa <a href=\"{0}\" target=\"voyantdocs\"> tabelarnim podacima </a>.",
 "PleaseSelectExisting":"Svakako odaberite korpus",
+"tableOptionsText":"Odredite kako bi dokumenti trebali biti ekstraktirani (trenutno je samo podržan MS Excel: .xls, xlsx). Za više informacija, pogledajte dokumentaciju o stvaranju korpusa sa <a href=\"{0}\" target=\"voyantdocs\"> tabelarnim podacima </a>.",
 "inputFormat":"Format za unos",
 "tableDocumentsColumns":"iz cijelih kolona",
 "accessModeWithoutPasswordText":"Ako navedete <i>pristupnu šifru</i>, možete odrediti i oblik pristupa za korisnike koji nemaju lozinku.",
@@ -296,33 +334,33 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeNone":"nepostojeći",
 "tokenizationOptions":"Tokenizacija",
 "advancedOptionsText":"Za više informacija o naprednim opcijama ispod, pogledajte dokumentaciju o <a href=\"{0}\" target=\"voyantdocs\">stvaranju korpusa</a>.",
+"inputRemoveUntilAfter":"omit until after",
 "tableDocuments":"Dokumenti",
-"inputRemoveUntilAfter":"omit unti after",
 "processingOptions":"Processing",
 "noAllowInputMessage":"This server has been configured to NOT allow new documents to be added. Please contact the server administrator (if you can).",
-"fileTypesMessage":"Jedna ili više vaših datoteka sadrži nekompatibilne ili nepoznate ekstenzije, što može izazvati problem.",
-"errorNotXmlContinue":"Odabrali ste XML format za unos podataka, ali unos nije u XML-u. Jeste li sigurni da želite nastaviti?",
 "SelectExisting":"Odabrati postojeći korpus",
+"errorNotXmlContinue":"Odabrali ste XML format za unos podataka, ali unos nije u XML-u. Jeste li sigurni da želite nastaviti?",
+"fileTypesMessage":"Jedna ili više vaših datoteka sadrži nekompatibilne ili nepoznate ekstenzije, što može izazvati problem.",
 "textOptions":"Text",
 "tableOptions":"Tabele",
-"xmlOptions":"XML",
 "Upload":"Otpremiti",
-"title":"Dodavanje tekstova",
+"xmlOptions":"XML",
 "error":"Greška",
+"title":"Dodavanje tekstova",
 "sureContinue":"Jeste li sigurni da želite nastaviti?",
-"Open":"Otvoriti",
 "inputRemoveUntil":"omit until",
+"Open":"Otvoriti",
 "badFiles":"nekompatibilno (moguća greška):",
 "emptyInput":"Unesite jedan ili više URL-ova u odvojenim redovima ili prekopirajte tekst",
 "ok":"OK",
 "accessPassword":"pristupna šifra",
-"adminPassword":"administrativna šifra",
 "accessModeNonConsumptive":"ograničeno (neiskoristivo",
+"adminPassword":"administrativna šifra",
 "tableMetadataText":"Ove opcije se koriste samo kada su dokumenti ekstraktirani iz ćelija u svakom redu (pogledajte prvu opciju u ovoj sekciji). Ista sintaksa kao opcija za sadržaj iznad: brojevi kolona se razdvajaju zarezom ili kombinuju uz pomoć znaka plus.",
 "xpathAuthor":"Autor",
 "corpusOptions":"Corpus",
-"xpathTitle":"Naslov",
 "pleaseProvideText":"Dodajte tekst u okvir (ili odaberite Otvoriti ili Otpremiti)",
+"xpathTitle":"Naslov",
 "invalidForm":"Korištene su neispravne vrijednosti; pozicionirajte kursor na polja sa crvenim okvirima za pojašnjenje",
 "tableAuthor":"Autor",
 "gearWinTitle":"Opcije",
@@ -330,8 +368,16 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "corpusTitle":"Corpus Title",
 "accessOptions":"Upravljanje pristupa",
 "tableNoHeadersRowText":"Određuje da li će se preskočiti prvi red (ako sadrži zaglavlje). Ukoliko postoji, zaglavlje se može koristiti za automatsko definiranje naslova dokumenata kad kada su dokumenti ekstraktirani iz cijelih kolona (u ovom slučaju polje za naslov ostavite praznim)."});
+Ext.apply(Voyant.panel.Via.i18n, {
+"timedout":"An attempt was made to fetch data but the request took too long. The process may be still ongoing and you could try again in a couple of minutes.",
+"visible":"Visible",
+"englishOnly":"You seem to have a text in a language other than English. Unfortunately, at the moment, Via only supports texts in English (because of the current way the lemmatization and synonym operations are programmed).",
+"title":"Via",
+"helpTip":"Via is a tool intended to help you explore the semantic clusters of English texts."});
 Ext.apply(Voyant.util.DetailedError.i18n, {
 "error":"Greška"});
+Ext.apply(Voyant.notebook.editor.button.Edit.i18n, {
+"tip":"Edit"});
 Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"najduže:",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
@@ -339,23 +385,29 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "averageWordsPerSentence":"Average Words Per Sentence:",
 "mostFrequentWords":"<b>Najučestalije riječi</b> u korpusu:",
 "title":"Sažetak",
-"numberOfTerms":"broj riječi u ovom dokumentu",
 "lowest":"najniže:",
+"numberOfTerms":"broj riječi u ovom dokumentu",
 "docsLength":"Dužina dokumenta:",
 "corpusType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"corpus-type keyword\" voyant:recordid=\"{id}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
-"seeAll":"Sve…",
 "highest":"najviše:",
+"seeAll":"Sve…",
 "distinctiveWords":"<b>Najspecifičnije riječi</b> (u odnosu na ostatak korpusa):",
 "docsDensity":"Gustoća vokabulara:",
 "helpTip":"<p> Alatka <i>Sažetak</i> nudi opšte informacije o korpusu. Mnogi elementi unutar ove alatke su linkovi koji aktiviraju dodatne prikaze. Uključuje funkcije, kao što su: </p> <ul><li> zbroj riječi (tokena) i oblika riječi (tipova), starost korpusa,</li><li> najučestaliji termini unutar korpusa, </li><li>a za korpuse koji sadrže više od jednog dokumenta<ul><li>sortiranje dokumenata po dužini i po gustoći vokabulara</li><li>osobite riječi za svaki dokument (TF-IDF vrijednosti)</li></ul></li></ul>",
-"moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Preostaje {0} od {1} ukupno </a>",
 "items":"elementi",
+"moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Preostaje {0} od {1} ukupno </a>",
 "shortest":"najkraće:"});
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
 "title":"Prikaz korpusa",
 "helpTip":"Ovo je predefinisani, opšte namjenski prikaz korpusa."});
+Ext.apply(Voyant.notebook.editor.button.Movement.i18n, {
+"tip":"Move / Remove Controls"});
 Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
 "label":"Familija fontova"});
+Ext.apply(Voyant.notebook.editor.button.Remove.i18n, {
+"tip":"remove this block",
+"confirmRemove":"Are you sure you want to remove this block (and lose any content in the editor)?",
+"confirmRemoveTitle":"Confirm Remove"});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"Izdavači",
 "sendToVoyantButton":"Novi Voyant korpus",
@@ -363,24 +415,17 @@ Ext.apply(Voyant.panel.Subset.i18n, {
 "sendToVoyantNoQuery":"Trenutno nema specifičnog upita, ali možete <a href=\"{0}\" target=\"_blank\"> otvoriti trenutni korpus unutar novog prozora.",
 "lexicalLabel":"Cijeli tekst",
 "noMatches":"Trenutni kriteriji pretrage ne poklapaju se ni sa jednim dokumentom, najprije izmijenite upit.",
-"titleLabel":"Naslovi",
 "authorLabel":"Autori",
+"titleLabel":"Naslovi",
 "title":"Izgrađivač radnog seta"});
-Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
-"titleLabel":"naslov",
-"authorLabel":"autor",
-"availableLabel":"isključiti:",
-"enabledLabel":"uključiti:",
-"fieldLabel":"Nazivi datoteka",
-"pubDateLabel":"datum"});
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"Dodati",
 "cancel":"poništiti",
 "clear":"Obrisati",
 "labelsTip":"Podesiti vidljivost oznaka",
 "update":"ažurirati",
-"title":"Mandala",
 "addTip":"Dodati magnet (traženi termin).",
+"title":"Mandala",
 "remove":"ukloniti",
 "labels":"oznake",
 "clearTip":"Obrisati sve magnete (tražene termine).",
@@ -389,6 +434,13 @@ Ext.apply(Voyant.panel.Mandala.i18n, {
 "helpTip":"Mandala je konceptualna vizualizacija koja pokazuje odnose između termina i dokumenata. Svaki traženi termin (ili magnet) privlači sebi dokumente na osnovu relativne učestalosti termina unutar korpusa."});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"Odaberite korpus"});
+Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
+"authorLabel":"autor",
+"availableLabel":"isključiti:",
+"titleLabel":"naslov",
+"enabledLabel":"uključiti:",
+"fieldLabel":"Nazivi datoteka",
+"pubDateLabel":"datum"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "matchingTerms":"Pronađeni termini: {count}",
 "tfidfTip":"Težina se ovdje mjeri u TF-IDF vrijednostima, što je uobičajen pokazatelj važnosti jednog termina unutar dokumenta u odnosu na ostatak korpusa.",
@@ -397,8 +449,8 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "relativeFreqTip":"Relativna učestalost (na milion) ovog termina u svakom dokumentu.",
 "termTip":"Termin unutar specifičnog dokumenta.",
 "zscore":"Standardizirano odstupanje (Z-score)",
-"trendTip":"Ovo je grafikon sparkline koji predstavlja distribuciju termina unutar linearnih segmenata jednog dokumenta (predefinisan kao 10 segmenata jednake veličine)",
 "tfidf":"Težina",
+"trendTip":"Ovo je grafikon sparkline koji predstavlja distribuciju termina unutar linearnih segmenata jednog dokumenta (predefinisan kao 10 segmenata jednake veličine)",
 "title":"Termini u dokumentu",
 "helpTip":"<p>Termini u dokumentu je tabelarni prikaz termina koji se pojavljuju u svakom dokumentu. Uključuje funkcije, kao što su:</p><ul><li>sortiranje po <i>Terminu</i>, <i>Zbroju</i> (apsolutna učestalost) i <i> Relativnoj </i> učestalosti (kliknuti na zaglavlje kolone)</li><li>grafikon sparkline za distribuciju učestalosti termina u dokumentima</li><li>dodatne kolone (<i> Težina</i> ili TF-IDF) dostupne su klikom na strijelicu koja se pojavljuje pozicioniranjem kursora na zaglavlje</li><li>okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita).</li></ul>",
 "zscoreTip":"Z-score ili standardizirano odstupanje predstavlja normaliziranu vrijednost za apsolutnu učestalost jednog termina u odnosu na učestalosti drugih termina u istom dokumentu."});
@@ -414,65 +466,80 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hoursAgo":"otprilike prije {} sat-a/i",
 "minutesAgo":"otprilike prije {} minut-e/i",
 "minuteAgo":"otprilike prije jedne minute",
-"monthAgo":"otprilike prije mjesec dana",
 "hourAgo":"otprilike prije sat vremena",
+"monthAgo":"otprilike prije mjesec dana",
 "failedCreateCorpus":"Neuspješan pokušaj stvaranja korpusa",
 "has1document":"sadrži 1 dokument",
-"yearsAgo":"otprilike prije {} godin-e/a/u",
 "secondAgo":"otprilike prije jedne sekunde",
+"yearsAgo":"otprilike prije {} godin-e/a/u",
 "now":"sada",
 "badDataTypeCorpus":"Unable to recognize a valid data type for this corpus: ",
-"yearAgo":"otprilike prije godinu dana",
 "secondsAgo":"prije {} sekund-e/i",
+"yearAgo":"otprilike prije godinu dana",
 "dayAgo":"otprilike prije jednog dana"});
+Ext.apply(Voyant.notebook.editor.button.Add.i18n, {
+"tip":"Add New Block",
+"title":"Spyral Notebook"});
+Ext.apply(Voyant.widget.CategoriesOption.i18n, {
+"edit":"Edit",
+"categories":"Categories"});
 Ext.apply(Voyant.panel.WordTree.i18n, {
 "emptyText":"Nema odgovarajućih rezultata.",
 "title":"Stablo riječi"});
+Ext.apply(Voyant.notebook.editor.button.RunUntil.i18n, {
+"tip":"Run all code blocks up to and including this one."});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "original":"original",
 "VOYANTTip":"Ovo je normalizovana verzija sadržaja. Kad su izvorni dokumenti u XML-u, biti će to uglavnom originalni sadržaj, a za većinu ostalih formata, jednostavni HTML sadržaj.",
 "fieldLabel":"Format datoteke",
-"voyantXml":"Voyant XML",
 "plainText":"običan tekst",
+"voyantXml":"Voyant XML",
 "SOURCETip":"Ovo je pokušaj da se izvorni dokumenti pokažu u svom originalnom formatu. U nekim slučajevima to može biti   pojedina arhiva, npr. ZIP datoteka.",
 "TXTTip":"Ovo će proizvesti svaki dokument u obliku običnog teksta."});
 Ext.apply(Voyant.panel.ScatterSet.i18n, {
 "title":"Disperzija",
 "helpTip":"Ovo je specijalizovani prikaz za rad sa dijagramima disperzije."});
 Ext.apply(Voyant.util.Toolable.i18n, {
-"exportTitle":"Eksport",
 "exportError":"Greška pri eksportu",
+"exportTitle":"Eksport",
+"exportAllTsvWarning":"You’re requesting all of the available data, are you sure you want to continue?",
 "exportDataTsvMessage":"Podaci u dnu se mogu prekopirati u proračunske tablice ili tekstualnu datoteku",
-"exportViewFieldset":"Eksport prikaza",
 "exportSvgMessage":"Ovo je umanjeni prikaz SVG slike; kliknite na desnu tipku miša ili CTRL+Click na sliku da biste je snimili u punoj veličini na tvrdi disk. Alternativno, prekopirajte HTML kôd ispod.",
+"exportViewFieldset":"Eksport prikaza",
 "exportDataJsonMessage":"Podaci u dnu se mogu koristiti u drugim web aplikacijama",
 "plusTip":"Kliknite da izaberete drugu alatku unutar ovog panela",
+"exportGridAllJson":"export all available data in JSON",
 "gearTip":"Definišite opcije",
 "cancelTitle":"Poništiti",
-"exportViewHtmlEmbed":"HTML isječak za ugradnju unutar druge web stranice",
 "exportGridCurrent":"Eksport trenutnih podataka",
+"exportViewHtmlEmbed":"HTML isječak za ugradnju unutar druge web stranice",
 "exportSvgTitle":"Eksportirajte SVG",
-"maximizeTip":"Otvorite ovu alatku u novom prozoru",
 "exportGridCurrentTsv":"Eksportirajte trenutne podatake kao vrijednosti razdvojene tabulatorom",
 "exportVizTitle":"Eksportirajte vizualizaciju",
+"maximizeTip":"Otvorite ovu alatku u novom prozoru",
 "exportDataTitle":"Eksportirajte podatke",
 "optionsTitle":"Opcije",
+"scaleLabel":"scaling ({0})",
 "exportBiblioTitle":"Eksportirajte bibliografsku referencu",
 "confirmTitle":"Potvrditi",
 "moreHelp":"Opširnije upute…",
+"exportGridAllTsv":"export all available data as tab separated values (text)",
 "exportViewUrl":"URL za ovaj prikaz",
-"helpTip":"Trenutno ne postoje specifičnije upute. Kliknite na slijedecu ikonu za posjet <a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools Documentation</a> web stranici.",
 "export":"Eksport",
+"helpTip":"Trenutno ne postoje specifičnije upute. Kliknite na slijedecu ikonu za posjet <a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools Documentation</a> web stranici.",
 "exportDataHtmlMessage":"Podaci u dnu se mogu prekopirati na HTML stranicu ili koristiti kao XML",
-"exportPngTitle":"Eksportirajte PNG",
 "exportPngMessage":"Ovo je umanjeni prikaz PNG slike; kliknite na desnu tipku miša ili CTRL+Click na sliku da biste je snimili u punoj veličini na tvrdi disk. Alternativno, prekopirajte HTML kôd ispod.",
+"exportPngTitle":"Eksportirajte PNG",
+"exportAllTitle":"Export All",
+"exportAllJsonWarning":"You’re requesting all of the available data (in the JSON format that Voyant uses), are you sure you want to continue?",
+"loading":"Loading…",
 "exportGridCurrentHtml":"Eksport trenutnih podataka u HTML ",
 "exportViewEmbedMessage":"HTML isječak u donjem okviru možete prekopirati na drugu web stranicu",
 "exportPng":"Eksportirajte ovu vizualizaciju u PNG formatu",
 "reset":"Resetiranje",
 "exportViewBiblio":"Bibliografska referenca za ovaj prikaz",
-"exportViewEmbedTitle":"Ugradite HTML isječak",
 "exportNoFunction":"Definisana eksport funkcija nije raspoloživa",
+"exportViewEmbedTitle":"Ugradite HTML isječak",
 "exportGridCurrentJson":"Eksport trenutnih podataka u JSON ",
 "exportSvg":"Eksportirajte ovu vizualizaciju u SVG formatu",
 "saveTip":"Eksportirajte URL, alatku, podatak ili bibliografsku referencu"});
@@ -481,10 +548,71 @@ Ext.apply(Voyant.panel.TextualArc.i18n, {
 "search":"filter",
 "minRawFreq":"minimalna učestalost",
 "adaptation":"Inspirisano <a href=\"http://textarc.org\" target=\"_blank\">TextArc</a> W. Bradford Paley-a.",
-"title":"TextualArc",
 "speedTip":"Kontrola brzine vizualizacije.",
+"title":"TextualArc",
 "helpTip":"TextualArc je vizualizacija termina unutar dokumenta, koja uključuje ponderisani centroid i luk koji slijedi red termina u dokumentu.",
 "speed":"brzina"});
+Ext.apply(Voyant.panel.DreamScape.i18n, {
+"baseLayerTip":"Determine map base layer",
+"cancel":"Cancel",
+"occurrences":"Occurrences",
+"annotateTip":"To annotate, click this icon, select a region and enter text in the box that will appear. If you don’t select a region you can click again to exit annotation mode. If you do select a region please click this icon again if you wish to add another annotation.",
+"displayTip":"Configure various aspects of the display",
+"osm":"Open Street Map",
+"annotate":"Annotate",
+"millisPerAnimation":"milliseconds per animation",
+"pubDateLabel":"years'",
+"animate":"Animate",
+"citiesMinPopulation":"minimum population",
+"viewOccurrencesTip":"Select this to see the location in Voyant.",
+"annotationsUpdateFailed":"An error occured while trying to store the annotations.",
+"wms4326":"WMS 4326",
+"mapTip":"Define base layer and projection",
+"editAnnotation":"Edit Annotation",
+"nopubDate":"No publication years defined in this corpus.",
+"removeLocationTip":"If this is not a valid place name, you can remove it (this applies to all occurrences).",
+"connections":"Connections",
+"removeLocation":"Remove Location",
+"add":"Add Filter",
+"keywordLabel":"keywords'",
+"editAnnotationMessage":"Add an annotation. To remove an existing annotation, remove the text and click OK.",
+"cities":"Cities",
+"baseLayer":"Base Layer",
+"annotationsLoadFailed":"An error occured while trying to load the annotations.",
+"projectionTip":"Determine map projection",
+"sphereMollweideProjection":"Sphere mollweide (Equal Area)",
+"animationSpeed":"Speed",
+"watercolor":"Stamen watercolor (Default)",
+"authorLabel":"authors'",
+"titleLabel":"titles",
+"title":"DreamScape",
+"webMercatorProjection":"Web Mercator (Default)",
+"noauthor":"No authors defined in this corpus.",
+"mercatorProjection":"Mercator (WGS84)",
+"viewOccurrences":"View Occurrences",
+"citiesMaxCount":"maximum count",
+"animations":"Animations",
+"connectionsMinFreq":"minimum occurrences",
+"openInVoyant":"Open in Voyant",
+"projection":"Projection",
+"removeLocationConfirm":"Are you sure you want to remove all occurrences of this location?",
+"annotationsUpdated":"Annotations have been stored. Please export new URL if you would like to reference it.",
+"map":"Map",
+"editLocationServerError":"An error occurred while trying to load alternate locations.",
+"editLocationTitle":"Select an alternative location",
+"arcGIS":"National Geographic World Map – ArcGIS",
+"viewConnections":"View Connection Occurrences",
+"display":"Display",
+"gallPetersProjection":"Gall Peters (Equal Area)",
+"editLocation":"Select Alternative Location",
+"editLocationNoLocationsFound":"No locations found.",
+"citiesMinFreq":"minimum occurrences",
+"filter":"Filter",
+"allNCitiesShown":"All {0} available cities shown.",
+"filterTip":"Determine any filters to use",
+"connectionsMaxCount":"maximum count",
+"editLocationTip":"If this place name is valid but the location is wrong, you can select an alternate location (this applies to all occurrences).",
+"editLocationNoAlternativesFound":"No alternative locations found."});
 Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "freqsMode":"Učestalosti",
 "freqsModeTip":"Određuje da li će učestalosti izraziti kao relativni zbroj ili apsolutni zbroj (po dokumentu ili segmentu).",
@@ -492,8 +620,8 @@ Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "documents":"Dokumenti",
 "documentSegments":"Segmenti dokumenta",
 "clearTerms":"Obrisati termine",
-"title":"Dijagram toka",
 "rawFrequencies":"Apsolutne učestalosti",
+"title":"Dijagram toka",
 "helpTip":"Dijagram toka vizualizira promjenu u učestalosti riječi unutar korpusa (ili unutar pojedinačnog dokumenta).",
 "segments":"Segmenti"});
 Ext.apply(Voyant.notebook.util.Embed.i18n, {
@@ -502,8 +630,8 @@ Ext.apply(Voyant.notebook.util.Embed.i18n, {
 Ext.apply(Voyant.widget.ListEditor.i18n, {
 "cancel":"Poništiti",
 "editList":"Revizija liste",
-"new":"Nova korisnički definisana lista",
 "editListMessage":"Ovo je lista. Jedan termin, jedan red.",
+"new":"Nova korisnički definisana lista",
 "editListTitle":"Revizija liste",
 "label":"Lista:",
 "none":"Ne postoji",
@@ -511,6 +639,8 @@ Ext.apply(Voyant.widget.ListEditor.i18n, {
 "whiteListLabel":"Bijela lista:"});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"opcije za preuzimanje"});
+Ext.apply(Voyant.notebook.editor.button.Run.i18n, {
+"tip":"Run the script in this block (Shift-Enter)"});
 Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
 "totalPropertyStatus":"{count:number(\"0,000\")}"});
 Ext.apply(Voyant.panel.Phrases.i18n, {
@@ -520,31 +650,77 @@ Ext.apply(Voyant.panel.Phrases.i18n, {
 "overlapFreq":"dati prioritet najučestalijim frazama",
 "emptyText":"Nema odgovarajućih rezultata",
 "length":"Dužina",
-"termTip":"Ovo je ključna fraza (u generaliziranom obliku, koji može izgledati malo drugačije u svakoj pojavi)",
 "termRawFreqTip":"Broj puta koliko se fraza pojavljuje u korpusu.",
-"title":"Fraze",
+"termTip":"Ovo je ključna fraza (u generaliziranom obliku, koji može izgledati malo drugačije u svakoj pojavi)",
 "lengthTip":"Gornja i donja granica za dužinu fraze (broj riječi u svakoj frazi).",
-"termRawFreq":"Zbroj",
+"title":"Fraze",
 "overlap":"Preklapanje",
 "overlapLength":"najučestalijihati prioritet najdužim frazama",
+"termRawFreq":"Zbroj",
 "overlapMenu":"Odaberite filter za preklapanje:",
 "term":"Termin",
 "helpTip":"<p> Korpus fraza je tabelarni prikaz fraza koje se ponavljaju unutar cijelog korpusa. <!-- Uključuje funkcije, kao što su:</p><ul><li>sortiranje po ključnim riječima, kolokatima, zbroju kolokata</li><li>okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita).)</li></ul>-->"});
+Ext.apply(Voyant.notebook.editor.button.Counter.i18n, {
+"tip":"Edit"});
 Ext.apply(Voyant.panel.Trends.i18n, {
-"relativeFrequencies":"Relativne učestalosti",
+"stacked":"Stacked Bar",
+"segmentsTitle":"Document Segments",
 "documents":"Dokumenti",
-"raw":"Apsolutne",
-"segmentsSlider":"Segmenti",
+"line":"Line",
 "scale":"Razmjer",
+"relativeTitle":"Relative Frequencies",
 "title":"Trendovi",
+"toggleTip":"Click to toggle the visibility of this series.",
 "segments":"Segmenti dokumenta",
+"resetTip":"Reset to initial view.",
+"bar":"Columns",
 "freqsMode":"Učestalosti",
-"freqsModeTip":"Određuje da li će učestalosti izraziti kao apsolutni ili relativni zbroj (u odnosu na dokument ili segment).",
+"dblClickItem":"Double-click to drilldown.",
+"segment":"segment:",
+"noResults":"No Results",
 "options":"Opcije",
+"drillDocumentTip":"View the distribution of all current terms within this document.",
 "rawFrequencies":"Apsolutne učestalosti",
 "helpTip":"<p><i>Trendovi</i> prikazuje linijski grafikon relativnih učestalosti unutar korpusa (za višestruke dokumente) ili unutar pojedinačnog dokumenta. Uključuje</p><ul><li> okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita).</li></ul>",
-"relative":"Relativne",
-"failedGetDocumentTerms":"Neuspješno izdvajanje termina u dokumentu za Trendove."});
+"area":"Area",
+"relativeFrequencies":"Relativne učestalosti",
+"drillTermTip":"View the distribution of this term within all documents.",
+"barline":"Line + Stacked Bar",
+"display":"Display",
+"raw":"Apsolutne",
+"segmentsSlider":"Segmenti",
+"labels":"Show Labels",
+"freqsModeTip":"Određuje da li će učestalosti izraziti kao apsolutni ili relativni zbroj (u odnosu na dokument ili segment).",
+"drillTerm":"Terms",
+"rawTitle":"Raw Frequencies",
+"reset":"Reset",
+"corpusTitle":"Corpus (Documents)",
+"drillDocument":"Document",
+"failedGetDocumentTerms":"Neuspješno izdvajanje termina u dokumentu za Trendove.",
+"relative":"Relativne"});
+Ext.apply(Voyant.notebook.editor.button.MoveDown.i18n, {
+"tip":"move this block down"});
+Ext.apply(Voyant.notebook.Notebook.i18n, {
+"newTip":"Create a new Spyral Notebook in a new window.",
+"autoSaveAvailableTitle":"Autosave Available",
+"cannotMoveLower":"This block is already at the bottom and cannot be moved lower.",
+"failedNotebookLoad":"Failed to load the specified notebook. A new notebook template will be presented instead.",
+"openTip":"Open a Spyral Notebook (by pasting in JSON code).",
+"differentUrl":"This notebook seems to be have been located at a different URL. If you’re sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook’s URL: {0}",
+"cannotMoveHigher":"This block is already at the top and cannot be moved higher.",
+"fetchingNotebook":"Fetching notebook…",
+"exportHtml":"HTML (suitable for saving or printing)",
+"exportJson":"Spyral Notebook data format (JSON)",
+"failedNotebookParse":"The loaded notebook appears to have a syntax error and will probably not run as is.",
+"saveItTip":"Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
+"exportAllLinks":"<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
+"originalJson":"Original JSON string",
+"editsAndLeaving":"It looks like you’ve been editing content and you will lose any content if you follow this link. Continue?",
+"differentUrlTitle":"Notebook from different URL",
+"autoSaveAvailable":"A more recent autosave is available, do you wish to switch to the auto-saved document?",
+"helpTip":"Spyral Notebooks are dynamic documents that combine text, code and interactive tools, they are a form of <a href=\"https://en.wikipedia.org/wiki/Literate_programming\" target=\"_blank\">literate programming</a>.",
+"eror":"Error",
+"runallTip":"Run all code blocks in this notebook"});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"Poništiti",
 "de":"njemački",
@@ -573,16 +749,16 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "el":"grčki",
 "mu":"višejezični",
 "en":"engleski",
-"label":"Prazne riječi:",
 "cn":"kineski",
 "it":"italijanski",
+"label":"Prazne riječi:",
 "noEditAutoTitle":"Greška pri reviziji liste praznih riječi",
 "es":"španski",
-"editStopListMessage":"Ovo je lista praznih riječi. Jedan termin, jedan red.",
 "applyGlobally":"Primjeniti globalno",
+"editStopListMessage":"Ovo je lista praznih riječi. Jedan termin, jedan red.",
 "eu":"baskijski",
-"editList":"Revizija liste",
 "ar":"arapski",
+"editList":"Revizija liste",
 "th":"tajlandski",
 "la":"Latin",
 "cz":"češki",
@@ -598,8 +774,8 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "select":"Odabrati",
 "exportInProgress":"Priprema vašeg korpusa za eksport",
 "facet.titleTitle":"Naslovi",
-"title":"Katalog",
 "lexicalTitle":"Termini",
+"title":"Katalog",
 "clickToOpenCorpus":"<a href=\"{0}\" target=\"_blank\" class=\"link\">Kliknite ovdje</a>za pristup vašem korpusu (pošto su skočni prozori blokirani).",
 "rawFreqs":"ukupan broj pojava (apsolutna učestalost)",
 "facet.languageTitle":"Jezici",
@@ -608,8 +784,8 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "plusFacetTip":"Dodati novi aspekt",
 "facet.collectionTitle":"Kolekcije",
 "matchingDocuments":"broj rezultata",
-"helpTip":"Alatka <i>Katalog</i> nudi sučelje za istraživanje korpusa sa većim brojem dokumenata, kao i stvaranje podseta (radnog seta) koji je baziran na kriterijima pretrage. Otprilike funkcioniše kao baza podataka, dopuštajući vam filtriranje dokumenata.",
 "export":"Eksport",
+"helpTip":"Alatka <i>Katalog</i> nudi sučelje za istraživanje korpusa sa većim brojem dokumenata, kao i stvaranje podseta (radnog seta) koji je baziran na kriterijima pretrage. Otprilike funkcioniše kao baza podataka, dopuštajući vam filtriranje dokumenata.",
 "downloadButton":"Preuzimanje",
 "facet.pubPlaceTitle":"Mjesta izdanja",
 "queryMatches":"{0} rezultata (od {1}).",
@@ -624,17 +800,55 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 Ext.apply(Voyant.panel.CollocatesSet.i18n, {
 "title":"Kolokati",
 "helpTip":"Ovo je specijalizovani prikaz za rad sa kolokatima."});
+Ext.apply(Voyant.panel.Veliza.i18n, {
+"scriptEditor":"Script Editor",
+"title":"Veliza",
+"typeAndEnter":"Type text and hit enter.",
+"scriptIntro":"This is an advanced feature that allows you see and edit the script used by Veliza. For more information on the syntax, see the <a href='{0}' target='_blank'>documentation</a>.",
+"send":"send",
+"fromCorpus":"from text"});
+Ext.apply(Voyant.notebook.editor.CodeEditorWrapper.i18n, {
+"modeJson":"JSON",
+"previousNotRun":"There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?",
+"modeCsv":"CSV (comma-separated values)",
+"modeJavascript":"Javascript (default)",
+"enableEditing":"By default editing is disable, do you wish to enable editing now?",
+"modeHtml":"HTML",
+"modeData":"Data",
+"modeTsv":"TSV (tab-separated values)",
+"modeXml":"XML",
+"modeCode":"Code",
+"previousNotRunTitle":"Previous Code Blocks",
+"modeText":"Text"});
 Ext.apply(Voyant.panel.MicroSearch.i18n, {
-"title":"Mikro pretraga",
 "loading":"Učitavaju se termini…",
+"title":"Mikro pretraga",
 "helpTip":"Ova alatka nudi pregled cijelog korpusa i omogućava vizualizaciju distribucije traženih termina."});
 Ext.apply(Voyant.panel.TopicContexts.i18n, {
 "reset":"resetiranje",
 "title":"Tematski konteksti",
 "helpTip":"Tematski konteksti"});
+Ext.apply(Voyant.notebook.editor.button.MoveUp.i18n, {
+"tip":"move this block up"});
+Ext.apply(Voyant.widget.ProgressMonitor.i18n, {
+"running":"Working…",
+"aborted":"Error",
+"noProgress":"This progress monitor was incorrectly initialized.",
+"badProgress":"Unable to understand the progress report from the server.",
+"progress":"Progress",
+"finished":"Finished",
+"launch":"Launching…"});
 Ext.apply(Voyant.panel.BubblelinesSet.i18n, {
 "title":"Bubblelines Skin",
 "helpTip":"Ovo je specijalizovani prikaz za rad sa Bubblelines."});
+Ext.apply(Voyant.widget.CorpusTermSummary.i18n, {
+"collocates":"Collocates:",
+"distribution":"Distribution:",
+"loading":"Loading...",
+"phrases":"Phrases:",
+"title":"Corpus Term Summary:",
+"correlations":"Correlations:",
+"items":"Items"});
 Ext.apply(Voyant.panel.Knots.i18n, {
 "findTerm":"Pronaći termin",
 "settings":"Podešavanje",
@@ -643,15 +857,15 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 "showTerm":"Prikazati termin",
 "sound":"zvuk",
 "clearTerms":"Obrisati",
-"removeTerm":"Ukloniti termin",
 "hideTerm":"Sakriti termin",
+"removeTerm":"Ukloniti termin",
+"noTermsFound":"Nije pronađen nijedan termin u ovom dokumentu.",
 "title":"Čvorovi",
 "type":"Vizualizacija",
-"noTermsFound":"Nije pronađen nijedan termin u ovom dokumentu.",
 "speed":"Brzina",
 "soundTip":"Aktiviranje i deaktiviranje zvučne funkcije čvorova",
-"options":"Opcije",
-"context":"Kontekst"});
+"context":"Kontekst",
+"options":"Opcije"});
 Ext.apply(Voyant.VoyantApp.i18n, {
 "serverResponseError":"Poruka o grešci na serveru",
 "error":"Greška",
@@ -661,8 +875,8 @@ Ext.apply(Voyant.panel.RezoViz.i18n, {
 "loadingEntities":"Entiteti se učitavaju...",
 "minEdgeCount":"Minimalni broj rubova",
 "noEntities":"Nema entiteta za graf.",
-"title":"RezoViz",
 "stiffness":"Krutost",
+"title":"RezoViz",
 "people":"Osobe",
 "friction":"Frikcija",
 "repulsion":"Odbojnost",
@@ -671,8 +885,8 @@ Ext.apply(Voyant.panel.RezoViz.i18n, {
 "locations":"Mjesta izdanja",
 "categories":"Kategorije"});
 Ext.apply(Voyant.widget.DocumentSelector.i18n, {
-"cancel":"Poništiti",
 "all":"sve",
+"cancel":"Poništiti",
 "selectAll":"Sve",
 "documents":"Dokumenti",
 "ok":"U redu",
@@ -689,8 +903,8 @@ Ext.apply(Voyant.panel.Contexts.i18n, {
 "documentTip":"Dokument pojavljivanja",
 "left":"Lijevo",
 "corpusTip":"Resetovanje na prikaz korpusa (konteksti iz svih dokumenata)",
-"rightTip":"Kontekst desno od ključne riječi",
 "context":"kontekst",
+"rightTip":"Kontekst desno od ključne riječi",
 "leftTip":"Kontekst lijevo od ključne riječi",
 "position":"Pozicija",
 "positionTip":"Pozicija ključne riječi unutar dokumenta",
@@ -702,24 +916,28 @@ Ext.apply(Voyant.VoyantDefaultApp.i18n, {
 "noViewErrorTitle":"Nije naveden nijedan prikaz",
 "helpTip":"Voyant Tools je mrežno okruženje za čitanje i analizu digitalnih tekstova. <p></p>",
 "noViewErrorTpl":"Nije pronađen nijedan prikaz sa imenom \"<i>{view}</i>\". Koristiće se predefinisani prikaz."});
-Ext.apply(Voyant.widget.Facet.i18n, {
-"emptyText":"Nisu pronađene vrijednosti"});
 Ext.apply(Voyant.panel.ScatterPlot.i18n, {
+"tsne":"t-SNE",
 "relFreq":"Relativno",
-"xAxis":"x-osa",
 "termsLabel":"Termini",
+"xAxis":"x-osa",
 "summaryLabel":"Sažetak",
 "title":"Dijagram disperzije",
 "nearby":"U blizini",
 "remove":"Ukloniti",
 "pca":"Analiza glavnih komponenata",
+"analyzing":"Analyzing",
+"output":"Output",
 "docSim":"Sličnost dokumenata",
+"perplexity":"Perplexity",
 "noTermSelected":"Nije odabran nijedan termin.",
 "freqsMode":"Učestalosti",
+"reload":"Reload",
 "terms":"Termini",
 "tokenFreqTip":"<b>{0}</b><br><b>Apsolutna učestalost</b><br>{1}<br><b>Relativna učestalost</b><br>{2}",
-"term":"Termin",
+"options":"Options",
 "docFreqTip":"<b>{0}</b><br><b>Zbroj riječi</b><br>{1}",
+"term":"Termin",
 "rawFrequencies":"Apsolutne učestalosti",
 "dimension":"Dimenzija",
 "helpTip":"<p>Dijagram disperzije prikazuje podudarnosti među upotrebama riječi unutar korpusa. Ova visualizacija se bazira na statističkoj analizi koja uzima u obzir podudarnost riječi unutar svakog dokumenta (gdje svaki dokument predstavlja jednu dimenziju) i svodi je na tridimenzionalni prostor kako bi se podaci lakše visualizirali u obliku dijagrama disperzije.</p>",
@@ -728,31 +946,39 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "pcTitle":"Postotak ukupne varijacije, obrazložen svim komponentama",
 "relativeFrequencies":"Relativne učestalosti",
 "addTerm":"Dodati termin",
+"plotting":"Plotting",
 "numTerms":"Termini",
 "removeTerm":"Ukloniti <b>{0}</b>",
 "tfidf":"TF-IDF",
 "analysis":"Analiza",
 "fill":"Popuniti",
 "loading":"Učitavanje",
+"iterations":"Iterations",
 "labels":"Oznake",
+"input":"Input",
 "freqsModeTip":"Određuje da li će učestalosti izraziti kao relativni zbroj, apsolutni zbroj ili TF-IDF.",
 "yAxis":"y-osa",
 "pc":"PC",
-"nearbyTerm":"U blizini <b>{0}</b>",
 "docsLabel":"Dokumenti",
-"rawFreq":"Apsolutno",
+"nearbyTerm":"U blizini <b>{0}</b>",
 "caTitle":"Postotak ukupne asocijacije, obrazložen svim dimenzijama",
+"rawFreq":"Apsolutno",
 "dimensions":"Dimenzije"});
 Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"Voyant tools",
 "privacy":"Privatnost",
 "voyantLink":"<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyant Tools</a>",
 "privacyMsg":"Programeri Voyant Tools prikupljaju podatke o paramentrima upotrebe alatki (registriraju se IP adrese kako bi se utvrdili višestruki upiti unutar iste sesije). Dodatno, Voyant Tools koristi Google Analytics (pogledajte Google's Privacy Policy, a posebno sekciju <em>Log Information</em>). Lokalno registrirani podaci i Google Analytics koristit će razvojnom timu za ispravljanje grešaka i usavršavanje alatki, kao i uvid u kako ih istraživači koriste. Ovi podaci se također mogu koristiti u istraživačke svrhe, u anonimnom i agregatnom obliku. Imajte u vidu da se tekstovi dodati u Voyant pohranjuju kako bi se omogućio neometan pristup tokom jedne ili između više sesija. Ako imate pitanja kako se sakupljaju i koriste podaci ili želite povući određeni korpus, slobodno se obratite Stéfanu Sinclairu. Kliknite na ovaj link za dodatne informacije."});
+Ext.apply(Voyant.widget.Facet.i18n, {
+"emptyText":"Nisu pronađene vrijednosti"});
 Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchTip":"<div>Sintaksa pretraživanja (pritisnite enter/return za početak pretraživanja):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>kaput</b>: pronađite tačan termin <i>kaput</i></li><li><b>kaput*</b>: pronađite termine koji počinju sa <i>kaput</i> kao jedinstven termin</li><li><b>^kaput*</b>: pronađite termine koji počinju sa <i>kaput</i> kao razdvojene (kaput, kaputi itd.)</li><li><b>*aput</b>: pronađite termine koji se završavaju na <i>aput</i> kao jedinstven termin</li><li><b>^*aput</b>: pronađite termine koji se završavaju na <i>aput</i>kao višestruke termine</li><li><b>kaput,jakna</b>: pronađite svaki termin razdvojen zarezima kao jedinstven termin</li><li><b>kaput|jakna</b>: pronađite termine razdvojene prečkom kao jedinstven termin</li><li><b>\"zimski kaput\"</b>: <i>zimski kaput</i>kao fraza</li><li><b>\"kaput rukavice\"~5</b>: <i>kaput</i> blizu termina <i>rukavice</i> (u razmaku do 5 riječi)</li><li><b>^kaput*,jakna|bunda,\"kaput rukavice\"~5</b>: kombiniranje sintaksi</li></ul>",
 "querySearchDocsModeTip":"<div>Sintaksa pretraživanja dokumenata (pritisnite enter/return za početak pretraživanja):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>kaput</b>: pronađite tačan termin <i>kaput</i></li><li><b>kaput*</b>: pronađite termine koji počinju sa <i>kaput</i></li><li><b>kaput,jakna</b>:pronađite svaki termin razdvojen zarezima kao jedinstven termin</li><li><b>\"zimski kaput\"</b>: <i>zimski kaput</i> kao fraza</li><li><b>\"kaput rukavice\"~5</b>: <i>kaput</i> blizu termina <i>rukavice</i> (u razmaku do 5 riječi)</li><li><b>+zimski +kaput</b>: pronađite svaki termin koji slijedi iza plus znaka (+)</li><li><b>+\"zimski kaput\" +rukavica*</b>: kombiniranje sintaksi</li></ul>",
 "querySearch":"Pretraga",
 "aggregateInDocumentsCount":"Broj dokumentata koji zadovoljavaju kriterije pretrage (ubrojeni dokumenti sadrže barem jedan traženi termin)."});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"njemački",
 "thisLanguage":"Bosnian",
@@ -760,8 +986,8 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "en":"engleski",
 "hr":"hrvatski",
 "it":"italijanski",
-"languageTitle":"Opcije za jezik sučelja",
 "fr":"francuski",
+"languageTitle":"Opcije za jezik sučelja",
 "ar":"arapski",
 "bs":"bosanski",
 "chooseLanguage":"Jezik sučelja",

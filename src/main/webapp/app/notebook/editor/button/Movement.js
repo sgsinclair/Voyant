@@ -5,9 +5,6 @@ Ext.define("Voyant.notebook.editor.button.Movement", {
 	alias: 'widget.notebookwrappermovement',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Move / Remove Controls"
-			}
 		}
 	},
 	constructor: function(config) {

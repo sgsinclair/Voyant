@@ -2,13 +2,6 @@ Ext.define('Voyant.util.Toolable', {
 	requires: ['Voyant.util.Localization','Voyant.util.Api'],
 	statics: {
 		i18n: {
-			exportGridAllJson: "export all available data in JSON",
-			exportAllTitle: "Export All",
-			exportAllJsonWarning: "You're requesting all of the available data (in a JSON format that Voyant uses), are you sure you want to continue?",
-			exportGridAllTsv: "export all available data as tab separated values (text)",
-			exportAllTsvWarning: "You're requesting all of the available data, are you sure you want to continue?",
-			scaleLabel: "scaling ({0})",
-			loading: "Loading…"
 		},
 		api: {
 			suppressTools: false

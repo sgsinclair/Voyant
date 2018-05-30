@@ -4,7 +4,6 @@ Ext.define("Voyant.notebook.editor.button.MoveUp", {
 	alias: 'widget.notebookwrappermoveup',
 	statics: {
 		i18n: {
-			tip: "move this block up"
 		}
 	},
 	constructor: function(config) {

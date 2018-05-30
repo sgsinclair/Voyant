@@ -4,9 +4,6 @@ Ext.define("Voyant.notebook.editor.button.Run", {
 	alias: 'widget.notebookwrapperrun',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Run the script in this block (Shift-Enter)"
-			}
 		}
 	},
 	glyph: 'xf04b@FontAwesome'

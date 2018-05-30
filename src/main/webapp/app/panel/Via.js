@@ -6,11 +6,6 @@ Ext.define('Voyant.panel.Via', {
 	alias: 'widget.via',
     statics: {
     	i18n: {
-    		title: "Via",
-    		helpTip: "Via is a tool intended to help you explore the semantic clusters of English texts.",
-    		visible: "Visible",
-    		timedout: "An attempt was made to fetch data but the request took too long. The process may be still ongoing and you could try again in a couple of minutes.",
-    		englishOnly: "You seem to have a text in a language other than English. Unfortunately, at the moment, Via only supports texts in English (because of the current way the lemmatization and synonym operations are programmed)."
     	},
     	api: {
     		stopList: 'auto',

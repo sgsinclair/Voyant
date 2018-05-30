@@ -1,14 +1,32 @@
 Voyant.util.Localization.LANGUAGE='ja'
+Ext.apply(Voyant.panel.Correlations.i18n, {
+"sourceTip":"Term 1 (the pairing is what matters, not the column)",
+"emptyText":"(No results.)",
+"significanceTip":"This is a measure of the signifiance of the correlation value. Often a significance of .05 or less indicates a strong correlation (which allows us to reject the null hypothesis that values are randomly distributed). The validity of this measure depends on assumptions about a normal distribution of the data. Also, don’t forget that we typically have a relatively small number of values (frequencies from segments in a text or from documents in a corpus), so these values should be used with care.",
+"targetTip":"Term 2 (the pairing is what matters, not the column)",
+"source":"Term 1",
+"title":"Correlations",
+"target":"Term 2",
+"significance":"Significance (p)",
+"correlation":"Correlation (r)",
+"correlationTip":"This is a measure of how closely term frequencies correlate (using Pearson’s correlation coefficient or a simple regression). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other drops), scores approaching 0 indicate little or no meaningful correlation.",
+"trendTip":"This represents the relative frequencies of the term.",
+"helpTip":"The Correlations tool enables an exploration of the extent to which term frequencies vary in sync (terms whose frequencies rise and fall together or inversely).",
+"minInDocumentsCountRatioLabel":"minimum coverage (%{0})"});
 Ext.apply(Voyant.panel.VoyantHeader.i18n, {
 "homeConfirm":"（現在のコーパスを離れて）本当にやり直しますか？",
 "title":"Voyantツール",
 "helpTip":"Voyantツールは、ウェブ上でデジタルテキストを読解・分析するための環境です。",
 "homeTip":"クリックしてコーパス作成画面に戻る。",
 "home":"やり直す"});
+Ext.apply(Voyant.data.util.Geonames.i18n, {
+"failedToFetchGeonames":"Failed to load location information."});
+Ext.apply(Voyant.notebook.editor.CodeEditor.i18n, {
+"emptyText":"// click here to edit"});
 Ext.apply(Voyant.panel.Topics.i18n, {
 "scores":"Scores",
 "adaptation":"adapted from David Mimno's <a href=\"https://github.com/mimno/jsLDA\" target=\"_blank\">jsLDA</a>",
-"scoresTip":"This represents the score of each document (in corpus order) for the row's topic.",
+"scoresTip":"This represents the score of each document (in corpus order) for the row’s topic.",
 "numTopics":"Topics",
 "title":"Topics",
 "loadingStopWords":"Loading stopwords…",
@@ -20,13 +38,13 @@ Ext.apply(Voyant.panel.Topics.i18n, {
 "topicTip":"This provides an ordered list of the ten most signifiant terms in the topic cluster. ",
 "helpTip":"This tool performs topic modelling (<a href=\"https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation\" target=\"_blank\">LDA</a>) on the current corpus. Initially words are randomly assigned to each topic and with each iteration the topics become more refined. Please note that because of the initial random assignment, results will be different each time this tool is run.",
 "loadingDocuments":"Loading documents…",
-"runIterationsTip":"This runs iterations (100 by default) on the current topics (in other words, the topics aren't replaced, they're refined).",
 "perDocLimitHigh":"This value seems high. Please note that problems may occur on the server or in your browser if you include too many terms (default is 1,000).",
-"searchTip":"Highlight the topics that contain the search (even partial words), don't forget that each topic is limited to the top 10 terms.",
+"runIterationsTip":"This runs iterations (100 by default) on the current topics (in other words, the topics aren’t replaced, they’re refined).",
 "iterations":"Iterations",
+"searchTip":"Highlight the topics that contain the search (even partial words), don’t forget that each topic is limited to the top 10 terms.",
 "runningIterations":"Performing topic modelling.",
-"runningIterationsCount":"Running {0} iterations.",
 "perDocLimitTip":"The maximum number of terms to include from the start of a document (set this to a very high number or to zero to have no limit, but beware that high values can cause problems on the server or in your browser).",
+"runningIterationsCount":"Running {0} iterations.",
 "limitTermsTip":"Determine the number of terms to show for each topic.",
 "totalDone":"({0} iterations done)",
 "numTopicsTip":"Determine the number of topics (or term clusters) to produce. Note that changing this value will regenerate topics (and that results will be different even with the same number of topics).",
@@ -48,33 +66,38 @@ Ext.apply(Voyant.panel.DocumentsFinder.i18n, {
 "query":"検索",
 "count":"頻度",
 "exportNewCorpus":"新しいコーパス",
-"title":"ドキュメントファインダー",
-"loading":"コーパスを読み込んでいます…",
 "addRow":"列の追加",
+"loading":"コーパスを読み込んでいます…",
+"title":"ドキュメントファインダー",
 "operator":"オペレータ",
 "textField":"テクスト（デフォルト）",
 "unsuccessfulQuery":"検索を完了できませんでした。",
-"pubPlaceField":"出版地",
 "advancedField":"<i>詳細検索</i>",
+"pubPlaceField":"出版地",
 "authorField":"著者",
 "noMatches":"一致するものがありません({0}のドキュメントの中で)",
 "field":"フィールド",
 "deleteRowTip":"この列を削除する",
 "publisherField":"出版社",
-"pubDateField":"発行日",
-"exportNewCorpusTip":"一致するドキュメントから新しいコーパスを作成する(一致するものがないときはボタンは見えなくなります)"});
+"exportNewCorpusTip":"一致するドキュメントから新しいコーパスを作成する(一致するものがないときはボタンは見えなくなります)",
+"pubDateField":"発行日"});
+Ext.apply(Voyant.notebook.editor.button.RunAll.i18n, {
+"tip":"Run all code blocks below."});
 Ext.apply(Voyant.panel.TermsBerry.i18n, {
 "scaling":"Scaling",
 "distinctTerms":"Distinct Terms",
-"topTerms":"Top Terms",
-"numTerms":"Terms",
 "context":"Context",
-"title":"TermsBerry",
-"strategy":"Strategy"});
+"numTerms":"Terms",
+"topTerms":"Top Terms",
+"reset":"Reset",
+"inDocs":"In Docs",
+"tfidf":"tf-idf",
+"strategy":"Strategy",
+"title":"TermsBerry"});
 Ext.apply(Voyant.widget.ColorPaletteOption.i18n, {
-"paletteEditor":"Palette Editor",
 "add":"追加する",
 "cancel":"キャンセル",
+"paletteEditor":"Palette Editor",
 "editList":"リストの編集",
 "saveNewPalette":"Save New Palette",
 "clear":"クリア",
@@ -84,15 +107,15 @@ Ext.apply(Voyant.panel.TermsRadio.i18n, {
 "displayPanelTip":"ワードディスプレイの設定を行うパネル",
 "linear":"線形",
 "log":"対数",
-"displayPanel":"ディスプレイパネル",
 "completingTransition":"移動中",
+"displayPanel":"ディスプレイパネル",
 "removeTerm":"<b>{0}</b>を消去",
 "yScale":"Y軸スケール",
 "title":"タームラジオ",
 "type":"視覚化",
 "speed":"速度",
-"segments":"セグメント",
 "fraction":"ワードディスプレイ",
+"segments":"セグメント",
 "duration":"速度",
 "help":"このツールは、一定期間内の一つのコーパスを通じた単語登場頻度を調べるのに用いることができます。",
 "resetTip":"図を初期状態にリセットする。",
@@ -107,20 +130,18 @@ Ext.apply(Voyant.util.Downloadable.i18n, {
 "exportTitle":"エクスポート",
 "downloadButton":"ダウンロード",
 "cancelButton":"キャンセル"});
-Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
-"contextTermRawFreq":"（前後の単語おける）共起の回数",
-"matchingTerms":"{count}",
-"contextTerm":"共起",
-"emptyText":"一致する情報が見つかりませんでした。",
-"termTip":"共起数がカウントされるキーワード",
-"termRawFreqTip":"コーパスの中にキーワードが現れた回数",
-"title":"共起",
-"termRawFreq":"カウント（キーワード）",
-"context":"前後の語数",
-"term":"単語",
-"helpTip":"コーパス共起では、コーパス全体を通して互いに近接して出現しやすい単語をテーブル形式で表示します。含まれる機能</p><ul><li>キーワード、共起語、共起回数による並び替え</li><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul></li></ul>",
-"contextTermRawFreqTip":"コーパス内において、キーワードの近くでこの共起が起こった回数",
-"contextTermTip":"キーワードの近くで共起する（前後の）単語"});
+Ext.apply(Voyant.panel.WordWall.i18n, {
+"scaling":"Scaling",
+"yStrength":"Y Strength",
+"delay":"Fetch Delay",
+"stop":"Stop",
+"terms":"Terms",
+"chargeDistance":"Charge Distance",
+"chargeStrength":"Charge Strength",
+"start":"Start",
+"xStrength":"X Strength",
+"title":"Wall of Words",
+"transition":"Transition Speed"});
 Ext.apply(Voyant.panel.Documents.i18n, {
 "keepTip":"選択または絞り込みされたドキュメントに基づく新しいコーパスを作る",
 "reorderFilteredError":"絞り込みされたコーパスは並び替えができません。先に新しいコーパスを作成(<i>消去する</i> or <i>残す</i> をクリック) してください。",
@@ -130,9 +151,9 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "language":"言語",
 "reorder":"並べ替える",
 "removeSelectedDocuments":"{0:plural('selected document')}を取り除いた（含まない） <i>新しい</i> コーパスを作りますか？",
-"title":"ドキュメント",
-"error":"エラー",
 "addTip":"コーパスに新しいドキュメントを追加",
+"error":"エラー",
+"title":"ドキュメント",
 "keepFilteredDocuments":"{0:plural('selected document')}のみを含む <i>新しい</i> コーパスを作りますか？",
 "remove":"消去する",
 "documentAuthor":"著者",
@@ -153,36 +174,48 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"コーパスには一つのドキュメントしか含まれていません。ドキュメントを削除すると新しいコーパスを作成できません。",
 "modify":"修正する",
-"typeTokenRatioLexical":"比率",
 "modifyTip":"このボタンをクリックすると、新しいドキュメントを加えたり、ドキュメントのサブセットを選択したり、ドキュメントを並べ直したりすることで、新しいコーパスを作ります。",
 "reorderDocuments":"表示された設定に基づいて<i>新しい</i>コーパスを作成しますか？",
+"typeTokenRatioLexical":"比率",
 "keep":"残す",
 "reorderOriginalError":"最初にコーパスを再設定してください（表の中で行をドラッグアンドドロップしてください）。"});
-Ext.apply(Voyant.panel.Panel.i18n, {
-"trend":"トレンド",
-"relativeFreq":"相対（頻度）",
-"colon":":",
+Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
+"contextTermRawFreq":"（前後の単語おける）共起の回数",
+"matchingTerms":"{count}",
+"contextTerm":"共起",
+"emptyText":"一致する情報が見つかりませんでした。",
+"termRawFreqTip":"コーパスの中にキーワードが現れた回数",
+"termTip":"共起数がカウントされるキーワード",
+"title":"共起",
+"termRawFreq":"カウント（キーワード）",
+"context":"前後の語数",
 "term":"単語",
-"rawFreq":"カウント",
-"loading":"読み込んでいます…",
-"error":"エラー",
-"info":"情報"});
+"helpTip":"コーパス共起では、コーパス全体を通して互いに近接して出現しやすい単語をテーブル形式で表示します。含まれる機能</p><ul><li>キーワード、共起語、共起回数による並び替え</li><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul></li></ul>",
+"contextTermRawFreqTip":"コーパス内において、キーワードの近くでこの共起が起こった回数",
+"contextTermTip":"キーワードの近くで共起する（前後の）単語"});
 Ext.apply(Voyant.panel.Bubbles.i18n, {
 "soundTip":"サウンドを切り替える",
 "sound":"サウンド",
 "adaptation":" <a href=\"https://www.m-i-b.com.ar/letters/en/\" target=\"_blank\">Martin Ignacio Bereciartuaの<i>レター・ペア</i></a>を適用する。",
-"title":"バブルズ",
 "speedTip":"視覚化の速度を調整する",
+"title":"バブルズ",
 "helpTip":"バブルズはドキュメント中の頻出単語を楽しく視覚化します。",
 "speed":"速度"});
+Ext.apply(Voyant.panel.Panel.i18n, {
+"trend":"トレンド",
+"relativeFreq":"相対（頻度）",
+"colon":":",
+"rawFreq":"カウント",
+"term":"単語",
+"error":"エラー",
+"loading":"読み込んでいます…",
+"info":"情報"});
+Ext.apply(Voyant.notebook.editor.TextEditor.i18n, {
+"emptyText":"(Click here to edit.)",
+"enableEditingTitle":"Enable Editing?"});
 Ext.apply(Voyant.widget.CorpusDocumentSelector.i18n, {
 "corpus":"コーパス",
 "scale":"スケール"});
-Ext.apply(Voyant.panel.Reader.i18n, {
-"documentFrequency":"ドキュメントの頻度",
-"limitedAccess":"これはアクセスが制限されたコーパスで、このツールの機能性は制限されています。",
-"title":"本文",
-"helpTip":"<p>本文ツールはコーパスの本文ビューを表示します。含まれる機能:</p><ul><li>単語にカーソルを合わせて出現頻度情報を表示</li><li>単語をクリックして下のグラフに分布情報を表示</li><li>下部の棒グラフがコーパス内での各ドキュメントの相対的分量を示す</li><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul>"});
 Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "fetchingCorpus":"コーパスを取得中",
 "moreToolsTypeViz":"視覚化ツール",
@@ -191,8 +224,8 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "passwordRequiredMessage":"このコーパスにはアクセスコードが必要です",
 "didYouKnow":"Did you know?",
 "passwordRequiredTitle":"アクセスコードが必要",
-"password":"アクセスコード",
 "didYouKnowText":"Help and options are available!",
+"password":"アクセスコード",
 "moreToolsScaleDocument":"ドキュメントツール",
 "moreToolsTypeGrid":"グリッドツール",
 "moreToolsType":"タイプ別",
@@ -203,20 +236,11 @@ Ext.apply(Voyant.VoyantCorpusApp.i18n, {
 "passwordValidateButton":"認証する",
 "moreToolsScale":"スケール別",
 "badPassword":"申し訳ありません、それは認証されたアクセスコードではないようです。"});
-Ext.apply(Voyant.panel.Bubblelines.i18n, {
-"findTerm":"単語を探す",
-"showTerm":"単語を表示する",
-"corpusTooSmall":"このツールで使うにはコーパスが小さすぎます。",
-"clearTerms":"クリア",
-"removeTerm":"単語を消去する",
-"hideTerm":"単語を隠す",
-"title":"バブルライン",
-"type":"視覚化",
-"separateLines":"単語ごとにバブルラインを分割する",
-"help":"バブルラインはコーパスの中でのある語の使用頻度と繰り返しを視覚化します。コーパスの中のそれぞれのドキュメントは等しい長さのセグメントに分割されて横軸に表されています。それぞれの語はバブルとして表され、バブルの大きさが、テキストが対応するセグメントに登場する頻度を表します。その語が登場する頻度が高いほどバブルの半径が大きくなります。",
-"total":"合計",
-"granularity":"粒度",
-"options":"オプション"});
+Ext.apply(Voyant.panel.Reader.i18n, {
+"documentFrequency":"ドキュメントの頻度",
+"limitedAccess":"これはアクセスが制限されたコーパスで、このツールの機能性は制限されています。",
+"title":"本文",
+"helpTip":"<p>本文ツールはコーパスの本文ビューを表示します。含まれる機能:</p><ul><li>単語にカーソルを合わせて出現頻度情報を表示</li><li>単語をクリックして下のグラフに分布情報を表示</li><li>下部の棒グラフがコーパス内での各ドキュメントの相対的分量を示す</li><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul>"});
 Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "corpusComparisonDifference":"頻度比較",
 "matchingTerms":"一致した語： {count}",
@@ -233,31 +257,45 @@ Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "trendTip":"これはコーパスの中のそれぞれのドキュメントの中のそれぞれの語の相対頻度の傾向を表します",
 "helpTip":"</p><p>コーパスタームでは、コーパス全体に出現する単語をテーブル形式で表示します。含まれる機能:</p><ul><li>ヘッダーをクリックすることで単語、語数（粗頻度）、相対頻度による並び替え。</li><li>ドキュメント間またはコーパス間で単語頻度の傾向を示すスパークライン</li><li>ヘッダー上にマウスを合わせると表示される矢印をクリックすることで行の追加が可能</li><li><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul>",
 "relativeSkewnessTip":"これはコーパス中の語の相対頻度の対称性を表す統計的指標です"});
+Ext.apply(Voyant.panel.Bubblelines.i18n, {
+"findTerm":"単語を探す",
+"showTerm":"単語を表示する",
+"corpusTooSmall":"このツールで使うにはコーパスが小さすぎます。",
+"clearTerms":"クリア",
+"hideTerm":"単語を隠す",
+"removeTerm":"単語を消去する",
+"title":"バブルライン",
+"type":"視覚化",
+"separateLines":"単語ごとにバブルラインを分割する",
+"help":"バブルラインはコーパスの中でのある語の使用頻度と繰り返しを視覚化します。コーパスの中のそれぞれのドキュメントは等しい長さのセグメントに分割されて横軸に表されています。それぞれの語はバブルとして表され、バブルの大きさが、テキストが対応するセグメントに登場する頻度を表します。その語が登場する頻度が高いほどバブルの半径が大きくなります。",
+"total":"合計",
+"granularity":"粒度",
+"options":"オプション"});
+Ext.apply(Voyant.panel.CustomSet.i18n, {
+"noSuchTool":"指定されたツール ({0}) は存在しません。",
+"title":"カスタム・ビュー",
+"helpTip":"これはカスタム・ビューです。"});
 Ext.apply(Voyant.panel.NoTool.i18n, {
 "notImplemented":"この <i>{0}</i> ツールは以前のヴァージョンの機能で、現在は実装されていません。実験的であったり、使いにくかったり、サポートされなくなった技術（Adobe FlashやJava Appletなど）に依存しているようなツール以外は、最終的に再実装される可能性もあります。 <i>{0}</i> ツールを使いたい場合は、旧バージョンを利用してください",
 "badToolSpecified":"<i>{0}</i> ツールが存在しません。Voyant ツールのメインページに戻ります",
 "currentButton":"現在のバージョンを使う",
 "oldButton":"古いバージョンを使う",
 "noToolSpecified":"ツールが指定されていません。Voyant ツールのメインページに戻ります",
-"title":"そのようなツールは存在しません",
-"error":"エラー"});
-Ext.apply(Voyant.panel.CustomSet.i18n, {
-"noSuchTool":"指定されたツール ({0}) は存在しません。",
-"title":"カスタム・ビュー",
-"helpTip":"これはカスタム・ビューです。"});
+"error":"エラー",
+"title":"そのようなツールは存在しません"});
 Ext.apply(Voyant.panel.CollocatesGraph.i18n, {
 "cleaning":"クリーニング",
-"releaseToRemove":"画面外にドラッグし、そのままリリースすると単語を削除",
 "context":"コンテクスト",
+"releaseToRemove":"画面外にドラッグし、そのままリリースすると単語を削除",
 "clearTerms":"クリア",
 "title":"リンク",
 "helpTip":"<p>リンクツールのコロケートグラフは、高頻度で近距離に出現する単語のネットワーク図を表示します。キーワードは青で、また近距離に出現する単語はオレンジで表示されます。含まれる機能</p><ul><li>単語にマウスカーソルを合わせると近距離での出現頻度を表示（全出現頻度ではない）</li><li>単語をダブルクリックするとさらに関連語を表示</li><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul></li></ul>"});
 Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "cancel":"キャンセル",
 "accessModeWithoutPassword":"その他のコード",
-"xpathGroupBy":"グループ化",
-"reveal":"結果を表示する",
 "OpenExisting":"既存のコーパスを開く",
+"reveal":"結果を表示する",
+"xpathGroupBy":"グループ化",
 "tableNoHeadersRow":"ヘッダー行がありません",
 "accessOptionsText":"一つあるいは複数のパスワードを指定することもできます（パスワードごとにコンマで区切ってください）。",
 "tableDocumentsRows":"各行のセルから",
@@ -266,11 +304,11 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tokenizationWordBoundaries":"単純な語境界",
 "numberEmpty":"少なくとも1つの列の数字が現在空白です。",
 "tokenization":"トークン化",
-"tokenizationWhitespace":"Whitespace Only",
 "inputRemoveFrom":"omit from",
+"tokenizationWhitespace":"Whitespace Only",
 "xpathContent":"コンテンツ",
-"numbersNeedCommas":"複数の数字を分けるにはコンマを使用してください",
 "textOptionsText":"These options allow you to ignore part of a text document by specifying regular expressions.",
+"numbersNeedCommas":"複数の数字を分けるにはコンマを使用してください",
 "tableDocumentsTable":"テーブル全体から",
 "UploadLocal":"ファイルを選択してアップロードする（複数選択可）",
 "helpTip":"このツールは３つのうちどれか１つの方法でコーパスを作成することができます。<ol><li>テキストボックスの中に直接入力するか、テキストをペーストして、<i>「結果を表示する」</i>をクリックする。もしもテキストボックスの各行にURLを入力した場合には、テキストがURLから抽出されるか、そうでなければそのコンテンツが１つのドキュメントとして扱われます。</li><li> <i>「開く」</i> をクリックすると既に存在しているコーパスを開きます。</li><li><i>アップロード</i>をクリックすると、１つかそれ以上のファイルをあなたのコンピュータからアップロードできます（CtrlかShiftキーを使うことで複数ファイルを選択することができます。</li></ol>",
@@ -278,11 +316,11 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableTitle":"タイトル",
 "noTextProvided":"テキストがありません",
 "tableContent":"コンテンツ",
-"xpathDocuments":"ドキュメント",
 "tokenizationAuto":"自動（強く推奨）",
+"xpathDocuments":"ドキュメント",
 "numbersCommasOnly":"コンマ区切り数値のみ",
-"tableOptionsText":"ドキュメントをどのように抽出するかを指定してください（現在はMS ExcelのXLS, XLSXのみサポートされています)。より詳しくはコーパス作成と<a href=\"{0}\" target=\"voyantdocs\">表データ</a>についてのマニュアルを参照してください",
 "PleaseSelectExisting":"コーパスが選択されていることを確認してください",
+"tableOptionsText":"ドキュメントをどのように抽出するかを指定してください（現在はMS ExcelのXLS, XLSXのみサポートされています)。より詳しくはコーパス作成と<a href=\"{0}\" target=\"voyantdocs\">表データ</a>についてのマニュアルを参照してください",
 "inputFormat":"入力フォーマット",
 "tableDocumentsColumns":"すべてのカラムから",
 "accessModeWithoutPasswordText":"あなたが<i>アクセスパスワード</i>を指定すれば、パスワードのないユーザーにどのようなアクセスが可能かを指定することもできます。",
@@ -296,33 +334,33 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeNone":"なし",
 "tokenizationOptions":"トークン化",
 "advancedOptionsText":"下記の詳細なオプションに関するさらなる情報は、<a href=\"{0}\" target=\"voyantdocs\">コーパスを作成する</a>マニュアルを参照してください。",
+"inputRemoveUntilAfter":"omit until after",
 "tableDocuments":"ドキュメント",
-"inputRemoveUntilAfter":"omit unti after",
 "processingOptions":"Processing",
 "noAllowInputMessage":"This server has been configured to NOT allow new documents to be added. Please contact the server administrator (if you can).",
-"fileTypesMessage":"互換性がないか、問題を起こしかねないような認識されない拡張子を持った１つかそれ以上のファイルがあります。",
-"errorNotXmlContinue":"入力されたデータはXML形式ではないようです。操作を続けますか？",
 "SelectExisting":"既存のコーパスを選択する",
+"errorNotXmlContinue":"入力されたデータはXML形式ではないようです。操作を続けますか？",
+"fileTypesMessage":"互換性がないか、問題を起こしかねないような認識されない拡張子を持った１つかそれ以上のファイルがあります。",
 "textOptions":"Text",
 "tableOptions":"テーブル",
-"xmlOptions":"XML形式",
 "Upload":"アップロードする",
-"title":"テキストを追加する",
+"xmlOptions":"XML形式",
 "error":"エラー",
+"title":"テキストを追加する",
 "sureContinue":"操作を続けますか？",
-"Open":"開く",
 "inputRemoveUntil":"omit until",
+"Open":"開く",
 "badFiles":"非互換（エラーの可能性大）",
 "emptyInput":"一つのURL、もしくは複数のURLを一行ずつ入力するか、あるいはテキスト全文を貼りつけてください",
 "ok":"OK",
 "accessPassword":"アクセスコード",
-"adminPassword":"管理コード",
 "accessModeNonConsumptive":"制限付き（非消費的）",
+"adminPassword":"管理コード",
 "tableMetadataText":"このオプションは、各行のセルからドキュメントを抽出する時だけ用いてください（このセクションの最初のオプションを見てください）。記法は前述のコンテンツオプションと同じで、コンマを用いてカラムを区切ったり、＋を用いて連結できます。",
 "xpathAuthor":"著者",
 "corpusOptions":"Corpus",
-"xpathTitle":"タイトル",
 "pleaseProvideText":"テキストをテキストボックスに入力してください（または開くかアップロードするを選択してください）",
+"xpathTitle":"タイトル",
 "invalidForm":"不正な値が使用されています。赤色で囲まれているフィールド上にマウスカーソルを移動し確認していください",
 "tableAuthor":"著者",
 "gearWinTitle":"オプション",
@@ -330,8 +368,16 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "corpusTitle":"Corpus Title",
 "accessOptions":"アクセスマネジメント",
 "tableNoHeadersRowText":"（ヘッダー行がある場合は）最初の行をスキップするかしないかを決定してください。ヘッダー行がある場合は、ドキュメントがカラム全体から抽出される時に（この場合は、タイトルフィールドが空欄になります）、それがドキュメントのタイトルを自動的に決定するために用いられます。"});
+Ext.apply(Voyant.panel.Via.i18n, {
+"timedout":"An attempt was made to fetch data but the request took too long. The process may be still ongoing and you could try again in a couple of minutes.",
+"visible":"Visible",
+"englishOnly":"You seem to have a text in a language other than English. Unfortunately, at the moment, Via only supports texts in English (because of the current way the lemmatization and synonym operations are programmed).",
+"title":"Via",
+"helpTip":"Via is a tool intended to help you explore the semantic clusters of English texts."});
 Ext.apply(Voyant.util.DetailedError.i18n, {
 "error":"エラー"});
+Ext.apply(Voyant.notebook.editor.button.Edit.i18n, {
+"tip":"Edit"});
 Ext.apply(Voyant.panel.Summary.i18n, {
 "longest":"最長:",
 "documentType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"document-type keyword\" voyant:recordid=\"{id}\" voyant:docindex=\"{docIndex}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
@@ -339,23 +385,29 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "averageWordsPerSentence":"Average Words Per Sentence:",
 "mostFrequentWords":"コーパスの中で<b>最も頻度の高い語</b>は：",
 "title":" コーパスの概要",
-"numberOfTerms":"ドキュメント中の語数",
 "lowest":"最少:",
+"numberOfTerms":"ドキュメント中の語数",
 "docsLength":"ドキュメントの長さ",
 "corpusType":"<tpl for=\"types\"><a href=\"#\" onclick=\"return false\" class=\"corpus-type keyword\" voyant:recordid=\"{id}\">{type}</a> ({val})<tpl if=\"xindex < xcount\">, </tpl></tpl>",
-"seeAll":"すべて",
 "highest":"最多:",
+"seeAll":"すべて",
 "distinctiveWords":"<b>特徴語</b>（コーパスにおける残りの語と比べて）：",
 "docsDensity":"語彙の密度",
 "helpTip":"<p>コーパスの<i>概要</i>ツールはコーパスに関する概要を提供します。このツールで表示される要素をクリックすると、他のツールに反映されます。含まれる機能</p><ul><li>のべ語数と異なり語数、コーパス生成からの経過時間</li><li>最頻出語</li><li>複数のドキュメントからなるコーパスを対象に<ul><li>ドキュメントの長さと語彙の密度</li><li>各ドキュメントの特徴語（TF−IDFスコアに基づく）</li></ul></li></ul>",
-"moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">残り {1} のうち {0} </a>",
 "items":"項目",
+"moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">残り {1} のうち {0} </a>",
 "shortest":"最短:"});
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
 "title":"コーパス・ビュー",
 "helpTip":"これはデフォルトで、多目的のコーパスビューです。"});
+Ext.apply(Voyant.notebook.editor.button.Movement.i18n, {
+"tip":"Move / Remove Controls"});
 Ext.apply(Voyant.widget.FontFamilyOption.i18n, {
 "label":"フォントファミリー"});
+Ext.apply(Voyant.notebook.editor.button.Remove.i18n, {
+"tip":"remove this block",
+"confirmRemove":"Are you sure you want to remove this block (and lose any content in the editor)?",
+"confirmRemoveTitle":"Confirm Remove"});
 Ext.apply(Voyant.panel.Subset.i18n, {
 "publisherLabel":"出版社",
 "sendToVoyantButton":"新しいVoyantコーパス",
@@ -363,24 +415,17 @@ Ext.apply(Voyant.panel.Subset.i18n, {
 "sendToVoyantNoQuery":"設定されたクエリは今のところありませんが、あなたは<a href=\"{0}\" target=\"_blank\">新しいウィンドウで現在のコーパスを開くことができます。</a>.",
 "lexicalLabel":"フルテキスト",
 "noMatches":"現在の検索基準ではどのドキュメントにも一致しません。検索をまず修正してください。",
-"titleLabel":"タイトル",
 "authorLabel":"著者",
+"titleLabel":"タイトル",
 "title":"ワークセット・ビルダー"});
-Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
-"titleLabel":"タイトル",
-"authorLabel":"著者",
-"availableLabel":"以下を除く：",
-"enabledLabel":"以下を含む：",
-"fieldLabel":"ファイル名",
-"pubDateLabel":"日付"});
 Ext.apply(Voyant.panel.Mandala.i18n, {
 "add":"追加する",
 "cancel":"キャンセル",
 "clear":"クリア",
 "labelsTip":"ラベルの可視状態を切り替える",
 "update":"アップデート",
-"title":"マンダラ",
 "addTip":"マグネット（検索語）を追加する",
+"title":"マンダラ",
 "remove":"消去",
 "labels":"ラベル",
 "clearTip":"すべてのマグネット（検索語）をクリアする",
@@ -389,6 +434,13 @@ Ext.apply(Voyant.panel.Mandala.i18n, {
 "helpTip":"「マンダラ」は単語とドキュメントの関係を示すための視覚化です。各検索語（またはマグネット）は、相対頻度に基づいてドキュメントに紐づけられます。"});
 Ext.apply(Voyant.widget.CorpusSelector.i18n, {
 "chooseCorpus":"コーパスの選択"});
+Ext.apply(Voyant.widget.DownloadFilenameBuilder.i18n, {
+"authorLabel":"著者",
+"availableLabel":"以下を除く：",
+"titleLabel":"タイトル",
+"enabledLabel":"以下を含む：",
+"fieldLabel":"ファイル名",
+"pubDateLabel":"日付"});
 Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "matchingTerms":"一致した単語： {count}",
 "tfidfTip":"ここでの有意性は、語がコーパスのそれ以外の部分に比べてあるドキュメントの中でどの程度重要かを表現するための一般的な方法であるTF-IDFスコアによって測られます。",
@@ -397,8 +449,8 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "relativeFreqTip":"各ドキュメントの中のこの語の相対頻度",
 "termTip":"単一の特定のドキュメントの中の言葉",
 "zscore":"Zスコア",
-"trendTip":"これは線形セグメントによってドキュメント中の語の分布を表すスパークライングラフです（デフォルトでは10の等幅のセグメント）",
 "tfidf":"有意",
+"trendTip":"これは線形セグメントによってドキュメント中の語の分布を表すスパークライングラフです（デフォルトでは10の等幅のセグメント）",
 "title":"ドキュメントの語",
 "helpTip":"<p>「ドキュメントの語」は各ドキュメント内に出現する単語をリスト化したものです。含まれる機能:</p><ul><li>ヘッダーをクリックすることで単語、語数（粗頻度）、相対頻度による並び替え。</li><li>ドキュメント間で単語頻度の傾向を示すスパークライン</li><li>ヘッダー上にマウスを合わせると表示される矢印をクリックすることで行の追加が可能</li><li><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul>",
 "zscoreTip":"Zスコア（標準得点）は語の粗頻度を同じドキュメントの中の他の語の頻度と比較するために一般化した値です。"});
@@ -414,65 +466,80 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hoursAgo":"およそ {count}  時間前",
 "minutesAgo":"およそ {count}  分前",
 "minuteAgo":"およそ1分前",
-"monthAgo":"およそ1カ月前",
 "hourAgo":"およそ1時間前",
+"monthAgo":"およそ1カ月前",
 "failedCreateCorpus":"コーパスの生成に失敗しました",
 "has1document":"は1個のドキュメントを含みます。",
-"yearsAgo":"およそ {count} 年前",
 "secondAgo":"およそ1秒前",
+"yearsAgo":"およそ {count} 年前",
 "now":"現在",
 "badDataTypeCorpus":"Unable to recognize a valid data type for this corpus: ",
-"yearAgo":"およそ1年前",
 "secondsAgo":" {count}  秒前",
+"yearAgo":"およそ1年前",
 "dayAgo":"およそ1日前"});
+Ext.apply(Voyant.notebook.editor.button.Add.i18n, {
+"tip":"Add New Block",
+"title":"Spyral Notebook"});
+Ext.apply(Voyant.widget.CategoriesOption.i18n, {
+"edit":"Edit",
+"categories":"Categories"});
 Ext.apply(Voyant.panel.WordTree.i18n, {
 "emptyText":"一致する情報が見つかりませんでした。",
 "title":"ワードツリー"});
+Ext.apply(Voyant.notebook.editor.button.RunUntil.i18n, {
+"tip":"Run all code blocks up to and including this one."});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
 "original":"オリジナル",
 "VOYANTTip":"これはコンテンツの標準化されたバージョンです。ソースドキュメントがXMLで書かれていたならほぼオリジナルな内容になります。そしてそうでないソースドキュメントの多くは単純なHTMLになります。",
 "fieldLabel":"ファイル形式",
-"voyantXml":"Voyant XML",
 "plainText":"プレーンテキスト",
+"voyantXml":"Voyant XML",
 "SOURCETip":"これを選ぶと、オリジナルのフォーマットでドキュメントソースをダウンロードすることになります。場合によっては、（１つのZIPファイルとして）ただ１つの保存用フォルダをダウンロードすることになります。",
 "TXTTip":"これは各ドキュメントのプレーンテキストを提供します。"});
 Ext.apply(Voyant.panel.ScatterSet.i18n, {
 "title":"散布図",
 "helpTip":"これは散布図で作業するために専門化されたビューです。"});
 Ext.apply(Voyant.util.Toolable.i18n, {
-"exportTitle":"エクスポート",
 "exportError":"エクスポートエラー",
+"exportTitle":"エクスポート",
+"exportAllTsvWarning":"You’re requesting all of the available data, are you sure you want to continue?",
 "exportDataTsvMessage":"下記データをコピーしてください。スプレッドシートやテキストファイルに貼り付け可能です。",
-"exportViewFieldset":"画面（ツールとデータ）のエクスポート",
 "exportSvgMessage":"<p>これはSVG形式画像のサムネイルです。右クリックまたはCTRLを押しながらクリックすると、フルサイズの画像を保存できます。</p><p>または、下記HTMLコードをコピーしてください</p>",
+"exportViewFieldset":"画面（ツールとデータ）のエクスポート",
 "exportDataJsonMessage":"下記データをコピーしてください。他のWebアプリケーションに利用できます。",
 "plusTip":"このパネルの場所に別のツールを割り当て（現在のツールは置き換えられます）",
+"exportGridAllJson":"export all available data in JSON",
 "gearTip":"このツールに関するオプションの設定",
 "cancelTitle":"キャンセル",
-"exportViewHtmlEmbed":"別のWebページにこの画面を埋め込むためのHTMLスニペット",
 "exportGridCurrent":"現在のデータをエクスポート",
+"exportViewHtmlEmbed":"別のWebページにこの画面を埋め込むためのHTMLスニペット",
 "exportSvgTitle":"SVGのエクスポート",
-"maximizeTip":"新しいウインドウでこのツールを開く",
 "exportGridCurrentTsv":"現在のデータをテキスト（タブ区切り）形式でエクスポート",
 "exportVizTitle":"図のエクスポート",
+"maximizeTip":"新しいウインドウでこのツールを開く",
 "exportDataTitle":"データのエクスポート",
 "optionsTitle":"オプション",
+"scaleLabel":"scaling ({0})",
 "exportBiblioTitle":"書誌情報をエクスポート",
 "confirmTitle":"確認",
 "moreHelp":"ヘルプをさらに表示",
+"exportGridAllTsv":"export all available data as tab separated values (text)",
 "exportViewUrl":"この画面（ツールとデータ）のURL",
-"helpTip":"このツールに関するヘルプはまだ用意されていません。このアイコンをクリックして<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyantツール解説サイト</a>にアクセスしてください。",
 "export":"エクスポート",
+"helpTip":"このツールに関するヘルプはまだ用意されていません。このアイコンをクリックして<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyantツール解説サイト</a>にアクセスしてください。",
 "exportDataHtmlMessage":"下記データをコピーしてください。HTMLに貼り付け可能です。またXMLとしても使用できます。",
-"exportPngTitle":"PNGのエクスポート",
 "exportPngMessage":"<p>これはPNG形式画像のサブネイルです。右クリックまたはCTRLを押しながらクリックすると、フルサイズの画像を保存できます。</p><p>または、下記HTMLコードをコピーしてください</p>",
+"exportPngTitle":"PNGのエクスポート",
+"exportAllTitle":"Export All",
+"exportAllJsonWarning":"You’re requesting all of the available data (in the JSON format that Voyant uses), are you sure you want to continue?",
+"loading":"Loading…",
 "exportGridCurrentHtml":"現在のデータをHTML形式でエクスポート",
 "exportViewEmbedMessage":"下のボックスに表示されるHTMLスニペットをコピー＆ペーストすることで別のWebページに埋め込むことができます。（例えばWordpressのような）CMSによっては、&lt;iframe&gt; タグを扱うためのプラグインが必要になります。",
 "exportPng":"この図をPNG形式でエクスポート",
 "reset":"リセット",
 "exportViewBiblio":"この画面の書誌情報",
-"exportViewEmbedTitle":"埋め込み用HTMLスニペット",
 "exportNoFunction":"選択されたエクスポート機能は利用できません",
+"exportViewEmbedTitle":"埋め込み用HTMLスニペット",
 "exportGridCurrentJson":"現在のデータをJSON形式でエクスポート",
 "exportSvg":"この図をSVG形式でエクスポート",
 "saveTip":"URL、埋め込み可能なツール、データ、書誌情報のエクスポート"});
@@ -480,11 +547,72 @@ Ext.apply(Voyant.panel.TextualArc.i18n, {
 "minRawFreqTip":"語の出現回数の最小値。デフォルトではパフォーマンスを改善するために2（=反復された単語）に設定されています。1にすると動作がかなり遅くなる可能性があります。",
 "search":"フィルター",
 "minRawFreq":"最小頻度",
-"adaptation":"Inspired by W. Bradford Paley's <a href=\"http://textarc.org\" target=\"_blank\">TextArc</a>",
-"title":"テクスチャルアーク",
+"adaptation":"Inspired by W. Bradford Paley’s <a href=\"http://textarc.org\" target=\"_blank\">TextArc</a>",
 "speedTip":"視覚化の速度を調整する",
+"title":"テクスチャルアーク",
 "helpTip":"テクスチャルアークはドキュメントの中の単語を視覚化します。文書は、単語と、文書の順番通りの単語に従っているアークの重み付きの重心を含んでいます。",
 "speed":"速度"});
+Ext.apply(Voyant.panel.DreamScape.i18n, {
+"baseLayerTip":"Determine map base layer",
+"cancel":"Cancel",
+"occurrences":"Occurrences",
+"annotateTip":"To annotate, click this icon, select a region and enter text in the box that will appear. If you don’t select a region you can click again to exit annotation mode. If you do select a region please click this icon again if you wish to add another annotation.",
+"displayTip":"Configure various aspects of the display",
+"osm":"Open Street Map",
+"annotate":"Annotate",
+"millisPerAnimation":"milliseconds per animation",
+"pubDateLabel":"years'",
+"animate":"Animate",
+"citiesMinPopulation":"minimum population",
+"viewOccurrencesTip":"Select this to see the location in Voyant.",
+"annotationsUpdateFailed":"An error occured while trying to store the annotations.",
+"wms4326":"WMS 4326",
+"mapTip":"Define base layer and projection",
+"editAnnotation":"Edit Annotation",
+"nopubDate":"No publication years defined in this corpus.",
+"removeLocationTip":"If this is not a valid place name, you can remove it (this applies to all occurrences).",
+"connections":"Connections",
+"removeLocation":"Remove Location",
+"add":"Add Filter",
+"keywordLabel":"keywords'",
+"editAnnotationMessage":"Add an annotation. To remove an existing annotation, remove the text and click OK.",
+"cities":"Cities",
+"baseLayer":"Base Layer",
+"annotationsLoadFailed":"An error occured while trying to load the annotations.",
+"projectionTip":"Determine map projection",
+"sphereMollweideProjection":"Sphere mollweide (Equal Area)",
+"animationSpeed":"Speed",
+"watercolor":"Stamen watercolor (Default)",
+"authorLabel":"authors'",
+"titleLabel":"titles",
+"title":"DreamScape",
+"webMercatorProjection":"Web Mercator (Default)",
+"noauthor":"No authors defined in this corpus.",
+"mercatorProjection":"Mercator (WGS84)",
+"viewOccurrences":"View Occurrences",
+"citiesMaxCount":"maximum count",
+"animations":"Animations",
+"connectionsMinFreq":"minimum occurrences",
+"openInVoyant":"Open in Voyant",
+"projection":"Projection",
+"removeLocationConfirm":"Are you sure you want to remove all occurrences of this location?",
+"annotationsUpdated":"Annotations have been stored. Please export new URL if you would like to reference it.",
+"map":"Map",
+"editLocationServerError":"An error occurred while trying to load alternate locations.",
+"editLocationTitle":"Select an alternative location",
+"arcGIS":"National Geographic World Map – ArcGIS",
+"viewConnections":"View Connection Occurrences",
+"display":"Display",
+"gallPetersProjection":"Gall Peters (Equal Area)",
+"editLocation":"Select Alternative Location",
+"editLocationNoLocationsFound":"No locations found.",
+"citiesMinFreq":"minimum occurrences",
+"filter":"Filter",
+"allNCitiesShown":"All {0} available cities shown.",
+"filterTip":"Determine any filters to use",
+"connectionsMaxCount":"maximum count",
+"editLocationTip":"If this place name is valid but the location is wrong, you can select an alternate location (this applies to all occurrences).",
+"editLocationNoAlternativesFound":"No alternative locations found."});
 Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "freqsMode":"使用頻度",
 "freqsModeTip":"使用頻度をそのままの数で表示するか、（ドキュメントもしくはセグメントに対する）相対数で表示するかどうか決定する。",
@@ -492,8 +620,8 @@ Ext.apply(Voyant.panel.StreamGraph.i18n, {
 "documents":"ドキュメント",
 "documentSegments":"ドキュメントの区切り",
 "clearTerms":"クリアー",
-"title":"ストリームグラフ",
 "rawFrequencies":"粗頻度",
+"title":"ストリームグラフ",
 "helpTip":"ストリームグラフは、コーパス（もしくはひとつのドキュメント）の中での語の使用頻度の変化を視覚化するものです。",
 "segments":"区切り"});
 Ext.apply(Voyant.notebook.util.Embed.i18n, {
@@ -502,8 +630,8 @@ Ext.apply(Voyant.notebook.util.Embed.i18n, {
 Ext.apply(Voyant.widget.ListEditor.i18n, {
 "cancel":"キャンセル",
 "editList":"リストの編集",
-"new":"新しいリスト",
 "editListMessage":"これは一語が一行に表示されるリストです",
+"new":"新しいリスト",
 "editListTitle":"リストの編集",
 "label":"リスト：",
 "none":"なし",
@@ -511,6 +639,8 @@ Ext.apply(Voyant.widget.ListEditor.i18n, {
 "whiteListLabel":"ホワイトリスト："});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"ダウンロードオプション"});
+Ext.apply(Voyant.notebook.editor.button.Run.i18n, {
+"tip":"Run the script in this block (Shift-Enter)"});
 Ext.apply(Voyant.widget.TotalPropertyStatus.i18n, {
 "totalPropertyStatus":"{count:number(\"0,000\")}"});
 Ext.apply(Voyant.panel.Phrases.i18n, {
@@ -520,31 +650,77 @@ Ext.apply(Voyant.panel.Phrases.i18n, {
 "overlapFreq":"頻出するフレーズを優先する",
 "emptyText":"一致する情報が見つかりませんでした。",
 "length":"長さ",
-"termTip":"これはキーワードフレーズです（これは一般化された状態で、フレーズごとの出現とはわずかに異なります）。",
 "termRawFreqTip":"この言葉がコーパス中に現れた回数",
-"title":"フレーズ",
+"termTip":"これはキーワードフレーズです（これは一般化された状態で、フレーズごとの出現とはわずかに異なります）。",
 "lengthTip":"フレーズの長さの上下範囲（それぞれのレーズの単語数をどれくらいにするか）。",
-"termRawFreq":"カウント",
+"title":"フレーズ",
 "overlap":"重複処理",
 "overlapLength":"長いフレーズを優先する",
+"termRawFreq":"カウント",
 "overlapMenu":"重複のフィルターを選択してください。",
 "term":"トークン",
 "helpTip":"<p>コーパスフレーズはコーパス全体の中で繰り返されるフレーズを一覧で見ることができます。<!-- 含まれる機能:</p> <ul><li>キーワード、共起語、共起回数による並び替え</li><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul>-->"});
+Ext.apply(Voyant.notebook.editor.button.Counter.i18n, {
+"tip":"Edit"});
 Ext.apply(Voyant.panel.Trends.i18n, {
-"relativeFrequencies":"相対頻度",
+"stacked":"Stacked Bar",
+"segmentsTitle":"Document Segments",
 "documents":"ドキュメント",
-"raw":"生データ",
-"segmentsSlider":"セグメント",
+"line":"Line",
 "scale":"スケール",
+"relativeTitle":"Relative Frequencies",
 "title":"トレンド",
+"toggleTip":"Click to toggle the visibility of this series.",
 "segments":"ドキュメントのセグメント",
+"resetTip":"Reset to initial view.",
+"bar":"Columns",
 "freqsMode":"頻度",
-"freqsModeTip":"使用頻度をそのままの数で表示するか、（ドキュメントもしくはセグメントに対する）相対数で表示するかどうか決定する。",
+"dblClickItem":"Double-click to drilldown.",
+"segment":"segment:",
+"noResults":"No Results",
 "options":"オプション",
+"drillDocumentTip":"View the distribution of all current terms within this document.",
 "rawFrequencies":"粗頻度",
 "helpTip":"<p><i>トレンド</i>は一つまたは複数のコーパス（ドキュメント）を横断して、相対頻度をグラフ化します。含まれる機能</p><ul><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul></li></ul>",
-"relative":"相関",
-"failedGetDocumentTerms":"Failed to get document terms for Trends."});
+"area":"Area",
+"relativeFrequencies":"相対頻度",
+"drillTermTip":"View the distribution of this term within all documents.",
+"barline":"Line + Stacked Bar",
+"display":"Display",
+"raw":"生データ",
+"segmentsSlider":"セグメント",
+"labels":"Show Labels",
+"freqsModeTip":"使用頻度をそのままの数で表示するか、（ドキュメントもしくはセグメントに対する）相対数で表示するかどうか決定する。",
+"drillTerm":"Terms",
+"rawTitle":"Raw Frequencies",
+"reset":"Reset",
+"corpusTitle":"Corpus (Documents)",
+"drillDocument":"Document",
+"failedGetDocumentTerms":"Failed to get document terms for Trends.",
+"relative":"相関"});
+Ext.apply(Voyant.notebook.editor.button.MoveDown.i18n, {
+"tip":"move this block down"});
+Ext.apply(Voyant.notebook.Notebook.i18n, {
+"newTip":"Create a new Spyral Notebook in a new window.",
+"autoSaveAvailableTitle":"Autosave Available",
+"cannotMoveLower":"This block is already at the bottom and cannot be moved lower.",
+"failedNotebookLoad":"Failed to load the specified notebook. A new notebook template will be presented instead.",
+"openTip":"Open a Spyral Notebook (by pasting in JSON code).",
+"differentUrl":"This notebook seems to be have been located at a different URL. If you’re sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook’s URL: {0}",
+"cannotMoveHigher":"This block is already at the top and cannot be moved higher.",
+"fetchingNotebook":"Fetching notebook…",
+"exportHtml":"HTML (suitable for saving or printing)",
+"exportJson":"Spyral Notebook data format (JSON)",
+"failedNotebookParse":"The loaded notebook appears to have a syntax error and will probably not run as is.",
+"saveItTip":"Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
+"exportAllLinks":"<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
+"originalJson":"Original JSON string",
+"editsAndLeaving":"It looks like you’ve been editing content and you will lose any content if you follow this link. Continue?",
+"differentUrlTitle":"Notebook from different URL",
+"autoSaveAvailable":"A more recent autosave is available, do you wish to switch to the auto-saved document?",
+"helpTip":"Spyral Notebooks are dynamic documents that combine text, code and interactive tools, they are a form of <a href=\"https://en.wikipedia.org/wiki/Literate_programming\" target=\"_blank\">literate programming</a>.",
+"eror":"Error",
+"runallTip":"Run all code blocks in this notebook"});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"キャンセル",
 "de":"ドイツ語",
@@ -573,16 +749,16 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "el":"ギリシャ語",
 "mu":"多言語",
 "en":"英語",
-"label":"ストップワード",
 "cn":"中国語",
 "it":"イタリア語",
+"label":"ストップワード",
 "noEditAutoTitle":"ストップリストのエラーを編集する",
 "es":"スペイン語",
-"editStopListMessage":"これはストップワードリストです。単語ごとに改行してください",
 "applyGlobally":"全体に適用",
+"editStopListMessage":"これはストップワードリストです。単語ごとに改行してください",
 "eu":"バスク語",
-"editList":"リストの編集",
 "ar":"アラビア語",
+"editList":"リストの編集",
 "th":"タイ語",
 "la":"Latin",
 "cz":"チェコ語",
@@ -598,8 +774,8 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "select":"選択する",
 "exportInProgress":"エクスポートするコーパスを準備してください…",
 "facet.titleTitle":"タイトル",
-"title":"カタログ",
 "lexicalTitle":"単語",
+"title":"カタログ",
 "clickToOpenCorpus":"ポップアップウィンドウがブロックされているので、新しいコーパスにアクセスするために、 <a href=\"{0}\" target=\"_blank\" class=\"link\">ここ</a>をクリックしてください。",
 "rawFreqs":"総出現回数（粗頻度）",
 "facet.languageTitle":"言語",
@@ -608,8 +784,8 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 "plusFacetTip":"絞り込み項目を追加する",
 "facet.collectionTitle":"コレクション",
 "matchingDocuments":"一致したドキュメントの数",
-"helpTip":"<i>カタログ</i>ツールは大型の、複数のドキュメントからなるコーパスの内容を探索するためのインターフェースを提供します。検索基準に基づいたサブセットも作成します。図書館データベースやオンラインストアに似た形式で、ドキュメントをフィルタリングできる機能です。",
 "export":"エクスポート",
+"helpTip":"<i>カタログ</i>ツールは大型の、複数のドキュメントからなるコーパスの内容を探索するためのインターフェースを提供します。検索基準に基づいたサブセットも作成します。図書館データベースやオンラインストアに似た形式で、ドキュメントをフィルタリングできる機能です。",
 "downloadButton":"ダウンロード",
 "facet.pubPlaceTitle":"出版地",
 "queryMatches":"{0}のドキュメントが該当（{1}のドキュメント中）",
@@ -624,17 +800,55 @@ Ext.apply(Voyant.panel.Catalogue.i18n, {
 Ext.apply(Voyant.panel.CollocatesSet.i18n, {
 "title":"散布図",
 "helpTip":"これは散布図で作業するために専門化されたビューです。"});
+Ext.apply(Voyant.panel.Veliza.i18n, {
+"scriptEditor":"Script Editor",
+"title":"Veliza",
+"typeAndEnter":"Type text and hit enter.",
+"scriptIntro":"This is an advanced feature that allows you see and edit the script used by Veliza. For more information on the syntax, see the <a href='{0}' target='_blank'>documentation</a>.",
+"send":"send",
+"fromCorpus":"from text"});
+Ext.apply(Voyant.notebook.editor.CodeEditorWrapper.i18n, {
+"modeJson":"JSON",
+"previousNotRun":"There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?",
+"modeCsv":"CSV (comma-separated values)",
+"modeJavascript":"Javascript (default)",
+"enableEditing":"By default editing is disable, do you wish to enable editing now?",
+"modeHtml":"HTML",
+"modeData":"Data",
+"modeTsv":"TSV (tab-separated values)",
+"modeXml":"XML",
+"modeCode":"Code",
+"previousNotRunTitle":"Previous Code Blocks",
+"modeText":"Text"});
 Ext.apply(Voyant.panel.MicroSearch.i18n, {
-"title":"マイクロサーチ",
 "loading":"単語を読み込んでいます…",
+"title":"マイクロサーチ",
 "helpTip":"このツールはコーパスの全体の概観を提示し、検索単語の分布を視覚化することができます。"});
 Ext.apply(Voyant.panel.TopicContexts.i18n, {
 "reset":"リセットする",
 "title":"トピックコンテクスト",
 "helpTip":"トピックコンテクスト"});
+Ext.apply(Voyant.notebook.editor.button.MoveUp.i18n, {
+"tip":"move this block up"});
+Ext.apply(Voyant.widget.ProgressMonitor.i18n, {
+"running":"Working…",
+"aborted":"Error",
+"noProgress":"This progress monitor was incorrectly initialized.",
+"badProgress":"Unable to understand the progress report from the server.",
+"progress":"Progress",
+"finished":"Finished",
+"launch":"Launching…"});
 Ext.apply(Voyant.panel.BubblelinesSet.i18n, {
 "title":"バブルラインスキン",
 "helpTip":"これはバブルラインで作業するために専門化されたビューです。"});
+Ext.apply(Voyant.widget.CorpusTermSummary.i18n, {
+"collocates":"Collocates:",
+"distribution":"Distribution:",
+"loading":"Loading...",
+"phrases":"Phrases:",
+"title":"Corpus Term Summary:",
+"correlations":"Correlations:",
+"items":"Items"});
 Ext.apply(Voyant.panel.Knots.i18n, {
 "findTerm":"単語を探す",
 "settings":"設定",
@@ -643,15 +857,15 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 "showTerm":"単語を表示",
 "sound":"サウンド",
 "clearTerms":"クリア",
-"removeTerm":"単語を消去",
 "hideTerm":"単語を隠す",
+"removeTerm":"単語を消去",
+"noTermsFound":"ドキュメント内に単語が見つかりませんでした",
 "title":"ノット",
 "type":"視覚化",
-"noTermsFound":"ドキュメント内に単語が見つかりませんでした",
 "speed":"速度",
 "soundTip":"ノットのサウンドのオン・オフを切り替える",
-"options":"オプション",
-"context":"コンテキスト"});
+"context":"コンテキスト",
+"options":"オプション"});
 Ext.apply(Voyant.VoyantApp.i18n, {
 "serverResponseError":"サーバーがエラーを返しています：",
 "error":"エラー",
@@ -661,8 +875,8 @@ Ext.apply(Voyant.panel.RezoViz.i18n, {
 "loadingEntities":"読み込み中",
 "minEdgeCount":"辺の数の下限",
 "noEntities":"No entities to graph.",
-"title":"RezoViz",
 "stiffness":"剛性",
+"title":"RezoViz",
 "people":"人物",
 "friction":"摩擦",
 "repulsion":"反発",
@@ -671,8 +885,8 @@ Ext.apply(Voyant.panel.RezoViz.i18n, {
 "locations":"場所",
 "categories":"カテゴリ"});
 Ext.apply(Voyant.widget.DocumentSelector.i18n, {
-"cancel":"キャンセル",
 "all":"すべて",
+"cancel":"キャンセル",
 "selectAll":"すべて選択",
 "documents":"ドキュメント",
 "ok":"OK",
@@ -689,8 +903,8 @@ Ext.apply(Voyant.panel.Contexts.i18n, {
 "documentTip":"出現元のドキュメント",
 "left":"左",
 "corpusTip":"コーパスモードにリセットする",
-"rightTip":"キーワードの右側の後文脈",
 "context":"コンテクスト",
+"rightTip":"キーワードの右側の後文脈",
 "leftTip":"キーワードの左側の前文脈",
 "position":"位置",
 "positionTip":"ドキュメント内のキーワードの位置",
@@ -702,24 +916,28 @@ Ext.apply(Voyant.VoyantDefaultApp.i18n, {
 "noViewErrorTitle":"指定されたビューはありません",
 "helpTip":"Voyantツールは、デジタルテキストの読解と分析のためのウェブ上の環境です。<p></p>",
 "noViewErrorTpl":" \"<i>{view}</i>\"という名前のビューはありません。デフォルトのビューが代わりに使われています。."});
-Ext.apply(Voyant.widget.Facet.i18n, {
-"emptyText":"該当なし"});
 Ext.apply(Voyant.panel.ScatterPlot.i18n, {
+"tsne":"t-SNE",
 "relFreq":"相対頻度",
-"xAxis":"X軸",
 "termsLabel":"語",
+"xAxis":"X軸",
 "summaryLabel":"要約",
 "title":"散布図",
 "nearby":"強調",
 "remove":"消去",
 "pca":"主成分分析",
+"analyzing":"Analyzing",
+"output":"Output",
 "docSim":"ドキュメント類似度",
+"perplexity":"Perplexity",
 "noTermSelected":"単語が選択されていません。",
 "freqsMode":"頻度",
+"reload":"Reload",
 "terms":"語数",
 "tokenFreqTip":"<b>{0}</b><br><b>粗頻度</b><br>{1}<br><b>相対頻度</b><br>{2}",
-"term":"語",
+"options":"Options",
 "docFreqTip":"<b>{0}</b><br><b>ワードの頻度</b><br>{1}",
+"term":"語",
 "rawFrequencies":"粗頻度",
 "dimension":"次元",
 "helpTip":"<p>散布図はコーパスの中での語の相関を表します。これはそれぞれのドキュメント（それぞれが一つの次元を表す）における語の相関を簡単に視覚化できる三次元空間に単純化した統計的分析によるものです。</p>",
@@ -728,31 +946,39 @@ Ext.apply(Voyant.panel.ScatterPlot.i18n, {
 "pcTitle":"全変動に対する各成分の寄与率",
 "relativeFrequencies":"相対頻度",
 "addTerm":"単語を追加",
+"plotting":"Plotting",
 "numTerms":"語数",
 "removeTerm":"<b>{0}</b>を消去",
 "tfidf":"TF-IDF",
 "analysis":"分析",
 "fill":"Fill",
 "loading":"読み込んでいます…",
+"iterations":"Iterations",
 "labels":"ラベル",
+"input":"Input",
 "freqsModeTip":"頻度を粗頻度・相対頻度・TF-IDFのどれで表すか選択して下さい",
 "yAxis":"Y軸",
 "pc":"PC（主成分）",
-"nearbyTerm":"強調 <b>{0}</b>",
 "docsLabel":"ドキュメントリスト",
-"rawFreq":"粗頻度",
+"nearbyTerm":"強調 <b>{0}</b>",
 "caTitle":"全連関に対する各次元の寄与率",
+"rawFreq":"粗頻度",
 "dimensions":"次元"});
 Ext.apply(Voyant.panel.VoyantFooter.i18n, {
 "voyantTools":"Voyantツール",
 "privacy":"プライバシー",
 "voyantLink":"<a href=\"http://docs.voyant-tools.org/\" target=\"_blank\">Voyantツール</a>",
 "privacyMsg":"Voyant ツールの開発者は、どのツールがどのパラメータで呼び出されたかのデータを収集します（同一セッション内の複数リクエストを識別するためにIPアドレスも記録されます）。加えて、Google Analytics も使用します（Google のプライバシーポリシー、特に<em>ログ情報</em>の項を参照）。サイト側で記録されたデータと Google Analytics データは開発チームによって、デバッグやツールの改善、研究者にどう使われているかを理解するために使われます。また、このデータは匿名化された統計データとして研究目的に使用されます。Voyant ツールに送信されたテキストは作業セッション中やセッションにまたがるアクセスを維持するために保存されることに留意してください。収集されるデータと用途についての質問、コーパスの除外申請は Stéfan Sinclair までご連絡ください。詳細情報はこのリンクをクリックしてください。"});
+Ext.apply(Voyant.widget.Facet.i18n, {
+"emptyText":"該当なし"});
 Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchTip":"<div>検索（エンター／リターンを押すことで検索が始まります） 以下の検索オプションは分かち書きをする言語の場合に有効</div> <ul style=\"margin-top: 3px; margin-bottom: 3px;\"> <li><b>coat</b> : <i>coat</i>と完全一致</li> <li><b>coat*</b> : <i>coat</i>で始まる語</li> <li><b>^coat*</b> : <i>coat</i>で始まるそれぞれの語</li> <li><b>*oat</b> : <i>oat</i>で終わる語</li> <li><b>^*oat</b> : <i>oat</i>で終わるそれぞれの語</li> <li><b>coat,jacket</b> : コンマで区切られた全単語と一致</li> <li><b>coat|jacket</b> : パイプで区切られた語いずれかと一致</li> <li><b>\"winter coat\"</b> : フレーズ「<i>winter coat</i>」と一致</li> <li><b>\"coat mittens\"~5</b> : <i>coat</i>と<i>mittens</i>の間に挟まれた5語</li> <li><b>^coat*,jacket|parka,\"coat mittens\"~5</b> : 複合的な構文</li></ul>",
 "querySearchDocsModeTip":"<div>ドキュメント検索（エンター／リターンを押すことで検索が始まります） 以下の検索オプションは分かち書きをする言語の場合に有効</div> <ul style=\"margin-top: 3px; margin-bottom: 3px;\"> <li><b>coat</b> : <i>coat</i>と完全一致</li> <li><b>coat*</b> : <i>coat</i>で始まる語</li> <li><b>coat,jacket</b> : コンマで区切られた全単語と一致</li> <li><b>\"winter coat\"</b> : フレーズ「<i>winter coat</i>」と一致</li> <li><b>\"coat mittens\"~5</b> : <i>coat</i>と<i>mittens</i>の間に挟まれた5語</li> <li><b>+winter+coat</b> : プラス(+) から始まる全単語と一致</li> <li><b>+\"winter coat\"+mitten*</b> : 複合的な構文</li></ul>",
 "querySearch":"検索",
 "aggregateInDocumentsCount":"検索基準を満たすドキュメントの数です（計上されたドキュメントは、少なくとも検索語を一つ含んでいます）。"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"ドイツ語",
 "thisLanguage":"日本語",
@@ -760,8 +986,8 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "en":"英語",
 "hr":"クロアチア語",
 "it":"イタリア語",
-"languageTitle":"言語オプション",
 "fr":"フランス語",
+"languageTitle":"言語オプション",
 "ar":"アラビア語",
 "bs":"ボスニア語",
 "chooseLanguage":"インターフェースの言語",

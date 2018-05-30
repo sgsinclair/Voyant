@@ -26,9 +26,6 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 	},
 	statics: {
 		i18n: {
-			emptyText: "(Click here to edit.)",
-			enableEditingTitle: "Enable Editing?",
-			enableEditing: "By default editing is disable, do you wish to enable editing now?"
 		}
 	},
 	border: false,

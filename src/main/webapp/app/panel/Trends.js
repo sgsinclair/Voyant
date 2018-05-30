@@ -66,29 +66,7 @@ Ext.define('Voyant.panel.Trends', {
     		},{xtype: 'colorpaletteoption'}]
 	},
     statics: {
-    	i18n: {
-    		relativeTitle: "Relative Frequencies",
-    		rawTitle: "Raw Frequencies",
-    		corpusTitle: "Corpus (Documents)",
-    		segmentsTitle: "Document Segments",
-    		toggleTip: "Click to toggle the visibility of this series.",
-    		reset: "Reset",
-    		resetTip: "Reset to initial view.",
-    		dblClickItem: "Double-click to drilldown.",
-    		drillTerm: "Terms",
-    		drillTermTip: "View the distribution of this term within all documents.",
-    		drillDocument: "Document",
-    		drillDocumentTip: "View the distribution of all current terms within this document.",
-    		noResults: "No Results",
-    		segment: "segment:",
-    		display: "Display",
-    		labels: "Show Labels",
-    		area: "Area",
-    		bar: "Columns",
-    		line: "Line",
-    		stacked: "Stacked Bar",
-    		barline: "Line + Stacked Bar"
-    		
+    	i18n: {    		
     	},
     	api: {
     		

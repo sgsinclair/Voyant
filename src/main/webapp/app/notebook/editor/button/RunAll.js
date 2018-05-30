@@ -4,7 +4,6 @@ Ext.define("Voyant.notebook.editor.button.RunAll", {
 	alias: 'widget.notebookwrapperrunall',
 	statics: {
 		i18n: {
-			tip: "Run all code blocks below."
 		}
 	},
 	glyph: 'xf04e@FontAwesome',

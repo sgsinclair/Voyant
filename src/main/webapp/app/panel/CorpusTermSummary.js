@@ -4,13 +4,6 @@ Ext.define('Voyant.widget.CorpusTermSummary', {
     alias: 'widget.corpustermsummary',
     statics: {
         i18n: {
-            title: 'Corpus Term Summary: ',
-            items: 'Items',
-            loading: 'Loading...',
-            distribution: 'Distribution: ',
-            collocates: 'Collocates: ',
-            correlations: 'Correlations: ',
-            phrases: 'Phrases: '
         },
         api: {
             stopList: 'auto',

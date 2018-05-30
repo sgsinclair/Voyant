@@ -10,27 +10,6 @@ Ext.define('Voyant.notebook.Notebook', {
 	alias: 'widget.notebook',
     statics: {
     	i18n: {
-    		title: "Spyral Notebook",
-    		helpTip: 'Spyral Notebooks are dynamic documents that combine text, code and interactive tools, they are a form of <a href="https://en.wikipedia.org/wiki/Literate_programming" target="_blank">literate programming</a>.',
-			eror: "Error",
-			cannotMoveHigher: "This block is already at the top and cannot be moved higher.",
-			cannotMoveLower: "This block is already at the bottom and cannot be moved lower.",
-			failedNotebookLoad: "Failed to load the specified notebook. A new notebook template will be presented instead.",
-			failedNotebookParse: "The loaded notebook appears to have a syntax error and will probably not run as is.",
-			exportAllLinks: "<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
-			originalJson: "Original JSON string",
-			exportJson: "Spyral Notebook data format (JSON)",
-			exportHtml: "HTML (suitable for saving or printing)",
-			editsAndLeaving: "It looks like you've been editing content and you will lose any content if you follow this link. Continue?",
-			fetchingNotebook: "Fetching notebook…",
-			openTip: "Open a Spyral Notebook (by pasting in JSON code).",
-			newTip: "Create a new Spyral Notebook in a new window.",
-			runallTip: "Run all code blocks in this notebook",
-			differentUrlTitle: "Notebook from Different URL",
-			differentUrl: "This notebook seems to be have been located at a different URL. If you're sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook's URL: {0}",
-			saveItTip: "Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
-			autoSaveAvailableTitle: "Autosave Available",
-			autoSaveAvailable: "A more recent autosave is available, do you wish to switch to the auto-saved document?"
     	},
     	api: {
     		input: undefined

@@ -4,7 +4,6 @@ Ext.define("Voyant.notebook.editor.button.MoveDown", {
 	alias: 'widget.notebookwrappermovedown',
 	statics: {
 		i18n: {
-			tip: "move this block down"
 		}
 	},
 	constructor: function(config) {

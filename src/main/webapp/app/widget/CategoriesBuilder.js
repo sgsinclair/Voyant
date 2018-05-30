@@ -4,8 +4,6 @@ Ext.define('Voyant.widget.CategoriesOption', {
 	alias: 'widget.categoriesoption',
 	statics: {
 		i18n: {
-			categories: 'Categories',
-			edit: 'Edit'
 		}
 	},
 	config: {

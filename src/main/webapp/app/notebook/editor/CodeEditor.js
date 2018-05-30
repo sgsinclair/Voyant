@@ -16,7 +16,6 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	},
 	statics: {
 		i18n: {
-			emptyText: "// click here to edit"
 		},
 		api: {
 			content: undefined

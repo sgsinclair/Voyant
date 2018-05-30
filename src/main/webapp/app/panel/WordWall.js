@@ -4,17 +4,6 @@ Ext.define('Voyant.panel.WordWall', {
     alias: 'widget.wordwall',
     statics: {
         i18n: {
-            title: 'Wall of Words',
-            terms: 'Terms',
-            scaling: 'Scaling',
-            xStrength: 'X Strength',
-            yStrength: 'Y Strength',
-            chargeStrength: 'Charge Strength',
-            chargeDistance: 'Charge Distance',
-            delay: 'Fetch Delay',
-            transition: 'Transition Speed',
-            stop: 'Stop',
-            start: 'Start'
         },
         api: {
             limit: 500,
