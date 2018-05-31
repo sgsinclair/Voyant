@@ -62,9 +62,9 @@
                         "title": "What's New"
                     },
                     {
-                        "name": "workshop",
-                        "url": "guides/ui/workshop",
-                        "title": "Workshop"
+                        "name": "tutorial",
+                        "url": "guides/ui/tutorial",
+                        "title": "Tutorial/Workshop"
                     }
                 ]
             },
