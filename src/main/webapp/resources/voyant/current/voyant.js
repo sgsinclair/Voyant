@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 28 12:14:08 EDT 2018 */
+/* This file created by JSCacher. Last modified: Fri Jun 01 14:06:57 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6390,13 +6390,6 @@ Ext.define('Voyant.util.Toolable', {
 	requires: ['Voyant.util.Localization','Voyant.util.Api'],
 	statics: {
 		i18n: {
-			exportGridAllJson: "export all available data in JSON",
-			exportAllTitle: "Export All",
-			exportAllJsonWarning: "You're requesting all of the available data (in a JSON format that Voyant uses), are you sure you want to continue?",
-			exportGridAllTsv: "export all available data as tab separated values (text)",
-			exportAllTsvWarning: "You're requesting all of the available data, are you sure you want to continue?",
-			scaleLabel: "scaling ({0})",
-			loading: "Loading…"
 		},
 		api: {
 			suppressTools: false
@@ -10002,7 +9995,6 @@ Ext.define('Voyant.data.util.Geonames', {
     mixins: ['Voyant.util.Localization'],
     statics: {
     		i18n: {
-    			failedToFetchGeonames: "Failed to load location information."
     		}
     },
 
@@ -12836,13 +12828,6 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 	msgbox: undefined,
 	statics: {
 		i18n: {
-			noProgress: "This progress monitor was incorrectly initialized.",
-			progress: "Progress",
-			badProgress: "Unable to understand the progress report from the server",
-			aborted: "Error",
-			finished: "Finished",
-			launch: "Launching…",
-			running: "Working…"
 		}
 	},
 	config: {
@@ -13115,8 +13100,6 @@ Ext.define('Voyant.widget.CategoriesOption', {
 	alias: 'widget.categoriesoption',
 	statics: {
 		i18n: {
-			categories: 'Categories',
-			edit: 'Edit'
 		}
 	},
 	config: {
@@ -17850,13 +17833,6 @@ Ext.define('Voyant.widget.CorpusTermSummary', {
     alias: 'widget.corpustermsummary',
     statics: {
         i18n: {
-            title: 'Corpus Term Summary: ',
-            items: 'Items',
-            loading: 'Loading...',
-            distribution: 'Distribution: ',
-            collocates: 'Collocates: ',
-            correlations: 'Correlations: ',
-            phrases: 'Phrases: '
         },
         api: {
             stopList: 'auto',
@@ -18055,19 +18031,6 @@ Ext.define('Voyant.panel.Correlations', {
 	alias: 'widget.correlations',
     statics: {
     	i18n: {
-    		title: "Correlations",
-    		helpTip: "The Correlations tool enables an exploration of the extent to which term frequencies vary in sync (terms whose frequencies rise and fall together or inversely).",
-    		sourceTip: "Term 1 (the pairing is what matters, not the column)",
-    		targetTip: "Term 2 (the pairing is what matters, not the column)",
-    		trendTip: "This represents the relative frequencies of the term.",
-    		minInDocumentsCountRatioLabel: "minimum coverage (%{0})",
-    		source: "Term 1",
-    		target: "Term 2",
-    		correlation: "Correlation (r)",
-    		correlationTip: "This is a measure of how closely term frequencies correlate (using Pearson's correlation coefficient or a simple regression). Scores approaching 1 mean that term frequencies vary in sync (they rise and drop together), scores approaching -1 mean that term frequencies vary inversely (one rises as the other dropx), scores approaching 0 indicate little or no meaningful corrlation.",
-    		significance: "Significance (p)",
-    		significanceTip: "This is a measure of the signifiance of the correlation value. Often a significance of .05 or less indicates a strong correlation (which allows us to reject the null hypothesis that values are randomly distributed). The validity of this measure depends on assumptions about a normal distribution of the data. Also, don't forget that we typically have a relatively small number of values (frequencies from segments in a texts or from texts in a document), so these values should be used with care.",
-    		emptyText: "(No results.)"
     	},
     	api: {
     		query: undefined,
@@ -18818,68 +18781,6 @@ Ext.define('Voyant.panel.DreamScape', {
     mixins: ['Voyant.panel.Panel'],
     statics: {
         i18n: {
-            title: 'DreamScape',
-            display: "Display",
-            displayTip: "Configure various aspects of the display.",
-            filter: "Filter",
-            filterTip: "Determine any filters to use.",
-            authorLabel: 'authors',
-            noauthor: "No authors defined in this corpus.",
-            titleLabel: 'titles',
-            keywordLabel: 'keywords',
-            pubDateLabel: 'years',
-            nopubDate: "No publication years defined in this corpus.",
-            animationSpeed: "Speed",
-            cities: "Cities",
-            connections: "Connections",
-            animations: "Animations",
-            animate: "Animate",
-            add: "Add Filter",
-            allNCitiesShown: "All {0} available cities shown.",
-            citiesMaxCount: "maximum count",
-            citiesMinPopulation: "minimum population",
-            citiesMinFreq: "minimum occurrences",
-            connectionsMaxCount: "maximum count",
-            connectionsMinFreq: "minimum occurrences",
-            millisPerAnimation: "milliseconds per animation",
-            projection: "Projection",
-            projectionTip: "Determine map projection",
-            webMercatorProjection: "Web Mercator (Default)",
-            mercatorProjection: "Mercator (WGS84)",
-            gallPetersProjection: "Gall Peters (Equal Area)",
-            sphereMollweideProjection: "Sphere mollweide (Equal Area)",
-            annotate: "Annotate",
-            annotateTip: "To annotate, click this icon, select a region and enter text in the box that will appear. If you don't select a region you can click again to exit annotation mode. If you do select a region please click this icon again if you wish to add another annotation.",
-            baseLayer: "Base Layer",
-            baseLayerTip: "Determine map base layer",
-            watercolor: "Stamen watercolor (Default)",
-            osm: "Open Street Map",
-            wms4326: "WMS 4326",
-            arcGIS: "National Geographic World Map - ArcGIS",
-            map: "Map",
-            mapTip: "Define base layer and projection",
-            annotationsUpdated: "Annotations have been stored. Please export new URL if you would like to reference it.",
-            annotationsUpdateFailed: "An error occured while trying to store the anntoations.",
-            annotationsLoadFailed: "An error occured while trying to load the anntoations.",
-            editLocationTitle: "Select an alternative location",
-			editLocationNoLocationsFound: "No locations found.",
-			editLocationNoAlternativesFound: "No altenrnative locations found",
-			editLocationServerError: "An error occurred while trying to load alternate locations.",
-			cancel: "Cancel",
-			editLocation: "Select Alternative Location",
-			removeLocation: "Remove Location",
-			editLocationTip: "If this place name is valid but the location is wrong, you can select an alternate location (this applies to all occurrences).",
-			removeLocationTip: "If this is not a valid place name, you can remove it (this applies to all occurrences).",
-			removeLocationConfirm: "Are you sure you want to remove all occurrences of this location?",
-			occurrences: "Occurrences",
-			viewOccurrences: "View Occurrences",
-			viewOccurrencesTip: "Select this to see a list of occurrences of this location",
-			openInVoyant: "Open in Voyant",
-			viewOccurrencesTip: "Select this to see the location in Voyant.",
-			editAnnotation: "Edit Annotation",
-			editAnnotationMessage: "Add an annotation. To remove an existing annotation, remove the text and click 'OK'.",
-			viewConnections: "View Connection Occurrences",
-			viewConnectionsTip: "Select this to see a list of occurrences between these two locations."
         },
         api: {
             stopList: 'auto',
@@ -21523,7 +21424,9 @@ Ext.define('Voyant.panel.Phrases', {
                     		scope: me
                 		}
                 	}
-                }, '-', {
+                }, {
+        			xtype: 'corpusdocumentselector'
+        		}, '-', {
                     xtype: 'button',
                     text: this.localize('overlap'),
                     tooltip: this.localize('overlapTip'),
@@ -21608,6 +21511,19 @@ Ext.define('Voyant.panel.Phrases', {
             }],
             
             listeners: {
+				corpusSelected: function() {
+					this.setApiParams({docIndex: undefined, docId: undefined});
+					this.loadFromApis();
+				},
+				documentsSelected: function(src, docs) {
+					var docIds = [];
+					var corpus = this.getStore().getCorpus();
+					docs.forEach(function(doc) {
+						docIds.push(corpus.getDocument(doc).getId())
+					}, this);
+					this.setApiParams({docId: docIds, docIndex: undefined})
+					this.loadFromApis();
+				},
             	termsClicked: {
             		fn: function(src, terms) {
                 		if (this.getStore().getCorpus()) { // make sure we have a corpus
@@ -24841,8 +24757,6 @@ Ext.define('Voyant.panel.SimpleDocReader', {
 	isConsumptive: true,
     statics: {
     	i18n: {
-    		noNext: "No next document.",
-    		noPrevious: "No previous document."
     	},
     	api: {
     		docIndex: undefined,
@@ -24964,16 +24878,6 @@ Ext.define('Voyant.panel.ScatterPlot', {
 	alias: 'widget.scatterplot',
     statics: {
     	i18n: {
-    		tsne: 't-SNE',
-    		terms: 'Terms',
-    		reload: 'Reload',
-    		options: 'Options',
-    		input: 'Input',
-    		output: 'Output',
-    		perplexity: 'Perplexity',
-    		iterations: 'Iterations',
-    		analyzing: 'Analyzing',
-    		plotting: 'Plotting'
     	},
     	api: {
     		docId: undefined,
@@ -27593,9 +27497,6 @@ Ext.define('Voyant.panel.TermsBerry', {
 	alias: 'widget.termsberry',
     statics: {
     	i18n: {
-    		tfidf: 'tf-idf',
-    		inDocs: 'In Docs',
-    		reset: 'Reset'
     	},
     	api: {
     		stopList: 'auto',
@@ -28775,29 +28676,7 @@ Ext.define('Voyant.panel.Trends', {
     		},{xtype: 'colorpaletteoption'}]
 	},
     statics: {
-    	i18n: {
-    		relativeTitle: "Relative Frequencies",
-    		rawTitle: "Raw Frequencies",
-    		corpusTitle: "Corpus (Documents)",
-    		segmentsTitle: "Document Segments",
-    		toggleTip: "Click to toggle the visibility of this series.",
-    		reset: "Reset",
-    		resetTip: "Reset to initial view.",
-    		dblClickItem: "Double-click to drilldown.",
-    		drillTerm: "Terms",
-    		drillTermTip: "View the distribution of this term within all documents.",
-    		drillDocument: "Document",
-    		drillDocumentTip: "View the distribution of all current terms within this document.",
-    		noResults: "No Results",
-    		segment: "segment:",
-    		display: "Display",
-    		labels: "Show Labels",
-    		area: "Area",
-    		bar: "Columns",
-    		line: "Line",
-    		stacked: "Stacked Bar",
-    		barline: "Line + Stacked Bar"
-    		
+    	i18n: {    		
     	},
     	api: {
     		
@@ -30553,12 +30432,6 @@ Ext.define('Voyant.panel.Veliza', {
 	autoScroll: true,
     statics: {
     	i18n: {
-    		title: "Veliza",
-    		typeAndEnter: "Type text and hit enter.",
-    		send: "send",
-    		fromCorpus: "from text",
-    		scriptEditor: "Script Editor",
-    		scriptIntro: "This is an advanced feature that allows you see and edit the script used by Veliza. For more information on the syntax, see the <a href='{0}' target='_blank'>documentation</a>."
     	},
     	api: {
     		script: '',
@@ -31119,17 +30992,6 @@ Ext.define('Voyant.panel.WordWall', {
     alias: 'widget.wordwall',
     statics: {
         i18n: {
-            title: 'Wall of Words',
-            terms: 'Terms',
-            scaling: 'Scaling',
-            xStrength: 'X Strength',
-            yStrength: 'Y Strength',
-            chargeStrength: 'Charge Strength',
-            chargeDistance: 'Charge Distance',
-            delay: 'Fetch Delay',
-            transition: 'Transition Speed',
-            stop: 'Stop',
-            start: 'Start'
         },
         api: {
             limit: 500,
@@ -32267,11 +32129,6 @@ Ext.define('Voyant.panel.Via', {
 	alias: 'widget.via',
     statics: {
     	i18n: {
-    		title: "Via",
-    		helpTip: "Via is a tool intended to help you explore the semantic clusters of English texts.",
-    		visible: "Visible",
-    		timedout: "An attempt was made to fetch data but the request took too long. The process may be still ongoing and you could try again in a couple of minutes.",
-    		englishOnly: "You seem to have a text in a language other than English. Unfortunately, at the moment, Via only supports texts in English (because of the current way the lemmatization and synonym operations are programmed)."
     	},
     	api: {
     		stopList: 'auto',
@@ -32408,9 +32265,6 @@ Ext.define("Voyant.notebook.editor.button.Add", {
 	alias: 'widget.notebookwrapperadd',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Add New Block"
-			}
 		}
 	},
 	constructor: function(config) {
@@ -32433,9 +32287,6 @@ Ext.define("Voyant.notebook.editor.button.Edit", {
 	alias: 'widget.notebookwrapperedit',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Edit"
-			}
 		}
 	},
 	constructor: function(config) {
@@ -32457,9 +32308,6 @@ Ext.define("Voyant.notebook.editor.button.Counter", {
 	alias: 'widget.notebookwrappercounter',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Edit"
-			}
 		}
 	},
 	config: {
@@ -32488,7 +32336,6 @@ Ext.define("Voyant.notebook.editor.button.MoveDown", {
 	alias: 'widget.notebookwrappermovedown',
 	statics: {
 		i18n: {
-			tip: "move this block down"
 		}
 	},
 	constructor: function(config) {
@@ -32511,7 +32358,6 @@ Ext.define("Voyant.notebook.editor.button.MoveUp", {
 	alias: 'widget.notebookwrappermoveup',
 	statics: {
 		i18n: {
-			tip: "move this block up"
 		}
 	},
 	constructor: function(config) {
@@ -32534,9 +32380,6 @@ Ext.define("Voyant.notebook.editor.button.Remove", {
 	alias: 'widget.notebookwrapperremove',
 	statics: {
 		i18n: {
-			tip: "remove this block",
-			confirmRemoveTitle: "Confirm Remove",
-			confirmRemove: "Are you sure you want to remove this block (and lose any content in the editor)?"
 		}
 	},
 	constructor: function(config) {
@@ -32571,9 +32414,6 @@ Ext.define("Voyant.notebook.editor.button.Movement", {
 	alias: 'widget.notebookwrappermovement',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Move / Remove Controls"
-			}
 		}
 	},
 	constructor: function(config) {
@@ -32599,9 +32439,6 @@ Ext.define("Voyant.notebook.editor.button.Run", {
 	alias: 'widget.notebookwrapperrun',
 	statics: {
 		i18n: {
-			tip: {
-				en: "Run the script in this block (Shift-Enter)"
-			}
 		}
 	},
 	glyph: 'xf04b@FontAwesome'
@@ -32612,7 +32449,6 @@ Ext.define("Voyant.notebook.editor.button.RunAll", {
 	alias: 'widget.notebookwrapperrunall',
 	statics: {
 		i18n: {
-			tip: "Run all code blocks below."
 		}
 	},
 	glyph: 'xf04e@FontAwesome',
@@ -32628,7 +32464,6 @@ Ext.define("Voyant.notebook.editor.button.RunUntil", {
 	alias: 'widget.notebookwrapperrununtil',
 	statics: {
 		i18n: {
-			tip: "Run all code blocks up to and including this one."
 		}
 	},
 	glyph: 'xf050@FontAwesome',
@@ -32709,7 +32544,6 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	},
 	statics: {
 		i18n: {
-			emptyText: "// click here to edit"
 		},
 		api: {
 			content: undefined
@@ -32834,17 +32668,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	cls: 'notebook-code-wrapper',
 	statics: {
 		i18n: {
-			previousNotRunTitle: "Previous Code Blocks",
-			previousNotRun: "There are previous blocks that have not been run (and may be needed for the code in this block). Do you wish to run all code blocks instead?",
-			modeCode: "Code",
-			modeData: "Data",
-			modeJavascript: "Javascript (default)",
-			modeJson: "JSON",
-			modeText: "Text",
-			modeCsv: "CSV (comma-separated values)",
-			modeTsv: "TSV (tab-separated values)",
-			modeHtml: "HTML",
-			modeXml: "XML"
 		}
 	},
 	config: {
@@ -33173,9 +32996,6 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 	},
 	statics: {
 		i18n: {
-			emptyText: "(Click here to edit.)",
-			enableEditingTitle: "Enable Editing?",
-			enableEditing: "By default editing is disable, do you wish to enable editing now?"
 		}
 	},
 	border: false,
@@ -33300,27 +33120,6 @@ Ext.define('Voyant.notebook.Notebook', {
 	alias: 'widget.notebook',
     statics: {
     	i18n: {
-    		title: "Spyral Notebook",
-    		helpTip: 'Spyral Notebooks are dynamic documents that combine text, code and interactive tools, they are a form of <a href="https://en.wikipedia.org/wiki/Literate_programming" target="_blank">literate programming</a>.',
-			eror: "Error",
-			cannotMoveHigher: "This block is already at the top and cannot be moved higher.",
-			cannotMoveLower: "This block is already at the bottom and cannot be moved lower.",
-			failedNotebookLoad: "Failed to load the specified notebook. A new notebook template will be presented instead.",
-			failedNotebookParse: "The loaded notebook appears to have a syntax error and will probably not run as is.",
-			exportAllLinks: "<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
-			originalJson: "Original JSON string",
-			exportJson: "Spyral Notebook data format (JSON)",
-			exportHtml: "HTML (suitable for saving or printing)",
-			editsAndLeaving: "It looks like you've been editing content and you will lose any content if you follow this link. Continue?",
-			fetchingNotebook: "Fetching notebook…",
-			openTip: "Open a Spyral Notebook (by pasting in JSON code).",
-			newTip: "Create a new Spyral Notebook in a new window.",
-			runallTip: "Run all code blocks in this notebook",
-			differentUrlTitle: "Notebook from Different URL",
-			differentUrl: "This notebook seems to be have been located at a different URL. If you're sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook's URL: {0}",
-			saveItTip: "Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
-			autoSaveAvailableTitle: "Autosave Available",
-			autoSaveAvailable: "A more recent autosave is available, do you wish to switch to the auto-saved document?"
     	},
     	api: {
     		input: undefined
