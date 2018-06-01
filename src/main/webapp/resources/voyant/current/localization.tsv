@@ -73,7 +73,7 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Spanish (es)	Por
 2018-05-29	Voyant.panel.DreamScape	annotationsUpdated	Annotations have been stored. Please export new URL if you would like to reference it.	Les annotations ont été enregistrées. Veuillez exporter vers une nouvelle URL si vous voulez y faire référence.														
 2018-05-29	Voyant.panel.DreamScape	annotationsUpdateFailed	An error occured while trying to store the annotations.	Une erreur s’est produite pendant l’enregistrement des annotations.														
 2018-05-29	Voyant.panel.DreamScape	arcGIS	National Geographic World Map – ArcGIS	National Geographic World Map – ArcGIS														
-2018-05-29	Voyant.panel.DreamScape	authorLabel	authors'	des auteurs														
+2018-05-29	Voyant.panel.DreamScape	authorLabel	authors'	auteur(s)														
 2018-05-29	Voyant.panel.DreamScape	baseLayer	Base Layer	Couche de base														
 2018-05-29	Voyant.panel.DreamScape	baseLayerTip	Determine map base layer	Choisir la couche de base de la carte														
 2018-05-29	Voyant.panel.DreamScape	cancel	Cancel	Annuler														
@@ -97,7 +97,7 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Spanish (es)	Por
 2018-05-29	Voyant.panel.DreamScape	filter	Filter	Filtrer														
 2018-05-29	Voyant.panel.DreamScape	filterTip	Determine any filters to use	Choisir des filtres à appliquer														
 2018-05-29	Voyant.panel.DreamScape	gallPetersProjection	Gall Peters (Equal Area)	Gall Peters (conserve les aires)														
-2018-05-29	Voyant.panel.DreamScape	keywordLabel	keywords'	des mots clés														
+2018-05-29	Voyant.panel.DreamScape	keywordLabel	keywords'	mot(s) clé(s)														
 2018-05-29	Voyant.panel.DreamScape	map	Map	Carte														
 2018-05-29	Voyant.panel.DreamScape	mapTip	Define base layer and projection	Définir la couche et la projection de base														
 2018-05-29	Voyant.panel.DreamScape	mercatorProjection	Mercator (WGS84)	Mercator (WGS84)														
@@ -109,13 +109,13 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Spanish (es)	Por
 2018-05-29	Voyant.panel.DreamScape	osm	Open Street Map	Open Street Map														
 2018-05-29	Voyant.panel.DreamScape	projection	Projection	Projection														
 2018-05-29	Voyant.panel.DreamScape	projectionTip	Determine map projection	Choisir une projection cartographique														
-2018-05-29	Voyant.panel.DreamScape	pubDateLabel	years'	des années														
+2018-05-29	Voyant.panel.DreamScape	pubDateLabel	years'	année(s)														
 2018-05-29	Voyant.panel.DreamScape	removeLocation	Remove Location	Supprimer la localisation														
 2018-05-29	Voyant.panel.DreamScape	removeLocationConfirm	Are you sure you want to remove all occurrences of this location?	Voulez-vous vraiment supprimer toutes les occurrences de cette localisation ?														
 2018-05-29	Voyant.panel.DreamScape	removeLocationTip	If this is not a valid place name, you can remove it (this applies to all occurrences).	Si ce toponyme n’est pas valable, vous pouvez le supprimer (cela s’appliquera à toutes ses occurrences).														
 2018-05-29	Voyant.panel.DreamScape	sphereMollweideProjection	Sphere mollweide (Equal Area)	Projection de Mollweide (conserve les aires)														
 2018-05-29	Voyant.panel.DreamScape	title	DreamScape	DreamScape														
-2018-05-29	Voyant.panel.DreamScape	titleLabel	titles	des titres														
+2018-05-29	Voyant.panel.DreamScape	titleLabel	titles	titre(s)														
 2018-05-29	Voyant.panel.DreamScape	viewConnections	View Connection Occurrences	Voir les liens des occurrences														
 2018-05-29	Voyant.panel.DreamScape	viewOccurrences	View Occurrences	Voir les occurrences														
 2018-05-29	Voyant.panel.DreamScape	viewOccurrencesTip	Select this to see a list of occurrences of this location	Sélectionner ceci pour voir une liste des occurrences de cette localisation														
@@ -170,9 +170,9 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Spanish (es)	Por
 2018-05-29	Voyant.panel.Via	timedout	An attempt was made to fetch data but the request took too long. The process may be still ongoing and you could try again in a couple of minutes.	Nous nous sommes efforcés de récupérer les données, mais la requête a pris trop de temps. Le processus se poursuit peut-être encore : vous pouvez essayer de recommencer dans quelques minutes.														
 2018-05-29	Voyant.panel.Via	title	Via	Via														
 2018-05-29	Voyant.panel.Via	visible	Visible	Visible														
-2018-05-29	Voyant.panel.WordWall	chargeDistance	Charge Distance	Charger la distance														
-2018-05-29	Voyant.panel.WordWall	chargeStrength	Charge Strength	Charger la force														
-2018-05-29	Voyant.panel.WordWall	delay	Fetch Delay	Récupérer le délai														
+2018-05-29	Voyant.panel.WordWall	chargeDistance	Charge Distance	Distance														
+2018-05-29	Voyant.panel.WordWall	chargeStrength	Charge Strength	Force														
+2018-05-29	Voyant.panel.WordWall	delay	Fetch Delay	Délai														
 2018-05-29	Voyant.panel.WordWall	scaling	Scaling	Échelle														
 2018-05-29	Voyant.panel.WordWall	start	Start	Commencer														
 2018-05-29	Voyant.panel.WordWall	stop	Stop	Arrêter														
@@ -246,7 +246,7 @@ Last Modified	Location	ID	English (en)	French (fr)	Italian (it)	Spanish (es)	Por
 2017-03-24	Voyant.panel.Topics	runningIterationsCount	Running {0} iterations.	{0} iterations		Ejecutado 												
 2017-03-24	Voyant.panel.Topics	scores	Scores	Scores		Resultados 												
 2017-03-24	Voyant.panel.Topics	scoresTip	This represents the score of each document (in corpus order) for the row’s topic.	Cette colonne représente le score pour chaque document (dans l’ordre du corpus) pour la thématique de la rangée.		Esto representa los resultados de cada documento (en el orden del corpus) por cada fila del tópico. 												
-2017-03-24	Voyant.panel.Topics	search	Search	Recheche		Búsqueda 												
+2017-03-24	Voyant.panel.Topics	search	Search	Recherche		Búsqueda 												
 2017-03-24	Voyant.panel.Topics	searchTip	Highlight the topics that contain the search (even partial words), don’t forget that each topic is limited to the top 10 terms.	Cette fonction met en surbrillance les thèmes qui contiennent le mot (ou la partie de mot), parmi les dix mots affichés de chaque thème.		Resalta los tópicos que contienen la búsqueda (incluso si son palabras parciales), recorda que cada tópico tiene un límite de los diez primeros términos. 												
 2017-03-24	Voyant.panel.Topics	title	Topics	Thèmes		Tópicos												
 2017-03-24	Voyant.panel.Topics	topic	Topic	Thème		Tópico 												
@@ -615,7 +615,7 @@ September 21	Voyant.panel.Trends	failedGetDocumentTerms	Failed to get document t
 2016-04-25	Voyant.panel.NoTool	noToolSpecified	No tool has been specified. You will be redirected to the main page of Voyant Tools.	Aucun outil n’a été sélectionné. Vous allez être redirigé(e) vers la page principale de Voyant Tools.	Nessuno strumento è stato specificato. Sarai rimandato alla pagina principale di Voyant Tools.	No se ha especificado ninguna herramienta. Usted será redirigido a la página principal de Voyant Tools.					Nije odabrana nijedna alatka. Bićete preusmjereni na početnu stranicu Voyant Tools.	Није одабрана ниједна алатка. Бићете преусмерени на почетну страницу Voyant Tools.	Nije odabrana nijedna alatka. Bićete preusmjereni na početnu stranicu Voyant Tools.	ツールが指定されていません。Voyant ツールのメインページに戻ります		Nebyl zvolen žádný nástroj.  Budete přesměrováni na hlavní stránku Voyant Tools.	لم يتم تحديد الأداة. سيتم اعادة توجيهك للصفحة الرئيسية لفوايانت تولز.	
 2016-04-25	Voyant.panel.NoTool	oldButton	Use Old Version	Utiliser l’ancienne version	Usa versione precedente	Usar la versión antigua					Koristite staru verziju	Користите стару верзију	Koristite staru verziju	古いバージョンを使う		Použít starou verzi	اخترالنسخة السابقة	
 2016-04-25	Voyant.panel.NoTool	title	No Such Tool	Aucun outil de ce nom	Non esiste questo strumento	Ninguna herramienta 					Nepostojeća alatka	Непостојећа алатка	Nepostojeća alatka	そのようなツールは存在しません		Žádný takový nástroj neexistuje.	لا توجد هذه الأداة	
-2016-04-25	Voyant.panel.Panel	colon	: 	:	:	:					:	:	:	:	:	: 	: 	
+2016-04-25	Voyant.panel.Panel	colon	: 	&nbsp;:	:	:					:	:	:	:	:	: 	: 	
 2016-04-25	Voyant.panel.Panel	error	Error	Erreur	Errore	Error					Greška	Грешка	Greška	エラー	טעות	Chyba	وقع خطأ	
 2016-04-25	Voyant.panel.Panel	info	Information	Information	Informazioni	Información					Informacija	Информација	Informacija	情報	מידע	Informace	معلومات	
 2016-04-25	Voyant.panel.Panel	loading	Loading	En cours de chargement	Caricamento in corso	Cargando 					Učitavanje	Учитавање	Učitavanje	読み込んでいます…	טוען	Nahrávání	تحميل	
