@@ -156,7 +156,9 @@ Ext.define('Voyant.panel.Phrases', {
                     		scope: me
                 		}
                 	}
-                }, '-', {
+                }, {
+        			xtype: 'corpusdocumentselector'
+        		}, '-', {
                     xtype: 'button',
                     text: this.localize('overlap'),
                     tooltip: this.localize('overlapTip'),
@@ -241,6 +243,19 @@ Ext.define('Voyant.panel.Phrases', {
             }],
             
             listeners: {
+				corpusSelected: function() {
+					this.setApiParams({docIndex: undefined, docId: undefined});
+					this.loadFromApis();
+				},
+				documentsSelected: function(src, docs) {
+					var docIds = [];
+					var corpus = this.getStore().getCorpus();
+					docs.forEach(function(doc) {
+						docIds.push(corpus.getDocument(doc).getId())
+					}, this);
+					this.setApiParams({docId: docIds, docIndex: undefined})
+					this.loadFromApis();
+				},
             	termsClicked: {
             		fn: function(src, terms) {
                 		if (this.getStore().getCorpus()) { // make sure we have a corpus
