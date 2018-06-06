@@ -61,9 +61,14 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 			}
         }).then(function(response) {
         	var xml = response.responseXML;
-        	var tagData = this._parseTags(xml, docId, this.curatedTags);
-        	
-        	this.savedTags[docId] = tagData;
+        	if (xml != null) {
+            	var tagData = this._parseTags(xml, docId, this.curatedTags);
+            	this.savedTags[docId] = tagData;
+        	} else {
+        	    if (window.console) {
+        	        console.warn('error loading xml for: '+docId);
+        	    }
+        	}
         	
 			if (callback) callback();
         }, null, null, this);
