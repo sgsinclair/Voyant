@@ -176,9 +176,8 @@ Ext.define('Voyant.panel.DToC.ToC', {
 					var corpus = this.getCorpus();
 					for (var i = 0; i < children.length; i++) {
 						var child = children[i];
-						child.getData().docIndex = i;
+						child.set('docIndex', i);
 						var doc = corpus.getDocument(child.getData().docId);
-						doc.set('origIndex', doc.get('index'));
 						doc.set('index', i);
 					}
 					
@@ -346,10 +345,9 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			}
 			if (!this.isCurator) {
 				author = doc.getAuthor();
-				if (author === undefined) {
-					author = '';
+				if (author !== undefined && author !== '') {
+				    title += '<br/><span class="author">'+author+'</span>';
 				}
-			    title += '<br/><span class="author">'+author+'</span>';
 			}
 			if (modifyCurrent) {
 				docNode = root.findChild('docId', doc.getId());
