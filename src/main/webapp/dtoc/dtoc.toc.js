@@ -189,6 +189,16 @@ Ext.define('Voyant.panel.DToC.ToC', {
 				},
 				scope: this
 			};
+			
+			treeConfig.bbar = {
+			   height: 50,
+			   style: {borderTopWidth: '1px !important'},
+			   items: [{
+    			   xtype: 'container',
+    			   html: '<span>Double-click to edit chapter title.<br/>Drag and drop to re-order chapters.</span>'
+			   }]
+			};
+			
 //			treeConfig.listeners.beforeitemdblclick = {
 //				fn: function(node, evt) {
 //					return false; // cancel node expand/contract, edit will still happen however
