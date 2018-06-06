@@ -272,7 +272,6 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		
 		if (window.history.pushState) {
 			// add the docId to the url (for proper annotation storage)
-		    // TODO use docIndex instead
 			var app = this.getApplication();
 			var corpusId = app.getCorpus().getId();
 			var docId = params.docId;
@@ -282,11 +281,12 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			
 			var url = app.getBaseUrl()+'dtoc/';
 			url += '?corpus='+corpusId+'&docId='+docId;
-			if (inkeTags !== false) {
-			    url += '&inkeTags=true';
-			} else if (curatorId !== undefined) {
+			// prioritize curatorId over inkeTags
+			if (curatorId !== undefined) {
 			    url += '&curatorId='+curatorId;
-			}
+			} else if (inkeTags !== false) {
+                url += '&inkeTags=true';
+            }
 			if (debug !== undefined) {
 			    url += '&debug=true';
 			}
