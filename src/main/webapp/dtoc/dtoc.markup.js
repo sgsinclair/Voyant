@@ -191,6 +191,8 @@ Ext.define('Voyant.panel.DToC.Markup', {
                 listeners: {
                     selectionchange: {
                     	fn: function(sm, selections) {
+                    	    this.getApplication().showMultiSelectMsg(this);
+                    	    
                     		this.handleSelections(selections);
                     	},
                     	scope: this

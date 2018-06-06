@@ -35,6 +35,8 @@ Ext.define('VoyantDTOCApp', {
     settingsWin: null,
     helpWin: null,
     
+    doShowMultiSelectMsg: true, // let the user know they can select multiple items
+    
     constructor: function() {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
         this.callParent(arguments);
@@ -670,6 +672,23 @@ Ext.define('VoyantDTOCApp', {
 	
 	showHelp: function(el) {
 	    this.helpWin = this.openUrl("http://cwrc.ca/DToC_Documentation/");
+    },
+    
+    showMultiSelectMsg: function(panel) {
+        if (this.doShowMultiSelectMsg) {
+            var msg = 'You can select multiple items.';
+            if (Ext.os.is.Windows) {
+                msg += '<br/>Use the CTRL or Shift key and click.'
+            } else if (Ext.os.is.MacOS) {
+                msg += '<br/>Use the Command or Shift key and click.'
+            }
+            panel.toastInfo({
+                html: msg,
+                hideDuration: 1000,
+                align: 't'
+            });
+            this.doShowMultiSelectMsg = false;
+        }
     },
     
 	onSplitterClick: function(splitter, event, el) {
