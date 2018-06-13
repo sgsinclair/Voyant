@@ -67,6 +67,8 @@ Ext.define('Voyant.panel.DToC.Index', {
 						return record.getData().targetMatches === true || record.getData().isCrossRef === true;
 					},
 					selectionchange: function(sm, nodes) {
+					    this.getApplication().showMultiSelectMsg(this);
+					    
 						var indexes = [];
 						var crossRef = null;
 						for (var i = 0; i < nodes.length; i++) {

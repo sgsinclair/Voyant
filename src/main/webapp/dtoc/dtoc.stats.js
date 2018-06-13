@@ -98,6 +98,8 @@ Ext.define('Voyant.panel.DToC.Stats', {
                 pruneRemoved: false,
                 listeners: {
                     selectionchange: function(sm, selections) {
+                        this.getApplication().showMultiSelectMsg(this);
+                        
                     	if (this.getStore() === this.corpusStore) {
                     		this.getApplication().dispatchEvent('corpusTermsClicked', this, selections);
                     	} else {
