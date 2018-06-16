@@ -255,6 +255,7 @@ Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "relativeSkewness":"Skew",
 "relativeFreqTip":"La frequenza relativa (per milione) di questo termine nell'intero corpus.",
 "trendTip":"Questo rappresenta l'andamento delle frequenze relative di ogni termine in ogni documento del corpus",
+"relativeFreqLabel":"frequenza relativa:",
 "helpTip":"</p><p>Parole del Corpus è una vista tabellare delle parole che compaiono in tutto il corpus. Funzionalità:</p><ul><li>ordinamento per <i>parola</i> e per <i>frequenza</i> (fai click sulle intestazioni di colonna)</li><li>un grafico sparkline dell'andamento della frequenza del termine nel corpus (se è composto da molteplici documenti) o nel documento (se ne è presente solo uno) </li><li>ulteriori colonne disponibili (frequenza relativa, acutezza della distribuzione e skew) facendo click sulla freccia che appare se si posiziona il puntatore sopra una intestazione</li><li>casella di ricerca (posizionare il mouse sopra l'icona lente di ingrandimento per un aiuto sulla sintassi)</li></ul>",
 "relativeSkewnessTip":"Questa è una misurazione statistica della simmetria delle frequenze relative di un termine su tutto il corpus."});
 Ext.apply(Voyant.panel.Bubblelines.i18n, {

@@ -255,6 +255,7 @@ Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "relativeSkewness":"Asimetričnost",
 "relativeFreqTip":"Relativna učestalost (na milion) ovog termina u cijelom korpusu.",
 "trendTip":"Predstavlja trend relativne učestalosti svakog termina u svakom dokumentu unutar korpusa.",
+"relativeFreqLabel":"Relativna učestalost:",
 "helpTip":"</p><p>Termini u korpusu je tabelarni prikaz termina koji se pojavljuju unutar cijelog korpusa. Uključuje funkcije, kao što su:</p><ul><li>sortiranje po <i>terminu</i> i <i>zbroju</i> (kliknuti na zaglavlje kolone)</li><li>grafikon sparkline za trend učestalosti termina unutar korpusa (ukoliko korpus sadrži više dokumenata) ili unutar dokumenta (ukoliko se korpus sastoji od samo jednog dokumenta) </li><li>dodatne kolone (relativna učestalost, oštrina i asimetričnost distribucije) dostupne su klikom na strijelicu koja se pojavljuje pozicioniranjem kursora na zaglavlje</li><li>okvir za pretraživanje (pozicioniranje kursora na ikonu za povećavanje nudi pomoć sa sintaksom upita).</li></ul>",
 "relativeSkewnessTip":"Ovo je statistička mjera za simetriju relativne učestalosti termina u cijelom korpusu."});
 Ext.apply(Voyant.panel.Bubblelines.i18n, {

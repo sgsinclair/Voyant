@@ -80,7 +80,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     			if (queryPlan.query.charAt(0)=="*") { // convert leading wildcard to regex
     				queryPlan.query = "."+queryPlan.query;
     			}
-    			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*') {
+    			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*' || queryPlan.query.charAt(queryPlan.query.length-1)=='|') {
     				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
     				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
     			}
@@ -98,11 +98,12 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
 	            }
 	            if (queryPlan.query.indexOf("*")>-1) {
-	            	if (queryPlan.query.indexOf(" ")==-1) {
+	            	// skip for multiword or pipes
+	            	if (queryPlan.query.indexOf(" ")==-1 && queryPlan.query.indexOf("|")==-1) {
 	            		queryPlan.query += ",^"+queryPlan.query;
 	            	}
 	            } else {
-	            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1 ? ","+"^"+queryPlan.query+"*" : "")
+	            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1  && queryPlan.query.indexOf("|")==-1 ? ","+"^"+queryPlan.query+"*" : "")
 	            }
     		}
     	});

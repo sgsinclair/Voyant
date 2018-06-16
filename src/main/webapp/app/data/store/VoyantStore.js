@@ -68,6 +68,7 @@ Ext.define('Voyant.data.store.VoyantStore', {
 					fn: function(store, operation) {
 						var parent = this.getParentPanel(), proxy = store.getProxy();
 						if (parent !== undefined) {
+
 							var params = parent.getApiParams();
 							operation = operation ? (operation===1 ? {} : operation) : {};
 							operation.params = operation.params || {};
@@ -79,8 +80,13 @@ Ext.define('Voyant.data.store.VoyantStore', {
 								});
 								this.previouslySetExtraParams = [];
 							}
-							
 							for (var key in params) {
+								
+								/* TODO NOT SURE ABOUT THIS
+								// don't sent stopList when there's a query
+								if (key=="stopList" && "query" in params && params.query) {continue;}
+								*/
+								
 								if (proxy && this.isBufferedStore) { // also set proxy for automatic buffering calls
 									this.previouslySetExtraParams.push(key);
 									proxy.setExtraParam(key, params[key]);

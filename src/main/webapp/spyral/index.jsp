@@ -83,6 +83,13 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 	.cke_button__sourcedialog_label {
 	    display: none !important;
 	}
+	.exported-notebook .notebookwrappercounter {
+		float: right;
+	}
+	.exported-notebook .notebookwrappercounter a {
+		text-decoration: none;
+	}
+	
 	.notebookwrappercounter a {
 		-webkit-border-radius: 3px;
 		-moz-border-radius: 3px;

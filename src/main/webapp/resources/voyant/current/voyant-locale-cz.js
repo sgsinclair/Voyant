@@ -255,6 +255,7 @@ Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "relativeSkewness":"Šikmost",
 "relativeFreqTip":"Relativní frekvence (na každý milion) tohoto termínu v celém korpusu.",
 "trendTip":"Toto reprezentuje trend relativních frekvencí pro každý termín v každém dokumentu korpusu.",
+"relativeFreqLabel":"Relativní frekvence:",
 "helpTip":"</p><p>Nástroj Termíny korpusu poskytuje tabulkové zobrazení termínů, které se objevují v celém korpusu. Funkce zahrnují:</p><ul><li>změna uspořádání pomocí <i>termín</i> a <i>počet</i> (klikněte na záhlaví sloupců)</li><li>řádkový minigraf (sparkline) trendů frekvence termínu napříč korpusem (pokud korpus obsahuje více dokumentů) nebo napříč dokumentem (pokud korpus obsahuje pouze jeden dokument)</li><li>zpřístupnění dodatečných sloupců (relativní frekvence, špičatost a šikmost rozdělení) pomocí kliknutí na šipku, která se objeví po najetí kurzoru na záhlaví</li><li>vyhledávací pole pro dotazy (najeďte kurzorem na ikonu Lupy pro nápovědu syntaxe</li></ul>",
 "relativeSkewnessTip":"Toto je statistická míra symetrie relativních frekvencí termínu napříč korpusem."});
 Ext.apply(Voyant.panel.Bubblelines.i18n, {

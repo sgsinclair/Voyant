@@ -255,6 +255,7 @@ Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "relativeSkewness":"スキュー",
 "relativeFreqTip":"コーパス全体におけるこの語の相対頻度（100万語あたり）",
 "trendTip":"これはコーパスの中のそれぞれのドキュメントの中のそれぞれの語の相対頻度の傾向を表します",
+"relativeFreqLabel":"relative frequency:",
 "helpTip":"</p><p>コーパスタームでは、コーパス全体に出現する単語をテーブル形式で表示します。含まれる機能:</p><ul><li>ヘッダーをクリックすることで単語、語数（粗頻度）、相対頻度による並び替え。</li><li>ドキュメント間またはコーパス間で単語頻度の傾向を示すスパークライン</li><li>ヘッダー上にマウスを合わせると表示される矢印をクリックすることで行の追加が可能</li><li><li>検索ボックス（？アイコンにカーソルを合わせると記法ヘルプが表示されます）</li></ul>",
 "relativeSkewnessTip":"これはコーパス中の語の相対頻度の対称性を表す統計的指標です"});
 Ext.apply(Voyant.panel.Bubblelines.i18n, {

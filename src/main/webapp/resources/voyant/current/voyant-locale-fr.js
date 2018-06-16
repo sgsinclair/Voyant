@@ -255,6 +255,7 @@ Ext.apply(Voyant.panel.CorpusTerms.i18n, {
 "relativeSkewness":"Coefficient de dissymétrie",
 "relativeFreqTip":"Fréquence relative (par million) de ce terme dans le corpus entier",
 "trendTip":"Représentation de la tendance des fréquences relatives pour chaque terme de chaque document du corpus.",
+"relativeFreqLabel":"fréquence relative :",
 "helpTip":"<p>L’outil <i>Termes</i> montre sous la forme d’un tableau, dans l’ensemble du corpus, les mots qui y apparaissent. À noter&nbsp;:</p><ul><li>il est possible de réarranger le tableau en prenant pour critère de tri le terme ou le nombre de termes (cliquez sur les en-têtes des colonnes)</li><li>un graphique <i>sparkline</i> des tendances de fréquence dans la totalité du corpus (si le corpus comprend plusieurs documents) ou dans la totalité du document (si le corpus ne comprend qu’un seul document)</li><li>il est possible d’ajouter des colonnes (fréquence relative, <i>peakedness</i>, ou coefficient de finesse de la distribution, et <i>skew</i>, ou coefficient de dissymétrie de la distribution) en cliquant sur la flèche qui apparaît au survol d’un en-tête</li><li>une case de recherche est disponible (l’aide de la syntaxe des requêtes apparaît au survol de l’icône représentant une loupe)</li></ul>",
 "relativeSkewnessTip":"Indicateur statistique évaluant la symétrie des fréquences relatives d’un terme d’un corpus."});
 Ext.apply(Voyant.panel.Bubblelines.i18n, {

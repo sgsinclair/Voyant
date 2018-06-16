@@ -38,7 +38,7 @@ For the purposes of the workshop, we typically like to emphasize the following:
 * Voyant Tools is open-source and is a work in progress, it may not always work as intended and it's best to approach all observations with some circumspection.
 * Voyant Tools has the advantage of being able to work with almost any language (represented in Unicode) but has the disadvantage that it has almost no language-specific functionality (needed for things like semantic analysis).
 * Voyant Tools is intended as a tool for exploration and to assist with interpretative practices, it is not intended to tell you what questions to ask or to provide irrefutable results, though you may notice some interesting things and you may be led to construct some compelling interpretations while using it.
-* Voyant Tools has no ambition to be the only tool that you use, there may come a point where its pre-programmed functionality seems constraining or inappropriate and other tools may be more suitable (we're especially big fans of [Python and Juypter Notebooks](https://github.com/sgsinclair/alta/blob/2eb10ab6787d032e317ce883fb0bc3427406333d/ipynb/Useful%20Resources.ipynb).
+* Voyant Tools has no ambition to be the only tool that you use, there may come a point where its pre-programmed functionality seems constraining or inappropriate and other tools may be more suitable (we're especially big fans of [Python and Juypter Notebooks](https://github.com/sgsinclair/alta/blob/2eb10ab6787d032e317ce883fb0bc3427406333d/ipynb/Useful%20Resources.ipynb)).
 * Voyant is designed to integrate into a collaborative research process, including the possibility of sharing corpora and embedding tools into web pages (as you might embed a video); we are interested in how tools and argumentation can be combined in scholarship.
 
 Ok, that's all somewhat abstract and conceptual, let's jump into using Voyant.
@@ -117,22 +117,21 @@ One last thing to point out from the Summary tool (bottom left): the "Distinctiv
 
 Now that an initial presentation of the interface has been made, this would be a good time to allow participants an opportunity to further explore. We will see some more functionality and some more tools in the next section, so the emphasis can be on the tools that are visible in the default interface: What information is shown in the five tools? What interactions between tools are possible? What simple tweaks to the settings and options are worth trying? Participants can use the Austen corpus or a simple corpus of their own (ideally that contains multiple documents).
 
-## Digging Deaper
+## Digging Deeper
 
 Voyant is an ongoing negotiation between simplicity and power: the design tries to simplify (relatively) the interface while still allowing more advanced operations.
 
 ### Search 
 
-A good example of this is [search](#!/guide/search), which is supported in several of the tools (including Reader, Trends and Contexts in the default view). It's possible to search for a single word, but more advanced searches are also supported with a special syntax (hovering over the question mark in the search box shows examples of the syntax). Try the search terms (in bold) in the list below (you can remove a query by hitting x in the box surrounding the query, or hitting backspace to delete it). Also notice that Voyant tries to suggest search terms as you type, you can click on a suggestion to add it to the queries.
+<iframe src="../tool/CorpusTerms/?corpus=austen" style="width: 350px; height: 350px; float: right"></iframe>
 
-<iframe src="../?corpus=austen&view=trends" style="width: 350px; height: 350px; float: right"></iframe>
+A good example of this is [search](#!/guide/search), which is supported in several of the tools (including Reader, Trends and Contexts in the default view). It's possible to search for a single word, but more advanced searches are also supported with a special syntax (hovering over the question mark in the search box shows examples of the syntax). Try the search terms (in bold) in the list below (you can remove a query by hitting x in the box surrounding the query, or hitting backspace to delete it). Also notice that Voyant tries to suggest search terms as you type, you can click on a suggestion to add it to the queries.
 
 * **love**: exact word match
 * **lov\***: combine all words that start with "lov"
 * **^lov\***: separate all words that start with "lov"
 * **love|loves**: combine all words separated by a pipe |
 * **"he loves"**: exact phrase match
-* **"she lov*"**: phrase including a wildcard word
 * **"she he love*"~10**: all words within a proximity of 10 words
 
 The notion of boolean operators (AND, OR) isn't relevant for most tools since we're querying for any instance of any of the **words** (unlike when we're wanting to find **documents** that contain any or all queries). Note also that Voyant doesn't support directly notions like singular and plural forms, but that you can determine what forms are present ("**^dog\***") and then decide if you want to combine forms ("**dog|dogs**") or keep them separate ("**dog,dogs**"). That helps for individual queries but of course doesn't help much when you would want to see all singular and plural forms combined in a frequency list.

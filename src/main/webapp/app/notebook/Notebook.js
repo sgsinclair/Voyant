@@ -231,6 +231,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			'saveIt': {
     				tooltip: this.localize("saveItTip"),
     				callback: function() {
+    					me.getExportHtml(); return;
     					/*
     					if (!("previousUrl" in this.getMetadata())) {
     						var passWin = Ext.create('Ext.window.Window', {
@@ -298,7 +299,7 @@ Ext.define('Voyant.notebook.Notebook', {
     						me.setSaveItTool(tool);
     					}
     				},
-    				disabled: true,
+//    				disabled: true,
     				scope: this
     			},
     			'open': {
@@ -795,6 +796,33 @@ Ext.define('Voyant.notebook.Notebook', {
         	}
         	Ext.defer(this._runCodeContainers, 100, this, [containers]);
     	}
+    },
+
+    getExportHtml: function() {
+    	var out = "";
+    	this.items.each(function(item, i) {
+    		type = item.isXType('notebookcodeeditorwrapper') ? 'code' : 'text';
+    		content = item.getContent();
+    		out+="<div class='notebook-editor-wrapper "+item.xtype+"'>\n"+
+    			"<div class='notebookwrappercounter'><a href='#_"+(i)+"' name='"+i+"'>"+(i+1)+"</a></div>";
+    		if (type=='code') {
+    			out+="<div class='notebook-code-editor ace-chrome'>\n"+item.getTargetEl().query('.ace_text-layer')[0].outerHTML+"\n</div>\n"+
+    				"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
+    		} else {
+    			out+=content+"\n";
+    		}
+    		out+="</div>\n"
+    	})
+        var myWindow = window.open();
+        myWindow.document.write('<html><head>');
+        myWindow.document.write('<title>Spyral Notebooks</title>');
+        myWindow.document.write(document.getElementById("ace-chrome").outerHTML);
+        myWindow.document.write(document.getElementById("voyant-notebooks-styles").outerHTML);
+        myWindow.document.write('</head><body class="exported-notebook">');
+        myWindow.document.write(out);
+        myWindow.document.write('</body></html>');
+        myWindow.document.close();
+        myWindow.focus();
     },
     
     getExportAllJson: function() {

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Jun 01 14:06:57 EDT 2018 */
+/* This file created by JSCacher. Last modified: Sat Jun 16 12:07:57 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8789,6 +8789,7 @@ Ext.define('Voyant.data.store.VoyantStore', {
 					fn: function(store, operation) {
 						var parent = this.getParentPanel(), proxy = store.getProxy();
 						if (parent !== undefined) {
+
 							var params = parent.getApiParams();
 							operation = operation ? (operation===1 ? {} : operation) : {};
 							operation.params = operation.params || {};
@@ -8800,8 +8801,13 @@ Ext.define('Voyant.data.store.VoyantStore', {
 								});
 								this.previouslySetExtraParams = [];
 							}
-							
 							for (var key in params) {
+								
+								/* TODO NOT SURE ABOUT THIS
+								// don't sent stopList when there's a query
+								if (key=="stopList" && "query" in params && params.query) {continue;}
+								*/
+								
 								if (proxy && this.isBufferedStore) { // also set proxy for automatic buffering calls
 									this.previouslySetExtraParams.push(key);
 									proxy.setExtraParam(key, params[key]);
@@ -11653,7 +11659,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     			if (queryPlan.query.charAt(0)=="*") { // convert leading wildcard to regex
     				queryPlan.query = "."+queryPlan.query;
     			}
-    			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*') {
+    			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*' || queryPlan.query.charAt(queryPlan.query.length-1)=='|') {
     				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
     				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
     			}
@@ -11671,11 +11677,12 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
 	            }
 	            if (queryPlan.query.indexOf("*")>-1) {
-	            	if (queryPlan.query.indexOf(" ")==-1) {
+	            	// skip for multiword or pipes
+	            	if (queryPlan.query.indexOf(" ")==-1 && queryPlan.query.indexOf("|")==-1) {
 	            		queryPlan.query += ",^"+queryPlan.query;
 	            	}
 	            } else {
-	            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1 ? ","+"^"+queryPlan.query+"*" : "")
+	            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1  && queryPlan.query.indexOf("|")==-1 ? ","+"^"+queryPlan.query+"*" : "")
 	            }
     		}
     	});
@@ -21770,7 +21777,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
                     xtype: 'sparklineline',
                     tipTpl: new Ext.XTemplate('{[this.getDocumentTitle(values.x,values.y)]}', {
                     	getDocumentTitle: function(docIndex, relativeFreq) {
-                    		return this.panel.store.getCorpus().getDocument(docIndex).getTitle()+"<br>relative frequency: "+Ext.util.Format.number(relativeFreq*1000000, "0,000")
+                    		return this.panel.store.getCorpus().getDocument(docIndex).getTitle()+"<br>"+this.panel.localize("relativeFreqLabel")+" "+Ext.util.Format.number(relativeFreq*1000000, "0,000")
                     	},
                     	panel: me 
                     })
@@ -33341,6 +33348,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			'saveIt': {
     				tooltip: this.localize("saveItTip"),
     				callback: function() {
+    					me.getExportHtml(); return;
     					/*
     					if (!("previousUrl" in this.getMetadata())) {
     						var passWin = Ext.create('Ext.window.Window', {
@@ -33408,7 +33416,7 @@ Ext.define('Voyant.notebook.Notebook', {
     						me.setSaveItTool(tool);
     					}
     				},
-    				disabled: true,
+//    				disabled: true,
     				scope: this
     			},
     			'open': {
@@ -33905,6 +33913,33 @@ Ext.define('Voyant.notebook.Notebook', {
         	}
         	Ext.defer(this._runCodeContainers, 100, this, [containers]);
     	}
+    },
+
+    getExportHtml: function() {
+    	var out = "";
+    	this.items.each(function(item, i) {
+    		type = item.isXType('notebookcodeeditorwrapper') ? 'code' : 'text';
+    		content = item.getContent();
+    		out+="<div class='notebook-editor-wrapper "+item.xtype+"'>\n"+
+    			"<div class='notebookwrappercounter'><a href='#_"+(i)+"' name='"+i+"'>"+(i+1)+"</a></div>";
+    		if (type=='code') {
+    			out+="<div class='notebook-code-editor ace-chrome'>\n"+item.getTargetEl().query('.ace_text-layer')[0].outerHTML+"\n</div>\n"+
+    				"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
+    		} else {
+    			out+=content+"\n";
+    		}
+    		out+="</div>\n"
+    	})
+        var myWindow = window.open();
+        myWindow.document.write('<html><head>');
+        myWindow.document.write('<title>Spyral Notebooks</title>');
+        myWindow.document.write(document.getElementById("ace-chrome").outerHTML);
+        myWindow.document.write(document.getElementById("voyant-notebooks-styles").outerHTML);
+        myWindow.document.write('</head><body class="exported-notebook">');
+        myWindow.document.write(out);
+        myWindow.document.write('</body></html>');
+        myWindow.document.close();
+        myWindow.focus();
     },
     
     getExportAllJson: function() {
