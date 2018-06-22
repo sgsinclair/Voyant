@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Jun 16 12:07:57 EDT 2018 */
+/* This file created by JSCacher. Last modified: Fri Jun 22 11:41:55 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -18200,9 +18200,15 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		inputFormat: undefined,
     		language: undefined,
     		xmlDocumentsXpath: undefined,
+    		xmlGroupByXpath: undefined,
     		xmlContentXpath: undefined,
     		xmlTitleXpath: undefined,
     		xmlAuthorXpath: undefined,
+    		htmlGroupByQuery: undefined,
+    		htmlDocumentsQuery: undefined,
+    		htmlContentQuery: undefined,
+    		htmlTitleQuery: undefined,
+    		htmlAuthorQuery: undefined,
     		tokenization: undefined,
     		adminPassword: undefined,
     		accessPassword: undefined,
@@ -18621,6 +18627,34 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								},{
 									fieldLabel: me.localize('xpathGroupBy'),
 									name: 'xmlGroupByXpath'
+								}
+							]
+						},,{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-html' target='voyantdocs'>"+me.localize('htmlOptions')+"</a>",
+	                        collapsible: true,
+	                        collapsed: true,
+	                        defaultType: 'textfield',
+	                        items: [
+	                            {
+	    							xtype: 'container',
+	    							html: '<p><i>'+new Ext.Template(me.localize('htmlOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-html'])+'</i></p>',
+	    							width: 375
+	                            },{
+									fieldLabel: me.localize('xpathContent'),
+									name: 'htmlContentQuery'
+								},{
+									fieldLabel: me.localize('xpathTitle'),
+									name: 'htmlTitleQuery'
+								},{
+									fieldLabel: me.localize('xpathAuthor'),
+									name: 'htmlAuthorQuery'
+								},{
+									fieldLabel: me.localize('xpathDocuments'),
+									name: 'htmlDocumentsQuery'
+								},{
+									fieldLabel: me.localize('xpathGroupBy'),
+									name: 'htmlGroupByQuery'
 								}
 							]
 						},{

@@ -7,7 +7,7 @@
 	String lang = "en";
 	
 	//hard-coded for now
-	String[] langs = new String[]{"en","es","ar","bs","cz","fr","he","hr","it","ja","sr"};
+	String[] langs = new String[]{"en","es","ar","bs","cz","fr","he","hr","it","ja","sr","pt"};
 	
 	//try first with parameter
 	if (request.getParameter("lang")!=null) {
@@ -121,13 +121,13 @@
 	<% } 
 } %>
 
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=2.4-M7r3<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=2.4-M7pr3&lang=<%= lang %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant.jsp?v=2.4-M7<%= (request.getParameter("debug")!=null ? "&debug=true" : "") %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale.jsp?v=2.4-M7&lang=<%= lang %>"></script>
 
 <% // ridiculous hack for Safari 11 that seems to hide fieldsets, tested with desktop and iPad
 	// https://www.sencha.com/forum/showthread.php?423768&p=1282921&viewfull=1#post1282921
 String userAgent = request.getHeader("user-agent");
-if (userAgent.indexOf("Safari") > -1 && (userAgent.indexOf("Version/11.0") > -1 || (userAgent.indexOf("Version/11.0") > -1 && userAgent.indexOf("Mobile")>-1))) { %>	<style>
+if (userAgent.indexOf("Safari") > -1 && (userAgent.indexOf("Version/11.") > -1 || (userAgent.indexOf("Version/11.") > -1 && userAgent.indexOf("Mobile")>-1))) { %>	<style>
 	/* ridiculous hack for Safari 11 that seems to hide fieldsets */
 	.x-fieldset {overflow: visible;}
 	</style>

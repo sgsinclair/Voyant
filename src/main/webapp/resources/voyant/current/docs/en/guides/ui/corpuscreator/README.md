@@ -91,6 +91,74 @@ This isn't the place to [learn XPath syntax](http://www.w3schools.com/xsl/xpath_
 * **`//dc:creator`**: select the `creator` element only when it is in the `dc` namespace
 * **`//*[local-name()='creator']`**: select any tag whose local name is `creator` regardless of namespace
 
+## HTML
+
+New and <span style="color: red">experimental</a>!
+
+You might want to work with only part of an HTML document, such as the main article without the rest of the navigation and other components on the page. You can now define CSS and jQuery type selectors that allow you to point to parts of an HTML document for the following:
+
+* **Content**: This defines the text content (by default it uses the HTML body tag). Multiple elements matching this query will be combined.
+* **Title**: This extracts the text only (no tags) from any matching elements to be used as title metadata.
+* **Author**: This extracts the text only (no tags) from any matching elements to be used as author metadata.
+* **Documents**: This allows you to extract multiple documents from an HTML document (such as individual posts in a blog). When this is used in combination with the options above, the other queries expressions will be relative to each sub-document (not to the original document root node).
+* **Group by**: When used in conjunction with a *Documents* option, this allows you to group multiple documents together that share the same value. For instance, if a page has multiple article tags, you can group all of the articles together based on the value of the author (so there would be one document per author with all of the articles from each grouped together). This option is ignored if *Documents* isn't specified.
+
+These options currently use the [Jsoup library](https://jsoup.org/) and support its [full syntax](https://jsoup.org/cookbook/extracting-data/selector-syntax) as described below. Rather than using trial and error in creating Voyant corpora, you can first <a href="https://try.jsoup.org" target="_blank">try Jsoup</a> with your HTML document.
+
+### Selectors:
+
+* **tagname**: find elements by tag, e.g. `a`
+* **#id**: find elements by ID, e.g. `#main`
+* **.class**: find elements by class name, e.g. `.chapter`
+* **[attribute]**: elements with attribute, e.g. `[role]`
+* **[^attr]**: elements with an attribute name prefix, e.g. `[^data-]` finds elements with HTML5 dataset attributes
+* **[attr=value]**: elements with attribute value, e.g. `[role=main]` (also quotable, like `[role='main']`)
+* **[attr^=value]**: elements with attributes that start with the value, e.g. `[href^=http]`
+* **[attr^=value]**: elements with attributes that start with the value, e.g. `[href*=voyant-tools]`
+* **[attr^=value]**: elements with attributes that start with the value, e.g. `[href$=html]`
+* **[attr~=regex]**: elements with attribute values that match the regular expression; e.g. `[href~=https?.+?(png|jpe?g)]
+
+### Selector combinations
+
+* **el#id**: elements with ID, e.g. `div#main`
+* **el.class**: elements with class, e.g. `div.chapter`
+* **el[attr]**: elements with attribute, e.g. `div[role]`
+* **ancestor child**: child elements that descend from ancestor, e.g. `body p` finds p elements anywhere under a body element
+* **parent > child**: child elements that descend directly from parent, e.g. `article > header > h1` finds h1 elements whose immedidiate parents are header and immediate grand-parents are article
+* **siblingA + siblingB**: finds sibling B element immediately preceded by sibling A, e.g. `article > header > h1 + p` finds paragraphs that are siblings of the previous selector example
+* **siblingA ~ siblingX**: finds sibling X element preceded by sibling A, e.g. `h1 ~ p` finds h1 elements that are followed by p elements
+* **el, el, el**: group multiple selectors, find unique elements that match any of the selectors; e.g. `body > h1, article header h1` find h1 elements that are immediate children of the body or that are descendences of article and header elements
+
+### Pseudo selectors
+* **:lt(n)**: find elements whose zero-based sibling index (i.e. its position in the DOM tree relative to its parent) is less than n; e.g. `td:lt(3)`
+* **:gt(n)**: find elements whose zero-based sibling index is greater than n; e.g. `div p:gt(2)`
+* **:eq(n)**: find elements whose zero-based sibling index is equal to n; e.g. form input:eq(0)
+* **:has(selector)**: find elements that contain elements matching the selector; e.g. `div:has(p)`
+* **:not(selector)**: find elements that do not match the selector; e.g. `div:not(.navigation)`
+* **:contains(text)**: find elements that contain the given text (in any descendant). The search is case-insensitive; e.g. `p:contains(text analysis)`
+* **:containsOwn(text)**: find elements that directly contain the given text `p:contains(text analysis)`
+* **:matches(regex)**: find elements whose text (in any descendant) matches the specified regular expression; e.g. `div:matches(19\d\d)`
+* **:matchesOwn(regex)**: find elements whose own text matches the specified regular expression e.g. `div:matches(19\d\d)`
+
+### Attribute Values
+
+Selectors (as defined by the W3C and as implemented by Jsoup) are designed to select DOM elements or nodes. In many cases this is fine because simply want to use the text value of the element:
+
+	// for the "Title" field we could simply put "title" to select the title tag
+	<title>Title</title>
+
+The problem is that in some cases we want the value of an attribute instead of the text content of an element. This isn't possible with selectors, but Voyant adds additional functionality by searching for an @ symbol and attribute name at the end of a selector, and if it's there, selecting the value
+
+	// for "Author" we could put "meta[name='author']@content"
+	<meta name="author" content="Jane Austen">
+	
+Note that in the case of grouped selectors, the same attribute applies to each group:
+
+	// only the value of author attribute is used: ".comment[author], header p[author] @author: 
+	<div class="comment" author="Jane Austen"></div><header><p author="Jane Austen"></p></header>
+	
+The <a href="https://try.jsoup.org" target="_blank">try Jsoup</a> tool does NOT support this attribute functionality, but you can use it to ensure that you have the right elements and then add the @attributename as desired in Voyant.
+
 ## Tables
 
 Voyant allows you to work flexibly with tabular data such as spreadsheets. At the moment the options described here only work with MS Excel files (.xsl or .xslx). Voyant can currently extract text from other tabular file formats such as OpenOffice, Pages, and comma-separated values (CSV), but in that case each file is considered as a separate document. The options below allow you to extract multiple documents from a single MS Excel file (or from several files).
