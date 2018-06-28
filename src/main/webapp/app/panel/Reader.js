@@ -219,15 +219,14 @@ Ext.define('Voyant.panel.Reader', {
 	    		if (query) {
 	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
 	    		}
-    		} else {
-    			this.on("loadedCorpus", function() {
-        			this.load();
-    	    		var query = this.getApiParam('query');
-    	    		if (query) {
-    	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
-    	    		}
-    			}, this);
     		}
+			this.on("loadedCorpus", function() {
+    			this.load(true); // make sure to clear in case we're replacing the corpus
+	    		var query = this.getApiParam('query');
+	    		if (query) {
+	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
+	    		}
+			}, this);
     	}, this);
     	
     	Ext.apply(this, {

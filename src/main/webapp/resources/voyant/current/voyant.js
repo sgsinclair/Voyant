@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Jun 22 11:41:55 EDT 2018 */
+/* This file created by JSCacher. Last modified: Wed Jun 27 23:39:01 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -14437,6 +14437,8 @@ Ext.define('Voyant.panel.Panel', {
 		this.on({
 			loadedCorpus: {
 				fn: function(src, corpus) {
+		    		// make sure API is updated if we had a corpus and it's changed, this should be registered first, so hopefully be fired before tools receive notification
+		    		this.setApiParam("corpus", corpus.getAliasOrId());
 					this.setCorpus(corpus);
 				},
 				priority: 999, // very high priority
@@ -18485,8 +18487,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
             	view.unmask();
 				if (action.result && (action.result.corpus || action.result.stepEnabledCorpusCreator)) {
 					var corpusParams = {corpus: action.result.corpus ? action.result.corpus.metadata.id : action.result.stepEnabledCorpusCreator.storedId};
-					Ext.apply(corpusParams, apiParams); // adding title & subTitle here
-					
+					Ext.applyIf(corpusParams, apiParams); // adding title & subTitle here
 					this.setCorpus(undefined)
 					this.loadCorpus(corpusParams);
 				} else {
@@ -24181,15 +24182,14 @@ Ext.define('Voyant.panel.Reader', {
 	    		if (query) {
 	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
 	    		}
-    		} else {
-    			this.on("loadedCorpus", function() {
-        			this.load();
-    	    		var query = this.getApiParam('query');
-    	    		if (query) {
-    	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
-    	    		}
-    			}, this);
     		}
+			this.on("loadedCorpus", function() {
+    			this.load(true); // make sure to clear in case we're replacing the corpus
+	    		var query = this.getApiParam('query');
+	    		if (query) {
+	    			this.loadQueryTerms(Ext.isString(query) ? [query] : query);
+	    		}
+			}, this);
     	}, this);
     	
     	Ext.apply(this, {

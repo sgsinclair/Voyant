@@ -69,6 +69,8 @@ Ext.define('Voyant.panel.Panel', {
 		this.on({
 			loadedCorpus: {
 				fn: function(src, corpus) {
+		    		// make sure API is updated if we had a corpus and it's changed, this should be registered first, so hopefully be fired before tools receive notification
+		    		this.setApiParam("corpus", corpus.getAliasOrId());
 					this.setCorpus(corpus);
 				},
 				priority: 999, // very high priority
