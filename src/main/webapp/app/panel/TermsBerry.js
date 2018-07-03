@@ -577,13 +577,13 @@ Ext.define('Voyant.panel.TermsBerry', {
 			.style('cursor', 'default');
 		text.append('tspan')
 			.attr('class', 'term')
-			.style('font-size', function(d) { return textSizer(d.data.rawFreq); })
+			.attr('font-size', function(d) { return textSizer(d.data.rawFreq); })
 			.attr('x', 0)
 			.attr('y', function(d) { return textSizer(d.data.rawFreq)/4; })
 			.text(function(d) { return d.data.term; });
 		text.append('tspan')
 			.attr('class', 'value')
-			.style('font-size', function(d) { return textSizer(d.data.rawFreq)*0.75; })
+			.attr('font-size', function(d) { return textSizer(d.data.rawFreq)*0.75; })
 			.attr('x', 0)
 			.attr('y', function(d) { return textSizer(d.data.rawFreq)+1; });
 		
