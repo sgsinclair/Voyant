@@ -979,11 +979,9 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>Синтакса претраживања докумената (притисните enter/return за почетак претраживања):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>капут</b>: пронађите тачан термин <i>капут</i></li><li><b>капут*</b>: пронађите термине који почињу са <i>капут</i></li><li><b>капут,јакна</b>:пронађите сваки термин раздвојен зарезима као јединствен термин</li><li><b>\"зимски капут\"</b>: <i>зимски капут</i> као фраза</li><li><b>\"капут рукавице\"~5</b>: <i>капут</i> близу термина<i> рукавице</i> (у размаку до 5 речи)</li><li><b>+зимски +капут</b>: пронађите сваки термин који следи иза плус знака (+)</li><li><b>+\"зимски капут\" +рукавицa*</b>: комбиновање синтакси</li></ul>",
 "querySearch":"Претрага",
 "aggregateInDocumentsCount":"Број документата који задовољавају критеријуме претраге (убројени документи садрже барем један тражени термин)."});
-Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
-"noPrevious":"No previous document.",
-"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"немачки",
+"pt":"Portuguese",
 "thisLanguage":"Serbian",
 "autoRecommended":"аутоматско препознавање (препоручљиво)",
 "en":"енглески",
@@ -999,3 +997,6 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "he":"хебрејски",
 "ro":"румунски",
 "sr":"српски"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});

@@ -979,11 +979,9 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>Sintassi di ricerca per i documenti (premere invio/return per far partire una ricerca):</div>< ul style =\"margin-top:3px ; margin-bottom:3px;\"><li><b>cappotto</b>:trova termine esatto <i>cappotto</i></li><li><b>cappotto *</b>:trova termini che iniziano con <i>cappotto</i></li><li><b>cappotto, giacca</b>:trova ogni termine separato da virgola come termini separati</li><li><b>\"cappotto invernale\"</b>: <i>cappotto invernale</i> come un sintagma</li><li>< b>\"guanti cappotto\"~ 5</b>: <i>cappotto</i> vicino a <i>guanti</i> (entro 5 parole)</li>< li><b> + inverno + cappotto</b>: trova ogni termine preceduto da un segno più ( + )</li><li>< b> +\"cappotto invernale\"+ guanto*</b>: combina le sintassi</li></ul>",
 "querySearch":"Cerca",
 "aggregateInDocumentsCount":" Questo è il numero di documenti che soddisfa i criteri di ricerca (ogni documento contato contiene almeno uno dei termini di ricerca)."});
-Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
-"noPrevious":"No previous document.",
-"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"Tedesco",
+"pt":"Portuguese",
 "thisLanguage":"Italiano",
 "autoRecommended":"Rilevamento Automatico (raccomandato)",
 "en":"Inglese",
@@ -999,3 +997,6 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "he":"Hebrew",
 "ro":"Romeno",
 "sr":"Serbian"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});

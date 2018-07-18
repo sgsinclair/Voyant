@@ -979,11 +979,9 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>ドキュメント検索（エンター／リターンを押すことで検索が始まります） 以下の検索オプションは分かち書きをする言語の場合に有効</div> <ul style=\"margin-top: 3px; margin-bottom: 3px;\"> <li><b>coat</b> : <i>coat</i>と完全一致</li> <li><b>coat*</b> : <i>coat</i>で始まる語</li> <li><b>coat,jacket</b> : コンマで区切られた全単語と一致</li> <li><b>\"winter coat\"</b> : フレーズ「<i>winter coat</i>」と一致</li> <li><b>\"coat mittens\"~5</b> : <i>coat</i>と<i>mittens</i>の間に挟まれた5語</li> <li><b>+winter+coat</b> : プラス(+) から始まる全単語と一致</li> <li><b>+\"winter coat\"+mitten*</b> : 複合的な構文</li></ul>",
 "querySearch":"検索",
 "aggregateInDocumentsCount":"検索基準を満たすドキュメントの数です（計上されたドキュメントは、少なくとも検索語を一つ含んでいます）。"});
-Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
-"noPrevious":"No previous document.",
-"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"ドイツ語",
+"pt":"Portuguese",
 "thisLanguage":"日本語",
 "autoRecommended":"自動判別（推奨）",
 "en":"英語",
@@ -999,3 +997,6 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "he":"ヘブライ語",
 "ro":"ルーマニア語",
 "sr":"セルビア語"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});

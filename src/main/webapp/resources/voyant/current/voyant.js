@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jun 27 23:39:01 EDT 2018 */
+/* This file created by JSCacher. Last modified: Fri Jun 29 11:11:51 PDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6060,7 +6060,7 @@ Ext.define('Voyant.util.Localization', {
 	
 	showLanguageOptions: function() {
 		var me = this;
-		var langs = ["ar","bs","cz","en","fr","he","hr","it","ja","sr"].map(function(lang) {
+		var langs = ["ar","bs","cz","en","fr","he","hr","it","ja","pt","sr"].map(function(lang) {
 			return {text: this.localize(lang), value: lang}
 		}, this);
 		langs.sort(function(a,b) {

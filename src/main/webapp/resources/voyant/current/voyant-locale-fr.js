@@ -979,11 +979,9 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>Recherche syntaxique de documents (appuyer sur la touche Entrée/Retour pour lancer une recherche)&nbsp;:</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>&nbsp;: trouver le terme exact <i>coat</i></li><li><b>coat*</b>&nbsp;: trouver les termes qui commencent par le terme exact <i>coat</i></li><li><b>coat,jacket</b>&nbsp;: trouver tous les mots délimités par des virgules, comme des termes séparés</li><li><b>\"winter coat\"</b>&nbsp;: trouver le syntagme exact <i>winter coat</i></li><li><b>\"coat mittens\"~5</b>&nbsp;: trouver le terme exact <i>coat</i> à proximité du terme exact <i>mittens</i> (dans une chaîne de 5 mots)</li><li><b>+winter +coat</b>&nbsp;: trouver tous les termes précédés d’un signe \"plus\" (+)</li><li><b>+\"winter coat\" +mitten*</b>&nbsp;: combiner les syntaxes</li></ul>",
 "querySearch":"Recherche",
 "aggregateInDocumentsCount":"Nombre de documents qui correspondent aux critères de la recherche (chaque document pris en compte contient au moins l’un des termes de la requête)."});
-Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
-"noPrevious":"Pas de document précédent.",
-"noNext":"Pas de document suivant."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"Allemand",
+"pt":"Portugais",
 "thisLanguage":"français",
 "autoRecommended":"Détection automatique (recommandée)",
 "en":"Anglais",
@@ -999,3 +997,6 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "he":"Hébreu",
 "ro":"Roumain",
 "sr":"Serbe"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"Pas de document précédent.",
+"noNext":"Pas de document suivant."});

@@ -29,7 +29,7 @@ Ext.apply(Voyant.panel.Topics.i18n, {
 "scoresTip":"Esta coluna representa os resultados de cada documento (no resultado do corpus) por cada linha do tema",
 "numTopics":"Tópicos",
 "title":"Temas",
-"loadingStopWords":"Carregando lista de palavras excluídas...",
+"loadingStopWords":"Carregando palavras excluídas (stopwords)...",
 "limitTerms":"Termos",
 "search":"Busca",
 "perDocLimit":"Temos/Documento",
@@ -317,7 +317,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableTitle":"Título",
 "noTextProvided":"Nenhum texto fornecido",
 "tableContent":"Conteúdo",
-"tokenizationAuto":"Automácito (altamente recomendado)",
+"tokenizationAuto":"Automático (altamente recomendado)",
 "xpathDocuments":"Documentos",
 "numbersCommasOnly":"Somente números separados por vírgula.",
 "PleaseSelectExisting":"Por favor, selecione um corpus.",
@@ -326,7 +326,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "tableDocumentsColumns":"a partir das colunas inteiras",
 "accessModeWithoutPasswordText":"Caso seja especificada uma <i>senha de acesso</i>, é possível especificar o tipo de acesso concedido sem utilização de senha.",
 "tableContentText":"Especifique qual número de coluna possui conteúdo (ou deixe em branco para usar todas as colunas). A coluna mais à esquerda é a coluna 1. Defina múltiplos documentos separando as colunas com uma vírgula ou combine as colunas usando o sinal de adição (+). Por exemplo “1+2,3) (sem aspas) combinaria as colunas 1 e 2 em um documento e empregaria a coluna 3 em um segundo documento.",
-"inputRemoveFromAfter":"omitir a partir do seguinte",
+"inputRemoveFromAfter":"omitir a partir do termo seguinte a",
 "corpusSubTitle":"Subtítulo do corpus",
 "numberZero":"0 é um número inválido, a primeira coluna é 1",
 "htmlOptionsText":"Experimental! Define CSS selectors (<a href='{0}' target='_blank'>see documentation</a>).",
@@ -336,7 +336,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeNone":"nenhum",
 "tokenizationOptions":"Segmentação",
 "advancedOptionsText":"Para mais informações sobre as opções avançadas apresentadas, ver documentação sobre <a href=\"{0}\" target=\"voyantdocs\">criação de corpus</a>.",
-"inputRemoveUntilAfter":"omitir até o seguinte",
+"inputRemoveUntilAfter":"omitir até o termo seguinte a",
 "tableDocuments":"Documentos",
 "processingOptions":"Preparação",
 "noAllowInputMessage":"Este servidor está configurado para NÃO permitir a adição de novos documentos. Por favor, contacte o administrador do servidor, se possível.",
@@ -397,7 +397,7 @@ Ext.apply(Voyant.panel.Summary.i18n, {
 "distinctiveWords":"<b>Palavras distintivas</b> (comparadas com o restante do corpus):",
 "docsDensity":"Densidade vocabular:",
 "helpTip":"<p>A ferramenta <i>Sumário</i> apresenta informações gerais sobre o corpus. Muitos elementos na ferramenta são links que acionam outras visualizações. Seus recursos incluem: :</p><ul><li>total de palavras (códigos) a formas de palavras (tipos) e idade do corpus</li><li>termos mais frequentes no corpus</li><li>para corpora com mais de um documento<ul><li>documentos organizados por extensão e densidade vocabular</li><li>palavras distintivas para cada documento (por pontuação TF-IDF)</li></ul></li></ul>",
-"items":"Elementos",
+"items":"elementos",
 "moreDistinctiveWords":"<a href=\"#\" onclick=\"return false\">Next {0} of {1} remaining</a>",
 "shortest":"Mais curto:"});
 Ext.apply(Voyant.panel.CorpusSet.i18n, {
@@ -510,7 +510,7 @@ Ext.apply(Voyant.util.Toolable.i18n, {
 "exportSvgMessage":"<p>This is a thumbnail of the SVG image, right-click or ctrl-click on the image to save a full-size copy on your hard drive.</p><p>Alternatively, copy the SVG code below.</p>",
 "exportViewFieldset":"Exportar vista (ferramentas e dados)",
 "exportDataJsonMessage":"Copiar os dados abaixo para utilização em outras aplicação web.",
-"plusTip":"Click to choose another tool for this panel location (this will replace the current tool).",
+"plusTip":"Substituir a ferramenta atual por outra ferramenta",
 "exportGridAllJson":"exportar todos os dados disponíveis em JSON",
 "gearTip":"Definir as opções para esta ferramenta",
 "cancelTitle":"Cancelar",
@@ -639,7 +639,7 @@ Ext.apply(Voyant.widget.ListEditor.i18n, {
 "label":"Lista:",
 "none":"Nenhum",
 "ok":"Salvar",
-"whiteListLabel":"Palavras incluídas:"});
+"whiteListLabel":"Palavras incluídas (white list):"});
 Ext.apply(Voyant.widget.DownloadOptions.i18n, {
 "title":"Opções de download"});
 Ext.apply(Voyant.notebook.editor.button.Run.i18n, {
@@ -731,7 +731,7 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "no":"Norueguês",
 "auto":"Detecção automática",
 "bg":"Búlgaro",
-"noEditAutoMessage":"A lista automática de palavras excluídas não pode ser editada. Por favor, seleciona uma nova lista de palavras excluídas definida pelo usuário.",
+"noEditAutoMessage":"A lista automática de palavras excluídas (stoplist) não pode ser editada. Por favor, selecione uma nova lista de palavras excluídas definida pelo usuário.",
 "lt":"Lituano",
 "lv":"Letão",
 "none":"Nenhum",
@@ -739,7 +739,7 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "bo":"Tibetano",
 "hu":"Húngaro",
 "br":"Bretão",
-"editStopListTitle":"Editar a lista de palavras excluídas",
+"editStopListTitle":"Editar a lista de palavras excluídas (stoplist)",
 "hy":"Armênio",
 "se":"Sueco",
 "grc":"Grego antigo",
@@ -754,11 +754,11 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "en":"Inglês",
 "cn":"Chinês",
 "it":"Italiano",
-"label":"Palavras excluídas:",
-"noEditAutoTitle":"Erro na edição da lista de palavras excluídas",
+"label":"Palavras excluídas (stoplist):",
+"noEditAutoTitle":"Erro na edição da lista de palavras excluídas (stoplist)",
 "es":"Espanhol",
 "applyGlobally":"Aplicar a tudo",
-"editStopListMessage":"Lista de palavras excluídas, um termo por linha.",
+"editStopListMessage":"Lista de palavras excluídas (stoplist), um termo por linha.",
 "eu":"Basco",
 "ar":"Árabe",
 "editList":"Editar a lista",
@@ -979,11 +979,9 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>Sintaxe de busca (aperte enter/return para iniciar uma busca):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>casaco</b>: termo exato <i>casaco</i></li><li><b>casaco*</b>: termos únicos que iniciam com <i>casaco</i> </li><li><b>^casaco*</b>: termos separados que iniciam com <i>casaco</i> (casaco, casacos, etc.)</li><li><b>*aco</b>: termos únicos que terminam com <i>aco</i> </li><li><b>^*aco</b>: termos múltiplos que terminam com <i>aco</i> </li><li><b>casaco,jaqueta</b>: busca cada termo separado por vírgulas como termos separados</li><li><b>casaco|jaqueta</b>: busca termos separados por barra vertical como um termo único </li><li><b>\"casaco de inverno\"</b>: <i>casaco de inverno</i> como frase exata (a ordem importa)</li><li><b>\"casaco azul\"~0</b>: <i>casaco azul</i> ou <i>azul casaco</i> (a ordem não importa)</li><li><b>\"casaco luvas\"~5</b>: <i>casaco</i> próximo de <i>luvas</i> (distância de 5 palavras)</li><li><b>^casaco*,jaqueta|algodão,\"casaco luvas\"~5</b>: combinação de sintaxes</li></ul>",
 "querySearch":"Buscar",
 "aggregateInDocumentsCount":"Este é o número de documentos que correspondem ao critério de busca (cada documento contém ao menos um dos termos buscados)"});
-Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
-"noPrevious":"Não há documento anterior.",
-"noNext":"Não há próximo documento."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"Alemão",
+"pt":"Portuguese",
 "thisLanguage":"Português",
 "autoRecommended":"Detecção automática (recomendado)",
 "en":"Inglês",
@@ -999,3 +997,6 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "he":"Hebraico",
 "ro":"Romeno",
 "sr":"Sérvio"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"Não há documento anterior.",
+"noNext":"Não há próximo documento."});

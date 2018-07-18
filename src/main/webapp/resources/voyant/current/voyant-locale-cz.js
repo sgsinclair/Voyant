@@ -979,11 +979,9 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>Syntax pro vyhledávání v dokumentech  (stisknutím klávesy enter/return zahájíte vyhledávání):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>kabát</b>: vyhledat přesné znění<i>kabát</i></li><li><b>kabát*</b>: vyhledat termíny začínající na <i>kabát</i></li><li><b>kabát,bunda</b>: vyhledat termíny oddělené čárkami jako samostatné termíny</li><li><b>\"zimní kabát\"</b>: <i>zimní kabát</i> jako slovní spojení</li><li><b>\"kabát rukavice\"~5</b>: <i>kabát</i> v blízkosti <i>rukavice</i> (v okolí 5 slov)</li><li><b>+zimní +kabát</b>: vyhledat každý termín, kterému předchází plus (+)</li><li><b>+\"zimní kabát\" +rukavice*</b>: kombinovaná syntax</li></ul>",
 "querySearch":"Vyhledávání",
 "aggregateInDocumentsCount":"Toto je počet dokumentů vyhovujících kritériím vyhledávání (každý započtený dokument obsahuje aspoň jeden vyhledávaný termín)."});
-Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
-"noPrevious":"No previous document.",
-"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"němčina",
+"pt":"Portuguese",
 "thisLanguage":"čeština",
 "autoRecommended":"Automatická detekce (doporučeno)",
 "en":"angličtina",
@@ -999,3 +997,6 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "he":"hebrejština",
 "ro":"rumunština",
 "sr":"srbština"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});

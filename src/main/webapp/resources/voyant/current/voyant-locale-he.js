@@ -979,11 +979,9 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>Search syntax for documents (press enter/return to trigger a search):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>coat</b>: match exact term <i>coat</i></li><li><b>coat*</b>: match terms that start with <i>coat</i></li><li><b>coat,jacket</b>: match each term separated by commas as separate terms</li><li><b>\"winter coat\"</b>: <i>winter coat</i> as an exact phrase (order matters)</li><li><b>\"winter coat\"~0</b>: <i>winter coat</i> or <i>coat winter</i> (order doesn't mattter)</li><li><b>\"coat mittens\"~5</b>: <i>coat</i> near <i>mittens</i> (within 5 words)</li><li><b>+winter +coat</b>: match every term preceded by a plus (+)</li><li><b>+\"winter coat\" +mitten*</b>: combine syntaxes</li></ul>",
 "querySearch":"חיפוש",
 "aggregateInDocumentsCount":"This is the number of documents that satisfy the search criteria (every counted document contains at least one of the search terms)."});
-Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
-"noPrevious":"No previous document.",
-"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"German",
+"pt":"Portuguese",
 "thisLanguage":"English",
 "autoRecommended":"Auto-Detect (recommended)",
 "en":"English",
@@ -999,3 +997,6 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "he":"Hebrew",
 "ro":"Romanian",
 "sr":"Serbian"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});

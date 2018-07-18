@@ -979,11 +979,9 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>Sintaksa pretraživanja dokumenata (pritisnite enter/return za početak pretraživanja):</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b>kaput</b>: pronađite tačan termin <i>kaput</i></li><li><b>kaput*</b>: pronađite termine koji počinju sa <i>kaput</i></li><li><b>kaput,jakna</b>:pronađite svaki termin razdvojen zarezima kao jedinstven termin</li><li><b>\"zimski kaput\"</b>: <i>zimski kaput</i> kao fraza</li><li><b>\"kaput rukavice\"~5</b>: <i>kaput</i> blizu termina <i>rukavice</i> (u razmaku do 5 riječi)</li><li><b>+zimski +kaput</b>: pronađite svaki termin koji slijedi iza plus znaka (+)</li><li><b>+\"zimski kaput\" +rukavica*</b>: kombiniranje sintaksi</li></ul>",
 "querySearch":"Pretraga",
 "aggregateInDocumentsCount":"Broj dokumentata koji zadovoljavaju kriterije pretrage (ubrojeni dokumenti sadrže barem jedan traženi termin)."});
-Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
-"noPrevious":"No previous document.",
-"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"njemački",
+"pt":"Portuguese",
 "thisLanguage":"Bosnian",
 "autoRecommended":"automatsko prepoznavanje (preporučljivo)",
 "en":"engleski",
@@ -999,3 +997,6 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "he":"hebrejski",
 "ro":"rumunski",
 "sr":"srpski"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});

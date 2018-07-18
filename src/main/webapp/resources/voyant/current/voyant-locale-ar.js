@@ -979,11 +979,9 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "querySearchDocsModeTip":"<div>طريقة البحث عن المستندات (مفتاح الدخول يبدأ البحث) :</div><ul style=\"margin-top: 3px; margin-bottom: 3px;\"><li><b> تطابق حرفي للكلمة  <i>معطف </i></li><li><b>معطف *</b>: تطابق الكلمات التي تبدأ ب <i>معطف </i></li><li><b>معطف ,جاكيت</b> طابق الكلمات المحددة بفاصلة ككلمات منفصلة</li><li><b>\" معطف شتوي\"</b>: <i>معطف شتوي</i> كعبارة </li><li><b>\"معطف,قفاز\"~5</b>:<i>معطف</i> بالقرب من <i>قفاز </i>ما بين خمسة كلمات</li><li><b>+معطف+شتوي</li></ul>طابق كل كلمة مسبوقة ب (+) +معطف+ قفاز*</b>: جمع طرق البحث</li></ul>",
 "querySearch":"بحث",
 "aggregateInDocumentsCount":"عدد المستندات التي تعادل معاير البحث (كل مستند ظاهر يحتوي على الاقل كلمة بحث واحدة)"});
-Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
-"noPrevious":"No previous document.",
-"noNext":"No next document."});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"الماني",
+"pt":"Portuguese",
 "thisLanguage":"عربي",
 "autoRecommended":" كشف تلقائي (يوصى به)",
 "en":"انكليزي",
@@ -999,3 +997,6 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "he":"عبري",
 "ro":"روماني",
 "sr":"صربي"});
+Ext.apply(Voyant.panel.SimpleDocReader.i18n, {
+"noPrevious":"No previous document.",
+"noNext":"No next document."});
