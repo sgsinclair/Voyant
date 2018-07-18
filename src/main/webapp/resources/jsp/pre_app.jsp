@@ -132,3 +132,11 @@ if (userAgent.indexOf("Safari") > -1 && (userAgent.indexOf("Version/11.") > -1 |
 	.x-fieldset {overflow: visible;}
 	</style>
 <% } %>
+
+<%@ page import = "java.nio.file.Files, java.nio.file.Paths, java.nio.file.Path" %>
+<%
+	Path path = Paths.get(System.getProperty("java.io.tmpdir"), "voyant-server", "header-include.html");
+	if (Files.exists(path)) { %>
+		<%= new String(Files.readAllBytes(path)) %>
+	<% }
+%>

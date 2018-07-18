@@ -95,4 +95,5 @@ Ext.onReady(function(){
 });
 </script>
 <title>Voyant Tools</title>
+
 <%@ include file="resources/jsp/post_app.jsp" %>
