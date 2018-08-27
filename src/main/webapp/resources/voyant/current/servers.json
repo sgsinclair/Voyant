@@ -14,10 +14,10 @@
         "latlong": "45.5576136,-73.8533637",
         "contact": "<a href='http://stefansinclair.name/'>Stéfan Sinclair</a> &amp; <a href='http://geoffreyrockwell.com'>Geoffrey Rockwell</a>"
     },{
-        "name": "Huma-Num",
-        "url": "http://voyant.tools.huma-num.fr/",
-        "location": "Lyon, France",
-        "latlong": "45.7718126,4.854807",
-        "contact": "<a href='http://www.huma-num.fr/informations-pratiques'>Huma-Num</a>"
+        "name": "University of Oklahoma, Dept. of Geography and Environmental Sustainability",
+        "url": "http://voyant.dges.ou.edu/",
+        "location": "Norman, OK, USA",
+        "latlong": "35.2470202,-97.5027986",
+        "contact": "<a href='mailto:dpurcell@ou.edu'>Darren Purcell</a>"
     }]
 }
