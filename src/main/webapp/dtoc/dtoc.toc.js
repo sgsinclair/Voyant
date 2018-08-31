@@ -304,8 +304,9 @@ Ext.define('Voyant.panel.DToC.ToC', {
 			}
 		},
 		query: function(src, query) {
-			if (query == '') {
+			if (query.length === 0) {
 				this.removeNodes('kwic');
+				this.getApplication().dispatchEvent('tocUpdated', this, []);
 			} else {
 				this.getKwics({query: query});
 			}
