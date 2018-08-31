@@ -30,6 +30,7 @@ Ext.define('VoyantDTOCApp', {
 	
 	useIndex: false, // whether display the index
 	isCurator: false,
+	isRegenerations: true,
     showFreqInReader: false,
     
     settingsWin: null,
@@ -47,17 +48,20 @@ Ext.define('VoyantDTOCApp', {
 	
 	listeners: {
     	loadedCorpus: function(src, corpus) {
+
+			if (corpus.getAliasOrId() !== 'regenerations') {
+				this.isRegenerations = false;
+			} else {
+				Ext.getCmp('header').getComponent('icons').setHtml('<div class="headerRow">'+
+					'<a href="http://inke.ca/" target="_blank"><img src="images/inke_logo_small.png" title="INKE Logo" /></a>'+
+					'<a href="http://cwrc.ca/" target="_blank"><img src="images/cwrc_logo_small.png" title="CWRC Logo" style="margin-left: 8px;" /></a>'+
+					'<a href="http://www.uap.ualberta.ca/" target="_blank"><img src="images/uap_logo_small.png" title="UAP Logo" style="margin-left: 8px;" /></a>'+
+					'<a href="http://voyant-tools.org/" target="_blank"><img src="images/voyant_small.png" title="Voyant Logo" style="margin: 1px 0 1px 8px;" /></a>'+
+				'</div>');
+			}
+
     		Ext.get('headerBookName').setHtml(this.getCorpus().getTitle());
     		Ext.get('headerAuthor').setHtml(this.getCorpus().getSubTitle());
-    		
-    		if (corpus.getAliasOrId() === 'regenerations') {
-    			Ext.getCmp('header').getComponent('icons').setHtml('<div class="headerRow">'+
-					'<a href="http://inke.ca/" target="_blank"><img src="images/inke_logo_small.png" title="INKE Logo" /></a>'+
-        			'<a href="http://cwrc.ca/" target="_blank"><img src="images/cwrc_logo_small.png" title="CWRC Logo" style="margin-left: 8px;" /></a>'+
-        			'<a href="http://www.uap.ualberta.ca/" target="_blank"><img src="images/uap_logo_small.png" title="UAP Logo" style="margin-left: 8px;" /></a>'+
-        			'<a href="http://voyant-tools.org/" target="_blank"><img src="images/voyant_small.png" title="Voyant Logo" style="margin: 1px 0 1px 8px;" /></a>'+
-    			'</div>');
-    		}
     		
     		function doIndexCheck() {
     			Ext.Ajax.request({

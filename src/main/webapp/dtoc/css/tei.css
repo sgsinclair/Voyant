@@ -1,1430 +1,227 @@
-/*
- *  CANADIAN WRITING RESEARCH COLLABORATORY - CSS2 specification for TEI
-    adapted by M. P. Olea from stylesheet by
-        Author: Adrian Edwards (adrian_edwards@yahoo.com) 
-        Date:   2000-04-19
-        Edited by
-            Sebastian Rahtz (sebastian.rahtz@oucs.ox.ac.uk) 2001-05-06
-            and for Oxygen:
-            2003-08-29 start of new parent div resets child auto-count. kl
-            2003-11-06 list attr list-style-type was none, now disc. kl
-            2007-06  reworking for TEI P5 and oxygen    
-    
-    **********
-    For comments, questions, and suggestions please contact Susan Brown, CWRC project leader
-    (sbrown@uoguelph.ca) or Mariana Paredes-Olea, CWRC Metadata Coordinator (paredeso@ualberta.ca)
-    **********    
- *
- */
+/* tei overrides */
 
-/* Use Georgia for default font */
-
-*[data-tag="TEI"] {
-  margin: 10px 25px;
-  font-family: Georgia, serif;
-  line-height: 1.5;
-}
-
-*[data-tag="abbr"] {
-  display: inline;
-}
-
-*[data-tag="add"] {
-  display: inline;
-  color: green;
-  background-color: inherit;
-  text-decoration: underline;
-}
-
-/*address {
-    display : block;
-    margin-top : 2em;
-    margin-left : 2em;
-    margin-right : 2em;
-    margin-bottom : 2em;
-}
-addrLine {
-    display : block;
-    white-space : nowrap;
-}*/
-
-*[data-tag="anchor"] {
-  display: none;
-}
-
-*[data-tag="argument"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="att"] {
-  display: inline;
-  font-family: sans-serif;
-  /*color: blue;*/
-  background-color: inherit;
-}
-
-*[data-tag="att"]:before {
-  content: "@";
-}
-
-*[data-tag="author"] {
-  display: inline;
-}
-
-*[data-tag="back"] {
-  display: block;
-  border: thin black solid;
-  margin-top: 1em;
-  padding-top: 0.5em;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  padding-bottom: 0.5em;
-}
-
-*[data-tag="bibl"] {
-  display: inline;
-}
-
-*[data-tag="#comment"] {
-  color: #08eb03;
-  font-size: smaller;
-}
-
-*[data-tag="#comment"]:before {
-  content: "<!--";
-}
-
-*[data-tag="#comment"]:after {
-  content: "-->";
-}
-
-*[data-tag="div"][type="works"] {
-  text-indent: -2em;
-  margin: 0 0 0 2em;
-}
-
-*[data-tag="bibl"] > *[data-tag="note"] {
-  display: inline;
-}
-
-*[data-tag="bibl"] > *[data-tag="title"][type="alternate"] {
-  content: "Alternate Title: " !important;
-}
-
-*[data-tag="bibl"] > *[data-tag="title"][type="subtitle"] {
-  content: "";
-}
-
-*[data-tag="argument"] > *[data-tag="bibl"],
-*[data-tag="body"] > *[data-tag="bibl"],
-*[data-tag="cit"] > *[data-tag="bibl"],
-*[data-tag="div"] > *[data-tag="bibl"],
-*[data-tag="div0"] > *[data-tag="bibl"],
-*[data-tag="div1"] > *[data-tag="bibl"],
-*[data-tag="div2"] > *[data-tag="bibl"],
-*[data-tag="div3"] > *[data-tag="bibl"],
-*[data-tag="div4"] > *[data-tag="bibl"],
-*[data-tag="div5"] > *[data-tag="bibl"],
-*[data-tag="div6"] > *[data-tag="bibl"],
-*[data-tag="div7"] > *[data-tag="bibl"],
-*[data-tag="epigraph"] > *[data-tag="bibl"],
-*[data-tag="listBibl"] > *[data-tag="bibl"] > *[data-tag="bibl"],
-*[data-tag="taxonomy"] > *[data-tag="bibl"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="biblFull"] {
-  display: inline;
-}
-
-*[data-tag="argument"] > *[data-tag="biblFull"],
-*[data-tag="body"] > *[data-tag="biblFull"],
-*[data-tag="cit"] > *[data-tag="biblFull"],
-*[data-tag="div"] > *[data-tag="biblFull"],
-*[data-tag="div0"] > *[data-tag="biblFull"],
-*[data-tag="div1"] > *[data-tag="biblFull"],
-*[data-tag="div2"] > *[data-tag="biblFull"],
-*[data-tag="div3"] > *[data-tag="biblFull"],
-*[data-tag="div4"] > *[data-tag="biblFull"],
-*[data-tag="div5"] > *[data-tag="biblFull"],
-*[data-tag="div6"] > *[data-tag="biblFull"],
-*[data-tag="div7"] > *[data-tag="biblFull"],
-*[data-tag="epigraph"] > *[data-tag="biblFull"],
-*[data-tag="listBibl"] > *[data-tag="biblFull"] > *[data-tag="biblFull"],
-*[data-tag="taxonomy"] > *[data-tag="biblFull"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="listBibl"] > *[data-tag="bibl"] {
-  display: block;
-  margin-left: 2em;
-  margin-bottom: 0.5em;
-  text-indent: -2em;
-}
-
-*[data-tag="biblScope"] {
-  display: inline;
-}
-
-*[data-tag="imprint"] > *[data-tag="biblScope"] {
-  display: block;
-}
-
-*[data-tag="body"] {
-  margin-top: 5px;
-  padding: 0 2em 0 0;
-  display: block;
-  counter-reset: div1;
-}
-
-*[data-tag="byline"] {
-  display: block;
-  font-style: italic;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="category"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="catRef"] {
-  display: none;
-}
-
-*[data-tag="cell"] {
-  display: table-cell;
-  border: 1px solid #EEEFEE;
-  padding: 3px;
-  color: inherit;
-  background-color: inherit;
-}
-
-*[data-tag="cell"][role = 'label'] {
-  color: inherit;
-  background-color: #BBBBBB;
-}
-
-*[data-tag="change"] {
-  display: block;
-  margin-bottom: 1em;
-  margin-left: 2em;
-}
-
-*[data-tag="cit"] {
-  display: inline;
-}
-
-*[data-tag="argument"] > *[data-tag="cit"],
-*[data-tag="body"] > *[data-tag="cit"],
-*[data-tag="div"] > *[data-tag="cit"],
-*[data-tag="div0"] > *[data-tag="cit"],
-*[data-tag="div1"] > *[data-tag="cit"],
-*[data-tag="div2"] > *[data-tag="cit"],
-*[data-tag="div3"] > *[data-tag="cit"],
-*[data-tag="div4"] > *[data-tag="cit"],
-*[data-tag="div5"] > *[data-tag="cit"],
-*[data-tag="div6"] > *[data-tag="cit"],
-*[data-tag="div7"] > *[data-tag="cit"],
-*[data-tag="epigraph"] > *[data-tag="cit"] {
-  display: block;
-  margin-bottom: 0.5em;
-  margin-top: 0.5em;
-}
-
-*[data-tag="classCode"] {
-  display: block;
-}
-
-*[data-tag="elementSpec"],
-*[data-tag="macroSpec"],
-*[data-tag="classSpec"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="closer"] {
-  display: block;
-  margin-bottom: 1em;
-  width: 95%;
-}
-
-*[data-tag="code"] {
-  display: inline;
-  font-family: monospace;
-}
-
-*[data-tag="corr"] {
-  display: inline;
-  color: green;
-  background-color: inherit;
-}
-
-*[data-tag="creation"] {
-  display: block;
-}
-
-*[data-tag="date"] {
-  display: inline;
-}
-
-*[data-tag="change"] > *[data-tag="date"],
-*[data-tag="publicationStmt"] > *[data-tag="date"] {
-  display: block;
-  font-weight: bold;
-}
-
-*[data-tag="dateline"] {
-  display: inline;
-}
-
-*[data-tag="del"] {
-  display: inline;
-  color: red;
-  background-color: inherit;
-  text-decoration: line-through;
-}
-
-*[data-tag="distributor"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="body"] > *[data-tag="div"] {
-  display: block;
-  counter-increment: div1;
-  counter-reset: div2;
-  margin: 0 0 1.5em 0;
-}
-
-*[data-tag="body"] > *[data-tag="div"] > *[data-tag="div"] {
-  display: block;
-  margin-bottom: 1em;
-  counter-increment: div2;
-  counter-reset: div3;
-}
-
-*[data-tag="body"] > *[data-tag="div"] > *[data-tag="div"] > *[data-tag="div"] {
-  display: block;
-  margin-bottom: 1em;
-  counter-increment: div3;
-}
-
-*[data-tag="body"] > *[data-tag="div"][type = "letter"] {
-  margin-bottom: 2em !important;
-}
-
-*[data-tag="div"][type="poem"] {
-  counter-reset: line;
-}
-
-*[data-tag="div1"] {
-  display: block;
-  margin-bottom: 1em;
-  counter-increment: div1;
-  counter-reset: div2;
-}
-
-*[data-tag="div2"] {
-  display: block;
-  margin-bottom: 1em;
-  counter-increment: div2;
-  counter-reset: div3;
-}
-
-*[data-tag="div3"] {
-  display: block;
-  margin-bottom: 1em;
-  counter-increment: div3;
-  counter-reset: div4;
-}
-
-*[data-tag="div4"] {
-  display: block;
-  margin-bottom: 1em;
-  counter-increment: div4;
-  counter-reset: div5;
-}
-
-*[data-tag="div5"] {
-  display: block;
-  margin-bottom: 1em;
-  counter-increment: div5;
-  counter-reset: div6;
-}
-
-*[data-tag="div6"] {
-  display: block;
-  margin-bottom: 1em;
-  counter-increment: div6;
-  counter-reset: div7;
-}
-
-*[data-tag="div7"] {
-  display: block;
-  margin-bottom: 1em;
-  counter-increment: div7;
-}
-
-*[data-tag="divGen"] {
-  display: none;
-}
-
-*[data-tag="docAuthor"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="byline"] *[data-tag="docAuthor"] {
-  display: inline;
-}
-
-
-
-
-
-*[data-tag="edition"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="bibl"] *[data-tag="edition"] {
-  display: inline;
-}
-
-*[data-tag="editionStmt"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="editor"] {
-  display: block;
-}
-
-*[data-tag="bibl"] *[data-tag="editor"] {
-  display: inline;
-}
-
-*[data-tag="eg"] {
-  font-family: monospace;
-  padding-top: 3mm;
-  padding-left: 4pt;
-  padding-bottom: 2pt;
-  display: block;
-  margin-top: 12pt;
-  margin-bottom: 12pt;
-  white-space: pre;
-  color: inherit;
-  background-color: #FFCC99;
-}
-
-*[data-tag="argument"] > *[data-tag="eg"],
-*[data-tag="body"] > *[data-tag="eg"],
-*[data-tag="div"] > *[data-tag="eg"],
-*[data-tag="div0"] > *[data-tag="eg"],
-*[data-tag="div1"] > *[data-tag="eg"],
-*[data-tag="div2"] > *[data-tag="eg"],
-*[data-tag="div3"] > *[data-tag="eg"],
-*[data-tag="div4"] > *[data-tag="eg"],
-*[data-tag="div5"] > *[data-tag="eg"],
-*[data-tag="div6"] > *[data-tag="eg"],
-*[data-tag="div7"] > *[data-tag="eg"],
-*[data-tag="epigraph"] > *[data-tag="eg"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="emph"] {
-  display: inline;
-  font-style: italic;
-}
-
-*[data-tag="epigraph"] {
-  display: block;
-  margin-bottom: 1em;
-  text-align: center;
-}
-
-*[data-tag="extent"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="bibl"] *[data-tag="extent"] {
-  display: inline;
-}
-
-*[data-tag="graphic"] {
-  color: gray;
-  background-color: inherit;
-  content: "{" attr(url) "}";
-}
-
-*[data-tag="figure"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="foreign"] {
-  display: inline;
-  font-style: italic;
-}
-
-*[data-tag="formula"] {
-  display: inline;
-  font-style: italic;
-}
-
-*[data-tag="front"] {
-  display: block;
-  margin-bottom: 1em;
-  padding-top: 0.5em;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  padding-bottom: 0.5em;
-}
-
-*[data-tag="funder"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="gap"] {
-  display: none;
-}
-
-*[data-tag="gap"]:after {
-  content: "[...]";
-  font-style: italic;
-}
-
-*[data-tag="gi"],
-*[data-tag="tag"] {
-  display: inline;
-  font-family: sans-serif;
-  /*color: blue;*/
-  background-color: inherit;
-}
-
-*[data-tag="tag"]:before,
-*[data-tag="gi"]:before {
-  content: "<";
-}
-
-*[data-tag="tag"]:after,
-*[data-tag="gi"]:after {
-  content: ">";
-}
-
-*[data-tag="gloss"] {
-  display: inline;
-}
-
-*[data-tag="group"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="body"] > *[data-tag="div"] > *[data-tag="head"] {
-  display: block;
-  padding-top: 7px;
-  padding-bottom: 10px;
-  color: inherit;
-  font-weight: bold;
-  margin-bottom: 0.5em;
-  margin-top: 1em;
-  font-size: 18px;
-}
-
-*[data-tag="body"] > *[data-tag="div"][type="poem"] > *[data-tag="head"] *[data-tag="author"] {
-  font-weight: normal;
-}
-
-*[data-tag="body"] > *[data-tag="div"] > *[data-tag="div"] > *[data-tag="head"] {
-  display: block;
-  padding-top: 14px;
-  padding-bottom: 10px;
-  padding-left: 10px;
-  color: inherit;
-  background-color: #BBBBBB;
-  font-weight: bold;
-  margin-bottom: 0.5em;
-  margin-top: 11px;
-}
-
-*[data-tag="body"] > *[data-tag="div"] > *[data-tag="div"] > *[data-tag="div"] > *[data-tag="head"] {
-  display: block;
-  padding-top: 14px;
-  padding-bottom: 10px;
-  padding-left: 10px;
-  color: inherit;
-  background-color: #BBBBBB;
-  font-weight: bold;
-  margin-bottom: 0.5em;
-  margin-top: 1em;
-}
-
-*[data-tag="div"] *[data-tag="opener"] *[data-tag="dateline"] {
-  display: block;
-  text-align: right;
-  width: 95%;
-}
-
-*[data-tag="div1"] > *[data-tag="head"]:before {
-  /*    content : counter(div1) ". ";
-*/
-  color: black;
-  background-color: inherit;
-}
-
-*[data-tag="div2"] > *[data-tag="head"]:before {
-  /*    content : counter(div1) "." counter(div2) ". ";
-*/
-  color: black;
-  background-color: inherit;
+:root {
+    padding: 20px 50px;
+    font-family: Georgia, serif;
+    font-size: 18px;
+    line-height: 25px;
 }
 
-*[data-tag="div3"] > *[data-tag="head"]:before {
-  /*    content : counter(div1) "." counter(div2) "." counter(div3) ". ";
-*/
-  color: black;
-  background-color: inherit;
+/* drop cap (sort of works) */
+div[type=chapter] > p:first-of-type::first-letter {
+    font-size: 46px;
+    float: left;
+    margin: 6px 6px 0 0;
+    line-height: 0.8;
 }
 
-*[data-tag="body"] > *[data-tag="div"] > *[data-tag="head"]:before {
-  /*    content : counter(div1) ". ";
-*/
-  color: black;
-  background-color: inherit;
+front {
+    margin: 0;
+    padding: 0;
 }
 
-*[data-tag="body"] > *[data-tag="div"] > *[data-tag="div"] > *[data-tag="head"]:before {
-  /*    content : counter(div1) "." counter(div2) ". ";
-*/
-  color: black;
-  background-color: inherit;
+front titlePage {
+    text-align: left;
+    border: none;
+    margin: 0;
+    padding: 0;
 }
 
-*[data-tag="body"] > *[data-tag="div"] > *[data-tag="div"] > *[data-tag="div"] > *[data-tag="head"]:before {
-  /*    content : counter(div1) "." counter(div2) "." counter(div3) ". ";
-*/
-  color: black;
-  background-color: inherit;
+front note {
+    display: block !important;
+    color: inherit;
 }
 
-/*
-*[data-tag="hi"] {
-  display: inline;
-  background-color: yellow;
-  color: black;
+front note:before {
+    content: none;
 }
-*/
 
-*[data-tag="hi"][rend] {
-  background-color: inherit;
-  color: inherit;
+front addrLine {
+    display: block;
 }
 
-*[data-tag="hi"][rend = "bold"] {
-  display: inline;
-  font-weight: bold;
+front biblFull {
+    display: block;
 }
 
-*[data-tag="hi"][rend = "italic"] {
-  display: inline;
-  font-style: italic;
+front resp {
+    display: block;
 }
 
-*[data-tag="hi"][rend = "underline"] {
-  display: inline;
-  text-decoration: underline;
+front ab {
+    display: block;
 }
 
-*[data-tag="hi"][rend = "it"] {
-  display: inline;
-  font-style: italic;
+front ab persname {
+    font-variant: small-caps;
 }
 
-*[data-tag="hi"][rend = "sc"] {
-  display: inline;
-  font-variant: small-caps;
+front list > item > list > item {
+    margin-left: 30px;
 }
 
-*[data-tag="hi"][rend = "sup"] {
-  display: inline;
-  vertical-align: super;
-  font-size: smaller;
+front > titlePage > docEdition:nth-child(1) note {
+    margin-left: 5em;
 }
 
-*[data-tag="hi"][rend = "sub"] {
-  display: inline;
-  vertical-align: sub;
-  font-size: smaller;
+[rend="bold"] {
+    font-weight: bold;
 }
 
-*[data-tag="hi"][rend = "ul"] {
-  display: inline;
-  text-decoration: underline;
+[rend="italic"] {
+    font-style: italic;
 }
 
-*[data-tag="ident"] {
-  display: inline;
-  font-family: monospace;
+p {
+    margin: 20px 0;
+    text-align: left !important;
+    text-indent: 0px !important;
 }
 
-*[data-tag="idno"] {
-  display: block;
-  margin-bottom: 1em;
+note {
+	display: none;
 }
 
-*[data-tag="bibl"] *[data-tag="idno"] {
-  display: inline;
+docTitle {
+    font-size: 120%;
 }
 
-*[data-tag="imprint"] {
-  display: inline;
+figure {
+    margin: 10px 0px !important;
 }
 
-*[data-tag="index"] {
-  display: none;
+ref {
+    color: #000000 !important;
 }
 
-*[data-tag="interp"] {
-  display: none;
+ref[target^="http://"], ref[target^="https://"] {
+    text-decoration: underline;
+    cursor: pointer;
 }
 
-*[data-tag="interpGrp"] {
-  display: none;
+hi {
+    background: none !important;
 }
 
-*[data-tag="list"][type = "gloss"] *[data-tag="item"] {
-  display: block;
-  margin-left: 1em;
+persName, placeName, orgName, title {
+    color: #000000 !important;
 }
 
-*[data-tag="list"] *[data-tag="item"] {
-  display: list-item;
-  margin-left: 12pt;
-}
-
-*[data-tag="item"] {
-  display: list-item;
-  margin-left: 12pt;
-}
-
-*[data-tag="item"][n]:before {
-  content: attr(n) ". ";
-  list-style: none;
-}
-
-/* should there be space after the content?
-     And should default marker be suppressed
-     when there is an @n attribute? --DRS */
-
-*[data-tag="change"] *[data-tag="item"] {
-  display: block;
-  margin-bottom: 0.5em;
-  margin-left: 1em;
-  margin-top: 0.5em;
-}
-
-*[data-tag="keywords"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="kw"] {
-  display: inline;
-  font-style: italic;
-}
-
-*[data-tag="l"] {
-  display: block;
-  white-space: nowrap;
-}
-
-*[data-tag="l"]:after {
-  content: counter(line);
-  counter-increment: line;
-  text-align: right;
-  float: right;
-  color: silver;
-  margin-right: 50px;
-}
-
-*[data-tag="label"] {
-  display: inline;
-  /*font-weight: bold;*/
-}
-
-*[data-tag="Label"] {
-  display: inline;
-  font-weight: bold;
-  color: #2F4F4F;
-  background-color: inherit;
-}
-
-*[data-tag="argument"] > *[data-tag="label"],
-*[data-tag="body"] > *[data-tag="label"],
-*[data-tag="div"] > *[data-tag="label"],
-*[data-tag="div0"] > *[data-tag="label"],
-*[data-tag="div1"] > *[data-tag="label"],
-*[data-tag="div2"] > *[data-tag="label"],
-*[data-tag="div3"] > *[data-tag="label"],
-*[data-tag="div4"] > *[data-tag="label"],
-*[data-tag="div5"] > *[data-tag="label"],
-*[data-tag="div6"] > *[data-tag="label"],
-*[data-tag="div7"] > *[data-tag="label"],
-*[data-tag="epigraph"] > *[data-tag="label"] {
-  display: block;
-  font-weight: bold;
-}
-
-*[data-tag="langUsage"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="lb"] {
-  display: block;
-}
-
-*[data-tag="lb"]:before {
-  content: "";
-}
-
-*[data-tag="lg"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="list"] {
-  display: block;
-  list-style-type: disc;
-  list-style-position: outside;
-  margin-bottom: 1em;
-  margin-left: 2em;
-  margin-top: 1em;
-}
-
-*[data-tag="list"][rend = "runon"] {
-  display: inline;
-}
-
-*[data-tag="list"][type = "bulleted"] {
-  list-style-type: disc;
-  list-style-position: outside;
-}
-
-*[data-tag="list"][type = "unordered"] {
-  list-style-type: disc;
-  list-style-position: outside;
-}
-
-*[data-tag="list"][type = "ordered"] {
-  list-style-type: decimal;
-  list-style-position: outside;
-}
-
-*[data-tag="list"][type = "numbered"] {
-  list-style-type: decimal;
-  list-style-position: outside;
-}
-
-*[data-tag="list"][type = "none"] {
-  list-style-type: none;
-}
-
-*[data-tag="listBibl"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="mentioned"] {
-  display: inline;
-  font-style: italic;
-}
-
-*[data-tag="milestone"] {
-  display: none;
-}
-
-*[data-tag="name"] {
-  display: inline;
-}
-
-*[data-tag="note"] {
-  display: block;
-  color: #999;
-}
-
-*[data-tag="note"]:before {
-  content: 'note: ';
-  font-variant: small-caps;
-}
-
-*[data-tag="note"][type]:before {
-  content: attr(type) ': ';
-}
-
-*[data-tag="opener"] *[data-tag="note"] {
-  display: block;
-  color: #999;
-}
-
-/* opener note:before {
-    content:'';
-    font-variant:normal;
-}
-opener note[type]:before {
-    content:'';
+/* graphic {
+    display: none;
 } */
 
-/* rules removed to fix: https://github.com/cwrc/CWRC-WriterBase/issues/49 */
-
-*[data-tag="note"][n]:before {
-  content: attr(n) " ";
-  vertical-align: super;
-}
-
-*[data-tag="div"] *[data-tag="note"] *[data-tag="persName"],
-*[data-tag="div"] *[data-tag="note"] *[data-tag="orgName"],
-*[data-tag="div"] *[data-tag="note"] *[data-tag="title"],
-*[data-tag="div"] *[data-tag="note"] *[data-tag="placeName"] {
-  color: #6DB0CC !important;
-}
-
-*[data-tag="note"][place = "left"] {
-  float: left;
-}
-
-*[data-tag="note"][place = "right"] {
-  float: right;
-}
-
-*[data-tag="note"][place = "inline"],
-*[data-tag="note"][place = "unspecified"] {
-  display: inline;
-}
-
-*[data-tag="note"][place = "inline"]:before {
-  content: '(';
-}
-
-*[data-tag="note"][place = "inline"]:after {
-  content: ')';
-}
-
-*[data-tag="notesStmt"] {
-  display: block;
-}
-
-*[data-tag="num"] {
-  display: inline;
-}
-
-*[data-tag="opener"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="opener"] *[data-tag="p"] {
-  text-align: justify !important;
-  text-indent: 0 !important;
-}
-
-*[data-tag="orig"] {
-  display: inline;
-}
-
-*[data-tag="p"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="pb"] {
-  display: block;
-}
-
-*[data-tag="pb"]:before {
-  content: '\00a0';
-  box-shadow: 0px 1em 0px 1px #000;
-}
-
-*[data-tag="pb"]:after {
-  content: attr(n);
-  box-shadow: 5em 1em 0px 1px #000;
-  text-indent: 30px;
-}
-
-*[data-tag="pb"]:before,
-*[data-tag="pb"]:after {
-  display: inline-block;
-  height: 0px;
-  width: 35%;
-  position: relative;
-  left: 10%;
-}
-
-/*
-
-pb:after {
-    content : attr(n);
-    font-weight : bold;
-    margin-bottom : 1em;
-    margin-top : 1em;
-    text-align : center;
-}*/
-
-/*
-*[data-tag="div"] *[data-tag="persName"],
-*[data-tag="div"] *[data-tag="placeName"],
-*[data-tag="div"] *[data-tag="orgName"],
-*[data-tag="div"] *[data-tag="title"] {
-  color: #336699;
-}
-*/
-
-*[data-tag="principal"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="ptr"] {
-  color: navy;
-  text-decoration: underline;
-  background-color: inherit;
-}
-
-*[data-tag="ptr"]:before {
-  background-color: inherit;
-  color: red;
-  content: "[" attr(target) "]";
-}
-
-*[data-tag="publicationStmt"] {
-  /*    display : block;
-    margin-bottom : 0.5em;*/
-}
-
-*[data-tag="publicationStmt"] *[data-tag="p"] {
-  display: block;
-  margin-bottom: 0;
-}
-
-*[data-tag="publisher"] {
-  display: inline;
-}
-
-*[data-tag="imprint"] > *[data-tag="publisher"],
-*[data-tag="publicationStmt"] > *[data-tag="publisher"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="pubPlace"] {
-  display: inline;
-}
-
-*[data-tag="imprint"] > *[data-tag="pubPlace"],
-*[data-tag="publicationStmt"] > *[data-tag="pubPlace"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="q"] {
-  display: inline;
-  quotes: '"' '"' "'" "'";
-  margin-top: 0em;
-  margin-left: 0em;
-  margin-right: 0em;
-  margin-bottom: 0em;
-}
-
-*[data-tag="q"][rend = "display"],
-*[data-tag="argument"] > *[data-tag="q"],
-*[data-tag="body"] > *[data-tag="q"],
-*[data-tag="cit"] > *[data-tag="q"],
-*[data-tag="div"] > *[data-tag="q"],
-*[data-tag="div0"] > *[data-tag="q"],
-*[data-tag="div1"] > *[data-tag="q"],
-*[data-tag="div2"] > *[data-tag="q"],
-*[data-tag="div3"] > *[data-tag="q"],
-*[data-tag="div4"] > *[data-tag="q"],
-*[data-tag="div5"] > *[data-tag="q"],
-*[data-tag="div6"] > *[data-tag="q"],
-*[data-tag="div7"] > *[data-tag="q"],
-*[data-tag="epigraph"] > *[data-tag="q"] {
-  display: block;
-  margin-bottom: 0.5em;
-  margin-left: 3em;
-  margin-right: 3em;
-  quotes: none;
-}
-
-*[data-tag="q"]:before {
-  content: "\201C";
-}
-
-*[data-tag="q"]:after {
-  content: "\201D";
-}
-
-*[data-tag="ref"] {
-  display: inline;
-  /*color: blue;*/
-  background-color: inherit;
-}
-
-*[data-tag="ref"]:before {
-  color: gray;
-  background-color: inherit;
-  text-decoration: underline;
-}
-
-*[data-tag="reg"] {
-  display: inline;
-  font-style: italic;
-}
-
-*[data-tag="rendition"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="resp"] {
-  display: block;
-}
-
-*[data-tag="respStmt"] {
-  display: block;
-  margin-left: 1em;
-}
-
-*[data-tag="respStmt"] > *[data-tag="name"]:before {
-  content: attr(role) ": ";
-  display: block !important;
-  font-variant: small-caps;
-}
-
-*[data-tag="bibl"] *[data-tag="respStmt"] {
-  display: inline;
-}
-
-*[data-tag="rdg"]:before {
-  background-color: inherit;
-  content: "[" attr(wit) "] ";
-  color: red;
-}
-
-*[data-tag="row"] {
-  display: table-row;
-}
-
-*[data-tag="row"][role = 'label'] {
-  color: inherit;
-  background-color: #BBBBBB;
-}
-
-*[data-tag="rs"] {
-  display: inline;
-}
-
-*[data-tag="s"] {
-  display: inline;
-}
-
-*[data-tag="salute"] {
-  display: block;
-  margin-bottom: 0.5em;
-  margin-top: 1em;
-}
-
-*[data-tag="samplingDecl"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="seg"] {
-  display: inline;
-}
-
-*[data-tag="seriesStmt"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="sic"] {
-  display: inline;
-  color: red;
-  background-color: inherit;
-}
-
-*[data-tag="sic"]:after {
-  content: " [sic]";
-}
-
-*[data-tag="signed"] {
-  display: block;
-  text-align: right;
-}
-
-*[data-tag="soCalled"] {
-  display: inline;
-  font-style: italic;
-  quotes: "'" "'";
-}
-
-*[data-tag="soCalled"]:before {
-  content: "\201C";
-}
-
-*[data-tag="soCalled"]:after {
-  content: "\201D";
-}
-
-*[data-tag="sp"] {
-  display: block;
-  margin-bottom: 0.5em;
-  margin-left: 2em;
-}
-
-/*
-*[data-tag="div"] *[data-tag="p"] {
-  text-align: justify;
-  text-indent: 30px;
-}
-*/
-
-*[data-tag="speaker"] {
-  display: inline;
-  font-weight: bold;
-}
-
-*[data-tag="sponsor"] {
-  display: block;
-  margin-bottom: 0.5em;
+figDesc {
+    display: none;
 }
 
-*[data-tag="stage"] {
-  display: inline;
-  font-style: italic;
+figure > head {
+    font-weight: normal;
+    text-align: center;
 }
 
-*[data-tag="table"] {
-  text-align: center;
-  display: table;
-  margin: 1em;
+figure > p, figure > ab {
+    text-align: center;
 }
 
-*[data-tag="table"] > *[data-tag="head"] {
-  display: table-caption;
-  font-style: italic;
-  margin-bottom: 6pt;
+list {
+	counter-reset: item;
 }
 
-*[data-tag="tagUsage"] {
-  display: block;
-  margin-bottom: 0.5em;
+list > item {
+	counter-increment: item;
+	display: list-item;
+	margin: 15px 0;
+	list-style: none;
 }
 
-*[data-tag="taxonomy"] {
-  display: block;
-  margin-bottom: 0.5em;
+list > item:before {
+	content: counter(item) ".";
 }
 
-*[data-tag="term"] {
-  font-family: sans-serif;
-  /*color: blue;*/
-  background-color: inherit;
-  display: inline;
+q::before, quote::before {
+    content: "";
 }
-
-*[data-tag="textClass"] {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-*[data-tag="time"] {
-  display: inline;
-}
-
-*[data-tag="title"] {
-  display: inline;
-}
-
-*[data-tag="title"][type="subtitle"] {
-  display: block;
-  font-weight: normal;
-}
-
-*[data-tag="title"][level = "m"],
-*[data-tag="title"][level = "j"] {
-  font-style: italic;
-}
-
-*[data-tag="title"][level = "s"] {
-  font-style: normal;
-}
-
-*[data-tag="title"][level = "a"],
-*[data-tag="title"][level = "u"] {
-  font-style: normal;
-}
-
-*[data-tag="title"][level = "a"]:before,
-*[data-tag="title"][level = "u"]:before {
-  content: "\201C";
-}
-
-*[data-tag="title"][level = "a"]:after,
-*[data-tag="title"][level = "u"]:after {
-  content: "\201D";
-}
-
-*[data-tag="seriesStmt"] > *[data-tag="title"],
-*[data-tag="titleStmt"] > *[data-tag="title"] {
-  color: gray;
-  font-weight: bold;
-}
-
-*[data-tag="titlePage"] {
-  display: block;
-  /*
-  border: thin black solid;
-  margin-bottom: 2em;
-  text-align: center;
-  padding-top: 1em;
-  padding-left: 1em;
-  padding-right: 1em;
-  padding-bottom: 1em;
-  */
-}
-
-*[data-tag="titlePart"] {
-  display: block;
-}
-
-*[data-tag="titleStmt"] {
-  margin-bottom: 1em;
-  color: #333;
-}
-
-*[data-tag="trailer"] {
-  display: block;
-  margin-bottom: 1em;
-}
-
-*[data-tag="unclear"] {
-  display: inline;
-  color: gray;
-  background-color: inherit;
-  font-style: italic;
-}
-
-/* header-related material */
-
-*[data-tag="teiHeader"] {
-  display: block;
-  color: gray;
-  background-color: rgb(251, 242, 234);
-  padding: .5em;
-}
-
-*[data-tag="teiHeader"] *[data-tag="author"]:before {
-  font-variant: small-caps;
-  content: "author: ";
-}
-
-*[data-tag="teiHeader"] *[data-tag="editor"]:before {
-  font-variant: small-caps;
-  content: "editor: ";
-}
-
-*[data-tag="teiHeader"] *[data-tag="title"] {
-  color: gray;
+q::after, quote::after {
+    content: "";
 }
 
-*[data-tag="titleStmt"] > *[data-tag="author"] {
-  display: block;
-  margin-left: 1em;
+q:not([type="block"]):not([rend="bloc"])::before, quote:not([type="block"]):not([rend="bloc"])::before {
+    content: "\201C";
 }
-
-*[data-tag="authority"] {
-  display: block;
-  margin-bottom: 0.5em;
+q:not([type="block"]):not([rend="bloc"])::after, quote:not([type="block"]):not([rend="bloc"])::after {
+    content: "\201D";
 }
 
-*[data-tag="availability"] {
-  display: block;
-  margin-bottom: 0.5em;
+q[type="block"], q[rend="bloc"], quote[type="block"], quote[rend="bloc"] {
+	display: block;
+	margin: 10px 40px;
 }
 
-*[data-tag="fileDesc"] {
-  /*    display : block;
-    margin-bottom : .5em;*/
+title[level = "a"]:before, title[level = "u"]:before {
+    content: "\201C";
 }
 
-*[data-tag="sourceDesc"] {
-  /*    display : block;
-    border : thin silver solid;
-    padding : .5em .5em 0 .5em;*/
+title[level = "a"]:after, title[level = "u"]:after {
+    content: "\201D";
 }
 
-*[data-tag="sourceDesc"] *[data-tag="p"] {
-  margin: 0;
+/* hide chapter header */
+:root > head,
+:root > docAuthor,
+:root > byline {
+    display: none;
 }
 
-*[data-tag="revisionDesc"] {
-  display: block;
-  margin-bottom: 1em;
+head {
+    display: block;
+    font-weight: bold;
 }
 
-*[data-tag="catDesc"] {
-  display: block;
-  margin-bottom: 0.5em;
+bibl {
+    display: block !important;
+    margin: 8px 0 !important;
+    padding-left: 24px !important;
+    text-indent: -24px !important;
 }
 
-*[data-tag="encodingDesc"] {
-  display: block;
-  margin-bottom: 1em;
+table {
+    table-layout: fixed;
+    width: 80%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
 }
 
-*[data-tag="profileDesc"] {
-  display: block;
-  margin-bottom: 1em;
+cell {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    border-right: none;
+    border-left: none;
+    padding: 5px 0px;
+    text-align: center;
+    word-wrap: break-word;
 }
 
-*[data-tag="projectDesc"] {
-  display: block;
-  margin-bottom: 1em;
+cell p {
+	margin: 0;
 }
 
-*[data-tag="docDate"] {
-  display: block;
-  margin-bottom: 0.5em;
+l:first-child:before {
+    content: none;
 }
-
-*[data-tag="docImprint"] *[data-tag="docDate"] {
-  display: inline;
+l:before {
+	content: "\A";
+	white-space: pre;
 }
 
-*[data-tag="docEdition"] {
-  display: block;
-  margin-bottom: 0.5em;
+lg {
+    margin-bottom: 20px;
 }
 
-*[data-tag="docImprint"] {
-  display: block;
-  margin-bottom: 0.5em;
+l {
+    display: inline;
 }
 
-*[data-tag="docTitle"] {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.5em;
-  font-weight: bold;
+l:after {
+    content: none;
 }
