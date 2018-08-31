@@ -13,6 +13,10 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -182,7 +186,6 @@ public class Trombone extends HttpServlet {
 
 		resp.setContentType(ResultsOutputFormat.getResultsOutputFormat(parameters.getParameterValue("outputFormat", "json")).getContentType());
 
-
 		if (parameters.containsKey("fetchData")) {
 			URL url;
 			URLConnection c;
@@ -292,6 +295,8 @@ public class Trombone extends HttpServlet {
 			outputStream.close();
 		}
 		else {
+			// we set a permissive control to data to allow calls from elsewhere – this may need to be monitored
+			resp.setHeader("Access-Control-Allow-Origin", "*");
 			Writer writer = resp.getWriter();
 			runTromboneController(parameters, resp.getWriter());
 			writer.flush();
@@ -467,5 +472,17 @@ public class Trombone extends HttpServlet {
 		return parameterValue;
 		
 	}
+	
+	public static boolean hasVoyantServerResource(String resource) {
+		return Files.exists(getVoyantServerResourcePath(resource));
+	}
 
+	public static String getVoyantServerResource(String resource) throws IOException {
+		return new String(Files.readAllBytes(getVoyantServerResourcePath(resource)), Charset.forName("UTF-8"));
+	}
+	
+	private static Path getVoyantServerResourcePath(String resource) {
+		// make file from resource to get filename only (avoid traversal vulnerability)
+		return Paths.get(System.getProperty("java.io.tmpdir"), "voyant-server", new File(resource).getName());
+	}
 }
