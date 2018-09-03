@@ -1,0 +1,30 @@
+/* we'll also add custom styles to display graphics here using js */
+
+[dtocHighlight=index] {
+	background-color: #FBD7B2 !important;
+}
+
+[dtocHighlight=tag] {
+	background-color: #B1D6FB !important;
+}
+
+[dtocHighlight=kwic] {
+	background-color: #FBB1FB !important;
+}
+
+dtocNoteNumber {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 0 2px 2px;
+    margin-right: -2px;
+    position: relative;
+    bottom: 6px;
+    left: -4px;
+}
+
+dtocNoteNumber:hover {
+    color: #fff;
+    background-color: #F47922;
+    cursor: pointer;
+}

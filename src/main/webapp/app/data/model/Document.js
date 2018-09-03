@@ -16,7 +16,8 @@ Ext.define('Voyant.data.model.Document', {
              {name: 'sentencesCount', type: 'int'},
              {name: 'averageWordsPerSentence', type: 'float', calculate:  function(data) {
         	 	return data['sentencesCount'] ? data['tokensCount-lexical'] / data['sentencesCount'] : 0;
-             }}
+			 }},
+			 {name: 'css', type: 'string'}
     ],
     
     getLexicalTokensCount: function() {
@@ -294,6 +295,10 @@ Ext.define('Voyant.data.model.Document', {
 			})
 			return dfd.promise
 		}
-    }
+	},
+	
+	getCSS: function() {
+		return this.get('css')
+	}
     
 });

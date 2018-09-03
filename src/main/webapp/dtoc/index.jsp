@@ -14,7 +14,7 @@
 <script src="dtoc.stats.js"></script>
 <script src="dtoc.docmodel.js"></script>
 <script src="dtoc.toc.js"></script>
-<script src="dtoc.reader.js"></script>
+<script src="dtoc.reader.iframe.js"></script>
 
 <script>
 Ext.Loader.setConfig({
@@ -77,7 +77,6 @@ Ext.onReady(function(){
  -->
 
 <link href="css/dtc.css" rel="stylesheet" type="text/css" />
-<link href="css/tei.css" rel="stylesheet" type="text/css" />
 <title>Dynamic Table of Contexts</title>
 </head>
 <body>
