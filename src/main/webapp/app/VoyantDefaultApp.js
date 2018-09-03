@@ -90,7 +90,8 @@ Ext.define('Voyant.VoyantDefaultApp', {
 					},{
 						xtype: 'container',
 						width: 800,
-						html: "<div style='font-style: italic; text-align: center; margin-top: 10px;'><div>"+this.localize('voyantIs')+"</div>" + (this.localize('translatedBy').indexOf("English") == -1 ? "<div>"+this.localize('translatedBy')+"</div>" : "")
+						html: "<div id='voyantIs' style='font-style: italic; text-align: center; margin-top: 10px;'><div>"+this.localize('voyantIs')+"</div>" + (this.localize('translatedBy').indexOf("English") == -1 ? "<div>"+this.localize('translatedBy')+"</div>" : "") +
+							(this.getCorpusCreatorText &&  this.getCorpusCreatorText().trim().length>0 ?  "<div id='corpusCreatorText'>"+this.getCorpusCreatorText()+"</div>" : "")
 					}]	
 				},{
 					layout: 'fit',

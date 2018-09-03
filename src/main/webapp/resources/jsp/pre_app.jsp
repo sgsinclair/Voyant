@@ -81,6 +81,7 @@
 
 <!-- D3 -->
 <script type="text/javascript" src="<%= base %>/resources/d3/current/d3.min.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/d3/fisheye.js"></script>
 <script type="text/javascript" src="<%= base %>/resources/cirrus/html5/d3.layout.cloud.js"></script>
 
 <!-- vis.js -->
@@ -133,10 +134,7 @@ if (userAgent.indexOf("Safari") > -1 && (userAgent.indexOf("Version/11.") > -1 |
 	</style>
 <% } %>
 
-<%@ page import = "java.nio.file.Files, java.nio.file.Paths, java.nio.file.Path" %>
-<%
-	Path path = Paths.get(System.getProperty("java.io.tmpdir"), "voyant-server", "header-include.html");
-	if (Files.exists(path)) { %>
-		<%= new String(Files.readAllBytes(path)) %>
-	<% }
-%>
+<%@ page import = "org.voyanttools.voyant.Trombone" %>
+<% if (Trombone.hasVoyantServerResource("header-include.html")) { %>
+	<%= Trombone.getVoyantServerResource("header-include.html") %>
+<% } %>

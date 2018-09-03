@@ -257,18 +257,34 @@ Ext.define('Voyant.panel.CorpusCreator', {
         });
         
         me.on("boxready", function(panel) {
-        	var app = this.getApplication()
+        	var app = this.getApplication();
         	if (app.getAllowInput && app.getAllowInput()=="false") {
-        		panel.hide();
-        		Ext.create('Ext.window.Window', {
-        		    layout: 'fit',
-        		    header: false,
-        		    modal: true,
-        		    bodyPadding: 10,
-        		    items: {  // Let's put an empty grid in just to illustrate fit layout
-        		        html: "<p style='color: red;'>"+panel.localize('noAllowInputMessage')+"</p>"
-        		    }
-        		}).show();
+        		if (app.getNoAllowInputText && app.getNoAllowInputText().trim().length>0) {
+        			Ext.defer(function() {
+            			var parent = panel.up("container");
+            			parent.removeAll(); // input box and copyright message
+            			parent.add({
+            	    		frame: false,
+            	    		padding: 10,
+            	    		style: {
+            	    		    borderColor: '#aaa',
+            	    		    borderStyle: 'solid'
+            	    		},
+            				html: app.getNoAllowInputText()
+            			})
+        			}, 100);
+        		} else {
+            		panel.hide();
+            		Ext.create('Ext.window.Window', {
+            		    layout: 'fit',
+            		    header: false,
+            		    modal: true,
+            		    bodyPadding: 10,
+            		    items: {  // Let's put an empty grid in just to illustrate fit layout
+            		        html: "<p style='color: red;'>"+panel.localize('noAllowInputMessage')+"</p>"
+            		    }
+            		}).show();
+        		}
         	}
         })
 

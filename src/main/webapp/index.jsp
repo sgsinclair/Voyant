@@ -48,6 +48,8 @@ Ext.onReady(function(){
 			version: '<%= application.getInitParameter("version") %>',
 			build: '<%= application.getInitParameter("build") %>',
 			openMenu: '<%= System.getProperty("org.voyanttools.voyant.openmenu")==null ? "" : System.getProperty("org.voyanttools.voyant.openmenu") %>',
+			hasCorpusCreatorText: '<%= org.voyanttools.voyant.Trombone.hasVoyantServerResource("corpus-creator-text") ? "true" : "false" %>',
+			hasNoAllowInputText: '<%= org.voyanttools.voyant.Trombone.hasVoyantServerResource("no-allow-input-text") ? "true" : "false" %>',
 			allowInput: '<%= System.getProperty("org.voyanttools.server.allowinput")==null ? "" : System.getProperty("org.voyanttools.server.allowinput") %>'
 		},
 		launch: function() {
