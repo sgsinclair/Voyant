@@ -1,16 +1,34 @@
-Ext.define('Voyant.panel.Mixer', {
+Ext.define('Voyant.panel.Loom', {
     extend: 'Ext.panel.Panel',
     mixins: ['Voyant.panel.Panel'],
-    alias: 'widget.mixer',
+    alias: 'widget.loom',
     statics: {
         i18n: {
+        	title: "Loom",
+        	controls: "Controls",
+        	frequenciesGroup: "Frequencies",
+        	coverageGroup: "Coverage",
+        	distributionsGroup: "Distribution",
+        	termsGroup: "Terms",
+        	rawFreqLabel: "raw frequency",
+        	rawFreqLabelTip: "raw term frequencies for the term must be between these values (inclusively)",
+        	rawFreqPercentileLabel: "raw frequency percentile",
+        	rawFreqPercentileLabelTip: "raw term frequencies for the term must be between these percentile values (inclusively), this is useful for saying something like terms in the top 90th percentile which will provide 10% of words regardless of the variation in values."
         },
         api: {
             limit: 500,
             stopList: 'auto',
-            coverage: undefined,
-            coverageSpan: undefined,
-            termLength: undefined
+            inDocuments: undefined,
+            spanSome: undefined,
+            spanAll: undefined,
+            spanOnly: undefined,
+            termLength: undefined,
+            rawFreq: undefined,
+            rawFreqPercentile: undefined,
+            distributionIncreases: undefined,
+            distributionDecreases: undefined,
+            distributionConsecutiveIncreases: undefined,
+            distributionConsecutiveDecreases: undefined
         },
         glyph: 'xf1e0@FontAwesome'
     },
@@ -35,33 +53,258 @@ Ext.define('Voyant.panel.Mixer', {
     		allowFunctions: true
     	});
     	controls.addAll({
-    		coverage: new Voyant.util.MixerControl({
+    		inDocuments: new Voyant.util.LoomControl({
 	    		group: 'coverage',
-	    		name: 'coverage',
-	    		enabled: this.getApiParam('coverage')!==undefined,
-	    		low: this.getApiParam('coverage')===undefined ? undefined : parseInt(this.getApiParam('coverage').split(",")[0]),
-	    		high: this.getApiParam('coverage')===undefined ? undefined : parseInt(this.getApiParam('coverage').split(",")[1]),
+	    		name: 'inDocuments',
+	    		initControl: function(store) {
+	    			this.setMin(1);
+	    			this.setMax(store.getAt(0).getDistributions().length);
+	        	},
+	        	validateRecord: function(record) {
+	        		var count = record.getDistributions().filter(function(val) {return val>0}).length;
+	        		return count >= this.getLow() && count <= this.getHigh();
+	        	}
+    		}),
+    		spanSome :new Voyant.util.LoomControl({
+	    		group: 'coverage',
+	    		name: 'spanSome',
+	    		offsetTipText: true,
+	    		initControl: function(store) {
+	    			this.setMax(store.getAt(0).getDistributions().length-1);
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions();
+	        		for (var i=low; i<high+1; i++) {
+	        			if (vals[i]>0) {return true}
+	        		}
+	        		return false;
+	        	}
+    		}),
+    		spanAll :new Voyant.util.LoomControl({
+	    		group: 'coverage',
+	    		name: 'spanAll',
+	    		offsetTipText: true,
+	    		initControl: function(store) {
+	    			this.setMax(store.getAt(0).getDistributions().length-1);
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions();
+	        		for (var i=low; i<high+1; i++) {
+	        			if (vals[i]==0) {return false}
+	        		}
+	        		return true;
+	        	}
+    		}),
+    		spanOnly :new Voyant.util.LoomControl({
+	    		group: 'coverage',
+	    		name: 'spanOnly',
+	    		offsetTipText: true,
+	    		initControl: function(store) {
+	    			this.setMax(store.getAt(0).getDistributions().length-1);
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions();
+	        		for (var i=0; i<vals.length; i++) {
+	        			if (i<low || i>high) {
+	        				if (vals[i]>0) {return false}
+	        			} else {
+	        				if (vals[i]==0) {return false}
+	        			}
+	        		}
+	        		return true;
+	        	}
+    		}),
+    		rawFreq :new Voyant.util.LoomControl({
+	    		group: 'frequencies',
+	    		name: 'rawFreq',
+	    		offsetTipText: true,
+	    		initControl: function(store) {
+	    			var vals = store.getRange().map(function(r) {return r.get('rawFreq')});
+	    			this.setMin(Ext.Array.min(vals))
+	    			this.setMax(Ext.Array.max(vals))
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), val = record.get("rawFreq");
+	        		return val>=low && val <= high;
+	        	}
+    		}),
+    		rawFreqPercentile :new Voyant.util.LoomControl({
+	    		group: 'frequencies',
+	    		name: 'rawFreqPercentile',
+	    		min: 0,
+	    		max: 100,
+	    		initControl: function(store) {
+	    			this.vals = store.getRange().map(function(r) {return r.get('rawFreq')});
+	    			this.vals.sort(function (a, b) {  return a - b;  });
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(),
+	        			ind = Ext.Array.indexOf(this.vals, record.get("rawFreq")),
+	        			val = Math.round(ind*100/this.vals.length)
+	        		return val>=low && val <= high;
+	        	}
+    		}),
+    		distributionsStdDev :new Voyant.util.LoomControl({
+	    		group: 'frequencies',
+	    		name: 'distributionsStdDev',
+	    		initControl: function(store) {
+	    			var allvals = Ext.Array.flatten(store.getRange().map(function(r) {return r.getDistributions()}));
+	    			// we'll scale to all available distributions, otherwise we're not making similar comparisons
+	    			var scale = d3.scaleLinear().domain([d3.min(allvals),d3.max(allvals)]).range([0,100]);
+	    			store.each(function(record) {
+	    				if (record.get("distributionsStdDev")===undefined) {
+	    					// https://derickbailey.com/2014/09/21/calculating-standard-deviation-with-array-map-and-array-reduce-in-javascript/
+	    					// https://gist.github.com/Daniel-Hug/7273430
+		    				var vals = record.getDistributions();
+		    				var scaledVals = vals.map(function(v) {return scale(v)});
+		    				var avg = Ext.Array.mean(scaledVals);
+							var squareDiffs = vals.map(function(value){
+								    var diff = value - avg;
+								    var sqrDiff = diff * diff;
+								    return sqrDiff;
+							});
+							var avgSquareDiff = Ext.Array.mean(squareDiffs);
+							var stdDev = Math.sqrt(avgSquareDiff);
+							record.set("distributionsStdDev", stdDev);
+	    				}
+	    			})
+	    			var vals = store.getRange().map(function(r) {return r.get('distributionsStdDev')});
+	    			this.setMin(Ext.Array.min(vals))
+	    			this.setMax(Ext.Array.max(vals))
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(),
+	        			val = record.get("distributionsStdDev");
+	        		return val>=low && val <= high;
+	        	}
+    		}),
+    		distributionsStdDevPercentile :new Voyant.util.LoomControl({
+	    		group: 'frequencies',
+	    		name: 'distributionsStdDevPercentile',
+	    		min: 0,
+	    		max: 100,
+	    		initControl: function(store) {
+	    			this.vals = store.getRange().map(function(r) {return r.get('distributionsStdDev')});
+	    			this.vals.sort(function (a, b) {  return a - b;  });
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(),
+        				ind = Ext.Array.indexOf(this.vals, record.get("distributionsStdDev")),
+        				val = Math.round(ind*100/this.vals.length)
+        			return val>=low && val <= high;
+	        	}
+    		}),
+    		termsLength :new Voyant.util.LoomControl({
+	    		group: 'terms',
+	    		name: 'termsLength',
+	    		offsetTipText: true,
+	    		initControl: function(store) {
+	    			var vals = store.getRange().map(function(r) {return r.get('term').length});
+	    			this.setMin(Ext.Array.min(vals))
+	    			this.setMax(Ext.Array.max(vals))
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), val = record.get("term").length;
+	        		return val>=low && val <= high;
+	        	}
+    		}),
+    		distributionIncreases :new Voyant.util.LoomControl({
+	    		group: 'distributions',
+	    		name: 'distributionIncreases',
 	    		initControl: function(store) {
 	    			this.setMax(store.getAt(0).getDistributions().length);
 	        	},
 	        	validateRecord: function(record) {
-	        		var count = Ext.Array.sum(record.getDistributions().map(function(val) {return val===0 ? 0 : 1}));
-	        		return count >= this.getLow() && count <= this.getHigh();
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions();
+	        		var increases = 0;
+	        		for (var i=1;i<vals.length;i++) {
+	        			if (vals[i]>vals[i-1]) {
+	        				increases++;
+	        				if (increases>high) {return false}
+	        			}
+	        		}
+	        		return increases>=low;
+	        	}
+    		}),
+    		distributionConsecutiveIncreases :new Voyant.util.LoomControl({
+	    		group: 'distributions',
+	    		name: 'distributionConsecutiveIncreases',
+	    		initControl: function(store) {
+	    			this.setMax(store.getAt(0).getDistributions().length);
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions();
+	        		var increases = 0;
+	        		for (var i=1;i<vals.length;i++) {
+	        			if (vals[i]>vals[i-1]) {
+	        				increases++;
+	        				if (increases>high) {return false}
+	        			} else {
+	        				increases=0;
+	        			}
+	        		}
+	        		return increases>=low;
+	        	}
+    		}),
+    		distributionDecreases :new Voyant.util.LoomControl({
+	    		group: 'distributions',
+	    		name: 'distributionDecreases',
+	    		initControl: function(store) {
+	    			this.setMax(store.getAt(0).getDistributions().length);
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions();
+	        		var decreases = 0;
+	        		for (var i=1;i<vals.length;i++) {
+	        			if (vals[i]<vals[i-1]) {
+	        				decreases++;
+	        				if (decreases>high) {return false}
+	        			}
+	        		}
+	        		return decreases>=low;
+	        	}
+    		}),
+    		distributionConsecutiveDecreases :new Voyant.util.LoomControl({
+	    		group: 'distributions',
+	    		name: 'distributionConsecutiveDecreases',
+	    		initControl: function(store) {
+	    			this.setMax(store.getAt(0).getDistributions().length);
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions();
+	        		var decreases = 0;
+	        		for (var i=1;i<vals.length;i++) {
+	        			if (vals[i]<vals[i-1]) {
+	        				decreases++;
+	        				if (decreases>high) {return false}
+	        			} else {
+	        				decreases = 0;
+	        			}
+	        		}
+	        		return decreases>=low;
 	        	}
     		})
-    	})
+    	});
+
     	controls.each(function(control) {
+    		var val = this.getApiParam(control.getName()), vals = (val || "").split(",");
+    		control.setEnabled(val!==undefined);
+    		if (vals.length==2) {
+    			control.setLow(parseInt(vals[0]))
+    			control.setHigh(parseInt(vals[1]))
+    		}
     		control.on("change", function(control) {
     			if (control.getEnabled()) {
     				this.setApiParam(control.getName(), control.getLow()+","+control.getHigh());
     			} else {
     				this.setApiParam(control.getName(), undefined);
     			}
+    			this.filterRecords();
     		}, this);
     	}, this);
     	this.setControls(controls);
     	
-    	var tbitems = ["coverage"].map(function(group) {
+    	var tbitems = ["frequencies","coverage","distributions","terms"].map(function(group) {
     		return {
     			text: this.localize(group+"Group"),
     			menu: {
@@ -93,6 +336,9 @@ Ext.define('Voyant.panel.Mixer', {
 									minValue: control.getMin() || 0,
 									maxValue: control.getMax() || 0,
 									values: [(control.getLow() || 0), (control.getHigh() || 0)],
+									tipText: function(t) {
+										return control.getOffsetTipText() ? t.value+1 : t.value;
+									},
 									listeners: {
     									beforerender: function(slider) {
     										slider.updateFromControl(control);
@@ -124,6 +370,30 @@ Ext.define('Voyant.panel.Mixer', {
             	type: 'hbox',
             	align: 'stretch'
             },
+            listeners: {
+            	afterrender: function() {
+            		var terms = this.getComponent("terms"), threads = this.getComponent("threads");
+            		
+            		// this is a quick and dirty implementation to mirror actions in the terms panel to the threads panel,
+            		// but it should probably redone locally to the threads logic and using the tips
+            		terms.on("termHovered", function(src, term) {
+            			var thick = threads.getTargetEl().dom.querySelector("path[term="+term+"]");
+            			if (thick) {
+                			var fadeIt = function(node, time) {
+                				opacity = node.getAttribute("opacity");
+                				if (opacity>0) {
+                					opacity-=.01;
+                					node.setAttribute("opacity", opacity)
+                					time=time/2
+                					Ext.defer(fadeIt, time, this, [node, time]);
+                				}
+                			}   
+                			thick.setAttribute("opacity", 1);
+                			fadeIt(thick, 1000);
+            			}
+            		})
+            	}
+            },
             items: [{
             	itemId: 'terms',
             	width: 100,
@@ -141,151 +411,8 @@ Ext.define('Voyant.panel.Mixer', {
             			});
             			terms.sort(function(a, b) {return a.term.localeCompare(b.term)});
             			
-            			// based on http://bl.ocks.org/jczaplew/8603055
-            			/*
-            			(function chart() {
-            			      var boxes = terms.length,
-            			      rowLen = 1,
-            			      xSteps =  d3.range(0, width, width/terms.length), 
-            			      ySteps =  d3.range(0, height, height/terms.length),
-            			      boxSteps = d3.range(boxes*boxes);
+            			// attempts to use fisheye code failed with larger number or words http://bl.ocks.org/jczaplew/8603055
 
-            			     //set scale and origin focus
-            			  var xFisheye = d3.fisheye.scale(d3.scaleIdentity).domain([0, width]).focus(width/2),
-            			      yFisheye = d3.fisheye.scale(d3.scaleIdentity).domain([0, height]).focus(height/2);
-            			      fontSizeFisheye = d3.fisheye.scale(d3.scaleLog).domain([3,150]).range([8,15]).focus(12),
-            			      fontOpacityFisheye = d3.fisheye.scale(d3.scaleLog).domain([8,50]).range([0,1]).focus(1);
-
-            			  var svg = d3.select(el.dom).append("svg")
-            			    .attr("width", width)
-            			    .attr("height", height)
-            			  .append("g")
-            			    .attr("transform", "translate(-.5,-.5)");
-
-            			  svg.append("rect")
-            			    .attr("class", "background")
-            			    .attr("width", width)
-            			    .attr("height", height); 
-            			  
-            			  var boxTest = svg.selectAll(".yrect")
-            			    .data(terms)
-            			  .enter().append("rect") 
-            			    .attr("class", "yrect")
-            			    .style("fill",function(d,i) {
-            			    	return "rgba(255,255,255,1)"
-            			      return d.col;
-            			    })   
-            			    .style("stroke",function(d,i) {
-            			    	return "rgba(255,255,255,1)"
-            			      return d.col;
-            			    })   
-            			    .attr("id", function(d, i) {
-            			      return i;
-            			    });
-            			          
-            			  var yText = svg.selectAll("ytext")
-            			    .data(terms)
-            			  .enter().append("text")
-            			    .text(function(d,i){return d.term})
-            			    .attr("class", "ytext") 
-            			    .attr("text-anchor", "middle")
-            			    .attr("fill", function(d) {return Voyant.application.getColorForTerm(d.term, true)})
-
-            			       
-            			  redraw();
-            			  reset();
-            			  
-            			  var currentRow = -1;
-
-            			  svg.on("mousemove", function() {
-            			    var mouse = d3.mouse(this);
-            			    currentRow = Math.round(mouse[1]*terms.length/height);
-            			    
-//            			    xFisheye.focus(mouse[0]); 
-//            			    yFisheye.focus(mouse[1]); 
-//            			    redraw();
-            			  });
-
-            			  svg.on("mouseout", function() {
-            			    reset();
-            			  });
-
-            			  function redraw() { 
-            			    yText
-            			      .attr("x", function(d, i) {
-            			        return xFisheye(xSteps[i%rowLen]) + (xFisheye(xSteps[(i+1)%rowLen] || width) - xFisheye(xSteps[i%rowLen]))/2;
-            			      })
-            			      .attr("y", function(d, i) {
-            			        var rowNum = Math.floor(i/rowLen);
-            			        return yFisheye(ySteps[rowNum]) + (yFisheye(ySteps[rowNum+1] || height) - yFisheye(ySteps[rowNum]))/2;
-            			      })
-            			      .style("font-size",function(d,i){ 
-            			         var rowNum = Math.floor(i/rowLen);
-            			         var xx = (xFisheye(xSteps[(i+1)%rowLen] || width) - xFisheye(xSteps[(i)%rowLen]));
-            			         var yy = (yFisheye(ySteps[rowNum+1]|| height) - yFisheye(ySteps[rowNum]));
-            			         var minDim = d3.min([xx,yy]);
-            			         return fontSizeFisheye(minDim);
-            			      })  
-            			      .style("fill-opacity",function(d,i){
-            			    	  return 1
-            			         var rowNum = Math.floor(i/rowLen);
-            			         var xx = (xFisheye(xSteps[(i+1)%rowLen] || width) - xFisheye(xSteps[(i)%rowLen]));
-            			         var yy = (yFisheye(ySteps[rowNum+1] || height) - yFisheye(ySteps[rowNum])); 
-            			         var minDim = d3.min([xx,yy]);
-            			         console.warn(yy,fontOpacityFisheye(yy))
-            			         return fontOpacityFisheye(yy);
-            			      })
-            			      .attr("dy",function(d,i){ 
-            			         var rowNum = ((i % terms.length) > 0) ? (i %  terms.length) : 1 ;
-            			         var yy = (yFisheye(ySteps[rowNum]) - yFisheye(ySteps[rowNum-1]));
-            			         return (fontSizeFisheye(yy)/2);
-            			      });
-
-            			     boxTest
-            			      .attr("x", function(d,i) {
-            			        return xFisheye(xSteps[i%rowLen]);
-            			      }) 
-            			     .attr("y", function(d,i) {
-            			        var rowNum = Math.floor(i/rowLen);
-            			        return yFisheye(ySteps[rowNum-1] || 0) + (yFisheye(ySteps[rowNum]) - yFisheye(ySteps[rowNum-1] || 0));
-            			      })
-            			     .attr("width", function(d,i) {
-            			        var rowNum = Math.floor(i/rowLen);
-            			        return (xFisheye(xSteps[(i+1)%rowLen] || width) - xFisheye(xSteps[i%rowLen]));
-            			      })   
-            			     .attr("height", function(d,i) {
-            			        var rowNum = Math.floor(i/rowLen);
-            			        return (yFisheye(ySteps[rowNum+1]|| height) - yFisheye(ySteps[rowNum]));
-            			      });
-            			          
-            			    }
-
-            			  function reset() {
-            			    d3.selectAll(".yrect")
-            			      .attr("height", function(d, i) {
-            			        return height/ terms.length;
-            			      })
-            			      .attr("y", function(d, i) {
-            			        return i * (height/ terms.length);
-            			      });
-
-            			    svg.selectAll(".ytext")
-            			      .attr("x", function(d, i) {
-            			        return width/2;
-            			      })
-            			      .attr("y", function(d, i) {
-            			    	  return i*height/terms.length
-            			        return (i *  terms.length) + 10;
-            			      })
-            			      .style("font-size",function(d,i){ 
-            			         return 12;
-            			      })  
-            			      .style("fill-opacity",function(d,i){
-            			         return 1;
-            			      });
-            			  }
-            			})();
-            			*/
             			
             			
           			  var svg = d3.select(el.dom).append("svg")
@@ -305,22 +432,8 @@ Ext.define('Voyant.panel.Mixer', {
     			  	.attr("y", function(t, i) {return textHeight*i})
       			    .attr("fill", function(d) {return Voyant.application.getColorForTerm(d.term, true)})
 
-
-//          			  var svg = d3.select(el.dom).append("svg")
-//            		      .attr("width", el.getWidth())
-//            		      .attr("height", el.getHeight());
-//            			
             			var textHeight = Math.ceil(height/terms.length);
-//            			text = svg.selectAll("text")
-//            				.data(terms)
-//            			  	.enter()
-//            			  	.append("text")
-//            			  	.text(function(t) {return t.term})
-//            			  	.attr("width", width)
-//            			  	.attr("text-anchor", "middle")
-//            			    .attr("fill", function(d) {return Voyant.application.getColorForTerm(d.term, true)})
-//            			  	.attr("x", width/2)
-//            			  	.attr("y", function(t, i) {return textHeight*i});
+
             			
             			var fisheye = d3.fisheye.circular()
 	            		    .radius(50)
@@ -328,6 +441,7 @@ Ext.define('Voyant.panel.Mixer', {
             			
             			yFisheye = d3.fisheye.scale(d3.scaleIdentity).domain([0, height]);
             			
+            			var me = this;
             			svg.on("mousemove", function() {
             				var mouse = d3.mouse(this);
             					currentItem = Math.round(mouse[1]*terms.length/height),
@@ -336,6 +450,9 @@ Ext.define('Voyant.panel.Mixer', {
             				yFisheye.focus(mouse[1]);
             				
             			var nodes = text.nodes();
+            			if (nodes[currentItem]) {
+                			me.fireEvent("termHovered", me, nodes[currentItem].textContent)
+            			}
             			
             			var fs = 14, y=Math.max(mouse[1],fs), fo=1;
             			d3.select(nodes[currentItem])
@@ -380,18 +497,13 @@ Ext.define('Voyant.panel.Mixer', {
             				.attr("font-size", fs)
             				.attr("fill-opacity", fo)
             			}
-            				            			
-            			/*
-        				text///.each(function(d,i) {return d})
-         				   .attr("y", function(d) { return yFisheye(d.y) })
-         				   .attr("font-size", function(d) {return 1})
-         				   */
+
             			})
 
             		}
             	}
             },{
-            	itemId: 'waves',
+            	itemId: 'threads',
 //                html: '<canvas></canvas>',
                 layout: 'fit',
                 flex: 1,
@@ -410,6 +522,10 @@ Ext.define('Voyant.panel.Mixer', {
             			var svg = d3.select(el.dom).append("svg")
             		      .attr("width", el.getWidth())
             		      .attr("height", el.getHeight());
+            			
+            			if (terms.length==0) {
+            				return this.up("panel").toastInfo("No hits")
+            			}
             			
             			var xincrement = width/terms[0].vals.length;
             			var yscale = d3.scaleLinear()
@@ -472,6 +588,7 @@ Ext.define('Voyant.panel.Mixer', {
 						      .attr("opacity", 0)
 						      .attr("stroke-width", 3)
 						      .attr("class", "line")
+            			      .attr("term", term.term)
             			      .attr("d", valueline)
 						      .on('mouseover', function() { // on mouse out hide line, circles and text
 						    	  d3.select(this)
@@ -510,116 +627,14 @@ Ext.define('Voyant.panel.Mixer', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 overflowHandler: 'scroller',
-                items: tbitems
-              }/*,{
-                dock: 'left',
-                xtype: 'toolbar',
-                overflowHandler: 'scroller',
                 items: [{
-                	xtype: 'mixercontrol',
-                	name: 'coverage',
-                	initControl: function(control, field, store) {
-                		field.setMaxValue(store.getAt(0).getDistributions().length);
-                	},
-                	validateRecord: function(field, record, vals) {
-                		var count = Ext.Array.sum(vals.map(function(val) {return val===0 ? 0 : 1}));
-                		return count >= field.getValue(0) && count <= field.getValue(1);
-                	}
-                },{
-                	xtype: 'mixercontrol',
-                	name: 'coverageSpan',
-                	initControl: function(control, field, store) {
-                		field.setMaxValue(store.getAt(0).getDistributions().length);
-                	},
-                	validateRecord: function(field, record, vals) {
-                		var min = field.getValue(0), max = field.getValue(1);
-                		for (var i=min; i<max+1; i++) {
-                			if (vals[i]>0) {
-                				return true;
-                			}
-                		}
-                		return false;
-                	}
-                },{
-                	xtype: 'mixercontrol',
-                	name: 'earliestlatest',
-                	initControl: function(control, field, store) {
-                		field.setMaxValue(store.getAt(0).getDistributions().length);
-                	},
-                	validateRecord: function(field, record, vals) {
-                		var min = field.getValue(0), max = field.getValue(1);
-                		for (var i=0; i<min; i++) {
-                			if (vals[i]>0) {return false}
-                		}
-                		for (var i=max; i<vals.length; i++) {
-                			if (vals[i]>0) {return false}
-                		}
-                		return true;
-                	}
-                },{
+                	text: this.localize("controls"),
+                	tooltip: this.localize("controlsTip"),
                 	menu: {
-                		defaults: {
-                			xtype: 'mixercontrol'
-                		},
-                		items: [{
-                			xtype: 'mixercontrol',
-                			name: 'rawFreq',
-                			initControl: function(control, field, store) {
-                				field.setMinValue(store.min('rawFreq'));
-                        		field.setMaxValue(store.max('rawFreq'));
-                        	},
-                        	validateRecord: function(field, record, vals) {
-                        		var val = record.get('rawFreq');
-                        		return val >= field.getValue(0) && val <= field.getValue(1);
-                        	}
-                		}]
-                	}
-                },{
-                	fieldLabel: this.localize('percentile'),
-                	xtype: 'multislider'
-                },{
-                	fieldLabel: this.localize('skew'),
-                	xtype: 'multislider'
-                },{
-                	fieldLabel: this.localize('peekedness'),
-                	xtype: 'multislider'
-                },{
-                	fieldLabel: this.localize('variance'),
-                	xtype: 'multislider'
-                },{
-                	fieldLabel: this.localize('increases'),
-                	xtype: 'multislider'
-                },{
-                	fieldLabel: this.localize('decreases'),
-                	xtype: 'multislider'
-                },{
-                	xtype: 'mixercontrol',
-                	name: 'termLength',
-                	initControl: function(control, field, store) {
-                		var min = 1, max = 1;
-                		store.each(function(record) {
-                			var len = record.getTerm().length;
-                			if (len>max) {max=len;}
-                		})
-                		field.setMaxValue(max);
-                	},
-                	validateRecord: function(field, record, vals) {
-                		var min = field.getValue(0), max = field.getValue(1), len = record.getTerm().length;
-                		return len>=min && len <=max;
+                    	items: tbitems
                 	}
                 }]
-            },{
-                dock: 'bottom',
-                xtype: 'toolbar',
-                overflowHandler: 'scroller',
-                items: [{
-                	fieldLabel: this.localize('segments'),
-                	xtype: 'slider'
-                },{
-                	fieldLabel: this.localize('limit'),
-                	xtype: 'slider'
-                }]
-            }*/]
+              }]
         });
         
         this.on('loadedCorpus', function(src, corpus) {
@@ -630,7 +645,7 @@ Ext.define('Voyant.panel.Mixer', {
         	}, this);
         	store.on("filterchange", function() {
         		this.getComponent("terms").fireEventArgs("filterchange", arguments);
-        		this.getComponent("waves").fireEventArgs("filterchange", arguments);
+        		this.getComponent("threads").fireEventArgs("filterchange", arguments);
         		
         	}, this);
         	this.setStore(store);
@@ -655,7 +670,7 @@ Ext.define('Voyant.panel.Mixer', {
     	var store = this.getStore();
     	store.clearFilter();
     	store.filterBy(function(record) {
-    		return Ext.Array.each(this.getControls().getRange(), function(control) {
+    		return Ext.Array.every(this.getControls().getRange(), function(control) {
     			return control.getEnabled()==false || control.getValidateRecord().call(control, record);
     		}, this);
     	}, this)
@@ -679,9 +694,9 @@ Ext.define('Voyant.panel.Mixer', {
     	var canvas = this.body.down('canvas').dom, ctx = canvas.getContext("2d");
     	ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    	var controls = this.query('mixercontrol');
+    	var controls = this.query('loomcontrol');
     	
-    	var mixerTermRecords = new Voyant.panel.MixerTermRecords();
+    	var loomTermRecords = new Voyant.panel.LoomTermRecords();
     	this.getStore().each(function(record) {
     		var vals = record.getDistributions().map(function(v) {return true;})
     		Ext.Array.each(controls, function(control) {
@@ -702,16 +717,16 @@ Ext.define('Voyant.panel.Mixer', {
     			}
     		});
     		if (Ext.isArray(vals) && Ext.Array.some(vals, function(v) {return v})) {
-    			mixerTermRecords.add(record);
+    			loomTermRecords.add(record);
     		}
     	})
     	
-    	mixerTermRecords.update(canvas, ctx);
+    	loomTermRecords.update(canvas, ctx);
     }
     
 });
 
-Ext.define('Voyant.panel.MixerTermRecords', {
+Ext.define('Voyant.panel.LoomTermRecords', {
 	config: {
 		termRecords: []
 	},
@@ -720,7 +735,7 @@ Ext.define('Voyant.panel.MixerTermRecords', {
 	    this.callParent(arguments);
 	},
 	add: function(record) {
-		this.getTermRecords().push(new Voyant.panel.MixerTermRecord(record));
+		this.getTermRecords().push(new Voyant.panel.LoomTermRecord(record));
 	},
 	update: function(canvas, ctx) {
 		var min = Ext.Array.min(this.getTermRecords().map(function(r) {return Ext.Array.min(r.getValues())}))
@@ -731,7 +746,7 @@ Ext.define('Voyant.panel.MixerTermRecords', {
 	}
 })
 
-Ext.define('Voyant.panel.MixerTermRecord', {
+Ext.define('Voyant.panel.LoomTermRecord', {
 	config: {
 		record: undefined,
 		values: undefined,
@@ -761,7 +776,7 @@ Ext.define('Voyant.panel.MixerTermRecord', {
 	}
 })
 
-Ext.define('Voyant.util.MixerControl', {
+Ext.define('Voyant.util.LoomControl', {
     extend: 'Ext.Base',
     mixins: ['Ext.mixin.Observable'],
     constructor: function(config) {
@@ -777,7 +792,8 @@ Ext.define('Voyant.util.MixerControl', {
     	low: undefined,
     	high: undefined,
     	initControls: Ext.emptyFn,
-    	validateRecord: Ext.emptyFn
+    	validateRecord: Ext.emptyFn,
+		offsetTipText: false
     },
     setMin: function() {
     	this.callParent(arguments);
@@ -813,64 +829,3 @@ Ext.define('Voyant.util.MixerControl', {
     }
     
 })
-/*
-Ext.define('Voyant.widget.MixerControl', {
-    extend: 'Ext.container.Container',
-	mixins: ['Voyant.util.Localization','Voyant.util.Api'],
-    alias: 'widget.mixercontrol',
-    layout: 'hbox',
-    statics: {
-        i18n: {
-        	coverageLabel: "coverage",
-        	coverageLabelTip: ""
-        }
-    },
-    config: {
-    	field: undefined,
-    	checked: true,
-    	name: undefined
-    },
-    constructor: function(config) {
-        this.callParent(arguments);
-    },
-    initComponent: function() {
-    	var me = this;
-    	Ext.apply(this, {
-    		title: this.localize('title'),
-    		listeners: {
-    			afterrender: function() {
-    				this.setField(this.getComponent("field"));
-    			},
-    			scope: this
-    		},
-    		items: [{
-    			xtype: 'checkbox',
-    			checked: true,
-    			listeners: {
-    				change: function(c, checked) {
-    					me.getComponent('field').setDisabled(!checked)
-    					me.up('mixer').revalidate();
-    				}
-    			}
-    		}, {xtype: 'tbspacer'}, {
-    			xtype: this.getField() || 'multislider',
-    			itemId: 'field',
-    			values: [0,0], // provide two values to ensure multislider
-    			width: 60,
-    			listeners: {
-    				changecomplete: function(cmp, val) {
-//    					debugger
-//    					me.getComponent('label').el.down(".label").dom.innerHTML="("+ (cmp.getValues ? cmp.getValues().join("-") : cmp.getValue()) + ") ";
-    					me.up('mixer').revalidate();
-    				}
-    			}
-    		},{xtype: 'tbspacer'}, {
-    			itemId: 'label',
-    			width: 150,
-    			html: " <span class='label'>&nbsp;</span> <span data-qtip=\"test\">"+this.localize(this.getName()+"Label")+"</span>"
-    		}]
-    	})
-    	this.callParent(arguments);
-    }
-})
-*/
