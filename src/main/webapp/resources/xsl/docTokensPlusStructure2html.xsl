@@ -92,6 +92,7 @@
             	</xsl:if>
             	<xsl:value-of select="$tags[1]/end" disable-output-escaping="yes"/>
             </xsl:when>
+            <xsl:when test="tokenType='processinginstruction'"></xsl:when>
             <xsl:otherwise><xsl:value-of select="term"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>

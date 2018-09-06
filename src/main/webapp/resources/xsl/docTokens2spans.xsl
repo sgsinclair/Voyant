@@ -69,6 +69,7 @@
                    </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
+            <xsl:when test="tokenType='processinginstruction'"></xsl:when>
             <xsl:otherwise><xsl:value-of select="term"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>

@@ -14,7 +14,7 @@
         <xsl:apply-templates select="results/documentTokens/tokens/token"/>
     </xsl:template>
     <xsl:template match="token">
-        <xsl:if test="not(contains(tokenType, 'tag'))">
+        <xsl:if test="not(contains(tokenType, 'tag')) and not(contains(tokenType, 'processinginstruction'))">
             <xsl:value-of select="term"/>
         </xsl:if>
     </xsl:template>
