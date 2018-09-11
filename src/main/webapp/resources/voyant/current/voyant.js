@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Sep 11 12:48:36 EDT 2018 */
+/* This file created by JSCacher. Last modified: Tue Sep 11 16:42:11 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -29789,13 +29789,22 @@ Ext.define('Voyant.panel.Trends', {
         			stopList: this.getApiParam("stopList")
         		},
         		callback: function(records, operation, success) {
-        			this.setApiParam("query", records.map(function(r) {return r.getTerm()}))
-        			this.loadCorpusTerms();
+        			if (records.length==0) {
+        				if (operation && operation.error) {
+        					this.showError(this.localize("noResults")+"<p style='color: red'>"+operation.error+"</p>")
+        				} else {
+        					this.showError(this.localize("noResults"))
+        				}
+        			} else {
+            			this.setApiParam("query", records.map(function(r) {return r.getTerm()}))
+            			this.loadCorpusTerms();
+        			}
         		},
         		scope: this
         	})
     		return;
     	}
+    	debugger
     	params = params || {};
     	//this.segments.hide();
     	var withDistributions = this.getApiParam("withDistributions");
@@ -29805,6 +29814,9 @@ Ext.define('Voyant.panel.Trends', {
 	    	stopList: "" // automatic queries should be stopped already
     	});
     	var docLabels = this.getCorpus().map(function(doc) {return doc.getTinyTitle()})
+    	if (Ext.Array.unique(docLabels).length<docLabels.length) { // we have duplicates, add index
+    		docLabels = docLabels.map(function(doc,i) {return (i+1)+")"+ doc})
+    	}
     	Ext.applyIf(params, this.getApiParams());
     	this.getCorpus().getCorpusTerms().load({
     		params: params,
@@ -29863,7 +29875,7 @@ Ext.define('Voyant.panel.Trends', {
     	    		fields: data.length>0 ? Object.keys(data[0]) : undefined,
     	    		data: data
     	    	});
-
+    	    	
     			this.buildChart({
         			store: store,
         			series: series,
