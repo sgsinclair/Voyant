@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Sep 05 20:54:49 EDT 2018 */
+/* This file created by JSCacher. Last modified: Tue Sep 11 12:48:36 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8133,6 +8133,7 @@ Ext.define('Voyant.data.model.CorpusTerm', {
              {name: 'relativeFreq', type: 'float'},
              {name: 'relativePeakedness', type: 'float'},
              {name: 'relativeSkewness', type: 'float'},
+             {name: 'comparisonRelativeFreqDifference', type: 'float'},
              {name: 'distributions'},
              {name: 'typeTokenRatio-lexical', type: 'float', calculate:  function(data) {
         	 	return data['typesCount-lexical']/data['tokensCount-lexical'];
@@ -21813,8 +21814,8 @@ Ext.define('Voyant.panel.CorpusTerms', {
             },{
             	text: this.localize("corpusComparisonDifference"),
             	tooltip: this.localize("corpusComparisonDifferenceTip"),
-            	dataIndex: 'relativeSkewness',
-            	renderer: Ext.util.Format.numberRenderer("0,000.0"),
+            	dataIndex: 'comparisonRelativeFreqDifference',
+            	renderer: Ext.util.Format.numberRenderer("0,000.00000"),
                 width: 'autoSize',
                 hidden: !this.getApiParam('comparisonCorpus'),
             	sortable: true,

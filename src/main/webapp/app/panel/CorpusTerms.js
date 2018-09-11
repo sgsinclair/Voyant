@@ -187,8 +187,8 @@ Ext.define('Voyant.panel.CorpusTerms', {
             },{
             	text: this.localize("corpusComparisonDifference"),
             	tooltip: this.localize("corpusComparisonDifferenceTip"),
-            	dataIndex: 'relativeSkewness',
-            	renderer: Ext.util.Format.numberRenderer("0,000.0"),
+            	dataIndex: 'comparisonRelativeFreqDifference',
+            	renderer: Ext.util.Format.numberRenderer("0,000.00000"),
                 width: 'autoSize',
                 hidden: !this.getApiParam('comparisonCorpus'),
             	sortable: true,
