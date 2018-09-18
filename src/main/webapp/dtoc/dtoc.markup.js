@@ -108,7 +108,18 @@ Ext.define('Voyant.panel.DToC.MarkupBase', {
     			    data.label = data.tagName;
     			}
     			delete data.freq;
-    			delete data.id;
+				delete data.id;
+				if (data.usage) {
+					if (data.usage === null) {
+						delete data.usage;
+					}
+				} else if (this.curatedTags !== null) {
+					// need to pull in curatedTag usage info when moving from default to curator mode
+					var curatedTag = this.curatedTags[data.tagName];
+					if (curatedTag && curatedTag.usage) {
+						data.usage = curatedTag.usage;
+					}
+				}
     			jsonData.push(data);
 			}
 		}, this);
@@ -174,7 +185,8 @@ Ext.define('Voyant.panel.DToC.Markup', {
 				{name: 'tagName', allowBlank: false},
 				{name: 'label', allowBlank: false},
 				{name: 'freq', type: 'int'},
-				{name: 'type'}
+				{name: 'type'},
+				{name: 'usage'}
 			],
 			sortInfo: {field: 'label', direction: 'ASC'}
 	    });

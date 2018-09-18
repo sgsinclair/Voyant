@@ -30,7 +30,8 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 			fields: [
 				{name: 'tagName', allowBlank: false},
 				{name: 'label', allowBlank: false},
-				{name: 'type'}
+				{name: 'type'},
+				{name: 'usage'}
 			],
 			sortInfo: {field: 'label', direction: 'ASC'},
 			data: [],
@@ -74,7 +75,24 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 				},
 				scope: this
 			}
-    	});
+		});
+		
+		this.usageCombo = Ext.create('Ext.form.field.ComboBox', {
+			xtype: 'combo',
+			triggerAction: 'all',
+			queryMode: 'local',
+			editable: true,
+			allowBlank: true,
+			autoSelect: false,
+			forceSelection: true,
+			store: new Ext.data.ArrayStore({
+			    idIndex: 0,
+				fields: ['type', 'label'],
+				data: [['image', 'Image'], ['note', 'Note'], ['link', 'Link']]
+			}),
+			valueField: 'type',
+			displayField: 'label'
+		})
     	
 		Ext.apply(this, {
 			plugins: {
@@ -165,6 +183,9 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 					xtype: 'textfield',
 				    allowBlank: false
 				}
+			},{
+				header: 'Usage', dataIndex: 'usage',
+				editor: this.usageCombo
 			}],
 			listeners: {
 				edit: function(editor, e) {
@@ -172,13 +193,13 @@ Ext.define('Voyant.panel.DToC.MarkupCurator', {
 						// determine whether tag or xpath
 						var type = e.value.match(/^\w+$/) == null ? 'x' : 't';
 						e.record.set('type', type);
+
+						var comboStore = this.tagCombo.getStore();
+						var r = comboStore.findRecord('tag', e.value);
+						if (r !== null) r.set('disabled', true);
+						r = comboStore.findRecord('tag', e.originalValue);
+						if (r !== null) r.set('disabled', false);
 					}
-					
-					var comboStore = this.tagCombo.getStore();
-					var r = comboStore.findRecord('tag', e.value);
-				    if (r !== null) r.set('disabled', true);
-				    r = comboStore.findRecord('tag', e.originalValue);
-				    if (r !== null) r.set('disabled', false);
 				},
 				scope: this
 			}

@@ -324,14 +324,28 @@ Ext.define('VoyantDTOCApp', {
 	
 	loadCuration: function(data) {
 		if (data) {
+			// TODO refactor with similar functions in setDTCMode
 			if (data.markup) {
 				var dtcMarkup = Ext.getCmp('dtcMarkup');
 				dtcMarkup.curatedTags = {};
 				dtcMarkup.tagTotals = {};
 				dtcMarkup.savedTags = {};
+				var reader = Ext.getCmp('dtcReader');
+				reader.linkSelectors = [];
+				reader.noteSelectors = [];
+				reader.imageSelectors = [];
 				for (var i = 0; i < data.markup.length; i++) {
 					var tag = data.markup[i];
 					dtcMarkup.curatedTags[tag.tagName] = tag;
+					if (tag.usage) {
+						if (tag.usage === 'link') {
+							reader.linkSelectors.push(tag.tagName);
+						} else if (tag.usage === 'note') {
+							reader.noteSelectors.push(tag.tagName);
+						} else if (tag.usage === 'image') {
+							reader.imageSelectors.push(tag.tagName);
+						}
+					}
 				}
 			}
 			if (data.toc && data.toc.length > 0) {
@@ -374,7 +388,7 @@ Ext.define('VoyantDTOCApp', {
     	}
     	
     	var treeData = Ext.getCmp('dtcToc').exportDocNodes();
-    	var tagData = Ext.getCmp('dtcMarkup').exportTagData();
+		var tagData = Ext.getCmp('dtcMarkup').exportTagData();
     	var savedTags = Ext.getCmp('dtcMarkup').savedTags; // TODO remove this
 		
 		var dtcTools = Ext.getCmp('dtcTools');
@@ -418,6 +432,11 @@ Ext.define('VoyantDTOCApp', {
 		}
 		this.getViewport().updateLayout();
 		
+		var reader = Ext.getCmp('dtcReader');
+		reader.linkSelectors = [];
+		reader.noteSelectors = [];
+		reader.imageSelectors = [];
+
 		var dtcMarkup = Ext.getCmp('dtcMarkup');
 		dtcMarkup.setCorpus(this.getCorpus());
 		if (isCurator) {
@@ -430,13 +449,24 @@ Ext.define('VoyantDTOCApp', {
 			for (var i = 0; i < tagData.length; i++) {
 				var tag = tagData[i];
 				dtcMarkup.curatedTags[tag.tagName] = tag;
+				if (tag.usage) {
+					if (tag.usage === 'link') {
+						reader.linkSelectors.push(tag.tagName);
+					} else if (tag.usage === 'note') {
+						reader.noteSelectors.push(tag.tagName);
+					} else if (tag.usage === 'image') {
+						reader.imageSelectors.push(tag.tagName);
+					}
+				}
 			}
 			dtcMarkup.store.loadData(tagData, false);
 			dtcMarkup.loadAllTags(true);
 			dtcMarkup.updateChapterFilter();
+
+			reader.reloadDocument();
 		}
     },
-    
+
     doExport: function() {
     	var exportObj = {markup: [], toc: []};
     	

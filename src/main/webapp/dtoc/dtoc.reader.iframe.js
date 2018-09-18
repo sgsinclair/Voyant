@@ -27,8 +27,14 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	},
     
     MINIMUM_LIMIT: 1000,
+	
 	currentDocId: null,
 	currentDocLanguage: null,
+
+	linkSelectors: [],
+	imageSelectors: [],
+	noteSelectors: [],
+
 	loading: false,
 	readerContainer: null,
 	prevButton: null,
@@ -348,6 +354,10 @@ Ext.define('Voyant.panel.DToC.Reader', {
 				} else {
 				    this._processCoverPage();
 				}
+			} else {
+				this._processLinks();
+				this._processNotes();
+				this._processImages();
 			}
 
 			this._getSelections();
@@ -407,6 +417,12 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			this.fetchDocument(data);
 		}
 	},
+
+	reloadDocument: function() {
+		var docId = this.currentDocId;
+		this.currentDocId = null;
+		this.fetchDocument({docId: docId});
+	},
 	
 	_processRdf: function() {
 		var rdf = this.readerContainer.getDoc().querySelectorAll('rdf');
@@ -465,14 +481,17 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	_processNotes: function() {
 		this.hideAllNotes(true);
 	    this.tokenToolTipsMap = {};
-	    
-		var notes = this.readerContainer.getDoc().querySelectorAll('note');
-		for (var i = 0; i < notes.length; i++) {
-			var note = notes[i];
-			var noteNumber = Ext.DomHelper.insertBefore(note, '<dtocNoteNumber>'+(i+1)+'</dtocNoteNumber>', true);
+		
+		var doc = this.readerContainer.getDoc();
+		var notes = [];
+		this.noteSelectors.forEach(function(selector) {
+			notes = notes.concat(Ext.dom.Query.select(selector, doc, 'select', false));
+		});
+		notes.forEach(function(note, index) {
+			var noteNumber = Ext.DomHelper.insertBefore(note, '<dtocNoteNumber>'+(index+1)+'</dtocNoteNumber>', true);
 			var tip = new Ext.ux.DToCToolTip(Ext.apply({
 				target: noteNumber,
-				title: 'Note '+(i+1),
+				title: 'Note '+(index+1),
 				html: note.innerHTML,
 				listeners: {
 				    beforeshow: this.hideAllNotes,
@@ -482,7 +501,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			
 			var tokenId = note.getAttribute('tokenid');
 			this.tokenToolTipsMap[tokenId] = tip;
-		}
+		}, this);
 	},
 	
 	_processBibls: function() {
@@ -522,32 +541,57 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			}
 		}
 		// assign ids to graphic tags and use that for loading image urls through the content/url combo
-		var graphics = doc.querySelectorAll('graphic');
-		for (var i = 0; i < graphics.length; i++) {
-			var image = graphics[i];
-			var id = image.getAttribute('id');
+		var images = [];
+		this.imageSelectors.forEach(function(selector) {
+			var att = this._getAttributeFromSelector(selector);
+			if (att !== null) {
+				var hits = Ext.dom.Query.select(selector, doc, 'select', false);
+				hits.forEach(function(el) {
+					images.push({el: el, att: att});
+				});
+			}
+		}, this);
+		images.forEach(function(image) {
+			var id = image.el.getAttribute('id');
 			if (!id) {
 				id = Ext.id(null, 'xml-graphic');
-				image.setAttribute('id', id);
+				image.el.setAttribute('id', id);
 			}
-			var url = image.getAttribute('url');
+			var url = image.el.getAttribute(image.att);
 			if (customSs) {
 				customSs.insertRule('#'+id+' { content: url('+url+')}');
 			}
-		}
+		});
 	},
 	
 	_processLinks: function() {
-		var links = this.readerContainer.getDoc().querySelectorAll('ref[target]');
-		for (var i = 0; i < links.length; i++) {
-			var link = links[i];
-			var url = link.getAttribute('target');
+		var doc = this.readerContainer.getDoc();
+		var links = [];
+		this.linkSelectors.forEach(function(selector) {
+			var att = this._getAttributeFromSelector(selector);
+			if (att !== null) {
+				var hits = Ext.dom.Query.select(selector, doc, 'select', false);
+				hits.forEach(function(el) {
+					links.push({el: el, att: att});
+				});
+			}
+		}, this);
+		links.forEach(function(link) {
+			var url = link.el.getAttribute(link.att);
 			if (url.indexOf("http://")===0 || url.indexOf("https://")===0) {
-				link.addEventListener('click', function(e) {
-					window.open(this.getAttribute('target'));
+				link.el.addEventListener('click', function(e) {
+					window.open(url);
 				}, link);
 			}
+		});
+	},
+
+	_getAttributeFromSelector: function(selector) {
+		var attName = selector.match(/\[@?([^\t\n\f\s\/>"'\]\=\~\|\^\$\*]+)/);
+		if (attName !== null) {
+			attName = attName[1];
 		}
+		return attName;
 	},
 	
 	_getSelections: function() {
