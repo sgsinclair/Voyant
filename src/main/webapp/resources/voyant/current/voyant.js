@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Sep 11 16:42:11 EDT 2018 */
+/* This file created by JSCacher. Last modified: Tue Sep 25 16:19:40 EDT 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -29804,13 +29804,12 @@ Ext.define('Voyant.panel.Trends', {
         	})
     		return;
     	}
-    	debugger
     	params = params || {};
     	//this.segments.hide();
     	var withDistributions = this.getApiParam("withDistributions");
     	Ext.applyIf(params, {
     		bins: this.getCorpus().getDocumentsCount(),
-			limit: 1000, // should have query, so no limit 
+			limit: 100, // should have query, so no limit 
 	    	stopList: "" // automatic queries should be stopped already
     	});
     	var docLabels = this.getCorpus().map(function(doc) {return doc.getTinyTitle()})
