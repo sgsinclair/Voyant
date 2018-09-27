@@ -276,33 +276,8 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		}
 		
 		this.currentDocId = params.docId;
-		
-		if (window.history.pushState) {
-			// add the docId to the url (for proper annotation storage)
-			var app = this.getApplication();
-			var corpusId = app.getCorpus().getId();
-			var docId = params.docId;
-			var inkeTags = app.getApiParam('inkeTags');
-			var curatorId = app.getApiParam('curatorId');
-			var debug = app.getApiParam('debug');
-			
-			var url = app.getBaseUrl()+'dtoc/';
-			url += '?corpus='+corpusId+'&docId='+docId;
-			// prioritize curatorId over inkeTags
-			if (curatorId !== undefined) {
-			    url += '&curatorId='+curatorId;
-			} else if (inkeTags !== false) {
-                url += '&inkeTags=true';
-            }
-			if (debug !== undefined) {
-			    url += '&debug=true';
-			}
-			
-			window.history.pushState({
-				corpus: corpusId,
-				docId: docId
-			}, 'Doc: '+docId, url);
-		}
+
+		this.getApplication().updateWindowHistory();
 		
 		this.setReaderTitle();
 		

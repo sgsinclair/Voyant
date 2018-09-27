@@ -321,64 +321,6 @@ Ext.define('VoyantDTOCApp', {
 		
 		this.callParent(arguments);
 	},
-	
-	loadCuration: function(data) {
-		if (data) {
-			// TODO refactor with similar functions in setDTCMode
-			if (data.markup) {
-				var dtcMarkup = Ext.getCmp('dtcMarkup');
-				dtcMarkup.curatedTags = {};
-				dtcMarkup.tagTotals = {};
-				dtcMarkup.savedTags = {};
-				var reader = Ext.getCmp('dtcReader');
-				reader.linkSelectors = [];
-				reader.noteSelectors = [];
-				reader.imageSelectors = [];
-				for (var i = 0; i < data.markup.length; i++) {
-					var tag = data.markup[i];
-					dtcMarkup.curatedTags[tag.tagName] = tag;
-					if (tag.usage) {
-						if (tag.usage === 'link') {
-							reader.linkSelectors.push(tag.tagName);
-						} else if (tag.usage === 'note') {
-							reader.noteSelectors.push(tag.tagName);
-						} else if (tag.usage === 'image') {
-							reader.imageSelectors.push(tag.tagName);
-						}
-					}
-				}
-			}
-			if (data.toc && data.toc.length > 0) {
-				var treeNodes = [];
-				this.addOrigIndexField();
-				for (var i = 0; i < data.toc.length; i++) {
-					var node = data.toc[i];
-					var doc = this.getCorpus().getDocument(node.d);
-					var docId = doc.getId();
-					
-					// check if docIndex matches doc order
-					// if it doesn't, set the appropriate fields
-					if (node.d != i) {
-						doc.set('origIndex', node.d);
-						doc.set('title', node.t);
-						doc.set('index', i);
-					}
-					
-					treeNodes.push({
-						text: node.t,
-						docId: docId
-					});
-				}
-				
-				this.getCorpus().getDocuments().setRemoteSort(false);
-				this.getCorpus().getDocuments().sort('index', 'ASC');
-				this.getCorpus().getDocuments().setRemoteSort(true);
-				
-				Ext.getCmp('dtcToc').initToc(treeNodes, true);
-				Ext.getCmp('dtcDocModel').buildProspect();
-			}
-		}
-    },
     
     setDTCMode: function(isCurator) {
     	this.isCurator = isCurator;
@@ -465,9 +407,108 @@ Ext.define('VoyantDTOCApp', {
 
 			reader.reloadDocument();
 		}
+	},
+	
+	updateWindowHistory: function() {
+		if (window.history.pushState) {
+			// add the docId to the url (for proper annotation storage)
+			var corpusId = this.getCorpus().getId();
+			var docId = Ext.getCmp('dtcReader').getCurrentDocId();
+			var inkeTags = this.getApiParam('inkeTags');
+			var curatorId = this.getApiParam('curatorId');
+			var debug = this.getApiParam('debug');
+
+			var url = this.getBaseUrl()+'dtoc/';
+			url += '?corpus='+corpusId+'&docId='+docId;
+			// prioritize curatorId over inkeTags
+			if (curatorId !== undefined) {
+				url += '&curatorId='+curatorId;
+			} else if (inkeTags !== false) {
+				url += '&inkeTags=true';
+			}
+			if (debug !== undefined) {
+				url += '&debug=true';
+			}
+
+			window.history.pushState({
+				corpus: corpusId,
+				docId: docId
+			}, 'Doc: '+docId, url);
+
+			// CWRC bridge
+			if (window.parent) {
+				var msg = JSON.stringify({
+					url: url,
+					corpusId: corpusId,
+					docId: docId,
+					curatorId: curatorId
+				});
+				window.parent.postMessage(msg, '*');
+			}
+		}
+	},
+
+	loadCuration: function(data) {
+		if (data) {
+			// TODO refactor with similar functions in setDTCMode
+			if (data.markup) {
+				var dtcMarkup = Ext.getCmp('dtcMarkup');
+				dtcMarkup.curatedTags = {};
+				dtcMarkup.tagTotals = {};
+				dtcMarkup.savedTags = {};
+				var reader = Ext.getCmp('dtcReader');
+				reader.linkSelectors = [];
+				reader.noteSelectors = [];
+				reader.imageSelectors = [];
+				for (var i = 0; i < data.markup.length; i++) {
+					var tag = data.markup[i];
+					dtcMarkup.curatedTags[tag.tagName] = tag;
+					if (tag.usage) {
+						if (tag.usage === 'link') {
+							reader.linkSelectors.push(tag.tagName);
+						} else if (tag.usage === 'note') {
+							reader.noteSelectors.push(tag.tagName);
+						} else if (tag.usage === 'image') {
+							reader.imageSelectors.push(tag.tagName);
+						}
+					}
+				}
+			}
+			if (data.toc && data.toc.length > 0) {
+				var treeNodes = [];
+				this.addOrigIndexField();
+				for (var i = 0; i < data.toc.length; i++) {
+					var node = data.toc[i];
+					var doc = this.getCorpus().getDocument(node.d);
+					var docId = doc.getId();
+					
+					// check if docIndex matches doc order
+					// if it doesn't, set the appropriate fields
+					if (node.d != i) {
+						doc.set('origIndex', node.d);
+						doc.set('title', node.t);
+						doc.set('index', i);
+					}
+					
+					treeNodes.push({
+						text: node.t,
+						docId: docId
+					});
+				}
+				
+				this.getCorpus().getDocuments().setRemoteSort(false);
+				this.getCorpus().getDocuments().sort('index', 'ASC');
+				this.getCorpus().getDocuments().setRemoteSort(true);
+				
+				Ext.getCmp('dtcToc').initToc(treeNodes, true);
+				Ext.getCmp('dtcDocModel').buildProspect();
+			}
+		}
     },
 
-    doExport: function() {
+    saveCuration: function() {
+		var dfd = new Ext.Deferred();
+
     	var exportObj = {markup: [], toc: []};
     	
     	var tagData = Ext.getCmp('dtcMarkup').exportTagData();
@@ -496,6 +537,18 @@ Ext.define('VoyantDTOCApp', {
 		
 		var me = this;
 		this.storeResource('curation-'+curatorId, exportObj).then(function() {
+			me.setApiParam('curatorId', curatorId);
+			dfd.resolve(curatorId);
+		}, function() {
+			dfd.reject();
+		});
+
+		return dfd.promise;
+	},
+
+	doExport: function() {
+		var me = this;
+		this.saveCuration().then(function(curatorId) {
 			// TODO add original query params if necessary
 			var params = {
 				corpus: me.getCorpus().getId(),
@@ -504,7 +557,7 @@ Ext.define('VoyantDTOCApp', {
 
 			var url = me.getBaseUrl()+'dtoc/?'+Ext.urlEncode(params);
 			var msg = '<p>'+ new Ext.Template("Copy and paste the URL below (you may need to add http or https depending on the current server) or simply <a href='{0}' target='_blank'>click on this link.</a>").apply([url])+'</p>';
-			
+
 			Ext.Msg.show({
 				title: 'Export',
 				message: msg,
@@ -514,6 +567,8 @@ Ext.define('VoyantDTOCApp', {
 				width: Ext.getBody().getWidth()-50,
 				icon: Ext.MessageBox.INFO
 			});
+
+			me.updateWindowHistory();
 		}, function() {
 			Ext.Msg.show({
 				title: 'Error',
