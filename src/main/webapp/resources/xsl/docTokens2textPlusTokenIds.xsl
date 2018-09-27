@@ -10,7 +10,7 @@
         <xsl:choose>
             <xsl:when test="contains(tokenType,'tag')">
                 <xsl:variable name="tags" as="element(tag)*">
-                    <xsl:analyze-string select="term" regex="(^./?)(\w+)(\s?.*?)(\s*/?>$)" flags="ms">
+                    <xsl:analyze-string select="term" regex="(^./?)([:\w]+)(\s?.*?)(\s*/?>$)" flags="ms">
                         <xsl:matching-substring>
                             <tag>
                                 <start><xsl:value-of select="regex-group(1)"/></start>
