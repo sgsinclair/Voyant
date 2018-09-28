@@ -10,10 +10,34 @@ Ext.define('Voyant.panel.Loom', {
         	coverageGroup: "Coverage",
         	distributionsGroup: "Distribution",
         	termsGroup: "Terms",
+        	inDocumentsLabel: "in documents",
+        	inDocumentsLabelTip: "each term must be present in the number of documents defined by this range",
+        	spanSomeLabel: "some documents",
+        	spanSomeLabelTip: "each term must be present in at least one document defined by this range",
+        	spanAllLabel: "all documents",
+        	spanAllLabelTip: "each term must be present in all documents defined by this range",
+        	spanOnlyLabel: "only documents",
+        	spanOnlyLabelTip: "each term must be present in only the documents defined by this range",
         	rawFreqLabel: "raw frequency",
         	rawFreqLabelTip: "raw term frequencies for the term must be between these values (inclusively)",
         	rawFreqPercentileLabel: "raw frequency percentile",
-        	rawFreqPercentileLabelTip: "raw term frequencies for the term must be between these percentile values (inclusively), this is useful for saying something like terms in the top 90th percentile which will provide 10% of words regardless of the variation in values."
+        	rawFreqPercentileLabelTip: "raw term frequencies for the term must be between these percentile values (inclusively), this is useful for saying something like terms in the top 90th percentile which will provide 10% of words regardless of the variation in values.",
+        	distributionsStdDevLabel: "standard deviation of distributions",
+        	distributionsStdDevLabelTip: "the standard deviation of term distribution scores must be between the defined range of values (lower will be for values that are more consistent, higher will be for values that have greater variability)",
+        	distributionsStdDevPercentileLabel: "percentile of standard deviations of distributions",
+        	distributionsStdDevPercentileLabelTip: "the percentile of standard deviations of distributions must be between the defined range of values (lower will be for values that are more consistent, higher will be for values that have greater variability)",
+        	termsLengthLabel: "term length",
+        	termsLengthLabelTip: "the length (number of characters) of the term (word)",
+        	termsLengthPercentileLabel: "term length percentile",
+        	termsLengthPercentileLabelTip: "the percentile of the length (number of characters) of the term (word)",
+        	distributionIncreasesLabel: "increases in distribution values",
+        	distributionIncreasesLabelTip: "the number of increases of the distribution values must be between the defined range (inclusively)",
+        	distributionConsecutiveIncreasesLabel: "consecutive decreases in distribution values",
+        	distributionConsecutiveIncreasesLabelTip: "the number of consecutive decreases of the distribution values must be between the defined range (inclusively)",
+        	distributionDecreasesLabel: "decreases in distribution values",
+        	distributionDecreasesLabelTip: "the number of decreases of the distribution values must be between the defined range (inclusively)",
+        	distributionConsecutiveDecreasesLabel: "consecutive decreases in distribution values",
+        	distributionConsecutiveDecreasesLabelTip: "the number of consecutive decreases of the distribution values must be between the defined range (inclusively)",
         },
         api: {
             limit: 500,
@@ -208,6 +232,22 @@ Ext.define('Voyant.panel.Loom', {
 	        		return val>=low && val <= high;
 	        	}
     		}),
+    		termsLengthPercentile :new Voyant.util.LoomControl({
+	    		group: 'terms',
+	    		name: 'termsLengthPercentile',
+	    		min: 0,
+	    		max: 100,
+	    		initControl: function(store) {
+	    			this.vals = store.getRange().map(function(r) {return r.get('term').length});
+	    			this.vals.sort(function (a, b) {  return a - b;  });
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(),
+        				ind = Ext.Array.indexOf(this.vals, record.get("term").length),
+        				val = Math.round(ind*100/this.vals.length)
+        			return val>=low && val <= high;
+	        	}
+    		}),
     		distributionIncreases :new Voyant.util.LoomControl({
 	    		group: 'distributions',
 	    		name: 'distributionIncreases',
@@ -304,8 +344,64 @@ Ext.define('Voyant.panel.Loom', {
     	}, this);
     	this.setControls(controls);
     	
+    	var tbitem = [{
+    		text: this.localize("presetsGroup"),
+    		menu: {
+    			items: [{
+    				text: this.localize('presetHighFreq'),
+    				handler: function() {
+    					{}
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetHighFreqLonger'),
+    				handler: function() {
+    					{termLengthPercentile: 75}
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetSingleDoc'),
+    				handler: function() {
+    					{spanOnly: "1,1"}
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetIncreaseDistributions'),
+    				handler: function() {
+    					{distributionIncreases: "8,10"}
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetDecreaseDistributions'),
+    				handler: function() {
+    					{spanOnly: "8,10"}
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetDistributionsNearStart'),
+    				handler: function() {
+    					{spanOnly: "1,1"}
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetDistributionsNearEnd'),
+    				handler: function() {
+    					{spanOnly: "1,1"}
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetDistributionsSporadic'),
+    				handler: function() {
+    					{spanOnly: "1,1"}
+    				},
+    				scope: this
+    			}]
+    		}
+    	}, {
+    		xtype: 'tbspacer'
+    	}];
     	var tbitems = ["frequencies","coverage","distributions","terms"].map(function(group) {
-    		return {
+    		tbitems.append({
     			text: this.localize(group+"Group"),
     			menu: {
     				items: controls.filterBy(function(control) {return control.getGroup()==group}).getRange().map(function(control) {
@@ -361,7 +457,7 @@ Ext.define('Voyant.panel.Loom', {
     					}
     				}, this)
     			}
-    		}
+    		});
     	}, this);
     	
         Ext.apply(this, {
