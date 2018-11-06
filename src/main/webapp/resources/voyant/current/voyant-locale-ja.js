@@ -327,7 +327,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPasswordText":"あなたが<i>アクセスパスワード</i>を指定すれば、パスワードのないユーザーにどのようなアクセスが可能かを指定することもできます。",
 "tableContentText":"どのカラム番号がコンテンツを含むか（または、すべてのカラムを使うために空欄を残すか）を指定してください。一番左のカラムはカラム１です。コンマを使ってカラムを区切ったり、＋を用いることでカラムを連結して、複数のドキュメントを決定してください。例えば、”1+2,3”（実際には、引用符で囲む必要はありません）と指定すると、カラム１と２を１つのドキュメントに連結して、２つ目のドキュメントとしてカラム３を使うことになります。",
 "inputRemoveFromAfter":"omit from after",
-"corpusSubTitle":"Corpus Subititle",
+"corpusSubTitle":"Corpus Subtitle",
 "numberZero":"0は無効です。最初の列は1です",
 "htmlOptionsText":"Experimental! Define CSS selectors (<a href='{0}' target='_blank'>see documentation</a>).",
 "inputFormatAuto":"自動判別（推奨）",

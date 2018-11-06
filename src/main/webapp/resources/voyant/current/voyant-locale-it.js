@@ -327,7 +327,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPasswordText":"Se specifichi una <i>password di accesso</i> puoi anche specificare il tipo di accesso da garantire ad utenti senza password.",
 "tableContentText":"Inserire i numeri delle colonne contenenti del testo (o lasciare vuoto per usare tutte le colonne). La prima colonna a sinistra ha il numero 1. Per distinguere i documenti separare le colonne con una virgola mentre per combinarle usare il segno più. Ad esempio 1+2,3 unirà le colonne 1 e 2 in un singolo documento e userà la colonna 3 per un secondo documento.",
 "inputRemoveFromAfter":"omit from after",
-"corpusSubTitle":"Corpus Subititle",
+"corpusSubTitle":"Corpus Subtitle",
 "numberZero":"0 non è valido, la prima colonna è 1",
 "htmlOptionsText":"Experimental! Define CSS selectors (<a href='{0}' target='_blank'>see documentation</a>).",
 "inputFormatAuto":"Rilevamento Automatico (raccomandato)",

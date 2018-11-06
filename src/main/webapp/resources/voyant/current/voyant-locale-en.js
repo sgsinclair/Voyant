@@ -327,7 +327,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPasswordText":"If you specify an <i>access password</i> you can also specify what access is granted to users without the password.",
 "tableContentText":"Specify which column numbers contain content (or leave blank to use all columns). The left-most columnn is column 1. Define multiple documents by separating columns with a comma or combine columns by using the plus sign. For example \"1+2,3\" (without quotes) would combine columns 1 and 2 into one document and use column 3 for  a second document.",
 "inputRemoveFromAfter":"omit from after",
-"corpusSubTitle":"Corpus Subititle",
+"corpusSubTitle":"Corpus Subtitle",
 "numberZero":"0 is invalid, the first column is 1",
 "htmlOptionsText":"Experimental! Define CSS selectors (<a href='{0}' target='_blank'>see documentation</a>).",
 "inputFormatAuto":"Auto-Detect (recommended)",

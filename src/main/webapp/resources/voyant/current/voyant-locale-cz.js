@@ -327,7 +327,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPasswordText":"Pokud zadáte <i>přístupové heslo</i> můžete také specifikovat, jaký typ přístupu bude poskytnut uživatelům bez hesla.",
 "tableContentText":"Specifikujte, která čísla sloupců mají obsah (nebo nevyplňujte, pokud chcete použít všechny sloupce). Sloupec nejvíce vlevo má číslo 1. Definujte více dokumentů pomocí oddělení sloupců čárkou, nebo sloupce slučte použitím znaménka plus. Například 1+2,3 sloučí sloupce 1 a 2 do jednoho dokumentu a použije sloupec 3 pro druhý dokument.",
 "inputRemoveFromAfter":"omit from after",
-"corpusSubTitle":"Corpus Subititle",
+"corpusSubTitle":"Corpus Subtitle",
 "numberZero":"0 je neplatné označení, první sloupec musí mít číslo 1",
 "htmlOptionsText":"Experimental! Define CSS selectors (<a href='{0}' target='_blank'>see documentation</a>).",
 "inputFormatAuto":"Automatická detekce (doporučeno)",

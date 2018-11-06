@@ -327,7 +327,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPasswordText":"اذا حُددت <i>كلمة سر الوصول</i> يمكنك أيضا تحديد مجال النفاذ لمستخدمين ليس لديهم كلمة السر",
 "tableContentText":"تحديد العواميد التي تحتوي بيانات او تجنب الاختيار لاستخدام جميع العواميد. العمود الاول في اقصى اليسار. تخصيص المستندات المتعددة باستخدام فاصلة محددة لكل من العواميد اوباستخدام رمز +. مثلا \"1+2,3\" من غيرالقوسين سيدمج العمود الاول و الثاني في مستند واحد وسينقل محتويات العمود الثالث الى مستند اخر.  ",
 "inputRemoveFromAfter":"omit from after",
-"corpusSubTitle":"Corpus Subititle",
+"corpusSubTitle":"Corpus Subtitle",
 "numberZero":"0 غير صالح, العمود الاول 1",
 "htmlOptionsText":"Experimental! Define CSS selectors (<a href='{0}' target='_blank'>see documentation</a>).",
 "inputFormatAuto":" كشف تلقائي (يوصى به)",

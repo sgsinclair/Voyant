@@ -327,7 +327,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPasswordText":"Ако наведете <i>приступну шифру</i>, можете одредити и облик приступа за кориснике који немају лозинку.",
 "tableContentText":"Одредите који бројеви колоне имају садржај (или оставите празно како бисте користили све колоне). Најлевља колона је колона 1. Дефинишите вишеструке документе тако што ћете колоне раздвојити зарезом или их комбиновати уз помоћ знака плус. Напримјер, 1+2, 3 би комбиновало колоне 1 и 2 у један документ, а колону 3 у други документ.",
 "inputRemoveFromAfter":"omit from after",
-"corpusSubTitle":"Corpus Subititle",
+"corpusSubTitle":"Corpus Subtitle",
 "numberZero":"0 не важи, прва колона је 1",
 "htmlOptionsText":"Experimental! Define CSS selectors (<a href='{0}' target='_blank'>see documentation</a>).",
 "inputFormatAuto":"аутоматско препознавање (препоручљиво)",
