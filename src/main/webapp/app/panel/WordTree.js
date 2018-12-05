@@ -40,7 +40,9 @@ Ext.define('Voyant.panel.WordTree', {
                 overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'querysearchfield'
-                }, this.localize('pool'), {
+                },
+                	'<span data-qtip="'+this.localize('poolTip')+'" class="info-tip">'+this.localize('pool')+"</span>"
+                , {
                 	xtype: 'slider',
                 	itemId: 'poolSlider',
                 	minValue: 10,
@@ -58,7 +60,10 @@ Ext.define('Voyant.panel.WordTree', {
                 		},
                 		scope: this
                 	}
-                }, this.localize('branches'), {
+                }, 
+                	'<span data-qtip="'+this.localize('branchesTip')+'" class="info-tip">'+this.localize('branches')+"</span>"
+    			,{
+                
                 	xtype: 'slider',
                 	itemId: 'branchesSlider',
                 	minValue: 2,
@@ -76,7 +81,9 @@ Ext.define('Voyant.panel.WordTree', {
                 		},
                 		scope: this
                 	}
-                }, this.localize('context'), {
+                },
+            	'<span data-qtip="'+this.localize('contextTip')+'" class="info-tip">'+this.localize('context')+"</span>"
+            	, {
                 	xtype: 'slider',
                 	itemId: 'contextSlider',
                 	minValue: 3,

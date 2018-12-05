@@ -38,6 +38,25 @@ Ext.define('Voyant.panel.Loom', {
         	distributionDecreasesLabelTip: "the number of decreases of the distribution values must be between the defined range (inclusively)",
         	distributionConsecutiveDecreasesLabel: "consecutive decreases in distribution values",
         	distributionConsecutiveDecreasesLabelTip: "the number of consecutive decreases of the distribution values must be between the defined range (inclusively)",
+        	distributionMaxLabel: "distribution maximum",
+        	distributionMaxLabelTip: "the maximum of the distribution values must be between the defined range (inclusively)",
+        	distributionMinLabel: "distribution minimum",
+        	distributionMinLabelTip: "the minimum of the distribution values must be between the defined range (inclusively)",
+        	presetsGroup: "pre-sets",
+        	presetHighFreq: "terms that are high frequency",
+        	presetHighFreqLonger: "terms that are longer and high frequency",
+        	presetSingleDoc: "higher frequency terms that only occur once",
+        	presetIncreaseDistributions: "terms that generally increase in frequency",
+        	presetDecreaseDistributions: "terms that generally decrease in frequency ",
+        	presetNearStartDistributions: "terms that peak in distribution toward the beginning ",
+        	presetNearEndDistributions: "terms that peak in distribution toward the end ",
+        	presetSporadicDistributions: "terms whose distributions vary the most",
+        	visibleTerms: "max terms",
+        	scaling: "scaling",
+        	scaleLinear: "linear",
+        	scaleLog: "logarithmic",
+        	scaleSqrt: "square root"
+        	
         },
         api: {
             limit: 500,
@@ -47,12 +66,18 @@ Ext.define('Voyant.panel.Loom', {
             spanAll: undefined,
             spanOnly: undefined,
             termLength: undefined,
+            termsLengthPercentile: undefined,
             rawFreq: undefined,
             rawFreqPercentile: undefined,
+            distributionsStdDev: undefined,
+            distributionsStdDevPercentile: undefined,
             distributionIncreases: undefined,
             distributionDecreases: undefined,
             distributionConsecutiveIncreases: undefined,
-            distributionConsecutiveDecreases: undefined
+            distributionConsecutiveDecreases: undefined,
+            distributionMax: undefined,
+            distributionMin: undefined,
+            scaling: 'linear'
         },
         glyph: 'xf1e0@FontAwesome'
     },
@@ -60,6 +85,9 @@ Ext.define('Voyant.panel.Loom', {
     config: {
     	store: undefined,
     	terms: undefined,
+    	options: [
+    		{xtype: 'stoplistoption'}
+    	],
     	controls: undefined
     },
 
@@ -323,6 +351,34 @@ Ext.define('Voyant.panel.Loom', {
 	        		}
 	        		return decreases>=low;
 	        	}
+    		}),
+    		distributionMax :new Voyant.util.LoomControl({
+	    		group: 'distributions',
+	    		name: 'distributionMax',
+	    		initControl: function(store) {
+	    			this.setMax(store.getAt(0).getDistributions().length);
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions(), val = Ext.Array.max(vals);
+	        		for (var i=low;i<high;i++) { // look at every value in case there are duplicate values
+	        			if (vals[i]==val) {return true}
+	        		}
+	        		return false;
+	        	}
+    		}),
+    		distributionMin :new Voyant.util.LoomControl({
+	    		group: 'distributions',
+	    		name: 'distributionMin',
+	    		initControl: function(store) {
+	    			this.setMax(store.getAt(0).getDistributions().length);
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions(), val = Ext.Array.min(vals);
+	        		for (var i=low;i<high;i++) { // look at every value in case there are duplicate values
+	        			if (vals[i]==val) {return true}
+	        		}
+	        		return false;
+	        	}
     		})
     	});
 
@@ -342,57 +398,90 @@ Ext.define('Voyant.panel.Loom', {
     			this.filterRecords();
     		}, this);
     	}, this);
+
     	this.setControls(controls);
     	
-    	var tbitem = [{
+    	// used below in preset handlers
+    	var me = this;
+    	var clearApiParamsForControls = function() {
+    		var currentParams = me.getApiParams();
+    		var params = {};
+    		me.controls.each(function(control) {
+    			control.setEnabled(false, true);
+    			var name = control.getName();
+    			if (name in currentParams) {
+    				me.setApiParam(name, undefined)
+    			}
+    		})
+    	}
+
+    	
+    	var tbitems = [{
     		text: this.localize("presetsGroup"),
     		menu: {
     			items: [{
     				text: this.localize('presetHighFreq'),
     				handler: function() {
-    					{}
+    					clearApiParamsForControls();
+    			    	this.filterRecords();
     				},
     				scope: this
     			},{
     				text: this.localize('presetHighFreqLonger'),
     				handler: function() {
-    					{termLengthPercentile: 75}
+    					clearApiParamsForControls();
+    					this.controls.getByKey("termsLengthPercentile").setEnabled(true, true).setValues(50,100, true);
+    					this.controls.getByKey("rawFreqPercentile").setEnabled(true, true).setValues(50,100);
     				},
     				scope: this
     			},{
     				text: this.localize('presetSingleDoc'),
     				handler: function() {
-    					{spanOnly: "1,1"}
+    					clearApiParamsForControls();
+    					this.controls.getByKey("inDocuments").setEnabled(true, true).setValues(1,1);
     				},
     				scope: this
     			},{
     				text: this.localize('presetIncreaseDistributions'),
     				handler: function() {
-    					{distributionIncreases: "8,10"}
+    					clearApiParamsForControls();
+    					var control = this.controls.getByKey("distributionIncreases");
+    					var max = control.getMax();
+    					control.setEnabled(true, true).setValues(Math.round(max*.75),max);
     				},
     				scope: this
     			},{
     				text: this.localize('presetDecreaseDistributions'),
     				handler: function() {
-    					{spanOnly: "8,10"}
+    					clearApiParamsForControls();
+    					var control = this.controls.getByKey("distributionDecreases");
+    					var max = control.getMax();
+    					control.setEnabled(true, true).setValues(Math.round(max*.75),max);
     				},
     				scope: this
     			},{
-    				text: this.localize('presetDistributionsNearStart'),
+    				text: this.localize('presetNearStartDistributions'),
     				handler: function() {
-    					{spanOnly: "1,1"}
+    					clearApiParamsForControls();
+    					var control = this.controls.getByKey("distributionMax");
+    					var max = control.getMax();
+    					control.setEnabled(true, true).setValues(0, Math.round(max*.2));
     				},
     				scope: this
     			},{
-    				text: this.localize('presetDistributionsNearEnd'),
+    				text: this.localize('presetNearEndDistributions'),
     				handler: function() {
-    					{spanOnly: "1,1"}
+    					clearApiParamsForControls();
+    					var control = this.controls.getByKey("distributionMax");
+    					var max = control.getMax();
+    					control.setEnabled(true, true).setValues(Math.round(max*.8), max);
     				},
     				scope: this
     			},{
-    				text: this.localize('presetDistributionsSporadic'),
+    				text: this.localize('presetSporadicDistributions'),
     				handler: function() {
-    					{spanOnly: "1,1"}
+    					clearApiParamsForControls();
+    					this.controls.getByKey("distributionsStdDevPercentile").setEnabled(true, true).setValues(80, 100);
     				},
     				scope: this
     			}]
@@ -400,8 +489,8 @@ Ext.define('Voyant.panel.Loom', {
     	}, {
     		xtype: 'tbspacer'
     	}];
-    	var tbitems = ["frequencies","coverage","distributions","terms"].map(function(group) {
-    		tbitems.append({
+    	["frequencies","coverage","distributions","terms"].map(function(group) {
+    		tbitems.push({
     			text: this.localize(group+"Group"),
     			menu: {
     				items: controls.filterBy(function(control) {return control.getGroup()==group}).getRange().map(function(control) {
@@ -497,6 +586,7 @@ Ext.define('Voyant.panel.Loom', {
             	listeners: {
             		filterchange: function(store) {
             			var el = this.getTargetEl(), width = el.getWidth(), height = el.getHeight(), len = store.getCount();
+            			el.setHtml(" ")
             			terms = store.getRange().map(function(r,i) {
             				return {
             					term: r.getTerm(),
@@ -624,11 +714,22 @@ Ext.define('Voyant.panel.Loom', {
             			}
             			
             			var xincrement = width/terms[0].vals.length;
-            			var yscale = d3.scaleLinear()
+            			
+            			var scale, scaleApi = this.up('loom').getApiParam("scaling");
+            			if (scaleApi=="sqrt") {scale = d3.scaleSqrt()}
+            			else if (scaleApi=="log") {scale = d3.scaleLog();}
+            			else {scale = d3.scaleLinear();}
+            			
+            			var yscale = scale
             				.domain([
-            					Ext.Array.min(terms.map(function(t) {return Ext.Array.min(t.vals)})),
-            					Ext.Array.max(terms.map(function(t) {return Ext.Array.max(t.vals)}))])
-            				.range([0, height-2]);
+            					Math.max(1e-6, Ext.Array.min(terms.map(function(t) {return Ext.Array.min(t.vals)}))),
+            					Math.max(1e-6, Ext.Array.max(terms.map(function(t) {return Ext.Array.max(t.vals)})))
+            					]).range([1e-6, height-2]);
+            			
+//            			console.warn(
+//            					Math.max(1e-6, Ext.Array.min(terms.map(function(t) {return Ext.Array.min(t.vals)}))),
+//            					Math.max(1e-6, Ext.Array.max(terms.map(function(t) {return Ext.Array.max(t.vals)})))
+//            					);
             			
             			var valueline = d3.line()
             				.curve(d3.curveCardinal)
@@ -723,11 +824,60 @@ Ext.define('Voyant.panel.Loom', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 overflowHandler: 'scroller',
-                items: [{
+                items: [tbitems[0], tbitems[2], tbitems[3], tbitems[4], tbitems[5]/*, {
                 	text: this.localize("controls"),
                 	tooltip: this.localize("controlsTip"),
                 	menu: {
                     	items: tbitems
+                	}
+                }*/,{
+        			fieldLabel: this.localize('visibleTerms'),
+        			labelWidth: 70,
+        			width: 120,
+        			xtype: 'slider',
+	            	increment: 25,
+	            	minValue: 25,
+	            	maxValue: 5000,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(parseInt(this.getApiParam("limit")));
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({limit: newvalue});
+	            			// maybe not necessary when value is smaller
+	            			this.fireEvent("loadedCorpus", this, this.getCorpus())
+	            		},
+	            		scope: this
+	            	}
+                },{
+                	text: this.localize("scaling"),
+                	menu: {
+                		defaults: {
+                			xtype: 'menucheckitem',
+                			handler: function(cmp) {
+                				this.setApiParam("scaling", cmp.getItemId());
+                        		this.getComponent("threads").fireEventArgs("filterchange", [this.getStore()]);
+                			},
+                			scope: this,
+                			listeners: {
+                				afterrender: function(cmp) {
+                					cmp.setChecked(cmp.getItemId()==this.getApiParam("scaling"))
+                				},
+                				scope: this
+                			},
+                			group: 'scaling'
+                		},
+                		items: [{
+                			text: this.localize("scaleLinear"),
+                			itemId: 'linear'
+                		},{
+                			text: this.localize("scaleLog"),
+                			itemId: 'log'
+                		},{
+                			text: this.localize("scaleSqrt"),
+                			itemId: 'sqrt'
+                		}]
+                
                 	}
                 }]
               }]
@@ -761,14 +911,16 @@ Ext.define('Voyant.panel.Loom', {
         
         this.callParent(arguments);
     },
-    
+
     filterRecords: function() {
     	var store = this.getStore();
     	store.clearFilter();
+    	var limit = parseInt(this.getApiParam("limit")), hit = 0;
     	store.filterBy(function(record) {
-    		return Ext.Array.every(this.getControls().getRange(), function(control) {
+    		var keep = Ext.Array.every(this.getControls().getRange(), function(control) {
     			return control.getEnabled()==false || control.getValidateRecord().call(control, record);
     		}, this);
+    		return keep && hit++<limit;
     	}, this)
     },
     
@@ -782,7 +934,6 @@ Ext.define('Voyant.panel.Loom', {
     		if (control.getMax()===undefined) {control.setMax(1);} // shouldn't happen
     		if (control.getHigh()==undefined) {control.setHigh(control.getMax())}
     		control.resumeEvent("change");
-    		control.fireEvent("change", control);
     	})
     },
     
@@ -894,18 +1045,22 @@ Ext.define('Voyant.util.LoomControl', {
     setMin: function() {
     	this.callParent(arguments);
     	this.fireEvent("change", this);
+    	return this;
     },
     setMax: function() {
     	this.callParent(arguments);
     	this.fireEvent("change", this);
+    	return this;
     },
     setLow: function() {
     	this.callParent(arguments);
     	this.fireEvent("change", this);
+    	return this;
     },
     setHigh: function() {
     	this.callParent(arguments);
     	this.fireEvent("change", this);
+    	return this;
     },
     setValues: function(low, high) {
     	this.suspendEvent("change");
@@ -917,11 +1072,13 @@ Ext.define('Voyant.util.LoomControl', {
         	this.setHigh(high);
     	}
     	this.resumeEvent("change");
-    	this.fireEvent("change", this);
+    	if (arguments.length < 3 || !arguments[2]) {this.fireEvent("change", this);}
+    	return this;
     },
     setEnabled: function() {
     	this.callParent(arguments);
-    	this.fireEvent("change", this);
+    	if (arguments.length < 2 || !arguments[1]) {this.fireEvent("change", this);}
+    	return this;
     }
     
 })

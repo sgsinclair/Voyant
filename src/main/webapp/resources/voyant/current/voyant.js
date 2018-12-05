@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Sep 25 16:19:40 EDT 2018 */
+/* This file created by JSCacher. Last modified: Mon Nov 05 13:46:32 EST 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -23277,10 +23277,53 @@ Ext.define('Voyant.panel.Loom', {
         	coverageGroup: "Coverage",
         	distributionsGroup: "Distribution",
         	termsGroup: "Terms",
+        	inDocumentsLabel: "in documents",
+        	inDocumentsLabelTip: "each term must be present in the number of documents defined by this range",
+        	spanSomeLabel: "some documents",
+        	spanSomeLabelTip: "each term must be present in at least one document defined by this range",
+        	spanAllLabel: "all documents",
+        	spanAllLabelTip: "each term must be present in all documents defined by this range",
+        	spanOnlyLabel: "only documents",
+        	spanOnlyLabelTip: "each term must be present in only the documents defined by this range",
         	rawFreqLabel: "raw frequency",
         	rawFreqLabelTip: "raw term frequencies for the term must be between these values (inclusively)",
         	rawFreqPercentileLabel: "raw frequency percentile",
-        	rawFreqPercentileLabelTip: "raw term frequencies for the term must be between these percentile values (inclusively), this is useful for saying something like terms in the top 90th percentile which will provide 10% of words regardless of the variation in values."
+        	rawFreqPercentileLabelTip: "raw term frequencies for the term must be between these percentile values (inclusively), this is useful for saying something like terms in the top 90th percentile which will provide 10% of words regardless of the variation in values.",
+        	distributionsStdDevLabel: "standard deviation of distributions",
+        	distributionsStdDevLabelTip: "the standard deviation of term distribution scores must be between the defined range of values (lower will be for values that are more consistent, higher will be for values that have greater variability)",
+        	distributionsStdDevPercentileLabel: "percentile of standard deviations of distributions",
+        	distributionsStdDevPercentileLabelTip: "the percentile of standard deviations of distributions must be between the defined range of values (lower will be for values that are more consistent, higher will be for values that have greater variability)",
+        	termsLengthLabel: "term length",
+        	termsLengthLabelTip: "the length (number of characters) of the term (word)",
+        	termsLengthPercentileLabel: "term length percentile",
+        	termsLengthPercentileLabelTip: "the percentile of the length (number of characters) of the term (word)",
+        	distributionIncreasesLabel: "increases in distribution values",
+        	distributionIncreasesLabelTip: "the number of increases of the distribution values must be between the defined range (inclusively)",
+        	distributionConsecutiveIncreasesLabel: "consecutive decreases in distribution values",
+        	distributionConsecutiveIncreasesLabelTip: "the number of consecutive decreases of the distribution values must be between the defined range (inclusively)",
+        	distributionDecreasesLabel: "decreases in distribution values",
+        	distributionDecreasesLabelTip: "the number of decreases of the distribution values must be between the defined range (inclusively)",
+        	distributionConsecutiveDecreasesLabel: "consecutive decreases in distribution values",
+        	distributionConsecutiveDecreasesLabelTip: "the number of consecutive decreases of the distribution values must be between the defined range (inclusively)",
+        	distributionMaxLabel: "distribution maximum",
+        	distributionMaxLabelTip: "the maximum of the distribution values must be between the defined range (inclusively)",
+        	distributionMinLabel: "distribution minimum",
+        	distributionMinLabelTip: "the minimum of the distribution values must be between the defined range (inclusively)",
+        	presetsGroup: "pre-sets",
+        	presetHighFreq: "terms that are high frequency",
+        	presetHighFreqLonger: "terms that are longer and high frequency",
+        	presetSingleDoc: "higher frequency terms that only occur once",
+        	presetIncreaseDistributions: "terms that generally increase in frequency",
+        	presetDecreaseDistributions: "terms that generally decrease in frequency ",
+        	presetNearStartDistributions: "terms that peak in distribution toward the beginning ",
+        	presetNearEndDistributions: "terms that peak in distribution toward the end ",
+        	presetSporadicDistributions: "terms whose distributions vary the most",
+        	visibleTerms: "max terms",
+        	scaling: "scaling",
+        	scaleLinear: "linear",
+        	scaleLog: "logarithmic",
+        	scaleSqrt: "square root"
+        	
         },
         api: {
             limit: 500,
@@ -23290,12 +23333,18 @@ Ext.define('Voyant.panel.Loom', {
             spanAll: undefined,
             spanOnly: undefined,
             termLength: undefined,
+            termsLengthPercentile: undefined,
             rawFreq: undefined,
             rawFreqPercentile: undefined,
+            distributionsStdDev: undefined,
+            distributionsStdDevPercentile: undefined,
             distributionIncreases: undefined,
             distributionDecreases: undefined,
             distributionConsecutiveIncreases: undefined,
-            distributionConsecutiveDecreases: undefined
+            distributionConsecutiveDecreases: undefined,
+            distributionMax: undefined,
+            distributionMin: undefined,
+            scaling: 'linear'
         },
         glyph: 'xf1e0@FontAwesome'
     },
@@ -23303,6 +23352,9 @@ Ext.define('Voyant.panel.Loom', {
     config: {
     	store: undefined,
     	terms: undefined,
+    	options: [
+    		{xtype: 'stoplistoption'}
+    	],
     	controls: undefined
     },
 
@@ -23475,6 +23527,22 @@ Ext.define('Voyant.panel.Loom', {
 	        		return val>=low && val <= high;
 	        	}
     		}),
+    		termsLengthPercentile :new Voyant.util.LoomControl({
+	    		group: 'terms',
+	    		name: 'termsLengthPercentile',
+	    		min: 0,
+	    		max: 100,
+	    		initControl: function(store) {
+	    			this.vals = store.getRange().map(function(r) {return r.get('term').length});
+	    			this.vals.sort(function (a, b) {  return a - b;  });
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(),
+        				ind = Ext.Array.indexOf(this.vals, record.get("term").length),
+        				val = Math.round(ind*100/this.vals.length)
+        			return val>=low && val <= high;
+	        	}
+    		}),
     		distributionIncreases :new Voyant.util.LoomControl({
 	    		group: 'distributions',
 	    		name: 'distributionIncreases',
@@ -23550,6 +23618,34 @@ Ext.define('Voyant.panel.Loom', {
 	        		}
 	        		return decreases>=low;
 	        	}
+    		}),
+    		distributionMax :new Voyant.util.LoomControl({
+	    		group: 'distributions',
+	    		name: 'distributionMax',
+	    		initControl: function(store) {
+	    			this.setMax(store.getAt(0).getDistributions().length);
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions(), val = Ext.Array.max(vals);
+	        		for (var i=low;i<high;i++) { // look at every value in case there are duplicate values
+	        			if (vals[i]==val) {return true}
+	        		}
+	        		return false;
+	        	}
+    		}),
+    		distributionMin :new Voyant.util.LoomControl({
+	    		group: 'distributions',
+	    		name: 'distributionMin',
+	    		initControl: function(store) {
+	    			this.setMax(store.getAt(0).getDistributions().length);
+	        	},
+	        	validateRecord: function(record) {
+	        		var low = this.getLow(), high = this.getHigh(), vals = record.getDistributions(), val = Ext.Array.min(vals);
+	        		for (var i=low;i<high;i++) { // look at every value in case there are duplicate values
+	        			if (vals[i]==val) {return true}
+	        		}
+	        		return false;
+	        	}
     		})
     	});
 
@@ -23569,10 +23665,99 @@ Ext.define('Voyant.panel.Loom', {
     			this.filterRecords();
     		}, this);
     	}, this);
+
     	this.setControls(controls);
     	
-    	var tbitems = ["frequencies","coverage","distributions","terms"].map(function(group) {
-    		return {
+    	// used below in preset handlers
+    	var me = this;
+    	var clearApiParamsForControls = function() {
+    		var currentParams = me.getApiParams();
+    		var params = {};
+    		me.controls.each(function(control) {
+    			control.setEnabled(false, true);
+    			var name = control.getName();
+    			if (name in currentParams) {
+    				me.setApiParam(name, undefined)
+    			}
+    		})
+    	}
+
+    	
+    	var tbitems = [{
+    		text: this.localize("presetsGroup"),
+    		menu: {
+    			items: [{
+    				text: this.localize('presetHighFreq'),
+    				handler: function() {
+    					clearApiParamsForControls();
+    			    	this.filterRecords();
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetHighFreqLonger'),
+    				handler: function() {
+    					clearApiParamsForControls();
+    					this.controls.getByKey("termsLengthPercentile").setEnabled(true, true).setValues(50,100, true);
+    					this.controls.getByKey("rawFreqPercentile").setEnabled(true, true).setValues(50,100);
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetSingleDoc'),
+    				handler: function() {
+    					clearApiParamsForControls();
+    					this.controls.getByKey("inDocuments").setEnabled(true, true).setValues(1,1);
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetIncreaseDistributions'),
+    				handler: function() {
+    					clearApiParamsForControls();
+    					var control = this.controls.getByKey("distributionIncreases");
+    					var max = control.getMax();
+    					control.setEnabled(true, true).setValues(Math.round(max*.75),max);
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetDecreaseDistributions'),
+    				handler: function() {
+    					clearApiParamsForControls();
+    					var control = this.controls.getByKey("distributionDecreases");
+    					var max = control.getMax();
+    					control.setEnabled(true, true).setValues(Math.round(max*.75),max);
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetNearStartDistributions'),
+    				handler: function() {
+    					clearApiParamsForControls();
+    					var control = this.controls.getByKey("distributionMax");
+    					var max = control.getMax();
+    					control.setEnabled(true, true).setValues(0, Math.round(max*.2));
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetNearEndDistributions'),
+    				handler: function() {
+    					clearApiParamsForControls();
+    					var control = this.controls.getByKey("distributionMax");
+    					var max = control.getMax();
+    					control.setEnabled(true, true).setValues(Math.round(max*.8), max);
+    				},
+    				scope: this
+    			},{
+    				text: this.localize('presetSporadicDistributions'),
+    				handler: function() {
+    					clearApiParamsForControls();
+    					this.controls.getByKey("distributionsStdDevPercentile").setEnabled(true, true).setValues(80, 100);
+    				},
+    				scope: this
+    			}]
+    		}
+    	}, {
+    		xtype: 'tbspacer'
+    	}];
+    	["frequencies","coverage","distributions","terms"].map(function(group) {
+    		tbitems.push({
     			text: this.localize(group+"Group"),
     			menu: {
     				items: controls.filterBy(function(control) {return control.getGroup()==group}).getRange().map(function(control) {
@@ -23628,7 +23813,7 @@ Ext.define('Voyant.panel.Loom', {
     					}
     				}, this)
     			}
-    		}
+    		});
     	}, this);
     	
         Ext.apply(this, {
@@ -23668,6 +23853,7 @@ Ext.define('Voyant.panel.Loom', {
             	listeners: {
             		filterchange: function(store) {
             			var el = this.getTargetEl(), width = el.getWidth(), height = el.getHeight(), len = store.getCount();
+            			el.setHtml(" ")
             			terms = store.getRange().map(function(r,i) {
             				return {
             					term: r.getTerm(),
@@ -23795,11 +23981,22 @@ Ext.define('Voyant.panel.Loom', {
             			}
             			
             			var xincrement = width/terms[0].vals.length;
-            			var yscale = d3.scaleLinear()
+            			
+            			var scale, scaleApi = this.up('loom').getApiParam("scaling");
+            			if (scaleApi=="sqrt") {scale = d3.scaleSqrt()}
+            			else if (scaleApi=="log") {scale = d3.scaleLog();}
+            			else {scale = d3.scaleLinear();}
+            			
+            			var yscale = scale
             				.domain([
-            					Ext.Array.min(terms.map(function(t) {return Ext.Array.min(t.vals)})),
-            					Ext.Array.max(terms.map(function(t) {return Ext.Array.max(t.vals)}))])
-            				.range([0, height-2]);
+            					Math.max(1e-6, Ext.Array.min(terms.map(function(t) {return Ext.Array.min(t.vals)}))),
+            					Math.max(1e-6, Ext.Array.max(terms.map(function(t) {return Ext.Array.max(t.vals)})))
+            					]).range([1e-6, height-2]);
+            			
+//            			console.warn(
+//            					Math.max(1e-6, Ext.Array.min(terms.map(function(t) {return Ext.Array.min(t.vals)}))),
+//            					Math.max(1e-6, Ext.Array.max(terms.map(function(t) {return Ext.Array.max(t.vals)})))
+//            					);
             			
             			var valueline = d3.line()
             				.curve(d3.curveCardinal)
@@ -23894,11 +24091,60 @@ Ext.define('Voyant.panel.Loom', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 overflowHandler: 'scroller',
-                items: [{
+                items: [tbitems[0], tbitems[2], tbitems[3], tbitems[4], tbitems[5]/*, {
                 	text: this.localize("controls"),
                 	tooltip: this.localize("controlsTip"),
                 	menu: {
                     	items: tbitems
+                	}
+                }*/,{
+        			fieldLabel: this.localize('visibleTerms'),
+        			labelWidth: 70,
+        			width: 120,
+        			xtype: 'slider',
+	            	increment: 25,
+	            	minValue: 25,
+	            	maxValue: 5000,
+	            	listeners: {
+	            		afterrender: function(slider) {
+	            			slider.setValue(parseInt(this.getApiParam("limit")));
+	            		},
+	            		changecomplete: function(slider, newvalue) {
+	            			this.setApiParams({limit: newvalue});
+	            			// maybe not necessary when value is smaller
+	            			this.fireEvent("loadedCorpus", this, this.getCorpus())
+	            		},
+	            		scope: this
+	            	}
+                },{
+                	text: this.localize("scaling"),
+                	menu: {
+                		defaults: {
+                			xtype: 'menucheckitem',
+                			handler: function(cmp) {
+                				this.setApiParam("scaling", cmp.getItemId());
+                        		this.getComponent("threads").fireEventArgs("filterchange", [this.getStore()]);
+                			},
+                			scope: this,
+                			listeners: {
+                				afterrender: function(cmp) {
+                					cmp.setChecked(cmp.getItemId()==this.getApiParam("scaling"))
+                				},
+                				scope: this
+                			},
+                			group: 'scaling'
+                		},
+                		items: [{
+                			text: this.localize("scaleLinear"),
+                			itemId: 'linear'
+                		},{
+                			text: this.localize("scaleLog"),
+                			itemId: 'log'
+                		},{
+                			text: this.localize("scaleSqrt"),
+                			itemId: 'sqrt'
+                		}]
+                
                 	}
                 }]
               }]
@@ -23932,14 +24178,16 @@ Ext.define('Voyant.panel.Loom', {
         
         this.callParent(arguments);
     },
-    
+
     filterRecords: function() {
     	var store = this.getStore();
     	store.clearFilter();
+    	var limit = parseInt(this.getApiParam("limit")), hit = 0;
     	store.filterBy(function(record) {
-    		return Ext.Array.every(this.getControls().getRange(), function(control) {
+    		var keep = Ext.Array.every(this.getControls().getRange(), function(control) {
     			return control.getEnabled()==false || control.getValidateRecord().call(control, record);
     		}, this);
+    		return keep && hit++<limit;
     	}, this)
     },
     
@@ -23953,7 +24201,6 @@ Ext.define('Voyant.panel.Loom', {
     		if (control.getMax()===undefined) {control.setMax(1);} // shouldn't happen
     		if (control.getHigh()==undefined) {control.setHigh(control.getMax())}
     		control.resumeEvent("change");
-    		control.fireEvent("change", control);
     	})
     },
     
@@ -24065,18 +24312,22 @@ Ext.define('Voyant.util.LoomControl', {
     setMin: function() {
     	this.callParent(arguments);
     	this.fireEvent("change", this);
+    	return this;
     },
     setMax: function() {
     	this.callParent(arguments);
     	this.fireEvent("change", this);
+    	return this;
     },
     setLow: function() {
     	this.callParent(arguments);
     	this.fireEvent("change", this);
+    	return this;
     },
     setHigh: function() {
     	this.callParent(arguments);
     	this.fireEvent("change", this);
+    	return this;
     },
     setValues: function(low, high) {
     	this.suspendEvent("change");
@@ -24088,11 +24339,13 @@ Ext.define('Voyant.util.LoomControl', {
         	this.setHigh(high);
     	}
     	this.resumeEvent("change");
-    	this.fireEvent("change", this);
+    	if (arguments.length < 3 || !arguments[2]) {this.fireEvent("change", this);}
+    	return this;
     },
     setEnabled: function() {
     	this.callParent(arguments);
-    	this.fireEvent("change", this);
+    	if (arguments.length < 2 || !arguments[1]) {this.fireEvent("change", this);}
+    	return this;
     }
     
 })
@@ -31594,7 +31847,9 @@ Ext.define('Voyant.panel.WordTree', {
                 overflowHandler: 'scroller',
                 items: [{
                 	xtype: 'querysearchfield'
-                }, this.localize('pool'), {
+                },
+                	'<span data-qtip="'+this.localize('poolTip')+'" class="info-tip">'+this.localize('pool')+"</span>"
+                , {
                 	xtype: 'slider',
                 	itemId: 'poolSlider',
                 	minValue: 10,
@@ -31612,7 +31867,10 @@ Ext.define('Voyant.panel.WordTree', {
                 		},
                 		scope: this
                 	}
-                }, this.localize('branches'), {
+                }, 
+                	'<span data-qtip="'+this.localize('branchesTip')+'" class="info-tip">'+this.localize('branches')+"</span>"
+    			,{
+                
                 	xtype: 'slider',
                 	itemId: 'branchesSlider',
                 	minValue: 2,
@@ -31630,7 +31888,9 @@ Ext.define('Voyant.panel.WordTree', {
                 		},
                 		scope: this
                 	}
-                }, this.localize('context'), {
+                },
+            	'<span data-qtip="'+this.localize('contextTip')+'" class="info-tip">'+this.localize('context')+"</span>"
+            	, {
                 	xtype: 'slider',
                 	itemId: 'contextSlider',
                 	minValue: 3,
@@ -35264,7 +35524,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	moreTools: [{
 			i18n: 'moreToolsScaleCorpus',
 			glyph: 'xf065@FontAwesome',
-			items: ['cirrus','corpusterms','bubblelines','correlations','corpuscollocates','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','topics','veliza','wordtree']
+			items: ['cirrus','corpusterms','bubblelines','correlations','corpuscollocates','dreamscape','loom','mandala','microsearch','streamgraph','phrases','documents','summary','trends','scatterplot','termsradio','topics','veliza','wordtree']
     	},{
 			i18n: 'moreToolsScaleDocument',
 			glyph: 'xf066@FontAwesome',
@@ -35272,7 +35532,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	},{
 			i18n: 'moreToolsTypeViz',
 			glyph: 'xf06e@FontAwesome',
-			items: ['cirrus','bubblelines','bubbles','collocatesgraph','knots','mandala','microsearch','streamgraph','scatterplot','textualarc','trends','termsberry','termsradio','wordtree']
+			items: ['cirrus','bubblelines','bubbles','collocatesgraph','dreamscape','loom','knots','mandala','microsearch','streamgraph','scatterplot','textualarc','trends','termsberry','termsradio','wordtree']
 		},{
 			i18n: 'moreToolsTypeGrid',
 			glyph: 'xf0ce@FontAwesome',
