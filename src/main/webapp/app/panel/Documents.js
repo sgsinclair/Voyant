@@ -224,7 +224,7 @@ Ext.define('Voyant.panel.Documents', {
         
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		
+
     		this.store.setCorpus(corpus);
     		if (this.isVisible()) {
         		this.store.load({params: this.getApiParams()});

@@ -36,6 +36,7 @@ Ext.define('Voyant.data.store.DocumentsMixin', {
 Ext.define('Voyant.data.store.Documents', {
 	extend: 'Ext.data.Store',
 	mixins: ['Voyant.data.store.DocumentsMixin'],
+    model: 'Voyant.data.model.Document',
 	constructor : function(config) {
 		config = config || {};
 		this.mixins['Voyant.data.store.DocumentsMixin'].constructor.apply(this, [config])
@@ -46,6 +47,7 @@ Ext.define('Voyant.data.store.Documents', {
 Ext.define('Voyant.data.store.DocumentsBuffered', {
 	extend: 'Ext.data.BufferedStore',
 	mixins: ['Voyant.data.store.DocumentsMixin'],
+    model: 'Voyant.data.model.Document',
 	constructor : function(config) {
 		config = config || {};
 		this.mixins['Voyant.data.store.DocumentsMixin'].constructor.apply(this, [config])

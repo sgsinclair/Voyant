@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Nov 05 13:46:32 EST 2018 */
+/* This file created by JSCacher. Last modified: Wed Dec 05 13:44:41 EST 2018 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -9195,6 +9195,7 @@ Ext.define('Voyant.data.store.DocumentsMixin', {
 Ext.define('Voyant.data.store.Documents', {
 	extend: 'Ext.data.Store',
 	mixins: ['Voyant.data.store.DocumentsMixin'],
+    model: 'Voyant.data.model.Document',
 	constructor : function(config) {
 		config = config || {};
 		this.mixins['Voyant.data.store.DocumentsMixin'].constructor.apply(this, [config])
@@ -9205,6 +9206,7 @@ Ext.define('Voyant.data.store.Documents', {
 Ext.define('Voyant.data.store.DocumentsBuffered', {
 	extend: 'Ext.data.BufferedStore',
 	mixins: ['Voyant.data.store.DocumentsMixin'],
+    model: 'Voyant.data.model.Document',
 	constructor : function(config) {
 		config = config || {};
 		this.mixins['Voyant.data.store.DocumentsMixin'].constructor.apply(this, [config])
@@ -22308,7 +22310,7 @@ Ext.define('Voyant.panel.Documents', {
         
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    		
+
     		this.store.setCorpus(corpus);
     		if (this.isVisible()) {
         		this.store.load({params: this.getApiParams()});
