@@ -31,6 +31,15 @@
 	</servlet>
 	
 	<servlet-mapping>
+		<servlet-name>microocp</servlet-name>
+		<url-pattern>/micro-ocp/*</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>microocp</servlet-name>
+		<jsp-file>/micro-ocp/index.jsp</jsp-file>
+	</servlet>
+	
+	<servlet-mapping>
 		<servlet-name>tool</servlet-name>
 		<url-pattern>/tool/*</url-pattern>
 	</servlet-mapping>
