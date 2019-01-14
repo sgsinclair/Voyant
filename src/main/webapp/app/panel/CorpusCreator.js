@@ -69,7 +69,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		frameHeader: true,
     		layout: {
     			type: 'vbox',
-    			align: 'middle'
+    			align: 'stretch'
     		},
 	    	dockedItems: [{
 	    		xtype: 'toolbar',
@@ -247,13 +247,16 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	    	    	}
 	    	    }]
 	    	}],
-	    	items: {
+	    	items: [{
+	    		html: this.getInitialConfig().addTextLabel,
+	    		hidden: this.getInitialConfig().addTextLabel==undefined
+	    	},{
+//	    		layout: 'fit',
+	    		height: 100,
     	    	xtype: 'textareafield',
-    	    	width: 800,
-    	    	height: 100,
     	    	itemId: 'input',
     	    	emptyText: this.localize('emptyInput')
-	    	}    
+	    	}]
         });
         
         me.on("boxready", function(panel) {

@@ -53,6 +53,7 @@ Ext.onReady(function(){
 						collapsed: true
 					}, {
 						xtype: 'corpuscreator',
+						addTextLabel: "This is a special interface for creating corpora to be used with the Dynamic Table of Contexts and documents are expected by default to have a schema that is compatible (see <a href='https://cwrc.ca/DToC_Documentation/#CreatingXMLDoc.html' target='_blank'>documentation</a>). You can use the <a href='../docs/#!/guide/corpuscreator-section-input-format' target='_blank'>options for corpus creation</a> to override default DToC format values or choose the Auto-detect input format and define the XPath queries that you wish to use.",
 						listeners: {
 							afterrender: function(cc) {
 								cc.setApiParam('inputFormat', 'dtoc'); // make this default

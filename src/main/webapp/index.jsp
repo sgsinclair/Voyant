@@ -23,7 +23,7 @@
     	   query+="view="+view;
        }
        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-	   response.setHeader("Location", "./" + (skin.equals("dtoc") ? "dtoc/" : "") + (query.length()>0 ? "?"+query : ""));
+	   response.setHeader("Location", "./" + (skin.equals("dtoc") ? "dtoc/" : "") + (query.length()>0 ? "?"+query+"" : ""));
        return;
    }
    
