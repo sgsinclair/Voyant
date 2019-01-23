@@ -102,7 +102,6 @@ Ext.define('Voyant.data.model.Document', {
 	    		docId: this.get('id')
 	    	});
 	    	return this.get('corpus').getTokens(config);
-//	    	return new Voyant.data.store.Tokens(config);
 		}
     },
 
@@ -228,6 +227,9 @@ Ext.define('Voyant.data.model.Document', {
 	    	Ext.apply(config, {
         		tool: 'corpus.DocumentTokens',
         		corpus: this.getCorpusId()
+	    	})
+	    	this.getTokens(config).then(function(tokens) {
+	    		dfd.resolve(tokens);
 	    	});
 	    	return dfd.promise
 		}
@@ -243,7 +245,7 @@ Ext.define('Voyant.data.model.Document', {
     			template: "docTokens2text",
     			noOthers: true
 	    	});
-			return this.getText(config);
+			return this.getText();
 		}
     	
     },
