@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jan 23 10:15:25 EST 2019 */
+/* This file created by JSCacher. Last modified: Wed Jan 23 18:44:32 EST 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -23027,7 +23027,7 @@ Ext.define('Voyant.panel.Fountain', {
     		if (me.getApiParam("groups")==undefined) {
     			var group = {};
     			lcwords.forEach(function(w) {
-    				if (w.length>4 && !(w in group)) {
+    				if (w.length>5 && !(w in group)) {
     					group[w] = w.length;
     				} 
     			});

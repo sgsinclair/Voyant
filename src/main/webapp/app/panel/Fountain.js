@@ -157,7 +157,7 @@ Ext.define('Voyant.panel.Fountain', {
     		if (me.getApiParam("groups")==undefined) {
     			var group = {};
     			lcwords.forEach(function(w) {
-    				if (w.length>4 && !(w in group)) {
+    				if (w.length>5 && !(w in group)) {
     					group[w] = w.length;
     				} 
     			});
