@@ -126,6 +126,7 @@ app/panel/DocumentTerms.js
 app/panel/Documents.js
 app/panel/DocumentsFinder.js
 app/panel/Dummy.js
+app/panel/Fountain.js
 app/panel/RezoViz.js
 app/panel/Loom.js
 app/panel/MicroSearch.js
