@@ -735,8 +735,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		docId = docId || this.currentDocId;
 		var doc = this.getCorpus().getDocument(docId);
 		var titleHtml = '';
-		var title = doc.get('title') || '';
-		title = title.normalize();
+		var title = doc.getTitle().normalize();
 		var names = '';
 		var colon = ': ';
 		var authors = doc.get('author');
