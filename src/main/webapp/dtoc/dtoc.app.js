@@ -230,7 +230,11 @@ Ext.define('VoyantDTOCApp', {
         			listeners: {
         				collapse: function(p) {
         					p.el.down('.x-panel-header').addCls('borderRadiusTop borderRadiusBottom');
+        				},
+        				afterrender: function() {
+        					this.collapse();
         				}
+        			
         			}
         		},{
         			xtype: 'splitter',
