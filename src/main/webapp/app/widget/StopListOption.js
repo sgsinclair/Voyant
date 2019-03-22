@@ -34,12 +34,14 @@ Ext.define('Voyant.widget.StopListOption', {
     			mu: "stop.mu.multi.txt",
     			nl: "stop.nl.dutch.txt",
     			no: "stop.no.norwegian.txt",
+    			pt: "stop.pt.brazilian.txt",
     			ro: "stop.ro.romanian-lucene.txt",
     			se: "stop.se.swedish-long.txt",
     			th: "stop.th.thai-lucene.txt",
     			tr: "stop.tr.turkish-lucene.txt"
     		},
 	    	i18n: {
+	    		
 	    	}
     },
     initComponent: function(config) {

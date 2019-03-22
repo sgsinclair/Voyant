@@ -2,17 +2,17 @@
 
 Several tools include a search box that allows you to specify advanced search query. The results returned will depend on the tool being used, but the syntax is fairly consistent throughout. Here are examples of searches:
 
-* `coat`: match **exact term** coat
-* `coat*`: match terms that start with the **prefix** coat and then a **wildcard** as **one term**
-* `^coat*`: match terms that start with coat as **separate terms** (coat, coats, etc.)
-* `*oat`: match terms that end with the **suffix** _oat_ as **one term**
-* `^*oat`: match terms that end with **suffix** _oat_ as **separate terms** (coat, moat, etc.)
-* `coat,jacket`: match each term **separated by commas** as **separate terms**
-* `coat|jacket`: match terms **separated by pipes** as a **single term**
-* `"winter coat"`: _winter coat_ as an exact **phrase** (word order matters)
-* `"winter coat"~0`: _winter coat_ or _coat winter_ **phrase** (word order doesn't matter but 0 words in between)
-* `"coat mittens"~5`: match _coat_ **near** _mittens_ (within 5 words)
-* `^coat*,jacket|parka,"coat mittens"~5`: **combine** syntaxes
+* [`love`](https://voyant-tools.org/?corpus=austen&query=love&view=CorpusTerms): match **exact term** love
+* [`love*`](https://voyant-tools.org/?corpus=austen&query=love*&view=CorpusTerms): match terms that start with the **prefix** love and then a **wildcard** as **one term**
+* [`^love*`](https://voyant-tools.org/?corpus=austen&query=^love*&view=CorpusTerms): match terms that start with love as **separate terms** (love, lovely, etc.)
+* [`*ove`](https://voyant-tools.org/?corpus=austen&query=ove*&view=CorpusTerms): match terms that end with the **suffix** _ove_ as **one term**
+* [`^*ove`](https://voyant-tools.org/?corpus=austen&query=^love*&view=CorpusTerms): match terms that end with **suffix** _ove_ as **separate terms** (love, above, etc.)
+* [`love,hate`](https://voyant-tools.org/?corpus=austen&query=love,hate&view=CorpusTerms): match each term **separated by commas** as **separate terms**
+* [`love\|hate`](https://voyant-tools.org/?corpus=austen&query=love\|hate&view=CorpusTerms): match terms **separated by pipes** as a **single term**
+* [`"love him"`](https://voyant-tools.org/?corpus=austen&query="love him"&view=CorpusTerms): _love him_ as an exact **phrase** (word order matters)
+* [`"love him"~0`](https://voyant-tools.org/?corpus=austen&query="love+him"~0&view=CorpusTerms): _love him_ or _him love_ **phrase** (word order doesn't matter but 0 words in between)
+* [`"love her"~5`](https://voyant-tools.org/?corpus=austen&query="love+her"~5&view=CorpusTerms): match _love_ **near** _her_ (within 5 words)
+* [`^love*,love\|hate,"love her"~5`](https://voyant-tools.org/?corpus=austen&query=^love*,hate\|love,"love+her"~5&view=CorpusTerms): **combine** syntaxes
 
 To complete a search, hit enter. Resetting a search is usually as simple as deleting the contents of the search box and pressing enter.
 
