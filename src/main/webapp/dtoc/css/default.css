@@ -1,0 +1,10 @@
+/* default styling for docs with none */
+:root {
+    display: block;
+    padding: 1em;
+}
+
+:root > * {
+    display: block;
+    padding: 1em 0;
+}

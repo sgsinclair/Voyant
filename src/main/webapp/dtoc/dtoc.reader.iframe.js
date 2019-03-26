@@ -296,11 +296,13 @@ Ext.define('Voyant.panel.DToC.Reader', {
 
 			if (this.getApplication().isRegenerations) {
 				this.addStylesheetToReader('dtoc/css/tei.css');
+			} else {
+				var cssUrl = this.getCorpus().getDocument(params.docId).getCSS();
+				if (cssUrl === '' && this.getStylesheetsInDoc().length === 0) {
+					cssUrl = 'dtoc/css/default.css';
+				}
+				this.addStylesheetToReader(cssUrl);
 			}
-
-			var cssUrl = this.getCorpus().getDocument(params.docId).getCSS();
-			if (cssUrl === '') cssUrl = 'https://cwrc.ca/templates/css/tei.css';
-			this.addStylesheetToReader(cssUrl);
 
 			var doc = this.readerContainer.getDoc();
             // need to add scroll every time doc is changed
@@ -349,6 +351,23 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		this.readerContainer.load(url);
 	},
 	
+	getStylesheetsInDoc: function() {
+		var styleSheets = [];
+		
+		var doc = this.readerContainer.getDoc();
+		var child = doc.firstChild;
+		while (child !== null) {
+			if (child.nodeType === Node.PROCESSING_INSTRUCTION_NODE && child.target === 'xml-stylesheet') {
+				if (child.data.indexOf('dtoc/css/custom.css') === -1) { // don't include the custom.css one
+					styleSheets.push(child);
+				}
+			}
+			child = child.nextSibling;
+		}
+
+		return styleSheets;
+	},
+
 	addStylesheetToReader: function(cssUrl) {
 		var doc = this.readerContainer.getDoc();
 		var cssPi = doc.createProcessingInstruction('xml-stylesheet', 'href="'+cssUrl+'" type="text/css"');

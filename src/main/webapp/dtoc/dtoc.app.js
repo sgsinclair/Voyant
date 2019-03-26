@@ -224,15 +224,13 @@ Ext.define('VoyantDTOCApp', {
         			cls: 'dtc-panel',
         			deferredRender: false,
         			activeTab: 0,
-        			items: dtcToolsConfig,
+					items: dtcToolsConfig,
+					collapsed: true,
         			animCollapse: false,
         			collapseDirection: 'left',
         			listeners: {
         				collapse: function(p) {
         					p.el.down('.x-panel-header').addCls('borderRadiusTop borderRadiusBottom');
-        				},
-        				afterrender: function() {
-        					this.collapse();
         				}
         			
         			}
