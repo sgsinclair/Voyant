@@ -16,7 +16,7 @@ Voyant Tools is an open-source project and the code is available through [GitHub
 
 ## Credits
 
-Voyant Tools is a labour of love. It's ancestry includes HyperPo and Taporware and more distantly TACT.
+Voyant Tools is a labour of love. Its ancestry includes HyperPo and Taporware and more distantly TACT.
 
 ### Project Leads
 
