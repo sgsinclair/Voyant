@@ -77,6 +77,19 @@ Voyant provides powerful functionality for creating a corpus from XML documents,
 * **Documents**: This allows you to extract multiple documents from an XML document (such as posts in an RSS feed, though usually selecting the RSS *Input Format* will do that automatically). When this is used in combination with the options below, the other XPath expressions will be relative to each sub-document (not to the original document root node).
 * **Group by**: When used in conjunction with a *Documents* option, this allows you to group multiple documents together that share the same XPath value. For instance, if you there are multiple &lt;speech&gt; documents, you can group all of the documents together based on the value of the speaker (so there would be one document per speaker with all of the speeches grouped together). This option is ignored if *Documents* isn't specified.
 
+Additional Metadata:
+
+* **Publication Date**: An indication of the publication date (there's no pre-defined format for this but often it's useful to have alphabetically sortable values such as a year number).
+* **Publisher**: The publisher of the document.
+* **Location**: The publication location of the document.
+* **Keywords**: Any keywords associated with the document.
+* **Collection**: An indication of the collection to which this document belongs.
+
+Finally, there's a box where you can provide user-defined metadata. This is currently used for advanced features in Voyant and won't be generally useful. The format is to have one entry per line where the metadata name points to an XPath expression:
+
+	xmlGenreXpath=//genre
+	xmlVolumeXpath=//div/@volume
+
 Both *Title* and *Author* XPath expressions can result in multiple values per document (some Voyant tools treat these separately and some combine them, depending on context). You of course have more control as needed:
 
 * **`//title`**: keep the text from every `title` tag as distinct values
@@ -102,6 +115,19 @@ You might want to work with only part of an HTML document, such as the main arti
 * **Author**: This extracts the text only (no tags) from any matching elements to be used as author metadata.
 * **Documents**: This allows you to extract multiple documents from an HTML document (such as individual posts in a blog). When this is used in combination with the options above, the other queries expressions will be relative to each sub-document (not to the original document root node).
 * **Group by**: When used in conjunction with a *Documents* option, this allows you to group multiple documents together that share the same value. For instance, if a page has multiple article tags, you can group all of the articles together based on the value of the author (so there would be one document per author with all of the articles from each grouped together). This option is ignored if *Documents* isn't specified.
+
+Additional Metadata:
+
+* **Publication Date**: An indication of the publication date (there's no pre-defined format for this but often it's useful to have alphabetically sortable values such as a year number).
+* **Publisher**: The publisher of the document.
+* **Location**: The publication location of the document.
+* **Keywords**: Any keywords associated with the document.
+* **Collection**: An indication of the collection to which this document belongs.
+
+Finally, there's a box where you can provide user-defined metadata. This is currently used for advanced features in Voyant and won't be generally useful. The format is to have one entry per line where the metadata name points to a selector:
+
+	htmlGenreQuery=.genre
+	htmlVolumeQuery=div@volume
 
 These options currently use the [Jsoup library](https://jsoup.org/) and support its [full syntax](https://jsoup.org/cookbook/extracting-data/selector-syntax) as described below. Rather than using trial and error in creating Voyant corpora, you can first <a href="https://try.jsoup.org" target="_blank">try Jsoup</a> with your HTML document.
 

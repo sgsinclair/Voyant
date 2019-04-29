@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Apr 29 15:07:51 EDT 2019 */
+/* This file created by JSCacher. Last modified: Mon Apr 29 16:52:54 EDT 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -18579,11 +18579,23 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		xmlContentXpath: undefined,
     		xmlTitleXpath: undefined,
     		xmlAuthorXpath: undefined,
+    		xmlPubDateXpath: undefined,
+    		xmlPublisherXpath: undefined,
+    		xmlPubPlaceXpath: undefined,
+    		xmlKeywordsXpath: undefined,
+    		xmlCollectionXpath: undefined,
+    		xmlExtraMetadataXpath: undefined,
     		htmlGroupByQuery: undefined,
     		htmlDocumentsQuery: undefined,
     		htmlContentQuery: undefined,
     		htmlTitleQuery: undefined,
     		htmlAuthorQuery: undefined,
+    		htmlPubDateQuery: undefined,
+    		htmlPublisherQuery: undefined,
+    		htmlPubPlaceQuery: undefined,
+    		htmlKeywordsQuery: undefined,
+    		htmlCollectionQuery: undefined,
+    		htmlExtraMetadataQuery: undefined,
     		tokenization: undefined,
     		adminPassword: undefined,
     		accessPassword: undefined,
@@ -19020,9 +19032,36 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								},{
 									fieldLabel: me.localize('xpathGroupBy'),
 									name: 'xmlGroupByXpath'
+								},{
+									xtype: 'fieldset',
+			                        title: me.localize('xmlAdditionalOptions'),
+			                        collapsible: true,
+			                        collapsed: true,
+			                        defaultType: 'textfield',
+			                        items: [{
+										fieldLabel: me.localize('xpathPubDate'),
+										name: 'xmlPubDateXpath'
+									},{
+										fieldLabel: me.localize('xpathPublisher'),
+										name: 'xmlPublisherXpath'
+									},{
+										fieldLabel: me.localize('xpathPubPlace'),
+										name: 'xmlPubPlaceXpath'
+									},{
+										fieldLabel: me.localize('xpathKeywords'),
+										name: 'xmlKeywordsXpath'
+									},{
+										fieldLabel: me.localize('xpathCollection'),
+										name: 'xmlCollectionXpath'
+									},{
+										xtype: 'textareafield',
+										grow: true,
+										fieldLabel: me.localize('xpathExtra'),
+										name: 'xmlExtraMetadataXpath'
+									}]
 								}
 							]
-						},,{
+						},{
 	        				xtype: 'fieldset',
 	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-html' target='voyantdocs'>"+me.localize('htmlOptions')+"</a>",
 	                        collapsible: true,
@@ -19048,6 +19087,33 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								},{
 									fieldLabel: me.localize('xpathGroupBy'),
 									name: 'htmlGroupByQuery'
+								},{
+									xtype: 'fieldset',
+			                        title: me.localize('xmlAdditionalOptions'),
+			                        collapsible: true,
+			                        collapsed: true,
+			                        defaultType: 'textfield',
+			                        items: [{
+										fieldLabel: me.localize('xpathPubDate'),
+										name: 'htmlPubDateQuery'
+									},{
+										fieldLabel: me.localize('xpathPublisher'),
+										name: 'htmlPublisherQuery'
+									},{
+										fieldLabel: me.localize('xpathPubPlace'),
+										name: 'htmlPubPlaceQuery'
+									},{
+										fieldLabel: me.localize('xpathKeywords'),
+										name: 'htmlKeywordsQuery'
+									},{
+										fieldLabel: me.localize('xpathCollection'),
+										name: 'htmlCollectionQuery'
+									},{
+										xtype: 'textareafield',
+										grow: true,
+										fieldLabel: me.localize('xpathExtra'),
+										name: 'htmlExtraMetadataQuery'
+									}]
 								}
 							]
 						},{
