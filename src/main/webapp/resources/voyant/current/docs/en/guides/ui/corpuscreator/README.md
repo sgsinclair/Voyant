@@ -41,6 +41,10 @@ Most document formats are fairly easy to detect automatically, Voyant does a dec
 It's possible to provide a title and subtitle for your corpus. These values aren't typically used in the
 [default skin](#!/guide/skins-section-default-skin) but are useful elsewhere, such as in the [Dynamic Table of Contexts skin](#!/guide/skins-section-dynamic-table-of-contexts-skin).
 
+## Documents Order
+
+You can select an initial sort order for the documents. The default behaviour depends somewhat on the input format and other factors but is typically related to the alphabetic order of files or titles. You can also force the use of titles for sorting, or author or publication date metadata (when available).
+
 ## Text
 
 Voyant provides functionality for ignoring parts of documents, for instance to exclude a license statement from the text to be analyzed. The values specified are regular expressions (so care should be taken when using characters other than letters, since they may have special meaning).

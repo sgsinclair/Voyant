@@ -46,7 +46,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		inputRemoveFrom: undefined,
     		inputRemoveFromAfter: undefined,
     		inputRemoveUntil: undefined,
-    		inputRemoveUntilAfter: undefined
+    		inputRemoveUntilAfter: undefined,
+    		sort: undefined
     	}
     },
     
@@ -416,6 +417,25 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								},{
 									fieldLabel: me.localize('corpusSubTitle'),
 									name: 'subTitle'
+								}, {
+									fieldLabel: me.localize("corpusSort"),
+									name: 'sort',
+								    xtype:'combo',
+								    queryMode:'local',
+								    store:[['',me.localize('corpusSortAuto')],['TITLEASC',me.localize('corpusSortTitle')],['AUTHORASC',me.localize('corpusSortAuthor')],['PUBDATEASC',me.localize('corpusSortPubDate')]],
+								    value: '',
+								    listeners: {
+								    	afterrender: {
+								    		fn: function(combo) {
+								    			var inputFormat = this.getApiParam('sort');
+								    			if (inputFormat) {
+								    				combo.setValue(inputFormat);
+								    			}
+								    		},
+								    		scope: me
+								    	}
+								    }
+
 								}
 							]
 						},{
