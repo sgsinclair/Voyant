@@ -329,7 +329,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "inputRemoveFromAfter":"omitir a partir do termo seguinte a",
 "corpusSubTitle":"Subtítulo do corpus",
 "numberZero":"0 é um número inválido, a primeira coluna é 1",
-"htmlOptionsText":"Experimental! Define CSS selectors (<a href='{0}' target='_blank'>see documentation</a>).",
+"htmlOptionsText":"Experimental! Definir os seletores CSS (<a href='{0}' target='_blank'>ver a documentação</a>).",
 "inputFormatAuto":"Detecção automática (recomendado)",
 "unknownFiles":"não reconhecido (possível erro):",
 "fileTypesWarning":"Advertência de tupos de arquivo",
@@ -488,7 +488,13 @@ Ext.apply(Voyant.widget.CategoriesOption.i18n, {
 "categories":"Categorias"});
 Ext.apply(Voyant.panel.WordTree.i18n, {
 "emptyText":"Nenhum resultado.",
-"title":"Árvore de palavras"});
+"pool":"limite",
+"context":"contexto",
+"branches":"ramifixações",
+"title":"Árvore de palavras",
+"poolTip":"limita o número de entradas concordantes (o que determina parcialmente quantas formas de frases repetidas podem ser encontradas)",
+"contextTip":"limita a extensão do contexto consultado para as ramificações",
+"branchesTip":"limita o número de ramificações exibidas em cada lado da palavra-chave"});
 Ext.apply(Voyant.notebook.editor.button.RunUntil.i18n, {
 "tip":"Executar todos os blocos código até e incluindo este"});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
@@ -703,33 +709,13 @@ Ext.apply(Voyant.panel.Trends.i18n, {
 "relative":"Relativo"});
 Ext.apply(Voyant.notebook.editor.button.MoveDown.i18n, {
 "tip":"mover este bloco para baixo"});
-Ext.apply(Voyant.notebook.Notebook.i18n, {
-"newTip":"Criar um Caderno Spytal em uma nova janela.",
-"autoSaveAvailableTitle":"Salvamento automático disponível",
-"cannotMoveLower":"O bloco já está no ponto mais baixo.",
-"failedNotebookLoad":"Falha ao carregar o caderno especificado. Um novo caderno será aberto.",
-"openTip":"Abrir um Caderno Spytal (colando um código JSON).",
-"differentUrl":"Esse caderno localizava-se aparentemente em outra URL. Se tem certeza de que esta URL está correta, é melhor executar novamente todos os blocos de código para assegurar que tudo funciona corretamente. Gostaria de executar todos os blocos de código? </p><pre>esta URL: {1}\n URL deste caderno: {0}",
-"cannotMoveHigher":"O bloco já está no topo e não pode ser movido para cima.",
-"fetchingNotebook":"Recuperação do caderno...",
-"exportHtml":"HTML (para salvar ou imprimir)",
-"exportJson":"Formato de dados do Caderno Spytal (JSON)",
-"failedNotebookParse":"O caderno aberto parece possuir um erro de sintaxe e provavelmente não poderá ser executado desta forma.",
-"saveItTip":"Salvar este caderno (em uma URL diferente). Este botão pode estar desabilitado se não houver nenhuma edição.",
-"exportAllLinks":"<ul><li>abrir caderno em <a href='{0}'>janela atual</a> ou em <a href='{0}' target='_blank'>nova janela</a></li><li>ver <a href='#' onclick='{1}' target='_blank'>Código bruto do caderno</a> em nova janela</li></ul>",
-"originalJson":"Cadeia de caracteres JSON originalmente",
-"editsAndLeaving":"Aparentemente o conteúdo estava em edição e tudo que foi editado será perdido ao avançar para este link. Deseja continuar?",
-"differentUrlTitle":"Caderno proveniente de outra URL",
-"autoSaveAvailable":"Há um salvamento automático mais recente. Você gostaria de abrir o documento salvo automaticamente?",
-"helpTip":"A ferramenta Caderno Spyral consiste em documentos dinâmicos que combinam texto, códigos e ferramentas interativas em uma forma de <a href=\"https://en.wikipedia.org/wiki/Literate_programming\" target=\"_blank\"> programação literária (letrada)</a>.",
-"eror":"Erro",
-"runallTip":"Executar todos os blocos de código neste caderno"});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"Cancelar",
 "de":"Alemão",
 "hi":"Indú",
 "no":"Norueguês",
 "auto":"Detecção automática",
+"ru":"Russian",
 "bg":"Búlgaro",
 "noEditAutoMessage":"A lista automática de palavras excluídas (stoplist) não pode ser editada. Por favor, selecione uma nova lista de palavras excluídas definida pelo usuário.",
 "lt":"Lituano",
@@ -771,6 +757,27 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "ro":"Romeno",
 "nl":"Holandês",
 "tr":"Turco"});
+Ext.apply(Voyant.notebook.Notebook.i18n, {
+"newTip":"Criar um Caderno Spytal em uma nova janela.",
+"autoSaveAvailableTitle":"Salvamento automático disponível",
+"cannotMoveLower":"O bloco já está no ponto mais baixo.",
+"failedNotebookLoad":"Falha ao carregar o caderno especificado. Um novo caderno será aberto.",
+"openTip":"Abrir um Caderno Spytal (colando um código JSON).",
+"differentUrl":"Esse caderno localizava-se aparentemente em outra URL. Se tem certeza de que esta URL está correta, é melhor executar novamente todos os blocos de código para assegurar que tudo funciona corretamente. Gostaria de executar todos os blocos de código? </p><pre>esta URL: {1}\n URL deste caderno: {0}",
+"cannotMoveHigher":"O bloco já está no topo e não pode ser movido para cima.",
+"fetchingNotebook":"Recuperação do caderno...",
+"exportHtml":"HTML (para salvar ou imprimir)",
+"exportJson":"Formato de dados do Caderno Spytal (JSON)",
+"failedNotebookParse":"O caderno aberto parece possuir um erro de sintaxe e provavelmente não poderá ser executado desta forma.",
+"saveItTip":"Salvar este caderno (em uma URL diferente). Este botão pode estar desabilitado se não houver nenhuma edição.",
+"exportAllLinks":"<ul><li>abrir caderno em <a href='{0}'>janela atual</a> ou em <a href='{0}' target='_blank'>nova janela</a></li><li>ver <a href='#' onclick='{1}' target='_blank'>Código bruto do caderno</a> em nova janela</li></ul>",
+"originalJson":"Cadeia de caracteres JSON originalmente",
+"editsAndLeaving":"Aparentemente o conteúdo estava em edição e tudo que foi editado será perdido ao avançar para este link. Deseja continuar?",
+"differentUrlTitle":"Caderno proveniente de outra URL",
+"autoSaveAvailable":"Há um salvamento automático mais recente. Você gostaria de abrir o documento salvo automaticamente?",
+"helpTip":"A ferramenta Caderno Spyral consiste em documentos dinâmicos que combinam texto, códigos e ferramentas interativas em uma forma de <a href=\"https://en.wikipedia.org/wiki/Literate_programming\" target=\"_blank\"> programação literária (letrada)</a>.",
+"eror":"Erro",
+"runallTip":"Executar todos os blocos de código neste caderno"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
 "sendToVoyantButton":"Novo corpus Voyant",
 "cancel":"Cancelar",
@@ -828,7 +835,7 @@ Ext.apply(Voyant.panel.MicroSearch.i18n, {
 "title":"Micro busca",
 "helpTip":"Esta ferramenta exibe uma visão geral de todo o corpus e permite a visualização da distribuição dos termos de busca."});
 Ext.apply(Voyant.panel.TopicContexts.i18n, {
-"reset":"reinicoar",
+"reset":"reiniciar",
 "title":"Contextos temáticos",
 "helpTip":"Contextos temáticos"});
 Ext.apply(Voyant.notebook.editor.button.MoveUp.i18n, {
@@ -981,7 +988,7 @@ Ext.apply(Voyant.widget.QuerySearchField.i18n, {
 "aggregateInDocumentsCount":"Este é o número de documentos que correspondem ao critério de busca (cada documento contém ao menos um dos termos buscados)"});
 Ext.apply(Voyant.util.Localization.i18n, {
 "de":"Alemão",
-"pt":"Portuguese",
+"pt":"Português",
 "thisLanguage":"Português",
 "autoRecommended":"Detecção automática (recomendado)",
 "en":"Inglês",

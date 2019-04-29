@@ -36,6 +36,7 @@ Ext.define('Voyant.widget.StopListOption', {
     			no: "stop.no.norwegian.txt",
     			pt: "stop.pt.brazilian.txt",
     			ro: "stop.ro.romanian-lucene.txt",
+    			ru: "stop.ru.russian.txt",
     			se: "stop.se.swedish-long.txt",
     			th: "stop.th.thai-lucene.txt",
     			tr: "stop.tr.turkish-lucene.txt"

@@ -488,7 +488,13 @@ Ext.apply(Voyant.widget.CategoriesOption.i18n, {
 "categories":"Catégories"});
 Ext.apply(Voyant.panel.WordTree.i18n, {
 "emptyText":"Pas de résultat.",
-"title":"Arbre de mots"});
+"pool":"limit",
+"context":"context",
+"branches":"branches",
+"title":"Arbre de mots",
+"poolTip":"limit the number of concordance entries that are fetched (which determines in part how many repeating phrase forms can be found)",
+"contextTip":"limit the length of the context retrieved for branches",
+"branchesTip":"limit the number of branches that are shown on each side of the keyword"});
 Ext.apply(Voyant.notebook.editor.button.RunUntil.i18n, {
 "tip":"Exécuter tous les blocs jusqu’à celui-ci compris"});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
@@ -703,33 +709,13 @@ Ext.apply(Voyant.panel.Trends.i18n, {
 "relative":"Relatif"});
 Ext.apply(Voyant.notebook.editor.button.MoveDown.i18n, {
 "tip":"déplacer ce bloc vers le bas"});
-Ext.apply(Voyant.notebook.Notebook.i18n, {
-"newTip":"Créer un nouveau carnet Spyral dans une nouvelle fenêtre",
-"autoSaveAvailableTitle":"Sauvegarde disponible",
-"cannotMoveLower":"Ce bloc est déjà tout en bas.",
-"failedNotebookLoad":"Impossible de charger le carnet demandé. Un nouveau carnet va s’ouvrir.",
-"openTip":"Ouvrir un carnet Spyral (en collant du code JSON)",
-"differentUrl":"Ce carnet se trouvait apparemment à une autre URL. Si vous êtes certain(e) que cette URL est exacte, il vaut peut-être mieux exécuter à nouveau tous les blocs de code pour vous assurer que tout fonctionne normalement. Voulez-vous exécuter tous les blocs de code ?</p><pre>Cette URL : {1}\nURL de ce carnet : {0}",
-"cannotMoveHigher":"Ce bloc est déjà tout en haut.",
-"fetchingNotebook":"Récupération du carnet…",
-"exportHtml":"HTML (pour sauvegarder ou imprimer)",
-"exportJson":"Format de données des carnets Spyral (JSON)",
-"failedNotebookParse":"Le carnet qui a été chargé semble comporter une erreur de syntaxe et ne pourra probablement pas être exécuté sous cette forme.",
-"saveItTip":"Sauvegarder ce carnet (à une autre URL). Ce bouton est peut-être désactivé s’il n’y a eu aucune modification.",
-"exportAllLinks":"<ul><li>ouvrir le carnet dans la <a href='{0}'>fenêtre actuelle</a> ou dans une <a href='{0}' target='_blank'>nouvelle fenêtre</a></li><li>voir le <a href='#' onclick='{1}' target='_blank'>code brut du carnet</a> dans une nouvelle fenêtre</li></ul>",
-"originalJson":"Chaînes de caractères JSON d’origine",
-"editsAndLeaving":"Vous étiez apparemment en train d’éditer le carnet : vous perdrez tout le contenu nouveau si vous suivez ce lien. Poursuivre ?",
-"differentUrlTitle":"Carnet venant d’une autre URL",
-"autoSaveAvailable":"Il existe une sauvegarde automatique plus récente. Voulez-vous revenir au document de cette sauvegarde ?",
-"helpTip":"Les carnets Spyral sont des documents dynamiques qui combinent du texte, du code et des outils interactifs. Ils sont un exemple de <a href=\"https://fr.wikipedia.org/wiki/Programmation_lettr%C3%A9e\" target=\"_blank\"><em>literate programming</em></a>.",
-"eror":"Erreur",
-"runallTip":"Exécuter tous les blocs de code de ce carnet"});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"Annuler",
 "de":"Allemand",
 "hi":"Hindi",
 "no":"Norvégien",
 "auto":"Détection automatique",
+"ru":"Russe",
 "bg":"Bulgare",
 "noEditAutoMessage":"La liste de mots vides choisie automatiquement ne peut être modifiée&nbsp;: veuillez sélectionner une liste de mots vides spécifique, par exemple la « Nouvelle liste créée par l’utilisateur ».",
 "lt":"Lituanien",
@@ -771,6 +757,27 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "ro":"Roumain",
 "nl":"Néerlandais",
 "tr":"Turc"});
+Ext.apply(Voyant.notebook.Notebook.i18n, {
+"newTip":"Créer un nouveau carnet Spyral dans une nouvelle fenêtre",
+"autoSaveAvailableTitle":"Sauvegarde disponible",
+"cannotMoveLower":"Ce bloc est déjà tout en bas.",
+"failedNotebookLoad":"Impossible de charger le carnet demandé. Un nouveau carnet va s’ouvrir.",
+"openTip":"Ouvrir un carnet Spyral (en collant du code JSON)",
+"differentUrl":"Ce carnet se trouvait apparemment à une autre URL. Si vous êtes certain(e) que cette URL est exacte, il vaut peut-être mieux exécuter à nouveau tous les blocs de code pour vous assurer que tout fonctionne normalement. Voulez-vous exécuter tous les blocs de code ?</p><pre>Cette URL : {1}\nURL de ce carnet : {0}",
+"cannotMoveHigher":"Ce bloc est déjà tout en haut.",
+"fetchingNotebook":"Récupération du carnet…",
+"exportHtml":"HTML (pour sauvegarder ou imprimer)",
+"exportJson":"Format de données des carnets Spyral (JSON)",
+"failedNotebookParse":"Le carnet qui a été chargé semble comporter une erreur de syntaxe et ne pourra probablement pas être exécuté sous cette forme.",
+"saveItTip":"Sauvegarder ce carnet (à une autre URL). Ce bouton est peut-être désactivé s’il n’y a eu aucune modification.",
+"exportAllLinks":"<ul><li>ouvrir le carnet dans la <a href='{0}'>fenêtre actuelle</a> ou dans une <a href='{0}' target='_blank'>nouvelle fenêtre</a></li><li>voir le <a href='#' onclick='{1}' target='_blank'>code brut du carnet</a> dans une nouvelle fenêtre</li></ul>",
+"originalJson":"Chaînes de caractères JSON d’origine",
+"editsAndLeaving":"Vous étiez apparemment en train d’éditer le carnet : vous perdrez tout le contenu nouveau si vous suivez ce lien. Poursuivre ?",
+"differentUrlTitle":"Carnet venant d’une autre URL",
+"autoSaveAvailable":"Il existe une sauvegarde automatique plus récente. Voulez-vous revenir au document de cette sauvegarde ?",
+"helpTip":"Les carnets Spyral sont des documents dynamiques qui combinent du texte, du code et des outils interactifs. Ils sont un exemple de <a href=\"https://fr.wikipedia.org/wiki/Programmation_lettr%C3%A9e\" target=\"_blank\"><em>literate programming</em></a>.",
+"eror":"Erreur",
+"runallTip":"Exécuter tous les blocs de code de ce carnet"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
 "sendToVoyantButton":"Nouveau corpus de Voyant",
 "cancel":"Annuler",

@@ -327,7 +327,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPasswordText":"Ако наведете <i>приступну шифру</i>, можете одредити и облик приступа за кориснике који немају лозинку.",
 "tableContentText":"Одредите који бројеви колоне имају садржај (или оставите празно како бисте користили све колоне). Најлевља колона је колона 1. Дефинишите вишеструке документе тако што ћете колоне раздвојити зарезом или их комбиновати уз помоћ знака плус. Напримјер, 1+2, 3 би комбиновало колоне 1 и 2 у један документ, а колону 3 у други документ.",
 "inputRemoveFromAfter":"omit from after",
-"corpusSubTitle":"Corpus Subtitle",
+"corpusSubTitle":"Corpus Subititle",
 "numberZero":"0 не важи, прва колона је 1",
 "htmlOptionsText":"Experimental! Define CSS selectors (<a href='{0}' target='_blank'>see documentation</a>).",
 "inputFormatAuto":"аутоматско препознавање (препоручљиво)",
@@ -488,7 +488,13 @@ Ext.apply(Voyant.widget.CategoriesOption.i18n, {
 "categories":"Categories"});
 Ext.apply(Voyant.panel.WordTree.i18n, {
 "emptyText":"Нема одговарајућих резултата.",
-"title":"Стабло речи"});
+"pool":"limit",
+"context":"context",
+"branches":"branches",
+"title":"Стабло речи",
+"poolTip":"limit the number of concordance entries that are fetched (which determines in part how many repeating phrase forms can be found)",
+"contextTip":"limit the length of the context retrieved for branches",
+"branchesTip":"limit the number of branches that are shown on each side of the keyword"});
 Ext.apply(Voyant.notebook.editor.button.RunUntil.i18n, {
 "tip":"Run all code blocks up to and including this one."});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
@@ -703,33 +709,13 @@ Ext.apply(Voyant.panel.Trends.i18n, {
 "relative":"Релативне"});
 Ext.apply(Voyant.notebook.editor.button.MoveDown.i18n, {
 "tip":"move this block down"});
-Ext.apply(Voyant.notebook.Notebook.i18n, {
-"newTip":"Create a new Spyral Notebook in a new window.",
-"autoSaveAvailableTitle":"Autosave Available",
-"cannotMoveLower":"This block is already at the bottom and cannot be moved lower.",
-"failedNotebookLoad":"Failed to load the specified notebook. A new notebook template will be presented instead.",
-"openTip":"Open a Spyral Notebook (by pasting in JSON code).",
-"differentUrl":"This notebook seems to be have been located at a different URL. If you’re sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook’s URL: {0}",
-"cannotMoveHigher":"This block is already at the top and cannot be moved higher.",
-"fetchingNotebook":"Fetching notebook…",
-"exportHtml":"HTML (suitable for saving or printing)",
-"exportJson":"Spyral Notebook data format (JSON)",
-"failedNotebookParse":"The loaded notebook appears to have a syntax error and will probably not run as is.",
-"saveItTip":"Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
-"exportAllLinks":"<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
-"originalJson":"Original JSON string",
-"editsAndLeaving":"It looks like you’ve been editing content and you will lose any content if you follow this link. Continue?",
-"differentUrlTitle":"Notebook from different URL",
-"autoSaveAvailable":"A more recent autosave is available, do you wish to switch to the auto-saved document?",
-"helpTip":"Spyral Notebooks are dynamic documents that combine text, code and interactive tools, they are a form of <a href=\"https://en.wikipedia.org/wiki/Literate_programming\" target=\"_blank\">literate programming</a>.",
-"eror":"Error",
-"runallTip":"Run all code blocks in this notebook"});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"Поништити",
 "de":"немачки",
 "hi":"хинди",
 "no":"норвешки",
 "auto":"Аутоматска детекција",
+"ru":"Russian",
 "bg":"бугарски",
 "noEditAutoMessage":"Аутоматски детектована листа празних речи не може да се измени. Одаберите специфичну листу, нпр. \"Нова лично дефинисана листа\"",
 "lt":"летонски",
@@ -771,6 +757,27 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "ro":"румунски",
 "nl":"холандски",
 "tr":"турски"});
+Ext.apply(Voyant.notebook.Notebook.i18n, {
+"newTip":"Create a new Spyral Notebook in a new window.",
+"autoSaveAvailableTitle":"Autosave Available",
+"cannotMoveLower":"This block is already at the bottom and cannot be moved lower.",
+"failedNotebookLoad":"Failed to load the specified notebook. A new notebook template will be presented instead.",
+"openTip":"Open a Spyral Notebook (by pasting in JSON code).",
+"differentUrl":"This notebook seems to be have been located at a different URL. If you’re sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook’s URL: {0}",
+"cannotMoveHigher":"This block is already at the top and cannot be moved higher.",
+"fetchingNotebook":"Fetching notebook…",
+"exportHtml":"HTML (suitable for saving or printing)",
+"exportJson":"Spyral Notebook data format (JSON)",
+"failedNotebookParse":"The loaded notebook appears to have a syntax error and will probably not run as is.",
+"saveItTip":"Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
+"exportAllLinks":"<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
+"originalJson":"Original JSON string",
+"editsAndLeaving":"It looks like you’ve been editing content and you will lose any content if you follow this link. Continue?",
+"differentUrlTitle":"Notebook from different URL",
+"autoSaveAvailable":"A more recent autosave is available, do you wish to switch to the auto-saved document?",
+"helpTip":"Spyral Notebooks are dynamic documents that combine text, code and interactive tools, they are a form of <a href=\"https://en.wikipedia.org/wiki/Literate_programming\" target=\"_blank\">literate programming</a>.",
+"eror":"Error",
+"runallTip":"Run all code blocks in this notebook"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
 "sendToVoyantButton":"Нови Voyant корпус",
 "cancel":"Поништити",

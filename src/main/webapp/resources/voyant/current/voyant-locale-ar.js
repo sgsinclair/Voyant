@@ -327,7 +327,7 @@ Ext.apply(Voyant.panel.CorpusCreator.i18n, {
 "accessModeWithoutPasswordText":"اذا حُددت <i>كلمة سر الوصول</i> يمكنك أيضا تحديد مجال النفاذ لمستخدمين ليس لديهم كلمة السر",
 "tableContentText":"تحديد العواميد التي تحتوي بيانات او تجنب الاختيار لاستخدام جميع العواميد. العمود الاول في اقصى اليسار. تخصيص المستندات المتعددة باستخدام فاصلة محددة لكل من العواميد اوباستخدام رمز +. مثلا \"1+2,3\" من غيرالقوسين سيدمج العمود الاول و الثاني في مستند واحد وسينقل محتويات العمود الثالث الى مستند اخر.  ",
 "inputRemoveFromAfter":"omit from after",
-"corpusSubTitle":"Corpus Subtitle",
+"corpusSubTitle":"Corpus Subititle",
 "numberZero":"0 غير صالح, العمود الاول 1",
 "htmlOptionsText":"Experimental! Define CSS selectors (<a href='{0}' target='_blank'>see documentation</a>).",
 "inputFormatAuto":" كشف تلقائي (يوصى به)",
@@ -488,7 +488,13 @@ Ext.apply(Voyant.widget.CategoriesOption.i18n, {
 "categories":"Categories"});
 Ext.apply(Voyant.panel.WordTree.i18n, {
 "emptyText":"لا يوجد نتائج مطابقة",
-"title":"ورد تري (شجرة الكلمات)"});
+"pool":"limit",
+"context":"context",
+"branches":"branches",
+"title":"ورد تري (شجرة الكلمات)",
+"poolTip":"limit the number of concordance entries that are fetched (which determines in part how many repeating phrase forms can be found)",
+"contextTip":"limit the length of the context retrieved for branches",
+"branchesTip":"limit the number of branches that are shown on each side of the keyword"});
 Ext.apply(Voyant.notebook.editor.button.RunUntil.i18n, {
 "tip":"Run all code blocks up to and including this one."});
 Ext.apply(Voyant.widget.DownloadFileFormat.i18n, {
@@ -703,33 +709,13 @@ Ext.apply(Voyant.panel.Trends.i18n, {
 "relative":"نسبي"});
 Ext.apply(Voyant.notebook.editor.button.MoveDown.i18n, {
 "tip":"move this block down"});
-Ext.apply(Voyant.notebook.Notebook.i18n, {
-"newTip":"Create a new Spyral Notebook in a new window.",
-"autoSaveAvailableTitle":"Autosave Available",
-"cannotMoveLower":"This block is already at the bottom and cannot be moved lower.",
-"failedNotebookLoad":"Failed to load the specified notebook. A new notebook template will be presented instead.",
-"openTip":"Open a Spyral Notebook (by pasting in JSON code).",
-"differentUrl":"This notebook seems to be have been located at a different URL. If you’re sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook’s URL: {0}",
-"cannotMoveHigher":"This block is already at the top and cannot be moved higher.",
-"fetchingNotebook":"Fetching notebook…",
-"exportHtml":"HTML (suitable for saving or printing)",
-"exportJson":"Spyral Notebook data format (JSON)",
-"failedNotebookParse":"The loaded notebook appears to have a syntax error and will probably not run as is.",
-"saveItTip":"Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
-"exportAllLinks":"<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
-"originalJson":"Original JSON string",
-"editsAndLeaving":"It looks like you’ve been editing content and you will lose any content if you follow this link. Continue?",
-"differentUrlTitle":"Notebook from different URL",
-"autoSaveAvailable":"A more recent autosave is available, do you wish to switch to the auto-saved document?",
-"helpTip":"Spyral Notebooks are dynamic documents that combine text, code and interactive tools, they are a form of <a href=\"https://en.wikipedia.org/wiki/Literate_programming\" target=\"_blank\">literate programming</a>.",
-"eror":"Error",
-"runallTip":"Run all code blocks in this notebook"});
 Ext.apply(Voyant.widget.StopListOption.i18n, {
 "cancel":"الغاء",
 "de":"الماني",
 "hi":"هندي",
 "no":"نرويجي",
 "auto":"تحديد اللغة تلقائيا",
+"ru":"Russian",
 "bg":"بلغاري",
 "noEditAutoMessage":"لا يمكن تحرير قائمة الكلمات المستبعدة بحسب اللغة المختارة, الرجاء اختيار قائمة تفصيلية اخرى \"كالقائمة الجديدة المعرفة من قبل المستخدم\"",
 "lt":"لاتفي",
@@ -771,6 +757,27 @@ Ext.apply(Voyant.widget.StopListOption.i18n, {
 "ro":"روماني",
 "nl":"هولندي",
 "tr":"تركي"});
+Ext.apply(Voyant.notebook.Notebook.i18n, {
+"newTip":"Create a new Spyral Notebook in a new window.",
+"autoSaveAvailableTitle":"Autosave Available",
+"cannotMoveLower":"This block is already at the bottom and cannot be moved lower.",
+"failedNotebookLoad":"Failed to load the specified notebook. A new notebook template will be presented instead.",
+"openTip":"Open a Spyral Notebook (by pasting in JSON code).",
+"differentUrl":"This notebook seems to be have been located at a different URL. If you’re sure this URL is correct, you may want to rerun all the code blocks to ensure that everything is functioning correctly. Do you wish to run all the code blocks?</p><pre>this URL: {1}\nthis notebook’s URL: {0}",
+"cannotMoveHigher":"This block is already at the top and cannot be moved higher.",
+"fetchingNotebook":"Fetching notebook…",
+"exportHtml":"HTML (suitable for saving or printing)",
+"exportJson":"Spyral Notebook data format (JSON)",
+"failedNotebookParse":"The loaded notebook appears to have a syntax error and will probably not run as is.",
+"saveItTip":"Save this notebook (to a different URL). This button may be disabled if no edits have been made.",
+"exportAllLinks":"<ul><li>open notebook in <a href='{0}'>current window</a> or a <a href='{0}' target='_blank'>new window</a></li><li>view <a href='#' onclick='{1}' target='_blank'>raw notebook code</a> in new window</li></ul>",
+"originalJson":"Original JSON string",
+"editsAndLeaving":"It looks like you’ve been editing content and you will lose any content if you follow this link. Continue?",
+"differentUrlTitle":"Notebook from different URL",
+"autoSaveAvailable":"A more recent autosave is available, do you wish to switch to the auto-saved document?",
+"helpTip":"Spyral Notebooks are dynamic documents that combine text, code and interactive tools, they are a form of <a href=\"https://en.wikipedia.org/wiki/Literate_programming\" target=\"_blank\">literate programming</a>.",
+"eror":"Error",
+"runallTip":"Run all code blocks in this notebook"});
 Ext.apply(Voyant.panel.Catalogue.i18n, {
 "sendToVoyantButton":"مكنز فويانت جديد",
 "cancel":"إلغاء",
