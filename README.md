@@ -1,7 +1,7 @@
 Voyant Tools
 ======
 
-Voyant Tools is a web-based text analysis, reading and visualization environment. Developed by a small team of digital humanities scholars led by [Stéfan Sinclair ](http://stefansinclair.name/)and [Geoffrey Rockwell](http://geoffreyrockwell.com/), Voyant Tools is designed for a very wide range of applications and users, from students to researchers and journalists to market analysts. It strives to balance user-friendliness with a range of analytic and interpretive functions.
+Voyant Tools is a web-based text analysis, reading and visualization environment. Developed by a small team of digital humanities scholars led by [Stéfan Sinclair ](http://stefansinclair.name/) and [Geoffrey Rockwell](http://geoffreyrockwell.com/), Voyant Tools is designed for a very wide range of applications and users, from students to researchers and journalists to market analysts. It strives to balance user-friendliness with a range of analytic and interpretive functions.
 # Features
 Some of the important features of Voyant Tools include:
 
@@ -29,17 +29,21 @@ There are many ways of contributing to the development of Voyant Tools:
 Voyant Tools is an open-source project and the code is available through [GitHub](http://github.com/sgsinclair/Voyant). The code is under a [GPL3 license](http://www.gnu.org/licenses/gpl-3.0.en.html) and the content of the web application is under a [Creative Commons By Attribution license](https://creativecommons.org/licenses/by/4.0/).
 
 # Voyant Tools 2.0
-The currently available version of [Voyant Tools](http://voyant-tools.org/) is 1.0 but version 2.0 is in active development and is expected to replace 1.0 in the first half of 2015. Voyant Tools 2.0 is a complete rewrite that is focused on better performance and scalability, as well as improved functionality (such as more powerful search).
+The currently available version of [Voyant Tools](http://voyant-tools.org/) is 2.0. It isa complete rewrite that is focused on better performance and scalability, as well as improved functionality (such as more powerful search). Voyant 3.0 is expected by 2020.
 
 ## Releases
-* Dec 3, 2014 - 2.0 M1 (Preview Release): Initial Release
+
+For a somewhat more detailed overview of releases please see [VoyantServer releases](https://github.com/sgsinclair/VoyantServer/releases)
 
 ##  Known Issues
 * several skins and tools are not yet implemented
-* tool help, options, and exporting not yet available
+* Voyant slows down as the index grows
 
 ##  Road Map
-* restore full functionality and backwards compatibility with Voyant Tools 1.0 (winter 2015)
-* resume development of Voyant Notebooks (summer 2015)
+* new architecture to better support distributed indices (multiple users)
+* update code to latest version of Lucene
+* integrate some language-specific functionality such as part-of-speech tagging
+* add functionality for word groups
+* resume development of Spyral (Voyant Notebooks)
 
 # Credits
