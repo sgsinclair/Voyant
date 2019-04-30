@@ -159,9 +159,12 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentAuthor":"Autor",
 "selectOrFilterError":"Nejdříve musíte vybrat dokumenty pomocí kliknutí myši na jeden nebo více řádků nebo provedením vyhledávacího dotazu.",
 "keepSelectedDocuments":"Vytvořit <i>nový</i> korpus, který ponechá pouze {0:plural('selected document')}?",
+"documentPubDate":"Date",
+"documentPublisher":"Publisher",
 "tokensCountLexical":"Slova",
 "averageWordsPerSentenceTip":"An estimate of the average number of words per sentence.",
 "removeTip":"Klikněte zde pro vytvoření nového korpusu, který vyloučí vybrané nebo filtrované (pomocí vyhledávacího dotazu) dokumenty.",
+"documentPubPlace":"Place",
 "matchingDocuments":"Dokumenty, v nichž byla nalezena shoda: {count}",
 "id":"ID",
 "documentTitle":"Název",
@@ -171,6 +174,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "newCorpus":"Nový korpus",
 "allSelectedError":"Vybrali jste všechny dokumenty, musíte zvolit podmnožinu dokumentů, které si přejete odstranit, nebo ponechat.",
 "reorderTip":"Klikněte zde pro vytvoření nového korpusu založeného na změněném uspořádání (přetáhněte řádky pomocí myši, abyste změnili uspořádání).",
+"documentCollection":"Collection",
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"Váš korpus obsahuje pouze jeden dokument, nemůžete dokumenty odstranit ani ponechat dokumenty, abyste vytvořili nový korpus.",
 "modify":"Změnit",
@@ -178,7 +182,8 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "reorderDocuments":"Vytvořit <i>nový</i> korpus na základě zobrazeného pořadí?",
 "typeTokenRatioLexical":"Poměr",
 "keep":"Ponechat",
-"reorderOriginalError":"Nejdříve prosím změňte uspořádání korpusu (pomocí myši přetáhněte řádky v tabulce)."});
+"reorderOriginalError":"Nejdříve prosím změňte uspořádání korpusu (pomocí myši přetáhněte řádky v tabulce).",
+"documentKeyword":"Keyword"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"Počet (kontext)",
 "matchingTerms":"{count}",

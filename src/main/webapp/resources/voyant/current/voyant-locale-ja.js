@@ -159,9 +159,12 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentAuthor":"著者",
 "selectOrFilterError":"行を選択するか検索ボックスに入力して、ひとつ以上のドキュメントを選択してください。",
 "keepSelectedDocuments":"{0:plural('selected document')}のみを含む <i>新しい</i> コーパスを作りますか？",
+"documentPubDate":"Date",
+"documentPublisher":"Publisher",
 "tokensCountLexical":"単語数",
 "averageWordsPerSentenceTip":"An estimate of the average number of words per sentence.",
 "removeTip":"選択または絞り込みされたドキュメントを除いて新しいコーパスを作る",
+"documentPubPlace":"Place",
 "matchingDocuments":"一致したドキュメント： {count}",
 "id":"ID",
 "documentTitle":"タイトル",
@@ -171,6 +174,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "newCorpus":"新しいコーパス",
 "allSelectedError":"すべてのドキュメントを選択してしまっています。取り除くか保存するドキュメントのサブセットを選択してください。",
 "reorderTip":"並べ替えられた順序に基づく新しいコーパスを作る（行をドラッグアンドドロップして並べ替えてください）",
+"documentCollection":"Collection",
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"コーパスには一つのドキュメントしか含まれていません。ドキュメントを削除すると新しいコーパスを作成できません。",
 "modify":"修正する",
@@ -178,7 +182,8 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "reorderDocuments":"表示された設定に基づいて<i>新しい</i>コーパスを作成しますか？",
 "typeTokenRatioLexical":"比率",
 "keep":"残す",
-"reorderOriginalError":"最初にコーパスを再設定してください（表の中で行をドラッグアンドドロップしてください）。"});
+"reorderOriginalError":"最初にコーパスを再設定してください（表の中で行をドラッグアンドドロップしてください）。",
+"documentKeyword":"Keyword"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"（前後の単語おける）共起の回数",
 "matchingTerms":"{count}",

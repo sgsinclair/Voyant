@@ -159,9 +159,12 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentAuthor":"Auteur",
 "selectOrFilterError":"Vous devez tout d’abord sélectionner des documents en cliquant sur une ou plusieurs lignes ou bien en lançant une recherche.",
 "keepSelectedDocuments":"Créer un <i>nouveau</i> corpus qui ne conserve que le {0:plural(’document sélectionné’)}?",
+"documentPubDate":"Date",
+"documentPublisher":"Publisher",
 "tokensCountLexical":"Mots",
 "averageWordsPerSentenceTip":"Estimation de la moyenne des mots par phrase",
 "removeTip":"Créer un nouveau corpus excluant les documents sélectionnés ou filtrés par une requête",
+"documentPubPlace":"Place",
 "matchingDocuments":"Documents correspondants&nbsp;: {count}",
 "id":"ID",
 "documentTitle":"Titre",
@@ -171,6 +174,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "newCorpus":"Nouveau corpus",
 "allSelectedError":"Vous avez sélectionné tous les documents&nbsp;: vous devez sélectionner un sous-ensemble de documents à supprimer ou à conserver.",
 "reorderTip":"Créer un nouveau corpus en réarrangeant les documents (glissez et déposez les lignes pour les réarranger)",
+"documentCollection":"Collection",
 "averageWordsPerSentence":"Mots/Phrase",
 "onlyOneError":"Votre corpus ne comprend qu’un seul document&nbsp;: vous ne pouvez pas supprimer ou conserver des documents pour créer un nouveau corpus.",
 "modify":"Modifier",
@@ -178,7 +182,8 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "reorderDocuments":"Créer un <i>nouveau</i> corpus fondé sur l’ordre actuellement visible ?",
 "typeTokenRatioLexical":"Proportion",
 "keep":"Conserver",
-"reorderOriginalError":"Veuillez d’abord réarranger le corpus (glissez et déposez les lignes dans le tableau)."});
+"reorderOriginalError":"Veuillez d’abord réarranger le corpus (glissez et déposez les lignes dans le tableau).",
+"documentKeyword":"Keyword"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"Total (contexte)",
 "matchingTerms":"{count}",

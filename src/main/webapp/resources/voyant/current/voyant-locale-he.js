@@ -159,9 +159,12 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentAuthor":"מחבר/ת",
 "selectOrFilterError":"You need to first select documents by clicking on one or more rows or by performing a search query.",
 "keepSelectedDocuments":"Create a <i>new</i> corpus that only keeps the {0:plural('selected document')}?",
+"documentPubDate":"Date",
+"documentPublisher":"Publisher",
 "tokensCountLexical":"מלים",
 "averageWordsPerSentenceTip":"An estimate of the average number of words per sentence.",
 "removeTip":"Click here to create a new corpus that excludes selected or filtered (search query) documents.        ",
+"documentPubPlace":"Place",
 "matchingDocuments":"Matching documents: {count}",
 "id":"ID",
 "documentTitle":"כותרת",
@@ -171,6 +174,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "newCorpus":"קורפוס חדש",
 "allSelectedError":"You have selected all documents, you must select a subset of documents to remove or keep.",
 "reorderTip":"Click here to create a new corpus based on a reordering of documents (drag and drop rows to reorder).",
+"documentCollection":"Collection",
 "averageWordsPerSentence":"מלים למשפטים",
 "onlyOneError":"Your corpus has only one document, you can’t remove or keep documents to create a new corpus.",
 "modify":"שינוי",
@@ -178,7 +182,8 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "reorderDocuments":"Create a <i>new</i> corpus based on the order shown?",
 "typeTokenRatioLexical":"יחס",
 "keep":"שמירה",
-"reorderOriginalError":"Please reorder the corpus first (drag and drop the rows in the table)."});
+"reorderOriginalError":"Please reorder the corpus first (drag and drop the rows in the table).",
+"documentKeyword":"Keyword"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"מספר (הקשר)",
 "matchingTerms":"{מספר}",

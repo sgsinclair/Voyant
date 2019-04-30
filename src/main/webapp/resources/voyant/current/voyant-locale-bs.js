@@ -159,9 +159,12 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentAuthor":"Autor",
 "selectOrFilterError":"Morate prvo odabrati dokumente tako što ćete kliknuti na jedan ili više redova ili izvršiti pretragu",
 "keepSelectedDocuments":"Izgradite <i>novi</i> korpus koji samo sadrži {0:plural('selected document')}?",
+"documentPubDate":"Date",
+"documentPublisher":"Publisher",
 "tokensCountLexical":"Riječi",
 "averageWordsPerSentenceTip":"An estimate of the average number of words per sentence.",
 "removeTip":"Kliknite ovdje da kreirate novi korpus bez dokumenata koje ste odabrali ili filtrirali uz pomoć pretraga",
+"documentPubPlace":"Place",
 "matchingDocuments":"broj rezultata: {count}",
 "id":"ID",
 "documentTitle":"Naslov",
@@ -171,6 +174,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "newCorpus":"Novi korpus",
 "allSelectedError":"Odabrali ste sve dokumente; morate odabrati podset dokumenata koji ćete ukloniti ili zadržati",
 "reorderTip":"Kliknite ovdje da kreirate novi korpus na osnovu redoslijeda dokumenata (povucite i ispustite redove za promijenu redoslijeda)",
+"documentCollection":"Collection",
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"Vaš korpus sadrži samo jedan dokument; ne možete ukloniti niti zadržati dokumente da izgradite novi korpus",
 "modify":"Izmijeniti",
@@ -178,7 +182,8 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "reorderDocuments":"Izgraditi <i>novi</i> korpus na osnovu datog redoslijeda?",
 "typeTokenRatioLexical":"Omjer",
 "keep":"Zadržati",
-"reorderOriginalError":"Prvo filtrirajte korpus (povucite i ispustite redove unutar tabele)"});
+"reorderOriginalError":"Prvo filtrirajte korpus (povucite i ispustite redove unutar tabele)",
+"documentKeyword":"Keyword"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"Zbroj (kontekst)",
 "matchingTerms":"{zbroj}",

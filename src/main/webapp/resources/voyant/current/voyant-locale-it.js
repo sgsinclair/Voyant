@@ -159,9 +159,12 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentAuthor":"Autore",
 "selectOrFilterError":"Devi prima selezionare dei documenti cliccando su una o più righe oppure facendo una ricerca.",
 "keepSelectedDocuments":"Crea un <i>nuovo</i> corpus che contiene {0:plural('selected document')}?",
+"documentPubDate":"Date",
+"documentPublisher":"Publisher",
 "tokensCountLexical":"Parole",
 "averageWordsPerSentenceTip":"An estimate of the average number of words per sentence.",
 "removeTip":"Fai click qui per creare un nuovo corpus che esclude i documenti selezionati o filtrati dalla ricerca",
+"documentPubPlace":"Place",
 "matchingDocuments":"Documenti trovati: {count}",
 "id":"ID",
 "documentTitle":"Titolo",
@@ -171,6 +174,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "newCorpus":"Nuovo Corpus",
 "allSelectedError":"Hai selezionato tutti i documenti, devi scegliere un sottoinsieme di documenti da eliminare o da conservare",
 "reorderTip":"Fai click qui per creare un nuovo corpus che esclude i documenti selezionati o filtrati dalla ricerca",
+"documentCollection":"Collection",
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"C'è un solo documento nel corpus. Non puoi crearne uno nuovo eliminando o mantenendo documenti.",
 "modify":"Modifica",
@@ -178,7 +182,8 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "reorderDocuments":"Vuoi generare un <i>nuovo</i> corpus seguendo l'ordine attuale?",
 "typeTokenRatioLexical":"Ratio",
 "keep":"Conserva",
-"reorderOriginalError":"Per favore, riordina prima il corpus (seleziona le righe della tabella e spostale col mouse)."});
+"reorderOriginalError":"Per favore, riordina prima il corpus (seleziona le righe della tabella e spostale col mouse).",
+"documentKeyword":"Keyword"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"Conteggio (contesto)",
 "matchingTerms":"{count}",

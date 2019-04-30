@@ -159,9 +159,12 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentAuthor":"Author",
 "selectOrFilterError":"You need to first select documents by clicking on one or more rows or by performing a search query.",
 "keepSelectedDocuments":"Create a <i>new</i> corpus that only keeps the {0:plural('selected document')}?",
+"documentPubDate":"Date",
+"documentPublisher":"Publisher",
 "tokensCountLexical":"Words",
 "averageWordsPerSentenceTip":"An estimate of the average number of words per sentence.",
 "removeTip":"Click here to create a new corpus that excludes selected or filtered (search query) documents.        ",
+"documentPubPlace":"Place",
 "matchingDocuments":"Matching documents: {count}",
 "id":"ID",
 "documentTitle":"Title",
@@ -171,6 +174,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "newCorpus":"New Corpus",
 "allSelectedError":"You have selected all documents, you must select a subset of documents to remove or keep.",
 "reorderTip":"Click here to create a new corpus based on a reordering of documents (drag and drop rows to reorder).",
+"documentCollection":"Collection",
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"Your corpus has only one document, you can’t remove or keep documents to create a new corpus.",
 "modify":"Modify",
@@ -178,7 +182,8 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "reorderDocuments":"Create a <i>new</i> corpus based on the order shown?",
 "typeTokenRatioLexical":"Ratio",
 "keep":"Keep",
-"reorderOriginalError":"Please reorder the corpus first (drag and drop the rows in the table)."});
+"reorderOriginalError":"Please reorder the corpus first (drag and drop the rows in the table).",
+"documentKeyword":"Keyword"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"Count (context)",
 "matchingTerms":"{count}",

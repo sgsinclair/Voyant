@@ -159,9 +159,12 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentAuthor":"Аутор",
 "selectOrFilterError":"Морате прво да одаберете документе тако што ћете да кликнете на један или више редова или извршите претрагу",
 "keepSelectedDocuments":"Изградите <i>нови</i> коpпус који само садржи {0:plural('selected document')}?",
+"documentPubDate":"Date",
+"documentPublisher":"Publisher",
 "tokensCountLexical":"Речи",
 "averageWordsPerSentenceTip":"An estimate of the average number of words per sentence.",
 "removeTip":"Кликните овде да креирате нови корпус без докумената које сте одабрали или филтрирали уз помоћ претрага",
+"documentPubPlace":"Place",
 "matchingDocuments":"Број резултата: {count}",
 "id":"ИД",
 "documentTitle":"Наслов",
@@ -171,6 +174,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "newCorpus":"Нови корпус",
 "allSelectedError":"Одабрали сте све документе; морате одабрати подсет докумената који ћете уклонити или задржати",
 "reorderTip":"Кликните овде да креирате нови корпус на основу редоследа докумената (повуците и испустите редове за промену редоследа)",
+"documentCollection":"Collection",
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"Ваш корпус садржи само један документ; не можете уклонити нити задржати документе да изградите нови корпус",
 "modify":"Изменити",
@@ -178,7 +182,8 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "reorderDocuments":"Изградити нови корпус на основу датог редоследа?",
 "typeTokenRatioLexical":"Омер",
 "keep":"Задржати",
-"reorderOriginalError":"Прво филтрирајте корпус (повуците и испустите редове унутар табеле)"});
+"reorderOriginalError":"Прво филтрирајте корпус (повуците и испустите редове унутар табеле)",
+"documentKeyword":"Keyword"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"Зброј (контекст)",
 "matchingTerms":"{зброј}",

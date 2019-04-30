@@ -166,6 +166,41 @@ Ext.define('Voyant.panel.Documents', {
 	    	        renderer: function(val, metadata, record) {return record.getAuthor();},
 	    	        flex: 2
 	    	    },{
+	    	        text: this.localize('documentPubDate'),
+	    	        dataIndex: 'pubDate',
+	    	        sortable: true,
+	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getPubDate();},
+	    	        flex: 2
+	    	    },{
+	    	        text: this.localize('documentPublisher'),
+	    	        dataIndex: 'publisher',
+	    	        sortable: false,
+	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getPublisher();},
+	    	        flex: 2
+	    	    },{
+	    	        text: this.localize('documentPubPlace'),
+	    	        dataIndex: 'pubPlace',
+	    	        sortable: false,
+	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getPubPlace();},
+	    	        flex: 2
+	    	    },{
+	    	        text: this.localize('documentKeyword'),
+	    	        dataIndex: 'keyword',
+	    	        sortable: false,
+	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getKeyword();},
+	    	        flex: 2
+	    	    },{
+	    	        text: this.localize('documentCollection'),
+	    	        dataIndex: 'collection',
+	    	        sortable: false,
+	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getCollection();},
+	    	        flex: 2
+	    	    },{
 	    	        text: this.localize('tokensCountLexical'),
 	    	        dataIndex: 'tokensCount-lexical',
 	    	        renderer: Ext.util.Format.numberRenderer('0,000'),
@@ -226,6 +261,7 @@ Ext.define('Voyant.panel.Documents', {
     	this.on('loadedCorpus', function(src, corpus) {
 
     		this.store.setCorpus(corpus);
+
     		if (this.isVisible()) {
         		this.store.load({params: this.getApiParams()});
     		} else {

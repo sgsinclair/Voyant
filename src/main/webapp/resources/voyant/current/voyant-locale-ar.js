@@ -159,9 +159,12 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "documentAuthor":"مؤلف",
 "selectOrFilterError":"يجب اولا تحديد المستندات بوساطة النقر على صف واحد او اكثراو باجراء عملية بحث",
 "keepSelectedDocuments":" انشاء مكنز <i>جديد</i>يحافظ فقط على{0:plural('selected document')}?",
+"documentPubDate":"Date",
+"documentPublisher":"Publisher",
 "tokensCountLexical":"كلمات",
 "averageWordsPerSentenceTip":"An estimate of the average number of words per sentence.",
 "removeTip":"النقر هنا لإنشاء مكنز جديد يستبعد المستندات المختارة اوالمرشحة (حسب عملية البحث)",
+"documentPubPlace":"Place",
 "matchingDocuments":"المستندات المطابقة:  {count}",
 "id":"معرف",
 "documentTitle":"عنوان",
@@ -171,6 +174,7 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "newCorpus":"مكنزجديد",
 "allSelectedError":"تم اختيار جميع المستندات, يجب اختيار مجموعة فرعية للازالة او للحفظ",
 "reorderTip":"النقرهنا لإنشاء مكنز جديد بناء على أعادة الترتيب للمستندات (بواسطة سحب والقاء الصفوف لاعادة التنظيم)",
+"documentCollection":"Collection",
 "averageWordsPerSentence":"Words/Sentence",
 "onlyOneError":"يحتوي المكنز على مستند واحد فقط , لا يمكن ازالة او الحفاظ على المستندات لانشاء مكنز جديد",
 "modify":"تعديل",
@@ -178,7 +182,8 @@ Ext.apply(Voyant.panel.Documents.i18n, {
 "reorderDocuments":"انشاء مكنز <i>جديد</i>بناء على الترتيب الظاهر؟",
 "typeTokenRatioLexical":"نسبة",
 "keep":"حفظ",
-"reorderOriginalError":"يرجى اعادة ترتيب المكنز اولا (سحب والقاء الصفوف في الجدول)"});
+"reorderOriginalError":"يرجى اعادة ترتيب المكنز اولا (سحب والقاء الصفوف في الجدول)",
+"documentKeyword":"Keyword"});
 Ext.apply(Voyant.panel.CorpusCollocates.i18n, {
 "contextTermRawFreq":"عدد (السياق)",
 "matchingTerms":"{count}",

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Apr 29 17:40:12 EDT 2019 */
+/* This file created by JSCacher. Last modified: Tue Apr 30 16:57:01 EDT 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8201,6 +8201,11 @@ Ext.define('Voyant.data.model.Document', {
     fields: [
              {name: 'corpus'},
              {name: 'id'},
+             {name: 'pubDate'},
+             {name: 'publisher'},
+             {name: 'pubPlace'},
+             {name: 'keyword'},
+             {name: 'collection'},
              {name: 'index', type: 'int'},
              {name: 'tokensCount-lexical', type: 'int'},
              {name: 'typesCount-lexical', type: 'int'},
@@ -8384,11 +8389,35 @@ Ext.define('Voyant.data.model.Document', {
     	return (parseInt(this.getIndex())+1) + ') ' + this.getTinyTitle();
     },
     
+    getPubDate: function() {
+    	return this.get("pubDate");
+    },
+    
+    getPublisher: function() {
+    	return this.get("publisher");
+    },
+    
+    getPubPlace: function() {
+    	return this.get("pubPlace");
+    },
+    
+    getKeyword: function() {
+    	return this.getMultiple("keyword");
+    },
+    
+    getCollection: function() {
+    	return this.getMultiple("collection");
+    },
+    
     getAuthor: function(max) {
-    	var author = this.get('author') || "";
-    	author = Ext.isArray(author) ? author.join("; ") : author;
-    	author = author.trim().replace(/\s+/g, ' ');
-    	return max ? this.getTruncated(author, max) : author;
+    	this.getMultiple("author")
+    },
+    
+    getMuliple: function(field, max) {
+    	var val = this.get(field) || "";
+    	val = Ext.isArray(val) ? val.join("; ") : val;
+    	val = val.trim().replace(/\s+/g, ' ');
+    	return max ? this.getTruncated(author, max) : val;
     },
     
     getCorpusId: function() {
@@ -22704,6 +22733,41 @@ Ext.define('Voyant.panel.Documents', {
 	    	        renderer: function(val, metadata, record) {return record.getAuthor();},
 	    	        flex: 2
 	    	    },{
+	    	        text: this.localize('documentPubDate'),
+	    	        dataIndex: 'pubDate',
+	    	        sortable: true,
+	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getPubDate();},
+	    	        flex: 2
+	    	    },{
+	    	        text: this.localize('documentPublisher'),
+	    	        dataIndex: 'publisher',
+	    	        sortable: false,
+	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getPublisher();},
+	    	        flex: 2
+	    	    },{
+	    	        text: this.localize('documentPubPlace'),
+	    	        dataIndex: 'pubPlace',
+	    	        sortable: false,
+	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getPubPlace();},
+	    	        flex: 2
+	    	    },{
+	    	        text: this.localize('documentKeyword'),
+	    	        dataIndex: 'keyword',
+	    	        sortable: false,
+	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getKeyword();},
+	    	        flex: 2
+	    	    },{
+	    	        text: this.localize('documentCollection'),
+	    	        dataIndex: 'collection',
+	    	        sortable: false,
+	    	        hidden: true,
+	    	        renderer: function(val, metadata, record) {return record.getCollection();},
+	    	        flex: 2
+	    	    },{
 	    	        text: this.localize('tokensCountLexical'),
 	    	        dataIndex: 'tokensCount-lexical',
 	    	        renderer: Ext.util.Format.numberRenderer('0,000'),
@@ -22764,6 +22828,7 @@ Ext.define('Voyant.panel.Documents', {
     	this.on('loadedCorpus', function(src, corpus) {
 
     		this.store.setCorpus(corpus);
+
     		if (this.isVisible()) {
         		this.store.load({params: this.getApiParams()});
     		} else {

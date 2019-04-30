@@ -4,6 +4,11 @@ Ext.define('Voyant.data.model.Document', {
     fields: [
              {name: 'corpus'},
              {name: 'id'},
+             {name: 'pubDate'},
+             {name: 'publisher'},
+             {name: 'pubPlace'},
+             {name: 'keyword'},
+             {name: 'collection'},
              {name: 'index', type: 'int'},
              {name: 'tokensCount-lexical', type: 'int'},
              {name: 'typesCount-lexical', type: 'int'},
@@ -187,11 +192,35 @@ Ext.define('Voyant.data.model.Document', {
     	return (parseInt(this.getIndex())+1) + ') ' + this.getTinyTitle();
     },
     
+    getPubDate: function() {
+    	return this.get("pubDate");
+    },
+    
+    getPublisher: function() {
+    	return this.get("publisher");
+    },
+    
+    getPubPlace: function() {
+    	return this.get("pubPlace");
+    },
+    
+    getKeyword: function() {
+    	return this.getMultiple("keyword");
+    },
+    
+    getCollection: function() {
+    	return this.getMultiple("collection");
+    },
+    
     getAuthor: function(max) {
-    	var author = this.get('author') || "";
-    	author = Ext.isArray(author) ? author.join("; ") : author;
-    	author = author.trim().replace(/\s+/g, ' ');
-    	return max ? this.getTruncated(author, max) : author;
+    	this.getMultiple("author")
+    },
+    
+    getMuliple: function(field, max) {
+    	var val = this.get(field) || "";
+    	val = Ext.isArray(val) ? val.join("; ") : val;
+    	val = val.trim().replace(/\s+/g, ' ');
+    	return max ? this.getTruncated(author, max) : val;
     },
     
     getCorpusId: function() {
