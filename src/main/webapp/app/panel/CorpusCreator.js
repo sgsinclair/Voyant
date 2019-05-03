@@ -33,7 +33,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		htmlKeywordsQuery: undefined,
     		htmlCollectionQuery: undefined,
     		htmlExtraMetadataQuery: undefined,
-    		jsonGroupByPointer: undefined,
+    		//jsonGroupByPointer: undefined,
     		jsonDocumentsPointer: undefined,
     		jsonContentPointer: undefined,
     		jsonTitlePointer: undefined,
@@ -607,10 +607,13 @@ Ext.define('Voyant.panel.CorpusCreator', {
 								},{
 									fieldLabel: me.localize('xpathDocuments'),
 									name: 'jsonDocumentsPointer'
-								},{
+								},/*{ 
+									// groupBy is tricky because documents are combined in ways that may conflict 
+									// with the other extraction options (especially since Pointer expects absolute
+		 							// addresses from root). So for now we'll skip.
 									fieldLabel: me.localize('xpathGroupBy'),
 									name: 'jsonGroupByPointer'
-								},{
+								},*/{
 									xtype: 'fieldset',
 			                        title: me.localize('xmlAdditionalOptions'),
 			                        collapsible: true,

@@ -230,7 +230,6 @@ Notice how **Documents** is an array. Once defined, the author metadata pointers
 * **Title**: This extracts the text to be used as title metadata.
 * **Author**: This extracts the text as author metadata (it can be an array or a string)
 * **Documents**: This allows you to extract multiple documents from an HTML document (such as individual posts in a blog). When this is used in combination with the options above, the other queries expressions will be relative to each sub-document (not to the original document root node).
-* **Group by**: When used in conjunction with a *Documents* option, this allows you to group multiple documents together that share the same value. For instance, if a document has multiple article pointers, you can group all of the articles together based on the value of the author (so there would be one document per author with all of the articles from each grouped together). This option is ignored if *Documents* isn't specified.
 
 Additional Metadata:
 
