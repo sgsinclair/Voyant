@@ -189,6 +189,64 @@ Note that in the case of grouped selectors, the same attribute applies to each g
 	
 The <a href="https://try.jsoup.org" target="_blank">try Jsoup</a> tool does NOT support this attribute functionality, but you can use it to ensure that you have the right elements and then add the @attributename as desired in Voyant.
 
+## JSON
+
+New and <span style="color: red">experimental</a>!
+
+You can now work with documents in JSON and use the [JSON Pointer](https://tools.ietf.org/html/rfc6901) syntax to select parts of the document, the same way you do with XML XPath or HTML CSS Selectors.
+
+The basic syntax is very simple, it somewhat resembles XPath but is less powerful. Every pointer should be a full address to the location in the document.
+
+Given an example JSON document like this:
+
+	{
+		"rss": {
+	        	"items": [{
+		            "title": "A Special Event",
+		            "description": "A Special Teleconference for our customers about our products",
+		            "link": "http://www.yourdomain.com/events.htm",
+		            "author": "Joe Blow"
+	        	},{
+		            "title": "Announcing new Products",
+		            "description": "Announcing a new line of products",
+		            "link": "http://www.yourdomain.com/events.htm",
+		            "author": "Joe Blow"
+	        	}]
+		}
+	}
+	
+You could define the following:
+
+* **Documents**: /rss/items
+* **Content**: /description
+* **Title**: /title
+* **Author**: /author
+
+Notice how **Documents** is an array. Once defined, the author metadata pointers are relative to each document (not the root of the JSON document).
+
+### Pointers
+
+* **Content**: This defines the text content (by default it uses the entire document but it's strongly recommended to define a pointer if applicable).
+* **Title**: This extracts the text to be used as title metadata.
+* **Author**: This extracts the text as author metadata (it can be an array or a string)
+* **Documents**: This allows you to extract multiple documents from an HTML document (such as individual posts in a blog). When this is used in combination with the options above, the other queries expressions will be relative to each sub-document (not to the original document root node).
+* **Group by**: When used in conjunction with a *Documents* option, this allows you to group multiple documents together that share the same value. For instance, if a document has multiple article pointers, you can group all of the articles together based on the value of the author (so there would be one document per author with all of the articles from each grouped together). This option is ignored if *Documents* isn't specified.
+
+Additional Metadata:
+
+* **Publication Date**: An indication of the publication date (there's no pre-defined format for this but often it's useful to have alphabetically sortable values such as a year number).
+* **Publisher**: The publisher of the document.
+* **Location**: The publication location of the document.
+* **Keywords**: Any keywords associated with the document.
+* **Collection**: An indication of the collection to which this document belongs.
+
+Finally, there's a box where you can provide user-defined metadata. This is currently used for advanced features in Voyant and won't be generally useful. The format is to have one entry per line where the metadata name points to a selector:
+
+	htmlGenreQuery=/genre
+	htmlVolumeQuery=/doc/volume
+
+If any Pointer is specified but doesn't exist in the document an exception will be raised and processing will fail. The error message should indicate which pointer failed.
+
 ## Tables
 
 Voyant allows you to work flexibly with tabular data such as spreadsheets. At the moment the options described here only work with MS Excel files (.xsl or .xslx). Voyant can currently extract text from other tabular file formats such as OpenOffice, Pages, and comma-separated values (CSV), but in that case each file is considered as a separate document. The options below allow you to extract multiple documents from a single MS Excel file (or from several files).

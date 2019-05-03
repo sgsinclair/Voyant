@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Apr 30 16:57:01 EDT 2019 */
+/* This file created by JSCacher. Last modified: Fri May 03 14:21:42 EDT 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -18625,6 +18625,17 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		htmlKeywordsQuery: undefined,
     		htmlCollectionQuery: undefined,
     		htmlExtraMetadataQuery: undefined,
+    		jsonGroupByPointer: undefined,
+    		jsonDocumentsPointer: undefined,
+    		jsonContentPointer: undefined,
+    		jsonTitlePointer: undefined,
+    		jsonAuthorPointer: undefined,
+    		jsonPubDatePointer: undefined,
+    		jsonPublisherPointer: undefined,
+    		jsonPubPlacePointer: undefined,
+    		jsonKeywordsPointer: undefined,
+    		jsonCollectionPointer: undefined,
+    		jsonExtraMetadataPointer: undefined,
     		tokenization: undefined,
     		adminPassword: undefined,
     		accessPassword: undefined,
@@ -19162,6 +19173,61 @@ Ext.define('Voyant.panel.CorpusCreator', {
 										grow: true,
 										fieldLabel: me.localize('xpathExtra'),
 										name: 'htmlExtraMetadataQuery'
+									}]
+								}
+							]
+						},{
+	        				xtype: 'fieldset',
+	                        title: "<a href='"+me.getBaseUrl()+"docs/#!/guide/corpuscreator-section-json' target='voyantdocs'>"+me.localize('jsonOptions')+"</a>",
+	                        collapsible: true,
+	                        collapsed: true,
+	                        defaultType: 'textfield',
+	                        items: [
+	                            {
+	    							xtype: 'container',
+	    							html: '<p><i>'+new Ext.Template(me.localize('jsonOptionsText')).applyTemplate([me.getBaseUrl()+'docs/#!/guide/corpuscreator-section-json'])+'</i></p>',
+	    							width: 375
+	                            },{
+									fieldLabel: me.localize('xpathContent'),
+									name: 'jsonContentPointer'
+								},{
+									fieldLabel: me.localize('xpathTitle'),
+									name: 'jsonTitlePointer'
+								},{
+									fieldLabel: me.localize('xpathAuthor'),
+									name: 'jsonAuthorPointer'
+								},{
+									fieldLabel: me.localize('xpathDocuments'),
+									name: 'jsonDocumentsPointer'
+								},{
+									fieldLabel: me.localize('xpathGroupBy'),
+									name: 'jsonGroupByPointer'
+								},{
+									xtype: 'fieldset',
+			                        title: me.localize('xmlAdditionalOptions'),
+			                        collapsible: true,
+			                        collapsed: true,
+			                        defaultType: 'textfield',
+			                        items: [{
+										fieldLabel: me.localize('xpathPubDate'),
+										name: 'jsonPubDatePointer'
+									},{
+										fieldLabel: me.localize('xpathPublisher'),
+										name: 'jsonPublisherPointer'
+									},{
+										fieldLabel: me.localize('xpathPubPlace'),
+										name: 'jsonPubPlacePointer'
+									},{
+										fieldLabel: me.localize('xpathKeywords'),
+										name: 'jsonKeywordsPointer'
+									},{
+										fieldLabel: me.localize('xpathCollection'),
+										name: 'jsonCollectionPointer'
+									},{
+										xtype: 'textareafield',
+										grow: true,
+										fieldLabel: me.localize('xpathExtra'),
+										name: 'jsonExtraMetadataPointer'
 									}]
 								}
 							]
