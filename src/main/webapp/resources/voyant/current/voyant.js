@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri May 03 16:06:37 EDT 2019 */
+/* This file created by JSCacher. Last modified: Sat May 04 17:18:16 EDT 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8413,7 +8413,7 @@ Ext.define('Voyant.data.model.Document', {
     	this.getMultiple("author")
     },
     
-    getMuliple: function(field, max) {
+    getMultiple: function(field, max) {
     	var val = this.get(field) || "";
     	val = Ext.isArray(val) ? val.join("; ") : val;
     	val = val.trim().replace(/\s+/g, ' ');

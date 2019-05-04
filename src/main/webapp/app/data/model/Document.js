@@ -216,7 +216,7 @@ Ext.define('Voyant.data.model.Document', {
     	this.getMultiple("author")
     },
     
-    getMuliple: function(field, max) {
+    getMultiple: function(field, max) {
     	var val = this.get(field) || "";
     	val = Ext.isArray(val) ? val.join("; ") : val;
     	val = val.trim().replace(/\s+/g, ' ');
