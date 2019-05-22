@@ -54,7 +54,7 @@ Both *Title* and *Author* XPath expressions can result in multiple values per do
 * **`//div[@type='chapter']/head`** keep the text from every `head` tag that's a child of a `div` tag whose type attribute is equal to `chapter`
 * **`string-join(//author, '; ')`** combine all the text content from `author` tags into one value separated by `; `
 
-This isn't the place to [learn XPath syntax](http://www.w3schools.com/xsl/xpath_syntax.asp), but it's worth mentioning a few things about [namespaces](http://www.w3schools.com/xml/xml_namespaces.asp). In most cases, you should be able to specify an XPath without any namespaces because Voyant will use the same default namespace as the document. You *can* use namespaces if you need to select elements in a given namespace. You can also create an XPath expression that only considers the local name of the element instead of the qualified name.
+This isn't the place to [learn XPath syntax](https://www.w3schools.com/xml/xpath_intro.asp), but it's worth mentioning a few things about [namespaces](http://www.w3schools.com/xml/xml_namespaces.asp). In most cases, you should be able to specify an XPath without any namespaces because Voyant will use the same default namespace as the document. You *can* use namespaces if you need to select elements in a given namespace. You can also create an XPath expression that only considers the local name of the element instead of the qualified name.
 
 * **`//creator`**: select the `creator` element using the default namespace
 * **`//dc:creator`**: select the `creator` element only when it is in the `dc` namespace
@@ -62,7 +62,7 @@ This isn't the place to [learn XPath syntax](http://www.w3schools.com/xsl/xpath_
 
 ## Tables
 
-Voyant allows you to work flexibly with tabular data such as spreadsheets. At the moment the options described here only work with MS Excel files (.xsl or .xslx). Voyant can currently extract text from other tabular file formats such as OpenOffice, Pages, and comma-separated values (CSV), but in that case each file is considered as a separate document. The options below allow you to extract multiple documents from a single MS Excel file (or from several files).
+Voyant allows you to work flexibly with tabular data such as spreadsheets. At the moment the options described here only work with MS Excel files (.xls or .xlsx). Voyant can currently extract text from other tabular file formats such as OpenOffice, Pages, and comma-separated values (CSV), but in that case each file is considered as a separate document. The options below allow you to extract multiple documents from a single MS Excel file (or from several files).
 
 The options for tables are a bit complex, but there are a lot of possibilities when working with tabular data, so it's worth it, right?
 
