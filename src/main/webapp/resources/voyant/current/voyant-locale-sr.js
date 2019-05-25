@@ -1015,6 +1015,7 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "it":"италијански",
 "fr":"француски",
 "languageTitle":"Опције за језик сучеља",
+"es":"шпански",
 "ar":"арапски",
 "bs":"босански",
 "chooseLanguage":"Језик сучеља",

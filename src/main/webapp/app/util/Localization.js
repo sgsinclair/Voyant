@@ -83,7 +83,7 @@ Ext.define('Voyant.util.Localization', {
 	
 	showLanguageOptions: function() {
 		var me = this;
-		var langs = ["ar","bs","cz","en","fr","he","hr","it","ja","pt","sr"].map(function(lang) {
+		var langs = ["ar","bs","cz","en","es","fr","he","hr","it","ja","pt","sr"].map(function(lang) {
 			return {text: this.localize(lang), value: lang}
 		}, this);
 		langs.sort(function(a,b) {

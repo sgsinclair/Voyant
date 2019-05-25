@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat May 04 17:18:16 EDT 2019 */
+/* This file created by JSCacher. Last modified: Sat May 25 13:29:31 EDT 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6060,7 +6060,7 @@ Ext.define('Voyant.util.Localization', {
 	
 	showLanguageOptions: function() {
 		var me = this;
-		var langs = ["ar","bs","cz","en","fr","he","hr","it","ja","pt","sr"].map(function(lang) {
+		var langs = ["ar","bs","cz","en","es","fr","he","hr","it","ja","pt","sr"].map(function(lang) {
 			return {text: this.localize(lang), value: lang}
 		}, this);
 		langs.sort(function(a,b) {
@@ -26018,18 +26018,35 @@ Ext.define('Voyant.panel.MicroOcp', {
 		glyph: 'xf1ea@FontAwesome'
     },
     config: {
+    	editor: undefined
     },
     
     constructor: function(config) {
-    	debugger
     	config = config || {};
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments); // we need api
 		
+		
+	    var store = Ext.create('Ext.data.Store', {
+	        fields: [{
+	            name: 'cocoa',
+	            type: 'string'
+	        }]});
+	    
+	    var microocp = this;
     	Ext.apply(this, {
     		title: this.localize('title'),
     		layout: 'hbox',
+            dockedItems: [{
+                dock: 'bottom',
+                xtype: 'toolbar',
+                overflowHandler: 'scroller',
+                items: [{
+                	text: "Create New Voyant Corpus"
+                }]
+            }],
     		items: [{
 		        	xtype: 'panel',
+    		    	autoScroll: true,
 		        	flex: 1,
 		        	height: '100%',
 		        	align: 'stretch',
@@ -26038,23 +26055,91 @@ Ext.define('Voyant.panel.MicroOcp', {
 		        		boxready: function() {
 		        			var me = this;
 		        			var editor = ace.edit(Ext.getDom(this.getEl()));
-		        			debugger
+		        			microocp.setEditor(editor); // set to the containing panel
+//		        			editor.setOptions({enableBasicAutocompletion: false, enableLiveAutocompletion: false});
+//		        			editor.setTheme("ace/theme/monokai");
+		        			editor.getSession().setMode("ace/mode/xml")
 //		        			editor.$blockScrolling = Infinity;
 //		        			editor.getSession().setUseWorker(true);
 //		        			editor.setTheme(this.getTheme());
 //		        			editor.getSession().setMode(this.getMode());
 //		        			editor.setOptions({minLines: 6, maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10, autoScrollEditorIntoView: true, scrollPastEnd: true});
 //		        			editor.setHighlightActiveLine(false);
-//		        			editor.renderer.setShowPrintMargin(false);
-//		        			editor.renderer.setShowGutter(false);
+		        			editor.renderer.setShowPrintMargin(false);
+		        			editor.renderer.setShowGutter(false);
 //		        			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
 //		        			editor.clearSelection();
 //		        		    editor.on("focus", function() {
 //		        		    	me.getEditor().renderer.setShowGutter(true);
 //		        		    }, this);
+		        			editor.$blockScrolling = Infinity
+		        			editor.setOptions({autoScrollEditorIntoView: true});
+		        			editor.setBehavioursEnabled(false); // disable auto-complete
+		        			editor.on("change", function(delta) {
+		        				reparse = false;
+		        				if (delta.action=="insert") {
+		        					if (delta.lines[0].indexOf(">")==0) { // close tag
+		        						reparse = true
+		        					}
+		        				} else if (delta.action=="remove") {
+		        					for (var i=0; i<delta.lines.length; i++) {
+		        						if (delta.lines[i].indexOf(">")>-1) {
+		        							reparse = true;
+		        							break;
+		        						}
+		        					}
+		        				}
+		        				if (reparse) {
+		        					Ext.defer(function() {
+		        						var str = editor.getValue();
+		        						var tags = /<(\w+)(\s(\w+))?>/g;
+		        						var matches;
+		        						var expressions = {}
+		        						while ((matches = tags.exec(str)) != null) {
+		        							if (matches[3]) {expressions[matches[1]+" "+matches[3]]=true}
+		        							else {expressions[matches[1]]=true}
+		        						}
+		        						
+		        						var store = this.up("panel").down("grid").getStore();
+		        						var inStoreItems = {};
+		        						store.getRange().forEach(function(item) {inStoreItems[item.get("cocoa")]=true;});
+		        						
+		        						for (item in expressions) {
+		        							if (!(item in inStoreItems)) {
+		        								store.add({cocoa: item});
+		        							}
+		        						}
+		        						for (inStoreItem in inStoreItems) {
+		        							if (!(inStoreItem in expressions)) {
+		        								var rec = store.findRecord("cocoa", inStoreItem)
+		        								store.remove(rec);
+		        							}
+		        						}
+		        						
+		        						
+		        					}, 100, me)
+		        				}
+		        			})
 		        		}
 
 		        	}
+		        }, {
+		        	xtype: 'grid',
+		        	height: '100%',
+		        	align: 'stretch',
+    		    	autoScroll: true,
+    		    	scrollable: true,
+
+		        	width: 150,
+		    		selModel: Ext.create('Ext.selection.CheckboxModel', {
+		    			mode: 'SIMPLE'
+		            }),
+		            store: store,
+		            columns: [ {
+		                text: 'COCOA',
+		                width: 100,
+		                dataIndex: 'cocoa'
+		            }]
 		        }]
     	});
 
@@ -26063,13 +26148,24 @@ Ext.define('Voyant.panel.MicroOcp', {
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
-    	});
+    		var me = this;
+    		corpus.getPlainText().then(function(text) {
+    			text = text.replace(/(\r\n|\r|\n)(\r\n|\r|\n)(\r\n|\r|\n)+/g,"\n\n")
+    			var editor = me.getEditor();
+    			editor.setValue(text).trim();
+    			editor.scrollToLine(1, true, true, function () {});
+    		})
+    	}, this);
     	
     	this.on('afterrender', function(panel) {
     		
     	});
     	
     	
+    },
+    
+    reparse: function(val) {
+    	debugger
     }
     
 });

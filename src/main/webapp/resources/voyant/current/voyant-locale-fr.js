@@ -1015,6 +1015,7 @@ Ext.apply(Voyant.util.Localization.i18n, {
 "it":"Italien",
 "fr":"Français",
 "languageTitle":"Paramètres de langue de l’interface",
+"es":"Espagnol",
 "ar":"Arabe",
 "bs":"Bosnien",
 "chooseLanguage":"Langue de l’interface",
