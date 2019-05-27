@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat May 25 13:29:31 EDT 2019 */
+/* This file created by JSCacher. Last modified: Sun May 26 21:46:57 EDT 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -26040,8 +26040,115 @@ Ext.define('Voyant.panel.MicroOcp', {
                 dock: 'bottom',
                 xtype: 'toolbar',
                 overflowHandler: 'scroller',
+                groupId: 'tbar',
                 items: [{
-                	text: "Create New Voyant Corpus"
+                	text: "Create New Voyant Corpus",
+                	handler: function() {
+                		var items = this.down('grid').getSelectionModel().getSelection().map(function(item) {return item.get("cocoa")});
+              // items = ["one","one two","two"]
+                		if (items.length==0) {
+                			return this.showError({title: "Error", msg: "No items are selected in the grid (on the right)."})
+                		}
+                		// convert to map for faster lookup
+                		itemsMap = {};
+                		items.forEach(function(item) {itemsMap[item]=true})
+                		
+                		
+						var str = this.getEditor().getValue();
+               // str = "<one>this<one two>is<two>a</one>sentence<two> <one>another"
+						var tags = /<(\/)?(\w+)(\s(\w+))?>/g;
+						var matches;
+						var tagsMap = {}
+						while ((matches = tags.exec(str)) != null) {
+							var isClose = matches[1]=="/", tag = matches[2], attr = matches[4],
+								item = (matches[4] ? matches[2]+" "+matches[4] : matches[2]);
+							if (isClose || item in itemsMap) {
+								if (tag in tagsMap) {
+									tagsMap[tag][tagsMap[tag].length-1].end = matches.index
+								}
+								if (!isClose) {
+									if (!(tag in tagsMap)) {tagsMap[tag] = []}
+									tagsMap[tag].push({
+										start: matches.index+matches[0].length,
+										tag: tag,
+										attr: attr
+									})
+								}
+							}
+							else if (item in itemsMap) {
+								if (tag in tagsMap) {
+									tagsMap[tag][tagsMap[tag].length-1].end = matches.index
+								}
+							}
+						}
+						
+                		// this should be more robust
+                		isGroupItems = this.getDockedComponent(1).down('checkbox').checked;
+
+                		var documents = [];
+                		if (isGroupItems) {
+                			var docs = {};
+    						for (var tag in tagsMap) {
+    							tagsMap[tag].forEach(function(entry,i) {
+    								var text = str.substring(entry.start, entry.end).replace(/<\/?\w+(\s+\w)*>/g, "").trim();
+    								if (text) {
+    									var item = entry.tag+(entry.attr ? " "+entry.attr : "");
+    									if (item in docs) {
+    										docs[item]+= text;
+    									} else {
+    										docs[item] = text;
+    									}
+    								}
+    							})
+    						}
+    						for (var item in docs) {
+    							documents.push({
+    								title: item,
+    								text: docs[item]
+    							})
+    						}
+                		} else {
+    						for (var tag in tagsMap) {
+    							tagsMap[tag].forEach(function(entry,i) {
+    								var text = str.substring(entry.start, entry.end).replace(/<\/?\w+(\s+\w)*>/g, "").trim();
+    								if (text) {
+    									documents.push({
+    										title: entry.tag+(entry.attr ? " "+entry.attr : "")+" "+(i+1),
+    										text: text
+    									})
+    								}
+    							})
+    						}
+                		}
+
+                		if (documents.length==0) {
+                			return this.showError({title: "Error", msg: "No documents found."})
+						}
+						
+						this.mask();
+						var progress = Ext.Msg.progress("Creating", "Creating new corpus.");
+						// create new corpus
+						var me = this;
+						new Corpus({
+							inputFormat: 'json',
+							input: Ext.JSON.encode({documents: documents}),
+							jsonDocumentsPointer: "/documents",
+							jsonTitlePointer: "/title",
+							jsonContentPointer: "/text"
+						}).then(function (corpus) {
+							progress.close();
+							me.unmask();
+							var app = me.getApplication();
+							me.openUrl(app.getBaseUrl()+"?corpus="+corpus.getAliasOrId())
+						});
+
+                		
+                	},
+                	scope: this
+                },{
+                	xtype: 'checkbox',
+                	boxLabel: "Combine documents with the same tag attribute.",
+                	checked: true
                 }]
             }],
     		items: [{
@@ -26158,16 +26265,12 @@ Ext.define('Voyant.panel.MicroOcp', {
     	}, this);
     	
     	this.on('afterrender', function(panel) {
-    		
+    		Ext.Msg.alert("MicroOCP", "MicroOCP is an experimental prototype that is intended to give a taste of working with the COCOA markup format (COunt and COncordance on the Atlas). Cocoa tags are like switches, you can place one and that tag remains in effect until the next instance of the tag, which can have an optional attribute (single word). As an enhancement to COCOA, you can also close a tag.<pre>&lt;speaker jack&gt;I'm falling &lt;speaker jill&gt;down the hill.&lt;/speaker&gt;</pre>")
     	});
     	
     	
-    },
-    
-    reparse: function(val) {
-    	debugger
     }
-    
+        
 });
 
 Ext.define('Voyant.panel.Reader', {
