@@ -6,7 +6,8 @@
     <xsl:template match="/">
 		<!-- here we add an empty stylesheet so that we can programmatically add rules to it later -->
 		<xsl:processing-instruction name="xml-stylesheet"> type="text/css" href="dtoc/css/custom.css" </xsl:processing-instruction>
-        <xsl:apply-templates select="results/documentTokens/tokens/token"/>
+		<xsl:apply-templates select="results/documentTokens/tokens/token[tokenType='processinginstruction']"/>
+        <xsl:apply-templates select="results/documentTokens/tokens/token[not(tokenType='processinginstruction')]"/>
     </xsl:template>
     <xsl:template match="token">
         <xsl:choose>
