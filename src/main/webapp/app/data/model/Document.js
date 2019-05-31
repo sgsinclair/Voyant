@@ -329,7 +329,7 @@ Ext.define('Voyant.data.model.Document', {
 	},
 	
 	getCSS: function() {
-		return this.get('css')
+		return this.get('css') || this.get('parent_css');
 	}
     
 });
