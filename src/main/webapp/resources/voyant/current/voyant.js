@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun May 26 21:46:57 EDT 2019 */
+/* This file created by JSCacher. Last modified: Fri May 31 11:05:18 EDT 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -8526,7 +8526,7 @@ Ext.define('Voyant.data.model.Document', {
 	},
 	
 	getCSS: function() {
-		return this.get('css')
+		return this.get('css') || this.get('parent_css');
 	}
     
 });
