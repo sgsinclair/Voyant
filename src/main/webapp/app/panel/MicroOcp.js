@@ -8,7 +8,8 @@ Ext.define('Voyant.panel.MicroOcp', {
     	},
     	api: {
     		config: undefined,
-    		stopList: 'auto'
+    		stopList: 'auto',
+    		uri: undefined
     	},
 		glyph: 'xf1ea@FontAwesome'
     },
@@ -250,6 +251,7 @@ Ext.define('Voyant.panel.MicroOcp', {
     	
         // create a listener for corpus loading (defined here, in case we need to load it next)
     	this.on('loadedCorpus', function(src, corpus) {
+    		if (this.getApiParam('uri')) {return;}
     		var me = this;
     		corpus.getPlainText().then(function(text) {
     			text = text.replace(/(\r\n|\r|\n)(\r\n|\r|\n)(\r\n|\r|\n)+/g,"\n\n")
@@ -261,6 +263,12 @@ Ext.define('Voyant.panel.MicroOcp', {
     	
     	this.on('afterrender', function(panel) {
     		Ext.Msg.alert("MicroOCP", "MicroOCP is an experimental prototype that is intended to give a taste of working with the COCOA markup format (COunt and COncordance on the Atlas). Cocoa tags are like switches, you can place one and that tag remains in effect until the next instance of the tag, which can have an optional attribute (single word). As an enhancement to COCOA, you can also close a tag.<pre>&lt;speaker jack&gt;I'm falling &lt;speaker jill&gt;down the hill.&lt;/speaker&gt;</pre>")
+    		if (this.getApiParam("uri")) {
+    			var me = this;
+    			Notebook.loadDataFromUrl(this.getApiParam("uri")).then(function(data) {
+    				me.getEditor().setValue(data);
+    			})
+    		}
     	});
     	
     	
