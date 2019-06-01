@@ -31,7 +31,7 @@ Ext.define('Voyant.panel.MicroOcp', {
 	    var microocp = this;
     	Ext.apply(this, {
     		title: this.localize('title'),
-    		layout: 'hbox',
+    		layout: 'border',
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
@@ -154,6 +154,7 @@ Ext.define('Voyant.panel.MicroOcp', {
 		        	height: '100%',
 		        	align: 'stretch',
 		        	header: false,
+		        	region: 'center',
 		        	listeners: {
 		        		boxready: function() {
 		        			var me = this;
@@ -228,19 +229,21 @@ Ext.define('Voyant.panel.MicroOcp', {
 		        	}
 		        }, {
 		        	xtype: 'grid',
+		        	region: 'east',
 		        	height: '100%',
 		        	align: 'stretch',
-    		    	autoScroll: true,
+//    		    	autoScroll: true,
     		    	scrollable: true,
+    		    	header: false,
 
-		        	width: 150,
+		        	width: 200,
 		    		selModel: Ext.create('Ext.selection.CheckboxModel', {
 		    			mode: 'SIMPLE'
 		            }),
 		            store: store,
 		            columns: [ {
 		                text: 'COCOA',
-		                width: 100,
+		                flex: 1,
 		                dataIndex: 'cocoa'
 		            }]
 		        }]
