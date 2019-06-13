@@ -298,7 +298,7 @@ Ext.define('Voyant.panel.DToC.Reader', {
 				this.addStylesheetToReader('dtoc/css/tei.css');
 			} else {
 				var cssUrl = this.getCorpus().getDocument(params.docId).getCSS();
-				if (cssUrl === '' && this.getStylesheetsInDoc().length === 0) {
+				if ((cssUrl === undefined || cssUrl === '') && this.getStylesheetsInDoc().length === 0) {
 					cssUrl = 'dtoc/css/default.css';
 				}
 				this.addStylesheetToReader(cssUrl);
