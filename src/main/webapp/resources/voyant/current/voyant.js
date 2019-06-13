@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Jun 01 14:40:11 EDT 2019 */
+/* This file created by JSCacher. Last modified: Sat Jun 01 15:09:59 EDT 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -26229,6 +26229,12 @@ Ext.define('Voyant.panel.MicroOcp', {
 		        					}, 100, me)
 		        				}
 		        			})
+		            		if (microocp.getApiParam("uri")) {
+		            			Notebook.loadDataFromUrl(microocp.getApiParam("uri")).then(function(data) {
+		            				microocp.getEditor().setValue(data);
+		            			})
+		            		}
+
 		        		}
 
 		        	}
@@ -26271,12 +26277,6 @@ Ext.define('Voyant.panel.MicroOcp', {
     	
     	this.on('afterrender', function(panel) {
     		Ext.Msg.alert("MicroOCP", "MicroOCP is an experimental prototype that is intended to give a taste of working with the COCOA markup format (COunt and COncordance on the Atlas). Cocoa tags are like switches, you can place one and that tag remains in effect until the next instance of the tag, which can have an optional attribute (single word). As an enhancement to COCOA, you can also close a tag.<pre>&lt;speaker jack&gt;I'm falling &lt;speaker jill&gt;down the hill.&lt;/speaker&gt;</pre>")
-    		if (this.getApiParam("uri")) {
-    			var me = this;
-    			Notebook.loadDataFromUrl(this.getApiParam("uri")).then(function(data) {
-    				me.getEditor().setValue(data);
-    			})
-    		}
     	});
     	
     	

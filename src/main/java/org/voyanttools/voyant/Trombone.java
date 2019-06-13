@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +41,7 @@ import org.voyanttools.trombone.model.CorpusAccess;
 import org.voyanttools.trombone.results.ResultsOutputFormat;
 import org.voyanttools.trombone.storage.Storage;
 import org.voyanttools.trombone.storage.file.FileStorage;
+import org.voyanttools.trombone.storage.memory.MemoryStorage;
 import org.voyanttools.trombone.tool.corpus.CorpusManager;
 import org.voyanttools.trombone.util.FlexibleParameters;
 
@@ -56,7 +58,24 @@ public class Trombone extends HttpServlet {
 	private FlexibleParametersFactory flexibleParametersFactory;
 	
 	public Trombone() throws IOException {
-		this.storage = new FileStorage();
+		this.storage = null;
+		String storage = System.getProperty("org.voyanttools.server.storage");
+//		if (storage==null || storage.isEmpty()) {
+//			storage = this.getInitParameter("storage");
+//		}
+		if (storage!=null && storage.isEmpty()==false) {
+			storage = storage.toLowerCase();
+			if (storage.equals("memory")) {
+				this.storage = new MemoryStorage();
+			} else if (storage.equals("file-per-corpus")) {
+				FlexibleParameters parameters = new FlexibleParameters();
+				parameters.setParameter("storage", storage);
+				this.storage = new FileStorage(parameters);
+			}
+		}
+		if (this.storage==null) {
+			this.storage = new FileStorage();
+		}
 	}
 	
 	@Override

@@ -9,10 +9,9 @@
 		<param-name>version</param-name>
 		<param-value>2.4</param-value>
 	</context-param>
-	
-	<context-param>
+		<context-param>
 		<param-name>build</param-name>
-		<param-value>M22</param-value>
+		<param-value>M24</param-value>
 	</context-param>
 	
 	<servlet>
