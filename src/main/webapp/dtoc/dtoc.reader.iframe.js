@@ -368,6 +368,19 @@ Ext.define('Voyant.panel.DToC.Reader', {
 		return styleSheets;
 	},
 
+	getCustomStylesheet: function() {
+		var doc = this.readerContainer.getDoc();
+		for (var i = 0; i < doc.styleSheets.length; i++) {
+			var ss = doc.styleSheets.item(i);
+			if (ss.href.indexOf('dtoc/css/custom.css') !== -1) {
+				return ss;
+			}
+		}
+		// shouldn't be here
+		console.warn('DToC: no custom stylesheet!');
+		return undefined;
+	},
+
 	addStylesheetToReader: function(cssUrl) {
 		var doc = this.readerContainer.getDoc();
 		var cssPi = doc.createProcessingInstruction('xml-stylesheet', 'href="'+cssUrl+'" type="text/css"');
@@ -474,11 +487,17 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	
 	_processNotes: function() {
 		this.hideAllNotes(true);
-	    this.tokenToolTipsMap = {};
+		this.tokenToolTipsMap = {};
+		
+		var customSs = this.getCustomStylesheet();
 		
 		var doc = this.readerContainer.getDoc();
 		var notes = [];
 		this.noteSelectors.forEach(function(selector) {
+			if (customSs) {
+				customSs.insertRule(selector+' { display: none !important; }');
+			}
+
 			notes = notes.concat(Ext.dom.Query.select(selector, doc, 'select', false));
 		});
 		notes.forEach(function(note, index) {
@@ -495,6 +514,8 @@ Ext.define('Voyant.panel.DToC.Reader', {
 			
 			var tokenId = note.getAttribute('tokenid');
 			this.tokenToolTipsMap[tokenId] = tip;
+
+			note.classList.add('hide');
 		}, this);
 	},
 	
@@ -527,13 +548,8 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	
 	_processImages: function() {
 		var doc = this.readerContainer.getDoc();
-		var customSs;
-		for (var i = 0; i < doc.styleSheets.length; i++) {
-			var ss = doc.styleSheets.item(i);
-			if (ss.href.indexOf('dtoc/css/custom.css') !== -1) {
-				customSs = ss;
-			}
-		}
+		var customSs = this.getCustomStylesheet();
+
 		// assign ids to graphic tags and use that for loading image urls through the content/url combo
 		var images = [];
 		this.imageSelectors.forEach(function(selector) {
