@@ -576,8 +576,18 @@ Ext.define('Voyant.panel.DToC.Reader', {
 	
 	_processLinks: function() {
 		var doc = this.readerContainer.getDoc();
+		var customSs = this.getCustomStylesheet();
+
 		var links = [];
 		this.linkSelectors.forEach(function(selector) {
+			if (customSs) {
+				try {
+					customSs.insertRule(selector+' { cursor: pointer; }');
+				} catch(e) {
+					console.warn('DToC: invalid css selector', selector);
+				}
+			}
+
 			var att = this._getAttributeFromSelector(selector);
 			if (att !== null) {
 				var hits = Ext.dom.Query.select(selector, doc, 'select', false);
