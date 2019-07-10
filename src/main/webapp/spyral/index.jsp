@@ -7,6 +7,7 @@ if (request.getServletPath().equals("/spiral")) {
 	response.setHeader("Location", url.toString().replace("/spiral/","/spyral/"));
     return;
 } %><%@ include file="../../resources/jsp/pre_app.jsp" %>
+<script src="<%= base %>/resources/spyral/spyral.js"></script>
 
 <script src="<%= base %>/resources/ckeditor/ckeditor4.6.2/ckeditor.js"></script>
 <script>
@@ -58,7 +59,7 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 	.notebook-code-wrapper .x-panel-body {
 	   border: thin solid rgba(0,0,0,0) !important;
 	}
-	.x-panel .notebook-editor-wrapper-hover.x-panel-body {
+	.x-panel .notebook-editor-wrapper-hover.x-panel-body, .editable {
 		border: thin dashed rgba(0,0,0,.2) !important;
 	}
 	.notebook-code-editor, .notebook-code-results {
@@ -79,7 +80,10 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 	}	
 	.notebook-code-results .info {
 		overflow: scroll
-	}	
+	}
+	.notebook-code-editor-raw { /* used for raw code in saved view */
+		display: none;
+	}
 	.cke_button__sourcedialog_label {
 	    display: none !important;
 	}
@@ -100,6 +104,31 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 	    padding: 1px;
 	    margin: 1px;
 	    font-size: smaller;
+	}
+	
+	table.spyral-table {
+	    border: thin solid #ccc;
+	}
+
+	table.spyral-table th {
+	    background-color: rgba(255, 255, 0, .05);
+	}
+
+	table.spyral-table td, table.spyral-table th {
+	    border-right: thin solid #eee; border-bottom: thin solid #eee;
+	}
+	table.spyral-table td:last-child {
+	    border-right: none; border-bottom: none;
+	}
+	
+	.spyral-header, .spyral-footer {
+		text-align: center;
+	}
+	
+	.spyral-footer {
+		margin-top: 1em;
+		background-color: rgba(0,0,0,.01);
+		border-top: rgba(0,0,0,.05);
 	}
 </style>
 
@@ -122,6 +151,18 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 			allowInput: '<%= System.getProperty("org.voyanttools.server.allowinput")==null ? "" : System.getProperty("org.voyanttools.server.allowinput") %>'
 		}
 	});
+	Spyral.Load.baseUrl = '<%
+	
+	StringBuilder fullurl = new StringBuilder();
+	fullurl.append(request.getScheme()).append("://").append(request.getServerName());
+	int serverPort = request.getServerPort();
+	if (serverPort != 80 && serverPort != 443) {
+		fullurl.append(":").append(serverPort);
+	}
+	fullurl.append(request.getContextPath());
+	
+	String fullbase = fullurl.toString();
+	%><%= fullbase %>/'
 </script>
 <title>Spyral</title>
 <%@ include file="../../resources/jsp/post_app.jsp" %>

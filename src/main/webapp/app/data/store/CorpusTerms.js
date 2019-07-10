@@ -20,7 +20,7 @@ Ext.define('Voyant.data.store.CorpusTermsMixin', {
 
 });
 
-/**
+/*
  * Corpus Terms store.
  */
 Ext.define('Voyant.data.store.CorpusTerms', {

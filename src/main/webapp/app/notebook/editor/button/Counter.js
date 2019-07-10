@@ -7,7 +7,8 @@ Ext.define("Voyant.notebook.editor.button.Counter", {
 		}
 	},
 	config: {
-		order: 0
+		order: 0,
+		name: undefined
 	},
 	cls: 'notebookwrappercounter',
 	constructor: function(config) {
@@ -23,6 +24,7 @@ Ext.define("Voyant.notebook.editor.button.Counter", {
 	updateHtml: function() {
 		var pos = this.getOrder()+1;
 		var lnk = 'spyralcounter_'+pos;
-		this.setHtml('<a name="'+lnk+'" id="'+lnk+'" href="#'+lnk+'">'+pos+'</a>');
+		var name = this.getName();
+		this.setHtml('<a name="'+name+'" href="#'+name+'">'+pos+'</a>');
 	}
 })

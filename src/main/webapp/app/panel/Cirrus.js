@@ -1,4 +1,16 @@
 // assuming Cirrus library is loaded by containing page (via voyant.jsp)
+/**
+ * Cirrus tool, a wordcloud-like visuaization.
+ * 
+ * 	// simple cirrus
+ * 	loadCorpus("austen").tool("cirrus");
+ *
+ * 	// define stopwords list and styling
+ * 	loadCorpus("austen").tool("cirrus", {
+ * 		stopList: 'auto',
+ * 		style: 'width: 500px; height: 400px'
+ * 	});
+ */
 Ext.define('Voyant.panel.Cirrus', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -7,10 +19,30 @@ Ext.define('Voyant.panel.Cirrus', {
     	i18n: {
     	},
     	api: {
+    		/**
+    		 * @cfg {String} stopList A comma-separated list of words, a named list or a URL to a plain text list, one word per line.
+    		 * @default auto
+    		 * 
+    		 * By default this is set to 'auto' which auto-detects the document's language and loads an appropriate list (if available for that language). Set this to blank to not use the default stopList.
+    		 *  
+    		 * For more information see the <a href="#!/guide/search">Stopwords documentation</a>.
+    		 */
     		stopList: 'auto',
     		categories: undefined,
     		whiteList: undefined, // specify a list of words to use
+    		
+    		/**
+    		 * @cfg {Number} limit Specify the number of terms to load (which is separate from the number of {@link #visible} terms to show) at a time).
+    		 * @default 500
+    		 * 
+    		 *  By default this is set to 'auto' which auto-detects the document's language and loads an appropriate list (if available for that language). Set this to blank to not use the default stopList.
+    		 */
     		limit: 500,
+    		
+    		/**
+    		 * @cfg {Number} visible Specify the number of terms that are visible at a time.
+    		 * @default 50
+    		 */
     		visible: 50,
     		terms: undefined,
     		docId: undefined,
@@ -29,7 +61,13 @@ Ext.define('Voyant.panel.Cirrus', {
     },
     
     config: {
+    	/**
+    	 * @private
+    	 */
     	mode: undefined,
+    	/**
+    	 * @private
+    	 */
     	options: [
     		{xtype: 'stoplistoption'},
     		{
@@ -57,15 +95,45 @@ Ext.define('Voyant.panel.Cirrus', {
     	    {xtype: 'colorpaletteoption'}
 
     	],
+    	/**
+    	 * @private
+    	 */
     	records: undefined,
+    	/**
+    	 * @private
+    	 */
     	terms: undefined,
+    	/**
+    	 * @private
+    	 */
     	cirrusId: undefined,
+    	/**
+    	 * @private
+    	 */
     	visLayout: undefined, // cloud layout algorithm
+    	/**
+    	 * @private
+    	 */
     	vis: undefined, // actual vis
+    	/**
+    	 * @private
+    	 */
     	tip: undefined,
+    	/**
+    	 * @private
+    	 */
     	sizeAdjustment: 100, // amount to multiply a word's relative size by
+    	/**
+    	 * @private
+    	 */
     	minFontSize: 12,
+    	/**
+    	 * @private
+    	 */
     	largestWordSize: 0,
+    	/**
+    	 * @private
+    	 */
     	smallestWordSize: 1000000
     },
     
@@ -74,6 +142,9 @@ Ext.define('Voyant.panel.Cirrus', {
     
     layout: 'fit',
     
+	/**
+	 * @private
+	 */
     constructor: function(config) {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);

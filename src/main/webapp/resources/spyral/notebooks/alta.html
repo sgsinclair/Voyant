@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset='UTF-8'>
+<title>The Art of Literary Text Analysis with Spyral Notebooks</title>
+<meta name="title" content="<h1>The Art of Literary Text Analysis with Spyral Notebooks</h1>"><meta name="author" content="Stéfan Sinclair & Geoffrey Rockwell"><meta name="keywords" content="alta"><meta name="modified" content="2019-07-04T17:08:05.461Z"><meta name="created" content="2019-06-26T17:50:11.213Z"><meta name="language" content="English"><meta name="license" content="Creative Commons Attribution (CC BY)"><meta name="version" content="0.1"><style id="ace-chrome">.ace-chrome .ace_gutter {background: #ebebeb;color: #333;overflow : hidden;}.ace-chrome .ace_print-margin {width: 1px;background: #e8e8e8;}.ace-chrome {background-color: #FFFFFF;color: black;}.ace-chrome .ace_cursor {color: black;}.ace-chrome .ace_invisible {color: rgb(191, 191, 191);}.ace-chrome .ace_constant.ace_buildin {color: rgb(88, 72, 246);}.ace-chrome .ace_constant.ace_language {color: rgb(88, 92, 246);}.ace-chrome .ace_constant.ace_library {color: rgb(6, 150, 14);}.ace-chrome .ace_invalid {background-color: rgb(153, 0, 0);color: white;}.ace-chrome .ace_fold {}.ace-chrome .ace_support.ace_function {color: rgb(60, 76, 114);}.ace-chrome .ace_support.ace_constant {color: rgb(6, 150, 14);}.ace-chrome .ace_support.ace_type,.ace-chrome .ace_support.ace_class.ace-chrome .ace_support.ace_other {color: rgb(109, 121, 222);}.ace-chrome .ace_variable.ace_parameter {font-style:italic;color:#FD971F;}.ace-chrome .ace_keyword.ace_operator {color: rgb(104, 118, 135);}.ace-chrome .ace_comment {color: #236e24;}.ace-chrome .ace_comment.ace_doc {color: #236e24;}.ace-chrome .ace_comment.ace_doc.ace_tag {color: #236e24;}.ace-chrome .ace_constant.ace_numeric {color: rgb(0, 0, 205);}.ace-chrome .ace_variable {color: rgb(49, 132, 149);}.ace-chrome .ace_xml-pe {color: rgb(104, 104, 91);}.ace-chrome .ace_entity.ace_name.ace_function {color: #0000A2;}.ace-chrome .ace_heading {color: rgb(12, 7, 255);}.ace-chrome .ace_list {color:rgb(185, 6, 144);}.ace-chrome .ace_marker-layer .ace_selection {background: rgb(181, 213, 255);}.ace-chrome .ace_marker-layer .ace_step {background: rgb(252, 255, 0);}.ace-chrome .ace_marker-layer .ace_stack {background: rgb(164, 229, 101);}.ace-chrome .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid rgb(192, 192, 192);}.ace-chrome .ace_marker-layer .ace_active-line {background: rgba(0, 0, 0, 0.07);}.ace-chrome .ace_gutter-active-line {background-color : #dcdcdc;}.ace-chrome .ace_marker-layer .ace_selected-word {background: rgb(250, 250, 255);border: 1px solid rgb(200, 200, 250);}.ace-chrome .ace_storage,.ace-chrome .ace_keyword,.ace-chrome .ace_meta.ace_tag {color: rgb(147, 15, 128);}.ace-chrome .ace_string.ace_regex {color: rgb(255, 0, 0)}.ace-chrome .ace_string {color: #1A1AA6;}.ace-chrome .ace_entity.ace_other.ace_attribute-name {color: #994409;}.ace-chrome .ace_indent-guide {background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;}
+/*# sourceURL=ace/css/ace-chrome */</style>
+<style id="voyant-notebooks-styles">
+	body.exported-notebook {
+		font-family: helvetica, arial, verdana, sans-serif;
+		font-size: 13px;
+		font-weight: 300;
+		line-height: 17px;
+		-webkit-font-smoothing: antialiased
+	}
+	body.exported-notebook .notebook-code-editor {
+		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+		font-size: 12px;
+		font-weight: normal;
+		line-height: normal;
+		white-space: pre;
+	}
+	.notebook-text-editor, .notebook-code-editor, .notebook-code-results {
+		padding: 6px;
+		margin: 6px;
+	}
+	.notebook-text-wrapper .x-panel-body {
+	   border: thin solid rgba(0,0,0,0) !important;
+	}
+	.notebook-code-wrapper .x-panel-body {
+	   border: thin solid rgba(0,0,0,0) !important;
+	}
+	.x-panel .notebook-editor-wrapper-hover.x-panel-body, .editable {
+		border: thin dashed rgba(0,0,0,.2) !important;
+	}
+	.notebook-code-editor, .notebook-code-results {
+		margin-left: 2em;
+	}
+	.notebook-code-editor {
+		border-left: thin solid rgb(240, 240, 240);
+	}
+	.notebook-code-results {
+		background-color: rgb(252, 252, 252);
+		border: thin solid rgb(240, 240, 240);
+	}
+	.notebook-code-results .error {
+		color: red;
+	}
+	.notebook-code-results pre {
+		font-size: smaller;
+	}	
+	.notebook-code-results .info {
+		overflow: scroll
+	}
+	.notebook-code-editor-raw { /* used for raw code in saved view */
+		display: none;
+	}
+	.cke_button__sourcedialog_label {
+	    display: none !important;
+	}
+	.exported-notebook .notebookwrappercounter {
+		float: right;
+	}
+	.exported-notebook .notebookwrappercounter a {
+		text-decoration: none;
+	}
+	
+	.notebookwrappercounter a {
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		border-radius: 3px;
+		background-color: #f5f5f5;
+	    text-align: right;
+	    border: thin solid #d8d8d8;
+	    padding: 1px;
+	    margin: 1px;
+	    font-size: smaller;
+	}
+	
+	.spyral-header, .spyral-footer {
+		text-align: center;
+	}
+	
+	.spyral-footer {
+		margin-top: 1em;
+		background-color: rgba(0,0,0,.01);
+		border-top: rgba(0,0,0,.05);
+	}
+</style>
+<script> // this script checks to see if embedded tools seem to be available
+window.addEventListener('load', function() {
+var hostnames = {}, warned = false;
+document.querySelectorAll('iframe').forEach(function(iframeEl) {
+let url = new URL(iframeEl.src);
+if (!(url.hostname in hostnames) && !warned) {
+hostnames[url.hostname] = true; // mark as fetched
+fetch(url).catch(response => {
+warned = true;
+alert('This notebook seems to contain one ore more tools that may not be able to load. Possible reasons include a server no longer being accessible (especially if the notebook was generated from a local server), or because of security restrictions.'+url)
+})
+}
+})
+})
+</script>
+</head>
+<body class='exported-notebook'><header class='spyral-header'><h1>The Art of Literary Text Analysis with Spyral Notebooks</h1></header>
+<article class='spyralArticle'><section id='0g4ugsaek1cha3ni' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="0g4ugsaek1cha3ni" href="#0g4ugsaek1cha3ni" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">1</a></div><div class='notebook-text-editor'><p><em>The Art of Literary Text Analysis with Spyral Notebooks</em> has two objectives. First, it's designed as a guide to provide a gentle introduction to concepts and methodologies for literary text analysis with computers – it's meant to be very welcoming to newcomers to digital tools for the study of texts. Second, the guide is intended to offer a glimpse of the wide range of possible techniques for using tools to study texts – if it cannot hope to explain and demonstrate everything, it at least has the ambition of suggesting the breadth of possibilities and providing a helpful foundation for further exploration and experimentation.</p><p>This instance of The Art of Literary Text Analysis is created in Spyral Notebooks (there's also companion version in <a data-tabindex-counter="15" data-tabindex-value="none" data-cke-saved-href="https://github.com/sgsinclair/alta/blob/master/ipynb/ArtOfLiteraryTextAnalysis.ipynb" href="https://github.com/sgsinclair/alta/blob/master/ipynb/ArtOfLiteraryTextAnalysis.ipynb" tabindex="-1">iPython Notebooks</a>).&nbsp;Other choices are available, and many conceptual aspects of the guide are relevant regardless of the implementation. Spyral Notebooks was chosen for several&nbsp;reasons:</p><ol><li>Spyral Notebooks requires no setup or installation to get started, you just visit a web page;</li><li>Spyral Notebooks leverages the analytic and visualization capabilities of <a data-tabindex-counter="15" data-tabindex-value="none" data-cke-saved-href="http://voyant-tools.org" href="http://voyant-tools.org" tabindex="-1">Voyant Tools</a>;</li><li>Text blocks in Spyral Notebooks are written with a simple styled editor (we're big fans of Markdown but we don't want to force people to learn it);</li><li>Code in Spyral Notebooks&nbsp;is essentially written in Javascript, a relatively friendly language to learn and one that's widely used;</li><li>The native format for Spyral Notebooks is HTML so you can usually open and read a notebook even if you're not doing so within the Spyral application;</li><li>Spyral Notebooks offers a&nbsp;<em>literate programming</em>&nbsp;model of writing where blocks of prose text (like this one) can be interspersed with bits of code and output (like below).&nbsp;<em>The Art of Literary Text Analysis</em>&nbsp;focuses on process, and the documentation-rich format offered by Spiral Notebooks is well-suited to the nature of this guide.</li></ol><p>Below is a very simple example of a Spyral code block. We use the <a data-cke-saved-href="../../docs/#!/api/loadCorpus" target="_blank" href="../../docs/#!/api/loadCorpus" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2">loadCorpus</a> function to load the built-in Jane Austen corpus of novels and then we call the <a data-cke-saved-href="../../docs/#!/api/Spyral.Corpus-method-.tool" target="_blank" href="../../docs/#!/api/Spyral.Corpus-method-.tool" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2">tool</a>&nbsp;function to create a <a data-cke-saved-href="../../docs/#!/api/Voyant.panel.Cirrus" target="_blank" href="../../docs/#!/api/Voyant.panel.Cirrus" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2">Cirrus</a> wordcloud from the corpus.</p></div>
+</section>
+<section id='00u1bvuqvqnvr174' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="00u1bvuqvqnvr174" href="#00u1bvuqvqnvr174" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">2</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_comment">// create a corpus and show word cloud</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"austen"</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"cirrus"</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+// create a corpus and show word cloud
+loadCorpus("austen").tool("cirrus");</pre>
+<div class='notebook-code-results'>
+<div style='height: 460px'>
+<div style="height: 446px">
+<div style="height: 432px">
+<div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px;" src="http://localhost:8080/voyant/tool/cirrus/?corpus=austen" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="4"></iframe></div></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id='obpzj09beeqhvuvz' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="obpzj09beeqhvuvz" href="#obpzj09beeqhvuvz" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">3</a></div><div class='notebook-text-editor'><h2>Table of Contents</h2><ul><li><a data-tabindex-counter="15" data-tabindex-value="none" data-cke-saved-href="../alta-start/" href="../alta-start/" tabindex="-1" target="_blank">Getting Started</a> (introducing core concepts of Spyral Notebooks)</li><li><a data-tabindex-counter="13" data-tabindex-value="none" data-cke-saved-href="../alta-create/" href="../alta-create/" tabindex="-1" target="_blank">Creating a Corpus</a>&nbsp;(how to create a corpus with Voyant or programmatically with strings or URLs)</li><li><a data-tabindex-counter="13" data-tabindex-value="none" data-cke-saved-href="../alta-smaller/" href="../alta-smaller/" tabindex="-1" target="_blank">Exploring a Smaller Corpus</a>&nbsp;(how to begin exploring a smaller corpus, Edgar Allan Poe's "The Gold Bug")</li><li><a data-tabindex-counter="13" data-tabindex-value="none" data-cke-saved-href="../alta-tables/" href="../alta-tables/" tabindex="-1" target="_blank">Introducing Tables</a>&nbsp;(introducing core concepts of working with custom data and tables)</li><li>Exploring a Larger Corpus</li></ul></div>
+</section>
+</article>
+<footer class='spyral-footer'>&copy; Stéfan Sinclair & Geoffrey Rockwell (Creative Commons Attribution (CC BY)). Created June 26, 2019.Modified July 4, 2019.</footer></body>
+</html>

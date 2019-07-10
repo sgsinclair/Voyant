@@ -164,6 +164,7 @@ app/notebook/editor/button/Counter.js
 app/notebook/editor/button/MoveDown.js
 app/notebook/editor/button/MoveUp.js
 app/notebook/editor/button/Remove.js
+app/notebook/editor/button/Metadata.js
 app/notebook/editor/button/Movement.js
 app/notebook/editor/button/Run.js
 app/notebook/editor/button/RunAll.js

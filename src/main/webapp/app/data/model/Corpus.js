@@ -1,4 +1,4 @@
-/**
+/*
  * @class Corpus
  * Corpus is possibly the most important class since in most cases you'll first create/load a corpus and then
  * interact with data derived from the corpus. In the simplest scenario you can create/load a corpus with a

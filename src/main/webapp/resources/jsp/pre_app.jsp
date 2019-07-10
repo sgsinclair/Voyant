@@ -1,7 +1,17 @@
 <%  // not sure it matters, but just in case, don't have any whitespace before doctype declaration (and possible redirects)
 	if (org.voyanttools.voyant.Voyant.preProcess(request, response)) {return;}
 %><%@ page contentType="text/html;charset=UTF-8" %><% 
-	String base = request.getContextPath();
+	StringBuilder url = new StringBuilder();
+/*
+	url.append(request.getScheme()).append("://").append(request.getServerName());
+	int serverPort = request.getServerPort();
+	if (serverPort != 80 && serverPort != 443) {
+		url.append(":").append(serverPort);
+	}
+*/
+	url.append(request.getContextPath());
+	
+	String base = url.toString();
 
 	//default to en
 	String lang = "en";

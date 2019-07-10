@@ -5,6 +5,10 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	cls: 'notebook-code-wrapper',
 	statics: {
 		i18n: {
+			runUntil: "Run up to here",
+			runUntilTip: "Run previous code blocks and this one.",
+			runFrom: "Run from here onwards",
+			runFromTip: "Run this and following code blocks."
 		}
 	},
 	config: {
@@ -52,8 +56,26 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 						xtype: 'notebookwrapperrununtil',
 						listeners: {
 							click: {
-								fn: function() {
-									this.up('notebook').runAllCode(this)
+								fn: function(btn, ev) {
+									Ext.create('Ext.menu.Menu', {
+										items: [{
+						    				text: this.localize("runUntil"),
+						    				tooltip: this.localize("runUntilTip"),
+						    				glyph: 'xf049@FontAwesome',
+						    				handler: function() {
+						    					this.up('notebook').runUntil(this);
+						    				},
+						    				scope: this
+										},{
+						    				text: this.localize("runFrom"),
+						    				tooltip: this.localize("runFromTip"),
+						    				glyph: 'xf050@FontAwesome',
+						    				handler: function() {
+						    					this.up('notebook').runFrom(this);
+						    				},
+						    				scope: this
+										}]
+									}).showAt(ev.pageX, ev.pageY)
 								},
 								scope: this
 							}
@@ -65,6 +87,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 						listeners: {
 							click: function() {
 								var me = this;
+								var mode = this.editor.getMode().split("/").pop()
 								new Ext.Window({
 								    title: 'Resize Me',
 								    layout: 'fit',
@@ -84,7 +107,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 							                    boxLabel : this.localize('modeJavascript'),
 							                    name  : 'codeMode',
 							                    inputValue: 'javascript',
-							                    flex  : 1													
+							                    flex  : 1,
+							                    checked: mode=="javascript"
 											}
 										},{
 											xtype: 'fieldset',
@@ -94,8 +118,9 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								                    xtype : 'radiofield',
 								                    boxLabel : this.localize('modeJson'),
 								                    name  : 'codeMode',
-								                    inputValue: 'javascript',
-								                    flex  : 1													
+								                    inputValue: 'json',
+								                    flex  : 1,
+								                    checked: mode=="json"												
 												}
 											},{
 												items: {
@@ -103,7 +128,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								                    boxLabel : this.localize('modeText'),
 								                    name  : 'codeMode',
 								                    inputValue: 'text',
-								                    flex  : 1													
+								                    flex  : 1,
+								                    checked: mode=="text"											
 												}
 											},/*{
 												items: {
@@ -127,7 +153,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								                    boxLabel : this.localize('modeHtml'),
 								                    name  : 'codeMode',
 								                    inputValue: 'html',
-								                    flex  : 1													
+								                    flex  : 1,
+								                    checked: mode=="html"											
 												}
 											},{
 												items: {
@@ -135,7 +162,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								                    boxLabel : this.localize('modeXml'),
 								                    name  : 'codeMode',
 								                    inputValue: 'xml',
-								                    flex  : 1													
+								                    flex  : 1	,
+								                    checked: mode=="xml"												
 												}
 											}]
 										}]
@@ -164,7 +192,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			    dock: 'right',
 			    items: [{
 			    		xtype: 'notebookwrappercounter',
-			    		order: config.order
+			    		order: config.order,
+			    		name: config.name
 			    	},{
 		        		xtype: 'notebookwrapperremove'
 		        	},{
@@ -209,7 +238,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	run: function(runningAll) {
 		if (this.editor.getMode()=='ace/mode/javascript') { // only run JS
 			if (runningAll===true) {
-				this._run();
+				return this._run();
 			} else {
 				var notebook = this.up('notebook');
 				Ext.Array.each(notebook.query('notebookcodeeditorwrapper'), function(wrapper) {
@@ -219,7 +248,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 							if (btnId=='yes') {
 								notebook.runAllCode();
 							} else {
-								this._run();
+								return this._run();
 							}
 						}, this)
 					}
@@ -229,28 +258,51 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	
 	_run: function() {
-		this.results.show();
-		this.results.update(' ');
-		this.results.mask('working…');
+		
+		this.results.show(); // make sure it's visible 
+		this.results.update(' '); // clear out the results
+		this.results.mask('working…'); // mask results
 		var code = this.editor.getValue();
-		var success = false;
+		Voyant.notebook.util.Show.TARGET = this.results.getEl(); // this is for output
+		Voyant.notebook.Notebook.currentBlock = this; // this is to tie back in to the block
+		Voyant.notebook.Notebook.currentNotebook.setCurrentBlock(this);
+		var result;
 		try {
-			Voyant.notebook.util.Show.TARGET = this.results.getEl(); // this is for output
-			Voyant.notebook.Notebook.currentBlock = this; // this is to tie back in to the block
 			
 			// I'd like to be able to run this in another scope/context, but it
 			// doesn't seem possible for the type of code that's being run
-			eval.call(window, code);
-			
-			Ext.defer(this.tryToUnmask, 20, this);
+			var result = eval.call(window, code);
 		}
 		catch (e) {
 			this.results.unmask();
-			Voyant.application.releaseAllDeferred();
 			Voyant.notebook.util.Show.showError(e);
+			this.getTargetEl().fireEvent('resize');
+			return e;
+		}
+		
+		this.setIsRun(true);
+		if (result!==undefined) {
+			if (result.then && result.catch && result.finally) {
+				var me = this;
+				result.then(function(result) {
+					if (result!==undefined) {
+						Spyral.Notebook.show(result);
+//						Voyant.notebook.util.Show.show(result)
+					}
+				}).catch(function(err) {
+					Voyant.notebook.util.Show.showError(err);
+				}).finally(function() {
+					me.results.unmask();
+					Ext.defer(function() {this.getTargetEl().fireEvent('resize')}, 50, me);
+				})
+			} else {
+				this.results.unmask();
+				Spyral.Notebook.show(result);
+//				Voyant.notebook.util.Show.show(result)
+			}
 		}
 		this.setIsRun(true);
-		return success;
+		return result;
 	},
 	
 	clearResults: function() {
@@ -273,6 +325,9 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	
 	tryToUnmask: function() {
+		if (Spyral && Spyral.promises) {
+			Ext.defer(this.tryToUnmask, 20, this);
+		}
 		if (Voyant.application.getDeferredCount()==0) {
 			for (var key in window) {
 				if (typeof window[key] == 'object' && window[key] && key!="opener" && window[key].isFulfilled &&  window[key].isFulfilled()) {

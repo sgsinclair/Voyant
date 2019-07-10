@@ -1,0 +1,256 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset='UTF-8'>
+<title>Introducing Custom Tables in Spyral Notebook</title>
+<meta name="title" content="<h1>Introducing Custom Tables in Spyral Notebook</h1>"><meta name="author" content="Stéfan Sinclair & Geoffrey Rockwell"><meta name="keywords" content="alta"><meta name="modified" content="2019-07-01T19:01:19.551Z"><meta name="created" content="2019-07-01T18:44:23.956Z"><meta name="language" content="English"><meta name="license" content="Creative Commons Attribution (CC BY)"><meta name="version" content="0.1"><style id="ace-chrome">.ace-chrome .ace_gutter {background: #ebebeb;color: #333;overflow : hidden;}.ace-chrome .ace_print-margin {width: 1px;background: #e8e8e8;}.ace-chrome {background-color: #FFFFFF;color: black;}.ace-chrome .ace_cursor {color: black;}.ace-chrome .ace_invisible {color: rgb(191, 191, 191);}.ace-chrome .ace_constant.ace_buildin {color: rgb(88, 72, 246);}.ace-chrome .ace_constant.ace_language {color: rgb(88, 92, 246);}.ace-chrome .ace_constant.ace_library {color: rgb(6, 150, 14);}.ace-chrome .ace_invalid {background-color: rgb(153, 0, 0);color: white;}.ace-chrome .ace_fold {}.ace-chrome .ace_support.ace_function {color: rgb(60, 76, 114);}.ace-chrome .ace_support.ace_constant {color: rgb(6, 150, 14);}.ace-chrome .ace_support.ace_type,.ace-chrome .ace_support.ace_class.ace-chrome .ace_support.ace_other {color: rgb(109, 121, 222);}.ace-chrome .ace_variable.ace_parameter {font-style:italic;color:#FD971F;}.ace-chrome .ace_keyword.ace_operator {color: rgb(104, 118, 135);}.ace-chrome .ace_comment {color: #236e24;}.ace-chrome .ace_comment.ace_doc {color: #236e24;}.ace-chrome .ace_comment.ace_doc.ace_tag {color: #236e24;}.ace-chrome .ace_constant.ace_numeric {color: rgb(0, 0, 205);}.ace-chrome .ace_variable {color: rgb(49, 132, 149);}.ace-chrome .ace_xml-pe {color: rgb(104, 104, 91);}.ace-chrome .ace_entity.ace_name.ace_function {color: #0000A2;}.ace-chrome .ace_heading {color: rgb(12, 7, 255);}.ace-chrome .ace_list {color:rgb(185, 6, 144);}.ace-chrome .ace_marker-layer .ace_selection {background: rgb(181, 213, 255);}.ace-chrome .ace_marker-layer .ace_step {background: rgb(252, 255, 0);}.ace-chrome .ace_marker-layer .ace_stack {background: rgb(164, 229, 101);}.ace-chrome .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid rgb(192, 192, 192);}.ace-chrome .ace_marker-layer .ace_active-line {background: rgba(0, 0, 0, 0.07);}.ace-chrome .ace_gutter-active-line {background-color : #dcdcdc;}.ace-chrome .ace_marker-layer .ace_selected-word {background: rgb(250, 250, 255);border: 1px solid rgb(200, 200, 250);}.ace-chrome .ace_storage,.ace-chrome .ace_keyword,.ace-chrome .ace_meta.ace_tag {color: rgb(147, 15, 128);}.ace-chrome .ace_string.ace_regex {color: rgb(255, 0, 0)}.ace-chrome .ace_string {color: #1A1AA6;}.ace-chrome .ace_entity.ace_other.ace_attribute-name {color: #994409;}.ace-chrome .ace_indent-guide {background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;}
+/*# sourceURL=ace/css/ace-chrome */</style>
+<style id="voyant-notebooks-styles">
+	body.exported-notebook {
+		font-family: helvetica, arial, verdana, sans-serif;
+		font-size: 13px;
+		font-weight: 300;
+		line-height: 17px;
+		-webkit-font-smoothing: antialiased
+	}
+	body.exported-notebook .notebook-code-editor {
+		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+		font-size: 12px;
+		font-weight: normal;
+		line-height: normal;
+		white-space: pre;
+	}
+	.notebook-text-editor, .notebook-code-editor, .notebook-code-results {
+		padding: 6px;
+		margin: 6px;
+	}
+	.notebook-text-wrapper .x-panel-body {
+	   border: thin solid rgba(0,0,0,0) !important;
+	}
+	.notebook-code-wrapper .x-panel-body {
+	   border: thin solid rgba(0,0,0,0) !important;
+	}
+	.x-panel .notebook-editor-wrapper-hover.x-panel-body, .editable {
+		border: thin dashed rgba(0,0,0,.2) !important;
+	}
+	.notebook-code-editor, .notebook-code-results {
+		margin-left: 2em;
+	}
+	.notebook-code-editor {
+		border-left: thin solid rgb(240, 240, 240);
+	}
+	.notebook-code-results {
+		background-color: rgb(252, 252, 252);
+		border: thin solid rgb(240, 240, 240);
+	}
+	.notebook-code-results .error {
+		color: red;
+	}
+	.notebook-code-results pre {
+		font-size: smaller;
+	}	
+	.notebook-code-results .info {
+		overflow: scroll
+	}
+	.notebook-code-editor-raw { /* used for raw code in saved view */
+		display: none;
+	}
+	.cke_button__sourcedialog_label {
+	    display: none !important;
+	}
+	.exported-notebook .notebookwrappercounter {
+		float: right;
+	}
+	.exported-notebook .notebookwrappercounter a {
+		text-decoration: none;
+	}
+	
+	.notebookwrappercounter a {
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		border-radius: 3px;
+		background-color: #f5f5f5;
+	    text-align: right;
+	    border: thin solid #d8d8d8;
+	    padding: 1px;
+	    margin: 1px;
+	    font-size: smaller;
+	}
+	
+	.spyral-header, .spyral-footer {
+		text-align: center;
+	}
+	
+	.spyral-footer {
+		margin-top: 1em;
+		background-color: rgba(0,0,0,.01);
+		border-top: rgba(0,0,0,.05);
+	}
+</style>
+<script> // this script checks to see if embedded tools seem to be available
+window.addEventListener('load', function() {
+var hostnames = {}, warned = false;
+document.querySelectorAll('iframe').forEach(function(iframeEl) {
+let url = new URL(iframeEl.src);
+if (!(url.hostname in hostnames) && !warned) {
+hostnames[url.hostname] = true; // mark as fetched
+fetch(url).catch(response => {
+warned = true;
+alert('This notebook seems to contain one ore more tools that may not be able to load. Possible reasons include a server no longer being accessible (especially if the notebook was generated from a local server), or because of security restrictions.'+url)
+})
+}
+})
+})
+</script>
+</head>
+<body class='exported-notebook'><header class='spyral-header'><h1>Introducing Custom Tables in Spyral Notebook</h1></header>
+<article class='spyralArticle'><section id='6kdjciayuay8liir' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="6kdjciayuay8liir" href="#6kdjciayuay8liir" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">1</a></div><div class='notebook-text-editor'><p>This notebook will help you work with custom Spyral Tables in your&nbsp;notebooks (it's part of the <a data-tabindex-counter="55" data-tabindex-value="none" data-cke-saved-href="alta" href="alta" tabindex="-1" target="_blank">Art of Literary Text Analysis with Spyral&nbsp;Notebooks</a>). In particular, we'll look at:</p><ul><li><a data-tabindex-counter="29" data-tabindex-value="none" data-cke-saved-href="#create" href="#create" tabindex="-1">creating a table</a></li><li><a data-tabindex-counter="21" data-tabindex-value="none" data-cke-saved-href="#display" href="#display" tabindex="-1">displaying data&nbsp;from a table</a></li><li><a data-tabindex-counter="55" data-tabindex-value="none" data-cke-saved-href="#next" href="#next" tabindex="-1">next steps</a></li></ul><p>In the previous notebook we looked at analyzing Edgar Allan Poe's "The Gold Bug" though we didn't spend much time on one of its key topics: cryptography. Indeed, for a literrary short story, there's a fairly good introduction to simple encryption, including this part:</p><blockquote><p>These characters, as any one might readily guess, form a cipher --that is to say, they convey a meaning …&nbsp;Now, in English, the letter which most frequently occurs is 'e'. Afterwards, the succession runs thus:&nbsp;<i>a o i d h n r s t u y c f g l m w b k p q x z</i>. E however predominates so remarkably that an individual sentence of any length is rarely seen, in which it is not the prevailing character.</p></blockquote><p>Beyond an analysis of the story, wouldn't it be interesting to test this affirmation, and in particular to see if the sequence of top frequency letters described in the short story matches the sequence of top frequency letters in text of the short story itself? We can do that! Spryal can help!</p><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22create%22%20data-cke-saved-name%3D%22create%22%20name%3D%22create%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Anchor" title="Anchor" align="" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Creating a Table</h2><p>Let's take a moment to describe the steps we'll follow:</p><ul><li>create a corpus with text from "The Gold Bug"</li><li>extract the actual text from the corpus</li><li>clean the text (so that we are left with letters from a to z)</li><li>create a table of letters and their frequencies</li><li>display output from the table</li></ul><h3>Create a Corpus with Text from "The Gold Bug"</h3><p>Just as we did in the <a data-tabindex-counter="32" data-tabindex-value="none" data-cke-saved-href="../alta-smaller/" href="../alta-smaller/" tabindex="-1" target="_blank">previous notebook</a>, we'll start by <a data-tabindex-counter="32" data-tabindex-value="none" data-cke-saved-href="../alta-create/#text" href="../alta-create/#text" tabindex="-1" target="_blank">creating our corpus</a> (in case it doesn't yet exist).</p></div>
+</section>
+<section id='89yohs2vxwwkuqi9' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="89yohs2vxwwkuqi9" href="#89yohs2vxwwkuqi9" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">2</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">inputRemoveUntil</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'THE GOLD-BUG'</span><span class="ace_punctuation ace_operator">,</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">inputRemoveFrom</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'FOUR BEASTS IN ONE'</span></div><div class="ace_line" style="height:16px"><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">assign</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"goldbug"</span><span class="ace_paren ace_rparen">)</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+loadCorpus("https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt", {
+    inputRemoveUntil: 'THE GOLD-BUG',
+    inputRemoveFrom: 'FOUR BEASTS IN ONE'
+}).assign("goldbug")</pre>
+<div class='notebook-code-results'>
+<div style='height: 45px'><div style="height: 31px"> <div class="info">This corpus has 1 document with 13,731 <span class="info-tip" data-qtip="every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted">total words</span> and 2,756 <span class="info-tip" data-qtip="multiple occurrences of words (like &quot;the&quot;) are counted once">unique word forms</span>. Created <span class="info-tip" data-qtip="2017-06-21, 13:20:57">about 7 minutes ago</span>.</div></div></div>
+</div>
+</section>
+<section id='4867egtl9hxwczh5' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="4867egtl9hxwczh5" href="#4867egtl9hxwczh5" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">3</a></div><div class='notebook-text-editor'><h3>Extract the Actual Text from the Corpus</h3><p>You may recall from the&nbsp;<a data-tabindex-counter="32" data-tabindex-value="none" data-cke-saved-href="http://alts-smaller" href="http://alts-smaller" tabindex="-1" target="_blank">previous notebook</a> a discussion of <a data-tabindex-counter="32" data-tabindex-value="none" data-cke-saved-href="http://en.wikipedia.org/wiki/Ajax_(programming)" href="http://en.wikipedia.org/wiki/Ajax_(programming)" tabindex="-1">asynchronous</a> Javascript which led us to use the assign function (instead of the more complicated <code>promise … then</code> pattern). We can use a similar trick to get our plain text (note that we can assign and show a subset of the string, but any other processing after assign would need to occur in a separate block). We use <a data-cke-saved-href="../../docs/#!/api/Corpus-method-getPlainText" href="../../docs/#!/api/Corpus-method-getPlainText" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="21">getPlainText</a> here because the text isn't too long, we might not want to do this with a larger corpus of several books.</p></div>
+</section>
+<section id='bemi8d3a3mtbtobi' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="bemi8d3a3mtbtobi" href="#bemi8d3a3mtbtobi" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">4</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">getPlainText</span><span class="ace_paren ace_lparen">(</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">assign</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"text"</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">show</span><span class="ace_paren ace_lparen">(</span><span class="ace_constant ace_numeric">100</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// show first 100 characters</span></div><div class="ace_line" style="height:16px"></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.getPlainText().assign("text").show(100); // show first 100 characters
+</pre>
+<div class='notebook-code-results'>
+<div style='height: 28px'><div style="height: 14px"> <div class="info"></div></div></div>
+</div>
+</section>
+<section id='jh1da1yjy6z814v6' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="jh1da1yjy6z814v6" href="#jh1da1yjy6z814v6" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">5</a></div><div class='notebook-text-editor'><h3>Clean the Text</h3>
+
+<p>We have the full text of "The Gold Bug", but we're only interested in counting letters from a to z. In order to prepare the letters to be counted, we'll do two operations:</p>
+
+<ol>
+	<li>convert the entire text to lowecase characters</li>
+	<li>remove all the characters that aren't from a to z using a regular expression</li>
+</ol>
+
+<p>The first operation of converting to lowercase is trivial, we use the <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase" target="_blank" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="22">toLowerCase</a> function. The second operation is a bit trickier. This isn't the venue to explain <a data-tabindex-counter="29" data-tabindex-value="none" href="https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions" tabindex="-1">regular expressions</a> in detail, but essentially they provide a powerful mechanism for string matching that can use wildcards, character classes and character ranges. In our case we can simply&nbsp;strip out all the caracters that are not in the range from a to z: [^a-z].</p>
+
+<ul>
+	<li>[] denotes a set of characters</li>
+	<li>^ specifies to match what is NOT the character that follows</li>
+	<li>a-z is treated as a single range (every character from a to z)</li>
+</ul>
+</div>
+</section>
+<section id='2k974wrnbfi1fv1o' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="2k974wrnbfi1fv1o" href="#2k974wrnbfi1fv1o" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">6</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_comment">// convert to lower case and replace non a-z characters with nothing</span></div><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">clean</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_identifier">text</span><span class="ace_punctuation ace_operator">.</span><span class="ace_support ace_function">toLowerCase</span><span class="ace_paren ace_lparen">(</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">.</span><span class="ace_support ace_function">replace</span><span class="ace_paren ace_lparen">(</span><span class="ace_string ace_regexp">/</span><span class="ace_constant ace_language ace_escape">[^</span><span class="ace_string ace_regexp ace_charachterclass">a</span><span class="ace_constant ace_language ace_escape">-</span><span class="ace_string ace_regexp ace_charachterclass">z</span><span class="ace_constant ace_language ace_escape">]</span><span class="ace_string ace_regexp">/g</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_string">""</span><span class="ace_paren ace_rparen">)</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">show</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">clean</span><span class="ace_punctuation ace_operator">.</span><span class="ace_support ace_function">substring</span><span class="ace_paren ace_lparen">(</span><span class="ace_constant ace_numeric">0</span><span class="ace_punctuation ace_operator">,</span><span class="ace_constant ace_numeric">50</span><span class="ace_paren ace_rparen">))</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+// convert to lower case and replace non a-z characters with nothing
+var clean = text.toLowerCase().replace(/[^a-z]/g, "")
+show(clean.substring(0,50))</pre>
+<div class='notebook-code-results'>
+<div style='height: 45px'><div style="height: 31px"> <div class="info">thegoldbugwhathowhathothisfellowisdancingmadhehath</div></div></div>
+</div>
+</section>
+<section id='lw0emlqqx6pgka3e' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="lw0emlqqx6pgka3e" href="#lw0emlqqx6pgka3e" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">7</a></div><div class='notebook-text-editor'><h3>Create a Table of Letter Frequencies</h3>
+
+<p>Creating a&nbsp;<a data-tabindex-counter="25" data-tabindex-value="none" href="../../docs/#!/api/Table" tabindex="-1">Table</a>&nbsp;in Spyral is easy, it can be something as simple as this:</p>
+
+<blockquote>
+<pre><code>var table = new VoyantTable();</code></pre>
+</blockquote>
+
+<p>As we'll see, tables provide convenient methods for updating values and for displaying output. Another benefit of Tables is a convenient way to count the items in an array. In order to convert our string of letters into an array of letters, we'll use the <a data-tabindex-counter="29" data-tabindex-value="none" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split" tabindex="-1" target="_blank">split</a> function.</p>
+</div>
+</section>
+<section id='n1f4co953g49ag5v' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="n1f4co953g49ag5v" href="#n1f4co953g49ag5v" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">8</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">letters</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_identifier">clean</span><span class="ace_punctuation ace_operator">.</span><span class="ace_support ace_function">split</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">""</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// make an array, one letter per item</span></div><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">table</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_keyword">new</span> <span class="ace_identifier">VoyantTable</span><span class="ace_paren ace_lparen">({</span><span class="ace_identifier">count</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_identifier">letters</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">orientation</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'horizontal'</span><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// create a table with letter counts</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">table</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">show</span><span class="ace_paren ace_lparen">(</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+var letters = clean.split(""); // make an array, one letter per item
+var table = new VoyantTable({count: letters, orientation: 'horizontal'}); // create a table with letter counts
+table.show();</pre>
+<div class='notebook-code-results'>
+<div style='height: 76px'><div style="height: 62px"> <div class="info"><table class="voyant-table" style="" id="ext-286"><thead><tr><th>e</th><th>t</th><th>a</th><th>o</th><th>i</th><th>n</th><th>s</th><th>h</th><th>r</th><th>d</th><th>l</th><th>u</th><th>c</th><th>m</th><th>f</th><th>w</th><th>p</th><th>y</th><th>g</th><th>b</th><th>v</th><th>k</th><th>x</th><th>j</th><th>q</th><th>z</th></tr></thead><tbody><tr><td>7625</td><td>5485</td><td>4478</td><td>4208</td><td>4183</td><td>3912</td><td>3516</td><td>3372</td><td>3278</td><td>2533</td><td>2324</td><td>1893</td><td>1523</td><td>1500</td><td>1392</td><td>1303</td><td>1170</td><td>1146</td><td>1143</td><td>1031</td><td>525</td><td>351</td><td>120</td><td>111</td><td>60</td><td>44</td></tr></tbody></table></div></div></div>
+</div>
+</section>
+<section id='7vbdn2s9xderoqji' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="7vbdn2s9xderoqji" href="#7vbdn2s9xderoqji" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">9</a></div><div class='notebook-text-editor'><p>So we have a simple output of our table of letters. We definitely see that "e" is first (counting the letters sorts them automatically by frequency), though the "t" is a bit of a surprise compared to the original. Let's try to output the two sets of letters together:</p>
+</div>
+</section>
+<section id='6i7cqfq4h6ww889d' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="6i7cqfq4h6ww889d" href="#6i7cqfq4h6ww889d" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">10</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">lettersDescribed</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_string">"e a o i d h n r s t u y c f g l m w b k p q x z"</span><span class="ace_punctuation ace_operator">;</span></div><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">lettersCounted</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_identifier">table</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">getHeaders</span><span class="ace_paren ace_lparen">(</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">.</span><span class="ace_support ace_function">join</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">' '</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// combine lettes with a space</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">show</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"&lt;pre&gt;"</span><span class="ace_keyword ace_operator">+</span><span class="ace_identifier">lettersDescribed</span><span class="ace_keyword ace_operator">+</span><span class="ace_string">"</span><span class="ace_constant ace_language ace_escape">\n</span><span class="ace_string">"</span><span class="ace_keyword ace_operator">+</span><span class="ace_identifier">lettersCounted</span><span class="ace_keyword ace_operator">+</span><span class="ace_string">"&lt;/pre&gt;"</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div><div class="ace_line" style="height:16px"></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+var lettersDescribed = "e a o i d h n r s t u y c f g l m w b k p q x z";
+var lettersCounted = table.getHeaders().join(' '); // combine lettes with a space
+show("<pre>"+lettersDescribed+"\n"+lettersCounted+"</pre>");
+</pre>
+<div class='notebook-code-results'>
+<div style='height: 84px'><div style="height: 70px"> <div class="info"><pre>e a o i d h n r s t u y c f g l m w b k p q x z
+e t a o i n s h r d l u c m f w p y g b v k x j q z</pre></div></div></div>
+</div>
+</section>
+<section id='hlltzql4eat4dyy0' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="hlltzql4eat4dyy0" href="#hlltzql4eat4dyy0" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">11</a></div><div class='notebook-text-editor'><p>Very interesting! For one thing, this shows that the list of letters described in the text are missing two members, which we can determine to be "v" and "j". Is this an omission from the author? From the edition? A quick look at some other editions online suggest that the omission is common, perhaps to all editions. The order of many other letters are different, the top letters are the most significant (such as the prominence of "t" in the text of "Gold Bug" that interrupts the sequence of vowels). We'd probably want to compare these frequencies to other texts as well to see if "The Gold Bug" is somehow distinctive (and how commonly the sequence claimed in the text is right or wrong).</p><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22display%22%20data-cke-saved-name%3D%22display%22%20name%3D%22display%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Ancre" title="Ancre" align="" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Displaying Data from a Table</h2><p>Although the default table.show() method that we used provides a nice display of the letter frequencies, it's also possible to display data from a table in other ways. In Sprial <code>show()</code> is usually used for the simplest (and static)&nbsp;output possible while <code>embed()</code> is used for embedding interactive views. We can generate a default grid from a table by simply calling <a data-tabindex-counter="21" data-tabindex-value="none" data-cke-saved-href="../docs/#!/api/VoyantTable-method-embed" href="../docs/#!/api/VoyantTable-method-embed" tabindex="-1" target="_blank">embed</a>&nbsp;(with a parameter to indicate that the grid should occupy 100% of the width available).</p></div>
+</section>
+<section id='ixif3whg6iybsr1n' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="ixif3whg6iybsr1n" href="#ixif3whg6iybsr1n" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">12</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">table</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">embed</span><span class="ace_paren ace_lparen">({</span><span class="ace_identifier">width</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"100%"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">height</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"100px"</span><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+table.embed({width: "100%", height: "100px"});</pre>
+<div class='notebook-code-results'>
+<div style='height: 132px'><div style="height: 118px"> <div class="info"><iframe style="width: 100%; height: 100px" id="ext-287" name="ext-287" src="https://voyant-tools.org/tool/VoyantTableTransform/?minimal=true&amp;embeddedApiId=9602b374b7bcbec31b3ac65f724a210c" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='ozfzyodqudu4cjcg' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="ozfzyodqudu4cjcg" href="#ozfzyodqudu4cjcg" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">13</a></div><div class='notebook-text-editor'><p>Although we can show and hide columns (see <a data-tabindex-counter="20" data-tabindex-value="none" data-cke-saved-href="../docs/#!/guide/grids" href="../docs/#!/guide/grids" tabindex="-1" target="_blank">documentation on grids</a>), in this case the grid isn't all that useful, and arguably harder to read than output from show(). But when tables have several rows of data and one wishes to do things like sort columns, embedding a table can be useful.</p><p>In this case what might be more useful is embedding a chart. However, before we do that, we're going to recreate our table with the default vertical orientation instead of the horizontal orientation we had previously (which was a very compact way of seeing letters as column headers and counts in the first row, but which arguably isn't a very standard way of showing tabular data).</p></div>
+</section>
+<section id='xbtsixbwwyysspg3' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="xbtsixbwwyysspg3" href="#xbtsixbwwyysspg3" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">14</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">verticalTable</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_keyword">new</span> <span class="ace_identifier">VoyantTable</span><span class="ace_paren ace_lparen">({</span><span class="ace_identifier">count</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_identifier">letters</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">headers</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_paren ace_lparen">[</span><span class="ace_string">"Letter"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_string">"Count"</span><span class="ace_paren ace_rparen">]})</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// create a table with letter counts</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">verticalTable</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">show</span><span class="ace_paren ace_lparen">(</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+var verticalTable = new VoyantTable({count: letters, headers: ["Letter", "Count"]}); // create a table with letter counts
+verticalTable.show();</pre>
+<div class='notebook-code-results'>
+<div style='height: 626px'><div style="height: 612px"> <div class="info"><table class="voyant-table" style="" id="ext-288"><thead><tr><th>Letter</th><th>Count</th></tr></thead><tbody><tr><td>e</td><td>7625</td></tr><tr><td>t</td><td>5485</td></tr><tr><td>a</td><td>4478</td></tr><tr><td>o</td><td>4208</td></tr><tr><td>i</td><td>4183</td></tr><tr><td>n</td><td>3912</td></tr><tr><td>s</td><td>3516</td></tr><tr><td>h</td><td>3372</td></tr><tr><td>r</td><td>3278</td></tr><tr><td>d</td><td>2533</td></tr><tr><td>l</td><td>2324</td></tr><tr><td>u</td><td>1893</td></tr><tr><td>c</td><td>1523</td></tr><tr><td>m</td><td>1500</td></tr><tr><td>f</td><td>1392</td></tr><tr><td>w</td><td>1303</td></tr><tr><td>p</td><td>1170</td></tr><tr><td>y</td><td>1146</td></tr><tr><td>g</td><td>1143</td></tr><tr><td>b</td><td>1031</td></tr><tr><td>v</td><td>525</td></tr><tr><td>k</td><td>351</td></tr><tr><td>x</td><td>120</td></tr><tr><td>j</td><td>111</td></tr><tr><td>q</td><td>60</td></tr><tr><td>z</td><td>44</td></tr></tbody></table></div></div></div>
+</div>
+</section>
+<section id='50ocbte1jhnhoerl' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="50ocbte1jhnhoerl" href="#50ocbte1jhnhoerl" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">15</a></div><div class='notebook-text-editor'><p>No surprises, but now that we have a more standard table, we can easily create a line chart that shows the letter counts on the y (vertical) axis and the letters on the x (horizontal) axis.</p>
+</div>
+</section>
+<section id='b8o6p7zj5m92tbv7' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="b8o6p7zj5m92tbv7" href="#b8o6p7zj5m92tbv7" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">16</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">verticalTable</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">embed</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'VoyantChart'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">width</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_constant ace_numeric">500</span><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+verticalTable.embed('VoyantChart', {width: 500});</pre>
+<div class='notebook-code-results'>
+<div style='height: 432px'><div style="height: 418px"> <div class="info"><iframe style="width: 500px; height: 400px" id="ext-289" name="ext-289" src="https://voyant-tools.org/tool/VoyantChart/?minimal=true&amp;embeddedApiId=3d688caba6e3027c27ed5faa9e695022" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='7ug6qmfzpn9zwsx6' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="7ug6qmfzpn9zwsx6" href="#7ug6qmfzpn9zwsx6" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">17</a></div><div class='notebook-text-editor'><p>The resulting graph is something close to what's called <a data-tabindex-counter="12" data-tabindex-value="none" data-cke-saved-href="https://en.wikipedia.org/wiki/Zipf%27s_law" href="https://en.wikipedia.org/wiki/Zipf%27s_law" tabindex="-1" target="_blank">Zipf's Law</a> which states that (for many lingustic phenomena like letter and word counts), frequency is inversely proportional to rank (or, roughly speaking, each letter is about half as frequent as its predecessor). While not quite a clean curve, the letter counts in Gold Bug somewhat follows Zipf's Law.</p><p>So we've looked at how easy and convenient it can be to create a table, in this case of letter frequencies&nbsp;in "The Gold Bug" and how tables can be display, including as grids and as charts.</p><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22next%22%20data-cke-saved-name%3D%22next%22%20name%3D%22next%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Ancre" title="Ancre" align="" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Next Steps</h2><p>Here are some exercises to try, based on the contents of this notebook:</p><ul><li>the prominence of the letter "t" in "The Gold Bug" is certainly unusual, any theories why? Could you describe in English (not in code) the steps that might be needed to better understand the use and distribution of the letter "t"?</li><li>create a new corpus from a different <a data-tabindex-counter="11" data-tabindex-value="none" data-cke-saved-href="https://www.gutenberg.org/wiki/Short_Stories_(Bookshelf)" href="https://www.gutenberg.org/wiki/Short_Stories_(Bookshelf)" tabindex="-1" target="_blank">short story</a>&nbsp;and start exploring it in the same way we did here, is the order of letters different?</li></ul><p>If you're working sequentially&nbsp;through the <a data-tabindex-counter="21" data-tabindex-value="none" data-cke-saved-href="alta" href="alta" tabindex="-1" target="_blank">Art of Literary Text Analysis with Spyral&nbsp;Notebooks</a>, the next notebook&nbsp;is <a data-tabindex-counter="9" data-tabindex-value="none" data-cke-saved-href="alta-scale" href="alta-scale" tabindex="-1" target="_blank">Thinking about Scale</a>.</p></div>
+</section>
+</article>
+<footer class='spyral-footer'>&copy; Stéfan Sinclair & Geoffrey Rockwell (Creative Commons Attribution (CC BY)). Created July 1, 2019.</footer></body>
+</html>

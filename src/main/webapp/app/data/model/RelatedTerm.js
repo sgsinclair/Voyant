@@ -1,4 +1,4 @@
-/**
+/*
  * Related Term
  */
 Ext.define('Voyant.data.model.RelatedTerm', {

@@ -1,4 +1,4 @@
-/**
+/*
  * @class NetworkGraph
  * 
  * A NetworkGraph can facilitate working with network graph data structures, as well as

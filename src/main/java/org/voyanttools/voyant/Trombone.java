@@ -334,14 +334,12 @@ public class Trombone extends HttpServlet {
 		}
 		
 		// intercept to see if we have a notebook in resources
-		if (parameters.getParameterValue("tool", "").equals("notebook.NotebookManager") && parameters.containsKey("notebook")) {
-			File file = new File(getServletContext().getRealPath("/resources/spyral"), parameters.getParameterValue("notebook").replaceFirst("/$", "") +".json");
-			if (!file.exists()) {
-				file = new File(getServletContext().getRealPath("/resources/spyral"), parameters.getParameterValue("notebook") +"/index.json");
-			}
+		if (parameters.getParameterValue("tool", "").equals("notebook.NotebookManager") && parameters.getParameterValue("action", "").equals("load") && parameters.getParameterValue("id","").trim().isEmpty()==false) {
+			File file = new File(getServletContext().getRealPath("/resources/spyral/notebooks"), parameters.getParameterValue("id")+".html");
 			if (file.exists()) {
 				String string = FileUtils.readFileToString(file);
-				parameters.setParameter("jsonData", string);
+				parameters.setParameter("data", string);
+				parameters.removeParameter("id"); // we can't overwrite this, so make sure to remove it
 			}
 		}
 		final Controller controller = new Controller(storage, parameters, writer);

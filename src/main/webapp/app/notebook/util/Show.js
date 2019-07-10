@@ -33,10 +33,17 @@ Ext.define("Voyant.notebook.util.Show", {
 					if (Ext.isNumber(contents)) {len = contents;}
 					contents = this;
 				}
-				contents = contents.getString ? contents.getString() : contents.toString();
-				if (len && Ext.isNumber(len)) {contents = contents.substring(0,len)}
-				if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
-				Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
+				if (contents.toHtml) {contents=contents.toHtml()}
+				else if (contents.getString) {contents=contents.getString()}
+				else if (contents.toString) {contents=contents.toString()}
+//				contents = contents.getString ? contents.getString() : contents.toString();
+				if (contents.then) {
+					contents.then(function(text) {show(text, len)})
+				} else {
+					if (len && Ext.isNumber(len)) {contents = contents.substring(0,len)}
+					if (Voyant.notebook.util.Show.SINGLE_LINE_MODE==false) {contents="<div class='"+Voyant.notebook.util.Show.MODE+"'>"+contents+"</div>";}
+					Voyant.notebook.util.Show.TARGET.insertHtml('beforeEnd',contents);
+				}
 			}
 		},
 		showError: function(error, more) {

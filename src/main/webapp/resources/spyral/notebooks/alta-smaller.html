@@ -1,0 +1,329 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset='UTF-8'>
+<title>Exploring a Small Corpus in a Spyral Notebook</title>
+<meta name="title" content="<h1>Exploring a Small Corpus in a Spyral Notebook</h1>"><meta name="author" content="Stéfan Sinclair & Geoffrey Rockwell"><meta name="keywords" content="alta"><meta name="modified" content="2019-07-01T18:43:07.952Z"><meta name="created" content="2019-06-29T22:23:32.810Z"><meta name="language" content="English"><meta name="license" content="Creative Commons Attribution (CC BY)"><meta name="version" content="0.1"><style id="ace-chrome">.ace-chrome .ace_gutter {background: #ebebeb;color: #333;overflow : hidden;}.ace-chrome .ace_print-margin {width: 1px;background: #e8e8e8;}.ace-chrome {background-color: #FFFFFF;color: black;}.ace-chrome .ace_cursor {color: black;}.ace-chrome .ace_invisible {color: rgb(191, 191, 191);}.ace-chrome .ace_constant.ace_buildin {color: rgb(88, 72, 246);}.ace-chrome .ace_constant.ace_language {color: rgb(88, 92, 246);}.ace-chrome .ace_constant.ace_library {color: rgb(6, 150, 14);}.ace-chrome .ace_invalid {background-color: rgb(153, 0, 0);color: white;}.ace-chrome .ace_fold {}.ace-chrome .ace_support.ace_function {color: rgb(60, 76, 114);}.ace-chrome .ace_support.ace_constant {color: rgb(6, 150, 14);}.ace-chrome .ace_support.ace_type,.ace-chrome .ace_support.ace_class.ace-chrome .ace_support.ace_other {color: rgb(109, 121, 222);}.ace-chrome .ace_variable.ace_parameter {font-style:italic;color:#FD971F;}.ace-chrome .ace_keyword.ace_operator {color: rgb(104, 118, 135);}.ace-chrome .ace_comment {color: #236e24;}.ace-chrome .ace_comment.ace_doc {color: #236e24;}.ace-chrome .ace_comment.ace_doc.ace_tag {color: #236e24;}.ace-chrome .ace_constant.ace_numeric {color: rgb(0, 0, 205);}.ace-chrome .ace_variable {color: rgb(49, 132, 149);}.ace-chrome .ace_xml-pe {color: rgb(104, 104, 91);}.ace-chrome .ace_entity.ace_name.ace_function {color: #0000A2;}.ace-chrome .ace_heading {color: rgb(12, 7, 255);}.ace-chrome .ace_list {color:rgb(185, 6, 144);}.ace-chrome .ace_marker-layer .ace_selection {background: rgb(181, 213, 255);}.ace-chrome .ace_marker-layer .ace_step {background: rgb(252, 255, 0);}.ace-chrome .ace_marker-layer .ace_stack {background: rgb(164, 229, 101);}.ace-chrome .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid rgb(192, 192, 192);}.ace-chrome .ace_marker-layer .ace_active-line {background: rgba(0, 0, 0, 0.07);}.ace-chrome .ace_gutter-active-line {background-color : #dcdcdc;}.ace-chrome .ace_marker-layer .ace_selected-word {background: rgb(250, 250, 255);border: 1px solid rgb(200, 200, 250);}.ace-chrome .ace_storage,.ace-chrome .ace_keyword,.ace-chrome .ace_meta.ace_tag {color: rgb(147, 15, 128);}.ace-chrome .ace_string.ace_regex {color: rgb(255, 0, 0)}.ace-chrome .ace_string {color: #1A1AA6;}.ace-chrome .ace_entity.ace_other.ace_attribute-name {color: #994409;}.ace-chrome .ace_indent-guide {background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;}
+/*# sourceURL=ace/css/ace-chrome */</style>
+<style id="voyant-notebooks-styles">
+	body.exported-notebook {
+		font-family: helvetica, arial, verdana, sans-serif;
+		font-size: 13px;
+		font-weight: 300;
+		line-height: 17px;
+		-webkit-font-smoothing: antialiased
+	}
+	body.exported-notebook .notebook-code-editor {
+		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+		font-size: 12px;
+		font-weight: normal;
+		line-height: normal;
+		white-space: pre;
+	}
+	.notebook-text-editor, .notebook-code-editor, .notebook-code-results {
+		padding: 6px;
+		margin: 6px;
+	}
+	.notebook-text-wrapper .x-panel-body {
+	   border: thin solid rgba(0,0,0,0) !important;
+	}
+	.notebook-code-wrapper .x-panel-body {
+	   border: thin solid rgba(0,0,0,0) !important;
+	}
+	.x-panel .notebook-editor-wrapper-hover.x-panel-body, .editable {
+		border: thin dashed rgba(0,0,0,.2) !important;
+	}
+	.notebook-code-editor, .notebook-code-results {
+		margin-left: 2em;
+	}
+	.notebook-code-editor {
+		border-left: thin solid rgb(240, 240, 240);
+	}
+	.notebook-code-results {
+		background-color: rgb(252, 252, 252);
+		border: thin solid rgb(240, 240, 240);
+	}
+	.notebook-code-results .error {
+		color: red;
+	}
+	.notebook-code-results pre {
+		font-size: smaller;
+	}	
+	.notebook-code-results .info {
+		overflow: scroll
+	}
+	.notebook-code-editor-raw { /* used for raw code in saved view */
+		display: none;
+	}
+	.cke_button__sourcedialog_label {
+	    display: none !important;
+	}
+	.exported-notebook .notebookwrappercounter {
+		float: right;
+	}
+	.exported-notebook .notebookwrappercounter a {
+		text-decoration: none;
+	}
+	
+	.notebookwrappercounter a {
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		border-radius: 3px;
+		background-color: #f5f5f5;
+	    text-align: right;
+	    border: thin solid #d8d8d8;
+	    padding: 1px;
+	    margin: 1px;
+	    font-size: smaller;
+	}
+	
+	.spyral-header, .spyral-footer {
+		text-align: center;
+	}
+	
+	.spyral-footer {
+		margin-top: 1em;
+		background-color: rgba(0,0,0,.01);
+		border-top: rgba(0,0,0,.05);
+	}
+</style>
+<script> // this script checks to see if embedded tools seem to be available
+window.addEventListener('load', function() {
+var hostnames = {}, warned = false;
+document.querySelectorAll('iframe').forEach(function(iframeEl) {
+let url = new URL(iframeEl.src);
+if (!(url.hostname in hostnames) && !warned) {
+hostnames[url.hostname] = true; // mark as fetched
+fetch(url).catch(response => {
+warned = true;
+alert('This notebook seems to contain one ore more tools that may not be able to load. Possible reasons include a server no longer being accessible (especially if the notebook was generated from a local server), or because of security restrictions.'+url)
+})
+}
+})
+})
+</script>
+</head>
+<body class='exported-notebook'><header class='spyral-header'><h1>Exploring a Small Corpus in a Spyral Notebook</h1></header>
+<article class='spyralArticle'><section id='tksau9xtp4lxfn5v' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="tksau9xtp4lxfn5v" href="#tksau9xtp4lxfn5v" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">1</a></div><div class='notebook-text-editor'><p>This notebook will help you explore a corpus with Spyral Notebooks (it's part of the&nbsp;<a data-tabindex-counter="48" data-tabindex-value="none" data-cke-saved-href="alta" href="alta" tabindex="-1" target="_blank">Art of Literary Text Analysis with Spyral&nbsp;Notebooks</a>). In particular, we'll look at:</p><ul><li><a data-tabindex-counter="24" data-tabindex-value="none" data-cke-saved-href="#reuse" href="#reuse" tabindex="-1">creating a reusable corpus</a></li><li><a data-tabindex-counter="23" data-tabindex-value="none" data-cke-saved-href="#freqs" href="#freqs" tabindex="-1">exploring term frequencies</a></li><li><a data-tabindex-counter="23" data-tabindex-value="none" data-cke-saved-href="#distributions" href="#distributions" tabindex="-1">exploring term distributions</a></li><li><a data-tabindex-counter="18" data-tabindex-value="none" data-cke-saved-href="#collocates" href="#collocates" tabindex="-1">exploring term collocates</a></li><li><a data-tabindex-counter="12" data-tabindex-value="none" data-cke-saved-href="#text" href="#text" tabindex="-1" target="_blank">exploring text</a></li><li><a data-tabindex-counter="12" data-tabindex-value="none" data-cke-saved-href="#next" href="#next" tabindex="-1" target="_blank">next steps</a></li></ul><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22reuse%22%20data-cke-saved-name%3D%22reuse%22%20name%3D%22reuse%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Anchor" title="Anchor" align="" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Crea<span style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">t</span>ing a Reusable Corpus</h2><p>Most of the code examples until now have created a transient corpus, in other words one that is created and used immediately, but not reused. In what follows we will show how we can create a corpus and reuse it elsewhere in the Spyral notebook.</p><p>It's useful to understand that when we create a corpus we actually get a promise for a corpus that will be delivered later. This is the nature of some Javascript code that runs <a data-tabindex-counter="24" data-tabindex-value="none" data-cke-saved-href="https://en.wikipedia.org/wiki/Ajax_(programming)" href="https://en.wikipedia.org/wiki/Ajax_(programming)" tabindex="-1" target="_blank">asynchronously</a>, in other words where things happen at different times. One way to deal with this situation would be to use something like this syntax (which we won't explain in detail since it's not the syntax we'll use):</p><blockquote><pre>var helloworld;
+<span style="background-color:#F0F8FF;">loadCorpus("Hello world!")</span><span style="background-color:#E6E6FA;">.then(<span style="color:#FF0000;">function(corpus) {
+&nbsp;   helloworld = corpus;
+}</span>)</span>;
+</pre></blockquote><p>Instead we'll use a convenience function of Corpus called <a data-tabindex-counter="16" data-tabindex-value="none" data-cke-saved-href="../docs/#!/api/Corpus-method-assign" href="../docs/#!/api/Corpus-method-assign" tabindex="-1" target="_blank">assign</a>, which takes as an argument a string name that is the variable name that will be used in subsequent code blocks.</p><blockquote><pre>loadCorpus("Hello world!").<span style="background-color:#E6E6FA;">assign("helloworld")</span>;</pre></blockquote><p>Much easier, yes? There are two crucial things to remember:</p><ol><li><code>assign</code> takes a string argument (with quotes) even though later we use the same word as a variable name (without quotes)</li><li>any references to the named corpus should occur in subsequent code blocks (in order to ensure that the corpus has been created)</li></ol><p>We can combine the code from the previous notebook <a data-tabindex-counter="24" data-tabindex-value="none" data-cke-saved-href="alta-create#text" href="alta-create#text" tabindex="-1" target="_blank">Creating a Corpus with Plain Text</a> with this new concept of creating a reusable corpus.</p></div>
+</section>
+<section id='5gecxpvsuep7ewfc' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="5gecxpvsuep7ewfc" href="#5gecxpvsuep7ewfc" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">2</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">inputRemoveUntil</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'THE GOLD-BUG'</span><span class="ace_punctuation ace_operator">,</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">inputRemoveFrom</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'FOUR BEASTS IN ONE'</span></div><div class="ace_line" style="height:16px"><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">assign</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"goldbug"</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// this line is the new part</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+loadCorpus("https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt", {
+    inputRemoveUntil: 'THE GOLD-BUG',
+    inputRemoveFrom: 'FOUR BEASTS IN ONE'
+}).assign("goldbug"); // this line is the new part</pre>
+<div class='notebook-code-results'>
+<div style='height: 45px'><div style="height: 31px"> <div class="info">This corpus has 1 document with 13,731 <span class="info-tip" data-qtip="every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted">total words</span> and 2,756 <span class="info-tip" data-qtip="multiple occurrences of words (like &quot;the&quot;) are counted once">unique word forms</span>. Created <span class="info-tip" data-qtip="2017-06-21, 13:20:57">about 3 minutes ago</span>.</div></div></div>
+</div>
+</section>
+<section id='2j5x8qtskgyap2f4' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="2j5x8qtskgyap2f4" href="#2j5x8qtskgyap2f4" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">3</a></div><div class='notebook-text-editor'><p>By running this code in its own <a data-tabindex-counter="24" data-tabindex-value="none" data-cke-saved-href="alta-start#code" href="alta-start#code" tabindex="-1" target="_blank">code block</a> we ensure that subsequent code blocks will have access to our new <code>goldbug</code> corpus variable. (But don't forget that this first code block needs to be executed before subsequent blocks have access to the variable – it may help to start by running all code blocks.) In the code block below we reuse the goldbug corpus to show a summary of the corpus.</p></div>
+</section>
+<section id='zh3e9jbv5eynuao6' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="zh3e9jbv5eynuao6" href="#zh3e9jbv5eynuao6" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">4</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'summary'</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// we are reusing the goldbug corpus</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('summary'); // we are reusing the goldbug corpus</pre>
+<div class='notebook-code-results'>
+<div style='height: 432px'><div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px" id="ext-500" name="ext-500" src="https://voyant-tools.org/tool/Summary/?minimal=true&amp;embeddedApiId=b6745a31a20d8ba8ebcaebbacf42db92&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='ntcvbb3b29ho8q5u' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="ntcvbb3b29ho8q5u" href="#ntcvbb3b29ho8q5u" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">5</a></div><div class='notebook-text-editor'><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22freqs%22%20data-cke-saved-name%3D%22freqs%22%20name%3D%22freqs%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Ancre" title="Ancre" align="" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Exploring Term Frequencies</h2><p>So, we have a reusable corpus in Spyral, now what? Sometimes we come to a corpus with pre-existing questions, sometimes we just want to start exploring. We can begin with simple term frequencies, what are the most frequent terms in the document? To start exploring, we can use the Cirrus word cloud visualization – we can use the <a data-cke-saved-href="../docs/#!/api/Corpus-method-embed" href="../docs/#!/api/Corpus-method-embed" target="_blank" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="23">embed</a> function of our <a data-cke-saved-href="../docs/#!/api/Corpus" href="../docs/#!/api/Corpus" target="_blank" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="23">corpus</a> and specify the <a data-cke-saved-href="../docs/#!/guide/cirrus" href="../docs/#!/guide/cirrus" target="_blank" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="23">Cirrus</a> tool to use.</p></div>
+</section>
+<section id='6y9uc685t18h1bvb' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="6y9uc685t18h1bvb" href="#6y9uc685t18h1bvb" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">6</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'cirrus'</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('cirrus');</pre>
+<div class='notebook-code-results'>
+<div style='height: 432px'><div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px" id="ext-501" name="ext-501" src="https://voyant-tools.org/tool/Cirrus/?minimal=true&amp;embeddedApiId=b6745a31a20d8ba8ebcaebbacf42db92&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='clnvnushc3jo02f2' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="clnvnushc3jo02f2" href="#clnvnushc3jo02f2" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">7</a></div><div class='notebook-text-editor'><p>The layout of the terms will change, but the relative size of terms will express frequency in the document. We can notice a few things immediately that are fairly distinctive of prose literature, for instance the high frequency of the term "said" (often used to report speeches by characters). Another typical characteristic of literature is the high frequency of character names ("legrand", "jupiter",&nbsp;"massa",&nbsp;etc.). More noticeable here are other terms such as "bug", "parchment" and "skull".</p><p>The word cloud is a very useful way to get a quick overview of high frequency terms, but it's also fairly limited. For instance, we are limited to the high frequency terms, we can't search for other terms, and we get no other information than term frequency. To dig a bit deeper we can invoke&nbsp;the <a data-cke-saved-href="../docs/#!/guide/corpusterms" href="../docs/#!/guide/corpusterms" target="_blank" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="23">Corpus Terms</a> tool.</p></div>
+</section>
+<section id='c9va5tpnq2bb3r2l' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="c9va5tpnq2bb3r2l" href="#c9va5tpnq2bb3r2l" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">8</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'corpusterms'</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('corpusterms');</pre>
+<div class='notebook-code-results'>
+<div style='height: 432px'><div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px" id="ext-502" name="ext-502" src="https://voyant-tools.org/tool/CorpusTerms/?minimal=true&amp;embeddedApiId=b6745a31a20d8ba8ebcaebbacf42db92&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='y66jewlvl0wb5h4x' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="y66jewlvl0wb5h4x" href="#y66jewlvl0wb5h4x" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">9</a></div><div class='notebook-text-editor'><p>The top frequency terms are indicated here (albeit in a less visually interesting way that with Cirrus), but we also have access to additional functionality available. Because this is a corpus with just one document, some of the columns are less relevant (like Trend, which shows the distribution of terms across several documents). However, we do have the possibility of scrolling down the list to see additional terms.</p><p>One thing we might notice is that there's an entry for "jupiter" (one of the character names that appears capitalized in the text), but also entries for "jupiter's" and "jup" (and possibly others). In fact, we can ask what terms appear that have the prefix "jup*".</p><p>In the code below we demonstrate the syntax for providing a query to a requested tool – the general form is something like this (where the options are defined by&nbsp;<a data-tabindex-counter="23" data-tabindex-value="none" data-cke-saved-href="../docs/#!/api/Voyant.panel.CorpusTerms" href="../docs/#!/api/Voyant.panel.CorpusTerms" tabindex="-1" target="_blank">Corpus Terms</a>):</p><blockquote><pre>corpus.tool('toolname', { options } );</pre></blockquote><p>The syntax of the actual query is defined by the <a data-tabindex-counter="23" data-tabindex-value="none" data-cke-saved-href="../docs/#!/guide/search" href="../docs/#!/guide/search" tabindex="-1" target="_blank">search box</a> (you can hover over the question mark in the search box for more information).</p><p>We also demonstrate here the use of the height and width parameters when <a data-tabindex-counter="19" data-tabindex-value="none" data-cke-saved-href="../docs/#!/api/Corpus-method-embed" href="../docs/#!/api/Corpus-method-embed" tabindex="-1" target="_blank">embedding</a> a tool (we don't need to take up the full size given to a tool by default.</p></div>
+</section>
+<section id='8hgorxoi1a0tsr4n' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="8hgorxoi1a0tsr4n" href="#8hgorxoi1a0tsr4n" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">10</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'corpusterms'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">query</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"^jup*,jup*"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">width</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"400px"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">height</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"250px"</span><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('corpusterms', {query: "^jup*,jup*", width: "400px", height: "250px"});</pre>
+<div class='notebook-code-results'>
+<div style='height: 282px'><div style="height: 268px"> <div class="info"><iframe style="width: 400px; height: 250px" id="ext-503" name="ext-503" src="https://voyant-tools.org/tool/CorpusTerms/?minimal=true&amp;embeddedApiId=3b3f97965915a3de691650a46e04ed66&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='n9gq23mhe84j59ik' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="n9gq23mhe84j59ik" href="#n9gq23mhe84j59ik" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">11</a></div><div class='notebook-text-editor'><p>The results can be broken down into the two query parts (separated by a comma):</p><ul><li><code>jup*</code>: the total frequency of all terms that start with jup</li><li><code>^jup*</code>: the frequency of each term that starts with jup ("jupiter", "jupiter's" and "jup")</li></ul><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22distributions%22%20data-cke-saved-name%3D%22distributions%22%20name%3D%22distributions%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Anchor" title="Anchor" align="" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Exploring Term Distributions</h2><p>Beyond term frequencies it can be interesting to explore how evenly terms are distributed in a corpus or in a document – is a given term more present at the beginning, middle or end? As with term frequencies, we have access to a convenient visualization for term distributions called <a data-cke-saved-href="../../docs/#!/guide/trends" href="../../docs/#!/guide/trends" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="22">Trends</a>. Since our corpus is comprised of a single document, Trends will show term distributions within that document (as opposed to term distributions across several documents in a corpus).</p></div>
+</section>
+<section id='hbuhfvlmghsa8jh8' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="hbuhfvlmghsa8jh8" href="#hbuhfvlmghsa8jh8" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">12</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'trends'</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('trends');</pre>
+<div class='notebook-code-results'>
+<div style='height: 432px'><div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px" id="ext-504" name="ext-504" src="https://voyant-tools.org/tool/Trends/?minimal=true&amp;embeddedApiId=b6745a31a20d8ba8ebcaebbacf42db92&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='dnjpzvf76yiw10gn' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="dnjpzvf76yiw10gn" href="#dnjpzvf76yiw10gn" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">13</a></div><div class='notebook-text-editor'><p>By default Trends will show the distribution&nbsp;of the top 5 terms in our document. Because we are in single document mode, we see the raw frequencies for 10 equal segments of text: Spyral divides the text into 10 equal parts and then counts frequencies in each part. We can use the "Segments" slider to get a finer-tune look at distribution, dividing the document into 20 segments, for instance.</p>
+
+<p>We can click on the terms in the top legend to toggle them on and off. If click (hide) "bug", "massa", and "said" we can see more clearly that the character names "legrand" and "jupiter" are used during the first half of the document much more than in the second half – something worth exploring perhaps. We can produce a more specific graph in a way similar to what we did for Corpus Terms, though this time we're using configuration options for <a href="../../docs/#!/api/Voyant.panel.Trends" target="_blank" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="22">Trends</a>.</p>
+
+<p>&nbsp;</p>
+</div>
+</section>
+<section id='fetb8hzueo0q29t6' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="fetb8hzueo0q29t6" href="#fetb8hzueo0q29t6" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">14</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'trends'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">query</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"jupiter,legrand"</span><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('trends', {query: "jupiter,legrand"});</pre>
+<div class='notebook-code-results'>
+<div style='height: 432px'><div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px" id="ext-515" name="ext-515" src="https://voyant-tools.org/tool/Trends/?minimal=true&amp;embeddedApiId=e2f8522372ca5067f19d290807c47f61&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='9lopy8v3818uey1w' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="9lopy8v3818uey1w" href="#9lopy8v3818uey1w" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">15</a></div><div class='notebook-text-editor'><p>Another useful visualization for distribution is TermsRadio since it shows more terms than the Trends tool. The TermsRadio is intended to scroll across the distributions, but we can request to see all of the bins at once using the bins and visibleBins parameters.</p>
+</div>
+</section>
+<section id='nt5m3f37zqfsws7f' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="nt5m3f37zqfsws7f" href="#nt5m3f37zqfsws7f" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">16</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'termsradio'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">bins</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_constant ace_numeric">10</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">visibleBins</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_constant ace_numeric">10</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">height</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'600px'</span><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('termsradio', {bins: 10, visibleBins: 10, height: '600px'});</pre>
+<div class='notebook-code-results'>
+<div style='height: 632px'><div style="height: 618px"> <div class="info"><iframe style="width: 90%; height: 600px" id="ext-506" name="ext-506" src="https://voyant-tools.org/tool/TermsRadio/?minimal=true&amp;embeddedApiId=f04d2efb03a5ca13eea7f7db7a109a81&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='ozyi9whi03qsqgyu' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="ozyi9whi03qsqgyu" href="#ozyi9whi03qsqgyu" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">17</a></div><div class='notebook-text-editor'><p>This tool reveals some potentially interesting things that we hadn't seen before. For instance, the word "parchment" is very high frequency, but limited to one portion of the text. Segment 9 also shows an intriguing set of words about words: "word", "characters", "word".</p>
+
+<p>This tool is useful, but we're still somewhat limited to the highest frequency terms. However, we can request a grid of all the Document Terms. In contrast to the Corpus Terms seen earlier, Document Terms also shows distribution graphs on the right for each word.</p>
+</div>
+</section>
+<section id='iukbiq7xmdgkl18y' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="iukbiq7xmdgkl18y" href="#iukbiq7xmdgkl18y" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">18</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"DocumentTerms"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">width</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"400px"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">height</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"300px"</span><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool("DocumentTerms", {width: "400px", height: "300px"});</pre>
+<div class='notebook-code-results'>
+<div style='height: 332px'><div style="height: 318px"> <div class="info"><iframe style="width: 400px; height: 300px" id="ext-507" name="ext-507" src="https://voyant-tools.org/tool/DocumentTerms/?minimal=true&amp;embeddedApiId=b6745a31a20d8ba8ebcaebbacf42db92&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='22gbg5u7hsd180p5' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="22gbg5u7hsd180p5" href="#22gbg5u7hsd180p5" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">19</a></div><div class='notebook-text-editor'><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22collocates%22%20data-cke-saved-name%3D%22collocates%22%20name%3D%22collocates%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Ancre" title="Ancre" align="" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Exploring Term Collocates</h2><p>We have looked at term frequencies and term distributions, but we have yet to explore how words are used in context. To do that we explore what are called collocates or terms that are co-located in proximity to terms of interest. As we have previously done, we can start with an interesting visualization and then drill down more from there. The visualization is called TermsBerry and it serves two primary purposes:</p><ol><li>just as with Cirrus, it shows the top frequency terms in our corpus</li><li>when you hover over a term it shows information about other terms that occur nearby (collocate)</li></ol><p><br></p></div>
+</section>
+<section id='2q82ush6om62otra' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="2q82ush6om62otra" href="#2q82ush6om62otra" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">20</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'TermsBerry'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">width</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"600px"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">height</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"600px"</span><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('TermsBerry', {width: "600px", height: "600px"});</pre>
+<div class='notebook-code-results'>
+<div style='height: 632px'><div style="height: 618px"> <div class="info"><iframe style="width: 600px; height: 600px" id="ext-508" name="ext-508" src="https://voyant-tools.org/tool/TermsBerry/?minimal=true&amp;embeddedApiId=b6745a31a20d8ba8ebcaebbacf42db92&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='hu6pgchl7ssc0ix4' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="hu6pgchl7ssc0ix4" href="#hu6pgchl7ssc0ix4" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">21</a></div><div class='notebook-text-editor'><p>Hovering over different words to see collocates: hours of fun :). A somewhat similar tool is Collocates Graph, though it shows fewer terms and emphasizes the network of terms: the larger the labels ("nodes" in network terminology) the more frequent is the term and the thicker the line ("edge" in network graph terminology)&nbsp;the more times the terms co-occur.</p>
+</div>
+</section>
+<section id='hne3lzmf1fo66hj0' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="hne3lzmf1fo66hj0" href="#hne3lzmf1fo66hj0" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">22</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'CollocatesGraph'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">width</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"500px"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">height</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"500px"</span><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('CollocatesGraph', {width: "500px", height: "500px"});</pre>
+<div class='notebook-code-results'>
+<div style='height: 532px'><div style="height: 518px"> <div class="info"><iframe style="width: 500px; height: 500px" id="ext-509" name="ext-509" src="https://voyant-tools.org/tool/CollocatesGraph/?minimal=true&amp;embeddedApiId=b6745a31a20d8ba8ebcaebbacf42db92&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='3ucqpydf5leugayy' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="3ucqpydf5leugayy" href="#3ucqpydf5leugayy" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">23</a></div><div class='notebook-text-editor'><p>The green terms are keywords and the red terms are collocates. You can fetch more collocates by increasing the value of the Context slider.</p>
+
+<p>One term we might want to consider in more detail is "massa". In fact, we can right-click (or ctrl-click) on the term's label in the graph above and choose "Centralize". Or, of course, we can generate a new tool to do the same.</p>
+</div>
+</section>
+<section id='k7g6o94ionpjsnpl' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="k7g6o94ionpjsnpl" href="#k7g6o94ionpjsnpl" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">24</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_comment">// </span><span class="ace_comment ace_doc ace_tag ace_storage ace_type">FIXME</span><span class="ace_comment">: this doesn't yet work</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'CollocatesGraph'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">centralize</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"massa"</span><span class="ace_paren ace_rparen">})</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+// FIXME: this doesn't yet work
+goldbug.tool('CollocatesGraph', {centralize: "massa"})</pre>
+<div class='notebook-code-results'>
+<div style='height: 432px'><div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px" id="ext-510" name="ext-510" src="https://voyant-tools.org/tool/CollocatesGraph/?minimal=true&amp;embeddedApiId=762a6ee4c3dc9ee34dbdbcf6833eec15&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='w5dab9a1maobnrxj' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="w5dab9a1maobnrxj" href="#w5dab9a1maobnrxj" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">25</a></div><div class='notebook-text-editor'><p>A graph like this certainly helps to identify words that occur close to a term of interest, and in this case we notice several non-English words (or words that aren't standard English: <em>dis</em>, <em>data</em>, <em>fer</em>, <em>ting</em>, etc. If we've read the text there's no mystery here, but sometimes exploratory text analysis is used when there's too much text to read or when we want to determine what parts of the text are worth reading in more detail. If we want a sense of how "massa" is used, we can request the Contexts tool, which provides words to the left and right of each occurrence of our keyword.</p>
+</div>
+</section>
+<section id='3gjpbxf5fbo9s4p7' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="3gjpbxf5fbo9s4p7" href="#3gjpbxf5fbo9s4p7" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">26</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'Contexts'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">query</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"massa"</span><span class="ace_paren ace_rparen">})</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('Contexts', {query: "massa"})</pre>
+<div class='notebook-code-results'>
+<div style='height: 432px'><div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px" id="ext-511" name="ext-511" src="https://voyant-tools.org/tool/Contexts/?minimal=true&amp;embeddedApiId=744079436a9c699ae9932c5823d8997d&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='j1iw1gwx932em6zs' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="j1iw1gwx932em6zs" href="#j1iw1gwx932em6zs" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">27</a></div><div class='notebook-text-editor'><p>The Contexts tool has a slider to adjust the amount of context that is shown for each occurrence, though we are still limited by the space available in the rows. If we want a true sense of the word's context, we can click on the plus sign in the left-most column, which will expand that particular occurrence. For instance, here's what we see in the first occurrence:</p><blockquote><p>In these excursions he was usually accompanied by an old negro, called Jupiter, who had been manumitted before the reverses of the family, but who could be induced, neither by threats nor by promises, to abandon what he considered his right of attendance upon the footsteps of his young “<span class="keyword">Massa Will</span>.” It is not improbable that the relatives of Legrand, conceiving him to be somewhat unsettled in intellect, had contrived to instil this obstinacy into Jupiter, with a view to the supervision and guardianship of the wanderer.</p></blockquote><p>What we learn from this is that the character who says "Massa Will" is Jupiter and we suppose that the other words are attempts to convey Jupiter's dialect (as we see clearly in subsequent occurrences). It's worth mentioning that "Will" here is a character name, but we would likely have missed that since "will" is also a common verb and noun.</p><p>If we want to see groupings of words with "massa" we can use the <a data-cke-saved-href="../docs/#!/guide/phrases" href="../docs/#!/guide/phrases" target="_blank" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="13">Phrases</a> tool or the more visual <a data-cke-saved-href="../docs/#!/guide/wordtree" href="../docs/#!/guide/wordtree" target="_blank" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="13">WordTree</a> tool.</p></div>
+</section>
+<section id='8muysefnqlqyip2n' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="8muysefnqlqyip2n" href="#8muysefnqlqyip2n" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">28</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'WordTree'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">query</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">"massa"</span><span class="ace_paren ace_rparen">})</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('WordTree', {query: "massa"})</pre>
+<div class='notebook-code-results'>
+<div style='height: 432px'><div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px" id="ext-512" name="ext-512" src="https://voyant-tools.org/tool/WordTree/?minimal=true&amp;embeddedApiId=744079436a9c699ae9932c5823d8997d&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='eum6g29a5chgr0sb' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="eum6g29a5chgr0sb" href="#eum6g29a5chgr0sb" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">29</a></div><div class='notebook-text-editor'><p>As with many tools, the size of the words matter, and we can see that to the left there are multiple occurrences of "No, Massa", "Why, Massa" and "Yes, Massa" (hover over a term for more information and click on it to expand or collapse it). To the right, as we've already seen, we have "Massa Will" and several other forms following a comma.</p><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22text%22%20data-cke-saved-name%3D%22text%22%20name%3D%22text%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Ancre" title="Ancre" align="" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Exploring Text</h2><p>In this simple example of exploring Poe's "Gold Bug" we've looked at various ways of studying term frequencies, distributions and collocates, but we haven't actually read the text (unless you read it at the end of the previous notebook on <a data-tabindex-counter="12" data-tabindex-value="none" data-cke-saved-href="http://alta-create#text" href="http://alta-create#text" tabindex="-1" target="_blank">Creating a Corpus in Text</a>). Whether one reads a text first, and then analyzes, or analyzes and then reads, or analyzes and reads at the same time, will depend on many factors, including the nature of the corpus and the nature of one's motivations for using Spyral. In any case, it's simple enough to start reading!</p></div>
+</section>
+<section id='ke3rmvnugak0c7gf' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="ke3rmvnugak0c7gf" href="#ke3rmvnugak0c7gf" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">30</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">goldbug</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'Reader'</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+goldbug.tool('Reader');</pre>
+<div class='notebook-code-results'>
+<div style='height: 432px'><div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px" id="ext-513" name="ext-513" src="https://voyant-tools.org/tool/Reader/?minimal=true&amp;embeddedApiId=b6745a31a20d8ba8ebcaebbacf42db92&amp;corpus=38683ce0ee7dc5f581735ed14938c679" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="2"></iframe></div></div></div>
+</div>
+</section>
+<section id='vj8ilyai0v8j6dgw' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="vj8ilyai0v8j6dgw" href="#vj8ilyai0v8j6dgw" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">31</a></div><div class='notebook-text-editor'><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22next%22%20data-cke-saved-name%3D%22next%22%20name%3D%22next%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Ancre" title="Ancre" align="" data-cke-saved-src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Next Steps</h2><p>Here are some exercises to try, based on the contents of this notebook:</p><ul><li>the "Gold Bug" is partly about cryptography, what keywords in Corpus Terms might help us identify and study that?</li><li>the term "bug" is distributed unevenly, when (distriibution) and how (collocates) is it used?</li><li>create a new corpus from a different <a data-tabindex-counter="12" data-tabindex-value="none" data-cke-saved-href="https://www.gutenberg.org/wiki/Short_Stories_(Bookshelf)" href="https://www.gutenberg.org/wiki/Short_Stories_(Bookshelf)" tabindex="-1" target="_blank">short story</a>&nbsp;and start exploring it in the same way we did here&nbsp;</li></ul><p>If you're working sequentially&nbsp;through the <a data-tabindex-counter="22" data-tabindex-value="none" data-cke-saved-href="alta" href="alta" tabindex="-1" target="_blank">Art of Literary Text Analysis with Spyral&nbsp;Notebooks</a>, the next notebook&nbsp;is <a data-tabindex-counter="12" data-tabindex-value="none" data-cke-saved-href="../alta-tables/" href="../alta-tables/" tabindex="-1" target="_blank">Introducing Tables</a>.</p></div>
+</section>
+</article>
+<footer class='spyral-footer'>&copy; Stéfan Sinclair & Geoffrey Rockwell (Creative Commons Attribution (CC BY)). Created June 29, 2019.Modified July 1, 2019.</footer></body>
+</html>

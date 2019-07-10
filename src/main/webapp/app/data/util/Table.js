@@ -1,4 +1,4 @@
-/**
+/*
  * @class VoyantTable
  * A VoyantTable can facilitate working with tabular data structures, as well as
  * displaying results (especially with {@link #embed} and {@link show}). 

@@ -8,6 +8,7 @@ Ext.define("Voyant.util.DetailedError", {
 	},
 	statics: {
 		i18n: {
+			error: "Error"
 		}
 	},
 	constructor: function(config) {

@@ -1,4 +1,4 @@
-/**
+/*
  * Corpus Term
  */
 Ext.define('Voyant.data.model.CorpusTerm', {

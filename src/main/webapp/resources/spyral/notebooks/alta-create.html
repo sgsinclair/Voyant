@@ -1,0 +1,347 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset='UTF-8'>
+<title>Creating a Corpus in a Spyral Notebook</title>
+<meta name="title" content="<h1>Creating a Corpus in a Spyral Notebook</h1>"><meta name="author" content="Stéfan Sinclair & Geoffrey Rockwell"><meta name="keywords" content="alta"><meta name="modified" content="2019-06-29T22:22:25.936Z"><meta name="created" content="2019-06-29T22:01:36.828Z"><meta name="language" content="English"><meta name="license" content="Creative Commons Attribution (CC BY)"><meta name="version" content="0.1"><style id="ace-chrome">.ace-chrome .ace_gutter {background: #ebebeb;color: #333;overflow : hidden;}.ace-chrome .ace_print-margin {width: 1px;background: #e8e8e8;}.ace-chrome {background-color: #FFFFFF;color: black;}.ace-chrome .ace_cursor {color: black;}.ace-chrome .ace_invisible {color: rgb(191, 191, 191);}.ace-chrome .ace_constant.ace_buildin {color: rgb(88, 72, 246);}.ace-chrome .ace_constant.ace_language {color: rgb(88, 92, 246);}.ace-chrome .ace_constant.ace_library {color: rgb(6, 150, 14);}.ace-chrome .ace_invalid {background-color: rgb(153, 0, 0);color: white;}.ace-chrome .ace_fold {}.ace-chrome .ace_support.ace_function {color: rgb(60, 76, 114);}.ace-chrome .ace_support.ace_constant {color: rgb(6, 150, 14);}.ace-chrome .ace_support.ace_type,.ace-chrome .ace_support.ace_class.ace-chrome .ace_support.ace_other {color: rgb(109, 121, 222);}.ace-chrome .ace_variable.ace_parameter {font-style:italic;color:#FD971F;}.ace-chrome .ace_keyword.ace_operator {color: rgb(104, 118, 135);}.ace-chrome .ace_comment {color: #236e24;}.ace-chrome .ace_comment.ace_doc {color: #236e24;}.ace-chrome .ace_comment.ace_doc.ace_tag {color: #236e24;}.ace-chrome .ace_constant.ace_numeric {color: rgb(0, 0, 205);}.ace-chrome .ace_variable {color: rgb(49, 132, 149);}.ace-chrome .ace_xml-pe {color: rgb(104, 104, 91);}.ace-chrome .ace_entity.ace_name.ace_function {color: #0000A2;}.ace-chrome .ace_heading {color: rgb(12, 7, 255);}.ace-chrome .ace_list {color:rgb(185, 6, 144);}.ace-chrome .ace_marker-layer .ace_selection {background: rgb(181, 213, 255);}.ace-chrome .ace_marker-layer .ace_step {background: rgb(252, 255, 0);}.ace-chrome .ace_marker-layer .ace_stack {background: rgb(164, 229, 101);}.ace-chrome .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid rgb(192, 192, 192);}.ace-chrome .ace_marker-layer .ace_active-line {background: rgba(0, 0, 0, 0.07);}.ace-chrome .ace_gutter-active-line {background-color : #dcdcdc;}.ace-chrome .ace_marker-layer .ace_selected-word {background: rgb(250, 250, 255);border: 1px solid rgb(200, 200, 250);}.ace-chrome .ace_storage,.ace-chrome .ace_keyword,.ace-chrome .ace_meta.ace_tag {color: rgb(147, 15, 128);}.ace-chrome .ace_string.ace_regex {color: rgb(255, 0, 0)}.ace-chrome .ace_string {color: #1A1AA6;}.ace-chrome .ace_entity.ace_other.ace_attribute-name {color: #994409;}.ace-chrome .ace_indent-guide {background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;}
+/*# sourceURL=ace/css/ace-chrome */</style>
+<style id="voyant-notebooks-styles">
+	body.exported-notebook {
+		font-family: helvetica, arial, verdana, sans-serif;
+		font-size: 13px;
+		font-weight: 300;
+		line-height: 17px;
+		-webkit-font-smoothing: antialiased
+	}
+	body.exported-notebook .notebook-code-editor {
+		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+		font-size: 12px;
+		font-weight: normal;
+		line-height: normal;
+		white-space: pre;
+	}
+	.notebook-text-editor, .notebook-code-editor, .notebook-code-results {
+		padding: 6px;
+		margin: 6px;
+	}
+	.notebook-text-wrapper .x-panel-body {
+	   border: thin solid rgba(0,0,0,0) !important;
+	}
+	.notebook-code-wrapper .x-panel-body {
+	   border: thin solid rgba(0,0,0,0) !important;
+	}
+	.x-panel .notebook-editor-wrapper-hover.x-panel-body, .editable {
+		border: thin dashed rgba(0,0,0,.2) !important;
+	}
+	.notebook-code-editor, .notebook-code-results {
+		margin-left: 2em;
+	}
+	.notebook-code-editor {
+		border-left: thin solid rgb(240, 240, 240);
+	}
+	.notebook-code-results {
+		background-color: rgb(252, 252, 252);
+		border: thin solid rgb(240, 240, 240);
+	}
+	.notebook-code-results .error {
+		color: red;
+	}
+	.notebook-code-results pre {
+		font-size: smaller;
+	}	
+	.notebook-code-results .info {
+		overflow: scroll
+	}
+	.notebook-code-editor-raw { /* used for raw code in saved view */
+		display: none;
+	}
+	.cke_button__sourcedialog_label {
+	    display: none !important;
+	}
+	.exported-notebook .notebookwrappercounter {
+		float: right;
+	}
+	.exported-notebook .notebookwrappercounter a {
+		text-decoration: none;
+	}
+	
+	.notebookwrappercounter a {
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		border-radius: 3px;
+		background-color: #f5f5f5;
+	    text-align: right;
+	    border: thin solid #d8d8d8;
+	    padding: 1px;
+	    margin: 1px;
+	    font-size: smaller;
+	}
+	
+	.spyral-header, .spyral-footer {
+		text-align: center;
+	}
+	
+	.spyral-footer {
+		margin-top: 1em;
+		background-color: rgba(0,0,0,.01);
+		border-top: rgba(0,0,0,.05);
+	}
+</style>
+<script> // this script checks to see if embedded tools seem to be available
+window.addEventListener('load', function() {
+var hostnames = {}, warned = false;
+document.querySelectorAll('iframe').forEach(function(iframeEl) {
+let url = new URL(iframeEl.src);
+if (!(url.hostname in hostnames) && !warned) {
+hostnames[url.hostname] = true; // mark as fetched
+fetch(url).catch(response => {
+warned = true;
+alert('This notebook seems to contain one ore more tools that may not be able to load. Possible reasons include a server no longer being accessible (especially if the notebook was generated from a local server), or because of security restrictions.'+url)
+})
+}
+})
+})
+</script>
+</head>
+<body class='exported-notebook'><header class='spyral-header'><h1>Creating a Corpus in a Spyral Notebook</h1></header>
+<article class='spyralArticle'><section id='hz478e7ejt70uoir' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="hz478e7ejt70uoir" href="#hz478e7ejt70uoir" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">1</a></div><div class='notebook-text-editor'><p>This notebook will help you create a corpus with Spyral Notebooks (it's part of the <a data-tabindex-counter="34" data-tabindex-value="none" data-cke-saved-href="alta" href="alta" tabindex="-1" target="_blank">Art of Literary Text Analysis with Spyral&nbsp;Notebooks</a>). In particular, we'll look at:</p><ul><li><a data-tabindex-counter="20" data-tabindex-value="none" data-cke-saved-href="#voyant" href="#voyant" tabindex="-1">creating a corpus in Voyant</a></li><li><a data-tabindex-counter="26" data-tabindex-value="none" data-cke-saved-href="#strings" href="#strings" tabindex="-1">creating a corpus from strings</a></li><li><a data-tabindex-counter="26" data-tabindex-value="none" data-cke-saved-href="#urls" href="#urls" tabindex="-1">creating a corpus from one or more URLs</a><ul><li><a data-tabindex-counter="13" data-tabindex-value="none" data-cke-saved-href="#xml" href="#xml" tabindex="-1">creating an XML Corpus</a></li><li><a data-tabindex-counter="13" data-tabindex-value="none" data-cke-saved-href="#text" href="#text" tabindex="-1">creating a Plain Text Corpus</a></li></ul></li><li><a data-tabindex-counter="34" data-tabindex-value="none" data-cke-saved-href="#next" href="#next" tabindex="-1">next steps</a></li></ul><p>In text analysis (both with and without computers) a <em>corpus</em> refers to a collection (or body) of texts. A corpus can be a single poem, a set of plays, all English novels from the nineteenth century, or even a large collection of tweets. How you define documents within a corpus might change depending on your needs. For instance, it might be worth grouping all documents from a decade into one single document and have ten documents for a corpus that spans across a century.</p><p>We will consider three ways of creating a corpus in Spyral, using <a data-tabindex-counter="15" data-tabindex-value="none" data-cke-saved-href="#voyant" href="#voyant" tabindex="-1">Voyant</a>,&nbsp;<a data-tabindex-counter="26" data-tabindex-value="none" data-cke-saved-href="#strings" href="#strings" tabindex="-1">strings</a>, and&nbsp;<a data-tabindex-counter="26" data-tabindex-value="none" data-cke-saved-href="#urls" href="#urls" tabindex="-1">URLs</a>. Of these, using URLs is often preferable since it's the most reliable way for others to access the same data (assuming the contents of the URL don't move). But that's not always possible, and sometimes uploading files is necessary. As we will see, it may also be possible to use a data service like <a data-tabindex-counter="26" data-tabindex-value="none" data-cke-saved-href="https://gist.github.com/" href="https://gist.github.com/" tabindex="-1">Gist</a> or <a data-tabindex-counter="26" data-tabindex-value="none" data-cke-saved-href="https://pastebin.com/" href="https://pastebin.com/" tabindex="-1">Pastebin</a> to host certain formats of text at a URL.</p><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22voyant%22%20data-cke-saved-name%3D%22voyant%22%20name%3D%22voyant%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Anchor" title="Anchor" align="" data-cke-saved-src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Creating a Corpus in Voyant</h2><p>Most of the techniques below describe ways of using Spyral to create a corpus programmatically, in other words with a bit of code. But of course it’s also possible to create a corpus using the usual Voyant interface and then to refer to that corpus in a Spyral Notebook (more about that below). Creating a corpus programmatically provides more flexibility (including options that may not be available in the user interface) and it also ensures that your Spyral Notebook is fully self-contained (which makes it more portable, it can run on different instances more easily). Then again, using the Voyant interface can be simpler&nbsp;and more familiar.</p><p>You might experiment first with the Voyant interface technique for creating a corpus and then rewrite parts of your Spyral notebook to use URLs instead if you're looking to share your notebook with others. If you use Voyant to create your corpus, you can still describe the process in detail in your Spyral Notebook so that others may try to reproduce or adapt your work using the same options.</p><p>When you first open the <a data-tabindex-counter="20" data-tabindex-value="none" data-cke-saved-href="../" href="../" tabindex="-1" target="_blank">home page of Voyant</a> (be sure to be on the same server as your instance of Spyral) you can begin by clicking on the options icon.</p><p style="text-align: center"><img alt="" data-cke-saved-src="../resources/spyral//alta-assets/voyant_input_options.png" src="../resources/spyral//alta-assets/voyant_input_options.png" style="max-width:800px;"></p><p>There’s a fairly dizzying number of options available (all of which are also available when you create your corpus programmatically) and you’re strongly encouraged to refer to the Voyant documentation on <a data-tabindex-counter="18" data-tabindex-value="none" data-cke-saved-href="../../docs/#!/guide/corpuscreator" href="../../docs/#!/guide/corpuscreator" tabindex="-1">creating a corpus</a>.</p><p style="text-align: center"><img alt="" data-cke-saved-src="../resources/spiral/alta-assets/voyant_input_options_dialog.png" src="../resources/spiral/alta-assets/voyant_input_options_dialog.png" style="max-width:400px;"></p><p>Once you’ve defined the input options you can create the corpus by either filling content in the text box (text or one URLs, one per line) or by clicking the upload button.</p><p style="text-align: center"><img alt="Inputting Text or File Upload" data-cke-saved-src="../../resources/spyral/notebooks/alta-assets/voyant_input.png" src="../../resources/spyral/notebooks/alta-assets/voyant_input.png" style="max-width: 800px; width: 801px; height: 223px;"></p><p>Once your corpus is loaded (assuming everything worked properly) you’ll see the regular Voyant interface, but we’re actually interested in the URL bar where part of the address should now contain a valid corpus ID that we can use in Spyral on the same server.</p><p style="text-align: center"><img alt="Selecting Corpus ID" data-cke-saved-src="../../resources/spyral/notebooks/alta-assets/voyant_corpus_id.png" src="../../resources/spyral/notebooks/alta-assets/voyant_corpus_id.png" style="max-width: 600px; width: 600px; height: 183px;"></p><p>Copy the corpus ID (only) into the clipboard (it will be different from the one in the screenshot above but it should have a similar format). Now we can use that ID in Spyral, try pasting the ID in place below, replacing “<em>austen</em>” (but be sure to leave the quotes in place). Then click the run button from the left toolbar.</p></div>
+</section>
+<section id='suahy5t1b36di0dw' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="suahy5t1b36di0dw" href="#suahy5t1b36di0dw" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">2</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"austen"</span><span class="ace_paren ace_rparen">)</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+loadCorpus("austen")</pre>
+<div class='notebook-code-results'>
+<div style='height: 0px'> <div class="info">This corpus (austen) has 8 documents with 781,763 total words and 15,368 unique word forms.</div></div>
+</div>
+</section>
+<section id='jlr8mq6pdxdlt3z1' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="jlr8mq6pdxdlt3z1" href="#jlr8mq6pdxdlt3z1" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">3</a></div><div class='notebook-text-editor'><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22strings%22%20data-cke-saved-name%3D%22strings%22%20name%3D%22strings%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Anchor" title="Anchor" align="" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Creating a Corpus from Strings</h2><p>Above we looked at using the regular Voyant interface to create a corpus, but we can also create a corpus directly and programmatically in Spyral. One very simple way to create a corpus in Spyral is with a set of one or more strings. This isn't especially practical for longer texts, and there are certain limitations since the strings need to be defined using either single or double quotes, usually on a single line.</p><p>Here's an example where the string "Hello Spyral!" is used directly to create a corpus:</p></div>
+</section>
+<section id='thy8xgkq4kk51zyk' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="thy8xgkq4kk51zyk" href="#thy8xgkq4kk51zyk" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">4</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"Hello Spyral!"</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+loadCorpus("Hello Spyral!");</pre>
+<div class='notebook-code-results'>
+<div style='height: 0px'> <div class="info">This corpus (20281564ba51492a0ab0565ce2b0a3c9) has 1 documents with 2 total words and 2 unique word forms.</div></div>
+</div>
+</section>
+<section id='dewleuqiqld75ue2' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="dewleuqiqld75ue2" href="#dewleuqiqld75ue2" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">5</a></div><div class='notebook-text-editor'><p>In Javascript (used by Spyral), a string can be define in several ways, but the most common ways are with single or double quotes. In the example&nbsp;below, we assign the string to a variable name – this is a name that we choose (with certain rules) and that we want to make both short and meaningful. We also use the keyword <em><code>var</code></em> which isn't strictly needed, but it's good programming practice and it declares the <a data-tabindex-counter="26" data-tabindex-value="none" href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Statements/var" tabindex="-1">scope</a> (where our variable is recognized).</p>
+
+<p>This is functionally equivalent to the previous code (note the use of the backslashes (//) that indicates a comment in the code that's ignored by the computer).</p>
+</div>
+</section>
+<section id='4ulek5k7u6hit0zf' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="4ulek5k7u6hit0zf" href="#4ulek5k7u6hit0zf" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">6</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">greeting</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_string">"Hello Spyral!"</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// declare a string into a variable</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">greeting</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// create a corpus with our variable</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+var greeting = "Hello Spyral!"; // declare a string into a variable
+loadCorpus(greeting); // create a corpus with our variable</pre>
+<div class='notebook-code-results'>
+<div style='height: 31px'> <div class="info">This corpus (20281564ba51492a0ab0565ce2b0a3c9) has 1 documents with 2 total words and 2 unique word forms.</div></div>
+</div>
+</section>
+<section id='kjvfz2otbwepmo4n' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="kjvfz2otbwepmo4n" href="#kjvfz2otbwepmo4n" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">7</a></div><div class='notebook-text-editor'><p>We can also create a corpus with two or more strings by using an array argument. An array is an ordered list of variables, in this case we have strings. Just as with strings, there are multiple ways of creating an array, but one of the most common ways is by using square brackets.</p>
+</div>
+</section>
+<section id='rmtsyx1dyr6wkzvt' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="rmtsyx1dyr6wkzvt" href="#rmtsyx1dyr6wkzvt" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">8</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">greeting</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_string">"Hello Spyral!"</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// declare a first string</span></div><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">reply</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_string">"Well hello there!"</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// declare a second string</span></div><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">texts</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_paren ace_lparen">[</span><span class="ace_identifier">greeting</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">reply</span><span class="ace_paren ace_rparen">]</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// combine the two strings into an array</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">texts</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// same as new Corpus([greeting, reply]).show();</span></div><div class="ace_line" style="height:16px"></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+var greeting = "Hello Spyral!"; // declare a first string
+var reply = "Well hello there!"; // declare a second string
+var texts = [greeting, reply]; // combine the two strings into an array
+loadCorpus(texts); // same as new Corpus([greeting, reply]).show();
+</pre>
+<div class='notebook-code-results'>
+<div style='height: 0px'> </div>
+</div>
+</section>
+<section id='woz5lay588usr2c6' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="woz5lay588usr2c6" href="#woz5lay588usr2c6" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">9</a></div><div class='notebook-text-editor'><p>Again, it's fairly impractical to work with strings of any length in Javascript. There are some techniques for multiline strings, but it's safest to combine strings together with the plus sign (concatenation). In the example below we also demonstrate escaping the double quote that's part of the string (but that's also used to define the start and end of the string.</p>
+</div>
+</section>
+<section id='zu4312p8eg4q7ufi' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="zu4312p8eg4q7ufi" href="#zu4312p8eg4q7ufi" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">10</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">greeting</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_string">"And then she asked </span><span class="ace_constant ace_language ace_escape">\"</span><span class="ace_string">What do "</span><span class="ace_keyword ace_operator">+</span> <span class="ace_comment">// add two string with plus sign</span></div><div class="ace_line" style="height:16px">    <span class="ace_string">" you mean?</span><span class="ace_constant ace_language ace_escape">\"</span><span class="ace_string"> in that voice."</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// note the use of \" to escape the double quote</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">show</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">greeting</span><span class="ace_paren ace_rparen">)</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+var greeting = "And then she asked \"What do "+ // add two string with plus sign
+    " you mean?\" in that voice."; // note the use of \" to escape the double quote
+show(greeting)</pre>
+<div class='notebook-code-results'>
+<div style='height: 87px'>
+<div style="height: 73px">
+<div style="height: 59px"><div style="height: 45px"><div style="height: 31px"> <div class="info">And then she asked "What do  you mean?" in that voice.</div></div></div></div>
+</div>
+</div>
+</div>
+</section>
+<section id='rp3o5xd66d8ie5gd' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="rp3o5xd66d8ie5gd" href="#rp3o5xd66d8ie5gd" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">11</a></div><div class='notebook-text-editor'><p>One situation where creating a corpus from a string can be useful is when we want to process a text and then feed it back in as a new corpus. The code snippet below demonstrates a few techniques that we won't explain in detail yet, but it's just a demonstration of what's possible:</p>
+</div>
+</section>
+<section id='4pmsbam62myhtr7x' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="4pmsbam62myhtr7x" href="#4pmsbam62myhtr7x" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">12</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_comment">// create a corpus with a URL (hermeneuti.ca) and get the plain text</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"http://hermeneuti.ca"</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">text</span><span class="ace_paren ace_lparen">(</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">then</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">text</span> <span class="ace_keyword ace_operator">=&gt;</span> <span class="ace_paren ace_lparen">{</span></div><div class="ace_line" style="height:16px">    <span class="ace_comment">// modify the plain text to replace "the" by "*THE*"</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">text</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_identifier">text</span><span class="ace_punctuation ace_operator">.</span><span class="ace_support ace_function">replace</span><span class="ace_paren ace_lparen">(</span><span class="ace_string ace_regexp">/</span><span class="ace_regexp ace_keyword ace_operator">\b</span><span class="ace_string ace_regexp">the</span><span class="ace_regexp ace_keyword ace_operator">\b</span><span class="ace_string ace_regexp">/g</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_string">"*THE*"</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div><div class="ace_line" style="height:16px">    <span class="ace_comment">// create a new corpus (with a string) and embed the reader tool</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">text</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'reader'</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span></div><div class="ace_line" style="height:16px"><span class="ace_paren ace_rparen">})</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+// create a corpus with a URL (hermeneuti.ca) and get the plain text
+loadCorpus("http://hermeneuti.ca").text().then(text => {
+    // modify the plain text to replace "the" by "*THE*"
+    text = text.replace(/\bthe\b/g, "*THE*");
+    // create a new corpus (with a string) and embed the reader tool
+    loadCorpus(text).tool('reader');
+})</pre>
+<div class='notebook-code-results'>
+<div style='height: 0px'> </div>
+</div>
+</section>
+<section id='bmhnzv6wufuyroav' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="bmhnzv6wufuyroav" href="#bmhnzv6wufuyroav" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">13</a></div><div class='notebook-text-editor'><h2><a id="urls" name="urls"></a>Creating a Corpus from URLs</h2>
+
+<p>The preferred way of creating a corpus in Spyral is to use URLs. The benefits are that the source texts&nbsp;can be accessed by other people and the corpus can be more easily re-created if ever it's lost or damaged. The disadvantages are that the content of URLs can change or disappear. We've already seen examples several times, and we can use both the single URL or array of URLs format (just as we did with strings).</p>
+</div>
+</section>
+<section id='p2lv0e3hwma2l75x' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="p2lv0e3hwma2l75x" href="#p2lv0e3hwma2l75x" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">14</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_comment">// one URL as a single string argument</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"http://hermeneuti.ca"</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">summary</span><span class="ace_paren ace_lparen">(</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> </div><div class="ace_line" style="height:16px"></div><div class="ace_line" style="height:16px"><span class="ace_comment">// an array of URLs as an argument</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">([</span><span class="ace_string">"http://hermeneuti.ca"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_string">"https://en.wikipedia.org/wiki/Voyant_Tools"</span><span class="ace_paren ace_rparen">])</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">summary</span><span class="ace_paren ace_lparen">(</span><span class="ace_paren ace_rparen">)</span></div><div class="ace_line" style="height:16px"></div><div class="ace_line" style="height:16px"><span class="ace_comment">// a variable to contain URLs that are then used as a single argument</span></div><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">urls</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_paren ace_lparen">[</span><span class="ace_string">"http://hermeneuti.ca"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_string">"https://en.wikipedia.org/wiki/Voyant_Tools"</span><span class="ace_paren ace_rparen">]</span><span class="ace_punctuation ace_operator">;</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">urls</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">summary</span><span class="ace_paren ace_lparen">(</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> </div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+// one URL as a single string argument
+loadCorpus("http://hermeneuti.ca").summary(); 
+
+// an array of URLs as an argument
+loadCorpus(["http://hermeneuti.ca", "https://en.wikipedia.org/wiki/Voyant_Tools"]).summary()
+
+// a variable to contain URLs that are then used as a single argument
+var urls = ["http://hermeneuti.ca", "https://en.wikipedia.org/wiki/Voyant_Tools"];
+loadCorpus(urls).summary(); </pre>
+<div class='notebook-code-results'>
+<div style='height: 0px'> </div>
+</div>
+</section>
+<section id='2pwys4y7146fbiv7' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="2pwys4y7146fbiv7" href="#2pwys4y7146fbiv7" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">15</a></div><div class='notebook-text-editor'><p>In addition to specifying one or more URLs it's also possible to specify parameters to be used for preparing the corpus. These parameters are the same as the ones used in the <a data-tabindex-counter="14" data-tabindex-value="none" data-cke-saved-href="../docs/#!/guide/corpuscreator-section-options" href="../docs/#!/guide/corpuscreator-section-options" tabindex="-1" target="_blank">Voyant options</a> interface (though there are even more options available programmatically in Spyral). Many of the options will depend on the format of the documents in your corpus. For a fuller&nbsp;list of options see the <a data-tabindex-counter="14" data-tabindex-value="none" data-cke-saved-href="../docs/#!/api/Corpus" href="../docs/#!/api/Corpus" tabindex="-1" target="_blank">Corpus</a>&nbsp;documentation.</p><h3><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22xml%22%20data-cke-saved-name%3D%22xml%22%20name%3D%22xml%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Ancre" title="Ancre" align="" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Creating an XML Corpus</h3><p>URLs can point to documents in a variety of formats supported by Spyral, including HTML, XML, RTF, MS Word, MS Excel, OpenOffice and compressed zip files containing documents. The XML handling of Spyral is particularly powerful as you can define very precisely how to treat each part of the document. For example, if we visit&nbsp;<a data-tabindex-counter="14" data-tabindex-value="none" data-cke-saved-href="http://www.cbc.ca/cmlink/rss-topstories" href="http://www.cbc.ca/cmlink/rss-topstories" tabindex="-1" target="_blank">http://www.cbc.ca/cmlink/rss-topstories</a> we find an XML document that is also an <a data-tabindex-counter="14" data-tabindex-value="none" data-cke-saved-href="https://en.wikipedia.org/wiki/RSS" href="https://en.wikipedia.org/wiki/RSS" tabindex="-1" target="_blank">RSS</a> feed, that is, a collection of items. Because the <a data-tabindex-counter="14" data-tabindex-value="none" data-cke-saved-href="https://en.wikipedia.org/wiki/Root_element" href="https://en.wikipedia.org/wiki/Root_element" tabindex="-1" target="_blank">root element</a> of this document is &lt;rss&gt;, Spyral assumes by default that you want each item to be its own document.&nbsp;</p></div>
+</section>
+<section id='3g8k0ekuz3hmgiu5' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="3g8k0ekuz3hmgiu5" href="#3g8k0ekuz3hmgiu5" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">16</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"http://www.cbc.ca/cmlink/rss-topstories"</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// treated as an RSS feed by default</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+loadCorpus("http://www.cbc.ca/cmlink/rss-topstories"); // treated as an RSS feed by default</pre>
+<div class='notebook-code-results'>
+<div style='height: 87px'>
+<div style="height: 73px">
+<div style="height: 59px"><div style="height: 45px"><div style="height: 31px"> <div class="info">This corpus has 20 documents with 2,467 <span class="info-tip" data-qtip="every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted">total words</span> and 866 <span class="info-tip" data-qtip="multiple occurrences of words (like &quot;the&quot;) are counted once">unique word forms</span>. Created now.</div></div></div></div>
+</div>
+</div>
+</div>
+</section>
+<section id='nj0i5qjia63751j4' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="nj0i5qjia63751j4" href="#nj0i5qjia63751j4" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">17</a></div><div class='notebook-text-editor'><p>However, we can tell Spyral to treat the document differently. For instance, we might want all of the items to be combined into one document. We can do that by providing a second argument to the Corpus object. The first argument specifies the source of the documents, the second argument (optionally) specifies processing parameters.</p>
+</div>
+</section>
+<section id='maqanuqula8jvro0' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="maqanuqula8jvro0" href="#maqanuqula8jvro0" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">18</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"http://www.cbc.ca/cmlink/rss-topstories"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">inputFormat</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'xml'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_comment">// force XML (not RSS)</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">xmlContentXpath</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'//item/description'</span> <span class="ace_comment">// grab item description for content</span></div><div class="ace_line" style="height:16px"><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">;</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+loadCorpus("http://www.cbc.ca/cmlink/rss-topstories", {
+    inputFormat: 'xml', // force XML (not RSS)
+    xmlContentXpath: '//item/description' // grab item description for content
+});</pre>
+<div class='notebook-code-results'>
+<div style='height: 87px'>
+<div style="height: 73px">
+<div style="height: 59px"><div style="height: 45px"><div style="height: 31px"> <div class="info">This corpus has 1 document with 1,716 <span class="info-tip" data-qtip="every occurrence of every word (like multiple occurrences of &quot;the&quot;) is counted">total words</span> and 691 <span class="info-tip" data-qtip="multiple occurrences of words (like &quot;the&quot;) are counted once">unique word forms</span>. Created now.</div></div></div></div>
+</div>
+</div>
+</div>
+</section>
+<section id='bmepo6072fi59u9y' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="bmepo6072fi59u9y" href="#bmepo6072fi59u9y" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">19</a></div><div class='notebook-text-editor'><p>Now we have all the description text in just one document.</p>
+
+<p>Let's look more closely at the syntax.</p>
+
+<blockquote>
+<pre>new Corpus( <span style="color:#0000FF;">"string"</span>, <span style="background-color:#E6E6FA;"><span style="color:#FF0000;">{</span>
+  </span><span style="color:#800080;"><span style="background-color:#E6E6FA;">name</span></span><span style="background-color:#E6E6FA;">: </span><span style="color:#0000CD;"><span style="background-color:#E6E6FA;">"value"</span></span><span style="background-color:#E6E6FA;">,
+  </span><span style="color:#800080;"><span style="background-color:#E6E6FA;">name</span></span><span style="background-color:#E6E6FA;">: </span><span style="color:#0000CD;"><span style="background-color:#E6E6FA;">"value"</span></span><span style="background-color:#E6E6FA;">
+<span style="color:#FF0000;">}</span></span> );</pre>
+</blockquote>
+
+<p>The first argument is a string, the URL of our source (http://www.cbc.ca/cmlink/rss-topstories). The second argument is a data type called an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types#Object_literals" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="13">object literal</a>. It can be declared with curly brackets&nbsp;that enclose&nbsp;a set of name: value pairs (note that the name doesn't need to be quoted but the value does need to be quoted). Each pair of arguments is separated by a comma (but no comma after the last one). It's easy to make a mistake by forgetting a comma or a curly bracket or something, but you can experiment with the examples below and try your own.</p>
+</div>
+</section>
+<section id='b808yhdrebqxqaf4' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="b808yhdrebqxqaf4" href="#b808yhdrebqxqaf4" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">20</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">oneValue</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">inputFormat</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'xml'</span><span class="ace_paren ace_rparen">}</span><span class="ace_punctuation ace_operator">;</span></div><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">twoValues</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_paren ace_lparen">{</span><span class="ace_identifier">inputFormat</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'xml'</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_identifier">xmlContentXPath</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'//item/description'</span><span class="ace_paren ace_rparen">}</span><span class="ace_punctuation ace_operator">;</span></div><div class="ace_line" style="height:16px"><span class="ace_storage ace_type">var</span> <span class="ace_identifier">twoValuesBis</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_paren ace_lparen">{</span> <span class="ace_comment">// exact same as above, just formatted differently</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">inputFormat</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'xml'</span><span class="ace_punctuation ace_operator">,</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">xmlContentXPath</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'//item/description'</span></div><div class="ace_line" style="height:16px"><span class="ace_paren ace_rparen">}</span><span class="ace_punctuation ace_operator">;</span></div><div class="ace_line" style="height:16px"><span class="ace_identifier">show</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">twoValuesBis</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">inputFormat</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// example of using an object's value</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+var oneValue = {inputFormat: 'xml'};
+var twoValues = {inputFormat: 'xml', xmlContentXPath: '//item/description'};
+var twoValuesBis = { // exact same as above, just formatted differently
+    inputFormat: 'xml',
+    xmlContentXPath: '//item/description'
+};
+show(twoValuesBis.inputFormat); // example of using an object's value</pre>
+<div class='notebook-code-results'>
+<div style='height: 87px'>
+<div style="height: 73px">
+<div style="height: 59px"><div style="height: 45px"><div style="height: 31px"> <div class="info">xml</div></div></div></div>
+</div>
+</div>
+</div>
+</section>
+<section id='f3bp8t9fg90amcq3' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="f3bp8t9fg90amcq3" href="#f3bp8t9fg90amcq3" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">21</a></div><div class='notebook-text-editor'><h3>&nbsp;<img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22text%22%20data-cke-saved-name%3D%22text%22%20name%3D%22text%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Ancre" title="Ancre" align="" data-cke-saved-src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Creating a Plain Text Corpus</h3><p>Above we considered how to create a corpus from a URL with XML content. Now let's consider an example with plain text, namely Edgar Allen Poe's short story&nbsp;"The Gold Bug." Several editions of the text exist online (and we could use them with a URL), but we will demonstrate using the Project Gutenberg edition. One of the first things to know is that Project Gutenberg sometimes blocks Spyral from fetching URLs from its servers, so we will start by making a copy of the document at another URL. We can outline our procedure as follows:</p><ul><li>find the document we want in plain text from Project Gutenberg</li><li>make a copy (legally) of the document in a Gist</li><li>determine which parts of the document are relevant</li><li>create a corpus with parameters that define the relevant document</li></ul><p>The "Gold Bug" is part of <a data-cke-saved-href="http://www.gutenberg.org/ebooks/2147" href="http://www.gutenberg.org/ebooks/2147" target="_blank" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="13">Volume 1 of the Works of Edgar Allan Poe on Project Gutenberg</a>. We have a choice of formats at this location, but for our example we will choose the&nbsp;<a charset="utf-8" data-cke-saved-href="http://www.gutenberg.org/files/2147/2147-0.txt" href="http://www.gutenberg.org/files/2147/2147-0.txt" target="_blank" title="Download" type="text/plain; charset=utf-8" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="13">Plain Text UTF-8</a>. We have found our document.</p><p>Next we will copy the contents of the page (not the URL, the full text) into the clipboard and then paste it into the main (bigger) text box in&nbsp;a <a data-cke-saved-href="https://gist.github.com/" href="https://gist.github.com/" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="13">new Gist</a>. Let's also specify a filename, we can use goldbug.txt. Finally, we'll click the "Create public gist" button. (Again, the Project Gutenberg license allows this kind of copying of content.)</p><p style="text-align: center"><img alt="" data-cke-saved-src="../resources/spyral/alta-assets/gist-gold-bug.png" src="../resources/spiral/alta-assets/gist-gold-bug.png" style="max-width: 800px"></p><p>After clicking "Create public gist" you will see a page that contains a button for the raw text – that's the URL we want (click on the "raw" button and then copy and paste the URL from the address bar of your browser).</p><p style="text-align: center"><img alt="" data-cke-saved-src="../resources/spyral/alta-assets/gist-gold-bug-raw.png" src="../resources/spyral/alta-assets/gist-gold-bug-raw.png" style="max-width: 800px"></p><p>You may be doing this with your own text, or you can use the URL from the "Gold Bug" (yes, it's a bit long):</p><blockquote><p><a data-cke-saved-href="https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt" href="https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt" target="_blank" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="13">https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt</a></p></blockquote><p>We could use the URL right away to create a Spyral corpus, but let's remember that this document is a volume contains several works and we only want "The Gold Bug." In order to isolate the part we want, we can scroll to the start of the short story where we find this:</p><blockquote><pre>the moon, or in the eye of the spectator, but must be looked for in
+something (an atmosphere?) existing about the moon.
+
+THE GOLD-BUG
+
+          What ho! what ho! this fellow is dancing mad!
+               He hath been bitten by the Tarantula.
+                    _--All in the Wrong._
+
+MANY years ago, I contracted an intimacy with a Mr. William Legrand.
+</pre></blockquote><p>The text "about the moon"&nbsp;is the end of the previous text, so we can say that we want to start with "THE GOLD-BUG" (capitalized, which is not the case elsewhere like in the table of contents at the top). We'll do a very similar operation to find the end of the text that we want:</p><blockquote><pre>required a dozen--who shall tell?”
+
+FOUR BEASTS IN ONE--THE HOMO-CAMELEOPARD
+
+                     Chacun a ses vertus.
+                        --_Crebillon’s Xerxes._
+
+ANTIOCHUS EPIPHANES is very generally looked upon as the Gog of the</pre></blockquote><p>So we know we want to remove all the text until "THE GOLD-BUG" and then all the text starting with "FOUR BEASTS IN ONE". Note that we don't need to specify many options (like inputFormat), because Spyral is fairly good at determining default values.</p></div>
+</section>
+<section id='6qt9yx9w0svvw5mo' class='notebook-editor-wrapper notebookcodeeditorwrapper'>
+<div class='notebookwrappercounter'><a name="6qt9yx9w0svvw5mo" href="#6qt9yx9w0svvw5mo" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">22</a></div><div class='notebook-code-editor ace-chrome'>
+<div class="ace_layer ace_text-layer" style="padding: 0px 4px;"><div class="ace_line" style="height:16px"><span class="ace_identifier">loadCorpus</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt"</span><span class="ace_punctuation ace_operator">,</span> <span class="ace_paren ace_lparen">{</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">inputRemoveUntil</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'THE GOLD-BUG'</span><span class="ace_punctuation ace_operator">,</span></div><div class="ace_line" style="height:16px">    <span class="ace_identifier">inputRemoveFrom</span><span class="ace_punctuation ace_operator">:</span> <span class="ace_string">'FOUR BEASTS IN ONE'</span></div><div class="ace_line" style="height:16px"><span class="ace_paren ace_rparen">})</span><span class="ace_punctuation ace_operator">.</span><span class="ace_identifier">tool</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">'reader'</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation ace_operator">;</span> <span class="ace_comment">// let's look at the reader to ensure we have the right text</span></div></div>
+</div>
+<pre class='notebook-code-editor-raw editor-mode-javascript'>
+loadCorpus("https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt", {
+    inputRemoveUntil: 'THE GOLD-BUG',
+    inputRemoveFrom: 'FOUR BEASTS IN ONE'
+}).tool('reader'); // let's look at the reader to ensure we have the right text</pre>
+<div class='notebook-code-results'>
+<div style='height: 474px'>
+<div style="height: 460px">
+<div style="height: 446px"><div style="height: 432px"><div style="height: 418px"> <div class="info"><iframe style="width: 90%; height: 400px" id="ext-388" name="ext-388" src="https://voyant-tools.org/tool/Reader/?minimal=true&amp;embeddedApiId=e29bb66ee53ad71395af883df399c20c" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="5"></iframe></div></div></div></div>
+</div>
+</div>
+</div>
+</section>
+<section id='bocvxzd8sg8xhtmo' class='notebook-editor-wrapper notebooktexteditorwrapper'>
+<div class='notebookwrappercounter'><a name="bocvxzd8sg8xhtmo" href="#bocvxzd8sg8xhtmo" data-tabindex-value="none" tabindex="-1" data-tabindex-counter="1">23</a></div><div class='notebook-text-editor'><h2><img class="cke_anchor" data-cke-realelement="%3Ca%20id%3D%22next%22%20data-cke-saved-name%3D%22next%22%20name%3D%22next%22%3E%3C%2Fa%3E" data-cke-real-node-type="1" alt="Ancre" title="Ancre" align="" data-cke-saved-src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" data-cke-real-element-type="anchor">Next Steps</h2><p>Here are some exercises to try, based on the contents of this notebook:</p><ul><li>use the Voyant interface to create a new corpus with different file formats such as&nbsp;PDF and&nbsp;MS Excel</li><li>create a new corpus with 3 URLs&nbsp;</li><li>create a new corpus from a different text in&nbsp;Project Gutenberg (be sure to create a copy and use the URL in Gist)</li></ul><p>If you're working sequentially&nbsp;through the <a data-tabindex-counter="22" data-tabindex-value="none" data-cke-saved-href="alta" href="alta" tabindex="-1" target="_blank">Art of Literary Text Analysis with Spyral&nbsp;Notebooks</a>, the next notebook&nbsp;is <a data-tabindex-counter="19" data-tabindex-value="none" data-cke-saved-href="../alta-smaller/" href="../alta-smaller/" tabindex="-1" target="_blank">Exploring a Smaller Corpus</a>.</p></div>
+</section>
+</article>
+<footer class='spyral-footer'>&copy; Stéfan Sinclair & Geoffrey Rockwell (Creative Commons Attribution (CC BY)). Created June 29, 2019.</footer></body>
+</html>

@@ -40,6 +40,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			editor.clearSelection();
 		    editor.on("focus", function() {
 		    	me.getEditor().renderer.setShowGutter(true);
+		    	console.warn(editor)
 		    }, this);
 		    editor.on("change", function(ev, editor) {
 		    		var lines = editor.getSession().getScreenLength();
@@ -52,7 +53,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 				    	var wrapper = me.up('notebookcodeeditorwrapper');
 				    	if (wrapper) {
 				    		wrapper.setIsRun(false);
-				    		var notebook = wrapper.up(notebook);
+				    		var notebook = wrapper.up("notebook");
 				    		if (notebook) {notebook.setIsEdited(true);}
 				    	}
 			    	} else {
