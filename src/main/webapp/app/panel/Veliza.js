@@ -54,12 +54,15 @@ Ext.define('Voyant.panel.Veliza', {
     				flex: 1,
     				listeners: {
     					afterrender: function(editor) {
+    						var corpus = me.getApiParam('corpus');
+    						if (!corpus) {return}
     						editor.mask(me.localize('loadingScript'));
     						Ext.Ajax.request({
     							url: me.getTromboneUrl(),
     							params: {
     								tool: 'corpus.Veliza',
-    								script: me.getApiParam('script')
+    								script: me.getApiParam('script'),
+    								corpus: corpus
     							}
     						}).then(function(response) {
     							var obj = Ext.decode(response.responseText);
