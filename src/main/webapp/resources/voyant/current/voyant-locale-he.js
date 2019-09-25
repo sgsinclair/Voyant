@@ -475,7 +475,7 @@ Ext.apply(Voyant.panel.DocumentTerms.i18n, {
 "trendTip":"This is a sparkline graph that represents the distribution of the term within linear segments of the document (by default 10 segments of equal size).",
 "title":"מונחי המסמך",
 "helpTip":"<p>Document Terms is a table view of terms that appear in each document. Features include:</p><ul><li>reordering by <i>Term</i>, <i>Count</i> (raw frequency), and <i>Relative</i> frequency (click on the column headers)</li><li>a sparkline graph of the distribution of term frequencies across the documents</li><li>additional columns available (<i>Significance</i> or TF-IDF) by clicking on the arrow that appears when hovering over a header</li><li>a search box for queries (hover over the magnifying icon for help with the syntax)</li></ul>",
-"zscoreTip":"The Z-Score, or <a href=\"https://en.wikipedia.org/wiki/Standard_score\" target=\"_blank\">standard score</a>, is a normalized value for the term's raw frequency compared to other term frequencies in the same document. It is calculated by taking the frequency of a term in a document, subtracting the mean frequency of all terms, and dividing the difference by the standard deviation of all term frequencies."});
+"zscoreTip":"The Z-Score, or <a href='https://en.wikipedia.org/wiki/Standard_score' target='_blank'>standard score</a>, is a normalized value for the term's raw frequency compared to other term frequencies in the same document. It is calculated by taking the frequency of a term in a document, subtracting the mean frequency of all terms, and dividing the difference by the standard deviation of all term frequencies."});
 Ext.apply(Voyant.data.model.Corpus.i18n, {
 "hasNdocuments":"כולל {} מסמכים",
 "daysAgo":"לפני כ-{} ימים",
