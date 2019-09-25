@@ -128,7 +128,6 @@ Ext.define('Voyant.widget.QuerySearchField', {
 				    			inDocumentsCountOnly: true
 	    					},
 	    					callback: function(records, operation, success) {
-	    						debugger
 	    						if (success && records && records.length==1) {
 	    							me.triggers.count.getEl().setHtml(records[0].getInDocumentsCount())
 	    						}
@@ -239,6 +238,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
 				}
 			});
 			store.on("load", function() {
+				store.insert(0, {
+					term: "test"
+				})
 				this.fireEvent.apply(this, ["load"].concat(Array.prototype.slice.call(arguments)));
 			}, this);
 

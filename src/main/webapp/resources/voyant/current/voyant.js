@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jul 10 16:36:53 EDT 2019 */
+/* This file created by JSCacher. Last modified: Fri Aug 02 15:55:03 EDT 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -11771,7 +11771,6 @@ Ext.define('Voyant.widget.QuerySearchField', {
 				    			inDocumentsCountOnly: true
 	    					},
 	    					callback: function(records, operation, success) {
-	    						debugger
 	    						if (success && records && records.length==1) {
 	    							me.triggers.count.getEl().setHtml(records[0].getInDocumentsCount())
 	    						}
@@ -11882,6 +11881,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
 				}
 			});
 			store.on("load", function() {
+				store.insert(0, {
+					term: "test"
+				})
 				this.fireEvent.apply(this, ["load"].concat(Array.prototype.slice.call(arguments)));
 			}, this);
 

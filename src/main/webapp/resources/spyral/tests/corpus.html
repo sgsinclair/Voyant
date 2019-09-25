@@ -1,0 +1,86 @@
+<html>
+<head>
+	<script>const Spyral = window.Spyral || {};</script>
+	<script src="../load.js"></script>
+	<script src="../corpus.js"></script>
+	<script src="test.js"></script>
+</head>
+<body>
+	<div id="cirrus"></div>
+<script>
+	
+	let corpus;
+	
+	Promise.all([
+		loadCorpus("austen").id().then(id => equals(id, "austen")),
+		loadCorpus("austen").metadata().then(data => {
+			equals(data.alias ? data.alias : data.id, "austen");
+			equals(data.documentsCount, 8);
+			equals(data.languageCodes[0], "en");
+		}),
+		loadCorpus("austen").summary().then(data => equals(data, "This corpus (austen) has 8 documents with 781,763 total words and 15,368 unique word forms.")),
+		loadCorpus("austen").titles().then(data => {
+			equals(data.length, 8);
+			equals(data[0], "1790 Love And Freindship")
+		}),
+		loadCorpus("austen").text({limit: 100}).then(data => {
+			equals(data.length, 807);
+			equals(data.indexOf("LOVE AND FREINDSHIP AND OTHER EARLY WORKS"), 0)
+		}),
+		loadCorpus("austen").texts({limit: 100}).then(data => {
+			equals(data.length, 8);
+			equals(data[0].indexOf("LOVE AND FREINDSHIP AND OTHER EARLY WORKS"), 0)
+		}),
+		loadCorpus("austen").terms({limit: 10}).then(data => {
+			equals(data.length, 10);
+			equals(data[0].term, "the");
+			equals(data[0].rawFreq, 28292);
+		}),
+		loadCorpus("austen").tokens({limit: 10}).then(data => {
+			equals(data.length, 20);
+			equals(data[1].term, "LOVE");
+			equals(data[1].rawFreq, 54);
+		}),
+		loadCorpus("austen").words({limit: 10}).then(data => {
+			equals(data.length, 10);
+			equals(data[0], "LOVE");
+		}),
+		loadCorpus("austen").contexts({limit: 10}).then(data => {
+			equals(data.length, 0);
+		}),
+		loadCorpus("austen").contexts({limit: 10, query: "love"}).then(data => {
+			equals(data.length, 10);
+			equals(data[0].term, "love");
+			equals(data[0].left, "");
+		}),
+		loadCorpus("austen").collocates({limit: 10}).then(data => {
+			equals(data.length, 0);
+		}),
+		loadCorpus("austen").collocates({limit: 10, query: "love"}).then(data => {
+			equals(data.length, 10);
+			equals(data[0].term, "love");
+			equals(data[0].contextTerm, "and");
+		}),
+		loadCorpus("austen").phrases({limit: 10}).then(data => {
+			equals(data.length, 10);
+			equals(data[0].term, "of the");
+			equals(data[0].length, 2);
+			equals(data[0].rawFreq, 3189);
+		}),
+		loadCorpus("austen").correlations({limit: 10, query: "love"}).then(data => {
+			equals(data.length, 10);
+			equals(data[0].source.term, "to");
+			equals(data[0].target.term, "love");
+			equals(data[0].correlation, 0.09780626);
+			equals(data[0].significance, 0.7185813);
+		}),
+		loadCorpus("austen").tool("Cirrus").then(data => document.getElementById("cirrus").innerHTML=data)
+		
+	]).then(() => {
+		equals(document.querySelectorAll("iframe").length, 1);
+		console.warn("all done")
+	})
+	
+</script>
+</body>
+</html>

@@ -1,332 +1,6 @@
-const Spyral = window.Spyral || {};
+// assumes Spyral has already been declared (by spyral.js)
 
 {
-
-	class Load {
-		static trombone(config, params) {
-			let  url = new URL(config && config.trombone ? config.trombone : this.baseUrl+"trombone");
-			let all = {...config,...params};
-			for (var key in all) {
-				if (all[key]===undefined) {delete all[key]}
-			}
-			let searchParams = Object.keys(all).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(all[key])).join("&")
-			let opt = {};
-			if (searchParams.length<800 || ("method" in all && all["method"]=="GET")) {
-				for (var key in all) {url.searchParams.set(key, all[key]);}
-			} else {
-				opt = {
-					method: 'POST',
-					headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
-					body: searchParams
-				}
-			}
-			return fetch(url, opt).then(response => {
-				if (response.ok) {
-					return response.json()
-				}
-				else {
-					return response.text().then(text => {
-						if (Voyant && Voyant.util && Voyant.util.DetailedError) {
-							new Voyant.util.DetailedError({
-								msg: "",
-								error: text.split(/(\r\n|\r|\n)/).shift(),
-								details: text
-							}).showMsg();
-						} else {
-							alert(text.split(/(\r\n|\r|\n)/).shift())
-							if (window.console) {console.error(text)}
-						}
-						throw Error(text);
-					});
-				}
-			})
-			
-			
-		}
-				
-		static load(urlToFetch, config) {
-			let  url = new URL(config && config.trombone ? config.trombone : this.baseUrl+"trombone");
-			url.searchParams.set("fetchData", urlToFetch);
-			return fetch(url).then(response => {
-				if (response.ok) {
-					return response;
-				}
-				else {
-					return response.text().then(text => {
-						if (Voyant && Voyant.util && Voyant.util.DetailedError) {
-							new Voyant.util.DetailedError({
-								error: text.split(/(\r\n|\r|\n)/).shift(),
-								details: text
-							}).showMsg();
-						} else {
-							alert(text.split(/(\r\n|\r|\n)/).shift())
-							if (window.console) {console.error(text)}
-						}
-						throw Error(text);
-					});
-				}
-			}).catch(err => {throw err})
-		}
-	
-		static html(url) {
-			return this.text(url).then(text => new DOMParser().parseFromString(text, 'text/html'));
-		}
-		static xml(url) {
-			return this.text(url).then(text => new DOMParser().parseFromString(text, 'text/xml'));
-		}
-		static json(url) {
-			return this.load(url).then(response => response.json());
-		}
-		static text(url) {
-			return this.load(url).then(response => response.text());
-		}
-		static corpus(config) {
-			return Spyral.Corpus.load(config);
-		}
-
-	}
-
-	class Util {
-		static id(len) {
-			len = len || 8;
-			// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-			return Math.random().toString(36).substring(2, 2+len) + Math.random().toString(36).substring(2, 2+len)
-		}
-		static toString(contents, config) {
-			if (contents.constructor === Array || contents.constructor===Object) {
-				contents = JSON.stringify(contents);
-				if (contents.length>500) {
-					contents = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'+contents.substring(0,500)+" <a href=''>+</a><div style='display: none'>"+contents.substring(501)+"</div>";
-				}
-			}
-			return contents.toString();
-		}
-		static more(before, more, after) {
-			return before + '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'+contents.substring(0,500)+" <a href=''>+</a><div style='display: none'>"+contents.substring(501)+"</div>";
-
-		}
-	}
-	
-	class Metadata {
-		constructor(config) {
-			['title', 'author', 'description', 'keywords', 'modified', 'created', 'language', 'license'].forEach(key => {
-				this[key] = undefined;
-			})
-			this.version = "0.1"; // may be changed by config
-			if (config instanceof HTMLDocument) {
-				config.querySelectorAll("meta").forEach(function(meta) {
-					var name =  meta.getAttribute("name");
-					if (name && this.hasOwnProperty(name)) {
-						var content = meta.getAttribute("content");
-						if (content) {
-							this[name] = content;
-						}
-					}
-				}, this);
-			} else {
-				this.set(config);
-			}
-			if (!this.created) {this.setDateNow("created")}
-		}
-		set(config) {
-			for (var key in config) {
-				if (this.hasOwnProperty(key)) {
-					this[key] = config[key];
-				}
-			}
-		}
-		setDateNow(field) {
-			this[field] = new Date().toISOString();
-		}
-		shortDate(field) {
-			return this[field] ? (new Date(Date.parse(this[field])).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })) : undefined;
-		}
-		getHeaders() {
-			var quotes = /"/g, newlines = /(\r\n|\r|\n)/g, tags = /<\/?\w+.*?>/g,
-				headers = "<title>"+(this.title || "").replace(tags,"")+"</title>\n"
-			for (var key in this) {
-				if (this[key]) {
-					headers+='<meta name="'+key+'" content="'+this[key].replace(quotes, "&quot;").replace(newlines, " ")+'">';
-				}
-			}
-			return headers;
-		}
-	}
-	
-	class Corpus {
-		constructor(id) {
-			this.corpusid = id;
-		}
-		id() {
-			return this.corpusid;
-		}
-		metadata(config, params) {
-			return Spyral.Load.trombone(config, {
-				tool: this._isDocumentsMode(config) ? "corpus.DocumentsMetadata" : "corpus.CorpusMetadata",
-				corpus: this.corpusid
-			})
-			.then(data => this._isDocumentsMode(config) ? data.documentsMetadata.documents : data.corpus.metadata)
-		}
-		
-		summary(config) {
-			return this.metadata().then(data => {
-				// TODO: make this a template
-				return `This corpus (${data.alias ? data.alias : data.id}) has ${data.documentsCount.toLocaleString()} documents with ${data.lexicalTokensCount.toLocaleString()} total words and ${data.lexicalTypesCount.toLocaleString()} unique word forms.`
-			})
-		}
-		
-		titles(config) {
-			return Spyral.Load.trombone(config, {
-				tool: "corpus.DocumentsMetadata",
-				corpus: this.corpusid
-			})
-			.then(data => data.documentsMetadata.documents.map(doc => doc.title))
-		}
-		
-		text(config) {
-			return this.texts(config).then(data => data.join("\n"))
-		}
-		
-		texts(config) {
-			return Spyral.Load.trombone(config, {
-				tool: "corpus.CorpusTexts",
-				corpus: this.corpusid
-			}).then(data => data.texts.texts)
-		}
-		
-		terms(config) {
-			return Spyral.Load.trombone(config, {
-				tool: this._isDocumentsMode(config) ? "corpus.DocumentTerms" : "corpus.CorpusTerms",
-				corpus: this.corpusid
-			}).then(data => this._isDocumentsMode(config) ? data.documentTerms.terms : data.corpusTerms.terms)
-		}
-		
-		tokens(config) {
-			return Spyral.Load.trombone(config, {
-				tool: "corpus.DocumentTokens",
-				corpus: this.corpusid
-			}).then(data => data.documentTokens.tokens)
-		}
-
-		words(config) {
-			return Spyral.Load.trombone(config, {
-				tool: "corpus.DocumentTokens",
-				noOthers: true,
-				corpus: this.corpusid
-			}).then(data => data.documentTokens.tokens)
-		}
-		
-		contexts(config) {
-			if ((!config || !config.query) && console) {console.warn("No query provided for contexts request.")}
-			return Spyral.Load.trombone(config, {
-				tool: "corpus.DocumentContexts",
-				corpus: this.corpusid
-			}).then(data => data.documentContexts.contexts)
-		}
-		
-		collocates(config) {
-			if ((!config || !config.query) && console) {console.warn("No query provided for collocates request.")}
-			return Spyral.Load.trombone(config, {
-				tool: "corpus.CorpusCollocates",
-				corpus: this.corpusid
-			}).then(data => data.corpusCollocates.collocates)
-		}
-
-		phrases(config) {
-			return Spyral.Load.trombone(config, {
-				tool: this._isDocumentsMode(config) ? "corpus.DocumentNgrams" : "corpus.CorpusNgrams",
-				corpus: this.corpusid
-			}).then(data => this._isDocumentsMode(config) ? data.documentNgrams.ngrams : data.corpusNgrams.ngrams)
-		}
-		
-		correlations(config) {
-			if ((!config || !config.query) && console) {
-				console.warn("No query provided for correlations request.")
-				if (!this._isDocumentsMode(config)) {
-					throw new Error("Unable to run correlations for a corpus without a query.")
-				}
-			}
-			return Spyral.Load.trombone(config, {
-				tool: this._isDocumentsMode(config) ? "corpus.DocumentTermCorrelations" : "corpus.CorpusTermCorrelations",
-				corpus: this.corpusid
-			}).then(data => data.termCorrelations.correlations)
-		}
-		
-		tool(tool, config) {
-			config = config || {}
-			let out='<iframe ';
-
-			// construct attributes of iframe
-			let defaultAttributes = {
-				width: undefined,
-				height: undefined,
-				style: "width: 90%; height: 400px;"
-			}
-			for (let attr in defaultAttributes) {
-				var val = config[attr] || defaultAttributes[attr];
-				if (val) {
-					out+=' '+attr+'="'+val+'"';
-				}
-			}
-
-			// construct src URL
-			var url = new URL((config && config.voyantUrl ? config.voyantUrl : Spyral.Load.baseUrl) + "tool/"+tool+"/");
-			url.searchParams.append("corpus", this.corpusid);
-			
-			// add API values from config (some may be ignored)
-			Object.keys(config || {}).forEach(key => {
-				if (key!="input" && !(key in defaultAttributes)) {
-					url.searchParams.append(key, config[key])
-				}
-			});
-			return out+' src="'+url+'"></iframe>'
-		}
-
-		htmltool(html, tool, config) {
-			return new Promise((resolve,reject) => {
-				this.tool(undefined, tool, config).then(out => resolve(html`${out}`));
-			});
-		}
-		
-		toString() {
-			return this.summary()
-		}
-		
-		_isDocumentsMode(config) {
-			return config && ((config.mode && config.mode=="documents") || config.documents);
-		}
-
-		
-		static load(config) {
-			var promise =  new Promise(function(resolve, reject) {
-				if (config instanceof Corpus) {
-					resolve(config);
-				} else if (typeof config == "string" && config.length>0 && /\W/.test(config)==false) {
-					resolve(new Corpus(config))
-				} else if (typeof config == "object" && config.corpus) {
-					resolve(new Corpus(config.corpus))
-				} else {
-					if (typeof config == "string") {config = {input: config}}
-					if (config && config.input) {
-						Spyral.Load.trombone(config, {tool: "corpus.CorpusMetadata"})
-						.then(data => resolve(new Corpus(data.corpus.metadata.id)))
-					}
-				}
-			});
-			
-			["id","metadata","summary","titles","text","texts","terms","tokens","words","contexts","collocates","phrases","correlations","tool"].forEach(name => {
-				promise[name] = function() {
-					var args = arguments
-					return promise.then(corpus => {return corpus[name].apply(corpus, args)})
-				}
-			})
-			promise.assign = function(name) {
-				this.then(corpus => {window[name] = corpus; return corpus})
-			}
-			return promise;
-		}
-	}
-	
 	class Table {
 		constructor(data, config, ...other) {
 
@@ -336,14 +10,19 @@ const Spyral = window.Spyral || {};
 			
 			// we have a configuration object followed by values: create({headers: []}, 1,2,3) …
 			if (data && typeof data == "object" && (typeof config == "string" || typeof config == "number" || Array.isArray(config))) {
-				data.rows = [config].concat(other);
+				data.rows = [config].concat(other).filter(v => v!==undefined)
 				config = undefined;
 			}
 			
 			// we have a simple variable set of arguments: create(1,2,3) …
-			if (Array.from(arguments).every(a => a!==undefined && !Array.isArray(a) && typeof a != "object")) {
-				data = [data,config].concat(other);
+			if (arguments.length>0 && Array.from(arguments).every(a => a!==undefined && !Array.isArray(a) && typeof a != "object")) {
+				data = [data,config].concat(other).filter(v => v!==undefined)
 				config = undefined;
+			}
+			
+			// could be CSV or TSV
+			if (Array.isArray(data) && data.length==1 && typeof data[0] == "string"  && (data[0].indexOf(",")>-1 || data[0].indexOf("\t")>-1)) {
+				data = data[0];
 			}
 			
 			// first check if we have a string that might be delimited data
@@ -357,7 +36,7 @@ const Spyral = window.Spyral || {};
 						if ((format && format=="tsv") || line.indexOf("\t")>-1) {
 							values = line.split(/\t/);
 						} else if ((format && format=="csv") || line.indexOf(",")>-1) {
-							values = parseCsvLine(line)
+							values = Spyral.Table.parseCsvLine(line)
 						} else {
 							values = [line]
 						}
@@ -673,7 +352,7 @@ const Spyral = window.Spyral || {};
 			// zip if requested
 			if (config && typeof config == "object" && "zip" in config && config.zip) {
 				if (rows.length<2) {throw new Error("Only one row available, can't zip")}
-				return zip(rows);
+				return Spyral.Table.zip(rows);
 			}
 			else {
 				return rows;
@@ -819,11 +498,11 @@ const Spyral = window.Spyral || {};
 		}
 		
 		rowSum(ind) {
-			return sum(this.row(ind));
+			return Spyral.Table.sum(this.row(ind));
 		}
 		
 		columnSum(ind) {
-			return sum(this.column(ind));
+			return Spyral.Table.sum(this.column(ind));
 		}
 
 		rowMean(ind) {
@@ -843,7 +522,7 @@ const Spyral = window.Spyral || {};
 		}
 		
 		rowRollingMean(ind, neighbors, overwrite) {
-			let means = rollingMean(this.row(ind), neighbors);
+			let means = Spyral.Table.rollingMean(this.row(ind), neighbors);
 			if (overwrite) {
 				this.setRow(ind, means);
 			}
@@ -851,7 +530,7 @@ const Spyral = window.Spyral || {};
 		}
 		
 		columnRollingMean(ind, neighbors, overwrite) {
-			let means = rollingMean(this.column(ind), neighbors);
+			let means = Spyral.Table.rollingMean(this.column(ind), neighbors);
 			if (overwrite) {
 				this.setColumn(ind, means);
 			}
@@ -1010,7 +689,7 @@ const Spyral = window.Spyral || {};
 		}
 		
 		html(target, config) {
-			let html = this.toHtml();
+			let html = this.toString();
 			if (typeof target == "function") {
 				target(html)
 			} else {
@@ -1027,24 +706,23 @@ const Spyral = window.Spyral || {};
 			return this;
 		}
 		
-		toHtml(config) {
+		toString(config) {
 			return "<table class='spyral-table'>" +
 				((config && "caption" in config && typeof config.caption == "string") ?
 						"<caption>"+config.caption+"</caption>" : "") +
 				((config && "noHeaders" in config && config.noHeaders) ? "" : ("<thead><tr>"+this.headers(true).map(c => "<th>"+c+"</th>").join("")+"</tr></thead>"))+
 				"<tbody>"+
-				this._rows.map(row => "<tr>"+row.map(c => "<td>"+(typeof c === "number" ? c.toLocaleString() : c)+"</td>").join("")+"</tr>") +
+				this._rows.map(row => "<tr>"+row.map(c => "<td>"+(typeof c === "number" ? c.toLocaleString() : c)+"</td>").join("")+"</tr>").join("") +
 				"</tbody></table>";
 		}
 		
-		chart(target, config) {
+		chart(config) {
 			
-			if (!target) {
-				target = document.createElement("div");
-				document.body.appendChild(target);
+			config = config || {};
+			if (!("target" in config)) {
+				config.target = Spyral.Notebook.getTarget();
 			}
 
-			config = config || {};
 			config.chart = config.chart || {};
 			
 			let columnsCount = this.columns();
@@ -1077,7 +755,11 @@ const Spyral = window.Spyral || {};
 				
 			}
 			
-			return Chart.chart(target, config);
+			if ("Highcharts" in window) {
+				Highcharts.chart(config.target, config);
+			} else {
+				throw Error("Highcharts library must be loaded")
+			}
 		}
 		
 		static create(config, data) {
@@ -1094,34 +776,73 @@ const Spyral = window.Spyral || {};
 			return typeof a == "string" && typeof b == "string" ? a.localeCompare(b) : a-b;
 		}
 		
+		static sum(data) {
+			return data.reduce((a,b) => a+b, 0);
+		}
+		
+		static mean(data) {
+			return Spyral.Table.sum(data) / data.length;
+		}
+		
+		static rollingMean(data, neighbors) {
+			// https://stackoverflow.com/questions/41386083/plot-rolling-moving-average-in-d3-js-v4/41388581#41387286
+			return data.map((val, idx, arr) => {
+				let start = Math.max(0, idx - neighbors), end = idx + neighbors
+				let subset = arr.slice(start, end + 1)
+				let sum = subset.reduce((a,b) => a + b)
+				return sum / subset.length
+			});
+		}
+		
+		static variance(data) {
+			let m = Spyral.Table.mean(data);
+			return Spyral.Table.mean(data.map(num => Math.pow(num-m, 2)));
+		}
+		
+		static standardDeviation(data) {
+			return Math.sqrt(Spyral.Table.variance(data));
+		}
+		
+		static zScores(data) {
+			let m = Spyral.Table.mean(data);
+			let s = Spyral.Table.standardDeviation(data);
+			return data.map(num => (num-m) / s);
+		}
+		
+		static zip(...data) {
+
+			// we have a single nested array, so let's recall with flattened arguments
+			if (data.length==1 && Array.isArray(data) && data.every(d => Array.isArray(d))) {
+				return Spyral.Table.zip.apply(null, ...data);
+			}
+			
+			// allow arrays to be of different lengths
+			let len = Math.max.apply(null, data.map(d => d.length));
+			return new Array(len).fill().map((_,i) => data.map(d => d[i]));
+		}
+		
+		static parseCsvLine(line) {
+			// this seems like a good balance between a built-in flexible parser and a heavier external parser
+			// https://lowrey.me/parsing-a-csv-file-in-es6-javascript/
+			const regex = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
+			let arr = [];
+			line.replace(regex, (m0, m1, m2, m3) => {
+				if (m1 !== undefined) {
+					arr.push(m1.replace(/\\'/g, "'"));
+				} else if (m2 !== undefined) {
+					arr.push(m2.replace(/\\"/g, "\""));
+				} else if (m3 !== undefined) {
+					arr.push(m3);
+				}
+				return "";
+			});
+			if (/,\s*$/.test(line)) {arr.push("");}
+			return arr;
+		}
+		
 	}
 	
-	class Notebook {
-		static getPreviousBlock() {
-			return Spyral.Notebook.getBlock(-1);
-		}
-		static getNextBlock() {
-			return Spyral.Notebook.getBlock(1);
-		}
-		static getBlock() {
-			if (Voyant && Voyant.notebook) {
-				return Voyant.notebook.Notebook.currentNotebook.getBlock.apply(Voyant.notebook.Notebook.currentNotebook, arguments)
-			}
-		}
-		static show(contents, config) {
-			var contents = Spyral.Util.toString(contents, config);
-			if (contents instanceof Promise) {
-				contents.then(c => Voyant.notebook.util.Show.show(c))
-			} else {
-				Voyant.notebook.util.Show.show(contents);
-			}
-		}
-	}
-
-	Object.assign(Spyral, {Metadata, Util, Load, Corpus, Table, Notebook})
-	loadCorpus = function() {return Spyral.Load.corpus.apply(Spyral.Load.Corpus, arguments)}
+	Object.assign(Spyral, {Table})
 	createTable = function() {return new Spyral.Table(...arguments)}
-}
 
-// declare static fields here since they're not supported by some browsers
-Spyral.Load.baseUrl = "http://localhost:8080/voyant/trombone";
+}

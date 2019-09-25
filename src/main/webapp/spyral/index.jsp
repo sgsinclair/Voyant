@@ -7,7 +7,18 @@ if (request.getServletPath().equals("/spiral")) {
 	response.setHeader("Location", url.toString().replace("/spiral/","/spyral/"));
     return;
 } %><%@ include file="../../resources/jsp/pre_app.jsp" %>
-<script src="<%= base %>/resources/spyral/spyral.js"></script>
+
+<!-- highcharts -->	
+<script type="text/javascript" src="<%=base %>/resources/highcharts/highcharts.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/highcharts/highcharts.css" />
+
+<script>const Spyral = window.Spyral || {};</script>
+<script src="<%= base %>/resources/spyral/notebook.js"></script>
+<script src="<%= base %>/resources/spyral/table.js"></script>
+<script src="<%= base %>/resources/spyral/corpus.js"></script>
+<script src="<%= base %>/resources/spyral/load.js"></script>
+<script src="<%= base %>/resources/spyral/util.js"></script>
+<script src="<%= base %>/resources/spyral/metadata.js"></script>
 
 <script src="<%= base %>/resources/ckeditor/ckeditor4.6.2/ckeditor.js"></script>
 <script>
