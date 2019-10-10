@@ -12,13 +12,7 @@ if (request.getServletPath().equals("/spiral")) {
 <script type="text/javascript" src="<%=base %>/resources/highcharts/highcharts.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/highcharts/highcharts.css" />
 
-<script>const Spyral = window.Spyral || {};</script>
-<script src="<%= base %>/resources/spyral/notebook.js"></script>
-<script src="<%= base %>/resources/spyral/table.js"></script>
-<script src="<%= base %>/resources/spyral/corpus.js"></script>
-<script src="<%= base %>/resources/spyral/load.js"></script>
-<script src="<%= base %>/resources/spyral/util.js"></script>
-<script src="<%= base %>/resources/spyral/metadata.js"></script>
+<script src="<%= base %>/resources/spyral/build/spyral.js"></script>
 
 <script src="<%= base %>/resources/ckeditor/ckeditor4.6.2/ckeditor.js"></script>
 <script>
@@ -45,103 +39,8 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 });
 </script>
 <script src="<%= base %>/resources/ace/2017-04-16/src-noconflict/ace.js"></script>
-<style id="voyant-notebooks-styles">
-	body.exported-notebook {
-		font-family: helvetica, arial, verdana, sans-serif;
-		font-size: 13px;
-		font-weight: 300;
-		line-height: 17px;
-		-webkit-font-smoothing: antialiased
-	}
-	body.exported-notebook .notebook-code-editor {
-		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
-		font-size: 12px;
-		font-weight: normal;
-		line-height: normal;
-		white-space: pre;
-	}
-	.notebook-text-editor, .notebook-code-editor, .notebook-code-results {
-		padding: 6px;
-		margin: 6px;
-	}
-	.notebook-text-wrapper .x-panel-body {
-	   border: thin solid rgba(0,0,0,0) !important;
-	}
-	.notebook-code-wrapper .x-panel-body {
-	   border: thin solid rgba(0,0,0,0) !important;
-	}
-	.x-panel .notebook-editor-wrapper-hover.x-panel-body, .editable {
-		border: thin dashed rgba(0,0,0,.2) !important;
-	}
-	.notebook-code-editor, .notebook-code-results {
-		margin-left: 2em;
-	}
-	.notebook-code-editor {
-		border-left: thin solid rgb(240, 240, 240);
-	}
-	.notebook-code-results {
-		background-color: rgb(252, 252, 252);
-		border: thin solid rgb(240, 240, 240);
-	}
-	.notebook-code-results .error {
-		color: red;
-	}
-	.notebook-code-results pre {
-		font-size: smaller;
-	}	
-	.notebook-code-results .info {
-		overflow: scroll
-	}
-	.notebook-code-editor-raw { /* used for raw code in saved view */
-		display: none;
-	}
-	.cke_button__sourcedialog_label {
-	    display: none !important;
-	}
-	.exported-notebook .notebookwrappercounter {
-		float: right;
-	}
-	.exported-notebook .notebookwrappercounter a {
-		text-decoration: none;
-	}
-	
-	.notebookwrappercounter a {
-		-webkit-border-radius: 3px;
-		-moz-border-radius: 3px;
-		border-radius: 3px;
-		background-color: #f5f5f5;
-	    text-align: right;
-	    border: thin solid #d8d8d8;
-	    padding: 1px;
-	    margin: 1px;
-	    font-size: smaller;
-	}
-	
-	table.spyral-table {
-	    border: thin solid #ccc;
-	}
-
-	table.spyral-table th {
-	    background-color: rgba(255, 255, 0, .05);
-	}
-
-	table.spyral-table td, table.spyral-table th {
-	    border-right: thin solid #eee; border-bottom: thin solid #eee;
-	}
-	table.spyral-table td:last-child {
-	    border-right: none; border-bottom: none;
-	}
-	
-	.spyral-header, .spyral-footer {
-		text-align: center;
-	}
-	
-	.spyral-footer {
-		margin-top: 1em;
-		background-color: rgba(0,0,0,.01);
-		border-top: rgba(0,0,0,.05);
-	}
-</style>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/spyral/css/spyral.css" />
+<style id="voyant-notebooks-styles"></style>
 
 <script>
 	Ext.Loader.setConfig({
@@ -162,7 +61,7 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 			allowInput: '<%= System.getProperty("org.voyanttools.server.allowinput")==null ? "" : System.getProperty("org.voyanttools.server.allowinput") %>'
 		}
 	});
-	Spyral.Load.baseUrl = '<%
+	Spyral.Load.setBaseUrl('<%
 	
 	StringBuilder fullurl = new StringBuilder();
 	fullurl.append(request.getScheme()).append("://").append(request.getServerName());
@@ -173,7 +72,7 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 	fullurl.append(request.getContextPath());
 	
 	String fullbase = fullurl.toString();
-	%><%= fullbase %>/'
+	%><%= fullbase %>/');
 </script>
 <title>Spyral</title>
 <%@ include file="../../resources/jsp/post_app.jsp" %>

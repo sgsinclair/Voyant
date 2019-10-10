@@ -1,0 +1,38 @@
+{
+	"name": "voyant-builder",
+	"version": "0.0.0",
+	"description": "Build for Voyant",
+	"main": "src/index.js",
+	"scripts": {
+		"build-spyral": "rollup -c",
+		"watch-spyral": "rollup -c --watch --sourcemap"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sgsinclair/Voyant.git"
+	},
+	"keywords": [
+		"voyant",
+		"text"
+	],
+	"contributors": [
+		"Stéfan Sinclair (http://stefansinclair.name)",
+		"Andrew MacDonald"
+	],
+	"license": "BSD-3-Clause",
+	"bugs": {
+		"url": "https://github.com/sgsinclair/Voyant/issues"
+	},
+	"homepage": "https://github.com/sgsinclair/Voyant",
+	"dependencies": {
+		"voyant": "^1.0.11"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.6.2",
+		"@babel/plugin-proposal-class-properties": "^7.5.5",
+		"@babel/preset-env": "^7.6.2",
+		"rollup": "^1.23.1",
+		"rollup-plugin-babel": "^4.3.3",
+		"rollup-plugin-node-resolve": "^5.2.0"
+	}
+}

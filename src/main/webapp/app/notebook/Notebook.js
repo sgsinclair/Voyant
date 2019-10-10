@@ -208,7 +208,18 @@ Ext.define('Voyant.notebook.Notebook', {
     	})
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-    	
+	
+		// add static / global functions from Spyral
+		window.Corpus = Spyral.Corpus;
+		window.Table = Spyral.Table;
+
+		window.loadCorpus = function() {
+			return Spyral.Corpus.load.apply(Spyral.Corpus.load, arguments)
+		}
+
+		window.createTable = function() {
+			return Spyral.Table.create(...arguments)
+		}
     },
     
     init: function() {
