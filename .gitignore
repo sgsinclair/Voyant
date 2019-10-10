@@ -20,3 +20,4 @@ local.properties
 src/main/webapp/WEB-INF/classes
 src/main/webapp/WEB-INF/lib
 src/main/webapp/.\#webclasspath
+src/main/webapp/resources/spyral/node_modules
