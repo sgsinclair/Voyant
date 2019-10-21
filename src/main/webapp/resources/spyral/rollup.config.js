@@ -14,7 +14,8 @@ export default {
 	plugins: [
 		resolve(),
 		babel({
-			include: 'node_modules/voyant/**'
+			include: 'node_modules/voyant/**' // for normal build, when voyantjs is loaded from npm
+			// exclude: 'node_modules/**' // for local dev, when voyantjs is loaded/linked from local install
 		})
 	],
 	external: ['highcharts']
