@@ -1,7 +1,7 @@
 import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
 
-export default {
+let config = {
 	input: 'src/index.js',
 	output: {
 		file: 'build/spyral.js',
@@ -12,11 +12,19 @@ export default {
 		}
 	},
 	plugins: [
-		resolve(),
-		babel({
-			include: 'node_modules/voyant/**' // for normal build, when voyantjs is loaded from npm
-			// exclude: 'node_modules/**' // for local dev, when voyantjs is loaded/linked from local install
-		})
+		resolve()
 	],
 	external: ['highcharts']
 };
+
+if (process.env.LOCAL_VOYANT === 'true') {
+	config.plugins.push(babel({
+		exclude: 'node_modules/**' // for local dev, when voyantjs is loaded/linked from local install
+	}))
+} else {
+	config.plugins.push(babel({
+		include: 'node_modules/voyant/**' // for normal build, when voyantjs is loaded from npm
+	}))
+}
+
+export default config;

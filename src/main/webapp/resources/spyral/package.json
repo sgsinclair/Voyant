@@ -5,7 +5,9 @@
 	"main": "src/index.js",
 	"scripts": {
 		"build-spyral": "rollup -c",
-		"watch-spyral": "rollup -c --watch --sourcemap"
+		"watch-spyral": "rollup -c --watch --sourcemap",
+		"build-spyral-local-voyant": "rollup -c --environment LOCAL_VOYANT",
+		"watch-spyral-local-voyant": "rollup -c --watch --sourcemap --environment LOCAL_VOYANT"
 	},
 	"repository": {
 		"type": "git",
