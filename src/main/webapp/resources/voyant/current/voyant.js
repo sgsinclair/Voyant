@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Aug 02 15:55:03 EDT 2019 */
+/* This file created by JSCacher. Last modified: Wed Sep 25 14:53:07 EDT 2019 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -22634,7 +22634,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
                     xtype: 'querysearchfield'
                 }, {
                     xtype: 'totalpropertystatus'
-                }]
+                },{
+        			xtype: 'corpusdocumentselector'
+        		}]
             }],
     		columns: [{
     			text: '#',

@@ -116,7 +116,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
                     xtype: 'querysearchfield'
                 }, {
                     xtype: 'totalpropertystatus'
-                }]
+                },{
+        			xtype: 'corpusdocumentselector'
+        		}]
             }],
     		columns: [{
     			text: '#',
