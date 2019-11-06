@@ -9,7 +9,7 @@
 		<param-name>version</param-name>
 		<param-value>2.4</param-value>
 	</context-param>
-		<context-param>
+	<context-param>
 		<param-name>build</param-name>
 		<param-value>M29</param-value>
 	</context-param>
@@ -55,14 +55,48 @@
 	</servlet>
 	
 	<servlet-mapping>
-		<servlet-name>spyral</servlet-name>
-		<url-pattern>/spyral/*</url-pattern>
-	</servlet-mapping>
-	
+        <servlet-name>spyral-oauth</servlet-name>
+        <url-pattern>/spyral/oauth</url-pattern>
+    </servlet-mapping>
 	<servlet>
-		<servlet-name>spyral</servlet-name>
-		<jsp-file>/spyral/index.jsp</jsp-file>
+        <servlet-name>spyral-oauth</servlet-name>
+        <jsp-file>/spyral/oauth/index.jsp</jsp-file>
+        <init-param>
+			<param-name>oauthprops</param-name>
+			<param-value>oauth.properties</param-value>
+		</init-param>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>spyral-oauth-callback</servlet-name>
+        <url-pattern>/spyral/oauth/callback</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>spyral-oauth-callback</servlet-name>
+        <servlet-class>org.voyanttools.voyant.SpyralAuth</servlet-class>
+        <init-param>
+			<param-name>oauthprops</param-name>
+			<param-value>oauth.properties</param-value>
+		</init-param>
+    </servlet>
+
+	<servlet-mapping>
+        <servlet-name>spyral-cookie</servlet-name>
+        <url-pattern>/spyral/cookie</url-pattern>
+    </servlet-mapping>
+	<servlet>
+        <servlet-name>spyral-cookie</servlet-name>
+        <jsp-file>/spyral/cookie/index.jsp</jsp-file>
 	</servlet>
+    
+    <servlet-mapping>
+        <servlet-name>spyral</servlet-name>
+        <url-pattern>/spyral/*</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>spyral</servlet-name>
+        <jsp-file>/spyral/index.jsp</jsp-file>
+    </servlet>
 	
 	<!-- this is to handle a bad URL in Hermeneutica the book -->
 	<servlet-mapping>

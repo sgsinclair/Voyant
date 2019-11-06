@@ -12,7 +12,7 @@
 Ext.define('Voyant.notebook.Notebook', {
 	alternateClassName: ["Notebook"],
 	extend: 'Ext.panel.Panel',
-	requires: ['Voyant.notebook.editor.CodeEditorWrapper','Voyant.notebook.editor.TextEditorWrapper','Voyant.notebook.util.Show','Voyant.panel.Cirrus','Voyant.panel.Summary'],
+	requires: ['Voyant.notebook.editor.CodeEditorWrapper','Voyant.notebook.editor.TextEditorWrapper','Voyant.notebook.util.Show','Voyant.panel.Cirrus','Voyant.panel.Summary','Voyant.notebook.github.GitHubDialogs'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.notebook',
     statics: {
@@ -43,7 +43,8 @@ Ext.define('Voyant.notebook.Notebook', {
     	api: {
     		input: undefined
     	},
-    	currentNotebook: undefined
+		currentNotebook: undefined,
+		githubDialogs: undefined
 
     },
     config: {
@@ -66,7 +67,12 @@ Ext.define('Voyant.notebook.Notebook', {
     	/**
     	 * @private
     	 */
-    	currentBlock: undefined
+		currentBlock: undefined,
+		/**
+		 * @private
+		 * Which solution to use for storing notebooks, either: 'voyant' or 'github'
+		 */
+		storageSolution: 'github'
     },
     
     /**
@@ -78,32 +84,59 @@ Ext.define('Voyant.notebook.Notebook', {
     		title: this.localize('title'),
     	    autoScroll: true,
     		includeTools: {
-    			'help': true,
+				'help': true,
+				'gear': true,
     			'save': true,
     			'saveIt': {
     				tooltip: this.localize("saveItTip"),
     				itemId: 'saveItTool',
     				callback: function() {
+						var me = this;
+						var data = this.generateExportHtml();
     					this.mask(this.localize('saving'));
-    					this.getMetadata().setDateNow("modified");
-    					var me = this;
-    					Spyral.Load.trombone({
-			    	    	 tool: 'notebook.NotebookManager',
-			    	    	 action: 'save',
-			    	    	 id: this.getNotebookId(),
-			    	    	 data: this.generateExportHtml()
-    					}).then(function(json) {
-    						me.unmask();
-    						var id = me.getNotebookId();
-    			    		if (!id || json.notebook.id!=id) {
-    			    			me.setNotebookId(json.notebook.id);
-    			    		}
-    			    		me.toastInfo({
-			    	    		html: me.localize('saved'),
-			    	    		anchor: 'tr'
-			    	    	});
-			    	    	me.setIsEdited(false);
-    					}).catch(function(err) {me.unmask()})
+						this.getMetadata().setDateNow("modified");
+
+						switch (this.getStorageSolution()) {
+							case 'voyant':
+								Spyral.Load.trombone({
+									tool: 'notebook.NotebookManager',
+									action: 'save',
+									id: this.getNotebookId(),
+									data: data
+								}).then(function(json) {
+									me.unmask();
+									var id = me.getNotebookId();
+									if (!id || json.notebook.id!=id) {
+										me.setNotebookId(json.notebook.id);
+									}
+									me.toastInfo({
+										html: me.localize('saved'),
+										anchor: 'tr'
+									});
+									me.setIsEdited(false);
+								}).catch(function(err) {me.unmask()});
+								break;
+							case 'github':
+								if (this.githubDialogs === undefined) {
+									this.githubDialogs = new Voyant.notebook.github.GitHubDialogs();
+								}
+								if (this.githubDialogs.hasListener('fileSaved') === false) {
+									this.githubDialogs.on('fileSaved', function(src, data) {
+										this.githubDialogs.close();
+										me.unmask();
+										me.toastInfo({
+											html: me.localize('saved'),
+											anchor: 'tr'
+										});
+										me.setIsEdited(false);
+									}, this);
+									this.githubDialogs.on('saveCancelled', function(src) {
+										me.unmask();
+									}, this);
+								}
+								this.githubDialogs.showSave(data);
+								break;
+						}
     				},
     				xtype: 'toolmenu',
     				glyph: 'xf0c2@FontAwesome',
@@ -127,13 +160,30 @@ Ext.define('Voyant.notebook.Notebook', {
     			'open': {
     				tooltip: this.localize("openTip"),
     				callback: function() {
-    					Ext.Msg.prompt(this.localize("openTitle"),this.localize("openMsg"),function(btn, text) {
-    						text = text.trim();
-    						if (btn=="ok") {
-    							this.clear();
-    							this.loadFromString(text);
-    						}
-    					}, this, true);
+						switch (this.getStorageSolution()) {
+							case 'voyant':
+								Ext.Msg.prompt(this.localize("openTitle"),this.localize("openMsg"),function(btn, text) {
+									text = text.trim();
+									if (btn=="ok") {
+										this.clear();
+										this.loadFromString(text);
+									}
+								}, this, true);
+								break;
+							case 'github':
+								if (this.githubDialogs === undefined) {
+									this.githubDialogs = new Voyant.notebook.github.GitHubDialogs();
+								}
+								if (this.githubDialogs.hasListener('fileLoaded') === false) {
+									this.githubDialogs.on('fileLoaded', function(src, data) {
+										this.githubDialogs.close();
+										this.clear();
+										this.loadFromString(data);
+									}, this);
+								}
+								this.githubDialogs.showLoad();
+								break;
+						}
     				},
     				xtype: 'toolmenu',
     				glyph: 'xf115@FontAwesome',
@@ -218,7 +268,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		}
 
 		window.createTable = function() {
-			return Spyral.Table.create(...arguments)
+			return Spyral.Table.create(arguments)
 		}
     },
     
@@ -825,8 +875,61 @@ Ext.define('Voyant.notebook.Notebook', {
     	    }]
     	    
     	}).show();
-    }
-    
-    
+	},
+	showOptionsClick: function(panel) {
+		let me = panel;
+		if (me.optionsWin === undefined) {
+			me.optionsWin = Ext.create('Ext.window.Window', {
+				title: me.localize('gearWinTitle'),
+    			closeAction: 'hide',
+				layout: 'fit',
+				width: 400,
+				height: 300,
+				bodyPadding: 10,
+				items: {
+					xtype: 'form',
+					items: [{
+						xtype: 'radiogroup',
+						fieldLabel: 'Storage Solution',
+						labelAlign: 'left',
+						layout: 'vbox',
+						items: [{
+							boxLabel: 'Voyant',
+							name: 'storageSolution',
+							inputValue: 'voyant',
+							checked: me.getStorageSolution() === 'voyant'
+						},{
+							boxLabel: 'GitHub',
+							name: 'storageSolution',
+							inputValue: 'github',
+							checked: me.getStorageSolution() === 'github'
+						}]
+					}]
+				},
+    			buttons: [{
+    				text: me.localize('ok'),
+    				handler: function(button, event) {
+    					var win = button.findParentByType('window');
+    					var form = win.down('form');
+    					if (form.isValid()) {
+        					var params = form.getValues();
+							me.setStorageSolution(params.storageSolution);
+        					win.hide();
+    					}
+    					else {
+    						me.showError({
+    							message: me.localize("invalidForm")
+    						})
+    					}
+    				}
+    			},{
+    				text: me.localize('cancel'),
+    				handler: function(button, event) {
+    					button.findParentByType('window').hide();
+    				}
+    			}]
+			});
+		}
+		me.optionsWin.show();
+	}
 });
-

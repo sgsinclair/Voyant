@@ -12,6 +12,8 @@ if (request.getServletPath().equals("/spiral")) {
 <script type="text/javascript" src="<%=base %>/resources/highcharts/highcharts.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/highcharts/highcharts.css" />
 
+<script src="<%= base %>/resources/octokit/octokit-rest.js"></script>
+
 <script src="<%= base %>/resources/spyral/build/spyral.js"></script>
 
 <script src="<%= base %>/resources/ckeditor/ckeditor4.6.2/ckeditor.js"></script>
