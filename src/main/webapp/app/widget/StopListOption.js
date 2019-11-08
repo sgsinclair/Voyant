@@ -126,6 +126,8 @@ Ext.define('Voyant.widget.StopListOption', {
 	    	        value: keywords,
 	    	        original: keywords,
 	    	        fn: function(btn,value,stoplist) {
+	    	        	// force lowercase for simple stopword list since it's lexical (this may change if the widget is used elsewhere)	    	        	value = value.toLowerCase();
+	    	        	value = value.toLowerCase();
 	    	        	if (btn=='ok' && stoplist.original!=value) {
 	    	        		var combo = this.down('combo')
 	    	        		if (Ext.String.trim(value).length==0) {
