@@ -3,9 +3,9 @@ Ext.define("Voyant.notebook.github.ReposBrowser", {
 	xtype: "githubreposbrowser",
 	config: {
 		repoType: 'owner',
-		selectedFileNode: undefined,
+		selectedNode: undefined,
 		repoId: undefined,
-		filePath: undefined
+		path: undefined
 	},
 
 	octokit: undefined,
@@ -25,9 +25,6 @@ Ext.define("Voyant.notebook.github.ReposBrowser", {
 				align: 'stretch',
 				pack: 'start'
 			},
-			defaults: {
-				padding: '0 5 5 5'
-			},
 			items: [{
 				layout: {
 					type: 'vbox',
@@ -36,8 +33,6 @@ Ext.define("Voyant.notebook.github.ReposBrowser", {
 				},
 				flex: 1,
 				items: [{
-					html: '<h3>Search</h3>'
-				},{
 					layout: {
 						type: 'accordion'
 					},
@@ -148,54 +143,44 @@ Ext.define("Voyant.notebook.github.ReposBrowser", {
 				]
 			},{
 				flex: 2,
-				layout: {
-					type: 'vbox',
-					align: 'stretch',
-					pack: 'start'
-				},
-				items: [{
-					html: '<h3>Results</h3>'
-				},{
-					xtype: 'treepanel',
-					itemId: 'repoTree',
-					flex: 1,
-					scrollable: true,
-					rootVisible: false,
-					viewConfig: {
-						emptyText: 'No results',
-						listeners: {
-							afteritemexpand: function(node, index, el) {
-								if (node.hasChildNodes() === false) {
-									switch(node.data.type) {
-										case 'repo':
-											let tr = el.querySelector('tr');
-											Ext.fly(tr).addCls('x-grid-tree-loading');
-											this.octokit.getRepoContents(node.getId()).then(function(resp) {
-												Ext.fly(tr).removeCls('x-grid-tree-loading');
-												this.addRepoContentsToNode(node, resp);
-											}.bind(this))
-											break;
-										case 'folder':
-											break;
-									}
+				layout: 'fit',
+				xtype: 'treepanel',
+				itemId: 'repoTree',
+				title: 'Repositories',
+				scrollable: true,
+				rootVisible: false,
+				viewConfig: {
+					emptyText: 'No results',
+					listeners: {
+						afteritemexpand: function(node, index, el) {
+							if (node.hasChildNodes() === false) {
+								switch(node.data.type) {
+									case 'repo':
+										let tr = el.querySelector('tr');
+										Ext.fly(tr).addCls('x-grid-tree-loading');
+										this.octokit.getRepoContents(node.getId()).then(function(resp) {
+											Ext.fly(tr).removeCls('x-grid-tree-loading');
+											this.addRepoContentsToNode(node, resp);
+										}.bind(this))
+										break;
+									case 'folder':
+										break;
 								}
-							},
-							itemclick: function(view, node, el) {
-								if (node.data.type === 'file') {
-									this.setSelectedFileNode(node);
-									this.fireEvent('fileNodeSelected', this, node);
-								}
-							},
-							scope: this
-						}
-					},
-					store: {
-						root: {
-							name: 'Root',
-							children: []
-						}
+							}
+						},
+						itemclick: function(view, node, el) {
+							this.setSelectedNode(node);
+							this.fireEvent('nodeSelected', this, node.data.type, node);
+						},
+						scope: this
 					}
-				}]
+				},
+				store: {
+					root: {
+						name: 'Root',
+						children: []
+					}
+				}
 			}],
 			listeners: {
 				boxready: function() {
@@ -211,18 +196,18 @@ Ext.define("Voyant.notebook.github.ReposBrowser", {
 		this.callParent(arguments);
 	},
 
-	updateSelectedFileNode: function(node, oldValue) {
+	updateSelectedNode: function(node, oldValue) {
 		if (node !== undefined) {
-			let repoParent = node.parentNode;
+			let repoParent = node;
 			while (repoParent !== null && repoParent.data.type !== 'repo') {
 				repoParent = repoParent.parentNode;
 			}
 
 			this.setRepoId(repoParent.getId());
-			this.setFilePath(node.getId());
+			this.setPath(node.getId());
 		} else {
 			this.setRepoId(undefined);
-			this.setFilePath(undefined);
+			this.setPath(undefined);
 		}
 	},
 
@@ -236,8 +221,8 @@ Ext.define("Voyant.notebook.github.ReposBrowser", {
 			repoTree.setLoading(true);
 		}
 
-		this.setSelectedFileNode(undefined);
-		this.fireEvent('fileNodeDeselected', this);
+		this.setSelectedNode(undefined);
+		this.fireEvent('nodeDeselected', this);
 	},
 
 	addReposToTree: function(rawRepos) {

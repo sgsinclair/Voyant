@@ -28,7 +28,7 @@ Ext.define("Voyant.notebook.github.GitHubDialogs", {
 		}
 	},
 
-	showAuthenticate: function() {
+	showAuthenticate: function(callback) {
 		const parent = this;
 
 		let authWin = undefined;
@@ -54,7 +54,7 @@ Ext.define("Voyant.notebook.github.GitHubDialogs", {
 							event.source.close();
 							parent.initOctokitWrapper();
 							button.up('window').close();
-							parent.showLoad();
+							callback.call(parent);
 						}
 					}
 					window.open(Voyant.application.getBaseUrlFull()+'spyral/oauth', '_blank');
@@ -78,7 +78,7 @@ Ext.define("Voyant.notebook.github.GitHubDialogs", {
 
 		this.authToken = this.getCookieValue('access-token');
 		if (this.authToken === '') {
-			this.showAuthenticate();
+			this.showAuthenticate(this.showLoad);
 			return;
 		} else if (this.octokitWrapper === undefined) {
 			this.initOctokitWrapper();
@@ -97,10 +97,14 @@ Ext.define("Voyant.notebook.github.GitHubDialogs", {
 				octokit: this.octokitWrapper,
 				itemId: 'repoBrowser',
 				listeners: {
-					fileNodeSelected: function(node) {
-						loadWin.queryById('load').setDisabled(false);
+					nodeSelected: function(src, type, node) {
+						if (type === 'file') {
+							loadWin.queryById('load').setDisabled(false);
+						} else {
+							loadWin.queryById('load').setDisabled(true);	
+						}
 					},
-					fileNodeDeselected: function(node) {
+					nodeDeselected: function(node) {
 						loadWin.queryById('load').setDisabled(true);
 					}
 				}
@@ -111,7 +115,7 @@ Ext.define("Voyant.notebook.github.GitHubDialogs", {
 				disabled: true,
 				handler: function() {
 					const repoBrowser = loadWin.queryById('repoBrowser');
-					this.loadFile(repoBrowser.getRepoId(), repoBrowser.getFilePath());
+					this.loadFile(repoBrowser.getRepoId(), repoBrowser.getPath());
 				},
 				scope: this
 			},{
@@ -140,9 +144,10 @@ Ext.define("Voyant.notebook.github.GitHubDialogs", {
 		let saveWin = undefined;
 		saveWin = Ext.create('Ext.window.Window', {
 			title: 'Save to GitHub',
-			width: 550,
-			height: 400,
+			width: 750,
+			height: 650,
 			closable: false,
+			maximizable: true,
 			layout: 'fit',
 			items: {
 				xtype: 'githubfilesaver',
@@ -151,12 +156,23 @@ Ext.define("Voyant.notebook.github.GitHubDialogs", {
 				saveData: data,
 				itemId: 'fileSaver',
 				listeners: {
-					fileSaved: function() {
-						parent.fireEvent('fileSaved', parent);
+					formValidityChange: function(src, valid) {
+						saveWin.queryById('save').setDisabled(!valid);
+					},
+					fileSaved: function(src, fileData) {
+						parent.fireEvent('fileSaved', parent, fileData);
 					}
 				}
 			},
 			buttons: [{
+				text: 'Save',
+				itemId: 'save',
+				disabled: true,
+				handler: function() {
+					saveWin.queryById('fileSaver').doSave();
+				},
+				scope: this
+			},{
 				text: 'Cancel',
 				handler: function() {
 					parent.close();
@@ -183,10 +199,26 @@ Ext.define("Voyant.notebook.github.GitHubDialogs", {
 		});
 	},
 
+	loadFileFromId: function(id) {
+		const parts = decodeURIComponent(id).split('/');
+		if (parts.length >= 3) {
+			const repoId = parts[0]+'/'+parts[1];
+			const filePath = parts.slice(2).join('/');
+			this.loadFile(repoId, filePath);
+		}
+	},
+
 	loadFile: function(repoId, filePath) {
-		this.octokitWrapper.loadFile(repoId, filePath).then((resp) => {
-			this.setCurrentFile(resp);
-			this.fireEvent('fileLoaded', this, resp.file);
+		this.authToken = this.getCookieValue('access-token');
+		if (this.authToken === '') {
+			this.showAuthenticate(this.loadFile.bind(this, repoId, filePath));
+			return;
+		} else if (this.octokitWrapper === undefined) {
+			this.initOctokitWrapper();
+		}
+		this.octokitWrapper.loadFile(repoId, filePath).then((data) => {
+			this.setCurrentFile(data);
+			this.fireEvent('fileLoaded', this, data);
 		});
 	}
 })

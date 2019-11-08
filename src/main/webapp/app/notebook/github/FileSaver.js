@@ -1,5 +1,5 @@
 Ext.define("Voyant.notebook.github.FileSaver", {
-	extend: "Ext.form.Panel",
+	extend: "Ext.container.Container",
 	xtype: "githubfilesaver",
 	config: {
 		currentFile: undefined,
@@ -22,72 +22,125 @@ Ext.define("Voyant.notebook.github.FileSaver", {
 
 	initComponent: function() {
 		Ext.apply(this, {
-			bodyPadding: '0 10 10 10',
 			layout: {
 				type: 'vbox',
-				pack: 'start'
+				pack: 'start',
+				align: 'stretch'
 			},
 			items: [{
-				html: '<h3>Repository Path</h3>'
+				xtype: 'githubreposbrowser',
+				octokit: this.octokit,
+				itemId: 'repoBrowser',
+				flex: 1,
+				listeners: {
+					nodeSelected: function(src, type, node) {
+						const form = this.queryById('saveForm').getForm();
+						const [owner, repo] = src.getRepoId().split('/');
+						form.setValues({owner, repo});
+						if (type === 'file') {
+							const pathComponents = this.getPathComponents(src.getPath());
+							form.setValues({...pathComponents});
+						} else if (type === 'folder') {
+							const folder = src.getPath().replace(/^\//, '');
+							form.setValues({folder, file: ''});
+						} else if (type === 'repo') {
+							form.setValues({folder: '', file: ''});
+						}
+					},
+					nodeDeselected: function(node) {
+						// loadWin.queryById('load').setDisabled(true);
+					},
+					scope: this
+				}
 			},{
-				xtype: 'container',
-				layout: 'hbox',
-				defaults: {
-					xtype: 'textfield',
-					labelAlign: 'top'
-				},
-				items: [{
-					fieldLabel: 'GitHub User',
-					name: 'owner',
-					allowBlank: false,
-					margin: '0 10 0 0'
-				},{
-					fieldLabel: 'Repository Name',
-					allowBlank: false,
-					name: 'repo'
-				}]
-			},{
-				html: '<h3>File Path</h3>',
-				margin: '15 0 0 0',
-			},{
-				xtype: 'textfield',
-				allowBlank: false,
-				name: 'path',
-				width: 352
-			},{
-				html: '<span class="x-form-item-label-default">The file (and folder) path to which to save (e.g. french/basque/SaintSauveur.html)</span>'
-			},{
-				xtype: 'container',
-				width: '100%',
+				bodyPadding: '10',
+				height: 200,
 				layout: {
-					type: 'hbox',
-					align: 'middle',
+					type: 'vbox',
 					pack: 'start'
 				},
-				margin: '25 0 0 0',
-				defaults: {
-					xtype: 'button'
-				},
+				xtype: 'form',
+				itemId: 'saveForm',
 				items: [{
-					text: 'Save',
-					handler: function () {
-						this.doSave(false);
+					html: '<span class="x-panel-header-title-default">Repository Path</span>'
+				},{
+					xtype: 'container',
+					layout: 'hbox',
+					defaults: {
+						xtype: 'textfield',
+						labelAlign: 'top'
 					},
-					scope: this,
-					margin: '0 10 0 0'
+					items: [{
+						fieldLabel: 'GitHub User',
+						name: 'owner',
+						allowBlank: false,
+						margin: '0 10 0 0'
+					},{
+						fieldLabel: 'Repository Name',
+						allowBlank: false,
+						name: 'repo'
+					}]
+				},{
+					html: '<span class="x-panel-header-title-default">File Path</span>',
+					margin: '10 0 0 0',
+				},{
+					xtype: 'container',
+					layout: 'hbox',
+					defaults: {
+						xtype: 'textfield',
+						labelAlign: 'top'
+					},
+					items: [{
+						fieldLabel: 'Folder(s)',
+						name: 'folder',
+						allowBlank: true,
+						margin: '0 10 0 0'
+					},{
+						fieldLabel: 'File Name',
+						allowBlank: false,
+						name: 'file'
+					}]
+				},{
+					/*
+					xtype: 'container',
+					width: '100%',
+					layout: {
+						type: 'hbox',
+						align: 'middle',
+						pack: 'start'
+					},
+					margin: '25 0 0 0',
+					defaults: {
+						xtype: 'button'
+					},
+					items: [{
+						text: 'Save',
+						handler: function () {
+							this.doSave(false);
+						},
+						scope: this,
+						margin: '0 10 0 0'
+					}
+					// ,{
+					// 	text: 'Save as Pull Request',
+					// 	handler: function () {
+					// 		this.doSave(true);
+					// 	},
+					// 	scope: this
+					// }
+					]
+				},{
+					*/
+					itemId: 'status',
+					html: '',
+					margin: '15 0 0 0'
+				}],
+				listeners: {
+					validitychange: function(form, valid) {
+						this.fireEvent('formValidityChange', this, valid);
+					},
+					scope: this
 				}
-				// ,{
-				// 	text: 'Save as Pull Request',
-				// 	handler: function () {
-				// 		this.doSave(true);
-				// 	},
-				// 	scope: this
-				// }
-				]
-			},{
-				itemId: 'status',
-				html: '',
-				margin: '15 0 0 0'
 			}],
 			listeners: {
 				boxready: function() {
@@ -105,23 +158,42 @@ Ext.define("Voyant.notebook.github.FileSaver", {
 			const username = resp.data.login;
 			this.setUsername(username);
 
-			const currentFile = this.getCurrentFile();
+			const form = this.queryById('saveForm').getForm();
+			const currentFile = this.getCurrentFile();			
 			if (currentFile !== undefined) {
-				this.getForm().setValues({
+				const pathComponents = this.getPathComponents(currentFile.path);
+				form.setValues({
 					owner: currentFile.owner,
 					repo: currentFile.repo,
-					path: currentFile.path.replace(/^\//, '')
+					...pathComponents
 				});
 			} else {
-				this.getForm().setValues({owner: username});
+				form.setValues({owner: username});
 			}
 		}.bind(this))
 	},
 
-	doSave: async function(isPR) {
-		const form = this.getForm();
+	getPathComponents: function(path) {
+		const pathComponents = path.split('/');
+		let file = pathComponents[pathComponents.length-1];
+		let folder = '';
+		if (pathComponents.length > 2) {
+			folder = pathComponents.slice(0, -1).join('/');
+		}
+		return {
+			folder,
+			file
+		}
+	},
+
+	doSave: async function(isPR=false) {
+		const form = this.queryById('saveForm').getForm();
 		if (form.isValid()) {
-			const {owner, repo, path} = form.getValues();
+			const {owner, repo, folder, file} = form.getValues();
+			let path = file;
+			if (folder !== '') {
+				path = folder+'/'+file;
+			}
 			this.setStatus('Checking repository');
 			const repoExists = await this.octokit.doesRepoExist(owner, repo);
 			if (repoExists) {
@@ -133,13 +205,14 @@ Ext.define("Voyant.notebook.github.FileSaver", {
 					this.setStatus('Checking file');
 					const branch = 'master';
 					const content = this.saveData;
-					const sha = await this.octokit.getLatestFileSHA({owner, repo, branch, path});
+					const fileData = {owner, repo, branch, path};
+					const sha = await this.octokit.getLatestFileSHA(fileData);
 					if (sha !== undefined) {
 						const message = 'File updated by Spyral';
 						this.octokit.saveFile(owner, repo, path, content, branch, message, sha).then(function(resp) {
 							this.setStatus('File updated');
 							setTimeout(function() {
-								this.fireEvent('fileSaved', this);
+								this.fireEvent('fileSaved', this, fileData);
 							}.bind(this), 500);
 						}.bind(this), function(error) {
 							this.setStatus('Error: '+error.message, 'error');
@@ -149,7 +222,7 @@ Ext.define("Voyant.notebook.github.FileSaver", {
 						this.octokit.saveFile(owner, repo, path, content, branch, message).then(function(resp) {
 							this.setStatus('File created');
 							setTimeout(function() {
-								this.fireEvent('fileSaved', this);
+								this.fireEvent('fileSaved', this, fileData);
 							}.bind(this), 500);
 						}.bind(this), function(error) {
 							this.setStatus('Error: '+error.message, 'error');

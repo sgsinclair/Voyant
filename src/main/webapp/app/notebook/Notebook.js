@@ -72,7 +72,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		 * @private
 		 * Which solution to use for storing notebooks, either: 'voyant' or 'github'
 		 */
-		storageSolution: 'github'
+		storageSolution: undefined
     },
     
     /**
@@ -90,65 +90,44 @@ Ext.define('Voyant.notebook.Notebook', {
     			'saveIt': {
     				tooltip: this.localize("saveItTip"),
     				itemId: 'saveItTool',
-    				callback: function() {
-						var me = this;
-						var data = this.generateExportHtml();
-    					this.mask(this.localize('saving'));
-						this.getMetadata().setDateNow("modified");
-
-						switch (this.getStorageSolution()) {
-							case 'voyant':
-								Spyral.Load.trombone({
-									tool: 'notebook.NotebookManager',
-									action: 'save',
-									id: this.getNotebookId(),
-									data: data
-								}).then(function(json) {
-									me.unmask();
-									var id = me.getNotebookId();
-									if (!id || json.notebook.id!=id) {
-										me.setNotebookId(json.notebook.id);
-									}
-									me.toastInfo({
-										html: me.localize('saved'),
-										anchor: 'tr'
-									});
-									me.setIsEdited(false);
-								}).catch(function(err) {me.unmask()});
-								break;
-							case 'github':
-								if (this.githubDialogs === undefined) {
-									this.githubDialogs = new Voyant.notebook.github.GitHubDialogs();
-								}
-								if (this.githubDialogs.hasListener('fileSaved') === false) {
-									this.githubDialogs.on('fileSaved', function(src, data) {
-										this.githubDialogs.close();
-										me.unmask();
-										me.toastInfo({
-											html: me.localize('saved'),
-											anchor: 'tr'
-										});
-										me.setIsEdited(false);
-									}, this);
-									this.githubDialogs.on('saveCancelled', function(src) {
-										me.unmask();
-									}, this);
-								}
-								this.githubDialogs.showSave(data);
-								break;
-						}
-    				},
     				xtype: 'toolmenu',
     				glyph: 'xf0c2@FontAwesome',
-    				disabled: true,
-    				scope: this
+					disabled: true,
+					callback: function(panel, tool) {
+						const storageSolution = this.getStorageSolution();
+						if (storageSolution === undefined) {
+						} else {
+							setTimeout(() => {
+								tool.toolMenu.hide()
+							})
+							if (storageSolution === 'github') {
+								this.saveWithGitHub();
+							} else {
+								this.saveWithVoyant();
+							}
+						}
+					},
+					scope: this,
+					items: [{
+						text: 'Save',
+						xtype: 'menuitem',
+						glyph: 'xf0c2@FontAwesome',
+						handler: this.saveWithVoyant,
+						scope: this
+					},{
+						text: 'Save to GitHub',
+						xtype: 'menuitem',
+						glyph: 'xf0c2@FontAwesome',
+						handler: this.saveWithGitHub,
+						scope: this
+					}]
     			},
     			'new': {
     				tooltip: this.localize("newTip"),
     				callback: function() {
     					this.clear();
     					this.addNew();
-    	    			url =  this.getBaseUrl()+"spyral/";
+    	    			let url = this.getBaseUrl()+"spyral/";
     	    			window.history.pushState({
     						url: url
     					}, "Spyral Notebook", url);
@@ -159,9 +138,18 @@ Ext.define('Voyant.notebook.Notebook', {
     			},
     			'open': {
     				tooltip: this.localize("openTip"),
-    				callback: function() {
-						switch (this.getStorageSolution()) {
-							case 'voyant':
+    				xtype: 'toolmenu',
+					glyph: 'xf115@FontAwesome',
+					callback: function(panel, tool) {
+						const storageSolution = this.getStorageSolution();
+						if (storageSolution === undefined) {
+						} else {
+							setTimeout(() => {
+								tool.toolMenu.hide()
+							})
+							if (storageSolution === 'github') {
+								this.githubDialogs.showLoad();
+							} else {
 								Ext.Msg.prompt(this.localize("openTitle"),this.localize("openMsg"),function(btn, text) {
 									text = text.trim();
 									if (btn=="ok") {
@@ -169,25 +157,33 @@ Ext.define('Voyant.notebook.Notebook', {
 										this.loadFromString(text);
 									}
 								}, this, true);
-								break;
-							case 'github':
-								if (this.githubDialogs === undefined) {
-									this.githubDialogs = new Voyant.notebook.github.GitHubDialogs();
-								}
-								if (this.githubDialogs.hasListener('fileLoaded') === false) {
-									this.githubDialogs.on('fileLoaded', function(src, data) {
-										this.githubDialogs.close();
-										this.clear();
-										this.loadFromString(data);
-									}, this);
-								}
-								this.githubDialogs.showLoad();
-								break;
+							}
 						}
-    				},
-    				xtype: 'toolmenu',
-    				glyph: 'xf115@FontAwesome',
-    				scope: this
+					},
+					scope: this,
+					items: [{
+						text: 'Load',
+						xtype: 'menuitem',
+						glyph: 'xf115@FontAwesome',
+						handler: function() {
+							Ext.Msg.prompt(this.localize("openTitle"),this.localize("openMsg"),function(btn, text) {
+								text = text.trim();
+								if (btn=="ok") {
+									this.clear();
+									this.loadFromString(text);
+								}
+							}, this, true);
+						},
+						scope: this
+					},{
+						text: 'Load from GitHub',
+						xtype: 'menuitem',
+						glyph: 'xf115@FontAwesome',
+						handler: function() {
+							this.githubDialogs.showLoad();
+						},
+						scope: this
+					}]
     			},
     			'runall': {
     				tooltip: this.localize("runallTip"),
@@ -270,18 +266,62 @@ Ext.define('Voyant.notebook.Notebook', {
 		window.createTable = function() {
 			return Spyral.Table.create(arguments)
 		}
+
+		this.githubDialogs = new Voyant.notebook.github.GitHubDialogs({
+			listeners: {
+				'fileLoaded': function(src, {owner, repo, ref, path, file}) {
+					this.githubDialogs.close();
+					this.clear();
+					this.loadFromString(file);
+
+					const id = encodeURIComponent(owner+'/'+repo+'/'+path);
+					if (location.search.indexOf(id) === -1) {
+						const url = this.getBaseUrl()+'spyral/?githubId='+id;
+						window.history.pushState({
+							url: url
+						}, 'Spyral Notebook: '+id, url);
+					}
+				},
+				'fileSaved': function(src, {owner, repo, branch, path}) {
+					this.githubDialogs.close();
+					this.unmask();
+					this.toastInfo({
+						html: this.localize('saved'),
+						anchor: 'tr'
+					});
+					this.setIsEdited(false);
+
+					const id = encodeURIComponent(owner+'/'+repo+'/'+path);
+					if (location.search.indexOf(id) === -1) {
+						const url = this.getBaseUrl()+'spyral/?githubId='+id;
+						window.history.pushState({
+							url: url
+						}, 'Spyral Notebook: '+id, url);
+					}
+				},
+				'saveCancelled': function(src) {
+					this.unmask();
+				},
+				scope: this
+			}
+		});
     },
     
     init: function() {
     	var queryParams = Ext.Object.fromQueryString(document.location.search, true);
     	var isRun = Ext.isDefined(queryParams.run);
-    	var spyralIdMatches =  /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
+		var spyralIdMatches = /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
+		var isGithub = Ext.isDefined(queryParams.githubId);
     	if (queryParams.input) {
     		if (queryParams.input.indexOf("http")===0) {
     			this.loadFromUrl(queryParams.input, isRun);
     		}
     	} else if (spyralIdMatches) {
-    		this.loadFromId(spyralIdMatches[1]);
+			this.loadFromId(spyralIdMatches[1]);
+			this.setStorageSolution('voyant');
+		} else if (isGithub) {
+			this.githubDialogs.loadFileFromId(queryParams.githubId);
+			this.setStorageSolution('github');
     	} else {
     		this.addNew();
     	}
@@ -331,7 +371,40 @@ Ext.define('Voyant.notebook.Notebook', {
     	this.setMetadata(new Spyral.Metadata());
     	var cells = this.getComponent("cells");
     	cells.removeAll();
-    },
+	},
+	
+	saveWithVoyant: function() {
+		var me = this;
+		var data = this.generateExportHtml();
+		this.mask(this.localize('saving'));
+		this.getMetadata().setDateNow("modified");
+
+		Spyral.Load.trombone({
+			tool: 'notebook.NotebookManager',
+			action: 'save',
+			id: this.getNotebookId(),
+			data: data
+		}).then(function(json) {
+			me.unmask();
+			var id = me.getNotebookId();
+			if (!id || json.notebook.id!=id) {
+				me.setNotebookId(json.notebook.id);
+			}
+			me.toastInfo({
+				html: me.localize('saved'),
+				anchor: 'tr'
+			});
+			me.setIsEdited(false);
+		}).catch(function(err) {me.unmask()});
+	},
+
+	saveWithGitHub: function() {
+		var data = this.generateExportHtml();
+		this.mask(this.localize('saving'));
+		this.getMetadata().setDateNow("modified");
+
+		this.githubDialogs.showSave(data);
+	},
 
     loadFromString: function(text) {
     	text = text.trim();
@@ -591,8 +664,8 @@ Ext.define('Voyant.notebook.Notebook', {
     setNotebookId: function (id) {
     	if (id) {
     		// update URL if needed
-    		if (location.pathname.indexOf("/spyral/"+id)==-1) {
-    			url =  this.getBaseUrl()+"spyral/"+id+"/";
+    		if (location.pathname.indexOf("/spyral/"+id) === -1) {
+    			let url = this.getBaseUrl()+"spyral/"+id+"/";
     			window.history.pushState({
 					url: url
 				}, "Spyral Notebook: "+id, url);
