@@ -12,7 +12,7 @@
 Ext.define('Voyant.notebook.Notebook', {
 	alternateClassName: ["Notebook"],
 	extend: 'Ext.panel.Panel',
-	requires: ['Voyant.notebook.editor.CodeEditorWrapper','Voyant.notebook.editor.TextEditorWrapper','Voyant.notebook.util.Show','Voyant.panel.Cirrus','Voyant.panel.Summary','Voyant.notebook.github.GitHubDialogs'],
+	requires: ['Voyant.notebook.editor.CodeEditorWrapper','Voyant.notebook.editor.TextEditorWrapper','Voyant.notebook.util.Show','Voyant.panel.Cirrus','Voyant.panel.Summary','Voyant.notebook.StorageDialogs','Voyant.notebook.github.GitHubDialogs'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.notebook',
     statics: {
@@ -44,6 +44,8 @@ Ext.define('Voyant.notebook.Notebook', {
     		input: undefined
     	},
 		currentNotebook: undefined,
+
+		voyantStorageDialogs: undefined,
 		githubDialogs: undefined
 
     },
@@ -72,7 +74,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		 * @private
 		 * Which solution to use for storing notebooks, either: 'voyant' or 'github'
 		 */
-		storageSolution: undefined
+		storageSolution: 'voyant'
     },
     
     /**
@@ -93,32 +95,18 @@ Ext.define('Voyant.notebook.Notebook', {
     				xtype: 'toolmenu',
     				glyph: 'xf0c2@FontAwesome',
 					disabled: true,
-					callback: function(panel, tool) {
-						const storageSolution = this.getStorageSolution();
-						if (storageSolution === undefined) {
-						} else {
-							setTimeout(() => {
-								tool.toolMenu.hide()
-							})
-							if (storageSolution === 'github') {
-								this.saveWithGitHub();
-							} else {
-								this.saveWithVoyant();
-							}
-						}
-					},
 					scope: this,
 					items: [{
 						text: 'Save',
 						xtype: 'menuitem',
 						glyph: 'xf0c2@FontAwesome',
-						handler: this.saveWithVoyant,
+						handler: this.showSaveDialog.bind(this, false),
 						scope: this
 					},{
-						text: 'Save to GitHub',
+						text: 'Save As...',
 						xtype: 'menuitem',
 						glyph: 'xf0c2@FontAwesome',
-						handler: this.saveWithGitHub,
+						handler: this.showSaveDialog.bind(this, true),
 						scope: this
 					}]
     			},
@@ -267,6 +255,34 @@ Ext.define('Voyant.notebook.Notebook', {
 			return Spyral.Table.create(arguments)
 		}
 
+		this.voyantStorageDialogs = new Voyant.notebook.StorageDialogs({
+			listeners: {
+				'fileLoaded': function(src) {
+
+				},
+				'fileSaved': function(src, notebookId) {
+					this.unmask();
+					if (notebookId !== null) {
+						var id = this.getNotebookId();
+						if (!id || notebookId!=id) {
+							this.setNotebookId(notebookId);
+						}
+						this.toastInfo({
+							html: this.localize('saved'),
+							anchor: 'tr'
+						});
+						this.setIsEdited(false);
+					} else {
+						// save error
+					}
+				},
+				'saveCancelled': function() {
+					this.unmask();
+				},
+				scope: this
+			}
+		});
+
 		this.githubDialogs = new Voyant.notebook.github.GitHubDialogs({
 			listeners: {
 				'fileLoaded': function(src, {owner, repo, ref, path, file}) {
@@ -372,40 +388,20 @@ Ext.define('Voyant.notebook.Notebook', {
     	var cells = this.getComponent("cells");
     	cells.removeAll();
 	},
+
+	showSaveDialog: function(saveAs) {
+		var data = this.generateExportHtml();
+		this.mask(this.localize('saving'));
+		this.getMetadata().setDateNow("modified");
+
+		const storageSolution = this.getStorageSolution();
+		if (storageSolution === 'github') {
+			this.githubDialogs.showSave(data);
+		} else {
+			this.voyantStorageDialogs.showSave(data, saveAs ? undefined : this.getNotebookId());
+		}
+	},
 	
-	saveWithVoyant: function() {
-		var me = this;
-		var data = this.generateExportHtml();
-		this.mask(this.localize('saving'));
-		this.getMetadata().setDateNow("modified");
-
-		Spyral.Load.trombone({
-			tool: 'notebook.NotebookManager',
-			action: 'save',
-			id: this.getNotebookId(),
-			data: data
-		}).then(function(json) {
-			me.unmask();
-			var id = me.getNotebookId();
-			if (!id || json.notebook.id!=id) {
-				me.setNotebookId(json.notebook.id);
-			}
-			me.toastInfo({
-				html: me.localize('saved'),
-				anchor: 'tr'
-			});
-			me.setIsEdited(false);
-		}).catch(function(err) {me.unmask()});
-	},
-
-	saveWithGitHub: function() {
-		var data = this.generateExportHtml();
-		this.mask(this.localize('saving'));
-		this.getMetadata().setDateNow("modified");
-
-		this.githubDialogs.showSave(data);
-	},
-
     loadFromString: function(text) {
     	text = text.trim();
 		if (text.indexOf("http")==0) {
@@ -802,7 +798,7 @@ Ext.define('Voyant.notebook.Notebook', {
 	getExportUrl: function(asTool) {
 		return location.href; // we just provide the current URL
 	},
-    
+
     showMetadataEditor: function() {
     	var me = this;
     	var metadata = this.getMetadata();
@@ -949,6 +945,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	    
     	}).show();
 	},
+	
 	showOptionsClick: function(panel) {
 		let me = panel;
 		if (me.optionsWin === undefined) {

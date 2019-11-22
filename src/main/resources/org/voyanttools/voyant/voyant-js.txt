@@ -174,10 +174,11 @@ app/notebook/editor/CodeEditor.js
 app/notebook/editor/CodeEditorWrapper.js
 app/notebook/editor/TextEditor.js
 app/notebook/editor/TextEditorWrapper.js
-app/notebook/github/OctokitWrapper.js
-app/notebook/github/ReposBrowser.js
-app/notebook/github/FileSaver.js
-app/notebook/github/GitHubDialogs.js
+app/notebook/storage/github/OctokitWrapper.js
+app/notebook/storage/github/ReposBrowser.js
+app/notebook/storage/github/FileSaver.js
+app/notebook/storage/github/GitHubDialogs.js
+app/notebook/storage/voyant/StorageDialogs.js
 app/notebook/Notebook.js
 
 # APPS
