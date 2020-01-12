@@ -1,7 +1,6 @@
 Ext.define('Voyant.panel.CorpusCreator', {
 	extend: 'Ext.form.Panel',
 	requires: ['Ext.form.field.File'],
-	requires: ['Voyant.data.model.Corpus'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.corpuscreator',
 	isConsumptive: true,

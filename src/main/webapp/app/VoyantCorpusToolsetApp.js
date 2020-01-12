@@ -3,7 +3,7 @@ Ext.define('Voyant.panel.DocumentClusters', {
 	alias: 'widget.documentclusters',
 	title: "Document Clusters"
 })
-//Ext.define('Voyant.panel.RezoViz', {
+
 //	extend: 'Ext.panel.Panel',
 //	alias: 'widget.rezoviz',
 //	title: "RezoViz"

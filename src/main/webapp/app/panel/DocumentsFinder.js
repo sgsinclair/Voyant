@@ -140,9 +140,6 @@ Ext.define('Voyant.panel.DocumentsFinder', {
 	    	    },{
 	    	    	xtype: 'actioncolumn',
 	                width: 25,
-	                sortable: false,
-	                menuDisabled: true,
-	                width: 25,
 	                getGlyph: 'xf014@FontAwesome',
 	                tooltip: this.localize('deleteQueryTip'),
 	                menuDisabled: true,

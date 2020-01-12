@@ -297,13 +297,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		}
     },
     
-    resetGraph: function() {
-		this.setNodeData([]);
-    	this.setLinkData([]);
-		this.setNetworkMode(this.DEFAULT_MODE);
-		this.refresh();
-    },
-    
     loadFromQuery: function(query) {
     	if (Ext.isArray(query) && query.length==0) {
     		this.setApiParam("query", undefined);
@@ -607,8 +600,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     resetGraph: function() {
-	    this.setNodeData([]);
-		this.setLinkData([]);
+		this.setNodeData([]);
+    	this.setLinkData([]);
+		this.setNetworkMode(this.DEFAULT_MODE); // ? there was another version of this function without this
 		this.refresh();
     },
     
