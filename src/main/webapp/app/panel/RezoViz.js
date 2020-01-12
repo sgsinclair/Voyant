@@ -215,6 +215,7 @@ Ext.define('Voyant.panel.RezoViz', {
         });
         
         this.on('loadedCorpus', function(src, corpus) {
+        	debugger
         	if (corpus.getDocumentsCount()==1) {
         		this.setApiParam("minEdgeCount", 1);
         	}
