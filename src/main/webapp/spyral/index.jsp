@@ -63,10 +63,12 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 			allowInput: '<%= System.getProperty("org.voyanttools.server.allowinput")==null ? "" : System.getProperty("org.voyanttools.server.allowinput") %>'
 		}
 	});
-	Spyral.Load.setBaseUrl('<%
+	
+	<% // there's a very weird thing where reloading a secure page sometimes causes the insecure page to be requested, so let's rely on the browser for scheme %>
+	Spyral.Load.setBaseUrl(document.location.protocol+'//<%
 	
 	StringBuilder fullurl = new StringBuilder();
-	fullurl.append(request.getScheme()).append("://").append(request.getServerName());
+	fullurl/*.append(request.getScheme()).append("://")*/.append(request.getServerName());
 	int serverPort = request.getServerPort();
 	if (serverPort != 80 && serverPort != 443) {
 		fullurl.append(":").append(serverPort);
