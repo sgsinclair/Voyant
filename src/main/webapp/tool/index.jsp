@@ -40,8 +40,36 @@ for (String notRealTool : notRealTools) {
 	}
 }
 
+boolean toolFound = false;
+if (!isNotRealTool) {
+	String lowerCasedFileName = tool.toLowerCase()+".js";
+	
+	// look in panels directory
+	java.io.File panelDirectory = new java.io.File(request.getServletContext().getRealPath("app"), "panel");
+	for (String file : panelDirectory.list()) {
+		if (file.toLowerCase().equals(lowerCasedFileName)) {
+			tool = file.substring(0,file.length()-3);
+			toolFound = true;
+			break;
+		}
+	}
+	
+	// look in widgets directory
+	if (!toolFound) {
+		java.io.File widgetDirectory = new java.io.File(request.getServletContext().getRealPath("app"), "widget");
+		for (String file : widgetDirectory.list()) {
+			if (file.toLowerCase().equals(lowerCasedFileName)) {
+				tool = file.substring(0,file.length()-3);
+				toolFound = true;
+				break;
+			}
+		}
+	}
+}
+
+
 // check to make sure that the indicated tool exists, otherwise redirect
-if (isNotRealTool || (new java.io.File(new java.io.File(request.getServletContext().getRealPath("app"), "panel"), tool + ".js").exists()==false && new java.io.File(new java.io.File(request.getServletContext().getRealPath("app"), "widget"), tool + ".js").exists()==false)) {
+if (isNotRealTool || !toolFound) {
 	response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 	response.setHeader("Location", "../NoTool/?notool="+tool+(query!=null ? "&"+query : ""));
 	return;
