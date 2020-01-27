@@ -271,7 +271,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			
 			// I'd like to be able to run this in another scope/context, but it
 			// doesn't seem possible for the type of code that's being run
-			var result = eval.call(window, code);
+			result = eval.call(window, code);
 		}
 		catch (e) {
 			this.results.unmask();
@@ -279,15 +279,13 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			this.getTargetEl().fireEvent('resize');
 			return e;
 		}
-		
 		this.setIsRun(true);
 		if (result!==undefined) {
 			if (result.then && result.catch && result.finally) {
 				var me = this;
 				result.then(function(result) {
 					if (result!==undefined) {
-						Spyral.Notebook.show(result);
-//						Voyant.notebook.util.Show.show(result)
+						this.results.update(result);
 					}
 				}).catch(function(err) {
 					Voyant.notebook.util.Show.showError(err);
@@ -297,11 +295,11 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				})
 			} else {
 				this.results.unmask();
-				Spyral.Notebook.show(result);
-//				Voyant.notebook.util.Show.show(result)
+				this.results.update(result);
 			}
+		} else {
+			this.results.unmask();
 		}
-		this.setIsRun(true);
 		return result;
 	},
 	
