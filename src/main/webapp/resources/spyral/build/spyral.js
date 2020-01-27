@@ -1,4 +1,4 @@
-var Spyral = (function (exports, Highcharts) {
+var Spyral = (function (Highcharts) {
   'use strict';
 
   function _typeof(obj) {
@@ -125,26 +125,19 @@ var Spyral = (function (exports, Highcharts) {
     return _construct.apply(null, arguments);
   }
 
-  function _taggedTemplateLiteral(strings, raw) {
-    if (!raw) {
-      raw = strings.slice(0);
-    }
-
-    return Object.freeze(Object.defineProperties(strings, {
-      raw: {
-        value: Object.freeze(raw)
-      }
-    }));
-  }
-
-  var Loader =
+  /**
+   * Class embodying Load functionality.
+   * @memberof Spyral
+   * @class
+   */
+  var Load =
   /*#__PURE__*/
   function () {
-    function Loader() {
-      _classCallCheck(this, Loader);
+    function Load() {
+      _classCallCheck(this, Load);
     }
 
-    _createClass(Loader, null, [{
+    _createClass(Load, null, [{
       key: "setBaseUrl",
       value: function setBaseUrl(baseUrl) {
         this.baseUrl = baseUrl;
@@ -267,112 +260,29 @@ var Spyral = (function (exports, Highcharts) {
       }
     }]);
 
-    return Loader;
+    return Load;
   }();
 
-  _defineProperty(Loader, "baseUrl", void 0);
-
-  function _templateObject() {
-    var data = _taggedTemplateLiteral(["", ""]);
-
-    _templateObject = function _templateObject() {
-      return data;
-    };
-
-    return data;
-  }
-  function load(config) {
-    return Corpus.load(config);
-  }
-  function create(config) {
-    return Corpus.load(config);
-  }
-  function id(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.id(api || config);
-    });
-  }
-  function metadata(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.metadata(api || config);
-    });
-  }
-  function summary(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.summary(api || config);
-    });
-  }
-  function titles(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.titles(api || config);
-    });
-  }
-  function text(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.text(api || config);
-    });
-  }
-  function texts(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.texts(api || config);
-    });
-  }
-  function terms(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.terms(api || config);
-    });
-  }
-  function tokens(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.tokens(api || config);
-    });
-  }
-  function words(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.words(api || config);
-    });
-  }
-  function contexts(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.contexts(api || config);
-    });
-  }
-  function collocates(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.collocates(api || config);
-    });
-  }
-  function phrases(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.phrases(api || config);
-    });
-  }
-  function correlations(config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.correlations(api || config);
-    });
-  }
-  function tool(target, tool, config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.tool(target, tool, api || config);
-    });
-  }
-  function htmltool(html, tool, config, api) {
-    return Corpus.load(config).then(function (corpus) {
-      return corpus.htmltool(html, tool, api || config);
-    });
-  }
-  function setBaseUrl(baseUrl) {
-    Loader.setBaseUrl(baseUrl);
-  }
+  _defineProperty(Load, "baseUrl", void 0);
 
   function isDocumentsMode(config) {
     return config && (config.mode && config.mode === "documents" || config.documents);
   }
+  /**
+   * Class representing a Corpus.
+   * @memberof Spyral
+   * @class
+   */
+
 
   var Corpus =
   /*#__PURE__*/
   function () {
+    /**
+     * Create a new Corpus using the specified Corpus ID
+     * @constructor
+     * @param {string} id The Corpus ID
+     */
     function Corpus(id) {
       _classCallCheck(this, Corpus);
 
@@ -381,22 +291,45 @@ var Spyral = (function (exports, Highcharts) {
 
     _createClass(Corpus, [{
       key: "id",
+
+      /**
+       * Get the ID
+       * @return {string} The ID
+       */
       value: function id() {
         var me = this;
         return new Promise(function (resolve) {
           return resolve(me.corpusid);
         });
       }
+      /**
+       * Create a Corpus and return the ID
+       * @param {object} config 
+       * @param {object} api 
+       */
+
     }, {
       key: "metadata",
+
+      /**
+       * Load the metadata
+       * @param {*} config 
+       * @param {*} params 
+       */
       value: function metadata(config, params) {
-        return Loader.trombone(config, {
+        return Load.trombone(config, {
           tool: isDocumentsMode(config) ? "corpus.DocumentsMetadata" : "corpus.CorpusMetadata",
           corpus: this.corpusid
         }).then(function (data) {
           return isDocumentsMode(config) ? data.documentsMetadata.documents : data.corpus.metadata;
         });
       }
+      /**
+       * Create a Corpus and return the metadata
+       * @param {*} config 
+       * @param {*} api 
+       */
+
     }, {
       key: "summary",
       value: function summary(config) {
@@ -405,10 +338,16 @@ var Spyral = (function (exports, Highcharts) {
           return "This corpus (".concat(data.alias ? data.alias : data.id, ") has ").concat(data.documentsCount.toLocaleString(), " documents with ").concat(data.lexicalTokensCount.toLocaleString(), " total words and ").concat(data.lexicalTypesCount.toLocaleString(), " unique word forms.");
         });
       }
+      /**
+       * Create a Corpus and return the summary
+       * @param {*} config 
+       * @param {*} api 
+       */
+
     }, {
       key: "titles",
       value: function titles(config) {
-        return Loader.trombone(config, {
+        return Load.trombone(config, {
           tool: "corpus.DocumentsMetadata",
           corpus: this.corpusid
         }).then(function (data) {
@@ -417,43 +356,78 @@ var Spyral = (function (exports, Highcharts) {
           });
         });
       }
+      /**
+       * Create a Corpus and return the titles
+       * @param {*} config 
+       * @param {*} api 
+       */
+
     }, {
       key: "text",
+
+      /**
+       * Get the text
+       * @param {*} config 
+       */
       value: function text(config) {
         return this.texts(config).then(function (data) {
           return data.join("\n");
         });
       }
+      /**
+       * Create a Corpus and return the text
+       * @param {*} config 
+       * @param {*} api 
+       */
+
     }, {
       key: "texts",
       value: function texts(config) {
-        return Loader.trombone(config, {
+        return Load.trombone(config, {
           tool: "corpus.CorpusTexts",
           corpus: this.corpusid
         }).then(function (data) {
           return data.texts.texts;
         });
       }
+      /**
+       * Create a Corpus and return the texts
+       * @param {*} config 
+       * @param {*} api 
+       */
+
     }, {
       key: "terms",
       value: function terms(config) {
-        return Loader.trombone(config, {
+        return Load.trombone(config, {
           tool: isDocumentsMode(config) ? "corpus.DocumentTerms" : "corpus.CorpusTerms",
           corpus: this.corpusid
         }).then(function (data) {
           return isDocumentsMode(config) ? data.documentTerms.terms : data.corpusTerms.terms;
         });
       }
+      /**
+       * Create a Corpus and return the terms
+       * @param {*} config 
+       * @param {*} api 
+       */
+
     }, {
       key: "tokens",
       value: function tokens(config) {
-        return Loader.trombone(config, {
+        return Load.trombone(config, {
           tool: "corpus.DocumentTokens",
           corpus: this.corpusid
         }).then(function (data) {
           return data.documentTokens.tokens;
         });
       }
+      /**
+       * Create a Corpus and return the tokens
+       * @param {*} config 
+       * @param {*} api 
+       */
+
     }, {
       key: "words",
       value: function words() {
@@ -464,7 +438,7 @@ var Spyral = (function (exports, Highcharts) {
           config.limit = 0;
         }
 
-        return Loader.trombone(config, {
+        return Load.trombone(config, {
           tool: "corpus.DocumentTokens",
           noOthers: true,
           corpus: this.corpusid
@@ -472,6 +446,12 @@ var Spyral = (function (exports, Highcharts) {
           return data.documentTokens.tokens;
         });
       }
+      /**
+       * Create a Corpus and return the words
+       * @param {object} config 
+       * @param {object} api 
+       */
+
     }, {
       key: "contexts",
       value: function contexts(config) {
@@ -479,13 +459,19 @@ var Spyral = (function (exports, Highcharts) {
           console.warn("No query provided for contexts request.");
         }
 
-        return Loader.trombone(config, {
+        return Load.trombone(config, {
           tool: "corpus.DocumentContexts",
           corpus: this.corpusid
         }).then(function (data) {
           return data.documentContexts.contexts;
         });
       }
+      /**
+       * Create a Corpus and return the contexts
+       * @param {object} config 
+       * @param {object} api 
+       */
+
     }, {
       key: "collocates",
       value: function collocates(config) {
@@ -493,23 +479,35 @@ var Spyral = (function (exports, Highcharts) {
           console.warn("No query provided for collocates request.");
         }
 
-        return Loader.trombone(config, {
+        return Load.trombone(config, {
           tool: "corpus.CorpusCollocates",
           corpus: this.corpusid
         }).then(function (data) {
           return data.corpusCollocates.collocates;
         });
       }
+      /**
+       * Create a Corpus and return the collocates
+       * @param {object} config 
+       * @param {object} api 
+       */
+
     }, {
       key: "phrases",
       value: function phrases(config) {
-        return Loader.trombone(config, {
+        return Load.trombone(config, {
           tool: isDocumentsMode(config) ? "corpus.DocumentNgrams" : "corpus.CorpusNgrams",
           corpus: this.corpusid
         }).then(function (data) {
           return isDocumentsMode(config) ? data.documentNgrams.ngrams : data.corpusNgrams.ngrams;
         });
       }
+      /**
+       * Create a Corpus and return the phrases
+       * @param {object} config 
+       * @param {object} api 
+       */
+
     }, {
       key: "correlations",
       value: function correlations(config) {
@@ -521,81 +519,225 @@ var Spyral = (function (exports, Highcharts) {
           }
         }
 
-        return Loader.trombone(config, {
+        return Load.trombone(config, {
           tool: isDocumentsMode(config) ? "corpus.DocumentTermCorrelations" : "corpus.CorpusTermCorrelations",
           corpus: this.corpusid
         }).then(function (data) {
           return data.termCorrelations.correlations;
         });
       }
+      /**
+       * Create a Corpus and return the correlations
+       * @param {object} config 
+       * @param {object} api 
+       */
+
     }, {
       key: "tool",
-      value: function tool(_tool, config) {
-
-        var config = config || {};
+      value: function tool(_tool) {
+        var _arguments = arguments;
+        var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var me = this;
         return new Promise(function (resolve, reject) {
-          var out = '<iframe '; // construct attributes of iframe
+          config = config || {}; // determine if we're calling one tool or multiple
+
+          var tools = Array.isArray(_tool) ? _tool : [_tool];
+
+          if (typeof config === "string") {
+            tools.push({
+              forTool: config
+            });
+            config = {};
+          } else if ("forTool" in config) {
+            tools.push(config);
+            config = {};
+          }
+
+          if (_arguments.length > 2) {
+            for (var i = 2; i < _arguments.length; i++) {
+              if (typeof _arguments[i] == "string") {
+                tools.push({
+                  forTool: _arguments[i]
+                });
+              } else if (_typeof(_arguments[i]) == "object") {
+                if ("forTool" in _arguments[i]) {
+                  tools.push(_arguments[i]);
+                  config = {};
+                } else {
+                  config = _arguments[i];
+                }
+              }
+            }
+          }
 
           var defaultAttributes = {
             width: undefined,
             height: undefined,
-            style: "width: 90%; height: 400px"
+            style: "width: 400px; height: 400px",
+            "float": "right"
           };
+          var out = "";
+          tools.forEach(function (t) {
+            t = typeof t === "string" ? {
+              forTool: t
+            } : t;
+            out += "<iframe "; // add attributes
 
-          for (var attr in defaultAttributes) {
-            var val = config[attr] || defaultAttributes[attr];
+            for (var attr in defaultAttributes) {
+              var val = (attr in t ? t[attr] : undefined) || (attr in config ? config[attr] : undefined) || (attr in defaultAttributes ? defaultAttributes[attr] : undefined);
 
-            if (val) {
-              out += ' ' + attr + '="' + val + '"';
-            }
-          } // construct src URL
+              if (val !== undefined) {
+                out += ' ' + attr + '="' + val + '"';
+              }
+            } // construct src URL
 
 
-          var url = new URL((config && config.voyantUrl ? config.voyantUrl : Loader.baseUrl) + "tool/" + _tool + "/");
-          url.searchParams.append("corpus", me.corpusid); // add API values from config (some may be ignored)
+            var url = new URL((config && config.voyantUrl ? config.voyantUrl : Load.baseUrl) + "tool/" + t.forTool + "/");
+            url.searchParams.append("corpus", me.corpusid); // add API values from config (some may be ignored)
 
-          Object.keys(config || {}).forEach(function (key) {
-            if (key !== "input" && !(key in defaultAttributes)) {
-              url.searchParams.append(key, config[key]);
-            }
+            var all = Object.assign(t, config);
+            Object.keys(all).forEach(function (key) {
+              if (key !== "input" && !(key in defaultAttributes)) {
+                url.searchParams.append(key, all[key]);
+              }
+            }); // add url
+
+            out += ' src="' + url + '"></iframe>';
           });
-          out += ' src="' + url + '"></iframe>';
-
-          /*
-          if (typeof target === "function") {
-            resolve(target(out));
-          } else {
-            if (typeof target === "string") {
-              target = document.querySelector(target);
-            }
-            if (target && _typeof(target) === "object" && "innerHTML" in target) {
-              target.innerHTML = out;
-            }
-            resolve(out);
-          }
-          */
-
-          resolve(out); // just return the tag
+          resolve(out);
         });
       }
-    }, {
-      key: "htmltool",
-      value: function htmltool(html, tool, config) {
-        var _this = this;
+      /**
+       * Create a Corpus and return the tool
+       * @param {*} tool 
+       * @param {*} config 
+       * @param {*} api 
+       */
 
-        return new Promise(function (resolve, reject) {
-          _this.tool(undefined, tool, config).then(function (out) {
-            return resolve(html(_templateObject(), out));
-          });
-        });
-      }
     }, {
       key: "toString",
       value: function toString() {
         return this.summary();
       }
+      /**
+       * Create a new Corpus using the provided config
+       * @param {object} config 
+       */
+
     }], [{
+      key: "setBaseUrl",
+      value: function setBaseUrl(baseUrl) {
+        Load.setBaseUrl(baseUrl);
+      }
+    }, {
+      key: "id",
+      value: function id(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.id(api || config);
+        });
+      }
+    }, {
+      key: "metadata",
+      value: function metadata(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.metadata(api || config);
+        });
+      }
+    }, {
+      key: "summary",
+      value: function summary(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.summary(api || config);
+        });
+      }
+    }, {
+      key: "titles",
+      value: function titles(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.titles(api || config);
+        });
+      }
+    }, {
+      key: "text",
+      value: function text(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.text(api || config);
+        });
+      }
+    }, {
+      key: "texts",
+      value: function texts(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.texts(api || config);
+        });
+      }
+    }, {
+      key: "terms",
+      value: function terms(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.terms(api || config);
+        });
+      }
+    }, {
+      key: "tokens",
+      value: function tokens(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.tokens(api || config);
+        });
+      }
+    }, {
+      key: "words",
+      value: function words(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.words(api || config);
+        });
+      }
+    }, {
+      key: "contexts",
+      value: function contexts(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.contexts(api || config);
+        });
+      }
+    }, {
+      key: "collocates",
+      value: function collocates(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.collocates(api || config);
+        });
+      }
+    }, {
+      key: "phrases",
+      value: function phrases(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.phrases(api || config);
+        });
+      }
+    }, {
+      key: "correlations",
+      value: function correlations(config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.correlations(api || config);
+        });
+      }
+    }, {
+      key: "tool",
+      value: function tool(_tool2, config, api) {
+        return Corpus.load(config).then(function (corpus) {
+          return corpus.tool(_tool2, config, api);
+        });
+      }
+    }, {
+      key: "create",
+      value: function create(config) {
+        return Corpus.load(config);
+      }
+      /**
+       * Load a Corpus using the provided config
+       * @param {object} config The Corpus config
+       */
+
+    }, {
       key: "load",
       value: function load(config) {
         var promise = new Promise(function (resolve, reject) {
@@ -613,7 +755,7 @@ var Spyral = (function (exports, Highcharts) {
             }
 
             if (config && config.input) {
-              Loader.trombone(config, {
+              Load.trombone(config, {
                 tool: "corpus.CorpusMetadata"
               }).then(function (data) {
                 return resolve(new Corpus(data.corpus.metadata.id));
@@ -644,30 +786,7 @@ var Spyral = (function (exports, Highcharts) {
     return Corpus;
   }();
 
-  _defineProperty(Corpus, "Loader", Loader);
-
-  var corpus = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    load: load,
-    create: create,
-    id: id,
-    metadata: metadata,
-    summary: summary,
-    titles: titles,
-    text: text,
-    texts: texts,
-    terms: terms,
-    tokens: tokens,
-    words: words,
-    contexts: contexts,
-    collocates: collocates,
-    phrases: phrases,
-    correlations: correlations,
-    tool: tool,
-    htmltool: htmltool,
-    setBaseUrl: setBaseUrl,
-    Corpus: Corpus
-  });
+  _defineProperty(Corpus, "Load", Load);
 
   function chart(target, config) {
     // convert title and suppress if not provided
@@ -732,6 +851,12 @@ var Spyral = (function (exports, Highcharts) {
     config.chart.type = type;
     return;
   }
+
+  /**
+   * Class representing a Table.
+   * @memberof Spyral
+   * @class
+   */
 
   var Table =
   /*#__PURE__*/
@@ -1713,7 +1838,11 @@ var Spyral = (function (exports, Highcharts) {
     }], [{
       key: "create",
       value: function create(data, config) {
-        return new Table(data, config);
+        for (var _len6 = arguments.length, other = new Array(_len6 > 2 ? _len6 - 2 : 0), _key6 = 2; _key6 < _len6; _key6++) {
+          other[_key6 - 2] = arguments[_key6];
+        }
+
+        return _construct(Table, [data, config].concat(other));
       }
     }, {
       key: "fetch",
@@ -1795,8 +1924,8 @@ var Spyral = (function (exports, Highcharts) {
     }, {
       key: "zip",
       value: function zip() {
-        for (var _len6 = arguments.length, data = new Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-          data[_key6] = arguments[_key6];
+        for (var _len7 = arguments.length, data = new Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+          data[_key7] = arguments[_key7];
         }
 
         // we have a single nested array, so let's recall with flattened arguments
@@ -1824,6 +1953,7 @@ var Spyral = (function (exports, Highcharts) {
   }(); // this seems like a good balance between a built-in flexible parser and a heavier external parser
   // https://lowrey.me/parsing-a-csv-file-in-es6-javascript/
 
+
   var regex = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
 
   function parseCsvLine(line) {
@@ -1847,129 +1977,292 @@ var Spyral = (function (exports, Highcharts) {
     return arr;
   }
 
-  function create$1(data, config) {
-    for (var _len7 = arguments.length, other = new Array(_len7 > 2 ? _len7 - 2 : 0), _key7 = 2; _key7 < _len7; _key7++) {
-      other[_key7 - 2] = arguments[_key7];
+  /**
+   * A helper for working with the Voyant Notebook app.
+   * @memberof Spyral
+   * @namespace
+   */
+  var Notebook =
+  /*#__PURE__*/
+  function () {
+    function Notebook() {
+      _classCallCheck(this, Notebook);
     }
 
-    return _construct(Table, [data, config].concat(other));
-  }
-  function fetch$1(input, api, config) {
-    return Table.fetch(input, api, config);
-  }
+    _createClass(Notebook, null, [{
+      key: "getPreviousBlock",
 
-  var table = /*#__PURE__*/Object.freeze({
-    __proto__: null,
+      /**
+       * Returns the previous block.
+       * @static
+       * @returns {string}
+       */
+      value: function getPreviousBlock() {
+        return Spyral.Notebook.getBlock(-1);
+      }
+      /**
+       * Returns the next block.
+       * @static
+       * @returns {string}
+       */
+
+    }, {
+      key: "getNextBlock",
+      value: function getNextBlock() {
+        return Spyral.Notebook.getBlock(1);
+      }
+      /**
+       * Returns the current block.
+       * @static
+       * @params {number} [offset] If specified, returns the block whose position is offset from the current block
+       * @returns {string}
+       */
+
+    }, {
+      key: "getBlock",
+      value: function getBlock() {
+        if (Voyant && Voyant.notebook) {
+          return Voyant.notebook.Notebook.currentNotebook.getBlock.apply(Voyant.notebook.Notebook.currentNotebook, arguments);
+        }
+      }
+      /**
+       * 
+       * @param {*} contents 
+       * @param {*} config 
+       */
+
+    }, {
+      key: "show",
+      value: function show(contents, config) {
+        var contents = Spyral.Util.toString(contents, config);
+
+        if (contents instanceof Promise) {
+          contents.then(function (c) {
+            return Voyant.notebook.util.Show.show(c);
+          });
+        } else {
+          Voyant.notebook.util.Show.show(contents);
+        }
+      }
+      /**
+       * @returns {string|element}
+       */
+
+    }, {
+      key: "getTarget",
+      value: function getTarget() {
+        if (Voyant && Voyant.notebook && Voyant.notebook.Notebook.currentBlock) {
+          return Voyant.notebook.Notebook.currentBlock;
+        } else {
+          var target = document.createElement("div");
+          document.body.appendChild(target);
+          return target;
+        }
+      }
+    }]);
+
+    return Notebook;
+  }();
+
+  /**
+   * A helper for working with the Voyant Notebook app.
+   * @memberof Spyral
+   * @namespace
+   */
+  var Util =
+  /*#__PURE__*/
+  function () {
+    function Util() {
+      _classCallCheck(this, Util);
+    }
+
+    _createClass(Util, null, [{
+      key: "id",
+
+      /**
+       * Generates a random ID of the specified length.
+       * @static
+       * @param {number} len The length of the ID to generate?
+       * @returns {string}
+       */
+      value: function id(len) {
+        len = len || 8; // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+
+        return Math.random().toString(36).substring(2, 2 + len) + Math.random().toString(36).substring(2, 2 + len);
+      }
+      /**
+       * 
+       * @static
+       * @param {*} contents 
+       * @param {*} config 
+       * @returns {string}
+       */
+
+    }, {
+      key: "toString",
+      value: function toString(contents, config) {
+        if (contents.constructor === Array || contents.constructor === Object) {
+          contents = JSON.stringify(contents);
+
+          if (contents.length > 500) {
+            contents = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>' + contents.substring(0, 500) + " <a href=''>+</a><div style='display: none'>" + contents.substring(501) + "</div>";
+          }
+        }
+
+        return contents.toString();
+      }
+      /**
+       * 
+       * @static
+       * @param {*} before 
+       * @param {*} more 
+       * @param {*} after 
+       */
+
+    }, {
+      key: "more",
+      value: function more(before, _more, after) {
+        return before + '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>' + contents.substring(0, 500) + " <a href=''>+</a><div style='display: none'>" + contents.substring(501) + "</div>";
+      }
+    }]);
+
+    return Util;
+  }();
+
+  /**
+   * A class for storing Notebook metadata
+   * @memberof Spyral
+   */
+  var Metadata =
+  /*#__PURE__*/
+  function () {
+    /**
+     * The Metadata config object
+     * @typedef {object} MetadataConfig
+     * @property {string} title The title of the Corpus
+     * @property {string} author The author of the Corpus
+     * @property {string} description The description of the Corpus
+     * @property {array} keywords The keywords for the Corpus
+     * @property {string} created When the Corpus was created
+     * @property {string} language The language of the Corpus
+     * @property {string} license The license for the Corpus
+     */
+
+    /** 
+     * The metadata constructor.
+     * @constructor
+     * @param {MetadataConfig} config The metadata config object
+     */
+    function Metadata(config) {
+      var _this = this;
+
+      _classCallCheck(this, Metadata);
+
+      ['title', 'author', 'description', 'keywords', 'modified', 'created', 'language', 'license'].forEach(function (key) {
+        _this[key] = undefined;
+      });
+      this.version = "0.1"; // may be changed by config
+
+      if (config instanceof HTMLDocument) {
+        config.querySelectorAll("meta").forEach(function (meta) {
+          var name = meta.getAttribute("name");
+
+          if (name && this.hasOwnProperty(name)) {
+            var content = meta.getAttribute("content");
+
+            if (content) {
+              this[name] = content;
+            }
+          }
+        }, this);
+      } else {
+        this.set(config);
+      }
+
+      if (!this.created) {
+        this.setDateNow("created");
+      }
+    }
+    /**
+     * Set metadata properties.
+     * @param {object} config A config object
+     */
+
+
+    _createClass(Metadata, [{
+      key: "set",
+      value: function set(config) {
+        for (var key in config) {
+          if (this.hasOwnProperty(key)) {
+            this[key] = config[key];
+          }
+        }
+      }
+      /**
+       * Sets the specified field to the current date and time.
+       * @param {string} field 
+       */
+
+    }, {
+      key: "setDateNow",
+      value: function setDateNow(field) {
+        this[field] = new Date().toISOString();
+      }
+      /**
+       * Gets the specified field as a short date.
+       * @param {string} field
+       * @returns {string|undefined}
+       */
+
+    }, {
+      key: "shortDate",
+      value: function shortDate(field) {
+        return this[field] ? new Date(Date.parse(this[field])).toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }) : undefined;
+      }
+      /**
+       * Gets the fields as a set of HTML meta tags.
+       * @returns {string}
+       */
+
+    }, {
+      key: "getHeaders",
+      value: function getHeaders() {
+        var quotes = /"/g,
+            newlines = /(\r\n|\r|\n)/g,
+            tags = /<\/?\w+.*?>/g,
+            headers = "<title>" + (this.title || "").replace(tags, "") + "</title>\n";
+
+        for (var key in this) {
+          if (this[key]) {
+            headers += '<meta name="' + key + '" content="' + this[key].replace(quotes, "&quot;").replace(newlines, " ") + '">';
+          }
+        }
+
+        return headers;
+      }
+    }]);
+
+    return Metadata;
+  }();
+
+  /**
+   * @namespace Spyral
+   */
+
+  var Spyral$1 = {
+    Notebook: Notebook,
+    Util: Util,
+    Metadata: Metadata,
+    Corpus: Corpus,
     Table: Table,
-    create: create$1,
-    fetch: fetch$1
-  });
+    Load: Load
+  };
 
-  class Notebook {
-  	static getPreviousBlock() {
-  		return Spyral.Notebook.getBlock(-1);
-  	}
-  	static getNextBlock() {
-  		return Spyral.Notebook.getBlock(1);
-  	}
-  	static getBlock() {
-  		if (Voyant && Voyant.notebook) {
-  			return Voyant.notebook.Notebook.currentNotebook.getBlock.apply(Voyant.notebook.Notebook.currentNotebook, arguments)
-  		}
-  	}
-  	static show(contents, config) {
-  		var contents = Spyral.Util.toString(contents, config);
-  		if (contents instanceof Promise) {
-  			contents.then(c => Voyant.notebook.util.Show.show(c));
-  		} else {
-  			Voyant.notebook.util.Show.show(contents);
-  		}
-  	}
-  	static getTarget() {
-  		if (Voyant && Voyant.notebook && Voyant.notebook.Notebook.currentBlock) {
-  			return Voyant.notebook.Notebook.currentBlock;
-  		} else {
-  			target = document.createElement("div");
-  			document.body.appendChild(target);
-  			return target;
-  		}
-  	}
-  }
+  return Spyral$1;
 
-  class Util {
-  	static id(len) {
-  		len = len || 8;
-  		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-  		return Math.random().toString(36).substring(2, 2+len) + Math.random().toString(36).substring(2, 2+len)
-  	}
-  	static toString(contents, config) {
-  		if (contents.constructor === Array || contents.constructor===Object) {
-  			contents = JSON.stringify(contents);
-  			if (contents.length>500) {
-  				contents = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'+contents.substring(0,500)+" <a href=''>+</a><div style='display: none'>"+contents.substring(501)+"</div>";
-  			}
-  		}
-  		return contents.toString();
-  	}
-  	static more(before, more, after) {
-  		return before + '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'+contents.substring(0,500)+" <a href=''>+</a><div style='display: none'>"+contents.substring(501)+"</div>";
-
-  	}
-  }
-
-  class Metadata {
-  	constructor(config) {
-  		['title', 'author', 'description', 'keywords', 'modified', 'created', 'language', 'license'].forEach(key => {
-  			this[key] = undefined;
-  		});
-  		this.version = "0.1"; // may be changed by config
-  		if (config instanceof HTMLDocument) {
-  			config.querySelectorAll("meta").forEach(function(meta) {
-  				var name =  meta.getAttribute("name");
-  				if (name && this.hasOwnProperty(name)) {
-  					var content = meta.getAttribute("content");
-  					if (content) {
-  						this[name] = content;
-  					}
-  				}
-  			}, this);
-  		} else {
-  			this.set(config);
-  		}
-  		if (!this.created) {this.setDateNow("created");}
-  	}
-  	set(config) {
-  		for (var key in config) {
-  			if (this.hasOwnProperty(key)) {
-  				this[key] = config[key];
-  			}
-  		}
-  	}
-  	setDateNow(field) {
-  		this[field] = new Date().toISOString();
-  	}
-  	shortDate(field) {
-  		return this[field] ? (new Date(Date.parse(this[field])).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })) : undefined;
-  	}
-  	getHeaders() {
-  		var quotes = /"/g, newlines = /(\r\n|\r|\n)/g, tags = /<\/?\w+.*?>/g,
-  			headers = "<title>"+(this.title || "").replace(tags,"")+"</title>\n";
-  		for (var key in this) {
-  			if (this[key]) {
-  				headers+='<meta name="'+key+'" content="'+this[key].replace(quotes, "&quot;").replace(newlines, " ")+'">';
-  			}
-  		}
-  		return headers;
-  	}
-  }
-
-  exports.Corpus = corpus;
-  exports.Load = Loader;
-  exports.Metadata = Metadata;
-  exports.Notebook = Notebook;
-  exports.Table = table;
-  exports.Util = Util;
-
-  return exports;
-
-}({}, Highcharts));
+}(Highcharts));
+//# sourceMappingURL=spyral.js.map
