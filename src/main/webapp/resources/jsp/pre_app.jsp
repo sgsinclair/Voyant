@@ -99,7 +99,7 @@
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/visjs/vis.min.css" />
 
 <!-- ACE Editor (used by Spyral and the widget.codeeditor -->
-<script src="<%= base %>/resources/ace/2017-04-16/src-noconflict/ace.js"></script>
+<script src="<%= base %>/resources/ace/1.4.7/src-noconflict/ace.js"></script>
 
 <!-- FontAwesome -->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/fontawesome/4.4.0/font-awesome-all<%= rtl %>.css" />

@@ -16,7 +16,7 @@ if (request.getServletPath().equals("/spiral")) {
 
 <script src="<%= base %>/resources/spyral/build/spyral.js"></script>
 
-<script src="<%= base %>/resources/ckeditor/ckeditor4.6.2/ckeditor.js"></script>
+<script src="<%= base %>/resources/ckeditor/ckeditor4.13.0/ckeditor.js"></script>
 <script>
 // adapted from http://handsomedogstudio.com/ckeditor-set-default-target-blank
 CKEDITOR.on('dialogDefinition', function(ev) {
@@ -40,7 +40,8 @@ CKEDITOR.on('dialogDefinition', function(ev) {
     }
 });
 </script>
-<script src="<%= base %>/resources/ace/2017-04-16/src-noconflict/ace.js"></script>
+<script src="<%= base %>/resources/ace/1.4.7/src-noconflict/ace.js"></script>
+<!--script src="<%= base %>/resources/ace/1.4.7/src-noconflict/ext-language_tools.js"></script-->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/spyral/css/spyral.css" />
 <style id="voyant-notebooks-styles"></style>
 
