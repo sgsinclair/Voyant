@@ -1,14 +1,19 @@
-import {Corpus, Table, Loader} from 'voyant';
+import {Corpus, Table, Load} from 'voyant';
 
 import {Notebook} from './notebook';
 import {Util} from './util';
 import {Metadata} from './metadata';
 
-export {
+/**
+ * @namespace Spyral
+ */
+const Spyral = {
 	Notebook,
 	Util,
 	Metadata,
 	Corpus,
 	Table,
-	Loader as Load
+	Load
 };
+
+export default Spyral;

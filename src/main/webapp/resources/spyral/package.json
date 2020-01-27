@@ -1,13 +1,16 @@
 {
-	"name": "voyant-builder",
-	"version": "0.0.0",
-	"description": "Build for Voyant",
+	"name": "spyral",
+	"version": "0.0.1",
+	"description": "Build Spyral for use with Voyant",
 	"main": "src/index.js",
 	"scripts": {
 		"build-spyral": "rollup -c",
 		"watch-spyral": "rollup -c --watch --sourcemap",
 		"build-spyral-local-voyant": "rollup -c --environment LOCAL_VOYANT",
-		"watch-spyral-local-voyant": "rollup -c --watch --sourcemap --environment LOCAL_VOYANT"
+		"watch-spyral-local-voyant": "rollup -c --watch --sourcemap --environment LOCAL_VOYANT",
+		"docs": "jsdoc -c jsdoc.config.json",
+		"docs-tern": "jsdoc -t jsdoc-tern-template -c jsdoc.config.json",
+		"docs-tern-debug": "node --inspect-brk=9229 node_modules/jsdoc/jsdoc.js -t jsdoc-tern-template -c jsdoc.config.json"
 	},
 	"repository": {
 		"type": "git",
@@ -27,12 +30,15 @@
 	},
 	"homepage": "https://github.com/sgsinclair/Voyant",
 	"dependencies": {
-		"voyant": "^1.0.11"
+		"@octokit/rest": "^16.33.1",
+		"js-cookie": "^2.2.1",
+		"voyant": "^1.2.0"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.6.2",
 		"@babel/plugin-proposal-class-properties": "^7.5.5",
 		"@babel/preset-env": "^7.6.2",
+		"jsdoc": "^3.6.3",
 		"rollup": "^1.23.1",
 		"rollup-plugin-babel": "^4.3.3",
 		"rollup-plugin-node-resolve": "^5.2.0"
