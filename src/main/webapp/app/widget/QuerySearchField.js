@@ -73,6 +73,21 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	me.on("beforequery", function(queryPlan) {
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
+    			
+    			// look for categories
+    			var cats = me.up("panel").getApplication().getCategories();
+    			for (let key in cats) {
+    				if (key.indexOf(queryPlan.query.indexOf(key))==0) {
+    					queryPlan.query = key+":"+cats[key].join("|")
+    				} else {
+    					cats[key].forEach(function(word) {
+    						if (word.indexOf(queryPlan.query)) {
+    							queryPlan.query = key+":"+cats[key].join("|")
+    						}
+    					})
+    				}
+    			}
+    			
     			if (queryPlan.query.charAt(0)=="^") {
     				queryPlan.query=queryPlan.query.substring(1)
     				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character

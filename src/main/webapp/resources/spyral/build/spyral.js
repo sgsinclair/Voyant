@@ -530,8 +530,9 @@ var Spyral = (function (exports, Highcharts) {
       }
     }, {
       key: "tool",
-      value: function tool(target, _tool) {
-        var config = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      value: function tool(_tool, config) {
+
+        var config = config || {};
         var me = this;
         return new Promise(function (resolve, reject) {
           var out = '<iframe '; // construct attributes of iframe
@@ -561,18 +562,19 @@ var Spyral = (function (exports, Highcharts) {
           });
           out += ' src="' + url + '"></iframe>';
 
+          /*
           if (typeof target === "function") {
             resolve(target(out));
           } else {
             if (typeof target === "string") {
               target = document.querySelector(target);
             }
-
-            if (_typeof(target) === "object" && "innerHTML" in target) {
+            if (target && _typeof(target) === "object" && "innerHTML" in target) {
               target.innerHTML = out;
-              resolve(out);
             }
+            resolve(out);
           }
+          */
 
           resolve(out); // just return the tag
         });

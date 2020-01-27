@@ -262,7 +262,19 @@ Ext.define('Voyant.VoyantCorpusApp', {
 				var api = this.getModifiedApiParams() || {}; // use application, not tool
 				delete api.view; // make sure we show default view
 				if (eventName=='termsClicked') {
-					api.query=data;
+					// data can be a simple array of terms or an array of term objects
+					if (Ext.isArray(data) && "term" in data[0] && "docIndex" in data[0]) {
+						let termsObj = {};
+						let docIndObj = {};
+						data.forEach(function(datum) {
+							termsObj[datum.term]=true;
+							docIndObj[datum.docIndex]=true;
+						})
+						api.query=Object.keys(termsObj);
+						api.docIndex=Object.keys(docIndObj);
+					} else {						
+						api.query=data;
+					}
 				}
 				else if (eventName=='documentsClicked') {
 					var docIndex = [];

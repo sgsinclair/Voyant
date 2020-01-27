@@ -59,22 +59,13 @@ public class Trombone extends HttpServlet {
 	
 	public Trombone() throws IOException {
 		this.storage = null;
-		String storage = System.getProperty("org.voyanttools.server.storage");
-//		if (storage==null || storage.isEmpty()) {
-//			storage = this.getInitParameter("storage");
-//		}
-		if (storage!=null && storage.isEmpty()==false) {
-			storage = storage.toLowerCase();
-			if (storage.equals("memory")) {
-				this.storage = new MemoryStorage();
-			} else if (storage.equals("file-per-corpus")) {
-				FlexibleParameters parameters = new FlexibleParameters();
-				parameters.setParameter("storage", storage);
-				this.storage = new FileStorage(parameters);
-			}
-		}
-		if (this.storage==null) {
-			this.storage = new FileStorage();
+		String storage = System.getProperty("org.voyanttools.server.storage", "file-per-corpus").toLowerCase();
+		if (storage.equals("memory")) {
+			this.storage = new MemoryStorage();
+		} else {
+			FlexibleParameters parameters = new FlexibleParameters();
+			parameters.setParameter("storage", storage);
+			this.storage = new FileStorage(parameters);
 		}
 	}
 	

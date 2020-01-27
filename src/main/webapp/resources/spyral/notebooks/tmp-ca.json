@@ -3,7 +3,7 @@
         "created": 1496929631651,
         "version": 2,
         "modified": 1496950159544,
-        "url": "http://localhost:8080/voyant/spyral/tmp-ca?debug=true&run=true",
+        "url": "https://voyant-tools.org/spyral/tmp-ca?debug=true&run=true",
         "previousNotebook": "tmp-ca",
         "originalUrl": "f581a032b35f64040d6e5a0ad16c556f"
     },

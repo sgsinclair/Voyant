@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Sep 25 14:53:07 EDT 2019 */
+/* This file created by JSCacher. Last modified: Sun Jan 19 13:16:57 EST 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -11607,6 +11607,8 @@ Ext.define('Voyant.widget.StopListOption', {
 	    	        value: keywords,
 	    	        original: keywords,
 	    	        fn: function(btn,value,stoplist) {
+	    	        	// force lowercase for simple stopword list since it's lexical (this may change if the widget is used elsewhere)	    	        	value = value.toLowerCase();
+	    	        	value = value.toLowerCase();
 	    	        	if (btn=='ok' && stoplist.original!=value) {
 	    	        		var combo = this.down('combo')
 	    	        		if (Ext.String.trim(value).length==0) {
@@ -11716,6 +11718,21 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	me.on("beforequery", function(queryPlan) {
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
+    			
+    			// look for categories
+    			var cats = me.up("panel").getApplication().getCategories();
+    			for (let key in cats) {
+    				if (key.indexOf(queryPlan.query.indexOf(key))==0) {
+    					queryPlan.query = key+":"+cats[key].join("|")
+    				} else {
+    					cats[key].forEach(function(word) {
+    						if (word.indexOf(queryPlan.query)) {
+    							queryPlan.query = key+":"+cats[key].join("|")
+    						}
+    					})
+    				}
+    			}
+    			
     			if (queryPlan.query.charAt(0)=="^") {
     				queryPlan.query=queryPlan.query.substring(1)
     				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
@@ -13258,7 +13275,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		exists: 'Category already exists',
     		confirmRemove: 'Are you sure you want to remove the category?',
     		save: 'Save',
-    		cancel: 'Cancel',
     		features: 'Features',
     		category: 'Category',
     		
@@ -17184,13 +17200,6 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 		}
     },
     
-    resetGraph: function() {
-		this.setNodeData([]);
-    	this.setLinkData([]);
-		this.setNetworkMode(this.DEFAULT_MODE);
-		this.refresh();
-    },
-    
     loadFromQuery: function(query) {
     	if (Ext.isArray(query) && query.length==0) {
     		this.setApiParam("query", undefined);
@@ -17494,8 +17503,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     resetGraph: function() {
-	    this.setNodeData([]);
-		this.setLinkData([]);
+		this.setNodeData([]);
+    	this.setLinkData([]);
+		this.setNetworkMode(this.DEFAULT_MODE); // ? there was another version of this function without this
 		this.refresh();
     },
     
@@ -18684,7 +18694,6 @@ Ext.define('Voyant.panel.Correlations', {
 Ext.define('Voyant.panel.CorpusCreator', {
 	extend: 'Ext.form.Panel',
 	requires: ['Ext.form.field.File'],
-	requires: ['Voyant.data.model.Corpus'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.corpuscreator',
 	isConsumptive: true,
@@ -23335,9 +23344,6 @@ Ext.define('Voyant.panel.DocumentsFinder', {
 	    	    },{
 	    	    	xtype: 'actioncolumn',
 	                width: 25,
-	                sortable: false,
-	                menuDisabled: true,
-	                width: 25,
 	                getGlyph: 'xf014@FontAwesome',
 	                tooltip: this.localize('deleteQueryTip'),
 	                menuDisabled: true,
@@ -24101,6 +24107,7 @@ Ext.define('Voyant.panel.RezoViz', {
         });
         
         this.on('loadedCorpus', function(src, corpus) {
+        	debugger
         	if (corpus.getDocumentsCount()==1) {
         		this.setApiParam("minEdgeCount", 1);
         	}
@@ -35420,6 +35427,1109 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 		return this.items.get(0).getContent();
 	}
 })
+Ext.define("Voyant.notebook.github.OctokitWrapper", {
+	extend: "Ext.Base",
+	alias: "octokitwrapper",
+
+	octokit: undefined,
+
+	constructor: function(config) {
+		const authToken = config.authToken;
+		this.octokit = new Octokit({
+			auth: authToken,
+			userAgent: 'https://github.com/sgsinclair/Voyant'
+		});
+	},
+
+	getInfoForAuthenticatedUser: function() {
+		return this.octokit.users.getAuthenticated();
+	},
+
+	getReposForAuthenticatedUser: function(affiliation='owner', page=0, per_page=10) {
+		return this.octokit.repos.list({
+			affiliation,
+			page,
+			per_page
+		});
+	},
+
+	getReposForUser: function(owner, page=0, per_page=10) {
+		return this.octokit.search.repos({
+			q: 'user:'+owner,
+			page,
+			per_page
+		})
+	},
+
+	searchWithinRepositories: function(query, page=0, per_page=10) {
+		console.log(query);
+	},
+
+	getRepoContents: function(repoId) {
+		let {owner, repo} = this.parseFullName(repoId);
+		return this.getBranchSHAs({owner, repo, branch: 'master'}).then(function(resp) {
+			return this.getTreeContentsRecursively(resp);
+		}.bind(this));
+	},
+
+	getTreeContentsRecursively: function(params) {
+		return this.octokit.git.getTree({
+			owner: params.owner,
+			repo: params.repo,
+			tree_sha: params.baseTreeSHA,
+			recursive: 1,
+			headers: {
+				'If-None-Match': '' // cache busting
+			}
+		}).then(function (resp) {
+			return {
+				...params,
+				contents: this.unflattenContents(resp.data.tree),
+				truncated: resp.data.truncated
+			}
+		}.bind(this));
+	},
+
+	loadFile: function(repoId, path) {
+		let {owner, repo} = this.parseFullName(repoId);
+		let ref = 'master';
+		return this.octokit.repos.getContents({
+			owner, repo, ref, path
+		}).then(function(resp) {
+			return {
+				owner, repo, ref, path,
+				sha: resp.data.sha,
+				file: atob(resp.data.content)
+			}
+		}.bind(this));
+	},
+
+	// SAVING
+
+	doesRepoExist: function(owner, repo) {
+		return this.getRepoContents(owner+'/'+repo).then(function(resp) {
+			return true;
+		}.bind(this), function(err) {
+			console.log(err);
+			return false;
+		}.bind(this));
+	},
+
+	getPermissionsForUser: function(owner, repo, username) {
+		return this.octokit.repos.getCollaboratorPermissionLevel({
+			owner, repo, username
+		}).then(function(resp) {
+			return resp.data.permission;
+		}.bind(this), function(err) {
+			return 'none';
+		}.bind(this));
+	},
+
+	saveFile: async function(owner, repo, path, content, branch, message, sha) {
+		if (sha === undefined) {
+			sha = await this.getLatestFileSHA({owner, repo, branch, path})
+		}
+		return this.octokit.repos.createOrUpdateFile({owner, repo, path, content: btoa(content), branch, message, sha});
+	},
+
+	// UTILITIES
+
+	parseFullName: function(fullName) {
+		let [owner, repo] = fullName.split('/');
+		return {owner, repo};
+	},
+
+	getBranchSHAs: function(params) {
+		return this.octokit.repos.getBranch({
+			owner: params.owner,
+			repo: params.repo,
+			branch: params.branch,
+			headers: {
+				'If-None-Match': '' // cache busting
+			}
+		}).then((resp) => {
+			return {
+				...params,
+				baseTreeSHA: resp.data.commit.commit.tree.sha,
+				parentCommitSHA: resp.data.commit.sha
+			}
+		})
+	},
+
+	getLatestFileSHA: async function(params) {
+		const {owner, repo, branch, path} = params
+		const {data: {data: {repository: {object: result}}}} = await this.octokit.request({
+			method: 'POST',
+			url: '/graphql',
+			query: `{
+				repository(owner: "${owner}", name: "${repo}") {
+					object(expression: "${branch}:${path}") {
+						... on Blob {
+							oid
+						}
+					}
+				}
+			}`
+		}).catch(function(error) {
+			console.log(error);
+		});
+		const sha = result ? result.oid : undefined
+		return sha
+	},
+
+	unflattenContents: function(flatContents) {
+		const files = flatContents.filter(file=>file.type==='blob')
+		var result = {type: 'folder', name: '', path: '', contents: []}
+		const findSubFolder = (parentFolder, folderNameToFind) => {
+			 const subfolder = parentFolder.contents.find(el => {
+			 	return el.type === 'folder' && el.name === folderNameToFind
+			 })
+			return subfolder;
+		}
+		const addSubFolder = (newFolderName, parentFolder) => {
+			const newSubFolder = {type: 'folder', name: newFolderName, path: `${parentFolder.path}/${newFolderName}`, contents:[]}
+			parentFolder.contents.push(newSubFolder)
+			return newSubFolder;
+		}
+		const addFile = (newFileName, parentFolder) => {
+			const newFile = {type: 'file', name: newFileName, path: `${parentFolder.path}/${newFileName}`}
+			parentFolder.contents.push(newFile)
+		}
+		const isFile = (pathSections, currentIndex) => {
+			return pathSections.length - 1 == currentIndex
+		}
+
+		files.forEach(file=>{
+			const pathSections = file.path.split('/')
+			pathSections.reduce(function(parentFolder, pathSection, pathSectionIndex) {
+				const subFolder = findSubFolder(parentFolder, pathSection)
+				if (subFolder) {
+					return subFolder
+				} else if (isFile(pathSections, pathSectionIndex)) {
+					return addFile(pathSection, parentFolder)
+				} else {
+					return addSubFolder(pathSection, parentFolder)
+				}
+			}, result)
+		})
+		return result
+	}
+});
+
+Ext.define("Voyant.notebook.github.ReposBrowser", {
+	extend: "Ext.container.Container",
+	xtype: "githubreposbrowser",
+	config: {
+		repoType: 'owner',
+		selectedNode: undefined,
+		repoId: undefined,
+		path: undefined
+	},
+
+	octokit: undefined,
+
+	constructor: function(config) {
+		config = config || {};
+		
+		this.octokit = config.octokit;
+
+    	this.callParent(arguments);
+    },
+
+	initComponent: function() {
+		Ext.apply(this, {
+			layout: {
+				type: 'hbox',
+				align: 'stretch',
+				pack: 'start'
+			},
+			items: [{
+				layout: {
+					type: 'vbox',
+					align: 'stretch',
+					pack: 'start'
+				},
+				flex: 1,
+				items: [{
+					layout: {
+						type: 'accordion'
+					},
+					items: [{
+						title: 'My Repositories',
+						frame: true,
+						items: {
+							xtype: 'radiogroup',
+							fieldLabel: 'Show repositories for which I am',
+							labelAlign: 'top',
+							layout: 'vbox',
+							items: [{
+								boxLabel: 'Owner',
+								name: 'repoType',
+								inputValue: 'owner',
+								checked: true
+							},{
+								boxLabel: 'Collaborator',
+								name: 'repoType',
+								inputValue: 'collaborator'
+							},{
+								boxLabel: 'Organization Member',
+								name: 'repoType',
+								inputValue: 'organization_member'
+							}],
+							listeners: {
+								change: function(field, newValues, oldValue) {
+									this.setRepoType(newValues.repoType);
+									this.clearTree(true);
+									this.octokit.getReposForAuthenticatedUser(this.getRepoType(), 0, 100).then((resp) => {
+										this.addReposToTree(resp.data);
+									},(error) => {
+										console.log(error);
+									})
+								},
+								scope: this
+							}
+						},
+						listeners: {
+							expand: function() {
+								this.clearTree(true);
+								this.octokit.getReposForAuthenticatedUser(this.getRepoType(), 0, 100).then((resp) => {
+									this.addReposToTree(resp.data);
+								},(error) => {
+									console.log(error);
+								})
+							},
+							scope: this
+						}
+					},{
+						title: 'Public Repositories',
+						frame: true,
+						layout: 'vbox',
+						items: [{
+							fieldLabel: 'Limit to user or organization',
+							labelAlign: 'top',
+							xtype: 'textfield'
+						},{
+							text: 'Search',
+							xtype: 'button',
+							handler: function(button) {
+								let repoOwner = button.prev('textfield').getValue();
+								if (repoOwner !== '') {
+									this.clearTree(true);
+									this.octokit.getReposForUser(repoOwner, 0, 100).then((resp) => {
+										this.addReposToTree(resp.data.items);
+									},(error) => {
+										console.log(error);
+									})
+								}
+							},
+							scope: this
+						}],
+						listeners: {
+							expand: function() {
+								this.clearTree();
+							},
+							scope: this
+						}
+					}]
+				}
+				// ,{
+				// 	padding: '20 0 0 0',
+				// 	items: [{
+				// 		fieldLabel: 'Search within repositories',
+				// 		labelAlign: 'top',
+				// 		xtype: 'textfield'
+				// 	},{
+				// 		xtype: 'button',
+				// 		text: 'Search',
+				// 		margin: '0 5 0 0',
+				// 		handler: function(button) {
+				// 			let query = button.prev('textfield').getValue();
+				// 			if (query !== '') {
+				// 				this.searchWithinRepositories(query);
+				// 			}
+				// 		},
+				// 		scope: this
+				// 	},{
+				// 		xtype: 'button',
+				// 		text: 'Clear',
+				// 		handler: function(button) {
+							
+				// 		},
+				// 		scope: this
+				// 	}]
+				// }
+				]
+			},{
+				flex: 2,
+				layout: 'fit',
+				xtype: 'treepanel',
+				itemId: 'repoTree',
+				title: 'Repositories',
+				scrollable: true,
+				rootVisible: false,
+				viewConfig: {
+					emptyText: 'No results',
+					listeners: {
+						afteritemexpand: function(node, index, el) {
+							if (node.hasChildNodes() === false) {
+								switch(node.data.type) {
+									case 'repo':
+										let tr = el.querySelector('tr');
+										Ext.fly(tr).addCls('x-grid-tree-loading');
+										this.octokit.getRepoContents(node.getId()).then(function(resp) {
+											Ext.fly(tr).removeCls('x-grid-tree-loading');
+											this.addRepoContentsToNode(node, resp);
+										}.bind(this))
+										break;
+									case 'folder':
+										break;
+								}
+							}
+						},
+						itemclick: function(view, node, el) {
+							this.setSelectedNode(node);
+							this.fireEvent('nodeSelected', this, node.data.type, node);
+						},
+						scope: this
+					}
+				},
+				store: {
+					root: {
+						name: 'Root',
+						children: []
+					}
+				}
+			}],
+			listeners: {
+				boxready: function() {
+					this.down('#repoTree').setLoading(true);
+					this.octokit.getReposForAuthenticatedUser(this.getRepoType(), 0, 100).then((resp) => {
+						this.addReposToTree(resp.data);
+					},(error) => {
+						console.log(error);
+					})
+				}
+			}
+		});
+		this.callParent(arguments);
+	},
+
+	updateSelectedNode: function(node, oldValue) {
+		if (node !== undefined) {
+			let repoParent = node;
+			while (repoParent !== null && repoParent.data.type !== 'repo') {
+				repoParent = repoParent.parentNode;
+			}
+
+			this.setRepoId(repoParent.getId());
+			this.setPath(node.getId());
+		} else {
+			this.setRepoId(undefined);
+			this.setPath(undefined);
+		}
+	},
+
+	clearTree: function(setLoading) {
+		let repoTree = this.down('#repoTree');
+		let root = repoTree.getRootNode();
+		root.removeAll();
+		repoTree.getView().refresh();
+
+		if (setLoading) {
+			repoTree.setLoading(true);
+		}
+
+		this.setSelectedNode(undefined);
+		this.fireEvent('nodeDeselected', this);
+	},
+
+	addReposToTree: function(rawRepos) {
+		let repoTree = this.down('#repoTree');
+		repoTree.setLoading(false);
+		let root = repoTree.getRootNode();
+		let repos = rawRepos.map((repo) => {
+			return {
+				id: repo.full_name,
+				text: repo.full_name,
+				description: repo.description,
+				leaf: false,
+				type: 'repo'
+			}
+		});
+		root.appendChild(repos);
+	},
+
+	addRepoContentsToNode: function(node, octokitResponse) {
+		function parseContents(content) {
+			let nodeConfig = {
+				id: content.path,
+				text: content.name,
+				type: content.type,
+				leaf: content.type === 'file'
+			};
+			if (nodeConfig.leaf === false) {
+				nodeConfig.children = [];
+				content.contents.forEach((child) => {
+					nodeConfig.children.push(parseContents(child));
+				})
+			}
+			return nodeConfig;
+		}
+		let contents = parseContents(octokitResponse.contents);
+		node.appendChild(contents.children);
+	}
+})
+Ext.define("Voyant.notebook.github.FileSaver", {
+	extend: "Ext.container.Container",
+	xtype: "githubfilesaver",
+	config: {
+		currentFile: undefined,
+		username: undefined
+	},
+
+	octokit: undefined,
+	saveData: undefined,
+
+	constructor: function(config) {
+		config = config || {};
+		
+		this.octokit = config.octokit;
+		this.saveData = config.saveData;
+
+		this.setCurrentFile(config.currentFile);
+
+    	this.callParent(arguments);
+    },
+
+	initComponent: function() {
+		Ext.apply(this, {
+			layout: {
+				type: 'vbox',
+				pack: 'start',
+				align: 'stretch'
+			},
+			items: [{
+				xtype: 'githubreposbrowser',
+				octokit: this.octokit,
+				itemId: 'repoBrowser',
+				flex: 1,
+				listeners: {
+					nodeSelected: function(src, type, node) {
+						const form = this.queryById('saveForm').getForm();
+						const [owner, repo] = src.getRepoId().split('/');
+						form.setValues({owner, repo});
+						if (type === 'file') {
+							const pathComponents = this.getPathComponents(src.getPath());
+							form.setValues({...pathComponents});
+						} else if (type === 'folder') {
+							const folder = src.getPath().replace(/^\//, '');
+							form.setValues({folder, file: ''});
+						} else if (type === 'repo') {
+							form.setValues({folder: '', file: ''});
+						}
+					},
+					nodeDeselected: function(node) {
+						// loadWin.queryById('load').setDisabled(true);
+					},
+					scope: this
+				}
+			},{
+				bodyPadding: '10',
+				height: 200,
+				layout: {
+					type: 'vbox',
+					pack: 'start'
+				},
+				xtype: 'form',
+				itemId: 'saveForm',
+				items: [{
+					html: '<span class="x-panel-header-title-default">Repository Path</span>'
+				},{
+					xtype: 'container',
+					layout: 'hbox',
+					defaults: {
+						xtype: 'textfield',
+						labelAlign: 'top'
+					},
+					items: [{
+						fieldLabel: 'GitHub User',
+						name: 'owner',
+						allowBlank: false,
+						margin: '0 10 0 0'
+					},{
+						fieldLabel: 'Repository Name',
+						allowBlank: false,
+						name: 'repo'
+					}]
+				},{
+					html: '<span class="x-panel-header-title-default">File Path</span>',
+					margin: '10 0 0 0',
+				},{
+					xtype: 'container',
+					layout: 'hbox',
+					defaults: {
+						xtype: 'textfield',
+						labelAlign: 'top'
+					},
+					items: [{
+						fieldLabel: 'Folder(s)',
+						name: 'folder',
+						allowBlank: true,
+						margin: '0 10 0 0'
+					},{
+						fieldLabel: 'File Name',
+						allowBlank: false,
+						name: 'file'
+					}]
+				},{
+					/*
+					xtype: 'container',
+					width: '100%',
+					layout: {
+						type: 'hbox',
+						align: 'middle',
+						pack: 'start'
+					},
+					margin: '25 0 0 0',
+					defaults: {
+						xtype: 'button'
+					},
+					items: [{
+						text: 'Save',
+						handler: function () {
+							this.doSave(false);
+						},
+						scope: this,
+						margin: '0 10 0 0'
+					}
+					// ,{
+					// 	text: 'Save as Pull Request',
+					// 	handler: function () {
+					// 		this.doSave(true);
+					// 	},
+					// 	scope: this
+					// }
+					]
+				},{
+					*/
+					itemId: 'status',
+					html: '',
+					margin: '15 0 0 0'
+				}],
+				listeners: {
+					validitychange: function(form, valid) {
+						this.fireEvent('formValidityChange', this, valid);
+					},
+					scope: this
+				}
+			}],
+			listeners: {
+				boxready: function() {
+					this.initForm();
+				},
+				scope: this
+			}
+		});
+
+		this.callParent(arguments);
+	},
+
+	initForm: function() {
+		this.octokit.getInfoForAuthenticatedUser().then(function(resp) {
+			const username = resp.data.login;
+			this.setUsername(username);
+
+			const form = this.queryById('saveForm').getForm();
+			const currentFile = this.getCurrentFile();			
+			if (currentFile !== undefined) {
+				const pathComponents = this.getPathComponents(currentFile.path);
+				form.setValues({
+					owner: currentFile.owner,
+					repo: currentFile.repo,
+					...pathComponents
+				});
+			} else {
+				form.setValues({owner: username});
+			}
+		}.bind(this))
+	},
+
+	getPathComponents: function(path) {
+		const pathComponents = path.split('/');
+		let file = pathComponents[pathComponents.length-1];
+		let folder = '';
+		if (pathComponents.length > 2) {
+			folder = pathComponents.slice(0, -1).join('/');
+		}
+		return {
+			folder,
+			file
+		}
+	},
+
+	doSave: async function(isPR=false) {
+		const form = this.queryById('saveForm').getForm();
+		if (form.isValid()) {
+			const {owner, repo, folder, file} = form.getValues();
+			let path = file;
+			if (folder !== '') {
+				path = folder+'/'+file;
+			}
+			this.setStatus('Checking repository');
+			const repoExists = await this.octokit.doesRepoExist(owner, repo);
+			if (repoExists) {
+				this.setStatus('Checking permissions');
+				const permission = await this.octokit.getPermissionsForUser(owner, repo, this.getUsername());
+				if (permission === 'none' || permission === 'read') {
+					this.setStatus('You don\'t have permission to write to this repository', 'error');
+				} else {
+					this.setStatus('Checking file');
+					const branch = 'master';
+					const content = this.saveData;
+					const fileData = {owner, repo, branch, path};
+					const sha = await this.octokit.getLatestFileSHA(fileData);
+					if (sha !== undefined) {
+						const message = 'File updated by Spyral';
+						this.octokit.saveFile(owner, repo, path, content, branch, message, sha).then(function(resp) {
+							this.setStatus('File updated');
+							setTimeout(function() {
+								this.fireEvent('fileSaved', this, fileData);
+							}.bind(this), 500);
+						}.bind(this), function(error) {
+							this.setStatus('Error: '+error.message, 'error');
+						});
+					} else {
+						const message = 'File created by Spyral';
+						this.octokit.saveFile(owner, repo, path, content, branch, message).then(function(resp) {
+							this.setStatus('File created');
+							setTimeout(function() {
+								this.fireEvent('fileSaved', this, fileData);
+							}.bind(this), 500);
+						}.bind(this), function(error) {
+							this.setStatus('Error: '+error.message, 'error');
+						});
+					}
+				}
+			} else {
+				this.setStatus('The specified repository does not exist', 'error');
+			}
+		} else {
+			this.setStatus('Form is not valid', 'error');
+		}
+	},
+
+	setStatus: function(message, type) {
+		let cls = '';
+		if (type && type === 'error') {
+			cls = 'x-form-invalid-under-default';
+		}
+		this.queryById('status').setHtml(`<span class="${cls}">${message}</span>`);
+	}
+});
+
+Ext.define("Voyant.notebook.github.GitHubDialogs", {
+	extend: "Ext.Component",
+	requires: ['Voyant.notebook.github.OctokitWrapper','Voyant.notebook.github.ReposBrowser','Voyant.notebook.github.FileSaver'],
+	alias: "widget.githubdialogs",
+	config: {
+		repoType: 'owner',
+		currentFile: undefined
+	},
+
+	authToken: undefined,
+	octokitWrapper: undefined,
+
+	currentWindow: undefined,
+
+	constructor: function(config) {
+		config = config || {};
+    	this.callParent(arguments);
+    },
+
+	initComponent: function() {
+		this.callParent(arguments);
+	},
+
+	close: function() {
+		if (this.currentWindow !== undefined) {
+			this.currentWindow.close();
+			this.currentWindow = undefined;
+		}
+	},
+
+	showAuthenticate: function(callback) {
+		const parent = this;
+
+		let authWin = undefined;
+		authWin = Ext.create('Ext.window.Window', {
+			title: 'Authenticate with GitHub',
+			width: 750,
+			height: 550,
+			closable: false,
+			layout: {
+				type: 'vbox',
+				align: 'middle',
+				pack: 'center'
+			},
+			items: [{
+				html: '<div style="margin-bottom: 10px;">You must authorize Spyral to use GitHub on your behalf.</div>'
+			},{
+				xtype: 'button',
+				text: 'Authorize with GitHub',
+				handler: function(button) {
+					function postMessageHandler(event) {
+						if (event.origin === window.location.origin && event.data === 'oauth_cookie_set') {
+							window.removeEventListener("message", postMessageHandler, false);
+							event.source.close();
+							parent.initOctokitWrapper();
+							button.up('window').close();
+							callback.call(parent);
+						}
+					}
+					window.open(Voyant.application.getBaseUrlFull()+'spyral/oauth', '_blank');
+					window.addEventListener("message", postMessageHandler, false);
+				}
+			}],
+			buttons: [{
+				text: 'Cancel',
+				handler: function() {
+					parent.close();
+				}
+			}]
+		});
+		authWin.show();
+
+		this.currentWindow = authWin;
+	},
+
+	showLoad: function() {
+		const parent = this;
+
+		this.authToken = this.getCookieValue('access-token');
+		if (this.authToken === '') {
+			this.showAuthenticate(this.showLoad);
+			return;
+		} else if (this.octokitWrapper === undefined) {
+			this.initOctokitWrapper();
+		}
+
+		let loadWin = undefined;
+		loadWin = Ext.create('Ext.window.Window', {
+			title: 'Load from GitHub',
+			width: 750,
+			height: 550,
+			closable: false,
+			maximizable: true,
+			layout: 'fit',
+			items: {
+				xtype: 'githubreposbrowser',
+				octokit: this.octokitWrapper,
+				itemId: 'repoBrowser',
+				listeners: {
+					nodeSelected: function(src, type, node) {
+						if (type === 'file') {
+							loadWin.queryById('load').setDisabled(false);
+						} else {
+							loadWin.queryById('load').setDisabled(true);	
+						}
+					},
+					nodeDeselected: function(node) {
+						loadWin.queryById('load').setDisabled(true);
+					}
+				}
+			},
+			buttons: [{
+				text: 'Load Selected',
+				itemId: 'load',
+				disabled: true,
+				handler: function() {
+					const repoBrowser = loadWin.queryById('repoBrowser');
+					this.loadFile(repoBrowser.getRepoId(), repoBrowser.getPath());
+				},
+				scope: this
+			},{
+				text: 'Cancel',
+				handler: function() {
+					parent.close();
+				}
+			}]
+		});
+		loadWin.show();
+
+		this.currentWindow = loadWin;
+	},
+
+	showSave: function(data) {
+		const parent = this;
+
+		this.authToken = this.getCookieValue('access-token');
+		if (this.authToken === '') {
+			this.showAuthenticate();
+			return;
+		} else if (this.octokitWrapper === undefined) {
+			this.initOctokitWrapper();
+		}
+
+		let saveWin = undefined;
+		saveWin = Ext.create('Ext.window.Window', {
+			title: 'Save to GitHub',
+			width: 750,
+			height: 650,
+			closable: false,
+			maximizable: true,
+			layout: 'fit',
+			items: {
+				xtype: 'githubfilesaver',
+				octokit: this.octokitWrapper,
+				currentFile: this.getCurrentFile(),
+				saveData: data,
+				itemId: 'fileSaver',
+				listeners: {
+					formValidityChange: function(src, valid) {
+						saveWin.queryById('save').setDisabled(!valid);
+					},
+					fileSaved: function(src, fileData) {
+						parent.fireEvent('fileSaved', parent, fileData);
+					}
+				}
+			},
+			buttons: [{
+				text: 'Save',
+				itemId: 'save',
+				disabled: true,
+				handler: function() {
+					saveWin.queryById('fileSaver').doSave();
+				},
+				scope: this
+			},{
+				text: 'Cancel',
+				handler: function() {
+					parent.close();
+					parent.fireEvent('saveCancelled', parent);
+				}
+			}]
+		});
+		saveWin.show();
+
+		this.currentWindow = saveWin;
+	},
+
+	getCookieValue: function(cookieName) {
+		const re = new RegExp('[; ]'+cookieName+'=([^\\s;]*)');
+		const sMatch = (' '+document.cookie).match(re);
+		if (cookieName && sMatch) return unescape(sMatch[1]);
+		return '';
+	},
+
+	initOctokitWrapper: function() {
+		this.authToken = this.getCookieValue('access-token');
+		this.octokitWrapper = new Voyant.notebook.github.OctokitWrapper({
+			authToken: this.authToken
+		});
+	},
+
+	loadFileFromId: function(id) {
+		const parts = decodeURIComponent(id).split('/');
+		if (parts.length >= 3) {
+			const repoId = parts[0]+'/'+parts[1];
+			const filePath = parts.slice(2).join('/');
+			this.loadFile(repoId, filePath);
+		}
+	},
+
+	loadFile: function(repoId, filePath) {
+		this.authToken = this.getCookieValue('access-token');
+		if (this.authToken === '') {
+			this.showAuthenticate(this.loadFile.bind(this, repoId, filePath));
+			return;
+		} else if (this.octokitWrapper === undefined) {
+			this.initOctokitWrapper();
+		}
+		this.octokitWrapper.loadFile(repoId, filePath).then((data) => {
+			this.setCurrentFile(data);
+			this.fireEvent('fileLoaded', this, data);
+		});
+	}
+})
+
+Ext.define("Voyant.notebook.StorageDialogs", {
+	extend: "Ext.Component",
+	requires: [],
+	alias: "",
+	config: {
+
+	},
+
+	constructor: function(config) {
+		config = config || {};
+    	this.callParent(arguments);
+    },
+
+	initComponent: function() {
+		this.callParent(arguments);
+	},
+	
+	showSave: function(data, notebookId='') {
+		const me = this;
+		const newNotebook = notebookId === '';
+		const title = newNotebook ? 'Save New Notebook' : 'Overwrite Existing Notebook';
+		Ext.create('Ext.window.Window', {
+			title: title,
+			items: [{
+				xtype: 'form',
+				width: 450,
+				bodyPadding: 5,
+				plugins: ['datatip'],
+				listeners: {
+					beforeshowtip: function(tip, config, msg) {
+						return !config.currentTarget.el.hasCls('x-form-invalid'); // don't show tooltip if the field is invalid because otherwise the two tips overlap
+					}
+				},
+				layout: 'anchor',
+				defaults: {
+					labelAlign: 'right',
+					labelWidth: 160,
+					width: 360,
+					inputAttrTpl: 'spellcheck="false"',
+					xtype: 'textfield'
+				},
+    	    	items: [{
+					fieldLabel: 'Notebook ID' + (newNotebook ? ' (optional)' : ''),
+					name: 'notebookId',
+					value: notebookId,
+					allowBlank: true,
+					readOnly: !newNotebook,
+					tooltip: 'An ID used to identify this notebook. If left blank, one will be generated for you.',
+					validator: function(val) {
+						if (val == '') {
+							return true;
+						} else if (val.match(/^[\w-]{4,16}$/) === null) {
+							return 'The ID must be between 4 and 16 alphanumeric characters.'
+						} else {
+							return true;
+						}
+					}
+				},{
+					fieldLabel: 'Access Code',
+					name: 'accessCode',
+					allowBlank: false,
+					value: newNotebook ? this.generateAccessCode() : '',
+					tooltip: 'The Access Code is required to overwrite this notebook.',
+					validator: function(val) {
+						if (val.match(/^[\w-]{4,16}$/) === null) {
+							return 'The access code must be between 4 and 16 alphanumeric characters.'
+						} else {
+							return true;
+						}
+					}
+				},{
+					fieldLabel: 'Email (optional)',
+					name: 'email',
+					allowBlank: true,
+					vtype: 'email',
+					hidden: !newNotebook,
+					tooltip: 'An email will be sent to this address with the Notebook URL and Access Code.'
+				}]
+			}],
+			buttons: [{
+    	        text: 'Cancel',
+	            ui: 'default-toolbar',
+    	        handler: function() {
+    	            this.up('window').close();
+					me.fireEvent('saveCancelled', me);
+    	        }
+    	    }, " ", {
+    	        text: 'Save',
+    	        handler: function(button) {
+					const win = button.up('window');
+					const form = win.down('form').getForm();
+					if (form.isValid()) {
+						const values = form.getValues();
+						values.data = data;
+						if (newNotebook && values.notebookId !== '') {
+							me.doesNotebookIdExist(values.notebookId).then(function(exists) {
+								if (exists) {
+									form.findField('notebookId').markInvalid('That Notebook ID already exists.');
+								} else {
+									me.doSave(values);
+									win.close();
+								}
+							});
+						} else {
+							button.setDisabled(true);
+							me.doSave(values).then(function(didSave) {
+								button.setDisabled(false);
+								if (didSave) {
+									win.close();
+								} else {
+									form.findField('accessCode').markInvalid('Invalid access code.');
+								}
+							});
+						}
+					}
+    	        }
+    	    }]
+		}).show();
+	},
+
+	doesNotebookIdExist: function(id) {
+		const dfd = new Ext.Deferred();
+
+		Spyral.Load.trombone({
+			tool: 'notebook.NotebookManager',
+			action: 'exists',
+			id: id,
+			noCache: 1
+		}).then(function(json) {
+			var exists = json.notebook.data === 'true';
+			dfd.resolve(exists);
+		}).catch(function(err) {
+			console.log(err);
+		});
+
+		return dfd.promise;
+	},
+
+	doSave: function({notebookId, accessCode, email, data}) {
+		const me = this;
+		return Spyral.Load.trombone({
+			tool: 'notebook.NotebookManager',
+			action: 'save',
+			id: notebookId,
+			accessCode: accessCode,
+			email: email,
+			data: data
+		}).then(function(json) {
+			if (json.notebook.data !== 'true') {
+				return false;
+			} else {
+				const notebookId = json.notebook.id;
+				me.fireEvent('fileSaved', me, notebookId);
+				return true;
+			}
+		}).catch(function(err) {
+			me.fireEvent('fileSaved', me, null);
+			return false;
+		});
+	},
+
+	generateAccessCode: function() {
+		const alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+		let code = '';
+		while (code.length < 6) {
+			if (Math.random() < .3) {
+				code += Math.floor(Math.random()*9);
+			} else {
+				let letter = alphabet[Math.floor(Math.random()*alphabet.length)];
+				if (Math.random() < .5) {
+					letter = letter.toUpperCase();
+				}
+				code += letter;
+			}
+		}
+		return code;
+	}
+})
 /**
  * @method loadCorpus
  * 
@@ -35434,7 +36544,7 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 Ext.define('Voyant.notebook.Notebook', {
 	alternateClassName: ["Notebook"],
 	extend: 'Ext.panel.Panel',
-	requires: ['Voyant.notebook.editor.CodeEditorWrapper','Voyant.notebook.editor.TextEditorWrapper','Voyant.notebook.util.Show','Voyant.panel.Cirrus','Voyant.panel.Summary'],
+	requires: ['Voyant.notebook.editor.CodeEditorWrapper','Voyant.notebook.editor.TextEditorWrapper','Voyant.notebook.util.Show','Voyant.panel.Cirrus','Voyant.panel.Summary','Voyant.notebook.StorageDialogs','Voyant.notebook.github.GitHubDialogs'],
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.notebook',
     statics: {
@@ -35465,7 +36575,10 @@ Ext.define('Voyant.notebook.Notebook', {
     	api: {
     		input: undefined
     	},
-    	currentNotebook: undefined
+		currentNotebook: undefined,
+
+		voyantStorageDialogs: undefined,
+		githubDialogs: undefined
 
     },
     config: {
@@ -35488,7 +36601,12 @@ Ext.define('Voyant.notebook.Notebook', {
     	/**
     	 * @private
     	 */
-    	currentBlock: undefined
+		currentBlock: undefined,
+		/**
+		 * @private
+		 * Which solution to use for storing notebooks, either: 'voyant' or 'github'
+		 */
+		storageSolution: 'voyant'
     },
     
     /**
@@ -35500,44 +36618,36 @@ Ext.define('Voyant.notebook.Notebook', {
     		title: this.localize('title'),
     	    autoScroll: true,
     		includeTools: {
-    			'help': true,
+				'help': true,
+				'gear': true,
     			'save': true,
     			'saveIt': {
     				tooltip: this.localize("saveItTip"),
     				itemId: 'saveItTool',
-    				callback: function() {
-    					this.mask(this.localize('saving'));
-    					this.getMetadata().setDateNow("modified");
-    					var me = this;
-    					Spyral.Load.trombone({
-			    	    	 tool: 'notebook.NotebookManager',
-			    	    	 action: 'save',
-			    	    	 id: this.getNotebookId(),
-			    	    	 data: this.generateExportHtml()
-    					}).then(function(json) {
-    						me.unmask();
-    						var id = me.getNotebookId();
-    			    		if (!id || json.notebook.id!=id) {
-    			    			me.setNotebookId(json.notebook.id);
-    			    		}
-    			    		me.toastInfo({
-			    	    		html: me.localize('saved'),
-			    	    		anchor: 'tr'
-			    	    	});
-			    	    	me.setIsEdited(false);
-    					}).catch(function(err) {me.unmask()})
-    				},
     				xtype: 'toolmenu',
     				glyph: 'xf0c2@FontAwesome',
-    				disabled: true,
-    				scope: this
+					disabled: true,
+					scope: this,
+					items: [{
+						text: 'Save',
+						xtype: 'menuitem',
+						glyph: 'xf0c2@FontAwesome',
+						handler: this.showSaveDialog.bind(this, false),
+						scope: this
+					},{
+						text: 'Save As...',
+						xtype: 'menuitem',
+						glyph: 'xf0c2@FontAwesome',
+						handler: this.showSaveDialog.bind(this, true),
+						scope: this
+					}]
     			},
     			'new': {
     				tooltip: this.localize("newTip"),
     				callback: function() {
     					this.clear();
     					this.addNew();
-    	    			url =  this.getBaseUrl()+"spyral/";
+    	    			let url = this.getBaseUrl()+"spyral/";
     	    			window.history.pushState({
     						url: url
     					}, "Spyral Notebook", url);
@@ -35548,18 +36658,52 @@ Ext.define('Voyant.notebook.Notebook', {
     			},
     			'open': {
     				tooltip: this.localize("openTip"),
-    				callback: function() {
-    					Ext.Msg.prompt(this.localize("openTitle"),this.localize("openMsg"),function(btn, text) {
-    						text = text.trim();
-    						if (btn=="ok") {
-    							this.clear();
-    							this.loadFromString(text);
-    						}
-    					}, this, true);
-    				},
     				xtype: 'toolmenu',
-    				glyph: 'xf115@FontAwesome',
-    				scope: this
+					glyph: 'xf115@FontAwesome',
+					callback: function(panel, tool) {
+						const storageSolution = this.getStorageSolution();
+						if (storageSolution === undefined) {
+						} else {
+							setTimeout(() => {
+								tool.toolMenu.hide()
+							})
+							if (storageSolution === 'github') {
+								this.githubDialogs.showLoad();
+							} else {
+								Ext.Msg.prompt(this.localize("openTitle"),this.localize("openMsg"),function(btn, text) {
+									text = text.trim();
+									if (btn=="ok") {
+										this.clear();
+										this.loadFromString(text);
+									}
+								}, this, true);
+							}
+						}
+					},
+					scope: this,
+					items: [{
+						text: 'Load',
+						xtype: 'menuitem',
+						glyph: 'xf115@FontAwesome',
+						handler: function() {
+							Ext.Msg.prompt(this.localize("openTitle"),this.localize("openMsg"),function(btn, text) {
+								text = text.trim();
+								if (btn=="ok") {
+									this.clear();
+									this.loadFromString(text);
+								}
+							}, this, true);
+						},
+						scope: this
+					},{
+						text: 'Load from GitHub',
+						xtype: 'menuitem',
+						glyph: 'xf115@FontAwesome',
+						handler: function() {
+							this.githubDialogs.showLoad();
+						},
+						scope: this
+					}]
     			},
     			'runall': {
     				tooltip: this.localize("runallTip"),
@@ -35630,19 +36774,102 @@ Ext.define('Voyant.notebook.Notebook', {
     	})
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-    	
+	
+		// add static / global functions from Spyral
+		window.Corpus = Spyral.Corpus;
+		window.Table = Spyral.Table;
+
+		window.loadCorpus = function() {
+			return Spyral.Corpus.load.apply(Spyral.Corpus.load, arguments)
+		}
+
+		window.createTable = function() {
+			return Spyral.Table.create(arguments)
+		}
+
+		this.voyantStorageDialogs = new Voyant.notebook.StorageDialogs({
+			listeners: {
+				'fileLoaded': function(src) {
+
+				},
+				'fileSaved': function(src, notebookId) {
+					this.unmask();
+					if (notebookId !== null) {
+						var id = this.getNotebookId();
+						if (!id || notebookId!=id) {
+							this.setNotebookId(notebookId);
+						}
+						this.toastInfo({
+							html: this.localize('saved'),
+							anchor: 'tr'
+						});
+						this.setIsEdited(false);
+					} else {
+						// save error
+					}
+				},
+				'saveCancelled': function() {
+					this.unmask();
+				},
+				scope: this
+			}
+		});
+
+		this.githubDialogs = new Voyant.notebook.github.GitHubDialogs({
+			listeners: {
+				'fileLoaded': function(src, {owner, repo, ref, path, file}) {
+					this.githubDialogs.close();
+					this.clear();
+					this.loadFromString(file);
+
+					const id = encodeURIComponent(owner+'/'+repo+'/'+path);
+					if (location.search.indexOf(id) === -1) {
+						const url = this.getBaseUrl()+'spyral/?githubId='+id;
+						window.history.pushState({
+							url: url
+						}, 'Spyral Notebook: '+id, url);
+					}
+				},
+				'fileSaved': function(src, {owner, repo, branch, path}) {
+					this.githubDialogs.close();
+					this.unmask();
+					this.toastInfo({
+						html: this.localize('saved'),
+						anchor: 'tr'
+					});
+					this.setIsEdited(false);
+
+					const id = encodeURIComponent(owner+'/'+repo+'/'+path);
+					if (location.search.indexOf(id) === -1) {
+						const url = this.getBaseUrl()+'spyral/?githubId='+id;
+						window.history.pushState({
+							url: url
+						}, 'Spyral Notebook: '+id, url);
+					}
+				},
+				'saveCancelled': function(src) {
+					this.unmask();
+				},
+				scope: this
+			}
+		});
     },
     
     init: function() {
     	var queryParams = Ext.Object.fromQueryString(document.location.search, true);
     	var isRun = Ext.isDefined(queryParams.run);
-    	var spyralIdMatches =  /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
+		var spyralIdMatches = /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
+		var isGithub = Ext.isDefined(queryParams.githubId);
     	if (queryParams.input) {
     		if (queryParams.input.indexOf("http")===0) {
     			this.loadFromUrl(queryParams.input, isRun);
     		}
     	} else if (spyralIdMatches) {
-    		this.loadFromId(spyralIdMatches[1]);
+			this.loadFromId(spyralIdMatches[1]);
+			this.setStorageSolution('voyant');
+		} else if (isGithub) {
+			this.githubDialogs.loadFileFromId(queryParams.githubId);
+			this.setStorageSolution('github');
     	} else {
     		this.addNew();
     	}
@@ -35692,8 +36919,21 @@ Ext.define('Voyant.notebook.Notebook', {
     	this.setMetadata(new Spyral.Metadata());
     	var cells = this.getComponent("cells");
     	cells.removeAll();
-    },
+	},
 
+	showSaveDialog: function(saveAs) {
+		var data = this.generateExportHtml();
+		this.mask(this.localize('saving'));
+		this.getMetadata().setDateNow("modified");
+
+		const storageSolution = this.getStorageSolution();
+		if (storageSolution === 'github') {
+			this.githubDialogs.showSave(data);
+		} else {
+			this.voyantStorageDialogs.showSave(data, saveAs ? undefined : this.getNotebookId());
+		}
+	},
+	
     loadFromString: function(text) {
     	text = text.trim();
 		if (text.indexOf("http")==0) {
@@ -35952,8 +37192,8 @@ Ext.define('Voyant.notebook.Notebook', {
     setNotebookId: function (id) {
     	if (id) {
     		// update URL if needed
-    		if (location.pathname.indexOf("/spyral/"+id)==-1) {
-    			url =  this.getBaseUrl()+"spyral/"+id+"/";
+    		if (location.pathname.indexOf("/spyral/"+id) === -1) {
+    			let url = this.getBaseUrl()+"spyral/"+id+"/";
     			window.history.pushState({
 					url: url
 				}, "Spyral Notebook: "+id, url);
@@ -36090,7 +37330,7 @@ Ext.define('Voyant.notebook.Notebook', {
 	getExportUrl: function(asTool) {
 		return location.href; // we just provide the current URL
 	},
-    
+
     showMetadataEditor: function() {
     	var me = this;
     	var metadata = this.getMetadata();
@@ -36236,11 +37476,65 @@ Ext.define('Voyant.notebook.Notebook', {
     	    }]
     	    
     	}).show();
-    }
-    
-    
+	},
+	
+	showOptionsClick: function(panel) {
+		let me = panel;
+		if (me.optionsWin === undefined) {
+			me.optionsWin = Ext.create('Ext.window.Window', {
+				title: me.localize('gearWinTitle'),
+    			closeAction: 'hide',
+				layout: 'fit',
+				width: 400,
+				height: 300,
+				bodyPadding: 10,
+				items: {
+					xtype: 'form',
+					items: [{
+						xtype: 'radiogroup',
+						fieldLabel: 'Storage Solution',
+						labelAlign: 'left',
+						layout: 'vbox',
+						items: [{
+							boxLabel: 'Voyant',
+							name: 'storageSolution',
+							inputValue: 'voyant',
+							checked: me.getStorageSolution() === 'voyant'
+						},{
+							boxLabel: 'GitHub',
+							name: 'storageSolution',
+							inputValue: 'github',
+							checked: me.getStorageSolution() === 'github'
+						}]
+					}]
+				},
+    			buttons: [{
+    				text: me.localize('ok'),
+    				handler: function(button, event) {
+    					var win = button.findParentByType('window');
+    					var form = win.down('form');
+    					if (form.isValid()) {
+        					var params = form.getValues();
+							me.setStorageSolution(params.storageSolution);
+        					win.hide();
+    					}
+    					else {
+    						me.showError({
+    							message: me.localize("invalidForm")
+    						})
+    					}
+    				}
+    			},{
+    				text: me.localize('cancel'),
+    				handler: function(button, event) {
+    					button.findParentByType('window').hide();
+    				}
+    			}]
+			});
+		}
+		me.optionsWin.show();
+	}
 });
-
 
 Ext.define('Voyant.VoyantApp', {
 	
@@ -36834,7 +38128,19 @@ Ext.define('Voyant.VoyantCorpusApp', {
 				var api = this.getModifiedApiParams() || {}; // use application, not tool
 				delete api.view; // make sure we show default view
 				if (eventName=='termsClicked') {
-					api.query=data;
+					// data can be a simple array of terms or an array of term objects
+					if (Ext.isArray(data) && "term" in data[0] && "docIndex" in data[0]) {
+						let termsObj = {};
+						let docIndObj = {};
+						data.forEach(function(datum) {
+							termsObj[datum.term]=true;
+							docIndObj[datum.docIndex]=true;
+						})
+						api.query=Object.keys(termsObj);
+						api.docIndex=Object.keys(docIndObj);
+					} else {						
+						api.query=data;
+					}
 				}
 				else if (eventName=='documentsClicked') {
 					var docIndex = [];
@@ -36881,11 +38187,11 @@ Ext.define('Voyant.panel.DocumentClusters', {
 	alias: 'widget.documentclusters',
 	title: "Document Clusters"
 })
-Ext.define('Voyant.panel.RezoViz', {
-	extend: 'Ext.panel.Panel',
-	alias: 'widget.rezoviz',
-	title: "RezoViz"
-})
+
+//	extend: 'Ext.panel.Panel',
+//	alias: 'widget.rezoviz',
+//	title: "RezoViz"
+//})
 Ext.define('Voyant.VoyantCorpusToolsetApp', {
 	extend : 'Voyant.VoyantCorpusApp',
 	requires: ['Voyant.panel.Contexts','Voyant.panel.CollocatesGraph','Voyant.panel.Trends'],

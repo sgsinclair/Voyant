@@ -89,7 +89,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		exists: 'Category already exists',
     		confirmRemove: 'Are you sure you want to remove the category?',
     		save: 'Save',
-    		cancel: 'Cancel',
     		features: 'Features',
     		category: 'Category',
     		
