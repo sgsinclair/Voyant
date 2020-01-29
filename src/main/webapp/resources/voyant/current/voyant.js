@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Jan 27 16:35:41 EST 2020 */
+/* This file created by JSCacher. Last modified: Wed Jan 29 17:07:02 EST 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -32508,9 +32508,10 @@ Ext.define('Voyant.panel.CustomSet', {
     	Ext.suspendLayouts();
     	
     	var tableLayout = decodeURI(this.getApiParam('tableLayout'));
+
     	if (tableLayout && tableLayout.charAt(0)!="{" && tableLayout.charAt(0)!="[") {
     		var cells = [];
-    		tableLayout.split(/,\s*/).forEach(function(cell) {
+    		tableLayout.replace(/;/g,",").split(/,\s*/).forEach(function(cell) {
     			cells.push(/^"'/.test(cell) ? cell : '"'+cell+'"');
     		});
     		tableLayout = "["+cells.join(",")+"]"; // treat as simple comma-separated string
@@ -35211,7 +35212,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				var me = this;
 				result.then(function(result) {
 					if (result!==undefined) {
-						this.results.update(result);
+						me.results.update(result);
 					}
 				}).catch(function(err) {
 					Voyant.notebook.util.Show.showError(err);

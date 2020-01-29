@@ -534,79 +534,124 @@ var Spyral = (function (Highcharts) {
 
     }, {
       key: "tool",
-      value: function tool(_tool) {
+      value: function (_tool2) {
+        function tool(_x) {
+          return _tool2.apply(this, arguments);
+        }
+
+        tool.toString = function () {
+          return _tool2.toString();
+        };
+
+        return tool;
+      }(function (_tool) {
         var _arguments = arguments;
         var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var me = this;
         return new Promise(function (resolve, reject) {
-          config = config || {}; // determine if we're calling one tool or multiple
+          var isTool = function isTool(obj) {
+            return obj && typeof obj == "string" && /\W/.test(obj) == false || _typeof(obj) == "object" && "forTool" in obj;
+          };
 
-          var tools = Array.isArray(_tool) ? _tool : [_tool];
+          var isConfig = function isConfig(obj) {
+            return obj && _typeof(obj) == "object" && !("forTool" in obj);
+          };
 
-          if (typeof config === "string") {
-            tools.push({
-              forTool: config
-            });
-            config = {};
-          } else if ("forTool" in config) {
-            tools.push(config);
-            config = {};
-          }
+          var lastArg = _arguments[_arguments.length - 1];
+          config = isConfig(lastArg) ? lastArg : {}; // we have all tools and we'll show them individually
 
-          if (_arguments.length > 2) {
-            for (var i = 2; i < _arguments.length; i++) {
-              if (typeof _arguments[i] == "string") {
-                tools.push({
-                  forTool: _arguments[i]
-                });
-              } else if (_typeof(_arguments[i]) == "object") {
-                if ("forTool" in _arguments[i]) {
-                  tools.push(_arguments[i]);
-                  config = {};
-                } else {
-                  config = _arguments[i];
+          if (isTool(_tool) && (isTool(lastArg) || isConfig(lastArg))) {
+            var val;
+            var url;
+
+            var _ret = function () {
+              var defaultAttributes = {
+                width: undefined,
+                height: undefined,
+                style: "width: 350px; height: 350px",
+                "float": "right"
+              };
+              var out = "";
+
+              for (var i = 0; i < _arguments.length; i++) {
+                var t = _arguments[i];
+
+                if (isTool(t)) {
+                  (function () {
+                    if (typeof t == "string") {
+                      t = {
+                        forTool: t
+                      };
+                    } // make sure we have object
+                    // build iframe tag
+
+
+                    out += "<iframe ";
+
+                    for (var attr in defaultAttributes) {
+                      val = (attr in t ? t[attr] : undefined) || (attr in config ? config[attr] : undefined) || (attr in defaultAttributes ? defaultAttributes[attr] : undefined);
+
+                      if (val !== undefined) {
+                        out += ' ' + attr + '="' + val + '"';
+                      }
+                    } // build url
+
+
+                    url = new URL((config && config.voyantUrl ? config.voyantUrl : Load.baseUrl) + "tool/" + t.forTool + "/");
+                    url.searchParams.append("corpus", me.corpusid); // add API values from config (some may be ignored)
+
+                    var all = Object.assign(t, config);
+                    Object.keys(all).forEach(function (key) {
+                      if (key !== "input" && !(key in defaultAttributes)) {
+                        url.searchParams.append(key, all[key]);
+                      }
+                    }); // finish tag
+
+                    out += ' src="' + url + '"></iframe>';
+                  })();
                 }
               }
-            }
-          }
 
-          var defaultAttributes = {
-            width: undefined,
-            height: undefined,
-            style: "width: 400px; height: 400px",
-            "float": "right"
-          };
-          var out = "";
-          tools.forEach(function (t) {
-            t = typeof t === "string" ? {
-              forTool: t
-            } : t;
-            out += "<iframe "; // add attributes
+              return {
+                v: resolve(out)
+              };
+            }();
+
+            if (_typeof(_ret) === "object") return _ret.v;
+          } else {
+            if (Array.isArray(_tool)) {
+              _tool = tool.join(";");
+            }
+
+            var defaultAttributes = {
+              width: undefined,
+              height: undefined,
+              style: "width: 90%; height: " + 350 * _tool.split(";").length + "px"
+            }; // build iframe tag
+
+            var out = "<iframe ";
 
             for (var attr in defaultAttributes) {
-              var val = (attr in t ? t[attr] : undefined) || (attr in config ? config[attr] : undefined) || (attr in defaultAttributes ? defaultAttributes[attr] : undefined);
+              var val = (attr in config ? config[attr] : undefined) || (attr in defaultAttributes ? defaultAttributes[attr] : undefined);
 
               if (val !== undefined) {
                 out += ' ' + attr + '="' + val + '"';
               }
-            } // construct src URL
+            } // build url
 
 
-            var url = new URL((config && config.voyantUrl ? config.voyantUrl : Load.baseUrl) + "tool/" + t.forTool + "/");
+            var url = new URL((config && config.voyantUrl ? config.voyantUrl : Load.baseUrl) + "?view=customset&tableLayout=" + _tool);
             url.searchParams.append("corpus", me.corpusid); // add API values from config (some may be ignored)
 
-            var all = Object.assign(t, config);
-            Object.keys(all).forEach(function (key) {
+            Object.keys(config).forEach(function (key) {
               if (key !== "input" && !(key in defaultAttributes)) {
-                url.searchParams.append(key, all[key]);
+                url.searchParams.append(key, config[key]);
               }
-            }); // add url
-
-            out += ' src="' + url + '"></iframe>';
-          });
-          resolve(out);
+            });
+            resolve(out + " src='" + url + "'></iframe");
+          }
         });
-      }
+      })
       /**
        * Create a Corpus and return the tool
        * @param {*} tool 
@@ -722,11 +767,21 @@ var Spyral = (function (Highcharts) {
       }
     }, {
       key: "tool",
-      value: function tool(_tool2, config, api) {
+      value: function (_tool3) {
+        function tool(_x2, _x3, _x4) {
+          return _tool3.apply(this, arguments);
+        }
+
+        tool.toString = function () {
+          return _tool3.toString();
+        };
+
+        return tool;
+      }(function (tool, config, api) {
         return Corpus.load(config).then(function (corpus) {
-          return corpus.tool(_tool2, config, api);
+          return corpus.tool(tool, config, api);
         });
-      }
+      })
     }, {
       key: "create",
       value: function create(config) {
