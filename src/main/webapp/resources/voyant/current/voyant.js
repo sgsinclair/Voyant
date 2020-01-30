@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jan 30 14:20:13 EST 2020 */
+/* This file created by JSCacher. Last modified: Thu Jan 30 16:20:26 EST 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7011,7 +7011,7 @@ var canvasSurface = this.down('draw') || this.down('chart');
 		}
 		let input = '["'+enc("<h2>Spyral Notebook Imported from Voyant Tools</h2>")+'","'+
 			enc('loadCorpus("'+this.getApplication().getCorpus().getAliasOrId()+'").tool("'+
-			toolForUrl+'"'+(Object.keys(api).length>0 ? (","+Ext.encode(api)) : "")+ ');')+'"]'
+			(toolForUrl=="VoyantHeader" ? "" : toolForUrl)+'"'+(Object.keys(api).length>0 ? (","+Ext.encode(api)) : "")+ ');')+'"]'
 		this.openUrl(this.getApplication().getBaseUrl()+"spyral/?run=true&"+(isDebug ? "debug=true&" : "")+"inputJsonArrayOfEncodedBase64="+input);
 	},
 	exportGridCurrentJson: function(grid, form) {
