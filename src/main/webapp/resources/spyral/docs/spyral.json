@@ -1,0 +1,203 @@
+{
+  "!name": "spyral",
+  "!define": {
+    "MetadataConfig": {
+      "title": {
+        "!type": "string",
+        "!doc": "The title of the Corpus"
+      },
+      "author": {
+        "!type": "string",
+        "!doc": "The author of the Corpus"
+      },
+      "description": {
+        "!type": "string",
+        "!doc": "The description of the Corpus"
+      },
+      "keywords": {
+        "!type": "array",
+        "!doc": "The keywords for the Corpus"
+      },
+      "created": {
+        "!type": "string",
+        "!doc": "When the Corpus was created"
+      },
+      "language": {
+        "!type": "string",
+        "!doc": "The language of the Corpus"
+      },
+      "license": {
+        "!type": "string",
+        "!doc": "The license for the Corpus"
+      },
+      "!doc": "The Metadata config object"
+    }
+  },
+  "Spyral": {
+    "Metadata": {
+      "!type": "fn(config: +MetadataConfig)",
+      "prototype": {
+        "set": {
+          "!type": "fn(config: object)",
+          "!doc": "Set metadata properties."
+        },
+        "setDateNow": {
+          "!type": "fn(field: string)",
+          "!doc": "Sets the specified field to the current date and time."
+        },
+        "shortDate": {
+          "!type": "fn(field: string) -> ?",
+          "!doc": "Gets the specified field as a short date."
+        },
+        "getHeaders": {
+          "!type": "fn() -> string",
+          "!doc": "Gets the fields as a set of HTML meta tags."
+        }
+      },
+      "!doc": "The metadata constructor."
+    },
+    "Notebook": {
+      "getPreviousBlock": {
+        "!type": "fn() -> string",
+        "!doc": "Returns the previous block."
+      },
+      "getNextBlock": {
+        "!type": "fn() -> string",
+        "!doc": "Returns the next block."
+      },
+      "getBlock": {
+        "!type": "fn() -> string",
+        "!doc": "Returns the current block."
+      },
+      "show": {
+        "!type": "fn(contents: ?, config: ?)"
+      },
+      "getTarget": {
+        "!type": "fn() -> ?"
+      }
+    },
+    "Util": {
+      "id": {
+        "!type": "fn(len: number) -> string",
+        "!doc": "Generates a random ID of the specified length."
+      },
+      "toString": {
+        "!type": "fn(contents: ?, config: ?) -> string"
+      },
+      "more": {
+        "!type": "fn(before: ?, more: ?, after: ?)"
+      }
+    },
+    "Corpus": {
+      "!type": "fn(id: string)",
+      "prototype": {
+        "id": {
+          "!type": "fn() -> string",
+          "!doc": "Get the ID"
+        },
+        "metadata": {
+          "!type": "fn(config: ?, params: ?)",
+          "!doc": "Load the metadata"
+        },
+        "text": {
+          "!type": "fn(config: ?)",
+          "!doc": "Get the text"
+        }
+      },
+      "!doc": "Create a new Corpus using the specified Corpus ID",
+      "id": {
+        "!type": "fn(config: object, api: object)",
+        "!doc": "Create a Corpus and return the ID"
+      },
+      "metadata": {
+        "!type": "fn(config: ?, api: ?)",
+        "!doc": "Create a Corpus and return the metadata"
+      },
+      "summary": {
+        "!type": "fn(config: ?, api: ?)",
+        "!doc": "Create a Corpus and return the summary"
+      },
+      "titles": {
+        "!type": "fn(config: ?, api: ?)",
+        "!doc": "Create a Corpus and return the titles"
+      },
+      "text": {
+        "!type": "fn(config: ?, api: ?)",
+        "!doc": "Create a Corpus and return the text"
+      },
+      "texts": {
+        "!type": "fn(config: ?, api: ?)",
+        "!doc": "Create a Corpus and return the texts"
+      },
+      "terms": {
+        "!type": "fn(config: ?, api: ?)",
+        "!doc": "Create a Corpus and return the terms"
+      },
+      "tokens": {
+        "!type": "fn(config: ?, api: ?)",
+        "!doc": "Create a Corpus and return the tokens"
+      },
+      "words": {
+        "!type": "fn(config: object, api: object)",
+        "!doc": "Create a Corpus and return the words"
+      },
+      "contexts": {
+        "!type": "fn(config: object, api: object)",
+        "!doc": "Create a Corpus and return the contexts"
+      },
+      "collocates": {
+        "!type": "fn(config: object, api: object)",
+        "!doc": "Create a Corpus and return the collocates"
+      },
+      "phrases": {
+        "!type": "fn(config: object, api: object)",
+        "!doc": "Create a Corpus and return the phrases"
+      },
+      "correlations": {
+        "!type": "fn(config: object, api: object)",
+        "!doc": "Create a Corpus and return the correlations"
+      },
+      "tool": {
+        "!type": "fn(target: ?, tool: ?, config: ?, api: ?)",
+        "!doc": "Create a Corpus and return the tool"
+      },
+      "htmltool": {
+        "!type": "fn(html: ?, tool: ?, config: ?, api: ?)",
+        "!doc": "Create a Corpus and return the html tool"
+      },
+      "create": {
+        "!type": "fn(config: object)",
+        "!doc": "Create a new Corpus using the provided config"
+      },
+      "load": {
+        "!type": "fn(config: object)",
+        "!doc": "Load a Corpus using the provided config"
+      }
+    },
+    "Load": {
+      "!type": "fn()",
+      "prototype": {}
+    },
+    "Table": {
+      "!type": "fn()",
+      "prototype": {
+        "rows": {
+          "!type": "fn()",
+          "!doc": "This function returns different values depending on the arguments provided.\rWhen there are no arguments, it returns the number of rows in this table.\rWhen the first argument is the boolean value `true` all rows are returned.\rWhen the first argument is a an array then the rows corresponding to the row\rindices or names are returned. When all arguments except are numbers or strings\rthen each of those is returned."
+        },
+        "columns": {
+          "!type": "fn()",
+          "!doc": "This function returns different values depending on the arguments provided.\rWhen there are no arguments, it returns the number of columns in this table.\rWhen the first argument is the boolean value `true` all columns are returned.\rWhen the first argument is a number a slice of the columns is returned and if\rthe second argument is a number it is treated as the length of the slice to\rreturn (note that it isn't the `end` index like with Array.slice())."
+        }
+      },
+      "create": {
+        "!type": "fn()",
+        "!doc": "Create a new Table"
+      },
+      "fetch": {
+        "!type": "fn()",
+        "!doc": "Build Spyral for use with Voyant"
+      }
+    }
+  }
+}

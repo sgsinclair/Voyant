@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jan 30 14:07:25 EST 2020 */
+/* This file created by JSCacher. Last modified: Thu Jan 30 14:20:13 EST 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -34847,15 +34847,21 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			editor.getSession().setUseWorker(true);
 			editor.setTheme(this.getTheme());
 			editor.getSession().setMode(this.getMode());
-			editor.setOptions({minLines: 6, maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			editor.setOptions({
+				minLines: 6,
+				maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10,
+				autoScrollEditorIntoView: true,
+				scrollPastEnd: true
+			});
 			editor.setHighlightActiveLine(false);
 			editor.renderer.setShowPrintMargin(false);
 			editor.renderer.setShowGutter(false);
 			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
 			editor.clearSelection();
 		    editor.on("focus", function() {
-		    	me.getEditor().renderer.setShowGutter(true);
-		    	console.warn(editor)
+				setTimeout(function() {
+					me.getEditor().renderer.setShowGutter(true);
+				}, 100); // slight delay to avoid selecting a range of text, caused by showing the gutter while mouse is still pressed
 		    }, this);
 		    editor.on("change", function(ev, editor) {
 		    		var lines = editor.getSession().getScreenLength();
@@ -34893,42 +34899,42 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			    }				
 			});
 			this.setEditor(editor);
-			
-			ace.config.loadModule('ace/ext/tern', function () {
-	            me.getEditor().setOptions({
-	                /**
-	                 * Either `true` or `false` or to enable with custom options pass object that
-	                 * has options for tern server: http://ternjs.net/doc/manual.html#server_api
-	                 * If `true`, then default options will be used
-	                 */
-	                enableTern: {
-	                    /* http://ternjs.net/doc/manual.html#option_defs */
-	                    defs: me.docs ? ['ecma5', me.docs] : [],
-	                    plugins: {
-	                        doc_comment: {
-	                            fullDocs: true
-	                        }
-	                    },
-	                    /**
-	                     * (default is true) If web worker is used for tern server.
-	                     * This is recommended as it offers better performance, but prevents this from working in a local html file due to browser security restrictions
-	                     */
-	                    useWorker: true
-	                },
-	                /**
-	                 * when using tern, it takes over Ace's built in snippets support.
-	                 * this setting affects all modes when using tern, not just javascript.
-	                 */
-	                enableSnippets: true,
-	                
-	                /**
-	                 * when using tern, Ace's basic text auto completion is enabled still by deafult.
-	                 * This settings affects all modes when using tern, not just javascript.
-	                 * For javascript mode the basic auto completion will be added to completion results if tern fails to find completions or if you double tab the hotkey for get completion (default is ctrl+space, so hit ctrl+space twice rapidly to include basic text completions in the result)
-	                 */
-	                enableBasicAutocompletion: true
-	            });
-	        });
+
+			ace.config.loadModule('ace/ext/tern', function (module) {
+				me.getEditor().setOptions({
+					/**
+					 * Either `true` or `false` or to enable with custom options pass object that
+					 * has options for tern server: http://ternjs.net/doc/manual.html#server_api
+					 * If `true`, then default options will be used
+					 */
+					enableTern: {
+						/* http://ternjs.net/doc/manual.html#option_defs */
+						defs: me.docs ? [me.docs] : ['ecma5'],
+						plugins: {
+							doc_comment: {
+								fullDocs: true
+							}
+						},
+						/**
+						 * (default is true) If web worker is used for tern server.
+						 * This is recommended as it offers better performance, but prevents this from working in a local html file due to browser security restrictions
+						 */
+						useWorker: true
+					},
+					/**
+					 * when using tern, it takes over Ace's built in snippets support.
+					 * this setting affects all modes when using tern, not just javascript.
+					 */
+					enableSnippets: false,
+					
+					/**
+					 * when using tern, Ace's basic text auto completion is enabled still by default.
+					 * This settings affects all modes when using tern, not just javascript.
+					 * For javascript mode the basic auto completion will be added to completion results if tern fails to find completions or if you double tab the hotkey for get completion (default is ctrl+space, so hit ctrl+space twice rapidly to include basic text completions in the result)
+					 */
+					enableBasicAutocompletion: false
+				});
+			});
 		},
 		removed: function(cmp, container) {
 			if (cmp.getEditor()) {
@@ -35247,9 +35253,11 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			} else {
 				this.results.unmask();
 				this.results.update(result);
+				this.getTargetEl().fireEvent('resize');
 			}
 		} else {
 			this.results.unmask();
+			this.getTargetEl().fireEvent('resize');
 		}
 		return result;
 	},
@@ -36553,13 +36561,6 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 		return code;
 	}
 })
-/**
- * @method loadCorpus
- * 
- * testing
- */
-
-
 /*
  * @class Notebook
  * A Spyral Notebook. This should never be instantiated directly.
@@ -36600,11 +36601,7 @@ Ext.define('Voyant.notebook.Notebook', {
     		inputEncodedBase64Json: undefined,
     		run: undefined
     	},
-		currentNotebook: undefined,
-
-		voyantStorageDialogs: undefined,
-		githubDialogs: undefined
-
+		currentNotebook: undefined
     },
     config: {
         /**
@@ -36632,7 +36629,12 @@ Ext.define('Voyant.notebook.Notebook', {
 		 * Which solution to use for storing notebooks, either: 'voyant' or 'github'
 		 */
 		storageSolution: 'voyant'
-    },
+	},
+	
+	voyantStorageDialogs: undefined,
+	githubDialogs: undefined,
+
+	spyralTernDocs: undefined, // holds the content of the spyral tern docs, for passing to the code editor
     
     /**
      * @private
@@ -36799,18 +36801,6 @@ Ext.define('Voyant.notebook.Notebook', {
     	})
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
-	
-		// add static / global functions from Spyral
-		window.Corpus = Spyral.Corpus;
-		window.Table = Spyral.Table;
-
-		window.loadCorpus = function() {
-			return Spyral.Corpus.load.apply(Spyral.Corpus.load, arguments)
-		}
-
-		window.createTable = function() {
-			return Spyral.Table.create(arguments)
-		}
 
 		this.voyantStorageDialogs = new Voyant.notebook.StorageDialogs({
 			listeners: {
@@ -36881,50 +36871,78 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     init: function() {
-    	var queryParams = Ext.Object.fromQueryString(document.location.search, true);
-    	var isRun = Ext.isDefined(queryParams.run);
-		var spyralIdMatches = /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
-		var isGithub = Ext.isDefined(queryParams.githubId);
-		if ("inputJsonArrayOfEncodedBase64" in queryParams) {
-			let json = Ext.decode(queryParams.inputJsonArrayOfEncodedBase64);
-			json.forEach(function(block) {
-				let text = decodeURIComponent(atob(block));
-				if (text.trim().indexOf("<")==0) {
-					this.addText(text);
-				} else {
-					this.addCode(text);
+		// add static / global functions from Spyral
+		window.Corpus = Spyral.Corpus;
+		window.Table = Spyral.Table;
+
+		window.loadCorpus = function() {
+			return Spyral.Corpus.load.apply(Spyral.Corpus.load, arguments)
+		}
+
+		window.createTable = function() {
+			return Spyral.Table.create(arguments)
+		}
+
+		// need to load docs first
+		Ext.Ajax.request({
+			url: this.getApplication().getBaseUrlFull()+'resources/spyral/docs/spyral.json',
+			callback: function(opts, success, response) {
+				if (success) {
+					this.spyralTernDocs = Ext.JSON.decode(response.responseText);
+					
+					// add docs for static / global functions
+					this.spyralTernDocs.Corpus = this.spyralTernDocs.Spyral.Corpus;
+					this.spyralTernDocs.Table = this.spyralTernDocs.Spyral.Table;
+					this.spyralTernDocs.loadCorpus = this.spyralTernDocs.Spyral.Corpus.load;
+					this.spyralTernDocs.createTable = this.spyralTernDocs.Spyral.Table.create;
 				}
-			}, this);
-		}
-		else if ("input" in queryParams) {
-    		if (queryParams.input.indexOf("http")===0) {
-    			this.loadFromUrl(queryParams.input, isRun);
-    		} else {
-    			this.loadFromString(queryParams.input);
-    		}
-    	} else if (spyralIdMatches) {
-			this.loadFromId(spyralIdMatches[1]);
-			this.setStorageSolution('voyant');
-		} else if (isGithub) {
-			this.githubDialogs.loadFileFromId(queryParams.githubId);
-			this.setStorageSolution('github');
-    	} else {
-    		this.addNew();
-    	}
-		if (isRun) {
-			var me = this;
-			Ext.defer(function() {
-				me.runAll()
-			}, 100)
-		}
+
+				var queryParams = Ext.Object.fromQueryString(document.location.search, true);
+				var isRun = Ext.isDefined(queryParams.run);
+				var spyralIdMatches = /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
+				var isGithub = Ext.isDefined(queryParams.githubId);
+				if ("inputJsonArrayOfEncodedBase64" in queryParams) {
+					let json = Ext.decode(queryParams.inputJsonArrayOfEncodedBase64);
+					json.forEach(function(block) {
+						let text = decodeURIComponent(atob(block));
+						if (text.trim().indexOf("<")==0) {
+							this.addText(text);
+						} else {
+							this.addCode(text);
+						}
+					}, this);
+				} else if (queryParams.input) {
+					if (queryParams.input.indexOf("http")===0) {
+						this.loadFromUrl(queryParams.input, isRun);
+					}
+				} else if (spyralIdMatches) {
+					this.loadFromId(spyralIdMatches[1]);
+					this.setStorageSolution('voyant');
+				} else if (isGithub) {
+					this.githubDialogs.loadFileFromId(queryParams.githubId);
+					this.setStorageSolution('github');
+				} else {
+					this.addNew();
+				}
+				
+				if (isRun) {
+					var me = this;
+					Ext.defer(function() {
+						me.runAll()
+					}, 100)
+				}
+
+			},
+			scope: this
+		})
     },
     
-    getBlock: function(pos) {
-    	pos = pos || 0;
+    getBlock: function(offset) {
+    	offset = offset || 0;
     	var containers = this.query("notebookcodeeditorwrapper");
     	var id = this.getCurrentBlock().id;
     	var current = containers.findIndex(function(container) {return container.id==id})
-    	if (current+pos<0 || current+pos>containers.length-1) {
+    	if (current+offset<0 || current+offset>containers.length-1) {
 			Ext.Msg.show({
 				title: this.localize('error'),
 				msg: this.localize('blockDoesNotExist'),
@@ -36933,10 +36951,10 @@ Ext.define('Voyant.notebook.Notebook', {
 			});
 			return undefined;
     	}
-    	content = containers[current+pos].getContent();
+    	content = containers[current+offset].getContent();
     	return content.input;
 //    	debugger
-//    	var mode = containers[current+pos].editor.getMode().split("/").pop();
+//    	var mode = containers[current+offset].editor.getMode().split("/").pop();
 //    	if (content.mode=="xml") {
 //    		return new DOMParser().parseFromString(content.input, 'text/xml')
 //    	} else if (content.mode=="json") {
@@ -36953,7 +36971,7 @@ Ext.define('Voyant.notebook.Notebook', {
 			title: "<h1>Spyral Notebook</h1>"
 		}));
 		this.addText("<p>This is a Spyral Notebook, a dynamic document that combines writing, code and data in service of reading, analyzing and interpreting digital texts.</p><p>Spyral Notebooks are composed of text blocks (like this one) and code blocks (like the one below). You can <span class='marker'>click on the blocks to edit</span> them and add new blocks by clicking add icon that appears in the left column when hovering over a block.</p>");
-		var code = this.addCode('loadCorpus("austen")');
+		var code = this.addCode('');
 		Ext.defer(function() {
 			code.run();
 		}, 100, this);
@@ -37131,10 +37149,10 @@ Ext.define('Voyant.notebook.Notebook', {
     },
  
     addCode: function(block, order, name) {
-    	return this._add(block, order, 'notebookcodeeditorwrapper', name);
+    	return this._add(block, order, 'notebookcodeeditorwrapper', name, {docs: this.spyralTernDocs});
     },
     
-    _add: function(block, order, xtype, name) {
+    _add: function(block, order, xtype, name, config) {
     	if (Ext.isString(block)) {
     		block = {input: block}
     	}
@@ -37144,7 +37162,7 @@ Ext.define('Voyant.notebook.Notebook', {
     		xtype: xtype,
     		order: order,
     		name: Spyral.Util.id()
-    	}))
+    	}, config))
     },
     
     updateMetadata: function() {
@@ -37579,7 +37597,6 @@ Ext.define('Voyant.notebook.Notebook', {
 		me.optionsWin.show();
 	}
 });
-
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
