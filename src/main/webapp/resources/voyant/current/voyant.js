@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jan 30 16:20:26 EST 2020 */
+/* This file created by JSCacher. Last modified: Thu Jan 30 16:27:13 EST 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -36388,7 +36388,7 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 	requires: [],
 	alias: "",
 	config: {
-
+		accessCode: undefined
 	},
 
 	constructor: function(config) {
@@ -36444,7 +36444,7 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 					fieldLabel: 'Access Code',
 					name: 'accessCode',
 					allowBlank: false,
-					value: newNotebook ? this.generateAccessCode() : '',
+					value: newNotebook ? this.generateAccessCode() : this.getAccessCode(),
 					tooltip: 'The Access Code is required to overwrite this notebook.',
 					validator: function(val) {
 						if (val.match(/^[\w-]{4,16}$/) === null) {
@@ -36534,6 +36534,7 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 			if (json.notebook.data !== 'true') {
 				return false;
 			} else {
+				me.setAccessCode(accessCode);
 				const notebookId = json.notebook.id;
 				me.fireEvent('fileSaved', me, notebookId);
 				return true;

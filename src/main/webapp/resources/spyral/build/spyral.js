@@ -534,17 +534,7 @@ var Spyral = (function (Highcharts) {
 
     }, {
       key: "tool",
-      value: function (_tool2) {
-        function tool(_x) {
-          return _tool2.apply(this, arguments);
-        }
-
-        tool.toString = function () {
-          return _tool2.toString();
-        };
-
-        return tool;
-      }(function (_tool) {
+      value: function tool(_tool) {
         var _arguments = arguments;
         var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var me = this;
@@ -620,13 +610,13 @@ var Spyral = (function (Highcharts) {
             if (_typeof(_ret) === "object") return _ret.v;
           } else {
             if (Array.isArray(_tool)) {
-              _tool = tool.join(";");
+              _tool = _tool.join(";");
             }
 
             var defaultAttributes = {
               width: undefined,
               height: undefined,
-              style: "width: 90%; height: " + 350 * _tool.split(";").length + "px"
+              style: "width: 90%; height: " + 350 * (_tool ? _tool : "").split(";").length + "px"
             }; // build iframe tag
 
             var out = "<iframe ";
@@ -640,7 +630,7 @@ var Spyral = (function (Highcharts) {
             } // build url
 
 
-            var url = new URL((config && config.voyantUrl ? config.voyantUrl : Load.baseUrl) + "?view=customset&tableLayout=" + _tool);
+            var url = new URL((config && config.voyantUrl ? config.voyantUrl : Load.baseUrl) + (_tool ? "?view=customset&tableLayout=" + _tool : ""));
             url.searchParams.append("corpus", me.corpusid); // add API values from config (some may be ignored)
 
             Object.keys(config).forEach(function (key) {
@@ -651,7 +641,7 @@ var Spyral = (function (Highcharts) {
             resolve(out + " src='" + url + "'></iframe");
           }
         });
-      })
+      }
       /**
        * Create a Corpus and return the tool
        * @param {*} tool 
@@ -767,21 +757,11 @@ var Spyral = (function (Highcharts) {
       }
     }, {
       key: "tool",
-      value: function (_tool3) {
-        function tool(_x2, _x3, _x4) {
-          return _tool3.apply(this, arguments);
-        }
-
-        tool.toString = function () {
-          return _tool3.toString();
-        };
-
-        return tool;
-      }(function (tool, config, api) {
+      value: function tool(_tool2, config, api) {
         return Corpus.load(config).then(function (corpus) {
-          return corpus.tool(tool, config, api);
+          return corpus.tool(_tool2, config, api);
         });
-      })
+      }
     }, {
       key: "create",
       value: function create(config) {
