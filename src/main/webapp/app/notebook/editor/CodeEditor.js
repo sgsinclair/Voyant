@@ -32,15 +32,21 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			editor.getSession().setUseWorker(true);
 			editor.setTheme(this.getTheme());
 			editor.getSession().setMode(this.getMode());
-			editor.setOptions({minLines: 6, maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10, autoScrollEditorIntoView: true, scrollPastEnd: true});
+			editor.setOptions({
+				minLines: 6,
+				maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10,
+				autoScrollEditorIntoView: true,
+				scrollPastEnd: true
+			});
 			editor.setHighlightActiveLine(false);
 			editor.renderer.setShowPrintMargin(false);
 			editor.renderer.setShowGutter(false);
 			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
 			editor.clearSelection();
 		    editor.on("focus", function() {
-		    	me.getEditor().renderer.setShowGutter(true);
-		    	console.warn(editor)
+				setTimeout(function() {
+					me.getEditor().renderer.setShowGutter(true);
+				}, 100); // slight delay to avoid selecting a range of text, caused by showing the gutter while mouse is still pressed
 		    }, this);
 		    editor.on("change", function(ev, editor) {
 		    		var lines = editor.getSession().getScreenLength();
