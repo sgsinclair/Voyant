@@ -34,7 +34,9 @@ Ext.define('Voyant.notebook.Notebook', {
     		exportHtmlDownload: "HTML (download)"
     	},
     	api: {
-    		input: undefined
+    		input: undefined,
+    		inputEncodedBase64Json: undefined,
+    		run: undefined
     	},
 		currentNotebook: undefined
     },
@@ -336,7 +338,17 @@ Ext.define('Voyant.notebook.Notebook', {
 				var isRun = Ext.isDefined(queryParams.run);
 				var spyralIdMatches = /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
 				var isGithub = Ext.isDefined(queryParams.githubId);
-				if (queryParams.input) {
+				if ("inputJsonArrayOfEncodedBase64" in queryParams) {
+					let json = Ext.decode(queryParams.inputJsonArrayOfEncodedBase64);
+					json.forEach(function(block) {
+						let text = decodeURIComponent(atob(block));
+						if (text.trim().indexOf("<")==0) {
+							this.addText(text);
+						} else {
+							this.addCode(text);
+						}
+					}, this);
+				} else if (queryParams.input) {
 					if (queryParams.input.indexOf("http")===0) {
 						this.loadFromUrl(queryParams.input, isRun);
 					}
@@ -349,6 +361,14 @@ Ext.define('Voyant.notebook.Notebook', {
 				} else {
 					this.addNew();
 				}
+				
+				if (isRun) {
+					var me = this;
+					Ext.defer(function() {
+						me.runAll()
+					}, 100)
+				}
+
 			},
 			scope: this
 		})
