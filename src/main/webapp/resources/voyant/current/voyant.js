@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Jan 29 17:07:02 EST 2020 */
+/* This file created by JSCacher. Last modified: Thu Jan 30 14:07:25 EST 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6649,6 +6649,11 @@ Ext.define('Voyant.util.Toolable', {
        		name: 'export',
        		inputValue: 'biblio',
        		boxLabel: panel.localize('exportViewBiblio')
+       	},{
+       		xtype: 'radio',
+       		name: 'export',
+       		inputValue: 'spyral',
+       		boxLabel: panel.localize("exportViewSpyral")
        	}];
 		if (panel.getExtraExportItems) {
 			panel.getExtraExportItems().forEach(function(item) {
@@ -6954,7 +6959,6 @@ var canvasSurface = this.down('draw') || this.down('chart');
 	},
 	exportEmbed: function() {
 		var asTool = this.isXType('voyantheader')==false;
-		console.warn(this.xtype, asTool)
 		Ext.Msg.show({
 		    title: this.localize('exportViewEmbedTitle'),
 		    message: this.localize('exportViewEmbedMessage'),
@@ -6989,6 +6993,26 @@ var canvasSurface = this.down('draw') || this.down('chart');
 		    buttons: Ext.Msg.OK,
 		    icon: Ext.Msg.INFO
 		});
+	},
+	exportSpyral: function() {
+		let toolForUrl = Ext.getClassName(this).split(".").pop();
+		let api = this.getApplication().getModifiedApiParams();
+		if (this.isXType('voyantheader')==false) {
+			delete api.panels; // not needed for individual tools
+			// add (and overwrite if need be) this tool's api
+			Ext.apply(api, this.getModifiedApiParams());
+			delete api.corpus;
+		}
+		let isDebug = api && "debug" in api;
+		delete api.view;
+		delete api.debug;
+		let enc = function(str) {
+			return btoa(encodeURIComponent(str)).replace(/=/g, "%3D");
+		}
+		let input = '["'+enc("<h2>Spyral Notebook Imported from Voyant Tools</h2>")+'","'+
+			enc('loadCorpus("'+this.getApplication().getCorpus().getAliasOrId()+'").tool("'+
+			toolForUrl+'"'+(Object.keys(api).length>0 ? (","+Ext.encode(api)) : "")+ ');')+'"]'
+		this.openUrl(this.getApplication().getBaseUrl()+"spyral/?run=true&"+(isDebug ? "debug=true&" : "")+"inputJsonArrayOfEncodedBase64="+input);
 	},
 	exportGridCurrentJson: function(grid, form) {
 		var store = grid.getStore();
@@ -36572,7 +36596,9 @@ Ext.define('Voyant.notebook.Notebook', {
     		exportHtmlDownload: "HTML (download)"
     	},
     	api: {
-    		input: undefined
+    		input: undefined,
+    		inputEncodedBase64Json: undefined,
+    		run: undefined
     	},
 		currentNotebook: undefined,
 
@@ -36859,9 +36885,22 @@ Ext.define('Voyant.notebook.Notebook', {
     	var isRun = Ext.isDefined(queryParams.run);
 		var spyralIdMatches = /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
 		var isGithub = Ext.isDefined(queryParams.githubId);
-    	if (queryParams.input) {
+		if ("inputJsonArrayOfEncodedBase64" in queryParams) {
+			let json = Ext.decode(queryParams.inputJsonArrayOfEncodedBase64);
+			json.forEach(function(block) {
+				let text = decodeURIComponent(atob(block));
+				if (text.trim().indexOf("<")==0) {
+					this.addText(text);
+				} else {
+					this.addCode(text);
+				}
+			}, this);
+		}
+		else if ("input" in queryParams) {
     		if (queryParams.input.indexOf("http")===0) {
     			this.loadFromUrl(queryParams.input, isRun);
+    		} else {
+    			this.loadFromString(queryParams.input);
     		}
     	} else if (spyralIdMatches) {
 			this.loadFromId(spyralIdMatches[1]);
@@ -36872,6 +36911,12 @@ Ext.define('Voyant.notebook.Notebook', {
     	} else {
     		this.addNew();
     	}
+		if (isRun) {
+			var me = this;
+			Ext.defer(function() {
+				me.runAll()
+			}, 100)
+		}
     },
     
     getBlock: function(pos) {

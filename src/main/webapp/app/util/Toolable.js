@@ -260,6 +260,11 @@ Ext.define('Voyant.util.Toolable', {
        		name: 'export',
        		inputValue: 'biblio',
        		boxLabel: panel.localize('exportViewBiblio')
+       	},{
+       		xtype: 'radio',
+       		name: 'export',
+       		inputValue: 'spyral',
+       		boxLabel: panel.localize("exportViewSpyral")
        	}];
 		if (panel.getExtraExportItems) {
 			panel.getExtraExportItems().forEach(function(item) {
@@ -565,7 +570,6 @@ var canvasSurface = this.down('draw') || this.down('chart');
 	},
 	exportEmbed: function() {
 		var asTool = this.isXType('voyantheader')==false;
-		console.warn(this.xtype, asTool)
 		Ext.Msg.show({
 		    title: this.localize('exportViewEmbedTitle'),
 		    message: this.localize('exportViewEmbedMessage'),
@@ -600,6 +604,26 @@ var canvasSurface = this.down('draw') || this.down('chart');
 		    buttons: Ext.Msg.OK,
 		    icon: Ext.Msg.INFO
 		});
+	},
+	exportSpyral: function() {
+		let toolForUrl = Ext.getClassName(this).split(".").pop();
+		let api = this.getApplication().getModifiedApiParams();
+		if (this.isXType('voyantheader')==false) {
+			delete api.panels; // not needed for individual tools
+			// add (and overwrite if need be) this tool's api
+			Ext.apply(api, this.getModifiedApiParams());
+			delete api.corpus;
+		}
+		let isDebug = api && "debug" in api;
+		delete api.view;
+		delete api.debug;
+		let enc = function(str) {
+			return btoa(encodeURIComponent(str)).replace(/=/g, "%3D");
+		}
+		let input = '["'+enc("<h2>Spyral Notebook Imported from Voyant Tools</h2>")+'","'+
+			enc('loadCorpus("'+this.getApplication().getCorpus().getAliasOrId()+'").tool("'+
+			toolForUrl+'"'+(Object.keys(api).length>0 ? (","+Ext.encode(api)) : "")+ ');')+'"]'
+		this.openUrl(this.getApplication().getBaseUrl()+"spyral/?run=true&"+(isDebug ? "debug=true&" : "")+"inputJsonArrayOfEncodedBase64="+input);
 	},
 	exportGridCurrentJson: function(grid, form) {
 		var store = grid.getStore();
