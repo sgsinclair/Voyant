@@ -146,9 +146,10 @@ Ext.define('Voyant.panel.CustomSet', {
     	Ext.suspendLayouts();
     	
     	var tableLayout = decodeURI(this.getApiParam('tableLayout'));
+
     	if (tableLayout && tableLayout.charAt(0)!="{" && tableLayout.charAt(0)!="[") {
     		var cells = [];
-    		tableLayout.split(/,\s*/).forEach(function(cell) {
+    		tableLayout.replace(/;/g,",").split(/,\s*/).forEach(function(cell) {
     			cells.push(/^"'/.test(cell) ? cell : '"'+cell+'"');
     		});
     		tableLayout = "["+cells.join(",")+"]"; // treat as simple comma-separated string

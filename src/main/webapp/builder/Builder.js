@@ -163,6 +163,7 @@ Ext.define('Voyant.panel.Builder', {
             	title: 'Tools',
             	width: 300,
             	split: true,
+	    		autoScroll: true,
 //            	tbar: [{
 //            		text: 'Add tool to cell',
 //            		handler: function() {

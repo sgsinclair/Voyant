@@ -285,7 +285,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				var me = this;
 				result.then(function(result) {
 					if (result!==undefined) {
-						this.results.update(result);
+						me.results.update(result);
 					}
 				}).catch(function(err) {
 					Voyant.notebook.util.Show.showError(err);
