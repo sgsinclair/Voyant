@@ -443,11 +443,13 @@ var Spyral = (function (Highcharts) {
           noOthers: true,
           corpus: this.corpusid
         }).then(function (data) {
-          return data.documentTokens.tokens;
+          return data.documentTokens.tokens.map(function (t) {
+            return t.term;
+          });
         });
       }
       /**
-       * Create a Corpus and return the words
+       * Create a Corpus and return an array of lexical forms (words) in document order.
        * @param {object} config 
        * @param {object} api 
        */
