@@ -4,7 +4,7 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 	alias: "widget.notebooktexteditor",
 	cls: 'notebook-text-editor',
 	config: {
-		ckeditorConfig : { // when upgrading ckeditor, remember to copy stopediting plugin
+		ckeditorConfig : { // when upgrading ckeditor, remember to copy stopediting and inserthtml4x plugins
 			toolbar:  [
 				    	{ name: 'basicstyles', items: [ 'Bold', 'Italic', '-', 'RemoveFormat' ] },
 				    	{ name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Justify', 'Outdent', 'Indent', 'Blockquote', 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ] },
@@ -12,10 +12,11 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 				    	{ name: 'styles', items: [ 'Styles', 'Format' ] },
 				    	{ name: 'links', items: [ 'Link', 'Unlink', 'Anchor'] },
 				    	{ name: 'insert', items: [ 'Image', 'Table' ] },
-				    	{ name: 'document', items: [ 'Sourcedialog', 'Stopediting'] }
+				    	{ name: 'document', items: [ 'inserthtml4x', 'Sourcedialog', 'Stopediting'] }
 		    ],
-		    extraPlugins: 'stopediting,sourcedialog,justify,colorbutton',
-		    removePlugins: 'iframe',
+		    
+		    extraPlugins: 'stopediting,sourcedialog,justify,colorbutton,inserthtml4x',
+//		    removePlugins: 'iframe',
 			allowedContent: true,
 			toolbarCanCollapse: true,
 			startupFocus: true
