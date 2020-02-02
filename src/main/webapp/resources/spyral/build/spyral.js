@@ -139,9 +139,21 @@ var Spyral = (function (Highcharts) {
 
     _createClass(Load, null, [{
       key: "setBaseUrl",
+
+      /**
+       * Set the base URL for use with the Load class
+       * @param {string} baseUrl 
+       */
       value: function setBaseUrl(baseUrl) {
         this.baseUrl = baseUrl;
       }
+      /**
+       * Make a call to trombone
+       * @param {object} config 
+       * @param {object} params
+       * @returns {JSON}
+       */
+
     }, {
       key: "trombone",
       value: function trombone() {
@@ -200,6 +212,13 @@ var Spyral = (function (Highcharts) {
           }
         });
       }
+      /**
+       * Fetch content from a URL, often resolving cross-domain data constraints
+       * @param {string} urlToFetch 
+       * @param {object} config
+       * @returns {Response}
+       */
+
     }, {
       key: "load",
       value: function load(urlToFetch, config) {
@@ -230,6 +249,12 @@ var Spyral = (function (Highcharts) {
           throw err;
         });
       }
+      /**
+       * Fetch HTML content from a URL
+       * @param {string} url 
+       * @returns {Document}
+       */
+
     }, {
       key: "html",
       value: function html(url) {
@@ -237,6 +262,12 @@ var Spyral = (function (Highcharts) {
           return new DOMParser().parseFromString(text, 'text/html');
         });
       }
+      /**
+       * Fetch XML content from a URL
+       * @param {string} url 
+       * @returns {XMLDocument}
+       */
+
     }, {
       key: "xml",
       value: function xml(url) {
@@ -244,6 +275,12 @@ var Spyral = (function (Highcharts) {
           return new DOMParser().parseFromString(text, 'text/xml');
         });
       }
+      /**
+       * Fetch JSON content from a URL
+       * @param {string} url 
+       * @returns {JSON}
+       */
+
     }, {
       key: "json",
       value: function json(url) {
@@ -251,6 +288,12 @@ var Spyral = (function (Highcharts) {
           return response.json();
         });
       }
+      /**
+       * Fetch text content from a URL
+       * @param {string} url 
+       * @returns {string}
+       */
+
     }, {
       key: "text",
       value: function text(url) {
@@ -825,69 +868,119 @@ var Spyral = (function (Highcharts) {
 
   _defineProperty(Corpus, "Load", Load);
 
-  function chart(target, config) {
-    // convert title and suppress if not provided
-    if ("title" in config) {
-      if (typeof config.title == "string") {
-        config.title = {
-          text: config.title
-        };
+  var Chart =
+  /*#__PURE__*/
+  function () {
+    /**
+     * Construct a new Chart class
+     * @constructor
+     * @param {*} target 
+     * @param {*} data 
+     */
+    function Chart(target, data) {
+      _classCallCheck(this, Chart);
+
+      this.target = target;
+      this.data = data;
+    }
+    /**
+     * Create a new chart
+     * @param {*} target 
+     * @param {*} config 
+     */
+
+
+    _createClass(Chart, [{
+      key: "create",
+      value: function create(target, config) {
+        Highcharts.chart(target, config);
       }
-    } else {
-      config.title = false;
-    } // convert subtitle and convert if not provided
+      /**
+       * Create a new chart
+       * @param {*} target 
+       * @param {*} config 
+       */
+
+    }, {
+      key: "bar",
+      value: function bar(config) {}
+    }, {
+      key: "line",
+      value: function line(config) {}
+    }, {
+      key: "scatter",
+      value: function scatter(config) {}
+    }], [{
+      key: "create",
+      value: function create(target, config) {
+        // convert title and suppress if not provided
+        if ("title" in config) {
+          if (typeof config.title == "string") {
+            config.title = {
+              text: config.title
+            };
+          }
+        } else {
+          config.title = false;
+        } // convert subtitle and convert if not provided
 
 
-    if ("subtitle" in config) {
-      if (typeof config.subtitle == "string") {
-        config.subtitle = {
-          text: config.subtitle
-        };
+        if ("subtitle" in config) {
+          if (typeof config.subtitle == "string") {
+            config.subtitle = {
+              text: config.subtitle
+            };
+          }
+        } else {
+          config.subtitle = false;
+        } // convert credits
+
+
+        if (!("credits" in config)) {
+          config.credits = false;
+        } // suppress xAxis title unless provided
+
+
+        if (!("xAxis" in config)) {
+          config.xAxis = {};
+        }
+
+        if (!("title" in config.xAxis)) ; //config.xAxis.title = false;
+        // suppress xAxis title unless provided
+
+
+        if (!("yAxis" in config)) {
+          config.yAxis = {};
+        }
+
+        if (!("title" in config.yAxis)) {
+          config.yAxis.title = false;
+        }
+
+        return Highcharts.chart(target, config);
       }
-    } else {
-      config.subtitle = false;
-    } // convert credits
+    }, {
+      key: "setDefaultChartType",
+      value: function setDefaultChartType(config, type) {
+        if ("type" in config) {
+          config.chart.type = config.type;
+          delete config.type;
+          return;
+        } // TODO: check plot options and series?
 
 
-    if (!("credits" in config)) {
-      config.credits = false;
-    } // suppress xAxis title unless provided
+        if ("chart" in config && "type" in config.chart) {
+          return;
+        } // already set
 
 
-    if (!("xAxis" in config)) {
-      config.xAxis = {};
-    }
+        config.chart.type = type;
+        return;
+      }
+    }]);
 
-    if (!("title" in config.xAxis)) ; //config.xAxis.title = false;
-    // suppress xAxis title unless provided
-
-
-    if (!("yAxis" in config)) {
-      config.yAxis = {};
-    }
-
-    if (!("title" in config.yAxis)) {
-      config.yAxis.title = false;
-    }
-
-    return Highcharts.chart(target, config);
-  }
-  function setDefaultChartType(config, type) {
-    if ("type" in config) {
-      config.chart.type = config.type;
-      delete config.type;
-      return;
-    } // TODO: check plot options and series?
-
-
-    if ("chart" in config && "type" in config.chart) {
-      return;
-    } // already set
-
-
-    config.chart.type = type;
-    return;
-  }
+    return Chart;
+  }();
 
   /**
    * Class representing a Table.
@@ -898,6 +991,12 @@ var Spyral = (function (Highcharts) {
   var Table =
   /*#__PURE__*/
   function () {
+    /**
+     * Create a new Table
+     * @constructor
+     * @param {(object|array|string|number)} data
+     * @param {object} config
+     */
     function Table(data, config) {
       var _this = this;
 
@@ -1033,6 +1132,12 @@ var Spyral = (function (Highcharts) {
         }
       }
     }
+    /**
+     * Set the headers for the Table
+     * @param {(object|array)} data
+     * @returns {Table}
+     */
+
 
     _createClass(Table, [{
       key: "setHeaders",
@@ -1055,6 +1160,12 @@ var Spyral = (function (Highcharts) {
 
         return this;
       }
+      /**
+       * Add rows to the Table
+       * @param {array} data
+       * @returns {Table}
+       */
+
     }, {
       key: "addRows",
       value: function addRows(data) {
@@ -1065,6 +1176,12 @@ var Spyral = (function (Highcharts) {
         }, this);
         return this;
       }
+      /**
+       * Add a row to the Table
+       * @param {(array|object)} data
+       * @returns {Table}
+       */
+
     }, {
       key: "addRow",
       value: function addRow(data) {
@@ -1080,6 +1197,14 @@ var Spyral = (function (Highcharts) {
         this.setRow(this.rows(), data, true);
         return this;
       }
+      /**
+       * Set a row
+       * @param {(number|string)} ind The row index
+       * @param {(object|array)} data
+       * @param {boolean} create
+       * @returns {Table}
+       */
+
     }, {
       key: "setRow",
       value: function setRow(ind, data, create) {
@@ -1126,6 +1251,14 @@ var Spyral = (function (Highcharts) {
 
         return this;
       }
+      /**
+       * Set a column
+       * @param {(number|string)} ind The column index
+       * @param {(object|array)} data
+       * @param {boolean} create
+       * @returns {Table}
+       */
+
     }, {
       key: "setColumn",
       value: function setColumn(ind, data, create) {
@@ -1154,6 +1287,14 @@ var Spyral = (function (Highcharts) {
 
         return this;
       }
+      /**
+       * Add to or set a cell value
+       * @param {(number|string)} row The row index
+       * @param {(number|string)} column The column index
+       * @param {number} value The value to set/add
+       * @param {boolean} overwrite True to set, false to add to current value
+       */
+
     }, {
       key: "updateCell",
       value: function updateCell(row, column, value, overwrite) {
@@ -1163,17 +1304,39 @@ var Spyral = (function (Highcharts) {
         this._rows[rowIndex][columnIndex] = val && !overwrite ? val + value : value;
         return this;
       }
+      /**
+       * Get the value of a cell
+       * @param {(number|string)} rowInd The row index
+       * @param {(number|string)} colInd The column index
+       * @returns {number}
+       */
+
     }, {
       key: "cell",
       value: function cell(rowInd, colInd) {
         return this._rows[this.getRowIndex(rowInd)][this.getColumnIndex(colInd)];
       }
+      /**
+       * Set the value of a cell
+       * @param {(number|string)} row The row index
+       * @param {(number|string)} column The column index
+       * @param {number} value The value to set
+       * @returns {Table}
+       */
+
     }, {
       key: "setCell",
       value: function setCell(row, column, value) {
         this.updateCell(row, column, value, true);
         return this;
       }
+      /**
+       * Get (and create) the row index
+       * @param {(number|string)} ind The index
+       * @param {boolean} create
+       * @returns {number}
+       */
+
     }, {
       key: "getRowIndex",
       value: function getRowIndex(ind, create) {
@@ -1207,6 +1370,13 @@ var Spyral = (function (Highcharts) {
 
         throw new Error("Please provide a valid row (number or named row)");
       }
+      /**
+       * Get (and create) the column index
+       * @param {(number|string)} ind The index
+       * @param {boolean} create
+       * @returns {number}
+       */
+
     }, {
       key: "getColumnIndex",
       value: function getColumnIndex(ind, create) {
@@ -1234,6 +1404,12 @@ var Spyral = (function (Highcharts) {
 
         throw new Error("Please provide a valid column (number or named column)");
       }
+      /**
+       * Add a column (at the specified index)
+       * @param {(object|string)} config
+       * @param {(number|string)} ind
+       */
+
     }, {
       key: "addColumn",
       value: function addColumn(config, ind) {
@@ -1278,7 +1454,10 @@ var Spyral = (function (Highcharts) {
        * When the first argument is the boolean value `true` all rows are returned.
        * When the first argument is a an array then the rows corresponding to the row
        * indices or names are returned. When all arguments except are numbers or strings
-       * then each of those is returned. 
+       * then each of those is returned.
+       * @param {(boolean|array|number|string)} [inds]
+       * @param {(object|number|string)} [config]
+       * @returns {number|array}
        */
 
     }, {
@@ -1338,6 +1517,13 @@ var Spyral = (function (Highcharts) {
           return rows;
         }
       }
+      /**
+       * Get the specified row
+       * @param {(number|string)} ind
+       * @param {boolean} [asObj]
+       * @returns {(number|string|object)}
+       */
+
     }, {
       key: "row",
       value: function row(ind, asObj) {
@@ -1362,6 +1548,9 @@ var Spyral = (function (Highcharts) {
        * When the first argument is a number a slice of the columns is returned and if
        * the second argument is a number it is treated as the length of the slice to
        * return (note that it isn't the `end` index like with Array.slice()).
+       * @param {(boolean|array|number|string)} [inds]
+       * @param {(object|number|string)} [config]
+       * @returns {number|array}
        */
 
     }, {
@@ -1419,6 +1608,13 @@ var Spyral = (function (Highcharts) {
           return columns;
         }
       }
+      /**
+       * Get the specified column
+       * @param {(number|string)} ind
+       * @param {boolean} [asObj]
+       * @returns {(number|string|object)}
+       */
+
     }, {
       key: "column",
       value: function column(ind, asObj) {
@@ -1428,7 +1624,8 @@ var Spyral = (function (Highcharts) {
 
         var data = this._rows.forEach(function (r) {
           return r[column];
-        });
+        }); // TODO
+
 
         if (asObj) {
           var obj = {};
@@ -1444,6 +1641,12 @@ var Spyral = (function (Highcharts) {
           });
         }
       }
+      /**
+       * Get the specified header
+       * @param {(number|string)} ind
+       * @returns {(number|string)}
+       */
+
     }, {
       key: "header",
       value: function header(ind) {
@@ -1455,6 +1658,12 @@ var Spyral = (function (Highcharts) {
           return i == _this10._headers[k];
         })];
       }
+      /**
+       * Get the specified headers
+       * @param {(boolean|array|number|string)} inds
+       * @returns {(number|array)}
+       */
+
     }, {
       key: "headers",
       value: function headers(inds) {
@@ -1487,11 +1696,23 @@ var Spyral = (function (Highcharts) {
             });
           }
       }
+      /**
+       * Does the specified column exist
+       * @param {(number|string)} ind
+       * @returns {(number|string)}
+       */
+
     }, {
       key: "hasColumn",
       value: function hasColumn(ind) {
         return ind in this._headers;
       }
+      /**
+       * Runs the specified function on each row.
+       * The function is passed the row and the row index.
+       * @param {function} fn
+       */
+
     }, {
       key: "forEach",
       value: function forEach(fn) {
@@ -1499,56 +1720,124 @@ var Spyral = (function (Highcharts) {
           return fn(r, i);
         });
       }
+      /**
+       * Get the minimum value in the specified row
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "rowMin",
       value: function rowMin(ind) {
         return Math.min.apply(null, this.row(ind));
       }
+      /**
+       * Get the maximum value in the specified row
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "rowMax",
       value: function rowMax(ind) {
         return Math.max.apply(null, this.row(ind));
       }
+      /**
+       * Get the minimum value in the specified column
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "columnMin",
       value: function columnMin(ind) {
         return Math.min.apply(null, this.column(ind));
       }
+      /**
+       * Get the maximum value in the specified column
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "columnMax",
       value: function columnMax(ind) {
         return Math.max.apply(null, this.column(ind));
       }
+      /**
+       * Get the sum of the values in the specified row
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "rowSum",
       value: function rowSum(ind) {
         return Table.sum(this.row(ind));
       }
+      /**
+       * Get the sum of the values in the specified column
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "columnSum",
       value: function columnSum(ind) {
         return Table.sum(this.column(ind));
       }
+      /**
+       * Get the mean of the values in the specified row
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "rowMean",
       value: function rowMean(ind) {
         return Table.mean(this.row(ind));
       }
+      /**
+       * Get the mean of the values in the specified column
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "columnMean",
       value: function columnMean(ind) {
         return Table.mean(this.column(ind));
       }
+      /**
+       * Get the count of each unique value in the specified row
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "rowCounts",
       value: function rowCounts(ind) {
         return Table.counts(this.row(ind));
       }
+      /**
+       * Get the count of each unique value in the specified column
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "columnCounts",
       value: function columnCounts(ind) {
         return Table.counts(this.column(ind));
       }
+      /**
+       * Get the rolling mean for the specified row
+       * @param {(number|string)} ind
+       * @param {number} neighbors
+       * @param {boolean} overwrite
+       * @returns {array}
+       */
+
     }, {
       key: "rowRollingMean",
       value: function rowRollingMean(ind, neighbors, overwrite) {
@@ -1560,6 +1849,14 @@ var Spyral = (function (Highcharts) {
 
         return means;
       }
+      /**
+       * Get the rolling mean for the specified column
+       * @param {(number|string)} ind
+       * @param {number} neighbors
+       * @param {boolean} overwrite
+       * @returns {array}
+       */
+
     }, {
       key: "columnRollingMean",
       value: function columnRollingMean(ind, neighbors, overwrite) {
@@ -1571,36 +1868,78 @@ var Spyral = (function (Highcharts) {
 
         return means;
       }
+      /**
+       * Get the variance for the specified row
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "rowVariance",
       value: function rowVariance(ind) {
         return Table.variance(this.row(ind));
       }
+      /**
+       * Get the variance for the specified column
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "columnVariance",
       value: function columnVariance(ind) {
         return Table.variance(this.column(ind));
       }
+      /**
+       * Get the standard deviation for the specified row
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "rowStandardDeviation",
       value: function rowStandardDeviation(ind) {
         return Table.standardDeviation(this.row(ind));
       }
+      /**
+       * Get the standard deviation for the specified column
+       * @param {(number|string)} ind
+       * @returns {number}
+       */
+
     }, {
       key: "columnStandardDeviation",
       value: function columnStandardDeviation(ind) {
         return Table.standardDeviation(this.column(ind));
       }
+      /**
+       * Get the z scores for the specified row
+       * @param {(number|string)} ind
+       * @returns {array}
+       */
+
     }, {
       key: "rowZScores",
       value: function rowZScores(ind) {
         return Table.zScores(this.row(ind));
       }
+      /**
+       * Get the z scores for the specified column
+       * @param {(number|string)} ind
+       * @returns {array}
+       */
+
     }, {
       key: "columnZScores",
       value: function columnZScores(ind) {
         return Table.zScores(this.column(ind));
       }
+      /**
+       * TODO
+       * Sort the specified rows
+       * @returns {Table}
+       */
+
     }, {
       key: "rowSort",
       value: function rowSort(inds, config) {
@@ -1667,6 +2006,12 @@ var Spyral = (function (Highcharts) {
 
         return this;
       }
+      /**
+       * TODO
+       * Sort the specified columns
+       * @returns {Table}
+       */
+
     }, {
       key: "columnSort",
       value: function columnSort(inds, config) {
@@ -1751,11 +2096,22 @@ var Spyral = (function (Highcharts) {
           });
         }
       }
+      /**
+       * TODO
+       * Create a chart
+       */
+
     }, {
       key: "chart",
-      value: function chart$1(target, config) {
-        chart(target, config);
+      value: function chart(target, config) {
+        Chart.create(target, config);
       }
+      /**
+       * Get a CSV representation of the Table
+       * @param {object} [config]
+       * @returns {string}
+       */
+
     }, {
       key: "toCsv",
       value: function toCsv(config) {
@@ -1772,6 +2128,12 @@ var Spyral = (function (Highcharts) {
           }).join(",");
         }).join("\n");
       }
+      /**
+       * Get a TSV representation of the Table
+       * @param {object} [config]
+       * @returns {string}
+       */
+
     }, {
       key: "toTsv",
       value: function toTsv(config) {
@@ -1779,6 +2141,13 @@ var Spyral = (function (Highcharts) {
           return row.join("\t");
         }).join("\n");
       }
+      /**
+       * Set the target's contents to an HTML representation of the Table
+       * @param {(function|string|object)} target
+       * @param {object} [config]
+       * @returns {Table}
+       */
+
     }, {
       key: "html",
       value: function html(target, config) {
@@ -1802,6 +2171,12 @@ var Spyral = (function (Highcharts) {
 
         return this;
       }
+      /**
+       * Get an HTML representation of the Table
+       * @param {object} [config]
+       * @returns {string}
+       */
+
     }, {
       key: "toString",
       value: function toString(config) {
@@ -1813,9 +2188,14 @@ var Spyral = (function (Highcharts) {
           }).join("") + "</tr>";
         }).join("") + "</tbody></table>";
       }
+      /**
+       * Show a chart representing the Table
+       * @param {object} [config]
+       */
+
     }, {
       key: "chart",
-      value: function chart$1() {
+      value: function chart() {
         var _this14 = this;
 
         var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -1839,7 +2219,7 @@ var Spyral = (function (Highcharts) {
         });
 
         if (isHeadersCategories) {
-          setDefaultChartType(config, "column");
+          Chart.setDefaultChartType(config, "column");
         } // set categories if not set
 
 
@@ -1870,8 +2250,15 @@ var Spyral = (function (Highcharts) {
           });
         }
 
-        return chart(target, config);
+        return Chart.create(target, config);
       }
+      /**
+       * Create a new Table
+       * @param {(object|array|string|number)} data
+       * @param {object} config
+       * @returns {Table}
+       */
+
     }], [{
       key: "create",
       value: function create(data, config) {
@@ -1881,6 +2268,14 @@ var Spyral = (function (Highcharts) {
 
         return _construct(Table, [data, config].concat(other));
       }
+      /**
+       * Fetch a Table from a source
+       * @param {string|Request} input
+       * @param {object} api
+       * @param {object} config
+       * @returns {Promise}
+       */
+
     }, {
       key: "fetch",
       value: function fetch(input, api, config) {
@@ -1896,6 +2291,12 @@ var Spyral = (function (Highcharts) {
           });
         });
       }
+      /**
+       * Get the count of each unique value in the data
+       * @param {array} data
+       * @returns {object}
+       */
+
     }, {
       key: "counts",
       value: function counts(data) {
@@ -1905,11 +2306,24 @@ var Spyral = (function (Highcharts) {
         });
         return vals;
       }
+      /**
+       * Compare two values
+       * @param {(number|string)} a
+       * @param {(number|string)} b
+       * @returns {number}
+       */
+
     }, {
       key: "cmp",
       value: function cmp(a, b) {
         return typeof a == "string" && typeof b == "string" ? a.localeCompare(b) : a - b;
       }
+      /**
+       * Get the sum of the provided values
+       * @param {array} data
+       * @returns {number}
+       */
+
     }, {
       key: "sum",
       value: function sum(data) {
@@ -1917,11 +2331,24 @@ var Spyral = (function (Highcharts) {
           return a + b;
         }, 0);
       }
+      /**
+       * Get the mean of the provided values
+       * @param {array} data
+       * @returns {number}
+       */
+
     }, {
       key: "mean",
       value: function mean(data) {
         return Table.sum(data) / data.length;
       }
+      /**
+       * Get rolling mean for the provided values
+       * @param {array} data
+       * @param {number} neighbors
+       * @returns {array}
+       */
+
     }, {
       key: "rollingMean",
       value: function rollingMean(data, neighbors) {
@@ -1936,6 +2363,12 @@ var Spyral = (function (Highcharts) {
           return sum / subset.length;
         });
       }
+      /**
+       * Get the variance for the provided values
+       * @param {array} data
+       * @returns {number}
+       */
+
     }, {
       key: "variance",
       value: function variance(data) {
@@ -1944,11 +2377,23 @@ var Spyral = (function (Highcharts) {
           return Math.pow(num - m, 2);
         }));
       }
+      /**
+       * Get the standard deviation for the provided values
+       * @param {array} data
+       * @returns {number}
+       */
+
     }, {
       key: "standardDeviation",
       value: function standardDeviation(data) {
         return Math.sqrt(Table.variance(data));
       }
+      /**
+       * Get the z scores for the provided values
+       * @param {array} data
+       * @returns {array}
+       */
+
     }, {
       key: "zScores",
       value: function zScores(data) {
@@ -1958,6 +2403,12 @@ var Spyral = (function (Highcharts) {
           return (num - m) / s;
         });
       }
+      /**
+       * Perform a zip operation of the provided arrays {@link https://en.wikipedia.org/wiki/Convolution_(computer_science)}
+       * @param {array} data
+       * @returns {array}
+       */
+
     }, {
       key: "zip",
       value: function zip() {
