@@ -28,6 +28,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		boxready: function() {
 			var me = this;
 			var editor = ace.edit(Ext.getDom(this.getEl()));
+			
 			editor.$blockScrolling = Infinity;
 			editor.getSession().setUseWorker(true);
 			editor.setTheme(this.getTheme());
@@ -41,34 +42,36 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			editor.setHighlightActiveLine(false);
 			editor.renderer.setShowPrintMargin(false);
 			editor.renderer.setShowGutter(false);
+			
 			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
 			editor.clearSelection();
+
 		    editor.on("focus", function() {
 				setTimeout(function() {
 					me.getEditor().renderer.setShowGutter(true);
 				}, 100); // slight delay to avoid selecting a range of text, caused by showing the gutter while mouse is still pressed
 		    }, this);
 		    editor.on("change", function(ev, editor) {
-		    		var lines = editor.getSession().getScreenLength();
-		    		if (lines!=me.getLines()) {
-		    			me.up('notebookcodeeditorwrapper').setSize({height: lines*editor.renderer.lineHeight+editor.renderer.scrollBar.getWidth()})
-		    			me.setLines(lines);
-		    		}
-			    	if (me.getIsChangeRegistered()==false) {
-			    		me.setIsChangeRegistered(true);
-				    	var wrapper = me.up('notebookcodeeditorwrapper');
-				    	if (wrapper) {
-				    		wrapper.setIsRun(false);
-				    		var notebook = wrapper.up("notebook");
-				    		if (notebook) {notebook.setIsEdited(true);}
-				    	}
-			    	} else {
-			    		if (!me.getEditedTimeout()) { // no timeout, so set it to 30 seconds
-							me.setEditedTimeout(setTimeout(function() {
-								me.setIsChangeRegistered(false);
-							}, 30000));
-			    		}
-			    	}
+				var lines = editor.getSession().getScreenLength();
+				if (lines!=me.getLines()) {
+					me.up('notebookcodeeditorwrapper').setSize({height: lines*editor.renderer.lineHeight+editor.renderer.scrollBar.getWidth()})
+					me.setLines(lines);
+				}
+				if (me.getIsChangeRegistered()==false) {
+					me.setIsChangeRegistered(true);
+					var wrapper = me.up('notebookcodeeditorwrapper');
+					if (wrapper) {
+						wrapper.setIsRun(false);
+						var notebook = wrapper.up("notebook");
+						if (notebook) {notebook.setIsEdited(true);}
+					}
+				} else {
+					if (!me.getEditedTimeout()) { // no timeout, so set it to 30 seconds
+						me.setEditedTimeout(setTimeout(function() {
+							me.setIsChangeRegistered(false);
+						}, 30000));
+					}
+				}
 		    }, this);
 		    editor.on("blur", function() {
 		    	me.getEditor().renderer.setShowGutter(false);
@@ -94,7 +97,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 					 */
 					enableTern: {
 						/* http://ternjs.net/doc/manual.html#option_defs */
-						defs: me.docs ? [me.docs] : ['ecma5'],
+						defs: me.docs ? ['browser', 'ecma5', me.docs] : ['ecma5', 'browser'],
 						plugins: {
 							doc_comment: {
 								fullDocs: true

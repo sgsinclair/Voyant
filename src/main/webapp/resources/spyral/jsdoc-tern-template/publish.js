@@ -124,7 +124,7 @@ exports.publish = function(data, opts, tutorials) {
     for (var d in docs) {
         var doc = docs[d];
 
-        var convertedEntry;
+        var convertedEntry = undefined;
 
         if (doc.kind && doc.kind === 'namespace') {
             createEntriesForName(doc.longname, output);
