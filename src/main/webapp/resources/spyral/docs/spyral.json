@@ -31,6 +31,27 @@
         "!doc": "The license for the Corpus"
       },
       "!doc": "The Metadata config object"
+    },
+    "HighchartsConfig": {
+      "title": {
+        "!type": "?"
+      },
+      "subtitle": {
+        "!type": "?"
+      },
+      "credits": {
+        "!type": "object"
+      },
+      "xAxis": {
+        "!type": "object"
+      },
+      "yAxis": {
+        "!type": "object"
+      },
+      "chart": {
+        "!type": "object"
+      },
+      "!doc": "The Highcharts config object"
     }
   },
   "Spyral": {
@@ -88,6 +109,20 @@
         "!type": "fn(before: ?, more: ?, after: ?)"
       }
     },
+    "Chart": {
+      "!type": "fn(target: ?, data: ?)",
+      "prototype": {
+        "create": {
+          "!type": "fn(target: ?, config: +HighchartsConfig) -> +Highcharts.Chart",
+          "!doc": "Create a new chart.\rSee https://api.highcharts.com/highcharts/ for full set of config options."
+        }
+      },
+      "!doc": "Construct a new Chart class",
+      "create": {
+        "!type": "fn(target: ?, config: +HighchartsConfig) -> +Highcharts.Chart",
+        "!doc": "Create a new chart\rSee https://api.highcharts.com/highcharts/ for full set of config options."
+      }
+    },
     "Corpus": {
       "!type": "fn(id: string)",
       "prototype": {
@@ -139,7 +174,7 @@
       },
       "words": {
         "!type": "fn(config: object, api: object)",
-        "!doc": "Create a Corpus and return the words"
+        "!doc": "Create a Corpus and return an array of lexical forms (words) in document order."
       },
       "contexts": {
         "!type": "fn(config: object, api: object)",
@@ -158,12 +193,8 @@
         "!doc": "Create a Corpus and return the correlations"
       },
       "tool": {
-        "!type": "fn(target: ?, tool: ?, config: ?, api: ?)",
+        "!type": "fn(tool: ?, config: ?, api: ?)",
         "!doc": "Create a Corpus and return the tool"
-      },
-      "htmltool": {
-        "!type": "fn(html: ?, tool: ?, config: ?, api: ?)",
-        "!doc": "Create a Corpus and return the html tool"
       },
       "create": {
         "!type": "fn(config: object)",
@@ -176,27 +207,260 @@
     },
     "Load": {
       "!type": "fn()",
-      "prototype": {}
+      "prototype": {},
+      "setBaseUrl": {
+        "!type": "fn(baseUrl: string)",
+        "!doc": "Set the base URL for use with the Load class"
+      },
+      "trombone": {
+        "!type": "fn(config: object, params: object) -> +JSON",
+        "!doc": "Make a call to trombone"
+      },
+      "load": {
+        "!type": "fn(urlToFetch: string, config: object) -> +Response",
+        "!doc": "Fetch content from a URL, often resolving cross-domain data constraints"
+      },
+      "html": {
+        "!type": "fn(url: string) -> +Document",
+        "!doc": "Fetch HTML content from a URL"
+      },
+      "xml": {
+        "!type": "fn(url: string) -> +XMLDocument",
+        "!doc": "Fetch XML content from a URL"
+      },
+      "json": {
+        "!type": "fn(url: string) -> +JSON",
+        "!doc": "Fetch JSON content from a URL"
+      },
+      "text": {
+        "!type": "fn(url: string) -> string",
+        "!doc": "Fetch text content from a URL"
+      }
     },
     "Table": {
-      "!type": "fn()",
+      "!type": "fn(data: ?, config: object)",
       "prototype": {
+        "setHeaders": {
+          "!type": "fn(data: ?) -> +Table",
+          "!doc": "Set the headers for the Table"
+        },
+        "addRows": {
+          "!type": "fn(data: array) -> +Table",
+          "!doc": "Add rows to the Table"
+        },
+        "addRow": {
+          "!type": "fn(data: ?) -> +Table",
+          "!doc": "Add a row to the Table"
+        },
+        "setRow": {
+          "!type": "fn(ind: ?, data: ?, create: boolean) -> +Table",
+          "!doc": "Set a row"
+        },
+        "setColumn": {
+          "!type": "fn(ind: ?, data: ?, create: boolean) -> +Table",
+          "!doc": "Set a column"
+        },
+        "updateCell": {
+          "!type": "fn(row: ?, column: ?, value: number, overwrite: boolean)",
+          "!doc": "Add to or set a cell value"
+        },
+        "cell": {
+          "!type": "fn(rowInd: ?, colInd: ?) -> number",
+          "!doc": "Get the value of a cell"
+        },
+        "setCell": {
+          "!type": "fn(row: ?, column: ?, value: number) -> +Table",
+          "!doc": "Set the value of a cell"
+        },
+        "getRowIndex": {
+          "!type": "fn(ind: ?, create: boolean) -> number",
+          "!doc": "Get (and create) the row index"
+        },
+        "getColumnIndex": {
+          "!type": "fn(ind: ?, create: boolean) -> number",
+          "!doc": "Get (and create) the column index"
+        },
+        "addColumn": {
+          "!type": "fn(config: ?, ind: ?)",
+          "!doc": "Add a column (at the specified index)"
+        },
         "rows": {
-          "!type": "fn()",
+          "!type": "fn(inds?: ?, config?: ?) -> ?",
           "!doc": "This function returns different values depending on the arguments provided.\rWhen there are no arguments, it returns the number of rows in this table.\rWhen the first argument is the boolean value `true` all rows are returned.\rWhen the first argument is a an array then the rows corresponding to the row\rindices or names are returned. When all arguments except are numbers or strings\rthen each of those is returned."
         },
+        "row": {
+          "!type": "fn(ind: ?, asObj?: boolean) -> ?",
+          "!doc": "Get the specified row"
+        },
         "columns": {
-          "!type": "fn()",
+          "!type": "fn(inds?: ?, config?: ?) -> ?",
           "!doc": "This function returns different values depending on the arguments provided.\rWhen there are no arguments, it returns the number of columns in this table.\rWhen the first argument is the boolean value `true` all columns are returned.\rWhen the first argument is a number a slice of the columns is returned and if\rthe second argument is a number it is treated as the length of the slice to\rreturn (note that it isn't the `end` index like with Array.slice())."
+        },
+        "column": {
+          "!type": "fn(ind: ?, asObj?: boolean) -> ?",
+          "!doc": "Get the specified column"
+        },
+        "header": {
+          "!type": "fn(ind: ?) -> ?",
+          "!doc": "Get the specified header"
+        },
+        "headers": {
+          "!type": "fn(inds: ?) -> ?",
+          "!doc": "Get the specified headers"
+        },
+        "hasColumn": {
+          "!type": "fn(ind: ?) -> ?",
+          "!doc": "Does the specified column exist"
+        },
+        "forEach": {
+          "!type": "fn(fn: fn())",
+          "!doc": "Runs the specified function on each row.\rThe function is passed the row and the row index."
+        },
+        "rowMin": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the minimum value in the specified row"
+        },
+        "rowMax": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the maximum value in the specified row"
+        },
+        "columnMin": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the minimum value in the specified column"
+        },
+        "columnMax": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the maximum value in the specified column"
+        },
+        "rowSum": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the sum of the values in the specified row"
+        },
+        "columnSum": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the sum of the values in the specified column"
+        },
+        "rowMean": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the mean of the values in the specified row"
+        },
+        "columnMean": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the mean of the values in the specified column"
+        },
+        "rowCounts": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the count of each unique value in the specified row"
+        },
+        "columnCounts": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the count of each unique value in the specified column"
+        },
+        "rowRollingMean": {
+          "!type": "fn(ind: ?, neighbors: number, overwrite: boolean) -> array",
+          "!doc": "Get the rolling mean for the specified row"
+        },
+        "columnRollingMean": {
+          "!type": "fn(ind: ?, neighbors: number, overwrite: boolean) -> array",
+          "!doc": "Get the rolling mean for the specified column"
+        },
+        "rowVariance": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the variance for the specified row"
+        },
+        "columnVariance": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the variance for the specified column"
+        },
+        "rowStandardDeviation": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the standard deviation for the specified row"
+        },
+        "columnStandardDeviation": {
+          "!type": "fn(ind: ?) -> number",
+          "!doc": "Get the standard deviation for the specified column"
+        },
+        "rowZScores": {
+          "!type": "fn(ind: ?) -> array",
+          "!doc": "Get the z scores for the specified row"
+        },
+        "columnZScores": {
+          "!type": "fn(ind: ?) -> array",
+          "!doc": "Get the z scores for the specified column"
+        },
+        "rowSort": {
+          "!type": "fn() -> +Table",
+          "!doc": "TODO\rSort the specified rows"
+        },
+        "columnSort": {
+          "!type": "fn() -> +Table",
+          "!doc": "TODO\rSort the specified columns"
+        },
+        "chart": {
+          "!type": "fn(config?: +HighchartsConfig) -> +Highcharts.Chart",
+          "!doc": "Show a chart representing the Table"
+        },
+        "toCsv": {
+          "!type": "fn(config?: object) -> string",
+          "!doc": "Get a CSV representation of the Table"
+        },
+        "toTsv": {
+          "!type": "fn(config?: object) -> string",
+          "!doc": "Get a TSV representation of the Table"
+        },
+        "html": {
+          "!type": "fn(target: ?, config?: object) -> +Table",
+          "!doc": "Set the target's contents to an HTML representation of the Table"
+        },
+        "toString": {
+          "!type": "fn(config?: object) -> string",
+          "!doc": "Get an HTML representation of the Table"
         }
       },
+      "!doc": "Create a new Table",
       "create": {
-        "!type": "fn()",
+        "!type": "fn(data: ?, config: object) -> +Table",
         "!doc": "Create a new Table"
       },
       "fetch": {
-        "!type": "fn()",
-        "!doc": "Build Spyral for use with Voyant"
+        "!type": "fn(input: ?, api: object, config: object) -> +Promise",
+        "!doc": "Fetch a Table from a source"
+      },
+      "counts": {
+        "!type": "fn(data: array) -> object",
+        "!doc": "Get the count of each unique value in the data"
+      },
+      "cmp": {
+        "!type": "fn(a: ?, b: ?) -> number",
+        "!doc": "Compare two values"
+      },
+      "sum": {
+        "!type": "fn(data: array) -> number",
+        "!doc": "Get the sum of the provided values"
+      },
+      "mean": {
+        "!type": "fn(data: array) -> number",
+        "!doc": "Get the mean of the provided values"
+      },
+      "rollingMean": {
+        "!type": "fn(data: array, neighbors: number) -> array",
+        "!doc": "Get rolling mean for the provided values"
+      },
+      "variance": {
+        "!type": "fn(data: array) -> number",
+        "!doc": "Get the variance for the provided values"
+      },
+      "standardDeviation": {
+        "!type": "fn(data: array) -> number",
+        "!doc": "Get the standard deviation for the provided values"
+      },
+      "zScores": {
+        "!type": "fn(data: array) -> array",
+        "!doc": "Get the z scores for the provided values"
+      },
+      "zip": {
+        "!type": "fn(data: array) -> array",
+        "!doc": "Perform a zip operation of the provided arrays https://en.wikipedia.org/wiki/Convolution_(computer_science)"
       }
     }
   }

@@ -868,9 +868,26 @@ var Spyral = (function (Highcharts) {
 
   _defineProperty(Corpus, "Load", Load);
 
+  /**
+   * Class representing a Chart.
+   * @memberof Spyral
+   * @class
+   */
+
   var Chart =
   /*#__PURE__*/
   function () {
+    /**
+     * The Highcharts config object
+     * @typedef {object} HighchartsConfig
+     * @property {(string|object)} title
+     * @property {(string|object)} subtitle
+     * @property {object} credits
+     * @property {object} xAxis
+     * @property {object} yAxis
+     * @property {object} chart
+     */
+
     /**
      * Construct a new Chart class
      * @constructor
@@ -884,21 +901,25 @@ var Spyral = (function (Highcharts) {
       this.data = data;
     }
     /**
-     * Create a new chart
-     * @param {*} target 
-     * @param {*} config 
+     * Create a new chart.
+     * See {@link https://api.highcharts.com/highcharts/} for full set of config options.
+     * @param {(string|element)} target 
+     * @param {HighchartsConfig} config 
+     * @returns {Highcharts.Chart}
      */
 
 
     _createClass(Chart, [{
       key: "create",
       value: function create(target, config) {
-        Highcharts.chart(target, config);
+        return Highcharts.chart(target, config);
       }
       /**
        * Create a new chart
-       * @param {*} target 
-       * @param {*} config 
+       * See {@link https://api.highcharts.com/highcharts/} for full set of config options.
+       * @param {(string|element)} target 
+       * @param {HighchartsConfig} config 
+       * @returns {Highcharts.Chart}
        */
 
     }, {
@@ -2099,12 +2120,16 @@ var Spyral = (function (Highcharts) {
       /**
        * TODO
        * Create a chart
+       * @param {(string|element)} target
+       * @param {HighchartsConfig} config 
+       * @returns {Highcharts.Chart}
        */
 
     }, {
       key: "chart",
       value: function chart(target, config) {
-        return Chart.create(target, config);
+        config.target = target;
+        return this.create(config);
       }
       /**
        * Get a CSV representation of the Table
@@ -2190,7 +2215,8 @@ var Spyral = (function (Highcharts) {
       }
       /**
        * Show a chart representing the Table
-       * @param {object} [config]
+       * @param {HighchartsConfig} [config]
+       * @returns {Highcharts.Chart}
        */
 
     }, {
