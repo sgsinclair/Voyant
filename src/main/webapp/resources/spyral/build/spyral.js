@@ -2104,7 +2104,7 @@ var Spyral = (function (Highcharts) {
     }, {
       key: "chart",
       value: function chart(target, config) {
-        Chart.create(target, config);
+        return Chart.create(target, config);
       }
       /**
        * Get a CSV representation of the Table
@@ -2202,8 +2202,8 @@ var Spyral = (function (Highcharts) {
         var target = config.target;
 
         if (target === undefined) {
-          if (Spyral && Spyral.Notebook) {
-            target = Spyral.Notebook.getTarget().results.el.dom;
+          if (Voyant && Voyant.notebook) {
+            target = Voyant.notebook.util.Show.TARGET.dom;
           } else {
             target = document.createElement("div");
             document.body.appendChild(target);
@@ -2747,10 +2747,10 @@ var Spyral = (function (Highcharts) {
     Metadata: Metadata,
     Corpus: Corpus,
     Table: Table,
-    Load: Load
+    Load: Load,
+    Chart: Chart
   };
 
   return Spyral$1;
 
 }(Highcharts));
-//# sourceMappingURL=spyral.js.map
