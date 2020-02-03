@@ -20,6 +20,9 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	height: 130,
 	border: false,
+
+	EMPTY_RESULTS_TEXT: ' ', // text to use when clearing results, prior to running code
+
 	constructor: function(config) {
 
 		this.results = Ext.create('Ext.Component', {
@@ -260,7 +263,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	_run: function() {
 		
 		this.results.show(); // make sure it's visible 
-		this.results.update(' '); // clear out the results
+		this.results.update(this.EMPTY_RESULTS_TEXT); // clear out the results
 		this.results.mask('working…'); // mask results
 		var code = this.editor.getValue();
 		Voyant.notebook.util.Show.TARGET = this.results.getEl(); // this is for output
@@ -284,18 +287,19 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			if (result.then && result.catch && result.finally) {
 				var me = this;
 				result.then(function(result) {
+					me.results.unmask();
 					if (result!==undefined) {
-						me.results.update(result);
+						me._showResult(result);
 					}
 				}).catch(function(err) {
+					me.results.unmask();
 					Voyant.notebook.util.Show.showError(err);
 				}).finally(function() {
-					me.results.unmask();
 					Ext.defer(function() {this.getTargetEl().fireEvent('resize')}, 50, me);
 				})
 			} else {
 				this.results.unmask();
-				this.results.update(result);
+				this._showResult(result);
 				this.getTargetEl().fireEvent('resize');
 			}
 		} else {
@@ -303,6 +307,13 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			this.getTargetEl().fireEvent('resize');
 		}
 		return result;
+	},
+
+	_showResult: function(result) {
+		// check for pre-existing content (such as from highcharts) and if it exists don't update
+		if (this.results.getEl().dom.innerHTML === this.EMPTY_RESULTS_TEXT) {
+			this.results.update(result);
+		}
 	},
 	
 	clearResults: function() {
