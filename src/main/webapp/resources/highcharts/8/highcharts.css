@@ -14,7 +14,7 @@
   line-height: normal;
   z-index: 0;
   /* #1072 */
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
   font-size: 12px;
 }
@@ -168,6 +168,10 @@
   fill-opacity: 0.85;
 }
 
+div.highcharts-tooltip {
+  filter: none;
+}
+
 .highcharts-selection-marker {
   fill: #335cad;
   fill-opacity: 0.25;
@@ -184,8 +188,20 @@
   stroke-width: 3;
 }
 
+.highcharts-point-inactive {
+  opacity: 0.2;
+  transition: opacity 50ms;
+  /* quick in */
+}
+
+.highcharts-series-inactive {
+  opacity: 0.2;
+  transition: opacity 50ms;
+  /* quick in */
+}
+
 .highcharts-state-hover path {
-  transition: stroke-width 50;
+  transition: stroke-width 50ms;
   /* quick in */
 }
 
@@ -302,7 +318,8 @@ g.highcharts-series,
   stroke-width: 0;
 }
 
-.highcharts-series:not(.highcharts-pie-series) .highcharts-point-select {
+.highcharts-series:not(.highcharts-pie-series) .highcharts-point-select,
+.highcharts-markers .highcharts-point-select {
   fill: #cccccc;
   stroke: #000000;
 }
@@ -392,13 +409,28 @@ g.highcharts-series,
   fill-opacity: 0.75;
 }
 
+.highcharts-vector-series .highcharts-point {
+  fill: none;
+  stroke-width: 2px;
+}
+
+.highcharts-windbarb-series .highcharts-point {
+  fill: none;
+  stroke-width: 2px;
+}
+
+/* Dumbbell/lollipop connector */
+.highcharts-lollipop-stem {
+  stroke: #000000;
+}
+
 /* Legend */
 .highcharts-legend-box {
   fill: none;
   stroke-width: 0;
 }
 
-.highcharts-legend-item text {
+.highcharts-legend-item > text {
   fill: #333333;
   font-weight: bold;
   font-size: 1em;
@@ -425,9 +457,28 @@ g.highcharts-series,
   fill: #cccccc;
 }
 
+circle.highcharts-legend-nav-active, circle.highcharts-legend-nav-inactive {
+  /* tracker */
+  fill: rgba(192, 192, 192, 0.0001);
+}
+
 .highcharts-legend-title-box {
   fill: none;
   stroke-width: 0;
+}
+
+/* Bubble legend */
+.highcharts-bubble-legend-symbol {
+  stroke-width: 2;
+  fill-opacity: 0.5;
+}
+
+.highcharts-bubble-legend-connectors {
+  stroke-width: 1;
+}
+
+.highcharts-bubble-legend-labels {
+  fill: #333333;
 }
 
 /* Loading */
@@ -514,6 +565,17 @@ g.highcharts-series,
 .highcharts-sankey-series .highcharts-point-hover.highcharts-link {
   transition: fill 50ms, fill-opacity 50ms;
   fill-opacity: 1;
+}
+
+.highcharts-venn-series .highcharts-point {
+  fill-opacity: 0.75;
+  stroke: #cccccc;
+  transition: stroke 250ms, fill-opacity 250ms;
+}
+
+.highcharts-venn-series .highcharts-point-hover {
+  fill-opacity: 1;
+  stroke: #cccccc;
 }
 
 /* Highstock */
@@ -844,4 +906,21 @@ text.highcharts-drilldown-data-label,
 
 .highcharts-annotation-label text {
   fill: #e6e6e6;
+}
+
+/* Gantt */
+.highcharts-treegrid-node-collapsed, .highcharts-treegrid-node-expanded {
+  cursor: pointer;
+}
+
+.highcharts-point-connecting-path {
+  fill: none;
+}
+
+.highcharts-grid-axis .highcharts-tick {
+  stroke-width: 1px;
+}
+
+.highcharts-grid-axis .highcharts-axis-line {
+  stroke-width: 1px;
 }

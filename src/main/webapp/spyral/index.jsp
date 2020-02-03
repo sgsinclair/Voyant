@@ -9,8 +9,8 @@ if (request.getServletPath().equals("/spiral")) {
 } %><%@ include file="../../resources/jsp/pre_app.jsp" %>
 
 <!-- highcharts -->	
-<script type="text/javascript" src="<%=base %>/resources/highcharts/highcharts.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/highcharts/highcharts.css" />
+<script type="text/javascript" src="<%=base %>/resources/highcharts/8/highcharts.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/highcharts/8/highcharts.css" />
 
 <script src="<%= base %>/resources/octokit/octokit-rest.js"></script>
 
