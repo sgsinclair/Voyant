@@ -376,10 +376,12 @@ Ext.define('Voyant.panel.CorpusCreator', {
 //    			width: 500,
     			layout: 'fit',
     			bodyPadding: 10,
+    			anchor: '100% 100%',
+//    			shrinkWrap: 3,
     			items: [{
     				xtype: 'form',
     				defaultType: 'textfield',
-        			maxHeight: me.getApplication().getViewport().getHeight()-300,
+        			maxHeight: me.getApplication().getViewport().getHeight()-120,
         			scrollable: true,
     				fieldDefaults: {
     					labelAlign: 'right',
@@ -773,7 +775,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     			}]
     		});
     	}
-    	me.optionsWin.show();
+    	me.optionsWin.showAt((me.getApplication().getViewport().getWidth()/2)-200,10);
     },
     
     validatePositiveNumbersCsv: function(val) {

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Feb 01 16:38:22 EST 2020 */
+/* This file created by JSCacher. Last modified: Mon Feb 10 16:56:13 EST 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6977,22 +6977,26 @@ var canvasSurface = this.down('draw') || this.down('chart');
 	},
 	exportBiblio: function() {
 		var date = new Date();
+		var url = this.getExportUrl()
 		Ext.Msg.show({
 		    title: this.localize('exportBiblioTitle'),
 		    message: '<fieldset><legend>MLA</legend>'+
-	    	'Sinclair, Stéfan and Geoffrey Rockwell. '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'." ')+
-	    	'<i>Voyant Tools</i>. '+Ext.Date.format(date,'Y')+'. Web. '+Ext.Date.format(date,'j M Y')+'. &lt;http://voyant-tools.org&gt;.</fieldset>'+
+		    // we can't seem to make the contents of an element unselectable, I wonder if an event isn't being fired and cancelling the usual behaviour
+	    	'<div unselectable="" style="user-select: all; -moz-user-select:all; -webkit-user-select:all;">Sinclair, Stéfan and Geoffrey Rockwell. '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'." ')+
+	    	'<i>Voyant Tools</i>. '+Ext.Date.format(date,'Y')+'. Web. '+Ext.Date.format(date,'j M Y')+'. &lt;'+url+'&gt;.</div></fieldset>'+
 	    	'<br >'+
 	    	'<fieldset><legend>Chicago</legend>'+
-	    	'Stéfan Sinclair and Geoffrey Rockwell, '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'", ')+
-	    	'<i>Voyant Tools</i>, accessed '+Ext.Date.format(date,'F j, Y')+', http://voyant-tools.org.</fieldset>'+
+	    	'<div>Stéfan Sinclair and Geoffrey Rockwell, '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'", ')+
+	    	'<i>Voyant Tools</i>, accessed '+Ext.Date.format(date,'F j, Y')+', '+url+'.</div></fieldset>'+
 	    	'<br >'+
 	    	'<fieldset><legend>APA</legend>'+
-	    	'Sinclair, S. &amp; G. Rockwell. ('+Ext.Date.format(date,'Y')+"). "+(this.isXType('voyantheader') ? '' : this.localize('title')+'. ')+
-	    	'<i>Voyant Tools</i>. Retrieved '+Ext.Date.format(date,'F j, Y')+', from http://voyant-tools.org</fieldset>',
+	    	'<div>Sinclair, S. &amp; G. Rockwell. ('+Ext.Date.format(date,'Y')+"). "+(this.isXType('voyantheader') ? '' : this.localize('title')+'. ')+
+	    	'<i>Voyant Tools</i>. Retrieved '+Ext.Date.format(date,'F j, Y')+', from '+url+'</div></fieldset>',
 		    buttons: Ext.Msg.OK,
 		    icon: Ext.Msg.INFO
-		});
+		}, function(a,b,c,d) {
+			debugger
+		})
 	},
 	exportSpyral: function() {
 		let toolForUrl = Ext.getClassName(this).split(".").pop();
@@ -19093,10 +19097,12 @@ Ext.define('Voyant.panel.CorpusCreator', {
 //    			width: 500,
     			layout: 'fit',
     			bodyPadding: 10,
+    			anchor: '100% 100%',
+//    			shrinkWrap: 3,
     			items: [{
     				xtype: 'form',
     				defaultType: 'textfield',
-        			maxHeight: me.getApplication().getViewport().getHeight()-300,
+        			maxHeight: me.getApplication().getViewport().getHeight()-120,
         			scrollable: true,
     				fieldDefaults: {
     					labelAlign: 'right',
@@ -19490,7 +19496,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
     			}]
     		});
     	}
-    	me.optionsWin.show();
+    	me.optionsWin.showAt((me.getApplication().getViewport().getWidth()/2)-200,10);
     },
     
     validatePositiveNumbersCsv: function(val) {
@@ -34843,6 +34849,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		boxready: function() {
 			var me = this;
 			var editor = ace.edit(Ext.getDom(this.getEl()));
+			
 			editor.$blockScrolling = Infinity;
 			editor.getSession().setUseWorker(true);
 			editor.setTheme(this.getTheme());
@@ -34856,34 +34863,36 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			editor.setHighlightActiveLine(false);
 			editor.renderer.setShowPrintMargin(false);
 			editor.renderer.setShowGutter(false);
+			
 			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
 			editor.clearSelection();
+
 		    editor.on("focus", function() {
 				setTimeout(function() {
 					me.getEditor().renderer.setShowGutter(true);
 				}, 100); // slight delay to avoid selecting a range of text, caused by showing the gutter while mouse is still pressed
 		    }, this);
 		    editor.on("change", function(ev, editor) {
-		    		var lines = editor.getSession().getScreenLength();
-		    		if (lines!=me.getLines()) {
-		    			me.up('notebookcodeeditorwrapper').setSize({height: lines*editor.renderer.lineHeight+editor.renderer.scrollBar.getWidth()})
-		    			me.setLines(lines);
-		    		}
-			    	if (me.getIsChangeRegistered()==false) {
-			    		me.setIsChangeRegistered(true);
-				    	var wrapper = me.up('notebookcodeeditorwrapper');
-				    	if (wrapper) {
-				    		wrapper.setIsRun(false);
-				    		var notebook = wrapper.up("notebook");
-				    		if (notebook) {notebook.setIsEdited(true);}
-				    	}
-			    	} else {
-			    		if (!me.getEditedTimeout()) { // no timeout, so set it to 30 seconds
-							me.setEditedTimeout(setTimeout(function() {
-								me.setIsChangeRegistered(false);
-							}, 30000));
-			    		}
-			    	}
+				var lines = editor.getSession().getScreenLength();
+				if (lines!=me.getLines()) {
+					me.up('notebookcodeeditorwrapper').setSize({height: lines*editor.renderer.lineHeight+editor.renderer.scrollBar.getWidth()})
+					me.setLines(lines);
+				}
+				if (me.getIsChangeRegistered()==false) {
+					me.setIsChangeRegistered(true);
+					var wrapper = me.up('notebookcodeeditorwrapper');
+					if (wrapper) {
+						wrapper.setIsRun(false);
+						var notebook = wrapper.up("notebook");
+						if (notebook) {notebook.setIsEdited(true);}
+					}
+				} else {
+					if (!me.getEditedTimeout()) { // no timeout, so set it to 30 seconds
+						me.setEditedTimeout(setTimeout(function() {
+							me.setIsChangeRegistered(false);
+						}, 30000));
+					}
+				}
 		    }, this);
 		    editor.on("blur", function() {
 		    	me.getEditor().renderer.setShowGutter(false);
@@ -34909,7 +34918,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 					 */
 					enableTern: {
 						/* http://ternjs.net/doc/manual.html#option_defs */
-						defs: me.docs ? [me.docs] : ['ecma5'],
+						defs: me.docs ? ['browser', 'ecma5', me.docs] : ['ecma5', 'browser'],
 						plugins: {
 							doc_comment: {
 								fullDocs: true
@@ -34977,6 +34986,9 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	height: 130,
 	border: false,
+
+	EMPTY_RESULTS_TEXT: ' ', // text to use when clearing results, prior to running code
+
 	constructor: function(config) {
 
 		this.results = Ext.create('Ext.Component', {
@@ -35217,7 +35229,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	_run: function() {
 		
 		this.results.show(); // make sure it's visible 
-		this.results.update(' '); // clear out the results
+		this.results.update(this.EMPTY_RESULTS_TEXT); // clear out the results
 		this.results.mask('working…'); // mask results
 		var code = this.editor.getValue();
 		Voyant.notebook.util.Show.TARGET = this.results.getEl(); // this is for output
@@ -35241,18 +35253,19 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			if (result.then && result.catch && result.finally) {
 				var me = this;
 				result.then(function(result) {
+					me.results.unmask();
 					if (result!==undefined) {
-						me.results.update(result);
+						me._showResult(result);
 					}
 				}).catch(function(err) {
+					me.results.unmask();
 					Voyant.notebook.util.Show.showError(err);
 				}).finally(function() {
-					me.results.unmask();
 					Ext.defer(function() {this.getTargetEl().fireEvent('resize')}, 50, me);
 				})
 			} else {
 				this.results.unmask();
-				this.results.update(result);
+				this._showResult(result);
 				this.getTargetEl().fireEvent('resize');
 			}
 		} else {
@@ -35260,6 +35273,13 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			this.getTargetEl().fireEvent('resize');
 		}
 		return result;
+	},
+
+	_showResult: function(result) {
+		// check for pre-existing content (such as from highcharts) and if it exists don't update
+		if (this.results.getEl().dom.innerHTML === this.EMPTY_RESULTS_TEXT) {
+			this.results.update(result);
+		}
 	},
 	
 	clearResults: function() {
@@ -35335,7 +35355,7 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 		    ],
 		    
 		    extraPlugins: 'stopediting,sourcedialog,justify,colorbutton,inserthtml4x',
-//		    removePlugins: 'iframe',
+//		    removePlugins: 'iframe', // why was this added?
 			allowedContent: true,
 			toolbarCanCollapse: true,
 			startupFocus: true
@@ -37652,6 +37672,10 @@ Ext.define('Voyant.VoyantApp', {
         
         var extjs = Ext.create('Ext.chart.theme.Base').getColors().map(function(val) { return this.hexToRgb(val); }, this);
         this.addColorPalette('extjs', extjs);
+    },
+    getBaseUrl: function() {
+    	var baseUrl = this.callParent();
+    	return baseUrl.indexOf("//")==0 ? location.protocol+baseUrl : baseUrl;
     },
     
     getBaseUrlFull: function() {
