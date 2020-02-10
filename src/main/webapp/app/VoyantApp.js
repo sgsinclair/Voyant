@@ -52,6 +52,10 @@ Ext.define('Voyant.VoyantApp', {
         var extjs = Ext.create('Ext.chart.theme.Base').getColors().map(function(val) { return this.hexToRgb(val); }, this);
         this.addColorPalette('extjs', extjs);
     },
+    getBaseUrl: function() {
+    	var baseUrl = this.callParent();
+    	return baseUrl.indexOf("//")==0 ? location.protocol+baseUrl : baseUrl;
+    },
     
     getBaseUrlFull: function() {
     	return window.location.origin+this.getBaseUrl(); // maybe doesn't work in all browsers?
