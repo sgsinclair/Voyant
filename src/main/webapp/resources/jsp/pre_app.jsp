@@ -61,28 +61,6 @@
 
 <link rel="shortcut icon" type="image/ico" href="<%= base %>/resources/voyant/favicon.ico" />
 
-<!-- EXTJS CLASSIC -->
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/ext-all<%= rtl %>.js"></script>
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/charts.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/charts-all<%= rtl %>.css" />
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/theme-crisp/theme-crisp.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/theme-crisp-all<%= rtl %>_1.css" />
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/theme-crisp-all<%= rtl %>_2.css" />
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/ux.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/ux-all<%= rtl %>-debug.css" />
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/examples/style.css" />
-
-<!-- EXTJS MODERN -->
-<!--
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/ext-modern-all.js"></script>
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/charts.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0-modern/charts-all<%= rtl %>.css" />
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/theme-material/theme-material.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0-modern/theme-material/resources/theme-material-all<%= rtl %>.css" />
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/ux.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0-modern/ux-all<%= rtl %>-debug.css" />
--->
-
 <!-- jQuery -->
 <script type="text/javascript" src="<%= base %>/resources/jquery/current/jquery.min.js"></script>
 <script type="text/javascript" src="<%= base %>/resources/jquery/current/jquery-ui.min.js"></script>
@@ -101,21 +79,13 @@
 <!-- ACE Editor (used by Spyral and the widget.codeeditor -->
 <script src="<%= base %>/resources/ace/1.4.7/src-noconflict/ace.js"></script>
 
-<!-- FontAwesome -->
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/fontawesome/4.4.0/font-awesome-all<%= rtl %>.css" />
-
 <!-- spectrum -->
 <script type="text/javascript" src="<%=base %>/resources/spectrum/spectrum.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/spectrum/spectrum.css" />
 
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/css/styles.css" />
 
-<!-- highcharts -->
-<!-- 
-<script type="text/javascript" src="<%=base %>/resources/highcharts/Highcharts-6.1.0/code/highcharts.js"></script>
-<script type="text/javascript" src="<%=base %>/resources/highcharts/Highcharts-6.1.0/code/modules/drilldown.js"></script>
-<script type="text/javascript" src="<%=base %>/resources/highcharts/custom-events/customEvents.min.js"></script>
- -->
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/extjs7/build/production/Voyant/desktop/resources/Voyant-all.css" />
  
 <%
 	// check to see if there's CSS in the URL
@@ -132,8 +102,7 @@
 	<% } 
 } %>
 
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant<%= (request.getParameter("debug")!=null ? ".jsp?debug=true" : ".min.js") %>"></script>
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale-<%= lang %>.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/extjs7/build/production/Voyant/generatedFiles/desktop/app.js"></script>
 
 <% // ridiculous hack for Safari 11 that seems to hide fieldsets, tested with desktop and iPad
 	// https://www.sencha.com/forum/showthread.php?423768&p=1282921&viewfull=1#post1282921

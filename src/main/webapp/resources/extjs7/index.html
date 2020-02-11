@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html manifest="">
+<head><base href="/">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10, user-scalable=yes">
+	<title>Voyant</title>
+
+  <script type="text/javascript">
+    var Ext = Ext || {};
+    Ext.beforeLoad = function (tags) {
+      var profile;
+      profile = 'desktop';
+      Ext.manifest ='generatedFiles/' + profile;
+    };
+  </script>
+
+  <!-- The line below must be kept intact for Sencha Cmd to build your application -->
+  <script id="microloader" data-app="2f2a6c40-6ccf-413d-b065-2ec87977cdae" type="text/javascript" src="generatedFiles/bootstrap.js"></script>
+</head>
+  <body></body>
+</html>

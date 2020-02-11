@@ -1,0 +1,57 @@
+{
+  "name": "voyant",
+  "product": "ext",
+  "version": "0.0.1",
+  "description": "my-ext-gen-app description for Ext JS app MyExtGenApp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/"
+  },
+  "keywords": [
+    "Ext",
+    "JS",
+    "Sencha",
+    "HTML5"
+  ],
+  "author": "Sencha, Inc.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/"
+  },
+  "homepage": "http://www.sencha.com",
+  "scripts": {
+    "start": "npm run dev:desktop",
+    "clean": "rimraf build",
+    "dev:desktop": "webpack-dev-server --env.profile=desktop --env.browser=yes --env.verbose=no",
+    "build:desktop": "npm run clean && cross-env webpack --env.profile=desktop --env.environment=production --env.treeshake=yes",
+    "watch:dev": "webpack --env.profile=desktop --env.browser=no --env.watch=yes --env.environment=development",
+    "watch:prod": "webpack --env.profile=desktop --env.browser=no --env.watch=yes --env.environment=production",
+    "build:dev": "webpack --env.profile=desktop --env.browser=no --env.watch=no --env.environment=development",
+    "build:prod": "webpack --env.profile=desktop --env.browser=no --env.watch=no --env.environment=production",
+    "build": "sencha app build --clean --production"
+  },
+  "dependencies": {
+    "@sencha/ext-modern": "~7.0.0",
+    "@sencha/ext-modern-theme-material": "~7.0.0",
+    "@sencha/ext": "~7.0.0"
+  },
+  "devDependencies": {
+    "@sencha/ext-webpack-plugin": "~7.0.1",
+    "html-webpack-plugin": "^3.2.0",
+    "base-href-webpack-plugin": "~2.0.0",
+    "cross-env": "^5.2.0",
+    "portfinder": "^1.0.21",
+    "webpack": "~4.39.2",
+    "webpack-cli": "~3.3.6",
+    "webpack-dev-server": "~3.8.0",
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "@babel/plugin-transform-async-to-generator": "^7.5.0",
+    "@babel/plugin-transform-regenerator": "^7.4.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-plugin-add-module-exports": "^1.0.2",
+    "babel-loader": "^8.0.6",
+    "lodash.find": "^4.6.0"
+  }
+}

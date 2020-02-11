@@ -1,0 +1,137 @@
+{
+  "name": "Voyant",
+  "namespace": "Voyant",
+  "version": "1.0.0.0",
+  "framework": "ext",
+  "template": "moderndesktopminimal",
+  "indexHtmlPath": "index.html",
+  "requires": [
+    "font-awesome"
+  ],
+
+  "builds": {
+    "desktop": {
+      "toolkit": "modern",
+      "theme": "theme-material",
+      "sass": {
+        "generated": {
+          "var": "${build.id}/sass/save.scss",
+          "src": "${build.id}/sass/save"
+        }
+      }
+    }
+  },
+
+  "classpath": ["app/${build.id}/src"],
+  "overrides": ["app/${build.id}/overrides"],
+
+  "sass": {
+    "namespace": "Voyant",
+    "etc": [
+      "sass/etc/all.scss"
+    ],
+    "var": [
+      "app/${build.id}/sass/var.scss"
+    ],
+    "src": [
+      "app/${build.id}/sass/src.scss"
+    ]
+  },
+
+  "resources": [
+    { "path": "resources/${build.id}" }
+  ],
+
+  "output": {
+    "base": "${workspace.build.dir}/${build.environment}/${app.name}",
+    "page": {
+      "path": "index.html",
+      "enable": false
+    },
+    "manifest": "generatedFiles/${build.id}.json",
+    "js": "generatedFiles/${build.id}/app.js",
+    "appCache": {"enable": false},
+    "resources": {
+      "path": "${build.id}/resources",
+      "shared": "resources"
+    }
+  },
+  
+  "fashion": {
+   "missingParameters": "error",
+    "inliner": {"enable": false}
+  },
+
+  "js": [
+    {
+      "path": "app.js",
+      "bundle": true
+    }
+  ],
+
+  "classic": {"js": []},
+  "modern": {"js": []},
+
+  "css": [
+    {
+      "path": "${build.out.css.path}",
+      "bundle": true,
+      "exclude": ["fashion"]
+    }
+  ],
+
+  "loader": {
+    "cache": false,
+    "cacheParam": "_dc"
+  },
+
+  "production": {
+    "output": {
+      "appCache": {
+        "enable": true,
+        "path": "cache.appcache"
+      }
+    },
+    "loader": {
+      "cache": "${build.timestamp}"
+    },
+    "cache": {
+      "enable": true
+    },
+    "compressor": {
+      "type": "yui"
+    }
+  },
+
+  "testing": {},
+
+  "development": {
+    "watch": {
+      "delay": 250
+    }
+  },
+
+  "bootstrap": {
+    "base": "${app.dir}/generatedFiles",
+    "manifest": "${build.id}.json",
+    "microloader": "bootstrap.js",
+    "css": "bootstrap.css"
+  },
+
+  "cache": {
+      "enable": false,
+      "deltas": "${build.id}/deltas"
+  },
+
+  "appCache": {
+    "cache": ["index.html"],
+    "network": ["*"],
+    "fallback": []
+  },
+
+
+  "archivePath": "archive/${build.id}",
+
+  "ignore": ["(^|/)CVS(/?$|/.*?$)"],
+  "id": "97703a48-9100-4e79-9de5-daaf6c061d96"
+}
