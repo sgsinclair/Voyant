@@ -592,21 +592,18 @@ var canvasSurface = this.down('draw') || this.down('chart');
 		Ext.Msg.show({
 		    title: this.localize('exportBiblioTitle'),
 		    message: '<fieldset><legend>MLA</legend>'+
-		    // we can't seem to make the contents of an element unselectable, I wonder if an event isn't being fired and cancelling the usual behaviour
-	    	'<div unselectable="" style="user-select: all; -moz-user-select:all; -webkit-user-select:all;">Sinclair, Stéfan and Geoffrey Rockwell. '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'." ')+
+	    	'<div class="x-selectable">Sinclair, Stéfan and Geoffrey Rockwell. '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'." ')+
 	    	'<i>Voyant Tools</i>. '+Ext.Date.format(date,'Y')+'. Web. '+Ext.Date.format(date,'j M Y')+'. &lt;'+url+'&gt;.</div></fieldset>'+
 	    	'<br >'+
 	    	'<fieldset><legend>Chicago</legend>'+
-	    	'<div>Stéfan Sinclair and Geoffrey Rockwell, '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'", ')+
+	    	'<div class="x-selectable">Stéfan Sinclair and Geoffrey Rockwell, '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'", ')+
 	    	'<i>Voyant Tools</i>, accessed '+Ext.Date.format(date,'F j, Y')+', '+url+'.</div></fieldset>'+
 	    	'<br >'+
 	    	'<fieldset><legend>APA</legend>'+
-	    	'<div>Sinclair, S. &amp; G. Rockwell. ('+Ext.Date.format(date,'Y')+"). "+(this.isXType('voyantheader') ? '' : this.localize('title')+'. ')+
+	    	'<div class="x-selectable">Sinclair, S. &amp; G. Rockwell. ('+Ext.Date.format(date,'Y')+"). "+(this.isXType('voyantheader') ? '' : this.localize('title')+'. ')+
 	    	'<i>Voyant Tools</i>. Retrieved '+Ext.Date.format(date,'F j, Y')+', from '+url+'</div></fieldset>',
 		    buttons: Ext.Msg.OK,
 		    icon: Ext.Msg.INFO
-		}, function(a,b,c,d) {
-			debugger
 		})
 	},
 	exportSpyral: function() {
