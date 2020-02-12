@@ -215,7 +215,7 @@ Ext.define('Voyant.panel.Contexts', {
 	           	 },
                  afterrender: function(me) {
                 	 me.getView().on('expandbody', function( rowNode, record, expandRow, eOpts ) {
-                		 if (expandRow.innerText==="" || (eOpts && eOpts.force)) {
+                		 if (expandRow.textContent==="" || (eOpts && eOpts.force)) {
                 	            var store = Ext.create("Voyant.data.store.Contexts", {
                 	            	stripTags: "all",
                 	            	corpus: me.getStore().getCorpus()

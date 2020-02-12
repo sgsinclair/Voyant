@@ -128,7 +128,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 listeners: {
                     // TODO widget disappears when scrolled off screen
                     expandbody: function(rowNode, record, expandRow, eOpts) {
-                        if (expandRow.innerText==='' || (eOpts && eOpts.force)) {
+                        if (expandRow.textContent==='' || (eOpts && eOpts.force)) {
                             Ext.create('Voyant.widget.CorpusTermSummary', {
                                 record: record,
                                 header: false,
