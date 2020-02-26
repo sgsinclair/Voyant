@@ -4,9 +4,10 @@
   "version": "1.0.0.0",
   "framework": "ext",
   "template": "moderndesktopminimal",
-  "indexHtmlPath": "index.html",
+  "indexHtmlPath": "../index.html",
   "requires": [
-    "font-awesome"
+    "font-awesome",
+    "charts"
   ],
 
   "builds": {
@@ -22,7 +23,7 @@
     }
   },
 
-  "classpath": ["app/${build.id}/src"],
+  "classpath": ["../app"],
   "overrides": ["app/${build.id}/overrides"],
 
   "sass": {
@@ -45,7 +46,7 @@
   "output": {
     "base": "${workspace.build.dir}/${build.environment}/${app.name}",
     "page": {
-      "path": "index.html",
+      "path": "../index.html",
       "enable": false
     },
     "manifest": "generatedFiles/${build.id}.json",
@@ -112,7 +113,7 @@
   },
 
   "bootstrap": {
-    "base": "${app.dir}/generatedFiles",
+    "base": "${workspace.build.dir}/${build.environment}/${app.name}/generatedFiles",
     "manifest": "${build.id}.json",
     "microloader": "bootstrap.js",
     "css": "bootstrap.css"

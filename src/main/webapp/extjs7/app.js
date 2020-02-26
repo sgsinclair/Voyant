@@ -1,4 +1,4 @@
 Ext.application({
-  extend: 'Voyant.Application',
+  extend: 'Voyant.VoyantApp',
   name: 'Voyant'
 })

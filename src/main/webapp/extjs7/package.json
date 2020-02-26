@@ -28,12 +28,14 @@
     "watch:prod": "webpack --env.profile=desktop --env.browser=no --env.watch=yes --env.environment=production",
     "build:dev": "webpack --env.profile=desktop --env.browser=no --env.watch=no --env.environment=development",
     "build:prod": "webpack --env.profile=desktop --env.browser=no --env.watch=no --env.environment=production",
-    "build": "sencha app build --clean --production"
+    "build": "sencha app build --clean --production",
+    "builddev": "sencha app build --clean --development"
   },
   "dependencies": {
+    "@sencha/ext": "~7.0.0",
+    "@sencha/ext-charts": "~7.0.0",
     "@sencha/ext-modern": "~7.0.0",
-    "@sencha/ext-modern-theme-material": "~7.0.0",
-    "@sencha/ext": "~7.0.0"
+    "@sencha/ext-modern-theme-material": "~7.0.0"
   },
   "devDependencies": {
     "@sencha/ext-webpack-plugin": "~7.0.1",

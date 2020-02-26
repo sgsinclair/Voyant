@@ -85,7 +85,7 @@
 
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/css/styles.css" />
 
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/extjs7/build/production/Voyant/desktop/resources/Voyant-all.css" />
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/7/production/Voyant/desktop/resources/Voyant-all.css" />
  
 <%
 	// check to see if there's CSS in the URL
@@ -102,7 +102,22 @@
 	<% } 
 } %>
 
-<script type="text/javascript" src="<%= base %>/resources/extjs7/build/production/Voyant/generatedFiles/desktop/app.js"></script>
+<!--
+<script type="text/javascript" src="<%= base %>/resources/ext/7/production/Voyant/generatedFiles/desktop/app.js"></script>
+-->
+
+
+<script type="text/javascript">
+    var Ext = Ext || {};
+    Ext.beforeLoad = function (tags) {
+      var profile;
+      profile = 'desktop';
+      Ext.manifest ='<%= base %>/resources/ext/7/development/Voyant/generatedFiles/' + profile;
+    };
+  </script>
+
+<script id="microloader" data-app="2f2a6c40-6ccf-413d-b065-2ec87977cdae" type="text/javascript" src="<%= base %>/resources/ext/7/development/Voyant/generatedFiles/bootstrap.js"></script>
+
 
 <% // ridiculous hack for Safari 11 that seems to hide fieldsets, tested with desktop and iPad
 	// https://www.sencha.com/forum/showthread.php?423768&p=1282921&viewfull=1#post1282921
