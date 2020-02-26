@@ -64,7 +64,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 			xtype = 'corpusset'; // switch to default view
 		}
 		var SPLIT_SIZE = 5;
-		this.viewport = Ext.create('Ext.container.Viewport', {
+		this.viewport = Ext.Viewport.add({
 		    layout: 'border',
 		    rtl: (this.getApiParam('rtl')!==undefined || Voyant.util.Localization.LANGUAGE=="ar" || Voyant.util.Localization.LANGUAGE=="he"),
 		    items: [{

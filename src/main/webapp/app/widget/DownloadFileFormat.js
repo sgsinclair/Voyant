@@ -1,5 +1,5 @@
 Ext.define('Voyant.widget.DownloadFileFormat', {
-    extend: 'Ext.form.CheckboxGroup', //'Ext.container.Container',
+    extend: 'Ext.field.CheckboxGroup', //'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.downloadfileformat',
 	statics: {

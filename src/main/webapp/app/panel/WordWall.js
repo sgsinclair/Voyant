@@ -4,9 +4,12 @@ Ext.define('Voyant.panel.WordWall', {
     alias: 'widget.wordwall',
     statics: {
         i18n: {
+            timing: 'Timing',
+            forces: 'Forces',
+            segment: 'Segment'
         },
         api: {
-            limit: 500,
+            limit: 150,
             stopList: 'auto'
         },
         glyph: 'xf1e0@FontAwesome'
@@ -14,24 +17,37 @@ Ext.define('Voyant.panel.WordWall', {
     
     config: {
         visId: undefined,
-        vis: undefined,
+        visParent: undefined,
+
+        // word wall
         simulation: undefined, // force layout
         nodes: undefined, // svg nodes
         tempNodes: undefined, // used to calculate text size and bounding boxes
         zoom: undefined,
+
+        // line and bar charts
+        lineX: undefined,
+        lineY: undefined,
+        chartLine: undefined,
+        barX: undefined,
+        barY: undefined,
+
+        docTermsStore: undefined,
+
+        currentTerm: undefined,
 
         terms: undefined,
         segments: undefined,
 
         filterOutUniqueTerms: true, // whether to remove terms that don't appear in all segments
 
-        currentSegment: undefined,
-        segmentTerms: undefined,
-        segmentTermsQueue: [],
+        currentSegment: undefined, // the current segment index
+        segmentTermsQueue: [], // stores the segment term positions, received from the web worker, then used to update term positions
 
         segmentDelay: 5000, // delay before displaying new segment data
         segmentDelayTimer: undefined,
         
+        // simulation: undefined, // for running the sim normally, i.e. not in a webworker
         webWorker: undefined,
         isSimulating: false, // are we running a webworker simulation?
         
@@ -41,7 +57,7 @@ Ext.define('Voyant.panel.WordWall', {
 
         minFreq: undefined,
         maxFreq: undefined,
-        letterDistribution: undefined,
+        letterDistribution: undefined, // used to arrange words alphabetically along the x axis
         
         frequencyScale: undefined,
 
@@ -63,7 +79,7 @@ Ext.define('Voyant.panel.WordWall', {
     MIN_SCALING: 1,
     MAX_SCALING: 20,
     
-    debugMsg: false,
+    debugMsg: true,
 
     constructor: function(config) {
         this.mixins['Voyant.util.DiacriticsRemover'].constructor.apply(this, arguments);
@@ -77,6 +93,16 @@ Ext.define('Voyant.panel.WordWall', {
     initComponent: function() {
         Ext.apply(this, {
             title: this.localize('title'),
+            layout: 'fit',
+            items: [{
+                itemId: 'wall',
+                xtype: 'container',
+                html: '<svg id="'+this.getVisId()+'"><g class="wordWall"/><g class="lineChart"/><g class="barChart"/></svg>'
+            }],
+            listeners: {
+                resize: this.handleResize,
+                scope: this
+            },
             dockedItems: [{
                 dock: 'bottom',
                 xtype: 'toolbar',
@@ -97,97 +123,124 @@ Ext.define('Voyant.panel.WordWall', {
                         },
                         scope: this
                     }
-                },this.localize('delay'),{
-                    width: 50,
-                    xtype: 'slider',
-                    minValue: 1,
-                    maxValue: 60,
-                    increment: 1,
-                    listeners: {
-                        render: function(slider) {
-                            slider.setValue(this.getSegmentDelay()/1000);
+                },{
+                    xtype: 'button',
+                    text: this.localize('timing'),
+                    menu: {
+                        width: 250,
+                        defaults: {
+                            labelAlign: 'right',
+                            labelWidth: 120
                         },
-                        changecomplete: function(slider, newValue) {
-                            this.setSegmentDelay(slider.getValue()*1000);
-                            this.restartSegmentTimer();
-                        },
-                        scope: this
+                        items: [{
+                            xtype: 'slider',
+                            fieldLabel: this.localize('delay'),
+                            minValue: 1,
+                            maxValue: 60,
+                            increment: 1,
+                            listeners: {
+                                render: function(slider) {
+                                    slider.setValue(this.getSegmentDelay()/1000);
+                                },
+                                changecomplete: function(slider, newValue) {
+                                    this.setSegmentDelay(slider.getValue()*1000);
+                                    this.restartSegmentTimer();
+                                },
+                                scope: this
+                            }
+                        },{
+                            xtype: 'slider',
+                            fieldLabel: this.localize('transition'),
+                            minValue: 100,
+                            maxValue: 5000,
+                            increment: 1,
+                            listeners: {
+                                render: function(slider) {
+                                    slider.setValue(this.getTransitionTime());
+                                },
+                                changecomplete: function(slider, newValue) {
+                                    this.setTransitionTime(slider.getValue());
+                                },
+                                scope: this
+                            }
+                        }]
                     }
-                },this.localize('transition'),{
-                    width: 50,
-                    xtype: 'slider',
-                    minValue: 100,
-                    maxValue: 5000,
-                    increment: 1,
-                    listeners: {
-                        render: function(slider) {
-                            slider.setValue(this.getTransitionTime());
+                },{
+                    xtype: 'button',
+                    text: this.localize('forces'),
+                    menu: {
+                        width: 250,
+                        defaults: {
+                            labelAlign: 'right',
+                            labelWidth: 120
                         },
-                        changecomplete: function(slider, newValue) {
-                            this.setTransitionTime(slider.getValue());
-                        },
-                        scope: this
+                        items: [{
+                            xtype: 'slider',
+                            fieldLabel: this.localize('xStrength'),
+                            minValue: 0,
+                            maxValue: 1000,
+                            increment: 10,
+                            listeners: {
+                                render: function(slider) {
+                                    slider.setValue(this.getXForceStrength()*1000);
+                                },
+                                changecomplete: function(slider, newValue) {
+                                    this.setXForceStrength(slider.getValue()/1000);
+                                },
+                                scope: this
+                            }
+                        },{
+                            xtype: 'slider',
+                            fieldLabel: this.localize('yStrength'),
+                            minValue: 0,
+                            maxValue: 1000,
+                            increment: 10,
+                            listeners: {
+                                render: function(slider) {
+                                    slider.setValue(this.getYForceStrength()*1000);
+                                },
+                                changecomplete: function(slider, newValue) {
+                                    this.setYForceStrength(slider.getValue()/1000);
+                                },
+                                scope: this
+                            }
+                        },{
+                            xtype: 'slider',
+                            fieldLabel: this.localize('chargeStrength'),
+                            minValue: -1000,
+                            maxValue: 1000,
+                            increment: 10,
+                            listeners: {
+                                render: function(slider) {
+                                    slider.setValue(this.getChargeStrength());
+                                },
+                                changecomplete: function(slider, newValue) {
+                                    this.setChargeStrength(slider.getValue());
+                                },
+                                scope: this
+                            }
+                        },{
+                            xtype: 'slider',
+                            fieldLabel: this.localize('chargeDistance'),
+                            minValue: 0,
+                            maxValue: 1000,
+                            increment: 10,
+                            listeners: {
+                                render: function(slider) {
+                                    slider.setValue(this.getChargeDistance());
+                                },
+                                changecomplete: function(slider, newValue) {
+                                    this.setChargeDistance(slider.getValue());
+                                },
+                                scope: this
+                            }
+                        }]
                     }
-                },this.localize('xStrength'),{
-                    width: 50,
-                    xtype: 'slider',
-                    minValue: 0,
-                    maxValue: 1000,
-                    increment: 10,
-                    listeners: {
-                        render: function(slider) {
-                            slider.setValue(this.getXForceStrength()*1000);
-                        },
-                        changecomplete: function(slider, newValue) {
-                            this.setXForceStrength(slider.getValue()/1000);
-                        },
-                        scope: this
-                    }
-                },this.localize('yStrength'),{
-                    width: 50,
-                    xtype: 'slider',
-                    minValue: 0,
-                    maxValue: 1000,
-                    increment: 10,
-                    listeners: {
-                        render: function(slider) {
-                            slider.setValue(this.getYForceStrength()*1000);
-                        },
-                        changecomplete: function(slider, newValue) {
-                            this.setYForceStrength(slider.getValue()/1000);
-                        },
-                        scope: this
-                    }
-                },this.localize('chargeStrength'),{
-                    width: 50,
-                    xtype: 'slider',
-                    minValue: -1000,
-                    maxValue: 0,
-                    increment: 10,
-                    listeners: {
-                        render: function(slider) {
-                            slider.setValue(this.getChargeStrength());
-                        },
-                        changecomplete: function(slider, newValue) {
-                            this.setChargeStrength(slider.getValue());
-                        },
-                        scope: this
-                    }
-                },this.localize('chargeDistance'),{
-                    width: 50,
-                    xtype: 'slider',
-                    minValue: 0,
-                    maxValue: 1000,
-                    increment: 10,
-                    listeners: {
-                        render: function(slider) {
-                            slider.setValue(this.getChargeDistance());
-                        },
-                        changecomplete: function(slider, newValue) {
-                            this.setChargeDistance(slider.getValue());
-                        },
-                        scope: this
-                    }
+                },{
+                    xtype: 'progress',
+                    text: this.localize('segment'),
+                    itemId: 'segmentProgress',
+                    width: 100
                 },{
                     xtype: 'button',
                     text: this.localize('stop'),
@@ -209,43 +262,94 @@ Ext.define('Voyant.panel.WordWall', {
             }]
         });
         
+        this.on('boxready', function() {
+            this.initVis();
+            this.handleResize();
+        }, this);
+
         this.on('loadedCorpus', function(src, corpus) {
+            this.setDocTermsStore(corpus.getDocumentTerms({
+    			proxy: {
+	    			extraParams: {
+						withDistributions: true
+					}
+    			},
+				listeners: {
+	   		    	 load: function(store, records, successful, options) {
+                        // store the distributions for each
+	   		    		records.forEach(function(record) {
+                            var term = record.getTerm();
+                            var match = this.getTerms().find(function(t) { return t.term === term; });
+                            if (match.docFreqs === undefined) {
+                                match.docFreqs = [];
+                            }
+                            match.docFreqs[record.getDocIndex()] = record.getDistributions();
+                        }, this);
+
+                        this.getLineY().domain([
+                            d3.min(this.getTerms(), function(c) {
+                                return d3.min(c.docFreqs, function(d) {
+                                    return d3.min(d);
+                                });
+                            }),
+                            d3.max(this.getTerms(), function(c) {
+                                return d3.max(c.docFreqs, function(d) {
+                                    return d3.max(d);
+                                });
+                            })
+                        ]);
+
+                        // this.updateChartLines();
+	   				},
+	   				scope: this
+	   		     }
+            }));
+            
             if (this.isVisible()) {
                 this.initLoad();
             }
         }, this);
         
-        this.on('resize', function(panel, width, height) {
-            var vis = Ext.get(this.getVisId());
-            if (vis) {
-                var el = this.body;//this.getLayout().getRenderTarget();
-                var elHeight = el.getHeight();
-                var elWidth = el.getWidth();
-                
-                vis.el.dom.setAttribute('width', elWidth);
-                vis.el.dom.setAttribute('height', elHeight);
-//                this.getSimulation()
-//                    .force('x', d3.forceX(elWidth/2))
-//                    .force('y', d3.forceY(elHeight/2));
-            }
-        }, this);
-        
         this.callParent(arguments);
     },
-    
+
     initVis: function() {
-        var el = this.getLayout().getRenderTarget();
-        el.update('');
-        var width = el.getWidth();
-        var height = el.getHeight();
+        this.setVisParent(d3.select('#'+this.getVisId()));
 
-        var svg = d3.select(el.dom).append('svg').attr('id',this.getVisId()).attr('class', 'wordWall').attr('width', width).attr('height', height);
-        var g = svg.append('g');
-        this.setVis(g);
-        
+        this.setSimulation(
+            d3.forceSimulation()
+            .on('tick', function() {
+                this.getNodes().attr('transform', function(d) {
+                    var width = this.getVisWidth();
+                    var height = this.getVisHeight();
+                    // constrain to window
+                    d.x = Math.max(0, Math.min(width-d.bbox.width, d.x));
+                    d.y = Math.max(d.bbox.height*0.5, Math.min(height-d.bbox.height, d.y));
+                    
+                    return 'translate('+d.x+','+d.y+')';
+                }.bind(this))
+            }.bind(this))
+        );
+
+        var g = this.getVisParent().select('g.wordWall');
         this.setNodes(g.append('g').attr('class', 'nodes').selectAll('.node'));
-
         this.setTempNodes(g.append('g').attr('class', 'tempNodes').selectAll('text'));
+
+        this.setLineX(d3.scaleLinear());
+        this.setLineY(d3.scaleLinear());
+        this.setChartLine(
+            d3.line()
+                // .curve(d3.curveBasis)
+                .x(function(d, index) {
+                    return this.getLineX()(index);
+                }.bind(this))
+                .y(function(d, index) {
+                    return this.getLineY()(d);
+                }.bind(this))
+        );
+
+        this.setBarX(d3.scaleLinear());
+        this.setBarY(d3.scaleLinear());
 
         if (this.getWebWorker() === undefined) {
             this.setWebWorker(new Worker(this.getBaseUrl()+'resources/d3/WordWallWorker.js'));
@@ -254,8 +358,6 @@ Ext.define('Voyant.panel.WordWall', {
     },
 
     initLoad: function() {
-        this.initVis();
-        
         this.count = 0;
 
         var params = this.getApiParams();
@@ -266,7 +368,14 @@ Ext.define('Voyant.panel.WordWall', {
             params: params,
             success: function(response) {
                 var data = Ext.decode(response.responseText);
-                this.setSegments(data.corpusSegmentTerms.segments);
+                var segs = data.corpusSegmentTerms.segments.map(function(d, i) {
+                    return {
+                        index: d['start-docIndex'],
+                        count: d['end-position']-d['start-position']
+                    }
+                });
+                if (this.debugMsg) console.log(segs);
+                this.setSegments(segs);
 
                 var terms = data.corpusSegmentTerms.terms;
                 if (this.getFilterOutUniqueTerms()) {
@@ -275,9 +384,31 @@ Ext.define('Voyant.panel.WordWall', {
 
                 this.setTerms(terms);
                 
-                this.setCurrentSegment(this.getSegments().length);
-                this.getNextSegment();
+                var docIds = [];
+                this.getCorpus().getDocuments().each(function(doc) {
+                    docIds.push(doc.getId());
+                });
+                var query = terms.map(function(t) { return t.term; });
+                var bins = 10;
+                this.getDocTermsStore().load({params: {
+                    docId: docIds,
+                    query: query,
+                    widthDistributions: true,
+                    bins: bins,
+                    limit: docIds.length * query.length
+                }});
 
+                this.getLineX().domain([0, this.getSegments().length*bins]);
+                
+                this.getBarX().domain([0, this.getSegments().length]);
+                this.getBarY().domain([0, d3.max(this.getSegments(), function(d) { return d.count; })]);
+
+                // already done in handleResize
+                // this.updateChartBars();
+
+                this.handleResize();
+
+                this.getNextSegment();
                 this.restartSegmentTimer();
             },
             failure: function(response) {
@@ -287,23 +418,128 @@ Ext.define('Voyant.panel.WordWall', {
         })
     },
 
+    // show the chart line for the currentTerm
+    updateCurrentTerm: function(term) {
+        var chart = this.getVisParent().select('g.lineChart');
+        chart.selectAll('.termLine path')
+            .style('stroke', '#000')
+            .style('stroke-width', 1)
+            .style('stroke-opacity', 0);
+        
+        if (term !== undefined) {
+            var chartTerm = chart.selectAll('.termLine').filter(function(d) { return d.id === term.id; });
+            chartTerm.select('path')
+                .style('stroke', '#000')
+                .style('stroke-width', 1)
+                .style('stroke-opacity', 1);
+        }
+    },
+
+    updateChartLines: function() {
+        if (this.getTerms() !== undefined) {
+            var terms = this.getVisParent().select('g.lineChart').selectAll('.termLine')
+                .data(this.getTerms());
+            
+            var termsEnter = terms.enter()
+                .append('g')
+                    .attr('class', 'termLine')
+                    .append('path')
+                        .attr('class', function(d) { return 'line '+d.term; })
+                        .style('stroke', '#000')
+                        .style('stroke-width', 1)
+                        .style('stroke-opacity', 0)
+                        .style('fill', 'none');
+                    
+            var allTerms = termsEnter.merge(terms);
+
+            allTerms.select('path').attr('d', function(d) { return this.getChartLine()(d.docFreqs.reduce(function(a,b) { return a.concat(b); })); }.bind(this))
+            
+            terms.exit().remove(); // shouldn't be necessary
+        }
+    },
+
+    updateChartBars: function(docs) {
+        if (this.getSegments() !== undefined) {
+            var segs = this.getVisParent().select('g.barChart').selectAll('.docBar').data(this.getSegments());
+
+            var segsEnter = segs.enter()
+                .append('rect')
+                    .attr('class', 'docBar')
+                    .style('stroke', 'none')
+                    .style('fill', '#000')
+                    .style('fill-opacity', 0.1);
+
+            var allSegs = segsEnter.merge(segs);
+            
+            allSegs
+                .attr('x', function(d) { return this.getBarX()(d.index); }.bind(this))
+                .attr('y', function(d) { return this.getBarY()(d.count); }.bind(this))
+                .attr('width', function(d) {
+                    return this.getBarX()(d.index+1) - this.getBarX()(d.index);
+                }.bind(this))
+                .attr('height', function(d) {
+                    return this.getBarY()(0) - this.getBarY()(d.count);
+                }.bind(this));
+
+            segs.exit().remove();
+        }
+    },
+
+    handleResize: function() {
+        var parent = Ext.get(this.getVisId()).parent('.x-container');
+        var totalWidth = parent.getWidth();
+        var totalHeight = parent.getHeight();
+
+        var wallHeight = Math.round(totalHeight*0.85);
+        var lineHeight = totalHeight-wallHeight;
+
+        this.getVisParent().attr('width', totalWidth).attr('height', totalHeight);
+        this.getVisParent().select('g.wordWall').attr('width', totalWidth).attr('height', wallHeight);
+        this.getVisParent().select('g.lineChart').attr('width', totalWidth).attr('height', lineHeight).attr('transform', 'translate(0, '+wallHeight+')');
+        this.getVisParent().select('g.barChart').attr('width', totalWidth).attr('height', lineHeight).attr('transform', 'translate(0, '+wallHeight+')');
+
+        var paddingW = Math.min(15, totalWidth*0.1);
+        var paddingH = Math.min(15, lineHeight*0.1);
+        if (this.getLineX() !== undefined) this.getLineX().rangeRound([paddingW, totalWidth-paddingW]);
+        if (this.getLineY() !== undefined) this.getLineY().rangeRound([lineHeight-paddingH, paddingH]);
+        if (this.getBarX() !== undefined) this.getBarX().rangeRound([paddingW, totalWidth-paddingW]);
+        if (this.getBarY() !== undefined) this.getBarY().rangeRound([lineHeight-paddingH, paddingH]);
+        
+        // this.updateChartLines();
+        // this.updateChartBars();
+    },
+
+
+    /**
+     * word wall methods
+     */
+
     restartSegmentTimer: function() {
         clearInterval(this.getSegmentDelayTimer());
 
         this.setSegmentDelayTimer(setInterval(function() {
-            this.updateNodePositions();
+            this.getNextSegment();
         }.bind(this), this.getSegmentDelay()));
     },
 
     getNextSegment: function() {
         var index = this.getCurrentSegment();
-        index++;
-        if (index >= this.getSegments().length) {
+        if (index === undefined) {
             index = 0;
+        } else {
+            index++;
+            if (index >= this.getSegments().length) {
+                index = 0;
+            }
         }
         this.setCurrentSegment(index);
         if (this.debugMsg) console.log('getNextSegment', index);
-        this.processTermsForSegment(this.getCurrentSegment());
+    },
+
+    updateCurrentSegment: function(value) {
+        var progress = (value+1) / this.getSegments().length;
+        this.down('#segmentProgress').setValue(progress);
+        this.processTermsForSegment(value);
     },
 
     processTermsForSegment: function(segmentIndex) {
@@ -336,9 +572,9 @@ Ext.define('Voyant.panel.WordWall', {
             }
         }, this);
 
-        this.setSegmentTerms(this.getTerms().filter(function(d) {
+        var filteredTerms = this.getTerms().filter(function(d) {
             return d.value > 0;
-        }));
+        });
 
         this.setMinFreq(min);
         this.setMaxFreq(max);
@@ -356,8 +592,7 @@ Ext.define('Voyant.panel.WordWall', {
         });
         this.setLetterDistribution(letterDist);
 
-        this.calculateNodeSizes(this.getSegmentTerms());
-        this.runSimulation(this.getSegmentTerms());
+        this.restartSimulation(filteredTerms);
     },
 
     // determine each node's font size and bounding box and store them for later use
@@ -384,6 +619,7 @@ Ext.define('Voyant.panel.WordWall', {
             })
             .text(function(d) { return d.term; })
             .each(function(d) {
+                // store the values on the data object
                 var bbox = this.getBBox();
                 d.bbox = {};
                 d.bbox.x = bbox.x;
@@ -393,11 +629,10 @@ Ext.define('Voyant.panel.WordWall', {
 
                 bboxTotal += bbox.width*bbox.height;
             })
-            .remove();
+            .remove(); // remove the temp text element
 
-        var el = this.getLayout().getRenderTarget();
-        var width = el.getWidth();
-        var height = el.getHeight();
+        var width = this.getVisWidth();
+        var height = this.getVisHeight();
 
         // adapt font size to available space
         var availableSpace = width*height;
@@ -412,27 +647,141 @@ Ext.define('Voyant.panel.WordWall', {
         }
     },
 
-    runSimulation: function(terms) {
-        this.setIsSimulating(true);
+    // https://bl.ocks.org/mbostock/0adcc447925ffae87975a3a81628a196
+    restartSimulation: function(terms) {
+        this.calculateNodeSizes(terms);
+        
+        // starting positions
+        terms.forEach(function(d) {
+            if (d.x === undefined) {
+                d.x = this.getXPosition(d);
+                d.y = this.getYPosition(d);
+            }
+        }, this);
 
-        var el = this.getLayout().getRenderTarget();
-        var width = el.getWidth();
-        var height = el.getHeight();
+        var nodesUpdate = this.getNodes().data(terms, function(d) { return d.id; });
 
-        // pass all the info to the worker
-        if (this.debugMsg) console.time("runSim");
-        this.getWebWorker().postMessage({
-            terms: terms,
-            width: width,
-            height: height,
-            minFreq: this.getMinFreq(),
-            maxFreq: this.getMaxFreq(),
-            xForceStrength: this.getXForceStrength(),
-            yForceStrength: this.getYForceStrength(),
-            chargeDistance: this.getChargeDistance(),
-            chargeStrength: this.getChargeStrength(),
-            letterDistribution: this.getLetterDistribution()
-        });
+        nodesUpdate.exit().transition().duration(this.getTransitionTime()).attr('fill-opacity', 0).remove();
+
+        var nodesEnter = nodesUpdate.enter()
+            .append('g')
+                .attr('class', 'node')
+                .attr('id', function(d) { return d.id; })
+                .attr('transform', function(d) {
+                    console.log('adding', d.term)
+                    return 'translate('+d.x+','+d.y+')';
+                })
+                .attr('fill-opacity', 0);
+
+        nodesEnter.on('mouseover', function(d) {
+            this.setCurrentTerm(d);
+        }.bind(this));
+        nodesEnter.on('mouseout', function(d) {
+            this.setCurrentTerm(undefined);
+        }.bind(this));
+
+        nodesEnter
+            .append('title')
+                .text(function(d) { return d.title; });
+
+        nodesEnter
+            .append('text')
+                .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
+                .attr('font-size', function(d) { return d.fontSize; })
+                .attr('fill', function(d) { return this.getApplication().getFeatureForTerm('color', d.term); }.bind(this))
+                .style('cursor', 'pointer')
+                .style('user-select', 'none')
+                .attr('dominant-baseline', 'middle')
+                .text(function(d) { return d.term; })
+
+        nodesEnter.transition().duration(this.getTransitionTime()).attr('fill-opacity', 1);
+
+        var allNodes = nodesEnter.merge(nodesUpdate);
+
+        allNodes.select('text').transition().duration(this.getTransitionTime()).attr('font-size', function(d) { return d.fontSize; });
+
+        this.setNodes(allNodes);
+
+        this.getSimulation().nodes(terms);
+
+        this.setForcesForSimulation();
+    },
+
+    getVisWidth: function() {
+        return parseInt(this.getVisParent().attr('width'));
+    },
+
+    getVisHeight: function() {
+        return parseInt(this.getVisParent().attr('height'));
+    },
+
+    getXPosition: function(d) {
+        var width = this.getVisWidth();
+        var letterDistribution = this.getLetterDistribution();
+        var percentPosition = 0;
+        for (var i = 0, len = letterDistribution.length; i < len; i++) {
+            var letterData = letterDistribution[i];
+            if (letterData.letter === d.letter) {
+                percentPosition += letterData.percent/2;
+                break;
+            }
+            percentPosition += letterData.percent;
+        }
+
+        var val = width * percentPosition;
+        return val;
+    },
+
+    getYPosition: function(d) {
+        var height = this.getVisHeight();
+        var val = height*0.025 + Math.abs(this.getFrequencyScale()(d.value)-1)*(height*0.9);
+        return val;
+    },
+
+    setForcesForSimulation: function() {
+        var sim = this.getSimulation();
+        if (sim !== undefined) {
+            var minFreq = this.getMinFreq();
+            var maxFreq = this.getMaxFreq();
+            var xForceStrength = this.getXForceStrength();
+            var yForceStrength = this.getYForceStrength();
+            var chargeStrength = this.getChargeStrength();
+            var chargeDistance = this.getChargeDistance();
+
+            var that = this;
+            sim
+                .force('x',
+                    d3.forceX(function(d) {
+                        return that.getXPosition(d);
+                    })
+                    .strength(function(d) {
+                        return d3.scaleLinear().domain([minFreq, maxFreq]).range([xForceStrength, xForceStrength*0.1])(d.value);
+                    })
+                )
+                .force('y',
+                    d3.forceY(function(d) {
+                        return that.getYPosition(d);
+                    })
+                    .strength(function(d) {
+                        return d3.scaleLinear().domain([minFreq, maxFreq]).range([yForceStrength, yForceStrength*0.1])(d.value);
+                    })
+                )
+                .force('charge',
+                    d3.forceManyBody().strength(function(d) {
+                        return d3.scaleLinear().domain([minFreq, maxFreq]).range([chargeStrength, chargeStrength*10])(d.value);
+                    })
+                    .distanceMax(function(d) {
+                        return d3.scaleLinear().domain([minFreq, maxFreq]).range([chargeDistance, chargeDistance*3])(d.value);
+                    })
+                )
+                .force('collide',
+                    d3.bboxCollide(function(d) {
+                        return [[d.bbox.x, d.bbox.y], [d.bbox.x+d.bbox.width, d.bbox.y+d.bbox.height]];
+                    }).strength(1).iterations(1)
+                );
+
+            sim.alpha(1).restart();
+        }
     },
 
     handleWebWorkerMessage: function(event) {
@@ -450,6 +799,7 @@ Ext.define('Voyant.panel.WordWall', {
                 // TODO adjust segment delay if it's less than the runSim time
                 this.getDockedItems()[1].getComponent('status').update('');
                 this.setIsSimulating(false);
+                // add new term positions to the end of the queue
                 this.getSegmentTermsQueue().push(event.data.nodes);
                 break;
         }
@@ -491,6 +841,13 @@ Ext.define('Voyant.panel.WordWall', {
                     })
                     .attr('fill-opacity', 0);
 
+                nodeEnter.on('mouseover', function(d) {
+                    this.setCurrentTerm(d);
+                }.bind(this));
+                nodeEnter.on('mouseout', function(d) {
+                    this.setCurrentTerm(undefined);
+                }.bind(this));
+
                 nodeEnter.append('title').text(function(d) { return d.title; });
 
                 nodeEnter.append('text')
@@ -499,7 +856,7 @@ Ext.define('Voyant.panel.WordWall', {
                     .attr('fill', function(d) { return this.getApplication().getFeatureForTerm('color', d.term); }.bind(this))
                     .style('cursor', 'pointer')
                     .style('user-select', 'none')
-                    .attr('alignment-baseline', 'middle')
+                    .attr('dominant-baseline', 'middle')
                     .text(function(d) { return d.term; });
 
                 nodeEnter.transition().duration(this.getTransitionTime()).attr('fill-opacity', 1);
@@ -520,6 +877,22 @@ Ext.define('Voyant.panel.WordWall', {
         }
     },
 
+    updateXForceStrength: function() {
+        this.setForcesForSimulation();
+    },
+
+    updateYForceStrength: function() {
+        this.setForcesForSimulation();
+    },
+
+    updateChargeStrength: function() {
+        this.setForcesForSimulation();
+    },
+
+    updateChargeDistance: function() {
+        this.setForcesForSimulation();
+    },
+
     updateMinFreq: function() {
         this.setFrequencyScale(d3.scaleLog().domain([this.getMinFreq(), this.getMaxFreq()]).range([0, 1]));
     },
@@ -528,26 +901,7 @@ Ext.define('Voyant.panel.WordWall', {
         this.setFrequencyScale(d3.scaleLog().domain([this.getMinFreq(), this.getMaxFreq()]).range([0, 1]));
     },
 
-    zoomToFit: function(paddingPercent, transitionDuration) {
-    	var bounds = this.getVis().node().getBBox();
-    	var width = bounds.width;
-    	var height = bounds.height;
-    	var midX = bounds.x + width/2;
-    	var midY = bounds.y + height/2;
-    	var svg = this.getVis().node().parentElement;
-    	var fullWidth = svg.clientWidth;
-    	var fullHeight = svg.clientHeight;
-    	var scale = (paddingPercent || 0.8) / Math.max(width/fullWidth, height/fullHeight);
-    	var translate = [fullWidth/2 - scale*midX, fullHeight/2 - scale*midY];
- 
-    	d3.select(svg)
-    		.transition()
-    		.duration(transitionDuration || 500)
-    		.call(this.getZoom().transform, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale));
-    },
-    
     idGet: function(term) {
         return term.replace(/\W/g, '_');
     }
-    
 });

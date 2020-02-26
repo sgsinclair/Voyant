@@ -13,7 +13,7 @@
  * 		});
  */
 Ext.define('Voyant.panel.CorpusTerms', {
-	extend: 'Ext.grid.Panel',
+	extend: 'Ext.grid.Grid',
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.corpusterms',
     statics: {

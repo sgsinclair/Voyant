@@ -150,7 +150,7 @@ Ext.define('Voyant.widget.DocumentSelector', {
 });
 
 Ext.define('Voyant.widget.DocumentSelectorButton', {
-    extend: 'Ext.button.Button',
+    extend: 'Ext.Button',
     alias: 'widget.documentselectorbutton',
     mixins: ['Voyant.widget.DocumentSelector'],
     initComponent: function() {

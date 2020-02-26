@@ -91,7 +91,7 @@ Ext.define('Voyant.widget.VoyantTableTransform', {
  * A Grid which creates itself from an existing HTML table element.
  */
 Ext.define('Ext.ux.grid.TransformGrid', {
-    extend: 'Ext.grid.Panel',
+    extend: 'Ext.grid.Grid',
 
     /**
      * Creates the grid from HTML table element.

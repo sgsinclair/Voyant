@@ -1,5 +1,5 @@
 Ext.define('Voyant.widget.QuerySearchField', {
-    extend: 'Ext.form.field.Tag',
+    extend: 'Ext.field.ComboBox',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.querysearchfield',
 	statics: {

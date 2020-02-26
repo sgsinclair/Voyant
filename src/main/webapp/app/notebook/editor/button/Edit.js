@@ -1,5 +1,5 @@
 Ext.define("Voyant.notebook.editor.button.Edit", {
-	extend: "Ext.button.Button",
+	extend: "Ext.Button",
 	mixins: ["Voyant.util.Localization"],
 	alias: 'widget.notebookwrapperedit',
 	statics: {

@@ -59,7 +59,7 @@ Ext.define('Voyant.VoyantToolApp', {
 	        	scope: this
 	        }
 	    });
-		Ext.create('Ext.container.Viewport', {
+		Ext.Viewport.add({
 		    layout: 'border',
 		    items: items
 		});

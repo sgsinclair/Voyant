@@ -1,5 +1,5 @@
 Ext.define('Voyant.panel.Phrases', {
-	extend: 'Ext.grid.Panel',
+	extend: 'Ext.grid.Grid',
 	mixins: ['Voyant.panel.Panel'],
 	alias: 'widget.phrases',
 	isConsumptive: true,

@@ -1,5 +1,5 @@
 Ext.define('Voyant.widget.Facet', {
-	extend: 'Ext.grid.Panel',
+	extend: 'Ext.grid.Grid',
     mixins: ['Voyant.panel.Panel'],
     alias: 'widget.facet',
 	statics: {

@@ -1,5 +1,5 @@
 Ext.define("Voyant.notebook.editor.button.Movement", {
-	extend: "Ext.button.Button",
+	extend: "Ext.Button",
 	mixins: ["Voyant.util.Localization"],
 	requires: ["Voyant.notebook.editor.button.MoveUp", "Voyant.notebook.editor.button.MoveDown", "Voyant.notebook.editor.button.Remove"],
 	alias: 'widget.notebookwrappermovement',

@@ -1,5 +1,5 @@
 Ext.define('Voyant.widget.CorpusDocumentSelector', {
-    extend: 'Ext.button.Button',
+    extend: 'Ext.Button',
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.corpusdocumentselector',
 	statics: {

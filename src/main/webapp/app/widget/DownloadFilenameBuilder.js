@@ -1,6 +1,6 @@
 Ext.define('Voyant.widget.DownloadFilenameBuilder', {
-    extend: 'Ext.form.FieldContainer', //'Ext.container.Container',
-    mixins: ['Voyant.util.Localization', 'Ext.form.field.Field'],
+    extend: 'Ext.field.Container', //'Ext.container.Container',
+    mixins: ['Voyant.util.Localization', 'Ext.field.Field'],
     alias: 'widget.downloadfilenamebuilder',
 	statics: {
 		i18n: {

@@ -1,5 +1,5 @@
 Ext.define("Voyant.notebook.editor.button.Counter", {
-	extend: "Ext.toolbar.TextItem",
+	extend: "Ext.Component",
 	mixins: ["Voyant.util.Localization"],
 	alias: 'widget.notebookwrappercounter',
 	statics: {

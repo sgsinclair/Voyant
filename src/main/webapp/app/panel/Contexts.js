@@ -1,5 +1,5 @@
 Ext.define('Voyant.panel.Contexts', {
-	extend: 'Ext.grid.Panel',
+	extend: 'Ext.grid.Grid',
 	mixins: ['Voyant.panel.Panel'],
 	requires: ['Voyant.data.store.Contexts'],
 	alias: 'widget.contexts',

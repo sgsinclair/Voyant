@@ -13,7 +13,7 @@ Ext.define('Voyant.VoyantCorpusToolsetApp', {
 	requires: ['Voyant.panel.Contexts','Voyant.panel.CollocatesGraph','Voyant.panel.Trends'],
 	name : 'VoyantCorpusToolsetApp',
 	launch: function() {
-		Ext.create('Ext.container.Viewport', {
+		Ext.Viewport.add({
 		    layout: 'border',
 		    items: [{
 		        region: 'south',

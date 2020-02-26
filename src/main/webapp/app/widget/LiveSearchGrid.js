@@ -1,5 +1,5 @@
 Ext.define('Voyant.widget.LiveSearchGrid', {
-    extend: 'Ext.grid.Panel',
+    extend: 'Ext.grid.Grid',
     
     /**
      * @private

@@ -1,5 +1,5 @@
 Ext.define('Voyant.panel.Documents', {
-	extend: 'Ext.grid.Panel',
+	extend: 'Ext.grid.Grid',
 	mixins: ['Voyant.panel.Panel','Voyant.util.Downloadable'],
 	alias: 'widget.documents',
 	isConsumptive: true,

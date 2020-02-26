@@ -8,7 +8,7 @@ Ext.define('Voyant.VoyantDocumentToolsetApp', {
 	requires: ['Voyant.panel.Contexts','Voyant.panel.CollocatesGraph','Voyant.panel.Trends'],
 	name : 'VoyantDocumentToolsetApp',
 	launch: function() {
-		Ext.create('Ext.container.Viewport', {
+		Ext.Viewport.add({
 		    layout: 'border',
 		    items: [{
 		        region: 'south',
