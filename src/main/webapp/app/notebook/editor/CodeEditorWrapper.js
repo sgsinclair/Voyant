@@ -1,6 +1,6 @@
 Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	extend: "Voyant.notebook.editor.EditorWrapper",
-	requires: ["Voyant.notebook.editor.CodeEditor","Voyant.notebook.editor.button.Run",,"Voyant.notebook.editor.button.RunAll"],
+	requires: ["Voyant.notebook.editor.CodeEditor","Voyant.notebook.editor.button.Run","Voyant.notebook.editor.button.RunAll"],
 	alias: "widget.notebookcodeeditorwrapper",
 	cls: 'notebook-code-wrapper',
 	statics: {
@@ -249,7 +249,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 					if (wrapper.editor && wrapper.editor.getMode() == 'ace/mode/javascript' && wrapper.getIsRun()==false) {
 						Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
 							if (btnId=='yes') {
-								notebook.runAllCode();
+								notebook.runAll();
 							} else {
 								return this._run();
 							}
