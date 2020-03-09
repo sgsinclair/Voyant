@@ -10,6 +10,8 @@ if (request.getServletPath().equals("/spiral")) {
 
 <!-- highcharts -->	
 <script type="text/javascript" src="<%=base %>/resources/highcharts/8/highcharts.js"></script>
+<!-- <script type="text/javascript" src="<%=base %>/resources/highcharts/8/highcharts-more.js"></script> -->
+<script type="text/javascript" src="<%=base %>/resources/highcharts/8/modules/networkgraph.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/highcharts/8/highcharts.css" />
 
 <script src="<%= base %>/resources/octokit/octokit-rest.js"></script>
