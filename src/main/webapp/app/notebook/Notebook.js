@@ -261,6 +261,8 @@ Ext.define('Voyant.notebook.Notebook', {
 					}
 				},
 				'saveCancelled': function() {
+				},
+				'close': function() {
 					this.unmask();
 				},
 				scope: this

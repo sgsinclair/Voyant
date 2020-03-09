@@ -114,7 +114,12 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 						}
 					}
     	        }
-    	    }]
+			}],
+			listeners: {
+				close: function() {
+					me.fireEvent('close', me); // need an additional close event in case the user uses the close tool / esc button
+				}
+			}
 		}).show();
 	},
 
