@@ -45,11 +45,12 @@ class Notebook {
 		}
 	}
 	/**
-	 * @returns {string|element}
+	 * Returns the target element
+	 * @returns {element}
 	 */
 	static getTarget() {
 		if (Voyant && Voyant.notebook && Voyant.notebook.Notebook.currentBlock) {
-			return Voyant.notebook.Notebook.currentBlock;
+			return Voyant.notebook.Notebook.currentBlock.results.getEl().dom
 		} else {
 			const target = document.createElement("div");
 			document.body.appendChild(target);
