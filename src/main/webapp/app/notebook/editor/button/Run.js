@@ -6,5 +6,10 @@ Ext.define("Voyant.notebook.editor.button.Run", {
 		i18n: {
 		}
 	},
-	glyph: 'xf04b@FontAwesome'
+	glyph: 'xf04b@FontAwesome',
+	constructor: function(config) {
+		config = config || {};
+		config.tooltip = this.localize('tip');
+		this.callParent(arguments);
+	}
 })
