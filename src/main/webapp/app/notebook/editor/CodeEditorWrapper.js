@@ -250,8 +250,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 						Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
 							if (btnId=='yes') {
 								notebook.runAll();
-							} else {
-								return this._run();
 							}
 						}, this)
 					}
