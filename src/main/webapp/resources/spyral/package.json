@@ -32,15 +32,15 @@
 	"dependencies": {
 		"@octokit/rest": "^16.33.1",
 		"js-cookie": "^2.2.1",
-		"voyant": "^1.2.0"
+		"voyant": "^1.4.1"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.6.2",
 		"@babel/plugin-proposal-class-properties": "^7.5.5",
 		"@babel/preset-env": "^7.6.2",
+		"@rollup/plugin-node-resolve": "^7.1.1",
 		"jsdoc": "^3.6.3",
-		"rollup": "^1.23.1",
-		"rollup-plugin-babel": "^4.3.3",
-		"rollup-plugin-node-resolve": "^5.2.0"
+		"rollup": "^1.31.1",
+		"rollup-plugin-babel": "^4.3.3"
 	}
 }
