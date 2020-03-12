@@ -44,6 +44,10 @@ exports.publish = function(data, opts, tutorials) {
             else if (type.indexOf('function') !== -1) {
                 type = type.replace(/function/g, 'fn()');
             }
+            //boolean
+            else if (type.indexOf('boolean') !== -1) {
+                type = 'bool';
+            }
             else if ((output[type] && output[type].prototype) || /[A-Z]/.test(type[0])) {
                 type = '+' + type;
             }
