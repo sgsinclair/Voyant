@@ -20,7 +20,8 @@ Ext.define('Voyant.panel.RezoViz', {
     	nodesStore: undefined, // used by combo
     	nodesDataSet: undefined, // used by vis
     	edgesDataSet: undefined, // used by vis
-    	isNetworkBounded: true
+    	isNetworkBounded: true,
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
     },
 
     categorizedNodeOptions: {

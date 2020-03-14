@@ -27,7 +27,7 @@ Ext.define('Voyant.panel.Mandala', {
 	textFont: '12px sans-serif',
 	
 	config: {
-    	options: [{xtype: 'stoplistoption'}]
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
 	},
 	
     constructor: function() {

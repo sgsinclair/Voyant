@@ -16,7 +16,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
-    	options: {xtype: 'stoplistoption'}
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
     },
     constructor: function(config) {
     	

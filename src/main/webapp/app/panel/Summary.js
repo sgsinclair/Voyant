@@ -40,7 +40,7 @@ Ext.define('Voyant.panel.Summary', {
 		glyph: 'xf1ea@FontAwesome'
     },
     config: {
-    	options: {xtype: 'stoplistoption'}
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
     },
     autoScroll: true,
     cls: 'corpus-summary',

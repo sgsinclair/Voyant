@@ -19,7 +19,7 @@ Ext.define('Voyant.panel.WordTree', {
     config: {
     	tree: undefined,
     	kwicStore: undefined,
-    	options: {xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	numBranches: 5,
     	lastClick: 1
     },

@@ -81,13 +81,12 @@ Ext.define('Voyant.VoyantApp', {
     	});
     	
     	// check for categories
-    	var queryParams = Ext.Object.fromQueryString(document.location.search);
-    	if (queryParams.categories) {
-    	    this.loadCategoryData(queryParams.categories).then(function() {
+    	if (this.getApiParam("categories")) {
+    	    this.loadCategoryData(this.getApiParam("categories")).then(function() {
     	        this.setColorTermAssociations();
     	    }, null, null, this);
-    	}
-    	
+    		
+    	}    	
 		this.callParent(arguments);
     },
     

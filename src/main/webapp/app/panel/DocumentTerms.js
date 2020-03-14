@@ -4,9 +4,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
 	requires: ['Voyant.data.store.DocumentTerms'],
 	alias: 'widget.documentterms',
 	config: {
-		options: {
+		options: [{
     		xtype: 'stoplistoption'
-    	}
+    	},{xtype: 'categoriesoption'}]
     },
     statics: {
     	i18n: {

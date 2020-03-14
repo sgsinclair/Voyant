@@ -86,7 +86,7 @@ Ext.define('Voyant.panel.Loom', {
     	store: undefined,
     	terms: undefined,
     	options: [
-    		{xtype: 'stoplistoption'}
+    		{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}
     	],
     	controls: undefined
     },

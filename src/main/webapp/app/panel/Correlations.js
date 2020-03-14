@@ -15,7 +15,11 @@ Ext.define('Voyant.panel.Correlations', {
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
-    	
+    	options: [{
+    		xtype: 'stoplistoption'
+    	},
+        	{xtype: 'categoriesoption'}
+        ]
     },
     constructor: function() {
         this.callParent(arguments);

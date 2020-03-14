@@ -12,8 +12,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		stopList: 'auto',
     		terms: undefined,
     		context: 5,
-    		centralize: undefined,
-    		categories: undefined
+    		centralize: undefined
     	},
 		glyph: 'xf1e0@FontAwesome'
     },

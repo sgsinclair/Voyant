@@ -17,6 +17,11 @@ Ext.define('Voyant.panel.Documents', {
     MODE_EDITING: 'editing',
     MODE_NORMAL: 'normal',
     config: {
+    	options: [{
+    		xtype: 'stoplistoption'
+    	},
+        	{xtype: 'categoriesoption'}
+        ],
     	mode: this.MODE_NORMAL
     },
 

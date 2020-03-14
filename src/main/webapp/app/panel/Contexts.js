@@ -17,6 +17,9 @@ Ext.define('Voyant.panel.Contexts', {
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
+    config: {
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
+    },
     constructor: function() {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
