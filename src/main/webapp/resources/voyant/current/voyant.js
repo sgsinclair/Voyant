@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Feb 10 16:56:13 EST 2020 */
+/* This file created by JSCacher. Last modified: Tue Feb 25 12:18:09 EST 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6981,21 +6981,18 @@ var canvasSurface = this.down('draw') || this.down('chart');
 		Ext.Msg.show({
 		    title: this.localize('exportBiblioTitle'),
 		    message: '<fieldset><legend>MLA</legend>'+
-		    // we can't seem to make the contents of an element unselectable, I wonder if an event isn't being fired and cancelling the usual behaviour
-	    	'<div unselectable="" style="user-select: all; -moz-user-select:all; -webkit-user-select:all;">Sinclair, Stéfan and Geoffrey Rockwell. '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'." ')+
+	    	'<div class="x-selectable">Sinclair, Stéfan and Geoffrey Rockwell. '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'." ')+
 	    	'<i>Voyant Tools</i>. '+Ext.Date.format(date,'Y')+'. Web. '+Ext.Date.format(date,'j M Y')+'. &lt;'+url+'&gt;.</div></fieldset>'+
 	    	'<br >'+
 	    	'<fieldset><legend>Chicago</legend>'+
-	    	'<div>Stéfan Sinclair and Geoffrey Rockwell, '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'", ')+
+	    	'<div class="x-selectable">Stéfan Sinclair and Geoffrey Rockwell, '+(this.isXType('voyantheader') ? '' : '"'+this.localize('title')+'", ')+
 	    	'<i>Voyant Tools</i>, accessed '+Ext.Date.format(date,'F j, Y')+', '+url+'.</div></fieldset>'+
 	    	'<br >'+
 	    	'<fieldset><legend>APA</legend>'+
-	    	'<div>Sinclair, S. &amp; G. Rockwell. ('+Ext.Date.format(date,'Y')+"). "+(this.isXType('voyantheader') ? '' : this.localize('title')+'. ')+
+	    	'<div class="x-selectable">Sinclair, S. &amp; G. Rockwell. ('+Ext.Date.format(date,'Y')+"). "+(this.isXType('voyantheader') ? '' : this.localize('title')+'. ')+
 	    	'<i>Voyant Tools</i>. Retrieved '+Ext.Date.format(date,'F j, Y')+', from '+url+'</div></fieldset>',
 		    buttons: Ext.Msg.OK,
 		    icon: Ext.Msg.INFO
-		}, function(a,b,c,d) {
-			debugger
 		})
 	},
 	exportSpyral: function() {
@@ -7689,7 +7686,7 @@ Ext.define('Voyant.util.CategoriesManager', {
             params: {
                 tool: 'resource.StoredResource',
                 retrieveResourceId: id,
-                failQuietly: true
+                failQuietly: false
             }
         }).then(function(response) {
             var json = Ext.decode(response.responseText);
@@ -7706,6 +7703,7 @@ Ext.define('Voyant.util.CategoriesManager', {
                 dfd.resolve(value);
             }
         }, function() {
+        	this.showError("Unable to load categories data: "+id);
             dfd.reject();
         }, null, this);
         
@@ -11686,14 +11684,18 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		inDocumentsCountOnly: undefined,
 		stopList: undefined,
 		showAggregateInDocumentsCount: false,
-		clearOnQuery: false
+		clearOnQuery: false,
+		parentPanel: undefined,
+		currentOriginalRawQueryPlan: undefined
 	},
 	hasCorpusLoadedListener: false,
 	isClearing: false, // flag for clearOnQuery
     
     constructor: function(config) {
     	config = config || {};
-    	var itemTpl = config.itemTpl ? config.itemTpl : '{term} ({'+(config.inDocumentsCountOnly ? 'inDocumentsCount' : 'rawFreq')+'})';
+    	var itemTpl = config.itemTpl ? config.itemTpl : (config.inDocumentsCountOnly ?
+    			('<tpl><tpl if="term.charAt(0)==\'@\'">{term}</tpl><tpl if="term.charAt(0)!=\'@\'">{term} ({inDocumentsCount})</tpl></tpl>') :
+    			('<tpl><tpl if="term.charAt(0)==\'@\'">{term}</tpl><tpl if="term.charAt(0)!=\'@\'">{term} ({rawFreq})</tpl></tpl>'))
     	Ext.applyIf(config, {
     		minWidth: 100,
     		maxWidth: 200,
@@ -11747,54 +11749,60 @@ Ext.define('Voyant.widget.QuerySearchField', {
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
     			
-    			// look for categories
-    			var cats = me.up("panel").getApplication().getCategories();
-    			for (let key in cats) {
-    				if (key.indexOf(queryPlan.query.indexOf(key))==0) {
-    					queryPlan.query = key+":"+cats[key].join("|")
-    				} else {
-    					cats[key].forEach(function(word) {
-    						if (word.indexOf(queryPlan.query)) {
-    							queryPlan.query = key+":"+cats[key].join("|")
-    						}
-    					})
-    				}
-    			}
+    			// set it in the raw state because we use it in the load event to add categories
+    			var originalRawQueryPlan = queryPlan.query.toLowerCase();
+    			this.setCurrentOriginalRawQueryPlan(queryPlan.query)
     			
-    			if (queryPlan.query.charAt(0)=="^") {
-    				queryPlan.query=queryPlan.query.substring(1)
-    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+    			if (queryPlan.query.charAt(0)!="@") {
+	    			if (queryPlan.query.charAt(0)=="^") {
+	    				queryPlan.query=queryPlan.query.substring(1)
+	    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+	    			}
+	    			if (queryPlan.query.charAt(0)=="*") { // convert leading wildcard to regex
+	    				queryPlan.query = "."+queryPlan.query;
+	    			}
+	    			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*' || queryPlan.query.charAt(queryPlan.query.length-1)=='|') {
+	    				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
+	    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+	    			}
+	    			if (queryPlan.query.charAt(0)==".") {
+	    				queryPlan.cancel = queryPlan.query.length< (/\W/.test(queryPlan.query.charAt(1)) ? 5 : 4) // cancel if we only have 3 or fewer after .
+	    			}
+	    			try {
+	                    new RegExp(queryPlan.query);
+		            }
+		            catch(e) {
+		            	queryPlan.cancel = true;
+		            }
+		            if (queryPlan.query.indexOf('"')>-1) { // deal with unfinished phrases
+		            	if (queryPlan.query.indexOf(" ")==-1) {queryPlan.cancel=true} // no space in phrase
+		            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
+		            }
+		            if (queryPlan.query.indexOf("*")>-1) {
+		            	// skip for multiword or pipes
+		            	if (queryPlan.query.indexOf(" ")==-1 && queryPlan.query.indexOf("|")==-1) {
+		            		queryPlan.query += ",^"+queryPlan.query;
+		            	}
+		            } else {
+		            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1  && queryPlan.query.indexOf("|")==-1 ? ","+"^"+queryPlan.query+"*" : "")
+		            }
+    			} else if (queryPlan.query=="@") { // no letters yet
+    				queryPlan.cancel = true;
     			}
-    			if (queryPlan.query.charAt(0)=="*") { // convert leading wildcard to regex
-    				queryPlan.query = "."+queryPlan.query;
-    			}
-    			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*' || queryPlan.query.charAt(queryPlan.query.length-1)=='|') {
-    				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
-    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
-    			}
-    			if (queryPlan.query.charAt(0)==".") {
-    				queryPlan.cancel = queryPlan.query.length< (/\W/.test(queryPlan.query.charAt(1)) ? 5 : 4) // cancel if we only have 3 or fewer after .
-    			}
-    			try {
-                    new RegExp(queryPlan.query);
-	            }
-	            catch(e) {
-	            	queryPlan.cancel = true;
-	            }
-	            if (queryPlan.query.indexOf('"')>-1) { // deal with unfinished phrases
-	            	if (queryPlan.query.indexOf(" ")==-1) {queryPlan.cancel=true} // no space in phrase
-	            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
-	            }
-	            if (queryPlan.query.indexOf("*")>-1) {
-	            	// skip for multiword or pipes
-	            	if (queryPlan.query.indexOf(" ")==-1 && queryPlan.query.indexOf("|")==-1) {
-	            		queryPlan.query += ",^"+queryPlan.query;
-	            	}
-	            } else {
-	            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1  && queryPlan.query.indexOf("|")==-1 ? ","+"^"+queryPlan.query+"*" : "")
+	            
+	            var parent = me.getParentPanel();
+	            if (queryPlan.cancel==false && parent) {
+	            	var originalRawQueryPlanWithoutAt = originalRawQueryPlan.charAt(0)=="@" ? originalRawQueryPlan.substring(1) : originalRawQueryPlan;
+		            for (var cat in parent.getApplication().getCategories()) {
+		            	if (cat.toLowerCase().indexOf(originalRawQueryPlanWithoutAt)>-1) {
+		            		queryPlan.query = "@"+cat+(originalRawQueryPlan.charAt(0)=="@" ? "" : ","+queryPlan.query);
+		            	}
+		            }	
 	            }
     		}
-    	});
+	            
+	            
+    	}, this);
     	
     	me.on("change", function(tags, queries) {
     		if (!me.isClearing) {
@@ -11836,6 +11844,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     		return clz.mixins["Voyant.panel.Panel"];
 		});
     	if (parentPanel != null) {
+    		this.setParentPanel(parentPanel);
     		if (parentPanel.getCorpus && parentPanel.getCorpus()) {
     			me.on("afterrender", function(c) {
     				this.doSetCorpus(parentPanel.getCorpus());	
@@ -11925,12 +11934,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
 					}
 				}
 			});
-			store.on("load", function() {
-				store.insert(0, {
-					term: "test"
-				})
-				this.fireEvent.apply(this, ["load"].concat(Array.prototype.slice.call(arguments)));
-			}, this);
+//			store.on("load", function() {
+//				this.fireEvent.apply(this, ["load"].concat(Array.prototype.slice.call(arguments)));
+//			}, this);
 
 			this.setStore(store);
     	}
@@ -15383,7 +15389,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		termStore: undefined,
 		docTermStore: undefined,
 		selectedDocs: undefined,
-    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'},{xtype: 'colorpaletteoption'}]
 	},
 	
 	termTpl: new Ext.XTemplate(
@@ -16943,8 +16949,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		stopList: 'auto',
     		terms: undefined,
     		context: 5,
-    		centralize: undefined,
-    		categories: undefined
+    		centralize: undefined
     	},
 		glyph: 'xf1e0@FontAwesome'
     },
@@ -17826,6 +17831,9 @@ Ext.define('Voyant.panel.Contexts', {
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
+    config: {
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
+    },
     constructor: function() {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
@@ -18024,7 +18032,7 @@ Ext.define('Voyant.panel.Contexts', {
 	           	 },
                  afterrender: function(me) {
                 	 me.getView().on('expandbody', function( rowNode, record, expandRow, eOpts ) {
-                		 if (expandRow.innerText==="" || (eOpts && eOpts.force)) {
+                		 if (expandRow.textContent==="" || (eOpts && eOpts.force)) {
                 	            var store = Ext.create("Voyant.data.store.Contexts", {
                 	            	stripTags: "all",
                 	            	corpus: me.getStore().getCorpus()
@@ -18132,7 +18140,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
-    	options: {xtype: 'stoplistoption'}
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
     },
     constructor: function(config) {
     	
@@ -18582,7 +18590,11 @@ Ext.define('Voyant.panel.Correlations', {
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
-    	
+    	options: [{
+    		xtype: 'stoplistoption'
+    	},
+        	{xtype: 'categoriesoption'}
+        ]
     },
     constructor: function() {
         this.callParent(arguments);
@@ -21458,7 +21470,7 @@ Ext.define('Voyant.panel.Knots', {
 		termStore: undefined,
 		docTermStore: undefined,
 		tokensStore: undefined,
-    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}],
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'},{xtype: 'colorpaletteoption'}],
     	refreshInterval: 100,
     	startAngle: 315,
     	angleIncrement: 15,
@@ -22035,6 +22047,12 @@ Ext.define('Voyant.panel.Phrases', {
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
+    config: {
+    	/**
+    	 * @private
+    	 */
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
+    },
     constructor: function(config) {
     	
         this.callParent(arguments);
@@ -22371,7 +22389,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	 */
     	options: [{
     		xtype: 'stoplistoption'
-    	},{
+    	},{xtype: 'categoriesoption'},{
     		xtype: 'corpusselector',
     		name: 'comparisonCorpus',
     		fieldLabel: 'comparison corpus'
@@ -22437,7 +22455,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
                 listeners: {
                     // TODO widget disappears when scrolled off screen
                     expandbody: function(rowNode, record, expandRow, eOpts) {
-                        if (expandRow.innerText==='' || (eOpts && eOpts.force)) {
+                        if (expandRow.textContent==='' || (eOpts && eOpts.force)) {
                             Ext.create('Voyant.widget.CorpusTermSummary', {
                                 record: record,
                                 header: false,
@@ -22561,9 +22579,9 @@ Ext.define('Voyant.panel.DocumentTerms', {
 	requires: ['Voyant.data.store.DocumentTerms'],
 	alias: 'widget.documentterms',
 	config: {
-		options: {
+		options: [{
     		xtype: 'stoplistoption'
-    	}
+    	},{xtype: 'categoriesoption'}]
     },
     statics: {
     	i18n: {
@@ -22785,6 +22803,11 @@ Ext.define('Voyant.panel.Documents', {
     MODE_EDITING: 'editing',
     MODE_NORMAL: 'normal',
     config: {
+    	options: [{
+    		xtype: 'stoplistoption'
+    	},
+        	{xtype: 'categoriesoption'}
+        ],
     	mode: this.MODE_NORMAL
     },
 
@@ -23602,7 +23625,7 @@ Ext.define('Voyant.panel.Fountain', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
-    	options: {xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	audio: false,
     	words: [],
     	groups: {},
@@ -23942,7 +23965,8 @@ Ext.define('Voyant.panel.RezoViz', {
     	nodesStore: undefined, // used by combo
     	nodesDataSet: undefined, // used by vis
     	edgesDataSet: undefined, // used by vis
-    	isNetworkBounded: true
+    	isNetworkBounded: true,
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
     },
 
     categorizedNodeOptions: {
@@ -24417,7 +24441,7 @@ Ext.define('Voyant.panel.Loom', {
     	store: undefined,
     	terms: undefined,
     	options: [
-    		{xtype: 'stoplistoption'}
+    		{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}
     	],
     	controls: undefined
     },
@@ -25430,7 +25454,7 @@ Ext.define('Voyant.panel.MicroSearch', {
     	/**
     	 * @private
     	 */
-    	options: {xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	
     	/**
     	 * @private
@@ -25642,7 +25666,7 @@ Ext.define('Voyant.panel.Mandala', {
 	textFont: '12px sans-serif',
 	
 	config: {
-    	options: [{xtype: 'stoplistoption'}]
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
 	},
 	
     constructor: function() {
@@ -26440,7 +26464,8 @@ Ext.define('Voyant.panel.Reader', {
     	lastScrollTop: 0,
 		scrollIntoView: false,
 		insertWhere: 'beforeEnd',
-    	lastLocationUpdate: new Date()
+    	lastLocationUpdate: new Date(),
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
     },
     
     SCROLL_UP: -1,
@@ -27147,9 +27172,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		glyph: 'xf06e@FontAwesome'
     },
 	config: {
-		options: {
-    		xtype: 'stoplistoption'
-    	},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	caStore: null,
     	pcaStore: null,
     	tsneStore: null,
@@ -28291,7 +28314,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     	
     	layerData: undefined,
     	
-    	graphId: undefined
+    	graphId: undefined,
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
     },
     
     graphMargin: {top: 20, right: 60, bottom: 110, left: 80},
@@ -28727,7 +28751,7 @@ Ext.define('Voyant.panel.Summary', {
 		glyph: 'xf1ea@FontAwesome'
     },
     config: {
-    	options: {xtype: 'stoplistoption'}
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
     },
     autoScroll: true,
     cls: 'corpus-summary',
@@ -30379,9 +30403,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		/**
 		 * @private
 		 */
-		options: [{
-			xtype: 'stoplistoption'
-		}],
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
 		/**
 		 * @private
 		 */
@@ -30878,7 +30900,8 @@ Ext.define('Voyant.panel.Trends', {
 	    /**
 	     * @private
 	     */
-    	options: [{xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'},
+
     		{
     			name: 'bins',
 		    	xtype: 'slider',
@@ -32039,9 +32062,7 @@ Ext.define('Voyant.panel.Subset', {
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
-    	options: {
-    		xtype: 'stoplistoption'
-    	},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
 		inDocumentsCountOnly: false,
 		stopList: 'auto',
 		store: undefined
@@ -32928,7 +32949,7 @@ Ext.define('Voyant.panel.WordTree', {
     config: {
     	tree: undefined,
     	kwicStore: undefined,
-    	options: {xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	numBranches: 5,
     	lastClick: 1
     },
@@ -37702,13 +37723,12 @@ Ext.define('Voyant.VoyantApp', {
     	});
     	
     	// check for categories
-    	var queryParams = Ext.Object.fromQueryString(document.location.search);
-    	if (queryParams.categories) {
-    	    this.loadCategoryData(queryParams.categories).then(function() {
+    	if (this.getApiParam("categories")) {
+    	    this.loadCategoryData(this.getApiParam("categories")).then(function() {
     	        this.setColorTermAssociations();
     	    }, null, null, this);
-    	}
-    	
+    		
+    	}    	
 		this.callParent(arguments);
     },
     
@@ -38332,6 +38352,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		api: {
 			view: 'corpusset',
 			stopList: 'auto',
+			categories: 'auto',
 			panels: undefined,
 			rtl: undefined
 		}

@@ -24,7 +24,8 @@ Ext.define('Voyant.panel.StreamGraph', {
     	
     	layerData: undefined,
     	
-    	graphId: undefined
+    	graphId: undefined,
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
     },
     
     graphMargin: {top: 20, right: 60, bottom: 110, left: 80},

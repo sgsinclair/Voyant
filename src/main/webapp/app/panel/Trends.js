@@ -21,7 +21,8 @@ Ext.define('Voyant.panel.Trends', {
 	    /**
 	     * @private
 	     */
-    	options: [{xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'},
+
     		{
     			name: 'bins',
 		    	xtype: 'slider',

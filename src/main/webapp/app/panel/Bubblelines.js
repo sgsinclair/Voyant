@@ -53,7 +53,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		termStore: undefined,
 		docTermStore: undefined,
 		selectedDocs: undefined,
-    	options: [{xtype: 'stoplistoption'},{xtype: 'colorpaletteoption'}]
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'},{xtype: 'colorpaletteoption'}]
 	},
 	
 	termTpl: new Ext.XTemplate(

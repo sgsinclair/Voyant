@@ -24,9 +24,7 @@ Ext.define('Voyant.panel.TermsRadio', {
 		/**
 		 * @private
 		 */
-		options: [{
-			xtype: 'stoplistoption'
-		}],
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
 		/**
 		 * @private
 		 */

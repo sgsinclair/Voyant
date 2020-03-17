@@ -24,7 +24,8 @@ Ext.define('Voyant.panel.Reader', {
     	lastScrollTop: 0,
 		scrollIntoView: false,
 		insertWhere: 'beforeEnd',
-    	lastLocationUpdate: new Date()
+    	lastLocationUpdate: new Date(),
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}]
     },
     
     SCROLL_UP: -1,

@@ -26,7 +26,7 @@ Ext.define('Voyant.panel.Fountain', {
     	glyph: 'xf06e@FontAwesome'
 	},
 	config: {
-    	options: {xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	audio: false,
     	words: [],
     	groups: {},

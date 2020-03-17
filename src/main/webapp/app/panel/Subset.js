@@ -16,9 +16,7 @@ Ext.define('Voyant.panel.Subset', {
 		glyph: 'xf0ce@FontAwesome'
     },
     config: {
-    	options: {
-    		xtype: 'stoplistoption'
-    	},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
 		inDocumentsCountOnly: false,
 		stopList: 'auto',
 		store: undefined

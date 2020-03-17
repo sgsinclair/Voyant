@@ -19,6 +19,12 @@ Ext.define('Voyant.panel.Phrases', {
     	},
 		glyph: 'xf0ce@FontAwesome'
     },
+    config: {
+    	/**
+    	 * @private
+    	 */
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
+    },
     constructor: function(config) {
     	
         this.callParent(arguments);

@@ -27,9 +27,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 		glyph: 'xf06e@FontAwesome'
     },
 	config: {
-		options: {
-    		xtype: 'stoplistoption'
-    	},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	caStore: null,
     	pcaStore: null,
     	tsneStore: null,

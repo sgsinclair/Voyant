@@ -13,14 +13,18 @@ Ext.define('Voyant.widget.QuerySearchField', {
 		inDocumentsCountOnly: undefined,
 		stopList: undefined,
 		showAggregateInDocumentsCount: false,
-		clearOnQuery: false
+		clearOnQuery: false,
+		parentPanel: undefined,
+		currentOriginalRawQueryPlan: undefined
 	},
 	hasCorpusLoadedListener: false,
 	isClearing: false, // flag for clearOnQuery
     
     constructor: function(config) {
     	config = config || {};
-    	var itemTpl = config.itemTpl ? config.itemTpl : '{term} ({'+(config.inDocumentsCountOnly ? 'inDocumentsCount' : 'rawFreq')+'})';
+    	var itemTpl = config.itemTpl ? config.itemTpl : (config.inDocumentsCountOnly ?
+    			('<tpl><tpl if="term.charAt(0)==\'@\'">{term}</tpl><tpl if="term.charAt(0)!=\'@\'">{term} ({inDocumentsCount})</tpl></tpl>') :
+    			('<tpl><tpl if="term.charAt(0)==\'@\'">{term}</tpl><tpl if="term.charAt(0)!=\'@\'">{term} ({rawFreq})</tpl></tpl>'))
     	Ext.applyIf(config, {
     		minWidth: 100,
     		maxWidth: 200,
@@ -74,54 +78,60 @@ Ext.define('Voyant.widget.QuerySearchField', {
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
     			
-    			// look for categories
-    			var cats = me.up("panel").getApplication().getCategories();
-    			for (let key in cats) {
-    				if (key.indexOf(queryPlan.query.indexOf(key))==0) {
-    					queryPlan.query = key+":"+cats[key].join("|")
-    				} else {
-    					cats[key].forEach(function(word) {
-    						if (word.indexOf(queryPlan.query)) {
-    							queryPlan.query = key+":"+cats[key].join("|")
-    						}
-    					})
-    				}
-    			}
+    			// set it in the raw state because we use it in the load event to add categories
+    			var originalRawQueryPlan = queryPlan.query.toLowerCase();
+    			this.setCurrentOriginalRawQueryPlan(queryPlan.query)
     			
-    			if (queryPlan.query.charAt(0)=="^") {
-    				queryPlan.query=queryPlan.query.substring(1)
-    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+    			if (queryPlan.query.charAt(0)!="@") {
+	    			if (queryPlan.query.charAt(0)=="^") {
+	    				queryPlan.query=queryPlan.query.substring(1)
+	    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+	    			}
+	    			if (queryPlan.query.charAt(0)=="*") { // convert leading wildcard to regex
+	    				queryPlan.query = "."+queryPlan.query;
+	    			}
+	    			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*' || queryPlan.query.charAt(queryPlan.query.length-1)=='|') {
+	    				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
+	    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
+	    			}
+	    			if (queryPlan.query.charAt(0)==".") {
+	    				queryPlan.cancel = queryPlan.query.length< (/\W/.test(queryPlan.query.charAt(1)) ? 5 : 4) // cancel if we only have 3 or fewer after .
+	    			}
+	    			try {
+	                    new RegExp(queryPlan.query);
+		            }
+		            catch(e) {
+		            	queryPlan.cancel = true;
+		            }
+		            if (queryPlan.query.indexOf('"')>-1) { // deal with unfinished phrases
+		            	if (queryPlan.query.indexOf(" ")==-1) {queryPlan.cancel=true} // no space in phrase
+		            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
+		            }
+		            if (queryPlan.query.indexOf("*")>-1) {
+		            	// skip for multiword or pipes
+		            	if (queryPlan.query.indexOf(" ")==-1 && queryPlan.query.indexOf("|")==-1) {
+		            		queryPlan.query += ",^"+queryPlan.query;
+		            	}
+		            } else {
+		            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1  && queryPlan.query.indexOf("|")==-1 ? ","+"^"+queryPlan.query+"*" : "")
+		            }
+    			} else if (queryPlan.query=="@") { // no letters yet
+    				queryPlan.cancel = true;
     			}
-    			if (queryPlan.query.charAt(0)=="*") { // convert leading wildcard to regex
-    				queryPlan.query = "."+queryPlan.query;
-    			}
-    			if (queryPlan.query.charAt(queryPlan.query.length-1)=='*' || queryPlan.query.charAt(queryPlan.query.length-1)=='|') {
-    				queryPlan.query=queryPlan.query.substring(0,queryPlan.query.length-1)
-    				queryPlan.cancel = queryPlan.query.length==0; // cancel if it's just that character
-    			}
-    			if (queryPlan.query.charAt(0)==".") {
-    				queryPlan.cancel = queryPlan.query.length< (/\W/.test(queryPlan.query.charAt(1)) ? 5 : 4) // cancel if we only have 3 or fewer after .
-    			}
-    			try {
-                    new RegExp(queryPlan.query);
-	            }
-	            catch(e) {
-	            	queryPlan.cancel = true;
-	            }
-	            if (queryPlan.query.indexOf('"')>-1) { // deal with unfinished phrases
-	            	if (queryPlan.query.indexOf(" ")==-1) {queryPlan.cancel=true} // no space in phrase
-	            	if ((queryPlan.query.match(/"/) || []).length!=2) {queryPlan.cancel=true;} // not balanced quotes
-	            }
-	            if (queryPlan.query.indexOf("*")>-1) {
-	            	// skip for multiword or pipes
-	            	if (queryPlan.query.indexOf(" ")==-1 && queryPlan.query.indexOf("|")==-1) {
-	            		queryPlan.query += ",^"+queryPlan.query;
-	            	}
-	            } else {
-	            	queryPlan.query = queryPlan.query+"*"+ (queryPlan.query.indexOf(" ")==-1  && queryPlan.query.indexOf("|")==-1 ? ","+"^"+queryPlan.query+"*" : "")
+	            
+	            var parent = me.getParentPanel();
+	            if (queryPlan.cancel==false && parent) {
+	            	var originalRawQueryPlanWithoutAt = originalRawQueryPlan.charAt(0)=="@" ? originalRawQueryPlan.substring(1) : originalRawQueryPlan;
+		            for (var cat in parent.getApplication().getCategories()) {
+		            	if (cat.toLowerCase().indexOf(originalRawQueryPlanWithoutAt)>-1) {
+		            		queryPlan.query = "@"+cat+(originalRawQueryPlan.charAt(0)=="@" ? "" : ","+queryPlan.query);
+		            	}
+		            }	
 	            }
     		}
-    	});
+	            
+	            
+    	}, this);
     	
     	me.on("change", function(tags, queries) {
     		if (!me.isClearing) {
@@ -163,6 +173,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     		return clz.mixins["Voyant.panel.Panel"];
 		});
     	if (parentPanel != null) {
+    		this.setParentPanel(parentPanel);
     		if (parentPanel.getCorpus && parentPanel.getCorpus()) {
     			me.on("afterrender", function(c) {
     				this.doSetCorpus(parentPanel.getCorpus());	
@@ -252,12 +263,9 @@ Ext.define('Voyant.widget.QuerySearchField', {
 					}
 				}
 			});
-			store.on("load", function() {
-				store.insert(0, {
-					term: "test"
-				})
-				this.fireEvent.apply(this, ["load"].concat(Array.prototype.slice.call(arguments)));
-			}, this);
+//			store.on("load", function() {
+//				this.fireEvent.apply(this, ["load"].concat(Array.prototype.slice.call(arguments)));
+//			}, this);
 
 			this.setStore(store);
     	}

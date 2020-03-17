@@ -62,7 +62,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     	 */
     	options: [{
     		xtype: 'stoplistoption'
-    	},{
+    	},{xtype: 'categoriesoption'},{
     		xtype: 'corpusselector',
     		name: 'comparisonCorpus',
     		fieldLabel: 'comparison corpus'

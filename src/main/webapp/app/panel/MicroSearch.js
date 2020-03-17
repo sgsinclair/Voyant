@@ -15,7 +15,7 @@ Ext.define('Voyant.panel.MicroSearch', {
     	/**
     	 * @private
     	 */
-    	options: {xtype: 'stoplistoption'},
+    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
     	
     	/**
     	 * @private

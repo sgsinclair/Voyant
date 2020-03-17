@@ -153,7 +153,7 @@ Ext.define('Voyant.util.CategoriesManager', {
             params: {
                 tool: 'resource.StoredResource',
                 retrieveResourceId: id,
-                failQuietly: true
+                failQuietly: false
             }
         }).then(function(response) {
             var json = Ext.decode(response.responseText);
@@ -170,6 +170,7 @@ Ext.define('Voyant.util.CategoriesManager', {
                 dfd.resolve(value);
             }
         }, function() {
+        	this.showError("Unable to load categories data: "+id);
             dfd.reject();
         }, null, this);
         
