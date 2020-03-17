@@ -5,13 +5,14 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 	alias: "widget.notebookeditorwrapper",
 	cls: "notebook-editor-wrapper",
 	config: {
+		cellId: undefined,
 		content: '',
 		isEditing: false
 	},
 	border: false,
 	bodyBorder: false,
 	initComponent: function() {
-		var me = this;
+		this.setCellId(this.config.cellId);
 		this.on("afterrender", function(){
 			this.getDockedItems().forEach(function(tb) {
 				tb.getTargetEl().setVisibilityMode(Ext.dom.Element.VISIBILITY);

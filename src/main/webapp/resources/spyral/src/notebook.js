@@ -57,6 +57,81 @@ class Notebook {
 			return target;
 		}
 	}
+
+	/**
+	 * Fetch and return the content of a notebook or a particular cell in a notebook
+	 * @param {string} url
+	 */
+	static import(url) {
+		const isFullNotebook = url.indexOf('#') === -1;
+		const isAbsoluteUrl = url.indexOf('http') === 0;
+
+		let notebookId = '';
+		let cellId = undefined;
+		if (isAbsoluteUrl) {
+			const urlParts = url.match(/\/[\w-]+/g);
+			if (urlParts !== null) {
+				notebookId = urlParts[urlParts.length-1].replace('/', '');
+			} else {
+				return;
+			}
+			if (!isFullNotebook) {
+				cellId = url.split('#')[1];
+			}
+		} else {
+			if (isFullNotebook) {
+				notebookId = url;
+			} else {
+				[notebookId, cellId] = url.split('#');
+			}
+		}
+		Spyral.Load.trombone({
+			tool: 'notebook.NotebookManager',
+			action: 'load',
+			id: notebookId,
+			noCache: 1
+		}).then(function(json) {
+			const notebook = json.notebook.data;
+			const parser = new DOMParser();
+			const htmlDoc = parser.parseFromString(notebook, 'text/html');
+			
+			let code = ''
+			if (cellId !== undefined) {
+				const cell = htmlDoc.querySelector('#'+cellId);
+				if (cell.classList.contains('notebookcodeeditorwrapper')) {
+					code = cell.querySelector('pre').textContent
+				} else {
+					// no code found
+				}
+			} else {
+				htmlDoc.querySelectorAll('section.notebook-editor-wrapper').forEach((cell, i) => {
+					if (cell.classList.contains('notebookcodeeditorwrapper')) {
+						code += cell.querySelector('pre').textContent + "\n"
+					}
+				})
+			}
+			
+			if (Ext) {
+				Ext.Msg.show({
+					title: 'Imported Code from: '+url,
+					message: '<pre>'+code+'</pre>',
+					buttons: Ext.Msg.OK
+				})
+			}
+
+			let result = undefined
+			try {
+				eval.call(window, code);
+			} catch(e) {
+				return e
+			}
+			if (result !== undefined) {
+				console.log(result)
+			}
+
+		})
+		
+	}
 }
 
 export { Notebook }
