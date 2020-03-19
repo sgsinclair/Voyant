@@ -11,10 +11,14 @@ if (request.getServletPath().equals("/spiral")) {
 <!-- highcharts -->	
 <script type="text/javascript" src="<%=base %>/resources/highcharts/8/highcharts.js"></script>
 <!-- <script type="text/javascript" src="<%=base %>/resources/highcharts/8/highcharts-more.js"></script> -->
+<script type="text/javascript" src="<%=base %>/resources/highcharts/8/modules/data.js"></script>
 <script type="text/javascript" src="<%=base %>/resources/highcharts/8/modules/networkgraph.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/highcharts/8/highcharts.css" />
 
-<script src="<%= base %>/resources/octokit/octokit-rest.js"></script>
+<script type="module">
+import { Octokit } from "https://cdn.pika.dev/@octokit/rest";
+window.Octokit = Octokit;
+</script>
 
 <script src="<%= base %>/resources/spyral/build/spyral.js"></script>
 

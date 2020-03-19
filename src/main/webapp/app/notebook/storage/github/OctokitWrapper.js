@@ -17,7 +17,7 @@ Ext.define("Voyant.notebook.github.OctokitWrapper", {
 	},
 
 	getReposForAuthenticatedUser: function(affiliation='owner', page=0, per_page=10) {
-		return this.octokit.repos.list({
+		return this.octokit.repos.listForAuthenticatedUser({
 			affiliation,
 			page,
 			per_page
