@@ -62,7 +62,7 @@ class Notebook {
 	 * Fetch and return the content of a notebook or a particular cell in a notebook
 	 * @param {string} url
 	 */
-	static import(url) {
+	static async import(url) {
 		const isFullNotebook = url.indexOf('#') === -1;
 		const isAbsoluteUrl = url.indexOf('http') === 0;
 
@@ -85,61 +85,61 @@ class Notebook {
 				[notebookId, cellId] = url.split('#');
 			}
 		}
-		Spyral.Load.trombone({
+
+		const json = await Spyral.Load.trombone({
 			tool: 'notebook.NotebookManager',
 			action: 'load',
 			id: notebookId,
 			noCache: 1
-		}).then(function(json) {
-			const notebook = json.notebook.data;
-			const parser = new DOMParser();
-			const htmlDoc = parser.parseFromString(notebook, 'text/html');
-			
-			let code = ''
-			let error = undefined
-			if (cellId !== undefined) {
-				const cell = htmlDoc.querySelector('#'+cellId);
-				if (cell !== null && cell.classList.contains('notebookcodeeditorwrapper')) {
-					code = cell.querySelector('pre').textContent
-				} else {
-					error = 'No code found for cell: '+cellId
-				}
+		})
+
+		const notebook = json.notebook.data;
+		const parser = new DOMParser();
+		const htmlDoc = parser.parseFromString(notebook, 'text/html');
+		
+		let code = ''
+		let error = undefined
+		if (cellId !== undefined) {
+			const cell = htmlDoc.querySelector('#'+cellId);
+			if (cell !== null && cell.classList.contains('notebookcodeeditorwrapper')) {
+				code = cell.querySelector('pre').textContent
 			} else {
-				htmlDoc.querySelectorAll('section.notebook-editor-wrapper').forEach((cell, i) => {
-					if (cell.classList.contains('notebookcodeeditorwrapper')) {
-						code += cell.querySelector('pre').textContent + "\n"
-					}
+				error = 'No code found for cell: '+cellId
+			}
+		} else {
+			htmlDoc.querySelectorAll('section.notebook-editor-wrapper').forEach((cell, i) => {
+				if (cell.classList.contains('notebookcodeeditorwrapper')) {
+					code += cell.querySelector('pre').textContent + "\n"
+				}
+			})
+		}
+		
+		if (Ext) {
+			if (error === undefined) {
+				Ext.Msg.show({
+					title: 'Imported code from: '+url,
+					message: '<pre>'+code+'</pre>',
+					buttons: Ext.Msg.OK
+				})
+			} else {
+				Ext.Msg.show({
+					title: 'Error importing code from: '+url,
+					message: error,
+					icon: Ext.Msg.ERROR,
+					buttons: Ext.Msg.OK
 				})
 			}
-			
-			if (Ext) {
-				if (error === undefined) {
-					Ext.Msg.show({
-						title: 'Imported code from: '+url,
-						message: '<pre>'+code+'</pre>',
-						buttons: Ext.Msg.OK
-					})
-				} else {
-					Ext.Msg.show({
-						title: 'Error importing code from: '+url,
-						message: error,
-						icon: Ext.Msg.ERROR,
-						buttons: Ext.Msg.OK
-					})
-				}
-			}
+		}
 
-			let result = undefined
-			try {
-				eval.call(window, code);
-			} catch(e) {
-				return e
-			}
-			if (result !== undefined) {
-				console.log(result)
-			}
-
-		})
+		let result = undefined
+		try {
+			eval.call(window, code);
+		} catch(e) {
+			return e
+		}
+		if (result !== undefined) {
+			console.log(result)
+		}
 	}
 }
 
