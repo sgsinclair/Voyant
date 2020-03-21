@@ -48,7 +48,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     
     launch: function(config) {
 		this.callParent(arguments);
-
+		
     	if (this.hasQueryToLoad()) {
         	var queryParams = Ext.Object.fromQueryString(document.location.search);
         	if (!queryParams.corpus && this.getCorpusId && this.getCorpusId()) {
@@ -256,6 +256,15 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
 //    		this.colorTermAssociations.clear();
+    		
+    		// let's load the categories based on the corpus
+        	if (this.getApiParam("categories")) {
+        	    this.loadCategoryData(this.getApiParam("categories")).then(function() {
+        	        this.setColorTermAssociations();
+        	    }, null, null, this);
+        		
+        	}    	
+
     		
     		this.on("unhandledEvent", function(src, eventName, data) {
 				var url = this.getBaseUrl() + '?corpus='+corpus.getAliasOrId();

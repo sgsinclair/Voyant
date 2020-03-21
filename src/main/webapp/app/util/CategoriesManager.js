@@ -147,13 +147,14 @@ Ext.define('Voyant.util.CategoriesManager', {
 	
 	loadCategoryData: function(id) {
         var dfd = new Ext.Deferred();
-        
+
         Ext.Ajax.request({
             url: this.getTromboneUrl(),
             params: {
-                tool: 'resource.StoredResource',
+                tool: 'resource.StoredCategories',
                 retrieveResourceId: id,
-                failQuietly: false
+                failQuietly: false,
+                corpus: this.getCorpus() ? this.getCorpus().getId() : undefined
             }
         }).then(function(response) {
             var json = Ext.decode(response.responseText);

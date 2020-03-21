@@ -80,13 +80,6 @@ Ext.define('Voyant.VoyantApp', {
     	    showDelay: 50 // shorten the delay before showing
     	});
     	
-    	// check for categories
-    	if (this.getApiParam("categories")) {
-    	    this.loadCategoryData(this.getApiParam("categories")).then(function() {
-    	        this.setColorTermAssociations();
-    	    }, null, null, this);
-    		
-    	}    	
 		this.callParent(arguments);
     },
     

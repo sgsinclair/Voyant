@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Feb 25 12:18:09 EST 2020 */
+/* This file created by JSCacher. Last modified: Sat Mar 21 17:30:58 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7680,13 +7680,14 @@ Ext.define('Voyant.util.CategoriesManager', {
 	
 	loadCategoryData: function(id) {
         var dfd = new Ext.Deferred();
-        
+
         Ext.Ajax.request({
             url: this.getTromboneUrl(),
             params: {
-                tool: 'resource.StoredResource',
+                tool: 'resource.StoredCategories',
                 retrieveResourceId: id,
-                failQuietly: false
+                failQuietly: false,
+                corpus: this.getCorpus() ? this.getCorpus().getId() : undefined
             }
         }).then(function(response) {
             var json = Ext.decode(response.responseText);
@@ -34755,7 +34756,12 @@ Ext.define("Voyant.notebook.editor.button.Run", {
 		i18n: {
 		}
 	},
-	glyph: 'xf04b@FontAwesome'
+	glyph: 'xf04b@FontAwesome',
+	constructor: function(config) {
+		config = config || {};
+		config.tooltip = this.localize('tip');
+		this.callParent(arguments);
+	}
 })
 Ext.define("Voyant.notebook.editor.button.RunAll", {
 	extend: "Ext.button.Button",
@@ -34987,7 +34993,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 })
 Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	extend: "Voyant.notebook.editor.EditorWrapper",
-	requires: ["Voyant.notebook.editor.CodeEditor","Voyant.notebook.editor.button.Run",,"Voyant.notebook.editor.button.RunAll"],
+	requires: ["Voyant.notebook.editor.CodeEditor","Voyant.notebook.editor.button.Run","Voyant.notebook.editor.button.RunAll"],
 	alias: "widget.notebookcodeeditorwrapper",
 	cls: 'notebook-code-wrapper',
 	statics: {
@@ -35236,9 +35242,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 					if (wrapper.editor && wrapper.editor.getMode() == 'ace/mode/javascript' && wrapper.getIsRun()==false) {
 						Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
 							if (btnId=='yes') {
-								notebook.runAllCode();
-							} else {
-								return this._run();
+								notebook.runAll();
 							}
 						}, this)
 					}
@@ -36541,7 +36545,12 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 						}
 					}
     	        }
-    	    }]
+			}],
+			listeners: {
+				close: function() {
+					me.fireEvent('close', me); // need an additional close event in case the user uses the close tool / esc button
+				}
+			}
 		}).show();
 	},
 
@@ -36867,6 +36876,8 @@ Ext.define('Voyant.notebook.Notebook', {
 					}
 				},
 				'saveCancelled': function() {
+				},
+				'close': function() {
 					this.unmask();
 				},
 				scope: this
@@ -37210,7 +37221,7 @@ Ext.define('Voyant.notebook.Notebook', {
     
     updateMetadata: function() {
     	var metadata = this.getMetadata();
-    	this.getComponent("spyralHeader").update(metadata.title);
+    	this.getComponent("spyralHeader").update(this.getInnerHeaderHtml());
     	this.getComponent("spyralFooter").update(this.getInnerFooterHtml());
     },
     
@@ -37354,7 +37365,18 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     getHeaderHtml: function() {
-    	return "<header class='spyral-header'>"+this.getMetadata().title+"</header>\n";
+    	return "<header class='spyral-header'>"+this.getInnerHeaderHtml()+"</header>\n";
+    },
+    
+    getInnerHeaderHtml: function() {
+    	let html = "";
+    	if (this.getMetadata().title) {
+        	html += "<div class='title'>"+this.getMetadata().title+"</div>";
+    	}
+    	if (this.getMetadata().author) {
+        	html += "<div class='author'>"+this.getMetadata().author+"</div>";
+    	}
+    	return html;
     },
     
     getInnerFooterHtml: function() {
@@ -37722,13 +37744,6 @@ Ext.define('Voyant.VoyantApp', {
     	    showDelay: 50 // shorten the delay before showing
     	});
     	
-    	// check for categories
-    	if (this.getApiParam("categories")) {
-    	    this.loadCategoryData(this.getApiParam("categories")).then(function() {
-    	        this.setColorTermAssociations();
-    	    }, null, null, this);
-    		
-    	}    	
 		this.callParent(arguments);
     },
     
@@ -38021,7 +38036,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     
     launch: function(config) {
 		this.callParent(arguments);
-
+		
     	if (this.hasQueryToLoad()) {
         	var queryParams = Ext.Object.fromQueryString(document.location.search);
         	if (!queryParams.corpus && this.getCorpusId && this.getCorpusId()) {
@@ -38229,6 +38244,15 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
 //    		this.colorTermAssociations.clear();
+    		
+    		// let's load the categories based on the corpus
+        	if (this.getApiParam("categories")) {
+        	    this.loadCategoryData(this.getApiParam("categories")).then(function() {
+        	        this.setColorTermAssociations();
+        	    }, null, null, this);
+        		
+        	}    	
+
     		
     		this.on("unhandledEvent", function(src, eventName, data) {
 				var url = this.getBaseUrl() + '?corpus='+corpus.getAliasOrId();
