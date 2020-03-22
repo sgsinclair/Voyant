@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Mar 22 14:04:39 EDT 2020 */
+/* This file created by JSCacher. Last modified: Sun Mar 22 15:31:52 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -34802,13 +34802,14 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 	alias: "widget.notebookeditorwrapper",
 	cls: "notebook-editor-wrapper",
 	config: {
+		cellId: undefined,
 		content: '',
 		isEditing: false
 	},
 	border: false,
 	bodyBorder: false,
 	initComponent: function() {
-		var me = this;
+		this.setCellId(this.config.cellId);
 		this.on("afterrender", function(){
 			this.getDockedItems().forEach(function(tb) {
 				tb.getTargetEl().setVisibilityMode(Ext.dom.Element.VISIBILITY);
@@ -35191,7 +35192,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			    items: [{
 			    		xtype: 'notebookwrappercounter',
 			    		order: config.order,
-			    		name: config.name
+			    		name: config.cellId
 			    	},{
 		        		xtype: 'notebookwrapperremove'
 		        	},{
@@ -35488,7 +35489,7 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 			    items: [{
 			    		xtype: 'notebookwrappercounter',
 			    		order: config.order,
-			    		name: config.name
+			    		name: config.cellId
 			    	},{
 		        		xtype: 'notebookwrapperremove'
 		        	},{
@@ -35525,7 +35526,7 @@ Ext.define("Voyant.notebook.github.OctokitWrapper", {
 	},
 
 	getReposForAuthenticatedUser: function(affiliation='owner', page=0, per_page=10) {
-		return this.octokit.repos.list({
+		return this.octokit.repos.listForAuthenticatedUser({
 			affiliation,
 			page,
 			per_page
@@ -37139,7 +37140,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			var editorType = typeRe[1];    			
     			var input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
     			var output = section.querySelector(".notebook-code-results").innerHTML;
-    			var codeEditor = this.addCode({
+    			this.addCode({
     				input: input,
     				output: output,
     				mode: editorType
@@ -37200,24 +37201,25 @@ Ext.define('Voyant.notebook.Notebook', {
     	Spyral.Load.text(url).then(function(text) {me.loadFromString(text)})
     },
     
-    addText: function(block, order,  name) {
-    	return this._add(block, order, 'notebooktexteditorwrapper', name);
+    addText: function(block, order, cellId) {
+    	return this._add(block, order, 'notebooktexteditorwrapper', cellId);
     },
  
-    addCode: function(block, order, name) {
-    	return this._add(block, order, 'notebookcodeeditorwrapper', name, {docs: this.spyralTernDocs});
+    addCode: function(block, order, cellId) {
+    	return this._add(block, order, 'notebookcodeeditorwrapper', cellId, {docs: this.spyralTernDocs});
     },
     
-    _add: function(block, order, xtype, name, config) {
+    _add: function(block, order, xtype, cellId, config) {
     	if (Ext.isString(block)) {
     		block = {input: block}
     	}
     	var cells = this.getComponent("cells");
-    	order = (typeof order === 'undefined') ? cells.items.length : order;
+		order = (typeof order === 'undefined') ? cells.items.length : order;
+		cellId = (typeof cellId === 'undefined') ? Spyral.Util.id() : cellId;
     	return cells.insert(order, Ext.apply(block, {
     		xtype: xtype,
     		order: order,
-    		name: Spyral.Util.id()
+    		cellId: cellId
     	}, config))
     },
     
