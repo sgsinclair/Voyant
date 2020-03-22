@@ -196,7 +196,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			    items: [{
 			    		xtype: 'notebookwrappercounter',
 			    		order: config.order,
-			    		name: config.name
+			    		name: config.cellId
 			    	},{
 		        		xtype: 'notebookwrapperremove'
 		        	},{

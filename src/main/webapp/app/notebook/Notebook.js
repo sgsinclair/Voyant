@@ -522,7 +522,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			var editorType = typeRe[1];    			
     			var input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
     			var output = section.querySelector(".notebook-code-results").innerHTML;
-    			var codeEditor = this.addCode({
+    			this.addCode({
     				input: input,
     				output: output,
     				mode: editorType
@@ -583,24 +583,25 @@ Ext.define('Voyant.notebook.Notebook', {
     	Spyral.Load.text(url).then(function(text) {me.loadFromString(text)})
     },
     
-    addText: function(block, order,  name) {
-    	return this._add(block, order, 'notebooktexteditorwrapper', name);
+    addText: function(block, order, cellId) {
+    	return this._add(block, order, 'notebooktexteditorwrapper', cellId);
     },
  
-    addCode: function(block, order, name) {
-    	return this._add(block, order, 'notebookcodeeditorwrapper', name, {docs: this.spyralTernDocs});
+    addCode: function(block, order, cellId) {
+    	return this._add(block, order, 'notebookcodeeditorwrapper', cellId, {docs: this.spyralTernDocs});
     },
     
-    _add: function(block, order, xtype, name, config) {
+    _add: function(block, order, xtype, cellId, config) {
     	if (Ext.isString(block)) {
     		block = {input: block}
     	}
     	var cells = this.getComponent("cells");
-    	order = (typeof order === 'undefined') ? cells.items.length : order;
+		order = (typeof order === 'undefined') ? cells.items.length : order;
+		cellId = (typeof cellId === 'undefined') ? Spyral.Util.id() : cellId;
     	return cells.insert(order, Ext.apply(block, {
     		xtype: xtype,
     		order: order,
-    		name: Spyral.Util.id()
+    		cellId: cellId
     	}, config))
     },
     
