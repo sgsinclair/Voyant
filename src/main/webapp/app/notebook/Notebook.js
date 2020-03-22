@@ -607,7 +607,7 @@ Ext.define('Voyant.notebook.Notebook', {
     
     updateMetadata: function() {
     	var metadata = this.getMetadata();
-    	this.getComponent("spyralHeader").update(metadata.title);
+    	this.getComponent("spyralHeader").update(this.getInnerHeaderHtml());
     	this.getComponent("spyralFooter").update(this.getInnerFooterHtml());
     },
     
@@ -751,7 +751,18 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     getHeaderHtml: function() {
-    	return "<header class='spyral-header'>"+this.getMetadata().title+"</header>\n";
+    	return "<header class='spyral-header'>"+this.getInnerHeaderHtml()+"</header>\n";
+    },
+    
+    getInnerHeaderHtml: function() {
+    	let html = "";
+    	if (this.getMetadata().title) {
+        	html += "<div class='title'>"+this.getMetadata().title+"</div>";
+    	}
+    	if (this.getMetadata().author) {
+        	html += "<div class='author'>"+this.getMetadata().author+"</div>";
+    	}
+    	return html;
     },
     
     getInnerFooterHtml: function() {
