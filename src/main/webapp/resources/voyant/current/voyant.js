@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Mar 21 17:30:58 EDT 2020 */
+/* This file created by JSCacher. Last modified: Sun Mar 22 14:04:39 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7691,8 +7691,8 @@ Ext.define('Voyant.util.CategoriesManager', {
             }
         }).then(function(response) {
             var json = Ext.decode(response.responseText);
-            var id = json.storedResource.id;
-            var value = json.storedResource.resource;
+            var id = json.storedCategories.id;
+            var value = json.storedCategories.resource;
             if (value.length == 0) {
                 dfd.reject();
             } else {
@@ -13233,7 +13233,7 @@ Ext.define('Voyant.widget.CategoriesOption', {
 	initComponent: function() {
 	    // TODO set value of option to current categories id if it exists
 		var value = this.up('window').panel.getApiParam('categories');
-    	var data = value ? [{name: 'categories-'+value, value: value}] : [];
+    	var data = value ? [{name: value, value: value}] : [];
 		
 		Ext.apply(this, {
     		layout: 'hbox',
@@ -13249,7 +13249,8 @@ Ext.define('Voyant.widget.CategoriesOption', {
     				fields: ['name', 'value'],
     				data: data
     			},
-    			name: 'category'
+    			name: 'category',
+    			value: value
     		}, {width: 10}, {xtype: 'tbspacer'}, {
     			xtype: 'button',
     			text: this.localize('edit'),
@@ -13266,7 +13267,7 @@ Ext.define('Voyant.widget.CategoriesOption', {
     						var id = win.getCategoriesId();
     						if (id !== undefined) {
 	    						var combo = this.down('combo');
-								var name = 'categories-'+id;
+								var name = id;
 								combo.getStore().add({name: name, value: id});
 								combo.setValue(id);
 								
@@ -13544,16 +13545,16 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			}],
 			listeners: {
 				show: function() {
-					if (this.getCategoriesId()) {
+					// check to see if the widget value is different from the API
+					if (this.getCategoriesId() && this.getCategoriesId()!=this.getApiParam("categories")) {
 		    			this.app.loadCategoryData(this.getCategoriesId()).then(function(data) {
 							this.buildCategories();
 							this.buildFeatures();
 						}, null, null, this);
-	    			} else {
-	    				this.buildCategories();
-	    				this.buildFeatures();
-	    			}
-					
+					} else {
+						this.buildCategories();
+						this.buildFeatures();
+					}					
 					this.down('tabpanel').setActiveTab(0);
 				},
 				afterrender: function(builder) {
@@ -13877,6 +13878,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     },
     
     buildCategories: function() {
+
     	this.queryById('categories').removeAll();
     	
     	var cats = this.app.getCategories();

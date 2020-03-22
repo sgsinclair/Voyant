@@ -158,8 +158,8 @@ Ext.define('Voyant.util.CategoriesManager', {
             }
         }).then(function(response) {
             var json = Ext.decode(response.responseText);
-            var id = json.storedResource.id;
-            var value = json.storedResource.resource;
+            var id = json.storedCategories.id;
+            var value = json.storedCategories.resource;
             if (value.length == 0) {
                 dfd.reject();
             } else {
