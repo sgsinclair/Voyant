@@ -18,7 +18,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     config: {
-    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
+    	options: [{xtype: 'stoplistoption'},{
+    		xtype: 'categoriesoption'
+    	}],
     	
     	nodeData: undefined,
     	linkData: undefined,
@@ -284,7 +286,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				params: {
 					limit: limit,
 					query: query,
-					stopList: this.getApiParam('stopList')
+					stopList: this.getApiParam('stopList'),
+					categories: this.getApiParam("categories")
 				},
 			    callback: function(records, operation, success) {
 			    	if (success) {
@@ -307,6 +310,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		query: query
     	});
     	var params = this.getApiParams();
+    	params.noCache=true;
     	(Ext.isString(query) ? [query] : query).forEach(function(q) {
         	this.getCorpus().getCorpusCollocates({autoLoad: false}).load({
         		params: Ext.apply(Ext.clone(params), {query: q}),

@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sun Mar 22 15:31:52 EDT 2020 */
+/* This file created by JSCacher. Last modified: Tue Mar 24 12:40:15 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -16958,7 +16958,9 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     },
     
     config: {
-    	options: [{xtype: 'stoplistoption'},{xtype: 'categoriesoption'}],
+    	options: [{xtype: 'stoplistoption'},{
+    		xtype: 'categoriesoption'
+    	}],
     	
     	nodeData: undefined,
     	linkData: undefined,
@@ -17224,7 +17226,8 @@ Ext.define('Voyant.panel.CollocatesGraph', {
 				params: {
 					limit: limit,
 					query: query,
-					stopList: this.getApiParam('stopList')
+					stopList: this.getApiParam('stopList'),
+					categories: this.getApiParam("categories")
 				},
 			    callback: function(records, operation, success) {
 			    	if (success) {
@@ -17247,6 +17250,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     		query: query
     	});
     	var params = this.getApiParams();
+    	params.noCache=true;
     	(Ext.isString(query) ? [query] : query).forEach(function(q) {
         	this.getCorpus().getCorpusCollocates({autoLoad: false}).load({
         		params: Ext.apply(Ext.clone(params), {query: q}),
@@ -25559,7 +25563,7 @@ Ext.define('Voyant.panel.MicroSearch', {
 		
     	if (!this.getApiParam('query')) {
     		var me = this;
-    		return this.getCorpus().loadCorpusTerms({limit: 1, stopList: this.getApiParam('stopList')}).then(function(corpusTerms) {
+    		return this.getCorpus().loadCorpusTerms({limit: 1, stopList: this.getApiParam('stopList'), categories: this.getApiParam("categories")}).then(function(corpusTerms) {
     			var term = corpusTerms.getAt(0).getTerm();
     			var q = me.down('querysearchfield');
     			q.addValue(new Voyant.data.model.CorpusTerm({term: term}));
@@ -25582,7 +25586,8 @@ Ext.define('Voyant.panel.MicroSearch', {
     			params: {
     				query: Ext.Array.from(query).join('|'), // treat as one query
         			withDistributions: 'relative',
-        			bins: this.getMaxSegments()
+        			bins: this.getMaxSegments(),
+        			categories: this.getApiParam('categories')
     			},
     			callback: function(records, operation, success) {
     				this.unmask();
@@ -28350,7 +28355,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 							var isActive = Ext.fly(el.firstElementChild).hasCls('x-legend-inactive');
 							record.set('active', isActive);
 							var terms = this.getCurrentTerms();
-							this.setApiParams({query: terms, limit: terms.length, stopList: undefined});
+							this.setApiParams({query: terms, limit: terms.length, stopList: undefined, categories: this.getApiParam("categories")});
 							this.loadFromCorpus();
 						},
 						scope: this
@@ -28488,7 +28493,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 	},
 
     loadFromCorpusTerms: function(corpusTerms) {
-    	var params = this.getApiParams(['limit','stopList','query','withDistributions','bins']);
+    	var params = this.getApiParams(['limit','stopList','query','withDistributions','bins','categories']);
 		// ensure that we're not beyond the number of documents
 		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
 			params.bins = this.getCorpus().getDocumentsCount();
@@ -28540,7 +28545,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     		    	}
     		    },
     		    scope: this,
-    		    params: this.getApiParams(['docId','docIndex','limit','stopList','query','withDistributions','bins'])
+    		    params: this.getApiParams(['docId','docIndex','limit','stopList','query','withDistributions','bins','categories'])
         	});
     	}
     },

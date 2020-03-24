@@ -57,7 +57,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 							var isActive = Ext.fly(el.firstElementChild).hasCls('x-legend-inactive');
 							record.set('active', isActive);
 							var terms = this.getCurrentTerms();
-							this.setApiParams({query: terms, limit: terms.length, stopList: undefined});
+							this.setApiParams({query: terms, limit: terms.length, stopList: undefined, categories: this.getApiParam("categories")});
 							this.loadFromCorpus();
 						},
 						scope: this
@@ -195,7 +195,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 	},
 
     loadFromCorpusTerms: function(corpusTerms) {
-    	var params = this.getApiParams(['limit','stopList','query','withDistributions','bins']);
+    	var params = this.getApiParams(['limit','stopList','query','withDistributions','bins','categories']);
 		// ensure that we're not beyond the number of documents
 		if (params.bins && params.bins > this.getCorpus().getDocumentsCount()) {
 			params.bins = this.getCorpus().getDocumentsCount();
@@ -247,7 +247,7 @@ Ext.define('Voyant.panel.StreamGraph', {
     		    	}
     		    },
     		    scope: this,
-    		    params: this.getApiParams(['docId','docIndex','limit','stopList','query','withDistributions','bins'])
+    		    params: this.getApiParams(['docId','docIndex','limit','stopList','query','withDistributions','bins','categories'])
         	});
     	}
     },
