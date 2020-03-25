@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Tue Mar 24 12:40:15 EDT 2020 */
+/* This file created by JSCacher. Last modified: Wed Mar 25 15:18:17 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -11924,6 +11924,16 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	    		}
 			}
 
+			var categories = this.getApiParam ? this.getApiParam("categories") : undefined;
+			if (!categories) {
+    			var parent = this.up("panel");
+    			while (parent) {
+    				if (parent && parent.getApiParam) {
+    					categories = parent.getApiParam('categories');
+	    				break;
+	    			}
+    			}
+			}
 			var store = corpus.getCorpusTerms({				
 				corpus: corpus.getAliasOrId(),
 				proxy: {
@@ -11931,7 +11941,8 @@ Ext.define('Voyant.widget.QuerySearchField', {
 			    			limit: 10,
 			    			tokenType: this.tokenType,
 			    			stopList: this.getStopList(),
-			    			inDocumentsCountOnly: this.getInDocumentsCountOnly()
+			    			inDocumentsCountOnly: this.getInDocumentsCountOnly(),
+			    			categories: categories
 					}
 				}
 			});

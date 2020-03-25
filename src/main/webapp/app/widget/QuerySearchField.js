@@ -252,6 +252,16 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	    		}
 			}
 
+			var categories = this.getApiParam ? this.getApiParam("categories") : undefined;
+			if (!categories) {
+    			var parent = this.up("panel");
+    			while (parent) {
+    				if (parent && parent.getApiParam) {
+    					categories = parent.getApiParam('categories');
+	    				break;
+	    			}
+    			}
+			}
 			var store = corpus.getCorpusTerms({				
 				corpus: corpus.getAliasOrId(),
 				proxy: {
@@ -259,7 +269,8 @@ Ext.define('Voyant.widget.QuerySearchField', {
 			    			limit: 10,
 			    			tokenType: this.tokenType,
 			    			stopList: this.getStopList(),
-			    			inDocumentsCountOnly: this.getInDocumentsCountOnly()
+			    			inDocumentsCountOnly: this.getInDocumentsCountOnly(),
+			    			categories: categories
 					}
 				}
 			});
