@@ -42,6 +42,11 @@
                         "title": "Stopwords"
                     },
                     {
+                        "name": "categories",
+                        "url": "guides/ui/categories",
+                        "title": "Categories"
+                    },
+                    {
                         "name": "search",
                         "url": "guides/ui/search",
                         "title": "Search"

@@ -31,6 +31,6 @@ Note that Voyant doesn't currently support regular expressions.
 
 ## Next Steps
 
-- [palette](#!/guide/palette)
+- [categories](#!/guide/categories)
 * [explore the tools](#!/guide/tools)
 * read [about Voyant Tools](#!/guide/about)
