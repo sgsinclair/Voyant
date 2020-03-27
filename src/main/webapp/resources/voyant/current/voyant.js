@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Mar 25 15:18:17 EDT 2020 */
+/* This file created by JSCacher. Last modified: Thu Mar 26 13:50:53 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -11693,6 +11693,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	isClearing: false, // flag for clearOnQuery
     
     constructor: function(config) {
+    	
     	config = config || {};
     	var itemTpl = config.itemTpl ? config.itemTpl : (config.inDocumentsCountOnly ?
     			('<tpl><tpl if="term.charAt(0)==\'@\'">{term}</tpl><tpl if="term.charAt(0)!=\'@\'">{term} ({inDocumentsCount})</tpl></tpl>') :
@@ -11744,9 +11745,11 @@ Ext.define('Voyant.widget.QuerySearchField', {
         this.callParent(arguments);
     },
     initComponent: function(config) {
+
     	var me = this;
 
     	me.on("beforequery", function(queryPlan) {
+    		debugger
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
     			
@@ -11806,6 +11809,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	}, this);
     	
     	me.on("change", function(tags, queries) {
+    		debugger
     		if (!me.isClearing) {
 	    		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
 	    		me.up('panel').fireEvent("query", me, queries);
@@ -11860,6 +11864,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	}
     	
     	me.on("afterrender", function(c) {
+    		debugger
     		if (me.hasCorpusLoadedListener === false) {
     			if (!me.getCorpus()) {
     	    		parentPanel = me.findParentBy(function(clz) {
@@ -11895,6 +11900,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	});
     	
     	me.on("beforedestroy", function(c) {
+    		debugger
     		if (me.triggers && me.triggers.help) {
     			Ext.tip.QuickTipManager.unregister(me.triggers.help.getEl());
     		}
@@ -11907,6 +11913,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     },
     
     doSetCorpus: function(corpus) {
+		debugger
     	if (corpus != null) {
 	    	this.setCorpus(corpus);
 			var stopList = this.getStopList();
@@ -11932,6 +11939,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     					categories = parent.getApiParam('categories');
 	    				break;
 	    			}
+    				parent = parent.up("panel");
     			}
 			}
 			var store = corpus.getCorpusTerms({				
@@ -13287,7 +13295,6 @@ Ext.define('Voyant.widget.CategoriesOption', {
     					}, this);
     					this.setBuilderWin(win);
     				}
-    				
     				var categoriesId = this.down('combo').getValue();
     				this.getBuilderWin().setCategoriesId(categoriesId);
 					this.getBuilderWin().show();
@@ -13382,6 +13389,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	width: 500,
 
     constructor: function(config) {
+
     	config = config || {};
     	
     	if (config.panel) {
@@ -13394,10 +13402,12 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	}
     	
     	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+
     	this.callParent(arguments);
     },
     
     initComponent: function() {
+
     	Ext.apply(this, {
     		header: false,
     		layout: 'fit',
@@ -13470,7 +13480,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				                xtype: 'toolbar',
 				                overflowHandler: 'scroller',
 				                items: [{
-				                    xtype: 'querysearchfield'
+				                	xtype: 'querysearchfield'
 				                }]
 				            }],
 				            listeners: {
@@ -13643,7 +13653,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     			}
     		}
     	}));
-    	
     	this.callParent(arguments);
     },
     
@@ -13889,7 +13898,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     },
     
     buildCategories: function() {
-
     	this.queryById('categories').removeAll();
     	
     	var cats = this.app.getCategories();

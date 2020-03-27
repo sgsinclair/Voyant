@@ -21,6 +21,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	isClearing: false, // flag for clearOnQuery
     
     constructor: function(config) {
+    	
     	config = config || {};
     	var itemTpl = config.itemTpl ? config.itemTpl : (config.inDocumentsCountOnly ?
     			('<tpl><tpl if="term.charAt(0)==\'@\'">{term}</tpl><tpl if="term.charAt(0)!=\'@\'">{term} ({inDocumentsCount})</tpl></tpl>') :
@@ -72,9 +73,11 @@ Ext.define('Voyant.widget.QuerySearchField', {
         this.callParent(arguments);
     },
     initComponent: function(config) {
+
     	var me = this;
 
     	me.on("beforequery", function(queryPlan) {
+
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
     			
@@ -134,6 +137,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	}, this);
     	
     	me.on("change", function(tags, queries) {
+    		
     		if (!me.isClearing) {
 	    		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
 	    		me.up('panel').fireEvent("query", me, queries);
@@ -188,6 +192,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	}
     	
     	me.on("afterrender", function(c) {
+    		
     		if (me.hasCorpusLoadedListener === false) {
     			if (!me.getCorpus()) {
     	    		parentPanel = me.findParentBy(function(clz) {
@@ -223,6 +228,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	});
     	
     	me.on("beforedestroy", function(c) {
+    		
     		if (me.triggers && me.triggers.help) {
     			Ext.tip.QuickTipManager.unregister(me.triggers.help.getEl());
     		}
@@ -235,6 +241,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     },
     
     doSetCorpus: function(corpus) {
+		
     	if (corpus != null) {
 	    	this.setCorpus(corpus);
 			var stopList = this.getStopList();
@@ -260,6 +267,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     					categories = parent.getApiParam('categories');
 	    				break;
 	    			}
+    				parent = parent.up("panel");
     			}
 			}
 			var store = corpus.getCorpusTerms({				
