@@ -796,12 +796,12 @@ Ext.define('Voyant.notebook.Notebook', {
        		listeners: {
        			afterrender: function(cmp) {
        		    	var file, name = (this.getNotebookId() || "spyral")+ ".html",
-       	    		data = this.generateExportHtml().split("\n"),
+       	    		data = this.generateExportHtml(),
        	    		properties = {type: 'text/html'};
 	       	    	try {
-	       	    	  file = new File(data, name, properties);
+	       	    	  file = new File([data], name, properties);
 	       	    	} catch (e) {
-	       	    	  file = new Blob(data, properties);
+	       	    	  file = new Blob([data], properties);
 	       	    	}
 	       	    	
        	    		var url = URL.createObjectURL(file);
@@ -825,16 +825,17 @@ Ext.define('Voyant.notebook.Notebook', {
         myWindow.document.close();
         myWindow.focus();
     },
-    
+	
+	// TODO not currently being used
     exportHtmlDownload: function() {
     	// https://stackoverflow.com/questions/2897619/using-html5-javascript-to-generate-and-save-a-file
     	var file,
-    		data = this.generateExportHtml().split("\n"),
+    		data = this.generateExportHtml(),
     		properties = {type: 'text/plain'}; // Specify the file's mime-type.
     	try {
-    	  file = new File(data, "files.txt", properties);
+    	  file = new File([data], "files.txt", properties);
     	} catch (e) {
-    	  file = new Blob(data, properties);
+    	  file = new Blob([data], properties);
     	}
     	var url = URL.createObjectURL(file);
     	this.getApplication().openUrl(url)
