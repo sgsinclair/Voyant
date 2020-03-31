@@ -624,7 +624,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		}
 		else {
 			cells.move(i, i-1);
-    		this.redoOrder();
+			this.redoOrder();
 		}
 	},
 	
@@ -641,7 +641,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		}
 		else {
 			cells.move(i, i+1);
-    		this.redoOrder();
+			this.redoOrder();
 		}
 	},
 	
@@ -672,7 +672,8 @@ Ext.define('Voyant.notebook.Notebook', {
     redoOrder: function() {
     	this.query("notebookwrappercounter").forEach(function(counter, i) {
     		counter.setOrder(i);
-    	})
+		})
+		this.setIsEdited(true);
     },
     
     setIsEdited: function(val) {
