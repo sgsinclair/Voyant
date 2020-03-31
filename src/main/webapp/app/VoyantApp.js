@@ -33,7 +33,7 @@ Ext.define('Voyant.VoyantApp', {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 		
 		this.mixins['Voyant.util.CategoriesManager'].constructor.apply(this, arguments);
-		this.addFeature('color');
+		this.addFeature('color', '#000000');
 		this.addFeature('font', '"Palatino Linotype", "Book Antiqua", Palatino, serif');
 		
 		// call the parent constructor
