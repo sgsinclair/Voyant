@@ -51,7 +51,32 @@
       "chart": {
         "!type": "object"
       },
+      "series": {
+        "!type": "array"
+      },
+      "plotOptions": {
+        "!type": "object"
+      },
       "!doc": "The Highcharts config object"
+    },
+    "TableConfig": {
+      "format": {
+        "!type": "string",
+        "!doc": "The format of the provided data, either \"tsv\" or \"csv\""
+      },
+      "headers": {
+        "!type": "?",
+        "!doc": "The table headers"
+      },
+      "hasHeaders": {
+        "!type": "bool",
+        "!doc": "True if the headers are the first item in the data"
+      },
+      "count": {
+        "!type": "string",
+        "!doc": "Specify \"vertical\" or \"horizontal\" to create a table of unique item counts in the provided data"
+      },
+      "!doc": "The Table config object"
     }
   },
   "Spyral": {
@@ -94,7 +119,12 @@
         "!type": "fn(contents: ?, config: ?)"
       },
       "getTarget": {
-        "!type": "fn() -> ?"
+        "!type": "fn() -> element",
+        "!doc": "Returns the target element"
+      },
+      "import": {
+        "!type": "fn(url: string)",
+        "!doc": "Fetch and return the content of a notebook or a particular cell in a notebook"
       }
     },
     "Util": {
@@ -110,17 +140,57 @@
       }
     },
     "Chart": {
-      "!type": "fn(target: ?, data: ?)",
+      "!type": "fn(target: element, data: array)",
       "prototype": {
         "create": {
           "!type": "fn(target: ?, config: +HighchartsConfig) -> +Highcharts.Chart",
-          "!doc": "Create a new chart.\rSee https://api.highcharts.com/highcharts/ for full set of config options."
+          "!doc": "Create a new chart\rSee https://api.highcharts.com/highcharts/ for full set of config options."
+        },
+        "bar": {
+          "!type": "fn(config?: object) -> +Highcharts.Chart",
+          "!doc": "Create a bar chart"
+        },
+        "line": {
+          "!type": "fn(config?: object) -> +Highcharts.Chart",
+          "!doc": "Create a line chart"
+        },
+        "scatter": {
+          "!type": "fn(config?: object) -> +Highcharts.Chart",
+          "!doc": "Create a scatter plot"
+        },
+        "networkgraph": {
+          "!type": "fn(config?: object) -> +Highcharts.Chart",
+          "!doc": "Create a network graph"
         }
       },
       "!doc": "Construct a new Chart class",
       "create": {
         "!type": "fn(target: ?, config: +HighchartsConfig) -> +Highcharts.Chart",
         "!doc": "Create a new chart\rSee https://api.highcharts.com/highcharts/ for full set of config options."
+      },
+      "setDefaultChartType": {
+        "!type": "fn(config: object, type: string)",
+        "!doc": "Sets the default chart type"
+      },
+      "setSeriesData": {
+        "!type": "fn(config: object, data: array)",
+        "!doc": "Add the provided data to the config as a series"
+      },
+      "bar": {
+        "!type": "fn(target: element, config: object) -> +Highcharts.Chart",
+        "!doc": "Create a bar chart"
+      },
+      "line": {
+        "!type": "fn(target: element, config: object) -> +Highcharts.Chart",
+        "!doc": "Create a line chart"
+      },
+      "scatter": {
+        "!type": "fn(target: element, config: object) -> +Highcharts.Chart",
+        "!doc": "Create a scatter plot"
+      },
+      "networkgraph": {
+        "!type": "fn(target: element, config: object) -> +Highcharts.Chart",
+        "!doc": "Create a network graph"
       }
     },
     "Corpus": {
@@ -238,7 +308,7 @@
       }
     },
     "Table": {
-      "!type": "fn(data: ?, config: object)",
+      "!type": "fn(data: ?, config: +TableConfig)",
       "prototype": {
         "setHeaders": {
           "!type": "fn(data: ?) -> +Table",
@@ -253,15 +323,15 @@
           "!doc": "Add a row to the Table"
         },
         "setRow": {
-          "!type": "fn(ind: ?, data: ?, create: boolean) -> +Table",
+          "!type": "fn(ind: ?, data: ?, create: bool) -> +Table",
           "!doc": "Set a row"
         },
         "setColumn": {
-          "!type": "fn(ind: ?, data: ?, create: boolean) -> +Table",
+          "!type": "fn(ind: ?, data: ?, create: bool) -> +Table",
           "!doc": "Set a column"
         },
         "updateCell": {
-          "!type": "fn(row: ?, column: ?, value: number, overwrite: boolean)",
+          "!type": "fn(row: ?, column: ?, value: number, overwrite: bool)",
           "!doc": "Add to or set a cell value"
         },
         "cell": {
@@ -273,11 +343,11 @@
           "!doc": "Set the value of a cell"
         },
         "getRowIndex": {
-          "!type": "fn(ind: ?, create: boolean) -> number",
+          "!type": "fn(ind: ?, create: bool) -> number",
           "!doc": "Get (and create) the row index"
         },
         "getColumnIndex": {
-          "!type": "fn(ind: ?, create: boolean) -> number",
+          "!type": "fn(ind: ?, create: bool) -> number",
           "!doc": "Get (and create) the column index"
         },
         "addColumn": {
@@ -289,7 +359,7 @@
           "!doc": "This function returns different values depending on the arguments provided.\rWhen there are no arguments, it returns the number of rows in this table.\rWhen the first argument is the boolean value `true` all rows are returned.\rWhen the first argument is a an array then the rows corresponding to the row\rindices or names are returned. When all arguments except are numbers or strings\rthen each of those is returned."
         },
         "row": {
-          "!type": "fn(ind: ?, asObj?: boolean) -> ?",
+          "!type": "fn(ind: ?, asObj?: bool) -> ?",
           "!doc": "Get the specified row"
         },
         "columns": {
@@ -297,7 +367,7 @@
           "!doc": "This function returns different values depending on the arguments provided.\rWhen there are no arguments, it returns the number of columns in this table.\rWhen the first argument is the boolean value `true` all columns are returned.\rWhen the first argument is a number a slice of the columns is returned and if\rthe second argument is a number it is treated as the length of the slice to\rreturn (note that it isn't the `end` index like with Array.slice())."
         },
         "column": {
-          "!type": "fn(ind: ?, asObj?: boolean) -> ?",
+          "!type": "fn(ind: ?, asObj?: bool) -> ?",
           "!doc": "Get the specified column"
         },
         "header": {
@@ -306,7 +376,7 @@
         },
         "headers": {
           "!type": "fn(inds: ?) -> ?",
-          "!doc": "Get the specified headers"
+          "!doc": "This function returns different values depending on the arguments provided.\rWhen there are no arguments, it returns the number of headers in this table.\rWhen the first argument is the boolean value `true` all headers are returned.\rWhen the first argument is a number a slice of the headers is returned.\rWhen the first argument is an array the slices specified in the array are returned."
         },
         "hasColumn": {
           "!type": "fn(ind: ?) -> ?",
@@ -357,11 +427,11 @@
           "!doc": "Get the count of each unique value in the specified column"
         },
         "rowRollingMean": {
-          "!type": "fn(ind: ?, neighbors: number, overwrite: boolean) -> array",
+          "!type": "fn(ind: ?, neighbors: number, overwrite: bool) -> array",
           "!doc": "Get the rolling mean for the specified row"
         },
         "columnRollingMean": {
-          "!type": "fn(ind: ?, neighbors: number, overwrite: boolean) -> array",
+          "!type": "fn(ind: ?, neighbors: number, overwrite: bool) -> array",
           "!doc": "Get the rolling mean for the specified column"
         },
         "rowVariance": {
@@ -396,10 +466,6 @@
           "!type": "fn() -> +Table",
           "!doc": "TODO\rSort the specified columns"
         },
-        "chart": {
-          "!type": "fn(config?: +HighchartsConfig) -> +Highcharts.Chart",
-          "!doc": "Show a chart representing the Table"
-        },
         "toCsv": {
           "!type": "fn(config?: object) -> string",
           "!doc": "Get a CSV representation of the Table"
@@ -415,11 +481,15 @@
         "toString": {
           "!type": "fn(config?: object) -> string",
           "!doc": "Get an HTML representation of the Table"
+        },
+        "chart": {
+          "!type": "fn(target?: ?, config?: +HighchartsConfig) -> +Highcharts.Chart",
+          "!doc": "Show a chart representing the Table"
         }
       },
       "!doc": "Create a new Table",
       "create": {
-        "!type": "fn(data: ?, config: object) -> +Table",
+        "!type": "fn(data: ?, config: +TableConfig) -> +Table",
         "!doc": "Create a new Table"
       },
       "fetch": {
