@@ -30,7 +30,6 @@
 	},
 	"homepage": "https://github.com/sgsinclair/Voyant",
 	"dependencies": {
-		"@octokit/rest": "^16.33.1",
 		"js-cookie": "^2.2.1",
 		"voyant": "^1.4.3"
 	},
@@ -38,6 +37,7 @@
 		"@babel/core": "^7.8.7",
 		"@babel/plugin-proposal-class-properties": "^7.8.3",
 		"@babel/preset-env": "^7.8.7",
+		"@rollup/plugin-commonjs": "^11.0.2",
 		"@rollup/plugin-node-resolve": "^7.1.1",
 		"jsdoc": "^3.6.3",
 		"rollup": "^2.0.6",
