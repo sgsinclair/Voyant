@@ -3633,10 +3633,11 @@ var Spyral = (function () {
 
                   if (Ext) {
                     if (error === undefined) {
-                      Ext.Msg.show({
-                        title: 'Imported code from: ' + url,
-                        message: '<pre>' + code + '</pre>',
-                        buttons: Ext.Msg.OK
+                      Ext.toast({
+                        // quick tip that auto-destructs
+                        html: 'Imported code from: ' + url,
+                        width: 200,
+                        align: 'b'
                       });
                     } else {
                       Ext.Msg.show({
@@ -3650,7 +3651,7 @@ var Spyral = (function () {
 
                   result = undefined;
                   _context.prev = 26;
-                  eval.call(window, code);
+                  result = eval.call(window, code);
                   _context.next = 33;
                   break;
 
@@ -3664,7 +3665,9 @@ var Spyral = (function () {
                     console.log(result);
                   }
 
-                case 34:
+                  return _context.abrupt("return", result);
+
+                case 35:
                 case "end":
                   return _context.stop();
               }

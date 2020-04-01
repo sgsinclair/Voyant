@@ -116,11 +116,11 @@ class Notebook {
 		
 		if (Ext) {
 			if (error === undefined) {
-				Ext.Msg.show({
-					title: 'Imported code from: '+url,
-					message: '<pre>'+code+'</pre>',
-					buttons: Ext.Msg.OK
-				})
+				Ext.toast({ // quick tip that auto-destructs
+				     html: 'Imported code from: '+url,
+				     width: 200,
+				     align: 'b'
+				});
 			} else {
 				Ext.Msg.show({
 					title: 'Error importing code from: '+url,
@@ -133,13 +133,14 @@ class Notebook {
 
 		let result = undefined
 		try {
-			eval.call(window, code);
+			result = eval.call(window, code);
 		} catch(e) {
 			return e
 		}
 		if (result !== undefined) {
 			console.log(result)
 		}
+		return result; // could be a promise?
 	}
 }
 
