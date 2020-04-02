@@ -419,15 +419,24 @@ Ext.define('Voyant.notebook.Notebook', {
 	},
 
 	showSaveDialog: function(saveAs) {
-		var data = this.generateExportHtml();
 		this.mask(this.localize('saving'));
 		this.getMetadata().setDateNow("modified");
 
+		const data = this.generateExportHtml();
 		const storageSolution = this.getStorageSolution();
-		if (storageSolution === 'github') {
-			this.githubDialogs.showSave(data);
+		
+		if (storageSolution === 'voyant' && this.getNotebookId() !== undefined && this.voyantStorageDialogs.getAccessCode() !== undefined) {
+			this.voyantStorageDialogs.doSave({
+				notebookId: this.getNotebookId(),
+				data: data,
+				accessCode: this.voyantStorageDialogs.getAccessCode()
+			});
 		} else {
-			this.voyantStorageDialogs.showSave(data, saveAs ? undefined : this.getNotebookId());
+			if (storageSolution === 'github') {
+				this.githubDialogs.showSave(data);
+			} else {
+				this.voyantStorageDialogs.showSave(data, saveAs ? undefined : this.getNotebookId());
+			}
 		}
 	},
 	
