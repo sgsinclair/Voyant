@@ -109,12 +109,8 @@ Ext.define('Voyant.notebook.Notebook', {
     			'new': {
     				tooltip: this.localize("newTip"),
     				callback: function() {
-    					this.clear();
-    					this.addNew();
     	    			let url = this.getBaseUrl()+"spyral/";
-    	    			window.history.pushState({
-    						url: url
-    					}, "Spyral Notebook", url);
+						this.getApplication().openUrl(url);
     				},
     				xtype: 'toolmenu',
     				glyph: 'xf067@FontAwesome',
