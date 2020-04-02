@@ -47,6 +47,15 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 });
 </script>
 <script src="<%= base %>/resources/ace/1.4.7/src-noconflict/ace.js"></script>
+<style>
+.ace-chrome .ace_gutter {
+    background-color: rgba(0,0,0,.025)!important;
+}
+.ace-chrome .ace_gutter-active-line {
+    background-color: rgba(0,0,0,.05)!important;
+}
+
+</style>
 <!--script src="<%= base %>/resources/ace/1.4.7/src-noconflict/ext-language_tools.js"></script-->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/spyral/css/spyral.css" />
 <style id="voyant-notebooks-styles"></style>
