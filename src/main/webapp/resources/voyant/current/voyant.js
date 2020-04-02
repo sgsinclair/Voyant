@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Mar 26 13:50:53 EDT 2020 */
+/* This file created by JSCacher. Last modified: Thu Apr 02 11:54:33 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -11749,7 +11749,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	var me = this;
 
     	me.on("beforequery", function(queryPlan) {
-    		debugger
+
     		if (queryPlan.query) {
     			queryPlan.query = queryPlan.query.trim();
     			
@@ -11809,7 +11809,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	}, this);
     	
     	me.on("change", function(tags, queries) {
-    		debugger
+    		
     		if (!me.isClearing) {
 	    		queries = queries.map(function(query) {return query.replace(/^(\^?)\*/, "$1.*")});
 	    		me.up('panel').fireEvent("query", me, queries);
@@ -11864,7 +11864,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	}
     	
     	me.on("afterrender", function(c) {
-    		debugger
+    		
     		if (me.hasCorpusLoadedListener === false) {
     			if (!me.getCorpus()) {
     	    		parentPanel = me.findParentBy(function(clz) {
@@ -11900,7 +11900,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     	});
     	
     	me.on("beforedestroy", function(c) {
-    		debugger
+    		
     		if (me.triggers && me.triggers.help) {
     			Ext.tip.QuickTipManager.unregister(me.triggers.help.getEl());
     		}
@@ -11913,7 +11913,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     },
     
     doSetCorpus: function(corpus) {
-		debugger
+		
     	if (corpus != null) {
 	    	this.setCorpus(corpus);
 			var stopList = this.getStopList();
@@ -13295,6 +13295,7 @@ Ext.define('Voyant.widget.CategoriesOption', {
     					}, this);
     					this.setBuilderWin(win);
     				}
+    				
     				var categoriesId = this.down('combo').getValue();
     				this.getBuilderWin().setCategoriesId(categoriesId);
 					this.getBuilderWin().show();
@@ -13389,7 +13390,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	width: 500,
 
     constructor: function(config) {
-
     	config = config || {};
     	
     	if (config.panel) {
@@ -13402,12 +13402,10 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	}
     	
     	this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-
     	this.callParent(arguments);
     },
     
     initComponent: function() {
-
     	Ext.apply(this, {
     		header: false,
     		layout: 'fit',
@@ -13480,7 +13478,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				                xtype: 'toolbar',
 				                overflowHandler: 'scroller',
 				                items: [{
-				                	xtype: 'querysearchfield'
+				                    xtype: 'querysearchfield'
 				                }]
 				            }],
 				            listeners: {
@@ -13653,6 +13651,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     			}
     		}
     	}));
+    	
     	this.callParent(arguments);
     },
     
@@ -13898,6 +13897,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     },
     
     buildCategories: function() {
+
     	this.queryById('categories').removeAll();
     	
     	var cats = this.app.getCategories();
@@ -34915,15 +34915,16 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 				scrollPastEnd: true
 			});
 			editor.setHighlightActiveLine(false);
+			editor.setHighlightGutterLine(false);
 			editor.renderer.setShowPrintMargin(false);
-			editor.renderer.setShowGutter(false);
+//			editor.renderer.setShowGutter(false);
 			
 			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
 			editor.clearSelection();
 
 		    editor.on("focus", function() {
 				setTimeout(function() {
-					me.getEditor().renderer.setShowGutter(true);
+					me.getEditor().setHighlightGutterLine(true);
 				}, 100); // slight delay to avoid selecting a range of text, caused by showing the gutter while mouse is still pressed
 		    }, this);
 		    editor.on("change", function(ev, editor) {
@@ -34949,7 +34950,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 				}
 		    }, this);
 		    editor.on("blur", function() {
-		    	me.getEditor().renderer.setShowGutter(false);
+		    	me.getEditor().setHighlightGutterLine(false);
 		    });
 			editor.commands.addCommand({
 				name: 'run',
@@ -37266,7 +37267,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		}
 		else {
 			cells.move(i, i-1);
-    		this.redoOrder();
+			this.redoOrder();
 		}
 	},
 	
@@ -37283,7 +37284,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		}
 		else {
 			cells.move(i, i+1);
-    		this.redoOrder();
+			this.redoOrder();
 		}
 	},
 	
@@ -37314,7 +37315,8 @@ Ext.define('Voyant.notebook.Notebook', {
     redoOrder: function() {
     	this.query("notebookwrappercounter").forEach(function(counter, i) {
     		counter.setOrder(i);
-    	})
+		})
+		this.setIsEdited(true);
     },
     
     setIsEdited: function(val) {
@@ -37438,12 +37440,12 @@ Ext.define('Voyant.notebook.Notebook', {
        		listeners: {
        			afterrender: function(cmp) {
        		    	var file, name = (this.getNotebookId() || "spyral")+ ".html",
-       	    		data = this.generateExportHtml().split("\n"),
+       	    		data = this.generateExportHtml(),
        	    		properties = {type: 'text/html'};
 	       	    	try {
-	       	    	  file = new File(data, name, properties);
+	       	    	  file = new File([data], name, properties);
 	       	    	} catch (e) {
-	       	    	  file = new Blob(data, properties);
+	       	    	  file = new Blob([data], properties);
 	       	    	}
 	       	    	
        	    		var url = URL.createObjectURL(file);
@@ -37467,16 +37469,17 @@ Ext.define('Voyant.notebook.Notebook', {
         myWindow.document.close();
         myWindow.focus();
     },
-    
+	
+	// TODO not currently being used
     exportHtmlDownload: function() {
     	// https://stackoverflow.com/questions/2897619/using-html5-javascript-to-generate-and-save-a-file
     	var file,
-    		data = this.generateExportHtml().split("\n"),
+    		data = this.generateExportHtml(),
     		properties = {type: 'text/plain'}; // Specify the file's mime-type.
     	try {
-    	  file = new File(data, "files.txt", properties);
+    	  file = new File([data], "files.txt", properties);
     	} catch (e) {
-    	  file = new Blob(data, properties);
+    	  file = new Blob([data], properties);
     	}
     	var url = URL.createObjectURL(file);
     	this.getApplication().openUrl(url)
@@ -37725,7 +37728,7 @@ Ext.define('Voyant.VoyantApp', {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 		
 		this.mixins['Voyant.util.CategoriesManager'].constructor.apply(this, arguments);
-		this.addFeature('color');
+		this.addFeature('color', '#000000');
 		this.addFeature('font', '"Palatino Linotype", "Book Antiqua", Palatino, serif');
 		
 		// call the parent constructor

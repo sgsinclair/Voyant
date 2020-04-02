@@ -40,15 +40,16 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 				scrollPastEnd: true
 			});
 			editor.setHighlightActiveLine(false);
+			editor.setHighlightGutterLine(false);
 			editor.renderer.setShowPrintMargin(false);
-			editor.renderer.setShowGutter(false);
+//			editor.renderer.setShowGutter(false);
 			
 			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
 			editor.clearSelection();
 
 		    editor.on("focus", function() {
 				setTimeout(function() {
-					me.getEditor().renderer.setShowGutter(true);
+					me.getEditor().setHighlightGutterLine(true);
 				}, 100); // slight delay to avoid selecting a range of text, caused by showing the gutter while mouse is still pressed
 		    }, this);
 		    editor.on("change", function(ev, editor) {
@@ -74,7 +75,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 				}
 		    }, this);
 		    editor.on("blur", function() {
-		    	me.getEditor().renderer.setShowGutter(false);
+		    	me.getEditor().setHighlightGutterLine(false);
 		    });
 			editor.commands.addCommand({
 				name: 'run',
