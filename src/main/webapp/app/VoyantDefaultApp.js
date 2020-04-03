@@ -12,7 +12,6 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		api: {
 			view: 'corpusset',
 			stopList: 'auto',
-			categories: 'auto',
 			panels: undefined,
 			rtl: undefined
 		}

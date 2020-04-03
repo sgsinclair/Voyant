@@ -10,7 +10,6 @@ Ext.define('Voyant.widget.CategoriesOption', {
 		builderWin: undefined
 	},
 	initComponent: function() {
-	    // TODO set value of option to current categories id if it exists
 		var value = this.up('window').panel.getApiParam('categories');
     	var data = value ? [{name: value, value: value}] : [];
 		
@@ -28,7 +27,7 @@ Ext.define('Voyant.widget.CategoriesOption', {
     				fields: ['name', 'value'],
     				data: data
     			},
-    			name: 'category',
+    			name: 'categories',
     			value: value
     		}, {width: 10}, {xtype: 'tbspacer'}, {
     			xtype: 'button',
@@ -311,6 +310,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			},{
 				text: this.localize('save'),
 				handler: function(btn) {
+					this.processFeatures();
 					this.app.setColorTermAssociations();
 					this.app.saveCategoryData().then(function(id) {
 						this.setCategoriesId(id);
@@ -611,8 +611,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 							var rowIndex = cmp.up('gridview').indexOf(cmp.el.up('table'));
 							var record = cmp.up('grid').getStore().getAt(rowIndex);
 							if (record) {
-								var category = record.get('category');
-								this.app.setCategoryFeature(category, cmp.feature, newvalue);
+								record.set(cmp.feature, newvalue);
 							} else {
 								if (window.console) {
 									console.warn('no record for', rowIndex, cmp);
@@ -626,7 +625,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			if (featureConfig.listeners) {
 				Ext.applyIf(widgetConfig.listeners, featureConfig.listeners);
 			}
-			
 			
 			columns.push({
 				sortable: false,
@@ -655,7 +653,21 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 		});
 		this.queryById('features').reconfigure(store, columns);
     },
-    
+	
+	processFeatures: function() {
+		var store = this.queryById('features').getStore();
+		var features = Object.keys(this.app.getFeatures());
+		store.each(function(record) {
+			var category = record.get('category');
+			features.forEach(function(feature) {
+				var featureValue = record.get(feature);
+				if (featureValue !== undefined) {
+					this.app.setCategoryFeature(category, feature, featureValue);
+				}
+			}, this)
+		}, this)
+	},
+
     buildCategories: function() {
 
     	this.queryById('categories').removeAll();

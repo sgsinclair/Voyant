@@ -146,6 +146,9 @@ Ext.define('Voyant.util.Toolable', {
 					        			}
 					        			if (values['palette'] != undefined) {
 					        				doGlobalUpdate('palette', values['palette']);
+										}
+										if (values['categories'] != undefined) {
+					        				doGlobalUpdate('categories', values['categories']);
 					        			}
 					        			
 					        			if (globalUpdate) {

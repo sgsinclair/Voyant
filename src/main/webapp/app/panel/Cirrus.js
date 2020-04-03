@@ -252,6 +252,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
+			this.getApplication().addFeature('font', this.getApiParam('fontFamily')); // make sure the default for font is set from the api
     		this.initVisLayout(); // force in case we've changed fontFamily from options
     		if (this.getApiParam("docIndex")) {
     			this.fireEvent("documentSelected", this, corpus.getDocument(this.getApiParam("docIndex")));
@@ -259,7 +260,7 @@ Ext.define('Voyant.panel.Cirrus', {
     			this.fireEvent("documentSelected", this, corpus.getDocument(this.getApiParam("docId")));
     		} else {
         		this.loadFromCorpus(corpus);
-    		}
+			}
     	},
     	
     	corpusSelected: function(src, corpus) {
@@ -320,7 +321,7 @@ Ext.define('Voyant.panel.Cirrus', {
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_CORPUS);
 		    	this.setRecords(operation.getRecords()); // not sure why operation.records is different from records
-		    	this.loadFromTermsRecords();
+				this.loadFromTermsRecords();
 		    },
 		    scope: this,
 		    params: this.getApiParams()
