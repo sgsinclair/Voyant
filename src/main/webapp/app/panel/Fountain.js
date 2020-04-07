@@ -61,7 +61,7 @@ Ext.define('Voyant.panel.Fountain', {
     				   },
     				   series: {
     				       type: 'gauge',
-    				       colors: this.getApplication().getColorPalette(undefined, true),
+    				       colors: this.getApplication().getColorPalette(this.getApiParam('palette'), true),
     				       angleField: 'val',
     				       donut: 20
     				   }

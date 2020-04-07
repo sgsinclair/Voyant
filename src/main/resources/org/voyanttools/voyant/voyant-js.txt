@@ -20,6 +20,7 @@ resources/termsradio/TermsRadio.js
 app/util/Assignable.js
 app/util/Api.js
 app/util/Localization.js
+app/util/Colors.js
 app/util/Deferrable.js
 app/util/DetailedError.js
 app/util/ResponseError.js

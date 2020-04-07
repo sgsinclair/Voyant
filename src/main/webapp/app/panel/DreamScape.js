@@ -461,7 +461,7 @@ Ext.define('Voyant.panel.DreamScape', {
                         itemId: 'addFilter',
                         glyph: 'xf067@FontAwesome',
                         handler: function(cmp) {
-                            var colors = this.getApplication().getColorPalette(undefined, true),
+                            var colors = this.getApplication().getColorPalette(this.getApiParam('palette'), true),
                                 color = colors[0]; // default to first
 
                             // find an available color

@@ -30,7 +30,7 @@ Ext.define('Voyant.widget.ColorPaletteOption', {
 
     	var app = this.up('window').panel.getApplication();
     	var data = [];
-    	for (var key in app.palettes) {
+    	for (var key in app.getPalettes()) {
     		data.push({name: key, value: key});
     	}
     	var value = app.getApiParam('palette');
