@@ -145,6 +145,7 @@ Ext.define('Voyant.util.Toolable', {
 					        				doGlobalUpdate('stopList', values['stopList']);
 					        			}
 					        			if (values['palette'] != undefined) {
+											app.resetColorTermAssociations();
 					        				doGlobalUpdate('palette', values['palette']);
 										}
 										if (values['categories'] != undefined) {

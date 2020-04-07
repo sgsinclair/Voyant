@@ -311,7 +311,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				text: this.localize('save'),
 				handler: function(btn) {
 					this.processFeatures();
-					this.app.setColorTermAssociations();
+					this.app.setColorTermsFromCategoryFeatures();
 					this.app.saveCategoryData().then(function(id) {
 						this.setCategoriesId(id);
 						btn.up('window').close();

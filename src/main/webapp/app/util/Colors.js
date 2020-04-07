@@ -20,8 +20,7 @@ Ext.define('Voyant.util.Colors', {
 		this.setPalettes({
 			'default': [[0, 0, 255], [51, 197, 51], [255, 0, 255], [121, 51, 255], [28, 255, 255], [255, 174, 0], [30, 177, 255], [182, 242, 58], [255, 0, 164], [51, 102, 153], [34, 111, 52], [155, 20, 104], [109, 43, 157], [128, 130, 33], [111, 76, 10], [119, 115, 165], [61, 177, 169], [202, 135, 115], [194, 169, 204], [181, 212, 228], [182, 197, 174], [255, 197, 197], [228, 200, 124], [197, 179, 159]]
 		});
-
-		this.setColorTermAssociations(new Ext.util.MixedCollection());
+		this.resetColorTermAssociations();
 
 		// palettes
 		if (d3 !== undefined) {
@@ -37,6 +36,10 @@ Ext.define('Voyant.util.Colors', {
         
         var extjs = Ext.create('Ext.chart.theme.Base').getColors().map(function(val) { return this.hexToRgb(val); }, this);
         this.addColorPalette('extjs', extjs);
+	},
+
+	resetColorTermAssociations: function() {
+		this.setColorTermAssociations(new Ext.util.MixedCollection());
 	},
 
 	rgbToHex: function(a) {
@@ -137,5 +140,9 @@ Ext.define('Voyant.util.Colors', {
 			color = this.rgbToHex(color);
 		}
 		return color;
+	},
+
+	setColorForTerm: function(term, color) {
+		this.getColorTermAssociations().replace(term, color);
 	}
 })

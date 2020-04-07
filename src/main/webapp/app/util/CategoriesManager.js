@@ -125,14 +125,14 @@ Ext.define('Voyant.util.CategoriesManager', {
 		return value;
 	},
 	
-	setColorTermAssociations: function() {
+	setColorTermsFromCategoryFeatures: function() {
         for (var category in this.getCategories()) {
             var color = this.getCategoryFeature(category, 'color');
             if (color !== undefined) {
                 var rgb = this.hexToRgb(color);
                 var terms = this.getCategoryTerms(category);
                 for (var i = 0; i < terms.length; i++) {
-                    this.colorTermAssociations.replace(terms[i], rgb);
+                    this.setColorForTerm(terms[i], rgb);
                 }
             }
         }
@@ -166,7 +166,9 @@ Ext.define('Voyant.util.CategoriesManager', {
                 value = Ext.decode(value);
                 
                 this.setCategories(value.categories);
-                this.setFeatures(value.features);
+				this.setFeatures(value.features);
+				
+				this.setColorTermsFromCategoryFeatures();
                 
                 dfd.resolve(value);
             }

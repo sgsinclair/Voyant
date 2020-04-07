@@ -255,14 +255,10 @@ Ext.define('Voyant.VoyantCorpusApp', {
     listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
-//    		this.colorTermAssociations.clear();
     		
     		// let's load the categories based on the corpus
         	if (this.getApiParam("categories")) {
-        	    this.loadCategoryData(this.getApiParam("categories")).then(function() {
-        	        this.setColorTermAssociations();
-        	    }, null, null, this);
-        		
+				this.loadCategoryData(this.getApiParam("categories"))
         	}    	
 
     		
