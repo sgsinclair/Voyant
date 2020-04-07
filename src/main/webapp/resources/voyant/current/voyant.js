@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 02 11:54:33 EDT 2020 */
+/* This file created by JSCacher. Last modified: Sat Apr 04 12:25:43 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6535,6 +6535,9 @@ Ext.define('Voyant.util.Toolable', {
 					        			}
 					        			if (values['palette'] != undefined) {
 					        				doGlobalUpdate('palette', values['palette']);
+										}
+										if (values['categories'] != undefined) {
+					        				doGlobalUpdate('categories', values['categories']);
 					        			}
 					        			
 					        			if (globalUpdate) {
@@ -6996,21 +6999,21 @@ var canvasSurface = this.down('draw') || this.down('chart');
 		})
 	},
 	exportSpyral: function() {
-		let toolForUrl = Ext.getClassName(this).split(".").pop();
-		let api = this.getApplication().getModifiedApiParams();
+		var toolForUrl = Ext.getClassName(this).split(".").pop();
+		var api = this.getApplication().getModifiedApiParams();
 		if (this.isXType('voyantheader')==false) {
 			delete api.panels; // not needed for individual tools
 			// add (and overwrite if need be) this tool's api
 			Ext.apply(api, this.getModifiedApiParams());
 			delete api.corpus;
 		}
-		let isDebug = api && "debug" in api;
+		var isDebug = api && "debug" in api;
 		delete api.view;
 		delete api.debug;
-		let enc = function(str) {
+		var enc = function(str) {
 			return btoa(encodeURIComponent(str)).replace(/=/g, "%3D");
 		}
-		let input = '["'+enc("<h2>Spyral Notebook Imported from Voyant Tools</h2>")+'","'+
+		var input = '["'+enc("<h2>Spyral Notebook Imported from Voyant Tools</h2>")+'","'+
 			enc('loadCorpus("'+this.getApplication().getCorpus().getAliasOrId()+'").tool("'+
 			(toolForUrl=="VoyantHeader" ? "" : toolForUrl)+'"'+(Object.keys(api).length>0 ? (","+Ext.encode(api)) : "")+ ');')+'"]'
 		this.openUrl(this.getApplication().getBaseUrl()+"spyral/?run=true&"+(isDebug ? "debug=true&" : "")+"inputJsonArrayOfEncodedBase64="+input);
@@ -13250,7 +13253,6 @@ Ext.define('Voyant.widget.CategoriesOption', {
 		builderWin: undefined
 	},
 	initComponent: function() {
-	    // TODO set value of option to current categories id if it exists
 		var value = this.up('window').panel.getApiParam('categories');
     	var data = value ? [{name: value, value: value}] : [];
 		
@@ -13268,7 +13270,7 @@ Ext.define('Voyant.widget.CategoriesOption', {
     				fields: ['name', 'value'],
     				data: data
     			},
-    			name: 'category',
+    			name: 'categories',
     			value: value
     		}, {width: 10}, {xtype: 'tbspacer'}, {
     			xtype: 'button',
@@ -13551,6 +13553,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			},{
 				text: this.localize('save'),
 				handler: function(btn) {
+					this.processFeatures();
 					this.app.setColorTermAssociations();
 					this.app.saveCategoryData().then(function(id) {
 						this.setCategoriesId(id);
@@ -13851,8 +13854,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 							var rowIndex = cmp.up('gridview').indexOf(cmp.el.up('table'));
 							var record = cmp.up('grid').getStore().getAt(rowIndex);
 							if (record) {
-								var category = record.get('category');
-								this.app.setCategoryFeature(category, cmp.feature, newvalue);
+								record.set(cmp.feature, newvalue);
 							} else {
 								if (window.console) {
 									console.warn('no record for', rowIndex, cmp);
@@ -13866,7 +13868,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			if (featureConfig.listeners) {
 				Ext.applyIf(widgetConfig.listeners, featureConfig.listeners);
 			}
-			
 			
 			columns.push({
 				sortable: false,
@@ -13895,7 +13896,21 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 		});
 		this.queryById('features').reconfigure(store, columns);
     },
-    
+	
+	processFeatures: function() {
+		var store = this.queryById('features').getStore();
+		var features = Object.keys(this.app.getFeatures());
+		store.each(function(record) {
+			var category = record.get('category');
+			features.forEach(function(feature) {
+				var featureValue = record.get(feature);
+				if (featureValue !== undefined) {
+					this.app.setCategoryFeature(category, feature, featureValue);
+				}
+			}, this)
+		}, this)
+	},
+
     buildCategories: function() {
 
     	this.queryById('categories').removeAll();
@@ -16612,6 +16627,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
+			this.getApplication().addFeature('font', this.getApiParam('fontFamily')); // make sure the default for font is set from the api
     		this.initVisLayout(); // force in case we've changed fontFamily from options
     		if (this.getApiParam("docIndex")) {
     			this.fireEvent("documentSelected", this, corpus.getDocument(this.getApiParam("docIndex")));
@@ -16619,7 +16635,7 @@ Ext.define('Voyant.panel.Cirrus', {
     			this.fireEvent("documentSelected", this, corpus.getDocument(this.getApiParam("docId")));
     		} else {
         		this.loadFromCorpus(corpus);
-    		}
+			}
     	},
     	
     	corpusSelected: function(src, corpus) {
@@ -16680,7 +16696,7 @@ Ext.define('Voyant.panel.Cirrus', {
 		    callback: function(records, operation, success) {
 		    	this.setMode(this.MODE_CORPUS);
 		    	this.setRecords(operation.getRecords()); // not sure why operation.records is different from records
-		    	this.loadFromTermsRecords();
+				this.loadFromTermsRecords();
 		    },
 		    scope: this,
 		    params: this.getApiParams()
@@ -36752,12 +36768,8 @@ Ext.define('Voyant.notebook.Notebook', {
     			'new': {
     				tooltip: this.localize("newTip"),
     				callback: function() {
-    					this.clear();
-    					this.addNew();
-    	    			let url = this.getBaseUrl()+"spyral/";
-    	    			window.history.pushState({
-    						url: url
-    					}, "Spyral Notebook", url);
+    	    			var url = this.getBaseUrl()+"spyral/";
+						this.getApplication().openUrl(url);
     				},
     				xtype: 'toolmenu',
     				glyph: 'xf067@FontAwesome',
@@ -36771,7 +36783,7 @@ Ext.define('Voyant.notebook.Notebook', {
 						const storageSolution = this.getStorageSolution();
 						if (storageSolution === undefined) {
 						} else {
-							setTimeout(() => {
+							setTimeout(function() {
 								tool.toolMenu.hide()
 							})
 							if (storageSolution === 'github') {
@@ -36984,9 +36996,9 @@ Ext.define('Voyant.notebook.Notebook', {
 				var spyralIdMatches = /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
 				var isGithub = Ext.isDefined(queryParams.githubId);
 				if ("inputJsonArrayOfEncodedBase64" in queryParams) {
-					let json = Ext.decode(queryParams.inputJsonArrayOfEncodedBase64);
+					var json = Ext.decode(queryParams.inputJsonArrayOfEncodedBase64);
 					json.forEach(function(block) {
-						let text = decodeURIComponent(atob(block));
+						var text = decodeURIComponent(atob(block));
 						if (text.trim().indexOf("<")==0) {
 							this.addText(text);
 						} else {
@@ -37066,15 +37078,24 @@ Ext.define('Voyant.notebook.Notebook', {
 	},
 
 	showSaveDialog: function(saveAs) {
-		var data = this.generateExportHtml();
 		this.mask(this.localize('saving'));
 		this.getMetadata().setDateNow("modified");
 
+		const data = this.generateExportHtml();
 		const storageSolution = this.getStorageSolution();
-		if (storageSolution === 'github') {
-			this.githubDialogs.showSave(data);
+		
+		if (storageSolution === 'voyant' && this.getNotebookId() !== undefined && this.voyantStorageDialogs.getAccessCode() !== undefined) {
+			this.voyantStorageDialogs.doSave({
+				notebookId: this.getNotebookId(),
+				data: data,
+				accessCode: this.voyantStorageDialogs.getAccessCode()
+			});
 		} else {
-			this.voyantStorageDialogs.showSave(data, saveAs ? undefined : this.getNotebookId());
+			if (storageSolution === 'github') {
+				this.githubDialogs.showSave(data);
+			} else {
+				this.voyantStorageDialogs.showSave(data, saveAs ? undefined : this.getNotebookId());
+			}
 		}
 	},
 	
@@ -37339,7 +37360,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	if (id) {
     		// update URL if needed
     		if (location.pathname.indexOf("/spyral/"+id) === -1) {
-    			let url = this.getBaseUrl()+"spyral/"+id+"/";
+    			var url = this.getBaseUrl()+"spyral/"+id+"/";
     			window.history.pushState({
 					url: url
 				}, "Spyral Notebook: "+id, url);
@@ -37399,7 +37420,7 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     getInnerHeaderHtml: function() {
-    	let html = "";
+    	var html = "";
     	if (this.getMetadata().title) {
         	html += "<div class='title'>"+this.getMetadata().title+"</div>";
     	}
@@ -37637,7 +37658,7 @@ Ext.define('Voyant.notebook.Notebook', {
 	},
 	
 	showOptionsClick: function(panel) {
-		let me = panel;
+		var me = panel;
 		if (me.optionsWin === undefined) {
 			me.optionsWin = Ext.create('Ext.window.Window', {
 				title: me.localize('gearWinTitle'),
@@ -37705,7 +37726,8 @@ Ext.define('Voyant.VoyantApp', {
     	i18n: {
     	},
     	api: {
-    		palette: 'default',
+			palette: 'default',
+			categories: 'auto',
     		lang: undefined,
     		debug: undefined
     	}
@@ -37728,7 +37750,7 @@ Ext.define('Voyant.VoyantApp', {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 		
 		this.mixins['Voyant.util.CategoriesManager'].constructor.apply(this, arguments);
-		this.addFeature('color', '#000000');
+		this.addFeature('color');
 		this.addFeature('font', '"Palatino Linotype", "Book Antiqua", Palatino, serif');
 		
 		// call the parent constructor
@@ -38292,8 +38314,8 @@ Ext.define('Voyant.VoyantCorpusApp', {
 				if (eventName=='termsClicked') {
 					// data can be a simple array of terms or an array of term objects
 					if (Ext.isArray(data) && "term" in data[0] && "docIndex" in data[0]) {
-						let termsObj = {};
-						let docIndObj = {};
+						var termsObj = {};
+						var docIndObj = {};
 						data.forEach(function(datum) {
 							termsObj[datum.term]=true;
 							docIndObj[datum.docIndex]=true;
@@ -38407,7 +38429,6 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		api: {
 			view: 'corpusset',
 			stopList: 'auto',
-			categories: 'auto',
 			panels: undefined,
 			rtl: undefined
 		}
