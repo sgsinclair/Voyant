@@ -1,7 +1,7 @@
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
-	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api','Voyant.util.Colors','Voyant.util.CategoriesManager'],
+	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api','Voyant.util.Colors'],
 	requires: ['Voyant.util.ResponseError'],
     
     name: 'VoyantApp',
@@ -35,25 +35,20 @@ Ext.define('Voyant.VoyantApp', {
 
 		this.mixins['Voyant.util.Colors'].constructor.apply(this, arguments);
 		
-		this.mixins['Voyant.util.CategoriesManager'].constructor.apply(this, arguments);
+		// ES6 mixin
+		Object.assign(this, Spyral.CategoriesManager);
+		
 		this.addFeature('color');
 		this.addFeature('font', '"Palatino Linotype", "Book Antiqua", Palatino, serif');
 		
 		// call the parent constructor
 		this.callParent(arguments);
 		
-		// override colors methods to add palette api param
-		// var _getColorPalette = this.getColorPalette;
-		// this.getColorPalette = function(key, returnHex) {
-		// 	key = key || this.getApiParam('palette');
-		// 	return _getColorPalette(key, returnHex);
-		// }
-
+		// override Voyant.util.Colors methods to add palette api param
 		var _getColor = this.getColor;
 		this.getColor = function(index, returnHex) {
 			return _getColor.apply(this, [this.getApiParam('palette'), index, returnHex]);
 		}
-
 		var _getColorForTerm = this.getColorForTerm;
 		this.getColorForTerm = function(term, returnHex) {
 			return _getColorForTerm.apply(this, [this.getApiParam('palette'), term, returnHex]);

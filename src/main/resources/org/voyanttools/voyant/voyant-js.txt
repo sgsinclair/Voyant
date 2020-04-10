@@ -30,7 +30,6 @@ app/util/Transferable.js
 app/util/Variants.js
 app/util/Downloadable.js
 app/util/Storage.js
-app/util/CategoriesManager.js
 app/util/DiacriticsRemover.js
 app/notebook/util/Show.js
 app/notebook/util/Embed.js

@@ -10,7 +10,7 @@ Ext.define('Voyant.util.Colors', {
 		 */
 		palettes: undefined,
 		/**
-		 * For tracking associations between a term and a color, to ensure consistent coloring across tools.
+		 * For tracking associations between a term and a color (in rgb format), to ensure consistent coloring across tools.
 		 * @private
 		 */
 		colorTermAssociations: undefined
@@ -142,7 +142,15 @@ Ext.define('Voyant.util.Colors', {
 		return color;
 	},
 
+	/**
+	 * Set the color assocation for a term.
+	 * @param {String} term The term
+	 * @param {Array} color An array of RGB values
+	 */
 	setColorForTerm: function(term, color) {
+		if (Array.isArray(color) === false) {
+			color = this.hexToRgb(color);
+		}
 		this.getColorTermAssociations().replace(term, color);
 	}
 })

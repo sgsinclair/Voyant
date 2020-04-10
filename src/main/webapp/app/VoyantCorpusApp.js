@@ -258,7 +258,19 @@ Ext.define('Voyant.VoyantCorpusApp', {
     		
     		// let's load the categories based on the corpus
         	if (this.getApiParam("categories")) {
-				this.loadCategoryData(this.getApiParam("categories"))
+				this.loadCategoryData(this.getApiParam("categories")).then(function(a,b,c) {
+					// assign colors
+					for (var category in this.getCategories()) {
+						var color = this.getCategoryFeature(category, 'color');
+						if (color !== undefined) {
+							var rgb = this.hexToRgb(color);
+							var terms = this.getCategoryTerms(category);
+							for (var i = 0; i < terms.length; i++) {
+								this.setColorForTerm(terms[i], rgb);
+							}
+						}
+					}
+				}, null, null, this)
         	}    	
 
     		

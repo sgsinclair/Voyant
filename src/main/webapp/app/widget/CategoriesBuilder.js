@@ -70,7 +70,7 @@ Ext.define('Voyant.widget.CategoriesOption', {
 Ext.define('Voyant.widget.CategoriesBuilder', {
     extend: 'Ext.window.Window',
     requires: ['Voyant.widget.FontFamilyOption'],
-    mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.CategoriesManager'],
+    mixins: ['Voyant.util.Localization','Voyant.util.Api'],
     alias: 'widget.categoriesbuilder',
     statics: {
     	i18n: {
@@ -311,7 +311,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				text: this.localize('save'),
 				handler: function(btn) {
 					this.processFeatures();
-					this.app.setColorTermsFromCategoryFeatures();
+					this.setColorTermsFromCategoryFeatures();
 					this.app.saveCategoryData().then(function(id) {
 						this.setCategoriesId(id);
 						btn.up('window').close();
@@ -327,6 +327,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 					// check to see if the widget value is different from the API
 					if (this.getCategoriesId() && this.getCategoriesId()!=this.getApiParam("categories")) {
 		    			this.app.loadCategoryData(this.getCategoriesId()).then(function(data) {
+							this.setColorTermsFromCategoryFeatures();
 							this.buildCategories();
 							this.buildFeatures();
 						}, null, null, this);
@@ -667,6 +668,19 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 			}, this)
 		}, this)
 	},
+
+	setColorTermsFromCategoryFeatures: function() {
+        for (var category in this.app.getCategories()) {
+            var color = this.app.getCategoryFeature(category, 'color');
+            if (color !== undefined) {
+                var rgb = this.app.hexToRgb(color);
+                var terms = this.app.getCategoryTerms(category);
+                for (var i = 0; i < terms.length; i++) {
+                    this.app.setColorForTerm(terms[i], rgb);
+                }
+            }
+        }
+    },
 
     buildCategories: function() {
 

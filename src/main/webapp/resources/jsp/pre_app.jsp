@@ -132,6 +132,9 @@
 	<% } 
 } %>
 
+<!-- spyral -->
+<script type="text/javascript" src="<%= base %>/resources/spyral/build/spyral.js"></script>
+
 <script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant<%= (request.getParameter("debug")!=null ? ".jsp?debug=true" : ".min.js") %>"></script>
 <script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale-<%= lang %>.js"></script>
 
