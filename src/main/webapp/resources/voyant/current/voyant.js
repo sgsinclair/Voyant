@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Sat Apr 04 12:25:43 EDT 2020 */
+/* This file created by JSCacher. Last modified: Thu Apr 09 16:06:40 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -6153,6 +6153,155 @@ Ext.define('Voyant.util.Localization', {
 	
 });
 
+/**
+ * A utility for storing palettes and associations between terms and colors.
+ */
+Ext.define('Voyant.util.Colors', {
+
+	config: {
+		/**
+		 * Palettes for use with terms and documents.
+		 * @private
+		 */
+		palettes: undefined,
+		/**
+		 * For tracking associations between a term and a color, to ensure consistent coloring across tools.
+		 * @private
+		 */
+		colorTermAssociations: undefined
+	},
+
+	constructor: function(config) {
+		this.setPalettes({
+			'default': [[0, 0, 255], [51, 197, 51], [255, 0, 255], [121, 51, 255], [28, 255, 255], [255, 174, 0], [30, 177, 255], [182, 242, 58], [255, 0, 164], [51, 102, 153], [34, 111, 52], [155, 20, 104], [109, 43, 157], [128, 130, 33], [111, 76, 10], [119, 115, 165], [61, 177, 169], [202, 135, 115], [194, 169, 204], [181, 212, 228], [182, 197, 174], [255, 197, 197], [228, 200, 124], [197, 179, 159]]
+		});
+		this.resetColorTermAssociations();
+
+		// palettes
+		if (d3 !== undefined) {
+			var cat10 = d3.scaleOrdinal(d3.schemeCategory10).range().map(function(val) { return this.hexToRgb(val); }, this);
+			var cat20a = d3.scaleOrdinal(d3.schemeCategory20).range().map(function(val) { return this.hexToRgb(val); }, this);
+			var cat20b = d3.scaleOrdinal(d3.schemeCategory20b).range().map(function(val) { return this.hexToRgb(val); }, this);
+			var cat20c = d3.scaleOrdinal(d3.schemeCategory20c).range().map(function(val) { return this.hexToRgb(val); }, this);
+			this.addColorPalette('d3_cat10', cat10);
+			this.addColorPalette('d3_cat20a', cat20a);
+			this.addColorPalette('d3_cat20b', cat20b);
+			this.addColorPalette('d3_cat20c', cat20c);
+		}
+        
+        var extjs = Ext.create('Ext.chart.theme.Base').getColors().map(function(val) { return this.hexToRgb(val); }, this);
+        this.addColorPalette('extjs', extjs);
+	},
+
+	resetColorTermAssociations: function() {
+		this.setColorTermAssociations(new Ext.util.MixedCollection());
+	},
+
+	rgbToHex: function(a) {
+		return "#" + ((1 << 24) + (a[0] << 16) + (a[1] << 8) + a[2]).toString(16).slice(1);
+	},
+	
+	hexToRgb: function(hex) {
+	    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+	    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+	    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+	        return r + r + g + g + b + b;
+	    });
+
+	    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	    return result ? [
+	        parseInt(result[1], 16),
+	        parseInt(result[2], 16),
+	        parseInt(result[3], 16)
+	    ] : null;
+	},
+
+	/**
+	 * Adds a new palette to the list.
+	 * @param key {String} The palette name.
+	 * @param values {Array} The array of colors. Format: [[r,g,b],[r,g,b],....]
+	 */
+	addColorPalette: function(key, values) {
+		this.getPalettes()[key] = values;
+	},
+
+	/**
+	 * Gets the whole color palette.
+	 * @param {String} [key] The key of the palette to return.
+	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of each color (optional, defaults to rgb values).
+	 * @return {Array} The color palette.
+	 * @private
+	 */
+	getColorPalette: function(key, returnHex) {
+		var paletteKey = key || 'default';
+		var palette = this.getPalettes()[paletteKey];
+		if (palette === undefined) {
+			palette = [];
+		}
+		if (returnHex) {
+			var colors = [];
+			for (var i = 0; i < palette.length; i++) {
+				colors.push(this.rgbToHex(palette[i]));
+			}
+			return colors;
+		} else {
+			return palette;
+		}
+	},
+
+	/**
+	 * Gets a particular color from the palette.
+	 * @param {String} key The palette key.
+	 * @param {Integer} index The index of the color to get.
+	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of the color (optional, defaults to rgb values).
+	 * @return {Mixed} The requested color, either a hex string or array of rgb values.
+	 * @private
+	 */
+	getColor: function(key, index, returnHex) {
+		var paletteKey = key || 'default';
+		var palette = this.getPalettes()[paletteKey];
+		if (index >= palette.length) {
+			index = index % palette.length;
+		}
+		if (returnHex) {
+			return this.rgbToHex(palette[index]);
+		} else {
+			return palette[index];
+		}
+	},
+
+	/**
+	 * Gets the color associated with the term.  Creates a new association if none exists.
+	 * @param {String} key The palette key.
+	 * @param {String} term The term to get the color for.
+	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of the color (optional, defaults to rgb values).
+	 * @return {Mixed} The requested color, either a hex string or array of rgb values.
+	 * @private
+	 */
+	getColorForTerm: function(key, term, returnHex) {
+		var paletteKey = key || 'default';
+		var palette = this.getPalettes()[paletteKey];
+
+		if (term.indexOf(':') != -1) {
+			term = term.split(':')[1];
+		}
+		var color = this.getColorTermAssociations().get(term);
+		if (color == null) {
+			var index = this.getColorTermAssociations().getCount() % palette.length;
+			color = palette[index];
+			this.getColorTermAssociations().add(term, color);
+		}
+		if (returnHex) {
+			color = this.rgbToHex(color);
+		}
+		return color;
+	},
+
+	setColorForTerm: function(term, color) {
+		this.getColorTermAssociations().replace(term, color);
+	}
+})
+
 Ext.define('Voyant.util.Deferrable', {
 	deferredStack : [],
 
@@ -6534,6 +6683,7 @@ Ext.define('Voyant.util.Toolable', {
 					        				doGlobalUpdate('stopList', values['stopList']);
 					        			}
 					        			if (values['palette'] != undefined) {
+											app.resetColorTermAssociations();
 					        				doGlobalUpdate('palette', values['palette']);
 										}
 										if (values['categories'] != undefined) {
@@ -6999,21 +7149,21 @@ var canvasSurface = this.down('draw') || this.down('chart');
 		})
 	},
 	exportSpyral: function() {
-		var toolForUrl = Ext.getClassName(this).split(".").pop();
-		var api = this.getApplication().getModifiedApiParams();
+		let toolForUrl = Ext.getClassName(this).split(".").pop();
+		let api = this.getApplication().getModifiedApiParams();
 		if (this.isXType('voyantheader')==false) {
 			delete api.panels; // not needed for individual tools
 			// add (and overwrite if need be) this tool's api
 			Ext.apply(api, this.getModifiedApiParams());
 			delete api.corpus;
 		}
-		var isDebug = api && "debug" in api;
+		let isDebug = api && "debug" in api;
 		delete api.view;
 		delete api.debug;
-		var enc = function(str) {
+		let enc = function(str) {
 			return btoa(encodeURIComponent(str)).replace(/=/g, "%3D");
 		}
-		var input = '["'+enc("<h2>Spyral Notebook Imported from Voyant Tools</h2>")+'","'+
+		let input = '["'+enc("<h2>Spyral Notebook Imported from Voyant Tools</h2>")+'","'+
 			enc('loadCorpus("'+this.getApplication().getCorpus().getAliasOrId()+'").tool("'+
 			(toolForUrl=="VoyantHeader" ? "" : toolForUrl)+'"'+(Object.keys(api).length>0 ? (","+Ext.encode(api)) : "")+ ');')+'"]'
 		this.openUrl(this.getApplication().getBaseUrl()+"spyral/?run=true&"+(isDebug ? "debug=true&" : "")+"inputJsonArrayOfEncodedBase64="+input);
@@ -7661,14 +7811,14 @@ Ext.define('Voyant.util.CategoriesManager', {
 		return value;
 	},
 	
-	setColorTermAssociations: function() {
+	setColorTermsFromCategoryFeatures: function() {
         for (var category in this.getCategories()) {
             var color = this.getCategoryFeature(category, 'color');
             if (color !== undefined) {
                 var rgb = this.hexToRgb(color);
                 var terms = this.getCategoryTerms(category);
                 for (var i = 0; i < terms.length; i++) {
-                    this.colorTermAssociations.replace(terms[i], rgb);
+                    this.setColorForTerm(terms[i], rgb);
                 }
             }
         }
@@ -7702,7 +7852,9 @@ Ext.define('Voyant.util.CategoriesManager', {
                 value = Ext.decode(value);
                 
                 this.setCategories(value.categories);
-                this.setFeatures(value.features);
+				this.setFeatures(value.features);
+				
+				this.setColorTermsFromCategoryFeatures();
                 
                 dfd.resolve(value);
             }
@@ -12483,7 +12635,7 @@ Ext.define('Voyant.widget.ColorPaletteOption', {
 
     	var app = this.up('window').panel.getApplication();
     	var data = [];
-    	for (var key in app.palettes) {
+    	for (var key in app.getPalettes()) {
     		data.push({name: key, value: key});
     	}
     	var value = app.getApiParam('palette');
@@ -13554,7 +13706,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				text: this.localize('save'),
 				handler: function(btn) {
 					this.processFeatures();
-					this.app.setColorTermAssociations();
+					this.app.setColorTermsFromCategoryFeatures();
 					this.app.saveCategoryData().then(function(id) {
 						this.setCategoriesId(id);
 						btn.up('window').close();
@@ -20040,7 +20192,7 @@ Ext.define('Voyant.panel.DreamScape', {
                         itemId: 'addFilter',
                         glyph: 'xf067@FontAwesome',
                         handler: function(cmp) {
-                            var colors = this.getApplication().getColorPalette(undefined, true),
+                            var colors = this.getApplication().getColorPalette(this.getApiParam('palette'), true),
                                 color = colors[0]; // default to first
 
                             // find an available color
@@ -23702,7 +23854,7 @@ Ext.define('Voyant.panel.Fountain', {
     				   },
     				   series: {
     				       type: 'gauge',
-    				       colors: this.getApplication().getColorPalette(undefined, true),
+    				       colors: this.getApplication().getColorPalette(this.getApiParam('palette'), true),
     				       angleField: 'val',
     				       donut: 20
     				   }
@@ -36768,7 +36920,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			'new': {
     				tooltip: this.localize("newTip"),
     				callback: function() {
-    	    			var url = this.getBaseUrl()+"spyral/";
+    	    			let url = this.getBaseUrl()+"spyral/";
 						this.getApplication().openUrl(url);
     				},
     				xtype: 'toolmenu',
@@ -36783,7 +36935,7 @@ Ext.define('Voyant.notebook.Notebook', {
 						const storageSolution = this.getStorageSolution();
 						if (storageSolution === undefined) {
 						} else {
-							setTimeout(function() {
+							setTimeout(() => {
 								tool.toolMenu.hide()
 							})
 							if (storageSolution === 'github') {
@@ -36996,9 +37148,9 @@ Ext.define('Voyant.notebook.Notebook', {
 				var spyralIdMatches = /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
 				var isGithub = Ext.isDefined(queryParams.githubId);
 				if ("inputJsonArrayOfEncodedBase64" in queryParams) {
-					var json = Ext.decode(queryParams.inputJsonArrayOfEncodedBase64);
+					let json = Ext.decode(queryParams.inputJsonArrayOfEncodedBase64);
 					json.forEach(function(block) {
-						var text = decodeURIComponent(atob(block));
+						let text = decodeURIComponent(atob(block));
 						if (text.trim().indexOf("<")==0) {
 							this.addText(text);
 						} else {
@@ -37360,7 +37512,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	if (id) {
     		// update URL if needed
     		if (location.pathname.indexOf("/spyral/"+id) === -1) {
-    			var url = this.getBaseUrl()+"spyral/"+id+"/";
+    			let url = this.getBaseUrl()+"spyral/"+id+"/";
     			window.history.pushState({
 					url: url
 				}, "Spyral Notebook: "+id, url);
@@ -37420,7 +37572,7 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     getInnerHeaderHtml: function() {
-    	var html = "";
+    	let html = "";
     	if (this.getMetadata().title) {
         	html += "<div class='title'>"+this.getMetadata().title+"</div>";
     	}
@@ -37658,7 +37810,7 @@ Ext.define('Voyant.notebook.Notebook', {
 	},
 	
 	showOptionsClick: function(panel) {
-		var me = panel;
+		let me = panel;
 		if (me.optionsWin === undefined) {
 			me.optionsWin = Ext.create('Ext.window.Window', {
 				title: me.localize('gearWinTitle'),
@@ -37717,7 +37869,7 @@ Ext.define('Voyant.notebook.Notebook', {
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
-	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api','Voyant.util.CategoriesManager'],
+	mixins: ['Voyant.util.Deferrable','Voyant.util.Localization','Voyant.util.Api','Voyant.util.Colors','Voyant.util.CategoriesManager'],
 	requires: ['Voyant.util.ResponseError'],
     
     name: 'VoyantApp',
@@ -37748,26 +37900,32 @@ Ext.define('Voyant.VoyantApp', {
 		Voyant.application = this;
 		
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+
+		this.mixins['Voyant.util.Colors'].constructor.apply(this, arguments);
 		
 		this.mixins['Voyant.util.CategoriesManager'].constructor.apply(this, arguments);
 		this.addFeature('color');
 		this.addFeature('font', '"Palatino Linotype", "Book Antiqua", Palatino, serif');
 		
 		// call the parent constructor
-        this.callParent(arguments);
-        
-        // palettes
-        var cat10 = d3.scaleOrdinal(d3.schemeCategory10).range().map(function(val) { return this.hexToRgb(val); }, this);
-        var cat20a = d3.scaleOrdinal(d3.schemeCategory20).range().map(function(val) { return this.hexToRgb(val); }, this);
-        var cat20b = d3.scaleOrdinal(d3.schemeCategory20b).range().map(function(val) { return this.hexToRgb(val); }, this);
-        var cat20c = d3.scaleOrdinal(d3.schemeCategory20c).range().map(function(val) { return this.hexToRgb(val); }, this);
-        this.addColorPalette('d3_cat10', cat10);
-        this.addColorPalette('d3_cat20a', cat20a);
-        this.addColorPalette('d3_cat20b', cat20b);
-        this.addColorPalette('d3_cat20c', cat20c);
-        
-        var extjs = Ext.create('Ext.chart.theme.Base').getColors().map(function(val) { return this.hexToRgb(val); }, this);
-        this.addColorPalette('extjs', extjs);
+		this.callParent(arguments);
+		
+		// override colors methods to add palette api param
+		// var _getColorPalette = this.getColorPalette;
+		// this.getColorPalette = function(key, returnHex) {
+		// 	key = key || this.getApiParam('palette');
+		// 	return _getColorPalette(key, returnHex);
+		// }
+
+		var _getColor = this.getColor;
+		this.getColor = function(index, returnHex) {
+			return _getColor.apply(this, [this.getApiParam('palette'), index, returnHex]);
+		}
+
+		var _getColorForTerm = this.getColorForTerm;
+		this.getColorForTerm = function(term, returnHex) {
+			return _getColorForTerm.apply(this, [this.getApiParam('palette'), term, returnHex]);
+		}
     },
     getBaseUrl: function() {
     	var baseUrl = this.callParent();
@@ -37895,128 +38053,6 @@ Ext.define('Voyant.VoyantApp', {
 			},
 			glyph: cls && cls.glyph ? cls.glyph : 'xf12e@FontAwesome'
 		};
-	},
-	
-	/**
-	 * Palettes for use with terms and documents.
-	 * @private
-	 */
-	palettes: {
-		'default': [[0, 0, 255], [51, 197, 51], [255, 0, 255], [121, 51, 255], [28, 255, 255], [255, 174, 0], [30, 177, 255], [182, 242, 58], [255, 0, 164], [51, 102, 153], [34, 111, 52], [155, 20, 104], [109, 43, 157], [128, 130, 33], [111, 76, 10], [119, 115, 165], [61, 177, 169], [202, 135, 115], [194, 169, 204], [181, 212, 228], [182, 197, 174], [255, 197, 197], [228, 200, 124], [197, 179, 159]]
-	},
-	
-	rgbToHex: function(a) {
-		return "#" + ((1 << 24) + (a[0] << 16) + (a[1] << 8) + a[2]).toString(16).slice(1);
-	},
-	
-	hexToRgb: function(hex) {
-	    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-	    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-	    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-	        return r + r + g + g + b + b;
-	    });
-
-	    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	    return result ? [
-	        parseInt(result[1], 16),
-	        parseInt(result[2], 16),
-	        parseInt(result[3], 16)
-	    ] : null;
-	},
-	
-	/**
-	 * Adds a new palette to the list.
-	 * @param key {String} The palette name.
-	 * @param values {Array} The array of colors. Format: [[,g,b],[r,g,b],....]
-	 */
-	addColorPalette: function(key, values) {
-		this.palettes[key] = values;
-	},
-	
-	/**
-	 * Gets the whole color palette.
-	 * @param {String} [key] The key of the palette to return, defaults to the "palette" api param value.
-	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of each color (optional, defaults to rgb values).
-	 * @return {Array} The color palette.
-	 * @private
-	 */
-	getColorPalette: function(key, returnHex) {
-		var paletteKey = key || this.getApiParam('palette') || 'default';
-		var palette = this.palettes[paletteKey];
-		if (palette === undefined) {
-			palette = [];
-		}
-		if (returnHex) {
-			var colors = [];
-			for (var i = 0; i < palette.length; i++) {
-				colors.push(this.rgbToHex(palette[i]));
-			}
-			return colors;
-		} else {
-			return palette;
-		}
-	},
-	
-	/**
-	 * Gets a particular color from the palette.
-	 * @param {Integer} index The index of the color to get.
-	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of the color (optional, defaults to rgb values).
-	 * @return {Mixed} The requested color, either a hex string or array of rgb values.
-	 * @private
-	 */
-	getColor: function(index, returnHex) {
-		var paletteKey = this.getApiParam('palette') || 'default';
-		var palette = this.palettes[paletteKey];
-		if (index >= palette.length) {
-			index = index % palette.length;
-		}
-		if (returnHex) {
-			return this.rgbToHex(palette[index]);
-		} else {
-			return palette[index];
-		}
-	},
-	
-	/**
-	 * For tracking associations between a term and a color, to ensure consistent coloring across tools.
-	 * @private
-	 */
-	colorTermAssociations: new Ext.util.MixedCollection(),
-	
-	/**
-	 * Gets the color associated with the term.  Creates a new association if none exists.
-	 * @param {String} term The term to get the color for.
-	 * @param {Boolean} [returnHex] True to return a hexadecimal representation of the color (optional, defaults to rgb values).
-	 * @return {Mixed} The requested color, either a hex string or array of rgb values.
-	 * @private
-	 */
-	getColorForTerm: function(term, returnHex) {
-		if (term.indexOf(':') != -1) {
-			term = term.split(':')[1];
-		}
-		var color = this.colorTermAssociations.get(term);
-		if (color == null) {
-			var paletteKey = this.getApiParam('palette') || 'default';
-			var palette = this.palettes[paletteKey];
-			
-			var index = this.colorTermAssociations.getCount() % palette.length;
-			color = palette[index];
-			this.colorTermAssociations.add(term, color);
-		}
-		if (returnHex) {
-			color = this.rgbToHex(color);
-		}
-		return color;
-	},
-	
-	getRgb: function(index, alpha) {
-		var color = this.getColor(index);
-		 return "rgba("+color[0]+","+color[1]+","+color[2]+","+alpha+")";
-	},
-	
-	getRgbaForTerm: function(term, alpha) {
-		 var color = this.getColorForTerm(term);
-		 return "rgba("+color[0]+","+color[1]+","+color[2]+","+alpha+")";
 	},
 
 	/**
@@ -38296,14 +38332,10 @@ Ext.define('Voyant.VoyantCorpusApp', {
     listeners: {
     	loadedCorpus: function(src, corpus) {
     		this.setCorpus(corpus);
-//    		this.colorTermAssociations.clear();
     		
     		// let's load the categories based on the corpus
         	if (this.getApiParam("categories")) {
-        	    this.loadCategoryData(this.getApiParam("categories")).then(function() {
-        	        this.setColorTermAssociations();
-        	    }, null, null, this);
-        		
+				this.loadCategoryData(this.getApiParam("categories"))
         	}    	
 
     		
@@ -38314,8 +38346,8 @@ Ext.define('Voyant.VoyantCorpusApp', {
 				if (eventName=='termsClicked') {
 					// data can be a simple array of terms or an array of term objects
 					if (Ext.isArray(data) && "term" in data[0] && "docIndex" in data[0]) {
-						var termsObj = {};
-						var docIndObj = {};
+						let termsObj = {};
+						let docIndObj = {};
 						data.forEach(function(datum) {
 							termsObj[datum.term]=true;
 							docIndObj[datum.docIndex]=true;

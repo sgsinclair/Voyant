@@ -3,7 +3,7 @@ from re import finditer
 
 def parse_file(fullfilename):
     output = "\n\n// *** Documentation extracted from: "+fullfilename+" ***\n\n"
-    commentsRe = re.compile(r'/\*\*(.*?)\*/[ \t]*(\r\n|\r|\n)(.+?)(\r\n|\r|\n)', re.S)
+    commentsRe = re.compile(r'/\*\*(.*?)\*/[ \t]*(\r\n|\r|\n)(.*?)(\r\n|\r|\n)', re.S)
     classCodeRe = re.compile(r'class\s+(\w+)')
     classCommentsRe = re.compile(r'@class(\s+\w+)*')
     memberOfRe = re.compile(r'@memberof\s+(\w+)')
@@ -13,20 +13,24 @@ def parse_file(fullfilename):
         contents = f.read()
         for match in finditer(commentsRe, contents):
             comments = match.group(1)
-            code = match.group(3)+"}"
+            code = match.group(3)
+            if re.search(r'\w', code):
+                code += "}"
+            else:
+                code = ""
             if "@typedef" in comments:
                 continue
             if "static" in code:
                 comments += "* @static\n"
                 code = code.replace("static", "")
-            if "function" not in code and "class" not in code and code.strip():
+            if "@cfg" not in comments and "function" not in code and "class" not in code and code.strip():
                 code = code.replace("async", "")
                 funcMatch = functionCodeRe.search(code)
                 if funcMatch:
                     comments += " * @method "+funcMatch.group(1)
                     code = ""
                 else:
-                    raise Exception("Can't find function: "+code)
+                    raise Exception("Can't find function: "+code+"\n\ncomments: "+comments)
             memberOfMatch = memberOfRe.search(comments)
             if memberOfMatch:
                 memberOf = memberOfMatch.group(1)+"."
@@ -45,7 +49,7 @@ def parse_file(fullfilename):
                     raise Exception("Unable to find class")
             code = code.replace("...", "")
             code = defaultsRe.sub("", code)
-            if "@class" in comments or "@method" in comments:
+            if "@cfg" in comments or "@class" in comments or "@method" in comments:
                 output += "/**\n"+comments.strip()+"\n */\n"+code+"\n\n"
     return output    
     
