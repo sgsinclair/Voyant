@@ -1221,7 +1221,44 @@ var Spyral = (function () {
        * 
        * An individual KWIC Object looks something like this:
        * 
+       * 		{
+          * 			"docIndex": 0,
+          * 			"query": "love",
+          * 			"term": "love",
+          * 			"position": 0,
+          * 			"left": "FREINDSHIP AND OTHER EARLY WORKS",
+          * 			"middle": "Love",
+          * 			"right": " And Friendship And Other Early"
+          *  	}
+          *  
+       * The following are valid in the config parameter:
        * 
+       *  * **start**: the zero-based start index of the list (for paging)
+       *  * **limit**: the maximum number of terms to provide per request
+       *  * **query**: a term query (see https://voyant-tools.org/docs/#!/guide/search)
+       *  * **sort**: the order of the contexts composed of a feature and either **ASC**ending or **DESC**ending: `TERMASC, TERMDESC, DOCINDEXASC, DOCINDEXDESC, POSITIONASC, POSITIONDESC, LEFTASC, LEFTDESC, RIGHTASC, RIGHTDESC`
+       *  * **perDocLimit**: the `limit` parameter is for the total number of terms returned, this parameter allows you to specify a limit value per document
+       *  * **stripTags**: for the `left`, `middle` and `right` values, one of the following: `ALL`, `BLOCKSONLY` (tries to maintain blocks for line formatting), `NONE` (default)
+       *  * **overlapStrategy**: determines how to handle cases where there's overlap between KWICs, such as "to be or not to be" when the keyword is "be"; here are the options:
+       *  	* **none**: nevermind the overlap, keep all words
+       *  		* {left: "to", middle: "be", right: "or not to be"} 
+       *  		* {left: "to be or not to", middle: "be", right: ""} 
+       *  	* **first**: priority goes to the first occurrence (some may be dropped)
+       *  		* {left: "to", middle: "be", right: "or not to be"} 
+       *  	* **merge**: balance the words between overlapping occurrences
+       *  		* {left: "to", middle: "be", right: "or"} 
+       *  		* {left: "not to", middle: "be", right: ""} 
+       *  * **context**: the size of the context (the number of words on each size of the keyword)
+       *  * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)
+       *  * **docId**: the document IDs to include (use commas to separate multiple values)
+       * 
+       * An example:
+       * 
+       * 		// load the first 20 words in the corpus
+       * 		loadCorpus("austen").contexts({query: "love", limit: 10})
+       * 
+       * @param {Object} config an Object specifying parameters (see above)
+       * @returns {Promise/Array} a Promise for an Array of KWIC Objects
        */
 
     }, {
@@ -1247,6 +1284,73 @@ var Spyral = (function () {
       //		return Corpus.load(config).then(corpus => corpus.contexts(api || config));
       //	}
 
+      /**
+       * Get a Promise for an Array of collocates (either CorpusCollocates or DocumentCollocates, depending on the specified mode).
+       * 
+       * The mode is set to "documents" when any of the following is true
+       * 
+       * * the `mode` parameter is set to "documents"
+       * * a `docIndex` parameter being set
+       * * a `docId` parameter being set
+       * 
+       * The following is an example a Corpus Collocate (corpus mode):
+       * 
+       * 		{
+          *   		"term": "love",
+          *   		"rawFreq": 568,
+          *   		"contextTerm": "mr",
+          *   		"contextTermRawFreq": 24
+       * 		}
+       * 
+       * The following is an example of Document Collocate (documents mode):
+       * 
+       * 		{
+          *   		"docIndex": 4,
+          *   		"keyword": "love",
+          *   		"keywordContextRawFrequency": 124,
+          *   		"term": "fanny",
+          *   		"termContextRawFrequency": 8,
+          *   		"termContextRelativeFrequency": 0.0,
+          *   		"termDocumentRawFrequency": 816,
+          *   		"termDocumentRelativeFrequency": 0.0,
+          *   		"termContextDocumentRelativeFrequencyDifference": 0.0
+          * 		}
+       * 
+       * The following config parameters are valid in both modes:
+       * 
+       *  * **start**: the zero-based start index of the list (for paging)
+       *  * **limit**: the maximum number of terms to provide per request
+       *  * **query**: a term query (see https://voyant-tools.org/docs/#!/guide/search)
+       *  * **context**: the size of the context (the number of words on each size of the keyword)
+       *  * **stopList** a list of stopwords to include (see https://voyant-tools.org/docs/#!/guide/stopwords)
+       * 
+       * The following are specific to corpus mode:
+       * 
+       *  * **bins**: by default there are the same number of bins as there are documents (for distribution values), this can be modified
+       *  * **corpusComparison**: you can provide the ID of a corpus for comparison of frequency values
+       *  * **inDocumentsCountOnly**: if you don't need term frequencies but only frequency per document set this to true
+       *  * **sort**: the order of the terms, one of the following (composed of a value and a direction of ASCending or DEScending: `INDOCUMENTSCOUNTASC, INDOCUMENTSCOUNTDESC, RAWFREQASC, RAWFREQDESC, TERMASC, TERMDESC, RELATIVEPEAKEDNESSASC, RELATIVEPEAKEDNESSDESC, RELATIVESKEWNESSASC, RELATIVESKEWNESSDESC, COMPARISONRELATIVEFREQDIFFERENCEASC, COMPARISONRELATIVEFREQDIFFERENCEDESC`
+       *  
+       *  The following are specific to documents mode:
+       * 
+       *  * **sort**: the order of the terms, one of the following (composed of a value and a direction of ASCending or DEScending: `RAWFREQASC, RAWFREQDESC, RELATIVEFREQASC, RELATIVEFREQDESC, TERMASC, TERMDESC, TFIDFASC, TFIDFDESC, ZSCOREASC, ZSCOREDESC`
+       *  * **collocatesWhitelist**: a keyword list – context terms will be limited to this list
+       *  * **perDocLimit**: the `limit` parameter is for the total number of terms returned, this parameter allows you to specify a limit value per document
+       *  * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)
+       *  * **docId**: the document IDs to include (use commas to separate multiple values)
+       *  
+       * An example:
+       * 
+       * 		// show top 5 terms
+        	 * 		loadCorpus("austen").terms({stopList: 'auto', limit: 5}).then(terms => terms.map(term => term.term))
+        	 * 
+        	 *		// show top term for each document
+        	 * 		loadCorpus("austen").terms({stopList: 'auto', perDocLimit: 1, mode: 'documents'}).then(terms => terms.map(term => term.term))
+        	 * 
+       * @param {Object} config an Object specifying parameters (see list above)
+       * @returns {Promise/Array} a Promise for a Array of Terms
+       */
+
     }, {
       key: "collocates",
       value: function collocates(config) {
@@ -1261,11 +1365,14 @@ var Spyral = (function () {
           return data.corpusCollocates.collocates;
         });
       }
-      /**
+      /*
        * Create a Corpus and return the collocates
        * @param {object} config 
        * @param {object} api 
        */
+      //	static collocates(config, api) {
+      //		return Corpus.load(config).then(corpus => corpus.collocates(api || config));
+      //	}
 
     }, {
       key: "phrases",
@@ -1438,13 +1545,6 @@ var Spyral = (function () {
       key: "setBaseUrl",
       value: function setBaseUrl(baseUrl) {
         Load.setBaseUrl(baseUrl);
-      }
-    }, {
-      key: "collocates",
-      value: function collocates(config, api) {
-        return Corpus.load(config).then(function (corpus) {
-          return corpus.collocates(api || config);
-        });
       }
     }, {
       key: "phrases",

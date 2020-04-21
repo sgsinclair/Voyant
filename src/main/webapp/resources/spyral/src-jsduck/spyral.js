@@ -1404,7 +1404,43 @@
 	 * 
 	 * An individual KWIC Object looks something like this:
 	 * 
+	 * 		{
+     * 			"docIndex": 0,
+     * 			"query": "love",
+     * 			"term": "love",
+     * 			"position": 0,
+     * 			"left": "FREINDSHIP AND OTHER EARLY WORKS",
+     * 			"middle": "Love",
+     * 			"right": " And Friendship And Other Early"
+     *  	}
+     *  
+	 * The following are valid in the config parameter:
 	 * 
+	 *  * **start**: the zero-based start index of the list (for paging)
+	 *  * **limit**: the maximum number of terms to provide per request
+	 *  * **query**: a term query (see https://voyant-tools.org/docs/#!/guide/search)
+	 *  * **sort**: the order of the contexts composed of a feature and either **ASC**ending or **DESC**ending: `TERMASC, TERMDESC, DOCINDEXASC, DOCINDEXDESC, POSITIONASC, POSITIONDESC, LEFTASC, LEFTDESC, RIGHTASC, RIGHTDESC`
+	 *  * **perDocLimit**: the `limit` parameter is for the total number of terms returned, this parameter allows you to specify a limit value per document
+	 *  * **stripTags**: for the `left`, `middle` and `right` values, one of the following: `ALL`, `BLOCKSONLY` (tries to maintain blocks for line formatting), `NONE` (default)
+	 *  * **overlapStrategy**: determines how to handle cases where there's overlap between KWICs, such as "to be or not to be" when the keyword is "be"; here are the options:
+	 *  	* **none**: nevermind the overlap, keep all words
+	 *  		* {left: "to", middle: "be", right: "or not to be"} 
+	 *  		* {left: "to be or not to", middle: "be", right: ""} 
+	 *  	* **first**: priority goes to the first occurrence:
+	 *  		* {left: "to", middle: "be", right: "or not to be"} 
+	 *  	* **merge**: balance the words
+	 *  		* {left: "to", middle: "be", right: "or"} 
+	 *  		* {left: "not to", middle: "be", right: ""} 
+	 *  * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)
+	 *  * **docId**: the document IDs to include (use commas to separate multiple values)
+	 * 
+	 * An example:
+	 * 
+	 * 		// load the first 20 words in the corpus
+	 * 		loadCorpus("austen").contexts({query: "love", limit: 10})
+	 * 
+	 * @param {Object} config an Object specifying parameters (see above)
+	 * @returns {Promise/Array} a Promise for an Array of KWIC Objects
 	  * @method contexts
  */
 

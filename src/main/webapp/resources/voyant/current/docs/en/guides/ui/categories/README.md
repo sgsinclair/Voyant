@@ -2,7 +2,7 @@
 
 <p class="keyword">*N.B. Categories are a new experimental feature, expect things to go wrong*.</p>
 
-Categories are a powerful way of handling lists of words that are of interest. For instance, instead of typing several words with positive conotations, you can use the built-in categories label `@positive` (`@positive` and `@negative` are the only two built-in categories but you can edit them, remove them and and more, as we'll see).
+Categories are a powerful way of handling lists of words that are of interest. For instance, instead of typing several words with positive connotations, you can use the built-in categories label `@positive` (`@positive` and `@negative` are the only two built-in categories but you can edit them, remove them and and more, as we'll see).
 
 A go place to demonstrate this is in the Terms tool.
 
