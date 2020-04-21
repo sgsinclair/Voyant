@@ -228,7 +228,8 @@ Ext.define('Voyant.notebook.Notebook', {
     			notebookWrapperMoveUp: this.notebookWrapperMoveUp,
     			notebookWrapperMoveDown: this.notebookWrapperMoveDown,
     			notebookWrapperRemove: this.notebookWrapperRemove,
-    			notebookWrapperAdd: this.notebookWrapperAdd,
+				notebookWrapperAdd: this.notebookWrapperAdd,
+				notebookLoaded: this.autoExecuteCells,
     			scope: this
     		}
     	})
@@ -524,16 +525,20 @@ Ext.define('Voyant.notebook.Notebook', {
     		} else if (classes.contains("notebookcodeeditorwrapper")) {
     			var inputEl = section.querySelector(".notebook-code-editor-raw");
     			var typeRe = /\beditor-mode-(\w+)\b/.exec(inputEl.className);
-    			var editorType = typeRe[1];    			
-    			var input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
+    			var editorType = typeRe[1];
+				var input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
+				var autoexec = /\bautoexec\b/.exec(inputEl.className) !== null;
     			var output = section.querySelector(".notebook-code-results").innerHTML;
     			this.addCode({
     				input: input,
     				output: output,
-    				mode: editorType
+					mode: editorType,
+					autoExecute: autoexec,
     			}, undefined, section.id)
     		}
-    	}, this);
+		}, this);
+		
+		this.fireEvent('notebookLoaded');
     },
     
     runUntil: function(upToCmp) {
@@ -580,7 +585,17 @@ Ext.define('Voyant.notebook.Notebook', {
 	        	Ext.defer(this._run, 100, this, [containers]);
 			}
     	}
-    },
+	},
+	
+	autoExecuteCells: function() {
+		var containers = [];
+    	Ext.Array.each(this.query("notebookcodeeditorwrapper"), function(item) {
+			if (item.getAutoExecute()) {
+				containers.push(item);
+			}
+		});
+		this._run(containers);
+	},
     
     loadFromUrl: function(url, run) {
     	var me = this;
@@ -736,16 +751,22 @@ Ext.define('Voyant.notebook.Notebook', {
         	this.getHeaderHtml()+
         	"<article class='spyralArticle'>";
 		this.getComponent("cells").items.each(function(item, i) {
-    		type = item.isXType('notebookcodeeditorwrapper') ? 'code' : 'text';
-    		content = item.getContent();
+    		var type = item.isXType('notebookcodeeditorwrapper') ? 'code' : 'text';
+    		var content = item.getContent();
     		var counter = item.down("notebookwrappercounter");
     		out+="<section id='"+counter.name+"' class='notebook-editor-wrapper "+item.xtype+"'>\n"+
     			"<div class='notebookwrappercounter'>"+counter.getTargetEl().dom.innerHTML+"</div>";
     		if (type=='code') {
     			var mode = item.down("notebookcodeeditor").getMode();
-    			mode = mode.substring(mode.lastIndexOf("/")+1);
-    			out+="<div class='notebook-code-editor ace-chrome'>\n"+item.getTargetEl().query('.ace_text-layer')[0].outerHTML+"\n</div>\n"+
-    				"<pre class='notebook-code-editor-raw editor-mode-"+mode+"'>\n"+content.input+"</pre>\n"+
+				mode = mode.substring(mode.lastIndexOf("/")+1);
+				
+				var autoexec = item.getAutoExecute() ? 'autoexec' : '';
+				
+				var codeTextLayer = item.getTargetEl().query('.ace_text-layer')[0].cloneNode(true);
+				codeTextLayer.style.setProperty('height', 'auto'); // fix for very large height set by ace
+
+    			out+="<div class='notebook-code-editor ace-chrome'>\n"+codeTextLayer.outerHTML+"\n</div>\n"+
+    				"<pre class='notebook-code-editor-raw editor-mode-"+mode+" "+autoexec+"'>\n"+content.input+"</pre>\n"+
     				"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
     		} else {
     			out+="<div class='notebook-text-editor'>"+content+"</div>\n";

@@ -12,7 +12,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		}
 	},
 	config: {
-		isRun: false
+		isRun: false,
+		autoExecute: false
 	},
 	layout: {
 		type: 'vbox',
@@ -85,6 +86,19 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 						}
 					},{
 						xtype: 'button',
+						glyph: 'f0d0@FontAwesome',
+						tooltip: this.localize('toggleAutoExecute'),
+						itemId: 'toggleAutoExecute',
+						enableToggle: true,
+						pressed: config.autoExecute,
+						listeners: {
+							click: function(b) {
+								this.setAutoExecute(b.pressed);
+							},
+							scope: this
+						}
+					},{
+						xtype: 'button',
 						glyph: 'xf1c9@FontAwesome',
 						tooltip: this.localize('codeModeTip'),
 						listeners: {
@@ -92,7 +106,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								var me = this;
 								var mode = this.editor.getMode().split("/").pop()
 								new Ext.Window({
-								    title: 'Resize Me',
+								    title: this.localize('codeModeTitle'),
 								    layout: 'fit',
 								    width: 200,
 								    items: [{
@@ -223,7 +237,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				var height = 20;
 				me.items.each(function(item) {height+=item.getHeight();})
 				me.setSize({height: height});
-			})
+			});
 		}, this);
 		me.callParent(arguments);
 	},
@@ -238,9 +252,13 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		}
 	},
 	
-	run: function(runningAll) {
+	/**
+	 * Run the code in this editor.
+	 * @param {boolean} forceRun True to force the code to run, otherwise a check is performed to see if previous editors have already run.
+	 */
+	run: function(forceRun) {
 		if (this.editor.getMode()=='ace/mode/javascript') { // only run JS
-			if (runningAll===true) {
+			if (forceRun===true) {
 				return this._run();
 			} else {
 				var notebook = this.up('notebook');
@@ -259,7 +277,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	
 	_run: function() {
-		
 		this.results.show(); // make sure it's visible 
 		this.results.update(this.EMPTY_RESULTS_TEXT); // clear out the results
 		this.results.mask('working…'); // mask results
