@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Fri Apr 17 16:01:04 EDT 2020 */
+/* This file created by JSCacher. Last modified: Wed Apr 22 12:02:25 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -34946,6 +34946,17 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			    	}
 			    }				
 			});
+			editor.commands.addCommand({
+				name: 'run',
+			    bindKey: {win: "Command-Shift-Enter", mac: "Command-Shift-Enter"}, // additional bindings like alt/cmd-enter don't seem to work
+			    exec: function(editor) {
+			    	debugger
+			    	var wrapper = me.up('notebookcodeeditorwrapper');
+			    	if (wrapper) {
+			    		wrapper.run();
+			    	}
+			    }				
+			});
 			this.setEditor(editor);
 
 			ace.config.loadModule('ace/ext/tern', function (module) {
@@ -35017,7 +35028,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		}
 	},
 	config: {
-		isRun: false
+		isRun: false,
+		autoExecute: false
 	},
 	layout: {
 		type: 'vbox',
@@ -35060,7 +35072,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								scope: this
 							}
 						}
-					},{
+					},/*{
 						xtype: 'notebookwrapperrununtil',
 						listeners: {
 							click: {
@@ -35088,6 +35100,19 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								scope: this
 							}
 						}
+					},*/{
+						xtype: 'button',
+						glyph: 'f0d0@FontAwesome',
+						tooltip: this.localize('toggleAutoExecute'),
+						itemId: 'toggleAutoExecute',
+						enableToggle: true,
+						pressed: config.autoExecute,
+						listeners: {
+							click: function(b) {
+								this.setAutoExecute(b.pressed);
+							},
+							scope: this
+						}
 					},{
 						xtype: 'button',
 						glyph: 'xf1c9@FontAwesome',
@@ -35097,7 +35122,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								var me = this;
 								var mode = this.editor.getMode().split("/").pop()
 								new Ext.Window({
-								    title: 'Resize Me',
+								    title: this.localize('codeModeTitle'),
 								    layout: 'fit',
 								    width: 200,
 								    items: [{
@@ -35228,7 +35253,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				var height = 20;
 				me.items.each(function(item) {height+=item.getHeight();})
 				me.setSize({height: height});
-			})
+			});
 		}, this);
 		me.callParent(arguments);
 	},
@@ -35236,16 +35261,20 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	switchModes: function(mode, light) {
 		var runnable = mode.indexOf('javascript')>-1;
 		this.down('notebookwrapperrun').setVisible(runnable);
-		this.down('notebookwrapperrununtil').setVisible(runnable);
+		// this.down('notebookwrapperrununtil').setVisible(runnable);
 		this.results.setVisible(runnable);
 		if (!light) {
 			this.editor.switchModes(mode);
 		}
 	},
 	
-	run: function(runningAll) {
+	/**
+	 * Run the code in this editor.
+	 * @param {boolean} forceRun True to force the code to run, otherwise a check is performed to see if previous editors have already run.
+	 */
+	run: function(forceRun) {
 		if (this.editor.getMode()=='ace/mode/javascript') { // only run JS
-			if (runningAll===true) {
+			if (forceRun===true) {
 				return this._run();
 			} else {
 				var notebook = this.up('notebook');
@@ -35264,7 +35293,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	
 	_run: function() {
-		
 		this.results.show(); // make sure it's visible 
 		this.results.update(this.EMPTY_RESULTS_TEXT); // clear out the results
 		this.results.mask('working…'); // mask results
@@ -36855,7 +36883,8 @@ Ext.define('Voyant.notebook.Notebook', {
     			notebookWrapperMoveUp: this.notebookWrapperMoveUp,
     			notebookWrapperMoveDown: this.notebookWrapperMoveDown,
     			notebookWrapperRemove: this.notebookWrapperRemove,
-    			notebookWrapperAdd: this.notebookWrapperAdd,
+				notebookWrapperAdd: this.notebookWrapperAdd,
+				notebookLoaded: this.autoExecuteCells,
     			scope: this
     		}
     	})
@@ -37151,16 +37180,20 @@ Ext.define('Voyant.notebook.Notebook', {
     		} else if (classes.contains("notebookcodeeditorwrapper")) {
     			var inputEl = section.querySelector(".notebook-code-editor-raw");
     			var typeRe = /\beditor-mode-(\w+)\b/.exec(inputEl.className);
-    			var editorType = typeRe[1];    			
-    			var input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
+    			var editorType = typeRe[1];
+				var input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
+				var autoexec = /\bautoexec\b/.exec(inputEl.className) !== null;
     			var output = section.querySelector(".notebook-code-results").innerHTML;
     			this.addCode({
     				input: input,
     				output: output,
-    				mode: editorType
+					mode: editorType,
+					autoExecute: autoexec,
     			}, undefined, section.id)
     		}
-    	}, this);
+		}, this);
+		
+		this.fireEvent('notebookLoaded');
     },
     
     runUntil: function(upToCmp) {
@@ -37207,7 +37240,17 @@ Ext.define('Voyant.notebook.Notebook', {
 	        	Ext.defer(this._run, 100, this, [containers]);
 			}
     	}
-    },
+	},
+	
+	autoExecuteCells: function() {
+		var containers = [];
+    	Ext.Array.each(this.query("notebookcodeeditorwrapper"), function(item) {
+			if (item.getAutoExecute()) {
+				containers.push(item);
+			}
+		});
+		this._run(containers);
+	},
     
     loadFromUrl: function(url, run) {
     	var me = this;
@@ -37363,16 +37406,22 @@ Ext.define('Voyant.notebook.Notebook', {
         	this.getHeaderHtml()+
         	"<article class='spyralArticle'>";
 		this.getComponent("cells").items.each(function(item, i) {
-    		type = item.isXType('notebookcodeeditorwrapper') ? 'code' : 'text';
-    		content = item.getContent();
+    		var type = item.isXType('notebookcodeeditorwrapper') ? 'code' : 'text';
+    		var content = item.getContent();
     		var counter = item.down("notebookwrappercounter");
     		out+="<section id='"+counter.name+"' class='notebook-editor-wrapper "+item.xtype+"'>\n"+
     			"<div class='notebookwrappercounter'>"+counter.getTargetEl().dom.innerHTML+"</div>";
     		if (type=='code') {
     			var mode = item.down("notebookcodeeditor").getMode();
-    			mode = mode.substring(mode.lastIndexOf("/")+1);
-    			out+="<div class='notebook-code-editor ace-chrome'>\n"+item.getTargetEl().query('.ace_text-layer')[0].outerHTML+"\n</div>\n"+
-    				"<pre class='notebook-code-editor-raw editor-mode-"+mode+"'>\n"+content.input+"</pre>\n"+
+				mode = mode.substring(mode.lastIndexOf("/")+1);
+				
+				var autoexec = item.getAutoExecute() ? 'autoexec' : '';
+				
+				var codeTextLayer = item.getTargetEl().query('.ace_text-layer')[0].cloneNode(true);
+				codeTextLayer.style.setProperty('height', 'auto'); // fix for very large height set by ace
+
+    			out+="<div class='notebook-code-editor ace-chrome'>\n"+codeTextLayer.outerHTML+"\n</div>\n"+
+    				"<pre class='notebook-code-editor-raw editor-mode-"+mode+" "+autoexec+"'>\n"+content.input+"</pre>\n"+
     				"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
     		} else {
     			out+="<div class='notebook-text-editor'>"+content+"</div>\n";

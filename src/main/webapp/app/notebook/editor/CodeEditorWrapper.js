@@ -56,7 +56,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								scope: this
 							}
 						}
-					},{
+					},/*{
 						xtype: 'notebookwrapperrununtil',
 						listeners: {
 							click: {
@@ -84,7 +84,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								scope: this
 							}
 						}
-					},{
+					},*/{
 						xtype: 'button',
 						glyph: 'f0d0@FontAwesome',
 						tooltip: this.localize('toggleAutoExecute'),
@@ -245,7 +245,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	switchModes: function(mode, light) {
 		var runnable = mode.indexOf('javascript')>-1;
 		this.down('notebookwrapperrun').setVisible(runnable);
-		this.down('notebookwrapperrununtil').setVisible(runnable);
+		// this.down('notebookwrapperrununtil').setVisible(runnable);
 		this.results.setVisible(runnable);
 		if (!light) {
 			this.editor.switchModes(mode);
