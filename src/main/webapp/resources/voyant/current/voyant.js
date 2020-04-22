@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Wed Apr 22 12:02:25 EDT 2020 */
+/* This file created by JSCacher. Last modified: Wed Apr 22 14:34:17 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -35021,10 +35021,18 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	cls: 'notebook-code-wrapper',
 	statics: {
 		i18n: {
+			runMultiple: "Run multiple cells",
 			runUntil: "Run up to here",
 			runUntilTip: "Run previous code blocks and this one.",
 			runFrom: "Run from here onwards",
-			runFromTip: "Run this and following code blocks."
+			runFromTip: "Run this and following code blocks.",
+			codeMode: "select from several formats for this cell",
+			codeModeTitle: "Code Mode",
+			codeModeTip: "Select from multiple code formats for this cell.",
+			configureTip: "Configuration Options",
+			autoExecuteOnLoad: "auto-run this cell on page load",
+			ok: "OK",
+			cancel: "Cancel"
 		}
 	},
 	config: {
@@ -35053,7 +35061,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			docs: config.docs,
 			mode: 'ace/mode/'+(config.mode ? config.mode : 'javascript')
 		});
-		
 		Ext.apply(this, {
 			dockedItems: [{
 			    xtype: 'toolbar',
@@ -35072,8 +35079,11 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								scope: this
 							}
 						}
-					},/*{
-						xtype: 'notebookwrapperrununtil',
+					},{
+						glyph: 'xf050@FontAwesome',
+						tooltip: this.localize("runMultiple"),
+						itemId: 'runMultiple',
+//						xtype: 'notebookwrapperrununtil',
 						listeners: {
 							click: {
 								fn: function(btn, ev) {
@@ -35100,123 +35110,137 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								scope: this
 							}
 						}
-					},*/{
-						xtype: 'button',
-						glyph: 'f0d0@FontAwesome',
-						tooltip: this.localize('toggleAutoExecute'),
-						itemId: 'toggleAutoExecute',
-						enableToggle: true,
-						pressed: config.autoExecute,
-						listeners: {
-							click: function(b) {
-								this.setAutoExecute(b.pressed);
-							},
-							scope: this
-						}
 					},{
 						xtype: 'button',
-						glyph: 'xf1c9@FontAwesome',
-						tooltip: this.localize('codeModeTip'),
-						listeners: {
-							click: function() {
-								var me = this;
-								var mode = this.editor.getMode().split("/").pop()
-								new Ext.Window({
-								    title: this.localize('codeModeTitle'),
-								    layout: 'fit',
-								    width: 200,
-								    items: [{
-										xtype: 'form',
-										layout: {
-											type: 'vbox',
-											align: 'stretch'
+						glyph: 'xf013@FontAwesome',
+						tooltip: this.localize("configureTip"),
+						scope: this,
+						cls: config.autoExecute ? "autoExecute" : "",
+						handler: function(btn, ev) {
+							var button = btn;
+							Ext.create('Ext.menu.Menu', {
+								items: [{
+									xtype: 'menucheckitem',
+									text: this.localize("autoExecuteOnLoad"),
+									hidden: this.results.isVisible()==false,
+//									glyph: 'f0d0@FontAwesome',
+//									tooltip: this.localize('toggleAutoExecute'),
+									itemId: 'toggleAutoExecute',
+									checked: this.getAutoExecute(),
+									handler: function(item, ev) {
+										this.setAutoExecute(item.checked);
+										item.up("menu").close();
+										button.toggleCls("autoExecute", item.checked);
+									},
+									scope: this
+								},{
+//									xtype: 'button',
+									text: this.localize('codeMode'),
+									glyph: 'xf1c9@FontAwesome',
+//									tooltip: this.localize('codeModeTip'),
+									listeners: {
+										click: function() {
+											var me = this;
+											var mode = this.editor.getMode().split("/").pop()
+											new Ext.Window({
+											    title: this.localize('codeModeTitle'),
+											    layout: 'fit',
+											    width: 200,
+											    items: [{
+													xtype: 'form',
+													layout: {
+														type: 'vbox',
+														align: 'stretch'
+													},
+													bodyPadding: 10,
+													items: [{
+														xtype: 'fieldset',
+														title: this.localize("modeCode"),
+														items: {
+										                    xtype : 'radiofield',
+										                    boxLabel : this.localize('modeJavascript'),
+										                    name  : 'codeMode',
+										                    inputValue: 'javascript',
+										                    flex  : 1,
+										                    checked: mode=="javascript"
+														}
+													},{
+														xtype: 'fieldset',
+														title: this.localize("modeData"),
+														items: [{
+															items: {
+											                    xtype : 'radiofield',
+											                    boxLabel : this.localize('modeJson'),
+											                    name  : 'codeMode',
+											                    inputValue: 'json',
+											                    flex  : 1,
+											                    checked: mode=="json"												
+															}
+														},{
+															items: {
+											                    xtype : 'radiofield',
+											                    boxLabel : this.localize('modeText'),
+											                    name  : 'codeMode',
+											                    inputValue: 'text',
+											                    flex  : 1,
+											                    checked: mode=="text"											
+															}
+														},/*{
+															items: {
+											                    xtype : 'radiofield',
+											                    boxLabel : this.localize('modeCsv'),
+											                    name  : 'codeMode',
+											                    inputValue: 'csv',
+											                    flex  : 1													
+															}
+														},{
+															items: {
+											                    xtype : 'radiofield',
+											                    boxLabel : this.localize('modeTsv'),
+											                    name  : 'codeMode',
+											                    inputValue: 'tsv',
+											                    flex  : 1													
+															}
+														},*/{
+															items: {
+											                    xtype : 'radiofield',
+											                    boxLabel : this.localize('modeHtml'),
+											                    name  : 'codeMode',
+											                    inputValue: 'html',
+											                    flex  : 1,
+											                    checked: mode=="html"											
+															}
+														},{
+															items: {
+											                    xtype : 'radiofield',
+											                    boxLabel : this.localize('modeXml'),
+											                    name  : 'codeMode',
+											                    inputValue: 'xml',
+											                    flex  : 1	,
+											                    checked: mode=="xml"												
+															}
+														}]
+													}]
+											    }],
+											   buttons: [{
+											        text: this.localize('ok'),
+											        handler: function() {
+											        	var win = this.up('window'); values = win.down('form').getForm().getValues();
+											        	me.switchModes(values.codeMode);
+											        	win.close();
+											        }
+											    },{
+											        text:  this.localize('cancel'),
+											        handler: function() {
+											        	this.up('window').close();
+											        }
+											    }]
+											}).show();
 										},
-										bodyPadding: 10,
-										items: [{
-											xtype: 'fieldset',
-											title: this.localize("modeCode"),
-											items: {
-							                    xtype : 'radiofield',
-							                    boxLabel : this.localize('modeJavascript'),
-							                    name  : 'codeMode',
-							                    inputValue: 'javascript',
-							                    flex  : 1,
-							                    checked: mode=="javascript"
-											}
-										},{
-											xtype: 'fieldset',
-											title: this.localize("modeData"),
-											items: [{
-												items: {
-								                    xtype : 'radiofield',
-								                    boxLabel : this.localize('modeJson'),
-								                    name  : 'codeMode',
-								                    inputValue: 'json',
-								                    flex  : 1,
-								                    checked: mode=="json"												
-												}
-											},{
-												items: {
-								                    xtype : 'radiofield',
-								                    boxLabel : this.localize('modeText'),
-								                    name  : 'codeMode',
-								                    inputValue: 'text',
-								                    flex  : 1,
-								                    checked: mode=="text"											
-												}
-											},/*{
-												items: {
-								                    xtype : 'radiofield',
-								                    boxLabel : this.localize('modeCsv'),
-								                    name  : 'codeMode',
-								                    inputValue: 'csv',
-								                    flex  : 1													
-												}
-											},{
-												items: {
-								                    xtype : 'radiofield',
-								                    boxLabel : this.localize('modeTsv'),
-								                    name  : 'codeMode',
-								                    inputValue: 'tsv',
-								                    flex  : 1													
-												}
-											},*/{
-												items: {
-								                    xtype : 'radiofield',
-								                    boxLabel : this.localize('modeHtml'),
-								                    name  : 'codeMode',
-								                    inputValue: 'html',
-								                    flex  : 1,
-								                    checked: mode=="html"											
-												}
-											},{
-												items: {
-								                    xtype : 'radiofield',
-								                    boxLabel : this.localize('modeXml'),
-								                    name  : 'codeMode',
-								                    inputValue: 'xml',
-								                    flex  : 1	,
-								                    checked: mode=="xml"												
-												}
-											}]
-										}]
-								    }],
-								   buttons: [{
-								        text: this.localize('ok'),
-								        handler: function() {
-								        	var win = this.up('window'); values = win.down('form').getForm().getValues();
-								        	me.switchModes(values.codeMode);
-								        	win.close();
-								        }
-								    },{
-								        text:  this.localize('cancel'),
-								        handler: function() {
-								        	this.up('window').close();
-								        }
-								    }]
-								}).show();
-							},
-							scope: this
+										scope: this
+									}
+								}]
+							}).showAt(ev.pageX, ev.pageY)
 						}
 					}
 			    ]
@@ -35261,7 +35285,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	switchModes: function(mode, light) {
 		var runnable = mode.indexOf('javascript')>-1;
 		this.down('notebookwrapperrun').setVisible(runnable);
-		// this.down('notebookwrapperrununtil').setVisible(runnable);
+		this.queryById("runMultiple").setVisible(runnable);
 		this.results.setVisible(runnable);
 		if (!light) {
 			this.editor.switchModes(mode);
