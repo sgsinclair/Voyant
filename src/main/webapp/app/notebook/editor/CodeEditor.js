@@ -44,7 +44,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			editor.renderer.setShowPrintMargin(false);
 //			editor.renderer.setShowGutter(false);
 			
-			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
+			editor.setValue(this.getContent() ? this.getContent() : "" /*this.localize('emptyText')*/);
 			editor.clearSelection();
 
 		    editor.on("focus", function() {

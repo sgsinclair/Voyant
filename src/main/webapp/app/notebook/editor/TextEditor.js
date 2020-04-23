@@ -32,7 +32,7 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 	border: false,
 	constructor: function(config) {
 		Ext.apply(this, {
-			html: config.content ? config.content : this.localize("emptyText")
+			html: config.content ? config.content : "" /*this.localize("emptyText") */
 		});
         this.callParent(arguments);
 	},
