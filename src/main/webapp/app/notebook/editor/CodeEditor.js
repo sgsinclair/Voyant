@@ -88,14 +88,12 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			    }				
 			});
 			editor.commands.addCommand({
-				name: 'run',
+				name: 'rununtil',
 			    bindKey: {win: "Command-Shift-Enter", mac: "Command-Shift-Enter"}, // additional bindings like alt/cmd-enter don't seem to work
 			    exec: function(editor) {
-			    	debugger
 			    	var wrapper = me.up('notebookcodeeditorwrapper');
-			    	if (wrapper) {
-			    		wrapper.run();
-			    	}
+			    	var notebook = wrapper.up("notebook");
+			    	notebook.runUntil(wrapper);
 			    }				
 			});
 			this.setEditor(editor);
