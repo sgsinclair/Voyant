@@ -31,7 +31,8 @@ Ext.define('Voyant.notebook.Notebook', {
     		cannotLoadUnrecognized: "Unable to recognize input.",
     		openTitle: "Open",
     		openMsg: "Paste in Notebook ID, a URL or a Spyral data file (in HTML).",
-    		exportHtmlDownload: "HTML (download)"
+    		exportHtmlDownload: "HTML (download)",
+    		errorParsingDomInput: "An error occurred while parsing the input of the document. The results might still work, except if the code contained HTML tags."
     	},
     	api: {
     		input: undefined,
@@ -511,12 +512,9 @@ Ext.define('Voyant.notebook.Notebook', {
     
     loadFromHtmlString: function(html) {
     	var parser = new DOMParser();
-    	var htmlDoc = parser.parseFromString(html, 'text/html');
-    	this.loadFromDom(htmlDoc);
-    },
-    
-    loadFromDom: function(dom) {
+    	var dom = parser.parseFromString(html, 'text/html');
     	this.setMetadata(new Spyral.Metadata(dom))
+    	var hasDomError = false;
     	dom.querySelectorAll("section.notebook-editor-wrapper").forEach(function(section) {
     		var classes = section.classList;
     		if (classes.contains("notebooktexteditorwrapper")) {
@@ -526,7 +524,31 @@ Ext.define('Voyant.notebook.Notebook', {
     			var inputEl = section.querySelector(".notebook-code-editor-raw");
     			var typeRe = /\beditor-mode-(\w+)\b/.exec(inputEl.className);
     			var editorType = typeRe[1];
-				var input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
+    			
+    			/* in an ideal world we could use inputEl.innerHTML to get the contents
+    			 * except that since it's in a parsed DOM it's already been transformed
+    			 *  significantly. For instance, all >, <, and & character appear in the
+    			 * html entities form (which breaks things like && () => {}). You also
+    			 * get strange artefacts like if you have "<div>" in your code it may add
+    			 * </div> to the end of the innerHTML (to make sure tags are balanced).
+    			 * and of course textContent or innerText won't work because that will
+    			 * strip any of the HTML formatting out. What's left is to use the parsing
+    			 * to ensure the order and to properly grab the IDs and then to do character
+    			 * searches on the original string. */
+    			var secPos = html.indexOf("<section id='"+section.id+"' class='notebook-editor-wrapper notebookcodeeditorwrapper'>");
+				var startPre = html.indexOf("<pre class='notebook-code-editor-raw editor-mode-", secPos);
+    			startPre = html.indexOf(">", startPre)+1; // add the length of the string
+    			var endPre = html.indexOf("</pre>\n<div class='notebook-code-results'>", startPre);
+    			
+    			// check if we hav valid values
+    			if (secPos==-1 || startPre == -1 || endPre == -1) {
+    				hasDomError = true;
+    				// this might work, unless the js code includes HTML
+    				input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
+    				debugger
+    			} else {
+        			input = html.substring(startPre, endPre);
+    			}
 				var autoexec = /\bautoexec\b/.exec(inputEl.className) !== null;
     			var output = section.querySelector(".notebook-code-results").innerHTML;
     			this.addCode({
@@ -538,6 +560,10 @@ Ext.define('Voyant.notebook.Notebook', {
     		}
 		}, this);
 		
+    	if (hasDomError) {
+			this.showError(this.localize("errorParsingDomInput"))
+    	}
+    	
 		this.fireEvent('notebookLoaded');
     },
     
@@ -754,6 +780,7 @@ Ext.define('Voyant.notebook.Notebook', {
     		var type = item.isXType('notebookcodeeditorwrapper') ? 'code' : 'text';
     		var content = item.getContent();
     		var counter = item.down("notebookwrappercounter");
+			// reminder that the parsing in of notebooks depends on the stability of this syntax
     		out+="<section id='"+counter.name+"' class='notebook-editor-wrapper "+item.xtype+"'>\n"+
     			"<div class='notebookwrappercounter'>"+counter.getTargetEl().dom.innerHTML+"</div>";
     		if (type=='code') {
@@ -764,9 +791,9 @@ Ext.define('Voyant.notebook.Notebook', {
 				
 				var codeTextLayer = item.getTargetEl().query('.ace_text-layer')[0].cloneNode(true);
 				codeTextLayer.style.setProperty('height', 'auto'); // fix for very large height set by ace
-
+				// reminder that the parsing in of notebooks depends on the stability of this syntax
     			out+="<div class='notebook-code-editor ace-chrome'>\n"+codeTextLayer.outerHTML+"\n</div>\n"+
-    				"<pre class='notebook-code-editor-raw editor-mode-"+mode+" "+autoexec+"'>\n"+content.input+"</pre>\n"+
+    				"<pre class='notebook-code-editor-raw editor-mode-"+mode+" "+autoexec+"'>"+content.input+"</pre>\n"+
     				"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
     		} else {
     			out+="<div class='notebook-text-editor'>"+content+"</div>\n";

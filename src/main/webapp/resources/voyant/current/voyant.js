@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 23 12:19:05 EDT 2020 */
+/* This file created by JSCacher. Last modified: Thu Apr 23 15:20:02 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -35035,7 +35035,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	config: {
 		isRun: false,
-		autoExecute: false
+		autoExecute: false,
+		isWarnedAboutPreviousCells: false
 	},
 	layout: {
 		type: 'vbox',
@@ -35296,18 +35297,23 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	 */
 	run: function(forceRun) {
 		if (this.editor.getMode()=='ace/mode/javascript') { // only run JS
-			if (forceRun===true) {
+			if (forceRun===true || this.getIsWarnedAboutPreviousCells()) {
 				return this._run();
 			} else {
+				// this code was for checking if previous cells hadn't been run, but it didn't seem worthwhile
 				var notebook = this.up('notebook');
 				Ext.Array.each(notebook.query('notebookcodeeditorwrapper'), function(wrapper) {
 					if (wrapper==this) {this._run(); return false;} // break
 					if (wrapper.editor && wrapper.editor.getMode() == 'ace/mode/javascript' && wrapper.getIsRun()==false) {
 						Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
 							if (btnId=='yes') {
-								notebook.runAll();
+								notebook.runUntil(this);
+							} else {
+								this._run();
 							}
-						}, this)
+						}, this);
+						this.setIsWarnedAboutPreviousCells(true);
+						return false;
 					}
 				}, this);
 			}
@@ -36708,7 +36714,8 @@ Ext.define('Voyant.notebook.Notebook', {
     		cannotLoadUnrecognized: "Unable to recognize input.",
     		openTitle: "Open",
     		openMsg: "Paste in Notebook ID, a URL or a Spyral data file (in HTML).",
-    		exportHtmlDownload: "HTML (download)"
+    		exportHtmlDownload: "HTML (download)",
+    		errorParsingDomInput: "An error occurred while parsing the input of the document. The results might still work, except if the code contained HTML tags."
     	},
     	api: {
     		input: undefined,
@@ -37190,6 +37197,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	var parser = new DOMParser();
     	var dom = parser.parseFromString(html, 'text/html');
     	this.setMetadata(new Spyral.Metadata(dom))
+    	var hasDomError = false;
     	dom.querySelectorAll("section.notebook-editor-wrapper").forEach(function(section) {
     		var classes = section.classList;
     		if (classes.contains("notebooktexteditorwrapper")) {
@@ -37210,17 +37218,20 @@ Ext.define('Voyant.notebook.Notebook', {
     			 * strip any of the HTML formatting out. What's left is to use the parsing
     			 * to ensure the order and to properly grab the IDs and then to do character
     			 * searches on the original string. */
-    			var secPos = html.indexOf("<section id='y5ebznmjvht8r7kj' class='notebook-editor-wrapper notebookcodeeditorwrapper'>");
+    			var secPos = html.indexOf("<section id='"+section.id+"' class='notebook-editor-wrapper notebookcodeeditorwrapper'>");
 				var startPre = html.indexOf("<pre class='notebook-code-editor-raw editor-mode-", secPos);
-    			startPre += 62; // add the length of the string
+    			startPre = html.indexOf(">", startPre)+1; // add the length of the string
     			var endPre = html.indexOf("</pre>\n<div class='notebook-code-results'>", startPre);
     			
     			// check if we hav valid values
-    			if (true || secPos==-1 || startPre == -1 || endPre == -1) {
-    				this.showError(this.localize("Can't parse the input correctly."))
+    			if (secPos==-1 || startPre == -1 || endPre == -1) {
+    				hasDomError = true;
+    				// this might work, unless the js code includes HTML
+    				input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
+    				debugger
+    			} else {
+        			input = html.substring(startPre, endPre);
     			}
-    			
-    			input = html.substring(startPre, endPre);
 				var autoexec = /\bautoexec\b/.exec(inputEl.className) !== null;
     			var output = section.querySelector(".notebook-code-results").innerHTML;
     			this.addCode({
@@ -37232,6 +37243,10 @@ Ext.define('Voyant.notebook.Notebook', {
     		}
 		}, this);
 		
+    	if (hasDomError) {
+			this.showError(this.localize("errorParsingDomInput"))
+    	}
+    	
 		this.fireEvent('notebookLoaded');
     },
     

@@ -21,7 +21,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	},
 	config: {
 		isRun: false,
-		autoExecute: false
+		autoExecute: false,
+		isWarnedAboutPreviousCells: false
 	},
 	layout: {
 		type: 'vbox',
@@ -282,18 +283,23 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	 */
 	run: function(forceRun) {
 		if (this.editor.getMode()=='ace/mode/javascript') { // only run JS
-			if (forceRun===true) {
+			if (forceRun===true || this.getIsWarnedAboutPreviousCells()) {
 				return this._run();
 			} else {
+				// this code was for checking if previous cells hadn't been run, but it didn't seem worthwhile
 				var notebook = this.up('notebook');
 				Ext.Array.each(notebook.query('notebookcodeeditorwrapper'), function(wrapper) {
 					if (wrapper==this) {this._run(); return false;} // break
 					if (wrapper.editor && wrapper.editor.getMode() == 'ace/mode/javascript' && wrapper.getIsRun()==false) {
 						Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
 							if (btnId=='yes') {
-								notebook.runAll();
+								notebook.runUntil(this);
+							} else {
+								this._run();
 							}
-						}, this)
+						}, this);
+						this.setIsWarnedAboutPreviousCells(true);
+						return false;
 					}
 				}, this);
 			}
