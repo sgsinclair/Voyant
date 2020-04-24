@@ -31,7 +31,7 @@
 	"homepage": "https://github.com/sgsinclair/Voyant",
 	"dependencies": {
 		"js-cookie": "^2.2.1",
-		"voyant": "^1.5.0"
+		"voyant": "^1.6.1"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.9.0",
