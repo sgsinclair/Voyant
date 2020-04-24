@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Apr 23 15:20:02 EDT 2020 */
+/* This file created by JSCacher. Last modified: Fri Apr 24 18:10:33 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -34316,7 +34316,7 @@ Ext.define('Voyant.panel.Topics', {
 //				console.warn(doc, doc.topicCounts[topic], docSortSmoothing, doc.tokens.length, sumDocSortSmoothing);
 				  return (doc.topicCounts[topic] + docSortSmoothing) / (doc.tokens.length + sumDocSortSmoothing);
 			});
-			
+		 	
 			data.push({
 				topic: this.topNWords(topicWordCounts[topic], limit),
 				scores: scores
@@ -34903,7 +34903,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			editor.renderer.setShowPrintMargin(false);
 //			editor.renderer.setShowGutter(false);
 			
-			editor.setValue(this.getContent() ? this.getContent() : this.localize('emptyText'));
+			editor.setValue(this.getContent() ? this.getContent() : "" /*this.localize('emptyText')*/);
 			editor.clearSelection();
 
 		    editor.on("focus", function() {
@@ -35371,7 +35371,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	_showResult: function(result) {
 		// check for pre-existing content (such as from highcharts) and if it exists don't update
 		if (this.results.getEl().dom.innerHTML === this.EMPTY_RESULTS_TEXT) {
-			this.results.update(result);
+			this.results.update(result.toString ? result.toString() : result);
 		}
 	},
 	
@@ -35464,7 +35464,7 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 	border: false,
 	constructor: function(config) {
 		Ext.apply(this, {
-			html: config.content ? config.content : this.localize("emptyText")
+			html: config.content ? config.content : "" /*this.localize("emptyText") */
 		});
         this.callParent(arguments);
 	},
@@ -37000,7 +37000,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		}
 
 		window.createTable = function() {
-			return Spyral.Table.create(arguments)
+			return Spyral.Table.create.apply(Spyral.Table, arguments)
 		}
 
 		// need to load docs first
