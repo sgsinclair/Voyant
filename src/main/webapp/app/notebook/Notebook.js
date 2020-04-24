@@ -317,7 +317,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		}
 
 		window.createTable = function() {
-			return Spyral.Table.create(arguments)
+			return Spyral.Table.create.apply(Spyral.Table, arguments)
 		}
 
 		// need to load docs first
