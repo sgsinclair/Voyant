@@ -357,7 +357,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	_showResult: function(result) {
 		// check for pre-existing content (such as from highcharts) and if it exists don't update
 		if (this.results.getEl().dom.innerHTML === this.EMPTY_RESULTS_TEXT) {
-			this.results.update(result);
+			this.results.update(result.toString ? result.toString() : result);
 		}
 	},
 	
