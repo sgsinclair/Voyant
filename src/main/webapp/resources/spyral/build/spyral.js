@@ -1576,7 +1576,7 @@ var Spyral = (function () {
      * @typedef {object} HighchartsConfig
      * @property {(string|object)} title
      * @property {(string|object)} subtitle
-     * @property {object} credit
+     * @property {object} credits
      * @property {object} xAxis
      * @property {object} yAxis
      * @property {object} chart

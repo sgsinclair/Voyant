@@ -144,7 +144,7 @@
       "prototype": {
         "create": {
           "!type": "fn(target: ?, config: +HighchartsConfig) -> +Highcharts.Chart",
-          "!doc": "Create a new chart\rSee https://api.highcharts.com/highcharts/ for full set of config options."
+          "!doc": "Create a new chart\nSee https://api.highcharts.com/highcharts/ for full set of config options."
         },
         "bar": {
           "!type": "fn(config?: object) -> +Highcharts.Chart",
@@ -166,7 +166,7 @@
       "!doc": "Construct a new Chart class",
       "create": {
         "!type": "fn(target: ?, config: +HighchartsConfig) -> +Highcharts.Chart",
-        "!doc": "Create a new chart\rSee https://api.highcharts.com/highcharts/ for full set of config options."
+        "!doc": "Create a new chart\nSee https://api.highcharts.com/highcharts/ for full set of config options."
       },
       "setDefaultChartType": {
         "!type": "fn(config: object, type: string)",
@@ -194,65 +194,52 @@
       }
     },
     "Corpus": {
-      "!type": "fn(id: string)",
+      "!type": "fn()",
       "prototype": {
         "id": {
-          "!type": "fn() -> string",
-          "!doc": "Get the ID"
+          "!type": "fn() -> +Promise/String",
+          "!doc": "Get a Promise for the ID of the corpus."
         },
         "metadata": {
-          "!type": "fn(config: ?, params: ?)",
-          "!doc": "Load the metadata"
+          "!type": "fn(config: +Object) -> +Promise/Object",
+          "!doc": "Get a Promise for the metadata object (of the corpus or document, depending on which mode is used).\n\nThe following is an example of the object return for the metadata of the Jane Austen corpus:\n\n\t{\n\t\t\"id\": \"b50407fd1cbbecec4315a8fc411bad3c\",\n\t\t\"alias\": \"austen\",\n\t\t\"title\": \"\",\n\t\t\"subTitle\": \"\",\n\t\t\"documentsCount\": 8,\n\t\t\"createdTime\": 1582429585984,\n\t\t\"createdDate\": \"2020-02-22T22:46:25.984-0500\",\n\t\t\"lexicalTokensCount\": 781763,\n\t\t\"lexicalTypesCount\": 15368,\n\t\t\"noPasswordAccess\": \"NORMAL\",\n\t\t\"languageCodes\": [\n\t\t\t\"en\"\n\t\t]\n\t}\n\nThe following is an example of what is returned as metadata for the first document:\n\n\t\t[\n\t\t\t{\n  \t\t\t\"id\": \"ddac6b12c3f4261013c63d04e8d21b45\",\n  \t\t\t\"extra.X-Parsed-By\": \"org.apache.tika.parser.DefaultParser\",\n  \t\t\t\"tokensCount-lexical\": \"33559\",\n  \t\t\t\"lastTokenStartOffset-lexical\": \"259750\",\n  \t\t\t\"parent_modified\": \"1548457455000\",\n  \t\t\t\"typesCount-lexical\": \"4235\",\n  \t\t\t\"typesCountMean-lexical\": \"7.924203\",\n  \t\t\t\"lastTokenPositionIndex-lexical\": \"33558\",\n  \t\t\t\"index\": \"0\",\n  \t\t\t\"language\": \"en\",\n  \t\t\t\"sentencesCount\": \"1302\",\n  \t\t\t\"source\": \"stream\",\n  \t\t\t\"typesCountStdDev-lexical\": \"46.626404\",\n  \t\t\t\"title\": \"1790 Love And Freindship\",\n  \t\t\t\"parent_queryParameters\": \"VOYANT_BUILD=M16&textarea-1015-inputEl=Type+in+one+or+more+URLs+on+separate+lines+or+paste+in+a+full+text.&VOYANT_REMOTE_ID=199.229.249.196&accessIP=199.229.249.196&VOYANT_VERSION=2.4&palette=default&suppressTools=false\",\n  \t\t\t\"extra.Content-Type\": \"text/plain; charset=windows-1252\",\n  \t\t\t\"parentType\": \"expansion\",\n  \t\t\t\"extra.Content-Encoding\": \"windows-1252\",\n  \t\t\t\"parent_source\": \"file\",\n  \t\t\t\"parent_id\": \"ae47e3a72cd3cad51e196e8a41e21aec\",\n  \t\t\t\"modified\": \"1432861756000\",\n  \t\t\t\"location\": \"1790 Love And Freindship.txt\",\n  \t\t\t\"parent_title\": \"Austen\",\n  \t\t\t\"parent_location\": \"Austen.zip\"\n  \t\t}\n \t ]\n\nIn Corpus mode there's no reason to specify arguments. In documents mode you\ncan request specific documents in the config object:\n\n * **start**: the zero-based start of the list\n * **limit**: a limit to the number of items to return at a time\n * **docIndex**: a zero-based list of documents (first document is zero, etc.); multiple documents can be separated by a comma\n * **docId**: a set of document IDs; multiple documents can be separated by a comma\n * **query**: one or more term queries for the title, author or full-text\n * **sort**: one of the following sort orders (composed of a feature like `INDEX` and a sort direction `ASC` or `DESC`): `INDEXASC`, `INDEXDESC`, `TITLEASC`, `TITLEDESC`, `AUTHORASC`, `AUTHORDESC`, `TOKENSCOUNTLEXICALASC`, `TOKENSCOUNTLEXICALDESC`, `TYPESCOUNTLEXICALASC`, `TYPESCOUNTLEXICALDESC`, `TYPETOKENRATIOLEXICALASC`, `TYPETOKENRATIOLEXICALDESC`, `PUBDATEASC`, `PUBDATEDESC`\n\n An example:\n \n \t// this would show the number 8 (the size of the corpus)\n \tloadCorpus(\"austen\").metadata().then(metadata => metadata.documentsCount)"
+        },
+        "summary": {
+          "!type": "fn() -> +Promise/String",
+          "!doc": "Get a Promise for a brief summary of the corpus that includes essential metadata (documents count, terms count, etc.) \n\nAn example:\n\n\t\tloadCorpus(\"austen\").summary();"
+        },
+        "titles": {
+          "!type": "fn(config: +Object) -> +Promise/Array",
+          "!doc": "Get a Promise for an Array of the document titles.\n\nThe following are valid in the config parameter:\n\n * **start**: the zero-based start of the list\n * **limit**: a limit to the number of items to return at a time\n * **docIndex**: a zero-based list of documents (first document is zero, etc.); multiple documents can be separated by a comma\n * **docId**: a set of document IDs; multiple documents can be separated by a comma\n * **query**: one or more term queries for the title, author or full-text\n * **sort**: one of the following sort orders (composed of a feature like `INDEX` and a sort direction `ASC` or `DESC`): `INDEXASC`, `INDEXDESC`, `TITLEASC`, `TITLEDESC`, `AUTHORASC`, `AUTHORDESC`, `TOKENSCOUNTLEXICALASC`, `TOKENSCOUNTLEXICALDESC`, `TYPESCOUNTLEXICALASC`, `TYPESCOUNTLEXICALDESC`, `TYPETOKENRATIOLEXICALASC`, `TYPETOKENRATIOLEXICALDESC`, `PUBDATEASC`, `PUBDATEDESC`\n\nAn example:\n\n\t\tloadCorpus(\"austen\").titles().then(titles => \"The last work is: \"+titles[titles.length-1])"
         },
         "text": {
-          "!type": "fn(config: ?)",
-          "!doc": "Get the text"
+          "!type": "fn(config: +Object) -> +Promise/String",
+          "!doc": "Get a Promise for the text of the entire corpus.\n\nTexts are concatenated together with two new lines and three dashes (\\\\n\\\\n---\\\\n\\\\n)\n\nThe following are valid in the config parameter:\n\n* **noMarkup**: strips away the markup\n* **compactSpace**: strips away superfluous spaces and multiple new lines\n* **limit**: a limit to the number of characters (per text)\n* **format**: `text` for plain text, any other value for the simplified Voyant markup\n\nAn example:\n\n\t\t// fetch 1000 characters from each text in the corpus into a single string\n\t\tloadCorpus(\"austen\").text({limit:1000})"
+        },
+        "texts": {
+          "!type": "fn(config: +Object) -> +Promise/String",
+          "!doc": "Get a Promise for an Array of texts from the entire corpus.\n\nThe following are valid in the config parameter:\n\n* **noMarkup**: strips away the markup\n* **compactSpace**: strips away superfluous spaces and multiple new lines\n* **limit**: a limit to the number of characters (per text)\n* **format**: `text` for plain text, any other value for the simplified Voyant markup\n\nAn example:\n\n\t\t// fetch 1000 characters from each text in the corpus into an Array\n\t\tloadCorpus(\"austen\").texts({limit:1000})"
+        },
+        "terms": {
+          "!type": "fn(config: +Object) -> +Promise/Array",
+          "!doc": "Get a Promise for an Array of terms (either CorpusTerms or DocumentTerms, depending on the specified mode).\nThese terms are actually types, so information about each type is collected (as opposed to the {#link tokens}\nmethod which is for every occurrence in document order).\n\nThe mode is set to \"documents\" when any of the following is true\n\n* the `mode` parameter is set to \"documents\"\n* a `docIndex` parameter being set\n* a `docId` parameter being set\n\nThe following is an example a Corpus Term (corpus mode):\n\n\t\t{\n\t\t\t\"term\": \"the\",\n\t\t\t\"inDocumentsCount\": 8,\n\t\t\t\"rawFreq\": 28292,\n\t\t\t\"relativeFreq\": 0.036189996,\n\t\t\t\"comparisonRelativeFreqDifference\": 0\n\t\t}\n\nThe following is an example of Document Term (documents mode):\n\n\t\t{\n\t\t\t\"term\": \"the\",\n\t\t\t\"rawFreq\": 1333,\n\t\t\t\"relativeFreq\": 39721.086,\n\t\t\t\"zscore\": 28.419,\n\t\t\t\"zscoreRatio\": -373.4891,\n\t\t\t\"tfidf\": 0.0,\n\t\t\t\"totalTermsCount\": 33559,\n\t\t\t\"docIndex\": 0,\n\t\t\t\"docId\": \"8a61d5d851a69c03c6ba9cc446713574\"\n\t\t}\n\nThe following config parameters are valid in both modes:\n\n * **start**: the zero-based start index of the list (for paging)\n * **limit**: the maximum number of terms to provide per request\n * **minRawFreq**: the minimum raw frequency of terms\n * **query**: a term query (see https://voyant-tools.org/docs/#!/guide/search)\n * **stopList** a list of stopwords to include (see https://voyant-tools.org/docs/#!/guide/stopwords)\n * **withDistributions**: a true value shows distribution across the corpus (corpus mode) or across the document (documents mode)\n * **whiteList**: a keyword list – terms will be limited to this list\n * **tokenType**: the token type to use, by default `lexical` (other possible values might be `title` and `author`)\n\nThe following are specific to corpus mode:\n\n * **bins**: by default there are the same number of bins as there are documents (for distribution values), this can be modified\n * **corpusComparison**: you can provide the ID of a corpus for comparison of frequency values\n * **inDocumentsCountOnly**: if you don't need term frequencies but only frequency per document set this to true\n * **sort**: the order of the terms, one of the following (composed of a value and a direction of ASCending or DEScending: `INDOCUMENTSCOUNTASC, INDOCUMENTSCOUNTDESC, RAWFREQASC, RAWFREQDESC, TERMASC, TERMDESC, RELATIVEPEAKEDNESSASC, RELATIVEPEAKEDNESSDESC, RELATIVESKEWNESSASC, RELATIVESKEWNESSDESC, COMPARISONRELATIVEFREQDIFFERENCEASC, COMPARISONRELATIVEFREQDIFFERENCEDESC`\n \n The following are specific to documents mode:\n\n * **bins**: by default the document is divided into 10 equal bins(for distribution values), this can be modified\n * **sort**: the order of the terms, one of the following (composed of a value and a direction of ASCending or DEScending: `RAWFREQASC, RAWFREQDESC, RELATIVEFREQASC, RELATIVEFREQDESC, TERMASC, TERMDESC, TFIDFASC, TFIDFDESC, ZSCOREASC, ZSCOREDESC`\n * **perDocLimit**: the `limit` parameter is for the total number of terms returned, this parameter allows you to specify a limit value per document\n * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)\n * **docId**: the document IDs to include (use commas to separate multiple values)\n \nAn example:\n\n\t\t// show top 5 terms\n\t\tloadCorpus(\"austen\").terms({stopList: 'auto', limit: 5}).then(terms => terms.map(term => term.term))\n\n\t\t// show top term for each document\n\t\tloadCorpus(\"austen\").terms({stopList: 'auto', perDocLimit: 1, mode: 'documents'}).then(terms => terms.map(term => term.term))"
+        },
+        "tokens": {
+          "!type": "fn(config: +Object) -> +Promise/Array",
+          "!doc": "Get a Promise for an Array of document tokens.\n\nThe promise returns an array of document token objects. A document token object can look something like this:\n\n\t\t{\n\t\t\t\"docId\": \"8a61d5d851a69c03c6ba9cc446713574\",\n\t\t\t\"docIndex\": 0,\n\t\t\t\"term\": \"LOVE\",\n\t\t\t\"tokenType\": \"lexical\",\n\t\t\t\"rawFreq\": 54,\n\t\t\t\"position\": 0,\n\t\t\t\"startOffset\": 3,\n\t\t\t\"endOffset\": 7\n\t\t}\n\nThe following are valid in the config parameter:\n\n * **start**: the zero-based start index of the list (for paging)\n * **limit**: the maximum number of terms to provide per request\n * **stopList** a list of stopwords to include (see https://voyant-tools.org/docs/#!/guide/stopwords)\n * **whiteList**: a keyword list – terms will be limited to this list\n * **perDocLimit**: the `limit` parameter is for the total number of terms returned, this parameter allows you to specify a limit value per document\n * **noOthers**: only include lexical forms, no other tokens\n * **stripTags**: one of the following: `ALL`, `BLOCKSONLY`, `NONE` (`BLOCKSONLY` tries to maintain blocks for line formatting)\n * **withPosLemmas**: include part-of-speech and lemma information when available (reliability of this may vary by instance)\n * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)\n * **docId**: the document IDs to include (use commas to separate multiple values)\n\nAn example:\n\n\t\t// load the first 20 tokens (don't include tags, spaces, etc.)\n\t\tloadCorpus(\"austen\").tokens({limit: 20, noOthers: true})"
+        },
+        "words": {
+          "!type": "fn(config: +Object) -> +Promise/Array",
+          "!doc": "Get a Promise for an Array of words from the corpus.\n\nThe array of words are in document order, much like tokens.\n\nThe following are valid in the config parameter:\n\n * **start**: the zero-based start index of the list (for paging)\n * **limit**: the maximum number of terms to provide per request\n * **stopList** a list of stopwords to include (see https://voyant-tools.org/docs/#!/guide/stopwords)\n * **whiteList**: a keyword list – terms will be limited to this list\n * **perDocLimit**: the `limit` parameter is for the total number of terms returned, this parameter allows you to specify a limit value per document\n * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)\n * **docId**: the document IDs to include (use commas to separate multiple values)\n\nAn example:\n\n\t\t// load the first 20 words in the corpus\n\t\tloadCorpus(\"austen\").tokens({limit: 20})"
+        },
+        "contexts": {
+          "!type": "fn()",
+          "!doc": "Get a Promise for an Array of Objects that contain keywords in contexts (KWICs).\n\nAn individual KWIC Object looks something like this:\n\n\t\t{\n\t\t\t\"docIndex\": 0,\n\t\t\t\"query\": \"love\",\n\t\t\t\"term\": \"love\",\n\t\t\t\"position\": 0,\n\t\t\t\"left\": \"\",\n\t\t\t\"middle\": \"LOVE\",\n\t\t\t\"right\": \" AND FREINDSHIP AND OTHER EARLY\"\n\t\t}\n\nThe following are some of the valid parameters:\n\n * **start**: the zero-based start index of the list (for paging)\n * **limit**: the maximum number of contexts to provide per request\n * **perDocLimit**: the `limit` parameter is for the total number of terms returned, this parameter allows you to specify a limit value per document\n * **sort**: the sort order of the results, one of the following (composed of a feature and one of **ASC**ending or **DESC**ending: `TERMASC, TERMDESC, DOCINDEXASC, DOCINDEXDESC, POSITIONASC, POSITIONDESC, LEFTASC, LEFTDESC, RIGHTASC, RIGHTDESC`\n * **overlapStrategy**: KWICs can feature overlapping words and this determines how to handle them, like the example of \"to be or not to be\" and searching for \"be\":\n \t\t* **none**: ignore overlapping contexts (default)\n \t\t\t* left: \"to\", middle: \"be\", right: \"or not to be\"\n \t\t\t* left: \"to be or not to\", middle: \"be\", right: \"\"\n \t\t* **first**: only keep the first instance (default), `first` or `merge`\n \t\t\t* left: \"to\", middle: \"be\", right: \"or not to be\"\n \t\t* **merge**: keep both instances by sharing words\n \t\t\t* left: \"to\", middle: \"be\", right: \"or\"\n \t\t\t* left: \"not to\", middle: \"be\", right: \"\"\n * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)\n * **docId**: the document IDs to include (use commas to separate multiple values)"
+        },
+        "collocates": {
+          "!type": "fn()",
+          "!doc": "Get a Promise for an Array of Objects that contain collocates.\n\nAn individual collocate looks something like this:\n\n\t\t{\n  \t\t\"term\": \"love\",\n  \t\t\"rawFreq\": 568,\n  \t\t\"contextTerm\": \"mr\",\n  \t\t\"contextTermRawFreq\": 24\n\t\t}\n\nThe following are some of the valid parameters:"
         }
-      },
-      "!doc": "Create a new Corpus using the specified Corpus ID",
-      "id": {
-        "!type": "fn(config: object, api: object)",
-        "!doc": "Create a Corpus and return the ID"
-      },
-      "metadata": {
-        "!type": "fn(config: ?, api: ?)",
-        "!doc": "Create a Corpus and return the metadata"
-      },
-      "summary": {
-        "!type": "fn(config: ?, api: ?)",
-        "!doc": "Create a Corpus and return the summary"
-      },
-      "titles": {
-        "!type": "fn(config: ?, api: ?)",
-        "!doc": "Create a Corpus and return the titles"
-      },
-      "text": {
-        "!type": "fn(config: ?, api: ?)",
-        "!doc": "Create a Corpus and return the text"
-      },
-      "texts": {
-        "!type": "fn(config: ?, api: ?)",
-        "!doc": "Create a Corpus and return the texts"
-      },
-      "terms": {
-        "!type": "fn(config: ?, api: ?)",
-        "!doc": "Create a Corpus and return the terms"
-      },
-      "tokens": {
-        "!type": "fn(config: ?, api: ?)",
-        "!doc": "Create a Corpus and return the tokens"
-      },
-      "words": {
-        "!type": "fn(config: object, api: object)",
-        "!doc": "Create a Corpus and return an array of lexical forms (words) in document order."
-      },
-      "contexts": {
-        "!type": "fn(config: object, api: object)",
-        "!doc": "Create a Corpus and return the contexts"
-      },
-      "collocates": {
-        "!type": "fn(config: object, api: object)",
-        "!doc": "Create a Corpus and return the collocates"
       },
       "phrases": {
         "!type": "fn(config: object, api: object)",
@@ -305,6 +292,10 @@
       "text": {
         "!type": "fn(url: string) -> string",
         "!doc": "Fetch text content from a URL"
+      },
+      "file": {
+        "!type": "fn(target: element) -> +Promise",
+        "!doc": "Create a file input in the target element and returns a Promise that's resolved with the file that is added to the input.\nThe file is also temporarily stored in the session storage for successive retrieval."
       }
     },
     "Table": {
@@ -356,7 +347,7 @@
         },
         "rows": {
           "!type": "fn(inds?: ?, config?: ?) -> ?",
-          "!doc": "This function returns different values depending on the arguments provided.\rWhen there are no arguments, it returns the number of rows in this table.\rWhen the first argument is the boolean value `true` all rows are returned.\rWhen the first argument is a an array then the rows corresponding to the row\rindices or names are returned. When all arguments except are numbers or strings\rthen each of those is returned."
+          "!doc": "This function returns different values depending on the arguments provided.\nWhen there are no arguments, it returns the number of rows in this table.\nWhen the first argument is the boolean value `true` all rows are returned.\nWhen the first argument is a an array then the rows corresponding to the row\nindices or names are returned. When all arguments except are numbers or strings\nthen each of those is returned."
         },
         "row": {
           "!type": "fn(ind: ?, asObj?: bool) -> ?",
@@ -364,7 +355,7 @@
         },
         "columns": {
           "!type": "fn(inds?: ?, config?: ?) -> ?",
-          "!doc": "This function returns different values depending on the arguments provided.\rWhen there are no arguments, it returns the number of columns in this table.\rWhen the first argument is the boolean value `true` all columns are returned.\rWhen the first argument is a number a slice of the columns is returned and if\rthe second argument is a number it is treated as the length of the slice to\rreturn (note that it isn't the `end` index like with Array.slice())."
+          "!doc": "This function returns different values depending on the arguments provided.\nWhen there are no arguments, it returns the number of columns in this table.\nWhen the first argument is the boolean value `true` all columns are returned.\nWhen the first argument is a number a slice of the columns is returned and if\nthe second argument is a number it is treated as the length of the slice to\nreturn (note that it isn't the `end` index like with Array.slice())."
         },
         "column": {
           "!type": "fn(ind: ?, asObj?: bool) -> ?",
@@ -376,7 +367,7 @@
         },
         "headers": {
           "!type": "fn(inds: ?) -> ?",
-          "!doc": "This function returns different values depending on the arguments provided.\rWhen there are no arguments, it returns the number of headers in this table.\rWhen the first argument is the boolean value `true` all headers are returned.\rWhen the first argument is a number a slice of the headers is returned.\rWhen the first argument is an array the slices specified in the array are returned."
+          "!doc": "This function returns different values depending on the arguments provided.\nWhen there are no arguments, it returns the number of headers in this table.\nWhen the first argument is the boolean value `true` all headers are returned.\nWhen the first argument is a number a slice of the headers is returned.\nWhen the first argument is an array the slices specified in the array are returned."
         },
         "hasColumn": {
           "!type": "fn(ind: ?) -> ?",
@@ -384,7 +375,7 @@
         },
         "forEach": {
           "!type": "fn(fn: fn())",
-          "!doc": "Runs the specified function on each row.\rThe function is passed the row and the row index."
+          "!doc": "Runs the specified function on each row.\nThe function is passed the row and the row index."
         },
         "rowMin": {
           "!type": "fn(ind: ?) -> number",
@@ -460,11 +451,11 @@
         },
         "rowSort": {
           "!type": "fn() -> +Table",
-          "!doc": "TODO\rSort the specified rows"
+          "!doc": "TODO\nSort the specified rows"
         },
         "columnSort": {
           "!type": "fn() -> +Table",
-          "!doc": "TODO\rSort the specified columns"
+          "!doc": "TODO\nSort the specified columns"
         },
         "toCsv": {
           "!type": "fn(config?: object) -> string",
