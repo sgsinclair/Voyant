@@ -3032,6 +3032,16 @@ var Spyral = (function () {
         return this;
       }
       /**
+       * Same as {@link toString}.
+       */
+
+    }, {
+      key: "toHtml",
+      value: function toHtml() {
+        var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        return this.toString(config);
+      }
+      /**
        * Get an HTML representation of the Table
        * @param {object} [config]
        * @returns {string}
