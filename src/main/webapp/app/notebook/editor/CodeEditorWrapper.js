@@ -116,6 +116,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 										this.setAutoExecute(item.checked);
 										item.up("menu").close();
 										button.toggleCls("autoExecute", item.checked);
+										this.up('notebook').setIsEdited(true);
 									},
 									scope: this
 								},{
