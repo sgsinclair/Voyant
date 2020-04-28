@@ -661,7 +661,7 @@ Ext.define('Voyant.panel.ScatterPlot', {
 				}
 			}
         	var tokenData = {
-        		x: token.get('vector')[0], y: token.get('vector')[1], z: token.get('vector')[2],
+        		x: token.get('vector')[0], y: token.get('vector')[1] || 0, z: token.get('vector')[2] || 0,
     			term: token.get('term'), rawFreq: freq, relativeFreq: token.get('relativeFreq'), cluster: token.get('cluster'), category: category,
     			disabled: false
         	};
