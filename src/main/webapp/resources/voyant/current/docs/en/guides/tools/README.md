@@ -19,7 +19,7 @@
 		</div>
 		<div>
 			<h4>Bubbles</h4>
-			<p>Bubblelines is a playful visualization of term frequencies by document.</p>
+			<p>Bubbles is a playful visualization of term frequencies by document.</p>
 		</div>
 	</dd></a>
 </div>
