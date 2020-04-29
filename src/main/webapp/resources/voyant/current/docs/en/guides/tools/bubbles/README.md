@@ -2,7 +2,7 @@
 
 Bubbles is a playful visualization of term frequencies by document.
 
-Use it with a <a href="../?view=Bubbles&corpus=austen" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Bubbles" target="_blank">your own corpus</a>.
+Use it with a <a href="../?view=Bubbles&corpus=austen&audio=true" target="_blank">Jane Austen corpus</a> or with <a href="../?view=Bubbles&audio=true" target="_blank">your own corpus</a>.
 
 High frequency terms are read in document order, and the current term is shown in the upper right-hand corner. The list of terms below shows a ranking of the cumulative frequencies to that point in the document. The first time a term is encountered a bubble is created and added to the main part of the canvas. The term flashes in yellow as it's being read. The relative size of the bubbles indicates the frequency compared to other terms to the current point in the document.
 
@@ -10,7 +10,7 @@ The total number of terms to be read is shown at the bottom, along with a progre
 
 You can hover over a bubble term to see its frequency to that point. You can also drag the bubble to move it if you wish.
 
-<iframe src="../tool/Bubbles/?corpus=austen&subtitle=The+Works+of+Jane+Austen" style="width: 90%; height: 600px;"></iframe>
+<iframe src="../tool/Bubbles/?corpus=austen&subtitle=The+Works+of+Jane+Austen&audio=true" style="width: 90%; height: 600px;"></iframe>
 <div style="width: 90%; text-align: center; margin-bottom: 1em;">Bubbles with the Works of Jane Austen. You can also <a href="../?view=Bubbles" target="_blank">use Bubbles with your own corpus</a>.</div>
 
 
