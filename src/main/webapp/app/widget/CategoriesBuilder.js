@@ -136,7 +136,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     },
     config: {
     	corpus: undefined,
-    	categoriesManager: undefined,
     	builderWin: undefined,
     	addCategoryWin: undefined,
     	categoriesId: undefined
@@ -153,7 +152,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	
     	if (config.panel) {
     		this.panel = config.panel;
-    		this.app = this.panel.getApplication();
+			this.app = this.panel.getApplication();
+			this.categoriesManager = this.app.getCategoriesManager();
     	} else {
     		if (window.console) {
     			console.warn('can\'t find panel!');
@@ -312,7 +312,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				handler: function(btn) {
 					this.processFeatures();
 					this.setColorTermsFromCategoryFeatures();
-					this.app.saveCategoryData().then(function(id) {
+					this.app.saveCategoryData(this.categoriesManager.getCategoryExportData()).then(function(id) {
 						this.setCategoriesId(id);
 						btn.up('window').close();
 					}, function() {
@@ -326,7 +326,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				show: function() {
 					// check to see if the widget value is different from the API
 					if (this.getCategoriesId() && this.getCategoriesId()!=this.getApiParam("categories")) {
-		    			this.app.loadCategoryData(this.getCategoriesId()).then(function(data) {
+		    			this.categoriesManager.loadCategoryData(this.getCategoriesId()).then(function(data) {
 							this.setColorTermsFromCategoryFeatures();
 							this.buildCategories();
 							this.buildFeatures();
@@ -373,7 +373,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    			name: 'categoryName',
 	    			allowBlank: false,
 	    			validator: function(val) {
-	    				return this.app.getCategoryTerms(val) === undefined ? true : this.localize('exists');
+	    				return this.categoriesManager.getCategoryTerms(val) === undefined ? true : this.localize('exists');
 	    			}.bind(this),
 	    			enableKeyEvents: true,
 	    			listeners: {
@@ -417,12 +417,12 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     },
     
     addCategory: function(name) {
-    	this.app.addCategory(name);
+    	this.categoriesManager.addCategory(name);
     	
     	this.queryById('features').getStore().add({category: name});
 
     	var termsData = [];
-    	var terms = this.app.getCategoryTerms(name);
+    	var terms = this.categoriesManager.getCategoryTerms(name);
     	if (terms !== undefined) {
     		for (var i = 0; i < terms.length; i++) {
     			termsData.push({term: terms[i]});
@@ -442,7 +442,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 //    				height: 15,
 //    				listeners: {
 //    					change: function(btn, color, pcolor) {
-//    						this.app.setCategoryFeature(name, 'color', color);
+//    						this.categoriesManager.setCategoryFeature(name, 'color', color);
 //    					},
 //    					afterrender: function(btn) {
 //    						var popup = btn.getPopup();
@@ -503,10 +503,10 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		listeners: {
     			beforedrop: function(node, data) {
     				// remove duplicates
-    				var app = this.up('categoriesbuilder').app;
+    				var categoriesManager = this.up('categoriesbuilder').categoriesManager;
     				for (var i = data.records.length-1; i >= 0; i--) {
     					var term = data.records[i].get('term');
-    					if (app.getCategoryForTerm(term) !== undefined) {
+    					if (categoriesManager.getCategoryForTerm(term) !== undefined) {
     						data.records.splice(i, 1);
     					}
     				}
@@ -515,19 +515,19 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     				data.view.getSelectionModel().deselectAll();
     				this.getSelectionModel().deselectAll();
     				
-    				var app = this.up('categoriesbuilder').app;
+    				var categoriesManager = this.up('categoriesbuilder').categoriesManager;
     				var terms = [];
     				for (var i = 0; i < data.records.length; i++) {
     					var term = data.records[i].get('term');
-    					if (app.getCategoryForTerm(term) === undefined) {
+    					if (categoriesManager.getCategoryForTerm(term) === undefined) {
     						terms.push(term);
     					}
     				}
-    				app.addTerms(name, terms);
+    				categoriesManager.addTerms(name, terms);
     				
     				var source = data.view.up('grid');
     				if (source.category) {
-    					app.removeTerms(source.category, terms);
+    					categoriesManager.removeTerms(source.category, terms);
     				}
     			}
     		}
@@ -543,12 +543,12 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     			xtype: 'textfield',
     			allowBlank: false,
     			validator: function(val) {
-    				return this.app.getCategoryTerms(val) === undefined || val ===  grid.getTitle() ? true : this.localize('exists');
+    				return this.categoriesManager.getCategoryTerms(val) === undefined || val ===  grid.getTitle() ? true : this.localize('exists');
     			}.bind(this)
     		},
     		listeners: {
     			complete: function(ed, newvalue, oldvalue) {
-    				this.app.renameCategory(oldvalue, newvalue);
+    				this.categoriesManager.renameCategory(oldvalue, newvalue);
     				this.buildFeatures();
     			},
     			scope: this
@@ -573,11 +573,11 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	var featuresStore = this.queryById('features').getStore();
     	featuresStore.removeAt(featuresStore.findExact('category', name));
     	
-		this.app.removeCategory(name);
+		this.categoriesManager.removeCategory(name);
     },
     
     addFeature: function(name) {
-		this.app.addFeature(name);
+		this.categoriesManager.addFeature(name);
 		this.buildFeatures();
     },
     
@@ -593,11 +593,11 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 		}];
 		var data = [];
 		
-		for (var category in this.app.getCategories()) {
+		for (var category in this.categoriesManager.getCategories()) {
 			data.push({category: category});
 		}
 		
-		var features = this.app.getFeatures();
+		var features = this.categoriesManager.getFeatures();
 		var featuresConfigs = Ext.ClassManager.getClass(this).features;
 		
 		for (var feature in features) {
@@ -637,8 +637,8 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				widget: widgetConfig
 			});
 			
-			for (var category in this.app.getCategories()) {
-				var value = this.app.getCategoryFeature(category, feature);
+			for (var category in this.categoriesManager.getCategories()) {
+				var value = this.categoriesManager.getCategoryFeature(category, feature);
 				for (var i = 0; i < data.length; i++) {
 					if (data[i].category == category) {
 						data[i][feature] = value;
@@ -657,24 +657,24 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	
 	processFeatures: function() {
 		var store = this.queryById('features').getStore();
-		var features = Object.keys(this.app.getFeatures());
+		var features = Object.keys(this.categoriesManager.getFeatures());
 		store.each(function(record) {
 			var category = record.get('category');
 			features.forEach(function(feature) {
 				var featureValue = record.get(feature);
 				if (featureValue !== undefined) {
-					this.app.setCategoryFeature(category, feature, featureValue);
+					this.categoriesManager.setCategoryFeature(category, feature, featureValue);
 				}
 			}, this)
 		}, this)
 	},
 
 	setColorTermsFromCategoryFeatures: function() {
-        for (var category in this.app.getCategories()) {
-            var color = this.app.getCategoryFeature(category, 'color');
+        for (var category in this.categoriesManager.getCategories()) {
+            var color = this.categoriesManager.getCategoryFeature(category, 'color');
             if (color !== undefined) {
                 var rgb = this.app.hexToRgb(color);
-                var terms = this.app.getCategoryTerms(category);
+                var terms = this.categoriesManager.getCategoryTerms(category);
                 for (var i = 0; i < terms.length; i++) {
                     this.app.setColorForTerm(terms[i], rgb);
                 }
@@ -686,7 +686,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 
     	this.queryById('categories').removeAll();
     	
-    	var cats = this.app.getCategories();
+    	var cats = this.categoriesManager.getCategories();
     	for (var key in cats) {
     		this.addCategory(key);
     	}

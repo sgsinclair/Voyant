@@ -19,7 +19,8 @@ Ext.define('Voyant.VoyantApp', {
     
     config: {
     	baseUrl: undefined,
-    	tromboneUrl: undefined
+		tromboneUrl: undefined,
+		categoriesManager: undefined
     },
     
     constructor: function(config) {
@@ -34,12 +35,22 @@ Ext.define('Voyant.VoyantApp', {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 
 		this.mixins['Voyant.util.Colors'].constructor.apply(this, arguments);
+
+		this.setCategoriesManager(new Spyral.Categories());
+		// inheritance/mixin hack
+		// var catProps = Object.getOwnPropertyNames(categories).concat(Object.getOwnPropertyNames(Object.getPrototypeOf(categories)));
+		// catProps.forEach(function(propName) {
+		// 	if (this[propName] === undefined) {
+		// 		if (typeof categories[propName] === 'function') {
+		// 			this[propName] = categories[propName].bind(this);
+		// 		} else {
+		// 			this[propName] = categories[propName];
+		// 		}
+		// 	}
+		// }, this)
 		
-		// ES6 mixin
-		Object.assign(this, Spyral.CategoriesManager);
-		
-		this.addFeature('color');
-		this.addFeature('font', '"Palatino Linotype", "Book Antiqua", Palatino, serif');
+		this.getCategoriesManager().addFeature('color');
+		this.getCategoriesManager().addFeature('font', '"Palatino Linotype", "Book Antiqua", Palatino, serif');
 		
 		// call the parent constructor
 		this.callParent(arguments);

@@ -724,7 +724,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     	}
     	
     	nodeEnter.append('text')
-			.attr('font-family', function(d) { return me.getApplication().getFeatureForTerm('font', d.term); })
+			.attr('font-family', function(d) { return me.getApplication().getCategoriesManager().getFeatureForTerm('font', d.term); })
 			.attr('font-size', function(d) { return Math.max(10, Math.sqrt(d.value)); })
 			.text(function(d) { return d.term; })
 			.each(function(d) { d.bbox = this.getBBox(); }) // set bounding box for later use

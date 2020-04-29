@@ -149,7 +149,7 @@ Ext.define('Voyant.panel.Cirrus', {
         this.callParent(arguments);
     	this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
     	
-    	this.getApplication().addFeature('orientation', function() { return ~~(Math.random() * 2) * 90; });
+    	this.getApplication().getCategoriesManager().addFeature('orientation', function() { return ~~(Math.random() * 2) * 90; });
     	
     	this.setCirrusId(Ext.id(null, 'cirrus_'));
     },
@@ -252,7 +252,7 @@ Ext.define('Voyant.panel.Cirrus', {
     	},
     	
     	loadedCorpus: function(src, corpus) {
-			this.getApplication().addFeature('font', this.getApiParam('fontFamily')); // make sure the default for font is set from the api
+			this.getApplication().getCategoriesManager().addFeature('font', this.getApiParam('fontFamily')); // make sure the default for font is set from the api
     		this.initVisLayout(); // force in case we've changed fontFamily from options
     		if (this.getApiParam("docIndex")) {
     			this.fireEvent("documentSelected", this, corpus.getDocument(this.getApiParam("docIndex")));
@@ -414,9 +414,9 @@ Ext.define('Voyant.panel.Cirrus', {
 						.size([width, height])
 						.overflow(true)
 						.padding(1)
-						.rotate(function(d) { return this.getApplication().getFeatureForTerm('orientation', d.text); }.bind(this))
+						.rotate(function(d) { return this.getApplication().getCategoriesManager().getFeatureForTerm('orientation', d.text); }.bind(this))
 						.spiral('archimedean')
-						.font(function(d) { return this.getApplication().getFeatureForTerm('font', d.text); }.bind(this))
+						.font(function(d) { return this.getApplication().getCategoriesManager().getFeatureForTerm('font', d.text); }.bind(this))
 						.fontSize(function(d) {return d.fontSize; }.bind(this))
 						.text(function(d) { return d.text; })
 						.on('end', this.draw.bind(this))
@@ -499,7 +499,7 @@ Ext.define('Voyant.panel.Cirrus', {
 			.attr('text-anchor', 'middle')
 			.attr('data-freq', function(d) { return d.rawFreq; })
 			.attr('transform', function(d) { return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')'; })
-			.style('font-family', function(d) { return panel.getApplication().getFeatureForTerm('font', d.text); })
+			.style('font-family', function(d) { return panel.getApplication().getCategoriesManager().getFeatureForTerm('font', d.text); })
 			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
 			.style('font-size', '1px')
 			.on('click', function(obj) {panel.dispatchEvent('termsClicked', panel, [obj.text]);})
@@ -521,7 +521,7 @@ Ext.define('Voyant.panel.Cirrus', {
 		var nodesUpdate = nodes.merge(nodesEnter);
 		
 		nodesUpdate.transition(t)
-			.style('font-family', function(d) { return panel.getApplication().getFeatureForTerm('font', d.text); })
+			.style('font-family', function(d) { return panel.getApplication().getCategoriesManager().getFeatureForTerm('font', d.text); })
 			.style('fill', function(d) { return panel.getApplication().getColorForTerm(d.text, true); })
 			.attr('transform', function(d) { return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')'; })
 			.style('font-size', function(d) { return d.fontSize + 'px'; });

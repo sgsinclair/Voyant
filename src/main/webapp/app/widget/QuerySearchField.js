@@ -125,7 +125,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
 	            var parent = me.getParentPanel();
 	            if (queryPlan.cancel==false && parent) {
 	            	var originalRawQueryPlanWithoutAt = originalRawQueryPlan.charAt(0)=="@" ? originalRawQueryPlan.substring(1) : originalRawQueryPlan;
-		            for (var cat in parent.getApplication().getCategories()) {
+		            for (var cat in parent.getApplication().getCategoriesManager().getCategories()) {
 		            	if (cat.toLowerCase().indexOf(originalRawQueryPlanWithoutAt)>-1) {
 		            		queryPlan.query = "@"+cat+(originalRawQueryPlan.charAt(0)=="@" ? "" : ","+queryPlan.query);
 		            	}

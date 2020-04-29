@@ -376,7 +376,7 @@ Ext.define('Voyant.panel.WordWall', {
 
         nodes.enter().append('text')
             .attr('fill-opacity', 0)
-            .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
+            .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getCategoriesManager().getFeatureForTerm('font', d.term); })
             .attr('font-size', function(d) {
                 var fontSize = fontSizer(d.value);
                 d.fontSize = fontSize;
@@ -494,9 +494,9 @@ Ext.define('Voyant.panel.WordWall', {
                 nodeEnter.append('title').text(function(d) { return d.title; });
 
                 nodeEnter.append('text')
-                    .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getFeatureForTerm('font', d.term); })
+                    .attr('font-family', function(d) { return 'Arial'; })//return me.getApplication().getCategoriesManager().getFeatureForTerm('font', d.term); })
                     .attr('font-size', function(d) { return d.fontSize; })
-                    .attr('fill', function(d) { return this.getApplication().getFeatureForTerm('color', d.term); }.bind(this))
+                    .attr('fill', function(d) { return this.getApplication().getCategoriesManager().getFeatureForTerm('color', d.term); }.bind(this))
                     .style('cursor', 'pointer')
                     .style('user-select', 'none')
                     .attr('alignment-baseline', 'middle')

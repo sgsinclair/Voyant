@@ -1,4 +1,4 @@
-import {Corpus, Table, Load, Chart, CategoriesManager} from 'voyant';
+import {Corpus, Table, Load, Chart, Categories} from 'voyant';
 
 import {Notebook} from './notebook';
 import {Util} from './util';
@@ -15,7 +15,7 @@ const Spyral = {
 	Table,
 	Load,
 	Chart,
-	CategoriesManager
+	Categories
 };
 
 export default Spyral;

@@ -572,7 +572,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 		
     	var text = node.append('text')
     		.attr('clip-path', function(d) { return 'url(#clip-' + idGet(d.data.term) + ')'; })
-    		.style('font-family', function(d) { return me.getApplication().getFeatureForTerm('font', d.data.term); })
+    		.style('font-family', function(d) { return me.getApplication().getCategoriesManager().getFeatureForTerm('font', d.data.term); })
 			.style('text-anchor', 'middle')
 			.style('cursor', 'default');
 		text.append('tspan')

@@ -250,7 +250,61 @@ Ext.define('Voyant.VoyantCorpusApp', {
     	    },
     	    scope: this
     	});
-    },
+	},
+	
+	loadCategoryData: function(id) {
+		var dfd = new Ext.Deferred();
+
+		Ext.Ajax.request({
+			url: Voyant.application.getTromboneUrl(),
+			params: {
+				tool: 'resource.StoredCategories',
+				retrieveResourceId: id,
+				failQuietly: false,
+				corpus: this.getCorpus() ? this.getCorpus().getId() : undefined
+			}
+		}).then(function(response) {
+			var json = Ext.decode(response.responseText);
+			var id = json.storedCategories.id;
+			var value = json.storedCategories.resource;
+			if (value.length === 0) {
+				dfd.reject();
+			} else {
+				value = Ext.decode(value);
+				
+				this.getCategoriesManager()._categories = value.categories;
+				this.getCategoriesManager()._features = value.features;
+				
+				dfd.resolve(value);
+			}
+		}, function() {
+			this.showError("Unable to load categories data: "+id);
+			dfd.reject();
+		}, null, this);
+		
+		return dfd.promise;
+	},
+
+	saveCategoryData: function(data) {
+		var dfd = new Ext.Deferred();
+		
+		var dataString = Ext.encode(data);
+		Ext.Ajax.request({
+			url: Voyant.application.getTromboneUrl(),
+			params: {
+				tool: 'resource.StoredResource',
+				storeResource: dataString
+			}
+		}).then(function(response) {
+			var json = Ext.util.JSON.decode(response.responseText);
+			var id = json.storedResource.id;
+			dfd.resolve(id);
+		}, function(response) {
+			dfd.reject();
+		});
+		
+		return dfd.promise;
+	},
     
     listeners: {
     	loadedCorpus: function(src, corpus) {
@@ -260,11 +314,11 @@ Ext.define('Voyant.VoyantCorpusApp', {
         	if (this.getApiParam("categories")) {
 				this.loadCategoryData(this.getApiParam("categories")).then(function(a,b,c) {
 					// assign colors
-					for (var category in this.getCategories()) {
-						var color = this.getCategoryFeature(category, 'color');
+					for (var category in this.getCategoriesManager().getCategories()) {
+						var color = this.getCategoriesManager().getCategoryFeature(category, 'color');
 						if (color !== undefined) {
 							var rgb = this.hexToRgb(color);
-							var terms = this.getCategoryTerms(category);
+							var terms = this.getCategoriesManager().getCategoryTerms(category);
 							for (var i = 0; i < terms.length; i++) {
 								this.setColorForTerm(terms[i], rgb);
 							}
