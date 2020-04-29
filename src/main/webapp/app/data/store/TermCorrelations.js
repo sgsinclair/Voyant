@@ -4,6 +4,7 @@ Ext.define('Voyant.data.store.TermCorrelationsMixin', {
 	constructor : function(config) {
 		this.mixins['Voyant.data.store.VoyantStore'].constructor.apply(this, [config, {
 			'proxy.extraParams.tool': 'corpus.CorpusTermCorrelations',
+			'proxy.extraParams.withDistributions': 'true',
 			'proxy.reader.rootProperty': 'termCorrelations.correlations',
 			'proxy.reader.totalProperty': 'termCorrelations.total'
 		}])
