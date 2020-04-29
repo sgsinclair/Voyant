@@ -144,7 +144,6 @@ Ext.define('Voyant.panel.CustomSet', {
 	
 	initTableLayout: function() {
     	Ext.suspendLayouts();
-    	
     	var tableLayout = decodeURI(this.getApiParam('tableLayout'));
 
     	if (tableLayout && tableLayout.charAt(0)!="{" && tableLayout.charAt(0)!="[") {
@@ -186,7 +185,7 @@ Ext.define('Voyant.panel.CustomSet', {
         				cell.shift();
         			}
         			if (cell[0] && Ext.isString(cell[0])) {
-        				xtype = cell[0];
+        				xtype = cell[0].toLowerCase();
         				cell.shift();
         			}
         			if (cell[0] && Ext.isNumber(cell[0])) {
@@ -201,13 +200,12 @@ Ext.define('Voyant.panel.CustomSet', {
         			}
         		} else if (Ext.isString(cell)) {
         			items.push({
-        				xtype: cell,
+        				xtype: cell.toLowerCase(),
         				colspan: 1,
         				rowspan: 1
         			})
         		}
         	}
-        	
         	Ext.apply(this, {
         		layout: {
         			type: 'table',
