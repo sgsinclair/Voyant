@@ -37,7 +37,7 @@ class Notebook {
 	 * @param {*} config 
 	 */
 	static show(contents, config) {
-		var contents = Spyral.Util.toString(contents, config);
+		var contents = Spyral.Util.toString(contents);
 		if (contents instanceof Promise) {
 			contents.then(c => Voyant.notebook.util.Show.show(c))
 		} else {

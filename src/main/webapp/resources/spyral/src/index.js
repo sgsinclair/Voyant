@@ -1,7 +1,6 @@
-import {Corpus, Table, Load, Chart, Categories} from 'voyant';
+import {Corpus, Table, Load, Util, Chart, Categories} from 'voyant';
 
 import {Notebook} from './notebook';
-import {Util} from './util';
 import {Metadata} from './metadata';
 
 /**
