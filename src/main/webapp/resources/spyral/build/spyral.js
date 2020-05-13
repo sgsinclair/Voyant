@@ -4460,39 +4460,92 @@ var Spyral = (function () {
 	  }
 	});
 
-	function id$1(len) {
-	  len = len || 8; // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-
-	  return Math.random().toString(36).substring(2, 2 + len) + Math.random().toString(36).substring(2, 2 + len);
-	}
-
-	function addStyles() {
-	  var id = 'spyral-file-input-styles';
-	  var head = document.querySelector('head');
-
-	  if (head.querySelector('style[id="' + id + '"]') === null) {
-	    var style = document.createElement('style');
-	    style.setAttribute('id', id);
-	    style.appendChild(document.createTextNode("\n.input-parent {\n\tpadding: 8px;\n\tbackground-color: #fff;\n\toutline: 2px dashed #999;\n\ttext-align: center;\n}\n.input-parent.is-dragover {\n\tbackground-color: #ccc;\n}\n.input-parent strong {\n\tcursor: pointer;\n}\n.input-parent input {\n\tdisplay: none;\n}\n"));
-	    head.appendChild(style);
+	/**
+	 * A helper for working with the Voyant Notebook app.
+	 * @memberof Spyral
+	 * @namespace
+	 */
+	var Util = /*#__PURE__*/function () {
+	  function Util() {
+	    _classCallCheck(this, Util);
 	  }
-	}
+
+	  _createClass(Util, null, [{
+	    key: "id",
+
+	    /**
+	     * Generates a random ID of the specified length.
+	     * @static
+	     * @param {number} len The length of the ID to generate?
+	     * @returns {string}
+	     */
+	    value: function id() {
+	      var len = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 8;
+	      // based on https://stackoverflow.com/a/13403498
+	      var times = Math.ceil(len / 11);
+	      var id = '';
+
+	      for (var i = 0; i < times; i++) {
+	        id += Math.random().toString(36).substring(2); // the result of this is 11 characters long
+	      }
+
+	      return id.substring(0, len);
+	    }
+	    /**
+	     * 
+	     * @static
+	     * @param {array|object|string} contents 
+	     * @returns {string}
+	     */
+
+	  }, {
+	    key: "toString",
+	    value: function toString(contents) {
+	      if (contents.constructor === Array || contents.constructor === Object) {
+	        contents = JSON.stringify(contents);
+
+	        if (contents.length > 500) {
+	          contents = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>' + contents.substring(0, 500) + " <a href=''>+</a><div style='display: none'>" + contents.substring(501) + "</div>";
+	        }
+	      }
+
+	      return contents.toString();
+	    }
+	    /**
+	     * 
+	     * @static
+	     * @param {string} before 
+	     * @param {string} more 
+	     * @param {string} after 
+	     */
+
+	  }, {
+	    key: "more",
+	    value: function more(before, _more, after) {
+	      return before + '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>' + _more.substring(0, 500) + " <a href=''>+</a><div style='display: none'>" + _more.substring(501) + "</div>" + after;
+	    }
+	  }]);
+
+	  return Util;
+	}();
+
 	/**
 	 * A multiple file input that features drag n drop as well as temporary file storage in session storage.
 	 */
-
 
 	var FileInput = /*#__PURE__*/function () {
 	  /**
 	   * The FileInput constructor
 	   * @param {element} target The element to place the file input into
 	   * @param {function} resolve A function to call with the file(s)
+	   * @param {function} reject A function to call if the input is cancelled
 	   */
-	  function FileInput(target, resolve) {
+	  function FileInput(target, resolve, reject) {
 	    _classCallCheck(this, FileInput);
 
 	    this.target = target;
 	    this.resolve = resolve;
+	    this.reject = reject;
 	    this.inputParent = undefined;
 	    this.fileInput = undefined;
 	    this.inputLabel = undefined;
@@ -4514,7 +4567,7 @@ var Spyral = (function () {
 
 	      this.inputParent = document.createElement('div');
 	      this.inputParent.setAttribute('class', 'input-parent');
-	      var fileInputId = id$1(16);
+	      var fileInputId = Util.id(16);
 	      this.fileInput = document.createElement('input');
 	      this.fileInput.setAttribute('type', 'file');
 	      this.fileInput.setAttribute('multiple', 'multiple');
@@ -4558,7 +4611,7 @@ var Spyral = (function () {
 	        _this._triggerLoad(event.dataTransfer.files);
 	      });
 	      this.target.appendChild(this.inputParent);
-	      this.target.setAttribute('spyral-temp-doc', id$1(32));
+	      this.target.setAttribute('spyral-temp-doc', Util.id(32));
 	    } // update label with file info
 
 	  }, {
@@ -4586,7 +4639,7 @@ var Spyral = (function () {
 	        } else {
 	          // store each file in its own session storage entry
 	          var childIds = readFiles.map(function (val, index) {
-	            var childId = id$1(32);
+	            var childId = Util.id(32);
 	            window.sessionStorage.setItem(childId, val);
 	            return childId;
 	          }); // store the ids for each file for later retrieval
@@ -4619,6 +4672,18 @@ var Spyral = (function () {
 
 	  return FileInput;
 	}();
+
+	function addStyles() {
+	  var id = 'spyral-file-input-styles';
+	  var head = document.querySelector('head');
+
+	  if (head.querySelector('style[id="' + id + '"]') === null) {
+	    var style = document.createElement('style');
+	    style.setAttribute('id', id);
+	    style.appendChild(document.createTextNode("\n.input-parent {\n\tpadding: 8px;\n\tbackground-color: #fff;\n\toutline: 2px dashed #999;\n\ttext-align: center;\n}\n.input-parent.is-dragover {\n\tbackground-color: #ccc;\n}\n.input-parent strong {\n\tcursor: pointer;\n}\n.input-parent input {\n\tdisplay: none;\n}\n"));
+	    head.appendChild(style);
+	  }
+	}
 
 	/**
 	 * Class embodying Load functionality.
@@ -4808,8 +4873,22 @@ var Spyral = (function () {
 	      var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
 
 	      if (target === undefined) {
-	        if (typeof Spyral !== 'undefined' && Spyral.Notebook) {
-	          target = Spyral.Notebook.getTarget();
+	        if (typeof Spyral !== 'undefined' && Spyral.Notebook && typeof Ext !== 'undefined') {
+	          var spyralTarget = Spyral.Notebook.getTarget(); // check for pre-existing target
+
+	          target = spyralTarget.parentElement.querySelector('[spyral-temp-doc]');
+
+	          if (target === null) {
+	            // add a component so that vbox layout will be properly calculated
+	            var resultsCmp = Ext.getCmp(spyralTarget.getAttribute('id'));
+	            var codeEditorCell = resultsCmp.findParentByType('panel');
+	            var targetCmp = codeEditorCell.add({
+	              xtype: 'component',
+	              padding: '20 10',
+	              html: ''
+	            });
+	            target = targetCmp.getEl().dom;
+	          }
 	        } else {
 	          target = document.createElement("div");
 	          document.body.appendChild(target);
@@ -4824,7 +4903,7 @@ var Spyral = (function () {
 	          return;
 	        }
 
-	        new FileInput(target, resolve);
+	        new FileInput(target, resolve, reject);
 	      });
 	    }
 	  }]);
@@ -8583,75 +8662,6 @@ var Spyral = (function () {
 
 	  return arr;
 	}
-
-	/**
-	 * A helper for working with the Voyant Notebook app.
-	 * @memberof Spyral
-	 * @namespace
-	 */
-	var Util = /*#__PURE__*/function () {
-	  function Util() {
-	    _classCallCheck(this, Util);
-	  }
-
-	  _createClass(Util, null, [{
-	    key: "id",
-
-	    /**
-	     * Generates a random ID of the specified length.
-	     * @static
-	     * @param {number} len The length of the ID to generate?
-	     * @returns {string}
-	     */
-	    value: function id() {
-	      var len = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 8;
-	      // based on https://stackoverflow.com/a/13403498
-	      var times = Math.ceil(len / 11);
-	      var id = '';
-
-	      for (var i = 0; i < times; i++) {
-	        id += Math.random().toString(36).substring(2); // the result of this is 11 characters long
-	      }
-
-	      return id.substring(0, len);
-	    }
-	    /**
-	     * 
-	     * @static
-	     * @param {array|object|string} contents 
-	     * @returns {string}
-	     */
-
-	  }, {
-	    key: "toString",
-	    value: function toString(contents) {
-	      if (contents.constructor === Array || contents.constructor === Object) {
-	        contents = JSON.stringify(contents);
-
-	        if (contents.length > 500) {
-	          contents = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>' + contents.substring(0, 500) + " <a href=''>+</a><div style='display: none'>" + contents.substring(501) + "</div>";
-	        }
-	      }
-
-	      return contents.toString();
-	    }
-	    /**
-	     * 
-	     * @static
-	     * @param {string} before 
-	     * @param {string} more 
-	     * @param {string} after 
-	     */
-
-	  }, {
-	    key: "more",
-	    value: function more(before, _more, after) {
-	      return before + '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>' + _more.substring(0, 500) + " <a href=''>+</a><div style='display: none'>" + _more.substring(501) + "</div>" + after;
-	    }
-	  }]);
-
-	  return Util;
-	}();
 
 	/**
 	 * Class for working with categories and features.
