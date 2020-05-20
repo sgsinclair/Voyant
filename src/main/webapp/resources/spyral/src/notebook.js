@@ -9,8 +9,8 @@ class Notebook {
 	 * @static
 	 * @returns {string}
 	 */
-	static getPreviousBlock() {
-		return Spyral.Notebook.getBlock(-1);
+	static getPreviousBlock(config) {
+		return Spyral.Notebook.getBlock(-1, config);
 	}
 	/**
 	 * Returns the next block.
@@ -18,7 +18,7 @@ class Notebook {
 	 * @returns {string}
 	 */
 	static getNextBlock() {
-		return Spyral.Notebook.getBlock(1);
+		return Spyral.Notebook.getBlock(1, config);
 	}
 	/**
 	 * Returns the current block.
@@ -31,6 +31,23 @@ class Notebook {
 			return Voyant.notebook.Notebook.currentNotebook.getBlock.apply(Voyant.notebook.Notebook.currentNotebook, arguments)
 		}
 	}
+	static setNextBlock(data, config) {
+		return Spyral.Notebook.setBlock(data, 1, config);
+	}
+	
+	static setBlock(data, position, config) {
+		if (Voyant && Voyant.notebook) {
+			const notebook = Voyant.notebook.Notebook.currentNotebook;
+			const contents = getNextBlock({failQuietly: true})
+			if (contents==undefined) {
+				notebook.addCode(block, order, cellId, config);
+			}
+			if (notebook) {
+//				notebook.
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * @param {*} contents 
