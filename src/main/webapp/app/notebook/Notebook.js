@@ -374,18 +374,22 @@ Ext.define('Voyant.notebook.Notebook', {
 		})
     },
     
-    getBlock: function(offset) {
+    getBlock: function(offset, config) {
     	offset = offset || 0;
+    	config = config || {};
     	var containers = this.query("notebookcodeeditorwrapper");
     	var id = this.getCurrentBlock().id;
     	var current = containers.findIndex(function(container) {return container.id==id})
     	if (current+offset<0 || current+offset>containers.length-1) {
-			Ext.Msg.show({
-				title: this.localize('error'),
-				msg: this.localize('blockDoesNotExist'),
-				buttons: Ext.MessageBox.OK,
-				icon: Ext.MessageBox.ERROR
-			});
+    		if ("failQuietly" in config && config.failQuietly) {}
+    		else {
+    			Ext.Msg.show({
+    				title: this.localize('error'),
+    				msg: this.localize('blockDoesNotExist'),
+    				buttons: Ext.MessageBox.OK,
+    				icon: Ext.MessageBox.ERROR
+    			});
+    		}
 			return undefined;
     	}
     	content = containers[current+offset].getContent();
@@ -633,7 +637,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	return this._add(block, order, 'notebooktexteditorwrapper', cellId);
     },
  
-    addCode: function(block, order, cellId) {
+    addCode: function(block, order, cellId, config) {
     	return this._add(block, order, 'notebookcodeeditorwrapper', cellId, {docs: this.spyralTernDocs});
     },
     
