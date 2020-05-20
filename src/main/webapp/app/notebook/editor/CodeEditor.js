@@ -35,7 +35,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 			editor.getSession().setMode(this.getMode());
 			editor.setOptions({
 				minLines: 6,
-				maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10,
+				maxLines: Infinity, // this.getMode().indexOf("javascript")>-1 ? Infinity : 10,
 				autoScrollEditorIntoView: true,
 				scrollPastEnd: true
 			});
@@ -145,7 +145,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 	switchModes: function(mode) {
 		this.setMode('ace/mode/'+mode);
 		this.getEditor().getSession().setMode(this.getMode());
-		this.getEditor().setOptions({maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10});
+//		this.getEditor().setOptions({maxLines: this.getMode().indexOf("javascript")>-1 ? Infinity : 10});
 
 	},
 	
