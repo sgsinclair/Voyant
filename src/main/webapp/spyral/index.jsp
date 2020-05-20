@@ -58,7 +58,35 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 </style>
 <!--script src="<%= base %>/resources/ace/1.4.7/src-noconflict/ext-language_tools.js"></script-->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/spyral/css/spyral.css" />
-<style id="voyant-notebooks-styles"></style>
+<style id="voyant-notebooks-styles">
+.ace_layer {
+	white-space: pre;
+	font-family: monospace;
+}
+
+.notebook-code-editor-raw {
+	display: none;
+}
+.notebookwrappercounter {
+	display: none;
+}
+.notebookcodeeditorwrapper {
+    margin-left: 1em;
+    padding-left: .5em;
+    border: thin solid rgba(0,0,0,.1);
+}
+.notebook-code-results {
+	margin-top: .5em;
+	padding: .5em;
+	background-color: rgba(0,0,0,.01)
+}
+.spyral-header, .spyral-footer {
+	text-align: center
+}
+.notebook-code-results .error {
+	font-color: red !important;
+}
+</style>
 
 <script>
 	Ext.Loader.setConfig({
