@@ -21,7 +21,7 @@
         "contact": "<a href='http://www.huma-num.fr/informations-pratiques'>Huma-Num</a>"
     },{
         "name": "South African Centre for Digital Language Resources (SADiLaR)",
-        "url": "https://service.sadilar.org/voyant",
+        "url": "https://service.sadilar.org/voyant/",
         "location": "South Africa",
         "latlong": "-26.7065869,27.2073277",
         "contact": "<a href='Juan.Steyn@nwu.ac.za'>Juan Steyn</a>"
