@@ -20,10 +20,10 @@
         "latlong": "45.7718126,4.854807",
         "contact": "<a href='http://www.huma-num.fr/informations-pratiques'>Huma-Num</a>"
     },{
-        "name": "University of Oklahoma, Dept. of Geography and Environmental Sustainability",
-        "url": "http://voyant.dges.ou.edu/",
-        "location": "Norman, OK, USA",
-        "latlong": "35.2470202,-97.5027986",
-        "contact": "<a href='mailto:dpurcell@ou.edu'>Darren Purcell</a>"
+        "name": "South African Centre for Digital Language Resources (SADiLaR)",
+        "url": "https://service.sadilar.org/voyant/",
+        "location": "South Africa",
+        "latlong": "-26.7065869,27.2073277",
+        "contact": "<a href='Juan.Steyn@nwu.ac.za'>Juan Steyn</a>"
     }]
 }

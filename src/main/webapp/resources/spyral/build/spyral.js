@@ -1082,12 +1082,12 @@ var Spyral = (function () {
       this.fileInput = undefined;
       this.inputLabel = undefined;
 
-      if (target.hasAttribute('spyral-temp-doc')) {
-        var storedFiles = FileInput.getStoredFiles(target);
-
-        if (storedFiles !== null) {
-          resolve(storedFiles);
-        }
+      if (target.querySelector('[spyral-temp-doc]') !== null) {
+        FileInput.getStoredFiles(target).then(function (storedFiles) {
+          if (storedFiles !== null) {
+            resolve(storedFiles);
+          }
+        });
       } else {
         this._init();
       }
@@ -1098,12 +1098,13 @@ var Spyral = (function () {
       value: function _init() {
         var _this = this;
 
-        addStyles(); // construct the elements
-
+        // construct the elements
         this.inputParent = document.createElement('div');
-        this.inputParent.setAttribute('class', 'input-parent');
+        this.inputParent.setAttribute('style', 'padding: 8px; background-color: #fff; outline: 2px dashed #999; text-align: center;');
+        this.inputParent.setAttribute('spyral-temp-doc', Util.id(32));
         var fileInputId = Util.id(16);
         this.fileInput = document.createElement('input');
+        this.fileInput.style.setProperty('display', 'none');
         this.fileInput.setAttribute('type', 'file');
         this.fileInput.setAttribute('multiple', 'multiple');
         this.fileInput.setAttribute('data-multiple-caption', '{count} files selected');
@@ -1118,10 +1119,10 @@ var Spyral = (function () {
         this.inputLabel.setAttribute('for', fileInputId);
         this.inputParent.appendChild(this.inputLabel);
         var labelText = document.createElement('strong');
+        labelText.style.setProperty('cursor', 'pointer');
         labelText.appendChild(document.createTextNode('Choose a file'));
         this.inputLabel.appendChild(labelText);
         var dndSpot = document.createElement('span');
-        dndSpot.setAttribute('class', 'box__dragndrop');
         dndSpot.appendChild(document.createTextNode(' or drag it here'));
         this.inputLabel.appendChild(dndSpot);
         ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(function (event) {
@@ -1132,12 +1133,12 @@ var Spyral = (function () {
         });
         ['dragover', 'dragenter'].forEach(function (event) {
           _this.inputParent.addEventListener(event, function (e) {
-            _this.inputParent.classList.add('is-dragover');
+            _this.inputParent.style.setProperty('background-color', '#ccc');
           });
         });
         ['dragend', 'dragleave', 'drop'].forEach(function (event) {
           _this.inputParent.addEventListener(event, function (e) {
-            _this.inputParent.classList.remove('is-dragover');
+            _this.inputParent.style.removeProperty('background-color');
           });
         });
         this.inputParent.addEventListener('drop', function (event) {
@@ -1146,13 +1147,15 @@ var Spyral = (function () {
           _this._triggerLoad(event.dataTransfer.files);
         });
         this.target.appendChild(this.inputParent);
-        this.target.setAttribute('spyral-temp-doc', Util.id(32));
+        console.log('init done');
       } // update label with file info
 
     }, {
       key: "_showFiles",
       value: function _showFiles(files) {
-        this.inputLabel.textContent = files.length > 1 ? (this.fileInput.getAttribute('data-multiple-caption') || '').replace('{count}', files.length) : files[0].name;
+        if (files.length > 0) {
+          this.inputLabel.textContent = files.length > 1 ? (this.fileInput.getAttribute('data-multiple-caption') || '').replace('{count}', files.length) : files[0].name;
+        }
       } // file load handler
 
     }, {
@@ -1163,68 +1166,167 @@ var Spyral = (function () {
         var files = Array.from(fileList);
         var readFiles = [];
         var currIndex = 0;
-        var target = this.target;
-        var fr = new FileReader();
 
-        fr.onload = function (e) {
-          readFiles.push({
-            filename: files[currIndex].name,
-            data: e.target.result
-          });
-          currIndex++;
+        if (files.length > 0) {
+          var fr = new FileReader();
 
-          if (currIndex < files.length) {
-            fr.readAsText(files[currIndex]);
-          } else {
-            // store each file in its own session storage entry
-            var childIds = readFiles.map(function (val, index) {
-              var childId = Util.id(32);
-              window.sessionStorage.setItem('filename-' + childId, val.filename);
-              window.sessionStorage.setItem('data-' + childId, val.data);
-              return childId;
-            }); // store the ids for each file for later retrieval
+          fr.onload = function (e) {
+            readFiles.push({
+              filename: files[currIndex].name,
+              data: e.target.result
+            });
+            currIndex++;
 
-            window.sessionStorage.setItem(target.getAttribute('spyral-temp-doc'), childIds.join());
+            if (currIndex < files.length) {
+              fr.readAsText(files[currIndex]);
+            } else {
+              // store each file in its own session storage entry
+              var childIds = readFiles.map(function (val, index) {
+                var childId = Util.id(32);
+                window.sessionStorage.setItem('filename-' + childId, val.filename);
+                window.sessionStorage.setItem('data-' + childId, val.data);
+                return childId;
+              }); // store the ids for each file for later retrieval
 
-            _this2.resolve(readFiles);
-          }
-        };
+              window.sessionStorage.setItem(_this2.inputParent.getAttribute('spyral-temp-doc'), childIds.join());
+              createServerStorage();
 
-        fr.readAsText(files[currIndex]);
+              if ((typeof ServerStorage === "undefined" ? "undefined" : _typeof(ServerStorage)) !== undefined) {
+                var serverStorage = new ServerStorage();
+                serverStorage.storeResource(_this2.inputParent.getAttribute('spyral-temp-doc'), childIds.join());
+                readFiles.map(function (val, index) {
+                  var childId = childIds[index];
+                  serverStorage.storeResource(childId, {
+                    filename: val.filename,
+                    data: val.data
+                  });
+                  return childId;
+                });
+              }
+
+              _this2.resolve(readFiles);
+            }
+          };
+
+          fr.readAsText(files[currIndex]);
+        } else {
+          this.resolve(readFiles);
+        }
       }
     }], [{
       key: "getStoredFiles",
-      value: function getStoredFiles(target) {
-        if (target.hasAttribute('spyral-temp-doc')) {
-          var fileIds = window.sessionStorage.getItem(target.getAttribute('spyral-temp-doc'));
+      value: function () {
+        var _getStoredFiles = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(target) {
+          var spyralTempDoc, fileIds, storedFiles, serverStorage, _storedFiles, i, file;
 
-          if (fileIds !== null) {
-            var storedFiles = fileIds.split(',').map(function (fileId) {
-              return {
-                filename: window.sessionStorage.getItem('filename-' + fileId),
-                data: window.sessionStorage.getItem('data-' + fileId)
-              };
-            });
-            return storedFiles;
-          }
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  if (!(target.querySelector('[spyral-temp-doc]') !== null)) {
+                    _context.next = 30;
+                    break;
+                  }
+
+                  spyralTempDoc = target.querySelector('[spyral-temp-doc]').getAttribute('spyral-temp-doc'); // check local storage
+
+                  fileIds = window.sessionStorage.getItem(spyralTempDoc);
+
+                  if (!(fileIds !== null)) {
+                    _context.next = 8;
+                    break;
+                  }
+
+                  storedFiles = fileIds.split(',').map(function (fileId) {
+                    return {
+                      filename: window.sessionStorage.getItem('filename-' + fileId),
+                      data: window.sessionStorage.getItem('data-' + fileId)
+                    };
+                  });
+                  return _context.abrupt("return", storedFiles);
+
+                case 8:
+                  // check server storage (if available)
+                  createServerStorage();
+
+                  if (!((typeof ServerStorage === "undefined" ? "undefined" : _typeof(ServerStorage)) !== undefined)) {
+                    _context.next = 30;
+                    break;
+                  }
+
+                  serverStorage = new ServerStorage();
+                  _context.next = 13;
+                  return serverStorage.getStoredResource(spyralTempDoc);
+
+                case 13:
+                  fileIds = _context.sent;
+
+                  if (!(fileIds !== undefined)) {
+                    _context.next = 29;
+                    break;
+                  }
+
+                  _storedFiles = [];
+                  fileIds = fileIds.split(',');
+                  i = 0;
+
+                case 18:
+                  if (!(i < fileIds.length)) {
+                    _context.next = 26;
+                    break;
+                  }
+
+                  _context.next = 21;
+                  return serverStorage.getStoredResource(fileIds[i]);
+
+                case 21:
+                  file = _context.sent;
+
+                  _storedFiles.push(file);
+
+                case 23:
+                  i++;
+                  _context.next = 18;
+                  break;
+
+                case 26:
+                  return _context.abrupt("return", _storedFiles);
+
+                case 29:
+                  return _context.abrupt("return", null);
+
+                case 30:
+                  return _context.abrupt("return", null);
+
+                case 31:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee);
+        }));
+
+        function getStoredFiles(_x) {
+          return _getStoredFiles.apply(this, arguments);
         }
 
-        return null;
-      }
+        return getStoredFiles;
+      }()
     }]);
 
     return FileInput;
   }();
 
-  function addStyles() {
-    var id = 'spyral-file-input-styles';
-    var head = document.querySelector('head');
-
-    if (head.querySelector('style[id="' + id + '"]') === null) {
-      var style = document.createElement('style');
-      style.setAttribute('id', id);
-      style.appendChild(document.createTextNode("\n.input-parent {\n\tpadding: 8px;\n\tbackground-color: #fff;\n\toutline: 2px dashed #999;\n\ttext-align: center;\n}\n.input-parent.is-dragover {\n\tbackground-color: #ccc;\n}\n.input-parent strong {\n\tcursor: pointer;\n}\n.input-parent input {\n\tdisplay: none;\n}\n"));
-      head.appendChild(style);
+  function createServerStorage() {
+    if (typeof Voyant !== 'undefined' && typeof Ext !== 'undefined') {
+      if (typeof ServerStorage === 'undefined') {
+        Ext.define('ServerStorage', {
+          extend: 'Voyant.util.Storage',
+          getTromboneUrl: function getTromboneUrl() {
+            return Voyant.application.getTromboneUrl();
+          }
+        });
+      }
     }
   }
 
@@ -1414,6 +1516,7 @@ var Spyral = (function () {
       key: "file",
       value: function file() {
         var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
+        var hasPreExistingTarget = false;
 
         if (target === undefined) {
           if (typeof Spyral !== 'undefined' && Spyral.Notebook && typeof Ext !== 'undefined') {
@@ -1424,30 +1527,67 @@ var Spyral = (function () {
             if (target === null) {
               // add a component so that vbox layout will be properly calculated
               var resultsCmp = Ext.getCmp(spyralTarget.getAttribute('id'));
-              var codeEditorCell = resultsCmp.findParentByType('panel');
-              var targetCmp = codeEditorCell.add({
-                xtype: 'component',
-                padding: '20 10',
-                html: ''
-              });
+              var codeEditorCell = resultsCmp.findParentByType('notebookcodeeditorwrapper');
+
+              var targetConfig = codeEditorCell._getUIComponent('');
+
+              var targetCmp = codeEditorCell.add(targetConfig);
+              codeEditorCell.setHeight(codeEditorCell.getHeight() + 80); // need to explicitly adjust height for added component to be visible
+
               target = targetCmp.getEl().dom;
+            } else {
+              hasPreExistingTarget = true;
+              target = target.parentElement;
             }
           } else {
             target = document.createElement("div");
+            target.setAttribute('class', 'target');
             document.body.appendChild(target);
           }
         }
 
-        return new Promise(function (resolve, reject) {
-          var storedFiles = FileInput.getStoredFiles(target);
+        if (hasPreExistingTarget) {
+          return new Promise( /*#__PURE__*/function () {
+            var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(resolve, reject) {
+              var storedFiles;
+              return regeneratorRuntime.wrap(function _callee$(_context) {
+                while (1) {
+                  switch (_context.prev = _context.next) {
+                    case 0:
+                      _context.next = 2;
+                      return FileInput.getStoredFiles(target);
 
-          if (storedFiles !== null) {
-            resolve(storedFiles);
-            return;
-          }
+                    case 2:
+                      storedFiles = _context.sent;
 
-          new FileInput(target, resolve, reject);
-        });
+                      if (!(storedFiles !== null)) {
+                        _context.next = 6;
+                        break;
+                      }
+
+                      resolve(storedFiles);
+                      return _context.abrupt("return");
+
+                    case 6:
+                      new FileInput(target, resolve, reject);
+
+                    case 7:
+                    case "end":
+                      return _context.stop();
+                  }
+                }
+              }, _callee);
+            }));
+
+            return function (_x, _x2) {
+              return _ref.apply(this, arguments);
+            };
+          }());
+        } else {
+          return new Promise(function (resolve, reject) {
+            new FileInput(target, resolve, reject);
+          });
+        }
       }
     }]);
 
