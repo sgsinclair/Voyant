@@ -35,11 +35,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 
 	constructor: function(config) {
 
-		this.results = Ext.create('Ext.Component', {
-			align: 'stretch',
-			cls: 'notebook-code-results',
-			html: Ext.Array.from(config.output).join("")
-		});
+		this.results = this._getResultsComponent(Ext.Array.from(config.output).join(""));
 		
 		this.editor = Ext.create("Voyant.notebook.editor.CodeEditor", {
 			content: Ext.Array.from(config.input).join("\n"),
@@ -248,6 +244,10 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			}],
 			items: [this.editor, this.results]
 		});
+
+		if (config.uiHtml !== undefined) {
+			this.items.push(this._getUIComponent(config.uiHtml))
+		}
 		
         this.callParent(arguments);
         
@@ -355,6 +355,37 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		return result;
 	},
 
+	_getResultsComponent: function(html) {
+		return Ext.create('Ext.Component', {
+			align: 'stretch',
+			cls: 'notebook-code-results',
+			html: html,
+			getValue: function() {
+				var el = this.getTargetEl(), resultEl = el.dom.cloneNode(true);
+				var output = resultEl.innerHTML;
+				if (!resultEl.style.height) {
+					output = "<div style='height: "+el.getHeight()+"px'>"+output+"</div>";
+				}
+				return output;
+			}
+		});
+	},
+
+	_getUIComponent: function(html) {
+		return Ext.create('Ext.Component', {
+			align: 'stretch',
+			cls: 'notebook-code-ui',
+			padding: '20 10',
+			html: html,
+			getValue: function() {
+				const el = this.getTargetEl()
+				const resultEl = el.dom.cloneNode(true);
+				let output = resultEl.innerHTML;
+				return output;
+			}
+		});
+	},
+
 	_showResult: function(result) {
 		// check for pre-existing content (such as from highcharts) and if it exists don't update
 		if (this.results.getEl().dom.innerHTML === this.EMPTY_RESULTS_TEXT) {
@@ -385,14 +416,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		if (Spyral && Spyral.promises) {
 			Ext.defer(this.tryToUnmask, 20, this);
 		}
-		if (Voyant.application.getDeferredCount()==0) {
+		if (Voyant.application.getDeferredCount()===0) {
 			for (var key in window) {
 				if (typeof window[key] == 'object' && window[key] && key!="opener" && window[key].isFulfilled &&  window[key].isFulfilled()) {
 					window[key] = window[key].valueOf();
 				}
 			}
 			this.results.unmask();
-			if (this.results.getTargetEl().getHtml().trim().length==0) {
+			if (this.results.getTargetEl().getHtml().trim().length===0) {
 				this.results.hide();
 			}
 			this.getTargetEl().fireEvent('resize');
@@ -407,11 +438,11 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			input: this.editor.getValue(),
 			mode: this.editor.getMode().split("/").pop()
 		}
-		if (toReturn.mode=='javascript') {
-			var el = this.results.getTargetEl(), resultEl = el.dom.cloneNode(true);
-			toReturn.output = resultEl.innerHTML;
-			if (!resultEl.style.height) {
-				toReturn.output = "<div style='height: "+el.getHeight()+"px'>"+toReturn.output+"</div>";
+		if (toReturn.mode==='javascript') {
+			toReturn.output = this.results.getValue();
+			var ui = this.down('component[cls="notebook-code-ui"]');
+			if (ui !== null) {
+				toReturn.ui = ui.getValue();
 			}
 		}
 		return toReturn;

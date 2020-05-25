@@ -544,20 +544,27 @@ Ext.define('Voyant.notebook.Notebook', {
     			startPre = html.indexOf(">", startPre)+1; // add the length of the string
     			var endPre = html.indexOf("</pre>\n<div class='notebook-code-results'>", startPre);
     			
-    			// check if we hav valid values
-    			if (secPos==-1 || startPre == -1 || endPre == -1) {
+    			// check if we have valid values
+    			if (secPos===-1 || startPre === -1 || endPre === -1) {
     				hasDomError = true;
     				// this might work, unless the js code includes HTML
-    				input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
+    				input = editorType === "javascript" ? inputEl.innerText : inputEl.innerHTML;
     				debugger
     			} else {
         			input = html.substring(startPre, endPre);
     			}
 				var autoexec = /\bautoexec\b/.exec(inputEl.className) !== null;
-    			var output = section.querySelector(".notebook-code-results").innerHTML;
+				var output = section.querySelector(".notebook-code-results").innerHTML;
+				var ui = section.querySelector(".notebook-code-ui");
+				if (ui !== null) {
+					ui = ui.innerHTML;
+				} else {
+					ui = undefined;
+				}
     			this.addCode({
     				input: input,
-    				output: output,
+					output: output,
+					uiHtml: ui,
 					mode: editorType,
 					autoExecute: autoexec,
     			}, undefined, section.id)
@@ -787,7 +794,7 @@ Ext.define('Voyant.notebook.Notebook', {
 			// reminder that the parsing in of notebooks depends on the stability of this syntax
     		out+="<section id='"+counter.name+"' class='notebook-editor-wrapper "+item.xtype+"'>\n"+
     			"<div class='notebookwrappercounter'>"+counter.getTargetEl().dom.innerHTML+"</div>";
-    		if (type=='code') {
+    		if (type==='code') {
     			var mode = item.down("notebookcodeeditor").getMode();
 				mode = mode.substring(mode.lastIndexOf("/")+1);
 				
@@ -798,7 +805,10 @@ Ext.define('Voyant.notebook.Notebook', {
 				// reminder that the parsing in of notebooks depends on the stability of this syntax
     			out+="<div class='notebook-code-editor ace-chrome'>\n"+codeTextLayer.outerHTML+"\n</div>\n"+
     				"<pre class='notebook-code-editor-raw editor-mode-"+mode+" "+autoexec+"'>"+content.input+"</pre>\n"+
-    				"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
+					"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
+				if (content.ui !== undefined) {
+					out += "<div class='notebook-code-ui'>\n"+content.ui+"\n</div>\n";
+				}
     		} else {
     			out+="<div class='notebook-text-editor'>"+content+"</div>\n";
     		}
