@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu May 14 17:56:46 EDT 2020 */
+/* This file created by JSCacher. Last modified: Mon May 25 16:53:47 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -35464,7 +35464,7 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 	border: false,
 	constructor: function(config) {
 		Ext.apply(this, {
-			html: config.content ? config.content : "" /*this.localize("emptyText") */
+			html: config.content ? config.content : this.localize("emptyText")
 		});
         this.callParent(arguments);
 	},
@@ -35492,6 +35492,16 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 			this.findParentByType("notebookeditorwrapper").setIsEditing(true);
 			if (!cmp.getEditor()) {
 				var editor = CKEDITOR.inline( el.dom, this.getCkeditorConfig() );
+				
+				// erase contents if it's click to edit (not localized, FIXME
+				editor.on("focus", function(evt) {
+					console.warn(this.getTargetEl().dom.innerText, this.localize("emptyText"))
+					if (this.getTargetEl().dom.innerText==this.localize("emptyText")) {
+						this.getTargetEl().update('')
+					}
+				}, this)
+				
+				
 				editor.on("blur", function(evt) {
 //					cmp.setEditor(undefined);
 					cmp.findParentByType("notebookeditorwrapper").setIsEditing(false).getEl().fireEvent("mouseout");
