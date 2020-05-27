@@ -67,7 +67,7 @@ Ext.onReady(function(){
 });
 </script>
 
-<link href='http://fonts.googleapis.com/css?family=Nunito:300,400' rel='stylesheet' type='text/css' />
+<link href='https://fonts.googleapis.com/css?family=Nunito:300,400' rel='stylesheet' type='text/css' />
 
 <!-- 
 <link href="annotator/annotator.min.css" rel="stylesheet" type="text/css" />
