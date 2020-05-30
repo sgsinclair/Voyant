@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon May 25 16:53:47 EDT 2020 */
+/* This file created by JSCacher. Last modified: Thu May 28 16:03:40 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -15412,7 +15412,7 @@ Ext.define('Voyant.panel.Bubblelines', {
     		this.setDocTermStore(corpus.getDocumentTerms({
     			proxy: {
 	    			extraParams: {
-						withDistributions: 'raw',
+						withDistributions: 'relative',
 						withPositions: true
 					}
     			},
@@ -35048,11 +35048,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 
 	constructor: function(config) {
 
-		this.results = Ext.create('Ext.Component', {
-			align: 'stretch',
-			cls: 'notebook-code-results',
-			html: Ext.Array.from(config.output).join("")
-		});
+		this.results = this._getResultsComponent(Ext.Array.from(config.output).join(""));
 		
 		this.editor = Ext.create("Voyant.notebook.editor.CodeEditor", {
 			content: Ext.Array.from(config.input).join("\n"),
@@ -35261,6 +35257,10 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			}],
 			items: [this.editor, this.results]
 		});
+
+		if (config.uiHtml !== undefined) {
+			this.items.push(this._getUIComponent(config.uiHtml))
+		}
 		
         this.callParent(arguments);
         
@@ -35368,6 +35368,37 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		return result;
 	},
 
+	_getResultsComponent: function(html) {
+		return Ext.create('Ext.Component', {
+			align: 'stretch',
+			cls: 'notebook-code-results',
+			html: html,
+			getValue: function() {
+				var el = this.getTargetEl(), resultEl = el.dom.cloneNode(true);
+				var output = resultEl.innerHTML;
+				if (!resultEl.style.height) {
+					output = "<div style='height: "+el.getHeight()+"px'>"+output+"</div>";
+				}
+				return output;
+			}
+		});
+	},
+
+	_getUIComponent: function(html) {
+		return Ext.create('Ext.Component', {
+			align: 'stretch',
+			cls: 'notebook-code-ui',
+			padding: '20 10',
+			html: html,
+			getValue: function() {
+				const el = this.getTargetEl()
+				const resultEl = el.dom.cloneNode(true);
+				let output = resultEl.innerHTML;
+				return output;
+			}
+		});
+	},
+
 	_showResult: function(result) {
 		// check for pre-existing content (such as from highcharts) and if it exists don't update
 		if (this.results.getEl().dom.innerHTML === this.EMPTY_RESULTS_TEXT) {
@@ -35398,14 +35429,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		if (Spyral && Spyral.promises) {
 			Ext.defer(this.tryToUnmask, 20, this);
 		}
-		if (Voyant.application.getDeferredCount()==0) {
+		if (Voyant.application.getDeferredCount()===0) {
 			for (var key in window) {
 				if (typeof window[key] == 'object' && window[key] && key!="opener" && window[key].isFulfilled &&  window[key].isFulfilled()) {
 					window[key] = window[key].valueOf();
 				}
 			}
 			this.results.unmask();
-			if (this.results.getTargetEl().getHtml().trim().length==0) {
+			if (this.results.getTargetEl().getHtml().trim().length===0) {
 				this.results.hide();
 			}
 			this.getTargetEl().fireEvent('resize');
@@ -35420,14 +35451,20 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			input: this.editor.getValue(),
 			mode: this.editor.getMode().split("/").pop()
 		}
-		if (toReturn.mode=='javascript') {
-			var el = this.results.getTargetEl(), resultEl = el.dom.cloneNode(true);
-			toReturn.output = resultEl.innerHTML;
-			if (!resultEl.style.height) {
-				toReturn.output = "<div style='height: "+el.getHeight()+"px'>"+toReturn.output+"</div>";
+		if (toReturn.mode==='javascript') {
+			toReturn.output = this.results.getValue();
+			var ui = this.down('component[cls="notebook-code-ui"]');
+			if (ui !== null) {
+				toReturn.ui = ui.getValue();
 			}
 		}
 		return toReturn;
+	},
+	
+	setContentAndMode: function(content, mode, config) {
+		debugger
+		this.editor.setContent(content);
+		this.switchModes(mode || "javascript")
 	}
 })
 Ext.define("Voyant.notebook.editor.TextEditor", {
@@ -35495,7 +35532,6 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 				
 				// erase contents if it's click to edit (not localized, FIXME
 				editor.on("focus", function(evt) {
-					console.warn(this.getTargetEl().dom.innerText, this.localize("emptyText"))
 					if (this.getTargetEl().dom.innerText==this.localize("emptyText")) {
 						this.getTargetEl().update('')
 					}
@@ -35581,6 +35617,7 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 	getContent: function() {
 		return this.items.get(0).getContent();
 	}
+	
 })
 Ext.define("Voyant.notebook.github.OctokitWrapper", {
 	extend: "Ext.Base",
@@ -37067,6 +37104,31 @@ Ext.define('Voyant.notebook.Notebook', {
 		})
     },
     
+    setBlock: function(data, offset, mode, config) {
+    	data = data || "";
+    	offset = offset || 1;
+    	config = config || {};
+    	var containers = this.query("notebookcodeeditorwrapper");
+    	var id = this.getCurrentBlock().id;
+    	var current = containers.findIndex(function(container) {return container.id==id})
+    	if (current+offset<0 || current+offset>containers.length) { // wanting to place before beginning or one beyond end
+			Ext.Msg.show({
+				title: this.localize('error'),
+				msg: this.localize('blockDoesNotExist'),
+				buttons: Ext.MessageBox.OK,
+				icon: Ext.MessageBox.ERROR
+			});
+			return undefined
+    	}
+    	// I can't seem to set the content, so we'll go nuclear and remove the block
+    	if (containers[current+offset]) {
+    		containers[current+offset].remove();
+    	}
+    	return this.addCode(Object.assign({},{
+    		input: data,
+    		mode: mode || "text"
+    	}, config), current+offset);
+    },
     getBlock: function(offset, config) {
     	offset = offset || 0;
     	config = config || {};
@@ -37237,20 +37299,27 @@ Ext.define('Voyant.notebook.Notebook', {
     			startPre = html.indexOf(">", startPre)+1; // add the length of the string
     			var endPre = html.indexOf("</pre>\n<div class='notebook-code-results'>", startPre);
     			
-    			// check if we hav valid values
-    			if (secPos==-1 || startPre == -1 || endPre == -1) {
+    			// check if we have valid values
+    			if (secPos===-1 || startPre === -1 || endPre === -1) {
     				hasDomError = true;
     				// this might work, unless the js code includes HTML
-    				input = editorType == "javascript" ? inputEl.innerText : inputEl.innerHTML;
+    				input = editorType === "javascript" ? inputEl.innerText : inputEl.innerHTML;
     				debugger
     			} else {
         			input = html.substring(startPre, endPre);
     			}
 				var autoexec = /\bautoexec\b/.exec(inputEl.className) !== null;
-    			var output = section.querySelector(".notebook-code-results").innerHTML;
+				var output = section.querySelector(".notebook-code-results").innerHTML;
+				var ui = section.querySelector(".notebook-code-ui");
+				if (ui !== null) {
+					ui = ui.innerHTML;
+				} else {
+					ui = undefined;
+				}
     			this.addCode({
     				input: input,
-    				output: output,
+					output: output,
+					uiHtml: ui,
 					mode: editorType,
 					autoExecute: autoexec,
     			}, undefined, section.id)
@@ -37480,7 +37549,7 @@ Ext.define('Voyant.notebook.Notebook', {
 			// reminder that the parsing in of notebooks depends on the stability of this syntax
     		out+="<section id='"+counter.name+"' class='notebook-editor-wrapper "+item.xtype+"'>\n"+
     			"<div class='notebookwrappercounter'>"+counter.getTargetEl().dom.innerHTML+"</div>";
-    		if (type=='code') {
+    		if (type==='code') {
     			var mode = item.down("notebookcodeeditor").getMode();
 				mode = mode.substring(mode.lastIndexOf("/")+1);
 				
@@ -37491,7 +37560,10 @@ Ext.define('Voyant.notebook.Notebook', {
 				// reminder that the parsing in of notebooks depends on the stability of this syntax
     			out+="<div class='notebook-code-editor ace-chrome'>\n"+codeTextLayer.outerHTML+"\n</div>\n"+
     				"<pre class='notebook-code-editor-raw editor-mode-"+mode+" "+autoexec+"'>"+content.input+"</pre>\n"+
-    				"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
+					"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
+				if (content.ui !== undefined) {
+					out += "<div class='notebook-code-ui'>\n"+content.ui+"\n</div>\n";
+				}
     		} else {
     			out+="<div class='notebook-text-editor'>"+content+"</div>\n";
     		}

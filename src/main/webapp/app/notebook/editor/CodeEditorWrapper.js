@@ -446,5 +446,11 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			}
 		}
 		return toReturn;
+	},
+	
+	setContentAndMode: function(content, mode, config) {
+		debugger
+		this.editor.setContent(content);
+		this.switchModes(mode || "javascript")
 	}
 })

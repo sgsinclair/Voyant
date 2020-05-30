@@ -43,4 +43,5 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 	getContent: function() {
 		return this.items.get(0).getContent();
 	}
+	
 })

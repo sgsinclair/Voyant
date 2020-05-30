@@ -17,7 +17,7 @@ class Notebook {
 	 * @static
 	 * @returns {string}
 	 */
-	static getNextBlock() {
+	static getNextBlock(config) {
 		return Spyral.Notebook.getBlock(1, config);
 	}
 	/**
@@ -31,20 +31,30 @@ class Notebook {
 			return Voyant.notebook.Notebook.currentNotebook.getBlock.apply(Voyant.notebook.Notebook.currentNotebook, arguments)
 		}
 	}
-	static setNextBlock(data, config) {
-		return Spyral.Notebook.setBlock(data, 1, config);
+	
+	static setNextBlockFromFiles(files, mode, config) {
+		if (!mode) {
+			if (files[0].filename.endsWith("html")) {mode="html"}
+			else if (files[0].filename.endsWith("xml")) {mode="xml"}
+			else if (files[0].filename.endsWith("json")) {mode="json"}
+			else {mode="text"}
+		}
+		return Spyral.Notebook.setBlock(files[0].data, 1, mode, config);
+	}
+
+	static setNextBlock(data, mode, config) {
+		// see if there's a block after this one and if not, create it
+		const contents = Spyral.Notebook.getNextBlock({failQuietly: true}); // don't show error if it doesn't exist
+		if (contents==undefined && Voyant && Voyant.notebook && Voyant.notebook.Notebook.currentNotebook) {
+			const notebook = Voyant.notebook.Notebook.currentNotebook;
+			//notebook.addCode('');
+		}
+		return Spyral.Notebook.setBlock(data, 1, mode, config);
 	}
 	
-	static setBlock(data, position, config) {
+	static setBlock(data, offset, mode, config) {
 		if (Voyant && Voyant.notebook) {
-			const notebook = Voyant.notebook.Notebook.currentNotebook;
-			const contents = getNextBlock({failQuietly: true})
-			if (contents==undefined) {
-				notebook.addCode(block, order, cellId, config);
-			}
-			if (notebook) {
-//				notebook.
-			}
+			return Voyant.notebook.Notebook.currentNotebook.setBlock.apply(Voyant.notebook.Notebook.currentNotebook, arguments)
 		}
 	}
 	

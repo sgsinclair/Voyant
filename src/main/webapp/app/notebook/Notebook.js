@@ -374,6 +374,31 @@ Ext.define('Voyant.notebook.Notebook', {
 		})
     },
     
+    setBlock: function(data, offset, mode, config) {
+    	data = data || "";
+    	offset = offset || 1;
+    	config = config || {};
+    	var containers = this.query("notebookcodeeditorwrapper");
+    	var id = this.getCurrentBlock().id;
+    	var current = containers.findIndex(function(container) {return container.id==id})
+    	if (current+offset<0 || current+offset>containers.length) { // wanting to place before beginning or one beyond end
+			Ext.Msg.show({
+				title: this.localize('error'),
+				msg: this.localize('blockDoesNotExist'),
+				buttons: Ext.MessageBox.OK,
+				icon: Ext.MessageBox.ERROR
+			});
+			return undefined
+    	}
+    	// I can't seem to set the content, so we'll go nuclear and remove the block
+    	if (containers[current+offset]) {
+    		containers[current+offset].remove();
+    	}
+    	return this.addCode(Object.assign({},{
+    		input: data,
+    		mode: mode || "text"
+    	}, config), current+offset);
+    },
     getBlock: function(offset, config) {
     	offset = offset || 0;
     	config = config || {};

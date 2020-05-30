@@ -1513,8 +1513,8 @@ var Spyral = (function () {
        */
 
     }, {
-      key: "file",
-      value: function file() {
+      key: "files",
+      value: function files() {
         var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
         var hasPreExistingTarget = false;
 
@@ -1546,8 +1546,10 @@ var Spyral = (function () {
           }
         }
 
+        var promise;
+
         if (hasPreExistingTarget) {
-          return new Promise( /*#__PURE__*/function () {
+          promise = new Promise( /*#__PURE__*/function () {
             var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(resolve, reject) {
               var storedFiles;
               return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -1584,10 +1586,20 @@ var Spyral = (function () {
             };
           }());
         } else {
-          return new Promise(function (resolve, reject) {
+          promise = new Promise(function (resolve, reject) {
             new FileInput(target, resolve, reject);
           });
-        }
+        } // graft this function to avoid need for then
+
+
+        promise.setNextBlockFromFiles = function () {
+          var args = arguments;
+          return this.then(function (files) {
+            return Spyral.Notebook.setNextBlockFromFiles.apply(Spyral.Load, [files].concat(Array.from(args)));
+          });
+        };
+
+        return promise;
       }
     }]);
 
@@ -10856,7 +10868,7 @@ var Spyral = (function () {
         });
 
         promise.assign = function (name) {
-          this.then(function (corpus) {
+          return this.then(function (corpus) {
             window[name] = corpus;
             return corpus;
           });
@@ -14743,6 +14755,68 @@ var Spyral = (function () {
     }, { unsafe: true });
   }
 
+  var MATCH$2 = wellKnownSymbol$1('match');
+
+  // `IsRegExp` abstract operation
+  // https://tc39.github.io/ecma262/#sec-isregexp
+  var isRegexp$1 = function (it) {
+    var isRegExp;
+    return isObject$1(it) && ((isRegExp = it[MATCH$2]) !== undefined ? !!isRegExp : classofRaw$1(it) == 'RegExp');
+  };
+
+  var notARegexp$1 = function (it) {
+    if (isRegexp$1(it)) {
+      throw TypeError("The method doesn't accept regular expressions");
+    } return it;
+  };
+
+  var MATCH$3 = wellKnownSymbol$1('match');
+
+  var correctIsRegexpLogic$1 = function (METHOD_NAME) {
+    var regexp = /./;
+    try {
+      '/./'[METHOD_NAME](regexp);
+    } catch (e) {
+      try {
+        regexp[MATCH$3] = false;
+        return '/./'[METHOD_NAME](regexp);
+      } catch (f) { /* empty */ }
+    } return false;
+  };
+
+  var getOwnPropertyDescriptor$5 = objectGetOwnPropertyDescriptor$1.f;
+
+
+
+
+
+
+  var nativeEndsWith = ''.endsWith;
+  var min$4 = Math.min;
+
+  var CORRECT_IS_REGEXP_LOGIC = correctIsRegexpLogic$1('endsWith');
+  // https://github.com/zloirock/core-js/pull/702
+  var MDN_POLYFILL_BUG =  !CORRECT_IS_REGEXP_LOGIC && !!function () {
+    var descriptor = getOwnPropertyDescriptor$5(String.prototype, 'endsWith');
+    return descriptor && !descriptor.writable;
+  }();
+
+  // `String.prototype.endsWith` method
+  // https://tc39.github.io/ecma262/#sec-string.prototype.endswith
+  _export$1({ target: 'String', proto: true, forced: !MDN_POLYFILL_BUG && !CORRECT_IS_REGEXP_LOGIC }, {
+    endsWith: function endsWith(searchString /* , endPosition = @length */) {
+      var that = String(requireObjectCoercible$1(this));
+      notARegexp$1(searchString);
+      var endPosition = arguments.length > 1 ? arguments[1] : undefined;
+      var len = toLength$1(that.length);
+      var end = endPosition === undefined ? len : min$4(toLength$1(endPosition), len);
+      var search = String(searchString);
+      return nativeEndsWith
+        ? nativeEndsWith.call(that, search, end)
+        : that.slice(end - search.length, end) === search;
+    }
+  });
+
   // TODO: Remove from `core-js@4` since it's moved to entry points
 
 
@@ -14958,7 +15032,7 @@ var Spyral = (function () {
   });
 
   var max$3 = Math.max;
-  var min$4 = Math.min;
+  var min$5 = Math.min;
   var floor$2 = Math.floor;
   var SUBSTITUTION_SYMBOLS = /\$([$&'`]|\d\d?|<[^>]*>)/g;
   var SUBSTITUTION_SYMBOLS_NO_NAMED = /\$([$&'`]|\d\d?)/g;
@@ -15023,7 +15097,7 @@ var Spyral = (function () {
           result = results[i];
 
           var matched = String(result[0]);
-          var position = max$3(min$4(toInteger$1(result.index), S.length), 0);
+          var position = max$3(min$5(toInteger$1(result.index), S.length), 0);
           var captures = [];
           // NOTE: This is equivalent to
           //   captures = result.slice(1).map(maybeToString)
@@ -15083,17 +15157,8 @@ var Spyral = (function () {
     }
   });
 
-  var MATCH$2 = wellKnownSymbol$1('match');
-
-  // `IsRegExp` abstract operation
-  // https://tc39.github.io/ecma262/#sec-isregexp
-  var isRegexp$1 = function (it) {
-    var isRegExp;
-    return isObject$1(it) && ((isRegExp = it[MATCH$2]) !== undefined ? !!isRegExp : classofRaw$1(it) == 'RegExp');
-  };
-
   var arrayPush = [].push;
-  var min$5 = Math.min;
+  var min$6 = Math.min;
   var MAX_UINT32 = 0xFFFFFFFF;
 
   // babel-minify transpiles RegExp('x', 'y') -> /x/y and it causes SyntaxError
@@ -15196,7 +15261,7 @@ var Spyral = (function () {
           var e;
           if (
             z === null ||
-            (e = min$5(toLength$1(splitter.lastIndex + (SUPPORTS_Y ? 0 : q)), S.length)) === p
+            (e = min$6(toLength$1(splitter.lastIndex + (SUPPORTS_Y ? 0 : q)), S.length)) === p
           ) {
             q = advanceStringIndex(S, q, unicodeMatching);
           } else {
@@ -16022,7 +16087,7 @@ var Spyral = (function () {
 
     }, {
       key: "getNextBlock",
-      value: function getNextBlock() {
+      value: function getNextBlock(config) {
         return Spyral.Notebook.getBlock(1, config);
       }
       /**
@@ -16040,22 +16105,41 @@ var Spyral = (function () {
         }
       }
     }, {
+      key: "setNextBlockFromFiles",
+      value: function setNextBlockFromFiles(files, mode, config) {
+        if (!mode) {
+          if (files[0].filename.endsWith("html")) {
+            mode = "html";
+          } else if (files[0].filename.endsWith("xml")) {
+            mode = "xml";
+          } else if (files[0].filename.endsWith("json")) {
+            mode = "json";
+          } else {
+            mode = "text";
+          }
+        }
+
+        return Spyral.Notebook.setBlock(files[0].data, 1, mode, config);
+      }
+    }, {
       key: "setNextBlock",
-      value: function setNextBlock(data, config) {
-        return Spyral.Notebook.setBlock(data, 1, config);
+      value: function setNextBlock(data, mode, config) {
+        // see if there's a block after this one and if not, create it
+        var contents = Spyral.Notebook.getNextBlock({
+          failQuietly: true
+        }); // don't show error if it doesn't exist
+
+        if (contents == undefined && Voyant && Voyant.notebook && Voyant.notebook.Notebook.currentNotebook) {
+          var notebook = Voyant.notebook.Notebook.currentNotebook; //notebook.addCode('');
+        }
+
+        return Spyral.Notebook.setBlock(data, 1, mode, config);
       }
     }, {
       key: "setBlock",
-      value: function setBlock(data, position, config) {
+      value: function setBlock(data, offset, mode, config) {
         if (Voyant && Voyant.notebook) {
-          var notebook = Voyant.notebook.Notebook.currentNotebook;
-          var contents = getNextBlock({
-            failQuietly: true
-          });
-
-          if (contents == undefined) {
-            notebook.addCode(block, order, cellId, config);
-          }
+          return Voyant.notebook.Notebook.currentNotebook.setBlock.apply(Voyant.notebook.Notebook.currentNotebook, arguments);
         }
       }
       /**
