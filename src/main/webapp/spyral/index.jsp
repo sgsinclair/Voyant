@@ -67,10 +67,11 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 .notebook-code-editor-raw {
 	display: none;
 }
-.notebookwrappercounter {
+/* .notebookwrappercounter {
 	display: none;
 }
-.notebookcodeeditorwrapper {
+ */
+ .notebookcodeeditorwrapper {
     margin-left: 1em;
     padding-left: .5em;
     border: thin solid rgba(0,0,0,.1);
