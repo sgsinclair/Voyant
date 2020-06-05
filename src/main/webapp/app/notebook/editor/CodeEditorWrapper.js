@@ -217,6 +217,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 							}).show();
 						},
 						scope: this
+					},{
+						xtype: "notebookwrapperexport"
 					}
 			    ]
 			},{
@@ -264,6 +266,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	switchModes: function(mode, light) {
 		var runnable = mode.indexOf('javascript')>-1;
 		this.down('notebookwrapperrun').setVisible(runnable);
+		this.down('notebookwrapperexport').setVisible(!runnable);
 		this.queryById("runMultiple").setVisible(runnable);
 		this.results.setVisible(runnable);
 		if (!light) {
