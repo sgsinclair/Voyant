@@ -123,7 +123,11 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 											checked: mode==="javascript",
 											listeners: {
 												change: function(cmp, newval, oldval) {
-													cmp.up().queryById('autoExecute').setHidden(!newval);
+													var autoExecCheck = cmp.up().queryById('autoExecute');
+													autoExecCheck.setHidden(!newval);
+													if (!newval) {
+														autoExecCheck.setValue(false);
+													}
 												}
 											}
 										},{
