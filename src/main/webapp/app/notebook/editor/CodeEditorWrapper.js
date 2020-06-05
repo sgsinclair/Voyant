@@ -99,131 +99,124 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 						cls: config.autoExecute ? "autoExecute" : "",
 						handler: function(btn, ev) {
 							var button = btn;
-							Ext.create('Ext.menu.Menu', {
+							var mode = this.editor.getMode().split("/").pop()
+							new Ext.Window({
+								title: this.localize('codeModeTitle'),
+								layout: 'fit',
+								width: 240,
 								items: [{
-									xtype: 'menucheckitem',
-									text: this.localize("autoExecuteOnLoad"),
-									hidden: this.results.isVisible()==false,
-//									glyph: 'f0d0@FontAwesome',
-//									tooltip: this.localize('toggleAutoExecute'),
-									itemId: 'toggleAutoExecute',
-									checked: this.getAutoExecute(),
-									handler: function(item, ev) {
-										this.setAutoExecute(item.checked);
-										item.up("menu").close();
-										button.toggleCls("autoExecute", item.checked);
-										this.up('notebook').setIsEdited(true);
+									xtype: 'form',
+									layout: {
+										type: 'vbox',
+										align: 'stretch'
+									},
+									bodyPadding: 10,
+									items: [{
+										xtype: 'fieldset',
+										title: this.localize("modeCode"),
+										items: [{
+											xtype : 'radiofield',
+											boxLabel : this.localize('modeJavascript'),
+											name  : 'codeMode',
+											inputValue: 'javascript',
+											flex  : 1,
+											checked: mode==="javascript",
+											listeners: {
+												change: function(cmp, newval, oldval) {
+													cmp.up().queryById('autoExecute').setHidden(!newval);
+												}
+											}
+										},{
+											xtype: 'checkbox',
+											boxLabel: this.localize('autoExecuteOnLoad'),
+											name: 'autoExecute',
+											itemId: 'autoExecute',
+											hidden: mode!=='javascript',
+											checked: this.getAutoExecute()
+										}]
+									},{
+										xtype: 'fieldset',
+										title: this.localize("modeData"),
+										items: [{
+											items: {
+												xtype : 'radiofield',
+												boxLabel : this.localize('modeJson'),
+												name  : 'codeMode',
+												inputValue: 'json',
+												flex  : 1,
+												checked: mode==="json"												
+											}
+										},{
+											items: {
+												xtype : 'radiofield',
+												boxLabel : this.localize('modeText'),
+												name  : 'codeMode',
+												inputValue: 'text',
+												flex  : 1,
+												checked: mode==="text"											
+											}
+										},/*{
+											items: {
+												xtype : 'radiofield',
+												boxLabel : this.localize('modeCsv'),
+												name  : 'codeMode',
+												inputValue: 'csv',
+												flex  : 1													
+											}
+										},{
+											items: {
+												xtype : 'radiofield',
+												boxLabel : this.localize('modeTsv'),
+												name  : 'codeMode',
+												inputValue: 'tsv',
+												flex  : 1													
+											}
+										},*/{
+											items: {
+												xtype : 'radiofield',
+												boxLabel : this.localize('modeHtml'),
+												name  : 'codeMode',
+												inputValue: 'html',
+												flex  : 1,
+												checked: mode==="html"											
+											}
+										},{
+											items: {
+												xtype : 'radiofield',
+												boxLabel : this.localize('modeXml'),
+												name  : 'codeMode',
+												inputValue: 'xml',
+												flex  : 1	,
+												checked: mode==="xml"												
+											}
+										}]
+									}]
+								}],
+								buttons: [{
+									text: this.localize('ok'),
+									handler: function(btn) {
+										var win = btn.up('window');
+										var form = win.down('form');
+										if (form.isDirty()) {
+											var values = form.getValues();
+											this.switchModes(values.codeMode);
+											this.setAutoExecute(values.autoExecute === 'on');
+											button.toggleCls("autoExecute", values.autoExecute === 'on');
+											this.up('notebook').setIsEdited(true);
+										}
+										win.close();
 									},
 									scope: this
 								},{
-//									xtype: 'button',
-									text: this.localize('codeMode'),
-									glyph: 'xf1c9@FontAwesome',
-//									tooltip: this.localize('codeModeTip'),
-									listeners: {
-										click: function() {
-											var me = this;
-											var mode = this.editor.getMode().split("/").pop()
-											new Ext.Window({
-											    title: this.localize('codeModeTitle'),
-											    layout: 'fit',
-											    width: 200,
-											    items: [{
-													xtype: 'form',
-													layout: {
-														type: 'vbox',
-														align: 'stretch'
-													},
-													bodyPadding: 10,
-													items: [{
-														xtype: 'fieldset',
-														title: this.localize("modeCode"),
-														items: {
-										                    xtype : 'radiofield',
-										                    boxLabel : this.localize('modeJavascript'),
-										                    name  : 'codeMode',
-										                    inputValue: 'javascript',
-										                    flex  : 1,
-										                    checked: mode=="javascript"
-														}
-													},{
-														xtype: 'fieldset',
-														title: this.localize("modeData"),
-														items: [{
-															items: {
-											                    xtype : 'radiofield',
-											                    boxLabel : this.localize('modeJson'),
-											                    name  : 'codeMode',
-											                    inputValue: 'json',
-											                    flex  : 1,
-											                    checked: mode=="json"												
-															}
-														},{
-															items: {
-											                    xtype : 'radiofield',
-											                    boxLabel : this.localize('modeText'),
-											                    name  : 'codeMode',
-											                    inputValue: 'text',
-											                    flex  : 1,
-											                    checked: mode=="text"											
-															}
-														},/*{
-															items: {
-											                    xtype : 'radiofield',
-											                    boxLabel : this.localize('modeCsv'),
-											                    name  : 'codeMode',
-											                    inputValue: 'csv',
-											                    flex  : 1													
-															}
-														},{
-															items: {
-											                    xtype : 'radiofield',
-											                    boxLabel : this.localize('modeTsv'),
-											                    name  : 'codeMode',
-											                    inputValue: 'tsv',
-											                    flex  : 1													
-															}
-														},*/{
-															items: {
-											                    xtype : 'radiofield',
-											                    boxLabel : this.localize('modeHtml'),
-											                    name  : 'codeMode',
-											                    inputValue: 'html',
-											                    flex  : 1,
-											                    checked: mode=="html"											
-															}
-														},{
-															items: {
-											                    xtype : 'radiofield',
-											                    boxLabel : this.localize('modeXml'),
-											                    name  : 'codeMode',
-											                    inputValue: 'xml',
-											                    flex  : 1	,
-											                    checked: mode=="xml"												
-															}
-														}]
-													}]
-											    }],
-											   buttons: [{
-											        text: this.localize('ok'),
-											        handler: function() {
-											        	var win = this.up('window'); values = win.down('form').getForm().getValues();
-											        	me.switchModes(values.codeMode);
-											        	win.close();
-											        }
-											    },{
-											        text:  this.localize('cancel'),
-											        handler: function() {
-											        	this.up('window').close();
-											        }
-											    }]
-											}).show();
-										},
-										scope: this
-									}
+									text:  this.localize('cancel'),
+									handler: function(btn) {
+										btn.up('window').close();
+									},
+									scope: this
 								}]
-							}).showAt(ev.pageX, ev.pageY)
-						}
+							}).show();
+						},
+						scope: this
 					}
 			    ]
 			},{
