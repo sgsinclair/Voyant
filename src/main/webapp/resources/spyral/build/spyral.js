@@ -1107,12 +1107,11 @@ var Spyral = (function () {
         this.fileInput.style.setProperty('display', 'none');
         this.fileInput.setAttribute('type', 'file');
         this.fileInput.setAttribute('multiple', 'multiple');
-        this.fileInput.setAttribute('data-multiple-caption', '{count} files selected');
         this.fileInput.setAttribute('id', fileInputId);
         this.fileInput.addEventListener('change', function (event) {
           _this._showFiles(event.target.files);
 
-          _this._triggerLoad(event.target.files);
+          _this._storeFiles(event.target.files);
         });
         this.inputParent.appendChild(this.fileInput);
         this.inputLabel = document.createElement('label');
@@ -1125,6 +1124,12 @@ var Spyral = (function () {
         var dndSpot = document.createElement('span');
         dndSpot.appendChild(document.createTextNode(' or drag it here'));
         this.inputLabel.appendChild(dndSpot);
+        var resetButton = document.createElement('span');
+        resetButton.setAttribute('style', 'width: 16px; height: 16px; border: 1px solid #999; float: right; line-height: 12px; color: #666; cursor: pointer;');
+        resetButton.setAttribute('title', 'Remove File Input');
+        resetButton.setAttribute('onclick', "if (typeof Voyant !== 'undefined' && typeof Ext !== 'undefined') { Ext.getCmp(this.parentElement.parentElement.getAttribute('id')).destroy(); } else { this.parentElement.remove(); }");
+        resetButton.appendChild(document.createTextNode('x'));
+        this.inputParent.appendChild(resetButton);
         ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(function (event) {
           _this.inputParent.addEventListener(event, function (e) {
             e.preventDefault();
@@ -1144,7 +1149,7 @@ var Spyral = (function () {
         this.inputParent.addEventListener('drop', function (event) {
           _this._showFiles(event.dataTransfer.files);
 
-          _this._triggerLoad(event.dataTransfer.files);
+          _this._storeFiles(event.dataTransfer.files);
         });
         this.target.appendChild(this.inputParent);
         console.log('init done');
@@ -1154,13 +1159,16 @@ var Spyral = (function () {
       key: "_showFiles",
       value: function _showFiles(files) {
         if (files.length > 0) {
-          this.inputLabel.textContent = files.length > 1 ? (this.fileInput.getAttribute('data-multiple-caption') || '').replace('{count}', files.length) : files[0].name;
-        }
-      } // file load handler
+          this.inputLabel.textContent = files.length > 1 ? Array.from(files).map(function (f) {
+            return f.name;
+          }).join(', ') : files[0].name; // prevent file input from being re-used
 
+          this.fileInput.remove();
+        }
+      }
     }, {
-      key: "_triggerLoad",
-      value: function _triggerLoad(fileList) {
+      key: "_storeFiles",
+      value: function _storeFiles(fileList) {
         var _this2 = this;
 
         var files = Array.from(fileList);
@@ -1173,18 +1181,20 @@ var Spyral = (function () {
           fr.onload = function (e) {
             readFiles.push({
               filename: files[currIndex].name,
+              type: files[currIndex].type,
               data: e.target.result
             });
             currIndex++;
 
             if (currIndex < files.length) {
-              fr.readAsText(files[currIndex]);
+              fr.readAsDataURL(files[currIndex]);
             } else {
               // store each file in its own session storage entry
               var childIds = readFiles.map(function (val, index) {
                 var childId = Util.id(32);
                 window.sessionStorage.setItem('filename-' + childId, val.filename);
                 window.sessionStorage.setItem('data-' + childId, val.data);
+                window.sessionStorage.setItem('type-' + childId, val.type);
                 return childId;
               }); // store the ids for each file for later retrieval
 
@@ -1198,112 +1208,149 @@ var Spyral = (function () {
                   var childId = childIds[index];
                   serverStorage.storeResource(childId, {
                     filename: val.filename,
-                    data: val.data
+                    data: val.data,
+                    type: val.type
                   });
                   return childId;
                 });
               }
 
-              _this2.resolve(readFiles);
+              _this2.resolve(files);
             }
           };
 
-          fr.readAsText(files[currIndex]);
+          fr.readAsDataURL(files[currIndex]);
         } else {
-          this.resolve(readFiles);
+          this.resolve(files);
         }
       }
     }], [{
       key: "getStoredFiles",
       value: function () {
         var _getStoredFiles = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(target) {
-          var spyralTempDoc, fileIds, storedFiles, serverStorage, _storedFiles, i, file;
+          var spyralTempDoc, fileIds, storedFiles, i, fileId, filename, data, type, file, serverStorage, _storedFiles, _i, storedFile, _file;
 
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  if (!(target.querySelector('[spyral-temp-doc]') !== null)) {
-                    _context.next = 30;
+                  if (!(target.hasAttribute('spyral-temp-doc') || target.querySelector('[spyral-temp-doc]') !== null)) {
+                    _context.next = 53;
                     break;
                   }
 
-                  spyralTempDoc = target.querySelector('[spyral-temp-doc]').getAttribute('spyral-temp-doc'); // check local storage
+                  spyralTempDoc = target.getAttribute('spyral-temp-doc') || target.querySelector('[spyral-temp-doc]').getAttribute('spyral-temp-doc'); // check local storage
 
                   fileIds = window.sessionStorage.getItem(spyralTempDoc);
 
                   if (!(fileIds !== null)) {
-                    _context.next = 8;
+                    _context.next = 22;
                     break;
                   }
 
-                  storedFiles = fileIds.split(',').map(function (fileId) {
-                    return {
-                      filename: window.sessionStorage.getItem('filename-' + fileId),
-                      data: window.sessionStorage.getItem('data-' + fileId)
-                    };
-                  });
+                  storedFiles = [];
+                  fileIds = fileIds.split(',');
+                  i = 0;
+
+                case 7:
+                  if (!(i < fileIds.length)) {
+                    _context.next = 19;
+                    break;
+                  }
+
+                  fileId = fileIds[i];
+                  filename = window.sessionStorage.getItem('filename-' + fileId);
+                  data = window.sessionStorage.getItem('data-' + fileId);
+                  type = window.sessionStorage.getItem('type-' + fileId);
+                  _context.next = 14;
+                  return FileInput.dataUrlToFile(data, filename, type);
+
+                case 14:
+                  file = _context.sent;
+                  storedFiles.push(file);
+
+                case 16:
+                  i++;
+                  _context.next = 7;
+                  break;
+
+                case 19:
                   return _context.abrupt("return", storedFiles);
 
-                case 8:
+                case 22:
                   // check server storage (if available)
                   createServerStorage();
 
                   if (!((typeof ServerStorage === "undefined" ? "undefined" : _typeof(ServerStorage)) !== undefined)) {
-                    _context.next = 30;
+                    _context.next = 53;
                     break;
                   }
 
                   serverStorage = new ServerStorage();
-                  _context.next = 13;
+                  _context.prev = 25;
+                  _context.next = 28;
                   return serverStorage.getStoredResource(spyralTempDoc);
 
-                case 13:
+                case 28:
                   fileIds = _context.sent;
 
                   if (!(fileIds !== undefined)) {
-                    _context.next = 29;
+                    _context.next = 47;
                     break;
                   }
 
                   _storedFiles = [];
                   fileIds = fileIds.split(',');
-                  i = 0;
+                  _i = 0;
 
-                case 18:
-                  if (!(i < fileIds.length)) {
-                    _context.next = 26;
+                case 33:
+                  if (!(_i < fileIds.length)) {
+                    _context.next = 44;
                     break;
                   }
 
-                  _context.next = 21;
-                  return serverStorage.getStoredResource(fileIds[i]);
+                  _context.next = 36;
+                  return serverStorage.getStoredResource(fileIds[_i]);
 
-                case 21:
-                  file = _context.sent;
+                case 36:
+                  storedFile = _context.sent;
+                  _context.next = 39;
+                  return FileInput.dataUrlToFile(storedFile.data, storedFile.filename, storedFile.type);
 
-                  _storedFiles.push(file);
+                case 39:
+                  _file = _context.sent;
 
-                case 23:
-                  i++;
-                  _context.next = 18;
+                  _storedFiles.push(_file);
+
+                case 41:
+                  _i++;
+                  _context.next = 33;
                   break;
 
-                case 26:
+                case 44:
                   return _context.abrupt("return", _storedFiles);
 
-                case 29:
+                case 47:
                   return _context.abrupt("return", null);
 
-                case 30:
+                case 48:
+                  _context.next = 53;
+                  break;
+
+                case 50:
+                  _context.prev = 50;
+                  _context.t0 = _context["catch"](25);
                   return _context.abrupt("return", null);
 
-                case 31:
+                case 53:
+                  return _context.abrupt("return", null);
+
+                case 54:
                 case "end":
                   return _context.stop();
               }
             }
-          }, _callee);
+          }, _callee, null, [[25, 50]]);
         }));
 
         function getStoredFiles(_x) {
@@ -1312,6 +1359,75 @@ var Spyral = (function () {
 
         return getStoredFiles;
       }()
+    }, {
+      key: "dataUrlToFile",
+      value: function () {
+        var _dataUrlToFile = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(dataUrl, fileName, mimeType) {
+          var res, buf, file;
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  _context2.next = 2;
+                  return fetch(dataUrl);
+
+                case 2:
+                  res = _context2.sent;
+                  _context2.next = 5;
+                  return res.arrayBuffer();
+
+                case 5:
+                  buf = _context2.sent;
+                  file = new File([buf], fileName, {
+                    type: mimeType
+                  });
+                  return _context2.abrupt("return", file);
+
+                case 8:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2);
+        }));
+
+        function dataUrlToFile(_x2, _x3, _x4) {
+          return _dataUrlToFile.apply(this, arguments);
+        }
+
+        return dataUrlToFile;
+      }()
+    }, {
+      key: "destroy",
+      value: function destroy(target) {
+        if (typeof Voyant !== 'undefined' && typeof Ext !== 'undefined') {
+          if (target.hasAttribute('spyral-temp-doc')) {
+            target = target.parentElement;
+          }
+
+          Ext.getCmp(target.getAttribute('id')).destroy();
+        } else {
+          target.remove();
+        }
+      }
+      /* currently unused
+      static clearStoredFiles(target) {
+      	if (target.hasAttribute('spyral-temp-doc') || target.querySelector('[spyral-temp-doc]') !== null) {
+      		const spyralTempDoc = target.getAttribute('spyral-temp-doc') || target.querySelector('[spyral-temp-doc]').getAttribute('spyral-temp-doc');
+      		let fileIds = window.sessionStorage.getItem(spyralTempDoc);
+      		if (fileIds !== null) {
+      			fileIds.split(',').forEach((fileId) => {
+      				window.sessionStorage.removeItem('filename-'+fileId);
+      				window.sessionStorage.removeItem('data-'+fileId);
+      				window.sessionStorage.removeItem('type-'+fileId);
+      			})
+      			window.sessionStorage.removeItem(spyralTempDoc);
+      		}
+      		// TODO also clear server storage?
+      	}
+      }
+      */
+
     }]);
 
     return FileInput;
@@ -1378,18 +1494,39 @@ var Spyral = (function () {
         }).join("&");
         var opt = {};
 
-        if (searchParams.length < 800 || "method" in all && all["method"] == "GET") {
-          for (var key in all) {
-            url.searchParams.set(key, all[key]);
+        if ("method" in all === false) {
+          all.method = "GET";
+        }
+
+        if (all.method === "GET") {
+          if (searchParams.length < 800) {
+            for (var key in all) {
+              url.searchParams.set(key, all[key]);
+            }
+          } else {
+            opt = {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+              },
+              body: searchParams
+            };
+          }
+        } else if (all.method === "POST") {
+          opt = {
+            method: 'POST'
+          };
+
+          if ("body" in all) {
+            opt.body = all["body"];
+          } else {
+            opt.headers = {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            };
+            opt.body = searchParams;
           }
         } else {
-          opt = {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-            },
-            body: searchParams
-          };
+          console.warn('Load.trombone: unsupported method:', all.method);
         }
 
         return fetch(url.toString(), opt).then(function (response) {
@@ -1506,7 +1643,7 @@ var Spyral = (function () {
         });
       }
       /**
-       * Create a file input in the target element and returns a Promise that's resolved with the file that is added to the input.
+       * Create a file input in the target element and returns a Promise that's resolved with the file(s) that is added to the input.
        * The file is also temporarily stored in the session storage for successive retrieval.
        * @param {element} target The target element to append the input to
        * @returns {Promise}
@@ -1518,7 +1655,7 @@ var Spyral = (function () {
         var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
         var hasPreExistingTarget = false;
 
-        if (target === undefined) {
+        function createTarget() {
           if (typeof Spyral !== 'undefined' && Spyral.Notebook && typeof Ext !== 'undefined') {
             var spyralTarget = Spyral.Notebook.getTarget(); // check for pre-existing target
 
@@ -1546,6 +1683,10 @@ var Spyral = (function () {
           }
         }
 
+        if (target === undefined) {
+          createTarget();
+        }
+
         var promise;
 
         if (hasPreExistingTarget) {
@@ -1563,17 +1704,22 @@ var Spyral = (function () {
                       storedFiles = _context.sent;
 
                       if (!(storedFiles !== null)) {
-                        _context.next = 6;
+                        _context.next = 8;
                         break;
                       }
 
                       resolve(storedFiles);
                       return _context.abrupt("return");
 
-                    case 6:
+                    case 8:
+                      // files have been removed so re-create the input
+                      FileInput.destroy(target);
+                      createTarget();
+
+                    case 10:
                       new FileInput(target, resolve, reject);
 
-                    case 7:
+                    case 11:
                     case "end":
                       return _context.stop();
                   }
@@ -1596,6 +1742,13 @@ var Spyral = (function () {
           var args = arguments;
           return this.then(function (files) {
             return Spyral.Notebook.setNextBlockFromFiles.apply(Spyral.Load, [files].concat(Array.from(args)));
+          });
+        };
+
+        promise.loadCorpusFromFiles = function () {
+          var args = arguments;
+          return this.then(function (files) {
+            return Spyral.Corpus.load.apply(Spyral.Corpus, [files].concat(Array.from(args)));
           });
         };
 
@@ -10850,6 +11003,29 @@ var Spyral = (function () {
                 input: config
               };
             }
+          } else if (config instanceof File || config instanceof Array && config[0] instanceof File) {
+            var formData = new FormData();
+
+            if (config instanceof File) {
+              formData.append('input', config);
+            } else {
+              config.forEach(function (file) {
+                formData.append('input', file);
+              });
+            } // append any other form options that may have been included
+
+
+            if (api && _typeof(api) == "object") {
+              for (var key in api) {
+                formData.append(key, api[key]);
+              }
+            }
+
+            formData.append('tool', 'corpus.CorpusMetadata');
+            config = {
+              body: formData,
+              method: 'POST'
+            };
           }
 
           Load.trombone(_objectSpread2({}, config, {}, api), {
@@ -13805,6 +13981,28 @@ var Spyral = (function () {
     });
   }
 
+  var defineProperty$6 = objectDefineProperty$1.f;
+
+  var FunctionPrototype = Function.prototype;
+  var FunctionPrototypeToString = FunctionPrototype.toString;
+  var nameRE = /^\s*function ([^ (]*)/;
+  var NAME = 'name';
+
+  // Function instances `.name` property
+  // https://tc39.github.io/ecma262/#sec-function-instances-name
+  if (descriptors$1 && !(NAME in FunctionPrototype)) {
+    defineProperty$6(FunctionPrototype, NAME, {
+      configurable: true,
+      get: function () {
+        try {
+          return FunctionPrototypeToString.call(this).match(nameRE)[1];
+        } catch (error) {
+          return '';
+        }
+      }
+    });
+  }
+
   var TO_STRING_TAG$4 = wellKnownSymbol$1('toStringTag');
   var test$2 = {};
 
@@ -13854,7 +14052,7 @@ var Spyral = (function () {
     return target;
   };
 
-  var defineProperty$6 = objectDefineProperty$1.f;
+  var defineProperty$7 = objectDefineProperty$1.f;
 
 
 
@@ -13862,7 +14060,7 @@ var Spyral = (function () {
 
   var setToStringTag$1 = function (it, TAG, STATIC) {
     if (it && !has$2(it = STATIC ? it : it.prototype, TO_STRING_TAG$6)) {
-      defineProperty$6(it, TO_STRING_TAG$6, { configurable: true, value: TAG });
+      defineProperty$7(it, TO_STRING_TAG$6, { configurable: true, value: TAG });
     }
   };
 
@@ -16108,31 +16306,24 @@ var Spyral = (function () {
       key: "setNextBlockFromFiles",
       value: function setNextBlockFromFiles(files, mode, config) {
         if (!mode) {
-          if (files[0].filename.endsWith("html")) {
+          if (files[0].name.endsWith("html")) {
             mode = "html";
-          } else if (files[0].filename.endsWith("xml")) {
+          } else if (files[0].name.endsWith("xml")) {
             mode = "xml";
-          } else if (files[0].filename.endsWith("json")) {
+          } else if (files[0].name.endsWith("json")) {
             mode = "json";
           } else {
             mode = "text";
           }
         }
 
-        return Spyral.Notebook.setBlock(files[0].data, 1, mode, config);
+        return files[0].text().then(function (text) {
+          return Spyral.Notebook.setNextBlock(text, mode, config);
+        });
       }
     }, {
       key: "setNextBlock",
       value: function setNextBlock(data, mode, config) {
-        // see if there's a block after this one and if not, create it
-        var contents = Spyral.Notebook.getNextBlock({
-          failQuietly: true
-        }); // don't show error if it doesn't exist
-
-        if (contents == undefined && Voyant && Voyant.notebook && Voyant.notebook.Notebook.currentNotebook) {
-          var notebook = Voyant.notebook.Notebook.currentNotebook; //notebook.addCode('');
-        }
-
         return Spyral.Notebook.setBlock(data, 1, mode, config);
       }
     }, {

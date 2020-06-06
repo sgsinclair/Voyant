@@ -378,7 +378,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	data = data || "";
     	offset = offset || 1;
     	config = config || {};
-    	var containers = this.query("notebookcodeeditorwrapper");
+    	var containers = this.query("notebookeditorwrapper");
     	var id = this.getCurrentBlock().id;
     	var current = containers.findIndex(function(container) {return container.id==id})
     	if (current+offset<0 || current+offset>containers.length) { // wanting to place before beginning or one beyond end
@@ -390,9 +390,11 @@ Ext.define('Voyant.notebook.Notebook', {
 			});
 			return undefined
     	}
+    	
     	// I can't seem to set the content, so we'll go nuclear and remove the block
     	if (containers[current+offset]) {
-    		containers[current+offset].remove();
+        	var cells = this.getComponent("cells");
+    		cells.remove(containers[current+offset]);
     	}
     	return this.addCode(Object.assign({},{
     		input: data,

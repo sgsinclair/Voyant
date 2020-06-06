@@ -34,21 +34,17 @@ class Notebook {
 	
 	static setNextBlockFromFiles(files, mode, config) {
 		if (!mode) {
-			if (files[0].filename.endsWith("html")) {mode="html"}
-			else if (files[0].filename.endsWith("xml")) {mode="xml"}
-			else if (files[0].filename.endsWith("json")) {mode="json"}
+			if (files[0].name.endsWith("html")) {mode="html"}
+			else if (files[0].name.endsWith("xml")) {mode="xml"}
+			else if (files[0].name.endsWith("json")) {mode="json"}
 			else {mode="text"}
 		}
-		return Spyral.Notebook.setBlock(files[0].data, 1, mode, config);
+		return files[0].text().then(text => {
+			return Spyral.Notebook.setNextBlock(text, mode, config);
+		})
 	}
 
 	static setNextBlock(data, mode, config) {
-		// see if there's a block after this one and if not, create it
-		const contents = Spyral.Notebook.getNextBlock({failQuietly: true}); // don't show error if it doesn't exist
-		if (contents==undefined && Voyant && Voyant.notebook && Voyant.notebook.Notebook.currentNotebook) {
-			const notebook = Voyant.notebook.Notebook.currentNotebook;
-			//notebook.addCode('');
-		}
 		return Spyral.Notebook.setBlock(data, 1, mode, config);
 	}
 	
