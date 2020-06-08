@@ -17,12 +17,16 @@ Ext.define("Voyant.notebook.util.Show", {
 	},
 	statics: {
 		show: function(contents, len) {
-			var arg = contents;
 			if (this.then) {
+				var arg = contents;
 				this.then(function(val) {
 					show.call(val, val, arg);
 				})
 			} else {
+				if (contents === undefined) {
+					return;
+				}
+				
 				if (Ext.isArray(contents)) {
 					var allContents = "";
 					contents.forEach(function(content) {
@@ -61,7 +65,7 @@ Ext.define("Voyant.notebook.util.Show", {
 			
 			else {
 
-				if (error.stack && !more) {more=error.stack}
+				if (error !== undefined && error.stack && !more) {more=error.stack}
 				if (more && Ext.isString(more)===false) {more=more.toString()}
 				
 			}
