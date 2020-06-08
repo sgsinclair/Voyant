@@ -241,12 +241,13 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			        }
 			    ]
 			}],
-			items: [this.editor, this.results]
+			items: [this.editor]
 		});
 
 		if (config.uiHtml !== undefined) {
 			this.items.push(this._getUIComponent(config.uiHtml))
 		}
+		this.items.push(this.results);
 		
         this.callParent(arguments);
         
