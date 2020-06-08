@@ -320,6 +320,12 @@ Ext.define('Voyant.notebook.Notebook', {
 			return Spyral.Table.create.apply(Spyral.Table, arguments)
 		}
 
+		window.onbeforeunload = function() {
+			if (this.getIsEdited()) {
+				return ''; // return any string to prompt the browser to warn the user they have unsaved changes
+			}
+		}.bind(this);
+
 		// need to load docs first
 		Ext.Ajax.request({
 			url: this.getApplication().getBaseUrlFull()+'resources/spyral/docs/spyral.json',
