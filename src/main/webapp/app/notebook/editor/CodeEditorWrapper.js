@@ -17,11 +17,138 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			autoExecuteOnLoad: "auto-run this cell on page load",
 			ok: "OK",
 			cancel: "Cancel"
+		},
+		configWin: undefined,
+		getConfigWindow: function(codeEditorInstance) {
+			if (this.configWin === undefined) {
+				this.configWin = new Ext.Window({
+					title: codeEditorInstance.localize('codeModeTitle'),
+					closeAction: 'hide',
+					layout: 'fit',
+					width: 240,
+					items: [{
+						xtype: 'form',
+						layout: {
+							type: 'vbox',
+							align: 'stretch'
+						},
+						bodyPadding: 10,
+						items: [{
+							xtype: 'fieldset',
+							title: codeEditorInstance.localize("modeCode"),
+							items: [{
+								xtype : 'radiofield',
+								boxLabel : codeEditorInstance.localize('modeJavascript'),
+								name  : 'codeMode',
+								inputValue: 'javascript',
+								flex  : 1,
+								listeners: {
+									change: function(cmp, newval, oldval) {
+										var autoExecCheck = cmp.up().queryById('autoExecute');
+										autoExecCheck.setHidden(!newval);
+										if (!newval) {
+											autoExecCheck.setValue(false);
+										}
+									}
+								}
+							},{
+								xtype: 'checkbox',
+								boxLabel: codeEditorInstance.localize('autoExecuteOnLoad'),
+								name: 'autoExecute',
+								itemId: 'autoExecute'
+							}]
+						},{
+							xtype: 'fieldset',
+							title: codeEditorInstance.localize("modeData"),
+							items: [{
+								items: {
+									xtype : 'radiofield',
+									boxLabel : codeEditorInstance.localize('modeJson'),
+									name  : 'codeMode',
+									inputValue: 'json',
+									flex  : 1
+								}
+							},{
+								items: {
+									xtype : 'radiofield',
+									boxLabel : codeEditorInstance.localize('modeText'),
+									name  : 'codeMode',
+									inputValue: 'text',
+									flex  : 1
+								}
+							},/*{
+								items: {
+									xtype : 'radiofield',
+									boxLabel : codeEditorInstance.localize('modeCsv'),
+									name  : 'codeMode',
+									inputValue: 'csv',
+									flex  : 1													
+								}
+							},{
+								items: {
+									xtype : 'radiofield',
+									boxLabel : codeEditorInstance.localize('modeTsv'),
+									name  : 'codeMode',
+									inputValue: 'tsv',
+									flex  : 1													
+								}
+							},*/{
+								items: {
+									xtype : 'radiofield',
+									boxLabel : codeEditorInstance.localize('modeHtml'),
+									name  : 'codeMode',
+									inputValue: 'html',
+									flex  : 1
+								}
+							},{
+								items: {
+									xtype : 'radiofield',
+									boxLabel : codeEditorInstance.localize('modeXml'),
+									name  : 'codeMode',
+									inputValue: 'xml',
+									flex  : 1
+								}
+							}]
+						}]
+					}],
+					buttons: [{
+						text: codeEditorInstance.localize('ok'),
+						itemId: 'ok'
+					},{
+						text:  codeEditorInstance.localize('cancel'),
+						handler: function(btn) {
+							btn.up('window').close();
+						},
+						scope: this
+					}]
+				})
+			}
+
+			// set form values
+			var mode = codeEditorInstance.getMode();
+			this.configWin.down('radiofield[name=codeMode][inputValue="'+mode+'"]').setValue(true);
+			this.configWin.down('checkbox#autoExecute').setValue(codeEditorInstance.getAutoExecute());
+			// set ok handler
+			this.configWin.down('button#ok').setHandler(function(btn) {
+				var win = btn.up('window');
+				var form = win.down('form');
+				if (form.isDirty()) {
+					var values = form.getValues();
+					codeEditorInstance.switchModes(values.codeMode);
+					codeEditorInstance.setAutoExecute(values.autoExecute === 'on');
+					codeEditorInstance.down('button#config').toggleCls("autoExecute", values.autoExecute === 'on');
+					codeEditorInstance.up('notebook').setIsEdited(true);
+				}
+				win.close();
+			});
+
+			return this.configWin;
 		}
 	},
 	config: {
 		isRun: false,
 		autoExecute: false,
+		mode: 'javascript',
 		isWarnedAboutPreviousCells: false
 	},
 	layout: {
@@ -34,14 +161,18 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	EMPTY_RESULTS_TEXT: ' ', // text to use when clearing results, prior to running code
 
 	constructor: function(config) {
+		config.mode = config.mode !== undefined ? config.mode : this.config.mode;
+		var runnable = config.mode.indexOf('javascript') > -1;
 
 		this.results = this._getResultsComponent(Ext.Array.from(config.output).join(""));
-		
+		this.results.setVisible(runnable);
+
 		this.editor = Ext.create("Voyant.notebook.editor.CodeEditor", {
 			content: Ext.Array.from(config.input).join("\n"),
 			docs: config.docs,
-			mode: 'ace/mode/'+(config.mode ? config.mode : 'javascript')
+			mode: 'ace/mode/'+config.mode
 		});
+
 		Ext.apply(this, {
 			dockedItems: [{
 			    xtype: 'toolbar',
@@ -54,6 +185,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 						xtype: 'notebookwrapperadd'
 					},{
 						xtype: 'notebookwrapperrun',
+						hidden: !runnable,
 						listeners: {
 							click: {
 								fn: this.run,
@@ -65,6 +197,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 						tooltip: this.localize("runMultiple"),
 						itemId: 'runMultiple',
 //						xtype: 'notebookwrapperrununtil',
+						hidden: !runnable,
 						listeners: {
 							click: {
 								fn: function(btn, ev) {
@@ -93,136 +226,17 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 						}
 					},{
 						xtype: 'button',
+						itemId: 'config',
 						glyph: 'xf013@FontAwesome',
 						tooltip: this.localize("configureTip"),
-						scope: this,
 						cls: config.autoExecute ? "autoExecute" : "",
 						handler: function(btn, ev) {
-							var button = btn;
-							var mode = this.editor.getMode().split("/").pop()
-							new Ext.Window({
-								title: this.localize('codeModeTitle'),
-								layout: 'fit',
-								width: 240,
-								items: [{
-									xtype: 'form',
-									layout: {
-										type: 'vbox',
-										align: 'stretch'
-									},
-									bodyPadding: 10,
-									items: [{
-										xtype: 'fieldset',
-										title: this.localize("modeCode"),
-										items: [{
-											xtype : 'radiofield',
-											boxLabel : this.localize('modeJavascript'),
-											name  : 'codeMode',
-											inputValue: 'javascript',
-											flex  : 1,
-											checked: mode==="javascript",
-											listeners: {
-												change: function(cmp, newval, oldval) {
-													var autoExecCheck = cmp.up().queryById('autoExecute');
-													autoExecCheck.setHidden(!newval);
-													if (!newval) {
-														autoExecCheck.setValue(false);
-													}
-												}
-											}
-										},{
-											xtype: 'checkbox',
-											boxLabel: this.localize('autoExecuteOnLoad'),
-											name: 'autoExecute',
-											itemId: 'autoExecute',
-											hidden: mode!=='javascript',
-											checked: this.getAutoExecute()
-										}]
-									},{
-										xtype: 'fieldset',
-										title: this.localize("modeData"),
-										items: [{
-											items: {
-												xtype : 'radiofield',
-												boxLabel : this.localize('modeJson'),
-												name  : 'codeMode',
-												inputValue: 'json',
-												flex  : 1,
-												checked: mode==="json"												
-											}
-										},{
-											items: {
-												xtype : 'radiofield',
-												boxLabel : this.localize('modeText'),
-												name  : 'codeMode',
-												inputValue: 'text',
-												flex  : 1,
-												checked: mode==="text"											
-											}
-										},/*{
-											items: {
-												xtype : 'radiofield',
-												boxLabel : this.localize('modeCsv'),
-												name  : 'codeMode',
-												inputValue: 'csv',
-												flex  : 1													
-											}
-										},{
-											items: {
-												xtype : 'radiofield',
-												boxLabel : this.localize('modeTsv'),
-												name  : 'codeMode',
-												inputValue: 'tsv',
-												flex  : 1													
-											}
-										},*/{
-											items: {
-												xtype : 'radiofield',
-												boxLabel : this.localize('modeHtml'),
-												name  : 'codeMode',
-												inputValue: 'html',
-												flex  : 1,
-												checked: mode==="html"											
-											}
-										},{
-											items: {
-												xtype : 'radiofield',
-												boxLabel : this.localize('modeXml'),
-												name  : 'codeMode',
-												inputValue: 'xml',
-												flex  : 1	,
-												checked: mode==="xml"												
-											}
-										}]
-									}]
-								}],
-								buttons: [{
-									text: this.localize('ok'),
-									handler: function(btn) {
-										var win = btn.up('window');
-										var form = win.down('form');
-										if (form.isDirty()) {
-											var values = form.getValues();
-											this.switchModes(values.codeMode);
-											this.setAutoExecute(values.autoExecute === 'on');
-											button.toggleCls("autoExecute", values.autoExecute === 'on');
-											this.up('notebook').setIsEdited(true);
-										}
-										win.close();
-									},
-									scope: this
-								},{
-									text:  this.localize('cancel'),
-									handler: function(btn) {
-										btn.up('window').close();
-									},
-									scope: this
-								}]
-							}).show();
+							Voyant.notebook.editor.CodeEditorWrapper.getConfigWindow(this).show();
 						},
 						scope: this
 					},{
-						xtype: "notebookwrapperexport"
+						xtype: "notebookwrapperexport",
+						hidden: runnable
 					}
 			    ]
 			},{
@@ -256,9 +270,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	initComponent: function(config) {
 		var me = this;
 		me.on("afterrender", function() {
-			if (this.editor && this.editor.getMode() != 'ace/mode/javavscript') {
-				this.switchModes(this.editor.getMode(), true)
-			}
 			this.getTargetEl().on("resize", function(el) {
 				var height = 20;
 				me.items.each(function(item) {height+=item.getHeight();})
@@ -268,15 +279,15 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		me.callParent(arguments);
 	},
 	
-	switchModes: function(mode, light) {
-		var runnable = mode.indexOf('javascript')>-1;
+	switchModes: function(mode) {
+		this.setMode(mode);
+		this.editor.switchModes(mode);
+
+		var runnable = mode.indexOf('javascript') > -1;
 		this.down('notebookwrapperrun').setVisible(runnable);
 		this.down('notebookwrapperexport').setVisible(!runnable);
 		this.queryById("runMultiple").setVisible(runnable);
 		this.results.setVisible(runnable);
-		if (!light) {
-			this.editor.switchModes(mode);
-		}
 	},
 	
 	/**
@@ -284,17 +295,17 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	 * @param {boolean} forceRun True to force the code to run, otherwise a check is performed to see if previous editors have already run.
 	 */
 	run: function(forceRun) {
-		if (this.editor.getMode()=='ace/mode/javascript') { // only run JS
+		if (this.editor.getMode()==='ace/mode/javascript') { // only run JS
 			if (forceRun===true || this.getIsWarnedAboutPreviousCells()) {
 				return this._run();
 			} else {
 				// this code was for checking if previous cells hadn't been run, but it didn't seem worthwhile
 				var notebook = this.up('notebook');
 				Ext.Array.each(notebook.query('notebookcodeeditorwrapper'), function(wrapper) {
-					if (wrapper==this) {this._run(); return false;} // break
-					if (wrapper.editor && wrapper.editor.getMode() == 'ace/mode/javascript' && wrapper.getIsRun()==false) {
+					if (wrapper===this) {this._run(); return false;} // break
+					if (wrapper.editor && wrapper.editor.getMode() === 'ace/mode/javascript' && wrapper.getIsRun()===false) {
 						Ext.Msg.confirm(this.localize('previousNotRunTitle'), this.localize('previousNotRun'), function(btnId) {
-							if (btnId=='yes') {
+							if (btnId==='yes') {
 								notebook.runUntil(this);
 							} else {
 								this._run();
