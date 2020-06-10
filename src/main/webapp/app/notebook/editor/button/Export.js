@@ -12,10 +12,13 @@ Ext.define("Voyant.notebook.editor.button.Export", {
 		}
 	},
 	constructor: function(config) {
-    	Ext.apply(this, {
-    		toolTip: this.localize('tip')
+    	Ext.apply(config, {
+    		tooltip: this.localize('tip')
     	})
         this.callParent(arguments);
+	},
+	config: {
+		exportType: 'input' // what type of content to include in the export: 'input' or 'output'
 	},
 	glyph: 'xf08e@FontAwesome',
 	listeners: {
@@ -38,13 +41,14 @@ Ext.define("Voyant.notebook.editor.button.Export", {
 			       		listeners: {
 			       			afterrender: function(cmp) {
 			       				var wrapper = exportCmp.up("notebookcodeeditorwrapper");
-			       				var content = wrapper.getContent();
-			       				var filename = wrapper.getCellId()+"."+(content.mode == "text" ? "txt" : content.mode);
-			       	    		var properties = {type: content.mode=="text" || true ? "text/plain" : "text/"+content.mode};
+								var content = wrapper.getContent();
+								var fileContent = this.getExportType() === 'output' ? content.output : content.input;
+			       				var filename = wrapper.getCellId()+"."+this.getFileExtension(content.mode);
+			       	    		var properties = {type: content.mode==="text" || true ? "text/plain" : "text/"+content.mode};
 			       	   	    	try {
-			       	   	    	  file = new File([content.input], filename, properties);
+			       	   	    	  file = new File([fileContent], filename, properties);
 			       	   	    	} catch (e) {
-			       	   	    	  file = new Blob([content.input], properties);
+			       	   	    	  file = new Blob([fileContent], properties);
 			       	   	    	}
 			       	    		var url = URL.createObjectURL(file);
 			       	    		var a = cmp.boxLabelEl.dom.querySelector("a");
@@ -70,9 +74,10 @@ Ext.define("Voyant.notebook.editor.button.Export", {
 		        			var val = form.getValues()['export'];
 		        			if (val=="html") {
 			       				var wrapper = exportCmp.up("notebookcodeeditorwrapper");
-			       				var content = wrapper.getContent();
+								var content = wrapper.getContent();
+								var fileContent = this.getExportType() === 'output' ? content.output : content.input;
 			       		        var myWindow = window.open();
-			       		        myWindow.document.write(content.input);
+			       		        myWindow.document.write(fileContent);
 			       		        myWindow.document.close();
 			       		        myWindow.focus();
 		        			}
@@ -90,6 +95,16 @@ Ext.define("Voyant.notebook.editor.button.Export", {
 				},
 				bodyPadding: 5
 			}).show();
+		}
+	},
+	getFileExtension(mode) {
+		if (
+			mode === 'text' ||
+			(mode === 'javascript' && this.getExportType() === 'output') // use txt for javascript results because they could be anything
+		) {
+			return 'txt';
+		} else {
+			return mode;
 		}
 	}
 })
