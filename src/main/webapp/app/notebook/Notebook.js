@@ -92,7 +92,6 @@ Ext.define('Voyant.notebook.Notebook', {
     				xtype: 'toolmenu',
     				glyph: 'xf0c2@FontAwesome',
 					disabled: true,
-					scope: this,
 					items: [{
 						text: 'Save',
 						xtype: 'menuitem',
@@ -105,6 +104,26 @@ Ext.define('Voyant.notebook.Notebook', {
 						glyph: 'xf0c2@FontAwesome',
 						handler: this.showSaveDialog.bind(this, true),
 						scope: this
+					},'-',{
+						text: 'Storage',
+						xtype: 'menuitem',
+						menu: {
+							items: [{
+								text: 'Voyant',
+								xtype: 'menucheckitem',
+								group: 'storageSolution',
+								checked: true,
+								handler: this.setStorageSolution.bind(this, 'voyant'),
+								scope: this
+							},{
+								text: 'GitHub',
+								xtype: 'menucheckitem',
+								group: 'storageSolution',
+								checked: false,
+								handler: this.setStorageSolution.bind(this, 'github'),
+								scope: this
+							}]
+						}
 					}]
     			},
     			'new': {
@@ -1091,8 +1110,9 @@ Ext.define('Voyant.notebook.Notebook', {
     	    }]
     	    
     	}).show();
-	},
+	}
 	
+	/*
 	showOptionsClick: function(panel) {
 		let me = panel;
 		if (me.optionsWin === undefined) {
@@ -1104,40 +1124,10 @@ Ext.define('Voyant.notebook.Notebook', {
 				height: 300,
 				bodyPadding: 10,
 				items: {
-					xtype: 'form',
-					items: [{
-						xtype: 'radiogroup',
-						fieldLabel: 'Storage Solution',
-						labelAlign: 'left',
-						layout: 'vbox',
-						items: [{
-							boxLabel: 'Voyant',
-							name: 'storageSolution',
-							inputValue: 'voyant',
-							checked: me.getStorageSolution() === 'voyant'
-						},{
-							boxLabel: 'GitHub',
-							name: 'storageSolution',
-							inputValue: 'github',
-							checked: me.getStorageSolution() === 'github'
-						}]
-					}]
 				},
     			buttons: [{
     				text: me.localize('ok'),
     				handler: function(button, event) {
-    					var win = button.findParentByType('window');
-    					var form = win.down('form');
-    					if (form.isValid()) {
-        					var params = form.getValues();
-							me.setStorageSolution(params.storageSolution);
-        					win.hide();
-    					}
-    					else {
-    						me.showError({
-    							message: me.localize("invalidForm")
-    						})
-    					}
     				}
     			},{
     				text: me.localize('cancel'),
@@ -1149,4 +1139,5 @@ Ext.define('Voyant.notebook.Notebook', {
 		}
 		me.optionsWin.show();
 	}
+	*/
 });
