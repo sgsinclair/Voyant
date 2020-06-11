@@ -150,7 +150,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		autoExecute: false,
 		mode: 'javascript',
 		isWarnedAboutPreviousCells: false,
-		expandResults: true
+		expandResults: true,
+		minimumResultsHeight: 40
 	},
 	layout: {
 		type: 'vbox',
@@ -377,6 +378,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				type: 'absolute'
 			},
 			items: [{
+				xtype: 'component',
+				itemId: 'results',
+				x: 0,
+				y: 0,
+				anchor: '100%',
+				height: me.getMinimumResultsHeight(),
+				html: html
+			},{
 				xtype: 'container',
 				itemId: 'buttons',
 				hidden: true,
@@ -411,12 +420,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 						}
 					}]
 				}]
-			},{
-				xtype: 'component',
-				itemId: 'results',
-				x: 0,
-				y: 0,
-				html: html
 			}],
 			getValue: function() {
 				var resultEl = this.getResultsEl().dom.cloneNode(true);
@@ -466,15 +469,33 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		// check for pre-existing content (such as from highcharts) and if it exists don't update
 		if (this.results.getResultsEl().dom.innerHTML === this.EMPTY_RESULTS_TEXT) {
 			this.results.update(result.toString ? result.toString() : result);
-			this._setResultsHeight();
 		}
+		// set height either way (e.g. there might be highcharts content we want to be viewable)
+		this._setResultsHeight();
 	},
 
-	_setResultsHeight: function() {
-		if (this.getExpandResults()) {
-			this.results.setHeight(Math.max(this.results.getResultsEl().getHeight(), 40));
+	/**
+	 * Set the height of the results component
+	 * @param {Boolean} forceMinimum True to ignore the expandResults config and use minimumResultsHeight
+	 */
+	_setResultsHeight: function(forceMinimum) {
+		if (!forceMinimum && this.getExpandResults()) {
+			var resultsEl = this.results.getResultsEl();
+			var height = resultsEl.getHeight();
+			if (resultsEl.dom.childElementCount > 0) {
+				// child might be taller than the results el (e.g. in the case of highcharts)
+				var childHeight = resultsEl.getFirstChild().getHeight();
+				if (childHeight > height) {
+					height = childHeight;
+					resultsEl.setHeight(height);
+				}
+			}
+			var computedStyle = window.getComputedStyle(this.results.getEl().dom);
+			var paddingHeight = parseFloat(computedStyle.getPropertyValue('padding-top'))+parseFloat(computedStyle.getPropertyValue('padding-bottom'));
+			this.results.setHeight(Math.max(height, this.getMinimumResultsHeight())+paddingHeight);
 		} else {
-			this.results.setHeight(40);
+			this.results.setHeight(this.getMinimumResultsHeight());
+			this.results.getResultsEl().setHeight(this.getMinimumResultsHeight());
 		}
 		this.getTargetEl().fireEvent('resize');
 	},
@@ -494,7 +515,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		} else {
 			this.results.update(' ');
 		}
-		this._setResultsHeight();
+		this._setResultsHeight(true);
 	},
 	
 	tryToUnmask: function() {
