@@ -73,7 +73,7 @@ class Notebook {
 	 */
 	static getTarget() {
 		if (Voyant && Voyant.notebook && Voyant.notebook.Notebook.currentBlock) {
-			return Voyant.notebook.Notebook.currentBlock.results.getEl().dom
+			return Voyant.notebook.Notebook.currentBlock.results.getResultsEl().dom
 		} else {
 			const target = document.createElement("div");
 			document.body.appendChild(target);
