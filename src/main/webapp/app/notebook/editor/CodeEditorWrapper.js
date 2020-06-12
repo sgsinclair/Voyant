@@ -151,7 +151,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		mode: 'javascript',
 		isWarnedAboutPreviousCells: false,
 		expandResults: true,
-		minimumResultsHeight: 40
+		minimumResultsHeight: 150
 	},
 	layout: {
 		type: 'vbox',
@@ -382,7 +382,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				itemId: 'results',
 				x: 0,
 				y: 0,
-				anchor: '100%',
+				anchor: '99%',
 				height: me.getMinimumResultsHeight(),
 				html: html
 			},{
@@ -479,8 +479,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	 * @param {Boolean} forceMinimum True to ignore the expandResults config and use minimumResultsHeight
 	 */
 	_setResultsHeight: function(forceMinimum) {
+		var resultsEl = this.results.getResultsEl();
 		if (!forceMinimum && this.getExpandResults()) {
-			var resultsEl = this.results.getResultsEl();
 			var height = resultsEl.getHeight();
 			if (resultsEl.dom.childElementCount > 0) {
 				// child might be taller than the results el (e.g. in the case of highcharts)
@@ -493,9 +493,11 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			var computedStyle = window.getComputedStyle(this.results.getEl().dom);
 			var paddingHeight = parseFloat(computedStyle.getPropertyValue('padding-top'))+parseFloat(computedStyle.getPropertyValue('padding-bottom'));
 			this.results.setHeight(Math.max(height, this.getMinimumResultsHeight())+paddingHeight);
+			resultsEl.removeCls('collapsed');
 		} else {
 			this.results.setHeight(this.getMinimumResultsHeight());
 			this.results.getResultsEl().setHeight(this.getMinimumResultsHeight());
+			resultsEl.addCls('collapsed');
 		}
 		this.getTargetEl().fireEvent('resize');
 	},

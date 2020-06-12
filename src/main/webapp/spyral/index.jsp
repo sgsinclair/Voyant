@@ -80,11 +80,14 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 	padding: .5em;
 	background-color: rgba(0,0,0,.01)
 }
+.notebook-code-results .collapsed {
+	overflow: auto;
+}
 .spyral-header, .spyral-footer {
 	text-align: center
 }
 .notebook-code-results .error {
-	font-color: red !important;
+	color: red !important;
 }
 </style>
 
