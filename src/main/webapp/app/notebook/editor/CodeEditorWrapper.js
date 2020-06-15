@@ -468,7 +468,17 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	_showResult: function(result) {
 		// check for pre-existing content (such as from highcharts) and if it exists don't update
 		if (this.results.getResultsEl().dom.innerHTML === this.EMPTY_RESULTS_TEXT) {
-			this.results.update(result.toString ? result.toString() : result);
+			if (result.toString) {result = result.toString()}
+			if (result && result.then) {
+				var me = this;
+				result.then(out => {
+					me.results.update(out);
+					me._setResultsHeight();
+					return out;
+				})
+			} else {
+				this.results.update(result);
+			}
 		}
 		// set height either way (e.g. there might be highcharts content we want to be viewable)
 		this._setResultsHeight();

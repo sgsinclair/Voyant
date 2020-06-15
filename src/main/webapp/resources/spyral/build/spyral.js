@@ -1126,8 +1126,13 @@ var Spyral = (function () {
         this.inputLabel.appendChild(dndSpot);
         var resetButton = document.createElement('span');
         resetButton.setAttribute('style', 'width: 16px; height: 16px; border: 1px solid #999; float: right; line-height: 12px; color: #666; cursor: pointer;');
-        resetButton.setAttribute('title', 'Remove File Input');
-        resetButton.setAttribute('onclick', "if (typeof Voyant !== 'undefined' && typeof Ext !== 'undefined') { Ext.getCmp(this.parentElement.parentElement.getAttribute('id')).destroy(); } else { this.parentElement.remove(); }");
+        resetButton.setAttribute('title', 'Remove File Input'); // listener to remove the element, which can be called from a saved notebook
+
+        resetButton.setAttribute('onclick', "if (typeof Voyant !== 'undefined' && typeof Ext !== 'undefined') { Ext.getCmp(this.parentElement.parentElement.getAttribute('id')).destroy(); } else { this.parentElement.remove(); }"); // additional listener to reject the promise, if this input was created through run code
+
+        resetButton.addEventListener('click', function () {
+          this.reject();
+        }.bind(this));
         resetButton.appendChild(document.createTextNode('x'));
         this.inputParent.appendChild(resetButton);
         ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(function (event) {
@@ -1201,7 +1206,7 @@ var Spyral = (function () {
               window.sessionStorage.setItem(_this2.inputParent.getAttribute('spyral-temp-doc'), childIds.join());
               createServerStorage();
 
-              if ((typeof ServerStorage === "undefined" ? "undefined" : _typeof(ServerStorage)) !== undefined) {
+              if (typeof ServerStorage !== 'undefined') {
                 var serverStorage = new ServerStorage();
                 serverStorage.storeResource(_this2.inputParent.getAttribute('spyral-temp-doc'), childIds.join());
                 readFiles.map(function (val, index) {
@@ -1668,7 +1673,8 @@ var Spyral = (function () {
 
               var targetConfig = codeEditorCell._getUIComponent('');
 
-              var targetCmp = codeEditorCell.add(targetConfig);
+              var targetCmp = codeEditorCell.insert(1, targetConfig); // insert after code cell
+
               codeEditorCell.setHeight(codeEditorCell.getHeight() + 80); // need to explicitly adjust height for added component to be visible
 
               target = targetCmp.getEl().dom;
@@ -1692,7 +1698,7 @@ var Spyral = (function () {
         if (hasPreExistingTarget) {
           promise = new Promise( /*#__PURE__*/function () {
             var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(resolve, reject) {
-              var storedFiles;
+              var storedFiles, deleteMsg;
               return regeneratorRuntime.wrap(function _callee$(_context) {
                 while (1) {
                   switch (_context.prev = _context.next) {
@@ -1715,11 +1721,21 @@ var Spyral = (function () {
                       // files have been removed so re-create the input
                       FileInput.destroy(target);
                       createTarget();
+                      deleteMsg = 'The previously added files have been deleted. You will need to add new files.';
 
-                    case 10:
+                      if (typeof Voyant !== 'undefined' && typeof Ext !== 'undefined') {
+                        Ext.ComponentQuery.query('notebook')[0].toastError({
+                          html: deleteMsg,
+                          anchor: 'tr'
+                        });
+                      } else {
+                        alert(deleteMsg);
+                      }
+
+                    case 12:
                       new FileInput(target, resolve, reject);
 
-                    case 11:
+                    case 13:
                     case "end":
                       return _context.stop();
                   }
@@ -1741,14 +1757,14 @@ var Spyral = (function () {
         promise.setNextBlockFromFiles = function () {
           var args = arguments;
           return this.then(function (files) {
-            return Spyral.Notebook.setNextBlockFromFiles.apply(Spyral.Load, [files].concat(Array.from(args)));
+            return Spyral.Notebook.setNextBlockFromFiles.apply(Load, [files].concat(Array.from(args)));
           });
         };
 
         promise.loadCorpusFromFiles = function () {
           var args = arguments;
           return this.then(function (files) {
-            return Spyral.Corpus.load.apply(Spyral.Corpus, [files].concat(Array.from(args)));
+            return Corpus.load.apply(Corpus, [files].concat(Array.from(args)));
           });
         };
 
@@ -16361,7 +16377,7 @@ var Spyral = (function () {
       key: "getTarget",
       value: function getTarget() {
         if (Voyant && Voyant.notebook && Voyant.notebook.Notebook.currentBlock) {
-          return Voyant.notebook.Notebook.currentBlock.results.getEl().dom;
+          return Voyant.notebook.Notebook.currentBlock.results.getResultsEl().dom;
         } else {
           var target = document.createElement("div");
           document.body.appendChild(target);
