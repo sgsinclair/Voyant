@@ -37,11 +37,15 @@ Ext.define("Voyant.notebook.util.Show", {
 					if (Ext.isNumber(contents)) {len = contents;}
 					contents = this;
 				}
+				if (contents.then) { // check if we currently have a promise
+					return contents.then(function(text) {show(text, len)})
+				}
 				if (contents.toHtml) {contents=contents.toHtml()}
 				else if (contents.getString) {contents=contents.getString()}
 				else if (contents.toString) {contents=contents.toString()}
 //				contents = contents.getString ? contents.getString() : contents.toString();
-				if (contents.then) {
+
+				if (contents.then) { // check again to see if we have a promise (like from toString())
 					contents.then(function(text) {show(text, len)})
 				} else {
 					if (len && Ext.isNumber(len)) {contents = contents.substring(0,len)}

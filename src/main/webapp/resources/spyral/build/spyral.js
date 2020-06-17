@@ -1495,18 +1495,35 @@ var Spyral = (function () {
         }
 
         var searchParams = Object.keys(all).map(function (key) {
-          return encodeURIComponent(key) + '=' + encodeURIComponent(all[key]);
+          if (all[key] instanceof Array) {
+            return all[key].map(function (val) {
+              return encodeURIComponent(key) + '=' + encodeURIComponent(val);
+            }).join("&");
+          } else {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(all[key]);
+          }
         }).join("&");
-        var opt = {};
 
         if ("method" in all === false) {
           all.method = "GET";
         }
 
+        var opt = {};
+
         if (all.method === "GET") {
           if (searchParams.length < 800) {
-            for (var key in all) {
-              url.searchParams.set(key, all[key]);
+            var _loop = function _loop(_key) {
+              if (all[_key] instanceof Array) {
+                all[_key].forEach(function (val) {
+                  url.searchParams.append(_key, val);
+                });
+              } else {
+                url.searchParams.set(_key, all[_key]);
+              }
+            };
+
+            for (var _key in all) {
+              _loop(_key);
             }
           } else {
             opt = {
@@ -1664,7 +1681,14 @@ var Spyral = (function () {
           if (typeof Spyral !== 'undefined' && Spyral.Notebook && typeof Ext !== 'undefined') {
             var spyralTarget = Spyral.Notebook.getTarget(); // check for pre-existing target
 
-            target = spyralTarget.parentElement.querySelector('[spyral-temp-doc]');
+            var codeWrapper = spyralTarget.closest('.notebook-code-wrapper');
+
+            if (codeWrapper === null) {
+              console.warn("Spyral.Load.files: can't find CodeEditorWrapper parent");
+              target = null;
+            } else {
+              target = codeWrapper.querySelector('[spyral-temp-doc]');
+            }
 
             if (target === null) {
               // add a component so that vbox layout will be properly calculated
@@ -1764,7 +1788,7 @@ var Spyral = (function () {
         promise.loadCorpusFromFiles = function () {
           var args = arguments;
           return this.then(function (files) {
-            return Corpus.load.apply(Corpus, [files].concat(Array.from(args)));
+            return Spyral.Corpus.load.apply(Spyral.Corpus, [files].concat(Array.from(args)));
           });
         };
 
@@ -11014,11 +11038,15 @@ var Spyral = (function () {
               config = {
                 corpus: config
               };
-            } else if (typeof config === "string") {
+            } else {
               config = {
                 input: config
               };
             }
+          } else if (config instanceof Array && config.length > 0 && typeof config[0] === 'string') {
+            config = {
+              input: config
+            };
           } else if (config instanceof File || config instanceof Array && config[0] instanceof File) {
             var formData = new FormData();
 
@@ -12613,6 +12641,10 @@ var Spyral = (function () {
         if (target === undefined) {
           if (typeof Spyral !== 'undefined' && Spyral.Notebook) {
             target = Spyral.Notebook.getTarget();
+
+            if (target.clientHeight === 0) {
+              target.style.height = '400px'; // 400 is the default Highcharts height
+            }
           } else {
             target = document.createElement("div");
             document.body.appendChild(target);
