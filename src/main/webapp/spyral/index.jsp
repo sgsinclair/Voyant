@@ -15,10 +15,7 @@ if (request.getServletPath().equals("/spiral")) {
 <script type="text/javascript" src="<%=base %>/resources/highcharts/8/modules/networkgraph.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/highcharts/8/highcharts.css" />
 
-<script type="module">
-import { Octokit } from "https://cdn.pika.dev/@octokit/rest";
-window.Octokit = Octokit;
-</script>
+<script src="<%= base %>/resources/octokitrest/octokit-rest-17.10.0.js"></script>
 
 <script src="<%= base %>/resources/spyral/build/spyral.js"></script>
 
