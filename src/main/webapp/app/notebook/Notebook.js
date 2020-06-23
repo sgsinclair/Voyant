@@ -718,6 +718,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	var metadata = this.getMetadata();
     	this.getComponent("spyralHeader").update(this.getInnerHeaderHtml());
     	this.getComponent("spyralFooter").update(this.getInnerFooterHtml());
+    	this.setIsEdited(true);
     },
     
 	notebookWrapperMoveUp: function(wrapper) {
