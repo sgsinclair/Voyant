@@ -483,7 +483,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		const data = this.generateExportHtml();
 		const storageSolution = this.getStorageSolution();
 		
-		if (storageSolution === 'voyant' && this.getNotebookId() !== undefined && this.voyantStorageDialogs.getAccessCode() !== undefined) {
+		if (!saveAs && storageSolution === 'voyant' && this.getNotebookId() !== undefined && this.voyantStorageDialogs.getAccessCode() !== undefined) {
 			this.voyantStorageDialogs.doSave({
 				notebookId: this.getNotebookId(),
 				data: data,
