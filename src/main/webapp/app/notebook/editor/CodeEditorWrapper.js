@@ -151,13 +151,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		mode: 'javascript',
 		isWarnedAboutPreviousCells: false,
 		expandResults: true,
-		minimumResultsHeight: 150
+		emptyResultsHeight: 40,
+		minimumResultsHeight: 120
 	},
 	layout: {
 		type: 'vbox',
 		align: 'stretch'
 	},
-	height: 130,
+	height: 150,
 	border: false,
 
 	EMPTY_RESULTS_TEXT: ' ', // text to use when clearing results, prior to running code
@@ -165,9 +166,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	constructor: function(config) {
 		config.mode = config.mode !== undefined ? config.mode : this.config.mode;
 		var runnable = config.mode.indexOf('javascript') > -1;
-
-		this.results = this._getResultsComponent(Ext.Array.from(config.output).join(""));
-		this.results.setVisible(runnable);
 
 		this.editor = Ext.create("Voyant.notebook.editor.CodeEditor", {
 			content: Ext.Array.from(config.input).join("\n"),
@@ -263,9 +261,12 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		if (config.uiHtml !== undefined) {
 			this.items.push(this._getUIComponent(config.uiHtml))
 		}
+
+		this.results = this._getResultsComponent(Ext.Array.from(config.output).join(""), config);
+		this.results.setVisible(runnable);
 		this.items.push(this.results);
 		
-        this.callParent(arguments);
+		this.callParent(arguments);
         
 	},
 	
@@ -273,6 +274,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		var me = this;
 		me.on("afterrender", function() {
 			this.getTargetEl().on("resize", function(el) {
+				me._setResultsHeight();
+
 				var height = 20;
 				me.items.each(function(item) {height+=item.getHeight();})
 				me.setSize({height: height});
@@ -369,21 +372,25 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		return result;
 	},
 
-	_getResultsComponent: function(html) {
+	_getResultsComponent: function(html, config) {
 		var me = this;
+		var isExpanded = config.expandResults === undefined ? me.config.expandResults : config.expandResults;
+		var height = me.config.emptyResultsHeight;
+
 		return Ext.create('Ext.Container', {
 			align: 'stretch',
 			cls: 'notebook-code-results',
 			layout: {
 				type: 'absolute'
 			},
+			height: height,
 			items: [{
 				xtype: 'component',
 				itemId: 'results',
 				x: 0,
 				y: 0,
 				anchor: '99%',
-				height: me.getMinimumResultsHeight(),
+				height: '100%',
 				html: html
 			},{
 				xtype: 'container',
@@ -395,8 +402,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 					xtype: 'toolbar',
 					style: { background: 'none', paddingTop: '0px' },
 					items: ['->',{
-						glyph: 'xf066@FontAwesome',
-						tooltip: 'Contract Results',
+						glyph: isExpanded ? 'xf066@FontAwesome' : 'xf065@FontAwesome',
+						tooltip: isExpanded ? 'Contract Results' : 'Expand Results',
 						handler: function(cmp) {
 							if (me.getExpandResults()) {
 								me.setExpandResults(false);
@@ -407,7 +414,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 								cmp.setTooltip('Contract Results');
 								cmp.setGlyph('xf066@FontAwesome');
 							}
-							me._setResultsHeight();
+							me.getTargetEl().fireEvent('resize');
 						}
 					},{
 						xtype: 'notebookwrapperexport',
@@ -424,9 +431,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			getValue: function() {
 				var resultEl = this.getResultsEl().dom.cloneNode(true);
 				var output = resultEl.innerHTML;
-				if (!resultEl.style.height) {
-					output = "<div style='height: "+this.getResultsEl().getHeight()+"px'>"+output+"</div>";
-				}
 				return output;
 			},
 			getResultsEl: function() {
@@ -444,7 +448,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 					});
 					cmp.getEl().on('mouseout', function(event, el) {
 						cmp.down('#buttons').setVisible(false);
-					})
+					});
 				}
 			}
 		});
@@ -473,15 +477,12 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				var me = this;
 				result.then(out => {
 					me.results.update(out);
-					me._setResultsHeight();
 					return out;
 				})
 			} else {
 				this.results.update(result);
 			}
 		}
-		// set height either way (e.g. there might be highcharts content we want to be viewable)
-		this._setResultsHeight();
 	},
 
 	/**
@@ -490,26 +491,32 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	 */
 	_setResultsHeight: function(forceMinimum) {
 		var resultsEl = this.results.getResultsEl();
-		if (!forceMinimum && this.getExpandResults()) {
-			var height = resultsEl.getHeight();
-			if (resultsEl.dom.childElementCount > 0) {
-				// child might be taller than the results el (e.g. in the case of highcharts)
-				var childHeight = resultsEl.getFirstChild().getHeight();
-				if (childHeight > height) {
-					height = childHeight;
-					resultsEl.setHeight(height);
-				}
-			}
+
+		// calculate child height
+		var resultsChildHeight = undefined;
+		if (resultsEl.dom.childElementCount > 0) {
+			// child might be taller than the results el (e.g. in the case of highcharts)
+			resultsChildHeight = resultsEl.getFirstChild().getHeight();
+		} else if (resultsEl.dom.firstChild !== null && resultsEl.dom.firstChild.nodeType === Node.TEXT_NODE) {
+			// calculate text height
+			var textHeight = Ext.util.TextMetrics.measure(resultsEl, resultsEl.dom.firstChild.data, resultsEl.getWidth()).height;
+			// we'll also need to add the padding so it's not cut off
 			var computedStyle = window.getComputedStyle(this.results.getEl().dom);
 			var paddingHeight = parseFloat(computedStyle.getPropertyValue('padding-top'))+parseFloat(computedStyle.getPropertyValue('padding-bottom'));
-			this.results.setHeight(Math.max(height, this.getMinimumResultsHeight())+paddingHeight);
+			
+			resultsChildHeight = textHeight+paddingHeight;
+		} else {
+			// no results?
+			resultsChildHeight = this.getEmptyResultsHeight();
+		}
+
+		if (!forceMinimum && this.getExpandResults()) {
+			this.results.setHeight(Math.max(resultsChildHeight, this.getEmptyResultsHeight()));
 			resultsEl.removeCls('collapsed');
 		} else {
-			this.results.setHeight(this.getMinimumResultsHeight());
-			this.results.getResultsEl().setHeight(this.getMinimumResultsHeight());
+			this.results.setHeight(Math.min(Math.max(resultsChildHeight, this.getEmptyResultsHeight()), this.getMinimumResultsHeight()));
 			resultsEl.addCls('collapsed');
 		}
-		this.getTargetEl().fireEvent('resize');
 	},
 	
 	clearResults: function() {
@@ -524,10 +531,27 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			} else {
 				panel.destroy();
 			}
+		} else if (this.results.getResultsEl().dom.hasAttribute('data-highcharts-chart')) {
+			var chartId = this.results.getResultsEl().dom.id;
+			var highchart = undefined;
+			Highcharts.charts.forEach(function(chart) {
+				if (chart !== undefined && chart.renderTo.id === chartId) {
+					highchart = chart;
+				}
+			})
+			if (highchart) {
+				highchart.destroy();
+				// remove highcharts style changes from results element
+				var resultsDom = this.results.getResultsEl().dom;
+				resultsDom.style.height = '100%';
+				resultsDom.style.overflow = '';
+			} else {
+				console.warn('tried to destroy highchart but could not', chartId);
+			}
 		} else {
 			this.results.update(' ');
 		}
-		this._setResultsHeight(true);
+		this.getTargetEl().fireEvent('resize');
 	},
 	
 	tryToUnmask: function() {

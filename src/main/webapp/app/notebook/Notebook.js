@@ -594,7 +594,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			var secPos = html.indexOf("<section id='"+section.id+"' class='notebook-editor-wrapper notebookcodeeditorwrapper'>");
 				var startPre = html.indexOf("<pre class='notebook-code-editor-raw editor-mode-", secPos);
     			startPre = html.indexOf(">", startPre)+1; // add the length of the string
-    			var endPre = html.indexOf("</pre>\n<div class='notebook-code-results'>", startPre);
+    			var endPre = html.indexOf("</pre>\n<div class='notebook-code-results", startPre);
     			
     			// check if we have valid values
     			if (secPos===-1 || startPre === -1 || endPre === -1) {
@@ -607,6 +607,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			}
 				var autoexec = /\bautoexec\b/.exec(inputEl.className) !== null;
 				var output = section.querySelector(".notebook-code-results").innerHTML;
+				var expandResults = section.querySelector(".notebook-code-results").classList.contains('collapsed') === false;
 				var ui = section.querySelector(".notebook-code-ui");
 				if (ui !== null) {
 					ui = ui.innerHTML;
@@ -616,6 +617,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			this.addCode({
     				input: input,
 					output: output,
+					expandResults: expandResults,
 					uiHtml: ui,
 					mode: editorType,
 					autoExecute: autoexec,
@@ -850,6 +852,8 @@ Ext.define('Voyant.notebook.Notebook', {
     		if (type==='code') {
     			var mode = item.down("notebookcodeeditor").getMode();
 				mode = mode.substring(mode.lastIndexOf("/")+1);
+
+				var expandResults = item.getExpandResults();
 				
 				var autoexec = item.getAutoExecute() ? 'autoexec' : '';
 				
@@ -858,7 +862,7 @@ Ext.define('Voyant.notebook.Notebook', {
 				// reminder that the parsing in of notebooks depends on the stability of this syntax
     			out+="<div class='notebook-code-editor ace-chrome'>\n"+codeTextLayer.outerHTML+"\n</div>\n"+
     				"<pre class='notebook-code-editor-raw editor-mode-"+mode+" "+autoexec+"'>"+content.input+"</pre>\n"+
-					"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
+					"<div class='notebook-code-results"+(expandResults ? '' : ' collapsed')+"'>\n"+content.output+"\n</div>\n";
 				if (content.ui !== undefined) {
 					out += "<div class='notebook-code-ui'>\n"+content.ui+"\n</div>\n";
 				}
