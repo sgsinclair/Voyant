@@ -72,6 +72,10 @@ CKEDITOR.on('dialogDefinition', function(ev) {
     padding-left: .5em;
     border: thin solid rgba(0,0,0,.1);
 }
+.notebookcodeeditorwrapper .collapsed {
+	overflow: auto;
+	max-height: 120px;
+}
 .notebook-code-results {
 	margin-top: .5em;
 	padding: .5em;
