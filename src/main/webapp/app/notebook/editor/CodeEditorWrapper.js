@@ -393,39 +393,37 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				height: '100%',
 				html: html
 			},{
-				xtype: 'container',
+				xtype: 'toolbar',
 				itemId: 'buttons',
 				hidden: true,
 				x: 0,
 				y: 0,
-				items: [{
-					xtype: 'toolbar',
-					style: { background: 'none', paddingTop: '0px' },
-					items: ['->',{
-						glyph: isExpanded ? 'xf066@FontAwesome' : 'xf065@FontAwesome',
-						tooltip: isExpanded ? 'Contract Results' : 'Expand Results',
-						handler: function(cmp) {
-							if (me.getExpandResults()) {
-								me.setExpandResults(false);
-								cmp.setTooltip('Expand Results');
-								cmp.setGlyph('xf065@FontAwesome');
-							} else {
-								me.setExpandResults(true);
-								cmp.setTooltip('Contract Results');
-								cmp.setGlyph('xf066@FontAwesome');
-							}
-							me.getTargetEl().fireEvent('resize');
+				style: { background: 'none', paddingTop: '0px', pointerEvents: 'none' },
+				defaults: { style: { pointerEvents: 'auto'} },
+				items: ['->',{
+					glyph: isExpanded ? 'xf066@FontAwesome' : 'xf065@FontAwesome',
+					tooltip: isExpanded ? 'Contract Results' : 'Expand Results',
+					handler: function(cmp) {
+						if (me.getExpandResults()) {
+							me.setExpandResults(false);
+							cmp.setTooltip('Expand Results');
+							cmp.setGlyph('xf065@FontAwesome');
+						} else {
+							me.setExpandResults(true);
+							cmp.setTooltip('Contract Results');
+							cmp.setGlyph('xf066@FontAwesome');
 						}
-					},{
-						xtype: 'notebookwrapperexport',
-						exportType: 'output'
-					},{
-						glyph: 'xf014@FontAwesome',
-						tooltip: 'Remove Results',
-						handler: function(cmp) {
-							me.clearResults();
-						}
-					}]
+						me.getTargetEl().fireEvent('resize');
+					}
+				},{
+					xtype: 'notebookwrapperexport',
+					exportType: 'output'
+				},{
+					glyph: 'xf014@FontAwesome',
+					tooltip: 'Remove Results',
+					handler: function(cmp) {
+						me.clearResults();
+					}
 				}]
 			}],
 			getValue: function() {
