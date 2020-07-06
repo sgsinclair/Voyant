@@ -13,11 +13,17 @@ Ext.define('Voyant.panel.DToC.MarkupLoader', {
 		function doLoad(index) {
 			if (index < me.getCorpus().getDocumentsCount()) {
 				currDocIndex++;
-				var id = me.getCorpus().getDocument(index).getId();
-				me._doLoadTags(id, function() {
-					dfd.update(id);
+				var doc = me.getCorpus().getDocument(index);
+				// check to see if this doc was specified as the index (via the cwrc interface)
+				if (doc.get('extra.isDtocIndex') === 'true') {
 					doLoad(currDocIndex);
-				});
+				} else {
+					var id = doc.getId();
+					me._doLoadTags(id, function() {
+						dfd.update(id);
+						doLoad(currDocIndex);
+					});
+				}
 			} else {
 				dfd.resolve();
 				me._storeTags();

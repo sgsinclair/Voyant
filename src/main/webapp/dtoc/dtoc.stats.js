@@ -204,7 +204,11 @@ Ext.define('Voyant.panel.DToC.Stats', {
 	    
 	    var docs = corpus.getDocuments();
 		for (var i = 0, len = corpus.getDocumentsCount(); i < len; i++) {
-    		var doc = docs.getAt(i);
+			var doc = docs.getAt(i);
+			// check to see if this doc was specified as the index (via the cwrc interface)
+			if (doc.get('extra.isDtocIndex') === 'true') {
+				continue;
+			}
     		menu.add({
 	            xtype: 'menucheckitem',
 	            docId: doc.getId(),

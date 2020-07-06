@@ -180,7 +180,11 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			var corpus = this.getCorpus();
 			var docs = corpus.getDocuments();
 			for (var i = 0, len = corpus.getDocumentsCount(); i < len; i++) {
-	    		var doc = docs.getAt(i);
+				var doc = docs.getAt(i);
+				// check to see if this doc was specified as the index (via the cwrc interface)
+				if (doc.get('extra.isDtocIndex') === 'true') {
+					continue;
+				}
 				this.model.add(doc.getId(), {
 					index: {},
 					tag: {},
@@ -332,14 +336,20 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			var docs = this.getCorpus().getDocuments();
 			var docsCount = this.getCorpus().getDocumentsCount();
 			
+			var indexInDocsMod = 0;
 			var totalTokens = 0;
 			for (var i = 0; i < docsCount; i++) {
-	    		var doc = docs.getAt(i);
+				var doc = docs.getAt(i);
+				// check to see if this doc was specified as the index (via the cwrc interface)
+				if (doc.get('extra.isDtocIndex') === 'true') {
+					indexInDocsMod = 1;
+					continue;
+				}
 				totalTokens += doc.get('tokensCount-lexical');
 			};
 			
 			var containerHeight = this.segmentContainer.getHeight();
-			var separationHeight = (docsCount-1) * this.LINE_HEIGHT;
+			var separationHeight = (docsCount-1-indexInDocsMod) * this.LINE_HEIGHT;
 			containerHeight -= separationHeight;
 			var availableLines = parseInt(containerHeight / this.LINE_HEIGHT);
 			if (this.LINE_HEIGHT * availableLines > containerHeight) {
@@ -357,7 +367,10 @@ Ext.define('Voyant.panel.DToC.DocModel', {
 			this.documents = new Ext.util.MixedCollection();
 			
 			for (var i = 0; i < docsCount; i++) {
-	    		var doc = docs.getAt(i);
+				var doc = docs.getAt(i);
+				if (doc.get('extra.isDtocIndex') === 'true') {
+					continue;
+				}
 	    		tiplabel = doc.getShortTitle();
 				docIndex = doc.getIndex();
 				imagesSnippet += "<div>";

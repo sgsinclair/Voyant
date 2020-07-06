@@ -346,7 +346,11 @@ Ext.define('Voyant.panel.DToC.ToC', {
 		
 		var docs = this.getCorpus().getDocuments();
 		for (var i = 0, len = this.getCorpus().getDocumentsCount(); i < len; i++) {
-    		var doc = docs.getAt(i);
+			var doc = docs.getAt(i);
+			// check to see if this doc was specified as the index (via the cwrc interface)
+			if (doc.get('extra.isDtocIndex') === 'true') {
+				continue;
+			}
     		var docNode, title, author;
 			if (this.titlesMode == this.MIN_TITLES) {
 				title = doc.getShortTitle().normalize();
