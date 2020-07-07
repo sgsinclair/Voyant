@@ -84,6 +84,18 @@ class Metadata {
 		}
 		return headers;
 	}
+
+	/**
+	 * Returns a clone of this Metadata
+	 * @returns {metadata}
+	 */
+	clone() {
+		let config = {};
+		Object.assign(config, this);
+		return new Metadata(config);
+	}
+
+
 }
 
 export { Metadata }

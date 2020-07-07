@@ -91,6 +91,33 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 	color: red !important;
 }
 </style>
+<style id="voyant-notebook-catalogue">
+.catalogue-notebook {
+	float: left;
+	width: 200px;
+	margin: 0 10px 10px 0;
+	padding: 5px;
+	border-radius: 2px;
+	border: 1px solid #ccc;
+	font-size: 13px;
+}
+.catalogue-notebook-over {
+	background-color: #eee;
+	border: 1px solid #bbb;
+	cursor: pointer;
+}
+.catalogue-notebook-selected {
+	background-color: #ddd;
+	border: 1px solid #aaa;
+}
+.catalogue-notebook .title {
+	font-weight: 600;
+}
+.catalogue-notebook .date {
+	color: #666;
+	font-size: 11px;
+}
+</style>
 
 <script>
 	Ext.Loader.setConfig({

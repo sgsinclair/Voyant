@@ -71,6 +71,7 @@ Ext.define('Voyant.notebook.Notebook', {
 	
 	voyantStorageDialogs: undefined,
 	githubDialogs: undefined,
+	catalogueWindow: undefined,
 
 	spyralTernDocs: undefined, // holds the content of the spyral tern docs, for passing to the code editor
     
@@ -198,7 +199,16 @@ Ext.define('Voyant.notebook.Notebook', {
 					xtype: 'toolmenu',
 					glyph: 'xf02c@FontAwesome',
 					scope: this
-    			}
+    			},
+                'catalogue': {
+                    tooltip: 'catalogue',
+                    callback: function() {
+                        this.catalogueWindow.showWindow();
+                    },
+                    xtype: 'toolmenu',
+                    glyph: 'xf00b@FontAwesome',
+                    scope: this
+                }
     		},
     			
     		items: [{
@@ -320,6 +330,18 @@ Ext.define('Voyant.notebook.Notebook', {
 				},
 				'saveCancelled': function(src) {
 					this.unmask();
+				},
+				scope: this
+			}
+		});
+
+		this.catalogueWindow = new Voyant.notebook.Catalogue({
+			listeners: {
+				notebookSelected: function(catalogue, notebookId) {
+					catalogue.hideWindow();
+					this.clear();
+					this.loadFromId(notebookId);
+					this.setNotebookId(notebookId);
 				},
 				scope: this
 			}
@@ -481,19 +503,30 @@ Ext.define('Voyant.notebook.Notebook', {
 		this.getMetadata().setDateNow("modified");
 
 		const data = this.generateExportHtml();
+		const metadata = this.getMetadata().clone(); // use a clone so that altering title and description doesn't affect original
+
+		// get text content of title and description
+		const textContainer = document.createElement('div');
+		textContainer.innerHTML = metadata.title;
+		metadata.title = textContainer.textContent;
+		textContainer.innerHTML = metadata.description;
+		metadata.description = textContainer.textContent;
+		textContainer.remove();
+
 		const storageSolution = this.getStorageSolution();
 		
 		if (!saveAs && storageSolution === 'voyant' && this.getNotebookId() !== undefined && this.voyantStorageDialogs.getAccessCode() !== undefined) {
 			this.voyantStorageDialogs.doSave({
 				notebookId: this.getNotebookId(),
 				data: data,
+				metadata: metadata,
 				accessCode: this.voyantStorageDialogs.getAccessCode()
 			});
 		} else {
 			if (storageSolution === 'github') {
 				this.githubDialogs.showSave(data);
 			} else {
-				this.voyantStorageDialogs.showSave(data, saveAs ? undefined : this.getNotebookId());
+				this.voyantStorageDialogs.showSave(data, metadata, saveAs ? undefined : this.getNotebookId());
 			}
 		}
 	},
@@ -552,7 +585,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	this.mask(this.localize("loading"));
     	var me = this;
     	Spyral.Load.trombone({
-	    	 tool: 'notebook.NotebookManager',
+	    	 tool: 'notebook.GitNotebookManager',
 	    	 action: 'load',
 	    	 id: id,
 	    	 noCache: 1

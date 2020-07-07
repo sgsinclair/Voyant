@@ -15,7 +15,7 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 		this.callParent(arguments);
 	},
 	
-	showSave: function(data, notebookId='') {
+	showSave: function(data, metadata, notebookId='') {
 		const me = this;
 		const newNotebook = notebookId === '';
 		const title = newNotebook ? 'Save New Notebook' : 'Overwrite Existing Notebook';
@@ -92,6 +92,7 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 					if (form.isValid()) {
 						const values = form.getValues();
 						values.data = data;
+						values.metadata = metadata;
 						if (newNotebook && values.notebookId !== '') {
 							me.doesNotebookIdExist(values.notebookId).then(function(exists) {
 								if (exists) {
@@ -127,7 +128,7 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 		const dfd = new Ext.Deferred();
 
 		Spyral.Load.trombone({
-			tool: 'notebook.NotebookManager',
+			tool: 'notebook.GitNotebookManager',
 			action: 'exists',
 			id: id,
 			noCache: 1
@@ -141,15 +142,18 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 		return dfd.promise;
 	},
 
-	doSave: function({notebookId, accessCode, email, data}) {
+	doSave: function({notebookId, accessCode, email, data, metadata}) {
 		const me = this;
+		metadata.id = notebookId;
+
 		return Spyral.Load.trombone({
-			tool: 'notebook.NotebookManager',
+			tool: 'notebook.GitNotebookManager',
 			action: 'save',
 			id: notebookId,
 			accessCode: accessCode,
 			email: email,
-			data: data
+			data: data,
+			metadata: JSON.stringify(metadata)
 		}).then(function(json) {
 			if (json.notebook.data !== 'true') {
 				return false;
