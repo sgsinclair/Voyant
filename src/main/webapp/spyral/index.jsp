@@ -64,9 +64,6 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 .notebook-code-editor-raw {
 	display: none;
 }
-.notebookwrappercounter {
-	display: none;
-}
 .notebookcodeeditorwrapper {
     margin-left: 1em;
     padding-left: .5em;
