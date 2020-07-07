@@ -110,6 +110,11 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 	background-color: #ddd;
 	border: 1px solid #aaa;
 }
+.catalogue-notebook .id {
+	float: right;
+	color: #666;
+	font-size: 9px;
+}
 .catalogue-notebook .title {
 	font-weight: 600;
 }

@@ -180,6 +180,7 @@ app/notebook/storage/github/ReposBrowser.js
 app/notebook/storage/github/FileSaver.js
 app/notebook/storage/github/GitHubDialogs.js
 app/notebook/storage/voyant/StorageDialogs.js
+app/notebook/Catalogue.js
 app/notebook/Notebook.js
 
 # APPS

@@ -32,6 +32,7 @@ Ext.define('Voyant.notebook.Catalogue', {
 		this.template = new Ext.XTemplate(
 			'<tpl for=".">',
 				'<div class="catalogue-notebook">',
+					'<div class="id">{id}</div>',
 					'<div class="title">{title}</div>',
 					'<div class="author">{author}</div>',
 					'<div class="dates"><span class="date">{[Ext.Date.format(values.created, "M j Y")]}</span> | <span class="date">{[Ext.Date.format(values.modified, "M j Y")]}</span></div>',
@@ -68,6 +69,9 @@ Ext.define('Voyant.notebook.Catalogue', {
 								group: 'sortfield'
 							},
 							items: [{
+								itemId: 'id',
+								text: 'ID'
+							},{
 								itemId: 'created',
 								text: 'Created'
 							},{
