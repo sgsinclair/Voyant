@@ -378,53 +378,67 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		var height = me.config.emptyResultsHeight;
 
 		return Ext.create('Ext.Container', {
-			align: 'stretch',
+			itemId: 'parent',
 			cls: 'notebook-code-results',
-			layout: {
-				type: 'absolute'
-			},
 			height: height,
+			layout: {
+				type: 'vbox',
+				align: 'stretch'
+			},
 			items: [{
-				xtype: 'component',
-				itemId: 'results',
-				x: 0,
-				y: 0,
-				anchor: '99%',
-				height: '100%',
-				html: html
-			},{
-				xtype: 'toolbar',
-				itemId: 'buttons',
-				hidden: true,
-				x: 0,
-				y: 0,
-				style: { background: 'none', paddingTop: '0px', pointerEvents: 'none' },
-				defaults: { style: { pointerEvents: 'auto'} },
-				items: ['->',{
-					glyph: isExpanded ? 'xf066@FontAwesome' : 'xf065@FontAwesome',
-					tooltip: isExpanded ? 'Contract Results' : 'Expand Results',
-					handler: function(cmp) {
-						if (me.getExpandResults()) {
-							me.setExpandResults(false);
-							cmp.setTooltip('Expand Results');
-							cmp.setGlyph('xf065@FontAwesome');
-						} else {
-							me.setExpandResults(true);
-							cmp.setTooltip('Contract Results');
-							cmp.setGlyph('xf066@FontAwesome');
+				xtype: 'container',
+				flex: 1,
+				layout: {
+					type: 'absolute'
+				},
+				items: [{
+					xtype: 'component',
+					itemId: 'results',
+					x: 0,
+					y: 0,
+					anchor: '100%',
+					height: '100%',
+					html: html
+				},{
+					xtype: 'toolbar',
+					itemId: 'buttons',
+					hidden: true,
+					x: 0,
+					y: 0,
+					style: { background: 'none', paddingTop: '0px', pointerEvents: 'none' },
+					defaults: { style: { pointerEvents: 'auto'} },
+					items: ['->',{
+						itemId: 'expandButton',
+						glyph: isExpanded ? 'xf066@FontAwesome' : 'xf065@FontAwesome',
+						tooltip: isExpanded ? 'Contract Results' : 'Expand Results',
+						handler: function() {
+							me.results.doExpandContract();
 						}
-						me.getTargetEl().fireEvent('resize');
-					}
-				},{
-					xtype: 'notebookwrapperexport',
-					exportType: 'output'
-				},{
-					glyph: 'xf014@FontAwesome',
-					tooltip: 'Remove Results',
-					handler: function(cmp) {
-						me.clearResults();
-					}
+					},{
+						xtype: 'notebookwrapperexport',
+						exportType: 'output'
+					},{
+						glyph: 'xf014@FontAwesome',
+						tooltip: 'Remove Results',
+						handler: function() {
+							me.clearResults();
+						}
+					}]
 				}]
+			},{
+				xtype: 'component',
+				itemId: 'expandWidget',
+				height: 20,
+				hidden: isExpanded ? true : false,
+				style: {textAlign: 'center', fontSize: '26px', cursor: 'pointer', borderTop: '1px solid #DDD'},
+				html: '&#8943;',
+				listeners: {
+					afterrender: function(cmp) {
+						cmp.getEl().on('click', function() {
+							me.results.doExpandContract();
+						})
+					}
+				}
 			}],
 			getValue: function() {
 				var resultEl = this.getResultsEl().dom.cloneNode(true);
@@ -433,6 +447,19 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			},
 			getResultsEl: function() {
 				return this.down('#results').getEl();
+			},
+			doExpandContract: function() {
+				var expandButton = me.results.down('#expandButton');
+				if (me.getExpandResults()) {
+					me.setExpandResults(false);
+					expandButton.setTooltip('Expand Results');
+					expandButton.setGlyph('xf065@FontAwesome');
+				} else {
+					me.setExpandResults(true);
+					expandButton.setTooltip('Contract Results');
+					expandButton.setGlyph('xf066@FontAwesome');
+				}
+				me.getTargetEl().fireEvent('resize');
 			},
 			// override update method and call it on results child instead
 			update: function() {
@@ -485,36 +512,50 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 
 	/**
 	 * Set the height of the results component
-	 * @param {Boolean} forceMinimum True to ignore the expandResults config and use minimumResultsHeight
 	 */
-	_setResultsHeight: function(forceMinimum) {
+	_setResultsHeight: function() {
+		var height = this._measureResultsHeight();
+		var resultsEl = this.results.getResultsEl();
+		var expandWidget = this.results.down('#expandWidget');
+		if (this.getExpandResults()) {
+			expandWidget.hide();
+			this.results.setHeight(Math.max(height, this.getEmptyResultsHeight()));
+			resultsEl.removeCls('collapsed');
+		} else {
+			height = Math.min(Math.max(height, this.getEmptyResultsHeight()), this.getMinimumResultsHeight());
+			if (height < this.getMinimumResultsHeight()) {
+				expandWidget.hide();
+			} else {
+				expandWidget.show();
+			}
+			this.results.setHeight(height);
+			resultsEl.addCls('collapsed');
+		}
+	},
+
+	_measureResultsHeight: function() {
+		if (this.results.paddingHeight === undefined) {
+			// compute and store parent padding, which we'll need when determining proper height
+			var computedStyle = window.getComputedStyle(this.results.getEl().dom);
+			this.results.paddingHeight = parseFloat(computedStyle.getPropertyValue('padding-top'))+parseFloat(computedStyle.getPropertyValue('padding-bottom'));
+		}
+
 		var resultsEl = this.results.getResultsEl();
 
-		// calculate child height
 		var resultsChildHeight = undefined;
 		if (resultsEl.dom.childElementCount > 0) {
 			// child might be taller than the results el (e.g. in the case of highcharts)
-			resultsChildHeight = resultsEl.getFirstChild().getHeight();
+			resultsChildHeight = resultsEl.getFirstChild().getHeight() + this.results.paddingHeight;
 		} else if (resultsEl.dom.firstChild !== null && resultsEl.dom.firstChild.nodeType === Node.TEXT_NODE) {
 			// calculate text height
 			var textHeight = Ext.util.TextMetrics.measure(resultsEl, resultsEl.dom.firstChild.data, resultsEl.getWidth()).height;
-			// we'll also need to add the padding so it's not cut off
-			var computedStyle = window.getComputedStyle(this.results.getEl().dom);
-			var paddingHeight = parseFloat(computedStyle.getPropertyValue('padding-top'))+parseFloat(computedStyle.getPropertyValue('padding-bottom'));
-			
-			resultsChildHeight = textHeight+paddingHeight;
+			resultsChildHeight = textHeight + this.results.paddingHeight;
 		} else {
 			// no results?
 			resultsChildHeight = this.getEmptyResultsHeight();
 		}
 
-		if (!forceMinimum && this.getExpandResults()) {
-			this.results.setHeight(Math.max(resultsChildHeight, this.getEmptyResultsHeight()));
-			resultsEl.removeCls('collapsed');
-		} else {
-			this.results.setHeight(Math.min(Math.max(resultsChildHeight, this.getEmptyResultsHeight()), this.getMinimumResultsHeight()));
-			resultsEl.addCls('collapsed');
-		}
+		return resultsChildHeight;
 	},
 	
 	clearResults: function() {
