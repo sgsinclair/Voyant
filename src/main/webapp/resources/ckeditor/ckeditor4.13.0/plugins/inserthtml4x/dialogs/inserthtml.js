@@ -36,5 +36,4 @@ CKEDITOR.dialog.add('inserthtmlDialog',function(editor){
 			if ( sInsert.length > 0 ) 
 			editor.insertHtml(sInsert); 
 		}
-	};
-});
+	};});

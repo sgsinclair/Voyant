@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Mon Jun 15 14:05:34 EDT 2020 */
+/* This file created by JSCacher. Last modified: Thu Jul 09 17:49:15 EDT 2020 */
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -7854,11 +7854,15 @@ Ext.define("Voyant.notebook.util.Show", {
 					if (Ext.isNumber(contents)) {len = contents;}
 					contents = this;
 				}
+				if (contents.then) { // check if we currently have a promise
+					return contents.then(function(text) {show(text, len)})
+				}
 				if (contents.toHtml) {contents=contents.toHtml()}
 				else if (contents.getString) {contents=contents.getString()}
 				else if (contents.toString) {contents=contents.toString()}
 //				contents = contents.getString ? contents.getString() : contents.toString();
-				if (contents.then) {
+
+				if (contents.then) { // check again to see if we have a promise (like from toString())
 					contents.then(function(text) {show(text, len)})
 				} else {
 					if (len && Ext.isNumber(len)) {contents = contents.substring(0,len)}
@@ -35276,13 +35280,14 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		mode: 'javascript',
 		isWarnedAboutPreviousCells: false,
 		expandResults: true,
-		minimumResultsHeight: 150
+		emptyResultsHeight: 40,
+		minimumResultsHeight: 120
 	},
 	layout: {
 		type: 'vbox',
 		align: 'stretch'
 	},
-	height: 130,
+	height: 150,
 	border: false,
 
 	EMPTY_RESULTS_TEXT: ' ', // text to use when clearing results, prior to running code
@@ -35290,9 +35295,6 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	constructor: function(config) {
 		config.mode = config.mode !== undefined ? config.mode : this.config.mode;
 		var runnable = config.mode.indexOf('javascript') > -1;
-
-		this.results = this._getResultsComponent(Ext.Array.from(config.output).join(""));
-		this.results.setVisible(runnable);
 
 		this.editor = Ext.create("Voyant.notebook.editor.CodeEditor", {
 			content: Ext.Array.from(config.input).join("\n"),
@@ -35388,9 +35390,12 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		if (config.uiHtml !== undefined) {
 			this.items.push(this._getUIComponent(config.uiHtml))
 		}
+
+		this.results = this._getResultsComponent(Ext.Array.from(config.output).join(""), config);
+		this.results.setVisible(runnable);
 		this.items.push(this.results);
 		
-        this.callParent(arguments);
+		this.callParent(arguments);
         
 	},
 	
@@ -35398,6 +35403,8 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		var me = this;
 		me.on("afterrender", function() {
 			this.getTargetEl().on("resize", function(el) {
+				me._setResultsHeight();
+
 				var height = 20;
 				me.items.each(function(item) {height+=item.getHeight();})
 				me.setSize({height: height});
@@ -35494,45 +35501,47 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		return result;
 	},
 
-	_getResultsComponent: function(html) {
+	_getResultsComponent: function(html, config) {
 		var me = this;
+		var isExpanded = config.expandResults === undefined ? me.config.expandResults : config.expandResults;
+		var height = me.config.emptyResultsHeight;
+
 		return Ext.create('Ext.Container', {
-			align: 'stretch',
+			itemId: 'parent',
 			cls: 'notebook-code-results',
+			height: height,
 			layout: {
-				type: 'absolute'
+				type: 'vbox',
+				align: 'stretch'
 			},
 			items: [{
-				xtype: 'component',
-				itemId: 'results',
-				x: 0,
-				y: 0,
-				anchor: '99%',
-				height: me.getMinimumResultsHeight(),
-				html: html
-			},{
 				xtype: 'container',
-				itemId: 'buttons',
-				hidden: true,
-				x: 0,
-				y: 0,
+				flex: 1,
+				layout: {
+					type: 'absolute'
+				},
 				items: [{
+					xtype: 'component',
+					itemId: 'results',
+					x: 0,
+					y: 0,
+					anchor: '100%',
+					height: '100%',
+					html: html
+				},{
 					xtype: 'toolbar',
-					style: { background: 'none', paddingTop: '0px' },
+					itemId: 'buttons',
+					hidden: true,
+					x: 0,
+					y: 0,
+					style: { background: 'none', paddingTop: '0px', pointerEvents: 'none' },
+					defaults: { style: { pointerEvents: 'auto'} },
 					items: ['->',{
-						glyph: 'xf066@FontAwesome',
-						tooltip: 'Contract Results',
-						handler: function(cmp) {
-							if (me.getExpandResults()) {
-								me.setExpandResults(false);
-								cmp.setTooltip('Expand Results');
-								cmp.setGlyph('xf065@FontAwesome');
-							} else {
-								me.setExpandResults(true);
-								cmp.setTooltip('Contract Results');
-								cmp.setGlyph('xf066@FontAwesome');
-							}
-							me._setResultsHeight();
+						itemId: 'expandButton',
+						glyph: isExpanded ? 'xf066@FontAwesome' : 'xf065@FontAwesome',
+						tooltip: isExpanded ? 'Contract Results' : 'Expand Results',
+						handler: function() {
+							me.results.doExpandContract();
 						}
 					},{
 						xtype: 'notebookwrapperexport',
@@ -35540,22 +35549,46 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 					},{
 						glyph: 'xf014@FontAwesome',
 						tooltip: 'Remove Results',
-						handler: function(cmp) {
+						handler: function() {
 							me.clearResults();
 						}
 					}]
 				}]
+			},{
+				xtype: 'component',
+				itemId: 'expandWidget',
+				height: 20,
+				hidden: isExpanded ? true : false,
+				style: {textAlign: 'center', fontSize: '26px', cursor: 'pointer', borderTop: '1px solid #DDD'},
+				html: '&#8943;',
+				listeners: {
+					afterrender: function(cmp) {
+						cmp.getEl().on('click', function() {
+							me.results.doExpandContract();
+						})
+					}
+				}
 			}],
 			getValue: function() {
 				var resultEl = this.getResultsEl().dom.cloneNode(true);
 				var output = resultEl.innerHTML;
-				if (!resultEl.style.height) {
-					output = "<div style='height: "+this.getResultsEl().getHeight()+"px'>"+output+"</div>";
-				}
 				return output;
 			},
 			getResultsEl: function() {
 				return this.down('#results').getEl();
+			},
+			doExpandContract: function() {
+				var expandButton = me.results.down('#expandButton');
+				if (me.getExpandResults()) {
+					me.setExpandResults(false);
+					expandButton.setTooltip('Expand Results');
+					expandButton.setGlyph('xf065@FontAwesome');
+				} else {
+					me.setExpandResults(true);
+					expandButton.setTooltip('Contract Results');
+					expandButton.setGlyph('xf066@FontAwesome');
+				}
+				me.getTargetEl().fireEvent('resize');
 			},
 			// override update method and call it on results child instead
 			update: function() {
@@ -35569,7 +35602,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 					});
 					cmp.getEl().on('mouseout', function(event, el) {
 						cmp.down('#buttons').setVisible(false);
-					})
+					});
 				}
 			}
 		});
@@ -35598,43 +35631,60 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 				var me = this;
 				result.then(out => {
 					me.results.update(out);
-					me._setResultsHeight();
 					return out;
 				})
 			} else {
 				this.results.update(result);
 			}
 		}
-		// set height either way (e.g. there might be highcharts content we want to be viewable)
-		this._setResultsHeight();
 	},
 
 	/**
 	 * Set the height of the results component
-	 * @param {Boolean} forceMinimum True to ignore the expandResults config and use minimumResultsHeight
 	 */
-	_setResultsHeight: function(forceMinimum) {
+	_setResultsHeight: function() {
+		var height = this._measureResultsHeight();
 		var resultsEl = this.results.getResultsEl();
-		if (!forceMinimum && this.getExpandResults()) {
-			var height = resultsEl.getHeight();
-			if (resultsEl.dom.childElementCount > 0) {
-				// child might be taller than the results el (e.g. in the case of highcharts)
-				var childHeight = resultsEl.getFirstChild().getHeight();
-				if (childHeight > height) {
-					height = childHeight;
-					resultsEl.setHeight(height);
-				}
-			}
-			var computedStyle = window.getComputedStyle(this.results.getEl().dom);
-			var paddingHeight = parseFloat(computedStyle.getPropertyValue('padding-top'))+parseFloat(computedStyle.getPropertyValue('padding-bottom'));
-			this.results.setHeight(Math.max(height, this.getMinimumResultsHeight())+paddingHeight);
+		var expandWidget = this.results.down('#expandWidget');
+		if (this.getExpandResults()) {
+			expandWidget.hide();
+			this.results.setHeight(Math.max(height, this.getEmptyResultsHeight()));
 			resultsEl.removeCls('collapsed');
 		} else {
-			this.results.setHeight(this.getMinimumResultsHeight());
-			this.results.getResultsEl().setHeight(this.getMinimumResultsHeight());
+			height = Math.min(Math.max(height, this.getEmptyResultsHeight()), this.getMinimumResultsHeight());
+			if (height < this.getMinimumResultsHeight()) {
+				expandWidget.hide();
+			} else {
+				expandWidget.show();
+			}
+			this.results.setHeight(height);
 			resultsEl.addCls('collapsed');
 		}
-		this.getTargetEl().fireEvent('resize');
+	},
+
+	_measureResultsHeight: function() {
+		if (this.results.paddingHeight === undefined) {
+			// compute and store parent padding, which we'll need when determining proper height
+			var computedStyle = window.getComputedStyle(this.results.getEl().dom);
+			this.results.paddingHeight = parseFloat(computedStyle.getPropertyValue('padding-top'))+parseFloat(computedStyle.getPropertyValue('padding-bottom'));
+		}
+
+		var resultsEl = this.results.getResultsEl();
+
+		var resultsChildHeight = undefined;
+		if (resultsEl.dom.childElementCount > 0) {
+			// child might be taller than the results el (e.g. in the case of highcharts)
+			resultsChildHeight = resultsEl.getFirstChild().getHeight() + this.results.paddingHeight;
+		} else if (resultsEl.dom.firstChild !== null && resultsEl.dom.firstChild.nodeType === Node.TEXT_NODE) {
+			// calculate text height
+			var textHeight = Ext.util.TextMetrics.measure(resultsEl, resultsEl.dom.firstChild.data, resultsEl.getWidth()).height;
+			resultsChildHeight = textHeight + this.results.paddingHeight;
+		} else {
+			// no results?
+			resultsChildHeight = this.getEmptyResultsHeight();
+		}
+
+		return resultsChildHeight;
 	},
 	
 	clearResults: function() {
@@ -35649,10 +35699,27 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 			} else {
 				panel.destroy();
 			}
+		} else if (this.results.getResultsEl().dom.hasAttribute('data-highcharts-chart')) {
+			var chartId = this.results.getResultsEl().dom.id;
+			var highchart = undefined;
+			Highcharts.charts.forEach(function(chart) {
+				if (chart !== undefined && chart.renderTo.id === chartId) {
+					highchart = chart;
+				}
+			})
+			if (highchart) {
+				highchart.destroy();
+				// remove highcharts style changes from results element
+				var resultsDom = this.results.getResultsEl().dom;
+				resultsDom.style.height = '100%';
+				resultsDom.style.overflow = '';
+			} else {
+				console.warn('tried to destroy highchart but could not', chartId);
+			}
 		} else {
 			this.results.update(' ');
 		}
-		this._setResultsHeight(true);
+		this.getTargetEl().fireEvent('resize');
 	},
 	
 	tryToUnmask: function() {
@@ -36791,7 +36858,7 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 		this.callParent(arguments);
 	},
 	
-	showSave: function(data, notebookId='') {
+	showSave: function(data, metadata, notebookId='') {
 		const me = this;
 		const newNotebook = notebookId === '';
 		const title = newNotebook ? 'Save New Notebook' : 'Overwrite Existing Notebook';
@@ -36868,6 +36935,7 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 					if (form.isValid()) {
 						const values = form.getValues();
 						values.data = data;
+						values.metadata = metadata;
 						if (newNotebook && values.notebookId !== '') {
 							me.doesNotebookIdExist(values.notebookId).then(function(exists) {
 								if (exists) {
@@ -36903,7 +36971,7 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 		const dfd = new Ext.Deferred();
 
 		Spyral.Load.trombone({
-			tool: 'notebook.NotebookManager',
+			tool: 'notebook.GitNotebookManager',
 			action: 'exists',
 			id: id,
 			noCache: 1
@@ -36917,15 +36985,18 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 		return dfd.promise;
 	},
 
-	doSave: function({notebookId, accessCode, email, data}) {
+	doSave: function({notebookId, accessCode, email, data, metadata}) {
 		const me = this;
+		metadata.id = notebookId;
+
 		return Spyral.Load.trombone({
-			tool: 'notebook.NotebookManager',
+			tool: 'notebook.GitNotebookManager',
 			action: 'save',
 			id: notebookId,
 			accessCode: accessCode,
 			email: email,
-			data: data
+			data: data,
+			metadata: JSON.stringify(metadata)
 		}).then(function(json) {
 			if (json.notebook.data !== 'true') {
 				return false;
@@ -36958,6 +37029,169 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 		return code;
 	}
 })
+Ext.define('Voyant.notebook.Catalogue', {
+	extend: 'Ext.Component',
+	requires: [],
+	alias: 'widget.notebookcatalogue',
+	statics: {
+		i18n: {
+		}
+	},
+
+	window: undefined,
+	
+	store: undefined,
+	template: undefined,
+
+	config: {},
+
+	constructor: function() {
+		this.store = Ext.create('Ext.data.JsonStore', {
+			fields: [
+				{name: 'id'},
+				{name: 'author'},
+				{name: 'title'},
+				{name: 'description'},
+				{name: 'keywords'},
+				{name: 'language'},
+				{name: 'license'},
+				{name: 'created', type: 'date'},
+				{name: 'modified', type: 'date'},
+				{name: 'version'}
+			]
+		});
+		this.template = new Ext.XTemplate(
+			'<tpl for=".">',
+				'<div class="catalogue-notebook">',
+					'<div class="id">{id}</div>',
+					'<div class="title">{title}</div>',
+					'<div class="author">{author}</div>',
+					'<div class="dates"><span class="date">{[Ext.Date.format(values.created, "M j Y")]}</span> | <span class="date">{[Ext.Date.format(values.modified, "M j Y")]}</span></div>',
+				'</div>',
+			'</tpl>'
+		);
+		this.callParent(arguments);
+	},
+
+	initComponent: function(config) {
+		this.callParent(arguments);
+	},
+
+	showWindow: function() {
+		if (this.window === undefined) {
+			this.window = Ext.create('Ext.window.Window', {
+				title: 'Notebooks Catalogue',
+				width: 700,
+				height: 550,
+				layout: {
+					type: 'vbox'
+				},
+				closeAction: 'hide',
+				items: [{
+					xtype: 'toolbar',
+					height: 30,
+					items: [{
+						xtype: 'splitbutton',
+						text: 'Sort',
+						glyph: 'xf161@FontAwesome',
+						menu: {
+							defaults: {
+								xtype: 'menucheckitem',
+								group: 'sortfield'
+							},
+							items: [{
+								itemId: 'id',
+								text: 'ID'
+							},{
+								itemId: 'created',
+								text: 'Created'
+							},{
+								itemId: 'modified',
+								text: 'Modified',
+								checked: true
+							},{
+								itemId: 'title',
+								text: 'Title'
+							},{
+								itemId: 'author',
+								text: 'Author'
+							}],
+							listeners: {
+								click: function(menu, item) {
+									var sortDir = menu.up().getGlyph().glyphConfig === 'xf161@FontAwesome' ? 'DESC' : 'ASC';
+									var sortField = item.itemId;
+									this.store.sort(sortField, sortDir);
+									this.window.down('#catalogue').refresh();
+								},
+								scope: this
+							}
+						},
+						handler: function(but) {
+							var sortDir;
+							if (but.getGlyph().glyphConfig === 'xf161@FontAwesome') {
+								but.setGlyph('xf160@FontAwesome');
+								sortDir = 'ASC';
+							} else {
+								but.setGlyph('xf161@FontAwesome');
+								sortDir = 'DESC';
+							}
+							var sortField = but.menu.down('[checked=true]').itemId;
+							this.store.sort(sortField, sortDir);
+							this.window.down('#catalogue').refresh();
+						},
+						scope: this
+					}]
+				},{
+					xtype: 'dataview',
+					flex: 1,
+					width: '100%',
+					padding: 10,
+					scrollable: 'vertical',
+					itemId: 'catalogue',
+					store: this.store,
+					tpl: this.template,
+					itemSelector: 'div.catalogue-notebook',
+					overItemCls: 'catalogue-notebook-over',
+					selectedItemCls: 'catalogue-notebook-selected'
+				}],
+				buttons: [{
+					text: 'Load Selected Notebook',
+					handler: function(but) {
+						var record = this.window.down('#catalogue').getSelection()[0]
+						if (record !== undefined) {
+							this.fireEvent('notebookSelected', this, record.get('id'))
+						}
+					},
+					scope: this
+				}]
+			})
+		}
+		this.window.show();
+		this.getNotebooks();
+	},
+
+	hideWindow: function() {
+		if (this.window !== undefined) {
+			this.window.close();
+		}
+	},
+
+	getNotebooks(query, config) {
+		this.window.mask('Loading');
+		this.window.down('#catalogue').getSelectionModel().deselectAll();
+    	var me = this;
+		Spyral.Load.trombone({
+			tool: 'notebook.GitNotebookManager',
+			action: 'catalogue',
+			noCache: 1
+		}).then(function(json) {
+			me.window.unmask();
+			var notebooks = JSON.parse(json.notebook.data);
+			me.store.loadRawData(notebooks);
+		}).catch(function(err) {me.window.unmask()});
+	}
+});
+
 /*
  * @class Notebook
  * A Spyral Notebook. This should never be instantiated directly.
@@ -37031,6 +37265,7 @@ Ext.define('Voyant.notebook.Notebook', {
 	
 	voyantStorageDialogs: undefined,
 	githubDialogs: undefined,
+	catalogueWindow: undefined,
 
 	spyralTernDocs: undefined, // holds the content of the spyral tern docs, for passing to the code editor
     
@@ -37158,7 +37393,16 @@ Ext.define('Voyant.notebook.Notebook', {
 					xtype: 'toolmenu',
 					glyph: 'xf02c@FontAwesome',
 					scope: this
-    			}
+    			},
+                'catalogue': {
+                    tooltip: 'catalogue',
+                    callback: function() {
+                        this.catalogueWindow.showWindow();
+                    },
+                    xtype: 'toolmenu',
+                    glyph: 'xf00b@FontAwesome',
+                    scope: this
+                }
     		},
     			
     		items: [{
@@ -37280,6 +37524,18 @@ Ext.define('Voyant.notebook.Notebook', {
 				},
 				'saveCancelled': function(src) {
 					this.unmask();
+				},
+				scope: this
+			}
+		});
+
+		this.catalogueWindow = new Voyant.notebook.Catalogue({
+			listeners: {
+				notebookSelected: function(catalogue, notebookId) {
+					catalogue.hideWindow();
+					this.clear();
+					this.loadFromId(notebookId);
+					this.setNotebookId(notebookId);
 				},
 				scope: this
 			}
@@ -37441,19 +37697,30 @@ Ext.define('Voyant.notebook.Notebook', {
 		this.getMetadata().setDateNow("modified");
 
 		const data = this.generateExportHtml();
+		const metadata = this.getMetadata().clone(); // use a clone so that altering title and description doesn't affect original
+
+		// get text content of title and description
+		const textContainer = document.createElement('div');
+		textContainer.innerHTML = metadata.title;
+		metadata.title = textContainer.textContent;
+		textContainer.innerHTML = metadata.description;
+		metadata.description = textContainer.textContent;
+		textContainer.remove();
+
 		const storageSolution = this.getStorageSolution();
 		
-		if (storageSolution === 'voyant' && this.getNotebookId() !== undefined && this.voyantStorageDialogs.getAccessCode() !== undefined) {
+		if (!saveAs && storageSolution === 'voyant' && this.getNotebookId() !== undefined && this.voyantStorageDialogs.getAccessCode() !== undefined) {
 			this.voyantStorageDialogs.doSave({
 				notebookId: this.getNotebookId(),
 				data: data,
+				metadata: metadata,
 				accessCode: this.voyantStorageDialogs.getAccessCode()
 			});
 		} else {
 			if (storageSolution === 'github') {
 				this.githubDialogs.showSave(data);
 			} else {
-				this.voyantStorageDialogs.showSave(data, saveAs ? undefined : this.getNotebookId());
+				this.voyantStorageDialogs.showSave(data, metadata, saveAs ? undefined : this.getNotebookId());
 			}
 		}
 	},
@@ -37512,7 +37779,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	this.mask(this.localize("loading"));
     	var me = this;
     	Spyral.Load.trombone({
-	    	 tool: 'notebook.NotebookManager',
+	    	 tool: 'notebook.GitNotebookManager',
 	    	 action: 'load',
 	    	 id: id,
 	    	 noCache: 1
@@ -37554,7 +37821,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			var secPos = html.indexOf("<section id='"+section.id+"' class='notebook-editor-wrapper notebookcodeeditorwrapper'>");
 				var startPre = html.indexOf("<pre class='notebook-code-editor-raw editor-mode-", secPos);
     			startPre = html.indexOf(">", startPre)+1; // add the length of the string
-    			var endPre = html.indexOf("</pre>\n<div class='notebook-code-results'>", startPre);
+    			var endPre = html.indexOf("</pre>\n<div class='notebook-code-results", startPre);
     			
     			// check if we have valid values
     			if (secPos===-1 || startPre === -1 || endPre === -1) {
@@ -37567,6 +37834,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			}
 				var autoexec = /\bautoexec\b/.exec(inputEl.className) !== null;
 				var output = section.querySelector(".notebook-code-results").innerHTML;
+				var expandResults = section.querySelector(".notebook-code-results").classList.contains('collapsed') === false;
 				var ui = section.querySelector(".notebook-code-ui");
 				if (ui !== null) {
 					ui = ui.innerHTML;
@@ -37576,6 +37844,7 @@ Ext.define('Voyant.notebook.Notebook', {
     			this.addCode({
     				input: input,
 					output: output,
+					expandResults: expandResults,
 					uiHtml: ui,
 					mode: editorType,
 					autoExecute: autoexec,
@@ -37678,6 +37947,7 @@ Ext.define('Voyant.notebook.Notebook', {
     	var metadata = this.getMetadata();
     	this.getComponent("spyralHeader").update(this.getInnerHeaderHtml());
     	this.getComponent("spyralFooter").update(this.getInnerFooterHtml());
+    	this.setIsEdited(true);
     },
     
 	notebookWrapperMoveUp: function(wrapper) {
@@ -37809,6 +38079,8 @@ Ext.define('Voyant.notebook.Notebook', {
     		if (type==='code') {
     			var mode = item.down("notebookcodeeditor").getMode();
 				mode = mode.substring(mode.lastIndexOf("/")+1);
+
+				var expandResults = item.getExpandResults();
 				
 				var autoexec = item.getAutoExecute() ? 'autoexec' : '';
 				
@@ -37817,7 +38089,7 @@ Ext.define('Voyant.notebook.Notebook', {
 				// reminder that the parsing in of notebooks depends on the stability of this syntax
     			out+="<div class='notebook-code-editor ace-chrome'>\n"+codeTextLayer.outerHTML+"\n</div>\n"+
     				"<pre class='notebook-code-editor-raw editor-mode-"+mode+" "+autoexec+"'>"+content.input+"</pre>\n"+
-					"<div class='notebook-code-results'>\n"+content.output+"\n</div>\n";
+					"<div class='notebook-code-results"+(expandResults ? '' : ' collapsed')+"'>\n"+content.output+"\n</div>\n";
 				if (content.ui !== undefined) {
 					out += "<div class='notebook-code-ui'>\n"+content.ui+"\n</div>\n";
 				}

@@ -2,6 +2,227 @@
 
 // *** Documentation extracted from: ../../../../voyantjs/src/categories.js ***
 
+/**
+* Class for working with categories and features.
+ * Categories are groupings of terms.
+ * Features are arbitrary properties (font, color) that are associated with each category.
+ * @class Spyral.Categories
+ */
+
+
+/**
+* Construct a new Categories class
+	  * @method constructor
+ */
+
+
+/**
+* Get the categories
+	 * @returns {object}
+	  * @method getCategories
+ */
+
+
+/**
+* Get category names as an array.
+	 * 
+	 * @returns {Array} of category names
+	  * @method getCategoryNames
+ */
+
+
+/**
+* Get the terms for a category
+	 * @param {string} name 
+	 * @returns {array}
+	  * @method getCategoryTerms
+ */
+
+
+/**
+* Add a new category
+	 * @param {string} name 
+	  * @method addCategory
+ */
+
+
+/**
+* Rename a category
+	 * @param {string} oldName 
+	 * @param {string} newName 
+	  * @method renameCategory
+ */
+
+
+/**
+* Remove a category
+	 * @param {string} name 
+	  * @method removeCategory
+ */
+
+
+/**
+* Add a term to a category
+	 * @param {string} category 
+	 * @param {string} term 
+	  * @method addTerm
+ */
+
+
+/**
+* Add multiple terms to a category
+	 * @param {string} category 
+	 * @param {array} terms 
+	  * @method addTerms
+ */
+
+
+/**
+* Remove a term from a category
+	 * @param {string} category 
+	 * @param {string} term 
+	  * @method removeTerm
+ */
+
+
+/**
+* Remove multiple terms from a category
+	 * @param {string} category 
+	 * @param {array} terms 
+	  * @method removeTerms
+ */
+
+
+/**
+* Get the category that a term belongs to
+	 * @param {string} term 
+	 * @return {object}
+	  * @method getCategoryForTerm
+ */
+
+
+/**
+* Get the feature for a term
+	 * @param {string} feature 
+	 * @param {string} term 
+	 * @returns {*}
+	  * @method getFeatureForTerm
+ */
+
+
+/**
+* Get the features
+	 * @returns {object}
+	  * @method getFeatures
+ */
+
+
+/**
+* Add a feature
+	 * @param {string} name 
+	 * @param {*} defaultValue 
+	  * @method addFeature
+ */
+
+
+/**
+* Remove a feature
+	 * @param {string} name 
+	  * @method removeFeature
+ */
+
+
+/**
+* Set the feature for a category
+	 * @param {string} categoryName 
+	 * @param {string} featureName 
+	 * @param {*} featureValue 
+	  * @method setCategoryFeature
+ */
+
+
+/**
+* Get the feature for a category
+	 * @param {string} categoryName 
+	 * @param {string} featureName 
+	 * @returns {*}
+	  * @method getCategoryFeature
+ */
+
+
+/**
+* Get a copy of the category and feature data
+	 * @return {object}
+	  * @method getCategoryExportData
+ */
+
+
+/**
+* Save the categories (if we're in a recognized environment).
+	 * @param {Object} config for the network call (specifying if needed the location of Trombone, etc., see {@link #Load.trombone}
+	 * @return {Promise} this returns a promise which eventually resolves to a string that is the ID reference for the stored categories
+	  * @method save
+ */
+
+
+/**
+* Load the categories (if we're in a recognized environment).
+	 * 
+	 * In its simplest form this can be used with a single string ID to load:
+	 * 	new Spyral.Categories().load("categories.en.txt")
+	 * 
+	 * Which is equivalent to:
+	 * 	new Spyral.Categories().load({retrieveResourceId: "categories.en.txt"});
+	 * 
+	 * @param {Object|String} config an object specifying the parameters (see above)
+	 * @param {Object} api an object specifying any parameters for the trombone call
+	 * @return {Promise} this first returns a promise and when the promise is resolved it returns this categories object (with the loaded data included)
+	  * @method load
+ */
+
+
+
+
+// *** Documentation extracted from: ../../../../voyantjs/src/util.js ***
+
+/**
+* A helper for working with the Voyant Notebook app.
+ * @namespace
+ * @class Spyral.Util
+ */
+
+
+/**
+* Generates a random ID of the specified length.
+	 * @static
+	 * @param {number} len The length of the ID to generate?
+	 * @returns {string}
+	 * @static
+ * @method id
+ */
+
+
+/**
+* 
+	 * @static
+	 * @param {array|object|string} contents 
+	 * @returns {string}
+	 * @static
+ * @method toString
+ */
+
+
+/**
+* 
+	 * @static
+	 * @param {string} before 
+	 * @param {string} more 
+	 * @param {string} after 
+	 * @static
+ * @method more
+ */
+
+
 
 
 // *** Documentation extracted from: ../../../../voyantjs/src/chart.js ***
@@ -134,6 +355,25 @@
 
 
 
+// *** Documentation extracted from: ../../../../voyantjs/src/fileinput.js ***
+
+/**
+* A multiple file input that features drag n drop as well as temporary file storage in session storage.
+ * @class FileInput
+ */
+
+
+/**
+* The FileInput constructor
+	 * @param {element} target The element to place the file input into
+	 * @param {function} resolve A function to call with the file(s)
+	 * @param {function} reject A function to call if the input is cancelled
+	  * @method constructor
+ */
+
+
+
+
 // *** Documentation extracted from: ../../../../voyantjs/src/load.js ***
 
 /**
@@ -206,12 +446,78 @@
  */
 
 
+/**
+* Create a file input in the target element and returns a Promise that's resolved with the file(s) that is added to the input.
+	 * The file is also temporarily stored in the session storage for successive retrieval.
+	 * @param {element} target The target element to append the input to
+	 * @returns {Promise}
+	 * @static
+ * @method files
+ */
+
+
 
 
 // *** Documentation extracted from: ../../../../voyantjs/src/table.js ***
 
 /**
-* Class representing a Table.
+* The Spyral.Table class in Spyral provides convenience functions for working with tabular
+ * data.
+ * 
+ * There are several ways of initializing a Table, here are some of them:
+ * 
+ * Provide an array of data with 3 rows:
+ * 
+ *  	let table = createTable([1,2,3]);
+ *
+ *
+ * Provide a nested array of data with multiple rows:
+ * 
+ *		let table = createTable([[1,2],[3,4]]);
+ * 
+ * Same nested array, but with a second argument specifying headers
+ * 
+ *		let table = createTable([[1,2],[3,4]], {headers: ["one","two"]});
+ * 
+ * Create table with comma-separated values:
+ * 
+ *  	let table = createTable("one,two\\n1,2\\n3,4");
+ * 
+ * Create table with tab-separated values
+ * 
+ *		let table = createTable("one\\ttwo\\n1\\t2\\n3\\t4");
+ * 
+ * Create table with array of objects
+ * 
+ *  	let table = createTable([{one:1,two:2},{one:3,two:4}]);
+ * 
+ * It's also possible simple to create a sorted frequency table from an array of values:
+ * 
+ *		let table = createTable(["one","two","one"], {count: "vertical", headers: ["Term","Count"]})
+ * 
+ * Working with a Corpus is easy. For instance, we can create a table from the top terms:
+ * 
+ *		loadCorpus("austen").terms({limit:500, stopList: 'auto'}).then(terms => {
+ *			return createTable(terms);
+ *		})
+ * 
+ * Similarly, we could create a frequency table from the first 1,000 words of the corpus:
+ * 
+ *		loadCorpus("austen").words({limit:1000, docIndex: 0, stopList: 'auto'}).then(words => {
+ *			return createTable(words, {count: "verticalA"});
+ *		});
+ *
+ * Some of the configuration options are as follows:
+ * 
+ * * **format**: especially for forcing csv or tsv when the data is a string
+ * * **hasHeaders**: determines if data has a header row (usually determined automatically)
+ * * **headers**: a Array of Strings that serve as headers for the table
+ * * **count**: forces Spyral to create a sorted frequency table from an Array of data, this can be set to "vertical" if the counts are shown vertically or set to true if the counts are shown horizontally
+ * 
+ * Tables are convenient in Spyral because you can simply show them to preview a version in HTML.
+ * 
+ * @param {Array|String} data an array of data or a string with CSV or TSV.
+ * @param {Object} config an Object for configuring the table initialization, see above
  * @class Spyral.Table
  */
 
@@ -596,6 +902,12 @@
 
 
 /**
+* Same as {@link toString}.
+	  * @method toHtml
+ */
+
+
+/**
 * Get an HTML representation of the Table
 	 * @param {object} [config]
 	 * @returns {string}
@@ -731,12 +1043,6 @@
  *
  * 	loadCorpus("Hello World!").then(corpus -> corpus.summary());
  *
- * The `loadCorpus` method is actually an alias, so the full form of this would actually be something like this:
- * 
- * 	Spyral.Corpus.load("Hello World").then(corpus -> corpus.summary());
- * 
- * But we like our short-cuts, so the first form is the preferred form.
- * 
  * Have a look at the {@link #input} configuration for more examples.
  * 
  * There is a lot of flexibility in how corpora are created, here's a summary of the parameters:
@@ -758,14 +1064,14 @@
  * Typically the corpus ID is used as a first string argument, with an optional second
  * argument for other parameters (especially those to recreate the corpus if needed).
  * 
- * 		loadCorpus("goldbug");
- * 
- * 		loadCorpus("goldbug", {
- *			// if corpus ID "goldbug" isn't found, use the input
- * 			input: "https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt",
- * 			inputRemoveUntil: 'THE GOLD-BUG',
- * 			inputRemoveFrom: 'FOUR BEASTS IN ONE'
- * 		});
+ * 	loadCorpus("goldbug");
+ *
+ * 	loadCorpus("goldbug", {
+ * 		// if corpus ID "goldbug" isn't found, use the input
+ * 		input: "https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt",
+ * 		inputRemoveUntil: 'THE GOLD-BUG',
+ * 		inputRemoveFrom: 'FOUR BEASTS IN ONE'
+ * 	});
  */
 
 
@@ -1130,34 +1436,34 @@
 	 * 
 	 * The following is an example of what is returned as metadata for the first document:
 	 *
-	 * 		[
-     * 			{
-     *   			"id": "ddac6b12c3f4261013c63d04e8d21b45",
-     *   			"extra.X-Parsed-By": "org.apache.tika.parser.DefaultParser",
-     *   			"tokensCount-lexical": "33559",
-     *   			"lastTokenStartOffset-lexical": "259750",
-     *   			"parent_modified": "1548457455000",
-     *   			"typesCount-lexical": "4235",
-     *   			"typesCountMean-lexical": "7.924203",
-     *   			"lastTokenPositionIndex-lexical": "33558",
-     *   			"index": "0",
-     *   			"language": "en",
-     *   			"sentencesCount": "1302",
-     *   			"source": "stream",
-     *   			"typesCountStdDev-lexical": "46.626404",
-     *   			"title": "1790 Love And Freindship",
-     *   			"parent_queryParameters": "VOYANT_BUILD=M16&textarea-1015-inputEl=Type+in+one+or+more+URLs+on+separate+lines+or+paste+in+a+full+text.&VOYANT_REMOTE_ID=199.229.249.196&accessIP=199.229.249.196&VOYANT_VERSION=2.4&palette=default&suppressTools=false",
-     *   			"extra.Content-Type": "text/plain; charset=windows-1252",
-     *   			"parentType": "expansion",
-     *   			"extra.Content-Encoding": "windows-1252",
-     *   			"parent_source": "file",
-     *   			"parent_id": "ae47e3a72cd3cad51e196e8a41e21aec",
-     *   			"modified": "1432861756000",
-     *   			"location": "1790 Love And Freindship.txt",
-     *   			"parent_title": "Austen",
-     *   			"parent_location": "Austen.zip"
-     *   		}
-     *  	 ]
+	 * 	[
+     * 		{
+     *   		"id": "ddac6b12c3f4261013c63d04e8d21b45",
+     *   		"extra.X-Parsed-By": "org.apache.tika.parser.DefaultParser",
+     *   		"tokensCount-lexical": "33559",
+     *   		"lastTokenStartOffset-lexical": "259750",
+     *   		"parent_modified": "1548457455000",
+     *   		"typesCount-lexical": "4235",
+     *   		"typesCountMean-lexical": "7.924203",
+     *   		"lastTokenPositionIndex-lexical": "33558",
+     *   		"index": "0",
+     *   		"language": "en",
+     *   		"sentencesCount": "1302",
+     *   		"source": "stream",
+     *   		"typesCountStdDev-lexical": "46.626404",
+     *   		"title": "1790 Love And Freindship",
+     *   		"parent_queryParameters": "VOYANT_BUILD=M16&textarea-1015-inputEl=Type+in+one+or+more+URLs+on+separate+lines+or+paste+in+a+full+text.&VOYANT_REMOTE_ID=199.229.249.196&accessIP=199.229.249.196&VOYANT_VERSION=2.4&palette=default&suppressTools=false",
+     *   		"extra.Content-Type": "text/plain; charset=windows-1252",
+     *   		"parentType": "expansion",
+     *   		"extra.Content-Encoding": "windows-1252",
+     *   		"parent_source": "file",
+     *   		"parent_id": "ae47e3a72cd3cad51e196e8a41e21aec",
+     *   		"modified": "1432861756000",
+     *   		"location": "1790 Love And Freindship.txt",
+     *   		"parent_title": "Austen",
+     *   		"parent_location": "Austen.zip"
+     * 		}
+     * 	]
 	 * 
 	 * In Corpus mode there's no reason to specify arguments. In documents mode you
 	 * can request specific documents in the config object:
@@ -1167,7 +1473,8 @@
 	 *  * **docIndex**: a zero-based list of documents (first document is zero, etc.); multiple documents can be separated by a comma
 	 *  * **docId**: a set of document IDs; multiple documents can be separated by a comma
 	 *  * **query**: one or more term queries for the title, author or full-text
-	 *  * **sort**: one of the following sort orders (composed of a feature like `INDEX` and a sort direction `ASC` or `DESC`): `INDEXASC`, `INDEXDESC`, `TITLEASC`, `TITLEDESC`, `AUTHORASC`, `AUTHORDESC`, `TOKENSCOUNTLEXICALASC`, `TOKENSCOUNTLEXICALDESC`, `TYPESCOUNTLEXICALASC`, `TYPESCOUNTLEXICALDESC`, `TYPETOKENRATIOLEXICALASC`, `TYPETOKENRATIOLEXICALDESC`, `PUBDATEASC`, `PUBDATEDESC`
+	 *  * **sort**: one of the following sort orders: `INDEX`, `TITLE`, `AUTHOR`, `TOKENSCOUNTLEXICAL`, `TYPESCOUNTLEXICAL`, `TYPETOKENRATIOLEXICAL`, `PUBDATE`
+	 *  * **dir**: sort direction, **`ASC`**ending or **`DESC`**ending
 	 * 
 	 *  An example:
 	 *  
@@ -1185,7 +1492,7 @@
 	 * 
 	 * An example:
 	 * 
-	 * 		loadCorpus("austen").summary();
+	 * 	loadCorpus("austen").summary();
 	 * 
 	 * @return {Promise/String} a Promise for a string containing a brief summary of the corpus metadata
 	  * @method summary
@@ -1202,14 +1509,15 @@
 	 *  * **docIndex**: a zero-based list of documents (first document is zero, etc.); multiple documents can be separated by a comma
 	 *  * **docId**: a set of document IDs; multiple documents can be separated by a comma
 	 *  * **query**: one or more term queries for the title, author or full-text
-	 *  * **sort**: one of the following sort orders (composed of a feature like `INDEX` and a sort direction `ASC` or `DESC`): `INDEXASC`, `INDEXDESC`, `TITLEASC`, `TITLEDESC`, `AUTHORASC`, `AUTHORDESC`, `TOKENSCOUNTLEXICALASC`, `TOKENSCOUNTLEXICALDESC`, `TYPESCOUNTLEXICALASC`, `TYPESCOUNTLEXICALDESC`, `TYPETOKENRATIOLEXICALASC`, `TYPETOKENRATIOLEXICALDESC`, `PUBDATEASC`, `PUBDATEDESC`
+	 *  * **sort**: one of the following sort orders: `INDEX`, `TITLE`, `AUTHOR`, `TOKENSCOUNTLEXICAL`, `TYPESCOUNTLEXICAL`, `TYPETOKENRATIOLEXICAL`, `PUBDATE`
+	 *  * **dir**: sort direction, **`ASC`**ending or **`DESC`**ending
 	 * 
 	 * An example:
-	 * 
-	 * 		loadCorpus("austen").titles().then(titles => "The last work is: "+titles[titles.length-1])
-	 * 
+	 *
+	 * 	loadCorpus("austen").titles().then(titles => "The last work is: "+titles[titles.length-1])
+	 *
 	 * @param {Object} config an Object specifying parameters (see list above) 
-	 * @returns {Promise/Array} a Promise for an Array of document titles  
+	 * @returns {Promise|Array} a Promise for an Array of document titles  
 	  * @method titles
  */
 
@@ -1228,8 +1536,8 @@
 	 * 
 	 * An example:
 	 *
-	 * 		// fetch 1000 characters from each text in the corpus into a single string
-	 * 		loadCorpus("austen").text({limit:1000})
+	 * 	// fetch 1000 characters from each text in the corpus into a single string
+	 * 	loadCorpus("austen").text({limit:1000})
 	 * 
 	 * @param {Object} config an Object specifying parameters (see list above)
 	 * @returns {Promise/String} a Promise for a string of the corpus
@@ -1249,8 +1557,8 @@
 	 * 
 	 * An example:
 	 *
-	 * 		// fetch 1000 characters from each text in the corpus into an Array
-	 * 		loadCorpus("austen").texts({limit:1000})
+	 * 	// fetch 1000 characters from each text in the corpus into an Array
+	 * 	loadCorpus("austen").texts({limit:1000})
 	 * 
 	 * @param {Object} config an Object specifying parameters (see list above)
 	 * @returns {Promise/String} a Promise for an Array of texts from the corpus
@@ -1271,27 +1579,27 @@
 	 * 
 	 * The following is an example a Corpus Term (corpus mode):
 	 * 
-	 * 		{
-	 * 			"term": "the",
-	 * 			"inDocumentsCount": 8,
-	 * 			"rawFreq": 28292,
-	 * 			"relativeFreq": 0.036189996,
-	 * 			"comparisonRelativeFreqDifference": 0
-	 * 		}
+	 * 	{
+	 * 		"term": "the",
+	 * 		"inDocumentsCount": 8,
+	 * 		"rawFreq": 28292,
+	 * 		"relativeFreq": 0.036189996,
+	 * 		"comparisonRelativeFreqDifference": 0
+	 * 	}
 	 * 
 	 * The following is an example of Document Term (documents mode):
 	 * 
-	 * 		{
-	 * 			"term": "the",
-	 * 			"rawFreq": 1333,
-	 * 			"relativeFreq": 39721.086,
-	 * 			"zscore": 28.419,
-	 * 			"zscoreRatio": -373.4891,
-	 * 			"tfidf": 0.0,
-	 * 			"totalTermsCount": 33559,
- 	 * 			"docIndex": 0,
-	 * 			"docId": "8a61d5d851a69c03c6ba9cc446713574"
-	 * 		}
+	 * 	{
+	 * 		"term": "the",
+	 * 		"rawFreq": 1333,
+	 * 		"relativeFreq": 39721.086,
+	 * 		"zscore": 28.419,
+	 * 		"zscoreRatio": -373.4891,
+	 * 		"tfidf": 0.0,
+	 * 		"totalTermsCount": 33559,
+ 	 * 		"docIndex": 0,
+	 * 		"docId": "8a61d5d851a69c03c6ba9cc446713574"
+	 * 	}
 	 * 
 	 * The following config parameters are valid in both modes:
 	 * 
@@ -1303,32 +1611,33 @@
 	 *  * **withDistributions**: a true value shows distribution across the corpus (corpus mode) or across the document (documents mode)
 	 *  * **whiteList**: a keyword list – terms will be limited to this list
 	 *  * **tokenType**: the token type to use, by default `lexical` (other possible values might be `title` and `author`)
+	 *  * **dir**: sort direction, **`ASC`**ending or **`DESC`**ending
 	 * 
 	 * The following are specific to corpus mode:
 	 * 
 	 *  * **bins**: by default there are the same number of bins as there are documents (for distribution values), this can be modified
 	 *  * **corpusComparison**: you can provide the ID of a corpus for comparison of frequency values
 	 *  * **inDocumentsCountOnly**: if you don't need term frequencies but only frequency per document set this to true
-	 *  * **sort**: the order of the terms, one of the following (composed of a value and a direction of ASCending or DEScending: `INDOCUMENTSCOUNTASC, INDOCUMENTSCOUNTDESC, RAWFREQASC, RAWFREQDESC, TERMASC, TERMDESC, RELATIVEPEAKEDNESSASC, RELATIVEPEAKEDNESSDESC, RELATIVESKEWNESSASC, RELATIVESKEWNESSDESC, COMPARISONRELATIVEFREQDIFFERENCEASC, COMPARISONRELATIVEFREQDIFFERENCEDESC`
+	 *  * **sort**: the order of the terms, one of the following: `INDOCUMENTSCOUNT, RAWFREQ, TERM, RELATIVEPEAKEDNESS, RELATIVESKEWNESS, COMPARISONRELATIVEFREQDIFFERENCE`
 	 *  
 	 *  The following are specific to documents mode:
 	 * 
 	 *  * **bins**: by default the document is divided into 10 equal bins(for distribution values), this can be modified
-	 *  * **sort**: the order of the terms, one of the following (composed of a value and a direction of ASCending or DEScending: `RAWFREQASC, RAWFREQDESC, RELATIVEFREQASC, RELATIVEFREQDESC, TERMASC, TERMDESC, TFIDFASC, TFIDFDESC, ZSCOREASC, ZSCOREDESC`
+	 *  * **sort**: the order of the terms, one of the following: `RAWFREQ, RELATIVEFREQ, TERM, TFIDF, ZSCORE`
 	 *  * **perDocLimit**: the `limit` parameter is for the total number of terms returned, this parameter allows you to specify a limit value per document
 	 *  * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)
 	 *  * **docId**: the document IDs to include (use commas to separate multiple values)
 	 *  
 	 * An example:
 	 * 
-	 * 		// show top 5 terms
-   	 * 		loadCorpus("austen").terms({stopList: 'auto', limit: 5}).then(terms => terms.map(term => term.term))
-   	 * 
-   	 *		// show top term for each document
-   	 * 		loadCorpus("austen").terms({stopList: 'auto', perDocLimit: 1, mode: 'documents'}).then(terms => terms.map(term => term.term))
+	 * 	// show top 5 terms
+   	 * 	loadCorpus("austen").terms({stopList: 'auto', limit: 5}).then(terms => terms.map(term => term.term))
+   	 *
+   	 * 	// show top term for each document
+   	 * 	loadCorpus("austen").terms({stopList: 'auto', perDocLimit: 1, mode: 'documents'}).then(terms => terms.map(term => term.term))
    	 * 
 	 * @param {Object} config an Object specifying parameters (see list above)
-	 * @returns {Promise/Array} a Promise for a Array of Terms
+	 * @returns {Promise|Array} a Promise for a Array of Terms
 	  * @method terms
  */
 
@@ -1363,12 +1672,12 @@
 	 *  * **docId**: the document IDs to include (use commas to separate multiple values)
 	 * 
 	 * An example:
-	 * 
-	 * 		// load the first 20 tokens (don't include tags, spaces, etc.)
-	 * 		loadCorpus("austen").tokens({limit: 20, noOthers: true})
-	 * 
+	 *
+	 * 	// load the first 20 tokens (don't include tags, spaces, etc.)
+	 * 	loadCorpus("austen").tokens({limit: 20, noOthers: true})
+	 *
 	 * @param {Object} config an Object specifying parameters (see above)
-	 * @returns {Promise/Array} a Promise for an Array of document tokens
+	 * @returns {Promise|Array} a Promise for an Array of document tokens
 	  * @method tokens
  */
 
@@ -1389,12 +1698,12 @@
 	 *  * **docId**: the document IDs to include (use commas to separate multiple values)
 	 * 
 	 * An example:
-	 * 
-	 * 		// load the first 20 words in the corpus
-	 * 		loadCorpus("austen").tokens({limit: 20})
-	 * 
+	 *
+	 * 	// load the first 20 words in the corpus
+	 * 	loadCorpus("austen").tokens({limit: 20})
+	 *
 	 * @param {Object} config an Object specifying parameters (see above)
-	 * @returns {Promise/Array} a Promise for an Array of words
+	 * @returns {Promise|Array} a Promise for an Array of words
 	  * @method words
  */
 
@@ -1404,140 +1713,404 @@
 	 * 
 	 * An individual KWIC Object looks something like this:
 	 * 
-	 * 		{
-     * 			"docIndex": 0,
-     * 			"query": "love",
-     * 			"term": "love",
-     * 			"position": 0,
-     * 			"left": "FREINDSHIP AND OTHER EARLY WORKS",
-     * 			"middle": "Love",
-     * 			"right": " And Friendship And Other Early"
-     *  	}
+     * 	{
+     *			"docIndex": 0,
+     *			"query": "love",
+     *			"term": "love",
+     *			"position": 0,
+     *			"left": "FREINDSHIP AND OTHER EARLY WORKS",
+     *			"middle": "Love",
+     *			"right": " And Friendship And Other Early"
+     * 	}
      *  
-	 * The following are valid in the config parameter:
+     * The following are valid in the config parameter:
+     * 
+     *  * **start**: the zero-based start index of the list (for paging)
+     *  * **limit**: the maximum number of terms to provide per request
+     *  * **query**: a term query (see https://voyant-tools.org/docs/#!/guide/search)
+     *  * **sort**: the order of the contexts: `TERM,, DOCINDEX, POSITION, LEFT, RIGHT`
+	 *  * **dir**: sort direction, **`ASC`**ending or **`DESC`**ending
+     *  * **perDocLimit**: the `limit` parameter is for the total number of terms returned, this parameter allows you to specify a limit value per document
+     *  * **stripTags**: for the `left`, `middle` and `right` values, one of the following: `ALL`, `BLOCKSONLY` (tries to maintain blocks for line formatting), `NONE` (default)
+     *  * **context**: the size of the context (the number of words on each size of the keyword)
+     *  * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)
+     *  * **docId**: the document IDs to include (use commas to separate multiple values)
+     *  * **overlapStrategy**: determines how to handle cases where there's overlap between KWICs, such as "to be or not to be" when the keyword is "be"; here are the options:
+     *      * **none**: nevermind the overlap, keep all words
+     *      	* {left: "to", middle: "be", right: "or not to be"} 
+     *      	* {left: "to be or not to", middle: "be", right: ""} 
+     *      * **first**: priority goes to the first occurrence (some may be dropped)
+     *      	* {left: "to", middle: "be", right: "or not to be"} 
+     *      * **merge**: balance the words between overlapping occurrences
+     *      	* {left: "to", middle: "be", right: "or"} 
+     *      	* {left: "not to", middle: "be", right: ""} 
+     * 
+     * An example:
+     * 
+     * 	// load the first 20 words in the corpus
+     * 	loadCorpus("austen").contexts({query: "love", limit: 10})
+     * 
+     * @param {Object} config an Object specifying parameters (see above)
+     * @returns {Promise|Array} a Promise for an Array of KWIC Objects
+      * @method contexts
+ */
+
+
+/**
+* Get a Promise for an Array of collocates (either document or corpus collocates, depending on the specified mode).
+	 * 
+	 * The mode is set to "documents" when any of the following is true
+	 * 
+	 * * the `mode` parameter is set to "documents"
+	 * * a `docIndex` parameter being set
+	 * * a `docId` parameter being set
+	 * 
+	 * The following is an example a Corpus Collocate (corpus mode):
+	 * 
+	 * 	{
+     *   		"term": "love",
+     *   		"rawFreq": 568,
+     *   		"contextTerm": "mr",
+     *   		"contextTermRawFreq": 24
+     * 	}
+	 * 
+	 * The following is an example of Document Collocate (documents mode):
+	 * 
+	 * 	{
+     * 			"docIndex": 4,
+     * 			"keyword": "love",
+     * 			"keywordContextRawFrequency": 124,
+     * 			"term": "fanny",
+     * 			"termContextRawFrequency": 8,
+     * 			"termContextRelativeFrequency": 0.021680217,
+     * 			"termDocumentRawFrequency": 816,
+     * 			"termDocumentRelativeFrequency": 0.0050853477,
+     * 			"termContextDocumentRelativeFrequencyDifference": 0.01659487
+     * 	}
+	 * 
+	 * The following config parameters are valid in both modes:
 	 * 
 	 *  * **start**: the zero-based start index of the list (for paging)
 	 *  * **limit**: the maximum number of terms to provide per request
 	 *  * **query**: a term query (see https://voyant-tools.org/docs/#!/guide/search)
-	 *  * **sort**: the order of the contexts composed of a feature and either **ASC**ending or **DESC**ending: `TERMASC, TERMDESC, DOCINDEXASC, DOCINDEXDESC, POSITIONASC, POSITIONDESC, LEFTASC, LEFTDESC, RIGHTASC, RIGHTDESC`
-	 *  * **perDocLimit**: the `limit` parameter is for the total number of terms returned, this parameter allows you to specify a limit value per document
-	 *  * **stripTags**: for the `left`, `middle` and `right` values, one of the following: `ALL`, `BLOCKSONLY` (tries to maintain blocks for line formatting), `NONE` (default)
-	 *  * **overlapStrategy**: determines how to handle cases where there's overlap between KWICs, such as "to be or not to be" when the keyword is "be"; here are the options:
-	 *  	* **none**: nevermind the overlap, keep all words
-	 *  		* {left: "to", middle: "be", right: "or not to be"} 
-	 *  		* {left: "to be or not to", middle: "be", right: ""} 
-	 *  	* **first**: priority goes to the first occurrence:
-	 *  		* {left: "to", middle: "be", right: "or not to be"} 
-	 *  	* **merge**: balance the words
-	 *  		* {left: "to", middle: "be", right: "or"} 
-	 *  		* {left: "not to", middle: "be", right: ""} 
+	 *  * **stopList** a list of stopwords to include (see https://voyant-tools.org/docs/#!/guide/stopwords)
+	 *  * **collocatesWhitelist**: collocates will be limited to this list
+     *  * **context**: the size of the context (the number of words on each size of the keyword)
+	 *  * **dir**: sort direction, **`ASC`**ending or **`DESC`**ending
+	 * 
+	 * The following are specific to corpus mode:
+	 * 
+	 *  * **sort**: the order of the terms, one of the following: `RAWFREQ, TERM, CONTEXTTERM, CONTEXTTERMRAWFREQ`
+	 *  
+	 *  The following are specific to documents mode:
+	 * 
+	 *  * **sort**: the order of the terms, one of the following: `TERM, REL, REL, RAW, DOCREL, DOCRAW, CONTEXTDOCRELDIFF`
 	 *  * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)
 	 *  * **docId**: the document IDs to include (use commas to separate multiple values)
-	 * 
+	 *  
 	 * An example:
 	 * 
-	 * 		// load the first 20 words in the corpus
-	 * 		loadCorpus("austen").contexts({query: "love", limit: 10})
+	 * 	// show top 5 collocate terms
+   	 * 	loadCorpus("austen").collocates({stopList: 'auto', limit: 5}).then(terms => terms.map(term => term.term))
+   	 * 
+	 * @param {Object} config an Object specifying parameters (see list above)
+	 * @returns {Promise|Array} a Promise for a Array of Terms
+	  * @method collocates
+ */
+
+
+/**
+* Get a Promise for an Array of phrases or n-grams (either document or corpus phrases, depending on the specified mode).
 	 * 
-	 * @param {Object} config an Object specifying parameters (see above)
-	 * @returns {Promise/Array} a Promise for an Array of KWIC Objects
-	  * @method contexts
+	 * The mode is set to "documents" when any of the following is true
+	 * 
+	 * * the `mode` parameter is set to "documents"
+	 * * a `docIndex` parameter being set
+	 * * a `docId` parameter being set
+	 * 
+	 * The following is an example a Corpus phrase (corpus mode), without distributions requested:
+	 * 
+	 * 	{
+     *  		"term": "love with",
+     *  		"rawFreq": 103,
+     *  		"length": 2
+     * 	}
+	 * 
+	 * The following is an example of Document phrase (documents mode), without positions requested:
+	 * 
+	 * 	{
+     *   		"term": "love with",
+     *   		"rawFreq": 31,
+     *   		"length": 2,
+     *   		"docIndex": 5
+     * 	}
+	 * 
+	 * The following config parameters are valid in both modes:
+	 * 
+	 *  * **start**: the zero-based start index of the list (for paging)
+	 *  * **limit**: the maximum number of terms to provide per request
+	 *  * **minLength**: the minimum length of the phrase
+	 *  * **maxLength**: the maximum length of the phrase
+	 *  * **minRawFreq**: the minimum raw frequency of the phrase
+     * 	* **sort**: the order of the terms, one of the following: `RAWFREQ, TERM, LENGTH`
+	 *  * **dir**: sort direction, **`ASC`**ending or **`DESC`**ending
+	 *  * **overlapFilter**: it happens that phrases contain other phrases and we need a strategy for handling overlap:
+     *      * **NONE**: nevermind the overlap, keep all phrases
+     *      * **LENGTHFIRST**: priority goes to the longest phrases
+     *      * **RAWFREQFIRST**: priority goes to the highest frequency phrases
+     *      * **POSITIONFIRST**: priority goes to the first phrases
+     * 
+     * The following are specific to documents mode:
+     * 
+	 *  * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)
+	 *  * **docId**: the document IDs to include (use commas to separate multiple values)
+     *  
+     * An example:
+     * 
+     * 	// load the first 20 phrases in the corpus
+     * 	loadCorpus("austen").phrases({query: "love", limit: 10})
+     * 
+     * @param {Object} config an Object specifying parameters (see above)
+     * @returns {Promise|Array} a Promise for an Array of phrase Objects
+      * @method phrases
  */
 
 
 /**
-* Create a Corpus and return the collocates
-	 * @param {object} config 
-	 * @param {object} api 
-	 * @static
- * @method collocates
+* Get a Promise for an Array of correlations (either document or corpus correlations, depending on the specified mode).
+	 * 
+	 * The mode is set to "documents" when any of the following is true
+	 * 
+	 * * the `mode` parameter is set to "documents"
+	 * * a `docIndex` parameter being set
+	 * * a `docId` parameter being set
+	 * 
+	 * The following is an example a Corpus correlation (corpus mode):
+	 * 
+	 * 	{
+     * 		"source": {
+     * 			"term": "mrs",
+     * 			"inDocumentsCount": 8,
+     * 			"rawFreq": 2531,
+     * 			"relativePeakedness": 0.46444246,
+     * 			"relativeSkewness": -0.44197384
+     * 		},
+     * 		"target": {
+     * 			"term": "love",
+     * 			"inDocumentsCount": 8,
+     * 			"rawFreq": 568,
+     * 			"relativePeakedness": 5.763066,
+     * 			"relativeSkewness": 2.2536576
+     * 		},
+     * 		"correlation": -0.44287738,
+     * 		"significance": 0.08580014
+     * 	}
+	 * 
+	 * The following is an example of Document correlation (documents mode), without positions requested:
+	 * 
+	 * 	{
+     * 		"source": {
+     * 			"term": "confide",
+     * 			"rawFreq": 3,
+     * 			"relativeFreq": 89.3948,
+     * 			"zscore": -0.10560975,
+     * 			"zscoreRatio": -0.7541012,
+     * 			"tfidf": 1.1168874E-5,
+     * 			"totalTermsCount": 33559,
+     * 			"docIndex": 0,
+     * 			"docId": "8a61d5d851a69c03c6ba9cc446713574"
+     * 		},
+     * 		"target": {
+     * 			"term": "love",
+     * 			"rawFreq": 54,
+     * 			"relativeFreq": 1609.1063,
+     * 			"zscore": 53.830048,
+     * 			"zscoreRatio": -707.44696,
+     * 			"tfidf": 0.0,
+     * 			"totalTermsCount": 33559,
+     * 			"docIndex": 0,
+     * 			"docId": "8a61d5d851a69c03c6ba9cc446713574"
+     * 		},
+     * 		"correlation": 0.93527687,
+     * 		"significance": 7.0970666E-5
+     * 	}
+	 * 
+	 * The following config parameters are valid in both modes:
+	 * 
+	 *  * **start**: the zero-based start index of the list (for paging)
+	 *  * **limit**: the maximum number of terms to provide per request
+	 *  * **minRawFreq**: the minimum raw frequency of the collocate terms
+	 *  * **termsOnly**: a very compact data view of the correlations
+     *  * **sort**: the order of the terms, one of the following: `CORRELATION`, `CORRELATIONABS`
+	 *  * **dir**: sort direction, **`ASC`**ending or **`DESC`**ending
+     * 
+     * The following are specific to documents mode:
+     * 
+	 *  * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)
+	 *  * **docId**: the document IDs to include (use commas to separate multiple values)
+     *  
+     * An example:
+     * 
+     * 	// load the first 10 phrases in the corpus
+     * 	loadCorpus("austen").correlations({query: "love", limit: 10})
+     * 
+     * @param {Object} config an Object specifying parameters (see above)
+     * @returns {Promise|Array} a Promise for an Array of phrase Objects
+      * @method correlations
  */
 
 
 /**
-* Create a Corpus and return the phrases
-	 * @param {object} config 
-	 * @param {object} api 
-	 * @static
- * @method phrases
+* Get a promise for an LDA object that has two primary methods of use:
+	 * 
+	 * 	* **getTopicWords**: get a list of topics (words organized into bunches of a specified size
+	 * 	* **getDocuments**: get a list of documents and the signican words
+	 *
+	 * The config object as parameter can contain the following:
+	 *  * **numberTopics**: the number of topics to get (default is 10)
+	 *  * **sweeps**: the number of sweeps to do, more sweeps = more accurate (default is 100)
+	 *  * **language**: stopwords language to use, default is corpus language
+	 * @param {Object} config (see above)
+	 * @return {Promise} a promise for an LDA object
+	  * @method lda
  */
 
 
 /**
-* Create a Corpus and return the correlations
-	 * @param {object} config 
-	 * @param {object} api 
-	 * @static
- * @method correlations
+* Get a promise for a list of LDA topics from the corpus.
+	 * 
+	 * The config object as parameter can contain the following:
+	 *  * **numberTopics**: the number of topics to get (default is 10)
+	 *  * **sweeps**: the number of sweeps to do, more sweeps = more accurate (default is 100)
+	 *  * **language**: stopwords language to use, default is corpus language
+	 * @param {Object} config (see above)
+	 * @return {Promise} a promise for an array of topics
+	  * @method ldaTopics
  */
 
 
 /**
-* Create a Corpus and return the tool
-	 * @param {*} tool 
-	 * @param {*} config 
-	 * @param {*} api 
-	 * @static
- * @method tool
+* Get a promise for a list of documents and associated words
+	 * 
+	 * The config object as parameter can contain the following:
+	 *  * **numberTopics**: the number of topics to get (default is 10)
+	 *  * **sweeps**: the number of sweeps to do, more sweeps = more accurate (default is 100)
+	 *  * **language**: stopwords language to use, default is corpus language
+	 * @param {Object} config (see above)
+	 * @return {Promise} a promise for an array of documents
+	  * @method ldaDocuments
  */
 
 
 /**
-* Create a new Corpus using the provided config
-	 * @param {object} config 
-	 * @static
- * @method create
+* Get a promise for the HTML snippet that will produce the specified Voyant tools to appear.
+	 * 
+	 * In its simplest form we can simply call the named tool:
+	 * 
+	 * 	loadCorpus("austen").tool("Cirrus");
+	 * 
+	 * Each tool supports some options (that are summarized below), and those can be specified as options:
+	 * 
+	 * 	loadCorpus("austen").tool("Trends", {query: "love"});
+	 * 
+	 * There are also parameters (width, height, style, float) that apply to the actual tool window:
+	 * 
+	 *  loadCorpus("austen").tool("Trends", {query: "love", style: "width: 500px; height: 500px"});
+	 * 
+	 * It's also possible to have several tools appear at once, though they won't be connected by events (clicking in a window won't modify the other windows):
+	 * 
+	 * 	loadCorpus("austen").tool("Cirrus", "Trends");
+	 * 
+	 * One easy way to get connected tools is to use the `CustomSet` tool and experiment with the layout:
+	 * 
+	 * 	loadCorpus("austen").tool("CustomSet", {tableLayout: "Cirrus,Trends", style: "width:800px; height: 500px"});
+	 * 
+	 * Here's a partial list of the tools available as well as their significant parameters:
+	 * 
+	 *  * <a href="./#!/guide/bubblelines" target="_blank">Bubblelines</a> visualizes the frequency and distribution of terms in a corpus.
+	 *  	* **bins**: number of bins to separate a document into
+	 *  	* **docIndex**: document index to restrict to (can be comma-separated list)
+	 *  	* **maxDocs**: maximum number of documents to show
+	 *  	* **query**: a query to search for in the corpus
+	 *  	* **stopList**: a named stopword list or comma-separated list of words
+	 *  * <a href="./#!/guide/bubbles" target="_blank">Bubbles</a> is a playful visualization of term frequencies by document.
+	 *  	* **audio**: whether or not to include audio
+	 *  	* **docIndex**: document index to restrict to (can be comma-separated list)
+	 *  	* **speed**: speed of the animation (0 to 60 lower is slower)
+	 *  	* **stopList**: a named stopword list or comma-separated list of words
+	 *  * <a href="./#!/guide/cirrus" target="_blank">Cirrus</a> is a word cloud that visualizes the top frequency words of a corpus or document.
+	 *  	* **background**: set the background colour of the word cloud
+	 *  	* **categories**: set the categories for the word cloud (usually an ID of an existing categories definition)
+	 *  	* **docIndex**: document index to restrict to (can be comma-separated list)
+	 *  	* **fontFamily**: the default font to use for the words (default: "Palatino Linotype", "Book Antiqua", Palatino, serif),
+	 *  	* **inlineData**: user-defined data, most easily expressed like this: love:20,like:15,dear:10
+	 *  	* **limit**: the number of terms to load (that are available, see also `visible` which determines how many are displayed),
+	 *  	* **stopList**: a named stopword list or comma-separated list of words
+	 *  	* **visible**: the number of terms to display in the word cloud (default is 50)
+	 *  	* **whiteList**: a keyword list – terms will be limited to this list
+	 *  * <a href="./#!/guide/collocatesgraph" target="_blank">CollocateGraphs</a> represents keywords and terms that occur in close proximity as a force directed network graph.
+ 	 *  	* **centralize**: the term to use for centralize mode (where things are focused on a single word)
+     *  	* **context**: the size of the context (the number of words on each size of the keyword)
+	 *  	* **limit**: the number of collocates to load for each keyword
+	 *  	* **query**: a query for the keywords (can be comma-separated list)
+	 *  	* **stopList**: a named stopword list or comma-separated list of words
+	 *  * <a href="./#!/guide/corpuscollocates" target="_blank">CorpusCollocates</a> is a table view of which terms appear more frequently in proximity to keywords across the entire corpus.
+     *  	* **context**: the size of the context (the number of words on each size of the keyword)
+	 *  	* **query**: a query for the keywords (can be comma-separated list)
+	 *  	* **sort**: sort order of collocates, one of `contextTermRawFreq`, `contextTermRawFreq`, `rawFreq`, `term`
+	 *  	* **stopList**: a named stopword list or comma-separated list of words
+	 *  * <a href="./#!/guide/contexts" target="_blank">Contexts</a> (or Keywords in Context) tool shows each occurrence of a keyword with a bit of surrounding text (the context).
+     *  	* **context**: the size of the context (the number of words on each size of the keyword)
+	 *  	* **expand**: the size of the extended context (when you expand a context occurrence), the number of words on each size of the keyword 
+	 *  	* **query**: a query for the keywords (can be comma-separated list)
+	 *  	* **stopList**: a named stopword list or comma-separated list of words
+	 *  * <a href="./#!/guide/correlations" target="_blank">Correlations</a> tool enables an exploration of the extent to which term frequencies vary in sync (terms whose frequencies rise and fall together or inversely).
+	 *  	* **minInDocumentsCountRatio**: the minimum percentage of documents in which the correlation must appear
+	 *  	* **query**: a query for the keywords (can be comma-separated list)
+	 *  	* **stopList**: a named stopword list or comma-separated list of words
+	 *  * <a href="./#!/guide/documentterms" target="_blank">DocumentTerms</a> is a table view of document term frequencies.
+     *  	* **bins**: for the purposes of analyzing distribution the documents are split into a specified number of segments or bins
+	 *  	* **docIndex**: document index to restrict to (can be comma-separated list)
+	 *  	* **expand**: the size of the extended context (when you expand a context occurrence), the number of words on each size of the keyword 
+	 *  	* **query**: a query for the keywords (can be comma-separated list)
+	 *  	* **stopList**: a named stopword list or comma-separated list of words
+	 *  * <a href="./#!/guide/corpusterms" target="_blank">CorpusTerms</a> is a table view of term frequencies in the entire corpus.
+     *  	* **bins**: for the purposes of analyzing distribution the documents are split into a specified number of segments or bins
+	 *  	* **docIndex**: document index to restrict to (can be comma-separated list)
+	 *  	* **expand**: the size of the extended context (when you expand a context occurrence), the number of words on each size of the keyword 
+	 *  	* **query**: a query for the keywords (can be comma-separated list)
+	 *  	* **stopList**: a named stopword list or comma-separated list of words
+	 *  * <a href="./#!/guide/documents" target="_blank">The</a> Documents tool shows a table of the documents in the corpus and includes functionality for modifying the corpus.
+	 *  * <a href="./#!/guide/knots" target="_blank">Knots</a> is a creative visualization that represents terms in a single document as a series of twisted lines.
+	 *  * <a href="./#!/guide/mandala" target="_blank">Mandala</a> is a conceptual visualization that shows the relationships between terms and documents.
+	 *  * <a href="./#!/guide/microsearch" target="_blank">Microsearch</a> visualizes the frequency and distribution of terms in a corpus.
+	 *  * <a href="./#!/guide/phrases" target="_blank">Phrases</a> shows repeating sequences of words organized by frequency of repetition or number of words in each repeated phrase.
+	 *  * <a href="./#!/guide/reader" target="_blank">Reader</a> provides a way of reading documents in the corpus, text is fetched on-demand as needed.
+	 *  * <a href="./#!/guide/scatterplot" target="_blank">ScatterPlot</a> is a graph visualization of how words cluster in a corpus using document similarity, correspondence analysis or principal component analysis.
+	 *  * <a href="./#!/guide/streamgraph" target="_blank">StreamGraph</a> is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).
+	 *  * <a href="./#!/guide/summary" target="_blank">Summary</a> provides a simple, textual overview of the current corpus, including including information about words and documents.
+	 *  * <a href="./#!/guide/termsradio" target="_blank">TermsRadio</a> is a visualization that depicts the change of the frequency of words in a corpus (or within a single document).
+	 *  * <a href="./#!/guide/textualarc" target="_blank">TextualArc</a> is a visualization of the terms in a document that includes a weighted centroid of terms and an arc that follows the terms in document order.
+	 *  * <a href="./#!/guide/topics" target="_blank">Topics</a> provides a rudimentary way of generating term clusters from a document or corpus and then seeing how each topic (term cluster) is distributed across the document or corpus.
+	 *  * <a href="./#!/guide/trends" target="_blank">Trends</a> shows a line graph depicting the distribution of a word’s occurrence across a corpus or document.
+	 *  * <a href="./#!/guide/veliza" target="_blank">Veliza</a> is an experimental tool for having a (limited) natural language exchange (in English) based on your corpus.
+	 *  * <a href="./#!/guide/wordtree" target="_blank">WordTree</a> is a tool that allows you to explore how words are used in phrases.
+	  * @method tool
  */
 
 
 /**
-* Load a Corpus using the provided config
-	 * @param {object} config The Corpus config
+* An alias for {@link #summary}.
+	  * @method toString
+ */
+
+
+/**
+* Load a Corpus using the provided config and api
+	 * @param {object} config the Corpus config
+	 * @param {object} api any additional API values
 	 * @static
  * @method load
- */
-
-
-
-
-// *** Documentation extracted from: resources/spyral/src/util.js ***
-
-/**
-* A helper for working with the Voyant Notebook app.
- * @namespace
- * @class Spyral.Util
- */
-
-
-/**
-* Generates a random ID of the specified length.
-	 * @static
-	 * @param {number} len The length of the ID to generate?
-	 * @returns {string}
-	 * @static
- * @method id
- */
-
-
-/**
-* 
-	 * @static
-	 * @param {*} contents 
-	 * @param {*} config 
-	 * @returns {string}
-	 * @static
- * @method toString
- */
-
-
-/**
-* 
-	 * @static
-	 * @param {*} before 
-	 * @param {*} more 
-	 * @param {*} after 
-	 * @static
- * @method more
  */
 
 

@@ -11374,9 +11374,65 @@ var Spyral = (function () {
   }();
 
   /**
-   * Class representing a Table.
+   * The Spyral.Table class in Spyral provides convenience functions for working with tabular
+   * data.
+   * 
+   * There are several ways of initializing a Table, here are some of them:
+   * 
+   * Provide an array of data with 3 rows:
+   * 
+   *  	let table = createTable([1,2,3]);
+   *
+   *
+   * Provide a nested array of data with multiple rows:
+   * 
+   *		let table = createTable([[1,2],[3,4]]);
+   * 
+   * Same nested array, but with a second argument specifying headers
+   * 
+   *		let table = createTable([[1,2],[3,4]], {headers: ["one","two"]});
+   * 
+   * Create table with comma-separated values:
+   * 
+   *  	let table = createTable("one,two\\n1,2\\n3,4");
+   * 
+   * Create table with tab-separated values
+   * 
+   *		let table = createTable("one\\ttwo\\n1\\t2\\n3\\t4");
+   * 
+   * Create table with array of objects
+   * 
+   *  	let table = createTable([{one:1,two:2},{one:3,two:4}]);
+   * 
+   * It's also possible simple to create a sorted frequency table from an array of values:
+   * 
+   *		let table = createTable(["one","two","one"], {count: "vertical", headers: ["Term","Count"]})
+   * 
+   * Working with a Corpus is easy. For instance, we can create a table from the top terms:
+   * 
+   *		loadCorpus("austen").terms({limit:500, stopList: 'auto'}).then(terms => {
+   *			return createTable(terms);
+   *		})
+   * 
+   * Similarly, we could create a frequency table from the first 1,000 words of the corpus:
+   * 
+   *		loadCorpus("austen").words({limit:1000, docIndex: 0, stopList: 'auto'}).then(words => {
+   *			return createTable(words, {count: "vertical"});
+   *		});
+   *
+   * Some of the configuration options are as follows:
+   * 
+   * * **format**: especially for forcing csv or tsv when the data is a string
+   * * **hasHeaders**: determines if data has a header row (usually determined automatically)
+   * * **headers**: a Array of Strings that serve as headers for the table
+   * * **count**: forces Spyral to create a sorted frequency table from an Array of data, this can be set to "vertical" if the counts are shown vertically or set to true if the counts are shown horizontally
+   * 
+   * Tables are convenient in Spyral because you can simply show them to preview a version in HTML.
+   * 
    * @memberof Spyral
    * @class
+   * @param {Array|String} data an array of data or a string with CSV or TSV.
+   * @param {Object} config an Object for configuring the table initialization, see above
    */
 
   var Table = /*#__PURE__*/function () {
@@ -12642,7 +12698,7 @@ var Spyral = (function () {
           if (typeof Spyral !== 'undefined' && Spyral.Notebook) {
             target = Spyral.Notebook.getTarget();
 
-            if (target.clientHeight === 0) {
+            if (target.clientHeight <= 40) {
               target.style.height = '400px'; // 400 is the default Highcharts height
             }
           } else {
@@ -12671,7 +12727,7 @@ var Spyral = (function () {
 
         if (rowsCount === 1) {
           config.dataFrom = config.dataFrom || "rows";
-        } else if (columnsCount === 1) {
+        } else if (columnsCount === 1 || !("dataFrom" in config)) {
           config.dataFrom = config.dataFrom || "columns";
         }
 
@@ -16641,6 +16697,62 @@ var Spyral = (function () {
     toISOString: dateToIsoString
   });
 
+  // `Object.keys` method
+  // https://tc39.github.io/ecma262/#sec-object.keys
+  var objectKeys$1 = Object.keys || function keys(O) {
+    return objectKeysInternal$1(O, enumBugKeys$1);
+  };
+
+  var nativeAssign = Object.assign;
+  var defineProperty$8 = Object.defineProperty;
+
+  // `Object.assign` method
+  // https://tc39.github.io/ecma262/#sec-object.assign
+  var objectAssign = !nativeAssign || fails$1(function () {
+    // should have correct order of operations (Edge bug)
+    if (descriptors$1 && nativeAssign({ b: 1 }, nativeAssign(defineProperty$8({}, 'a', {
+      enumerable: true,
+      get: function () {
+        defineProperty$8(this, 'b', {
+          value: 3,
+          enumerable: false
+        });
+      }
+    }), { b: 2 })).b !== 1) return true;
+    // should work with symbols and should have deterministic property order (V8 bug)
+    var A = {};
+    var B = {};
+    // eslint-disable-next-line no-undef
+    var symbol = Symbol();
+    var alphabet = 'abcdefghijklmnopqrst';
+    A[symbol] = 7;
+    alphabet.split('').forEach(function (chr) { B[chr] = chr; });
+    return nativeAssign({}, A)[symbol] != 7 || objectKeys$1(nativeAssign({}, B)).join('') != alphabet;
+  }) ? function assign(target, source) { // eslint-disable-line no-unused-vars
+    var T = toObject$1(target);
+    var argumentsLength = arguments.length;
+    var index = 1;
+    var getOwnPropertySymbols = objectGetOwnPropertySymbols$1.f;
+    var propertyIsEnumerable = objectPropertyIsEnumerable$1.f;
+    while (argumentsLength > index) {
+      var S = indexedObject$1(arguments[index++]);
+      var keys = getOwnPropertySymbols ? objectKeys$1(S).concat(getOwnPropertySymbols(S)) : objectKeys$1(S);
+      var length = keys.length;
+      var j = 0;
+      var key;
+      while (length > j) {
+        key = keys[j++];
+        if (!descriptors$1 || propertyIsEnumerable.call(S, key)) T[key] = S[key];
+      }
+    } return T;
+  } : nativeAssign;
+
+  // `Object.assign` method
+  // https://tc39.github.io/ecma262/#sec-object.assign
+  _export$1({ target: 'Object', stat: true, forced: Object.assign !== objectAssign }, {
+    assign: objectAssign
+  });
+
   /**
    * A class for storing Notebook metadata
    * @memberof Spyral
@@ -16753,6 +16865,18 @@ var Spyral = (function () {
         }
 
         return headers;
+      }
+      /**
+       * Returns a clone of this Metadata
+       * @returns {metadata}
+       */
+
+    }, {
+      key: "clone",
+      value: function clone() {
+        var config = {};
+        Object.assign(config, this);
+        return new Metadata(config);
       }
     }]);
 
