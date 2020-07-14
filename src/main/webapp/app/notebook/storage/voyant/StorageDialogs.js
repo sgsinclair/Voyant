@@ -184,5 +184,9 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 			}
 		}
 		return code;
+	},
+
+	reset: function() {
+		this.setAccessCode(undefined);
 	}
 })

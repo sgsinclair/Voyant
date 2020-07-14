@@ -493,7 +493,8 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     clear: function() {
-    	this.setMetadata(new Spyral.Metadata());
+		this.setMetadata(new Spyral.Metadata());
+		this.voyantStorageDialogs.reset();
     	var cells = this.getComponent("cells");
     	cells.removeAll();
 	},
