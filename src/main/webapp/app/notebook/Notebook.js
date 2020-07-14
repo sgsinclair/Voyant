@@ -69,6 +69,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		storageSolution: 'voyant'
 	},
 	
+	metadataWindow: undefined,
 	voyantStorageDialogs: undefined,
 	githubDialogs: undefined,
 	catalogueWindow: undefined,
@@ -1005,150 +1006,158 @@ Ext.define('Voyant.notebook.Notebook', {
 	},
 
     showMetadataEditor: function() {
-    	var me = this;
-    	var metadata = this.getMetadata();
-		Ext.create('Ext.window.Window', {
-    	    title: this.localize('metadataEditor'),
-    	    autoScroll: true,
-    	    items: [{
-    	    	xtype: 'form',
-    	    	items: {
-    	    	    bodyPadding: 5,
-    	    	    width: 600,
+		if (this.metadataWindow === undefined) {
+			var me = this;
 
-    	    	    // Fields will be arranged vertically, stretched to full width
-    	    	    layout: 'anchor',
-    	    	    defaults: {
-    	    	        anchor: '100%',
-    	    	        labelAlign: "right"
-    	    	    },
+			this.metadataWindow = Ext.create('Ext.window.Window', {
+				title: this.localize('metadataEditor'),
+				autoScroll: true,
+				closeAction: 'hide',
+				items: [{
+					xtype: 'form',
+					items: {
+						bodyPadding: 5,
+						width: 600,
 
-    	    	    // The fields
-    	    	    defaultType: 'textfield',
-    	    	    items: [{
-    	    	        fieldLabel: this.localize("metadataTitle"),
-    	    	        xtype: 'htmleditor',
-    	    	        name: 'title',
-    	    	        value: metadata.title,
-    	    	        height: 100,
-    	    	        enableAlignments : false,
-    	    	        enableColors : false,
-    	    	        enableFont : false,
-    	    	        enableFontSize : false,
-    	    	        enableLinks : false,
-    	    	        enableLists : false
-    	    	    },{
-    	    	        fieldLabel: this.localize("metadataAuthor"),
-    	    	        name: 'author',
-    	    	        value: metadata.author
-    	    	    },{
-    	    	        fieldLabel: this.localize("metadataKeywords"),
-    	    	        name: 'keywords',
-    	    	        value: metadata.keywords
-    	    	    },{
-    	    	    	xtype: 'htmleditor',
-    	    	        fieldLabel: this.localize("metadataDescription"),
-    	    	        name: 'description',
-    	    	        height: 100,
-    	    	        value: metadata.description,
-    	    	        enableAlignments : false,
-    	    	        enableColors : false,
-    	    	        enableFont : false
-    	    	    },{
-    	    	    	xtype: 'combo',
-    	    	        fieldLabel: this.localize("metadataLicense"),
-    	    	        name: 'license',
-    	    	        value: metadata.license || "Creative Commons Attribution (CC BY)",
-    	    	        store: {
-    	    	        	fields: ['text'],
-    	    	        	data: [
-    	        	        	{"text": "Apache License 2.0"},
-    	        	        	{"text": "BSD 3-Clause \"New\" or \"Revised\" license"},
-    	        	        	{"text": "BSD 2-Clause \"Simplified\" or \"FreeBSD\" license"},
-    	        	        	{"text": "Creative Commons Attribution (CC BY)"},
-    	        	        	{"text": "Creative Commons Attribution-ShareAlike (CC BY-SA)"},
-    	        	        	{"text": "Creative Commons Zero (CC0)"},
-    	        	        	{"text": "GNU General Public License (GPL)"},
-    	        	        	{"text": "GNU Library or \"Lesser\" General Public License (LGPL)"},
-    	        	        	{"text": "MIT license"},
-    	        	        	{"text": "Mozilla Public License 2.0"},
-    	        	        	{"text": "Common Development and Distribution License"},
-    	        	        	{"text": "Eclipse Public License"}
-    	        	        ]
-    	    	        }
-    	    	    },{
-    	    	    	xtype: 'combo',
-    	    	    	name: 'language',
-    	    	    	value: metadata.language || "English",
-    	    	        fieldLabel: this.localize("metadataLanguage"),
-    	    	        store: {
-    	    	        	fields: ['text'],
-    	    	        	data: [
-    	    	        		{"text": "Bengali"},
-    	    	        		{"text": "Bhojpuri"},
-    	    	        		{"text": "Egyptian Arabic"},
-    	    	        		{"text": "English"},
-    	    	        		{"text": "French"},
-    	    	        		{"text": "German"},
-    	    	        		{"text": "Gujarati"},
-    	    	        		{"text": "Hausa"},
-    	    	        		{"text": "Hindi"},
-    	    	        		{"text": "Indonesian"},
-    	    	        		{"text": "Italian"},
-    	    	        		{"text": "Japanese"},
-    	    	        		{"text": "Javanese"},
-    	    	        		{"text": "Kannada"},
-    	    	        		{"text": "Korean"},
-    	    	        		{"text": "Mandarin"},
-    	    	        		{"text": "Marathi"},
-    	    	        		{"text": "Persian"},
-    	    	        		{"text": "Portuguese"},
-    	    	        		{"text": "Russian"},
-    	    	        		{"text": "Southern Min"},
-    	    	        		{"text": "Spanish"},
-    	    	        		{"text": "Standard Arabic"},
-    	    	        		{"text": "Swahili"},
-    	    	        		{"text": "Tamil"},
-    	    	        		{"text": "Telugu"},
-    	    	        		{"text": "Thai"},
-    	    	        		{"text": "Turkish"},
-    	    	        		{"text": "Urdu"},
-    	    	        		{"text": "Vietnamese"},
-    	    	        		{"text": "Western Punjabi"},
-    	    	        		{"text": "Wu Chinese"},
-    	    	        		{"text": "Yue Chinese"}
-    	        	        ]
-    	    	        }
-    	    	    }]
-    	    		
-    	    	}
-    	    }],
+						// Fields will be arranged vertically, stretched to full width
+						layout: 'anchor',
+						defaults: {
+							anchor: '100%',
+							labelAlign: "right"
+						},
 
-    	    
-    	    // Reset and Submit buttons
-    	    buttons: [{
-    	        text: this.localize('metadataCancel'),
-	            ui: 'default-toolbar',
-    	        handler: function() {
-    	            this.up('window').close();
-    	        }
-    	    },{
-    	        text: this.localize('metadataReset'),
-	            ui: 'default-toolbar',
-    	        handler: function() {
-    	            this.up('window').down('form').getForm().reset();
-    	        }
-    	    }, " ", {
-    	        text: this.localize('metadataSave'),
-    	        handler: function() {
-    	            var form = this.up('window').down('form').getForm();
-    	            metadata.set(form.getValues())
-    	            me.updateMetadata();
-    	            this.up('window').close();
-    	        }
-    	    }]
-    	    
-    	}).show();
+						// The fields
+						defaultType: 'textfield',
+						items: [{
+							fieldLabel: this.localize("metadataTitle"),
+							xtype: 'htmleditor',
+							name: 'title',
+							height: 100,
+							enableAlignments : false,
+							enableColors : false,
+							enableFont : false,
+							enableFontSize : false,
+							enableLinks : false,
+							enableLists : false
+						},{
+							fieldLabel: this.localize("metadataAuthor"),
+							name: 'author'
+						},{
+							fieldLabel: this.localize("metadataKeywords"),
+							name: 'keywords'
+						},{
+							xtype: 'htmleditor',
+							fieldLabel: this.localize("metadataDescription"),
+							name: 'description',
+							height: 100,
+							enableAlignments : false,
+							enableColors : false,
+							enableFont : false
+						},{
+							xtype: 'combo',
+							fieldLabel: this.localize("metadataLicense"),
+							name: 'license',
+							store: {
+								fields: ['text'],
+								data: [
+									{"text": "Apache License 2.0"},
+									{"text": "BSD 3-Clause \"New\" or \"Revised\" license"},
+									{"text": "BSD 2-Clause \"Simplified\" or \"FreeBSD\" license"},
+									{"text": "Creative Commons Attribution (CC BY)"},
+									{"text": "Creative Commons Attribution-ShareAlike (CC BY-SA)"},
+									{"text": "Creative Commons Zero (CC0)"},
+									{"text": "GNU General Public License (GPL)"},
+									{"text": "GNU Library or \"Lesser\" General Public License (LGPL)"},
+									{"text": "MIT license"},
+									{"text": "Mozilla Public License 2.0"},
+									{"text": "Common Development and Distribution License"},
+									{"text": "Eclipse Public License"}
+								]
+							}
+						},{
+							xtype: 'combo',
+							name: 'language',
+							fieldLabel: this.localize("metadataLanguage"),
+							store: {
+								fields: ['text'],
+								data: [
+									{"text": "Bengali"},
+									{"text": "Bhojpuri"},
+									{"text": "Egyptian Arabic"},
+									{"text": "English"},
+									{"text": "French"},
+									{"text": "German"},
+									{"text": "Gujarati"},
+									{"text": "Hausa"},
+									{"text": "Hindi"},
+									{"text": "Indonesian"},
+									{"text": "Italian"},
+									{"text": "Japanese"},
+									{"text": "Javanese"},
+									{"text": "Kannada"},
+									{"text": "Korean"},
+									{"text": "Mandarin"},
+									{"text": "Marathi"},
+									{"text": "Persian"},
+									{"text": "Portuguese"},
+									{"text": "Russian"},
+									{"text": "Southern Min"},
+									{"text": "Spanish"},
+									{"text": "Standard Arabic"},
+									{"text": "Swahili"},
+									{"text": "Tamil"},
+									{"text": "Telugu"},
+									{"text": "Thai"},
+									{"text": "Turkish"},
+									{"text": "Urdu"},
+									{"text": "Vietnamese"},
+									{"text": "Western Punjabi"},
+									{"text": "Wu Chinese"},
+									{"text": "Yue Chinese"}
+								]
+							}
+						}]
+						
+					}
+				}],
+
+				
+				// Reset and Submit buttons
+				buttons: [{
+					text: this.localize('metadataCancel'),
+					ui: 'default-toolbar',
+					handler: function() {
+						this.up('window').close();
+					}
+				},{
+					text: this.localize('metadataReset'),
+					ui: 'default-toolbar',
+					handler: function() {
+						this.up('window').down('form').getForm().reset();
+					}
+				}, " ", {
+					text: this.localize('metadataSave'),
+					handler: function() {
+						var form = this.up('window').down('form').getForm();
+						me.getMetadata().set(form.getValues());
+						me.updateMetadata();
+						this.up('window').close();
+					}
+				}]
+				
+			})
+		}
+
+		var metadata = this.getMetadata();
+		var form = this.metadataWindow.down('form').getForm();
+		form.findField('title').setValue(metadata.title);
+		form.findField('author').setValue(metadata.author);
+		form.findField('keywords').setValue(metadata.keywords);
+		form.findField('description').setValue(metadata.description);
+		form.findField('license').setValue(metadata.license || "Creative Commons Attribution (CC BY)");
+		form.findField('language').setValue(metadata.language || "English");
+
+		this.metadataWindow.show();
 	}
 	
 	/*
