@@ -33,9 +33,9 @@ Ext.define('Voyant.notebook.Catalogue', {
 			'<tpl for=".">',
 				'<div class="catalogue-notebook">',
 					'<div class="id">{id}</div>',
-					'<div class="title">{title}</div>',
-					'<div class="author">{author}</div>',
-					'<div class="dates"><span class="date">{[Ext.Date.format(values.created, "M j Y")]}</span> | <span class="date">{[Ext.Date.format(values.modified, "M j Y")]}</span></div>',
+					'<div class="title nowrap" title="{title}">{title}</div>',
+					'<div class="author nowrap"><i class="fa fa-user" aria-hidden="true"></i> {author}</div>',
+					'<div class="dates"><span class="date"><i class="fa fa-clock-o" aria-hidden="true"></i> {[Ext.Date.format(values.modified, "M j Y")]}</span></div>',
 				'</div>',
 			'</tpl>'
 		);
@@ -59,6 +59,7 @@ Ext.define('Voyant.notebook.Catalogue', {
 				items: [{
 					xtype: 'toolbar',
 					height: 30,
+					hidden: true,
 					items: [{
 						xtype: 'splitbutton',
 						text: 'Sort',
@@ -152,6 +153,7 @@ Ext.define('Voyant.notebook.Catalogue', {
 		Spyral.Load.trombone({
 			tool: 'notebook.GitNotebookManager',
 			action: 'catalogue',
+			limit: 100,
 			noCache: 1
 		}).then(function(json) {
 			me.window.unmask();

@@ -91,12 +91,14 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 <style id="voyant-notebook-catalogue">
 .catalogue-notebook {
 	float: left;
-	width: 200px;
+	width: 210px;
 	margin: 0 10px 10px 0;
-	padding: 5px;
+	padding: 10px;
 	border-radius: 2px;
 	border: 1px solid #ccc;
 	font-size: 13px;
+	line-height: 18px;
+	height: 75px;
 }
 .catalogue-notebook-over {
 	background-color: #eee;
@@ -111,14 +113,25 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 	float: right;
 	color: #666;
 	font-size: 9px;
+	line-height: 9px;
 }
 .catalogue-notebook .title {
 	font-weight: 600;
+}
+.catalogue-notebook .author {
+	color: #666;
+	font-size: 11px;
 }
 .catalogue-notebook .date {
 	color: #666;
 	font-size: 11px;
 }
+.catalogue-notebook .nowrap {
+	white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 </style>
 
 <script>
