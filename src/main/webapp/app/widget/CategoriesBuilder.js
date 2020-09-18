@@ -274,7 +274,11 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 		                    	text: this.localize('removeTerms'),
 		                    	handler: function() {
 		                    		this.queryById('categories').query('grid').forEach(function(grid) {
-		                    			grid.getStore().remove(grid.getSelection());
+										var sels = grid.getSelection();
+										sels.forEach(function(sel) {
+											this.categoriesManager.removeTerm(grid.category, sel.getTerm());
+										}, this);
+		                    			grid.getStore().remove(sels);
 		                    		}, this);
 		                    	},
 		                    	scope: this
