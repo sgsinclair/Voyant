@@ -316,13 +316,13 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				handler: function(btn) {
 					this.processFeatures();
 					this.setColorTermsFromCategoryFeatures();
-					this.app.saveCategoryData(this.categoriesManager.getCategoryExportData()).then(function(id) {
+					this.app.saveCategoryData().then(function(id) {
 						this.setCategoriesId(id);
 						btn.up('window').close();
-					}, function() {
+					}.bind(this), function() {
 						this.setCategoriesId(undefined);
 						btn.up('window').close();
-					}, null, this);
+					}.bind(this));
 				},
 				scope: this
 			}],
