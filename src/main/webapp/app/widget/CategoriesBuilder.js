@@ -330,11 +330,11 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				show: function() {
 					// check to see if the widget value is different from the API
 					if (this.getCategoriesId() && this.getCategoriesId()!=this.getApiParam("categories")) {
-		    			this.categoriesManager.loadCategoryData(this.getCategoriesId()).then(function(data) {
+		    			this.app.loadCategoryData(this.getCategoriesId()).then(function(data) {
 							this.setColorTermsFromCategoryFeatures();
 							this.buildCategories();
 							this.buildFeatures();
-						}, null, null, this);
+						}.bind(this));
 					} else {
 						this.buildCategories();
 						this.buildFeatures();
