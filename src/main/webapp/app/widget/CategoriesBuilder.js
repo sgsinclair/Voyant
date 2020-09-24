@@ -506,14 +506,16 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
             }],
     		listeners: {
     			beforedrop: function(node, data) {
-    				// remove duplicates
-    				var categoriesManager = this.up('categoriesbuilder').categoriesManager;
-    				for (var i = data.records.length-1; i >= 0; i--) {
-    					var term = data.records[i].get('term');
-    					if (categoriesManager.getCategoryForTerm(term) !== undefined) {
-    						data.records.splice(i, 1);
-    					}
-    				}
+					var categoriesManager = this.up('categoriesbuilder').categoriesManager;
+					var source = data.view.up('grid');
+
+					if (source.category !== undefined) {
+						// we're moving a term from one category to another
+						for (var i = data.records.length-1; i >= 0; i--) {
+							var term = data.records[i].get('term');
+							categoriesManager.removeTerm(source.category, term);
+						}
+					}
     			},
     			drop: function(node, data) {
     				data.view.getSelectionModel().deselectAll();
@@ -523,16 +525,9 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     				var terms = [];
     				for (var i = 0; i < data.records.length; i++) {
     					var term = data.records[i].get('term');
-    					if (categoriesManager.getCategoryForTerm(term) === undefined) {
-    						terms.push(term);
-    					}
+    					terms.push(term);
     				}
     				categoriesManager.addTerms(name, terms);
-    				
-    				var source = data.view.up('grid');
-    				if (source.category) {
-    					categoriesManager.removeTerms(source.category, terms);
-    				}
     			}
     		}
     	});
