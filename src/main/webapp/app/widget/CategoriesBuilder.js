@@ -90,7 +90,9 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		confirmRemove: 'Are you sure you want to remove the category?',
     		save: 'Save',
     		features: 'Features',
-    		category: 'Category',
+			category: 'Category',
+			increaseCategory: 'Increase Category Priority',
+			decreaseCategory: 'Decrease Category Priority',
     		
     		color: 'Color',
     		font: 'Font',
@@ -354,7 +356,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    			if (this.panel.getCorpus && this.panel.getCorpus()) {builder.fireEvent('loadedCorpus', builder, this.panel.getCorpus());}
 	    			else if (this.panel.getStore && this.panel.getStore() && this.panel.getStore().getCorpus && this.panel.getStore().getCorpus()) {
 	    				builder.fireEvent('loadedCorpus', builder, this.panel.getStore().getCorpus());
-	    			}
+					}
 				},
 				scope: this
 			}
@@ -415,7 +417,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 					form.clearInvalid();
     			}
     		}
-    	}));
+		}));
     	
     	this.callParent(arguments);
     },
@@ -437,29 +439,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		xtype: 'grid',
     		category: name,
     		title: name,
-//    		header: {
-//    			items: [{
-//    				xtype: 'colorbutton',
-//    				format: '#hex6',
-//    				value: color,
-//    				width: 30,
-//    				height: 15,
-//    				listeners: {
-//    					change: function(btn, color, pcolor) {
-//    						this.categoriesManager.setCategoryFeature(name, 'color', color);
-//    					},
-//    					afterrender: function(btn) {
-//    						var popup = btn.getPopup();
-//    						popup.listeners = {
-//    							focusleave: function(sel, evt) {
-//    								sel.close(); // fix for conflict between selector and parent modal window, when you click outside of the selector
-//    							}
-//    						};
-//    					},
-//    					scope: this
-//    				}
-//    			}]
-//    		},
     		frame: true,
     		width: 150,
     		margin: '10 0 10 10',
@@ -475,7 +454,38 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     				}, this);
     			},
     			scope: this
-    		}],
+			}],
+			bbar: [{
+				xtype: 'button',
+				text: '',
+				tooltip: this.localize('increaseCategory'),
+				glyph: 'xf067@FontAwesome',
+				handler: function(b) {
+					var grid = b.findParentByType('grid');
+					var parent = this.queryById('categories');
+					var prev = parent.prevChild(grid);
+					if (prev !== null) {
+						parent.moveBefore(grid, prev);
+						this.app.getCategoriesManager().setCategoryRanking(grid.getTitle(), parent.items.indexOf(grid));
+					}
+				},
+				scope: this
+			},'->',{
+				xtype: 'button',
+				text: '',
+				tooltip: this.localize('decreaseCategory'),
+				glyph: 'xf068@FontAwesome',
+				handler: function(b) {
+					var grid = b.findParentByType('grid');
+					var parent = this.queryById('categories');
+					var next = parent.nextChild(grid);
+					if (next !== null) {
+						parent.moveAfter(grid, next);
+						this.app.getCategoriesManager().setCategoryRanking(grid.getTitle(), parent.items.indexOf(grid));
+					}
+				},
+				scope: this
+			}],
     		
     		store: Ext.create('Ext.data.JsonStore', {
     			data: termsData,
@@ -556,7 +566,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	
     	grid.header.getTitle().textEl.on('dblclick', function(e, t) {
     		titleEditor.startEdit(t);
-    	});
+		});
     },
     
     removeCategory: function(name) {
