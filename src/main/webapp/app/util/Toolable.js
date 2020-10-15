@@ -454,7 +454,7 @@ Ext.define('Voyant.util.Toolable', {
 			}
 		}
 		
-var canvasSurface = this.down('draw') || this.down('chart');
+		var canvasSurface = this.down('draw') || this.down('chart');
 		if (canvasSurface && (canvasSurface.isChart || canvasSurface.isCanvas)) {
 
 			// first part taken from EXTJ Draw.getImage()
@@ -544,29 +544,45 @@ var canvasSurface = this.down('draw') || this.down('chart');
 		var svg = targetEl.querySelector("svg"); // finally try finding an SVG
 		if (svg) {
 			var width = targetEl.offsetWidth*scale,
-				height = targetEl.offsetHeight*scale
+				height = targetEl.offsetHeight*scale;
 			var clone = svg.cloneNode(true); // we don't want to scale, etc. the original
 			clone.setAttribute("version", 1.1)
 			clone.setAttribute("xmlns", "http://www.w3.org/2000/svg")
-			clone.setAttribute("transform", "scale("+scale+")")
 			clone.setAttribute("width", width)
 			clone.setAttribute("height", height)
-			
-			var html = clone.outerHTML,
-			  img = 'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)));
 
-			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: width,height:height}),
-			  context = canvas.getContext("2d"), me=this;
+			var svgChildren = [];
+			while (clone.children.length > 0) {
+				svgChildren.push(clone.removeChild(clone.children[0]));
+			};
+
+			var g = document.createElement('g');
+			g.setAttribute("style", "transform-box: fill-box;");
+			g.setAttribute("transform", "scale("+scale+")")
+			clone.appendChild(g);
+
+			svgChildren.forEach(function(item) {
+				g.appendChild(item);
+			})
+
+			var html = clone.outerHTML,
+				img = 'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)));
+
+			var canvas = Ext.DomHelper.createDom({tag:'canvas',width: width,height:height}),
+				context = canvas.getContext("2d");
 			  
-			  var image = new Image;
-			  image.src = img;
-			  image.panel = this;
-			  image.onload = function() {
-				  context.drawImage(image, 0, 0);
-				  img = canvas.toDataURL("image/png");
+			var image = new Image;
+			image.src = img;
+			image.panel = this;
+			image.onload = function() {
+				context.drawImage(image, 0, 0);
+				img = canvas.toDataURL("image/png");
 		        if (form && form.isVisible()) {form.unmask();}
-				  return this.panel.exportPngData.call(this.panel, img);
-			  };
+				return this.panel.exportPngData.call(this.panel, img);
+			};
+			// image.onerror = function(ev) {
+			// 	console.log(ev)
+			// }
 		}
 	},
 	exportUrl: function() {
