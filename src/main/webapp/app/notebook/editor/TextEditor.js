@@ -16,9 +16,8 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 		    ],
 		    
 		    extraPlugins: 'stopediting,sourcedialog,justify,colorbutton,inserthtml4x',
-//		    removePlugins: 'iframe', // why was this added?
 			allowedContent: true,
-			toolbarCanCollapse: true,
+			toolbarCanCollapse: false,
 			startupFocus: true
 		},
 		editor: undefined,
