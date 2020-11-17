@@ -216,7 +216,6 @@ Ext.define('Voyant.panel.RezoViz', {
         });
         
         this.on('loadedCorpus', function(src, corpus) {
-        	debugger
         	if (corpus.getDocumentsCount()==1) {
         		this.setApiParam("minEdgeCount", 1);
         	}
@@ -243,7 +242,8 @@ Ext.define('Voyant.panel.RezoViz', {
     			limit: this.getApiParam('limit'),
     			minEdgeCount: this.getApiParam("minEdgeCount"),
     			corpus: corpusId
-    		},
+			},
+			timeout: 60000,
     		success: function(response) {
     			el.unmask();
     			var obj = Ext.decode(response.responseText);
@@ -275,7 +275,7 @@ Ext.define('Voyant.panel.RezoViz', {
     	var extent = d3.extent(nodes, function(node) {return node.rawFreq;});
     	var min = extent[0];
     	var max = extent[1];    	
-    	var scaleFont = d3.scale.linear()
+    	var scaleFont = d3.scaleLinear()
                     .domain([min, max])
                     .range([10, 24]);
     	
