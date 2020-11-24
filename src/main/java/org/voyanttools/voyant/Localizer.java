@@ -33,7 +33,7 @@ public class Localizer {
 	}
 
 	private static void update(String lang, File sourceFile, File cachedFile) throws IOException {
-		List<String> lines = FileUtils.readLines(sourceFile);
+		List<String> lines = FileUtils.readLines(sourceFile, "UTF-8");
 		String header = lines.get(0);
 		int pos = header.indexOf("("+lang+")");
 		if (pos==-1) {
@@ -61,6 +61,6 @@ public class Localizer {
 			sb.setLength(sb.length()-2);
 			sb.append("});\n");
 		}
-		FileUtils.writeStringToFile(cachedFile, sb.toString());
+		FileUtils.writeStringToFile(cachedFile, sb.toString(), "UTF-8");
 	}
 }

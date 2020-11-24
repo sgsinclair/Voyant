@@ -500,7 +500,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "yearAgo":"منذ حوالي سنة",
 "dayAgo":"منذ حوالي يوم"});
 Ext.apply(Voyant.notebook.editor.button.Add.i18n, {
-"tip":"Add New Block",
+"tip":"Add New Cell (with Shift key to repeat the same kind of cell)",
 "title":"Spyral Notebook"});
 Ext.apply(Voyant.widget.CategoriesOption.i18n, {
 "edit":"Edit",
@@ -900,7 +900,7 @@ Ext.apply(Voyant.panel.Knots.i18n, {
 Ext.apply(Voyant.VoyantApp.i18n, {
 "serverResponseError":"رسالة خطأ من النظام الخادم:",
 "error":"وقع خطأ",
-"translatedBy":" الترجمة العربية بقلم <\"a href=\"http://djwrisley.com>ديفيد جوزيف رزلي</a> و نجلاء جركس"});
+"translatedBy":"الترجمة العربية بقلم ديفيد جوزيف رزلي و نجلاء جركس"});
 Ext.apply(Voyant.panel.RezoViz.i18n, {
 "noEntitiesForEdgeCount":"لا توجد عناصر للتخطيط. هل ترغب في تخفيض العدد الادنى للاضلاع لتحسين النتائج ",
 "loadingEntities":"تحميل العناصر جاري",

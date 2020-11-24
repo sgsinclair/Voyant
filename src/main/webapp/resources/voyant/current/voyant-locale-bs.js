@@ -500,7 +500,7 @@ Ext.apply(Voyant.data.model.Corpus.i18n, {
 "yearAgo":"otprilike prije godinu dana",
 "dayAgo":"otprilike prije jednog dana"});
 Ext.apply(Voyant.notebook.editor.button.Add.i18n, {
-"tip":"Add New Block",
+"tip":"Add New Cell (with Shift key to repeat the same kind of cell)",
 "title":"Spyral Notebook"});
 Ext.apply(Voyant.widget.CategoriesOption.i18n, {
 "edit":"Edit",
