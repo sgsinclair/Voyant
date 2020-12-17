@@ -6,5 +6,5 @@
     "--output": "docs",
     "--template": "../template-min",
     "--welcome": "welcome.html",
-    "--footer": "<a href='http://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> St&eacute;fan Sinclair & Geoffrey Rockwell"
+    "--footer": "<a href='http://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> Stéfan Sinclair & Geoffrey Rockwell"
 }
