@@ -411,8 +411,8 @@ Ext.define('Voyant.data.model.Corpus', {
      * 
      * 	new Corpus("Hello World!");
      * 	new Corpus({input: "Hello World!"});
-     * 
-     * @param {String/String[]/Object} config The source document(s) as a text string, a URL, an array of text strings and URLs, or a config object.
+	 * @param  {String|String[]|Object} source The source document(s) as a text string, a URL, an array of text strings and URLs, or a config object.
+     * @param {String|String[]|Object} [config] An additional config to use with the source.
 	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return a Corpus but a promise to return a Corpus when it's finished loading
 	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
 	 * Corpus as an argument, as per the example above).
