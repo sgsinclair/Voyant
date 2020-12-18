@@ -95,7 +95,7 @@ Ext.define("Voyant.notebook.editor.button.Export", {
 			Voyant.notebook.editor.button.Export.getExportWindow(cmp).show();
 		}
 	},
-	getFileExtension(mode) {
+	getFileExtension: function(mode) {
 		if (
 			mode === 'text' ||
 			(mode === 'javascript' && this.getExportType() === 'output') // use txt for javascript results because they could be anything

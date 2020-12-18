@@ -146,7 +146,7 @@ Ext.define('Voyant.notebook.Catalogue', {
 		}
 	},
 
-	getNotebooks(query, config) {
+	getNotebooks: function(query, config) {
 		this.window.mask('Loading');
 		this.window.down('#catalogue').getSelectionModel().deselectAll();
     	var me = this;
