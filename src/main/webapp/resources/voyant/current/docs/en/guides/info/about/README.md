@@ -20,7 +20,8 @@ Voyant Tools is a labour of love. Its ancestry includes HyperPo and Taporware an
 
 ### Project Leads
 
-* Stéfan Sinclair, McGill University
+In memory of Stéfan Sinclair, McGill University, who imagined, designed, and programmed much of Voyant Tools until 2020 when he passed away. See [obituary](https://csdh-schn.org/stefan-sinclair-in-memoriam/).
+
 * Geoffrey Rockwell, University of Alberta
 
 We appreciate you citing Voyant Tools, it helps to demonstrate the value of the tool and our recognizes our efforts. Depending on the citation style you need, you could adapt the following:
@@ -101,4 +102,4 @@ Ultimately, Voyant is an attempt to learn from the strengths and weaknesses of p
 
 ## Privacy Statement
 
-The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see [Google's Privacy Policy](http://www.google.ca/intl/en/policies/privacy/) and the Log Information section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact [Stéfan Sinclair](http://stefansinclair.name).
+The developers of Voyant Tools gather data from the site about what tools are invoked and with what parameters (IP addresses are also logged in order to be able to identify multiple requests during a same session). In addition, Voyant Tools uses Google Analytics (see [Google's Privacy Policy](https://policies.google.com/privacy?hl=en&gl=ca) and the Log Information section in particular). Locally logged data and Google Analytics data will be used by the development team in order to debug and improve the tools, as well as to understand how researchers are using them. This data may also be used for research purposes in anonymous and aggregate forms. Please note that texts submitted to Voyant Tools are stored in order to allow persistent access during a work session and between work sessions. If you have questions about the data being collected and how it is being used, or to request that a corpus be removed, please contact [Geoffrey Rockwell](mailto:voyanttools@gmail.com).
