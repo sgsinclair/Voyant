@@ -4,8 +4,7 @@
     "--warnings": ["-link"],
     "--guides": "guides.json",
     "--exclude": "app/notebook/storage/github/FileSaver.js,app/notebook/storage/github/OctokitWrapper.js",
-    "--output": "../docs",
     "--template": "../template-min",
     "--welcome": "welcome.html",
-    "--footer": "<a href='http://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> Stéfan Sinclair & Geoffrey Rockwell"
+    "--footer": "<a href='https://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> St&eacute;fan Sinclair & Geoffrey Rockwell"
 }
