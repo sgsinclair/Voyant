@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.voyant-tools</groupId>
@@ -22,68 +23,63 @@
 					<exclude>**/*.java</exclude>
 				</excludes>
 			</resource>
-			<!--  make sure we grab the Voyant JS file liste -->
+			<!-- make sure we grab the Voyant JS file liste -->
 			<resource>
 				<directory>${basedir}/src/main/resources</directory>
 			</resource>
 		</resources>
-		
+
 		<plugins>
-          <plugin>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>install</phase>
-                <goals>
-                  <goal>copy-dependencies</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${basedir}/src/main/webapp/WEB-INF/lib</outputDirectory>
-				  <includeScope>runtime</includeScope>
-				  <!-- we have to skip trombone to ensure that we're using compiled classes from project -->
-				  <excludeArtifactIds>trombone</excludeArtifactIds>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          		      <plugin>
-	        <!-- http://maven.apache.org/plugins/maven-war-plugin/overlays.html -->
-	        <artifactId>maven-war-plugin</artifactId>
-	        <configuration>
-	          <outputDirectory>${basedir}/target</outputDirectory>
-	          <webappDirectory>${basedir}/src/main/webapp</webappDirectory>
-	          <warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
-	        </configuration>
-	      </plugin>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
-       <plugin>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-maven-plugin</artifactId>
-		</plugin>    
-      </plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/src/main/webapp/WEB-INF/lib</outputDirectory>
+							<includeScope>runtime</includeScope>
+							<!-- we have to skip trombone to ensure that we're using compiled 
+								classes from project -->
+							<excludeArtifactIds>trombone</excludeArtifactIds>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- http://maven.apache.org/plugins/maven-war-plugin/overlays.html -->
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<outputDirectory>${basedir}/target</outputDirectory>
+					<webappDirectory>${basedir}/src/main/webapp</webappDirectory>
+					<warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
 	</build>
-	
+
 	<dependencies>
-	    <dependency>
-	      <groupId>org.voyant-tools</groupId>
-	      <artifactId>trombone</artifactId>
-	      <version>5.2.0-SNAPSHOT</version>
-	    </dependency>
-	    <!--
 		<dependency>
-			<groupId>caja</groupId>
-			<artifactId>caja</artifactId>
-			<version>r5127</version>
-			<scope>compile</scope>
+			<groupId>org.voyant-tools</groupId>
+			<artifactId>trombone</artifactId>
+			<version>5.2.0-SNAPSHOT</version>
 		</dependency>
-		-->
+		<!-- <dependency> <groupId>caja</groupId> <artifactId>caja</artifactId> 
+			<version>r5127</version> <scope>compile</scope> </dependency> -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
@@ -91,11 +87,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-    		<groupId>commons-io</groupId>
-   			 <artifactId>commons-io</artifactId>
-    		<version>2.6</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.6</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
@@ -124,13 +120,13 @@
 			<name>Google Caja</name>
 			<url>http://google-caja.googlecode.com/svn/maven</url>
 		</repository>
-    <repository>
-        <id>trombone-mvn-repo</id>
-        <url>https://raw.github.com/sgsinclair/trombone/mvn-repo/</url>
-        <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-        </snapshots>
-    </repository>
+		<repository>
+			<id>trombone-mvn-repo</id>
+			<url>https://raw.github.com/sgsinclair/trombone/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
 	</repositories>
 </project>
