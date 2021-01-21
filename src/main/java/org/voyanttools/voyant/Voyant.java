@@ -58,8 +58,7 @@ public class Voyant {
 	}
 	
 	public static String getBaseUrlString(HttpServletRequest request) {
-		
-		StringBuilder sb = new StringBuilder().append(request.getScheme()).append("://").append(request.getServerName());
+		StringBuilder sb = new StringBuilder("//").append(request.getServerName());
 		int serverPort = request.getServerPort();
 		if (serverPort!=80 && serverPort!=443) {
 			sb.append(":").append(serverPort);
