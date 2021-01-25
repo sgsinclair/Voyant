@@ -1149,6 +1149,11 @@ Ext.define('Voyant.notebook.Notebook', {
 		}
 
 		var metadata = this.getMetadata();
+		if (metadata === undefined) {
+			metadata = new Spyral.Metadata();
+			this.setMetadata(metadata);
+		}
+		
 		var form = this.metadataWindow.down('form').getForm();
 		form.findField('title').setValue(metadata.title);
 		form.findField('author').setValue(metadata.author);
