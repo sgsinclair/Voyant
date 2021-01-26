@@ -1,12 +1,10 @@
 /**
  * A helper for working with the Voyant Notebook app.
  * @memberof Spyral
- * @namespace
  */
 class Notebook {
 	/**
 	 * Returns the previous block.
-	 * @static
 	 * @returns {string}
 	 */
 	static getPreviousBlock(config) {
@@ -14,7 +12,6 @@ class Notebook {
 	}
 	/**
 	 * Returns the next block.
-	 * @static
 	 * @returns {string}
 	 */
 	static getNextBlock(config) {
@@ -22,8 +19,7 @@ class Notebook {
 	}
 	/**
 	 * Returns the current block.
-	 * @static
-	 * @params {number} [offset] If specified, returns the block whose position is offset from the current block
+	 * @param {number} [offset] If specified, returns the block whose position is offset from the current block
 	 * @returns {string}
 	 */
 	static getBlock() {
