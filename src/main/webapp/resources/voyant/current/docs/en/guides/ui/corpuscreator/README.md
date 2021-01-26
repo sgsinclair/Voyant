@@ -110,7 +110,7 @@ This isn't the place to [learn XPath syntax](http://www.w3schools.com/xsl/xpath_
 
 ## HTML
 
-New and <span style="color: red">experimental</a>!
+New and <span style="color: red">experimental</span>!
 
 You might want to work with only part of an HTML document, such as the main article without the rest of the navigation and other components on the page. You can now define CSS and jQuery type selectors that allow you to point to parts of an HTML document for the following:
 
@@ -191,7 +191,7 @@ The <a href="https://try.jsoup.org" target="_blank">try Jsoup</a> tool does NOT 
 
 ## JSON
 
-New and <span style="color: red">experimental</a>!
+New and <span style="color: red">experimental</span>!
 
 You can now work with documents in JSON and use the [JSON Pointer](https://tools.ietf.org/html/rfc6901) syntax to select parts of the document, the same way you do with XML XPath or HTML CSS Selectors.
 
