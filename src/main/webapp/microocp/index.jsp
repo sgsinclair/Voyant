@@ -1,6 +1,6 @@
 <%@ include file="../resources/jsp/pre_app.jsp" %>
 <!--  Note that <String> base is defined in pre_app.jsp -->
-<script src="<%= base %>/resources/ace/2017-04-16/src-noconflict/ace.js"></script>
+<script src="<%= base %>/resources/ace/1.4.12/src-min-noconflict/ace.js"></script>
 
 <script>
 	Ext.Loader.setConfig({
