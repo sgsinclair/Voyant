@@ -82,7 +82,6 @@ app/data/model/Corpus.js
 # WIDGETS
 app/widget/CodeEditor.js
 app/widget/CorpusSelector.js
-# app/widget/CorpusTermSummary.js
 app/widget/ListEditor.js
 app/widget/StopListOption.js
 app/widget/QuerySearchField.js
@@ -125,6 +124,7 @@ app/panel/CorpusTerms.js
 app/panel/DocumentTerms.js
 app/panel/Documents.js
 app/panel/DocumentsFinder.js
+app/panel/Embedder.js
 app/panel/Fountain.js
 app/panel/RezoViz.js
 app/panel/Loom.js
