@@ -9,6 +9,9 @@ def parse_file(fullfilename):
     memberOfRe = re.compile(r'@memberof\s+(\w+)')
     defaultsRe = re.compile(r'=\s*(\{\s*\}|undefined)')
     functionCodeRe = re.compile(r'^\s*(\w+)\s*\(')
+    typeDefRe = re.compile(r'@typedef\s+\{(\w+)\}\s+(\w+)(.*)', re.S | re.M)
+    typeDefs = {}
+    paramRe = re.compile(r'@param\s+\{(\w+)\}\s+\[?(\w+)\]?\s*(\w*)')
     with open(fullfilename) as f:
         contents = f.read()
         for match in finditer(commentsRe, contents):
@@ -19,7 +22,28 @@ def parse_file(fullfilename):
             else:
                 code = ""
             if "@typedef" in comments:
+                typeDefMatch = typeDefRe.search(comments)
+                typeDefType = typeDefMatch.group(1)
+                typeDefName = typeDefMatch.group(2)
+                typeDefProps = typeDefMatch.group(3)
+                typeDefProps = typeDefProps.replace("@property", "@param")
+                typeDefProps = re.sub(r'\}\s+', '} '+typeDefName+'.', typeDefProps)
+                typeDefs[typeDefName] = {
+                    'name': typeDefName,
+                    'type': typeDefType,
+                    'props': typeDefProps
+                }
                 continue
+            if "@param" in comments:
+                for paramMatch in finditer(paramRe, comments):
+                    paramType = paramMatch.group(1)
+                    paramName = paramMatch.group(2)
+                    typeDef = typeDefs.get(paramType)
+                    if typeDef is not None:
+                        comments = comments.replace(paramType, typeDef['type'])
+                        typeDefProps = typeDef['props']
+                        typeDefProps = typeDefProps.replace(paramType+'.', paramName+'.')
+                        comments += typeDefProps
             if "static" in code:
                 comments += "* @static\n"
                 code = code.replace("static", "")
