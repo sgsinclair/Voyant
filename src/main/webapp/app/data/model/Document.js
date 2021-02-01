@@ -3,7 +3,8 @@ Ext.define('Voyant.data.model.Document', {
     //requires: ['Voyant.data.store.DocumentTerms'],
     fields: [
              {name: 'corpus'},
-             {name: 'id'},
+			 {name: 'id'},
+			 {name: 'author'},
              {name: 'pubDate'},
              {name: 'publisher'},
              {name: 'pubPlace'},
@@ -220,7 +221,7 @@ Ext.define('Voyant.data.model.Document', {
     	var val = this.get(field) || "";
     	val = Ext.isArray(val) ? val.join("; ") : val;
     	val = val.trim().replace(/\s+/g, ' ');
-    	return max ? this.getTruncated(author, max) : val;
+    	return max ? this.getTruncated(val, max) : val;
     },
     
     getCorpusId: function() {
