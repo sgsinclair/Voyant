@@ -5,14 +5,14 @@
 class Metadata {
 	/**
 	 * The Metadata config object
-	 * @typedef {object} MetadataConfig
-	 * @property {string} title The title of the Corpus
-	 * @property {string} author The author of the Corpus
-	 * @property {string} description The description of the Corpus
-	 * @property {array} keywords The keywords for the Corpus
-	 * @property {string} created When the Corpus was created
-	 * @property {string} language The language of the Corpus
-	 * @property {string} license The license for the Corpus
+	 * @typedef {Object} MetadataConfig
+	 * @property {String} title The title of the Corpus
+	 * @property {String} author The author of the Corpus
+	 * @property {String} description The description of the Corpus
+	 * @property {Array} keywords The keywords for the Corpus
+	 * @property {String} created When the Corpus was created
+	 * @property {String} language The language of the Corpus
+	 * @property {String} license The license for the Corpus
 	 */
 
 	/** 
@@ -43,7 +43,7 @@ class Metadata {
 
 	/**
 	 * Set metadata properties.
-	 * @param {object} config A config object
+	 * @param {Object} config A config object
 	 */
 	set(config) {
 		for (var key in config) {
@@ -55,7 +55,7 @@ class Metadata {
 
 	/**
 	 * Sets the specified field to the current date and time.
-	 * @param {string} field 
+	 * @param {String} field 
 	 */
 	setDateNow(field) {
 		this[field] = new Date().toISOString();
@@ -63,8 +63,8 @@ class Metadata {
 
 	/**
 	 * Gets the specified field as a short date.
-	 * @param {string} field
-	 * @returns {string|undefined}
+	 * @param {String} field
+	 * @returns {(String|undefined)}
 	 */
 	shortDate(field) {
 		return this[field] ? (new Date(Date.parse(this[field])).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })) : undefined;
@@ -72,7 +72,7 @@ class Metadata {
 
 	/**
 	 * Gets the fields as a set of HTML meta tags.
-	 * @returns {string}
+	 * @returns {String}
 	 */
 	getHeaders() {
 		var quotes = /"/g, newlines = /(\r\n|\r|\n)/g, tags = /<\/?\w+.*?>/g,
@@ -87,7 +87,7 @@ class Metadata {
 
 	/**
 	 * Returns a clone of this Metadata
-	 * @returns {metadata}
+	 * @returns {Spyral.Metadata}
 	 */
 	clone() {
 		let config = {};
