@@ -24,3 +24,4 @@ src/main/webapp/resources/spyral/node_modules
 src/main/resources/oath.properties
 /.pydevproject
 .vscode/
+src/main/js/node_modules

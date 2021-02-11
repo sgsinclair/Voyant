@@ -98,6 +98,10 @@
         "getHeaders": {
           "!type": "fn() -> string",
           "!doc": "Gets the fields as a set of HTML meta tags."
+        },
+        "clone": {
+          "!type": "fn() -> metadata",
+          "!doc": "Returns a clone of this Metadata"
         }
       },
       "!doc": "The metadata constructor."
@@ -154,6 +158,14 @@
           "!type": "fn(name: string)",
           "!doc": "Remove a category"
         },
+        "getCategoryRanking": {
+          "!type": "fn(name: string) -> number",
+          "!doc": "Gets the ranking for a category"
+        },
+        "setCategoryRanking": {
+          "!type": "fn(name: string, ranking: number)",
+          "!doc": "Sets the ranking for a category"
+        },
         "addTerm": {
           "!type": "fn(category: string, term: string)",
           "!doc": "Add a term to a category"
@@ -171,8 +183,12 @@
           "!doc": "Remove multiple terms from a category"
         },
         "getCategoryForTerm": {
-          "!type": "fn(term: string) -> object",
-          "!doc": "Get the category that a term belongs to"
+          "!type": "fn(term: string) -> string",
+          "!doc": "Get the category that a term belongs to, taking ranking into account"
+        },
+        "getCategoriesForTerm": {
+          "!type": "fn(term: string) -> array",
+          "!doc": "Get all the categories a term belongs to"
         },
         "getFeatureForTerm": {
           "!type": "fn(feature: string, term: string) -> ?",
@@ -323,8 +339,16 @@
           "!doc": "Get a Promise for an Array of correlations (either document or corpus correlations, depending on the specified mode).\n\nThe mode is set to \"documents\" when any of the following is true\n\n* the `mode` parameter is set to \"documents\"\n* a `docIndex` parameter being set\n* a `docId` parameter being set\n\nThe following is an example a Corpus correlation (corpus mode):\n\n\t{\n\t\t\"source\": {\n\t\t\t\"term\": \"mrs\",\n\t\t\t\"inDocumentsCount\": 8,\n\t\t\t\"rawFreq\": 2531,\n\t\t\t\"relativePeakedness\": 0.46444246,\n\t\t\t\"relativeSkewness\": -0.44197384\n\t\t},\n\t\t\"target\": {\n\t\t\t\"term\": \"love\",\n\t\t\t\"inDocumentsCount\": 8,\n\t\t\t\"rawFreq\": 568,\n\t\t\t\"relativePeakedness\": 5.763066,\n\t\t\t\"relativeSkewness\": 2.2536576\n\t\t},\n\t\t\"correlation\": -0.44287738,\n\t\t\"significance\": 0.08580014\n\t}\n\nThe following is an example of Document correlation (documents mode), without positions requested:\n\n\t{\n\t\t\"source\": {\n\t\t\t\"term\": \"confide\",\n\t\t\t\"rawFreq\": 3,\n\t\t\t\"relativeFreq\": 89.3948,\n\t\t\t\"zscore\": -0.10560975,\n\t\t\t\"zscoreRatio\": -0.7541012,\n\t\t\t\"tfidf\": 1.1168874E-5,\n\t\t\t\"totalTermsCount\": 33559,\n\t\t\t\"docIndex\": 0,\n\t\t\t\"docId\": \"8a61d5d851a69c03c6ba9cc446713574\"\n\t\t},\n\t\t\"target\": {\n\t\t\t\"term\": \"love\",\n\t\t\t\"rawFreq\": 54,\n\t\t\t\"relativeFreq\": 1609.1063,\n\t\t\t\"zscore\": 53.830048,\n\t\t\t\"zscoreRatio\": -707.44696,\n\t\t\t\"tfidf\": 0.0,\n\t\t\t\"totalTermsCount\": 33559,\n\t\t\t\"docIndex\": 0,\n\t\t\t\"docId\": \"8a61d5d851a69c03c6ba9cc446713574\"\n\t\t},\n\t\t\"correlation\": 0.93527687,\n\t\t\"significance\": 7.0970666E-5\n\t}\n\nThe following config parameters are valid in both modes:\n\n * **start**: the zero-based start index of the list (for paging)\n * **limit**: the maximum number of terms to provide per request\n * **minRawFreq**: the minimum raw frequency of the collocate terms\n * **termsOnly**: a very compact data view of the correlations\n * **sort**: the order of the terms, one of the following: `CORRELATION`, `CORRELATIONABS`\n * **dir**: sort direction, **`ASC`**ending or **`DESC`**ending\n\nThe following are specific to documents mode:\n\n * **docIndex**: the zero-based index of the documents to include (use commas to separate multiple values)\n * **docId**: the document IDs to include (use commas to separate multiple values)\n \nAn example:\n\n\t// load the first 10 phrases in the corpus\n\tloadCorpus(\"austen\").correlations({query: \"love\", limit: 10})"
         },
         "lda": {
-          "!type": "fn(config: +Object)",
-          "!doc": "config params:\n * **numberTopics**: the number of topics to get (default is 10)\n * **sweeps**: the number of sweeps to do, more sweeps = more accurate (default is 100)\n * **language**: stopwords language to use, default is corpus language"
+          "!type": "fn(config: +Object) -> +Promise",
+          "!doc": "Get a promise for an LDA object that has two primary methods of use:\n\n\t* **getTopicWords**: get a list of topics (words organized into bunches of a specified size\n\t* **getDocuments**: get a list of documents and the signican words\n\nThe config object as parameter can contain the following:\n * **numberTopics**: the number of topics to get (default is 10)\n * **sweeps**: the number of sweeps to do, more sweeps = more accurate (default is 100)\n * **language**: stopwords language to use, default is corpus language"
+        },
+        "ldaTopics": {
+          "!type": "fn(config: +Object) -> +Promise",
+          "!doc": "Get a promise for a list of LDA topics from the corpus.\n\nThe config object as parameter can contain the following:\n * **numberTopics**: the number of topics to get (default is 10)\n * **sweeps**: the number of sweeps to do, more sweeps = more accurate (default is 100)\n * **language**: stopwords language to use, default is corpus language"
+        },
+        "ldaDocuments": {
+          "!type": "fn(config: +Object) -> +Promise",
+          "!doc": "Get a promise for a list of documents and associated words\n\nThe config object as parameter can contain the following:\n * **numberTopics**: the number of topics to get (default is 10)\n * **sweeps**: the number of sweeps to do, more sweeps = more accurate (default is 100)\n * **language**: stopwords language to use, default is corpus language"
         },
         "tool": {
           "!type": "fn()",
@@ -335,13 +359,9 @@
           "!doc": "An alias for #summary."
         }
       },
-      "create": {
-        "!type": "fn(config: object)",
-        "!doc": "Create a new Corpus using the provided config"
-      },
       "load": {
-        "!type": "fn(config: object)",
-        "!doc": "Load a Corpus using the provided config"
+        "!type": "fn(config: object, api: object)",
+        "!doc": "Load a Corpus using the provided config and api"
       }
     },
     "Load": {
@@ -375,9 +395,9 @@
         "!type": "fn(url: string) -> string",
         "!doc": "Fetch text content from a URL"
       },
-      "file": {
+      "files": {
         "!type": "fn(target: element) -> +Promise",
-        "!doc": "Create a file input in the target element and returns a Promise that's resolved with the file that is added to the input.\nThe file is also temporarily stored in the session storage for successive retrieval."
+        "!doc": "Create a file input in the target element and returns a Promise that's resolved with the file(s) that is added to the input.\nThe file is also temporarily stored in the session storage for successive retrieval."
       }
     },
     "Table": {

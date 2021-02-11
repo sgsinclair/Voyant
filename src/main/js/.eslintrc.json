@@ -1,0 +1,48 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+	"extends": "eslint:recommended",
+	"parser": "@babel/eslint-parser",
+    "parserOptions": {
+        "ecmaVersion": 11,
+        "sourceType": "module"
+	},
+	"globals": {
+		"Ext": "readonly",
+		"Voyant": "readonly",
+		"Spyral": "readonly",
+		"module": "readonly"
+	},
+    "rules": {
+		"eqeqeq": [
+			"error",
+			"always"
+		],
+        "indent": [
+            "error",
+			"tab",
+			{
+				"ignoreComments": true,
+				"MemberExpression": "off"
+			}
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+		],
+		"space-before-function-paren": [
+			"error",
+			"never"
+		]
+    }
+}

@@ -72,7 +72,7 @@ app/data/store/Tokens.js
 app/data/store/TSNEAnalysis.js
 
 # TABLES
-app/data/util/Table.js
+# app/data/util/Table.js
 app/data/util/NetworkGraph.js
 app/data/util/Geonames.js
 
@@ -80,7 +80,7 @@ app/data/util/Geonames.js
 app/data/model/Corpus.js
 
 # WIDGETS
-app/widget/CodeEditor.js
+# app/widget/CodeEditor.js
 app/widget/CorpusSelector.js
 app/widget/ListEditor.js
 app/widget/StopListOption.js

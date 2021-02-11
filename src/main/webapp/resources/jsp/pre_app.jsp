@@ -75,6 +75,10 @@
 	gtag('config', 'G-MZ8WDV5DGZ');
 </script>
 
+<script type="text/javascript" src="<%= base %>/resources/vendor/vendor-voyant.js"></script>
+
+<script type="text/javascript" src="<%= base %>/resources/spyral/spyral.min.js"></script>
+
 <!-- EXTJS CLASSIC -->
 <script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/ext-all<%= rtl %>.js"></script>
 <script type="text/javascript" src="<%= base %>/resources/ext/6.2.0/charts.js"></script>
@@ -86,51 +90,22 @@
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/theme-crisp/resources/ux-all<%= rtl %>-debug.css" />
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0/examples/style.css" />
 
-<!-- EXTJS MODERN -->
-<!--
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/ext-modern-all.js"></script>
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/charts.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0-modern/charts-all<%= rtl %>.css" />
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/theme-material/theme-material.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0-modern/theme-material/resources/theme-material-all<%= rtl %>.css" />
-<script type="text/javascript" src="<%= base %>/resources/ext/6.2.0-modern/ux.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/ext/6.2.0-modern/ux-all<%= rtl %>-debug.css" />
--->
-
 <!-- jQuery -->
-<script type="text/javascript" src="<%= base %>/resources/jquery/current/jquery.min.js"></script>
-<script type="text/javascript" src="<%= base %>/resources/jquery/current/jquery-ui.min.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/jquery/current/jquery-ui.min.css" />
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/jquery/current/jquery-ui.theme.min.css" />
+<script type="text/javascript" src="<%= base %>/resources/jquery-ui/jquery-ui.min.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/jquery-ui/jquery-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/jquery-ui/jquery-ui.theme.min.css" />
 
-<!-- D3 -->
-<script type="text/javascript" src="<%= base %>/resources/d3/current/d3.min.js"></script>
 <script type="text/javascript" src="<%= base %>/resources/d3/fisheye.js"></script>
-<script type="text/javascript" src="<%= base %>/resources/cirrus/html5/d3.layout.cloud.js"></script>
-
-<!-- vis.js -->
-<script type="text/javascript" src="<%= base %>/resources/visjs/vis.min.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/visjs/vis.min.css" />
-
-<!-- ACE Editor (used by Spyral and the widget.codeeditor -->
-<script src="<%= base %>/resources/ace/1.4.12/src-min-noconflict/ace.js"></script>
+<script type="text/javascript" src="<%= base %>/resources/d3/d3.layout.cloud.js"></script>
 
 <!-- FontAwesome -->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/fontawesome/4.4.0/font-awesome-all<%= rtl %>.css" />
 
-<!-- spectrum -->
-<script type="text/javascript" src="<%=base %>/resources/spectrum/spectrum.js"></script>
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/spectrum/spectrum.css" />
 
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/css/styles.css" />
 
-<!-- highcharts -->
-<!-- 
-<script type="text/javascript" src="<%=base %>/resources/highcharts/Highcharts-6.1.0/code/highcharts.js"></script>
-<script type="text/javascript" src="<%=base %>/resources/highcharts/Highcharts-6.1.0/code/modules/drilldown.js"></script>
-<script type="text/javascript" src="<%=base %>/resources/highcharts/custom-events/customEvents.min.js"></script>
- -->
- 
+
 <%
 	// check to see if there's CSS in the URL
 	if (request.getParameter("cssInline")!=null) { 
@@ -146,10 +121,7 @@
 	<% } 
 } %>
 
-<!-- spyral -->
-<script type="text/javascript" src="<%= base %>/resources/spyral/build/spyral.js"></script>
-
-<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant<%= (request.getParameter("debug")!=null ? ".jsp?debug=true" : ".min.js") %>"></script>
+<script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant<%= (request.getParameter("debug")!=null ? ".js" : ".min.js") %>"></script>
 <script type="text/javascript" src="<%= base %>/resources/voyant/current/voyant-locale-<%= lang %>.js"></script>
 
 <% // ridiculous hack for Safari 11 that seems to hide fieldsets, tested with desktop and iPad

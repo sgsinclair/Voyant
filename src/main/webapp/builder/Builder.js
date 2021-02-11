@@ -9,7 +9,7 @@ Ext.define('Voyant.panel.Builder', {
     	dropTargets: {},
     	colResizers: {},
     	rowResizers: {},
-    	toolsList: ["cirrus", "corpusterms", "bubblelines", "corpuscollocates", "microsearch", "streamgraph", "phrases", "documents", "summary", "trends", "scatterplot", "termsradio", "wordtree", "contexts", "documentterms", "reader", "knots", "collocatesgraph"]
+    	toolsList: ["cirrus", "corpusterms", "bubblelines", "corpuscollocates", "microsearch", "streamgraph", "phrases", "documents", "summary", "trends", "scatterplot", "termsradio", "wordtree", "contexts", "documentterms", "reader", "knots", "collocatesgraph", "embedder"]
     },
     statics: {
     	i18n: {

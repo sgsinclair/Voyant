@@ -1,10 +1,11 @@
 
 
-// *** Documentation extracted from: ../../../../voyantjs/src/categories.js ***
+// *** Documentation extracted from: ..\..\..\..\voyantjs\src\categories.js ***
 
 /**
 * Class for working with categories and features.
  * Categories are groupings of terms.
+ * A term can be present in multiple categories. Category ranking is used to determine which feature value to prioritize.
  * Features are arbitrary properties (font, color) that are associated with each category.
  * @class Spyral.Categories
  */
@@ -18,7 +19,7 @@
 
 /**
 * Get the categories
-	 * @returns {object}
+	 * @returns {Object}
 	  * @method getCategories
  */
 
@@ -34,7 +35,7 @@
 /**
 * Get the terms for a category
 	 * @param {string} name 
-	 * @returns {array}
+	 * @returns {Array}
 	  * @method getCategoryTerms
  */
 
@@ -62,6 +63,22 @@
 
 
 /**
+* Gets the ranking for a category
+	 * @param {string} name 
+	 * @returns {number}
+	  * @method getCategoryRanking
+ */
+
+
+/**
+* Sets the ranking for a category
+	 * @param {string} name 
+	 * @param {number} ranking 
+	  * @method setCategoryRanking
+ */
+
+
+/**
 * Add a term to a category
 	 * @param {string} category 
 	 * @param {string} term 
@@ -72,7 +89,7 @@
 /**
 * Add multiple terms to a category
 	 * @param {string} category 
-	 * @param {array} terms 
+	 * @param {Array} terms 
 	  * @method addTerms
  */
 
@@ -88,16 +105,24 @@
 /**
 * Remove multiple terms from a category
 	 * @param {string} category 
-	 * @param {array} terms 
+	 * @param {Array} terms 
 	  * @method removeTerms
  */
 
 
 /**
-* Get the category that a term belongs to
+* Get the category that a term belongs to, taking ranking into account
 	 * @param {string} term 
-	 * @return {object}
+	 * @returns {string}
 	  * @method getCategoryForTerm
+ */
+
+
+/**
+* Get all the categories a term belongs to
+	 * @param {string} term 
+	 * @returns {Array}
+	  * @method getCategoriesForTerm
  */
 
 
@@ -112,7 +137,7 @@
 
 /**
 * Get the features
-	 * @returns {object}
+	 * @returns {Object}
 	  * @method getFeatures
  */
 
@@ -152,15 +177,15 @@
 
 /**
 * Get a copy of the category and feature data
-	 * @return {object}
+	 * @returns {Object}
 	  * @method getCategoryExportData
  */
 
 
 /**
 * Save the categories (if we're in a recognized environment).
-	 * @param {Object} config for the network call (specifying if needed the location of Trombone, etc., see {@link #Load.trombone}
-	 * @return {Promise} this returns a promise which eventually resolves to a string that is the ID reference for the stored categories
+	 * @param {Object} config for the network call (specifying if needed the location of Trombone, etc., see {@link Spyral.Load#trombone}
+	 * @returns {Promise} this returns a promise which eventually resolves to a string that is the ID reference for the stored categories
 	  * @method save
  */
 
@@ -176,56 +201,14 @@
 	 * 
 	 * @param {Object|String} config an object specifying the parameters (see above)
 	 * @param {Object} api an object specifying any parameters for the trombone call
-	 * @return {Promise} this first returns a promise and when the promise is resolved it returns this categories object (with the loaded data included)
+	 * @returns {Promise} this first returns a promise and when the promise is resolved it returns this categories object (with the loaded data included)
 	  * @method load
  */
 
 
 
 
-// *** Documentation extracted from: ../../../../voyantjs/src/util.js ***
-
-/**
-* A helper for working with the Voyant Notebook app.
- * @namespace
- * @class Spyral.Util
- */
-
-
-/**
-* Generates a random ID of the specified length.
-	 * @static
-	 * @param {number} len The length of the ID to generate?
-	 * @returns {string}
-	 * @static
- * @method id
- */
-
-
-/**
-* 
-	 * @static
-	 * @param {array|object|string} contents 
-	 * @returns {string}
-	 * @static
- * @method toString
- */
-
-
-/**
-* 
-	 * @static
-	 * @param {string} before 
-	 * @param {string} more 
-	 * @param {string} after 
-	 * @static
- * @method more
- */
-
-
-
-
-// *** Documentation extracted from: ../../../../voyantjs/src/chart.js ***
+// *** Documentation extracted from: ..\..\..\..\voyantjs\src\chart.js ***
 
 /**
 * Class representing a Chart.
@@ -236,28 +219,46 @@
 /**
 * Construct a new Chart class
 	 * @constructor
-	 * @param {element} target 
-	 * @param {array} data 
+	 * @param {HTMLElement} target 
+	 * @param {Array} data 
 	  * @method constructor
  */
 
 
 /**
-* Create a new chart
-	 * See {@link https://api.highcharts.com/highcharts/} for full set of config options.
-	 * @param {(string|element)} target 
-	 * @param {HighchartsConfig} config 
+* Create a new chart.
+	 * See [Highcharts API](https://api.highcharts.com/highcharts/) for full set of config options.
+	 * @param {(String|HTMLElement)} target 
+	 * @param {Object} config 
 	 * @returns {Highcharts.Chart}
+	 
+	 * @param {(string|object)} config.title
+	 * @param {(string|object)} config.subtitle
+	 * @param {Object} config.credits
+	 * @param {Object} config.xAxis
+	 * @param {Object} config.yAxis
+	 * @param {Object} config.chart
+	 * @param {Array} config.series
+	 * @param {Object} config.plotOptions
 	  * @method create
  */
 
 
 /**
-* Create a new chart
-	 * See {@link https://api.highcharts.com/highcharts/} for full set of config options.
-	 * @param {(string|element)} target 
-	 * @param {HighchartsConfig} config 
+* Create a new chart.
+	 * See [Highcharts API](https://api.highcharts.com/highcharts/) for full set of config options.
+	 * @param {(String|HTMLElement)} target 
+	 * @param {Object} config 
 	 * @returns {Highcharts.Chart}
+	 
+	 * @param {(string|object)} config.title
+	 * @param {(string|object)} config.subtitle
+	 * @param {Object} config.credits
+	 * @param {Object} config.xAxis
+	 * @param {Object} config.yAxis
+	 * @param {Object} config.chart
+	 * @param {Array} config.series
+	 * @param {Object} config.plotOptions
 	 * @static
  * @method create
  */
@@ -265,7 +266,7 @@
 
 /**
 * Sets the default chart type
-	 * @param {object} config The chart config object
+	 * @param {Object} config The chart config object
 	 * @param {string} type The type of chart
 	 * @static
  * @method setDefaultChartType
@@ -274,8 +275,8 @@
 
 /**
 * Add the provided data to the config as a series
-	 * @param {object} config 
-	 * @param {array} data 
+	 * @param {Object} config 
+	 * @param {Array} data 
 	 * @static
  * @method setSeriesData
  */
@@ -283,7 +284,7 @@
 
 /**
 * Create a bar chart
-	 * @param {object} [config]
+	 * @param {Object} [config]
 	 * @returns {Highcharts.Chart}
 	  * @method bar
  */
@@ -291,8 +292,8 @@
 
 /**
 * Create a bar chart
-	 * @param {element} target 
-	 * @param {object} config 
+	 * @param {HTMLElement} target 
+	 * @param {Object} config 
 	 * @returns {Highcharts.Chart}
 	 * @static
  * @method bar
@@ -301,7 +302,7 @@
 
 /**
 * Create a line chart
-	 * @param {object} [config]
+	 * @param {Object} [config]
 	 * @returns {Highcharts.Chart}
 	  * @method line
  */
@@ -309,8 +310,8 @@
 
 /**
 * Create a line chart
-	 * @param {element} target 
-	 * @param {object} config 
+	 * @param {HTMLElement} target 
+	 * @param {Object} config 
 	 * @returns {Highcharts.Chart}
 	 * @static
  * @method line
@@ -319,7 +320,7 @@
 
 /**
 * Create a scatter plot
-	 * @param {object} [config]
+	 * @param {Object} [config]
 	 * @returns {Highcharts.Chart}
 	  * @method scatter
  */
@@ -327,8 +328,8 @@
 
 /**
 * Create a scatter plot
-	 * @param {element} target 
-	 * @param {object} config 
+	 * @param {HTMLElement} target 
+	 * @param {Object} config 
 	 * @returns {Highcharts.Chart}
 	 * @static
  * @method scatter
@@ -337,7 +338,7 @@
 
 /**
 * Create a network graph
-	 * @param {object} [config]
+	 * @param {Object} [config]
 	 * @returns {Highcharts.Chart}
 	  * @method networkgraph
  */
@@ -345,8 +346,8 @@
 
 /**
 * Create a network graph
-	 * @param {element} target 
-	 * @param {object} config 
+	 * @param {HTMLElement} target 
+	 * @param {Object} config 
 	 * @returns {Highcharts.Chart}
 	 * @static
  * @method networkgraph
@@ -355,682 +356,7 @@
 
 
 
-// *** Documentation extracted from: ../../../../voyantjs/src/fileinput.js ***
-
-/**
-* A multiple file input that features drag n drop as well as temporary file storage in session storage.
- * @class FileInput
- */
-
-
-/**
-* The FileInput constructor
-	 * @param {element} target The element to place the file input into
-	 * @param {function} resolve A function to call with the file(s)
-	 * @param {function} reject A function to call if the input is cancelled
-	  * @method constructor
- */
-
-
-
-
-// *** Documentation extracted from: ../../../../voyantjs/src/load.js ***
-
-/**
-* Class embodying Load functionality.
- * @class Spyral.Load
- */
-
-
-/**
-* Set the base URL for use with the Load class
-	 * @param {string} baseUrl 
-	 * @static
- * @method setBaseUrl
- */
-
-
-/**
-* Make a call to trombone
-	 * @param {object} config 
-	 * @param {object} params
-	 * @returns {JSON}
-	 * @static
- * @method trombone
- */
-
-
-/**
-* Fetch content from a URL, often resolving cross-domain data constraints
-	 * @param {string} urlToFetch 
-	 * @param {object} config
-	 * @returns {Response}
-	 * @static
- * @method load
- */
-
-
-/**
-* Fetch HTML content from a URL
-	 * @param {string} url 
-	 * @returns {Document}
-	 * @static
- * @method html
- */
-
-
-/**
-* Fetch XML content from a URL
-	 * @param {string} url 
-	 * @returns {XMLDocument}
-	 * @static
- * @method xml
- */
-
-
-/**
-* Fetch JSON content from a URL
-	 * @param {string} url 
-	 * @returns {JSON}
-	 * @static
- * @method json
- */
-
-
-/**
-* Fetch text content from a URL
-	 * @param {string} url 
-	 * @returns {string}
-	 * @static
- * @method text
- */
-
-
-/**
-* Create a file input in the target element and returns a Promise that's resolved with the file(s) that is added to the input.
-	 * The file is also temporarily stored in the session storage for successive retrieval.
-	 * @param {element} target The target element to append the input to
-	 * @returns {Promise}
-	 * @static
- * @method files
- */
-
-
-
-
-// *** Documentation extracted from: ../../../../voyantjs/src/table.js ***
-
-/**
-* The Spyral.Table class in Spyral provides convenience functions for working with tabular
- * data.
- * 
- * There are several ways of initializing a Table, here are some of them:
- * 
- * Provide an array of data with 3 rows:
- * 
- *  	let table = createTable([1,2,3]);
- *
- *
- * Provide a nested array of data with multiple rows:
- * 
- *		let table = createTable([[1,2],[3,4]]);
- * 
- * Same nested array, but with a second argument specifying headers
- * 
- *		let table = createTable([[1,2],[3,4]], {headers: ["one","two"]});
- * 
- * Create table with comma-separated values:
- * 
- *  	let table = createTable("one,two\\n1,2\\n3,4");
- * 
- * Create table with tab-separated values
- * 
- *		let table = createTable("one\\ttwo\\n1\\t2\\n3\\t4");
- * 
- * Create table with array of objects
- * 
- *  	let table = createTable([{one:1,two:2},{one:3,two:4}]);
- * 
- * It's also possible simple to create a sorted frequency table from an array of values:
- * 
- *		let table = createTable(["one","two","one"], {count: "vertical", headers: ["Term","Count"]})
- * 
- * Working with a Corpus is easy. For instance, we can create a table from the top terms:
- * 
- *		loadCorpus("austen").terms({limit:500, stopList: 'auto'}).then(terms => {
- *			return createTable(terms);
- *		})
- * 
- * Similarly, we could create a frequency table from the first 1,000 words of the corpus:
- * 
- *		loadCorpus("austen").words({limit:1000, docIndex: 0, stopList: 'auto'}).then(words => {
- *			return createTable(words, {count: "verticalA"});
- *		});
- *
- * Some of the configuration options are as follows:
- * 
- * * **format**: especially for forcing csv or tsv when the data is a string
- * * **hasHeaders**: determines if data has a header row (usually determined automatically)
- * * **headers**: a Array of Strings that serve as headers for the table
- * * **count**: forces Spyral to create a sorted frequency table from an Array of data, this can be set to "vertical" if the counts are shown vertically or set to true if the counts are shown horizontally
- * 
- * Tables are convenient in Spyral because you can simply show them to preview a version in HTML.
- * 
- * @param {Array|String} data an array of data or a string with CSV or TSV.
- * @param {Object} config an Object for configuring the table initialization, see above
- * @class Spyral.Table
- */
-
-
-/**
-* Create a new Table
-	 * @constructor
-	 * @param {(object|array|string|number)} data
-	 * @param {TableConfig} config
-	  * @method constructor
- */
-
-
-/**
-* Set the headers for the Table
-	 * @param {(object|array)} data
-	 * @returns {Table}
-	  * @method setHeaders
- */
-
-
-/**
-* Add rows to the Table
-	 * @param {array} data
-	 * @returns {Table}
-	  * @method addRows
- */
-
-
-/**
-* Add a row to the Table
-	 * @param {(array|object)} data
-	 * @returns {Table}
-	  * @method addRow
- */
-
-
-/**
-* Set a row
-	 * @param {(number|string)} ind The row index
-	 * @param {(object|array)} data
-	 * @param {boolean} create
-	 * @returns {Table}
-	  * @method setRow
- */
-
-
-/**
-* Set a column
-	 * @param {(number|string)} ind The column index
-	 * @param {(object|array)} data
-	 * @param {boolean} create
-	 * @returns {Table}
-	  * @method setColumn
- */
-
-
-/**
-* Add to or set a cell value
-	 * @param {(number|string)} row The row index
-	 * @param {(number|string)} column The column index
-	 * @param {number} value The value to set/add
-	 * @param {boolean} overwrite True to set, false to add to current value
-	  * @method updateCell
- */
-
-
-/**
-* Get the value of a cell
-	 * @param {(number|string)} rowInd The row index
-	 * @param {(number|string)} colInd The column index
-	 * @returns {number}
-	  * @method cell
- */
-
-
-/**
-* Set the value of a cell
-	 * @param {(number|string)} row The row index
-	 * @param {(number|string)} column The column index
-	 * @param {number} value The value to set
-	 * @returns {Table}
-	  * @method setCell
- */
-
-
-/**
-* Get (and create) the row index
-	 * @param {(number|string)} ind The index
-	 * @param {boolean} create
-	 * @returns {number}
-	  * @method getRowIndex
- */
-
-
-/**
-* Get (and create) the column index
-	 * @param {(number|string)} ind The index
-	 * @param {boolean} create
-	 * @returns {number}
-	  * @method getColumnIndex
- */
-
-
-/**
-* Add a column (at the specified index)
-	 * @param {(object|string)} config
-	 * @param {(number|string)} ind
-	  * @method addColumn
- */
-
-
-/**
-* This function returns different values depending on the arguments provided.
-	 * When there are no arguments, it returns the number of rows in this table.
-	 * When the first argument is the boolean value `true` all rows are returned.
-	 * When the first argument is a an array then the rows corresponding to the row
-	 * indices or names are returned. When all arguments except are numbers or strings
-	 * then each of those is returned.
-	 * @param {(boolean|array|number|string)} [inds]
-	 * @param {(object|number|string)} [config]
-	 * @returns {number|array}
-	  * @method rows
- */
-
-
-/**
-* Get the specified row
-	 * @param {(number|string)} ind
-	 * @param {boolean} [asObj]
-	 * @returns {(number|string|object)}
-	  * @method row
- */
-
-
-/**
-* This function returns different values depending on the arguments provided.
-	 * When there are no arguments, it returns the number of columns in this table.
-	 * When the first argument is the boolean value `true` all columns are returned.
-	 * When the first argument is a number a slice of the columns is returned and if
-	 * the second argument is a number it is treated as the length of the slice to
-	 * return (note that it isn't the `end` index like with Array.slice()).
-	 * @param {(boolean|array|number|string)} [inds]
-	 * @param {(object|number|string)} [config]
-	 * @returns {number|array}
-	  * @method columns
- */
-
-
-/**
-* Get the specified column
-	 * @param {(number|string)} ind
-	 * @param {boolean} [asObj]
-	 * @returns {(number|string|object)}
-	  * @method column
- */
-
-
-/**
-* Get the specified header
-	 * @param {(number|string)} ind
-	 * @returns {(number|string)}
-	  * @method header
- */
-
-
-/**
-* This function returns different values depending on the arguments provided.
-	 * When there are no arguments, it returns the number of headers in this table.
-	 * When the first argument is the boolean value `true` all headers are returned.
-	 * When the first argument is a number a slice of the headers is returned.
-	 * When the first argument is an array the slices specified in the array are returned.
-	 * @param {(boolean|array|number|string)} inds
-	 * @returns {(number|array)}
-	  * @method headers
- */
-
-
-/**
-* Does the specified column exist
-	 * @param {(number|string)} ind
-	 * @returns {(number|string)}
-	  * @method hasColumn
- */
-
-
-/**
-* Runs the specified function on each row.
-	 * The function is passed the row and the row index.
-	 * @param {function} fn
-	  * @method forEach
- */
-
-
-/**
-* Get the minimum value in the specified row
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method rowMin
- */
-
-
-/**
-* Get the maximum value in the specified row
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method rowMax
- */
-
-
-/**
-* Get the minimum value in the specified column
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method columnMin
- */
-
-
-/**
-* Get the maximum value in the specified column
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method columnMax
- */
-
-
-/**
-* Get the sum of the values in the specified row
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method rowSum
- */
-
-
-/**
-* Get the sum of the values in the specified column
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method columnSum
- */
-
-
-/**
-* Get the mean of the values in the specified row
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method rowMean
- */
-
-
-/**
-* Get the mean of the values in the specified column
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method columnMean
- */
-
-
-/**
-* Get the count of each unique value in the specified row
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method rowCounts
- */
-
-
-/**
-* Get the count of each unique value in the specified column
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method columnCounts
- */
-
-
-/**
-* Get the rolling mean for the specified row
-	 * @param {(number|string)} ind
-	 * @param {number} neighbors
-	 * @param {boolean} overwrite
-	 * @returns {array}
-	  * @method rowRollingMean
- */
-
-
-/**
-* Get the rolling mean for the specified column
-	 * @param {(number|string)} ind
-	 * @param {number} neighbors
-	 * @param {boolean} overwrite
-	 * @returns {array}
-	  * @method columnRollingMean
- */
-
-
-/**
-* Get the variance for the specified row
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method rowVariance
- */
-
-
-/**
-* Get the variance for the specified column
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method columnVariance
- */
-
-
-/**
-* Get the standard deviation for the specified row
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method rowStandardDeviation
- */
-
-
-/**
-* Get the standard deviation for the specified column
-	 * @param {(number|string)} ind
-	 * @returns {number}
-	  * @method columnStandardDeviation
- */
-
-
-/**
-* Get the z scores for the specified row
-	 * @param {(number|string)} ind
-	 * @returns {array}
-	  * @method rowZScores
- */
-
-
-/**
-* Get the z scores for the specified column
-	 * @param {(number|string)} ind
-	 * @returns {array}
-	  * @method columnZScores
- */
-
-
-/**
-* TODO
-	 * Sort the specified rows
-	 * @returns {Table}
-	  * @method rowSort
- */
-
-
-/**
-* TODO
-	 * Sort the specified columns
-	 * @returns {Table}
-	  * @method columnSort
- */
-
-
-/**
-* Get a CSV representation of the Table
-	 * @param {object} [config]
-	 * @returns {string}
-	  * @method toCsv
- */
-
-
-/**
-* Get a TSV representation of the Table
-	 * @param {object} [config]
-	 * @returns {string}
-	  * @method toTsv
- */
-
-
-/**
-* Set the target's contents to an HTML representation of the Table
-	 * @param {(function|string|object)} target
-	 * @param {object} [config]
-	 * @returns {Table}
-	  * @method html
- */
-
-
-/**
-* Same as {@link toString}.
-	  * @method toHtml
- */
-
-
-/**
-* Get an HTML representation of the Table
-	 * @param {object} [config]
-	 * @returns {string}
-	  * @method toString
- */
-
-
-/**
-* Show a chart representing the Table
-	 * @param {(string|element)} [target]
-	 * @param {HighchartsConfig} [config]
-	 * @returns {Highcharts.Chart}
-	  * @method chart
- */
-
-
-/**
-* Create a new Table
-	 * @param {(object|array|string|number)} data
-	 * @param {TableConfig} config
-	 * @returns {Table}
-	 * @static
- * @method create
- */
-
-
-/**
-* Fetch a Table from a source
-	 * @param {string|Request} input
-	 * @param {object} api
-	 * @param {object} config
-	 * @returns {Promise}
-	 * @static
- * @method fetch
- */
-
-
-/**
-* Get the count of each unique value in the data
-	 * @param {array} data
-	 * @returns {object}
-	 * @static
- * @method counts
- */
-
-
-/**
-* Compare two values
-	 * @param {(number|string)} a
-	 * @param {(number|string)} b
-	 * @returns {number}
-	 * @static
- * @method cmp
- */
-
-
-/**
-* Get the sum of the provided values
-	 * @param {array} data
-	 * @returns {number}
-	 * @static
- * @method sum
- */
-
-
-/**
-* Get the mean of the provided values
-	 * @param {array} data
-	 * @returns {number}
-	 * @static
- * @method mean
- */
-
-
-/**
-* Get rolling mean for the provided values
-	 * @param {array} data
-	 * @param {number} neighbors
-	 * @returns {array}
-	 * @static
- * @method rollingMean
- */
-
-
-/**
-* Get the variance for the provided values
-	 * @param {array} data
-	 * @returns {number}
-	 * @static
- * @method variance
- */
-
-
-/**
-* Get the standard deviation for the provided values
-	 * @param {array} data
-	 * @returns {number}
-	 * @static
- * @method standardDeviation
- */
-
-
-/**
-* Get the z scores for the provided values
-	 * @param {array} data
-	 * @returns {array}
-	 * @static
- * @method zScores
- */
-
-
-/**
-* Perform a zip operation of the provided arrays {@link https://en.wikipedia.org/wiki/Convolution_(computer_science)}
-	 * @param {array} data
-	 * @returns {array}
-	 * @static
- * @method zip
- */
-
-
-
-
-// *** Documentation extracted from: ../../../../voyantjs/src/corpus.js ***
+// *** Documentation extracted from: ..\..\..\..\voyantjs\src\corpus.js ***
 
 /**
 * The Corpus class in Spyral. Here's a simple example:
@@ -1171,22 +497,6 @@
 
 /**
 * @cfg {String} tableTitle Determine how to extract the title from each document; only used for table-based documents.
- * 
- * Columns are referred to by numbers, the first is column 1 (not 0).
- * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
- * 
- * Some examples:
- * 
- * - **1**: use column 1
- * - **1,2**: use columns 1 and 2 separately
- * - **1+2,3**: combine columns 1 and two and use column 3 separately
- * 
- * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
- */
-
-
-/**
-* @cfg {String} tableContent Determine how to extract body content from the table; only used for table-based documents.
  * 
  * Columns are referred to by numbers, the first is column 1 (not 0).
  * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
@@ -1408,7 +718,7 @@
 /**
 * Get a Promise for the ID of the corpus.
 	 * 
-	 * @return {Promise/String} a Promise for the string ID of the corpus
+	 * @return {Promise|String} a Promise for the string ID of the corpus
 	  * @method id
  */
 
@@ -1482,7 +792,7 @@
 	 *  	loadCorpus("austen").metadata().then(metadata => metadata.documentsCount)
 	 *  
 	 * @param {Object} config an Object specifying parameters (see list above)
-	 * @return {Promise/Object} a Promise for an Object containing metadata
+	 * @return {Promise|Object} a Promise for an Object containing metadata
 	  * @method metadata
  */
 
@@ -1494,7 +804,7 @@
 	 * 
 	 * 	loadCorpus("austen").summary();
 	 * 
-	 * @return {Promise/String} a Promise for a string containing a brief summary of the corpus metadata
+	 * @return {Promise|String} a Promise for a string containing a brief summary of the corpus metadata
 	  * @method summary
  */
 
@@ -1540,7 +850,7 @@
 	 * 	loadCorpus("austen").text({limit:1000})
 	 * 
 	 * @param {Object} config an Object specifying parameters (see list above)
-	 * @returns {Promise/String} a Promise for a string of the corpus
+	 * @returns {Promise|String} a Promise for a string of the corpus
 	  * @method text
  */
 
@@ -1561,7 +871,7 @@
 	 * 	loadCorpus("austen").texts({limit:1000})
 	 * 
 	 * @param {Object} config an Object specifying parameters (see list above)
-	 * @returns {Promise/String} a Promise for an Array of texts from the corpus
+	 * @returns {Promise|String} a Promise for an Array of texts from the corpus
 	  * @method texts
  */
 
@@ -1961,6 +1271,14 @@
 
 
 /**
+* Get lemmas. This is the equivalent calling: this.tokens({ withPosLemmas: true, noOthers: true })
+	 * @param {Object} config an Object specifying parameters (see above)
+     * @returns {Promise|Array} a Promise for an Array of lemma Objects
+	  * @method lemmas
+ */
+
+
+/**
 * Get a promise for an LDA object that has two primary methods of use:
 	 * 
 	 * 	* **getTopicWords**: get a list of topics (words organized into bunches of a specified size
@@ -2107,8 +1425,8 @@
 
 /**
 * Load a Corpus using the provided config and api
-	 * @param {object} config the Corpus config
-	 * @param {object} api any additional API values
+	 * @param {Object} config the Corpus config
+	 * @param {Object} api any additional API values
 	 * @static
  * @method load
  */
@@ -2116,7 +1434,737 @@
 
 
 
-// *** Documentation extracted from: resources/spyral/src/metadata.js ***
+// *** Documentation extracted from: ..\..\..\..\voyantjs\src\fileinput.js ***
+
+/**
+* A multiple file input that features drag n drop as well as temporary file storage in session storage.
+ * @class FileInput
+ */
+
+
+/**
+* The FileInput constructor
+	 * @param {HTMLElement} target The element to place the file input into
+	 * @param {Function} resolve A function to call with the file(s)
+	 * @param {Function} reject A function to call if the input is cancelled
+	  * @method constructor
+ */
+
+
+
+
+// *** Documentation extracted from: ..\..\..\..\voyantjs\src\load.js ***
+
+/**
+* Class embodying Load functionality.
+ * @class Spyral.Load
+ */
+
+
+/**
+* Set the base URL for use with the Load class
+	 * @param {string} baseUrl 
+	 * @static
+ * @method setBaseUrl
+ */
+
+
+/**
+* Make a call to trombone
+	 * @param {Object} config 
+	 * @param {Object} params
+	 * @returns {JSON}
+	 * @static
+ * @method trombone
+ */
+
+
+/**
+* Fetch content from a URL, often resolving cross-domain data constraints
+	 * @param {string} urlToFetch 
+	 * @param {Object} config
+	 * @returns {Response}
+	 * @static
+ * @method load
+ */
+
+
+/**
+* Fetch HTML content from a URL
+	 * @param {string} url 
+	 * @returns {Document}
+	 * @static
+ * @method html
+ */
+
+
+/**
+* Fetch XML content from a URL
+	 * @param {string} url 
+	 * @returns {XMLDocument}
+	 * @static
+ * @method xml
+ */
+
+
+/**
+* Fetch JSON content from a URL
+	 * @param {string} url 
+	 * @returns {JSON}
+	 * @static
+ * @method json
+ */
+
+
+/**
+* Fetch text content from a URL
+	 * @param {string} url 
+	 * @returns {string}
+	 * @static
+ * @method text
+ */
+
+
+/**
+* Create a file input in the target element and returns a Promise that's resolved with the file(s) that is added to the input.
+	 * The file is also temporarily stored in the session storage for successive retrieval.
+	 * @param {HTMLElement} target The target element to append the input to
+	 * @returns {Promise}
+	 * @static
+ * @method files
+ */
+
+
+
+
+// *** Documentation extracted from: ..\..\..\..\voyantjs\src\table.js ***
+
+/**
+* The Spyral.Table class in Spyral provides convenience functions for working with tabular
+ * data.
+ * 
+ * There are several ways of initializing a Table, here are some of them:
+ * 
+ * Provide an array of data with 3 rows:
+ * 
+ *  	let table = createTable([1,2,3]);
+ *
+ *
+ * Provide a nested array of data with multiple rows:
+ * 
+ *		let table = createTable([[1,2],[3,4]]);
+ * 
+ * Same nested array, but with a second argument specifying headers
+ * 
+ *		let table = createTable([[1,2],[3,4]], {headers: ["one","two"]});
+ * 
+ * Create table with comma-separated values:
+ * 
+ *  	let table = createTable("one,two\\n1,2\\n3,4");
+ * 
+ * Create table with tab-separated values
+ * 
+ *		let table = createTable("one\\ttwo\\n1\\t2\\n3\\t4");
+ * 
+ * Create table with array of objects
+ * 
+ *  	let table = createTable([{one:1,two:2},{one:3,two:4}]);
+ * 
+ * It's also possible simple to create a sorted frequency table from an array of values:
+ * 
+ *		let table = createTable(["one","two","one"], {count: "vertical", headers: ["Term","Count"]})
+ * 
+ * Working with a Corpus is easy. For instance, we can create a table from the top terms:
+ * 
+ *		loadCorpus("austen").terms({limit:500, stopList: 'auto'}).then(terms => {
+ *			return createTable(terms);
+ *		})
+ * 
+ * Similarly, we could create a frequency table from the first 1,000 words of the corpus:
+ * 
+ *		loadCorpus("austen").words({limit:1000, docIndex: 0, stopList: 'auto'}).then(words => {
+ *			return createTable(words, {count: "vertical"});
+ *		});
+ *
+ * Some of the configuration options are as follows:
+ * 
+ * * **format**: especially for forcing csv or tsv when the data is a string
+ * * **hasHeaders**: determines if data has a header row (usually determined automatically)
+ * * **headers**: a Array of Strings that serve as headers for the table
+ * * **count**: forces Spyral to create a sorted frequency table from an Array of data, this can be set to "vertical" if the counts are shown vertically or set to true if the counts are shown horizontally
+ * 
+ * Tables are convenient in Spyral because you can simply show them to preview a version in HTML.
+ * 
+ * @param {Array|String} data an array of data or a string with CSV or TSV.
+ * @param {Object} config an Object for configuring the table initialization, see above
+ * @class Spyral.Table
+ */
+
+
+/**
+* Create a new Table
+	 * @constructor
+	 * @param {(Object|Array|String|Number)} data
+	 * @param {Object} config
+	 
+	 * @param {string} config.format The format of the provided data, either "tsv" or "csv"
+	 * @param {(Object|Array)} config.headers The table headers
+	 * @param {boolean} config.hasHeaders True if the headers are the first item in the data
+	 * @param {string} config.count Specify "vertical" or "horizontal" to create a table of unique item counts in the provided data
+	  * @method constructor
+ */
+
+
+/**
+* Set the headers for the Table
+	 * @param {(Object|Array)} data
+	 * @returns {Table}
+	  * @method setHeaders
+ */
+
+
+/**
+* Add rows to the Table
+	 * @param {Array} data
+	 * @returns {Table}
+	  * @method addRows
+ */
+
+
+/**
+* Add a row to the Table
+	 * @param {(Array|Object)} data
+	 * @returns {Table}
+	  * @method addRow
+ */
+
+
+/**
+* Set a row
+	 * @param {(number|string)} ind The row index
+	 * @param {(Object|Array)} data
+	 * @param {boolean} create
+	 * @returns {Table}
+	  * @method setRow
+ */
+
+
+/**
+* Set a column
+	 * @param {(number|string)} ind The column index
+	 * @param {(Object|Array)} data
+	 * @param {boolean} create
+	 * @returns {Table}
+	  * @method setColumn
+ */
+
+
+/**
+* Add to or set a cell value
+	 * @param {(number|string)} row The row index
+	 * @param {(number|string)} column The column index
+	 * @param {number} value The value to set/add
+	 * @param {boolean} overwrite True to set, false to add to current value
+	  * @method updateCell
+ */
+
+
+/**
+* Get the value of a cell
+	 * @param {(number|string)} rowInd The row index
+	 * @param {(number|string)} colInd The column index
+	 * @returns {number}
+	  * @method cell
+ */
+
+
+/**
+* Set the value of a cell
+	 * @param {(number|string)} row The row index
+	 * @param {(number|string)} column The column index
+	 * @param {number} value The value to set
+	 * @returns {Table}
+	  * @method setCell
+ */
+
+
+/**
+* Get (and create) the row index
+	 * @param {(number|string)} ind The index
+	 * @param {boolean} create
+	 * @returns {number}
+	  * @method getRowIndex
+ */
+
+
+/**
+* Get (and create) the column index
+	 * @param {(number|string)} ind The index
+	 * @param {boolean} create
+	 * @returns {number}
+	  * @method getColumnIndex
+ */
+
+
+/**
+* Add a column (at the specified index)
+	 * @param {(Object|String)} config
+	 * @param {(number|string)} ind
+	  * @method addColumn
+ */
+
+
+/**
+* This function returns different values depending on the arguments provided.
+	 * When there are no arguments, it returns the number of rows in this table.
+	 * When the first argument is the boolean value `true` all rows are returned.
+	 * When the first argument is a an array then the rows corresponding to the row
+	 * indices or names are returned. When all arguments except are numbers or strings
+	 * then each of those is returned.
+	 * @param {(Boolean|Array|Number|String)} [inds]
+	 * @param {(Object|Number|String)} [config]
+	 * @returns {(Number|Array)}
+	  * @method rows
+ */
+
+
+/**
+* Get the specified row
+	 * @param {(number|string)} ind
+	 * @param {boolean} [asObj]
+	 * @returns {(Object|Number|String)}
+	  * @method row
+ */
+
+
+/**
+* This function returns different values depending on the arguments provided.
+	 * When there are no arguments, it returns the number of columns in this table.
+	 * When the first argument is the boolean value `true` all columns are returned.
+	 * When the first argument is a number a slice of the columns is returned and if
+	 * the second argument is a number it is treated as the length of the slice to
+	 * return (note that it isn't the `end` index like with Array.slice()).
+	 * @param {(Boolean|Array|Number|String)} [inds]
+	 * @param {(Object|Number|String)} [config]
+	 * @returns {(Number|Array)}
+	  * @method columns
+ */
+
+
+/**
+* Get the specified column
+	 * @param {(number|string)} ind
+	 * @param {boolean} [asObj]
+	 * @returns {(Object|Number|String)}
+	  * @method column
+ */
+
+
+/**
+* Get the specified header
+	 * @param {(number|string)} ind
+	 * @returns {(number|string)}
+	  * @method header
+ */
+
+
+/**
+* This function returns different values depending on the arguments provided.
+	 * When there are no arguments, it returns the number of headers in this table.
+	 * When the first argument is the boolean value `true` all headers are returned.
+	 * When the first argument is a number a slice of the headers is returned.
+	 * When the first argument is an array the slices specified in the array are returned.
+	 * @param {(Boolean|Array|Number|String)} inds
+	 * @returns {(Number|Array)}
+	  * @method headers
+ */
+
+
+/**
+* Does the specified column exist
+	 * @param {(number|string)} ind
+	 * @returns {(number|string)}
+	  * @method hasColumn
+ */
+
+
+/**
+* Runs the specified function on each row.
+	 * The function is passed the row and the row index.
+	 * @param {Function} fn
+	  * @method forEach
+ */
+
+
+/**
+* Get the minimum value in the specified row
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method rowMin
+ */
+
+
+/**
+* Get the maximum value in the specified row
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method rowMax
+ */
+
+
+/**
+* Get the minimum value in the specified column
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method columnMin
+ */
+
+
+/**
+* Get the maximum value in the specified column
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method columnMax
+ */
+
+
+/**
+* Get the sum of the values in the specified row
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method rowSum
+ */
+
+
+/**
+* Get the sum of the values in the specified column
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method columnSum
+ */
+
+
+/**
+* Get the mean of the values in the specified row
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method rowMean
+ */
+
+
+/**
+* Get the mean of the values in the specified column
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method columnMean
+ */
+
+
+/**
+* Get the count of each unique value in the specified row
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method rowCounts
+ */
+
+
+/**
+* Get the count of each unique value in the specified column
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method columnCounts
+ */
+
+
+/**
+* Get the rolling mean for the specified row
+	 * @param {(number|string)} ind
+	 * @param {number} neighbors
+	 * @param {boolean} overwrite
+	 * @returns {Array}
+	  * @method rowRollingMean
+ */
+
+
+/**
+* Get the rolling mean for the specified column
+	 * @param {(number|string)} ind
+	 * @param {number} neighbors
+	 * @param {boolean} overwrite
+	 * @returns {Array}
+	  * @method columnRollingMean
+ */
+
+
+/**
+* Get the variance for the specified row
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method rowVariance
+ */
+
+
+/**
+* Get the variance for the specified column
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method columnVariance
+ */
+
+
+/**
+* Get the standard deviation for the specified row
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method rowStandardDeviation
+ */
+
+
+/**
+* Get the standard deviation for the specified column
+	 * @param {(number|string)} ind
+	 * @returns {number}
+	  * @method columnStandardDeviation
+ */
+
+
+/**
+* Get the z scores for the specified row
+	 * @param {(number|string)} ind
+	 * @returns {Array}
+	  * @method rowZScores
+ */
+
+
+/**
+* Get the z scores for the specified column
+	 * @param {(number|string)} ind
+	 * @returns {Array}
+	  * @method columnZScores
+ */
+
+
+/**
+* TODO
+	 * Sort the specified rows
+	 * @returns {Table}
+	  * @method rowSort
+ */
+
+
+/**
+* TODO
+	 * Sort the specified columns
+	 * @returns {Table}
+	  * @method columnSort
+ */
+
+
+/**
+* Get a CSV representation of the Table
+	 * @param {Object} [config]
+	 * @returns {string}
+	  * @method toCsv
+ */
+
+
+/**
+* Get a TSV representation of the Table
+	 * @param {Object} [config]
+	 * @returns {string}
+	  * @method toTsv
+ */
+
+
+/**
+* Set the target's contents to an HTML representation of the Table
+	 * @param {(Function|String|Object)} target
+	 * @param {Object} [config]
+	 * @returns {Table}
+	  * @method html
+ */
+
+
+/**
+* Same as {@link toString}.
+	  * @method toHtml
+ */
+
+
+/**
+* Get an HTML representation of the Table
+	 * @param {Object} [config]
+	 * @returns {string}
+	  * @method toString
+ */
+
+
+/**
+* Show a chart representing the Table
+	 * @param {(String|HTMLElement)} [target]
+	 * @param {HighchartsConfig} [config]
+	 * @returns {Highcharts.Chart}
+	  * @method chart
+ */
+
+
+/**
+* Show an interactive grid representing the table
+	 * @param {Object} [config]
+	  * @method grid
+ */
+
+
+/**
+* Create a new Table
+	 * @param {(Object|Array|String|Number)} data
+	 * @param {Object} config
+	 * @returns {Table}
+	 
+	 * @param {string} config.format The format of the provided data, either "tsv" or "csv"
+	 * @param {(Object|Array)} config.headers The table headers
+	 * @param {boolean} config.hasHeaders True if the headers are the first item in the data
+	 * @param {string} config.count Specify "vertical" or "horizontal" to create a table of unique item counts in the provided data
+	 * @static
+ * @method create
+ */
+
+
+/**
+* Fetch a Table from a source
+	 * @param {(String|Request)} input
+	 * @param {Object} api
+	 * @param {Object} config
+	 * @returns {Promise}
+	 * @static
+ * @method fetch
+ */
+
+
+/**
+* Get the count of each unique value in the data
+	 * @param {Array} data
+	 * @returns {Object}
+	 * @static
+ * @method counts
+ */
+
+
+/**
+* Compare two values
+	 * @param {(number|string)} a
+	 * @param {(number|string)} b
+	 * @returns {number}
+	 * @static
+ * @method cmp
+ */
+
+
+/**
+* Get the sum of the provided values
+	 * @param {Array} data
+	 * @returns {number}
+	 * @static
+ * @method sum
+ */
+
+
+/**
+* Get the mean of the provided values
+	 * @param {Array} data
+	 * @returns {number}
+	 * @static
+ * @method mean
+ */
+
+
+/**
+* Get rolling mean for the provided values
+	 * @param {Array} data
+	 * @param {number} neighbors
+	 * @returns {Array}
+	 * @static
+ * @method rollingMean
+ */
+
+
+/**
+* Get the variance for the provided values
+	 * @param {Array} data
+	 * @returns {number}
+	 * @static
+ * @method variance
+ */
+
+
+/**
+* Get the standard deviation for the provided values
+	 * @param {Array} data
+	 * @returns {number}
+	 * @static
+ * @method standardDeviation
+ */
+
+
+/**
+* Get the z scores for the provided values
+	 * @param {Array} data
+	 * @returns {Array}
+	 * @static
+ * @method zScores
+ */
+
+
+/**
+* Perform a zip operation of the provided arrays {@link https://en.wikipedia.org/wiki/Convolution_(computer_science)}
+	 * @param {Array} data
+	 * @returns {Array}
+	 * @static
+ * @method zip
+ */
+
+
+
+
+// *** Documentation extracted from: ..\..\..\..\voyantjs\src\util.js ***
+
+/**
+* A helper for working with the Voyant Notebook app.
+ * @class Spyral.Util
+ */
+
+
+/**
+* Generates a random ID of the specified length.
+	 * @param {Number} len The length of the ID to generate?
+	 * @returns {String}
+	 * @static
+ * @method id
+ */
+
+
+/**
+* 
+	 * @param {Array|Object|String} contents 
+	 * @returns {String}
+	 * @static
+ * @method toString
+ */
+
+
+/**
+* 
+	 * @param {String} before 
+	 * @param {String} more 
+	 * @param {String} after 
+	 * @static
+ * @method more
+ */
+
+
+
+
+// *** Documentation extracted from: resources\spyral\src\metadata.js ***
 
 /**
 * A class for storing Notebook metadata
@@ -2127,54 +2175,67 @@
 /**
 * The metadata constructor.
 	 * @constructor
-	 * @param {MetadataConfig} config The metadata config object
+	 * @param {Object} config The metadata config object
+	 
+	 * @param {String} config.title The title of the Corpus
+	 * @param {String} config.author The author of the Corpus
+	 * @param {String} config.description The description of the Corpus
+	 * @param {Array} config.keywords The keywords for the Corpus
+	 * @param {String} config.created When the Corpus was created
+	 * @param {String} config.language The language of the Corpus
+	 * @param {String} config.license The license for the Corpus
 	  * @method constructor
  */
 
 
 /**
 * Set metadata properties.
-	 * @param {object} config A config object
+	 * @param {Object} config A config object
 	  * @method set
  */
 
 
 /**
 * Sets the specified field to the current date and time.
-	 * @param {string} field 
+	 * @param {String} field 
 	  * @method setDateNow
  */
 
 
 /**
 * Gets the specified field as a short date.
-	 * @param {string} field
-	 * @returns {string|undefined}
+	 * @param {String} field
+	 * @returns {(String|undefined)}
 	  * @method shortDate
  */
 
 
 /**
 * Gets the fields as a set of HTML meta tags.
-	 * @returns {string}
+	 * @returns {String}
 	  * @method getHeaders
+ */
+
+
+/**
+* Returns a clone of this Metadata
+	 * @returns {Spyral.Metadata}
+	  * @method clone
  */
 
 
 
 
-// *** Documentation extracted from: resources/spyral/src/notebook.js ***
+// *** Documentation extracted from: resources\spyral\src\notebook.js ***
 
 /**
 * A helper for working with the Voyant Notebook app.
- * @namespace
  * @class Spyral.Notebook
  */
 
 
 /**
 * Returns the previous block.
-	 * @static
 	 * @returns {string}
 	 * @static
  * @method getPreviousBlock
@@ -2183,7 +2244,6 @@
 
 /**
 * Returns the next block.
-	 * @static
 	 * @returns {string}
 	 * @static
  * @method getNextBlock
@@ -2192,8 +2252,7 @@
 
 /**
 * Returns the current block.
-	 * @static
-	 * @params {number} [offset] If specified, returns the block whose position is offset from the current block
+	 * @param {number} [offset] If specified, returns the block whose position is offset from the current block
 	 * @returns {string}
 	 * @static
  * @method getBlock

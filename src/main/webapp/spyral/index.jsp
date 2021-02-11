@@ -8,18 +8,12 @@ if (request.getServletPath().equals("/spiral")) {
     return;
 } %><%@ include file="../../resources/jsp/pre_app.jsp" %>
 
-<!-- highcharts -->	
-<script type="text/javascript" src="<%=base %>/resources/highcharts/8/highcharts.js"></script>
-<!-- <script type="text/javascript" src="<%=base %>/resources/highcharts/8/highcharts-more.js"></script> -->
-<script type="text/javascript" src="<%=base %>/resources/highcharts/8/modules/data.js"></script>
-<script type="text/javascript" src="<%=base %>/resources/highcharts/8/modules/networkgraph.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= base %>/resources/highcharts/8/highcharts.css" />
+<script type="text/javascript" src="<%= base %>/resources/vendor/vendor-spyral.js"></script>
 
-<script src="<%= base %>/resources/octokitrest/octokit-rest-17.10.0.js"></script>
 
-<script src="<%= base %>/resources/spyral/build/spyral.js"></script>
+<link rel="stylesheet" type="text/css" href="<%= base %>/resources/highcharts/highcharts.css" />
 
-<script src="<%= base %>/resources/ckeditor/ckeditor4.15.0/ckeditor.js"></script>
+
 <script>
 // adapted from http://handsomedogstudio.com/ckeditor-set-default-target-blank
 CKEDITOR.on('dialogDefinition', function(ev) {
@@ -43,7 +37,6 @@ CKEDITOR.on('dialogDefinition', function(ev) {
     }
 });
 </script>
-<script src="<%= base %>/resources/ace/1.4.12/src-min-noconflict/ace.js"></script>
 <style>
 .ace-chrome .ace_gutter {
     background-color: rgba(0,0,0,.025)!important;
@@ -53,7 +46,6 @@ CKEDITOR.on('dialogDefinition', function(ev) {
 }
 
 </style>
-<!--script src="<%= base %>/resources/ace/1.4.12/src-min-noconflict/ext-language_tools.js"></script-->
 <link rel="stylesheet" type="text/css" href="<%= base %>/resources/spyral/css/spyral.css" />
 <style id="voyant-notebooks-styles">
 .ace_layer {

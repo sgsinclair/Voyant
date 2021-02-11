@@ -1,0 +1,56 @@
+{
+  "name": "voyanttools",
+  "version": "1.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sgsinclair/Voyant.git"
+  },
+  "author": "Andrew MacDonald (https://github.com/ajmacdonald)",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/sgsinclair/Voyant/issues"
+  },
+  "homepage": "https://github.com/sgsinclair/Voyant#readme",
+  "scripts": {
+    "build-voyant": "node build-voyant.mjs",
+    "build-spyral": "rollup -c src/spyral/rollup.config.js",
+    "watch-spyral": "rollup -c src/spyral/rollup.config.js --watch --sourcemap",
+    "build-spyral-local-voyant": "rollup -c src/spyral/rollup.config.js --environment LOCAL_VOYANT",
+    "watch-spyral-local-voyant": "rollup -c src/spyral/rollup.config.js --watch --sourcemap --environment LOCAL_VOYANT",
+    "build-vendors": "node build-vendors-voyant.mjs && node build-vendors-spyral.mjs",
+    "docs": "jsdoc -c jsdoc.config.json",
+    "docs-tern": "jsdoc -t jsdoc-tern-template -c jsdoc.config.json",
+    "docs-tern-debug": "node --inspect-brk=9229 node_modules/jsdoc/jsdoc.js -t jsdoc-tern-template -c jsdoc.config.json"
+  },
+  "dependencies": {
+    "@octokit/rest": "^17.11.2",
+    "ace-builds": "^1.4.12",
+    "ckeditor4": "^4.16.0",
+    "d3": "^4.9.1",
+    "highcharts": "^8.2.2",
+    "jquery": "^3.5.1",
+    "js-cookie": "^2.2.1",
+    "ol": "^4.5.0",
+    "processing-js": "^1.4.18",
+    "spectrum-colorpicker": "^1.8.1",
+    "vis-network": "^9.0.1",
+    "voyant": "^1.19.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.13",
+    "@babel/eslint-parser": "^7.12.13",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
+    "@rollup/plugin-babel": "^5.2.3",
+    "@rollup/plugin-commonjs": "^17.1.0",
+    "@rollup/plugin-node-resolve": "^11.1.1",
+    "core-js": "^3.8.3",
+    "eslint": "^7.19.0",
+    "google-closure-compiler": "^20210106.0.0",
+    "jsdoc": "^3.6.6",
+    "rollup": "^2.38.4",
+    "rollup-plugin-terser": "^7.0.2",
+    "why-is-node-running": "^2.2.0"
+  }
+}

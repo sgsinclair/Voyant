@@ -995,7 +995,6 @@ var Spyral = (function () {
   /**
    * A helper for working with the Voyant Notebook app.
    * @memberof Spyral
-   * @namespace
    */
   var Util = /*#__PURE__*/function () {
     function Util() {
@@ -1007,9 +1006,8 @@ var Spyral = (function () {
 
       /**
        * Generates a random ID of the specified length.
-       * @static
-       * @param {number} len The length of the ID to generate?
-       * @returns {string}
+       * @param {Number} len The length of the ID to generate?
+       * @returns {String}
        */
       value: function id() {
         var len = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 8;
@@ -1025,9 +1023,8 @@ var Spyral = (function () {
       }
       /**
        * 
-       * @static
-       * @param {array|object|string} contents 
-       * @returns {string}
+       * @param {Array|Object|String} contents 
+       * @returns {String}
        */
 
     }, {
@@ -1037,7 +1034,7 @@ var Spyral = (function () {
           contents = JSON.stringify(contents);
 
           if (contents.length > 500) {
-            contents = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>' + contents.substring(0, 500) + " <a href=''>+</a><div style='display: none'>" + contents.substring(501) + "</div>";
+            contents = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>' + contents.substring(0, 500) + ' <a href=\'\'>+</a><div style=\'display: none\'>' + contents.substring(501) + '</div>';
           }
         }
 
@@ -1045,16 +1042,15 @@ var Spyral = (function () {
       }
       /**
        * 
-       * @static
-       * @param {string} before 
-       * @param {string} more 
-       * @param {string} after 
+       * @param {String} before 
+       * @param {String} more 
+       * @param {String} after 
        */
 
     }, {
       key: "more",
       value: function more(before, _more, after) {
-        return before + '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>' + _more.substring(0, 500) + " <a href=''>+</a><div style='display: none'>" + _more.substring(501) + "</div>" + after;
+        return before + '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>' + _more.substring(0, 500) + ' <a href=\'\'>+</a><div style=\'display: none\'>' + _more.substring(501) + '</div>' + after;
       }
     }]);
 
@@ -1068,9 +1064,9 @@ var Spyral = (function () {
   var FileInput = /*#__PURE__*/function () {
     /**
      * The FileInput constructor
-     * @param {element} target The element to place the file input into
-     * @param {function} resolve A function to call with the file(s)
-     * @param {function} reject A function to call if the input is cancelled
+     * @param {HTMLElement} target The element to place the file input into
+     * @param {Function} resolve A function to call with the file(s)
+     * @param {Function} reject A function to call if the input is cancelled
      */
     function FileInput(target, resolve, reject) {
       _classCallCheck(this, FileInput);
@@ -1128,7 +1124,7 @@ var Spyral = (function () {
         resetButton.setAttribute('style', 'width: 16px; height: 16px; border: 1px solid #999; float: right; line-height: 12px; color: #666; cursor: pointer;');
         resetButton.setAttribute('title', 'Remove File Input'); // listener to remove the element, which can be called from a saved notebook
 
-        resetButton.setAttribute('onclick', "if (typeof Voyant !== 'undefined' && typeof Ext !== 'undefined') { Ext.getCmp(this.parentElement.parentElement.getAttribute('id')).destroy(); } else { this.parentElement.remove(); }"); // additional listener to reject the promise, if this input was created through run code
+        resetButton.setAttribute('onclick', 'if (typeof Voyant !== \'undefined\' && typeof Ext !== \'undefined\') { Ext.getCmp(this.parentElement.parentElement.getAttribute(\'id\')).destroy(); } else { this.parentElement.remove(); }'); // additional listener to reject the promise, if this input was created through run code
 
         resetButton.addEventListener('click', function () {
           this.reject();
@@ -1142,12 +1138,12 @@ var Spyral = (function () {
           });
         });
         ['dragover', 'dragenter'].forEach(function (event) {
-          _this.inputParent.addEventListener(event, function (e) {
+          _this.inputParent.addEventListener(event, function () {
             _this.inputParent.style.setProperty('background-color', '#ccc');
           });
         });
         ['dragend', 'dragleave', 'drop'].forEach(function (event) {
-          _this.inputParent.addEventListener(event, function (e) {
+          _this.inputParent.addEventListener(event, function () {
             _this.inputParent.style.removeProperty('background-color');
           });
         });
@@ -1195,7 +1191,7 @@ var Spyral = (function () {
               fr.readAsDataURL(files[currIndex]);
             } else {
               // store each file in its own session storage entry
-              var childIds = readFiles.map(function (val, index) {
+              var childIds = readFiles.map(function (val) {
                 var childId = Util.id(32);
                 window.sessionStorage.setItem('filename-' + childId, val.filename);
                 window.sessionStorage.setItem('data-' + childId, val.data);
@@ -1206,8 +1202,8 @@ var Spyral = (function () {
               window.sessionStorage.setItem(_this2.inputParent.getAttribute('spyral-temp-doc'), childIds.join());
               createServerStorage();
 
-              if (typeof ServerStorage !== 'undefined') {
-                var serverStorage = new ServerStorage();
+              if (typeof Voyant.util.ServerStorage !== 'undefined') {
+                var serverStorage = new Voyant.util.ServerStorage();
                 serverStorage.storeResource(_this2.inputParent.getAttribute('spyral-temp-doc'), childIds.join());
                 readFiles.map(function (val, index) {
                   var childId = childIds[index];
@@ -1286,12 +1282,12 @@ var Spyral = (function () {
                   // check server storage (if available)
                   createServerStorage();
 
-                  if (!((typeof ServerStorage === "undefined" ? "undefined" : _typeof(ServerStorage)) !== undefined)) {
+                  if (!(_typeof(Voyant.util.ServerStorage) !== undefined)) {
                     _context.next = 53;
                     break;
                   }
 
-                  serverStorage = new ServerStorage();
+                  serverStorage = new Voyant.util.ServerStorage();
                   _context.prev = 25;
                   _context.next = 28;
                   return serverStorage.getStoredResource(spyralTempDoc);
@@ -1440,8 +1436,8 @@ var Spyral = (function () {
 
   function createServerStorage() {
     if (typeof Voyant !== 'undefined' && typeof Ext !== 'undefined') {
-      if (typeof ServerStorage === 'undefined') {
-        Ext.define('ServerStorage', {
+      if (typeof Voyant.util.ServerStorage === 'undefined') {
+        Ext.define('Voyant.util.ServerStorage', {
           extend: 'Voyant.util.Storage',
           getTromboneUrl: function getTromboneUrl() {
             return Voyant.application.getTromboneUrl();
@@ -1474,8 +1470,8 @@ var Spyral = (function () {
       }
       /**
        * Make a call to trombone
-       * @param {object} config 
-       * @param {object} params
+       * @param {Object} config 
+       * @param {Object} params
        * @returns {JSON}
        */
 
@@ -1484,7 +1480,8 @@ var Spyral = (function () {
       value: function trombone() {
         var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var params = arguments.length > 1 ? arguments[1] : undefined;
-        var url = new URL(config.trombone ? config.trombone : this.baseUrl + "trombone");
+        var url = new URL(config.trombone ? config.trombone : this.baseUrl + 'trombone', window.location.origin);
+        delete config.trombone;
 
         var all = _objectSpread2({}, config, {}, params);
 
@@ -1498,19 +1495,19 @@ var Spyral = (function () {
           if (all[key] instanceof Array) {
             return all[key].map(function (val) {
               return encodeURIComponent(key) + '=' + encodeURIComponent(val);
-            }).join("&");
+            }).join('&');
           } else {
             return encodeURIComponent(key) + '=' + encodeURIComponent(all[key]);
           }
-        }).join("&");
+        }).join('&');
 
-        if ("method" in all === false) {
-          all.method = "GET";
+        if ('method' in all === false) {
+          all.method = 'GET';
         }
 
         var opt = {};
 
-        if (all.method === "GET") {
+        if (all.method === 'GET') {
           if (searchParams.length < 800) {
             var _loop = function _loop(_key) {
               if (all[_key] instanceof Array) {
@@ -1534,13 +1531,13 @@ var Spyral = (function () {
               body: searchParams
             };
           }
-        } else if (all.method === "POST") {
+        } else if (all.method === 'POST') {
           opt = {
             method: 'POST'
           };
 
-          if ("body" in all) {
-            opt.body = all["body"];
+          if ('body' in all) {
+            opt.body = all['body'];
           } else {
             opt.headers = {
               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
@@ -1558,7 +1555,7 @@ var Spyral = (function () {
             return response.text().then(function (text) {
               if (Voyant && Voyant.util && Voyant.util.DetailedError) {
                 new Voyant.util.DetailedError({
-                  msg: "",
+                  msg: '',
                   error: text.split(/(\r\n|\r|\n)/).shift(),
                   details: text
                 }).showMsg();
@@ -1578,15 +1575,15 @@ var Spyral = (function () {
       /**
        * Fetch content from a URL, often resolving cross-domain data constraints
        * @param {string} urlToFetch 
-       * @param {object} config
+       * @param {Object} config
        * @returns {Response}
        */
 
     }, {
       key: "load",
       value: function load(urlToFetch, config) {
-        var url = new URL(config && config.trombone ? config.trombone : this.baseUrl + "trombone");
-        url.searchParams.set("fetchData", urlToFetch);
+        var url = new URL(config && config.trombone ? config.trombone : this.baseUrl + 'trombone');
+        url.searchParams.set('fetchData', urlToFetch);
         return fetch(url.toString()).then(function (response) {
           if (response.ok) {
             return response;
@@ -1667,7 +1664,7 @@ var Spyral = (function () {
       /**
        * Create a file input in the target element and returns a Promise that's resolved with the file(s) that is added to the input.
        * The file is also temporarily stored in the session storage for successive retrieval.
-       * @param {element} target The target element to append the input to
+       * @param {HTMLElement} target The target element to append the input to
        * @returns {Promise}
        */
 
@@ -1684,7 +1681,7 @@ var Spyral = (function () {
             var codeWrapper = spyralTarget.closest('.notebook-code-wrapper');
 
             if (codeWrapper === null) {
-              console.warn("Spyral.Load.files: can't find CodeEditorWrapper parent");
+              console.warn('Spyral.Load.files: can\'t find CodeEditorWrapper parent');
               target = null;
             } else {
               target = codeWrapper.querySelector('[spyral-temp-doc]');
@@ -1707,7 +1704,7 @@ var Spyral = (function () {
               target = target.parentElement;
             }
           } else {
-            target = document.createElement("div");
+            target = document.createElement('div');
             target.setAttribute('class', 'target');
             document.body.appendChild(target);
           }
@@ -9426,7 +9423,7 @@ var Spyral = (function () {
 
   function isDocumentsMode() {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    return "docIndex" in config || "docId" in config || "mode" in config && config.mode == "documents";
+    return 'docIndex' in config || 'docId' in config || 'mode' in config && config.mode == 'documents';
   }
   /**
    * The Corpus class in Spyral. Here's a simple example:
@@ -9457,314 +9454,299 @@ var Spyral = (function () {
 
   var Corpus = /*#__PURE__*/function () {
     /**
-     * @cfg {String} corpus The ID of a previously created corpus.
-     * 
-     * A corpus ID can be used to try to retrieve a corpus that has been previously created.
-     * Typically the corpus ID is used as a first string argument, with an optional second
-     * argument for other parameters (especially those to recreate the corpus if needed).
-     * 
-     * 	loadCorpus("goldbug");
-     *
-     * 	loadCorpus("goldbug", {
-     * 		// if corpus ID "goldbug" isn't found, use the input
-     * 		input: "https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt",
-     * 		inputRemoveUntil: 'THE GOLD-BUG',
-     * 		inputRemoveFrom: 'FOUR BEASTS IN ONE'
-     * 	});
-     */
+    * @cfg {String} corpus The ID of a previously created corpus.
+    * 
+    * A corpus ID can be used to try to retrieve a corpus that has been previously created.
+    * Typically the corpus ID is used as a first string argument, with an optional second
+    * argument for other parameters (especially those to recreate the corpus if needed).
+    * 
+    * 	loadCorpus("goldbug");
+    *
+    * 	loadCorpus("goldbug", {
+    * 		// if corpus ID "goldbug" isn't found, use the input
+    * 		input: "https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt",
+    * 		inputRemoveUntil: 'THE GOLD-BUG',
+    * 		inputRemoveFrom: 'FOUR BEASTS IN ONE'
+    * 	});
+    */
 
     /**
-     * @cfg {String/String[]} input Input sources for the corpus.
-     * 
-     * The input sources can be either normal text or URLs (starting with `http`).
-     * 
-     * Typically input sources are specified as a string or an array in the first argument, with an optional second argument for other parameters.
-     * 
-     * 		loadCorpus("Hello Voyant!"); // one document with this string
-     * 
-     * 		loadCorpus(["Hello Voyant!", "How are you?"]); // two documents with these strings
-     * 
-     * 		loadCorpus("http://hermeneuti.ca/"); // one document from URL
-     * 
-     * 		loadCorpus(["http://hermeneuti.ca/", "https://en.wikipedia.org/wiki/Voyant_Tools"]); // two documents from URLs
-     * 
-     * 		loadCorpus("Hello Voyant!", "http://hermeneuti.ca/"]); // two documents, one from string and one from URL
-     * 
-     * 		loadCorpus("https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt", {
-     * 			inputRemoveUntil: 'THE GOLD-BUG',
-     * 			inputRemoveFrom: 'FOUR BEASTS IN ONE'
-     * 		});
-     * 
-     * 		// use a corpus ID but also specify an input source if the corpus can't be found
-     * 		loadCorpus("goldbug", {
-     * 			input: "https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt",
-     * 			inputRemoveUntil: 'THE GOLD-BUG',
-     * 			inputRemoveFrom: 'FOUR BEASTS IN ONE'
-     * 		});
-     */
+    * @cfg {String/String[]} input Input sources for the corpus.
+    * 
+    * The input sources can be either normal text or URLs (starting with `http`).
+    * 
+    * Typically input sources are specified as a string or an array in the first argument, with an optional second argument for other parameters.
+    * 
+    * 		loadCorpus("Hello Voyant!"); // one document with this string
+    * 
+    * 		loadCorpus(["Hello Voyant!", "How are you?"]); // two documents with these strings
+    * 
+    * 		loadCorpus("http://hermeneuti.ca/"); // one document from URL
+    * 
+    * 		loadCorpus(["http://hermeneuti.ca/", "https://en.wikipedia.org/wiki/Voyant_Tools"]); // two documents from URLs
+    * 
+    * 		loadCorpus("Hello Voyant!", "http://hermeneuti.ca/"]); // two documents, one from string and one from URL
+    * 
+    * 		loadCorpus("https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt", {
+    * 			inputRemoveUntil: 'THE GOLD-BUG',
+    * 			inputRemoveFrom: 'FOUR BEASTS IN ONE'
+    * 		});
+    * 
+    * 		// use a corpus ID but also specify an input source if the corpus can't be found
+    * 		loadCorpus("goldbug", {
+    * 			input: "https://gist.githubusercontent.com/sgsinclair/84c9da05e9e142af30779cc91440e8c1/raw/goldbug.txt",
+    * 			inputRemoveUntil: 'THE GOLD-BUG',
+    * 			inputRemoveFrom: 'FOUR BEASTS IN ONE'
+    * 		});
+    */
 
     /**
-     * @cfg {String} inputFormat The input format of the corpus (the default is to auto-detect).
-     * 
-     * The auto-detect format is usually reliable and inputFormat should only be used if the default
-     * behaviour isn't desired. Most of the relevant values are used for XML documents:
-     * 
-     * - **DTOC**: Dynamic Table of Contexts XML format
-     * - **HTML**: Hypertext Markup Language
-     * - **RSS**: Really Simple Syndication XML format
-     * - **TEI**: Text Encoding Initiative XML format
-     * - **TEICORPUS**: Text Encoding Initiative Corpus XML format
-     * - **TEXT**: plain text
-     * - **XML**: treat the document as XML (sometimes overridding auto-detect of XML vocabularies like RSS and TEI)
-     * 
-     * Other formats include **PDF**, **MSWORD**, **XLSX**, **RTF**, **ODT**, and **ZIP** (but again, these rarely need to be specified).
-     */
+    * @cfg {String} inputFormat The input format of the corpus (the default is to auto-detect).
+    * 
+    * The auto-detect format is usually reliable and inputFormat should only be used if the default
+    * behaviour isn't desired. Most of the relevant values are used for XML documents:
+    * 
+    * - **DTOC**: Dynamic Table of Contexts XML format
+    * - **HTML**: Hypertext Markup Language
+    * - **RSS**: Really Simple Syndication XML format
+    * - **TEI**: Text Encoding Initiative XML format
+    * - **TEICORPUS**: Text Encoding Initiative Corpus XML format
+    * - **TEXT**: plain text
+    * - **XML**: treat the document as XML (sometimes overridding auto-detect of XML vocabularies like RSS and TEI)
+    * 
+    * Other formats include **PDF**, **MSWORD**, **XLSX**, **RTF**, **ODT**, and **ZIP** (but again, these rarely need to be specified).
+    */
 
     /**
-     * @cfg {String} tableDocuments Determine what is a document in a table (the entire table, by row, by column); only used for table-based documents.
-     * 
-     * Possible values are:
-     * 
-     * - **undefined or blank** (default): the entire table is one document
-     * - **rows**: each row of the table is a separate document
-     * - **columns**: each column of the table is a separate document
-     * 
-     * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
-     */
+    * @cfg {String} tableDocuments Determine what is a document in a table (the entire table, by row, by column); only used for table-based documents.
+    * 
+    * Possible values are:
+    * 
+    * - **undefined or blank** (default): the entire table is one document
+    * - **rows**: each row of the table is a separate document
+    * - **columns**: each column of the table is a separate document
+    * 
+    * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    */
 
     /**
-     * @cfg {String} tableContent Determine how to extract body content from the table; only used for table-based documents.
-     * 
-     * Columns are referred to by numbers, the first is column 1 (not 0).
-     * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
-     * 
-     * Some examples:
-     * 
-     * - **1**: use column 1
-     * - **1,2**: use columns 1 and 2 separately
-     * - **1+2,3**: combine columns 1 and two and use column 3 separately
-     * 
-     * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
-     */
+    * @cfg {String} tableContent Determine how to extract body content from the table; only used for table-based documents.
+    * 
+    * Columns are referred to by numbers, the first is column 1 (not 0).
+    * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    * 
+    * Some examples:
+    * 
+    * - **1**: use column 1
+    * - **1,2**: use columns 1 and 2 separately
+    * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    * 
+    * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    */
 
     /**
-     * @cfg {String} tableAuthor Determine how to extract the author from each document; only used for table-based documents.
-     * 
-     * Columns are referred to by numbers, the first is column 1 (not 0).
-     * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
-     * 
-     * Some examples:
-     * 
-     * - **1**: use column 1
-     * - **1,2**: use columns 1 and 2 separately
-     * - **1+2,3**: combine columns 1 and two and use column 3 separately
-     * 
-     * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
-     */
+    * @cfg {String} tableAuthor Determine how to extract the author from each document; only used for table-based documents.
+    * 
+    * Columns are referred to by numbers, the first is column 1 (not 0).
+    * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    * 
+    * Some examples:
+    * 
+    * - **1**: use column 1
+    * - **1,2**: use columns 1 and 2 separately
+    * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    * 
+    * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    */
 
     /**
-     * @cfg {String} tableTitle Determine how to extract the title from each document; only used for table-based documents.
-     * 
-     * Columns are referred to by numbers, the first is column 1 (not 0).
-     * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
-     * 
-     * Some examples:
-     * 
-     * - **1**: use column 1
-     * - **1,2**: use columns 1 and 2 separately
-     * - **1+2,3**: combine columns 1 and two and use column 3 separately
-     * 
-     * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
-     */
+    * @cfg {String} tableTitle Determine how to extract the title from each document; only used for table-based documents.
+    * 
+    * Columns are referred to by numbers, the first is column 1 (not 0).
+    * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
+    * 
+    * Some examples:
+    * 
+    * - **1**: use column 1
+    * - **1,2**: use columns 1 and 2 separately
+    * - **1+2,3**: combine columns 1 and two and use column 3 separately
+    * 
+    * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    */
 
     /**
-     * @cfg {String} tableContent Determine how to extract body content from the table; only used for table-based documents.
-     * 
-     * Columns are referred to by numbers, the first is column 1 (not 0).
-     * You can specify separate columns by using a comma or you can combined the contents of columns/cells by using a plus sign.
-     * 
-     * Some examples:
-     * 
-     * - **1**: use column 1
-     * - **1,2**: use columns 1 and 2 separately
-     * - **1+2,3**: combine columns 1 and two and use column 3 separately
-     * 
-     * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
-     */
+    * @cfg {String} tableNoHeadersRow Determine if the table has a first row of headers; only used for table-based documents.
+    * 
+    * Provide a value of "true" if there is no header row, otherwise leave it blank or undefined (default).
+    * 
+    * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
+    */
 
     /**
-     * @cfg {String} tableNoHeadersRow Determine if the table has a first row of headers; only used for table-based documents.
-     * 
-     * Provide a value of "true" if there is no header row, otherwise leave it blank or undefined (default).
-     * 
-     * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tables).
-     */
+    * @cfg {String} tokenization The tokenization strategy to use
+    * 
+    * This should usually be undefined, unless specific behaviour is required. These are the valid values:
+    * 
+    * - **undefined or blank**: use the default tokenization (which uses Unicode rules for word segmentation)
+    * - **wordBoundaries**: use any Unicode character word boundaries for tokenization
+    * - **whitespace**: tokenize by whitespace only (punctuation and other characters will be kept with words)
+    * 
+    * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tokenization).
+    */
 
     /**
-     * @cfg {String} tokenization The tokenization strategy to use
-     * 
-     * This should usually be undefined, unless specific behaviour is required. These are the valid values:
-     * 
-     * - **undefined or blank**: use the default tokenization (which uses Unicode rules for word segmentation)
-     * - **wordBoundaries**: use any Unicode character word boundaries for tokenization
-     * - **whitespace**: tokenize by whitespace only (punctuation and other characters will be kept with words)
-     * 
-     * See also [Creating a Corpus Tokenization](#!/guide/corpuscreator-section-tokenization).
-     */
+    * @cfg {String} xmlContentXpath The XPath expression that defines the location of document content (the body); only used for XML-based documents.
+    * 
+    * 		loadCorpus("<doc><head>Hello world!</head><body>This is Voyant!</body></doc>", {
+    * 			 xmlContentXpath: "//body"
+    * 		}); // document would be: "This is Voyant!"
+    * 
+    * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    */
 
     /**
-     * @cfg {String} xmlContentXpath The XPath expression that defines the location of document content (the body); only used for XML-based documents.
-     * 
-     * 		loadCorpus("<doc><head>Hello world!</head><body>This is Voyant!</body></doc>", {
-     * 			 xmlContentXpath: "//body"
-     * 		}); // document would be: "This is Voyant!"
-     * 
-     * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
-     */
+    * @cfg {String} xmlTitleXpath The XPath expression that defines the location of each document's title; only used for XML-based documents.
+    * 
+    * 		loadCorpus("<doc><title>Hello world!</title><body>This is Voyant!</body></doc>", {
+    * 			 xmlTitleXpath: "//title"
+    * 		}); // title would be: "Hello world!"
+    * 
+    * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    */
 
     /**
-     * @cfg {String} xmlTitleXpath The XPath expression that defines the location of each document's title; only used for XML-based documents.
-     * 
-     * 		loadCorpus("<doc><title>Hello world!</title><body>This is Voyant!</body></doc>", {
-     * 			 xmlTitleXpath: "//title"
-     * 		}); // title would be: "Hello world!"
-     * 
-     * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
-     */
+    * @cfg {String} xmlAuthorXpath The XPath expression that defines the location of each document's author; only used for XML-based documents.
+    * 
+    * 		loadCorpus("<doc><author>Stéfan Sinclair</author><body>This is Voyant!</body></doc>", {
+    * 			 xmlAuthorXpath: "//author"
+    * 		}); // author would be: "Stéfan Sinclair"
+    * 
+    * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    */
 
     /**
-     * @cfg {String} xmlAuthorXpath The XPath expression that defines the location of each document's author; only used for XML-based documents.
-     * 
-     * 		loadCorpus("<doc><author>Stéfan Sinclair</author><body>This is Voyant!</body></doc>", {
-     * 			 xmlAuthorXpath: "//author"
-     * 		}); // author would be: "Stéfan Sinclair"
-     * 
-     * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
-     */
+    * @cfg {String} xmlPubPlaceXpath The XPath expression that defines the location of each document's publication place; only used for XML-based documents.
+    * 
+    * 		loadCorpus("<doc><pubPlace>Montreal</pubPlace><body>This is Voyant!</body></doc>", {
+    * 			 xmlPubPlaceXpath: "//pubPlace"
+    * 		}); // publication place would be: "Montreal"
+    * 
+    * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    */
 
     /**
-     * @cfg {String} xmlPubPlaceXpath The XPath expression that defines the location of each document's publication place; only used for XML-based documents.
-     * 
-     * 		loadCorpus("<doc><pubPlace>Montreal</pubPlace><body>This is Voyant!</body></doc>", {
-     * 			 xmlPubPlaceXpath: "//pubPlace"
-     * 		}); // publication place would be: "Montreal"
-     * 
-     * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
-     */
+    * @cfg {String} xmlPublisherXpath The XPath expression that defines the location of each document's publisher; only used for XML-based documents.
+    * 
+    * 		loadCorpus("<doc><publisher>The Owl</publisher><body>This is Voyant!</body></doc>", {
+    * 			 xmlPublisherXpath: "//publisher"
+    * 		}); // publisher would be: "The Owl"
+    * 
+    * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    */
 
     /**
-     * @cfg {String} xmlPublisherXpath The XPath expression that defines the location of each document's publisher; only used for XML-based documents.
-     * 
-     * 		loadCorpus("<doc><publisher>The Owl</publisher><body>This is Voyant!</body></doc>", {
-     * 			 xmlPublisherXpath: "//publisher"
-     * 		}); // publisher would be: "The Owl"
-     * 
-     * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
-     */
+    * @cfg {String} xmlKeywordXpath The XPath expression that defines the location of each document's keywords; only used for XML-based documents.
+    * 
+    * 		loadCorpus("<doc><keyword>text analysis</keyword><body>This is Voyant!</body></doc>", {
+    * 			 xmlKeywordXpath: "//keyword"
+    * 		}); // publisher would be: "text analysis"
+    * 
+    * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    */
 
     /**
-     * @cfg {String} xmlKeywordXpath The XPath expression that defines the location of each document's keywords; only used for XML-based documents.
-     * 
-     * 		loadCorpus("<doc><keyword>text analysis</keyword><body>This is Voyant!</body></doc>", {
-     * 			 xmlKeywordXpath: "//keyword"
-     * 		}); // publisher would be: "text analysis"
-     * 
-     * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
-     */
+    * @cfg {String} xmlCollectionXpath The XPath expression that defines the location of each document's collection name; only used for XML-based documents.
+    * 
+    * 		loadCorpus("<doc><collection>documentation</collection><body>This is Voyant!</body></doc>", {
+    * 			 xmlCollectionXpath: "//collection"
+    * 		}); // publisher would be: "documentation"
+    * 
+    * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    */
 
     /**
-     * @cfg {String} xmlCollectionXpath The XPath expression that defines the location of each document's collection name; only used for XML-based documents.
-     * 
-     * 		loadCorpus("<doc><collection>documentation</collection><body>This is Voyant!</body></doc>", {
-     * 			 xmlCollectionXpath: "//collection"
-     * 		}); // publisher would be: "documentation"
-     * 
-     * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
-     */
+    * @cfg {String} xmlGroupByXpath The XPath expression that defines the location of each document's collection name; only used for XML-based documents.
+    * 
+    * 		loadCorpus("<doc><sp s='Juliet'>Hello!</sp><sp s='Romeo'>Hi!</sp><sp s='Juliet'>Bye!</sp></doc>", {
+    * 			 xmlDocumentsXPath: '//sp',
+    *           xmlGroupByXpath: "//@s"
+    * 		}); // two docs: "Hello! Bye!" (Juliet) and "Hi!" (Romeo)
+    * 
+    * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    */
 
     /**
-     * @cfg {String} xmlGroupByXpath The XPath expression that defines the location of each document's collection name; only used for XML-based documents.
-     * 
-     * 		loadCorpus("<doc><sp s='Juliet'>Hello!</sp><sp s='Romeo'>Hi!</sp><sp s='Juliet'>Bye!</sp></doc>", {
-     * 			 xmlDocumentsXPath: '//sp',
-     *           xmlGroupByXpath: "//@s"
-     * 		}); // two docs: "Hello! Bye!" (Juliet) and "Hi!" (Romeo)
-     * 
-     * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
-     */
+    * @cfg {String} xmlExtraMetadataXpath A value that defines the location of other metadata; only used for XML-based documents.
+    * 
+    * 		loadCorpus("<doc><tool>Voyant</tool><phase>1</phase><body>This is Voyant!</body></doc>", {
+    * 			 xmlExtraMetadataXpath: "tool=//tool\nphase=//phase"
+    * 		}); // tool would be "Voyant" and phase would be "1"
+    * 
+    * Note that `xmlExtraMetadataXpath` is a bit different from the other XPath expressions in that it's
+    * possible to define multiple values (each on its own line) in the form of name=xpath.
+    * 
+    * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
+    */
 
     /**
-     * @cfg {String} xmlExtraMetadataXpath A value that defines the location of other metadata; only used for XML-based documents.
-     * 
-     * 		loadCorpus("<doc><tool>Voyant</tool><phase>1</phase><body>This is Voyant!</body></doc>", {
-     * 			 xmlExtraMetadataXpath: "tool=//tool\nphase=//phase"
-     * 		}); // tool would be "Voyant" and phase would be "1"
-     * 
-     * Note that `xmlExtraMetadataXpath` is a bit different from the other XPath expressions in that it's
-     * possible to define multiple values (each on its own line) in the form of name=xpath.
-     * 
-     * See also [Creating a Corpus with XML](#!/guide/corpuscreator-section-xml).
-     */
+    * @cfg {String} xmlExtractorTemplate Pass the XML document through the XSL template located at the specified URL before extraction (this is ignored in XML-based documents).
+    * 
+    * This is an advanced parameter that allows you to define a URL of an XSL template that can
+    * be called *before* text extraction (in other words, the other XML-based parameters apply
+    * after this template has been processed).
+    */
 
     /**
-     * @cfg {String} xmlExtractorTemplate Pass the XML document through the XSL template located at the specified URL before extraction (this is ignored in XML-based documents).
-     * 
-     * This is an advanced parameter that allows you to define a URL of an XSL template that can
-     * be called *before* text extraction (in other words, the other XML-based parameters apply
-     * after this template has been processed).
-     */
+    * @cfg {String} inputRemoveUntil Omit text up until the start of the matching regular expression (this is ignored in XML-based documents).
+    * 
+    * 		loadCorpus("Hello world! This is Voyant!", {
+    * 			 inputRemoveUntil: "This"
+    * 		}); // document would be: "This is Voyant!"
+    * 
+    * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
+    */
 
     /**
-     * @cfg {String} inputRemoveUntil Omit text up until the start of the matching regular expression (this is ignored in XML-based documents).
-     * 
-     * 		loadCorpus("Hello world! This is Voyant!", {
-     * 			 inputRemoveUntil: "This"
-     * 		}); // document would be: "This is Voyant!"
-     * 
-     * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
-     */
+    * @cfg {String} inputRemoveUntilAfter Omit text up until the end of the matching regular expression (this is ignored in XML-based documents).
+    * 
+    * 		loadCorpus("Hello world! This is Voyant!", {
+    * 			 inputRemoveUntilAfter: "world!"
+    * 		}); // document would be: "This is Voyant!"
+    * 
+    * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
+    */
 
     /**
-     * @cfg {String} inputRemoveUntilAfter Omit text up until the end of the matching regular expression (this is ignored in XML-based documents).
-     * 
-     * 		loadCorpus("Hello world! This is Voyant!", {
-     * 			 inputRemoveUntilAfter: "world!"
-     * 		}); // document would be: "This is Voyant!"
-     * 
-     * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
-     */
+    * @cfg {String} inputRemoveFrom Omit text from the start of the matching regular expression (this is ignored in XML-based documents).
+    * 
+    * 		loadCorpus("Hello world! This is Voyant!", {
+    * 			 inputRemoveFrom: "This"
+    * 		}); // document would be: "Hello World!"
+    * 
+    * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
+    */
 
     /**
-     * @cfg {String} inputRemoveFrom Omit text from the start of the matching regular expression (this is ignored in XML-based documents).
-     * 
-     * 		loadCorpus("Hello world! This is Voyant!", {
-     * 			 inputRemoveFrom: "This"
-     * 		}); // document would be: "Hello World!"
-     * 
-     * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
-     */
+    * @cfg {String} inputRemoveFromAfter Omit text from the end of the matching regular expression (this is ignored in XML-based documents).
+    * 
+    * 		loadCorpus("Hello world! This is Voyant!", {
+    * 			 inputRemoveFromAfter: "This"
+    * 		}); // document would be: "Hello World! This"
+    * 
+    * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
+    */
 
     /**
-     * @cfg {String} inputRemoveFromAfter Omit text from the end of the matching regular expression (this is ignored in XML-based documents).
-     * 
-     * 		loadCorpus("Hello world! This is Voyant!", {
-     * 			 inputRemoveFromAfter: "This"
-     * 		}); // document would be: "Hello World! This"
-     * 
-     * See also [Creating a Corpus with Text](#!/guide/corpuscreator-section-text).
-     */
+    * @cfg {String} subTitle A sub-title for the corpus.
+    * 
+    * This is currently not used, except in the Dynamic Table of Contexts skin. Still, it may be worth specifying a subtitle for later use.
+    */
 
     /**
-     * @cfg {String} subTitle A sub-title for the corpus.
-     * 
-     * This is currently not used, except in the Dynamic Table of Contexts skin. Still, it may be worth specifying a subtitle for later use.
-     */
-
-    /**
-     * @cfg {String} title A title for the corpus.
-     * 
-     * This is currently not used, except in the Dynamic Table of Contexts skin. Still, it may be worth specifying a title for later use.
-     */
+    * @cfg {String} title A title for the corpus.
+    * 
+    * This is currently not used, except in the Dynamic Table of Contexts skin. Still, it may be worth specifying a title for later use.
+    */
 
     /**
     * @cfg {String} curatorTsv a simple TSV of paths and labels for the DToC interface (this isn't typically used outside of the specialized DToC context).
@@ -9794,7 +9776,7 @@ var Spyral = (function () {
       /**
        * Get a Promise for the ID of the corpus.
        * 
-       * @return {Promise/String} a Promise for the string ID of the corpus
+       * @return {Promise|String} a Promise for the string ID of the corpus
        */
       value: function id() {
         var me = this;
@@ -9804,8 +9786,8 @@ var Spyral = (function () {
       }
       /*
        * Create a Corpus and return the ID
-       * @param {object} config 
-       * @param {object} api 
+       * @param {Object} config 
+       * @param {Object} api 
        */
       //	static id(config, api) {
       //		return Corpus.load(config).then(corpus => corpus.id(api || config));
@@ -9880,14 +9862,14 @@ var Spyral = (function () {
        *  	loadCorpus("austen").metadata().then(metadata => metadata.documentsCount)
        *  
        * @param {Object} config an Object specifying parameters (see list above)
-       * @return {Promise/Object} a Promise for an Object containing metadata
+       * @return {Promise|Object} a Promise for an Object containing metadata
        */
 
     }, {
       key: "metadata",
       value: function metadata(config) {
         return Load.trombone(config, {
-          tool: isDocumentsMode(config) ? "corpus.DocumentsMetadata" : "corpus.CorpusMetadata",
+          tool: isDocumentsMode(config) ? 'corpus.DocumentsMetadata' : 'corpus.CorpusMetadata',
           corpus: this.corpusid
         }).then(function (data) {
           return isDocumentsMode(config) ? data.documentsMetadata.documents : data.corpus.metadata;
@@ -9909,7 +9891,7 @@ var Spyral = (function () {
        * 
        * 	loadCorpus("austen").summary();
        * 
-       * @return {Promise/String} a Promise for a string containing a brief summary of the corpus metadata
+       * @return {Promise|String} a Promise for a string containing a brief summary of the corpus metadata
        */
 
     }, {
@@ -9952,10 +9934,10 @@ var Spyral = (function () {
 
     }, {
       key: "titles",
-      value: function titles(config) {
-        return this.metadata({
-          mode: "documents"
-        }).then(function (data) {
+      value: function titles() {
+        var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        config.mode = 'documents';
+        return this.metadata(config).then(function (data) {
           return data.map(function (doc) {
             return doc.title;
           });
@@ -9988,14 +9970,14 @@ var Spyral = (function () {
        * 	loadCorpus("austen").text({limit:1000})
        * 
        * @param {Object} config an Object specifying parameters (see list above)
-       * @returns {Promise/String} a Promise for a string of the corpus
+       * @returns {Promise|String} a Promise for a string of the corpus
        */
 
     }, {
       key: "text",
       value: function text(config) {
         return this.texts(config).then(function (data) {
-          return data.join("\n\n---\n\n");
+          return data.join('\n\n---\n\n');
         });
       }
       /*
@@ -10023,14 +10005,14 @@ var Spyral = (function () {
        * 	loadCorpus("austen").texts({limit:1000})
        * 
        * @param {Object} config an Object specifying parameters (see list above)
-       * @returns {Promise/String} a Promise for an Array of texts from the corpus
+       * @returns {Promise|String} a Promise for an Array of texts from the corpus
        */
 
     }, {
       key: "texts",
       value: function texts(config) {
         return Load.trombone(config, {
-          tool: "corpus.CorpusTexts",
+          tool: 'corpus.CorpusTexts',
           corpus: this.corpusid
         }).then(function (data) {
           return data.texts.texts;
@@ -10123,7 +10105,7 @@ var Spyral = (function () {
       key: "terms",
       value: function terms(config) {
         return Load.trombone(config, {
-          tool: isDocumentsMode(config) ? "corpus.DocumentTerms" : "corpus.CorpusTerms",
+          tool: isDocumentsMode(config) ? 'corpus.DocumentTerms' : 'corpus.CorpusTerms',
           corpus: this.corpusid
         }).then(function (data) {
           return isDocumentsMode(config) ? data.documentTerms.terms : data.corpusTerms.terms;
@@ -10180,7 +10162,7 @@ var Spyral = (function () {
       key: "tokens",
       value: function tokens(config) {
         return Load.trombone(config, {
-          tool: "corpus.DocumentTokens",
+          tool: 'corpus.DocumentTokens',
           corpus: this.corpusid
         }).then(function (data) {
           return data.documentTokens.tokens;
@@ -10225,12 +10207,12 @@ var Spyral = (function () {
         var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
         // by default DocumentTokens limits to 50 which probably isn't expected
-        if (!("limit" in config)) {
+        if (!('limit' in config)) {
           config.limit = 0;
         }
 
         return Load.trombone(config, {
-          tool: "corpus.DocumentTokens",
+          tool: 'corpus.DocumentTokens',
           noOthers: true,
           corpus: this.corpusid
         }).then(function (data) {
@@ -10241,8 +10223,8 @@ var Spyral = (function () {
       }
       /*
        * Create a Corpus and return an array of lexical forms (words) in document order.
-       * @param {object} config 
-       * @param {object} api 
+       * @param {Object} config 
+       * @param {Object} api 
        */
       //	static words(config, api) {
       //		return Corpus.load(config).then(corpus => corpus.words(api || config));
@@ -10298,11 +10280,11 @@ var Spyral = (function () {
       key: "contexts",
       value: function contexts(config) {
         if ((!config || !config.query) && console) {
-          console.warn("No query provided for contexts request.");
+          console.warn('No query provided for contexts request.');
         }
 
         return Load.trombone(config, {
-          tool: "corpus.DocumentContexts",
+          tool: 'corpus.DocumentContexts',
           corpus: this.corpusid
         }).then(function (data) {
           return data.documentContexts.contexts;
@@ -10310,8 +10292,8 @@ var Spyral = (function () {
       }
       /*
        * Create a Corpus and return the contexts
-       * @param {object} config 
-       * @param {object} api 
+       * @param {Object} config 
+       * @param {Object} api 
        */
       //	static contexts(config, api) {
       //		return Corpus.load(config).then(corpus => corpus.contexts(api || config));
@@ -10382,11 +10364,11 @@ var Spyral = (function () {
       key: "collocates",
       value: function collocates(config) {
         if ((!config || !config.query) && console) {
-          console.warn("No query provided for collocates request.");
+          console.warn('No query provided for collocates request.');
         }
 
         return Load.trombone(config, {
-          tool: "corpus.CorpusCollocates",
+          tool: 'corpus.CorpusCollocates',
           corpus: this.corpusid
         }).then(function (data) {
           return data.corpusCollocates.collocates;
@@ -10394,8 +10376,8 @@ var Spyral = (function () {
       }
       /*
        * Create a Corpus and return the collocates
-       * @param {object} config 
-       * @param {object} api 
+       * @param {Object} config 
+       * @param {Object} api 
        */
       //	static collocates(config, api) {
       //		return Corpus.load(config).then(corpus => corpus.collocates(api || config));
@@ -10460,7 +10442,7 @@ var Spyral = (function () {
       key: "phrases",
       value: function phrases(config) {
         return Load.trombone(config, {
-          tool: isDocumentsMode(config) ? "corpus.DocumentNgrams" : "corpus.CorpusNgrams",
+          tool: isDocumentsMode(config) ? 'corpus.DocumentNgrams' : 'corpus.CorpusNgrams',
           corpus: this.corpusid
         }).then(function (data) {
           return isDocumentsMode(config) ? data.documentNgrams.ngrams : data.corpusNgrams.ngrams;
@@ -10468,8 +10450,8 @@ var Spyral = (function () {
       }
       /*
        * Create a Corpus and return the phrases
-       * @param {object} config 
-       * @param {object} api 
+       * @param {Object} config 
+       * @param {Object} api 
        */
       //	static phrases(config, api) {
       //		return Corpus.load(config).then(corpus => corpus.phrases(api || config));
@@ -10561,15 +10543,15 @@ var Spyral = (function () {
       key: "correlations",
       value: function correlations(config) {
         if ((!config || !config.query) && console) {
-          console.warn("No query provided for correlations request.");
+          console.warn('No query provided for correlations request.');
 
           if (!isDocumentsMode(config)) {
-            throw new Error("Unable to run correlations for a corpus without a query.");
+            throw new Error('Unable to run correlations for a corpus without a query.');
           }
         }
 
         return Load.trombone(config, {
-          tool: isDocumentsMode(config) ? "corpus.DocumentTermCorrelations" : "corpus.CorpusTermCorrelations",
+          tool: isDocumentsMode(config) ? 'corpus.DocumentTermCorrelations' : 'corpus.CorpusTermCorrelations',
           corpus: this.corpusid
         }).then(function (data) {
           return data.termCorrelations.correlations;
@@ -10577,13 +10559,27 @@ var Spyral = (function () {
       }
       /*
        * Create a Corpus and return the correlations
-       * @param {object} config 
-       * @param {object} api 
+       * @param {Object} config 
+       * @param {Object} api 
        */
       //	static correlations(config, api) {
       //		return Corpus.load(config).then(corpus => corpus.correlations(api || config));
       //	}
 
+      /**
+       * Get lemmas. This is the equivalent of calling: this.tokens({ withPosLemmas: true, noOthers: true })
+       * @param {Object} config an Object specifying parameters (see above)
+          * @returns {Promise|Array} a Promise for an Array of lemma Objects
+       */
+
+    }, {
+      key: "lemmas",
+      value: function lemmas() {
+        var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        config.withPosLemmas = true;
+        config.noOthers = true;
+        return this.tokens(config);
+      }
       /**
        * Get a promise for an LDA object that has two primary methods of use:
        * 
@@ -10629,8 +10625,8 @@ var Spyral = (function () {
                   };
                   _context.next = 4;
                   return Load.trombone({
-                    tool: "resource.KeywordsManager",
-                    stopList: config.language || "auto",
+                    tool: 'resource.KeywordsManager',
+                    stopList: config.language || 'auto',
                     corpus: this.corpusid
                   });
 
@@ -10649,12 +10645,12 @@ var Spyral = (function () {
 
                   // our corpus contains a single document, so split it into segments
                   if (texts.length == 1) {
-                    words = texts[0].split(" ");
+                    words = texts[0].split(' ');
                     wordsPerBin = Math.ceil(words.length / options.bins);
                     ts = [];
 
                     for (i = 0; i < options.bins; i++) {
-                      ts[i] = words.slice(i * wordsPerBin, i * wordsPerBin + wordsPerBin).join(" ");
+                      ts[i] = words.slice(i * wordsPerBin, i * wordsPerBin + wordsPerBin).join(' ');
                     }
 
                     texts = ts;
@@ -10883,11 +10879,11 @@ var Spyral = (function () {
         var me = this;
         return new Promise(function (resolve, reject) {
           var isTool = function isTool(obj) {
-            return obj && typeof obj == "string" && /\W/.test(obj) == false || _typeof(obj) == "object" && "forTool" in obj;
+            return obj && typeof obj === 'string' && /\W/.test(obj) === false || _typeof(obj) === 'object' && 'forTool' in obj;
           };
 
           var isConfig = function isConfig(obj) {
-            return obj && _typeof(obj) == "object" && !("forTool" in obj);
+            return obj && _typeof(obj) === 'object' && !('forTool' in obj);
           };
 
           var lastArg = _arguments[_arguments.length - 1];
@@ -10901,17 +10897,17 @@ var Spyral = (function () {
               var defaultAttributes = {
                 width: undefined,
                 height: undefined,
-                style: "width: 350px; height: 350px",
-                "float": "right"
+                style: 'width: 350px; height: 350px',
+                "float": 'right'
               };
-              var out = "";
+              var out = '';
 
               for (var i = 0; i < _arguments.length; i++) {
                 var t = _arguments[i];
 
                 if (isTool(t)) {
                   (function () {
-                    if (typeof t == "string") {
+                    if (typeof t === 'string') {
                       t = {
                         forTool: t
                       };
@@ -10919,7 +10915,7 @@ var Spyral = (function () {
                     // build iframe tag
 
 
-                    out += "<iframe ";
+                    out += '<iframe ';
 
                     for (var attr in defaultAttributes) {
                       val = (attr in t ? t[attr] : undefined) || (attr in config ? config[attr] : undefined) || (attr in defaultAttributes ? defaultAttributes[attr] : undefined);
@@ -10930,12 +10926,12 @@ var Spyral = (function () {
                     } // build url
 
 
-                    url = new URL((config && config.voyantUrl ? config.voyantUrl : Load.baseUrl) + "tool/" + t.forTool + "/");
-                    url.searchParams.append("corpus", me.corpusid); // add API values from config (some may be ignored)
+                    url = new URL((config && config.voyantUrl ? config.voyantUrl : Load.baseUrl) + 'tool/' + t.forTool + '/');
+                    url.searchParams.append('corpus', me.corpusid); // add API values from config (some may be ignored)
 
                     var all = Object.assign(t, config);
                     Object.keys(all).forEach(function (key) {
-                      if (key !== "input" && !(key in defaultAttributes)) {
+                      if (key !== 'input' && !(key in defaultAttributes)) {
                         url.searchParams.append(key, all[key]);
                       }
                     }); // finish tag
@@ -10953,16 +10949,16 @@ var Spyral = (function () {
             if (_typeof(_ret) === "object") return _ret.v;
           } else {
             if (Array.isArray(_tool)) {
-              _tool = _tool.join(";");
+              _tool = _tool.join(';');
             }
 
             var defaultAttributes = {
               width: undefined,
               height: undefined,
-              style: "width: 90%; height: " + 350 * (_tool ? _tool : "").split(";").length + "px"
+              style: 'width: 90%; height: ' + 350 * (_tool ? _tool : '').split(';').length + 'px'
             }; // build iframe tag
 
-            var out = "<iframe ";
+            var out = '<iframe ';
 
             for (var attr in defaultAttributes) {
               var val = (attr in config ? config[attr] : undefined) || (attr in defaultAttributes ? defaultAttributes[attr] : undefined);
@@ -10973,15 +10969,15 @@ var Spyral = (function () {
             } // build url
 
 
-            var url = new URL((config && config.voyantUrl ? config.voyantUrl : Load.baseUrl) + (_tool ? "?view=customset&tableLayout=" + _tool : ""));
-            url.searchParams.append("corpus", me.corpusid); // add API values from config (some may be ignored)
+            var url = new URL((config && config.voyantUrl ? config.voyantUrl : Load.baseUrl) + (_tool ? '?view=customset&tableLayout=' + _tool : ''));
+            url.searchParams.append('corpus', me.corpusid); // add API values from config (some may be ignored)
 
             Object.keys(config).forEach(function (key) {
-              if (key !== "input" && !(key in defaultAttributes)) {
+              if (key !== 'input' && !(key in defaultAttributes)) {
                 url.searchParams.append(key, config[key]);
               }
             });
-            resolve(out + " src='" + url + "'></iframe");
+            resolve(out + ' src=\'' + url + '\'></iframe');
           }
         });
       }
@@ -11006,7 +11002,7 @@ var Spyral = (function () {
       }
       /*
        * Create a new Corpus using the provided config
-       * @param {object} config 
+       * @param {Object} config 
        */
       //	static create(config) {
       //		return Corpus.load(config);
@@ -11014,8 +11010,8 @@ var Spyral = (function () {
 
       /**
        * Load a Corpus using the provided config and api
-       * @param {object} config the Corpus config
-       * @param {object} api any additional API values
+       * @param {Object} config the Corpus config
+       * @param {Object} api any additional API values
        */
 
     }], [{
@@ -11033,7 +11029,7 @@ var Spyral = (function () {
             resolve(config);
           }
 
-          if (typeof config === "string") {
+          if (typeof config === 'string') {
             if (config.length > 0 && /\W/.test(config) === false) {
               config = {
                 corpus: config
@@ -11059,7 +11055,7 @@ var Spyral = (function () {
             } // append any other form options that may have been included
 
 
-            if (api && _typeof(api) == "object") {
+            if (api && _typeof(api) === 'object') {
               for (var key in api) {
                 formData.append(key, api[key]);
               }
@@ -11073,12 +11069,12 @@ var Spyral = (function () {
           }
 
           Load.trombone(_objectSpread2({}, config, {}, api), {
-            tool: "corpus.CorpusMetadata"
+            tool: 'corpus.CorpusMetadata'
           }).then(function (data) {
             return resolve(new Corpus(data.corpus.metadata.id));
           });
         });
-        ["id", "metadata", "summary", "titles", "text", "texts", "terms", "tokens", "words", "contexts", "collocates", "phrases", "correlations", "tool"].forEach(function (name) {
+        ['id', 'metadata', 'summary', 'titles', 'text', 'texts', 'terms', 'tokens', 'words', 'contexts', 'collocates', 'phrases', 'correlations', 'lemmas', 'tool'].forEach(function (name) {
           promise[name] = function () {
             var args = arguments;
             return promise.then(function (corpus) {
@@ -11103,6 +11099,8 @@ var Spyral = (function () {
 
   _defineProperty(Corpus, "Load", Load);
 
+  /* global Highcharts */
+
   /**
    * Class representing a Chart.
    * @memberof Spyral
@@ -11111,22 +11109,22 @@ var Spyral = (function () {
   var Chart = /*#__PURE__*/function () {
     /**
      * The Highcharts config object
-     * @typedef {object} HighchartsConfig
+     * @typedef {Object} HighchartsConfig
      * @property {(string|object)} title
      * @property {(string|object)} subtitle
-     * @property {object} credits
-     * @property {object} xAxis
-     * @property {object} yAxis
-     * @property {object} chart
-     * @property {array} series
-     * @property {object} plotOptions
+     * @property {Object} credits
+     * @property {Object} xAxis
+     * @property {Object} yAxis
+     * @property {Object} chart
+     * @property {Array} series
+     * @property {Object} plotOptions
      */
 
     /**
      * Construct a new Chart class
      * @constructor
-     * @param {element} target 
-     * @param {array} data 
+     * @param {HTMLElement} target 
+     * @param {Array} data 
      */
     function Chart(target, data) {
       _classCallCheck(this, Chart);
@@ -11135,9 +11133,9 @@ var Spyral = (function () {
       this.data = data;
     }
     /**
-     * Create a new chart
-     * See {@link https://api.highcharts.com/highcharts/} for full set of config options.
-     * @param {(string|element)} target 
+     * Create a new chart.
+     * See [Highcharts API](https://api.highcharts.com/highcharts/) for full set of config options.
+     * @param {(String|HTMLElement)} target 
      * @param {HighchartsConfig} config 
      * @returns {Highcharts.Chart}
      */
@@ -11149,9 +11147,9 @@ var Spyral = (function () {
         return Highcharts.chart(target, config);
       }
       /**
-       * Create a new chart
-       * See {@link https://api.highcharts.com/highcharts/} for full set of config options.
-       * @param {(string|element)} target 
+       * Create a new chart.
+       * See [Highcharts API](https://api.highcharts.com/highcharts/) for full set of config options.
+       * @param {(String|HTMLElement)} target 
        * @param {HighchartsConfig} config 
        * @returns {Highcharts.Chart}
        */
@@ -11161,7 +11159,7 @@ var Spyral = (function () {
 
       /**
        * Create a bar chart
-       * @param {object} [config]
+       * @param {Object} [config]
        * @returns {Highcharts.Chart}
        */
       value: function bar() {
@@ -11171,8 +11169,8 @@ var Spyral = (function () {
       }
       /**
        * Create a bar chart
-       * @param {element} target 
-       * @param {object} config 
+       * @param {HTMLElement} target 
+       * @param {Object} config 
        * @returns {Highcharts.Chart}
        */
 
@@ -11181,7 +11179,7 @@ var Spyral = (function () {
 
       /**
        * Create a line chart
-       * @param {object} [config]
+       * @param {Object} [config]
        * @returns {Highcharts.Chart}
        */
       value: function line() {
@@ -11191,8 +11189,8 @@ var Spyral = (function () {
       }
       /**
        * Create a line chart
-       * @param {element} target 
-       * @param {object} config 
+       * @param {HTMLElement} target 
+       * @param {Object} config 
        * @returns {Highcharts.Chart}
        */
 
@@ -11201,7 +11199,7 @@ var Spyral = (function () {
 
       /**
        * Create a scatter plot
-       * @param {object} [config]
+       * @param {Object} [config]
        * @returns {Highcharts.Chart}
        */
       value: function scatter() {
@@ -11211,8 +11209,8 @@ var Spyral = (function () {
       }
       /**
        * Create a scatter plot
-       * @param {element} target 
-       * @param {object} config 
+       * @param {HTMLElement} target 
+       * @param {Object} config 
        * @returns {Highcharts.Chart}
        */
 
@@ -11221,7 +11219,7 @@ var Spyral = (function () {
 
       /**
        * Create a network graph
-       * @param {object} [config]
+       * @param {Object} [config]
        * @returns {Highcharts.Chart}
        */
       value: function networkgraph() {
@@ -11239,8 +11237,8 @@ var Spyral = (function () {
       }
       /**
        * Create a network graph
-       * @param {element} target 
-       * @param {object} config 
+       * @param {HTMLElement} target 
+       * @param {Object} config 
        * @returns {Highcharts.Chart}
        */
 
@@ -11248,8 +11246,8 @@ var Spyral = (function () {
       key: "create",
       value: function create(target, config) {
         // convert title and suppress if not provided
-        if ("title" in config) {
-          if (typeof config.title == "string") {
+        if ('title' in config) {
+          if (typeof config.title === 'string') {
             config.title = {
               text: config.title
             };
@@ -11259,8 +11257,8 @@ var Spyral = (function () {
         } // convert subtitle and convert if not provided
 
 
-        if ("subtitle" in config) {
-          if (typeof config.subtitle == "string") {
+        if ('subtitle' in config) {
+          if (typeof config.subtitle === 'string') {
             config.subtitle = {
               text: config.subtitle
             };
@@ -11270,24 +11268,24 @@ var Spyral = (function () {
         } // convert credits
 
 
-        if (!("credits" in config)) {
+        if (!('credits' in config)) {
           config.credits = false;
         } // suppress xAxis title unless provided
 
 
-        if (!("xAxis" in config)) {
+        if (!('xAxis' in config)) {
           config.xAxis = {};
         }
 
-        if (!("title" in config.xAxis)) ; //config.xAxis.title = false;
+        if (!('title' in config.xAxis)) ; //config.xAxis.title = false;
         // suppress xAxis title unless provided
 
 
-        if (!("yAxis" in config)) {
+        if (!('yAxis' in config)) {
           config.yAxis = {};
         }
 
-        if (!("title" in config.yAxis)) {
+        if (!('title' in config.yAxis)) {
           config.yAxis.title = false;
         }
 
@@ -11295,22 +11293,22 @@ var Spyral = (function () {
       }
       /**
        * Sets the default chart type
-       * @param {object} config The chart config object
+       * @param {Object} config The chart config object
        * @param {string} type The type of chart
        */
 
     }, {
       key: "setDefaultChartType",
       value: function setDefaultChartType(config, type) {
-        if ("type" in config) {
+        if ('type' in config) {
           config.chart.type = config.type;
           delete config.type;
           return;
         } // TODO: check plot options and series?
 
 
-        if ("chart" in config) {
-          if ("type" in config.chart) {
+        if ('chart' in config) {
+          if ('type' in config.chart) {
             return;
           } // already set
 
@@ -11323,8 +11321,8 @@ var Spyral = (function () {
       }
       /**
        * Add the provided data to the config as a series
-       * @param {object} config 
-       * @param {array} data 
+       * @param {Object} config 
+       * @param {Array} data 
        */
 
     }, {
@@ -11438,9 +11436,9 @@ var Spyral = (function () {
   var Table = /*#__PURE__*/function () {
     /**
      * The Table config object
-     * @typedef {object} TableConfig
+     * @typedef {Object} TableConfig
      * @property {string} format The format of the provided data, either "tsv" or "csv"
-     * @property {(object|array)} headers The table headers
+     * @property {(Object|Array)} headers The table headers
      * @property {boolean} hasHeaders True if the headers are the first item in the data
      * @property {string} count Specify "vertical" or "horizontal" to create a table of unique item counts in the provided data
      */
@@ -11448,7 +11446,7 @@ var Spyral = (function () {
     /**
      * Create a new Table
      * @constructor
-     * @param {(object|array|string|number)} data
+     * @param {(Object|Array|String|Number)} data
      * @param {TableConfig} config
      */
     function Table(data, config) {
@@ -11464,7 +11462,7 @@ var Spyral = (function () {
       this._headers = {};
       this._rowKeyColumnIndex = 0; // we have a configuration object followed by values: create({headers: []}, 1,2,3) …
 
-      if (data && _typeof(data) == "object" && (typeof config == "string" || typeof config == "number" || Array.isArray(config))) {
+      if (data && _typeof(data) === 'object' && (typeof config === 'string' || typeof config === 'number' || Array.isArray(config))) {
         data.rows = [config].concat(other).filter(function (v) {
           return v !== undefined;
         });
@@ -11473,7 +11471,7 @@ var Spyral = (function () {
 
 
       if (arguments.length > 0 && Array.from(arguments).every(function (a) {
-        return a !== undefined && !Array.isArray(a) && _typeof(a) != "object";
+        return a !== undefined && !Array.isArray(a) && _typeof(a) !== 'object';
       })) {
         data = [data, config].concat(other).filter(function (v) {
           return v !== undefined;
@@ -11482,26 +11480,26 @@ var Spyral = (function () {
       } // could be CSV or TSV
 
 
-      if (Array.isArray(data) && data.length == 1 && typeof data[0] == "string" && (data[0].indexOf(",") > -1 || data[0].indexOf("\t") > -1)) {
+      if (Array.isArray(data) && data.length == 1 && typeof data[0] === 'string' && (data[0].indexOf(',') > -1 || data[0].indexOf('\t') > -1)) {
         data = data[0];
       } // first check if we have a string that might be delimited data
 
 
-      if (data && (typeof data == "string" || typeof data == "number")) {
-        if (typeof data == "number") {
+      if (data && (typeof data === 'string' || typeof data === 'number')) {
+        if (typeof data === 'number') {
           data = String(data);
         } // convert to string for split
 
 
         var rows = [];
-        var format = config && "format" in config ? config.format : undefined;
+        var format = config && 'format' in config ? config.format : undefined;
         data.split(/(\r\n|[\n\v\f\r\x85\u2028\u2029])+/g).forEach(function (line, i) {
           if (line.trim().length > 0) {
             var values;
 
-            if (format && format == "tsv" || line.indexOf("\t") > -1) {
+            if (format && format == 'tsv' || line.indexOf('\t') > -1) {
               values = line.split(/\t/);
-            } else if (format && format == "csv" || line.indexOf(",") > -1) {
+            } else if (format && format == 'csv' || line.indexOf(',') > -1) {
               values = parseCsvLine(line);
             } else {
               values = [line];
@@ -11511,7 +11509,7 @@ var Spyral = (function () {
 
             if (i == 0 && values.every(function (v) {
               return isNaN(v);
-            }) && (_typeof(config) != "object" || _typeof(config) == "object" && !("hasHeaders" in config) && !("headers" in config))) {
+            }) && (_typeof(config) !== 'object' || _typeof(config) === 'object' && !('hasHeaders' in config) && !('headers' in config))) {
               _this.setHeaders(values);
             } else {
               rows.push(values.map(function (v) {
@@ -11527,19 +11525,19 @@ var Spyral = (function () {
         if (config) {
           if (Array.isArray(config)) {
             this.setHeaders(config);
-          } else if (_typeof(config) == "object") {
-            if ("headers" in config) {
+          } else if (_typeof(config) === 'object') {
+            if ('headers' in config) {
               this.setHeaders(config.headers);
-            } else if ("hasHeaders" in config && config.hasHeaders) {
+            } else if ('hasHeaders' in config && config.hasHeaders) {
               this.setHeaders(data.shift());
             }
           }
         }
 
-        if (config && "count" in config && config.count) {
+        if (config && 'count' in config && config.count) {
           var freqs = Table.counts(data);
 
-          if (config.count == "vertical") {
+          if (config.count == 'vertical') {
             for (var item in freqs) {
               this.addRow(item, freqs[item]);
             }
@@ -11558,29 +11556,29 @@ var Spyral = (function () {
         } else {
           this.addRows(data);
         }
-      } else if (data && _typeof(data) == "object") {
-        if ("headers" in data && Array.isArray(data.headers)) {
+      } else if (data && _typeof(data) === 'object') {
+        if ('headers' in data && Array.isArray(data.headers)) {
           this.setHeaders(data.headers);
-        } else if ("hasHeaders" in data && "rows" in data) {
+        } else if ('hasHeaders' in data && 'rows' in data) {
           this.setHeaders(data.rows.shift());
         }
 
-        if ("rows" in data && Array.isArray(data.rows)) {
+        if ('rows' in data && Array.isArray(data.rows)) {
           this.addRows(data.rows);
         }
 
-        if ("rowKeyColumn" in data) {
-          if (typeof data.rowKeyColumn == "number") {
+        if ('rowKeyColumn' in data) {
+          if (typeof data.rowKeyColumn === 'number') {
             if (data.rowKeyColumn < this.columns()) {
               this._rowKeyColumnIndex = data.rowKeyColumn;
             } else {
-              throw new Error("The rowKeyColumn value is higher than the number headers designated: " + data.rowKeyColum);
+              throw new Error('The rowKeyColumn value is higher than the number headers designated: ' + data.rowKeyColum);
             }
-          } else if (typeof data.rowKeyColumn == "string") {
+          } else if (typeof data.rowKeyColumn === 'string') {
             if (data.rowKeyColumn in this._headers) {
               this._rowKeyColumnIndex = this._headers[data.rowKeyColumn];
             } else {
-              throw new Error("Unable to find column designated by rowKeyColumn: " + data.rowKeyColumn);
+              throw new Error('Unable to find column designated by rowKeyColumn: ' + data.rowKeyColumn);
             }
           }
         }
@@ -11588,7 +11586,7 @@ var Spyral = (function () {
     }
     /**
      * Set the headers for the Table
-     * @param {(object|array)} data
+     * @param {(Object|Array)} data
      * @returns {Table}
      */
 
@@ -11602,21 +11600,21 @@ var Spyral = (function () {
           data.forEach(function (h) {
             return _this2.addColumn(h);
           }, this);
-        } else if (_typeof(data) == "object") {
+        } else if (_typeof(data) === 'object') {
           if (this.columns() == 0 || Object.keys(data).length == this.columns()) {
             this._headers = data;
           } else {
-            throw new Error("The number of columns don't match: ");
+            throw new Error('The number of columns don\'t match: ');
           }
         } else {
-          throw new Error("Unrecognized argument for headers, it should be an array or an object." + data);
+          throw new Error('Unrecognized argument for headers, it should be an array or an object.' + data);
         }
 
         return this;
       }
       /**
        * Add rows to the Table
-       * @param {array} data
+       * @param {Array} data
        * @returns {Table}
        */
 
@@ -11632,7 +11630,7 @@ var Spyral = (function () {
       }
       /**
        * Add a row to the Table
-       * @param {(array|object)} data
+       * @param {(Array|Object)} data
        * @returns {Table}
        */
 
@@ -11654,7 +11652,7 @@ var Spyral = (function () {
       /**
        * Set a row
        * @param {(number|string)} ind The row index
-       * @param {(object|array)} data
+       * @param {(Object|Array)} data
        * @param {boolean} create
        * @returns {Table}
        */
@@ -11667,7 +11665,7 @@ var Spyral = (function () {
         var rowIndex = this.getRowIndex(ind, create);
 
         if (rowIndex >= this.rows() && !create) {
-          throw new Error("Attempt to set row values for a row that does note exist: " + ind + ". Maybe use addRow() instead?");
+          throw new Error('Attempt to set row values for a row that does note exist: ' + ind + '. Maybe use addRow() instead?');
         } // we have a simple array, so we'll just push to the rows
 
 
@@ -11678,7 +11676,7 @@ var Spyral = (function () {
                 this.addColumn();
               }
             } else {
-              throw new Error("The row that you've created contains more columns than the current table. Maybe use addColunm() first?");
+              throw new Error('The row that you\'ve created contains more columns than the current table. Maybe use addColunm() first?');
             }
           }
 
@@ -11686,11 +11684,11 @@ var Spyral = (function () {
             return _this4.setCell(rowIndex, i, d);
           }, this);
         } // we have an object so we'll use the headers
-        else if (_typeof(data) == "object") {
-            for (var _column in data) {
-              if (!this.hasColumn(_column)) ;
+        else if (_typeof(data) === 'object') {
+            for (var column in data) {
+              if (!this.hasColumn(column)) ;
 
-              this.setCell(rowIndex, _column, data[_column]);
+              this.setCell(rowIndex, column, data[column]);
             }
           } else if (this.columns() < 2 && create) {
             // hopefully some scalar value
@@ -11700,7 +11698,7 @@ var Spyral = (function () {
 
             this.setCell(rowIndex, 0, data);
           } else {
-            throw new Error("setRow() expects an array or an object, maybe setCell()?");
+            throw new Error('setRow() expects an array or an object, maybe setCell()?');
           }
 
         return this;
@@ -11708,7 +11706,7 @@ var Spyral = (function () {
       /**
        * Set a column
        * @param {(number|string)} ind The column index
-       * @param {(object|array)} data
+       * @param {(Object|Array)} data
        * @param {boolean} create
        * @returns {Table}
        */
@@ -11721,7 +11719,7 @@ var Spyral = (function () {
         var columnIndex = this.getColumnIndex(ind, create);
 
         if (columnIndex >= this.columns() && !create) {
-          throw new Error("Attempt to set column values for a column that does note exist: " + ind + ". Maybe use addColumn() instead?");
+          throw new Error('Attempt to set column values for a column that does note exist: ' + ind + '. Maybe use addColumn() instead?');
         } // we have a simple array, so we'll just push to the rows
 
 
@@ -11730,9 +11728,9 @@ var Spyral = (function () {
             return _this5.setCell(i, columnIndex, d, create);
           }, this);
         } // we have an object so we'll use the headers
-        else if (_typeof(data) == "object") {
+        else if (_typeof(data) === 'object') {
             for (var row in data) {
-              this.setCell(row, columnIndex, data[column], create);
+              this.setCell(row, columnIndex, data[row], create);
             }
           } // hope we have a scalar value to assign to the first row
           else {
@@ -11796,7 +11794,7 @@ var Spyral = (function () {
       value: function getRowIndex(ind, create) {
         var _this6 = this;
 
-        if (typeof ind == "number") {
+        if (typeof ind === 'number') {
           if (ind < this._rows.length) {
             return ind;
           } else if (create) {
@@ -11804,8 +11802,8 @@ var Spyral = (function () {
             return ind;
           }
 
-          throw new Error("The requested row does not exist: " + ind);
-        } else if (typeof ind == "string") {
+          throw new Error('The requested row does not exist: ' + ind);
+        } else if (typeof ind === 'string') {
           var row = this._rows.findIndex(function (r) {
             return r[_this6._rowKeyColumnIndex] === ind;
           }, this);
@@ -11818,11 +11816,11 @@ var Spyral = (function () {
             this.addRow(arr);
             return this.rows();
           } else {
-            throw new Error("Unable to find the row named " + ind);
+            throw new Error('Unable to find the row named ' + ind);
           }
         }
 
-        throw new Error("Please provide a valid row (number or named row)");
+        throw new Error('Please provide a valid row (number or named row)');
       }
       /**
        * Get (and create) the column index
@@ -11834,7 +11832,7 @@ var Spyral = (function () {
     }, {
       key: "getColumnIndex",
       value: function getColumnIndex(ind, create) {
-        if (typeof ind == "number") {
+        if (typeof ind === 'number') {
           if (ind < this.columns()) {
             return ind;
           } else if (create) {
@@ -11842,8 +11840,8 @@ var Spyral = (function () {
             return ind;
           }
 
-          throw new Error("The requested column does not exist: " + ind);
-        } else if (typeof ind == "string") {
+          throw new Error('The requested column does not exist: ' + ind);
+        } else if (typeof ind === 'string') {
           if (ind in this._headers) {
             return this._headers[ind];
           } else if (create) {
@@ -11853,14 +11851,14 @@ var Spyral = (function () {
             return this._headers[ind];
           }
 
-          throw new Error("Unable to find column named " + ind);
+          throw new Error('Unable to find column named ' + ind);
         }
 
-        throw new Error("Please provide a valid column (number or named column)");
+        throw new Error('Please provide a valid column (number or named column)');
       }
       /**
        * Add a column (at the specified index)
-       * @param {(object|string)} config
+       * @param {(Object|String)} config
        * @param {(number|string)} ind
        */
 
@@ -11870,9 +11868,9 @@ var Spyral = (function () {
         // determine col
         var col = this.columns(); // default
 
-        if (config && typeof config == "string") {
+        if (config && typeof config === 'string') {
           col = config;
-        } else if (config && _typeof(config) == "object" && "header" in config) {
+        } else if (config && _typeof(config) === 'object' && 'header' in config) {
           col = config.header;
         } else if (ind !== undefined) {
           col = ind;
@@ -11880,7 +11878,7 @@ var Spyral = (function () {
 
 
         if (col in this._headers) {
-          throw new Error("This column exists already: " + config.header);
+          throw new Error('This column exists already: ' + config.header);
         } // add column
 
 
@@ -11889,7 +11887,7 @@ var Spyral = (function () {
 
         var data = [];
 
-        if (config && _typeof(config) == "object" && "rows" in config) {
+        if (config && _typeof(config) === 'object' && 'rows' in config) {
           data = config.rows;
         } else if (Array.isArray(config)) {
           data = config;
@@ -11915,9 +11913,9 @@ var Spyral = (function () {
        * When the first argument is a an array then the rows corresponding to the row
        * indices or names are returned. When all arguments except are numbers or strings
        * then each of those is returned.
-       * @param {(boolean|array|number|string)} [inds]
-       * @param {(object|number|string)} [config]
-       * @returns {number|array}
+       * @param {(Boolean|Array|Number|String)} [inds]
+       * @param {(Object|Number|String)} [config]
+       * @returns {(Number|Array)}
        */
 
     }, {
@@ -11936,9 +11934,9 @@ var Spyral = (function () {
           other[_key3 - 2] = arguments[_key3];
         }
 
-        var asObj = config && _typeof(config) == "object" && config.asObj || other.length > 0 && _typeof(other[other.length - 1]) == "object" && other[other.length - 1].asObj; // return all
+        var asObj = config && _typeof(config) === 'object' && config.asObj || other.length > 0 && _typeof(other[other.length - 1]) === 'object' && other[other.length - 1].asObj; // return all
 
-        if (typeof inds == "boolean" && inds) {
+        if (typeof inds === 'boolean' && inds) {
           rows = this._rows.map(function (r, i) {
             return _this7.row(i, asObj);
           });
@@ -11948,9 +11946,9 @@ var Spyral = (function () {
               return _this7.row(ind);
             });
           } // return specified rows as varargs
-          else if (typeof inds == "number" || typeof inds == "string") {
+          else if (typeof inds === 'number' || typeof inds === 'string') {
               [inds, config].concat(other).every(function (i) {
-                if (typeof i == "number" || typeof i == "string") {
+                if (typeof i === 'number' || typeof i === 'string') {
                   rows.push(_this7.row(i, asObj));
                   return true;
                 } else {
@@ -11960,16 +11958,16 @@ var Spyral = (function () {
 
               if (other.length > 0) {
                 // when config is in last position
-                if (_typeof(other[other.length - 1]) == "object") {
+                if (_typeof(other[other.length - 1]) === 'object') {
                   config = other[other.length - 1];
                 }
               }
             } // zip if requested
 
 
-        if (config && _typeof(config) == "object" && "zip" in config && config.zip) {
+        if (config && _typeof(config) === 'object' && 'zip' in config && config.zip) {
           if (rows.length < 2) {
-            throw new Error("Only one row available, can't zip");
+            throw new Error('Only one row available, can\'t zip');
           }
 
           return Table.zip(rows);
@@ -11981,7 +11979,7 @@ var Spyral = (function () {
        * Get the specified row
        * @param {(number|string)} ind
        * @param {boolean} [asObj]
-       * @returns {(number|string|object)}
+       * @returns {(Object|Number|String)}
        */
 
     }, {
@@ -12008,9 +12006,9 @@ var Spyral = (function () {
        * When the first argument is a number a slice of the columns is returned and if
        * the second argument is a number it is treated as the length of the slice to
        * return (note that it isn't the `end` index like with Array.slice()).
-       * @param {(boolean|array|number|string)} [inds]
-       * @param {(object|number|string)} [config]
-       * @returns {number|array}
+       * @param {(Boolean|Array|Number|String)} [inds]
+       * @param {(Object|Number|String)} [config]
+       * @returns {(Number|Array)}
        */
 
     }, {
@@ -12029,9 +12027,9 @@ var Spyral = (function () {
           other[_key4 - 2] = arguments[_key4];
         }
 
-        var asObj = config && _typeof(config) == "object" && config.asObj || other.length > 0 && _typeof(other[other.length - 1]) == "object" && other[other.length - 1].asObj; // return all columns
+        var asObj = config && _typeof(config) === 'object' && config.asObj || other.length > 0 && _typeof(other[other.length - 1]) === 'object' && other[other.length - 1].asObj; // return all columns
 
-        if (typeof inds == "boolean" && inds) {
+        if (typeof inds === 'boolean' && inds) {
           for (var i = 0, len = this.columns(); i < len; i++) {
             columns.push(this.column(i, asObj));
           }
@@ -12040,9 +12038,9 @@ var Spyral = (function () {
             inds.forEach(function (i) {
               return columns.push(_this8.column(i, asObj));
             }, this);
-          } else if (typeof inds == "number" || typeof inds == "string") {
+          } else if (typeof inds === 'number' || typeof inds === 'string') {
             [inds, config].concat(other).every(function (i) {
-              if (typeof i == "number" || typeof i == "string") {
+              if (typeof i === 'number' || typeof i === 'string') {
                 columns.push(_this8.column(i, asObj));
                 return true;
               } else {
@@ -12052,15 +12050,15 @@ var Spyral = (function () {
 
             if (other.length > 0) {
               // when config is in last position
-              if (_typeof(other[other.length - 1]) == "object") {
+              if (_typeof(other[other.length - 1]) === 'object') {
                 config = other[other.length - 1];
               }
             }
           }
 
-        if (config && _typeof(config) == "object" && "zip" in config && config.zip) {
+        if (config && _typeof(config) === 'object' && 'zip' in config && config.zip) {
           if (columns.length < 2) {
-            throw new Error("Only one column available, can't zip");
+            throw new Error('Only one column available, can\'t zip');
           }
 
           return Table.zip(columns);
@@ -12072,7 +12070,7 @@ var Spyral = (function () {
        * Get the specified column
        * @param {(number|string)} ind
        * @param {boolean} [asObj]
-       * @returns {(number|string|object)}
+       * @returns {(Object|Number|String)}
        */
 
     }, {
@@ -12124,8 +12122,8 @@ var Spyral = (function () {
        * When the first argument is the boolean value `true` all headers are returned.
        * When the first argument is a number a slice of the headers is returned.
        * When the first argument is an array the slices specified in the array are returned.
-       * @param {(boolean|array|number|string)} inds
-       * @returns {(number|array)}
+       * @param {(Boolean|Array|Number|String)} inds
+       * @returns {(Number|Array)}
        */
 
     }, {
@@ -12138,7 +12136,7 @@ var Spyral = (function () {
           return Object.keys(this._headers).length;
         }
 
-        if (typeof inds == "boolean" && inds) {
+        if (typeof inds === 'boolean' && inds) {
           inds = Array(Object.keys(this._headers).length).fill().map(function (_, i) {
             return i;
           });
@@ -12150,7 +12148,7 @@ var Spyral = (function () {
             return _this11.header(i);
           });
         } // return specified rows as varargs
-        else if (typeof inds == "number" || typeof inds == "string") {
+        else if (typeof inds === 'number' || typeof inds === 'string') {
             for (var _len5 = arguments.length, other = new Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
               other[_key5 - 1] = arguments[_key5];
             }
@@ -12174,7 +12172,7 @@ var Spyral = (function () {
       /**
        * Runs the specified function on each row.
        * The function is passed the row and the row index.
-       * @param {function} fn
+       * @param {Function} fn
        */
 
     }, {
@@ -12299,7 +12297,7 @@ var Spyral = (function () {
        * @param {(number|string)} ind
        * @param {number} neighbors
        * @param {boolean} overwrite
-       * @returns {array}
+       * @returns {Array}
        */
 
     }, {
@@ -12318,7 +12316,7 @@ var Spyral = (function () {
        * @param {(number|string)} ind
        * @param {number} neighbors
        * @param {boolean} overwrite
-       * @returns {array}
+       * @returns {Array}
        */
 
     }, {
@@ -12379,7 +12377,7 @@ var Spyral = (function () {
       /**
        * Get the z scores for the specified row
        * @param {(number|string)} ind
-       * @returns {array}
+       * @returns {Array}
        */
 
     }, {
@@ -12390,7 +12388,7 @@ var Spyral = (function () {
       /**
        * Get the z scores for the specified column
        * @param {(number|string)} ind
-       * @returns {array}
+       * @returns {Array}
        */
 
     }, {
@@ -12417,7 +12415,7 @@ var Spyral = (function () {
         } // wrap a single index as array
 
 
-        if (typeof inds == "string" || typeof inds == "number") {
+        if (typeof inds === 'string' || typeof inds === 'number') {
           inds = [inds];
         }
 
@@ -12429,7 +12427,7 @@ var Spyral = (function () {
               ind = _this12.getColumnIndex(inds[i]);
 
               if (a != b) {
-                if (typeof a[ind] == "string" && typeof b[ind] == "string") {
+                if (typeof a[ind] === 'string' && typeof b[ind] === 'string') {
                   return a[ind].localeCompare(b[ind]);
                 } else {
                   return a[ind] - b[ind];
@@ -12441,9 +12439,9 @@ var Spyral = (function () {
           }, config);
         }
 
-        if (typeof inds == "function") {
+        if (typeof inds === 'function') {
           this._rows.sort(function (a, b) {
-            if (config && "asObject" in config && config.asObject) {
+            if (config && 'asObject' in config && config.asObject) {
               var c = {};
 
               for (var k in _this12._headers) {
@@ -12462,7 +12460,7 @@ var Spyral = (function () {
             }
           });
 
-          if (config && "reverse" in config && config.reverse) {
+          if (config && 'reverse' in config && config.reverse) {
             this._rows.reverse(); // in place
 
           }
@@ -12489,7 +12487,7 @@ var Spyral = (function () {
         } // wrap a single index as array
 
 
-        if (typeof inds == "string" || typeof inds == "number") {
+        if (typeof inds === 'string' || typeof inds === 'number') {
           inds = [inds];
         }
 
@@ -12520,10 +12518,10 @@ var Spyral = (function () {
           });
         }
 
-        if (typeof inds == "function") {
+        if (typeof inds === 'function') {
           var _headers = Object.keys(this._headers);
 
-          if (config && "asObject" in _headers && _headers.asObject) {
+          if (config && 'asObject' in _headers && _headers.asObject) {
             _headers = _headers.map(function (h, i) {
               return {
                 header: h,
@@ -12539,7 +12537,7 @@ var Spyral = (function () {
           });
 
           _headers = _headers.map(function (h) {
-            return _typeof(h) == "object" ? h.header : h;
+            return _typeof(h) === 'object' ? h.header : h;
           }); // convert back to string
           // make sure we have all keys
 
@@ -12562,7 +12560,7 @@ var Spyral = (function () {
       }
       /**
        * Get a CSV representation of the Table
-       * @param {object} [config]
+       * @param {Object} [config]
        * @returns {string}
        */
 
@@ -12571,34 +12569,34 @@ var Spyral = (function () {
       value: function toCsv(config) {
         var cell = function cell(c) {
           var quote = /"/g;
-          return typeof c == "string" && (c.indexOf(",") > -1 || c.indexOf('"') > -1) ? '"' + c.replace(quote, '\"') + '"' : c;
+          return typeof c === 'string' && (c.indexOf(',') > -1 || c.indexOf('"') > -1) ? '"' + c.replace(quote, '\"') + '"' : c;
         };
 
-        return (config && "noHeaders" in config && config.noHeaders ? "" : this.headers(true).map(function (h) {
+        return (config && 'noHeaders' in config && config.noHeaders ? '' : this.headers(true).map(function (h) {
           return cell(h);
-        }).join(",") + "\n") + this._rows.map(function (row) {
+        }).join(',') + '\n') + this._rows.map(function (row) {
           return row.map(function (c) {
             return cell(c);
-          }).join(",");
-        }).join("\n");
+          }).join(',');
+        }).join('\n');
       }
       /**
        * Get a TSV representation of the Table
-       * @param {object} [config]
+       * @param {Object} [config]
        * @returns {string}
        */
 
     }, {
       key: "toTsv",
       value: function toTsv(config) {
-        return config && "noHeaders" in config && config.noHeaders ? "" : this.headers(true).join("\t") + "\n" + this._rows.map(function (row) {
-          return row.join("\t");
-        }).join("\n");
+        return config && 'noHeaders' in config && config.noHeaders ? '' : this.headers(true).join('\t') + '\n' + this._rows.map(function (row) {
+          return row.join('\t');
+        }).join('\n');
       }
       /**
        * Set the target's contents to an HTML representation of the Table
-       * @param {(function|string|object)} target
-       * @param {object} [config]
+       * @param {(Function|String|Object)} target
+       * @param {Object} [config]
        * @returns {Table}
        */
 
@@ -12607,18 +12605,18 @@ var Spyral = (function () {
       value: function html(target, config) {
         var html = this.toString(config);
 
-        if (typeof target == "function") {
+        if (typeof target === 'function') {
           target(html);
         } else {
-          if (typeof target == "string") {
+          if (typeof target === 'string') {
             target = document.querySelector(target);
 
             if (!target) {
-              throw "Unable to find specified target: " + target;
+              throw 'Unable to find specified target: ' + target;
             }
           }
 
-          if (_typeof(target) == "object" && "innerHTML" in target) {
+          if (_typeof(target) === 'object' && 'innerHTML' in target) {
             target.innerHTML = html;
           }
         }
@@ -12637,7 +12635,7 @@ var Spyral = (function () {
       }
       /**
        * Get an HTML representation of the Table
-       * @param {object} [config]
+       * @param {Object} [config]
        * @returns {string}
        */
 
@@ -12646,37 +12644,37 @@ var Spyral = (function () {
       value: function toString() {
         var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        if (typeof config == "number") {
+        if (typeof config === 'number') {
           config = {
             limit: config
           };
         }
 
-        if ("top" in config && !("limit" in config)) {
+        if ('top' in config && !('limit' in config)) {
           config.limit = config.top;
         }
 
-        if ("limit" in config && !("bottom" in config)) {
+        if ('limit' in config && !('bottom' in config)) {
           config.bottom = 0;
         }
 
-        if ("bottom" in config && !("limit" in config)) {
+        if ('bottom' in config && !('limit' in config)) {
           config.limit = 0;
         }
 
-        return "<table" + ("id" in config ? " id='" + config.id + "' " : " ") + "class='voyantTable'>" + (config && "caption" in config && typeof config.caption == "string" ? "<caption>" + config.caption + "</caption>" : "") + (config && "noHeaders" in config && config.noHeaders ? "" : "<thead><tr>" + this.headers(true).map(function (c) {
-          return "<th>" + c + "</th>";
-        }).join("") + "</tr></thead>") + "<tbody>" + this._rows.filter(function (row, i, arr) {
-          return !("limit" in config) || i < config.limit || !("bottom" in config) || i > arr.length - 1 - config.bottom;
+        return '<table' + ('id' in config ? ' id=\'' + config.id + '\' ' : ' ') + 'class=\'voyantTable\'>' + (config && 'caption' in config && typeof config.caption === 'string' ? '<caption>' + config.caption + '</caption>' : '') + (config && 'noHeaders' in config && config.noHeaders ? '' : '<thead><tr>' + this.headers(true).map(function (c) {
+          return '<th>' + c + '</th>';
+        }).join('') + '</tr></thead>') + '<tbody>' + this._rows.filter(function (row, i, arr) {
+          return !('limit' in config) || i < config.limit || !('bottom' in config) || i > arr.length - 1 - config.bottom;
         }).map(function (row) {
-          return "<tr>" + row.map(function (c) {
-            return "<td>" + (typeof c === "number" ? c.toLocaleString() : c) + "</td>";
-          }).join("") + "</tr>";
-        }).join("") + "</tbody></table>";
+          return '<tr>' + row.map(function (c) {
+            return '<td>' + (typeof c === 'number' ? c.toLocaleString() : c) + '</td>';
+          }).join('') + '</tr>';
+        }).join('') + '</tbody></table>';
       }
       /**
        * Show a chart representing the Table
-       * @param {(string|element)} [target]
+       * @param {(String|HTMLElement)} [target]
        * @param {HighchartsConfig} [config]
        * @returns {Highcharts.Chart}
        */
@@ -12702,7 +12700,7 @@ var Spyral = (function () {
               target.style.height = '400px'; // 400 is the default Highcharts height
             }
           } else {
-            target = document.createElement("div");
+            target = document.createElement('div');
             document.body.appendChild(target);
           }
         }
@@ -12716,7 +12714,7 @@ var Spyral = (function () {
         });
 
         if (isHeadersCategories) {
-          Chart.setDefaultChartType(config, "column");
+          Chart.setDefaultChartType(config, 'column');
         } // set categories if not set
 
 
@@ -12726,19 +12724,19 @@ var Spyral = (function () {
         config.series = config.series || []; // one row, so let's take series from rows
 
         if (rowsCount === 1) {
-          config.dataFrom = config.dataFrom || "rows";
-        } else if (columnsCount === 1 || !("dataFrom" in config)) {
-          config.dataFrom = config.dataFrom || "columns";
+          config.dataFrom = config.dataFrom || 'rows';
+        } else if (columnsCount === 1 || !('dataFrom' in config)) {
+          config.dataFrom = config.dataFrom || 'columns';
         }
 
-        if ("dataFrom" in config) {
-          if (config.dataFrom === "rows") {
+        if ('dataFrom' in config) {
+          if (config.dataFrom === 'rows') {
             config.data = {
               rows: []
             };
             config.data.rows.push(headers);
             config.data.rows = config.data.rows.concat(this.rows(true));
-          } else if (config.dataFrom === "columns") {
+          } else if (config.dataFrom === 'columns') {
             config.data = {
               columns: []
             };
@@ -12750,15 +12748,15 @@ var Spyral = (function () {
               });
             }
           }
-        } else if ("seriesFrom" in config) {
-          if (config.seriesFrom === "rows") {
+        } else if ('seriesFrom' in config) {
+          if (config.seriesFrom === 'rows') {
             this.rows(config.rows ? config.rows : true).forEach(function (row, i) {
               config.series[i] = config.series[i] || {};
               config.series[i].data = headers.map(function (h) {
                 return _this14.cell(i, h);
               });
             });
-          } else if (config.seriesFrom === "columns") {
+          } else if (config.seriesFrom === 'columns') {
             this.columns(config.columns ? config.columns : true).forEach(function (col, i) {
               config.series[i] = config.series[i] || {};
               config.series[i].data = [];
@@ -12776,7 +12774,7 @@ var Spyral = (function () {
       }
       /**
        * Create a new Table
-       * @param {(object|array|string|number)} data
+       * @param {(Object|Array|String|Number)} data
        * @param {TableConfig} config
        * @returns {Table}
        */
@@ -12792,9 +12790,9 @@ var Spyral = (function () {
       }
       /**
        * Fetch a Table from a source
-       * @param {string|Request} input
-       * @param {object} api
-       * @param {object} config
+       * @param {(String|Request)} input
+       * @param {Object} api
+       * @param {Object} config
        * @returns {Promise}
        */
 
@@ -12804,7 +12802,7 @@ var Spyral = (function () {
         return new Promise(function (resolve, reject) {
           window.fetch(input, api).then(function (response) {
             if (!response.ok) {
-              throw new Error(response.status + " " + response.statusText);
+              throw new Error(response.status + ' ' + response.statusText);
             }
 
             response.text().then(function (text) {
@@ -12815,8 +12813,8 @@ var Spyral = (function () {
       }
       /**
        * Get the count of each unique value in the data
-       * @param {array} data
-       * @returns {object}
+       * @param {Array} data
+       * @returns {Object}
        */
 
     }, {
@@ -12838,11 +12836,11 @@ var Spyral = (function () {
     }, {
       key: "cmp",
       value: function cmp(a, b) {
-        return typeof a == "string" && typeof b == "string" ? a.localeCompare(b) : a - b;
+        return typeof a === 'string' && typeof b === 'string' ? a.localeCompare(b) : a - b;
       }
       /**
        * Get the sum of the provided values
-       * @param {array} data
+       * @param {Array} data
        * @returns {number}
        */
 
@@ -12855,7 +12853,7 @@ var Spyral = (function () {
       }
       /**
        * Get the mean of the provided values
-       * @param {array} data
+       * @param {Array} data
        * @returns {number}
        */
 
@@ -12866,9 +12864,9 @@ var Spyral = (function () {
       }
       /**
        * Get rolling mean for the provided values
-       * @param {array} data
+       * @param {Array} data
        * @param {number} neighbors
-       * @returns {array}
+       * @returns {Array}
        */
 
     }, {
@@ -12887,7 +12885,7 @@ var Spyral = (function () {
       }
       /**
        * Get the variance for the provided values
-       * @param {array} data
+       * @param {Array} data
        * @returns {number}
        */
 
@@ -12901,7 +12899,7 @@ var Spyral = (function () {
       }
       /**
        * Get the standard deviation for the provided values
-       * @param {array} data
+       * @param {Array} data
        * @returns {number}
        */
 
@@ -12912,8 +12910,8 @@ var Spyral = (function () {
       }
       /**
        * Get the z scores for the provided values
-       * @param {array} data
-       * @returns {array}
+       * @param {Array} data
+       * @returns {Array}
        */
 
     }, {
@@ -12927,8 +12925,8 @@ var Spyral = (function () {
       }
       /**
        * Perform a zip operation of the provided arrays {@link https://en.wikipedia.org/wiki/Convolution_(computer_science)}
-       * @param {array} data
-       * @returns {array}
+       * @param {Array} data
+       * @returns {Array}
        */
 
     }, {
@@ -12970,18 +12968,18 @@ var Spyral = (function () {
     var arr = [];
     line.replace(regex, function (m0, m1, m2, m3) {
       if (m1 !== undefined) {
-        arr.push(m1.replace(/\\'/g, "'"));
+        arr.push(m1.replace(/\\'/g, '\''));
       } else if (m2 !== undefined) {
-        arr.push(m2.replace(/\\"/g, "\""));
+        arr.push(m2.replace(/\\"/g, '"'));
       } else if (m3 !== undefined) {
         arr.push(m3);
       }
 
-      return "";
+      return '';
     });
 
     if (/,\s*$/.test(line)) {
-      arr.push("");
+      arr.push('');
     }
 
     return arr;
@@ -12990,6 +12988,7 @@ var Spyral = (function () {
   /**
    * Class for working with categories and features.
    * Categories are groupings of terms.
+   * A term can be present in multiple categories. Category ranking is used to determine which feature value to prioritize.
    * Features are arbitrary properties (font, color) that are associated with each category.
    * @memberof Spyral
    * @class
@@ -13003,12 +13002,13 @@ var Spyral = (function () {
       _classCallCheck(this, Categories);
 
       this._categories = {};
+      this._categoriesRanking = [];
       this._features = {};
       this._featureDefaults = {};
     }
     /**
      * Get the categories
-     * @returns {object}
+     * @returns {Object}
      */
 
 
@@ -13031,7 +13031,7 @@ var Spyral = (function () {
       /**
        * Get the terms for a category
        * @param {string} name 
-       * @returns {array}
+       * @returns {Array}
        */
 
     }, {
@@ -13049,6 +13049,8 @@ var Spyral = (function () {
       value: function addCategory(name) {
         if (this._categories[name] === undefined) {
           this._categories[name] = [];
+
+          this._categoriesRanking.push(name);
         }
       }
       /**
@@ -13060,15 +13062,19 @@ var Spyral = (function () {
     }, {
       key: "renameCategory",
       value: function renameCategory(oldName, newName) {
-        var terms = this.getCategoryTerms(oldName);
-        this.addTerms(newName, terms);
+        if (oldName !== newName) {
+          var terms = this.getCategoryTerms(oldName);
+          var ranking = this.getCategoryRanking(oldName);
+          this.addTerms(newName, terms);
 
-        for (var feature in this._features) {
-          var value = this._features[feature][oldName];
-          this.setCategoryFeature(newName, feature, value);
+          for (var feature in this._features) {
+            var value = this._features[feature][oldName];
+            this.setCategoryFeature(newName, feature, value);
+          }
+
+          this.removeCategory(oldName);
+          this.setCategoryRanking(newName, ranking);
         }
-
-        this.removeCategory(oldName);
       }
       /**
        * Remove a category
@@ -13080,8 +13086,52 @@ var Spyral = (function () {
       value: function removeCategory(name) {
         delete this._categories[name];
 
+        var index = this._categoriesRanking.indexOf(name);
+
+        if (index !== -1) {
+          this._categoriesRanking.splice(index, 1);
+        }
+
         for (var feature in this._features) {
           delete this._features[feature][name];
+        }
+      }
+      /**
+       * Gets the ranking for a category
+       * @param {string} name 
+       * @returns {number}
+       */
+
+    }, {
+      key: "getCategoryRanking",
+      value: function getCategoryRanking(name) {
+        var ranking = this._categoriesRanking.indexOf(name);
+
+        if (ranking === -1) {
+          return undefined;
+        } else {
+          return ranking;
+        }
+      }
+      /**
+       * Sets the ranking for a category
+       * @param {string} name 
+       * @param {number} ranking 
+       */
+
+    }, {
+      key: "setCategoryRanking",
+      value: function setCategoryRanking(name, ranking) {
+        if (this._categories[name] !== undefined) {
+          ranking = Math.min(this._categoriesRanking.length - 1, Math.max(0, ranking));
+
+          var index = this._categoriesRanking.indexOf(name);
+
+          if (index !== -1) {
+            this._categoriesRanking.splice(index, 1);
+          }
+
+          this._categoriesRanking.splice(ranking, 0, name);
         }
       }
       /**
@@ -13098,7 +13148,7 @@ var Spyral = (function () {
       /**
        * Add multiple terms to a category
        * @param {string} category 
-       * @param {array} terms 
+       * @param {Array} terms 
        */
 
     }, {
@@ -13134,7 +13184,7 @@ var Spyral = (function () {
       /**
        * Remove multiple terms from a category
        * @param {string} category 
-       * @param {array} terms 
+       * @param {Array} terms 
        */
 
     }, {
@@ -13157,21 +13207,44 @@ var Spyral = (function () {
         }
       }
       /**
-       * Get the category that a term belongs to
+       * Get the category that a term belongs to, taking ranking into account
        * @param {string} term 
-       * @return {object}
+       * @returns {string}
        */
 
     }, {
       key: "getCategoryForTerm",
       value: function getCategoryForTerm(term) {
+        var ranking = Number.MAX_VALUE;
+        var cat = undefined;
+
         for (var category in this._categories) {
-          if (this._categories[category].indexOf(term) != -1) {
-            return category;
+          if (this._categories[category].indexOf(term) !== -1 && this.getCategoryRanking(category) < ranking) {
+            ranking = this.getCategoryRanking(category);
+            cat = category;
           }
         }
 
-        return undefined;
+        return cat;
+      }
+      /**
+       * Get all the categories a term belongs to
+       * @param {string} term 
+       * @returns {Array}
+       */
+
+    }, {
+      key: "getCategoriesForTerm",
+      value: function getCategoriesForTerm(term) {
+        var cats = [];
+
+        for (var category in this._categories) {
+          if (this._categories[category].indexOf(term) !== -1) {
+            cats.push(category);
+          }
+        }
+
+        return cats;
       }
       /**
        * Get the feature for a term
@@ -13187,7 +13260,7 @@ var Spyral = (function () {
       }
       /**
        * Get the features
-       * @returns {object}
+       * @returns {Object}
        */
 
     }, {
@@ -13267,7 +13340,7 @@ var Spyral = (function () {
       }
       /**
        * Get a copy of the category and feature data
-       * @return {object}
+       * @returns {Object}
        */
 
     }, {
@@ -13275,13 +13348,16 @@ var Spyral = (function () {
       value: function getCategoryExportData() {
         return {
           categories: Object.assign({}, this._categories),
+          categoriesRanking: this._categoriesRanking.map(function (x) {
+            return x;
+          }),
           features: Object.assign({}, this._features)
         };
       }
       /**
        * Save the categories (if we're in a recognized environment).
-       * @param {Object} config for the network call (specifying if needed the location of Trombone, etc., see {@link #Load.trombone}
-       * @return {Promise} this returns a promise which eventually resolves to a string that is the ID reference for the stored categories
+       * @param {Object} config for the network call (specifying if needed the location of Trombone, etc., see {@link Spyral.Load#trombone}
+       * @returns {Promise} this returns a promise which eventually resolves to a string that is the ID reference for the stored categories
        */
 
     }, {
@@ -13291,7 +13367,7 @@ var Spyral = (function () {
         var api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var categoriesData = JSON.stringify(this.getCategoryExportData());
         return Load.trombone(api, Object.assign(config, {
-          tool: "resource.StoredCategories",
+          tool: 'resource.StoredCategories',
           storeResource: categoriesData
         })).then(function (data) {
           return data.storedCategories.id;
@@ -13308,7 +13384,7 @@ var Spyral = (function () {
        * 
        * @param {Object|String} config an object specifying the parameters (see above)
        * @param {Object} api an object specifying any parameters for the trombone call
-       * @return {Promise} this first returns a promise and when the promise is resolved it returns this categories object (with the loaded data included)
+       * @returns {Promise} this first returns a promise and when the promise is resolved it returns this categories object (with the loaded data included)
        */
 
     }, {
@@ -13318,22 +13394,30 @@ var Spyral = (function () {
         var api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var me = this;
 
-        if (typeof config == "string") {
+        if (typeof config === 'string') {
           config = {
-            "retrieveResourceId": config
+            'retrieveResourceId': config
           };
         }
 
-        if (!("retrieveResourceId" in config)) {
-          throw Error("You must provide a value for the retrieveResourceId parameter");
+        if (!('retrieveResourceId' in config)) {
+          throw Error('You must provide a value for the retrieveResourceId parameter');
         }
 
         return Load.trombone(api, Object.assign(config, {
-          tool: "resource.StoredCategories"
+          tool: 'resource.StoredCategories'
         })).then(function (data) {
           var cats = JSON.parse(data.storedCategories.resource);
           me._features = cats.features;
           me._categories = cats.categories;
+          me._categoriesRanking = cats.categoriesRanking || [];
+
+          if (me._categoriesRanking.length === 0) {
+            for (var category in me._categories) {
+              me._categoriesRanking.push(category);
+            }
+          }
+
           return me;
         });
       }
@@ -16363,7 +16447,6 @@ var Spyral = (function () {
   /**
    * A helper for working with the Voyant Notebook app.
    * @memberof Spyral
-   * @namespace
    */
   var Notebook = /*#__PURE__*/function () {
     function Notebook() {
@@ -16375,7 +16458,6 @@ var Spyral = (function () {
 
       /**
        * Returns the previous block.
-       * @static
        * @returns {string}
        */
       value: function getPreviousBlock(config) {
@@ -16383,7 +16465,6 @@ var Spyral = (function () {
       }
       /**
        * Returns the next block.
-       * @static
        * @returns {string}
        */
 
@@ -16394,8 +16475,7 @@ var Spyral = (function () {
       }
       /**
        * Returns the current block.
-       * @static
-       * @params {number} [offset] If specified, returns the block whose position is offset from the current block
+       * @param {number} [offset] If specified, returns the block whose position is offset from the current block
        * @returns {string}
        */
 
@@ -16760,14 +16840,14 @@ var Spyral = (function () {
   var Metadata = /*#__PURE__*/function () {
     /**
      * The Metadata config object
-     * @typedef {object} MetadataConfig
-     * @property {string} title The title of the Corpus
-     * @property {string} author The author of the Corpus
-     * @property {string} description The description of the Corpus
-     * @property {array} keywords The keywords for the Corpus
-     * @property {string} created When the Corpus was created
-     * @property {string} language The language of the Corpus
-     * @property {string} license The license for the Corpus
+     * @typedef {Object} MetadataConfig
+     * @property {String} title The title of the Corpus
+     * @property {String} author The author of the Corpus
+     * @property {String} description The description of the Corpus
+     * @property {Array} keywords The keywords for the Corpus
+     * @property {String} created When the Corpus was created
+     * @property {String} language The language of the Corpus
+     * @property {String} license The license for the Corpus
      */
 
     /** 
@@ -16807,7 +16887,7 @@ var Spyral = (function () {
     }
     /**
      * Set metadata properties.
-     * @param {object} config A config object
+     * @param {Object} config A config object
      */
 
 
@@ -16822,7 +16902,7 @@ var Spyral = (function () {
       }
       /**
        * Sets the specified field to the current date and time.
-       * @param {string} field 
+       * @param {String} field 
        */
 
     }, {
@@ -16832,8 +16912,8 @@ var Spyral = (function () {
       }
       /**
        * Gets the specified field as a short date.
-       * @param {string} field
-       * @returns {string|undefined}
+       * @param {String} field
+       * @returns {(String|undefined)}
        */
 
     }, {
@@ -16847,7 +16927,7 @@ var Spyral = (function () {
       }
       /**
        * Gets the fields as a set of HTML meta tags.
-       * @returns {string}
+       * @returns {String}
        */
 
     }, {
@@ -16868,7 +16948,7 @@ var Spyral = (function () {
       }
       /**
        * Returns a clone of this Metadata
-       * @returns {metadata}
+       * @returns {Spyral.Metadata}
        */
 
     }, {

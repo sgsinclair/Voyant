@@ -1,4 +1,4 @@
-/* This file created by JSCacher. Last modified: Thu Jul 09 17:49:15 EDT 2020 */
+//src/bubblelines/Bubblelines.js
 function Bubblelines(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -909,6 +909,7 @@ Bubblelines.prototype = {
 		this.canvas.width = this.canvas.width;
 	}
 };
+//src/knots/Knots.js
 function Knots(config) {
 	this.container = config.container;
 	this.externalClickHandler = config.clickHandler;
@@ -1473,898 +1474,7 @@ Knots.prototype = {
 		this.canvas.width = this.canvas.width;
 	}
 };
-/*
- * Author: Andrew MacDonald
- * Licensed for use under the GNU General Public License
- * http://creativecommons.org/licenses/GPL/2.0/
- */
-
-function Cirrus(config) {
-    var that = this;
-    this.config = config;
-    var canvasId = Ext.id(null, 'cirrusCanvas');
-    if (this.config.containerId == null) {
-        alert('You must provide a valid container ID!');
-        return;
-    }
-    var containerId = '#'+this.config.containerId;
-    var wordController = null;
-    var resizeTimer = null;
-    
-    this.clear = function() {
-        this.canvas.width = this.canvas.width;
-    };
-    
-    this.addWords = function(words) {
-        wordController.addWords(words);
-    };
-    
-    this.arrangeWords = function() {
-        wordController.arrangeWords();
-    };
-
-    this.clearAll = function() {
-        wordController.setWords([]);
-        wordController.grid = [];
-        this.clear();
-    };
-
-    this.resizeWords = function() {
-        that.setCanvasDimensions();
-        wordController.resetWordCoordinates();
-        wordController.calculateSizeAdjustment();
-        wordController.resizeWords();
-        wordController.arrangeWords();
-        resizeTimer = null;
-    };
-
-    this.setCanvasDimensions = function() {
-        var container = $(containerId)[0];
-        var width = Math.max(container.offsetWidth, container.clientWidth);
-        var height = Math.max(container.offsetHeight, container.clientHeight);
-        this.canvas.width = width;
-        this.canvas.height = height;
-    };
-
-    function hex2RGB(hex) {
-        hex = hex.charAt(0) == '#' ? hex.substring(1,7) : hex;
-        var rgb = [];
-        rgb.push(parseInt(hex.substring(0, 2), 16));
-        rgb.push(parseInt(hex.substring(2, 4), 16));
-        rgb.push(parseInt(hex.substring(4, 6), 16));
-        return rgb;
-    }
-    
-    function init() {
-        
-        if ($('#'+that.config.containerId).length == 0) {
-            alert('You must provide a valid container ID!');
-            return;
-        }
-        
-        // create the canvas
-        that.canvas = document.createElement('canvas');
-        that.canvas.setAttribute('id', canvasId);
-        that.canvas.setAttribute('tabIndex', 1);
-        that.setCanvasDimensions();
-        $(containerId).append(that.canvas);
-        canvasId = '#'+canvasId;
-        
-        that.context = that.canvas.getContext('2d');
-        var isLocal = false; // should we call the server for words or use local ones?
-        that.wordData = new Array(); // the word data to input into the app
-        that.useFadeEffect = true; // should we use a fade effect for displaying words?
-        that.colors = [[116,116,181], [139,163,83], [189,157,60], [171,75,75], [174,61,155]];
-        wordController = new WordController(that);
-        
-        for (var key in that.config) {
-            if (key == 'words') that.wordData = that.config[key];
-            if (key == 'layout') {
-                if (that.config[key] == 'circle') wordController.layout = wordController.CIRCLE;
-                else if (that.config[key] == 'square') wordController.layout = wordController.SQUARE;
-            }
-            if (key == 'colors') {
-                // expects an array of hex colors
-                if ($.isArray(that.config[key]) && that.config[key].length > 0) {
-                    that.colors = [];
-                    for (var c in that.config[key]) {
-                        that.colors.push(hex2RGB(that.config[key][c]));
-                    }
-                }
-            }
-            if (key == 'background') {
-                $(canvasId).css("background-color", that.config[key]);
-            }
-            if (key == 'fade') {
-                if (that.config[key] == 'true') that.useFadeEffect = true;
-                else if (that.config[key] == 'false') that.useFadeEffect = false;
-            }
-            if (key == 'smoothness') {
-                wordController.wordsToArrange = Math.max(1, Math.min(20, parseInt(that.config[key]))); // set to value between 1-20
-            }
-        }
-        
-        if (isLocal && testData) {
-            var cnt = 0;
-            for (var key in testData) {
-                that.wordData.push({word: key, size: testData[key] / 13, label: key});
-                cnt++;
-                if (cnt == 100) break;
-            }
-        }
-        
-        if (that.wordData.length > 0) {
-            that.clear();
-            wordController.addWords(that.wordData);
-            wordController.arrangeWords();
-        }
-        
-        $(window).resize(function() {
-            if (resizeTimer != null) clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(that.resizeWords, 1000);
-        });
-
-        $(canvasId).keypress(function(event) {
-            if (event.which == 114) wordController.arrangeWords(); // r was pressed
-        });
-        
-        $(canvasId).click(function(event) {
-            var matchingWord = wordController.handleWordClick(event);
-            if (matchingWord !== undefined) {
-	            if (that.config.clickHandler) {
-	            	that.config.clickHandler({term: matchingWord.text, value: matchingWord.value});
-	            }
-            }
-        });
-        
-        $(canvasId).mouseover(function(event) {
-        	wordController.startUpdates();
-        });
-        $(canvasId).mouseout(function(event) {
-        	wordController.stopUpdates();
-        });
-        
-        $(canvasId).mousemove(function(event) {
-            wordController.handleMouseMove(event);
-        });
-    }
-    
-    $(document).ready(init);
-}
-
-/**
- * The word object.  Stores various properties related to diplaying the word.
- * @author Andrew
- */
-function Word(_text, _origSize, _color, _rolloverText, _value) {
-    this.height = 0;					// the height of the label
-    this.width = 0;						// the width of the label
-    this.rotation = 0; 					// rotation of the label, in radians
-    this.relativeSize = 0;				// the size relative to the largest and smallest word sizes
-    this.mask = null;					// a 2 dimensional array containing the local xy co-ordinates of opaque pixels
-    this.size = 0;						// the largest of either the height or width, used in the circle layout
-    
-    /* Init */
-    this.text = _text;					// the actual word
-    this.color = _color;				// the color of the label
-    this.origSize = _origSize;			// the original size (used when re-calculating relative sizes of words)
-    this.rolloverText = _rolloverText;	// the text to show on rollover
-    this.value = _value || 0;			// a value associated with the word (can be anything)
-    this.x = 0;							// the x co-ordinate
-    this.y = 0;							// the y co-ordinate
-    this.tx = 0;						// the translation value for x
-    this.ty = 0;						// the translation value for y
-    this.fontFamily = 'Arial';			// the font family
-    this.fontSize = 12;					// the font family
-    this.alpha = 1;						// alpha of the label
-    this.live = false;					// true if the word should be displayed
-    this.isOver = false;				// true if the mouse if over the word
-    
-    this.draw = function(ctx) {
-        ctx.save();
-        ctx.fillStyle = 'rgba('+this.color[0]+','+this.color[1]+','+this.color[2]+','+this.alpha+')';
-        ctx.textBaseline = 'alphabetic';
-        ctx.font = this.fontSize + 'px '+ this.fontFamily;
-        ctx.translate(this.x + this.tx, this.y + this.ty);
-        ctx.rotate(this.rotation);
-        ctx.fillText(this.text, 0, 0);
-        ctx.restore();
-    };
-}
-
-function WordController(parentApp) {
-    var that = this;
-    
-    var app = parentApp;
-    
-    var myFont = 'Impact';
-    
-    this.CIRCLE = 0; // circle layout
-    
-    this.ratio = 1; // the width to height ratio
-    
-    var _layout = this.CIRCLE; // what layout to use
-    this.getLayout = function() {
-        return _layout;
-    };
-    this.setLayout = function(value) {
-        _layout = value;
-    };
-    
-    this.HORIZONTAL = 0;
-    this.MIXED = 1; // horizontal and vertical
-    
-    var _wordOrientation = this.MIXED;
-    this.getWordOrientation = function() {
-        return _wordOrientation;
-    };
-    this.setWordOrientation = function(value) {
-    	_wordOrientation = value;
-    };
-    
-    this.UPDATE_RATE = 25; // update frequency in milliseconds
-    this.COARSENESS = 5; // how many pixels do we skip when creating the mask?
-//    if ($.browser.webkit) this.COARSENESS = 3; 
-    this.grid = new Array(); // a multidimensional array ([x][y]), holding co-ords for words
-    var timer_i = 0;
-    var timer; // timer used to incrementally call the arrange method
-    this.doingArrange = false;
-    this.wordsToArrange = 5; // how many words to arrange for each call to the arrange method
-    var overWord = null; // what word is the user mousing over?
-    var overX = 0; // position of the mouse when over a word
-    var overY = 0;
-    
-    var _words = new Array(); // the list of word objects
-    this.getWords = function() {
-        return _words;
-    }
-    this.setWords = function(value) {
-        _words = value;
-    }
-    
-    this.sizeAdjustment = 100; // amount to multiply a word's relative size by
-    
-    this.minFontSize = 12;
-    
-    // for tracking sizes in word data
-    this.largestWordSize = 0;
-    this.smallestWordSize = 10000;
-    
-    var _uniqueWords = new Object(); // stores words as properties, making sure we don't have duplicates
-    
-    /**
-     * Creates a word object and adds it to the list.
-     * If the size value is outside the current max/min value, returns true (meaning we have to resize all the words).
-     * @param	word
-     * @param	size
-     * @param	color
-     * @param	label
-     * @param	value
-     * @return
-     */
-    function addWord(word, size, color, label, value) {
-        var sizeChanged = false;
-        if (_uniqueWords[word] == null) {
-            _uniqueWords[word] = true;
-            
-            if (size > that.largestWordSize) {
-                that.largestWordSize = size;
-                sizeChanged = true;
-            }
-            if (size < that.smallestWordSize) {
-                that.smallestWordSize = size * 0.8; // set the smallest size a bit smaller than the actual smallest size; this will insure all words are legible.
-                sizeChanged = true;
-            }
-            var wordObj = new Word(word, size, color, label, value);
-            _words.push(wordObj);
-        }
-        return sizeChanged;
-    }
-    
-    /**
-     * Adds an array of objects with the following properties: word, size, color, label, value.
-     * @param	words
-     */
-    this.addWords = function(newWords) {
-        var sizeChanged = false;
-        for (var i = 0; i < newWords.length; i++) {
-            var wordObj = newWords[i];
-            
-            var color;
-            if (typeof(wordObj.color) == undefined || wordObj.color == null || wordObj.color == '') {
-                color = app.colors[Math.floor(Math.random() * (app.colors.length))];
-            } else color = wordObj.color;
-            
-            var size;
-            if (typeof(wordObj.size) == undefined || wordObj.size == null || wordObj.size == '') {
-                size = Math.floor(Math.random() * 40);
-            } else size = parseFloat(wordObj.size);
-            
-            sizeChanged = addWord(wordObj.word, size, color, wordObj.label, wordObj.value) || sizeChanged;
-        }
-        sortWords();
-        
-        this.setRelativeSizes();
-        this.calculateSizeAdjustment();
-        if (sizeChanged) this.resizeWords();
-        else createAllGraphics();
-    }
-    
-    this.resetWordCoordinates = function() {
-        app.clear();
-        clearTimeout(timer);
-        for (var i = 0; i < _words.length; i++) {
-            var word = _words[i];
-            word.x = 0;
-            word.y = 0;
-            word.tx = 0;
-            word.ty = 0;
-        }
-    }
-    
-    this.calculateSizeAdjustment = function() {
-    	this.ratio = app.canvas.width / app.canvas.height;
-        var stageArea = app.canvas.width * app.canvas.height;
-        if (stageArea < 100000) this.minFontSize = 8;
-        else this.minFontSize = 12;
-        var pixelsPerWord = stageArea / _words.length;
-        var totalWordsSize = 0;
-        for (var i = 0; i < _words.length; i++) {
-            var word = _words[i];
-            var wordArea = calculateWordArea(word);
-            totalWordsSize += wordArea;
-        }
-        this.sizeAdjustment = stageArea / totalWordsSize;
-    }
-    
-    function calculateWordArea(word) {
-        var baseSize = Math.log(word.relativeSize * 10) * Math.LOG10E; // take the relativeSize (0.1 to 1.0), multiply by 10, then get the base-10 log of it
-        var height = (baseSize + word.relativeSize) / 2; // find the average between relativeSize and the log
-        var width = 0; //(baseSize / 1.5) * word.text.length;
-        for (var i = 0; i < word.text.length; i++ ) {
-            var letter = word.text.charAt(i);
-            if (letter == 'f' || letter == 'i' || letter == 'j' || letter == 'l' || letter == 'r' || letter == 't') width += baseSize / 3;
-            else if (letter == 'm' || letter == 'w') width += baseSize / (4 / 3);
-            else width += baseSize / 1.9;
-        }
-        var wordArea = height * width;
-        return wordArea;
-    }
-    
-    // based on post from http://stackoverflow.com/questions/1134586/how-can-you-find-the-height-of-text-on-an-html-canvas
-    // not really working yet
-    function measureTextHeight(label) {
-        app.context.fillStyle = 'rgb(255,255,255)';
-        app.context.fillRect(label.x, label.y, label.width, label.height);
-        label.draw(app.context);
-        var imageData = app.context.getImageData(label.x, label.y, label.width, label.height);
-        var first = false;
-        var last = false;
-        var y = label.height;
-        var x = 0;
-        while (!last && y) {
-            y--;
-            for (x = 0; x < label.width; x++) {
-                var pixel = getPixel(x, y, imageData);
-                if (pixel[0] != 255 || pixel[1] != 255 || pixel[2] != 255) {
-                    last = y;
-                    break;
-                }
-            }
-        }
-        while (y) {
-            y--;
-            for (x = 0; x < label.width; x++) {
-                var pixel = getPixel(x, y, imageData);
-                if (pixel[0] != 255 || pixel[1] != 255 || pixel[2] != 255) {
-                    first = y;
-                    break;
-                }
-            }
-            if (first != y) {
-                return last - first;
-            }
-        }
-        return 0;
-    }
-    
-    function measureDimensions(word) {
-        app.context.save();
-        app.context.textBaseline = 'alphabetic';
-        app.context.font = word.fontSize + 'px '+ word.fontFamily;
-        word.width = app.context.measureText(word.text).width;
-        word.height = Math.ceil(app.context.measureText('m').width * 1.15); // initial estimate (make it bigger for when we actually measure the height)
-        app.context.restore();
-    }
-    
-    // returns an array [r, g, b, a]
-    function getPixel(x, y, imageData) {
-        var index = (x + y * imageData.width) * 4;
-        return [imageData.data[index], imageData.data[index+1], imageData.data[index+2], imageData.data[index+3]];
-    }
-    
-    function setPixel(imageData, x, y, r, g, b, a) {
-        var index = (x + y * imageData.width) * 4;
-        imageData.data[index] = r;
-        imageData.data[index+1] = g;
-        imageData.data[index+2] = b;
-        imageData.data[index+3] = a;
-    }
-    
-    function findNewRelativeSize(word, areaMultiplier) {
-        var area = calculateWordArea(word) * areaMultiplier;
-        // given the area = (x+6)*(2*x/3*y), solve for x
-        var newRelativeSize = (Math.sqrt(6) * Math.sqrt(6 * Math.pow(word.text.length, 2) + area * word.text.length) - 6 * word.text.length) / (2 * word.text.length);
-        return newRelativeSize;
-    }
-    
-    /**
-     * Determines the relative size for each word.
-     * Call after all/new words are added and before createAllGraphics.
-     */
-    this.setRelativeSizes = function() {
-    	for (var i = 0; i < _words.length; i++) {
-            var word = _words[i];
-            word.relativeSize = mapValue(word.origSize, this.smallestWordSize, this.largestWordSize, 0.1, 1);
-        }
-    }
-    
-    /**
-     * Re-adds words using new adjusted sizes.
-     * Run after the largestWordSize and/or smallestWordSize have changed.
-     * Need to run manually, since it's intensive.
-     */
-    this.resizeWords = function() {
-        app.clear();
-        createAllGraphics();
-        sortWords();
-    }
-    
-    /**
-     * Sort the word list by size, largest first.
-     */
-    function sortWords() {
-        _words.sort(function(a, b) {
-            if (a.origSize > b.origSize) return -1;
-            else if (a.origSize < b.origSize) return 1;
-            else return 0;
-        });
-    }
-    
-    /**
-     * Creates the Label that gets displayed on the stage.
-     * Randomly selects an angle from possible values.
-     * Calculates the mask of the word (used in hit detection).
-     * @param	wordObj
-     */
-
-    function createWordGraphics(wordObj) {
-        var adjustedSize = findNewRelativeSize(wordObj, that.sizeAdjustment);
-        wordObj.fontSize = adjustedSize > that.minFontSize ? adjustedSize : that.minFontSize;
-        wordObj.fontFamily = myFont;
-        
-        measureDimensions(wordObj);
-        // these values are needed for accurate x and y co-ordinates after rotating the word
-        wordObj.tx = 0;
-        wordObj.ty = wordObj.height;
-        //~ var trueHeight = measureTextHeight(wordObj);
-        //~ console.log(wordObj.height, trueHeight);
-        //~ wordObj.height = trueHeight;
-        
-        var angle = 0;
-        
-        if (that.getWordOrientation() === that.MIXED) {
-	        if (wordObj.text.match(/\s/) == null) {
-				if (Math.random() > 0.66) {
-					var tempHeight = wordObj.height;
-					var tempWidth = wordObj.width;
-					wordObj.height = tempWidth;
-					wordObj.width = tempHeight;
-					if (Math.round(Math.random()) == 0) {
-						angle = 90;
-						wordObj.ty = 0;
-					} else {
-						angle = -90;
-						wordObj.ty = wordObj.height;
-						wordObj.tx = wordObj.width;
-					}
-				}
-			}
-        }
-        
-        
-
-        wordObj.size = Math.max(wordObj.height, wordObj.width);
-        wordObj.rotation = degreesToRadians(angle);
-        
-        // find the pixels that aren't transparent and store them as the mask
-        app.context.fillStyle = app.canvas.style.backgroundColor;
-        app.context.fillRect(0, 0, app.canvas.width, app.canvas.height);
-        wordObj.draw(app.context);
-        var imageData = app.context.getImageData(wordObj.x, wordObj.y, wordObj.width, wordObj.height);
-        var mask = new Array();
-        for (var x = 0; x < wordObj.width; x++) {
-            var xm = Math.floor(x / that.COARSENESS) * that.COARSENESS;
-            if (mask[xm] == null) mask[xm] = {};
-            for (var y = 0; y < wordObj.height; y++) {
-                var ym = Math.floor(y / that.COARSENESS) * that.COARSENESS;
-                var pixel = getPixel(x, y, imageData);
-                var pixelColor = 'rgb('+pixel[0]+', '+pixel[1]+', '+pixel[2]+')';
-                if (pixelColor != app.canvas.style.backgroundColor) {
-                    mask[xm][ym] = true;
-                }
-                if (mask[xm][ym]) {
-                    y = ym + that.COARSENESS; // there's a match, so skip ahead
-                    continue;
-                }
-            }
-        }
-        wordObj.mask = mask;
-    }
-    
-    /**
-     * Helper method which runs createWordGraphics for all the words.
-     */
-    function createAllGraphics() {
-    	for (var i = 0; i < _words.length; i++) {
-            createWordGraphics(_words[i]);
-        }
-    }
-    
-    /**
-     * Arrange the words on the stage using the chosen layout scheme.
-     */
-    this.arrangeWords = function() {
-//    	console.profile();
-        clearTimeout(timer);
-        app.clear(); // reset canvas
-        
-        this.toggleLoadingText();
-
-        if (_words.length > 0) {
-            
-            this.grid = [];
-            timer_i = 0; // used as the increment for the word list
-      
-            function doArrange() {                
-                // common variables between the layout schemes
-                var x;
-                var y;
-                var word;
-                var breakOut;
-                var fail;
-                var wordCount = this.wordsToArrange - 1;
-                var appCanvasWidth = app.canvas.width;
-                var appCanvasHeight = app.canvas.height;
-                var halfWidth = appCanvasWidth * 0.5;
-                var halfHeight = appCanvasHeight * 0.5;
-                var dd = 0.05;
-
-                do {
-                    word = _words[timer_i];
-                    if (word !== undefined) {
-	                    var a = Math.random() * Math.PI; // angle?
-	                    var d = Math.random() * (word.size * 0.25); // diameter?
-	                    var da = (Math.random() - 0.5) * 0.5;
-	                    var halfWordWidth = word.width * 0.5;
-	                    var halfWordHeight = word.height * 0.5;
-	
-	                    while (true) {
-	                        x = Math.floor((halfWidth + (Math.cos(a) * d * this.ratio) - halfWordWidth) / this.COARSENESS) * this.COARSENESS;
-	                        y = Math.floor((halfHeight + (Math.sin(a) * d) - halfWordHeight) / this.COARSENESS) * this.COARSENESS;
-	
-	                        fail = false;
-	                        if (x + halfWordWidth >= appCanvasWidth || y + halfWordHeight >= appCanvasHeight) {
-	                            fail = true;
-	                        } else {
-	                        	fail = hitTest(x, y, word.height, word.width, word.mask);
-	                        }
-	                        if (!fail) {
-	                            break;
-	                        }
-	                        a += da;
-	                        d += dd;
-	                    }
-	
-	                    finalizeWord(x, y, word);
-	                    if (app.useFadeEffect) {
-	                    	word.alpha = 0;
-		                    for (var w = 0; w < timer_i; w++) {
-		                        var wrd = _words[w];
-		                        if (wrd.alpha < 1) fadeWord(wrd);
-		                    }
-	                    } else {
-	                    	word.alpha = 1;
-	                    	word.draw(app.context);
-	                    }
-                    }
-                    timer_i++;
-                    if (timer_i >= _words.length) {
-                        clearTimeout(timer);
-//                        console.profileEnd();
-                        this.doingArrange = false;
-                        
-                        this.toggleLoadingText(false);                               
-                        
-                        drawWords();
-                        
-                        break;
-                    }
-                } while (wordCount--);
-            }
-            
-            /**
-             * Test the mask of a word against the overall grid to see if they intersect.
-             * @param	x
-             * @param	y
-             * @param	h
-             * @param	w
-             * @param	mask
-             * @return
-             */
-            function hitTest(x, y, h, w, mask) {
-                for (var xt = 0; xt <= w; xt += this.COARSENESS) {
-                    for (var yt = 0; yt <= h; yt += this.COARSENESS) {
-                        if (mask[xt] && mask[xt][yt] && this.grid[xt + x] != null && this.grid[xt + x][yt + y] != null) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-            
-            /**
-             * Set the new position of the word, and make it visible.
-             * @param	x
-             * @param	y
-             * @param	word
-             * @param   drawIt
-             */
-            function finalizeWord(x, y, word, drawIt) {
-                set_grid(x, y, word);
-
-                word.x = x;
-                word.y = y;
-
-                word.live = true;
-                if (drawIt) {
-                	/*
-                    if ($.browser.webkit) {
-                        // cover the canvas with a transparent rectangle
-                        // forces webkit to show the words
-                        app.context.fillStyle = 'rgba(0,0,0,0)';
-                        app.context.fillRect(0, 0, app.canvas.width, app.canvas.height);
-                    }
-                    */
-                    word.draw(app.context);
-                }
-            }
-            
-            function fadeWord(word) {
-                word.alpha += 0.25;
-//                if ($.browser.webkit) {
-                    // cover the canvas with a transparent rectangle
-                    // forces webkit to show the words
-//                    app.context.fillStyle = 'rgba(0,0,0,0)';
-//                    app.context.fillRect(0, 0, app.canvas.width, app.canvas.height);
-//               }
-                word.draw(app.context);
-            }
-
-            /**
-             * Mark the spots on the grid where the word is located.
-             * @param	x
-             * @param	y
-             * @param	word
-             */
-            function set_grid(x, y, word) {
-                for (var xt = 0; xt < word.width; xt += this.COARSENESS) {
-                    for (var yt = 0; yt < word.height; yt += this.COARSENESS) {
-                        if (word.mask[xt] && word.mask[xt][yt]) {
-                            if (!this.grid[xt + x]) this.grid[xt + x] = [];
-                            this.grid[xt + x][yt + y] = word;
-                        }
-                    }
-                }
-            }
-            
-            doArrange = doArrange.createDelegate(this);
-            hitTest = hitTest.createDelegate(this);
-            finalizeWord = finalizeWord.createDelegate(this);
-            fadeWord = fadeWord.createDelegate(this);
-            set_grid = set_grid.createDelegate(this);
-            this.doingArrange = true;
-            
-//            if ($.browser.mozilla) {
-//                // FF needs more time to perform each layout run
-//                timer = setInterval(doArrange, 250);
-//            } else {
-                timer = setInterval(doArrange, 50);
-//            }
-            
-        } else {
-            alert("Error: There are no words to arrange.");
-        }
-    }
-    
-    this.toggleLoadingText = function(show) {
-        app.context.save();
-        
-        if (show) app.context.fillStyle = 'black';
-        else app.context.fillStyle = app.canvas.style.backgroundColor;
-        
-        app.context.textBaseline = 'top';
-        app.context.font = '10px Arial';
-        var offset = app.context.measureText('Loading').width + 10;
-        app.context.fillText('Loading', app.canvas.width - offset, 10);
-        
-        app.context.restore();
-    }
-    
-    this.startUpdates = function() {
-    	timer = setInterval(drawWords, that.UPDATE_RATE);
-    }
-    
-    this.stopUpdates = function() {
-    	if (overWord != null) {
-	    	// remove existing tooltip
-	    	overWord = null;
-	    	drawWords();
-    	}
-    	clearTimeout(timer);
-    }
-    
-    function drawWords() {
-        app.clear();
-        var i = _words.length;
-        while(i--) {
-        	var word = _words[i];
-            word.alpha = 1;
-            if (word.live) word.draw(app.context);
-        }
-        var $canvasEl = $(app.canvas);
-        if (overWord != null) {
-        	// add pointer cursor
-        	$canvasEl.css('cursor', 'pointer');
-        	
-            // draw the tooltip
-            app.context.save();
-            app.context.textBaseline = 'alphabetic';
-            app.context.font = '12px Arial';
-            
-            var wordWidth = app.context.measureText(overWord.text).width;
-            var valueWidth = app.context.measureText(overWord.value).width;
-            var maxWidth = wordWidth > valueWidth ? wordWidth : valueWidth;
-            maxWidth += 20;
-            
-            var x = overX + 15;
-            var y = overY + 25;
-            var appWidth = $canvasEl.width();
-            var appHeight = $canvasEl.height();
-            if (x + maxWidth >= appWidth) {
-            	x -= maxWidth;
-            }
-            if (y + 40 >= appHeight) {
-            	y -= 40;
-            }
-            
-            app.context.fillStyle = 'rgba(255,255,255,0.9)';
-            app.context.strokeStyle = 'rgba(100,100,100,0.9)';
-            app.context.translate(x, y);
-            app.context.fillRect(0, 0, maxWidth, 40);
-            app.context.strokeRect(0, 0, maxWidth, 40);
-            app.context.fillStyle = 'rgba(0,0,0,0.9)';
-            app.context.fillText(overWord.text+':', 8, 18);
-            app.context.fillText(overWord.value, 8, 30);
-            app.context.restore();
-        } else {
-        	$canvasEl.css('cursor', 'default');
-        }
-    }
-    
-    /**
-     * Checks to see if the mouse is currently over a word.
-     * @param	event
-     */
-    this.handleMouseMove = function(event) {
-        if (!this.doingArrange) {
-        	var i = _words.length;
-            while(i--) {
-                _words[i].isOver = false;
-            }
-            var offset = $(app.canvas).offset();
-            var remainder = (event.pageX - offset.left) % this.COARSENESS;
-            var x = (event.pageX - offset.left) - remainder;
-            remainder = (event.pageY - offset.top) % this.COARSENESS;
-            var y = (event.pageY - offset.top) - remainder;
-            overWord = this.findWordByCoords(x, y);
-            if (overWord != null) {
-                overWord.isOver = true;
-                overX = x;
-                overY = y;
-            }
-        }
-    }
-    
-    /**
-     * Checks to see if a word was clicked on, and then sends out the corresponding event.
-     * @param	event
-     * @return
-     */
-    this.handleWordClick = function(event) {
-        var offset = $(app.canvas).offset();
-        var remainder = (event.pageX - offset.left) % this.COARSENESS;
-        var x = (event.pageX - offset.left) - remainder;
-        remainder = (event.pageY - offset.top) % this.COARSENESS;
-        var y = (event.pageY - offset.top) - remainder;
-        var matchingWord = this.findWordByCoords(x, y);
-        
-        if (matchingWord != null) {
-            return {text: matchingWord.text, value: matchingWord.value};
-        }
-    }
-    
-    /**
-     * Returns the word which occupies the co-ordinates that were passed in.
-     * @param	x
-     * @param	y
-     * @return
-     */
-    this.findWordByCoords = function(x, y) {
-        var matchingWord = null;
-        if (this.grid[x] !=  null) {
-            if (this.grid[x][y] != null) {
-                matchingWord = this.grid[x][y];
-            } else if (this.grid[x][y + this.COARSENESS] != null) {
-                matchingWord = this.grid[x][y + this.COARSENESS];
-            }
-        }
-        if (matchingWord == null && this.grid[x + this.COARSENESS] != null) {
-            if (this.grid[x + this.COARSENESS][y] != null) {
-                matchingWord = this.grid[x + this.COARSENESS][y];
-            } else if (this.grid [x + this.COARSENESS][y + this.COARSENESS] != null) {
-                matchingWord = this.grid[x + this.COARSENESS][y + this.COARSENESS];
-            }
-        }
-        
-        return matchingWord;
-    }
-    
-    /**
-     * Convert an angle in degrees to radians.
-     * @param	degrees
-     * @return
-     */
-    function degreesToRadians(degrees) {
-        var radians = degrees * (Math.PI / 180);
-        return radians;
-    }
-    
-    /**
-     * Convenience function to map a variable from one coordinate space to another (from processing).
-     */
-    function mapValue(value, istart, istop, ostart, ostop) {
-        return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
-    }
-    
-}
-
-// from Ext
-Function.prototype.createDelegate = function(obj, args, appendArgs){
-    var method = this;
-    return function() {
-        var callArgs = args || arguments;
-        if (appendArgs === true){
-            callArgs = Array.prototype.slice.call(arguments, 0);
-            callArgs = callArgs.concat(args);
-        }else if (typeof appendArgs=="number"){
-            callArgs = Array.prototype.slice.call(arguments, 0); // copy arguments first
-            var applyArgs = [appendArgs, 0].concat(args); // create method call params
-            Array.prototype.splice.apply(callArgs, applyArgs); // splice them in
-        }
-        return method.apply(obj || window, callArgs);
-    };
-}
+//src/doubletree/DoubleTree.js
 /**
  * Voyant changes & additions:
  * - height setter, height no longer calculated based on content
@@ -3817,6 +2927,7 @@ function noOp() {
 // ////////////////
 
 })();
+//src/doubletree/Trie.js
 /* (This is the new BSD license.)
 * Copyright (c) 2012-2014, Chris Culy
 * All rights reserved.
@@ -4159,6 +3270,7 @@ doubletree.Trie = function(caseSensitive, fldNames, fldDelim, distinguishingFlds
 
 })();
 
+//../webapp/resources/termsradio/TermsRadio.js
 /**
  * @param {object} config
  * @param {Voyant.panel.TermsRadio} config.parent
@@ -5840,6 +4952,7 @@ TermsRadio.prototype = {
 	}
 	
 };
+//src/app/util/Assignable.js
 Ext.define('Voyant.util.Assignable', {
     transferable: ['assign'],
     /**
@@ -5880,6 +4993,7 @@ Ext.define('Voyant.util.Assignable', {
 		}
 	}
 })
+//src/app/util/Api.js
 Ext.define('Voyant.util.Api', {
 	constructor: function(config) {
 		var apis = [];
@@ -5975,6 +5089,7 @@ Ext.define('Voyant.util.Api', {
 		if (this.api && this.api[key]) {this.api[key].value=value;}
 	}
 });
+//src/app/util/Localization.js
 Ext.define('Voyant.util.Localization', {
 	statics: {
 		DEFAULT_LANGUAGE: 'en',
@@ -6060,7 +5175,7 @@ Ext.define('Voyant.util.Localization', {
 	
 	showLanguageOptions: function() {
 		var me = this;
-		var langs = ["ar","bs","cz","en","es","fr","he","hr","it","ja","pt","sr"].map(function(lang) {
+		var langs = ["ar","bs","cz","de","en","es","fr","he","hr","it","ja","pt","sr"].map(function(lang) {
 			return {text: this.localize(lang), value: lang}
 		}, this);
 		langs.sort(function(a,b) {
@@ -6153,6 +5268,7 @@ Ext.define('Voyant.util.Localization', {
 	
 });
 
+//src/app/util/Colors.js
 /**
  * A utility for storing palettes and associations between terms and colors.
  */
@@ -6310,6 +5426,7 @@ Ext.define('Voyant.util.Colors', {
 	}
 })
 
+//src/app/util/Deferrable.js
 Ext.define('Voyant.util.Deferrable', {
 	deferredStack : [],
 
@@ -6366,6 +5483,7 @@ Ext.define('Voyant.util.Deferrable', {
 	}
 });
 
+//src/app/util/DetailedError.js
 Ext.define("Voyant.util.DetailedError", {
 	extend: "Ext.Error",
 	mixins: ['Voyant.util.Localization'],
@@ -6407,6 +5525,7 @@ Ext.define("Voyant.util.DetailedError", {
 	}
 })
 
+//src/app/util/ResponseError.js
 Ext.define("Voyant.util.ResponseError", {
 	extend: "Voyant.util.DetailedError",
 	config: {
@@ -6424,6 +5543,7 @@ Ext.define("Voyant.util.ResponseError", {
 	
 })
 
+//src/app/util/SparkLine.js
 Ext.define('Voyant.util.SparkLine', {
 	/**
 	 * Gets a Google spark line.
@@ -6544,6 +5664,7 @@ Ext.define('Voyant.util.SparkLine', {
 		return response;
 	}
 });
+//src/app/util/Toolable.js
 Ext.define('Voyant.util.Toolable', {
 	requires: ['Voyant.util.Localization','Voyant.util.Api'],
 	statics: {
@@ -7000,7 +6121,7 @@ Ext.define('Voyant.util.Toolable', {
 			}
 		}
 		
-var canvasSurface = this.down('draw') || this.down('chart');
+		var canvasSurface = this.down('draw') || this.down('chart');
 		if (canvasSurface && (canvasSurface.isChart || canvasSurface.isCanvas)) {
 
 			// first part taken from EXTJ Draw.getImage()
@@ -7090,29 +6211,45 @@ var canvasSurface = this.down('draw') || this.down('chart');
 		var svg = targetEl.querySelector("svg"); // finally try finding an SVG
 		if (svg) {
 			var width = targetEl.offsetWidth*scale,
-				height = targetEl.offsetHeight*scale
+				height = targetEl.offsetHeight*scale;
 			var clone = svg.cloneNode(true); // we don't want to scale, etc. the original
 			clone.setAttribute("version", 1.1)
 			clone.setAttribute("xmlns", "http://www.w3.org/2000/svg")
-			clone.setAttribute("transform", "scale("+scale+")")
 			clone.setAttribute("width", width)
 			clone.setAttribute("height", height)
-			
-			var html = clone.outerHTML,
-			  img = 'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)));
 
-			  var canvas = Ext.DomHelper.createDom({tag:'canvas',width: width,height:height}),
-			  context = canvas.getContext("2d"), me=this;
+			var svgChildren = [];
+			while (clone.children.length > 0) {
+				svgChildren.push(clone.removeChild(clone.children[0]));
+			};
+
+			var g = document.createElement('g');
+			g.setAttribute("style", "transform-box: fill-box;");
+			g.setAttribute("transform", "scale("+scale+")")
+			clone.appendChild(g);
+
+			svgChildren.forEach(function(item) {
+				g.appendChild(item);
+			})
+
+			var html = clone.outerHTML,
+				img = 'data:image/svg+xml;base64,'+ btoa(unescape(encodeURIComponent(html)));
+
+			var canvas = Ext.DomHelper.createDom({tag:'canvas',width: width,height:height}),
+				context = canvas.getContext("2d");
 			  
-			  var image = new Image;
-			  image.src = img;
-			  image.panel = this;
-			  image.onload = function() {
-				  context.drawImage(image, 0, 0);
-				  img = canvas.toDataURL("image/png");
+			var image = new Image;
+			image.src = img;
+			image.panel = this;
+			image.onload = function() {
+				context.drawImage(image, 0, 0);
+				img = canvas.toDataURL("image/png");
 		        if (form && form.isVisible()) {form.unmask();}
-				  return this.panel.exportPngData.call(this.panel, img);
-			  };
+				return this.panel.exportPngData.call(this.panel, img);
+			};
+			// image.onerror = function(ev) {
+			// 	console.log(ev)
+			// }
 		}
 	},
 	exportUrl: function() {
@@ -7442,6 +6579,7 @@ Ext.define('Voyant.util.ToolMenu', {
 
 });
 
+//src/app/util/Transferable.js
 Ext.define("Voyant.util.Transferable", {
 	transferable: ['transfer'],
 	transfer: function(source, destination) {
@@ -7458,6 +6596,7 @@ Ext.define("Voyant.util.Transferable", {
 		}
 	}
 })
+//src/app/util/Variants.js
 Ext.define("Voyant.util.Variants", {
 	extend: 'Ext.Base',
 	constructor: function(variants) {
@@ -7482,6 +6621,7 @@ Ext.define("Voyant.util.Variants", {
 		return variants
 	}
 })
+//src/app/util/Downloadable.js
 Ext.define("Voyant.util.Downloadable", {
 	mixins: ['Voyant.util.Localization'],
 	statics: {
@@ -7541,6 +6681,7 @@ Ext.define("Voyant.util.Downloadable", {
 		this.openUrl(url)
     }
 })
+//src/app/util/Storage.js
 Ext.define('Voyant.util.Storage', {
 	MAX_LENGTH: 950000, // keep it under 1 megabyte
 	
@@ -7692,6 +6833,7 @@ Ext.define('Voyant.util.Storage', {
 	}
 });
 
+//src/app/util/DiacriticsRemover.js
 /*
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -7815,6 +6957,7 @@ Ext.define("Voyant.util.DiacriticsRemover", {
     }
 
 });
+//src/app/notebook/util/Show.js
 Ext.define("Voyant.notebook.util.Show", {
 	transferable: ['show'],
 	
@@ -7909,6 +7052,7 @@ String.prototype.show = Voyant.notebook.util.Show.show;
 var show = Voyant.notebook.util.Show.show;
 var showError = Voyant.notebook.util.Show.showError;
 
+//src/app/notebook/util/Embed.js
 Ext.define("Voyant.notebook.util.Embed", {
 	transferable: ['embed'],
 	embed: function() { // this is for instances
@@ -8066,6 +7210,7 @@ Ext.define("Voyant.notebook.util.Embed", {
 })
 
 embed = Voyant.notebook.util.Embed.embed
+//src/app/data/model/AnalysisToken.js
 Ext.define('Voyant.data.model.AnalysisToken', {
     extend: 'Ext.data.Model',
     idProperty: 'term',
@@ -8078,6 +7223,7 @@ Ext.define('Voyant.data.model.AnalysisToken', {
          {name: 'vector'}
     ]
 });
+//src/app/data/model/Context.js
 Ext.define('Voyant.data.model.Context', {
     extend: 'Ext.data.Model',
     fields: [
@@ -8100,6 +7246,7 @@ Ext.define('Voyant.data.model.Context', {
         getHighlightedContext: function() {return this.getLeft()+this.getHighlightedMiddle()+this.getRight();}
 	
 });
+//src/app/data/model/CorpusFacet.js
 Ext.define('Voyant.data.model.CorpusFacet', {
     extend: 'Ext.data.Model',
     idProperty: 'label',
@@ -8118,6 +7265,7 @@ Ext.define('Voyant.data.model.CorpusFacet', {
 		return this.get('inDocumentsCount')
 	}
 });
+//src/app/data/model/CorpusCollocate.js
 Ext.define('Voyant.data.model.CorpusCollocate', {
     extend: 'Ext.data.Model',
     fields: [
@@ -8134,6 +7282,7 @@ Ext.define('Voyant.data.model.CorpusCollocate', {
     getContextTerm: function() {return this.get('contextTerm');},
     getContextTermRawFreq: function() {return this.get('contextTermRawFreq');}
 });
+//src/app/data/model/CorpusTerm.js
 /*
  * Corpus Term
  */
@@ -8189,6 +7338,7 @@ Ext.define('Voyant.data.model.CorpusTerm', {
 		return this.getTerm()+": "+this.getRawFreq();
 	}
 });
+//src/app/data/model/CorpusNgram.js
 Ext.define('Voyant.data.model.CorpusNgram', {
     extend: 'Ext.data.Model',
     fields: [
@@ -8199,18 +7349,21 @@ Ext.define('Voyant.data.model.CorpusNgram', {
         ],
     getTerm: function() {return this.get('term');}
 });
+//src/app/data/model/Dimension.js
 Ext.define('Voyant.data.model.Dimension', {
     extend: 'Ext.data.Model',
     fields: [
         {name: 'percentage', type: 'number'}
     ]
 });
+//src/app/data/model/Document.js
 Ext.define('Voyant.data.model.Document', {
     extend: 'Ext.data.Model',
     //requires: ['Voyant.data.store.DocumentTerms'],
     fields: [
              {name: 'corpus'},
-             {name: 'id'},
+			 {name: 'id'},
+			 {name: 'author'},
              {name: 'pubDate'},
              {name: 'publisher'},
              {name: 'pubPlace'},
@@ -8427,7 +7580,7 @@ Ext.define('Voyant.data.model.Document', {
     	var val = this.get(field) || "";
     	val = Ext.isArray(val) ? val.join("; ") : val;
     	val = val.trim().replace(/\s+/g, ' ');
-    	return max ? this.getTruncated(author, max) : val;
+    	return max ? this.getTruncated(val, max) : val;
     },
     
     getCorpusId: function() {
@@ -8540,6 +7693,7 @@ Ext.define('Voyant.data.model.Document', {
 	}
     
 });
+//src/app/data/model/DocumentEntity.js
 Ext.define('Voyant.data.model.DocumentEntity', {
     extend: 'Ext.data.Model',
     fields: [
@@ -8554,6 +7708,7 @@ Ext.define('Voyant.data.model.DocumentEntity', {
     getRawFreq: function() {return this.get('rawFreq')},
     getPositions: function() {return this.get('positions')}
 });
+//src/app/data/model/DocumentQueryMatch.js
 Ext.define('Voyant.data.model.DocumentQueryMatch', {
     extend: 'Ext.data.Model',
     fields: [
@@ -8566,6 +7721,7 @@ Ext.define('Voyant.data.model.DocumentQueryMatch', {
     getDistributions: function() {return this.get("distributions")},
     getDocIds: function() {return this.get("docIds")}
 });
+//src/app/data/model/DocumentTerm.js
 Ext.define('Voyant.data.model.DocumentTerm', {
     extend: 'Ext.data.Model',
     fields: [
@@ -8586,6 +7742,7 @@ Ext.define('Voyant.data.model.DocumentTerm', {
     getRelativeFreq: function() {return this.get('relativeFreq')},
     getDistributions: function() {return this.get('distributions')}
 });
+//src/app/data/model/PrincipalComponent.js
 Ext.define('Voyant.data.model.PrincipalComponent', {
     extend: 'Ext.data.Model',
     fields: [
@@ -8593,6 +7750,7 @@ Ext.define('Voyant.data.model.PrincipalComponent', {
         {name: 'eigenVectors'}
     ]
 });
+//src/app/data/model/RelatedTerm.js
 /*
  * Related Term
  */
@@ -8631,6 +7789,7 @@ Ext.define('Voyant.data.model.RelatedTerm', {
 		return this.getSource()+"-"+this.getTarget();
 	}
 });
+//src/app/data/model/StatisticalAnalysis.js
 Ext.define('Voyant.data.model.StatisticalAnalysis', {
     extend: 'Ext.data.Model',
     requires: ['Voyant.data.model.PrincipalComponent', 'Voyant.data.model.Dimension', 'Voyant.data.model.AnalysisToken'],
@@ -8670,6 +7829,7 @@ Ext.define('Voyant.data.model.StatisticalAnalysis', {
 //    	name: 'tokens', model: 'Voyant.data.model.AnalysisToken'
 //    }]
 });
+//src/app/data/model/Token.js
 Ext.define('Voyant.data.model.Token', {
     extend: 'Ext.data.Model',
     fields: [
@@ -8727,6 +7887,7 @@ Ext.define('Voyant.data.model.Token', {
 		return this.get("rawFreq");
 	}
 });
+//src/app/data/model/TermCorrelation.js
 /*
  * Related Term
  */
@@ -8770,6 +7931,7 @@ Ext.define('Voyant.data.model.TermCorrelation', {
 		return this.getSource()+"-"+this.getTarget();
 	}
 });
+//src/app/data/store/VoyantStore.js
 Ext.define('Voyant.data.store.VoyantStore', {
 	mixins: ['Voyant.util.Localization','Voyant.notebook.util.Embed'],
 	config: {
@@ -8804,6 +7966,7 @@ Ext.define('Voyant.data.store.VoyantStore', {
 		config.proxy = config.proxy || {};
 		Ext.applyIf(config.proxy, {
 			type: 'ajax',
+			timeout: 120000,
 			url: Voyant.application.getTromboneUrl(),
 			actionMethods: {read: 'POST'},
 			reader: {
@@ -8907,6 +8070,7 @@ Ext.define('Voyant.data.store.VoyantStore', {
 	}
 	
 });
+//src/app/data/store/CAAnalysis.js
 Ext.define('Voyant.data.store.CAAnalysisMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
 	embeddable: ['Voyant.panel.ScatterPlot'],
@@ -8940,6 +8104,7 @@ Ext.define('Voyant.data.store.CAAnalysisBuffered', {
 		this.callParent([config]);
 	}
 });
+//src/app/data/store/Contexts.js
 Ext.define('Voyant.data.store.ContextsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.Context',
@@ -8971,6 +8136,7 @@ Ext.define('Voyant.data.store.ContextsBuffered', {
 		this.callParent([config]);
 	}
 });
+//src/app/data/store/CorpusCollocates.js
 Ext.define('Voyant.data.store.CorpusCollocatesMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.CorpusCollocate',
@@ -9002,6 +8168,7 @@ Ext.define('Voyant.data.store.CorpusCollocatesBuffered', {
 		this.callParent([config]);
 	}
 });
+//src/app/data/store/CorpusFacets.js
 Ext.define('Voyant.data.store.CorpusFacetsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: Voyant.data.model.CorpusFacet,
@@ -9034,6 +8201,7 @@ Ext.define('Voyant.data.store.CorpusFacetsBuffered', {
 	}
 });
 
+//src/app/data/store/CorpusTerms.js
 Ext.define('Voyant.data.store.CorpusTermsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: Voyant.data.model.CorpusTerm,
@@ -9105,6 +8273,7 @@ Ext.define('Voyant.data.store.CorpusTermsBuffered', {
 	}
 });
 
+//src/app/data/store/DocumentQueryMatches.js
 Ext.define('Voyant.data.store.DocumentQueryMatchesMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.DocumentQueryMatch',
@@ -9138,6 +8307,7 @@ Ext.define('Voyant.data.store.DocumentQueryMatchesBuffered', {
 	}
 });
 
+//src/app/data/store/DocumentTerms.js
 Ext.define('Voyant.data.store.DocumentTermsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.DocumentTerm',
@@ -9170,6 +8340,7 @@ Ext.define('Voyant.data.store.DocumentTermsBuffered', {
 	}
 });
 
+//src/app/data/store/DocumentEntities.js
 Ext.define('Voyant.data.store.DocumentEntitiesMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.DocumentEntity',
@@ -9202,6 +8373,7 @@ Ext.define('Voyant.data.store.DocumentEntitiesBuffered', {
 	}
 });
 
+//src/app/data/store/Documents.js
 Ext.define('Voyant.data.store.DocumentsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.Document',
@@ -9259,6 +8431,7 @@ Ext.define('Voyant.data.store.DocumentsBuffered', {
 	}
 });
 
+//src/app/data/store/PCAAnalysis.js
 Ext.define('Voyant.data.store.PCAAnalysisMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
 	embeddable: ['Voyant.panel.ScatterPlot'],
@@ -9292,6 +8465,7 @@ Ext.define('Voyant.data.store.PCAAnalysisBuffered', {
 		this.callParent([config]);
 	}
 });
+//src/app/data/store/DocSimAnalysis.js
 Ext.define('Voyant.data.store.DocSimAnalysisMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.StatisticalAnalysis',
@@ -9324,6 +8498,7 @@ Ext.define('Voyant.data.store.DocSimAnalysisBuffered', {
 		this.callParent([config]);
 	}
 });
+//src/app/data/store/CorpusNgrams.js
 Ext.define('Voyant.data.store.CorpusNgramsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.CorpusNgram',
@@ -9356,6 +8531,7 @@ Ext.define('Voyant.data.store.CorpusNgramsBuffered', {
 	}
 });
 
+//src/app/data/store/RelatedTerms.js
 Ext.define('Voyant.data.store.RelatedTermsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.RelatedTerm',
@@ -9387,6 +8563,7 @@ Ext.define('Voyant.data.store.RelatedTermsBuffered', {
 		this.callParent([config]);
 	}
 });
+//src/app/data/store/TermCorrelations.js
 Ext.define('Voyant.data.store.TermCorrelationsMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.TermCorrelation',
@@ -9419,6 +8596,7 @@ Ext.define('Voyant.data.store.TermCorrelationsBuffered', {
 		this.callParent([config]);
 	}
 });
+//src/app/data/store/Tokens.js
 Ext.define('Voyant.data.store.TokensMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
     model: 'Voyant.data.model.Token',
@@ -9450,6 +8628,7 @@ Ext.define('Voyant.data.store.TokensBuffered', {
 		this.callParent([config]);
 	}
 });
+//src/app/data/store/TSNEAnalysis.js
 Ext.define('Voyant.data.store.TSNEAnalysisMixin', {
 	mixins: ['Voyant.data.store.VoyantStore'],
 	embeddable: ['Voyant.panel.ScatterPlot'],
@@ -9484,489 +8663,7 @@ Ext.define('Voyant.data.store.TSNEAnalysisBuffered', {
 		this.callParent([config]);
 	}
 });
-/*
- * @class VoyantTable
- * A VoyantTable can facilitate working with tabular data structures, as well as
- * displaying results (especially with {@link #embed} and {@link show}). 
- * Here's a simple example showing the Zipf-Law distribution of the top 20 frequency terms.
- * 
- * 	new Corpus("austen").loadCorpusTerms(20).then(function(corpusTerms) {
- * 		var table = new VoyantTable({rowKey: 0}); // use first column as row key
- * 		corpusTerms.each(function(corpusTerm) {
- *			table.addRow([corpusTerm.getTerm(), corpusTerm.getRawFreq()]);
- * 		});
- * 		table.embed("voyantchart"); // graph table as line chart
- * 	});
- */
-Ext.define('Voyant.data.table.Table', {
-	alternateClassName: ["VoyantTable"],
-	mixins: ['Voyant.notebook.util.Embed','Voyant.notebook.util.Show'],
-	embeddable: ['Voyant.widget.VoyantTableTransform','Voyant.widget.VoyantChart','Voyant.widget.CodeEditor'],
-	config: {
-		
-		/**
-		 * @private
-		 */
-		rows: [],
-
-		/**
-		 * @private
-		 */
-		headers: [],
-
-		/**
-		 * @private
-		 */
-		rowsMap: {},
-		
-		/**
-		 * @private
-		 */
-		headersMap: {},
-		
-		/**
-		 * Specifies that a specific header should serve as row key.
-		 * 
-		 */
-		rowKey: undefined,
-		
-		/**
-		 * @private
-		 */
-		model: undefined
-	},
-	
-	clone: function() {
-		var table = new VoyantTable();
-		table.setRows(Ext.clone(this.getRows()));
-		table.setHeaders(Ext.clone(this.getHeaders()))
-		table.setRowsMap(Ext.clone(this.getRowsMap()))
-		table.setHeadersMap(Ext.clone(this.getHeadersMap()))
-		table.setRowKey(Ext.clone(this.getRowKey()))
-		return table;
-	},
-
-	constructor: function(config, opts) {
-
-		config = config || {};
-		if (config.fromBlock) {
-			var data = Voyant.notebook.Notebook.getDataFromBlock(config.fromBlock);
-			if (data) {
-				data = data.trim();
-				config.rows = [];
-				data.split(/\n+/).forEach(function(line,i) {
-					var cells = line.split("\t");
-					if (i==0 && !config.noHeaders) {
-						config.headers = cells
-					} else {
-						config.rows.push(cells)
-					}
-				})
-				
-			}
-		} else if (config.count && Ext.isArray(config.count)) {
-			// create counts
-			var freqs = {};
-			config.count.forEach(function(item) {freqs[item] = freqs[item] ? freqs[item]+1 : 1;});
-			// sort counts
-			var counts = [];
-			for (var key in freqs) {counts.push([key, freqs[key]])}
-			counts.sort(function(a,b) {return b[1] - a[1]});
-			if (config.limit && counts.length>config.limit) {
-				counts.splice(config.limit);
-			}
-			if (config.orientation && config.orientation=="horizontal") {
-				config.headers = counts.map(function(item) {return item[0]});
-				config.rows = [counts.map(function(item) {return item[1]})];
-			} else {
-				config.headers = config.headers ? config.headers : ["Item","Count"];
-				config.rows = counts;
-			}
-		} else if (config.isStore || config.store) {
-			var store = config.store ? config.store : config;
-			if (opts && opts.headers) {
-				config.headers = opts.headers;
-			} else {
-				// store.getModel() doesn't seem to work (for CorpusTerms at least)
-				// so instead we'll try looking at the first record to get headers
-				var record = store.getAt(0);
-				if (record) { // don't know what to do if this fails?
-					config.headers = record.getFields().map(function(field) {return field.getName()});
-				}
-			}
-			
-			// now we get rows
-			config.rows = [];
-			store.each(function(record) {
-				var data = record.getData();
-				var cells = config.headers.map(function(header) {return data[header]}); // only from headers
-				config.rows.push(cells);
-			}, this);
-		}
-
-		// not sure why config isn't working
-		if (!config.rows && Ext.isArray(config)) {
-			config.rows = config;
-		}
-		if (!this.getHeaders()) {
-			if (!config.headers && !config.noHeaders && config.rows) {
-				this.setHeaders(config.rows.shift())
-			} else {
-				this.setHeaders(Ext.Array.from(config.headers));
-			}
-		}
-		this.setRows(Ext.Array.from(config.rows));
-		this.setRowKey(config.rowKey ? config.rowKey : this.getHeaders()[0]);
-
-		// if we have no headers, use the index as header
-		if (this.getHeaders().length==0) {
-			var firstRow = this.getRow(0, false);
-			if (firstRow) {
-				this.setHeaders(firstRow.map(function(cell, i) {return i}));
-			}
-		}
-		
-		var headersMap = {};
-		this.getHeaders().forEach(function(header, i) {
-			headersMap[header] = i;
-		});
-		this.setHeadersMap(headersMap);
-		
-		this.reMapRows();
-		
-		this.callParent();
-	},
-	addRow: function(row) {
-		if (Ext.isArray(row))
-		if (Ext.isObject(row)) {
-			var len = this.getRows().length;
-			for (var key in row) {
-				this.updateCell(len, key, row[key])
-			}
-			
-		} else if (Ext.isArray(row)) {
-			this.getRows().push(row);
-			var header = this.getColumnIndex(this.getRowKey());
-			if (header!==undefined && row[header]!==undefined) {
-				this.getRowsMap()[row[header]] = this.getRows().length-1;
-			}
-		}
-	},
-	eachRecord: function(fn, scope) {
-		var item, i=0, len=this.getRows().length;
-		for (; i<len; i++) {
-            item = this.getRecord(i);
-			if (fn.call(scope || item, item, i, len) === false) {
-                break;
-            }			
-		}
-	},
-	eachRow: function(fn, asMap, scope) {
-		var item, i=0, len=this.getRows().length;
-		for (; i<len; i++) {
-            item = this.getRow(i, asMap);
-			if (fn.call(scope || item, item, i, len) === false) {
-                break;
-            }			
-		}
-	},
-	getRow: function(index, asMap) {
-		var r = this.getRowIndex(index);
-		if (asMap) {
-			var row = {};
-			var headers = this.getHeaders();
-			Ext.Array.from(this.getRows()[r]).forEach(function(item, i) {
-				row[headers[i] || i] = item;
-			}, this);
-			return row;
-		} else {
-			return this.getRows()[r];
-		}
-	},
-	getRecord: function(index) {
-		if (this.model) {return new this.model(this.getRow(index, true))}
-	},
-	mapRows: function(fn, asMap, scope) {
-		var rows = [];
-		this.eachRow(function(row, i) {
-//			if (Object.keys(row).length>0) {
-				rows.push(fn.call(scope || this, row, i))
-//			}
-		}, asMap, this)
-		return rows;
-	},
-	
-	/**
-	 * Update the cell value at the specified row and column.
-	 * 
-	 * This will create the row and column as needed. If there's an existing value in the cell,
-	 * it will be added to the new value, unless the `replace` argument is set to true.
-	 * 
-	 * @param {Number/String} row The cell's row.
-	 * @param {Number/String} column The cell's column.
-	 * @param {Mixed} value The cell's value.
-	 * @param {boolean} [replace] Replace the current value (if it exists), otherwise
-	 * the value is added to any current value (which is the default behaviour).
-	 */
-	updateCell: function(row, column, value, replace) {
-		var rows = this.getRows();
-		var r = Ext.isNumber(row) ? row : this.getRowIndex(row);
-		var c = this.getColumnIndex(column);
-		if (rows[r]===undefined) {rows[r]=[]}
-		if (rows[r][c]===undefined || replace) {rows[r][c]=value}
-		else {rows[r][c]+=value}
-		// add to rowsMap if this is the header
-		if (this.getHeaders()[c]===this.getRowKey()) {
-			this.getRowsMap()[column] = r;
-		}
-	},
-	
-	getRowIndex: function(key) {
-		if (Ext.isNumber(key)) {return key;}
-		if (Ext.isString(key)) {
-			var rowsMap = this.getRowsMap();
-			if (!(key in rowsMap)) {
-				rowsMap[key] = this.getRows().length;
-				this.getRows().push(new Array(this.getHeaders().length))
-			}
-			return rowsMap[key];
-		}
-	},
-	
-	getColumnIndex: function(column) {
-		var headers = this.getHeaders();
-		if (Ext.isNumber(column)) {
-			if (headers[column]===undefined) {
-				headers[column]=column;
-				this.getRows().forEach(function(row) {
-					row.splice(column, 0, undefined);
-				});
-			}
-			return column;
-		} else if (Ext.isString(column)) {
-			if (!(column in this.getHeadersMap())) {
-				// we don't have this column yet, so create it and expand rows
-				this.getHeaders().push(column);
-				this.getHeadersMap()[column] = this.getHeaders().length-1
-				this.getRows().forEach(function(row) {
-					row.push(undefined)
-				});
-			}
-			return this.getHeadersMap()[column]
-		}
-	},
-	
-	getColumnHeader: function(column) {
-		var c = this.getColumnIndex(column);
-		return this.getHeaders()[c];
-	},
-	
-	/**
-	 * Compute the sum of the values in the column.
-	 * 
-	 * @param {Number/String} column The column index (as a number) or key (as a string).
-	 */
-	getColumnSum: function(column) {
-		return Ext.Array.sum(this.getColumnValues(column, true));
-	},
-	
-	/**
-	 * Compute the sum of the values in the column.
-	 * 
-	 * @param {Number/String} column The column index (as a number) or key (as a string).
-	 */
-	getColumnMean: function(column) {
-		return Ext.Array.mean(this.getColumnValues(column, true));
-	},
-	
-	/**
-	 * Get the largest value in the array.
-	 * 
-	 * @param {Number/String} column The column index (as a number) or key (as a string).
-	 */
-	getColumnMax: function(column) {
-		return Ext.Array.max(this.getColumnValues(column, true));
-	},
-	
-	/**
-	 * Get the smallest value in the array.
-	 * 
-	 * @param {Number/String} column The column index (as a number) or key (as a string).
-	 */
-	getColumnMin: function(column) {
-		return Ext.Array.min(this.getColumnValues(column, true));
-	},
-	
-	getColumnValues: function(column, clean) {
-		var c = this.getColumnIndex(column), vals = [];
-		this.eachRow(function(row) {
-			vals.push(row[c]);
-		});
-		if (clean) {return Ext.Array.clean(vals)}
-		else {return vals;}
-	},
-	
-	/**
-	 * @private
-	 */
-	reMapRows: function() {
-		var rowKey = this.getRowKey();
-		var rowsMap = {}
-		this.eachRow(function(row, i) {
-			if (rowKey in row) {
-				rowsMap[row[rowKey]] = i;
-			}
-		}, true);
-		this.setRowsMap(rowsMap)
-	},
-	
-	sortByColumn: function(columns) {
-		var rows = this.getRows(),
-			sortColumnsIndices = Ext.Array.from(columns).map(function(column) {
-				if (Ext.isObject(column)) {
-					for (key in column) {
-						return {
-							index: this.getColumnIndex(key),
-							direction: column[key].indexOf("asc")>-1 ? 'asc' : 'desc'
-						}
-					}
-				} else {
-					return {
-						index: this.getColumnIndex(column),
-						direction: "desc"
-					}
-				}
-			}, this);
-		rows.sort(function(a, b) {
-			for (var i=0, len=sortColumnsIndices.length; i<len; i++) {
-				var header = sortColumnsIndices[i].index
-				if (a[header]!=b[header]) {
-					if (sortColumnsIndices[i].direction=='asc') {return a[header] > b[header] ? 1 : -1}
-					else {return a[header] > b[header] ? -1 : 1}
-				}
-			}
-		});
-		this.reMapRows();
-		return this;
-	},
-	
-	loadCorrespondenceAnalysis: function(config) {
-		return this._doAnalysisLoad('table.CA', 'Voyant.data.store.CAAnalysis', config);
-	},
-	
-	loadPrincipalComponentAnalysis: function(config) {
-		return this._doAnalysisLoad('table.PCA', 'Voyant.data.store.PCAAnalysis', config);
-	},
-	
-	loadTSNEAnalysis: function(config) {
-		return this._doAnalysisLoad('table.TSNE', 'Voyant.data.store.TSNEAnalysis', config);		
-	},
-	
-	_doAnalysisLoad: function(tool, storeType, config) {
-		if (this.then) {
-			return Voyant.application.getDeferredNestedPromise(this, arguments);
-		} else {
-	    	config = config || {};
-			var dfd = Voyant.application.getDeferred(this);
-			Ext.apply(config, {
-		        columnHeaders: true,
-		        rowHeaders: true,
-		        tool: tool,
-		        analysisInput: this.toTsv(),
-		        inputFormat: 'tsv'
-			});
-			var store = Ext.create(storeType, {noCorpus: true});
-			store.load({
-				params: config,
-				callback: function(records, operation, success) {
-					if (success) {
-						dfd.resolve(store, records)
-					} else {
-						dfd.reject(operation.error.response);
-					}
-				}
-			})
-			return dfd.promise
-		}
-	},
-	
-	embed: function(cmp, config) {
-		if (!config && Ext.isObject(cmp)) {
-			config = cmp;
-			cmp = this.embeddable[0];
-		}
-		config = config || {};
-		
-		var columnHeaders = Ext.Array.from(config.headers || this.getHeaders()).map(function(header) {return this.getColumnHeader(header);}, this);
-		
-		var json = {
-				rowkey: this.getRowKey(),
-				config: config,
-				headers: columnHeaders
-		};
-		if ("headers" in config) {
-			var columnIndices = Ext.Array.from(config.headers).map(function(header) {return this.getColumnIndex(header);}, this);
-			var rows = [];
-			this.getRows().forEach(function(row) {
-				rows.push(columnIndices.map(function(i) {
-					return row[i]
-				}))
-			})
-			Ext.apply(json, {
-				rows: rows
-			})
-		} else {
-			Ext.apply(json, {
-				rows: this.getRows()
-			})
-		}
-		Ext.apply(config, {
-			tableJson: JSON.stringify(json)
-		});
-		delete config.axes;
-		delete config.series;
-		
-		embed.call(this, cmp, config);
-		
-	},
-	
-	toTsv: function(config) {
-		var tsv = this.getHeaders().join("\t");
-		this.getRows().forEach(function(row, i) {
-			if (config && Ext.isNumber(config) && i>config) {return;}
-			tsv += "\n"+row.map(function(cell) {
-				return Ext.isString(cell) ? cell.replace(/(\n|\t)/g, "") : cell;
-			}).join("\t");
-		})
-		return tsv;
-	},
-	
-	getString: function(config) {
-		config = config || {};
-		var table = "<table class='voyant-table' style='"+(config.width ? ' width: '+config.width : '')+"' id='"+(config.id ? config.id : Ext.id())+"'>";
-		var headers = this.getHeaders();
-		if (headers.length) {
-			table+="<thead><tr>";
-			for (var i=0, len = headers.length; i<len; i++) {
-				table+="<th>"+headers[i]+"</th>";
-			}
-			table+="</tr></thead>";
-		}
-		table+="<tbody>";
-		for (var i=0, len = Ext.isNumber(config) ? config : this.getRows().length; i<len; i++) {
-			var row = this.getRow(i);
-			if (row && Ext.isArray(row)) {
-				table+="<tr>";
-				row.forEach(function(cell) {
-					table+="<td>"+cell+"</td>";
-				})
-				table+="</tr>";
-			}
-		}
-		table+="</tbody></table>";
-		return table;
-	}
-});
+//src/app/data/util/NetworkGraph.js
 /*
  * @class NetworkGraph
  * 
@@ -10051,6 +8748,7 @@ Ext.define('Voyant.data.util.NetworkGraph', {
 		return this.getEdges().map(function(edge) {edge.source+"-"+edge.target}).join("; ");
 	}
 });
+//src/app/data/util/Geonames.js
 Ext.define('Voyant.data.util.Geonames', {
     mixins: ['Voyant.util.Localization'],
     statics: {
@@ -10198,6 +8896,7 @@ Ext.define('Voyant.data.util.Geonames', {
         return occurences
     }
 });
+//src/app/data/model/Corpus.js
 /*
  * @class Corpus
  * Corpus is possibly the most important class since in most cases you'll first create/load a corpus and then
@@ -10611,8 +9310,8 @@ Ext.define('Voyant.data.model.Corpus', {
      * 
      * 	new Corpus("Hello World!");
      * 	new Corpus({input: "Hello World!"});
-     * 
-     * @param {String/String[]/Object} config The source document(s) as a text string, a URL, an array of text strings and URLs, or a config object.
+	 * @param  {String|String[]|Object} source The source document(s) as a text string, a URL, an array of text strings and URLs, or a config object.
+     * @param {String|String[]|Object} [config] An additional config to use with the source.
 	 * @returns {Ext.promise.Promise} *Important*: This doesn't immediately return a Corpus but a promise to return a Corpus when it's finished loading
 	 * (you should normally chain the promise with {@link Ext.promise.Promise#then then} and provide a function that receives the
 	 * Corpus as an argument, as per the example above).
@@ -11268,49 +9967,7 @@ Ext.define('Voyant.data.model.Corpus', {
     
 
 });
-Ext.define('Voyant.widget.CodeEditor', {
-	extend: 'Ext.panel.Panel',
-    mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.notebook.util.Embed'],
-	alias: 'widget.codeeditor',
-    statics: {
-    	i18n: {},
-		api: {
-			tableJson: undefined,
-			content: '',
-			mode: 'ace/mode/text',
-			width: undefined
-		}
-    },
-	constructor: function(config) {
-    	config = config || {};
-		var me = this;
-    	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	me.buildFromParams();
-    	Ext.apply(me, {
-    		items: {
-    			xtype: 'notebookcodeeditor',
-    			content: config.content ? config.content : this.getApiParam('content'),
-    			mode: config.mode ? config.mode : this.getApiParam("mode")
-    		}
-    	})
-        me.callParent(arguments);
-	},
-	initComponent: function(config) {
-    	var me = this, config = config || {};
-    	me.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
-    	me.callParent(arguments);
-	},
-	
-	buildFromParams: function() {
-		var me = this, tableJson = this.getApiParam('tableJson');
-		if (tableJson) {
-			var json = Ext.decode(tableJson);
-			var text = json.headers.join("\t") + "\n"+
-				json.rows.map(function(row) {return row.join("\t")}).join("\n");
-			this.setApiParam('content', text);
-		}
-	}
-})
+//src/app/widget/CorpusSelector.js
 Ext.define('Voyant.widget.CorpusSelector', {
     extend: 'Ext.form.field.ComboBox',
     mixins: ['Voyant.util.Localization', 'Voyant.util.Api'],
@@ -11370,6 +10027,7 @@ Ext.define('Voyant.widget.CorpusSelector', {
 	    	return data;
     }
 })
+//src/app/widget/ListEditor.js
 Ext.define('Voyant.widget.ListEditor', {
     extend: 'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
@@ -11472,6 +10130,7 @@ Ext.define('Voyant.widget.ListEditor', {
     	});
     }
 })
+//src/app/widget/StopListOption.js
 Ext.define('Voyant.widget.StopListOption', {
     extend: 'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
@@ -11636,6 +10295,7 @@ Ext.define('Voyant.widget.StopListOption', {
     	});
     }
 })
+//src/app/widget/QuerySearchField.js
 Ext.define('Voyant.widget.QuerySearchField', {
     extend: 'Ext.form.field.Tag',
     mixins: ['Voyant.util.Localization'],
@@ -11930,6 +10590,7 @@ Ext.define('Voyant.widget.QuerySearchField', {
     
 });
 
+//src/app/widget/TotalPropertyStatus.js
 Ext.define('Voyant.widget.TotalPropertyStatus', {
     extend: 'Ext.Component',
     mixins: ['Voyant.util.Localization'],
@@ -11962,6 +10623,7 @@ Ext.define('Voyant.widget.TotalPropertyStatus', {
     }
 });
 
+//src/app/widget/DocumentSelector.js
 Ext.define('Voyant.widget.DocumentSelector', {
     mixins: ['Voyant.util.Localization'],
     alias: 'widget.documentselector',
@@ -12133,6 +10795,7 @@ Ext.define('Voyant.widget.DocumentSelectorMenuItem', {
     }
 })
 
+//src/app/widget/CorpusDocumentSelector.js
 Ext.define('Voyant.widget.CorpusDocumentSelector', {
     extend: 'Ext.button.Button',
     mixins: ['Voyant.util.Localization'],
@@ -12202,6 +10865,7 @@ Ext.define('Voyant.widget.CorpusDocumentSelector', {
 		me.callParent(arguments);	
     }
 });
+//src/app/widget/DownloadFilenameBuilder.js
 Ext.define('Voyant.widget.DownloadFilenameBuilder', {
     extend: 'Ext.form.FieldContainer', //'Ext.container.Container',
     mixins: ['Voyant.util.Localization', 'Ext.form.field.Field'],
@@ -12291,6 +10955,7 @@ Ext.define('Voyant.widget.DownloadFilenameBuilder', {
     
 });
 
+//src/app/widget/DownloadFileFormat.js
 Ext.define('Voyant.widget.DownloadFileFormat', {
     extend: 'Ext.form.CheckboxGroup', //'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
@@ -12337,6 +11002,7 @@ Ext.define('Voyant.widget.DownloadFileFormat', {
     }
 });
 
+//src/app/widget/DownloadOptions.js
 Ext.define('Voyant.widget.DownloadOptions', {
     extend: 'Ext.form.FieldSet',
     mixins: ['Voyant.util.Localization'],
@@ -12359,6 +11025,7 @@ Ext.define('Voyant.widget.DownloadOptions', {
     }
 });
 
+//src/app/widget/FontFamilyOption.js
 Ext.define('Voyant.widget.FontFamilyOption', {
     extend: 'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
@@ -12414,6 +11081,7 @@ Ext.define('Voyant.widget.FontFamilyOption', {
         me.callParent(arguments);
     }
 })
+//src/app/widget/ColorPaletteOption.js
 Ext.define('Voyant.widget.ColorPaletteOption', {
     extend: 'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
@@ -12666,6 +11334,7 @@ Ext.define('Voyant.widget.ColorPaletteOption', {
     	});
     }
 });
+//src/app/widget/VoyantChart.js
 Ext.define('Voyant.widget.VoyantChart', {
     extend: 'Ext.chart.CartesianChart',
     mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.notebook.util.Embed'],
@@ -12794,6 +11463,7 @@ Ext.define('Voyant.widget.VoyantChart', {
     }
 
 })
+//src/app/widget/LiveSearchGrid.js
 Ext.define('Voyant.widget.LiveSearchGrid', {
     extend: 'Ext.grid.Panel',
     
@@ -12932,6 +11602,7 @@ Ext.define('Voyant.widget.LiveSearchGrid', {
     }
 });
 
+//src/app/widget/ProgressMonitor.js
 Ext.define('Voyant.widget.ProgressMonitor', {
 	extend: "Ext.Base",
 	mixins: ['Voyant.util.Localization'],
@@ -13019,6 +11690,7 @@ Ext.define('Voyant.widget.ProgressMonitor', {
 	}
 
 })
+//src/app/widget/VoyantTableTransform.js
 Ext.define('Voyant.widget.VoyantTableTransform', {
 	extend: 'Ext.panel.Panel',
     mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.notebook.util.Embed'],
@@ -13204,6 +11876,7 @@ Ext.define('Ext.ux.grid.TransformGrid', {
     }
 });
 
+//src/app/widget/CategoriesBuilder.js
 Ext.define('Voyant.widget.CategoriesOption', {
 	extend: 'Ext.container.Container',
 	mixins: ['Voyant.util.Localization'],
@@ -13296,7 +11969,9 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		confirmRemove: 'Are you sure you want to remove the category?',
     		save: 'Save',
     		features: 'Features',
-    		category: 'Category',
+			category: 'Category',
+			increaseCategory: 'Increase Category Priority',
+			decreaseCategory: 'Decrease Category Priority',
     		
     		color: 'Color',
     		font: 'Font',
@@ -13480,7 +12155,11 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 		                    	text: this.localize('removeTerms'),
 		                    	handler: function() {
 		                    		this.queryById('categories').query('grid').forEach(function(grid) {
-		                    			grid.getStore().remove(grid.getSelection());
+										var sels = grid.getSelection();
+										sels.forEach(function(sel) {
+											this.categoriesManager.removeTerm(grid.category, sel.getTerm());
+										}, this);
+		                    			grid.getStore().remove(sels);
 		                    		}, this);
 		                    	},
 		                    	scope: this
@@ -13518,13 +12197,13 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				handler: function(btn) {
 					this.processFeatures();
 					this.setColorTermsFromCategoryFeatures();
-					this.app.saveCategoryData(this.categoriesManager.getCategoryExportData()).then(function(id) {
+					this.app.saveCategoryData().then(function(id) {
 						this.setCategoriesId(id);
 						btn.up('window').close();
-					}, function() {
+					}.bind(this), function() {
 						this.setCategoriesId(undefined);
 						btn.up('window').close();
-					}, null, this);
+					}.bind(this));
 				},
 				scope: this
 			}],
@@ -13532,11 +12211,11 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 				show: function() {
 					// check to see if the widget value is different from the API
 					if (this.getCategoriesId() && this.getCategoriesId()!=this.getApiParam("categories")) {
-		    			this.categoriesManager.loadCategoryData(this.getCategoriesId()).then(function(data) {
+		    			this.app.loadCategoryData(this.getCategoriesId()).then(function(data) {
 							this.setColorTermsFromCategoryFeatures();
 							this.buildCategories();
 							this.buildFeatures();
-						}, null, null, this);
+						}.bind(this));
 					} else {
 						this.buildCategories();
 						this.buildFeatures();
@@ -13556,7 +12235,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 	    			if (this.panel.getCorpus && this.panel.getCorpus()) {builder.fireEvent('loadedCorpus', builder, this.panel.getCorpus());}
 	    			else if (this.panel.getStore && this.panel.getStore() && this.panel.getStore().getCorpus && this.panel.getStore().getCorpus()) {
 	    				builder.fireEvent('loadedCorpus', builder, this.panel.getStore().getCorpus());
-	    			}
+					}
 				},
 				scope: this
 			}
@@ -13617,7 +12296,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
 					form.clearInvalid();
     			}
     		}
-    	}));
+		}));
     	
     	this.callParent(arguments);
     },
@@ -13639,29 +12318,6 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     		xtype: 'grid',
     		category: name,
     		title: name,
-//    		header: {
-//    			items: [{
-//    				xtype: 'colorbutton',
-//    				format: '#hex6',
-//    				value: color,
-//    				width: 30,
-//    				height: 15,
-//    				listeners: {
-//    					change: function(btn, color, pcolor) {
-//    						this.categoriesManager.setCategoryFeature(name, 'color', color);
-//    					},
-//    					afterrender: function(btn) {
-//    						var popup = btn.getPopup();
-//    						popup.listeners = {
-//    							focusleave: function(sel, evt) {
-//    								sel.close(); // fix for conflict between selector and parent modal window, when you click outside of the selector
-//    							}
-//    						};
-//    					},
-//    					scope: this
-//    				}
-//    			}]
-//    		},
     		frame: true,
     		width: 150,
     		margin: '10 0 10 10',
@@ -13677,7 +12333,38 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     				}, this);
     			},
     			scope: this
-    		}],
+			}],
+			bbar: [{
+				xtype: 'button',
+				text: '',
+				tooltip: this.localize('increaseCategory'),
+				glyph: 'xf067@FontAwesome',
+				handler: function(b) {
+					var grid = b.findParentByType('grid');
+					var parent = this.queryById('categories');
+					var prev = parent.prevChild(grid);
+					if (prev !== null) {
+						parent.moveBefore(grid, prev);
+						this.app.getCategoriesManager().setCategoryRanking(grid.getTitle(), parent.items.indexOf(grid));
+					}
+				},
+				scope: this
+			},'->',{
+				xtype: 'button',
+				text: '',
+				tooltip: this.localize('decreaseCategory'),
+				glyph: 'xf068@FontAwesome',
+				handler: function(b) {
+					var grid = b.findParentByType('grid');
+					var parent = this.queryById('categories');
+					var next = parent.nextChild(grid);
+					if (next !== null) {
+						parent.moveAfter(grid, next);
+						this.app.getCategoriesManager().setCategoryRanking(grid.getTitle(), parent.items.indexOf(grid));
+					}
+				},
+				scope: this
+			}],
     		
     		store: Ext.create('Ext.data.JsonStore', {
     			data: termsData,
@@ -13708,14 +12395,16 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
             }],
     		listeners: {
     			beforedrop: function(node, data) {
-    				// remove duplicates
-    				var categoriesManager = this.up('categoriesbuilder').categoriesManager;
-    				for (var i = data.records.length-1; i >= 0; i--) {
-    					var term = data.records[i].get('term');
-    					if (categoriesManager.getCategoryForTerm(term) !== undefined) {
-    						data.records.splice(i, 1);
-    					}
-    				}
+					var categoriesManager = this.up('categoriesbuilder').categoriesManager;
+					var source = data.view.up('grid');
+
+					if (source.category !== undefined) {
+						// we're moving a term from one category to another
+						for (var i = data.records.length-1; i >= 0; i--) {
+							var term = data.records[i].get('term');
+							categoriesManager.removeTerm(source.category, term);
+						}
+					}
     			},
     			drop: function(node, data) {
     				data.view.getSelectionModel().deselectAll();
@@ -13725,16 +12414,9 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     				var terms = [];
     				for (var i = 0; i < data.records.length; i++) {
     					var term = data.records[i].get('term');
-    					if (categoriesManager.getCategoryForTerm(term) === undefined) {
-    						terms.push(term);
-    					}
+    					terms.push(term);
     				}
     				categoriesManager.addTerms(name, terms);
-    				
-    				var source = data.view.up('grid');
-    				if (source.category) {
-    					categoriesManager.removeTerms(source.category, terms);
-    				}
     			}
     		}
     	});
@@ -13763,7 +12445,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	
     	grid.header.getTitle().textEl.on('dblclick', function(e, t) {
     		titleEditor.startEdit(t);
-    	});
+		});
     },
     
     removeCategory: function(name) {
@@ -13898,6 +12580,7 @@ Ext.define('Voyant.widget.CategoriesBuilder', {
     	}
     }
 });
+//src/app/widget/VoyantNetworkGraph.js
 Ext.define('Voyant.widget.VoyantNetworkGraph', {
     extend: 'Ext.panel.Panel',
     mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.notebook.util.Embed'],
@@ -14496,6 +13179,7 @@ Ext.define('Voyant.widget.VoyantNetworkGraph', {
     	this.getEdgeSelection().call(this.applyEdgeStyle.bind(this));
     }
 });
+//src/app/widget/ReaderGraph.js
 Ext.define('Voyant.widget.ReaderGraph', {
     extend: 'Ext.container.Container',
     mixins: ['Voyant.util.Localization'],
@@ -14850,6 +13534,7 @@ Ext.define('Voyant.widget.ReaderGraph', {
         locMarkEl.setX(locX);
     }
 });
+//src/app/panel/Panel.js
 Ext.define('Voyant.panel.Panel', {
 	mixins: ['Voyant.util.Localization','Voyant.util.Api','Voyant.util.Toolable','Voyant.util.DetailedError'],
 	requires: ['Voyant.widget.QuerySearchField','Voyant.widget.StopListOption','Voyant.widget.CategoriesOption','Voyant.widget.TotalPropertyStatus'],
@@ -15030,6 +13715,7 @@ Ext.define('Voyant.panel.Panel', {
 	}
 	
 });
+//src/app/panel/VoyantTabPanel.js
 
 Ext.define('Voyant.panel.VoyantTabPanel', {
 	extend: 'Ext.tab.Panel',
@@ -15067,6 +13753,7 @@ Ext.define('Voyant.panel.VoyantTabPanel', {
 		}
 	}
 });
+//src/app/widget/Facet.js
 Ext.define('Voyant.widget.Facet', {
 	extend: 'Ext.grid.Panel',
     mixins: ['Voyant.panel.Panel'],
@@ -15146,6 +13833,7 @@ Ext.define('Voyant.widget.Facet', {
     }
 });
 
+//src/app/panel/Bubbles.js
 // assuming Bubblelines library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Bubbles', {
 	extend: 'Ext.panel.Panel',
@@ -15348,6 +14036,7 @@ Ext.define('Voyant.panel.Bubbles', {
     	this.callParent(arguments);
     }
 });
+//src/app/panel/Bubblelines.js
 // assuming Bubblelines library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Bubblelines', {
 	extend: 'Ext.panel.Panel',
@@ -15799,6 +14488,7 @@ Ext.define('Voyant.panel.Bubblelines', {
 		this.getApplication().dispatchEvent('termsClicked', this, data);
 	}
 });
+//src/app/panel/Catalogue.js
 Ext.define('Voyant.panel.Catalogue', {
 	extend: 'Ext.panel.Panel',
 	requires: ['Voyant.widget.Facet'],
@@ -16350,6 +15040,7 @@ Ext.define('Voyant.panel.Catalogue', {
     
 });
 
+//src/app/panel/Cirrus.js
 // assuming Cirrus library is loaded by containing page (via voyant.jsp)
 /**
  * Cirrus tool, a wordcloud-like visuaization.
@@ -16950,6 +15641,7 @@ Ext.define('Voyant.panel.Cirrus', {
         return newRelativeSize;
     }
 });
+//src/app/panel/CollocatesGraph.js
 Ext.define('Voyant.panel.CollocatesGraph', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -17831,6 +16523,7 @@ Ext.define('Voyant.panel.CollocatesGraph', {
     }
     
 });
+//src/app/panel/Contexts.js
 Ext.define('Voyant.panel.Contexts', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -18141,6 +16834,7 @@ Ext.define('Voyant.panel.Contexts', {
      }
      
 });
+//src/app/panel/CorpusCollocates.js
 Ext.define('Voyant.panel.CorpusCollocates', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -18394,6 +17088,7 @@ Ext.define('Voyant.panel.CorpusCollocates', {
     }
     
 })
+//src/app/panel/CorpusTermSummary.js
 Ext.define('Voyant.widget.CorpusTermSummary', {
     extend: 'Ext.panel.Panel',
     mixins: ['Voyant.panel.Panel'],
@@ -18592,6 +17287,7 @@ Ext.define('Voyant.widget.CorpusTermSummary', {
     }
 });
 
+//src/app/panel/Correlations.js
 Ext.define('Voyant.panel.Correlations', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -18750,6 +17446,7 @@ Ext.define('Voyant.panel.Correlations', {
      }
      
 });
+//src/app/panel/CorpusCreator.js
 Ext.define('Voyant.panel.CorpusCreator', {
 	extend: 'Ext.form.Panel',
 	requires: ['Ext.form.field.File'],
@@ -19554,6 +18251,7 @@ Ext.define('Voyant.panel.CorpusCreator', {
 	}
     
 });
+//src/app/panel/DreamScape.js
 Ext.define('Voyant.panel.DreamScape', {
     extend: 'Ext.Panel',
     xtype: 'dreamscape',
@@ -21451,6 +20149,7 @@ Ext.define('Voyant.widget.GeonamesFilter', {
     }
 });
 
+//src/app/panel/Knots.js
 // assuming Knots library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Knots', {
 	extend: 'Ext.panel.Panel',
@@ -22045,6 +20744,7 @@ Ext.define('Voyant.panel.Knots', {
 		this.getApplication().dispatchEvent('termsClicked', this, data);
 	}
 });
+//src/app/panel/Phrases.js
 Ext.define('Voyant.panel.Phrases', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -22344,6 +21044,7 @@ Ext.define('Voyant.panel.Phrases', {
     }
     
 })
+//src/app/panel/CorpusTerms.js
 /**
  * Corpus Terms tool, a grid that shows the terms in the corpus.
  * 
@@ -22592,6 +21293,7 @@ Ext.define('Voyant.panel.CorpusTerms', {
     }
 })
 
+//src/app/panel/DocumentTerms.js
 Ext.define('Voyant.panel.DocumentTerms', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -22803,6 +21505,7 @@ Ext.define('Voyant.panel.DocumentTerms', {
     
 });
 
+//src/app/panel/Documents.js
 Ext.define('Voyant.panel.Documents', {
 	extend: 'Ext.grid.Panel',
 	mixins: ['Voyant.panel.Panel','Voyant.util.Downloadable'],
@@ -23274,6 +21977,7 @@ Ext.define('Voyant.panel.Documents', {
     	if (win && win.isFloating()) {win.close()}
     }
 })
+//src/app/panel/DocumentsFinder.js
 Ext.define('Voyant.panel.DocumentsFinder', {
 	extend: 'Ext.grid.Panel',
 	require: ['Voyant.data.store.DocumentQueryMatches','Ext.grid.plugin.CellEditing'],
@@ -23589,33 +22293,68 @@ Ext.define('Voyant.panel.DocumentsFinder', {
     }
     
 })
-Ext.define('Voyant.panel.Dummy', {
-    extend: 'Ext.Panel',
-    xtype: 'dummy',
-	autoScroll: true,
-    initComponent: function() {
-        var me = this;
-        
-        var columns = 3;
-        
-        Ext.apply(this, {
-    		xtype: 'tabpanel',
-    		items: [{
-                title: 'Tab 1',
-                icon: null,
-                glyph: 42,
-                html: "one"
-            }, {
-                title: 'Tab 2',
-                icon: null,
-                glyph: 70,
-                html: "two"
-            }]
-        })
-        
-        this.callParent();
-    }
+//src/app/panel/Embedder.js
+Ext.define('Voyant.panel.Embedder', {
+	extend: 'Ext.Panel',
+	mixins: ['Voyant.panel.Panel'],
+	alias: 'widget.embedder',
+	statics: {
+		i18n: {
+			title: 'Embedded',
+			url: 'URL',
+			go: 'Go'
+		},
+		api: {
+			url: undefined
+		},
+		glyph: 'xf0c1@FontAwesome'
+	},
+	constructor: function(config) {
+		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
+		this.setApiParam('url', config.url);
+
+        this.callParent(arguments);
+		
+		this.mixins['Voyant.panel.Panel'].constructor.apply(this, arguments);
+    },
+	initComponent: function() {
+		Ext.apply(this, {
+			title: this.localize('title'),
+			layout: {
+				type: 'fit'
+			},
+			items: {
+				xtype: 'uxiframe',
+				src: this.getApiParam('url')
+			},
+			tbar: [{
+				xtype: 'textfield',
+				value: this.getApiParam('url'),
+				emptyText: this.localize('url'),
+				listeners: {
+					specialkey: function(field, e){
+						if (e.getKey() == e.ENTER) {
+							field.up('panel').down('uxiframe').load(field.getValue());
+						}
+					}
+				}
+			},{
+				xtype: 'button',
+				text: this.localize('go'),
+				handler: function(btn) {
+					var url = btn.prev('textfield').getValue();
+					btn.up('panel').down('uxiframe').load(url);
+				}
+			}]
+		});
+		
+		this.callParent();
+	},
+	loadUrl: function(url) {
+		this.down('uxiframe').load(url);
+	}
 });
+//src/app/panel/Fountain.js
 // assuming Bubblelines library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Fountain', {
 	extend: 'Ext.panel.Panel',
@@ -23962,6 +22701,7 @@ Ext.define('Voyant.panel.Fountain', {
     	this.callParent(arguments);
     }
 });
+//src/app/panel/RezoViz.js
 Ext.define('Voyant.panel.RezoViz', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -24180,7 +22920,6 @@ Ext.define('Voyant.panel.RezoViz', {
         });
         
         this.on('loadedCorpus', function(src, corpus) {
-        	debugger
         	if (corpus.getDocumentsCount()==1) {
         		this.setApiParam("minEdgeCount", 1);
         	}
@@ -24207,7 +22946,8 @@ Ext.define('Voyant.panel.RezoViz', {
     			limit: this.getApiParam('limit'),
     			minEdgeCount: this.getApiParam("minEdgeCount"),
     			corpus: corpusId
-    		},
+			},
+			timeout: 60000,
     		success: function(response) {
     			el.unmask();
     			var obj = Ext.decode(response.responseText);
@@ -24239,7 +22979,7 @@ Ext.define('Voyant.panel.RezoViz', {
     	var extent = d3.extent(nodes, function(node) {return node.rawFreq;});
     	var min = extent[0];
     	var max = extent[1];    	
-    	var scaleFont = d3.scale.linear()
+    	var scaleFont = d3.scaleLinear()
                     .domain([min, max])
                     .range([10, 24]);
     	
@@ -24372,6 +23112,7 @@ Ext.define('Voyant.panel.RezoViz', {
 		return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 	}
 });
+//src/app/panel/Loom.js
 Ext.define('Voyant.panel.Loom', {
     extend: 'Ext.panel.Panel',
     mixins: ['Voyant.panel.Panel'],
@@ -25456,6 +24197,7 @@ Ext.define('Voyant.util.LoomControl', {
     }
     
 })
+//src/app/panel/MicroSearch.js
 Ext.define('Voyant.panel.MicroSearch', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -25657,6 +24399,7 @@ Ext.define('Voyant.panel.MicroSearch', {
     	
     }
 });
+//src/app/panel/Mandala.js
 Ext.define('Voyant.panel.Mandala', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -26177,6 +24920,7 @@ Ext.define('Voyant.panel.Mandala', {
     }
     
 });
+//src/app/panel/MicroOcp.js
 Ext.define('Voyant.panel.MicroOcp', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -26458,6 +25202,7 @@ Ext.define('Voyant.panel.MicroOcp', {
         
 });
 
+//src/app/panel/Reader.js
 Ext.define('Voyant.panel.Reader', {
 	extend: 'Ext.panel.Panel',
 	requires: ['Voyant.data.store.Tokens'],
@@ -27042,6 +25787,7 @@ Ext.define('Voyant.panel.Reader', {
     }
 });
 
+//src/app/panel/SimpleDocReader.js
 Ext.define('Voyant.panel.SimpleDocReader', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -27163,6 +25909,7 @@ Ext.define('Voyant.panel.SimpleDocReader', {
 	}
 });
 
+//src/app/panel/ScatterPlot.js
 Ext.define('Voyant.panel.ScatterPlot', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -28308,6 +27055,7 @@ Ext.define('Ext.chart.series.CustomScatter', {
     	this.callParent(arguments);
     }
 });
+//src/app/panel/StreamGraph.js
 Ext.define('Voyant.panel.StreamGraph', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -28729,6 +27477,7 @@ Ext.define('Voyant.panel.StreamGraph', {
 });
 
 
+//src/app/panel/Summary.js
 /**
  * The Summary panel provides an overview of a corpus, and the content will
  * depend on whether the corpus includes one document or many.
@@ -29141,6 +27890,7 @@ Ext.define('Voyant.panel.Summary', {
     }    
 });
 
+//src/app/panel/TextualArc.js
 Ext.define('Voyant.panel.TextualArc', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -29681,6 +28431,7 @@ Ext.define('Voyant.panel.TextualArc', {
     
     
 });
+//src/app/panel/TopicContexts.js
 
 // for mysterious reasons, Ext.require loads the scripts but produces a blank page, so use loadScript instead
 /*
@@ -29782,6 +28533,7 @@ Ext.define('Voyant.panel.TopicContexts', {
     }
     
 })
+//src/app/panel/TermsBerry.js
 Ext.define('Voyant.panel.TermsBerry', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -30397,6 +29149,7 @@ Ext.define('Voyant.panel.TermsBerry', {
 		}
     }
 });
+//src/app/panel/TermsRadio.js
 /**
  * Terms Radio tool, a visualization for term distributions.
  * 
@@ -30897,6 +29650,7 @@ Ext.define('Voyant.panel.TermsRadio', {
     
 });
 
+//src/app/panel/Trends.js
 /**
  * Trends tool, a line graph that shows term distributions.
  * 
@@ -31652,6 +30406,7 @@ Ext.define('Voyant.panel.Trends', {
 
 
  });
+//src/app/panel/NoTool.js
 Ext.define('Voyant.panel.NoTool', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -31749,6 +30504,7 @@ Ext.define('Voyant.panel.NoTool', {
     	return this.getApplication().getBaseUrl()+(queryString ? "?"+queryString : "")
 	}
 });
+//src/app/panel/VoyantFooter.js
 Ext.define('Voyant.panel.VoyantFooter', {
 	extend: 'Ext.container.Container',
 	mixins: ['Voyant.panel.Panel'],
@@ -31763,8 +30519,8 @@ Ext.define('Voyant.panel.VoyantFooter', {
 		boxready: function(container, width, height) {
 			var parts = [
 				"<a href='"+container.getBaseUrl()+"docs/' target='voyantdocs'>"+container.localize('voyantTools')+"</a> ",
-				", <a href='http://stefansinclair.name/'>St&eacute;fan Sinclair</a> &amp; <a href='http://geoffreyrockwell.com'>Geoffrey Rockwell</a>",
-				" (<a href='http://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> "+ new Date().getFullYear() +")",
+				", <a href='https://csdh-schn.org/stefan-sinclair-in-memoriam/'>St&eacute;fan Sinclair</a> &amp; <a href='https://geoffreyrockwell.com'>Geoffrey Rockwell</a>",
+				" (<a href='https://creativecommons.org/licenses/by/4.0/' target='_blank'><span class='cc'>c</span></a> "+ new Date().getFullYear() +")",
 				" <a class='privacy' href='"+this.getBaseUrl()+"docs/#!/guide/about-section-privacy-statement' target='top'>"+container.localize('privacy')+"</a>",
 				" v. "+Voyant.application.getVersion() + (Voyant.application.getBuild() ? " ("+Voyant.application.getBuild()+")" : "")
 			];
@@ -31790,6 +30546,7 @@ Ext.define('Voyant.panel.VoyantFooter', {
     	}
 	}
 });
+//src/app/panel/VoyantHeader.js
 Ext.define('Voyant.panel.VoyantHeader', {
 	extend: 'Ext.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -31851,6 +30608,7 @@ Ext.define('Voyant.panel.VoyantHeader', {
     }
 });
 
+//src/app/panel/CorpusSet.js
 Ext.define('Voyant.panel.CorpusSet', {
 	extend: 'Ext.panel.Panel',
     requires: ['Voyant.panel.VoyantTabPanel','Voyant.panel.Cirrus', 'Voyant.panel.Summary', 'Voyant.panel.CorpusTerms', 'Voyant.panel.Reader', 'Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts', 'Voyant.panel.Phrases', 'Voyant.panel.DocumentTerms','Voyant.panel.CorpusCollocates','Voyant.panel.CollocatesGraph','Voyant.panel.StreamGraph','Voyant.panel.TermsBerry'],
@@ -32023,6 +30781,7 @@ Ext.define('Voyant.panel.CorpusSet', {
     	}
     }
 })
+//src/app/panel/ScatterSet.js
 Ext.define('Voyant.panel.ScatterSet', {
 	extend: 'Ext.panel.Panel',
     requires: ['Voyant.panel.ScatterPlot','Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts'],
@@ -32064,6 +30823,7 @@ Ext.define('Voyant.panel.ScatterSet', {
         }]
     }]
 })
+//src/app/panel/Subset.js
 Ext.define('Voyant.panel.Subset', { 
 	
 	
@@ -32334,6 +31094,7 @@ Ext.define('Voyant.panel.Subset', {
     }
 })
 
+//src/app/panel/CollocatesSet.js
 Ext.define('Voyant.panel.CollocatesSet', {
 	extend: 'Ext.panel.Panel',
     requires: ['Voyant.panel.ScatterPlot','Voyant.panel.Documents', 'Voyant.panel.Trends', 'Voyant.panel.Contexts'],
@@ -32390,6 +31151,7 @@ Ext.define('Voyant.panel.CollocatesSet', {
         }]
     }]
 })
+//src/app/panel/BubblelinesSet.js
 Ext.define('Voyant.panel.BubblelinesSet', {
 	extend: 'Ext.panel.Panel',
     requires: ['Voyant.panel.Bubblelines','Voyant.panel.Contexts', 'Voyant.panel.Reader'],
@@ -32431,6 +31193,7 @@ Ext.define('Voyant.panel.BubblelinesSet', {
         }]
     }]
 })
+//src/app/panel/CustomSet.js
 Ext.define('Voyant.panel.CustomSet', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -32723,6 +31486,7 @@ Ext.define('Voyant.panel.CustomSet', {
     	this.updateLayout();
 	}
 })
+//src/app/panel/Veliza.js
 Ext.define('Voyant.panel.Veliza', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -32946,6 +31710,7 @@ Ext.define('Voyant.panel.Veliza', {
     	body.scroll('b', Infinity);
     }
 });
+//src/app/panel/WordTree.js
 Ext.define('Voyant.panel.WordTree', {
 	extend: 'Ext.panel.Panel',
 	mixins: ['Voyant.panel.Panel'],
@@ -33294,6 +32059,7 @@ Ext.define('Voyant.panel.WordTree', {
 });
 
 
+//src/app/panel/WordWall.js
 Ext.define('Voyant.panel.WordWall', {
     extend: 'Ext.panel.Panel',
     mixins: ['Voyant.panel.Panel','Voyant.util.DiacriticsRemover'],
@@ -33847,6 +32613,7 @@ Ext.define('Voyant.panel.WordWall', {
     }
     
 });
+//src/app/panel/Topics.js
 // heavy lifting for the LDA from https://github.com/mimno/jsLDA with tweaks to fit into a Voyant object scope
 
 Ext.define('Voyant.panel.Topics', {
@@ -34429,6 +33196,7 @@ Ext.define('Voyant.panel.Topics', {
     	}
     
 });
+//src/app/panel/Via.js
 
 // assuming Cirrus library is loaded by containing page (via voyant.jsp)
 Ext.define('Voyant.panel.Via', {
@@ -34567,6 +33335,7 @@ Ext.define('Voyant.panel.Via', {
     	});
     }
 });
+//src/app/notebook/editor/button/Add.js
 Ext.define("Voyant.notebook.editor.button.Add", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34589,6 +33358,7 @@ Ext.define("Voyant.notebook.editor.button.Add", {
 		}
 	}
 })
+//src/app/notebook/editor/button/Edit.js
 Ext.define("Voyant.notebook.editor.button.Edit", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34610,6 +33380,7 @@ Ext.define("Voyant.notebook.editor.button.Edit", {
 		}
 	}
 })
+//src/app/notebook/editor/button/Export.js
 Ext.define("Voyant.notebook.editor.button.Export", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34707,7 +33478,7 @@ Ext.define("Voyant.notebook.editor.button.Export", {
 			Voyant.notebook.editor.button.Export.getExportWindow(cmp).show();
 		}
 	},
-	getFileExtension(mode) {
+	getFileExtension: function(mode) {
 		if (
 			mode === 'text' ||
 			(mode === 'javascript' && this.getExportType() === 'output') // use txt for javascript results because they could be anything
@@ -34718,6 +33489,7 @@ Ext.define("Voyant.notebook.editor.button.Export", {
 		}
 	}
 })
+//src/app/notebook/editor/button/Counter.js
 Ext.define("Voyant.notebook.editor.button.Counter", {
 	extend: "Ext.toolbar.TextItem",
 	mixins: ["Voyant.util.Localization"],
@@ -34748,6 +33520,7 @@ Ext.define("Voyant.notebook.editor.button.Counter", {
 		this.setHtml('<a name="'+name+'" href="#'+name+'">'+pos+'</a>');
 	}
 })
+//src/app/notebook/editor/button/MoveDown.js
 Ext.define("Voyant.notebook.editor.button.MoveDown", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34770,6 +33543,7 @@ Ext.define("Voyant.notebook.editor.button.MoveDown", {
 		}
 	}
 })
+//src/app/notebook/editor/button/MoveUp.js
 Ext.define("Voyant.notebook.editor.button.MoveUp", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34792,6 +33566,7 @@ Ext.define("Voyant.notebook.editor.button.MoveUp", {
 		}
 	}
 })
+//src/app/notebook/editor/button/Remove.js
 Ext.define("Voyant.notebook.editor.button.Remove", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34825,6 +33600,7 @@ Ext.define("Voyant.notebook.editor.button.Remove", {
 		}
 	}
 })
+//src/app/notebook/editor/button/Metadata.js
 Ext.define("Voyant.notebook.editor.button.Metadata", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34847,6 +33623,7 @@ Ext.define("Voyant.notebook.editor.button.Metadata", {
 		}
 	}
 })
+//src/app/notebook/editor/button/Movement.js
 Ext.define("Voyant.notebook.editor.button.Movement", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34873,6 +33650,7 @@ Ext.define("Voyant.notebook.editor.button.Movement", {
         }
 	]
 })
+//src/app/notebook/editor/button/Run.js
 Ext.define("Voyant.notebook.editor.button.Run", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34888,6 +33666,7 @@ Ext.define("Voyant.notebook.editor.button.Run", {
 		this.callParent(arguments);
 	}
 })
+//src/app/notebook/editor/button/RunAll.js
 Ext.define("Voyant.notebook.editor.button.RunAll", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34903,6 +33682,7 @@ Ext.define("Voyant.notebook.editor.button.RunAll", {
 		this.callParent(arguments);
 	}
 })
+//src/app/notebook/editor/button/RunUntil.js
 Ext.define("Voyant.notebook.editor.button.RunUntil", {
 	extend: "Ext.button.Button",
 	mixins: ["Voyant.util.Localization"],
@@ -34918,6 +33698,7 @@ Ext.define("Voyant.notebook.editor.button.RunUntil", {
 		this.callParent(arguments);
 	}
 })
+//src/app/notebook/editor/EditorWrapper.js
 Ext.define("Voyant.notebook.editor.EditorWrapper", {
 	extend: "Ext.panel.Panel",
 	mixins: ["Voyant.util.Localization"],
@@ -34972,6 +33753,7 @@ Ext.define("Voyant.notebook.editor.EditorWrapper", {
 		}
 	}
 })
+//src/app/notebook/editor/CodeEditor.js
 Ext.define("Voyant.notebook.editor.CodeEditor", {
 	extend: "Ext.Component",
 	alias: "widget.notebookcodeeditor", 
@@ -35127,6 +33909,7 @@ Ext.define("Voyant.notebook.editor.CodeEditor", {
 		return this.getEditor().getValue();
 	}
 })
+//src/app/notebook/editor/CodeEditorWrapper.js
 Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 	extend: "Voyant.notebook.editor.EditorWrapper",
 	requires: ["Voyant.notebook.editor.CodeEditor","Voyant.notebook.editor.button.Run","Voyant.notebook.editor.button.RunAll"],
@@ -35764,6 +34547,7 @@ Ext.define("Voyant.notebook.editor.CodeEditorWrapper", {
 		this.switchModes(mode || "javascript")
 	}
 })
+//src/app/notebook/editor/TextEditor.js
 Ext.define("Voyant.notebook.editor.TextEditor", {
 	extend: "Ext.Component",
 	mixins: ["Voyant.util.Localization"],
@@ -35782,9 +34566,8 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 		    ],
 		    
 		    extraPlugins: 'stopediting,sourcedialog,justify,colorbutton,inserthtml4x',
-//		    removePlugins: 'iframe', // why was this added?
 			allowedContent: true,
-			toolbarCanCollapse: true,
+			toolbarCanCollapse: false,
 			startupFocus: true
 		},
 		editor: undefined,
@@ -35869,6 +34652,7 @@ Ext.define("Voyant.notebook.editor.TextEditor", {
 		return this.getTargetEl().dom.innerHTML;
 	}
 })
+//src/app/notebook/editor/TextEditorWrapper.js
 Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 	extend: "Voyant.notebook.editor.EditorWrapper",
 	requires: ["Voyant.notebook.editor.TextEditor","Voyant.notebook.editor.button.Edit"],
@@ -35916,6 +34700,7 @@ Ext.define("Voyant.notebook.editor.TextEditorWrapper", {
 	}
 	
 })
+//src/app/notebook/storage/github/OctokitWrapper.js
 Ext.define("Voyant.notebook.github.OctokitWrapper", {
 	extend: "Ext.Base",
 	alias: "octokitwrapper",
@@ -36105,6 +34890,7 @@ Ext.define("Voyant.notebook.github.OctokitWrapper", {
 	}
 });
 
+//src/app/notebook/storage/github/ReposBrowser.js
 Ext.define("Voyant.notebook.github.ReposBrowser", {
 	extend: "Ext.container.Container",
 	xtype: "githubreposbrowser",
@@ -36368,6 +35154,7 @@ Ext.define("Voyant.notebook.github.ReposBrowser", {
 		node.appendChild(contents.children);
 	}
 })
+//src/app/notebook/storage/github/FileSaver.js
 Ext.define("Voyant.notebook.github.FileSaver", {
 	extend: "Ext.container.Container",
 	xtype: "githubfilesaver",
@@ -36616,6 +35403,7 @@ Ext.define("Voyant.notebook.github.FileSaver", {
 	}
 });
 
+//src/app/notebook/storage/github/GitHubDialogs.js
 Ext.define("Voyant.notebook.github.GitHubDialogs", {
 	extend: "Ext.Component",
 	requires: ['Voyant.notebook.github.OctokitWrapper','Voyant.notebook.github.ReposBrowser','Voyant.notebook.github.FileSaver'],
@@ -36841,6 +35629,7 @@ Ext.define("Voyant.notebook.github.GitHubDialogs", {
 	}
 })
 
+//src/app/notebook/storage/voyant/StorageDialogs.js
 Ext.define("Voyant.notebook.StorageDialogs", {
 	extend: "Ext.Component",
 	requires: [],
@@ -37027,8 +35816,13 @@ Ext.define("Voyant.notebook.StorageDialogs", {
 			}
 		}
 		return code;
+	},
+
+	reset: function() {
+		this.setAccessCode(undefined);
 	}
 })
+//src/app/notebook/Catalogue.js
 Ext.define('Voyant.notebook.Catalogue', {
 	extend: 'Ext.Component',
 	requires: [],
@@ -37064,9 +35858,9 @@ Ext.define('Voyant.notebook.Catalogue', {
 			'<tpl for=".">',
 				'<div class="catalogue-notebook">',
 					'<div class="id">{id}</div>',
-					'<div class="title">{title}</div>',
-					'<div class="author">{author}</div>',
-					'<div class="dates"><span class="date">{[Ext.Date.format(values.created, "M j Y")]}</span> | <span class="date">{[Ext.Date.format(values.modified, "M j Y")]}</span></div>',
+					'<div class="title nowrap" title="{title}">{title}</div>',
+					'<div class="author nowrap"><i class="fa fa-user" aria-hidden="true"></i> {author}</div>',
+					'<div class="dates"><span class="date"><i class="fa fa-clock-o" aria-hidden="true"></i> {[Ext.Date.format(values.modified, "M j Y")]}</span></div>',
 				'</div>',
 			'</tpl>'
 		);
@@ -37090,6 +35884,7 @@ Ext.define('Voyant.notebook.Catalogue', {
 				items: [{
 					xtype: 'toolbar',
 					height: 30,
+					hidden: true,
 					items: [{
 						xtype: 'splitbutton',
 						text: 'Sort',
@@ -37176,13 +35971,14 @@ Ext.define('Voyant.notebook.Catalogue', {
 		}
 	},
 
-	getNotebooks(query, config) {
+	getNotebooks: function(query, config) {
 		this.window.mask('Loading');
 		this.window.down('#catalogue').getSelectionModel().deselectAll();
     	var me = this;
 		Spyral.Load.trombone({
 			tool: 'notebook.GitNotebookManager',
 			action: 'catalogue',
+			limit: 100,
 			noCache: 1
 		}).then(function(json) {
 			me.window.unmask();
@@ -37192,6 +35988,7 @@ Ext.define('Voyant.notebook.Catalogue', {
 	}
 });
 
+//src/app/notebook/Notebook.js
 /*
  * @class Notebook
  * A Spyral Notebook. This should never be instantiated directly.
@@ -37263,6 +36060,7 @@ Ext.define('Voyant.notebook.Notebook', {
 		storageSolution: 'voyant'
 	},
 	
+	metadataWindow: undefined,
 	voyantStorageDialogs: undefined,
 	githubDialogs: undefined,
 	catalogueWindow: undefined,
@@ -37687,7 +36485,8 @@ Ext.define('Voyant.notebook.Notebook', {
     },
     
     clear: function() {
-    	this.setMetadata(new Spyral.Metadata());
+		this.setMetadata(new Spyral.Metadata());
+		this.voyantStorageDialogs.reset();
     	var cells = this.getComponent("cells");
     	cells.removeAll();
 	},
@@ -38198,150 +36997,163 @@ Ext.define('Voyant.notebook.Notebook', {
 	},
 
     showMetadataEditor: function() {
-    	var me = this;
-    	var metadata = this.getMetadata();
-		Ext.create('Ext.window.Window', {
-    	    title: this.localize('metadataEditor'),
-    	    autoScroll: true,
-    	    items: [{
-    	    	xtype: 'form',
-    	    	items: {
-    	    	    bodyPadding: 5,
-    	    	    width: 600,
+		if (this.metadataWindow === undefined) {
+			var me = this;
 
-    	    	    // Fields will be arranged vertically, stretched to full width
-    	    	    layout: 'anchor',
-    	    	    defaults: {
-    	    	        anchor: '100%',
-    	    	        labelAlign: "right"
-    	    	    },
+			this.metadataWindow = Ext.create('Ext.window.Window', {
+				title: this.localize('metadataEditor'),
+				autoScroll: true,
+				closeAction: 'hide',
+				items: [{
+					xtype: 'form',
+					items: {
+						bodyPadding: 5,
+						width: 600,
 
-    	    	    // The fields
-    	    	    defaultType: 'textfield',
-    	    	    items: [{
-    	    	        fieldLabel: this.localize("metadataTitle"),
-    	    	        xtype: 'htmleditor',
-    	    	        name: 'title',
-    	    	        value: metadata.title,
-    	    	        height: 100,
-    	    	        enableAlignments : false,
-    	    	        enableColors : false,
-    	    	        enableFont : false,
-    	    	        enableFontSize : false,
-    	    	        enableLinks : false,
-    	    	        enableLists : false
-    	    	    },{
-    	    	        fieldLabel: this.localize("metadataAuthor"),
-    	    	        name: 'author',
-    	    	        value: metadata.author
-    	    	    },{
-    	    	        fieldLabel: this.localize("metadataKeywords"),
-    	    	        name: 'keywords',
-    	    	        value: metadata.keywords
-    	    	    },{
-    	    	    	xtype: 'htmleditor',
-    	    	        fieldLabel: this.localize("metadataDescription"),
-    	    	        name: 'description',
-    	    	        height: 100,
-    	    	        value: metadata.description,
-    	    	        enableAlignments : false,
-    	    	        enableColors : false,
-    	    	        enableFont : false
-    	    	    },{
-    	    	    	xtype: 'combo',
-    	    	        fieldLabel: this.localize("metadataLicense"),
-    	    	        name: 'license',
-    	    	        value: metadata.license || "Creative Commons Attribution (CC BY)",
-    	    	        store: {
-    	    	        	fields: ['text'],
-    	    	        	data: [
-    	        	        	{"text": "Apache License 2.0"},
-    	        	        	{"text": "BSD 3-Clause \"New\" or \"Revised\" license"},
-    	        	        	{"text": "BSD 2-Clause \"Simplified\" or \"FreeBSD\" license"},
-    	        	        	{"text": "Creative Commons Attribution (CC BY)"},
-    	        	        	{"text": "Creative Commons Attribution-ShareAlike (CC BY-SA)"},
-    	        	        	{"text": "Creative Commons Zero (CC0)"},
-    	        	        	{"text": "GNU General Public License (GPL)"},
-    	        	        	{"text": "GNU Library or \"Lesser\" General Public License (LGPL)"},
-    	        	        	{"text": "MIT license"},
-    	        	        	{"text": "Mozilla Public License 2.0"},
-    	        	        	{"text": "Common Development and Distribution License"},
-    	        	        	{"text": "Eclipse Public License"}
-    	        	        ]
-    	    	        }
-    	    	    },{
-    	    	    	xtype: 'combo',
-    	    	    	name: 'language',
-    	    	    	value: metadata.language || "English",
-    	    	        fieldLabel: this.localize("metadataLanguage"),
-    	    	        store: {
-    	    	        	fields: ['text'],
-    	    	        	data: [
-    	    	        		{"text": "Bengali"},
-    	    	        		{"text": "Bhojpuri"},
-    	    	        		{"text": "Egyptian Arabic"},
-    	    	        		{"text": "English"},
-    	    	        		{"text": "French"},
-    	    	        		{"text": "German"},
-    	    	        		{"text": "Gujarati"},
-    	    	        		{"text": "Hausa"},
-    	    	        		{"text": "Hindi"},
-    	    	        		{"text": "Indonesian"},
-    	    	        		{"text": "Italian"},
-    	    	        		{"text": "Japanese"},
-    	    	        		{"text": "Javanese"},
-    	    	        		{"text": "Kannada"},
-    	    	        		{"text": "Korean"},
-    	    	        		{"text": "Mandarin"},
-    	    	        		{"text": "Marathi"},
-    	    	        		{"text": "Persian"},
-    	    	        		{"text": "Portuguese"},
-    	    	        		{"text": "Russian"},
-    	    	        		{"text": "Southern Min"},
-    	    	        		{"text": "Spanish"},
-    	    	        		{"text": "Standard Arabic"},
-    	    	        		{"text": "Swahili"},
-    	    	        		{"text": "Tamil"},
-    	    	        		{"text": "Telugu"},
-    	    	        		{"text": "Thai"},
-    	    	        		{"text": "Turkish"},
-    	    	        		{"text": "Urdu"},
-    	    	        		{"text": "Vietnamese"},
-    	    	        		{"text": "Western Punjabi"},
-    	    	        		{"text": "Wu Chinese"},
-    	    	        		{"text": "Yue Chinese"}
-    	        	        ]
-    	    	        }
-    	    	    }]
-    	    		
-    	    	}
-    	    }],
+						// Fields will be arranged vertically, stretched to full width
+						layout: 'anchor',
+						defaults: {
+							anchor: '100%',
+							labelAlign: "right"
+						},
 
-    	    
-    	    // Reset and Submit buttons
-    	    buttons: [{
-    	        text: this.localize('metadataCancel'),
-	            ui: 'default-toolbar',
-    	        handler: function() {
-    	            this.up('window').close();
-    	        }
-    	    },{
-    	        text: this.localize('metadataReset'),
-	            ui: 'default-toolbar',
-    	        handler: function() {
-    	            this.up('window').down('form').getForm().reset();
-    	        }
-    	    }, " ", {
-    	        text: this.localize('metadataSave'),
-    	        handler: function() {
-    	            var form = this.up('window').down('form').getForm();
-    	            metadata.set(form.getValues())
-    	            me.updateMetadata();
-    	            this.up('window').close();
-    	        }
-    	    }]
-    	    
-    	}).show();
+						// The fields
+						defaultType: 'textfield',
+						items: [{
+							fieldLabel: this.localize("metadataTitle"),
+							xtype: 'htmleditor',
+							name: 'title',
+							height: 100,
+							enableAlignments : false,
+							enableColors : false,
+							enableFont : false,
+							enableFontSize : false,
+							enableLinks : false,
+							enableLists : false
+						},{
+							fieldLabel: this.localize("metadataAuthor"),
+							name: 'author'
+						},{
+							fieldLabel: this.localize("metadataKeywords"),
+							name: 'keywords'
+						},{
+							xtype: 'htmleditor',
+							fieldLabel: this.localize("metadataDescription"),
+							name: 'description',
+							height: 100,
+							enableAlignments : false,
+							enableColors : false,
+							enableFont : false
+						},{
+							xtype: 'combo',
+							fieldLabel: this.localize("metadataLicense"),
+							name: 'license',
+							store: {
+								fields: ['text'],
+								data: [
+									{"text": "Apache License 2.0"},
+									{"text": "BSD 3-Clause \"New\" or \"Revised\" license"},
+									{"text": "BSD 2-Clause \"Simplified\" or \"FreeBSD\" license"},
+									{"text": "Creative Commons Attribution (CC BY)"},
+									{"text": "Creative Commons Attribution-ShareAlike (CC BY-SA)"},
+									{"text": "Creative Commons Zero (CC0)"},
+									{"text": "GNU General Public License (GPL)"},
+									{"text": "GNU Library or \"Lesser\" General Public License (LGPL)"},
+									{"text": "MIT license"},
+									{"text": "Mozilla Public License 2.0"},
+									{"text": "Common Development and Distribution License"},
+									{"text": "Eclipse Public License"}
+								]
+							}
+						},{
+							xtype: 'combo',
+							name: 'language',
+							fieldLabel: this.localize("metadataLanguage"),
+							store: {
+								fields: ['text'],
+								data: [
+									{"text": "Bengali"},
+									{"text": "Bhojpuri"},
+									{"text": "Egyptian Arabic"},
+									{"text": "English"},
+									{"text": "French"},
+									{"text": "German"},
+									{"text": "Gujarati"},
+									{"text": "Hausa"},
+									{"text": "Hindi"},
+									{"text": "Indonesian"},
+									{"text": "Italian"},
+									{"text": "Japanese"},
+									{"text": "Javanese"},
+									{"text": "Kannada"},
+									{"text": "Korean"},
+									{"text": "Mandarin"},
+									{"text": "Marathi"},
+									{"text": "Persian"},
+									{"text": "Portuguese"},
+									{"text": "Russian"},
+									{"text": "Southern Min"},
+									{"text": "Spanish"},
+									{"text": "Standard Arabic"},
+									{"text": "Swahili"},
+									{"text": "Tamil"},
+									{"text": "Telugu"},
+									{"text": "Thai"},
+									{"text": "Turkish"},
+									{"text": "Urdu"},
+									{"text": "Vietnamese"},
+									{"text": "Western Punjabi"},
+									{"text": "Wu Chinese"},
+									{"text": "Yue Chinese"}
+								]
+							}
+						}]
+						
+					}
+				}],
+
+				
+				// Reset and Submit buttons
+				buttons: [{
+					text: this.localize('metadataCancel'),
+					ui: 'default-toolbar',
+					handler: function() {
+						this.up('window').close();
+					}
+				},{
+					text: this.localize('metadataReset'),
+					ui: 'default-toolbar',
+					handler: function() {
+						this.up('window').down('form').getForm().reset();
+					}
+				}, " ", {
+					text: this.localize('metadataSave'),
+					handler: function() {
+						var form = this.up('window').down('form').getForm();
+						me.getMetadata().set(form.getValues());
+						me.updateMetadata();
+						this.up('window').close();
+					}
+				}]
+				
+			})
+		}
+
+		var metadata = this.getMetadata();
+		if (metadata === undefined) {
+			metadata = new Spyral.Metadata();
+			this.setMetadata(metadata);
+		}
+		
+		var form = this.metadataWindow.down('form').getForm();
+		form.findField('title').setValue(metadata.title);
+		form.findField('author').setValue(metadata.author);
+		form.findField('keywords').setValue(metadata.keywords);
+		form.findField('description').setValue(metadata.description);
+		form.findField('license').setValue(metadata.license || "Creative Commons Attribution (CC BY)");
+		form.findField('language').setValue(metadata.language || "English");
+
+		this.metadataWindow.show();
 	}
 	
 	/*
@@ -38373,6 +37185,7 @@ Ext.define('Voyant.notebook.Notebook', {
 	}
 	*/
 });
+//src/app/VoyantApp.js
 Ext.define('Voyant.VoyantApp', {
 	
     extend: 'Ext.app.Application',
@@ -38588,6 +37401,7 @@ Ext.define('Voyant.VoyantApp', {
 
     
 });
+//src/app/VoyantCorpusApp.js
 Ext.define('Voyant.VoyantCorpusApp', {
 	
     extend: 'Voyant.VoyantApp',
@@ -38843,57 +37657,15 @@ Ext.define('Voyant.VoyantCorpusApp', {
 	},
 	
 	loadCategoryData: function(id) {
-		var dfd = new Ext.Deferred();
-
-		Ext.Ajax.request({
-			url: Voyant.application.getTromboneUrl(),
-			params: {
-				tool: 'resource.StoredCategories',
-				retrieveResourceId: id,
-				failQuietly: false,
-				corpus: this.getCorpus() ? this.getCorpus().getId() : undefined
-			}
-		}).then(function(response) {
-			var json = Ext.decode(response.responseText);
-			var id = json.storedCategories.id;
-			var value = json.storedCategories.resource;
-			if (value.length === 0) {
-				dfd.reject();
-			} else {
-				value = Ext.decode(value);
-				
-				this.getCategoriesManager()._categories = value.categories;
-				this.getCategoriesManager()._features = value.features;
-				
-				dfd.resolve(value);
-			}
-		}, function() {
-			this.showError("Unable to load categories data: "+id);
-			dfd.reject();
-		}, null, this);
-		
-		return dfd.promise;
+		return this.getCategoriesManager().load(id, {
+			trombone: Voyant.application.getTromboneUrl()
+		});
 	},
 
 	saveCategoryData: function(data) {
-		var dfd = new Ext.Deferred();
-		
-		var dataString = Ext.encode(data);
-		Ext.Ajax.request({
-			url: Voyant.application.getTromboneUrl(),
-			params: {
-				tool: 'resource.StoredResource',
-				storeResource: dataString
-			}
-		}).then(function(response) {
-			var json = Ext.util.JSON.decode(response.responseText);
-			var id = json.storedResource.id;
-			dfd.resolve(id);
-		}, function(response) {
-			dfd.reject();
+		return this.getCategoriesManager().save({}, {
+			trombone: Voyant.application.getTromboneUrl()
 		});
-		
-		return dfd.promise;
 	},
     
     listeners: {
@@ -38902,7 +37674,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     		
     		// let's load the categories based on the corpus
         	if (this.getApiParam("categories")) {
-				this.loadCategoryData(this.getApiParam("categories")).then(function(a,b,c) {
+				this.loadCategoryData(this.getApiParam("categories")).then(function() {
 					// assign colors
 					for (var category in this.getCategoriesManager().getCategories()) {
 						var color = this.getCategoriesManager().getCategoryFeature(category, 'color');
@@ -38914,7 +37686,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
 							}
 						}
 					}
-				}, null, null, this)
+				}.bind(this));
         	}    	
 
     		
@@ -38977,6 +37749,7 @@ Ext.define('Voyant.VoyantCorpusApp', {
     }
 
 });
+//src/app/VoyantCorpusToolsetApp.js
 Ext.define('Voyant.panel.DocumentClusters', {
 	extend: 'Ext.panel.Panel',
 	alias: 'widget.documentclusters',
@@ -39026,6 +37799,7 @@ Ext.define('Voyant.VoyantCorpusToolsetApp', {
         this.callParent(arguments);
 	}
 });
+//src/app/VoyantDefaultApp.js
 Ext.define('Voyant.VoyantDefaultApp', {
 	extend : 'Voyant.VoyantCorpusApp',
 	mixins: ['Voyant.util.Api'],
@@ -39133,6 +37907,7 @@ Ext.define('Voyant.VoyantDefaultApp', {
 		this.callParent(arguments);
 	}
 });
+//src/app/VoyantDocumentToolsetApp.js
 Ext.define('Voyant.panel.MoreLikeThis', {
 	extend: 'Ext.panel.Panel',
 	alias: 'widget.morelikethis',
@@ -39177,6 +37952,7 @@ Ext.define('Voyant.VoyantDocumentToolsetApp', {
         this.callParent(arguments);
 	}
 });
+//src/app/VoyantNotebookApp.js
 Ext.define('Voyant.VoyantNotebookApp', {
 	extend : 'Voyant.VoyantApp',
 	requires: ['Voyant.panel.VoyantFooter','Voyant.notebook.Notebook','Voyant.data.model.Corpus','Voyant.notebook.util.Show'],
@@ -39195,6 +37971,7 @@ Ext.define('Voyant.VoyantNotebookApp', {
 		this.callParent(arguments);    	
 	}
 });
+//src/app/VoyantToolApp.js
 Ext.define('Voyant.VoyantToolApp', {
 	extend : 'Voyant.VoyantCorpusApp',
 	name : 'VoyantToolApp',

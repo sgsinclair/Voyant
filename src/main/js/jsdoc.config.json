@@ -1,0 +1,11 @@
+{
+	"source": {
+		"include": ["src", "node_modules\\voyant\\src"],
+		"includePattern": ".+\\.js$"
+	},
+	"opts": {
+		"destination": "docs",
+		"recurse": true,
+		"package": "package.json"
+	}
+}
