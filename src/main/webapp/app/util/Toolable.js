@@ -270,6 +270,9 @@ Ext.define('Voyant.util.Toolable', {
        		inputValue: 'spyral',
        		boxLabel: panel.localize("exportViewSpyral")
        	}];
+		if (panel.isXType('notebook')) {
+			exportViewItems.splice(2, 1); // remove redundant spyral export for spyral notebooks
+		}
 		if (panel.getExtraExportItems) {
 			panel.getExtraExportItems().forEach(function(item) {
 				Ext.applyIf(item, {
