@@ -79,6 +79,26 @@ Ext.define('Voyant.panel.DocumentTerms', {
         		this.getStore().load({params: this.getApiParams()});
     		}
     	});
+
+		this.on("documentsSelected", function(src, docIds) {
+    		this.setApiParams({
+    			docId: docIds,
+    			query: undefined
+    		});
+    		if (this.isVisible()) {
+        		this.getStore().load({params: this.getApiParams()});
+    		}
+		});
+
+		this.on("corpusSelected", function(src, corpus) {
+			this.setApiParams({
+				docId: undefined,
+				docIndex: undefined
+			});
+			if (this.isVisible()) {
+				this.getStore().load({params: this.getApiParams()});
+			}
+		});
     	
     	this.on("activate", function() { // load after tab activate (if we're in a tab panel)
     		if (this.getStore().getCorpus()) {
