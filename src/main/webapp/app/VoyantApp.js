@@ -157,6 +157,8 @@ Ext.define('Voyant.VoyantApp', {
 				message: config.getMsg()+"<p class='error'>\n"+config.getError()+" … "+
 					"<a href='#' onclick=\"window.open('').document.write(unescape('<pre>"+escape(config.getDetails())+"</pre>')); return false;\">more</a></p>"
 			}
+		} else if (config instanceof Ext.data.operation.Operation) {
+			return this.showError(Ext.create("Voyant.util.ResponseError", config.getError()))
 		} else {
 			if (Ext.isString(config)) {
 				config = {message: config}
