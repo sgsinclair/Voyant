@@ -18,6 +18,13 @@ Ext.define('Voyant.panel.Panel', {
 	config: {
 		corpus: undefined
 	},
+	stateful: true,
+	stateEvents: ['savestate'],
+	getState: function() {
+		console.log('getting state for: '+this.getXType());
+		var state = this.callParent();
+		return state;
+	},
 	constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 		this.mixins['Voyant.util.Toolable'].constructor.apply(this, arguments);

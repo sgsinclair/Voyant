@@ -1,5 +1,5 @@
 Ext.define('Voyant.VoyantDefaultApp', {
-	extend : 'Voyant.VoyantCorpusApp',
+	extend : 'Voyant.VoyantStatefulApp',
 	mixins: ['Voyant.util.Api'],
 	name : 'VoyantDefaultApp',
 	constructor: function() {

@@ -186,6 +186,7 @@ app/notebook/Notebook.js
 app/VoyantApp.js
 app/VoyantCorpusApp.js
 app/VoyantCorpusToolsetApp.js
+app/VoyantStatefulApp.js
 app/VoyantDefaultApp.js
 app/VoyantDocumentToolsetApp.js
 app/VoyantNotebookApp.js
