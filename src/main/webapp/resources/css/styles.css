@@ -34,17 +34,6 @@ a {
     background-color: #f5f5f5;
 }
 
-@font-face {
-  font-family : 'FontAwesome';
-  src         : url('../fontawesome/current/fonts/fontawesome-webfont.eot?32940503');
-  src         : url('../fontawesome/current/font-awesome-4.0.3/fonts/fontawesome-webfont.eot?32940503#iefix') 
-        format('embedded-opentype'), url('../fontawesome/current/fonts/fontawesome-webfont.woff?32940503') 
-        format('woff'), url('../fontawesome/current/fonts/fontawesome-webfont.ttf?32940503') format('truetype'), 
-        url('../fontawesome/current/fonts/fontawesome-webfont.svg?32940503#FontAwesome') format('svg');
-  font-weight : normal;
-  font-style  : normal;
-}
-
 .info-tip {
     border-bottom: thin dotted #aaf;
 }
