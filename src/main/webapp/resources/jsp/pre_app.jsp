@@ -54,12 +54,17 @@
 	} else if (lang.equals("he") || lang.equals("ar")) {
 		rtl = "-rtl";
 	}
+
+	String spyral = "";
+	if (request.getServletPath().contains("/spyral") == true) {
+		spyral = "_spyral";
+	}
 %><!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-<link rel="shortcut icon" type="image/ico" href="<%= base %>/resources/voyant/favicon.ico" />
+<link rel="shortcut icon" type="image/ico" href="<%= base %>/resources/voyant/favicon<%= spyral %>.ico" />
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MZ8WDV5DGZ"></script>
