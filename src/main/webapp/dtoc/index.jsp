@@ -57,6 +57,7 @@ Ext.onReady(function(){
 						listeners: {
 							afterrender: function(cc) {
 								cc.setApiParam('inputFormat', 'dtoc'); // make this default
+								cc.setApiParam('dtocIndexDoc', 0);
 							}
 						}
 					}]

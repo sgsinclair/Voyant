@@ -57,7 +57,8 @@ Ext.define('Voyant.panel.CorpusCreator', {
     		inputRemoveFromAfter: undefined,
     		inputRemoveUntil: undefined,
     		inputRemoveUntilAfter: undefined,
-    		sort: undefined
+    		sort: undefined,
+			dtocIndexDoc: -1
     	}
     },
     
