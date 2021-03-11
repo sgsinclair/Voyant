@@ -79,6 +79,7 @@ Ext.define('VoyantDTOCApp', {
                         this.useIndex = true;
                         Ext.getCmp('dtcIndex').loadIndex();
                     } else {
+						this.useIndex = false;
                     	Ext.getCmp('dtcTools').remove(Ext.getCmp('dtcIndex'), true);
                     	Ext.getCmp('dtcMarkup').loadAllTags(true);
                     }
@@ -88,6 +89,8 @@ Ext.define('VoyantDTOCApp', {
                     }
                     this.dispatchEvent('corpusDocumentSelected', this, {docId: docId});
                 }, function() {
+					this.useIndex = false;
+					Ext.getCmp('dtcTools').remove(Ext.getCmp('dtcIndex'), true);
                 	Ext.getCmp('dtcMarkup').loadAllTags(true);
                 	var docId = this.getApiParam('docId');
                     if (docId === undefined) {
