@@ -387,9 +387,9 @@ Ext.define('Voyant.notebook.Notebook', {
 				var spyralIdMatches = /\/spyral\/([\w-]+)\/?$/.exec(location.pathname);
 				var isGithub = Ext.isDefined(queryParams.githubId);
 				if ("inputJsonArrayOfEncodedBase64" in queryParams) {
-					let json = Ext.decode(queryParams.inputJsonArrayOfEncodedBase64);
+					let json = Ext.decode(decodeURIComponent(atob(queryParams.inputJsonArrayOfEncodedBase64)));
 					json.forEach(function(block) {
-						let text = decodeURIComponent(atob(block));
+						let text = block;
 						if (text.trim().indexOf("<")==0) {
 							this.addText(text);
 						} else {

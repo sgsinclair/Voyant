@@ -644,10 +644,10 @@ Ext.define('Voyant.util.Toolable', {
 		let enc = function(str) {
 			return btoa(encodeURIComponent(str)).replace(/=/g, "%3D");
 		}
-		let input = '["'+enc("<h2>Spyral Notebook Imported from Voyant Tools</h2>")+'","'+
-			enc('loadCorpus("'+this.getApplication().getCorpus().getAliasOrId()+'").tool("'+
-			(toolForUrl=="VoyantHeader" ? "" : toolForUrl)+'"'+(Object.keys(api).length>0 ? (","+Ext.encode(api)) : "")+ ');')+'"]'
-		this.openUrl(this.getApplication().getBaseUrl()+"spyral/?run=true&"+(isDebug ? "debug=true&" : "")+"inputJsonArrayOfEncodedBase64="+input);
+		let input = "['<h2>Spyral Notebook Imported from Voyant Tools</h2>','"+
+			'loadCorpus("'+this.getApplication().getCorpus().getAliasOrId()+'").tool("'+
+			(toolForUrl=="VoyantHeader" ? "" : toolForUrl)+'"'+(Object.keys(api).length>0 ? (","+Ext.encode(api)) : "")+ ");']"
+		this.openUrl(this.getApplication().getBaseUrl()+"spyral/?run=true&"+(isDebug ? "debug=true&" : "")+"inputJsonArrayOfEncodedBase64="+enc(input));
 	},
 	exportGridCurrentJson: function(grid, form) {
 		var store = grid.getStore();
