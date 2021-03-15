@@ -408,6 +408,7 @@ Ext.define('Voyant.notebook.Notebook', {
 					this.setStorageSolution('github');
 				} else {
 					this.addNew();
+					this.setIsEdited(false);
 				}
 				
 				if (isRun) {
@@ -846,11 +847,19 @@ Ext.define('Voyant.notebook.Notebook', {
     			let url = this.getBaseUrl()+"spyral/"+id+"/";
     			window.history.pushState({
 					url: url
-				}, "Spyral Notebook: "+id, url);
+				}, '', url);
     		}
     	}
 		this.callParent(arguments);
     },
+
+	setMetadata: function(metadata) {
+		this.callParent(arguments);
+		if (metadata && metadata.title) {
+			let title = metadata.title.replace(/<\/?\w+.*?>/g, ''); // remove tags
+			document.title = title+' - Spyral';
+		}
+	},
     
     generateExportHtml: function() {
     	var metadata = this.getMetadata();
