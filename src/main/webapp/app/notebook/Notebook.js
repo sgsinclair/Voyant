@@ -388,10 +388,17 @@ Ext.define('Voyant.notebook.Notebook', {
 				var isGithub = Ext.isDefined(queryParams.githubId);
 				if ("inputJsonArrayOfEncodedBase64" in queryParams) {
 					let json = Ext.decode(decodeURIComponent(atob(queryParams.inputJsonArrayOfEncodedBase64)));
-					json.forEach(function(block) {
+					json.forEach(function(block, index) {
 						let text = block;
 						if (text.trim().indexOf("<")==0) {
-							this.addText(text);
+							if (index === 0) {
+								// assume first text block is metadata
+								this.setMetadata(new Spyral.Metadata({
+									title: text
+								}));
+							} else {
+								this.addText(text);
+							}
 						} else {
 							this.addCode(text);
 						}
@@ -605,7 +612,7 @@ Ext.define('Voyant.notebook.Notebook', {
     loadFromHtmlString: function(html) {
     	var parser = new DOMParser();
     	var dom = parser.parseFromString(html, 'text/html');
-    	this.setMetadata(new Spyral.Metadata(dom))
+    	this.setMetadata(new Spyral.Metadata(dom));
     	var hasDomError = false;
     	dom.querySelectorAll("section.notebook-editor-wrapper").forEach(function(section) {
     		var classes = section.classList;
@@ -1052,6 +1059,7 @@ Ext.define('Voyant.notebook.Notebook', {
 							fieldLabel: this.localize("metadataAuthor"),
 							name: 'author'
 						},{
+							// TODO convert to tag field?
 							fieldLabel: this.localize("metadataKeywords"),
 							name: 'keywords'
 						},{
