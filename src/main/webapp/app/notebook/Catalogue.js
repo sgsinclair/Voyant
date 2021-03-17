@@ -1,9 +1,20 @@
 Ext.define('Voyant.notebook.Catalogue', {
 	extend: 'Ext.Component',
-	requires: [],
+	requires: ['Voyant.widget.Facet','Voyant.data.store.NotebookFacets'],
+    mixins: ['Voyant.util.Localization'],
 	alias: 'widget.notebookcatalogue',
 	statics: {
 		i18n: {
+			title: 'Notebooks Catalogue',
+			browse: 'Browse Notebooks',
+			keywords: 'Keywords',
+			author: 'Author',
+			language: 'Language',
+			license: 'License',
+			search: 'Search',
+			noResults: 'No matching notebooks',
+			suggested: 'Suggested Notebooks',
+			load: 'Load Selected Notebook'
 		}
 	},
 
@@ -12,7 +23,9 @@ Ext.define('Voyant.notebook.Catalogue', {
 	store: undefined,
 	template: undefined,
 
-	config: {},
+	config: {
+		facets: {}
+	},
 
 	constructor: function() {
 		this.store = Ext.create('Ext.data.JsonStore', {
@@ -49,83 +62,130 @@ Ext.define('Voyant.notebook.Catalogue', {
 	showWindow: function() {
 		if (this.window === undefined) {
 			this.window = Ext.create('Ext.window.Window', {
-				title: 'Notebooks Catalogue',
-				width: 700,
-				height: 550,
-				layout: {
-					type: 'vbox'
-				},
-				closeAction: 'hide',
+				title: this.localize('title'),
+				width: 800,
+				height: 675,
+				layout: 'border',
 				items: [{
-					xtype: 'toolbar',
-					height: 30,
-					hidden: true,
+					xtype: 'panel',
+					region: 'center',
+					flex: 2,
+					border: true,
+					layout: {
+						type: 'vbox',
+						align: 'stretch'
+					},
 					items: [{
-						xtype: 'splitbutton',
-						text: 'Sort',
-						glyph: 'xf161@FontAwesome',
-						menu: {
-							defaults: {
-								xtype: 'menucheckitem',
-								group: 'sortfield'
+						xtype: 'toolbar',
+						height: 30,
+						layout: {
+							type: 'hbox',
+							pack: 'center'
+						},
+						items: [{xtype:'tbspacer', flex: .1},{
+							xtype: 'textfield',
+							itemId: 'queryfield',
+							emptyText: this.localize('search'),
+							flex: .8,
+							enableKeyEvents: true,
+							triggers: {
+								search: {
+									cls: 'fa-trigger form-fa-search-trigger',
+									handler: function(cmp) {
+										// var query = cmp.getValue();
+										// if (query.trim().length > 0) {
+										// 	this.getNotebooks([query]);
+										// }
+										this.getNotebooks();
+									},
+									scope: this
+								}
 							},
-							items: [{
-								itemId: 'id',
-								text: 'ID'
-							},{
-								itemId: 'created',
-								text: 'Created'
-							},{
-								itemId: 'modified',
-								text: 'Modified',
-								checked: true
-							},{
-								itemId: 'title',
-								text: 'Title'
-							},{
-								itemId: 'author',
-								text: 'Author'
-							}],
 							listeners: {
-								click: function(menu, item) {
-									var sortDir = menu.up().getGlyph().glyphConfig === 'xf161@FontAwesome' ? 'DESC' : 'ASC';
-									var sortField = item.itemId;
-									this.store.sort(sortField, sortDir);
-									this.window.down('#catalogue').refresh();
+								keyup: function(cmp, e) {
+									if (e.getCharCode() === 13) {
+										this.getNotebooks();
+									}
 								},
 								scope: this
 							}
-						},
-						handler: function(but) {
-							var sortDir;
-							if (but.getGlyph().glyphConfig === 'xf161@FontAwesome') {
-								but.setGlyph('xf160@FontAwesome');
-								sortDir = 'ASC';
-							} else {
-								but.setGlyph('xf161@FontAwesome');
-								sortDir = 'DESC';
-							}
-							var sortField = but.menu.down('[checked=true]').itemId;
-							this.store.sort(sortField, sortDir);
-							this.window.down('#catalogue').refresh();
-						},
-						scope: this
+						},{xtype:'tbspacer', flex: .1}]
+					},{
+						xtype: 'dataview',
+						flex: 1,
+						width: '100%',
+						padding: 10,
+						scrollable: 'vertical',
+						itemId: 'catalogue',
+						store: this.store,
+						tpl: this.template,
+						itemSelector: 'div.catalogue-notebook',
+						overItemCls: 'catalogue-notebook-over',
+						selectedItemCls: 'catalogue-notebook-selected',
+						listeners: {
+							itemdblclick: function(view, record, el) {
+								this.fireEvent('notebookSelected', this, record.get('id'));
+							},
+							scope: this
+						}
 					}]
 				},{
-					xtype: 'dataview',
+					xtype: 'panel',
+					region: 'west',
+					collapsible: true,
+					title: this.localize('browse'),
 					flex: 1,
-					width: '100%',
-					padding: 10,
-					scrollable: 'vertical',
-					itemId: 'catalogue',
-					store: this.store,
-					tpl: this.template,
-					itemSelector: 'div.catalogue-notebook',
-					overItemCls: 'catalogue-notebook-over',
-					selectedItemCls: 'catalogue-notebook-selected'
+					itemId: 'facets',
+					layout: {
+						type: 'accordion',
+						animate: false,
+						multi: true,
+						align: 'stretch',
+						hideCollapseTool: true
+					},
+					defaults: {
+						xtype: 'facet',
+						flex: 1
+					},
+					items: [{
+						title: this.localize('keywords'),
+						facet: 'facet.keywords',
+						store: Ext.create('Voyant.data.store.NotebookFacets', {
+							facet: 'facet.keywords'
+						})
+					},{
+						title: this.localize('author'),
+						facet: 'facet.author',
+						store: Ext.create('Voyant.data.store.NotebookFacets', {
+							facet: 'facet.author'
+						})
+					},{
+						title: this.localize('language'),
+						facet: 'facet.language',
+						store: Ext.create('Voyant.data.store.NotebookFacets', {
+							facet: 'facet.language'
+						})
+					},{
+						title: this.localize('license'),
+						facet: 'facet.license',
+						store: Ext.create('Voyant.data.store.NotebookFacets', {
+							facet: 'facet.license'
+						})
+					}]
+				},{
+					xtype: 'panel',
+					region: 'east',
+					collapsible: true,
+					collapsed: true,
+					title: this.localize('suggested'),
+					flex: 1,
+					items: [{
+
+					}]
 				}],
+				closeAction: 'hide',
 				buttons: [{
-					text: 'Load Selected Notebook',
+					text: this.localize('load'),
 					handler: function(but) {
 						var record = this.window.down('#catalogue').getSelection()[0]
 						if (record !== undefined) {
@@ -134,10 +194,23 @@ Ext.define('Voyant.notebook.Catalogue', {
 					},
 					scope: this
 				}]
-			})
+			});
+			this.window.query('#facets > facet').forEach(function(facetCmp) {
+				facetCmp.getSelectionModel().on('selectionchange', this._handleFacetSelection.bind(this, facetCmp.facet))
+				facetCmp.getStore().load();
+			}, this);
+		} else {
+			// reset
+			this.setFacets({});
+			this.window.query('#facets > facet').forEach(function(facetCmp) {
+				facetCmp.getSelectionModel().deselectAll();
+			});
+			this.window.down('#queryfield').setValue('');
+			this.window.down('#catalogue').getSelectionModel().deselectAll();
+			this.store.removeAll();
 		}
+
 		this.window.show();
-		this.getNotebooks();
 	},
 
 	hideWindow: function() {
@@ -146,19 +219,51 @@ Ext.define('Voyant.notebook.Catalogue', {
 		}
 	},
 
-	getNotebooks: function(query, config) {
-		this.window.mask('Loading');
+	_handleFacetSelection: function(facet, model, selected) {
+		var labels = [];
+		selected.forEach(function(model) {
+			labels.push({facet: facet, label: model.getLabel ? model.getLabel() : model.getTerm()})
+		})
+		this.getFacets()[facet] = labels;
+		this.getNotebooks();
+	},
+
+	getNotebooks: function(queries) {
+    	if (!queries) {
+	    	queries = [];
+			var facets = this.getFacets();
+	    	for (facet in facets) {
+	    		facets[facet].forEach(function(label) {
+	        		queries.push(label.facet+":"+label.label);
+	    		})
+	    	}
+			var queryfieldstring = this.window.down('#queryfield').getValue();
+			if (queryfieldstring.trim().length > 0) {
+				queries.push('text:'+queryfieldstring);
+				queries.push('code:'+queryfieldstring);
+			}
+			return this.getNotebooks(queries);
+    	}
+		if (queries.length === 0) {
+			this.window.down('#catalogue').getSelectionModel().deselectAll();
+			this.store.removeAll();
+			return;
+		}
+
+		this.window.down('#catalogue').mask('Loading');
 		this.window.down('#catalogue').getSelectionModel().deselectAll();
-    	var me = this;
+
+		var me = this;
 		Spyral.Load.trombone({
-			tool: 'notebook.GitNotebookManager',
-			action: 'catalogue',
-			limit: 100,
+			tool: 'notebook.NotebookFinder',
+			query: queries,
 			noCache: 1
 		}).then(function(json) {
-			me.window.unmask();
-			var notebooks = JSON.parse(json.notebook.data);
-			me.store.loadRawData(notebooks);
-		}).catch(function(err) {me.window.unmask()});
+			me.window.down('#catalogue').unmask();
+			me.store.loadRawData(json.catalogue.notebooks);
+			me.store.sort('modified', 'DESC');
+		}).catch(function(err) {
+			me.window.unmask()
+		});
 	}
 });

@@ -16,8 +16,7 @@ Ext.define('Voyant.widget.Facet', {
         Ext.applyIf(config || {}, {
         	includeTools: [], // don't show tools in header
         	rowLines: false,
-        	columnLines: false, // ignored?
-        	subtitle: undefined
+			subtitle: undefined
         });
         this.mixins['Voyant.panel.Panel'].constructor.apply(this, [config]);
 	},

@@ -70,6 +70,7 @@ app/data/store/RelatedTerms.js
 app/data/store/TermCorrelations.js
 app/data/store/Tokens.js
 app/data/store/TSNEAnalysis.js
+app/data/store/NotebookFacets.js
 
 # TABLES
 app/data/util/Table.js
