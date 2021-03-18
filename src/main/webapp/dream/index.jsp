@@ -1,4 +1,34 @@
-<%@ include file="../resources/jsp/pre_app.jsp" %>
+<% request.setAttribute("title", "DREaM - Distant Reading Early Modernity"); %>
+<%@ include file="../resources/jsp/html_head.jsp" %>
+
+<link href='http://fonts.googleapis.com/css?family=Cinzel+Decorative:400,900' rel='stylesheet' type='text/css'>
+<style>
+	.dream-body {
+		background-image: url(dream-tp-transparent.png);
+		background-size: cover;
+	}
+	.dream-body .x-panel-body-default {
+		background: none;
+	}
+	.dream-body header {
+		font-family: 'Cinzel Decorative', cursive;
+	}
+	.dream-body h1 {
+		font-size: 600%;
+		margin-bottom: 35px;
+	}
+	table.intro {
+		margin-left: auto;
+		margin-right: auto;
+		max-width: 125em;
+	}
+	table.intro td {
+		padding: 1em;
+		vertical-align: top;
+	}
+</style>
+
+<%@ include file="../resources/jsp/head_body.jsp" %>
 
 <script>
 	Ext.Loader.setConfig({
@@ -249,34 +279,6 @@
 		}
 	});
 </script>
-<link href='http://fonts.googleapis.com/css?family=Cinzel+Decorative:400,900' rel='stylesheet' type='text/css'>
-<style>
-	.dream-body {
-		background-image: url(dream-tp-transparent.png);
-		background-size: cover;
-	}
-	.dream-body .x-panel-body-default {
-		background: none;
-	}
-	.dream-body header {
-		font-family: 'Cinzel Decorative', cursive;
-	}
-	.dream-body h1 {
-		font-size: 600%;
-		margin-bottom: 35px;
-	}
-	table.intro {
-		margin-left: auto;
-		margin-right: auto;
-		max-width: 125em;
-	}
-	table.intro td {
-		padding: 1em;
-		vertical-align: top;
-	}
-</style>
-</head>
-<body>
 
 <section>
 	<header>

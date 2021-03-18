@@ -1,4 +1,9 @@
-<%@ include file="../resources/jsp/pre_app.jsp" %>
+<% request.setAttribute("title", "Voyant Tools - Skin Builder"); %>
+<%@ include file="../resources/jsp/html_head.jsp" %>
+
+<link href="css/builder.css" rel="stylesheet" type="text/css" />
+
+<%@ include file="../resources/jsp/head_body.jsp" %>
 
 <script>
     Ext.Loader.setConfig({
@@ -32,8 +37,5 @@
 <script src="Builder.js"></script>
 <script src="TableGrid.js"></script>
 
-<link href="css/builder.css" rel="stylesheet" type="text/css" />
-
-<body>
 </body>
 </html>

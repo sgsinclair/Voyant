@@ -75,7 +75,11 @@ if (isNotRealTool || !toolFound) {
 	return;
 }
 
-%><%@ include file="../resources/jsp/pre_app.jsp" %>
+%>
+
+<% request.setAttribute("title", "Voyant Tools - "+tool); %>
+<%@ include file="../resources/jsp/html_head.jsp" %>
+<%@ include file="../resources/jsp/head_body.jsp" %>
 	
 <script>
 	Ext.Loader.setConfig({
@@ -111,5 +115,6 @@ if (isNotRealTool || !toolFound) {
 	});
 	
 </script>
-<title>Voyant Tools - <%= tool %></title>
-<%@ include file="../resources/jsp/post_app.jsp" %>
+
+</body>
+</html>

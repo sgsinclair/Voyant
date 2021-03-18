@@ -1,4 +1,58 @@
-<% request.setAttribute("lang", "fr"); %><%@ include file="../resources/jsp/pre_app.jsp" %>
+<% request.setAttribute("lang", "fr"); %>
+
+<% request.setAttribute("title", "PBLit"); %>
+<%@ include file="../resources/jsp/html_head.jsp" %>
+
+<style>
+	/* Page */
+	div#page {
+		padding: 0px;
+		position: relative;
+		min-height: 100%;
+		background-color: #FFFFF3;
+	}
+	
+	/* Header */
+	#header {
+		background-color: #E2F3FF;
+		width: 100%;
+		height: 100px;
+	}
+	
+	#header a {
+		color: #36393D;
+		text-decoration: none;
+		font-size: 16px;
+		letter-spacing: -1px;
+	}
+	/* HEADER */
+	#logo {
+		display: block;
+		float: left;
+		margin: 0px 0px 0px 10px;
+		width: 226px;
+		height: 100px;
+		cursor: pointer;
+		background-image: url('pblit_logo.png');
+		background-repeat: no-repeat;
+	}
+	div#content {
+		width: 100%;
+		height: 100%;
+		border-top: 3px solid #36393D;
+		margin: 0px;
+		padding: 0px;
+	}
+	#fullCol {
+		margin: 10px;
+		padding: 15px;
+		background-color: #FFFFFF;
+		border: 1px solid #EEEEEE;
+	}
+	
+</style>
+
+<%@ include file="../resources/jsp/head_body.jsp" %>
 
 <script>
 	Ext.Loader.setConfig({
@@ -8,13 +62,12 @@
 			'resources': '../resources'
 		}
 	});
-
  	Ext.define('Voyant.panel.Pblit', {
  	 	extend: 'Voyant.panel.Catalogue',
  	 	statics: {
  	 	 	i18n: {
  	 	 	 	"facet.extra.collectionTitle": "Collections",
- 	 	 	 	helpTip: "PBLit (PolyBase littéraire) est un projet expérimental qui vise à développer des stratégies pour l'exploitation simultanée de multiples base de données et sources de textes numérisés. De nombreuses ressources existent pour les littéraires, mais les données sont presque toujours disponibles uniquement à partir de l'interface de chaque ressource individuelle. PBLit offre un modèle prototype pour la navigation et la recherche dans de multiples ressources littéraires."
+ 	 	 	 	helpTip: "PBLit (PolyBase littÃ©raire) est un projet expÃ©rimental qui vise Ã  dÃ©velopper des stratÃ©gies pour l'exploitation simultanÃ©e de multiples base de donnÃ©es et sources de textes numÃ©risÃ©s. De nombreuses ressources existent pour les littÃ©raires, mais les donnÃ©es sont presque toujours disponibles uniquement Ã  partir de l'interface de chaque ressource individuelle. PBLit offre un modÃ¨le prototype pour la navigation et la recherche dans de multiples ressources littÃ©raires."
  	 	 	}
  	 	},
 		alias: 'widget.pblit',
@@ -43,18 +96,15 @@
 	    	}
 		},
 	    launch: function() {
-
 	    	if (!this.hasQueryToLoad()) {
 		    	location.replace("?corpus=dream")
 	    	}
-
 			// get current markup and then dispose of it
 			var headerEl = document.querySelector("body > section");
 			var introHtml = headerEl.outerHTML;
 			headerEl.remove();
 			
 			var me = this;
-
 			
 			Ext.create('Ext.container.Viewport', {
 			    layout: 'fit',
@@ -70,63 +120,10 @@
 					}
 			    }]
 			});
-
 			this.callParent(arguments);
-
 		}
 	});
 </script>
-<style>
-/* Page */
-div#page {
-	padding: 0px;
-	position: relative;
-	min-height: 100%;
-	background-color: #FFFFF3;
-}
-
-/* Header */
-#header {
-	background-color: #E2F3FF;
-	width: 100%;
-	height: 100px;
-}
-
-#header a {
-	color: #36393D;
-	text-decoration: none;
-	font-size: 16px;
-	letter-spacing: -1px;
-}
-/* HEADER */
-#logo {
-	display: block;
-	float: left;
-	margin: 0px 0px 0px 10px;
-	width: 226px;
-	height: 100px;
-	cursor: pointer;
-	background-image: url('pblit_logo.png');
-	background-repeat: no-repeat;
-}
-div#content {
-	width: 100%;
-	height: 100%;
-	border-top: 3px solid #36393D;
-	margin: 0px;
-	padding: 0px;
-}
-#fullCol {
-	margin: 10px;
-	padding: 15px;
-	background-color: #FFFFFF;
-	border: 1px solid #EEEEEE;
-}
-
-</style>
-<title>PBLit</title>
-</head>
-<body>
 
 <section>
 <div id="page">
@@ -138,28 +135,28 @@ div#content {
 <div>
 	<!-- LEFT COLUMN -->
 	<div id="fullCol">
-			<h2>Présentation</h2>
+			<h2>PrÃ©sentation</h2>
 			<div>
-				<p>PBLit (PolyBase littéraire) est un projet expérimental qui vise à
-					développer des stratégies pour l'exploitation simultanée de
-					multiples base de données et sources de textes numérisés. De
-					nombreuses ressources existent pour les littéraires, mais les
-					données sont presque toujours disponibles uniquement à partir de
-					l'interface de chaque ressource individuelle. PBLit offre un modèle
+				<p>PBLit (PolyBase littÃ©raire) est un projet expÃ©rimental qui vise Ã 
+					dÃ©velopper des stratÃ©gies pour l'exploitation simultanÃ©e de
+					multiples base de donnÃ©es et sources de textes numÃ©risÃ©s. De
+					nombreuses ressources existent pour les littÃ©raires, mais les
+					donnÃ©es sont presque toujours disponibles uniquement Ã  partir de
+					l'interface de chaque ressource individuelle. PBLit offre un modÃ¨le
 					prototype pour la navigation et la recherche dans de multiples
-					ressources littéraires.</p>
+					ressources littÃ©raires.</p>
 				<p>Les cinq ressources disponibles actuellement sont les suivantes:</p>
 				<ol>
 					<li><a href="http://www.satorbase.org/">SatorBase</a>, une base de
-						données relationnelle de topoï dans la
-						littérature française de 1200 à 1800</li>
+						donnÃ©es relationnelle de topoÃ¯ dans la
+						littÃ©rature franÃ§aise de 1200 Ã  1800</li>
 					<li><a href="http://tapor.mcmaster.ca/%7Ehyperliste/">Hyperliste</a>,
-						une base de données d'énumérations
-						dans la littérature française de 1200 à 1500</li>
-					<li>Le Thésaurus du motif merveilleux</li>
+						une base de donnÃ©es d'Ã©numÃ©rations
+						dans la littÃ©rature franÃ§aise de 1200 Ã  1500</li>
+					<li>Le ThÃ©saurus du motif merveilleux</li>
 					<li><a href="http://digihum.mcgill.ca/toucher/">Toucher</a>, une
-						sélection de textes littéraires intégraux</li>
-					<li>Articles savants relatifs à la topique narrative</li>
+						sÃ©lection de textes littÃ©raires intÃ©graux</li>
+					<li>Articles savants relatifs Ã  la topique narrative</li>
 				</ol>
 			</div>
 	</div>

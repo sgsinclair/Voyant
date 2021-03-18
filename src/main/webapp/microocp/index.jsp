@@ -1,5 +1,7 @@
-<%@ include file="../resources/jsp/pre_app.jsp" %>
-<!--  Note that <String> base is defined in pre_app.jsp -->
+<% request.setAttribute("title", "Voyant Tools MicroOCP"); %>
+<%@ include file="../resources/jsp/html_head.jsp" %>
+<%@ include file="../resources/jsp/head_body.jsp" %>
+
 <script src="<%= base %>/resources/ace/1.4.12/src-min-noconflict/ace.js"></script>
 
 <script>
@@ -33,5 +35,6 @@
 	});
 	
 </script>
-<title>Voyant Tools MicroOCP</title>
-<%@ include file="../resources/jsp/post_app.jsp" %>
+
+</body>
+</html>

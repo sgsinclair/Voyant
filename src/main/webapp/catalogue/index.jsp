@@ -9,7 +9,11 @@ if (parts.length<2) {
 }
 String corpus = parts[1];
 
-%><%@ include file="../resources/jsp/pre_app.jsp" %>
+%>
+
+<% request.setAttribute("title", "Voyant Tools - "+corpus); %>
+<%@ include file="../resources/jsp/html_head.jsp" %>
+<%@ include file="../resources/jsp/head_body.jsp" %>
 	
 <script>
 	Ext.Loader.setConfig({
@@ -44,5 +48,6 @@ String corpus = parts[1];
 	});
 	
 </script>
-<title>Voyant Tools - <%= corpus %></title>
-<%@ include file="../resources/jsp/post_app.jsp" %>
+
+</body>
+</html>

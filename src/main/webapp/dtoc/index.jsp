@@ -1,4 +1,10 @@
-<%@ include file="../resources/jsp/pre_app.jsp" %>
+<% request.setAttribute("title", "Dynamic Table of Contexts"); %>
+<%@ include file="../resources/jsp/html_head.jsp" %>
+
+<link href='https://fonts.googleapis.com/css?family=Nunito:300,400' rel='stylesheet' type='text/css' />
+<link href="css/dtc.css" rel="stylesheet" type="text/css" />
+
+<%@ include file="../resources/jsp/head_body.jsp" %>
 
 <!-- <script src="https://hypothes.is/embed.js" async></script> -->
 
@@ -68,19 +74,5 @@ Ext.onReady(function(){
 });
 </script>
 
-<link href='https://fonts.googleapis.com/css?family=Nunito:300,400' rel='stylesheet' type='text/css' />
-
-<!-- 
-<link href="annotator/annotator.min.css" rel="stylesheet" type="text/css" />
-<link href="annotator/dtoc.annotator.css" rel="stylesheet" type="text/css" />
-<script src="annotator/annotator-full.min.js"></script>
-<script src="annotator/dtoc.annotator.auth.js"></script>
-<script src="annotator/dtoc.annotator.js"></script>
- -->
-
-<link href="css/dtc.css" rel="stylesheet" type="text/css" />
-<title>Dynamic Table of Contexts</title>
-</head>
-<body>
 </body>
 </html>

@@ -26,8 +26,11 @@
 	   response.setHeader("Location", "./" + (skin.equals("dtoc") ? "dtoc/" : "") + (query.length()>0 ? "?"+query+"" : ""));
        return;
    }
-   
-   %><%@ include file="resources/jsp/pre_app.jsp" %>
+%>
+
+<% request.setAttribute("title", "Voyant Tools"); %>
+<%@ include file="resources/jsp/html_head.jsp" %>
+<%@ include file="resources/jsp/head_body.jsp" %>
 <!-- <script>
 	Ext.Loader.setConfig({
 		enabled : true,
@@ -96,6 +99,6 @@ Ext.onReady(function(){
 	});
 });
 </script>
-<title>Voyant Tools</title>
 
-<%@ include file="resources/jsp/post_app.jsp" %>
+</body>
+</html>
