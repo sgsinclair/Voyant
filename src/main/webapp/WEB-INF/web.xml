@@ -128,4 +128,13 @@
 		<extension>js</extension>
 		<mime-type>application/javascript;charset=UTF-8</mime-type>
 	</mime-mapping>
+
+	<!-- universally set encoding for UTF-8 (simpliflies jsp includes)-->
+	<jsp-config>
+		<jsp-property-group>
+			<url-pattern>*.jsp</url-pattern>
+			<page-encoding>UTF-8</page-encoding>
+		</jsp-property-group>
+	</jsp-config>
+
 </web-app>
