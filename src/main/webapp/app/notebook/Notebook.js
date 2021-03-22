@@ -523,12 +523,14 @@ Ext.define('Voyant.notebook.Notebook', {
 		metadata.description = textContainer.textContent;
 		textContainer.remove();
 
-		metadata.keywords = metadata.keywords.split(/[\s,]+/).reduce(function(keywordsArray, keyword) {
-			if (keyword.length > 0) {
-				keywordsArray.push(keyword.toLowerCase());
-			}
-			return keywordsArray;
-		}, []);
+		if (metadata.keywords) {
+			metadata.keywords = metadata.keywords.split(/[\s,]+/).reduce(function(keywordsArray, keyword) {
+				if (keyword.length > 0) {
+					keywordsArray.push(keyword.toLowerCase());
+				}
+				return keywordsArray;
+			}, []);
+		}
 
 		const storageSolution = this.getStorageSolution();
 		
