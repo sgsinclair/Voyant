@@ -654,7 +654,7 @@ Ext.define('Voyant.util.Toolable', {
 		var store = grid.getStore();
 		var fields = store.getFields();
 		var value = "<table>\n\t<thead>\n\t\t<tr>\n";
-		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns();
+		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns().filter(function(col) { return col.dataIndex && col.dataIndex.trim().length > 0 });
 		values = [];
 
 		function jsonCollector(row) {
@@ -684,7 +684,7 @@ Ext.define('Voyant.util.Toolable', {
 	exportGridCurrentTsv: function(grid, form) {
 		var store = grid.getStore();
 		var fields = store.getFields();
-		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns();
+		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns().filter(function(col) { return col.dataIndex && col.dataIndex.trim().length > 0 });
 		var fields = [];
 		visibleColumns.forEach(function(column) {
 			fields.push(column.text);
@@ -723,7 +723,7 @@ Ext.define('Voyant.util.Toolable', {
 		var store = grid.getStore();
 		var fields = store.getFields();
 		var value = "<table>\n\t<thead>\n\t\t<tr>\n";
-		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns();
+		var visibleColumns = grid.getColumnManager().headerCt.getVisibleGridColumns().filter(function(col) { return col.dataIndex && col.dataIndex.trim().length > 0 });
 		visibleColumns.forEach(function(column) {
 			value+="\t\t\t<td>"+column.text+"</td>\n";
 		});
