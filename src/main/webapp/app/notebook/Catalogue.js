@@ -65,6 +65,7 @@ Ext.define('Voyant.notebook.Catalogue', {
 				title: this.localize('title'),
 				width: 800,
 				height: 675,
+				modal: true,
 				layout: 'border',
 				items: [{
 					xtype: 'panel',
