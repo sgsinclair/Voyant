@@ -240,8 +240,7 @@ Ext.define('Voyant.notebook.Catalogue', {
 	    	}
 			var queryfieldstring = this.window.down('#queryfield').getValue();
 			if (queryfieldstring.trim().length > 0) {
-				queries.push('text:'+queryfieldstring);
-				queries.push('code:'+queryfieldstring);
+				queries.push(queryfieldstring);
 			}
 			return this.getNotebooks(queries);
     	}
