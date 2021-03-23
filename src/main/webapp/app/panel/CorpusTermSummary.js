@@ -181,8 +181,8 @@ Ext.define('Voyant.widget.CorpusTermSummary', {
                     store.load({
                         params: params,
                         callback: function(records, op, success) {
+							container.unmask();
                             if (success && records && records.length>0) {
-                                container.unmask();
                                 Ext.dom.Helper.append(container.getTargetEl().first().first(),
                                     new Ext.XTemplate('<div class="contents">'+template+'</div>').apply(records.map(mapping))
                                 );
