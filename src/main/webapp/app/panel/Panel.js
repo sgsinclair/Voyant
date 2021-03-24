@@ -18,20 +18,17 @@ Ext.define('Voyant.panel.Panel', {
 	config: {
 		corpus: undefined
 	},
+
 	stateful: true,
 	stateEvents: ['savestate'],
-	getState: function() {
-		console.log('getting state for: '+this.getXType());
-		var state = this.callParent();
-		return state;
-	},
+	
 	constructor: function(config) {
 		this.mixins['Voyant.util.Api'].constructor.apply(this, arguments);
 		this.mixins['Voyant.util.Toolable'].constructor.apply(this, arguments);
 		if (!this.glyph) {
 			this.glyph = Ext.ClassManager.getClass(this).glyph
 		}
-		
+
 		this.on("afterrender", function() {
 			if (this.getXType()!='facet' && this.getApiParam('subtitle') && this.getTitle()) {
 				this.setTitle(this.getTitle()+" <i style='font-size: smaller;'>"+this.getApiParam('subtitle')+"</i>")
@@ -105,6 +102,43 @@ Ext.define('Voyant.panel.Panel', {
 	dispatchEvent: function() {
 		var application = this.getApplication();
 		application.dispatchEvent.apply(application, arguments);
+	},
+
+	applyState: function(state) {
+		console.log('applying state for: '+this.getXType());
+		this.callParent(arguments);
+	},
+
+	getState: function() {
+		console.log('getting state for: '+this.getXType());
+		var state = this.callParent();
+		return state;
+	},
+
+	/**
+	 * Get the pseudo xpath for this panel
+	 * @return {String} The path
+	 */
+	getPath: function() {
+		var path = '';
+		var panelParent = this;
+		while(panelParent !== undefined) {
+			var index = this._getPanelIndex(panelParent);
+			path = panelParent.getXType()+(index > -1 ? '['+index+']' : '')+'|'+path;
+			panelParent = panelParent.up();
+		}
+		path = path.substring(0, path.length-1); // remove trailing |
+		return path;
+	},
+
+	_getPanelIndex: function(panel) {
+		var xtype = panel.getXType();
+		var index = -1;
+		var sibs = panel.up() && panel.up().query('> '+xtype);
+		if (sibs && sibs.length > 1) {
+			index = sibs.indexOf(panel);
+		}
+		return index;
 	},
 	
 	showError: function(config, response) {

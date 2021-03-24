@@ -243,5 +243,41 @@ Ext.define('Voyant.panel.CorpusTerms', {
 
         me.callParent(arguments);
         
-    }
+    },
+
+	getState: function() {
+		var state = this.callParent(arguments);
+		state.selectedTerms = this.getSelection().map(function(record) {
+			return record.get('term');
+		});
+		return state;
+	},
+
+	applyState: function(state) {
+		var supressSelectionEvent = true;
+
+		var doSelect = function(terms) {
+			var records = [];
+			terms.forEach(function(term) {
+				var record = this.getStore().findRecord('term', term);
+				if (record !== null) {
+					records.push(record);
+				} else {
+					console.log('no record for', term);
+				}
+			}, this);
+			this.getSelectionModel().select(records, false, supressSelectionEvent);
+		}
+
+		if (state.selectedTerms) {
+			if (this.getStore().isLoaded()) {
+				doSelect(state.selectedTerms);
+			} else {
+				this.getStore().on('load', doSelect.bind(this, state.selectedTerms), this, {single: true});
+				// this.getStore().on('datachanged', function() {
+				// 	console.log('datachanged')
+				// }, this, {single: true});
+			}
+		}
+	}
 })
