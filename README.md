@@ -1,3 +1,7 @@
+#### With the passing of Stéfan Sinclair, this repository has been archived. ####
+#### Please see [voyanttools/Voyant](https://github.com/voyanttools/Voyant) for future development. ####
+
+
 Voyant Tools
 ======
 
